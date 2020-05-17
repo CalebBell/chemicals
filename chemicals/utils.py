@@ -37,7 +37,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'd2xs_to_dxdn_partials', 'dxs_to_dxsn1', 'd2xs_to_d2xsn1',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows', 
-'solve_flow_composition_mix', 'assert_energy_balance',
+'solve_flow_composition_mix',
 'phase_select_property',  'allclose_variable', 
 'polylog2', 'v_to_v_molar', 'v_molar_to_v', 'TrivialSolutionError',
 'PhaseCountReducedError', 'PhaseExistenceImpossible', 'OverspeficiedError']
@@ -2469,47 +2469,6 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
     
     return Fs, zs, ws
 
-
-def assert_energy_balance(inlets, outlets, energy_inlets, energy_outlets, 
-                          rtol=1E-9, atol=0.0, reactive=False):
-    try:
-        [_ for _ in inlets]
-    except TypeError:
-        inlets = [inlets]
-    try:
-        [_ for _ in outlets]
-    except TypeError:
-        outlets = [outlets]
-    try:
-        [_ for _ in energy_inlets]
-    except TypeError:
-        energy_inlets = [energy_inlets]
-
-    try:
-        [_ for _ in energy_outlets]
-    except TypeError:
-        energy_outlets = [energy_outlets]
-
-    # Energy streams need to handle direction, not just magnitude
-    energy_in = 0.0
-    for feed in inlets:
-        if not reactive:
-            energy_in += feed.energy
-        else:
-            energy_in += feed.energy_reactive
-    for feed in energy_inlets:
-        energy_in += feed.Q
-        
-    energy_out = 0.0
-    for product in outlets:
-        if not reactive:
-            energy_out += product.energy
-        else:
-            energy_out += product.energy_reactive
-    for product in energy_outlets:
-        energy_out += product.Q
-
-    assert_close(energy_in, energy_out, rtol=rtol, atol=atol)
 
 
 

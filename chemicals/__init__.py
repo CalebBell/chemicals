@@ -24,15 +24,18 @@ import os
 
 from . import utils
 from . import critical
+from . import elements
 
 from .utils import *
 from .critical import *
+from .elements import *
 
-__all__ = ['utils', 'critical']
+__all__ = ['utils', 'critical', 'elements']
 
 
 __all__.extend(critical.__all__)
 __all__.extend(utils.__all__)
+__all__.extend(elements.__all__)
 
 chemicals_dir = os.path.dirname(__file__)
 
