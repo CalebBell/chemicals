@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,15 +31,8 @@ __all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions',
            'blocks', 'homonuclear_elemental_gases', 'charge_from_formula',
            'serialize_formula', 'mixture_atomic_composition_ordered',
            'periodic_table']
-from pprint import pprint
-import os
 import re
 import string
-from collections import Counter
-from chemicals.utils import to_num
-
-folder = os.path.join(os.path.dirname(__file__), 'Misc')
-
 
 CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7440-42-8', '7440-44-0', '7727-37-9', '7782-44-7', '7782-41-4', '7440-01-9', '7440-23-5', '7439-95-4', '7429-90-5', '7440-21-3', '7723-14-0', '7704-34-9', '7782-50-5', '7440-37-1', '7440-09-7', '7440-70-2', '7440-20-2', '7440-32-6', '7440-62-2', '7440-47-3', '7439-96-5', '7439-89-6', '7440-48-4', '7440-02-0', '7440-50-8', '7440-66-6', '7440-55-3', '7440-56-4', '7440-38-2', '7782-49-2', '10097-32-2', '7439-90-9', '7440-17-7', '7440-24-6', '7440-65-5', '7440-67-7', '7440-03-1', '7439-98-7', '7440-26-8', '7440-18-8', '7440-16-6', '7440-05-3', '7440-22-4', '7440-43-9', '7440-74-6', '7440-31-5', '7440-36-0', '13494-80-9', '7553-56-2', '7440-63-3', '7440-46-2', '7440-39-3', '7439-91-0', '7440-45-1', '7440-10-0', '7440-00-8', '7440-12-2', '7440-19-9', '7440-53-1', '7440-54-2', '7440-27-9', '7429-91-6', '7440-60-0', '7440-52-0', '7440-30-4', '7440-64-4', '7439-94-3', '7440-58-6', '7440-25-7', '7440-33-7', '7440-15-5', '7440-04-2', '7439-88-5', '7440-06-4', '7440-57-5', '7439-97-6', '7440-28-0', '7439-92-1', '7440-69-9', '7440-08-6', '7440-68-8', '10043-92-2', '7440-73-5', '7440-14-4', '7440-34-8', '7440-29-1', '7440-13-3', '7440-61-1', '7439-99-8', '7440-07-5', '7440-35-9', '7440-51-9', '7440-40-6', '7440-71-3', '7429-92-7', '7440-72-4', '7440-11-1', '10028-14-5', '22537-19-5', '53850-36-5', '53850-35-4', '54038-81-2', '54037-14-8', '54037-57-9', '54038-01-6', '54083-77-1', '54386-24-2', '54084-26-3', '54084-70-7', '54085-16-4', '54085-64-2', '54100-71-9', '54101-14-3', '54144-19-3']
 CAS_by_number = list(CAS_by_number_standard)
@@ -275,21 +269,11 @@ class Element(object):
     '''
     __slots__ = ['number', 'symbol', 'name', 'CAS', 'MW', 'AReneg', 'rcov',
                  'rvdw', 'maxbonds', 'elneg', 'ionization', 'elaffinity',
-                 'period', 'group', 'block', 
+                 'period', 'group', 
                  'InChI_key', 'PubChem', 'phase', 'Hf', 'S0']
 
-    @property
-    def CAS_standard(self):
-        r'''CAS number of the compound of the element used as a standard state
-        ; i.e. the typically diatomic molecules hydrogen, nitrogen, oxygen, 
-        fluorine, and chlorine, have different CAS numbers for the monoatomic
-        form and the diatomic form. This method returns the conventionally used
-        CAS number.
-        '''
-        return CAS_by_number_standard[self.number-1]
-    
     def __init__(self, number, symbol, name, MW, CAS, AReneg, rcov, rvdw,
-                 maxbonds, elneg, ionization, elaffinity, period, group, block,
+                 maxbonds, elneg, ionization, elaffinity, period, group,
                  PubChem, phase, Hf, S0, InChI_key=None):
         self.number = number
         self.symbol = symbol
@@ -299,7 +283,6 @@ class Element(object):
 
         self.period = period
         self.group = group
-        self.block = block
 
         self.AReneg = AReneg
         self.rcov = rcov
@@ -317,6 +300,16 @@ class Element(object):
         self.Hf = Hf
 
     @property
+    def CAS_standard(self):
+        r'''CAS number of the compound of the element used as a standard state
+        ; i.e. the typically diatomic molecules hydrogen, nitrogen, oxygen, 
+        fluorine, and chlorine, have different CAS numbers for the monoatomic
+        form and the diatomic form. This method returns the conventionally used
+        CAS number.
+        '''
+        return CAS_by_number_standard[self.number-1]
+    
+    @property
     def protons(self): 
         return self.number
     
@@ -330,47 +323,173 @@ class Element(object):
 
     @property
     def InChI(self): 
-        return self.symbol # 'InChI=1S/' +    
+        return self.symbol # 'InChI=1S/' +
+    
+    @property
+    def block(self):
+        for k, v in blocks.items():
+            if self.number in v:
+                return k
+
+# New file format; same data, coverted to Python lists for convenience with a few regular expressions
+# https://github.com/openbabel/openbabel/blob/master/src/elementtable.h
+openbabel_element_data = [
+[  1, "H", 2.20, 0.31, 0.31, 1.10,  1,    1.00794, 2.20, 13.5984, 0.75420375, 0.75, 0.75, 0.75, "Hydrogen"],
+[  2, "He", 0.00, 0.28, 0.28, 1.40,  0,   4.002602, 0.00, 24.5874,          0, 0.85, 1.00, 1.00, "Helium"],
+[  3, "Li", 0.97, 1.28, 1.28, 1.81,  1,      6.941, 0.98,  5.3917,   0.618049, 0.80, 0.50, 1.00, "Lithium"],
+[  4, "Be", 1.47, 0.96, 0.96, 1.53,  2,   9.012182, 1.57,  9.3227,          0, 0.76, 1.00, 0.00, "Beryllium"],
+[  5, "B", 2.01, 0.84, 0.84, 1.92,  4,     10.811, 2.04,   8.298,   0.279723, 1.00, 0.71, 0.71, "Boron"],
+[  6, "C", 2.50, 0.76, 0.76, 1.70,  4,    12.0107, 2.55, 11.2603,   1.262118, 0.40, 0.40, 0.40, "Carbon"],
+[  7, "N", 3.07, 0.71, 0.71, 1.55,  4,    14.0067, 3.04, 14.5341,      -0.07, 0.05, 0.05, 1.00, "Nitrogen"],
+[  8, "O", 3.50, 0.66, 0.66, 1.52,  2,    15.9994, 3.44, 13.6181,   1.461112, 1.00, 0.05, 0.05, "Oxygen"],
+[  9, "F", 4.10, 0.57, 0.57, 1.47,  1, 18.9984032, 3.98, 17.4228,  3.4011887, 0.50, 0.70, 1.00, "Fluorine"],
+[ 10, "Ne", 0.00, 0.58, 0.58, 1.54,  0,    20.1797, 0.00, 21.5645,          0, 0.70, 0.89, 0.96, "Neon"],
+[ 11, "Na", 1.01, 1.66, 1.66, 2.27,  1,   22.98977, 0.93,  5.1391,   0.547926, 0.67, 0.36, 0.95, "Sodium"],
+[ 12, "Mg", 1.23, 1.41, 1.41, 1.73,  2,    24.3050, 1.31,  7.6462,          0, 0.54, 1.00, 0.00, "Magnesium"],
+[ 13, "Al", 1.47, 1.21, 1.21, 1.84,  6,  26.981538, 1.61,  5.9858,    0.43283, 0.75, 0.65, 0.65, "Aluminium"],
+[ 14, "Si", 1.74, 1.11, 1.11, 2.10,  6,    28.0855, 1.90,  8.1517,   1.389521, 0.50, 0.60, 0.60, "Silicon"],
+[ 15, "P", 2.06, 1.07, 1.07, 1.80,  6,  30.973761, 2.19, 10.4867,     0.7465, 1.00, 0.50, 0.00, "Phosphorus"],
+[ 16, "S", 2.44, 1.05, 1.05, 1.80,  6,     32.065, 2.58,   10.36,  2.0771029, 0.70, 0.70, 0.00, "Sulfur"],
+[ 17, "Cl", 2.83, 1.02, 1.02, 1.75,  1,     35.453, 3.16, 12.9676,   3.612724, 0.12, 0.94, 0.12, "Chlorine"],
+[ 18, "Ar", 0.00, 1.06, 1.06, 1.88,  0,     39.948, 0.00, 15.7596,          0, 0.50, 0.82, 0.89, "Argon"],
+[ 19, "K", 0.91, 2.03, 2.03, 2.75,  1,    39.0983, 0.82,  4.3407,   0.501459, 0.56, 0.25, 0.83, "Potassium"],
+[ 20, "Ca", 1.04, 1.76, 1.76, 2.31,  2,     40.078, 1.00,  6.1132,    0.02455, 0.24, 1.00, 0.00, "Calcium"],
+[ 21, "Sc", 1.20, 1.70, 1.70, 2.30,  6,   44.95591, 1.36,  6.5615,      0.188, 0.90, 0.90, 0.90, "Scandium"],
+[ 22, "Ti", 1.32, 1.60, 1.60, 2.15,  6,     47.867, 1.54,  6.8281,      0.084, 0.75, 0.76, 0.78, "Titanium"],
+[ 23, "V", 1.45, 1.53, 1.53, 2.05,  6,    50.9415, 1.63,  6.7462,      0.525, 0.65, 0.65, 0.67, "Vanadium"],
+[ 24, "Cr", 1.56, 1.39, 1.39, 2.05,  6,    51.9961, 1.66,  6.7665,    0.67584, 0.54, 0.60, 0.78, "Chromium"],
+[ 25, "Mn", 1.60, 1.39, 1.39, 2.05,  8,  54.938049, 1.55,   7.434,          0, 0.61, 0.48, 0.78, "Manganese"],
+[ 26, "Fe", 1.64, 1.32, 1.32, 2.05,  6,     55.845, 1.83,  7.9024,      0.151, 0.88, 0.40, 0.20, "Iron"],
+[ 27, "Co", 1.70, 1.26, 1.26, 2.00,  6,    58.9332, 1.88,   7.881,     0.6633, 0.94, 0.56, 0.63, "Cobalt"],
+[ 28, "Ni", 1.75, 1.24, 1.24, 2.00,  6,    58.6934, 1.91,  7.6398,    1.15716, 0.31, 0.82, 0.31, "Nickel"],
+[ 29, "Cu", 1.75, 1.32, 1.32, 2.00,  6,     63.546, 1.90,  7.7264,    1.23578, 0.78, 0.50, 0.20, "Copper"],
+[ 30, "Zn", 1.66, 1.22, 1.22, 2.10,  6,      65.38, 1.65,  9.3942,          0, 0.49, 0.50, 0.69, "Zinc"],
+[ 31, "Ga", 1.82, 1.22, 1.22, 1.87,  3,     69.723, 1.81,  5.9993,       0.41, 0.76, 0.56, 0.56, "Gallium"],
+[ 32, "Ge", 2.02, 1.20, 1.20, 2.11,  4,      72.64, 2.01,  7.8994,   1.232712, 0.40, 0.56, 0.56, "Germanium"],
+[ 33, "As", 2.20, 1.19, 1.19, 1.85,  3,   74.92160, 2.18,  9.7886,      0.814, 0.74, 0.50, 0.89, "Arsenic"],
+[ 34, "Se", 2.48, 1.20, 1.20, 1.90,  2,      78.96, 2.55,  9.7524,    2.02067, 1.00, 0.63, 0.00, "Selenium"],
+[ 35, "Br", 2.74, 1.20, 1.20, 1.83,  1,     79.904, 2.96, 11.8138,   3.363588, 0.65, 0.16, 0.16, "Bromine"],
+[ 36, "Kr", 0.00, 1.16, 1.16, 2.02,  0,     83.798, 3.00, 13.9996,          0, 0.36, 0.72, 0.82, "Krypton"],
+[ 37, "Rb", 0.89, 2.20, 2.20, 3.03,  1,    85.4678, 0.82,  4.1771,   0.485916, 0.44, 0.18, 0.69, "Rubidium"],
+[ 38, "Sr", 0.99, 1.95, 1.95, 2.49,  2,      87.62, 0.95,  5.6949,    0.05206, 0.00, 1.00, 0.00, "Strontium"],
+[ 39, "Y", 1.11, 1.90, 1.90, 2.40,  6,   88.90585, 1.22,  6.2173,      0.307, 0.58, 1.00, 1.00, "Yttrium"],
+[ 40, "Zr", 1.22, 1.75, 1.75, 2.30,  6,     91.224, 1.33,  6.6339,      0.426, 0.58, 0.88, 0.88, "Zirconium"],
+[ 41, "Nb", 1.23, 1.64, 1.64, 2.15,  6,   92.90638, 1.60,  6.7589,      0.893, 0.45, 0.76, 0.79, "Niobium"],
+[ 42, "Mo", 1.30, 1.54, 1.54, 2.10,  6,      95.96, 2.16,  7.0924,     0.7472, 0.33, 0.71, 0.71, "Molybdenum"],
+[ 43, "Tc", 1.36, 1.47, 1.47, 2.05,  6,         98, 1.90,    7.28,       0.55, 0.23, 0.62, 0.62, "Technetium"],
+[ 44, "Ru", 1.42, 1.46, 1.46, 2.05,  6,     101.07, 2.20,  7.3605,    1.04638, 0.14, 0.56, 0.56, "Ruthenium"],
+[ 45, "Rh", 1.45, 1.42, 1.42, 2.00,  6,  102.90550, 2.28,  7.4589,    1.14289, 0.04, 0.49, 0.55, "Rhodium"],
+[ 46, "Pd", 1.35, 1.39, 1.39, 2.05,  6,     106.42, 2.20,  8.3369,    0.56214, 0.00, 0.41, 0.52, "Palladium"],
+[ 47, "Ag", 1.42, 1.45, 1.45, 2.10,  6,   107.8682, 1.93,  7.5762,    1.30447, 0.88, 0.88, 1.00, "Silver"],
+[ 48, "Cd", 1.46, 1.44, 1.44, 2.20,  6,    112.411, 1.69,  8.9938,          0, 1.00, 0.85, 0.56, "Cadmium"],
+[ 49, "In", 1.49, 1.42, 1.42, 2.20,  3,    114.818, 1.78,  5.7864,      0.404, 0.65, 0.46, 0.45, "Indium"],
+[ 50, "Sn", 1.72, 1.39, 1.39, 1.93,  4,    118.701, 1.96,  7.3439,   1.112066, 0.40, 0.50, 0.50, "Tin"],
+[ 51, "Sb", 1.82, 1.39, 1.39, 2.17,  3,    121.760, 2.05,  8.6084,   1.047401, 0.62, 0.39, 0.71, "Antimony"],
+[ 52, "Te", 2.01, 1.38, 1.38, 2.06,  2,     127.60, 2.10,  9.0096,   1.970875, 0.83, 0.48, 0.00, "Tellurium"],
+[ 53, "I", 2.21, 1.39, 1.39, 1.98,  1,  126.90447, 2.66, 10.4513,   3.059038, 0.58, 0.00, 0.58, "Iodine"],
+[ 54, "Xe", 0.00, 1.40, 1.40, 2.16,  0,    131.293, 2.60, 12.1298,          0, 0.26, 0.62, 0.69, "Xenon"],
+[ 55, "Cs", 0.86, 2.44, 2.44, 3.43,  1,  132.90545, 0.79,  3.8939,   0.471626, 0.34, 0.09, 0.56, "Caesium"],
+[ 56, "Ba", 0.97, 2.15, 2.15, 2.68,  2,    137.327, 0.89,  5.2117,    0.14462, 0.00, 0.79, 0.00, "Barium"],
+[ 57, "La", 1.08, 2.07, 2.07, 2.50, 12,   138.9055, 1.10,  5.5769,       0.47, 0.44, 0.83, 1.00, "Lanthanum"],
+[ 58, "Ce", 0.00, 2.04, 2.04, 2.48,  6,    140.116, 1.12,  5.5387,        0.5, 1.00, 1.00, 0.78, "Cerium"],
+[ 59, "Pr", 0.00, 2.03, 2.03, 2.47,  6,  140.90765, 1.13,   5.473,        0.5, 0.85, 1.00, 0.78, "Praseodymium"],
+[ 60, "Nd", 0.00, 2.01, 2.01, 2.45,  6,     144.24, 1.14,   5.525,        0.5, 0.78, 1.00, 0.78, "Neodymium"],
+[ 61, "Pm", 0.00, 1.99, 1.99, 2.43,  6,        145, 0.00,   5.582,        0.5, 0.64, 1.00, 0.78, "Promethium"],
+[ 62, "Sm", 0.00, 1.98, 1.98, 2.42,  6,     150.36, 1.17,  5.6437,        0.5, 0.56, 1.00, 0.78, "Samarium"],
+[ 63, "Eu", 0.00, 1.98, 1.98, 2.40,  6,    151.964, 0.00,  5.6704,        0.5, 0.38, 1.00, 0.78, "Europium"],
+[ 64, "Gd", 0.00, 1.96, 1.96, 2.38,  6,     157.25, 1.20,  6.1498,        0.5, 0.27, 1.00, 0.78, "Gadolinium"],
+[ 65, "Tb", 0.00, 1.94, 1.94, 2.37,  6,  158.92534, 0.00,  5.8638,        0.5, 0.19, 1.00, 0.78, "Terbium"],
+[ 66, "Dy", 0.00, 1.92, 1.92, 2.35,  6,    162.500, 1.22,  5.9389,        0.5, 0.12, 1.00, 0.78, "Dysprosium"],
+[ 67, "Ho", 0.00, 1.92, 1.92, 2.33,  6,  164.93032, 1.23,  6.0215,        0.5, 0.00, 1.00, 0.61, "Holmium"],
+[ 68, "Er", 0.00, 1.89, 1.89, 2.32,  6,    167.259, 1.24,  6.1077,        0.5, 0.00, 0.90, 0.46, "Erbium"],
+[ 69, "Tm", 0.00, 1.90, 1.90, 2.30,  6,  168.93421, 1.25,  6.1843,        0.5, 0.00, 0.83, 0.32, "Thulium"],
+[ 70, "Yb", 0.00, 1.87, 1.87, 2.28,  6,    173.054, 0.00,  6.2542,        0.5, 0.00, 0.75, 0.22, "Ytterbium"],
+[ 71, "Lu", 0.00, 1.87, 1.87, 2.27,  6,   174.9668, 1.27,  5.4259,        0.5, 0.00, 0.67, 0.14, "Lutetium"],
+[ 72, "Hf", 1.23, 1.75, 1.75, 2.25,  6,     178.49, 1.30,  6.8251,          0, 0.30, 0.76, 1.00, "Hafnium"],
+[ 73, "Ta", 1.33, 1.70, 1.70, 2.20,  6,   180.9479, 1.50,  7.5496,      0.322, 0.30, 0.65, 1.00, "Tantalum"],
+[ 74, "W", 1.40, 1.62, 1.62, 2.10,  6,     183.84, 2.36,   7.864,      0.815, 0.13, 0.58, 0.84, "Tungsten"],
+[ 75, "Re", 1.46, 1.51, 1.51, 2.05,  6,    186.207, 1.90,  7.8335,       0.15, 0.15, 0.49, 0.67, "Rhenium"],
+[ 76, "Os", 1.52, 1.44, 1.44, 2.00,  6,     190.23, 2.20,  8.4382,     1.0778, 0.15, 0.40, 0.59, "Osmium"],
+[ 77, "Ir", 1.55, 1.41, 1.41, 2.00,  6,    192.217, 2.20,   8.967,    1.56436, 0.09, 0.33, 0.53, "Iridium"],
+[ 78, "Pt", 1.44, 1.36, 1.36, 2.05,  6,    195.078, 2.28,  8.9588,     2.1251, 0.90, 0.85, 0.68, "Platinum"],
+[ 79, "Au", 1.42, 1.36, 1.36, 2.10,  6,  196.96655, 2.54,  9.2255,    2.30861, 0.80, 0.82, 0.12, "Gold"],
+[ 80, "Hg", 1.44, 1.32, 1.32, 2.05,  6,     200.59, 2.00, 10.4375,          0, 0.71, 0.71, 0.76, "Mercury"],
+[ 81, "Tl", 1.44, 1.45, 1.45, 1.96,  3,   204.3833, 1.62,  6.1082,      0.377, 0.65, 0.33, 0.30, "Thallium"],
+[ 82, "Pb", 1.55, 1.46, 1.46, 2.02,  4,      207.2, 2.33,  7.4167,      0.364, 0.34, 0.35, 0.38, "Lead"],
+[ 83, "Bi", 1.67, 1.48, 1.48, 2.07,  3,  208.98040, 2.02,  7.2855,   0.942363, 0.62, 0.31, 0.71, "Bismuth"],
+[ 84, "Po", 1.76, 1.40, 1.40, 1.97,  2,        209, 2.00,   8.414,        1.9, 0.67, 0.36, 0.00, "Polonium"],
+[ 85, "At", 1.90, 1.50, 1.50, 2.02,  1,        210, 2.20,       0,        2.8, 0.46, 0.31, 0.27, "Astatine"],
+[ 86, "Rn", 0.00, 1.50, 1.50, 2.20,  0,        222, 0.00, 10.7485,          0, 0.26, 0.51, 0.59, "Radon"],
+[ 87, "Fr", 0.00, 2.60, 2.60, 3.48,  1,        223, 0.70,  4.0727,          0, 0.26, 0.00, 0.40, "Francium"],
+[ 88, "Ra", 0.00, 2.21, 2.21, 2.83,  2,        226, 0.90,  5.2784,          0, 0.00, 0.49, 0.00, "Radium"],
+[ 89, "Ac", 0.00, 2.15, 2.15, 2.00,  6,        227, 1.10,    5.17,          0, 0.44, 0.67, 0.98, "Actinium"],
+[ 90, "Th", 0.00, 2.06, 2.06, 2.40,  6,   232.0381, 1.30,  6.3067,          0, 0.00, 0.73, 1.00, "Thorium"],
+[ 91, "Pa", 0.00, 2.00, 2.00, 2.00,  6,  231.03588, 1.50,    5.89,          0, 0.00, 0.63, 1.00, "Protactinium"],
+[ 92, "U", 0.00, 1.96, 1.96, 2.30,  6,  238.02891, 1.38,  6.1941,          0, 0.00, 0.56, 1.00, "Uranium"],
+[ 93, "Np", 0.00, 1.90, 1.90, 2.00,  6,     237.05, 1.36,  6.2657,          0, 0.00, 0.50, 1.00, "Neptunium"],
+[ 94, "Pu", 0.00, 1.87, 1.87, 2.00,  6,     244.06, 1.28,   6.026,          0, 0.00, 0.42, 1.00, "Plutonium"],
+[ 95, "Am", 0.00, 1.80, 1.80, 2.00,  6,     243.06, 1.30,  5.9738,          0, 0.33, 0.36, 0.95, "Americium"],
+[ 96, "Cm", 0.00, 1.69, 1.69, 2.00,  6,     247.07, 1.30,  5.9914,          0, 0.47, 0.36, 0.89, "Curium"],
+[ 97, "Bk", 0.00, 1.60, 1.60, 2.00,  6,     247.07, 1.30,  6.1979,          0, 0.54, 0.31, 0.89, "Berkelium"],
+[ 98, "Cf", 0.00, 1.60, 1.60, 2.00,  6,     251.08, 1.30,  6.2817,          0, 0.63, 0.21, 0.83, "Californium"],
+[ 99, "Es", 0.00, 1.60, 1.60, 2.00,  6,     252.08, 1.30,    6.42,          0, 0.70, 0.12, 0.83, "Einsteinium"],
+[100, "Fm", 0.00, 1.60, 1.60, 2.00,  6,     257.10, 1.30,     6.5,          0, 0.70, 0.12, 0.73, "Fermium"],
+[101, "Md", 0.00, 1.60, 1.60, 2.00,  6,     258.10, 1.30,    6.58,          0, 0.70, 0.05, 0.65, "Mendelevium"],
+[102, "No", 0.00, 1.60, 1.60, 2.00,  6,     259.10, 1.30,    6.65,          0, 0.74, 0.05, 0.53, "Nobelium"],
+[103, "Lr", 0.00, 1.60, 1.60, 2.00,  6,     262.11, 0.00,     4.9,          0, 0.78, 0.00, 0.40, "Lawrencium"],
+[104, "Rf", 0.00, 1.60, 1.60, 2.00,  6,     265.12, 0.00,       6,          0, 0.80, 0.00, 0.35, "Rutherfordium"],
+[105, "Db", 0.00, 1.60, 1.60, 2.00,  6,     268.13, 0.00,       0,          0, 0.82, 0.00, 0.31, "Dubnium"],
+[106, "Sg", 0.00, 1.60, 1.60, 2.00,  6,     271.13, 0.00,       0,          0, 0.85, 0.00, 0.27, "Seaborgium"],
+[107, "Bh", 0.00, 1.60, 1.60, 2.00,  6,        270, 0.00,       0,          0, 0.88, 0.00, 0.22, "Bohrium"],
+[108, "Hs", 0.00, 1.60, 1.60, 2.00,  6,     277.15, 0.00,       0,          0, 0.90, 0.00, 0.18, "Hassium"],
+[109, "Mt", 0.00, 1.60, 1.60, 2.00,  6,     276.15, 0.00,       0,          0, 0.92, 0.00, 0.15, "Meitnerium"],
+[110, "Ds", 0.00, 1.60, 1.60, 2.00,  6,     281.16, 0.00,       0,          0, 0.93, 0.00, 0.14, "Darmstadtium"],
+[111, "Rg", 0.00, 1.60, 1.60, 2.00,  6,     280.16, 0.00,       0,          0, 0.94, 0.00, 0.13, "Roentgenium"],
+[112, "Cn", 0.00, 1.60, 1.60, 2.00,  6,     285.17, 0.00,       0,          0, 0.95, 0.00, 0.12, "Copernicium"],
+[113, "Nh", 0.00, 1.60, 1.60, 2.00,  6,     284.18, 0.00,       0,          0, 0.96, 0.00, 0.11, "Nihonium"],
+[114, "Fl", 0.00, 1.60, 1.60, 2.00,  6,     289.19, 0.00,       0,          0, 0.97, 0.00, 0.10, "Flerovium"],
+[115, "Mc", 0.00, 1.60, 1.60, 2.00,  6,     288.19, 0.00,       0,          0, 0.98, 0.00, 0.09, "Moscovium"],
+[116, "Lv", 0.00, 1.60, 1.60, 2.00,  6,        293, 0.00,       0,          0, 0.99, 0.00, 0.08, "Livermorium"],
+[117, "Ts", 0.00, 1.60, 1.60, 2.00,  6,        294, 0.00,       0,          0, 0.99, 0.00, 0.07, "Tennessine"],
+[118, "Og", 0.00, 1.60, 1.60, 2.00,  6,        294, 0.00,       0,          0, 0.99, 0.00, 0.06, "Oganesson"],
+]
+
+
 
 element_list = []
-with open(os.path.join(folder, 'element.txt'), 'rb') as f:
-    '''Load the file from OpenBabel with element data, and store it as both a
-    list of elements first, and then as an instance of Periodic Table.'''
-    for line in f:
-        line = line.decode("utf-8")
-        if line[0] != '#':
-            values = to_num(line.strip('\n').split('\t'))
-            number, symbol, AReneg, rcov, _, rvdw, maxbonds, MW, elneg, ionization, elaffinity, _, _, _, name = values
-            number = int(number)
-            name = str(name)
-            AReneg = None if AReneg == 0 else AReneg
-            rcov = None if rcov == 1.6 else rcov  # in Angstrom
-            rvdw = None if rvdw == 2.0 else rvdw  # in Angstrom
-            maxbonds = None if maxbonds == 6.0 else int(maxbonds)
-            elneg = None if elneg == 0.0 else elneg
-            ionization = None if ionization == 0.0 else ionization  # in eV
-            elaffinity = None if elaffinity == 0.0 else elaffinity  # in eV
-            block = [key for key in blocks.keys() if number in blocks[key]][0]
-            period = periods[number-1]
-            group = groups[number-1]
-            InChI_key = InChI_keys[number-1]
-            cid = cids[number-1]
-            phase = phases[number-1]
-            Hf = Hfs[number-1]
-            S0 = S0s[number-1]
+'''Load the data from OpenBabel, and store it as both a
+list of elements first, and then as an instance of Periodic Table.'''
+for values in openbabel_element_data:
+    number, symbol, AReneg, rcov, _, rvdw, maxbonds, MW, elneg, ionization, elaffinity, _, _, _, name = values
+    number = int(number)
+    name = str(name)
+    AReneg = None if AReneg == 0 else AReneg
+    rcov = None if rcov == 1.6 else rcov  # in Angstrom
+    rvdw = None if rvdw == 2.0 else rvdw  # in Angstrom
+    maxbonds = None if maxbonds == 6.0 else int(maxbonds)
+    elneg = None if elneg == 0.0 else elneg
+    ionization = None if ionization == 0.0 else ionization  # in eV
+    elaffinity = None if elaffinity == 0.0 else elaffinity  # in eV
+    period = periods[number-1]
+    group = groups[number-1]
+    InChI_key = InChI_keys[number-1]
+    cid = cids[number-1]
+    phase = phases[number-1]
+    Hf = Hfs[number-1]
+    S0 = S0s[number-1]
 
-            ele = Element(number=number, symbol=symbol, name=name, MW=MW,
-                          CAS=CAS_by_number[number-1], AReneg=AReneg,
-                          rcov=rcov, rvdw=rvdw, maxbonds=maxbonds, elneg=elneg,
-                          ionization=ionization, elaffinity=elaffinity,
-                          block=block, period=period, group=group,
-                          InChI_key=InChI_key, phase=phase, PubChem=cid,
-                          Hf=Hf, S0=S0)
-            element_list.append(ele)
+    ele = Element(number=number, symbol=symbol, name=name, MW=MW,
+                  CAS=CAS_by_number[number-1], AReneg=AReneg,
+                  rcov=rcov, rvdw=rvdw, maxbonds=maxbonds, elneg=elneg,
+                  ionization=ionization, elaffinity=elaffinity,
+                  period=period, group=group,
+                  InChI_key=InChI_key, phase=phase, PubChem=cid,
+                  Hf=Hf, S0=S0)
+    element_list.append(ele)
 
 periodic_table = PeriodicTable(element_list)
 '''Single instance of the PeriodicTable class'''
-
+del openbabel_element_data
 
 def molecular_weight(atoms):
     r'''Calculates molecular weight of a molecule given a dictionary of its
@@ -735,16 +854,14 @@ def atoms_to_Hill(atoms):
             s += ele + str_ele_count(ele)
     return s
 
-
-
-_formula_p1 = re.compile(r'([A-Z][a-z]{0,2}\d*)')
-_formula_p2 = re.compile(r'([A-Z][a-z]{0,2})')
+_simple_formula_parser_re_str = r'([A-Z][a-z]{0,2})([\d\.\d]+)?'
+_simple_formula_parser_re = None # Delay creation to simple_formula_parser to speedup start
 
 def simple_formula_parser(formula):
     r'''Basic formula parser, primarily for obtaining element counts from 
-    formulas as formated in PubChem. Handles formulas with integer counts, 
-    but no brackets, no hydrates, no charges, no isotopes, and no group
-    multipliers.
+    formulas as formated in PubChem. Handles formulas with integer or decimal
+    counts (with period separator), but no brackets, no hydrates, no charges,
+    no isotopes, and no group multipliers.
     
     Strips charges from the end of a formula first. Accepts repeated chemical
     units. Performs no sanity checking that elements are actually elements.
@@ -771,18 +888,29 @@ def simple_formula_parser(formula):
     >>> simple_formula_parser('CO2')
     {'C': 1, 'O': 2}
     '''
+    global _simple_formula_parser_re
+    if _simple_formula_parser_re is None:
+        _simple_formula_parser_re = re.compile(_simple_formula_parser_re_str)
     formula = formula.split('+')[0].split('-')[0]
-    groups = _formula_p1.split(formula)[1::2]
-    cnt = Counter()
-    for group in groups:
-        ele, count = _formula_p2.split(group)[1:]
-        cnt[ele] += int(count) if count.isdigit() else 1
-    return dict(cnt)
+    counts = {}
+    for element, count in _simple_formula_parser_re.findall(formula):
+        if count.isdigit():
+            count = int(count)
+        elif count:
+            count = float(count)
+        else:
+            count = 1
+        if element in counts:
+            counts[element] += count
+        else:
+            counts[element] = count
+    return counts
 
-
-formula_token_matcher_rational = re.compile('[A-Z][a-z]?|(?:\d*[.])?\d+|\d+|[()]')
+#  Delay creation to simple_formula_parser to speedup start
+formula_token_matcher_rational_re_str = r'[A-Z][a-z]?|(?:\d*[.])?\d+|\d+|[()]'
+bracketed_charge_re_str = r'\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$'
+formula_token_matcher_rational = bracketed_charge_re = None
 letter_set = set(string.ascii_letters)
-bracketed_charge_re = re.compile('\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$')
 
 
 def nested_formula_parser(formula, check=True):
@@ -815,9 +943,14 @@ def nested_formula_parser(formula, check=True):
 
     Examples
     --------
-    >>> pprint(nested_formula_parser('Pd(NH3)4.0001+2'))
-    {'H': 12.0003, 'N': 4.0001, 'Pd': 1}
+    >>> nested_formula_parser('Pd(NH3)4.0001+2')
+    {'Pd': 1, 'N': 4.0001, 'H': 12.0003}
     '''
+    global formula_token_matcher_rational, bracketed_charge_re
+    if formula_token_matcher_rational is None:
+        formula_token_matcher_rational = re.compile(formula_token_matcher_rational_re_str)
+        bracketed_charge_re = re.compile(bracketed_charge_re_str)
+    
     formula = formula.replace('[', '').replace(']', '')
     charge_splits = bracketed_charge_re.split(formula)
     if len(charge_splits) > 1:
@@ -898,6 +1031,7 @@ def charge_from_formula(formula):
     >>> charge_from_formula('Br3(-)')
     -1
     '''
+    global bracketed_charge_re
     negative = '-' in formula
     positive = '+' in formula
     if positive and negative:
@@ -908,6 +1042,8 @@ def charge_from_formula(formula):
     
     hit = False
     if '(' in formula:
+        if bracketed_charge_re is None:
+            bracketed_charge_re = re.compile(bracketed_charge_re_str)
         hit = bracketed_charge_re.findall(formula)
         if hit:
             formula = hit[-1].replace('(', '').replace(')', '')

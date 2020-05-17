@@ -94,9 +94,18 @@ def test_Hill_formula():
 
 
 def test_simple_formula_parser():
-    formulas = ['CO2', 'H20OCo2NaClH4P4']
-    results = [{'C': 1, 'O': 2},  {'P': 4, 'Co': 2, 'Cl': 1, 'H': 24, 'Na': 1, 'O': 1}]
-    
+    formulas = ['CO2',
+                'H20OCo2NaClH4P4', 
+                'C.234O2', 
+                'O2C.234',
+                'C555.234O.0000000000000000000000000000000001']
+    results = [{'C': 1, 'O': 2},  
+               {'P': 4, 'Co': 2, 'Cl': 1, 'H': 24, 'Na': 1, 'O': 1}, 
+               {'O': 2, 'C': 0.234}, 
+               {'O': 2, 'C': 0.234},
+               {'C': 555.234, 'O': 1e-34}
+               ]
+
     for f in [simple_formula_parser, nested_formula_parser]:
         for formula, result in zip(formulas, results):
             assert f(formula) == result
