@@ -19,7 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
-
 from __future__ import division
 
 __all__ = ['Tc', 'Pc', 'Vc', 'Zc', 'Mersmann_Kind_predictor', 'third_property', 'critical_surface', 
@@ -28,54 +27,66 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc', 'Mersmann_Kind_predictor', 'third_property', 
            'Chueh_Prausnitz_Vc', 
            'modified_Wilson_Vc']
 __all__.extend(['Tc_methods', 'Pc_methods', 'Vc_methods', 'Zc_methods', 
-                'critical_surface_methods', '_crit_IUPAC', '_crit_Matthews', 
-                '_crit_CRC', '_crit_PSRKR4', '_crit_PassutDanner', '_crit_Yaws'])
+                'critical_surface_methods',
+                
+                # If the variables are exposed in __all__, they will be loaded by a star import. 
+                # That is not great practice but is quite convenient.
+#                '_crit_IUPAC', '_crit_Matthews', 
+#                '_crit_CRC', '_crit_PSRKR4', '_crit_PassutDanner', '_crit_Yaws',
+    ])
 
 import os
-import numpy as np
 import pandas as pd
-from fluids.constants import R, N_A
-from thermo.utils import log, isnan
-from thermo.utils import mixing_simple
-
+from fluids.constants import R, R_inv, N_A
+from chemicals.utils import log, isnan, PY37
+from chemicals.data_reader import register_df_source, data_source
 
 folder = os.path.join(os.path.dirname(__file__), 'Critical Properties')
 
 
 ### Read the various data files
 
+def _add_Zc_to_df(df):
+    # Some files don't have the `Zc` column; this adds it
+     df['Zc'] = pd.Series(df['Pc']*df['Vc']*R_inv/df['Tc'], index=df.index)
+
 # IUPAC Organic data series
 # TODO: 12E of this data http://pubsdc3.acs.org/doi/10.1021/acs.jced.5b00571
-
-_crit_IUPAC = pd.read_csv(os.path.join(folder, 'IUPACOrganicCriticalProps.tsv'),
-                          sep='\t', index_col=0)
-
-_crit_Matthews = pd.read_csv(os.path.join(folder,
-'Mathews1972InorganicCriticalProps.tsv'), sep='\t', index_col=0)
+register_df_source(folder, name='IUPACOrganicCriticalProps.tsv')
 
 # CRC Handbook from TRC Organic data section (only in 2015)
 # No Inorganic table was taken, although it is already present;
 # data almost all from IUPAC
-_crit_CRC = pd.read_csv(os.path.join(folder,
-'CRCCriticalOrganics.tsv'), sep='\t', index_col=0)
-_crit_CRC['Zc'] = pd.Series(_crit_CRC['Pc']*_crit_CRC['Vc']/_crit_CRC['Tc']/R,
- index=_crit_CRC.index)
+               
+register_df_source(folder, name='CRCCriticalOrganics.tsv', postload=_add_Zc_to_df)
 
+register_df_source(folder, name='Mathews1972InorganicCriticalProps.tsv')
+register_df_source(folder, name='Appendix to PSRK Revision 4.tsv', postload=_add_Zc_to_df)
+register_df_source(folder, name='PassutDanner1973.tsv')
+register_df_source(folder, name='Yaws Collection.tsv', postload=_add_Zc_to_df)
 
-_crit_PSRKR4 = pd.read_csv(os.path.join(folder,
-'Appendix to PSRK Revision 4.tsv'), sep='\t', index_col=0)
-_crit_PSRKR4['Zc'] = pd.Series(_crit_PSRKR4['Pc']*_crit_PSRKR4['Vc']/_crit_PSRKR4['Tc']/R,
-                             index=_crit_PSRKR4.index)
+_critical_dfs_loaded = False
+def load_critical_dfs():
+    global _crit_IUPAC, _crit_Matthews, _crit_CRC, _crit_PSRKR4, _crit_Yaws
+    global _crit_PassutDanner, _critical_dfs_loaded
+    _crit_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')
+    _crit_Matthews = data_source('Mathews1972InorganicCriticalProps.tsv')
+    _crit_CRC = data_source('CRCCriticalOrganics.tsv')
+    _crit_PSRKR4 = data_source('Appendix to PSRK Revision 4.tsv')
+    _crit_Yaws = data_source('Yaws Collection.tsv')
+    _crit_PassutDanner = data_source('PassutDanner1973.tsv')
+    _critical_dfs_loaded = True
 
+if PY37:
+    def __getattr__(name):
+        if name in ('_crit_IUPAC', '_crit_Matthews', '_crit_CRC', '_crit_PSRKR4',
+                    '_crit_Yaws', '_crit_PassutDanner'):
+            load_critical_dfs()
+            return globals()[name]
+        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+else:
+    load_critical_dfs()
 
-_crit_PassutDanner = pd.read_csv(os.path.join(folder, 'PassutDanner1973.tsv'),
-                                 sep='\t', index_col=0)
-
-
-_crit_Yaws = pd.read_csv(os.path.join(folder, 'Yaws Collection.tsv'),
-                         sep='\t', index_col=0)
-_crit_Yaws['Zc'] = pd.Series(_crit_Yaws['Pc']*_crit_Yaws['Vc']/_crit_Yaws['Tc']/R,
-                             index=_crit_Yaws.index)
 
 ### Strings defining each method
 
@@ -224,6 +235,8 @@ def Tc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[SURF]):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
+    if not _critical_dfs_loaded: load_critical_dfs()
+    
     def list_methods():
         methods = []
         if CASRN in _crit_IUPAC.index and not isnan(_crit_IUPAC.at[CASRN, 'Tc']):
@@ -252,24 +265,23 @@ def Tc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[SURF]):
         Method = list_methods()[0]
 
     if Method == IUPAC:
-        _Tc = float(_crit_IUPAC.at[CASRN, 'Tc'])
+        return float(_crit_IUPAC.at[CASRN, 'Tc'])
     elif Method == MATTHEWS:
-        _Tc = float(_crit_Matthews.at[CASRN, 'Tc'])
+        return float(_crit_Matthews.at[CASRN, 'Tc'])
     elif Method == PSRK:
-        _Tc = float(_crit_PSRKR4.at[CASRN, 'Tc'])
+        return float(_crit_PSRKR4.at[CASRN, 'Tc'])
     elif Method == PD:
-        _Tc = float(_crit_PassutDanner.at[CASRN, 'Tc'])
+        return float(_crit_PassutDanner.at[CASRN, 'Tc'])
     elif Method == CRC:
-        _Tc = float(_crit_CRC.at[CASRN, 'Tc'])
+        return float(_crit_CRC.at[CASRN, 'Tc'])
     elif Method == YAWS:
-        _Tc = float(_crit_Yaws.at[CASRN, 'Tc'])
+        return float(_crit_Yaws.at[CASRN, 'Tc'])
     elif Method == SURF:
-        _Tc = third_property(CASRN=CASRN, T=True)
+        return third_property(CASRN=CASRN, T=True)
     elif Method == NONE:
-        _Tc = None
+        return None
     else:
         raise Exception('Failure in in function')
-    return _Tc
 
 
 Pc_methods = [IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS, SURF]
@@ -408,6 +420,8 @@ def Pc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[SURF]):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
+    if not _critical_dfs_loaded: load_critical_dfs()
+    
     def list_methods():
         methods = []
         if CASRN in _crit_IUPAC.index and not isnan(_crit_IUPAC.at[CASRN, 'Pc']):
@@ -586,6 +600,7 @@ def Vc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[SURF]):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
+    if not _critical_dfs_loaded: load_critical_dfs()
     def list_methods():
         methods = []
         if CASRN in _crit_IUPAC.index and not isnan(_crit_IUPAC.at[CASRN, 'Vc']):
@@ -758,6 +773,7 @@ def Zc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[COMBINED]):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
+    if not _critical_dfs_loaded: load_critical_dfs()
     def list_methods():
         methods = []
         if CASRN in _crit_IUPAC.index and not isnan(_crit_IUPAC.at[CASRN, 'Zc']):
@@ -895,7 +911,7 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
     Prediction of critical volume of decane:
         
     >>> Mersmann_Kind_predictor({'C': 10, 'H': 22})
-    0.0005851859052024729
+    0.0005851858957767497
     
     This is compared against the experimental value, 0.000624 (a 6.2% relative
     error)
@@ -905,7 +921,7 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
     >>> from thermo.critical import rcovs_regressed
     >>> Mersmann_Kind_predictor({'C': 10, 'H': 22}, coeff=4.261206523632586, 
     ... power=0.5597281770786228, covalent_radii=rcovs_regressed)
-    0.0005956871011923075
+    0.0005956870915974391
     
     The relative error is only 4.5% now. This is compared to an experimental 
     uncertainty of 5.6%.
@@ -1274,11 +1290,7 @@ def third_property(CASRN=None, T=False, P=False, V=False):
         return None
     return Third
 
-
-### Critical Properties - Mixtures
-
-
-### Crtical Temperature of Mixtures
+### Crtical Temperature of Mixtures - Estimation routines
 
 
 def Li(zs, Tcs, Vcs):
@@ -1334,10 +1346,10 @@ def Li(zs, Tcs, Vcs):
        The Canadian Journal of Chemical Engineering 49, no. 5
        (October 1, 1971): 709-10. doi:10.1002/cjce.5450490529.
     '''
-    denominator = sum(zs[i]*Vcs[i] for i in range(len(zs)))
+    denominator_inv = 1.0/sum(zs[i]*Vcs[i] for i in range(len(zs)))
     Tcm = 0
     for i in range(len(zs)):
-        Tcm += zs[i]*Vcs[i]*Tcs[i]/denominator
+        Tcm += zs[i]*Vcs[i]*Tcs[i]*denominator_inv
     return Tcm
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,15 +38,15 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows', 
 'solve_flow_composition_mix', 'assert_energy_balance',
-'phase_select_property',  'allclose_variable', 'horner', 
+'phase_select_property',  'allclose_variable', 
 'polylog2', 'v_to_v_molar', 'v_molar_to_v', 'TrivialSolutionError',
 'PhaseCountReducedError', 'PhaseExistenceImpossible', 'OverspeficiedError']
 
 import os
+import sys
 from cmath import sqrt as csqrt
 from bisect import bisect_left
 import numpy as np
-from numpy.testing import assert_allclose
 from fluids.numerics import brenth, newton, linspace, polyint, polyint_over_x, derivative, polyder, horner, horner_and_der2, quadratic_from_f_ders, assert_close
 
 from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
@@ -61,10 +61,14 @@ __all__.extend(['acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
 'hypot', 'isinf', 'isnan', 'ldexp',  'log', 'log10', 'log1p', 'modf', 
 'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc'])
 __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma', 
-    
 # Obtained from SciPy 0.19 (2014 CODATA)
 # Included here so calculations are consistent across SciPy versions
 from fluids.constants import g, R, k, N_A, calorie, epsilon_0
+
+__all__.extend(['PY37'])
+version_components = sys.version.split('.')
+PY_MAJOR, PY_MINOR = int(version_components[0]), int(version_components[1])
+PY37 = (PY_MAJOR, PY_MINOR) >= (3, 7)
 
 
 def to_num(values):
@@ -1020,7 +1024,7 @@ def Z(T, P, V):
     Examples
     --------
     >>> Z(600, P=1E6, V=0.00463)
-    0.9281019876560912
+    0.9281016730797027
 
     References
     ----------
@@ -1058,14 +1062,14 @@ def B_to_Z(B, T, P):
     Examples
     --------
     >>> B_to_Z(-0.0015, 300, 1E5)
-    0.9398638020957176
+    0.939863822478637
 
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    return 1. + B*P/R/T
+    return 1. + B*P/(R*T)
 
 
 def B_from_Z(Z, T, P):
@@ -1096,7 +1100,7 @@ def B_from_Z(Z, T, P):
     Examples
     --------
     >>> B_from_Z(0.94, 300, 1E5)
-    -0.0014966027640000014
+    -0.0014966032712675846
 
     References
     ----------
@@ -1148,7 +1152,7 @@ def Z_from_virial_density_form(T, P, *args):
     Examples
     --------
     >>> Z_from_virial_density_form(300, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
-    1.2843496002100001
+    1.2843494052609186
 
     References
     ----------
@@ -1439,7 +1443,7 @@ def dxs_to_dns(dxs, xs):
     Examples
     --------
     >>> dxs_to_dns([-0.0028, -0.00719, -0.00859], [0.7, 0.2, 0.1])
-    [0.001457, -0.0029330000000000003, -0.004333]
+    [0.0014570000000000004, -0.002933, -0.004333]
     '''
     xdx_tot = 0.0
     for j in range(len(xs)):
@@ -1526,7 +1530,7 @@ def dxs_to_dn_partials(dxs, xs, F):
     --------
     >>> dxs_to_dn_partials([-0.0026404, -0.00719, -0.00859], [0.7, 0.2, 0.1],
     ... -0.0016567)
-    [-0.00015182, -0.00470142, -0.00610142]
+    [-0.00015182, -0.0047014199999999996, -0.00610142]
     '''
     xdx_totF = F
     for j in range(len(xs)):
@@ -1552,21 +1556,6 @@ diff(h(n1, n2)*f(n1,  n2), n1, n2)
     return hess
 
 
-#def d2xs_to_d2ns(d2xs, dxs, dns):
-#    # Could use some simplifying. Derived with trial and error via lots of inner loops
-#    # Not working; must have just worked for the one thing for which the derivative was
-#    # calculated in the test
-#    # Should implement different dns and dxs for parts of equations
-#    N = len(d2xs)
-#    cmps = range(N)
-#    hess = []
-#    for i in cmps:
-#        row = []
-#        for j in cmps:
-#            v = d2xs[i][j] -2*dns[i] - dns[j] - dxs[j]
-#            row.append(v)
-#        hess.append(row)
-#    return hess
 
 def d2xs_to_dxdn_partials(d2xs, xs):
     r'''Convert second-order mole fraction derivatives of a quantity 
@@ -1942,37 +1931,6 @@ def allclose_variable(a, b, limits, rtols=None, atols=None):
             return False
     return True
 
-
-def horner(coeffs, x):
-    r'''Simple function to calculate the value of a polynomial at a specific
-    value of `x`, using the Horner evaluation scheme
-
-    Parameters
-    ----------
-    coeffs : array-like
-        Coefficients, where coeffs[0] is multiplied by the largest power of x,
-        and coeffs[-1] is added to the sum with no multiplication.
-    x : float
-        Value to evaluate the polynomial at
-
-    Returns
-    -------
-    y : float
-        Evaluated result
-
-    Notes
-    -----
-    Efficient. Faster than numpy.polyval.
-
-    Examples
-    --------
-    >>> horner([1,2,3], 3)
-    18
-    '''
-    tot = 0.0
-    for c in coeffs:
-        tot = tot * x + c
-    return tot
 
 
 def polylog2(x):
@@ -2447,9 +2405,9 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
     >>> Fs
     [3600, 519.3039148597746, 1038.6078297195493, 17.44015034881175, 17.687253669610733]
     >>> zs
-    [0.6932356751002142, 0.1, 0.2, 0.003358370666918819, 0.0034059542328670383]
+    [0.6932356751002141, 0.1, 0.2, 0.0033583706669188186, 0.003405954232867038]
     >>> ws
-    [0.5154077420893427, 0.19012206531421305, 0.26447019259644433, 0.010000000000000002, 0.020000000000000004]
+    [0.5154077420893426, 0.19012206531421305, 0.26447019259644433, 0.01, 0.02]
     '''
     # Fs needs to have at least one flow in it
     # Either F, z, or w needs to be specified for every flow. 

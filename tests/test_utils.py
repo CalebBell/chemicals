@@ -323,9 +323,6 @@ def test_allclose_variable():
     assert allclose_variable(x, y, limits=[.0], atols=[.1])
 
 
-def test_horner():
-    assert horner([1,2,3], 3) == 18
-    
 def test_polylog2():
     x = polylog2(0.5)
     assert_close(x, 0.5822405264516294)
