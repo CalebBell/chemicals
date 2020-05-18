@@ -160,6 +160,8 @@ def Tb(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
+    if not _phase_change_const_loaded:
+        load_phase_change_constants()
     def list_methods():
         methods = []
         if CASRN in miscdata.CRC_inorganic_data.index and not isnan(miscdata.CRC_inorganic_data.at[CASRN, 'Tb']):
@@ -261,6 +263,8 @@ def Tm(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
+    if not _phase_change_const_loaded:
+        load_phase_change_constants()
     def list_methods():
         methods = []
         if CASRN in Tm_ON_data.index:
@@ -973,6 +977,8 @@ def Hfus(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
+    if not _phase_change_const_loaded:
+        load_phase_change_constants()
     def list_methods():
         methods = []
         if CASRN in CRCHfus_data.index:

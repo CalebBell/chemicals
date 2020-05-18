@@ -22,20 +22,35 @@ SOFTWARE.'''
 
 from __future__ import division
 
-__all__ = ['Staveley_data', 'Tt_methods', 'Tt', 'Pt_methods', 'Pt']
+__all__ = ['Tt_methods', 'Tt', 'Pt_methods', 'Pt']
 
 import os
 import numpy as np
 import pandas as pd
 
-from chemicals.utils import isnan
+from chemicals.utils import isnan, PY37
 from chemicals.phase_change import Tm
+from chemicals.data_reader import register_df_source, data_source
 
 folder = os.path.join(os.path.dirname(__file__), 'Triple Properties')
 
 
-Staveley_data = pd.read_csv(os.path.join(folder, 'Staveley 1981.tsv'),
-                       sep='\t', index_col=0)
+register_df_source(folder, name='Staveley 1981.tsv')
+
+_triple_dfs_loaded = False
+def load_triple_dfs():
+    global Staveley_data, _triple_dfs_loaded
+    Staveley_data = data_source('Staveley 1981.tsv')
+    _triple_dfs_loaded = True
+
+if PY37:
+    def __getattr__(name):
+        if name in ('Staveley_data',):
+            load_triple_dfs()
+            return globals()[name]
+        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+else:
+    load_triple_dfs()
 
 STAVELEY = 'STAVELEY'
 MELTING = 'MELTING'
@@ -95,6 +110,8 @@ def Tt(CASRN, AvailableMethods=False, Method=None):
        of Low Melting Substances and Their Use in Cryogenic Work." Cryogenics
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     '''
+    if not _triple_dfs_loaded:
+        load_triple_dfs()
     def list_methods():
         methods = []
         if CASRN in Staveley_data.index:
@@ -171,6 +188,8 @@ def Pt(CASRN, AvailableMethods=False, Method=None):
        of Low Melting Substances and Their Use in Cryogenic Work." Cryogenics
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     '''
+    if not _triple_dfs_loaded:
+        load_triple_dfs()
     def list_methods():
         methods = []
         if CASRN in Staveley_data.index and not isnan(Staveley_data.at[CASRN, 'Pt']):
