@@ -34,6 +34,7 @@ from . import refractivity
 from . import solubility
 from . import lennard_jones
 from . import vapor_pressure
+from . import virial
 
 from .utils import *
 from .critical import *
@@ -47,9 +48,10 @@ from .refractivity import *
 from .solubility import *
 from .lennard_jones import *
 from .vapor_pressure import *
+from .virial import *
 __all__ = ['utils', 'critical', 'elements', 'dipole', 'dippr', 'temperature', 
            'miscdata', 'environment', 'refractivity', 'solubility', 
-           'lennard_jones', 'vapor_pressure']
+           'lennard_jones', 'vapor_pressure', 'virial']
 
 
 __all__.extend(critical.__all__)
@@ -64,6 +66,7 @@ __all__.extend(refractivity.__all__)
 __all__.extend(solubility.__all__)
 __all__.extend(lennard_jones.__all__)
 __all__.extend(vapor_pressure.__all__)
+__all__.extend(virial.__all__)
 
 chemicals_dir = os.path.dirname(__file__)
 
