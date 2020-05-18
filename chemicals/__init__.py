@@ -36,6 +36,7 @@ from . import lennard_jones
 from . import vapor_pressure
 from . import virial
 from . import phase_change
+from . import triple
 
 from .utils import *
 from .critical import *
@@ -51,9 +52,11 @@ from .lennard_jones import *
 from .vapor_pressure import *
 from .virial import *
 from .phase_change import *
+from .triple import *
 __all__ = ['utils', 'critical', 'elements', 'dipole', 'dippr', 'temperature', 
            'miscdata', 'environment', 'refractivity', 'solubility', 
-           'lennard_jones', 'vapor_pressure', 'virial', 'phase_change']
+           'lennard_jones', 'vapor_pressure', 'virial', 'phase_change',
+           'triple']
 
 
 __all__.extend(critical.__all__)
@@ -70,6 +73,7 @@ __all__.extend(lennard_jones.__all__)
 __all__.extend(vapor_pressure.__all__)
 __all__.extend(virial.__all__)
 __all__.extend(phase_change.__all__)
+__all__.extend(triple.__all__)
 
 chemicals_dir = os.path.dirname(__file__)
 
