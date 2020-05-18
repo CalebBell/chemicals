@@ -23,6 +23,7 @@ SOFTWARE.'''
 from numpy.testing import assert_allclose
 import pytest
 import pandas as pd
+from fluids.numerics import assert_close, assert_close1d
 from chemicals.critical import *
 from chemicals.critical import (_crit_IUPAC, _crit_Matthews, _crit_CRC, 
                                 _crit_PSRKR4, _crit_Yaws, _crit_PassutDanner)
@@ -185,7 +186,7 @@ def test_relationships():
         critical_surface(Tc=599.4, Pc=1.19E6, Method='FAIL')
 
 @pytest.mark.slow
-def test_Tc_main():
+def test_Tc_all_values():
     sources = [_crit_IUPAC, _crit_Matthews, _crit_CRC, _crit_PSRKR4, _crit_PassutDanner, _crit_Yaws]
     CASs = set()
     [CASs.update(set(k.index.values)) for k in sources]
@@ -193,8 +194,9 @@ def test_Tc_main():
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_allclose(Tcs_default_sum, 6053723.896122222)
+    assert_close(Tcs_default_sum, 6053723.896122222)
 
+def test_Tc():
     assert_allclose(514.0, Tc(CASRN='64-17-5'))
 
     assert_allclose(647.3, Tc(CASRN='7732-18-5', Method='PSRK'))
