@@ -31,40 +31,66 @@ import numpy as np
 import pandas as pd
 from fluids.constants import R, pi, N_A
 from chemicals.utils import log, isnan
+from chemicals.utils import PY37
 from chemicals import miscdata
+from chemicals.data_reader import register_df_source, data_source
 
 folder = os.path.join(os.path.dirname(__file__), 'Phase Change')
 
+register_df_source(folder, name='Yaws Boiling Points.tsv')
+register_df_source(folder, name='OpenNotebook Melting Points.tsv')
+register_df_source(folder, name='Ghazerati Appendix Vaporization Enthalpy.tsv',
+                   csv_kwargs={'dtype': {'Hvap298': float}})
+register_df_source(folder, name='CRC Handbook Heat of Vaporization.tsv')
+register_df_source(folder, name='CRC Handbook Heat of Fusion.tsv')
+register_df_source(folder, name='Ghazerati Appendix Sublimation Enthalpy.tsv')
 
-Yaws_data = pd.read_csv(os.path.join(folder,
-'Yaws Boiling Points.tsv'), sep='\t', index_col=0)
+register_df_source(folder, name='Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
+register_df_source(folder, name='VDI PPDS Enthalpies of vaporization.tsv')
+register_df_source(folder, name='Alibakhshi one-coefficient enthalpy of vaporization.tsv')
 
-Tm_ON_data = pd.read_csv(os.path.join(folder, 'OpenNotebook Melting Points.tsv'),
-                         sep='\t', index_col=0)
+_phase_change_const_loaded = False
+def load_phase_change_constants():
+    global Yaws_data, Tm_ON_data, GharagheiziHvap_data, CRCHvap_data
+    global CRCHfus_data, GharagheiziHsub_data, _phase_change_const_loaded
+    
+    Yaws_data = data_source('Yaws Boiling Points.tsv')
+    Tm_ON_data = data_source('OpenNotebook Melting Points.tsv')
+    GharagheiziHvap_data = data_source('Ghazerati Appendix Vaporization Enthalpy.tsv')
+    CRCHvap_data = data_source('CRC Handbook Heat of Vaporization.tsv')
+    CRCHfus_data = data_source('CRC Handbook Heat of Fusion.tsv')
+    GharagheiziHsub_data = data_source('Ghazerati Appendix Sublimation Enthalpy.tsv')
+    _phase_change_const_loaded = True
 
-GharagheiziHvap_data = pd.read_csv(os.path.join(folder, 'Ghazerati Appendix Vaporization Enthalpy.tsv'),
-                                   sep='\t', index_col=0)
+_phase_change_corrs_loaded = False
+def load_phase_change_correlations():
+    global Perrys2_150, _Perrys2_150_values, VDI_PPDS_4, _VDI_PPDS_4_values
+    global Alibakhshi_Cs, _phase_change_corrs_loaded
 
-CRCHvap_data = pd.read_csv(os.path.join(folder, 'CRC Handbook Heat of Vaporization.tsv'),
-                           sep='\t', index_col=0)
-
-CRCHfus_data = pd.read_csv(os.path.join(folder, 'CRC Handbook Heat of Fusion.tsv'),
-                                    sep='\t', index_col=0)
-
-GharagheiziHsub_data = pd.read_csv(os.path.join(folder, 'Ghazerati Appendix Sublimation Enthalpy.tsv'),
-                                    sep='\t', index_col=0)
-
-Perrys2_150 = pd.read_csv(os.path.join(folder, 'Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv'),
-                          sep='\t', index_col=0)
-_Perrys2_150_values = Perrys2_150.values
-
-VDI_PPDS_4 = pd.read_csv(os.path.join(folder, 'VDI PPDS Enthalpies of vaporization.tsv'),
-                          sep='\t', index_col=0)
-_VDI_PPDS_4_values = VDI_PPDS_4.values
-
-Alibakhshi_Cs = pd.read_csv(os.path.join(folder, 'Alibakhshi one-coefficient enthalpy of vaporization.tsv'),
-                          sep='\t', index_col=0)
-
+    # 66554 for pandas; 19264 bytes for numpy
+    Perrys2_150 = data_source('Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
+    _Perrys2_150_values = np.array(Perrys2_150.values[:, 1:], dtype=float)
+    
+    # 52187 bytes for pandas, 13056 bytes for numpy
+    VDI_PPDS_4 = data_source('VDI PPDS Enthalpies of vaporization.tsv')
+    _VDI_PPDS_4_values = np.array(VDI_PPDS_4.values[:, 2:], dtype=float)
+    
+    Alibakhshi_Cs = data_source('Alibakhshi one-coefficient enthalpy of vaporization.tsv')
+    _phase_change_corrs_loaded = True
+    
+if PY37:
+    def __getattr__(name):
+        if name in ('Yaws_data', 'Tm_ON_data', 'GharagheiziHvap_data', 'CRCHvap_data',
+                    'CRCHfus_data', 'GharagheiziHsub_data'):
+            load_phase_change_constants()
+            return globals()[name]
+        elif name in ('Perrys2_150', '_Perrys2_150_values', 'VDI_PPDS_4', '_VDI_PPDS_4_values', 'Alibakhshi_Cs'):
+            load_phase_change_correlations()
+            return globals()[name]
+        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+else:
+    load_phase_change_constants()
+    load_phase_change_correlations()
 
 ### Boiling Point at 1 atm
 
@@ -967,6 +993,6 @@ def Hfus(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
     elif Method == NONE:
         return None
     else:
-        raise valueError('Unrecognized method')
+        raise ValueError('Unrecognized method')
 
 
