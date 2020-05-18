@@ -29,6 +29,7 @@ from . import dipole
 from . import dippr
 from . import temperature
 from . import miscdata
+from . import environment
 
 from .utils import *
 from .critical import *
@@ -37,7 +38,8 @@ from .dipole import *
 from .dippr import *
 from .temperature import *
 from .miscdata import *
-__all__ = ['utils', 'critical', 'elements', 'dipole', 'dippr', 'temperature', 'miscdata']
+from .environment import *
+__all__ = ['utils', 'critical', 'elements', 'dipole', 'dippr', 'temperature', 'miscdata', 'environment']
 
 
 __all__.extend(critical.__all__)
@@ -47,6 +49,7 @@ __all__.extend(dipole.__all__)
 __all__.extend(dippr.__all__)
 __all__.extend(temperature.__all__)
 __all__.extend(miscdata.__all__)
+__all__.extend(environment.__all__)
 
 chemicals_dir = os.path.dirname(__file__)
 
