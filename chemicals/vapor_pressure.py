@@ -67,7 +67,7 @@ register_df_source(folder, name='VDI PPDS Boiling temperatures at different pres
 _vapor_pressure_dfs_loaded = False
 def load_vapor_pressure_dfs():
     global WagnerMcGarry, _WagnerMcGarry_values, AntoinePoling, _AntoinePoling_values
-    global WagnerPoling, _WagnerPoling_values, AntoineExtended, _AntoineExtended_value 
+    global WagnerPoling, _WagnerPoling_values, AntoineExtended, _AntoineExtended_values 
     global Perrys2_8, _Perrys2_8_values, VDI_PPDS_3, _VDI_PPDS_3_values
     global _vapor_pressure_dfs_loaded
 
@@ -101,7 +101,7 @@ if PY37:
     def __getattr__(name):
         if name in ('WagnerMcGarry', '_WagnerMcGarry_values', 'AntoinePoling', 
                     '_AntoinePoling_values', 'WagnerPoling', '_WagnerPoling_values', 
-                    'AntoineExtended', '_AntoineExtended_value', 'Perrys2_8', 
+                    'AntoineExtended', '_AntoineExtended_values', 'Perrys2_8', 
                     '_Perrys2_8_values', 'VDI_PPDS_3', '_VDI_PPDS_3_values'):
             load_vapor_pressure_dfs()
             return globals()[name]
