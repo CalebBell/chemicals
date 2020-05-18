@@ -345,7 +345,7 @@ def EQ105(T, A, B, C, D):
     Hexane molar density; DIPPR coefficients normally in kmol/m^3.
 
     >>> EQ105(300., 0.70824, 0.26411, 507.6, 0.27537)
-    7.593170096339236
+    7.593170096339237
 
     References
     ----------
