@@ -36,6 +36,23 @@ folder = os.path.join(os.path.dirname(__file__), 'Misc')
 register_df_source(folder, name='Physical Constants of Inorganic Compounds.csv')
 register_df_source(folder, name='Physical Constants of Organic Compounds.csv')
 
+_loaded_VDI = False
+def load_VDI_saturation_data():
+    '''Read in a dict of assorted chemical properties at saturation for 58
+    industrially important chemicals, from:
+    Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
+    This listing is the successor to that in:
+    Schlunder, Ernst U, and International Center for Heat and Mass Transfer.
+    Heat Exchanger Design Handbook. Washington: Hemisphere Pub. Corp., 1983.
+    '''
+    import json
+    global VDI_saturation_data
+    
+    with open(os.path.join(folder, 'VDI Saturation Compounds Data.json')) as f:
+        VDI_saturation_data = json.loads(f.read())
+    _loaded_VDI = True
+    
+
 _CRC_dfs_loaded = False
 def load_CRC_dfs():
     global CRC_inorganic_data, CRC_organic_data
@@ -53,27 +70,11 @@ if PY37:
             return VDI_saturation_data
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_critical_dfs()
+    load_CRC_dfs()
     load_VDI_saturation_data()
 
 ### VDI Saturation
 
-_loaded_VDI = False
-def load_VDI_saturation_data():
-    '''Read in a dict of assorted chemical properties at saturation for 58
-    industrially important chemicals, from:
-    Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
-    This listing is the successor to that in:
-    Schlunder, Ernst U, and International Center for Heat and Mass Transfer.
-    Heat Exchanger Design Handbook. Washington: Hemisphere Pub. Corp., 1983.
-    '''
-    import json
-    global VDI_saturation_data
-    
-    with open(os.path.join(folder, 'VDI Saturation Compounds Data.json')) as f:
-        VDI_saturation_data = json.loads(f.read())
-    _loaded_VDI = True
-    
     
 
 # Created with the following code. Don't delete! Updates may be necessary.
