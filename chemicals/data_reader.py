@@ -19,14 +19,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
-from __future__ import division
-
-__all__ = ['df_sources', 'data_source', 'register_df_source', 'load_df']
+__all__ = ['df_sources', 'data_source', 'register_df_source', 'load_df',
+           'retrieve_from_df_dict', 'retrieve_from_df', 'retrieve_value_from_df',
+           'list_available_methods']
 
 import os
 import pandas as pd
+from chemicals.utils import isnan
+from collections.abc import Iterable
+from chemicals.exceptions import InvalidMethod
 path_join = os.path.join
 
+# %% Loading data from local databanks
 
 df_sources = {}
 
@@ -40,11 +44,8 @@ def load_df(key):
     folder, name, sep, index_col, csv_kwargs, postload = load_cmds[key]
     path = path_join(folder, name)
     df = pd.read_csv(path, sep=sep, index_col=index_col, **csv_kwargs)
-    if postload is not None:
-        postload(df)
-        
+    if postload: postload(df)
     df_sources[key] = df
-    
 
 def data_source(key):
     try:
@@ -52,3 +53,36 @@ def data_source(key):
     except KeyError:
         load_df(key)
         return df_sources[key]
+
+
+# %% Retrieving data from files
+
+def retrieve_from_df_dict(df_dict, index, key, method, ignore_methods):
+    if method:
+        try: df = df_dict[method]
+        except KeyError: raise InvalidMethod(method)
+        value = retrieve_from_df(df, index, key)
+    elif ignore_methods:
+        df_dict = {method: df for method, df in df_dict.items()
+                   if method not in ignore_methods}
+    for df in df_dict.values():
+        value = retrieve_from_df(df, index, key)
+        if value is not None: return value
+
+def retrieve_from_df(df, index, key):
+    if isinstance(key, str):
+        return retrieve_value_from_df(df, index, key)
+    elif isinstance(key, Iterable):    
+        return [retrieve_value_from_df(df, index, i) for i in key]
+    else:
+        raise ValueError('key must be a string or an iterable of strings')
+    
+def retrieve_value_from_df(df, index, key):
+    if index in df.index:
+        value = df.at[index, key]
+        try: return None if isnan(value) else float(value)
+        except: return value
+
+def list_available_methods(df_dict, index, key):
+    return [method for method, df in df_dict.items()
+            if retrieve_from_df(df, index, key) is not None]

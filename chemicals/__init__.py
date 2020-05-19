@@ -22,6 +22,7 @@ SOFTWARE.'''
 
 import os
 
+from . import exceptions
 from . import utils
 from . import critical
 from . import elements
@@ -38,6 +39,7 @@ from . import virial
 from . import phase_change
 from . import triple
 
+from .exceptions import *
 from .utils import *
 from .critical import *
 from .elements import *
@@ -56,9 +58,9 @@ from .triple import *
 __all__ = ['utils', 'critical', 'elements', 'dipole', 'dippr', 'temperature', 
            'miscdata', 'environment', 'refractivity', 'solubility', 
            'lennard_jones', 'vapor_pressure', 'virial', 'phase_change',
-           'triple']
+           'triple', 'exceptions']
 
-
+__all__.extend(exceptions.__all__)
 __all__.extend(critical.__all__)
 __all__.extend(utils.__all__)
 __all__.extend(elements.__all__)
