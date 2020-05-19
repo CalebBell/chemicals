@@ -33,10 +33,10 @@ import os
 import pandas as pd
 from fluids.constants import R, R_inv, N_A
 from chemicals.utils import log, PY37
-from chemicals.exceptions import InvalidMethod
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
                                    list_available_methods)
 
 folder = os.path.join(os.path.dirname(__file__), 'Critical Properties')
@@ -242,9 +242,12 @@ def critical_point_temperature(CASRN, AvailableMethods=False, Method=None, Ignor
     if not _critical_dfs_loaded: load_critical_dfs()
     if AvailableMethods:
         return list_available_methods(_critical_dfs_by_method, CASRN, 'Tc')
-    else:
+    elif Method:
         return retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Tc',
-                                     Method, IgnoreMethods) 
+                                     Method) 
+    else:
+        return retrieve_any_from_df_dict(_critical_dfs_by_method, CASRN, 'Tc',
+                                         IgnoreMethods) 
 Tc = critical_point_temperature
 
 Pc_methods = [IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS]
@@ -385,9 +388,12 @@ def critical_point_pressure(CASRN, AvailableMethods=False, Method=None, IgnoreMe
     if not _critical_dfs_loaded: load_critical_dfs()
     if AvailableMethods:
         return list_available_methods(_critical_dfs_by_method, CASRN, 'Pc')
-    else:
+    elif Method:
         return retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Pc',
-                                     Method, IgnoreMethods) 
+                                     Method) 
+    else:
+        return retrieve_any_from_df_dict(_critical_dfs_by_method, CASRN, 'Pc',
+                                         IgnoreMethods) 
 Pc = critical_point_pressure
 
 Vc_methods = [IUPAC, MATTHEWS, CRC, PSRK, YAWS, SURF]
@@ -524,9 +530,12 @@ def critical_point_volume(CASRN, AvailableMethods=False, Method=None, IgnoreMeth
         return list_available_methods(_critical_dfs_by_method, CASRN, 'Vc')
     elif Method == SURF:
         return third_property(CASRN=CASRN, V=True)
+    elif Method:
+        return retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Pc',
+                                     Method) 
     else:
-        Vc = retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Vc',
-                                   Method, IgnoreMethods) 
+        Vc = retrieve_any_from_df_dict(_critical_dfs_by_method, CASRN, 'Vc',
+                                       IgnoreMethods) 
         if not Vc and SURF not in IgnoreMethods:
             Vc = third_property(CASRN=CASRN, V=True)
         return Vc
@@ -665,9 +674,12 @@ def Zc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[COMBINED]):
         return list_available_methods(_critical_dfs_by_method, CASRN, 'Vc')
     elif Method == COMBINED:
         Zc = Vc(CASRN)*Pc(CASRN)/Tc(CASRN)/R
+    elif Method:
+        return retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Zc',
+                                     Method) 
     else:
-        Zc = retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Zc',
-                                   Method, IgnoreMethods) 
+        Zc = retrieve_any_from_df_dict(_critical_dfs_by_method, CASRN, 'Zc',
+                                       IgnoreMethods) 
         if not Zc and COMBINED not in IgnoreMethods:
             Zc = Vc(CASRN)*Pc(CASRN)/Tc(CASRN)/R
         return Zc
@@ -1065,7 +1077,7 @@ def critical_surface(Tc=None, Pc=None, Vc=None, AvailableMethods=False,
     elif Method == GRIGORAS:
         Third = Grigoras(Tc=Tc, Pc=Pc, Vc=Vc)
     else:
-        raise InvalidMethod(Method)
+        raise ValueError('invalid method' + repr(Method))
     return Third
 
 
