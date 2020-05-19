@@ -102,7 +102,7 @@ PSRK = 'PSRK'
 PD = 'PD'
 YAWS = 'YAWS'
 SURF = 'SURF'
-Tc_methods = [IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS, SURF]
+Tc_methods = [IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS]
 
 
 def critical_point_temperature(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=()):
@@ -247,7 +247,7 @@ def critical_point_temperature(CASRN, AvailableMethods=False, Method=None, Ignor
                                      Method, IgnoreMethods) 
 Tc = critical_point_temperature
 
-Pc_methods = [IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS, SURF]
+Pc_methods = [IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS]
 
 def critical_point_pressure(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=()):
     r'''This function handles the retrieval of a chemical's critical
