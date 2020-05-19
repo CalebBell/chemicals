@@ -46,9 +46,10 @@ import sys
 from cmath import sqrt as csqrt
 from bisect import bisect_left
 import numpy as np
-from fluids.numerics import brenth, newton, linspace, polyint, polyint_over_x, derivative, polyder, horner, horner_and_der2, assert_close
-try: from fluids.numerics import quadratic_from_f_ders
-except: pass # TODO: Update fluids on PyPI
+from fluids.numerics import (brenth, newton, linspace, polyint, 
+                             polyint_over_x, derivative, polyder,
+                             horner, horner_and_der2, assert_close,
+                             quadratic_from_f_ders)
 from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
                   cos, cosh, degrees, e,  exp, fabs, 
                   factorial, floor, fmod, frexp, fsum, hypot, isinf, 
