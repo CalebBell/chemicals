@@ -20,7 +20,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-__all__ = ['InvalidMethod']
+__all__ = ['TrivialSolutionError',
+           'PhaseCountReducedError', 
+           'PhaseExistenceImpossible', 
+           'OverspeficiedError']
 
-class InvalidMethod(ValueError):
-    """ValueError regarding an attempt to evaluate an invalid method."""
+class OverspeficiedError(Exception):
+    '''Generic error to raise when multiple values are given, when only
+    one option should be given.
+    '''
+
+
+class TrivialSolutionError(Exception):
+    '''Error raised SS converges to trivial solution
+    '''
+    def __init__(self, message, comp_difference, iterations, err):
+        super().__init__(message)
+        self.comp_difference = comp_difference
+        self.iterations = iterations
+        self.err = err
+
+
+class PhaseCountReducedError(Exception):
+    '''Error raised SS inner flash loop says all Ks are under 1 or above 1
+    '''
+    def __init__(self, message, zs=None, Ks=None):
+        super().__init__(message)
+        self.zs = zs
+        self.Ks = Ks
+
+
+class PhaseExistenceImpossible(Exception):
+    '''Error raised SS inner flash loop says all Ks are under 1 or above 1
+    '''
+    def __init__(self, message, zs=None, T=None, P=None):
+        super().__init__(message)
+        self.zs = zs
+        self.T = T
+        self.P = P
