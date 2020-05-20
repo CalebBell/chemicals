@@ -56,17 +56,14 @@ def data_source(key):
 
 # %% Retrieving data from files
 
-def retrieve_from_df_dict(df_dict, method, index, key):
+def retrieve_from_df_dict(df_dict, index, key, method):
     try: df = df_dict[method]
     except KeyError: raise ValueError('invalid method ' + repr(method))
     except TypeError: raise TypeError("method must be a string, "
                                      f"not a '{type(method).__name__}' object")
     return retrieve_from_df(df, index, key)
 
-def retrieve_any_from_df_dict(df_dict, index, key, ignore_methods):
-    if ignore_methods:
-        df_dict = {method: df for method, df in df_dict.items()
-                   if method not in ignore_methods}
+def retrieve_any_from_df_dict(df_dict, index, key):
     for df in df_dict.values():
         value = retrieve_from_df(df, index, key)
         if value is not None: return value

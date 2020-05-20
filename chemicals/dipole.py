@@ -19,16 +19,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
-
-from __future__ import division
-
 __all__ = ['dipole_moment', 'dipole_methods']
-import os
-import numpy as np
-import pandas as pd
-from chemicals.utils import isnan, PY37
-from chemicals.data_reader import register_df_source, data_source
 
+import os
+from chemicals.utils import PY37
+from chemicals.data_reader import (register_df_source,
+                                   data_source,
+                                   retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
+                                   list_available_methods)
 
 folder = os.path.join(os.path.dirname(__file__), 'Misc')
 
@@ -38,11 +37,15 @@ register_df_source(folder, name='Muller Supporting Info Dipoles.csv')
 
 _dipole_dfs_loaded = False
 def load_dipole_dfs():
-    global _dipole_Poling, _dipole_CCDB, _dipole_Muller
-    _dipole_Poling = data_source('Poling Dipole.csv')
+    global _dipole_CCDB, _dipole_Muller, _dipole_Poling, _dipole_df_dict
     _dipole_CCDB = data_source('cccbdb.nist.gov Dipoles.csv')
     _dipole_Muller = data_source('Muller Supporting Info Dipoles.csv')
-
+    _dipole_Poling = data_source('Poling Dipole.csv')
+    _dipole_df_dict = {
+        'CCCBDB': _dipole_CCDB,
+        'MULLER': _dipole_Muller,
+        'POLING': _dipole_Poling,
+    }
 
 if PY37:
     def __getattr__(name):
@@ -58,7 +61,6 @@ else:
 CCCBDB = 'CCCBDB'
 MULLER = 'MULLER'
 POLING = 'POLING'
-NONE = 'NONE'
 
 dipole_methods = [CCCBDB, MULLER, POLING]
 
@@ -127,30 +129,11 @@ def dipole_moment(CASRN, AvailableMethods=False, Method=None):
     .. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    if not _dipole_dfs_loaded:
-        load_dipole_dfs()
-    def list_methods():
-        methods = []
-        if CASRN in _dipole_CCDB.index and not isnan(_dipole_CCDB.at[CASRN, 'Dipole']):
-            methods.append(CCCBDB)
-        if CASRN in _dipole_Muller.index and not isnan(_dipole_Muller.at[CASRN, 'Dipole']):
-            methods.append(MULLER)
-        if CASRN in _dipole_Poling.index and not isnan(_dipole_Poling.at[CASRN, 'Dipole']):
-            methods.append(POLING)
-        methods.append(NONE)
-        return methods
+    if not _dipole_dfs_loaded: load_dipole_dfs()
     if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == CCCBDB:
-        return float(_dipole_CCDB.at[CASRN, 'Dipole'])
-    elif Method == MULLER:
-        return float(_dipole_Muller.at[CASRN, 'Dipole'])
-    elif Method == POLING:
-        return float(_dipole_Poling.at[CASRN, 'Dipole'])
-    elif Method == NONE:
-        return None
+        return list_available_methods(_dipole_df_dict, CASRN, 'Dipole')
+    elif Method:
+        return retrieve_from_df_dict(_dipole_df_dict, CASRN, 'Dipole',
+                                     Method) 
     else:
-        raise Exception('Failure in in function')
+        return retrieve_any_from_df_dict(_dipole_df_dict, CASRN, 'Dipole') 

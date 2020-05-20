@@ -177,11 +177,11 @@ def test_relationships():
 
     methods = critical_surface(Tc=599.4, Pc=1.19E6, AvailableMethods=True)
     methods.sort()
-    methods_listed = ['IHMELS', 'MEISSNER', 'GRIGORAS', 'NONE']
+    methods_listed = ['IHMELS', 'MEISSNER', 'GRIGORAS']
     methods_listed.sort()
     assert methods == methods_listed
-
-    assert None == critical_surface()
+    with pytest.raises(AssertionError):
+        critical_surface()
     with pytest.raises(Exception):
         critical_surface(Tc=599.4, Pc=1.19E6, Method='FAIL')
 
@@ -203,14 +203,12 @@ def test_Tc():
 
     assert_allclose(126.2, Tc(CASRN='7727-37-9', Method='MATTHEWS'))
 
-    assert_allclose(467.3661399548533, Tc(CASRN='64-17-5', Method='SURF'))
-
     methods = Tc(CASRN='98-01-1', AvailableMethods=True)
-    assert methods == ['IUPAC', 'PSRK', 'YAWS', 'NONE']
+    assert methods == ['IUPAC', 'PSRK', 'YAWS']
 
     # Error handling
     assert None == Tc(CASRN='BADCAS')
-    # TODO: Only list critical surface as a method if it can be calculated!
+    
     with pytest.raises(Exception):
         Tc(CASRN='98-01-1', Method='BADMETHOD')
 
@@ -231,10 +229,8 @@ def test_Pc_main():
 
     assert_allclose(3394387.5, Pc(CASRN='7727-37-9', Method='MATTHEWS'))
 
-    assert_allclose(6751845.238095238, Pc(CASRN='64-17-5', Method='SURF'))
-
     methods = Pc(CASRN='98-01-1', AvailableMethods=True)
-    assert methods == ['IUPAC', 'PSRK', 'YAWS', 'NONE']
+    assert methods == ['IUPAC', 'PSRK', 'YAWS']
 
     # Error handling
     assert None == Pc(CASRN='BADCAS')
@@ -259,10 +255,8 @@ def test_Vc_main():
 
     assert_allclose(8.950e-05, Vc(CASRN='7727-37-9', Method='MATTHEWS'))
 
-    assert_allclose(0.00018476306394027916, Vc(CASRN='64-17-5', Method='SURF'))
-
     methods = Vc(CASRN='98-01-1', AvailableMethods=True)
-    assert methods == ['PSRK', 'YAWS', 'NONE']
+    assert methods == ['PSRK', 'YAWS']
 
     # Error handling
     assert None == Vc(CASRN='BADCAS')
@@ -287,10 +281,8 @@ def test_Zc_main():
 
     assert_allclose(0.29, Zc(CASRN='7727-37-9', Method='MATTHEWS'))
 
-    assert_allclose(0.24125043269792068, Zc(CASRN='64-17-5', Method='COMBINED'))
-
     methods = Zc(CASRN='98-01-1', AvailableMethods=True)
-    assert methods == ['PSRK', 'YAWS', 'NONE']
+    assert methods == ['PSRK', 'YAWS']
 
     # Error handling
     assert None == Zc(CASRN='BADCAS')

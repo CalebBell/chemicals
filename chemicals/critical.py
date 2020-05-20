@@ -46,6 +46,7 @@ folder = os.path.join(os.path.dirname(__file__), 'Critical Properties')
 
 def _add_Zc_to_df(df):
     # Some files don't have the `Zc` column; this adds it
+    # TODO: Think about adding these to the files
     if 'Zc' in df: return
     df['Zc'] = pd.Series(df['Pc']*df['Vc']*R_inv/df['Tc'], index=df.index)
 
@@ -65,7 +66,8 @@ register_df_source(folder, 'Yaws Collection.tsv', postload=_add_Zc_to_df)
 _critical_dfs_loaded = False
 def load_critical_dfs():
     global _crit_IUPAC, _crit_Matthews, _crit_CRC, _crit_PSRKR4, _crit_Yaws
-    global _crit_PassutDanner, _critical_dfs_loaded, _critical_dfs_by_method
+    global _crit_PassutDanner, _critical_dfs_loaded, _Tc_dfs_dict, _Pc_dfs_dict
+    global _Vc_dfs_dict, _Zc_dfs_dict
     _crit_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')
     _crit_Matthews = data_source('Mathews1972InorganicCriticalProps.tsv')
     _crit_CRC = data_source('CRCCriticalOrganics.tsv')
@@ -73,7 +75,7 @@ def load_critical_dfs():
     _crit_Yaws = data_source('Yaws Collection.tsv')
     _crit_PassutDanner = data_source('PassutDanner1973.tsv')
     _critical_dfs_loaded = True
-    _critical_dfs_by_method = {
+    _Tc_dfs_dict = {
         'IUPAC': _crit_IUPAC,
         'MATTHEWS': _crit_Matthews,
         'CRC': _crit_CRC,
@@ -81,11 +83,18 @@ def load_critical_dfs():
         'PD': _crit_PassutDanner,
         'YAWS': _crit_Yaws
     }
+    _Pc_dfs_dict = _Tc_dfs_dict
+    # The Passut Danner tsv file doesn't have Vc; so its not included
+    # TODO: Think about adding Vc to the file by Ihmels
+    _Vc_dfs_dict = _Tc_dfs_dict.copy()
+    del _Vc_dfs_dict['PD']
+    _Zc_dfs_dict = _Vc_dfs_dict
 
 if PY37:
     def __getattr__(name):
         if name in ('_crit_IUPAC', '_crit_Matthews', '_crit_CRC', '_crit_PSRKR4',
-                    '_crit_Yaws', '_crit_PassutDanner', '_critical_dfs_by_method'):
+                    '_crit_Yaws', '_crit_PassutDanner', '_Tc_dfs_dict',
+                    '_Pc_dfs_dict', '_Vc_dfs_dict', '_Zc_dfs_dict',):
             load_critical_dfs()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
@@ -101,11 +110,10 @@ CRC = 'CRC'
 PSRK = 'PSRK'
 PD = 'PD'
 YAWS = 'YAWS'
-SURF = 'SURF'
-Tc_methods = [IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS]
+Tc_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
 
 
-def critical_point_temperature(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=()):
+def critical_point_temperature(CASRN, AvailableMethods=False, Method=None):
     r'''This function handles the retrieval of a chemical's critical
     temperature. Lookup is based on CASRNs. Will automatically select a data
     source to use if no Method is provided; returns None if the data is not
@@ -130,14 +138,11 @@ def critical_point_temperature(CASRN, AvailableMethods=False, Method=None, Ignor
     ----------------
     Method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
-        'CRC', 'PSRK', 'PD', 'YAWS', and 'SURF'. All valid values are also held  
+        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held  
         in the list `Tc_methods`.
     AvailableMethods : bool, optional
         If True, function will determine which methods can be used to obtain
         Tc for the desired chemical, and will return methods instead of Tc
-    IgnoreMethods : list, optional
-        A list of methods to ignore in obtaining the full list of methods,
-        useful for for performance reasons and ignoring inaccurate methods
 
     Notes
     -----
@@ -241,18 +246,16 @@ def critical_point_temperature(CASRN, AvailableMethods=False, Method=None, Ignor
     '''
     if not _critical_dfs_loaded: load_critical_dfs()
     if AvailableMethods:
-        return list_available_methods(_critical_dfs_by_method, CASRN, 'Tc')
+        return list_available_methods(_Tc_dfs_dict, CASRN, 'Tc')
     elif Method:
-        return retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Tc',
-                                     Method) 
+        return retrieve_from_df_dict(_Tc_dfs_dict, CASRN, 'Tc', Method) 
     else:
-        return retrieve_any_from_df_dict(_critical_dfs_by_method, CASRN, 'Tc',
-                                         IgnoreMethods) 
+        return retrieve_any_from_df_dict(_Tc_dfs_dict, CASRN, 'Tc') 
 Tc = critical_point_temperature
 
-Pc_methods = [IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS]
+Pc_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
 
-def critical_point_pressure(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=()):
+def critical_point_pressure(CASRN, AvailableMethods=False, Method=None):
     r'''This function handles the retrieval of a chemical's critical
     pressure. Lookup is based on CASRNs. Will automatically select a data
     source to use if no Method is provided; returns None if the data is not
@@ -282,14 +285,11 @@ def critical_point_pressure(CASRN, AvailableMethods=False, Method=None, IgnoreMe
     ----------------
     Method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
-        'CRC', 'PSRK', 'PD', 'YAWS', and 'SURF'. All valid values are also held  
+        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held  
         in the list `Pc_methods`.
     AvailableMethods : bool, optional
         If True, function will determine which methods can be used to obtain
         Pc for the desired chemical, and will return methods instead of Pc
-    IgnoreMethods : list, optional
-        A list of methods to ignore in obtaining the full list of methods,
-        useful for for performance reasons and ignoring inaccurate methods
 
     Notes
     -----
@@ -308,9 +308,6 @@ def critical_point_pressure(CASRN, AvailableMethods=False, Method=None, IgnoreMe
           data published in [16]_
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
-        * SURF', an estimation method using a
-          simple quadratic method for estimating Pc from Tc and Vc. This is
-          ignored and not returned as a method by default.
 
     References
     ----------
@@ -387,18 +384,16 @@ def critical_point_pressure(CASRN, AvailableMethods=False, Method=None, IgnoreMe
     '''
     if not _critical_dfs_loaded: load_critical_dfs()
     if AvailableMethods:
-        return list_available_methods(_critical_dfs_by_method, CASRN, 'Pc')
+        return list_available_methods(_Pc_dfs_dict, CASRN, 'Pc')
     elif Method:
-        return retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Pc',
-                                     Method) 
+        return retrieve_from_df_dict(_Pc_dfs_dict, CASRN, 'Pc', Method) 
     else:
-        return retrieve_any_from_df_dict(_critical_dfs_by_method, CASRN, 'Pc',
-                                         IgnoreMethods) 
+        return retrieve_any_from_df_dict(_Pc_dfs_dict, CASRN, 'Pc') 
 Pc = critical_point_pressure
 
-Vc_methods = [IUPAC, MATTHEWS, CRC, PSRK, YAWS, SURF]
+Vc_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
 
-def critical_point_volume(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[SURF]):
+def critical_point_volume(CASRN, AvailableMethods=False, Method=None):
     r'''This function handles the retrieval of a chemical's critical
     volume. Lookup is based on CASRNs. Will automatically select a data
     source to use if no Method is provided; returns None if the data is not
@@ -428,15 +423,12 @@ def critical_point_volume(CASRN, AvailableMethods=False, Method=None, IgnoreMeth
     ----------------
     Method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
-        'CRC', 'PSRK', 'YAWS', and 'SURF'. All valid values are also held  
+        'CRC', 'PSRK', and 'YAWS'. All valid values are also held  
         in the list `Vc_methods`.
     AvailableMethods : bool, optional
         If True, function will determine which methods can be used to obtain
         Vc for the desired chemical, and will return methods instead of Vc
-    IgnoreMethods : list, optional
-        A list of methods to ignore in obtaining the full list of methods,
-        useful for for performance reasons and ignoring inaccurate methods
-
+        
     Notes
     -----
     A total of six sources are available for this function. They are:
@@ -452,9 +444,6 @@ def critical_point_volume(CASRN, AvailableMethods=False, Method=None, IgnoreMeth
           estimated data published in [15]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [16]_.
-        * 'SURF', an estimation method using a
-          simple quadratic method for estimating Pc from Tc and Vc. This is
-          ignored and not returned as a method by default
 
     References
     ----------
@@ -527,25 +516,17 @@ def critical_point_volume(CASRN, AvailableMethods=False, Method=None, IgnoreMeth
     '''
     if not _critical_dfs_loaded: load_critical_dfs()
     if AvailableMethods:
-        return list_available_methods(_critical_dfs_by_method, CASRN, 'Vc')
-    elif Method == SURF:
-        return third_property(CASRN=CASRN, V=True)
+        return list_available_methods(_Vc_dfs_dict, CASRN, 'Vc')
     elif Method:
-        return retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Pc',
-                                     Method) 
+        return retrieve_from_df_dict(_Vc_dfs_dict, CASRN, 'Vc', Method)
     else:
-        Vc = retrieve_any_from_df_dict(_critical_dfs_by_method, CASRN, 'Vc',
-                                       IgnoreMethods) 
-        if not Vc and SURF not in IgnoreMethods:
-            Vc = third_property(CASRN=CASRN, V=True)
-        return Vc
+        return retrieve_any_from_df_dict(_Vc_dfs_dict, CASRN, 'Vc') 
 Vc = critical_point_volume
 
-COMBINED = 'COMBINED'
-Zc_methods = [IUPAC, MATTHEWS, CRC, PSRK, YAWS, COMBINED]
+Zc_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
 
 
-def Zc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[COMBINED]):
+def compressibility_factor(CASRN, AvailableMethods=False, Method=None):
     r'''This function handles the retrieval of a chemical's critical
     compressibility. Lookup is based on CASRNs. Will automatically select a
     data source to use if no Method is provided; returns None if the data is
@@ -575,14 +556,11 @@ def Zc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[COMBINED]):
     ----------------
     Method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
-        'CRC', 'PSRK', 'YAWS', and 'COMBINED'. All valid values are also held  
+        'CRC', 'PSRK', and 'YAWS'. All valid values are also held  
         in `Zc_methods`.
     AvailableMethods : bool, optional
         If True, function will determine which methods can be used to obtain
         Zc for the desired chemical, and will return methods instead of Zc
-    IgnoreMethods : list, optional
-        A list of methods to ignore in obtaining the full list of methods,
-        useful for for performance reasons and ignoring inaccurate methods
 
     Notes
     -----
@@ -671,20 +649,13 @@ def Zc(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[COMBINED]):
     '''
     if not _critical_dfs_loaded: load_critical_dfs()
     if AvailableMethods:
-        return list_available_methods(_critical_dfs_by_method, CASRN, 'Vc')
-    elif Method == COMBINED:
-        Zc = Vc(CASRN)*Pc(CASRN)/Tc(CASRN)/R
+        return list_available_methods(_Zc_dfs_dict, CASRN, 'Zc')
     elif Method:
-        return retrieve_from_df_dict(_critical_dfs_by_method, CASRN, 'Zc',
-                                     Method) 
+        return retrieve_from_df_dict(_Zc_dfs_dict, CASRN, 'Zc', Method)
     else:
-        Zc = retrieve_any_from_df_dict(_critical_dfs_by_method, CASRN, 'Zc',
-                                       IgnoreMethods) 
-        if not Zc and COMBINED not in IgnoreMethods:
-            Zc = Vc(CASRN)*Pc(CASRN)/Tc(CASRN)/R
-        return Zc
+        return retrieve_any_from_df_dict(_Zc_dfs_dict, CASRN, 'Zc') 
+Zc = compressibility_factor
     
-
 
 rcovs_Mersmann_Kind = {'C': 0.77, 'Cl': 0.99, 'I': 1.33, 'H': 0.37, 'F': 0.71, 
                        'S': 1.04, 'O': 0.6, 'N': 0.71, 'Si': 1.17, 'Br': 1.14}
@@ -824,6 +795,10 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
 
 ### Critical Property Relationships
 
+def _assert_two_critical_properties_provided(critical_properties):
+    assert sum([bool(i) for i in critical_properties]) == 2, (
+        'Two and only two of Tc, Pc, and Vc must be provided'
+    )
 
 def Ihmels(Tc=None, Pc=None, Vc=None):
     r'''Most recent, and most recommended method of estimating critical
@@ -871,6 +846,7 @@ def Ihmels(Tc=None, Pc=None, Vc=None):
        & Engineering Data 55, no. 9 (September 9, 2010): 3474-80.
        doi:10.1021/je100167w.
     '''
+    _assert_two_critical_properties_provided([Tc, Pc, Vc])
     if Tc and Vc:
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Pc = -0.025+2.215*Tc/Vc
@@ -881,13 +857,11 @@ def Ihmels(Tc=None, Pc=None, Vc=None):
         Vc = 443*Tc/(200*Pc+5)
         Vc = Vc/1E6  # cm^3/mol to m^3/mol
         return Vc
-    elif Pc and Vc:
+    else: # Pc and Vc
         Pc = Pc/1E6  # Pa to MPa
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Tc = 5.0/443*(40*Pc*Vc + Vc)
         return Tc
-    else:
-        raise Exception('Two of Tc, Pc, and Vc must be provided')
 
 
 def Meissner(Tc=None, Pc=None, Vc=None):
@@ -936,6 +910,7 @@ def Meissner(Tc=None, Pc=None, Vc=None):
            Constants." Industrial & Engineering Chemistry 34, no. 5
            (May 1, 1942): 521-26. doi:10.1021/ie50389a003.
     '''
+    _assert_two_critical_properties_provided([Tc, Pc, Vc])
     if Tc and Vc:
         Vc = Vc*1E6
         Pc = 20.8*Tc/(Vc-8)
@@ -946,13 +921,11 @@ def Meissner(Tc=None, Pc=None, Vc=None):
         Vc = 104/5.0*Tc/Pc+8
         Vc = Vc/1E6  # cm^3/mol to m^3/mol
         return Vc
-    elif Pc and Vc:
+    else: # Pc and Vc
         Pc = Pc/101325.  # Pa to atm
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Tc = 5./104.0*Pc*(Vc-8)
         return Tc
-    else:
-        raise Exception('Two of Tc, Pc, and Vc must be provided')
 
 
 def Grigoras(Tc=None, Pc=None, Vc=None):
@@ -1003,6 +976,7 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
            Chemistry 11, no. 4 (May 1, 1990): 493-510.
            doi:10.1002/jcc.540110408
     '''
+    _assert_two_critical_properties_provided([Tc, Pc, Vc])
     if Tc and Vc:
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Pc = 2.9 + 20.2*Tc/Vc
@@ -1013,19 +987,17 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
         Vc = 202.0*Tc/(10*Pc-29.0)
         Vc = Vc/1E6  # cm^3/mol to m^3/mol
         return Vc
-    elif Pc and Vc:
+    else: # Pc and Vc
         Pc = Pc/1E5  # Pa to bar
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Tc = 1.0/202*(10*Pc-29.0)*Vc
         return Tc
-    else:
-        raise Exception('Two of Tc, Pc, and Vc must be provided')
 
 
 IHMELS = 'IHMELS'
 MEISSNER = 'MEISSNER'
 GRIGORAS = 'GRIGORAS'
-critical_surface_methods = [IHMELS, MEISSNER, GRIGORAS]
+critical_surface_methods = (IHMELS, MEISSNER, GRIGORAS)
 
 
 def critical_surface(Tc=None, Pc=None, Vc=None, AvailableMethods=False,
