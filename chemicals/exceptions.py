@@ -23,13 +23,16 @@ SOFTWARE.'''
 __all__ = ['TrivialSolutionError',
            'PhaseCountReducedError', 
            'PhaseExistenceImpossible', 
+           'UnderspecifiedError',
            'OverspeficiedError']
 
-class OverspeficiedError(Exception):
-    '''Generic error to raise when multiple values are given, when only
-    one option should be given.
+class UnderspecifiedError(Exception):
+    '''Generic error to raise when not enough values are given.
     '''
 
+class OverspeficiedError(Exception):
+    '''Generic error to raise when too many values are given.
+    '''
 
 class TrivialSolutionError(Exception):
     '''Error raised SS converges to trivial solution
@@ -48,7 +51,6 @@ class PhaseCountReducedError(Exception):
         super().__init__(message)
         self.zs = zs
         self.Ks = Ks
-
 
 class PhaseExistenceImpossible(Exception):
     '''Error raised SS inner flash loop says all Ks are under 1 or above 1
