@@ -23,44 +23,46 @@ SOFTWARE.'''
 __all__ = ['Tt_methods', 'Tt', 'Pt_methods', 'Pt']
 
 import os
-import numpy as np
-import pandas as pd
-
-from chemicals.utils import isnan, PY37
+from chemicals.utils import PY37
 from chemicals.phase_change import Tm
-from chemicals.data_reader import register_df_source, data_source
+from chemicals.data_reader import (register_df_source,
+                                   data_source,
+                                   retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
+                                   list_available_methods_from_df_dict)
 
+
+# %% Register data sources and lazy load them
 folder = os.path.join(os.path.dirname(__file__), 'Triple Properties')
+register_df_source(folder, 'Staveley 1981.tsv')
 
-
-register_df_source(folder, name='Staveley 1981.tsv')
-
-_triple_dfs_loaded = False
-def load_triple_dfs():
-    global Staveley_data, _triple_dfs_loaded
-    Staveley_data = data_source('Staveley 1981.tsv')
-    _triple_dfs_loaded = True
+_triple_data_loaded = False
+def _load_triple_data():
+    global triple_data_Staveley, _triple_data_loaded, Tt_sources, Pt_sources
+    triple_data_Staveley = data_source('Staveley 1981.tsv')
+    _triple_data_loaded = True
+    Tt_sources = {
+        STAVELEY: triple_data_Staveley,
+    }
+    Pt_sources = Tt_sources.copy()
 
 if PY37:
     def __getattr__(name):
-        if name in ('Staveley_data',):
-            load_triple_dfs()
+        if name in ('triple_data_Staveley', 'Tt_sources', 'Pt_sources'):
+            _load_triple_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_triple_dfs()
+    _load_triple_data()
 
 STAVELEY = 'STAVELEY'
 MELTING = 'MELTING'
-NONE = 'NONE'
-
 Tt_methods = [STAVELEY, MELTING]
 
-
-def Tt(CASRN, AvailableMethods=False, Method=None):
+def Tt(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's triple temperature.
     Lookup is based on CASRNs. Will automatically select a data source to use
-    if no Method is provided; returns None if the data is not available.
+    if no method is provided; returns None if the data is not available.
 
     Returns data from [1]_, or a chemical's melting point if available.
 
@@ -73,16 +75,16 @@ def Tt(CASRN, AvailableMethods=False, Method=None):
     -------
     Tt : float
         Triple point temperature, [K]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Tt with the
         given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         Tt_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         the Tt for the desired chemical, and will return methods
         instead of the Tt
@@ -108,37 +110,28 @@ def Tt(CASRN, AvailableMethods=False, Method=None):
        of Low Melting Substances and Their Use in Cryogenic Work." Cryogenics
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     '''
-    if not _triple_dfs_loaded:
-        load_triple_dfs()
-    def list_methods():
-        methods = []
-        if CASRN in Staveley_data.index:
-            methods.append(STAVELEY)
-        if Tm(CASRN):
-            methods.append(MELTING)
-        methods.append(NONE)
+    if not _triple_data_loaded: _load_triple_data()
+    if get_methods:
+        methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt68')
+        if Tm(CASRN): methods.append(MELTING)
         return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == STAVELEY:
-        return Staveley_data.at[CASRN, "Tt68"]
-    elif Method == MELTING:
-        return Tm(CASRN)
-    elif Method == NONE:
-        return None
+    elif method:
+        if method == MELTING:
+            return Tm(CASRN)
+        else:
+            return retrieve_from_df_dict(Tt_sources, CASRN, 'Tt68', method) 
     else:
-        raise Exception('Failure in in function')
+        Tt = retrieve_any_from_df_dict(Tt_sources, CASRN, 'Tt68') 
+        if Tt: return Tt
+        return Tm(CASRN)    
+triple_point_temperature = Tt
 
 Pt_methods = [STAVELEY]
 
-
-def Pt(CASRN, AvailableMethods=False, Method=None):
+def Pt(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's triple pressure.
     Lookup is based on CASRNs. Will automatically select a data source to use
-    if no Method is provided; returns None if the data is not available.
+    if no method is provided; returns None if the data is not available.
 
     Returns data from [1]_ only. 
     
@@ -156,16 +149,16 @@ def Pt(CASRN, AvailableMethods=False, Method=None):
     -------
     Pt : float
         Triple point pressure, [Pa]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Pt with the
         given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         Pt_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         the Pt for the desired chemical, and will return methods
         instead of the Pt
@@ -186,23 +179,13 @@ def Pt(CASRN, AvailableMethods=False, Method=None):
        of Low Melting Substances and Their Use in Cryogenic Work." Cryogenics
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     '''
-    if not _triple_dfs_loaded:
-        load_triple_dfs()
-    def list_methods():
-        methods = []
-        if CASRN in Staveley_data.index and not isnan(Staveley_data.at[CASRN, 'Pt']):
-            methods.append(STAVELEY)
-        methods.append(NONE)
+    if not _triple_data_loaded: _load_triple_data()
+    if get_methods:
+        methods = list_available_methods_from_df_dict(Pt_sources, CASRN, 'Pt')
         return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == STAVELEY:
-        return Staveley_data.at[CASRN, 'Pt']
-    elif Method == NONE:
-        return None
+    elif method:
+        return retrieve_from_df_dict(Pt_sources, CASRN, 'Pt', method) 
     else:
-        raise Exception('Failure in in function')
+        return retrieve_any_from_df_dict(Pt_sources, CASRN, 'Pt') 
+triple_point_pressure = Pt
 

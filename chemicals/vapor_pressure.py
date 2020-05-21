@@ -42,27 +42,24 @@ import pandas as pd
 
 folder = os.path.join(os.path.dirname(__file__), 'Vapor Pressure')
 
-register_df_source(folder, name='Antoine Collection Poling.tsv')
-register_df_source(folder, name='Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
+register_df_source(folder, 'Antoine Collection Poling.tsv')
+register_df_source(folder, 'Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
 
-register_df_source(folder, name='Wagner Original McGarry.tsv', csv_kwargs={
+register_df_source(folder, 'Wagner Original McGarry.tsv', csv_kwargs={
         'dtype': {'A': float, 'B': float, 'C': float, 'D': float,
                  'Pc': float, 'Tc': float, 'Tmin': float}})
 
-register_df_source(folder, name='Wagner Collection Poling.tsv', csv_kwargs={
+register_df_source(folder, 'Wagner Collection Poling.tsv', csv_kwargs={
         'dtype': {'A': float, 'B': float, 'C': float, 'D': float, 'Pc': float, 
                   'Tc': float, 'Pc': float, 'Tmin': float, 'Tmax': float}})
 
-register_df_source(folder, name='Antoine Extended Collection Poling.tsv', csv_kwargs={
+register_df_source(folder, 'Antoine Extended Collection Poling.tsv', csv_kwargs={
     'dtype':{'A': float, 'B': float, 'C': float, 'Tc': float, 'to': float,
              'n': float, 'E': float, 'F': float, 'Tmin': float, 'Tmax': float}})
 
-register_df_source(folder, name='VDI PPDS Boiling temperatures at different pressures.tsv', csv_kwargs={
+register_df_source(folder, 'VDI PPDS Boiling temperatures at different pressures.tsv', csv_kwargs={
         'dtype':{'Tm': float, 'Tc': float, 'Pc': float, 'A': float,
                  'B': float, 'C': float, 'D': float}})
-
-
-
 
 _vapor_pressure_dfs_loaded = False
 def load_vapor_pressure_dfs():

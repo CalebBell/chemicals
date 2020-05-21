@@ -24,41 +24,41 @@ from fluids.numerics import assert_close, assert_close1d
 import pytest
 import pandas as pd
 from chemicals.triple import *
-from chemicals.triple import Staveley_data
+from chemicals.triple import triple_data_Staveley
 
 
 def test_data():
-    Tt_sum = Staveley_data['Tt68'].sum()
+    Tt_sum = triple_data_Staveley['Tt68'].sum()
     assert_close(Tt_sum, 31251.845000000001)
 
-    Pt_sum = Staveley_data['Pt'].sum()
+    Pt_sum = triple_data_Staveley['Pt'].sum()
     assert_close(Pt_sum, 1886624.8374376972)
 
-    Pt_uncertainty_sum = Staveley_data['Pt_uncertainty'].sum()
+    Pt_uncertainty_sum = triple_data_Staveley['Pt_uncertainty'].sum()
     assert_close(Pt_uncertainty_sum, 138.65526315789461)
 
-    assert Staveley_data.index.is_unique
-    assert Staveley_data.shape == (189, 5)
+    assert triple_data_Staveley.index.is_unique
+    assert triple_data_Staveley.shape == (189, 5)
 
 
 def test_Tt():
     Tt1_calc = Tt('7664-41-7')
     Tt1 = 195.48
-    Tt2_calc = Tt('74-82-8', Method='MELTING')
+    Tt2_calc = Tt('74-82-8', method='MELTING')
     Tt2 = 90.75
     Tt3_calc = Tt('74-82-8')
     Tt3 = 90.69
     assert_close1d([Tt1_calc, Tt2_calc, Tt3_calc], [Tt1, Tt2, Tt3])
 
-    m = Tt('7439-90-9', AvailableMethods=True)
-    assert m == ['STAVELEY', 'MELTING', 'NONE']
+    m = Tt('7439-90-9', get_methods=True)
+    assert m == ['STAVELEY', 'MELTING']
     assert None == Tt('72433223439-90-9')
     with pytest.raises(Exception):
-        Tt('74-82-8', Method='BADMETHOD')
+        Tt('74-82-8', method='BADMETHOD')
 
-    Tt_sum = sum([Tt(i) for i in Staveley_data.index])
+    Tt_sum = sum([Tt(i) for i in triple_data_Staveley.index])
     assert_close(Tt_sum, 31251.845000000001)
-    Tt_sum2 = pd.Series([Tt(i, Method='MELTING') for i in Staveley_data.index]).sum()
+    Tt_sum2 = pd.Series([Tt(i, method='MELTING') for i in triple_data_Staveley.index]).sum()
     assert_close(Tt_sum2, 28778.196000000004)
 
 
@@ -67,11 +67,11 @@ def test_Pt():
     Pt1 = 6079.5
     assert_close(Pt1_calc, Pt1)
 
-    m = Pt('7664-41-7', AvailableMethods=True)
-    assert m == ['STAVELEY', 'NONE']
+    m = Pt('7664-41-7', get_methods=True)
+    assert m == ['STAVELEY']
     assert None == Pt('72433223439-90-9')
     with pytest.raises(Exception):
-        Pt('74-82-8', Method='BADMETHOD')
+        Pt('74-82-8', method='BADMETHOD')
 
-    Pt_sum = sum([Pt(i) for i in Staveley_data.index if pd.notnull(Staveley_data.at[i, 'Pt'])])
+    Pt_sum = sum([Pt(i) for i in triple_data_Staveley.index if pd.notnull(triple_data_Staveley.at[i, 'Pt'])])
     assert_close(Pt_sum, 1886624.8374376972)

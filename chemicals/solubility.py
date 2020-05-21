@@ -19,8 +19,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
+# TODO: Decide whether a solubility_parameter lookup method is actually needed.
+# If so, add framework for lazy loading and solubility_parameter_sources.
+# If not, replace the `solubility_parameter` function with `solubility_parameter_DEFINITION`
 
-from __future__ import division
 
 __all__ = ['solubility_parameter_methods', 'solubility_parameter', 
            'solubility_eutectic', 'Tm_depression_eutectic',
@@ -33,12 +35,10 @@ from chemicals.utils import log, exp
 #folder = os.path.join(os.path.dirname(__file__), 'Solubility')
 
 DEFINITION = 'DEFINITION'
-NONE = 'NONE'
 solubility_parameter_methods = [DEFINITION]
 
-
 def solubility_parameter(T=298.15, Hvapm=None, Vml=None,
-                         CASRN='', AvailableMethods=False, Method=None):
+                         CASRN='', get_methods=False, method=None):
     r'''This function handles the calculation of a chemical's solubility
     parameter. Calculation is a function of temperature, but is not always
     presented as such. No lookup values are available; either `Hvapm`, `Vml`,
@@ -62,16 +62,16 @@ def solubility_parameter(T=298.15, Hvapm=None, Vml=None,
     -------
     delta : float
         Solubility parameter, [Pa^0.5]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain the solubility parameter
         with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         solubility_parameter_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         the solubility parameter for the desired chemical, and will return
         methods instead of the solubility parameter
@@ -98,31 +98,25 @@ def solubility_parameter(T=298.15, Hvapm=None, Vml=None,
     .. [1] Barton, Allan F. M. CRC Handbook of Solubility Parameters and Other
        Cohesion Parameters, Second Edition. CRC Press, 1991.
     '''
-    def list_methods():
+    if get_methods:
         methods = []
         if T and Hvapm and Vml:
             methods.append(DEFINITION)
-        methods.append(NONE)
         return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == DEFINITION:
-        if (not Hvapm) or (not T) or (not Vml):
-            delta = None
+    elif method:
+        if method == DEFINITION:
+            try: return solubility_parameter_DEFINITION(Hvapm, T, Vml)
+            except TypeError: pass
         else:
-            if Hvapm < R*T or Vml < 0:  # Prevent taking the root of a negative number
-                delta = None
-            else:
-                delta = ((Hvapm - R*T)/Vml)**0.5
-    elif Method == NONE:
-        delta = None
+            raise ValueError('invalid method ' + repr(method))
     else:
-        raise Exception('Failure in in function')
-    return delta
+        try: return solubility_parameter_DEFINITION(Hvapm, T, Vml)
+        except TypeError: pass
 
+def solubility_parameter_DEFINITION(Hvapm, T, Vml):
+    r'''See :func:`chemicals.solubility_parameter`'''
+    # Prevent taking the root of a negative number
+    return None if (Hvapm < R*T or Vml < 0) else ((Hvapm - R*T)/Vml)**0.5
 
 def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     r'''Returns the maximum solubility of a solute in a solvent.

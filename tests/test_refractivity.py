@@ -25,14 +25,14 @@ import pytest
 import pandas as pd
 import numpy as np
 from chemicals.refractivity import *
-from chemicals.refractivity import CRC_RI_organic
+from chemicals.refractivity import RI_data_CRC_organic
 
 def test_refractivity_CRC():
-    assert_allclose(CRC_RI_organic['RI'].sum(), 6602.78821)
-    assert_allclose(CRC_RI_organic['RIT'].sum(), 1304152.35)
+    assert_allclose(RI_data_CRC_organic['RI'].sum(), 6602.78821)
+    assert_allclose(RI_data_CRC_organic['RIT'].sum(), 1304152.35)
 
 def test_refractivity_general():
-    mat = np.array([refractive_index(i) for i in  CRC_RI_organic.index.values])
+    mat = np.array([refractive_index(i) for i in  RI_data_CRC_organic.index.values])
     Ts = mat[:,1]
     # Test refractive index sum
     assert_allclose(mat[:,0].sum(), 6602.78821)
@@ -46,16 +46,14 @@ def test_refractivity_general():
     val = refractive_index(CASRN='64-17-5', full_info=False)
     assert_allclose(val, 1.3611)
 
-    vals = refractive_index(CASRN='64-17-5', AvailableMethods=True)
-    assert vals ==  ['CRC', 'NONE']
-
-    assert (None, None) == refractive_index(CASRN='64-17-5', Method='NONE')
-    assert CRC_RI_organic.index.is_unique
-    assert CRC_RI_organic.shape == (4490, 2)
+    vals = refractive_index(CASRN='64-17-5', get_methods=True)
+    assert vals ==  ['CRC']
+    assert RI_data_CRC_organic.index.is_unique
+    assert RI_data_CRC_organic.shape == (4490, 2)
 
 
     with pytest.raises(Exception):
-        refractive_index(CASRN='64-17-5', Method='FAIL')
+        refractive_index(CASRN='64-17-5', method='FAIL')
 
 
 

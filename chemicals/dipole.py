@@ -57,7 +57,7 @@ if PY37:
 else:
     _load_dipole_data()
 
-# %%
+# %% Dipole moment functions
 
 CCCBDB = 'CCCBDB'
 MULLER = 'MULLER'
@@ -132,7 +132,6 @@ def dipole_moment(CASRN, get_methods=False, method=None):
     if get_methods:
         return list_available_methods_from_df_dict(dipole_sources, CASRN, 'Dipole')
     elif method:
-        return retrieve_from_df_dict(dipole_sources, CASRN, 'Dipole',
-                                     method) 
+        return retrieve_from_df_dict(dipole_sources, CASRN, 'Dipole', method) 
     else:
         return retrieve_any_from_df_dict(dipole_sources, CASRN, 'Dipole') 

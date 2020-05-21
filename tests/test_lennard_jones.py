@@ -24,21 +24,21 @@ from numpy.testing import assert_allclose
 import pytest
 import pandas as pd
 from chemicals.lennard_jones import *
-from chemicals.lennard_jones import MagalhaesLJ_data
+from chemicals.lennard_jones import LJ_data_Magalhaes
 from fluids.constants import k
 
 
 def test_LJ_data():
     # Two instances of 174899-66-2 were present;
     # the apparently more common one, [Bmim][CF 3SO 3], was kept.
-    tot = MagalhaesLJ_data['epsilon'].abs().sum()
+    tot = LJ_data_Magalhaes['epsilon'].abs().sum()
     assert_allclose(tot, 187099.82029999999)
 
-    tot = MagalhaesLJ_data['sigma'].abs().sum()
+    tot = LJ_data_Magalhaes['sigma'].abs().sum()
     assert_allclose(tot, 1995.8174799999997)
 
-    assert MagalhaesLJ_data.index.is_unique
-    assert MagalhaesLJ_data.shape == (322, 3)
+    assert LJ_data_Magalhaes.index.is_unique
+    assert LJ_data_Magalhaes.shape == (322, 3)
 
 
 def test_molecular_diameter_CSP():
@@ -81,38 +81,38 @@ def test_molecular_diameter_CSP():
 
 def test_stockmayer_function():
     # Use the default method for each chemical in this file
-    Stockmayers = [Stockmayer(CASRN=i) for i in MagalhaesLJ_data.index]
+    Stockmayers = [Stockmayer(CASRN=i) for i in LJ_data_Magalhaes.index]
     Stockmayer_default_sum = pd.Series(Stockmayers).sum()
     assert_allclose(Stockmayer_default_sum, 187099.82029999999)
 
     assert_allclose(1291.41, Stockmayer(CASRN='64-17-5'))
 
-    methods = Stockmayer(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975, CASRN='110-54-3', AvailableMethods=True)
-    assert methods[0:-1] == Stockmayer_methods
+    methods = Stockmayer(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975, CASRN='110-54-3', get_methods=True)
+    assert methods == Stockmayer_methods
 
-    values_calc = [Stockmayer(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975, CASRN='110-54-3', Method=i) for i in methods[0:-1]]
-    values = [434.76, 427.33156230000003, 318.10801442820025, 390.85200000000003, 392.8824, 393.15049999999997, 341.90399999999994, 273.54201582027196]
+    values_calc = [Stockmayer(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975, CASRN='110-54-3', method=i) for i in methods]
+    values = [434.76, 427.33156230000003, 273.54201582027196, 318.10801442820025, 390.85200000000003, 392.8824, 393.15049999999997, 341.90399999999994]
     assert_allclose(values_calc, values)
 
     # Error handling
     assert None == Stockmayer(CASRN='BADCAS')
 
     with pytest.raises(Exception):
-        Stockmayer(CASRN='98-01-1', Method='BADMETHOD')
+        Stockmayer(CASRN='98-01-1', method='BADMETHOD')
 
 
 def test_molecular_diameter_function():
     # Use the default method for each chemical in this file
-    MDs = [molecular_diameter(CASRN=i) for i in MagalhaesLJ_data.index]
+    MDs = [molecular_diameter(CASRN=i) for i in LJ_data_Magalhaes.index]
     MDs_sum = pd.Series(MDs).sum()
     assert_allclose(MDs_sum, 1995.8174799999997)
 
     assert_allclose(4.23738, molecular_diameter(CASRN='64-17-5'))
 
-    methods = molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', AvailableMethods=True)
-    assert methods[0:-1] == molecular_diameter_methods
+    methods = molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', get_methods=True)
+    assert methods == molecular_diameter_methods
 
-    values_calc = [molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', Method=i) for i in methods[0:-1]]
+    values_calc = [molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', method=i) for i in methods]
     values = [5.61841, 5.989061939666203, 5.688003783388763, 6.27423491655056, 6.080607912773406, 6.617051217297049, 5.960764840627408, 6.0266865190488215, 6.054448122758386, 5.9078666913304225]
     assert_allclose(values_calc, values)
 
@@ -120,7 +120,7 @@ def test_molecular_diameter_function():
     assert None == molecular_diameter(CASRN='BADCAS')
 
     with pytest.raises(Exception):
-        molecular_diameter(CASRN='98-01-1', Method='BADMETHOD')
+        molecular_diameter(CASRN='98-01-1', method='BADMETHOD')
 
 
 def test_stockmayer():

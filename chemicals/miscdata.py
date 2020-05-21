@@ -20,24 +20,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from __future__ import division
-
-__all__ = ['VDI_tabular_data']
+__all__ = ['lookup_VDI_tabular_data']
 
 import os
-import copy
-import pandas as pd
 from chemicals.utils import PY37
 from chemicals.data_reader import register_df_source, data_source
+
+# %% Register data sources and lazy load them
 
 folder = os.path.join(os.path.dirname(__file__), 'Misc')
 
 ### CRC Handbook general tables
-register_df_source(folder, name='Physical Constants of Inorganic Compounds.csv')
-register_df_source(folder, name='Physical Constants of Organic Compounds.csv')
+register_df_source(folder, 'Physical Constants of Inorganic Compounds.csv')
+register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
 
-_loaded_VDI = False
-def load_VDI_saturation_data():
+_VDI_dict_loaded = False
+def _load_VDI_saturation_dict():
     '''Read in a dict of assorted chemical properties at saturation for 58
     industrially important chemicals, from:
     Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
@@ -46,36 +44,33 @@ def load_VDI_saturation_data():
     Heat Exchanger Design Handbook. Washington: Hemisphere Pub. Corp., 1983.
     '''
     import json
-    global VDI_saturation_data
+    global VDI_saturation_dict, _VDI_dict_loaded
     
     with open(os.path.join(folder, 'VDI Saturation Compounds Data.json')) as f:
-        VDI_saturation_data = json.loads(f.read())
-    _loaded_VDI = True
+        VDI_saturation_dict = json.loads(f.read())
+    _VDI_dict_loaded = True
     
-
-_CRC_dfs_loaded = False
-def load_CRC_dfs():
-    global CRC_inorganic_data, CRC_organic_data
+_CRC_data_loaded = False
+def _load_CRC_data():
+    global CRC_inorganic_data, CRC_organic_data, _CRC_data_loaded
     CRC_inorganic_data = data_source('Physical Constants of Inorganic Compounds.csv')
     CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
-    _CRC_dfs_loaded = True
+    _CRC_data_loaded = True
     
 if PY37:
     def __getattr__(name):
         if name in ('CRC_inorganic_data', 'CRC_organic_data'):
-            load_CRC_dfs()
+            _load_CRC_data()
             return globals()[name]
-        elif name == 'VDI_saturation_data':
-            load_VDI_saturation_data()
-            return VDI_saturation_data
+        elif name == 'VDI_saturation_dict':
+            _load_VDI_saturation_dict()
+            return VDI_saturation_dict
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_CRC_dfs()
-    load_VDI_saturation_data()
+    _load_CRC_data()
+    _load_VDI_saturation_dict()
 
 ### VDI Saturation
-
-    
 
 # Created with the following code. Don't delete! Updates may be necessary.
 #from chemicals.utils import to_num, rho_to_Vm
@@ -86,13 +81,13 @@ else:
 #            "Cp (g)": [], "Mu (l)": [], "Mu (g)": [], "K (l)": [], "K (g)": [],
 #            "Pr (l)": [], "Pr (g)": [], "sigma": [], "Beta": [],
 #            "Volume (l)": [], "Volume (g)": []}
-#VDI_saturation_data = {}
+#VDI_saturation_dict = {}
 #with open(os.path.join(folder, 'VDI Saturation Compounds Data.csv')) as f:
 #    next(f)
 #    for line in f:
 #        values = to_num(line.strip('\n').split('\t'))
 #        (CASRN, _name, _MW, _Tc, T, P, rhol, rhog, Hvap, cpl, cpg, mul, mug, kl, kg, prl, prg, sigma, Beta) = values
-#        newdict = (VDI_saturation_data[CASRN] if CASRN in VDI_saturation_data else copy.deepcopy(emptydict))
+#        newdict = (VDI_saturation_dict[CASRN] if CASRN in VDI_saturation_dict else copy.deepcopy(emptydict))
 #        newdict["Name"] = _name
 #        newdict["MW"] = _MW
 #        newdict["Tc"] = _Tc
@@ -113,10 +108,9 @@ else:
 #        newdict["Beta"].append(Beta)
 #        newdict["Volume (l)"].append(rho_to_Vm(rhol, _MW))
 #        newdict["Volume (g)"].append(rho_to_Vm(rhog, _MW))
-#        VDI_saturation_data[CASRN] = newdict
+#        VDI_saturation_dict[CASRN] = newdict
 
-
-def VDI_tabular_data(CASRN, prop):
+def lookup_VDI_tabular_data(CASRN, prop):
     r'''This function retrieves the tabular data available for a given chemical
     and a given property. Lookup is based on CASRNs. Length of data returned
     varies between chemicals. All data is at saturation condition from [1]_.
@@ -156,20 +150,18 @@ def VDI_tabular_data(CASRN, prop):
     ----------
     .. [1] Gesellschaft, VDI, ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
     '''
-    if not _loaded_VDI:
-        load_VDI_saturation_data()
+    if not _VDI_dict_loaded: _load_VDI_saturation_dict()
     try:
-        d = VDI_saturation_data[CASRN]
-    except KeyError:
-        raise Exception('CASRN not in VDI tabulation')
+        d = VDI_saturation_dict[CASRN]
+    except KeyError: 
+        raise LookupError('CASRN not in VDI tabulation')
     try:
         props, Ts = d[prop], d['T']
     except:
-        raise Exception('Proprty not specified correctly')
+        raise ValueError('property not specified correctly')
     Ts = [T for p, T in zip(props, Ts) if p]
     props = [p for p in props if p]
-
-    # Not all data series convererge to correct values
+    # Not all data series converege to correct values
     if prop == 'sigma':
         Ts.append(d['Tc'])
         props.append(0)

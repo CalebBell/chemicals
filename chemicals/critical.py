@@ -85,8 +85,8 @@ def _load_critical_data():
     }
     # Create copies just incase new dfs need to be added later
     Pc_sources = Tc_sources.copy()
-    # The Passut Danner tsv file doesn't have Vc, so its not included
     Vc_sources = Tc_sources.copy()
+    # The Passut Danner tsv file doesn't have Vc, so its not included
     del Vc_sources['PD']
     Zc_sources = Vc_sources.copy()
 

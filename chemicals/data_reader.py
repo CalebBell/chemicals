@@ -38,7 +38,6 @@ path_join = os.path.join
 # %% Loading data from local databanks
 
 df_sources = {}
-
 load_cmds = {}
 
 def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs={},
@@ -79,7 +78,7 @@ def retrieve_from_df(df, index, key):
         if isinstance(key, str):
             return get_value_from_df(df, index, key)
         elif isinstance(key, Iterable):    
-            return [get_value_from_df(df, index, i) for i in key]
+            return [df.at[index, i] for i in key]
         else:
             raise ValueError('key must be a string or an iterable of strings')
 

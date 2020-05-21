@@ -43,15 +43,16 @@ folder = os.path.join(os.path.dirname(__file__), 'Environment')
 register_df_source(folder, 'Official Global Warming Potentials.tsv')
 register_df_source(folder, 'Ozone Depletion Potentials.tsv')
 register_df_source(folder, 'CRC logP table.tsv')
-register_df_source(folder, 'Syrres logP data.csv.gz', csv_kwargs={'compression': 'gzip'})
+register_df_source(folder, 'Syrres logP data.csv.gz',
+                   csv_kwargs={'compression': 'gzip'})
 
-_GWP_ODP_loaded = False
+_GWP_ODP_data_loaded = False
 def _load_GWP_ODP_data():
-    global _GWP_ODP_loaded, GWP_data, ODP_data, _GWP_keys_by_method
+    global _GWP_ODP_data_loaded, GWP_data, ODP_data, _GWP_keys_by_method
     global _GWP_keys_by_method, _ODP_keys_by_method
     GWP_data = data_source('Official Global Warming Potentials.tsv')
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
-    _GWP_ODP_loaded = True
+    _GWP_ODP_data_loaded = True
     _GWP_keys_by_method = {
         'IPCC (2007) 100yr' : '100yr GWP',
         'IPCC (2007) 100yr-SAR': 'SAR 100yr',
@@ -69,12 +70,12 @@ def _load_GWP_ODP_data():
         'ODP1 string': 'ODP1',
     }
     
-_logP_loaded = False
+_logP_data_loaded = False
 def _load_logP_data():
-    global _logP_loaded, logP_data_CRC, logP_data_Syrres, logP_sources
+    global _logP_data_loaded, logP_data_CRC, logP_data_Syrres, logP_sources
     logP_data_CRC = data_source('CRC logP table.tsv')
     logP_data_Syrres = data_source('Syrres logP data.csv.gz')
-    _logP_loaded = True
+    _logP_data_loaded = True
     logP_sources = {
         'CRC': logP_data_CRC,
         'SYRRES': logP_data_Syrres,
@@ -155,7 +156,7 @@ def GWP(CASRN, get_methods=False, method=None):
        Changes in Atmospheric Constituents and in Radiative Forcing." 2007.
        https://www.ipcc.ch/publications_and_data/ar4/wg1/en/ch2s2-10-2.html.
     '''
-    if not _GWP_ODP_loaded: _load_GWP_ODP_data()
+    if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if get_methods:
         if CASRN in GWP_data.index:
             return [method for method, key in _GWP_keys_by_method.items()
@@ -171,7 +172,6 @@ global_warming_potential = GWP
 
 ### Ozone Depletion Potentials
 
-
 ODP2MAX = 'ODP2 Max'
 ODP2MIN = 'ODP2 Min'
 ODP2STR = 'ODP2 string'
@@ -181,7 +181,6 @@ ODP1MIN = 'ODP1 Min'
 ODP1STR = 'ODP1 string'
 ODP1LOG = 'ODP1 logarithmic average'
 ODP_methods = [ODP2MAX, ODP1MAX, ODP2LOG, ODP1LOG, ODP2MIN, ODP1MIN, ODP2STR, ODP1STR]
-
 
 def ODP(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's Ozone Depletion
@@ -255,7 +254,7 @@ def ODP(CASRN, get_methods=False, method=None):
        Project-Report No. 52, Geneva, Switzerland, 516 p.
        https://www.wmo.int/pages/prog/arep/gaw/ozone_2010/documents/Ozone-Assessment-2010-complete.pdf
     '''
-    if not _GWP_ODP_loaded: _load_GWP_ODP_data()
+    if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if get_methods:
         if CASRN in ODP_data.index:
             return [method for method, key in _ODP_keys_by_method.items()
@@ -271,11 +270,9 @@ ozone_depletion_potential = ODP
 
 ### log P
 
-
 SYRRES = 'SYRRES'
 CRC = 'CRC'
 logP_methods = [SYRRES, CRC]
-
 
 def logP(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's octanol-water
@@ -325,7 +322,7 @@ def logP(CASRN, get_methods=False, method=None):
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
-    if not _logP_loaded: _load_logP_data()
+    if not _logP_data_loaded: _load_logP_data()
     if get_methods:
         return list_available_methods_from_df_dict(logP_sources, CASRN, 'logP')
     elif method:

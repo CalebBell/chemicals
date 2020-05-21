@@ -20,47 +20,54 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from __future__ import division
 __all__ = ['Stockmayer_methods', 'Stockmayer', 
-'molecular_diameter_methods', 'molecular_diameter', 'sigma_Flynn', 
-'sigma_Bird_Stewart_Lightfoot_critical_2', 
-'sigma_Bird_Stewart_Lightfoot_critical_1', 
-'sigma_Bird_Stewart_Lightfoot_boiling', 'sigma_Bird_Stewart_Lightfoot_melting',
-'sigma_Stiel_Thodos', 'sigma_Tee_Gotoh_Steward_1', 'sigma_Tee_Gotoh_Steward_2',
-'sigma_Silva_Liu_Macedo', 'epsilon_Flynn', 
-'epsilon_Bird_Stewart_Lightfoot_critical', 
-'epsilon_Bird_Stewart_Lightfoot_boiling', 
-'epsilon_Bird_Stewart_Lightfoot_melting', 'epsilon_Stiel_Thodos', 
-'epsilon_Tee_Gotoh_Steward_1', 'epsilon_Tee_Gotoh_Steward_2', 
-'Neufeld_collision', 'collision_integral_Neufeld_Janzen_Aziz', 'As_collision',
-'Bs_collision', 'Cs_collision', 'collision_integral_Kim_Monroe', 'Tstar']
+           'molecular_diameter_methods', 'molecular_diameter', 'sigma_Flynn', 
+           'sigma_Bird_Stewart_Lightfoot_critical_2', 
+           'sigma_Bird_Stewart_Lightfoot_critical_1', 
+           'sigma_Bird_Stewart_Lightfoot_boiling', 
+           'sigma_Bird_Stewart_Lightfoot_melting',
+           'sigma_Stiel_Thodos', 'sigma_Tee_Gotoh_Steward_1',
+           'sigma_Tee_Gotoh_Steward_2',
+           'sigma_Silva_Liu_Macedo', 'epsilon_Flynn', 
+           'epsilon_Bird_Stewart_Lightfoot_critical', 
+           'epsilon_Bird_Stewart_Lightfoot_boiling', 
+           'epsilon_Bird_Stewart_Lightfoot_melting', 'epsilon_Stiel_Thodos', 
+           'epsilon_Tee_Gotoh_Steward_1', 'epsilon_Tee_Gotoh_Steward_2', 
+           'Neufeld_collision', 'collision_integral_Neufeld_Janzen_Aziz', 
+           'As_collision', 'Bs_collision', 'Cs_collision', 
+           'collision_integral_Kim_Monroe', 'Tstar']
 
 import os
-import pandas as pd
 from fluids.constants import k
 from chemicals.utils import exp, log, sin
 from chemicals.utils import PY37
-from chemicals.data_reader import register_df_source, data_source
+from chemicals.data_reader import (register_df_source,
+                                   data_source,
+                                   retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
+                                   list_available_methods_from_df_dict)
+# %% Register data sources and lazy load them
 
 folder = os.path.join(os.path.dirname(__file__), 'Viscosity')
+register_df_source(folder, 'MagalhaesLJ.tsv')
 
-register_df_source(folder, name='MagalhaesLJ.tsv')
-
-_LJ_dfs_loaded = False
-def load_LJ_dfs():
-    global _LJ_dfs_loaded, MagalhaesLJ_data
-    MagalhaesLJ_data = data_source('MagalhaesLJ.tsv')
-    _LJ_dfs_loaded = True
+_LJ_data_loaded = False
+def _load_LJ_data():
+    global _LJ_data_loaded, LJ_data_Magalhaes, LJ_sources
+    LJ_data_Magalhaes = data_source('MagalhaesLJ.tsv')
+    _LJ_data_loaded = True
+    LJ_sources = {
+        MAGALHAES: LJ_data_Magalhaes,
+    }
 
 if PY37:
     def __getattr__(name):
-        if name in ('MagalhaesLJ_data',):
-            load_LJ_dfs()
+        if name in ('LJ_data_Magalhaes', 'LJ_sources'):
+            _load_LJ_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_LJ_dfs()
-
+    _load_LJ_data()
 
 FLYNN = 'Flynn (1960)'
 STIELTHODOS = 'Stiel and Thodos Tc, Zc (1962)'
@@ -70,18 +77,15 @@ TEEGOTOSTEWARD2 = 'Tee, Gotoh, and Stewart CSP with Tc, omega (1966)'
 BSLC = 'Bird, Stewart, and Light (2002) critical relation'
 BSLB = 'Bird, Stewart, and Light (2002) boiling relation'
 BSLM = 'Bird, Stewart, and Light (2002) melting relation'
-NONE = 'None'
-
-Stockmayer_methods = [MAGALHAES, TEEGOTOSTEWARD2, FLYNN, BSLC, TEEGOTOSTEWARD1,
-                      BSLB, BSLM, STIELTHODOS]
-
+Stockmayer_methods = [MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC, 
+                      TEEGOTOSTEWARD1, BSLB, BSLM]
 
 def Stockmayer(Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
-               CASRN='', AvailableMethods=False, Method=None):
+               CASRN='', get_methods=False, method=None):
     r'''This function handles the retrieval or calculation a chemical's
     Stockmayer parameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 7 CSP methods.
-    Will automatically select a data source to use if no Method is provided;
+    Will automatically select a data source to use if no method is provided;
     returns None if the data is not available.
 
     Prefered sources are 'Magalhães, Lito, Da Silva, and Silva (2013)' for
@@ -113,16 +117,16 @@ def Stockmayer(Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
     -------
     epsilon_k : float
         Lennard-Jones depth of potential-energy minimum over k, [K]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain epsilon with the given
         inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         Stockmayer_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         epsilon for the desired chemical, and will return methods instead of
         epsilon
@@ -145,54 +149,44 @@ def Stockmayer(Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
        Ranges of Temperature and Density." The Journal of Supercritical Fluids
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
-    if not _LJ_dfs_loaded:
-        load_LJ_dfs()
-    def list_methods():
-        methods = []
-        if CASRN in MagalhaesLJ_data.index:
-            methods.append(MAGALHAES)
-        if Tc and omega:
-            methods.append(TEEGOTOSTEWARD2)
+    if not _LJ_data_loaded: _load_LJ_data()
+    if get_methods:
+        methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'epsilon')
         if Tc:
+            if omega: methods.append(TEEGOTOSTEWARD2)
+            if Zc: methods.append(STIELTHODOS)
             methods.append(FLYNN)
             methods.append(BSLC)
             methods.append(TEEGOTOSTEWARD1)
-        if Tb:
-            methods.append(BSLB)
-        if Tm:
-            methods.append(BSLM)
-        if Tc and Zc:
-            methods.append(STIELTHODOS)
-        methods.append(NONE)
+        if Tb: methods.append(BSLB)
+        if Tm: methods.append(BSLM)
         return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == FLYNN:
-        epsilon = epsilon_Flynn(Tc)
-    elif Method == BSLC:
-        epsilon = epsilon_Bird_Stewart_Lightfoot_critical(Tc)
-    elif Method == BSLB:
-        epsilon = epsilon_Bird_Stewart_Lightfoot_boiling(Tb)
-    elif Method == BSLM:
-        epsilon = epsilon_Bird_Stewart_Lightfoot_melting(Tm)
-    elif Method == STIELTHODOS:
-        epsilon = epsilon_Stiel_Thodos(Tc, Zc)
-    elif Method == TEEGOTOSTEWARD1:
-        epsilon = epsilon_Tee_Gotoh_Steward_1(Tc)
-    elif Method == TEEGOTOSTEWARD2:
-        epsilon = epsilon_Tee_Gotoh_Steward_2(Tc, omega)
-
-    elif Method == MAGALHAES:
-        epsilon = float(MagalhaesLJ_data.at[CASRN, "epsilon"])
-    elif Method == NONE:
-        epsilon = None
+    elif method:
+        if method == FLYNN:
+            return epsilon_Flynn(Tc)
+        elif method == BSLC:
+            return epsilon_Bird_Stewart_Lightfoot_critical(Tc)
+        elif method == BSLB:
+            return epsilon_Bird_Stewart_Lightfoot_boiling(Tb)
+        elif method == BSLM:
+            return epsilon_Bird_Stewart_Lightfoot_melting(Tm)
+        elif method == STIELTHODOS:
+            return epsilon_Stiel_Thodos(Tc, Zc)
+        elif method == TEEGOTOSTEWARD1:
+            return epsilon_Tee_Gotoh_Steward_1(Tc)
+        elif method == TEEGOTOSTEWARD2:
+            return epsilon_Tee_Gotoh_Steward_2(Tc, omega)
+        else:
+            return retrieve_from_df_dict(LJ_sources, CASRN, 'epsilon', method)
     else:
-        raise Exception('Failure in in function')
-    return epsilon
-
+        epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'epsilon')
+        if epsilon is not None: return epsilon
+        if Tc:
+            if omega: return epsilon_Tee_Gotoh_Steward_2(Tc, omega)
+            if Zc: return epsilon_Stiel_Thodos(Tc, Zc)
+            return epsilon_Flynn(Tc)
+        if Tb: return epsilon_Bird_Stewart_Lightfoot_boiling(Tb)
+        if Tm: return epsilon_Bird_Stewart_Lightfoot_melting(Tm)
 
 TEEGOTOSTEWARD3 = 'Tee, Gotoh, and Stewart CSP with Tc, Pc (1966)'
 TEEGOTOSTEWARD4 = 'Tee, Gotoh, and Stewart CSP with Tc, Pc, omega (1966)'
@@ -200,18 +194,16 @@ BSLC1 = 'Bird, Stewart, and Light (2002) critical relation with Vc'
 BSLC2 = 'Bird, Stewart, and Light (2002) critical relation with Tc, Pc'
 STIELTHODOSMD = 'Stiel and Thodos Vc, Zc (1962)'
 SILVALIUMACEDO = 'Silva, Liu, and Macedo (1998) critical relation with Tc, Pc'
-
 molecular_diameter_methods = [MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
                               BSLC2, TEEGOTOSTEWARD3, STIELTHODOSMD, FLYNN,
                               BSLC1, BSLB, BSLM]
 
-
 def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
-          Vm=None, Vb=None, CASRN='', AvailableMethods=False, Method=None):
+          Vm=None, Vb=None, CASRN='', get_methods=False, method=None):
     r'''This function handles the retrieval or calculation a chemical's
     L-J molecular diameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 9 CSP methods.
-    Will automatically select a data source to use if no Method is provided;
+    Will automatically select a data source to use if no method is provided;
     returns None if the data is not available.
 
     Prefered sources are 'Magalhães, Lito, Da Silva, and Silva (2013)' for
@@ -247,16 +239,16 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
     -------
     sigma : float
         Lennard-Jones molecular diameter, [Angstrom]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain epsilon with the given
         inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         molecular_diameter_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         sigma for the desired chemical, and will return methods instead of
         sigma
@@ -279,59 +271,55 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
        Ranges of Temperature and Density." The Journal of Supercritical Fluids
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
-    if not _LJ_dfs_loaded:
-        load_LJ_dfs()
-    def list_methods():
-        methods = []
-        if CASRN in MagalhaesLJ_data.index:
-            methods.append(MAGALHAES)
-        if Tc and Pc and omega:
-            methods.append(TEEGOTOSTEWARD4)
-        if Tc and Pc:
-            methods.append(SILVALIUMACEDO)
-            methods.append(BSLC2)
-            methods.append(TEEGOTOSTEWARD3)
-        if Vc and Zc:
-            methods.append(STIELTHODOSMD)
+    if not _LJ_data_loaded: _load_LJ_data()
+    if get_methods:
+        methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'sigma')
+        if Tc:
+            if Pc:
+                if omega: methods.append(TEEGOTOSTEWARD4)
+                methods.append(SILVALIUMACEDO)
+                methods.append(BSLC2)
+                methods.append(TEEGOTOSTEWARD3)
         if Vc:
+            if Zc: methods.append(STIELTHODOSMD)
             methods.append(FLYNN)
             methods.append(BSLC1)
-        if Vb:
-            methods.append(BSLB)
-        if Vm:
-            methods.append(BSLM)
-        methods.append(NONE)
+        if Vb: methods.append(BSLB)
+        if Vm: methods.append(BSLM)
         return methods
-
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-    if Method == FLYNN:
-        sigma = sigma_Flynn(Vc)
-    elif Method == BSLC1:
-        sigma = sigma_Bird_Stewart_Lightfoot_critical_1(Vc)
-    elif Method == BSLC2:
-        sigma = sigma_Bird_Stewart_Lightfoot_critical_2(Tc, Pc)
-    elif Method == TEEGOTOSTEWARD3:
-        sigma = sigma_Tee_Gotoh_Steward_1(Tc, Pc)
-    elif Method == SILVALIUMACEDO:
-        sigma = sigma_Silva_Liu_Macedo(Tc, Pc)
-    elif Method == BSLB:
-        sigma = sigma_Bird_Stewart_Lightfoot_boiling(Vb)
-    elif Method == BSLM:
-        sigma = sigma_Bird_Stewart_Lightfoot_melting(Vm)
-    elif Method == STIELTHODOSMD:
-        sigma = sigma_Stiel_Thodos(Vc, Zc)
-    elif Method == TEEGOTOSTEWARD4:
-        sigma = sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega)
-    elif Method == MAGALHAES:
-        sigma = float(MagalhaesLJ_data.at[CASRN, "sigma"])
-    elif Method == NONE:
-        sigma = None
+    if method:
+        if method == FLYNN:
+            return sigma_Flynn(Vc)
+        elif method == BSLC1:
+            return sigma_Bird_Stewart_Lightfoot_critical_1(Vc)
+        elif method == BSLC2:
+            return sigma_Bird_Stewart_Lightfoot_critical_2(Tc, Pc)
+        elif method == TEEGOTOSTEWARD3:
+            return sigma_Tee_Gotoh_Steward_1(Tc, Pc)
+        elif method == SILVALIUMACEDO:
+            return sigma_Silva_Liu_Macedo(Tc, Pc)
+        elif method == BSLB:
+            return sigma_Bird_Stewart_Lightfoot_boiling(Vb)
+        elif method == BSLM:
+            return sigma_Bird_Stewart_Lightfoot_melting(Vm)
+        elif method == STIELTHODOSMD:
+            return sigma_Stiel_Thodos(Vc, Zc)
+        elif method == TEEGOTOSTEWARD4:
+            return sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega)
+        else:
+            return retrieve_from_df_dict(LJ_sources, CASRN, 'sigma', method)
     else:
-        raise Exception('Failure in in function')
-    return sigma
+        epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'sigma')
+        if epsilon is not None: return epsilon
+        if Tc:
+            if Pc:
+                if omega: return sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega)
+                return sigma_Silva_Liu_Macedo(Tc, Pc)
+        if Vc:
+            if Zc: return sigma_Stiel_Thodos(Vc, Zc)
+            return sigma_Flynn(Vc)
+        if Vb: return sigma_Bird_Stewart_Lightfoot_boiling(Vb)
+        if Vm: return sigma_Bird_Stewart_Lightfoot_melting(Vm)
 
 
 ### Sigma Lennard-Jones
@@ -373,7 +361,6 @@ def sigma_Flynn(Vc):
     sigma = 0.561*(Vc**(1/3.))**1.2
     return sigma
 
-
 def sigma_Bird_Stewart_Lightfoot_critical_2(Tc, Pc):
     r'''Calculates Lennard-Jones molecular diameter.
     Uses critical temperature and pressure. CSP method by [1]_.
@@ -412,7 +399,6 @@ def sigma_Bird_Stewart_Lightfoot_critical_2(Tc, Pc):
     sigma = 2.44*(Tc/Pc)**(1/3.0)
     return sigma
 
-
 def sigma_Bird_Stewart_Lightfoot_critical_1(Vc):
     r'''Calculates Lennard-Jones molecular diameter.
     Uses critical volume. CSP method by [1]_.
@@ -448,7 +434,6 @@ def sigma_Bird_Stewart_Lightfoot_critical_1(Vc):
     Vc = Vc*1E6  # m^3/mol to cm^3/mol
     sigma = 0.841*Vc**(1/3.0)
     return sigma
-
 
 def sigma_Bird_Stewart_Lightfoot_boiling(Vb):
     r'''Calculates Lennard-Jones molecular diameter.
@@ -486,7 +471,6 @@ def sigma_Bird_Stewart_Lightfoot_boiling(Vb):
     sigma = 1.166*Vb**(1/3.0)
     return sigma
 
-
 def sigma_Bird_Stewart_Lightfoot_melting(Vm):
     r'''Calculates Lennard-Jones molecular diameter.
     Uses molar volume of a liquid at its melting point. CSP method by [1]_.
@@ -522,7 +506,6 @@ def sigma_Bird_Stewart_Lightfoot_melting(Vm):
     Vm = Vm*1E6
     sigma = 1.222*Vm**(1/3.)
     return sigma
-
 
 def sigma_Stiel_Thodos(Vc, Zc):
     r'''Calculates Lennard-Jones molecular diameter.
@@ -606,7 +589,6 @@ def sigma_Tee_Gotoh_Steward_1(Tc, Pc):
     sigma = 2.3647*(Tc/Pc)**(1/3.)
     return sigma
 
-
 def sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega):
     r'''Calculates Lennard-Jones molecular diameter.
     Uses critical temperature, pressure, and acentric factor. CSP method by
@@ -650,7 +632,6 @@ def sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega):
     Pc = Pc/101325.
     sigma = (2.3551-0.0874*omega)*(Tc/Pc)**(1/3.)
     return sigma
-
 
 def sigma_Silva_Liu_Macedo(Tc, Pc):
     r'''Calculates Lennard-Jones molecular diameter.
@@ -698,9 +679,7 @@ def sigma_Silva_Liu_Macedo(Tc, Pc):
         sigma = (term)**(1/3.)
     return sigma
 
-
 ### epsilon Lennard-Jones
-
 
 def epsilon_Flynn(Tc):
     r'''Calculates Lennard-Jones depth of potential-energy minimum.
@@ -737,7 +716,6 @@ def epsilon_Flynn(Tc):
     epsilon_k = 1.77*Tc**(5/6.)
     return epsilon_k
 
-
 def epsilon_Bird_Stewart_Lightfoot_critical(Tc):
     r'''Calculates Lennard-Jones depth of potential-energy minimum.
     Uses critical temperature. CSP method by [1]_.
@@ -771,7 +749,6 @@ def epsilon_Bird_Stewart_Lightfoot_critical(Tc):
     '''
     epsilon_k = 0.77*Tc
     return epsilon_k
-
 
 def epsilon_Bird_Stewart_Lightfoot_boiling(Tb):
     r'''Calculates Lennard-Jones depth of potential-energy minimum.
@@ -807,7 +784,6 @@ def epsilon_Bird_Stewart_Lightfoot_boiling(Tb):
     epsilon_k = 1.15*Tb
     return epsilon_k
 
-
 def epsilon_Bird_Stewart_Lightfoot_melting(Tm):
     r'''Calculates Lennard-Jones depth of potential-energy minimum.
     Uses melting temperature. CSP method by [1]_.
@@ -841,7 +817,6 @@ def epsilon_Bird_Stewart_Lightfoot_melting(Tm):
     '''
     epsilon_k = 1.92*Tm
     return epsilon_k
-
 
 def epsilon_Stiel_Thodos(Tc, Zc):
     r'''Calculates Lennard-Jones depth of potential-energy minimum.
@@ -881,7 +856,6 @@ def epsilon_Stiel_Thodos(Tc, Zc):
     epsilon_k = 65.3*Tc*Zc**3.6
     return epsilon_k
 
-
 def epsilon_Tee_Gotoh_Steward_1(Tc):
     r'''Calculates Lennard-Jones depth of potential-energy minimum.
     Uses Critical temperature. CSP method by [1]_.
@@ -918,7 +892,6 @@ def epsilon_Tee_Gotoh_Steward_1(Tc):
     '''
     epsilon_k = 0.7740*Tc
     return epsilon_k
-
 
 def epsilon_Tee_Gotoh_Steward_2(Tc, omega):
     r'''Calculates Lennard-Jones depth of potential-energy minimum.
@@ -959,7 +932,6 @@ def epsilon_Tee_Gotoh_Steward_2(Tc, omega):
     epsilon_k = (0.7915 + 0.1693*omega)*Tc
     return epsilon_k
 
-
 ### Collision Integral
 
 Neufeld_collision = {
@@ -980,7 +952,6 @@ Neufeld_collision = {
     (3, 5): [0.99958, 0.15029, 0.50441, 1.64304, 2.06947, 4.87712, None, None, -0.0005184, 3.45031, 0.26821, 3.73348],
     (4, 4): [1.12007, 0.14578, 0.53347, 1.11986, 2.28803, 3.27567, None, None, 0.0007427, 21.048, -0.28759, 6.69149]
 }
-
 
 def collision_integral_Neufeld_Janzen_Aziz(Tstar, l=1, s=1):
     r'''Calculates Lennard-Jones collision integral for any of 16 values of
@@ -1045,7 +1016,6 @@ def collision_integral_Neufeld_Janzen_Aziz(Tstar, l=1, s=1):
         omega += R*Tstar**B*sin(S*Tstar**W-P)
     return omega
 
-
 As_collision = {(1, 1): -1.10367290,
                 (1, 2): 1.35555540,
                 (1, 3): 1.06771150,
@@ -1063,7 +1033,6 @@ As_collision = {(1, 1): -1.10367290,
                 (3, 5): 1.50498090,
                 (4, 4): 2.62223930
                 }
-
 
 Bs_collision = {
 (1, 1): [2.6431984,0.0060432255,-0.15158773,0.054237938,-0.0090468682,0.0006174200700],
@@ -1084,7 +1053,6 @@ Bs_collision = {
 (4, 4): [-1.9158462,1.016638,-0.43355278,0.10496591,-0.013951104,0.0008004853400]
 }
 
-
 Cs_collision = {
     (1, 1): [1.6690746, -0.6914589, 0.15502132, -0.020642189, 0.001540207700, -0.000049729535],
     (1, 2): [-0.47499422, 0.14482036, -0.032158368, 0.0044357933, -0.00034138118, 0.000011259742],
@@ -1103,7 +1071,6 @@ Cs_collision = {
     (3, 5): [-0.60014514, 0.19764859, -0.045212434, 0.0063650284, -0.00049991689, 0.000016833944],
     (4, 4): [-1.4676253, 0.53048161, -0.11909781, 0.016123847, -0.0012174905, 0.0000395451]
 }
-
 
 def collision_integral_Kim_Monroe(Tstar, l=1, s=1):
     r'''Calculates Lennard-Jones collision integral for any of 16 values of
@@ -1162,9 +1129,7 @@ def collision_integral_Kim_Monroe(Tstar, l=1, s=1):
         omega += Bs[ki]/Tstar**(ki+1) + Cs[ki]*log(Tstar)**(ki+1)
     return omega
 
-
 ### Misc
-
 
 def Tstar(T, epsilon_k=None, epsilon=None):
     r'''This function calculates the parameter `Tstar` as needed in performing

@@ -36,8 +36,9 @@ from chemicals.data_reader import (register_df_source,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
 
-folder = os.path.join(os.path.dirname(__file__), 'Phase Change')
+# %% Register data sources and lazy load them
 
+folder = os.path.join(os.path.dirname(__file__), 'Phase Change')
 register_df_source(folder, 'Yaws Boiling Points.tsv')
 register_df_source(folder, 'OpenNotebook Melting Points.tsv')
 register_df_source(folder, 'Ghazerati Appendix Vaporization Enthalpy.tsv',
@@ -96,7 +97,8 @@ def _load_phase_change_correlations():
 if PY37:
     def __getattr__(name):
         if name in ('Tb_data_Yaws', 'Tm_ON_data', 'Hvap_data_Gharagheizi',
-                    'Hvap_data_CRC', 'Hfus_data_CRC', 'Hsub_data_Gharagheizi'):
+                    'Hvap_data_CRC', 'Hfus_data_CRC', 'Hsub_data_Gharagheizi',
+                    'Tb_sources', 'Tm_sources', 'Hfus_sources'):
             _load_phase_change_constants()
             return globals()[name]
         elif name in ('phase_change_data_Perrys2_150',
@@ -111,13 +113,14 @@ else:
     _load_phase_change_constants()
     _load_phase_change_correlations()
 
+# %% Phase change functions
+
 ### Boiling Point at 1 atm
 
 CRC_ORG = 'CRC_ORG'
 CRC_INORG = 'CRC_INORG'
 YAWS = 'YAWS'
 Tb_methods = [CRC_INORG, CRC_ORG, YAWS]
-
 
 def Tb(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's boiling
@@ -182,14 +185,10 @@ def Tb(CASRN, get_methods=False, method=None):
     else:
         return retrieve_any_from_df_dict(Tb_sources, CASRN, 'Tb') 
 
-
 ### Melting Point
 
-
 OPEN_NTBKM = 'OPEN_NTBKM'
-
 Tm_methods = [OPEN_NTBKM, CRC_INORG, CRC_ORG]
-
 
 def Tm(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's melting
@@ -314,7 +313,6 @@ def Clapeyron(T, Tc, Pc, dZ=1, Psat=101325):
     Tr = T/Tc
     return R*T*dZ*log(Pc/Psat)/(1. - Tr)
 
-
 def Pitzer(T, Tc, omega):
     r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
     fit by [2]_ to the work of Pitzer [1]_; requires a chemical's critical
@@ -371,7 +369,6 @@ def Pitzer(T, Tc, omega):
     '''
     Tr = T/Tc
     return R*Tc * (7.08*(1. - Tr)**0.354 + 10.95*omega*(1. - Tr)**0.456)
-
 
 def SMK(T, Tc, omega):
     r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
@@ -473,7 +470,6 @@ def SMK(T, Tc, omega):
 #    domega = (omega - omegaR1)/(omegaR2 - omegaR1)
     return R*Tc*(L0 + domega*L1)
 
-
 def MK(T, Tc, omega):
     r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
     the work of [1]_; requires a chemical's critical temperature and
@@ -546,7 +542,6 @@ def MK(T, Tc, omega):
 
     return H0 + omega*H1 + omega**2*H2
 
-
 def Velasco(T, Tc, omega):
     r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
     the work of [1]_; requires a chemical's critical temperature and
@@ -594,7 +589,6 @@ def Velasco(T, Tc, omega):
        doi:10.1016/j.jct.2015.01.011.
     '''
     return (7.2729 + 10.4962*omega + 0.6061*omega**2)*(1-T/Tc)**0.38*R*Tc
-
 
 ### Enthalpy of Vaporization at Normal Boiling Point.
 
@@ -655,7 +649,6 @@ def Riedel(Tb, Tc, Pc):
     Tbr = Tb/Tc
     return 1.093*Tb*R*(log(Pc) - 1.013)/(0.93 - Tbr)
 
-
 def Chen(Tb, Tc, Pc):
     r'''Calculates enthalpy of vaporization using the Chen [1]_ correlation
     and a chemical's critical temperature, pressure and boiling point.
@@ -707,7 +700,6 @@ def Chen(Tb, Tc, Pc):
     Tbr = Tb/Tc
     Pc = Pc/1E5  # Pa to bar
     return R*Tb*(3.978*Tbr - 3.958 + 1.555*log(Pc))/(1.07 - Tbr)
-
 
 def Liu(Tb, Tc, Pc):
     r'''Calculates enthalpy of vaporization at the normal boiling point using
@@ -763,7 +755,6 @@ def Liu(Tb, Tc, Pc):
     Tbr = Tb/Tc
     return R*Tb*(Tb/220.)**0.0627*(1. - Tbr)**0.38*log(Pc/101325.) \
         / (1 - Tbr + 0.38*Tbr*log(Tbr))
-
 
 def Vetere(Tb, Tc, Pc, F=1):
     r'''Calculates enthalpy of vaporization at the boiling point, using the
@@ -822,10 +813,6 @@ def Vetere(Tb, Tc, Pc, F=1):
     term = taub**0.38*(log(Pc)-0.513 + 0.5066/Pc/Tbr**2) / (taub + F*(1-taub**0.38)*log(Tbr))
     return R*Tb*term
 
-
-### Enthalpy of Vaporization at STP.
-
-
 ### Enthalpy of Vaporization adjusted for T
 
 def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
@@ -883,12 +870,10 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     H2 = Hvap_ref*((1.0 - Tr)/(1.0 - Trefr))**exponent
     return H2
 
-
 ### Heat of Fusion
 
 CRC = 'CRC'
 Hfus_methods = [CRC]
-
 
 def Hfus(CASRN, get_methods=False, method=None): 
     r'''This function handles the retrieval of a chemical's heat of fusion.

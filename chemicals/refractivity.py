@@ -20,47 +20,53 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from __future__ import division
-
 __all__ = ['RI_methods', 'refractive_index', 
            'polarizability_from_RI', 'molar_refractivity_from_RI', 
            'RI_from_molar_refractivity']
 
 import os
-import pandas as pd
 from fluids.constants import pi, N_A
-from chemicals.data_reader import register_df_source, data_source
+from chemicals.data_reader import (register_df_source,
+                                   data_source,
+                                   retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
+                                   list_available_methods_from_df_dict)
 from chemicals.utils import PY37
+
+
+# %% Register data sources and lazy load them
+
 folder = os.path.join(os.path.dirname(__file__), 'Misc')
+register_df_source(folder, 'CRC Handbook Organic RI.csv', 
+                   csv_kwargs={'dtype': {'RI': float, 'RIT': float}})
 
-
-
-register_df_source(folder, name='CRC Handbook Organic RI.csv')
-
-_RI_dat_loaded = False
-def load_RI_dfs():
-    global _RI_dat_loaded, CRC_RI_organic
-    CRC_RI_organic = data_source('CRC Handbook Organic RI.csv')
+_RI_data_loaded = False
+def _load_RI_data():
+    global _RI_data_loaded, RI_data_CRC_organic, RI_sources
+    RI_data_CRC_organic = data_source('CRC Handbook Organic RI.csv')
+    RI_sources = {
+        CRC: RI_data_CRC_organic,
+    }
 
 if PY37:
     def __getattr__(name):
-        if name in ('CRC_RI_organic',):
-            load_RI_dfs()
+        if name in ('RI_data_CRC_organic', 'RI_sources'):
+            _load_RI_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_RI_dfs()
+    _load_RI_data()
+
+# %% Refractive index functions
 
 CRC = 'CRC'
-NONE = 'NONE'
 RI_methods = [CRC]
 
-
-def refractive_index(CASRN, T=None, AvailableMethods=False, Method=None,
+def refractive_index(CASRN, get_methods=False, method=None,
                      full_info=True):
     r'''This function handles the retrieval of a chemical's refractive
     index. Lookup is based on CASRNs. Will automatically select a data source
-    to use if no Method is provided; returns None if the data is not available.
+    to use if no method is provided; returns None if the data is not available.
 
     Function has data for approximately 4500 chemicals.
 
@@ -75,15 +81,15 @@ def refractive_index(CASRN, T=None, AvailableMethods=False, Method=None,
         Refractive Index on the Na D line, [-]
     T : float, only returned if full_info == True
         Temperature at which refractive index reading was made
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain RI with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         RI_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         RI for the desired chemical, and will return methods instead of RI
     full_info : bool, optional
@@ -106,32 +112,18 @@ def refractive_index(CASRN, T=None, AvailableMethods=False, Method=None,
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
-    if not _RI_dat_loaded:
-        load_RI_dfs()
-    def list_methods():
-        methods = []
-        if CASRN in CRC_RI_organic.index:
-            methods.append(CRC)
-        methods.append(NONE)
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == CRC:
-        _RI = float(CRC_RI_organic.at[CASRN, 'RI'])
-        if full_info:
-            _T = float(CRC_RI_organic.at[CASRN, 'RIT'])
-    elif Method == NONE:
-        _RI, _T = None, None
+    if not _RI_data_loaded: _load_RI_data()
+    if get_methods:
+        return list_available_methods_from_df_dict(RI_sources, CASRN, 'RI')
     else:
-        raise Exception('Failure in in function')
-    if full_info:
-        return _RI, _T
-    else:
-        return _RI
-
+        key = ('RI', 'RIT') if full_info else 'RI'
+        if method:
+            value = retrieve_from_df_dict(RI_sources, CASRN, key, method) 
+        else:
+            value = retrieve_any_from_df_dict(RI_sources, CASRN, key) 
+        if full_info and value is None:
+            value = (None, None)
+        return value
 
 def polarizability_from_RI(RI, Vm):
     r'''Returns the polarizability of a fluid given its molar volume and
@@ -175,7 +167,6 @@ def polarizability_from_RI(RI, Vm):
     '''
     return 3/(4*pi*N_A)*(RI**2-1)/(RI**2+2)*Vm
 
-
 def molar_refractivity_from_RI(RI, Vm):
     r'''Returns the molar refractivity of a fluid given its molar volume and
     refractive index.
@@ -212,7 +203,6 @@ def molar_refractivity_from_RI(RI, Vm):
        doi:10.1007/s10765-016-2075-8.
     '''
     return (RI**2 - 1.)/(RI**2 + 2.)*Vm
-
 
 def RI_from_molar_refractivity(Rm, Vm):
     r'''Returns the refractive index of a fluid given its molar volume and
@@ -251,5 +241,4 @@ def RI_from_molar_refractivity(Rm, Vm):
     '''
     Rm = ((-2*Rm - Vm)/(Rm-Vm))**0.5
     return Rm
-
 

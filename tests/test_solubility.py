@@ -43,13 +43,13 @@ def test_solubility_parameter():
     assert delta == solubility_parameter(298.2, 26403.3, 0.000116055)
     assert_close(delta, 14357.681538173534)
 
-    assert None == solubility_parameter(298.2, 26403.3, Method='DEFINITION')
-    assert None == solubility_parameter(T=298.2, Vml=0.000116055, Method='DEFINITION')
+    assert None == solubility_parameter(298.2, 26403.3, method='DEFINITION')
+    assert None == solubility_parameter(T=298.2, Vml=0.000116055, method='DEFINITION')
     assert None == solubility_parameter(T=298.2, Vml=0.000116055)
-    assert ['DEFINITION', 'NONE'] == solubility_parameter(T=298.2, Hvapm=26403.3, Vml=0.000116055, AvailableMethods=True)
+    assert ['DEFINITION'] == solubility_parameter(T=298.2, Hvapm=26403.3, Vml=0.000116055, get_methods=True)
 
     with pytest.raises(Exception):
-        solubility_parameter(CASRN='132451235-2151234-1234123', Method='BADMETHOD')
+        solubility_parameter(CASRN='132451235-2151234-1234123', method='BADMETHOD')
 
     assert None == solubility_parameter(T=3500.2, Hvapm=26403.3, Vml=0.000116055)
 
