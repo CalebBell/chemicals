@@ -23,7 +23,6 @@ SOFTWARE.'''
 # If so, add framework for lazy loading and solubility_parameter_sources.
 # If not, replace the `solubility_parameter` function with `solubility_parameter_DEFINITION`
 
-
 __all__ = ['solubility_parameter_methods', 'solubility_parameter', 
            'solubility_eutectic', 'Tm_depression_eutectic',
            'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture']
