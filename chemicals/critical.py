@@ -52,7 +52,7 @@ def _add_Zc_to_df(df):
 
 # IUPAC Organic data series
 # TODO: 12E of this data http://pubsdc3.acs.org/doi/10.1021/acs.jced.5b00571
-register_df_source(folder, name='IUPACOrganicCriticalProps.tsv')
+register_df_source(folder, 'IUPACOrganicCriticalProps.tsv')
 
 # CRC Handbook from TRC Organic data section (only in 2015)
 # No Inorganic table was taken, although it is already present;

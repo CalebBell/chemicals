@@ -94,7 +94,6 @@ else:
     _load_GWP_ODP_data()
     _load_logP_data()
 
-
 IPCC100 = 'IPCC (2007) 100yr'
 IPCC100SAR = 'IPCC (2007) 100yr-SAR'
 IPCC20 = 'IPCC (2007) 20yr'
