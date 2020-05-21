@@ -39,16 +39,17 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'mix_multiple_component_flows', 'mix_component_partial_flows', 
 'solve_flow_composition_mix',
 'phase_select_property',  'allclose_variable', 
-'polylog2', 'v_to_v_molar', 'v_molar_to_v', 'TrivialSolutionError',
-'PhaseCountReducedError', 'PhaseExistenceImpossible', 'OverspeficiedError']
+'polylog2', 'v_to_v_molar', 'v_molar_to_v']
 
 import os
 import sys
 from cmath import sqrt as csqrt
 from bisect import bisect_left
 import numpy as np
-from fluids.numerics import brenth, newton, linspace, polyint, polyint_over_x, derivative, polyder, horner, horner_and_der2, quadratic_from_f_ders, assert_close
-
+from fluids.numerics import (brenth, newton, linspace, polyint, 
+                             polyint_over_x, derivative, polyder,
+                             horner, horner_and_der2, assert_close,
+                             quadratic_from_f_ders)
 from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
                   cos, cosh, degrees, e,  exp, fabs, 
                   factorial, floor, fmod, frexp, fsum, hypot, isinf, 
@@ -2322,39 +2323,3 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
     ws = zs_to_ws(zs, MWs)
     
     return Fs, zs, ws
-
-
-
-
-class OverspeficiedError(Exception):
-    '''Generic error to raise when multiple values are given, when only
-    one option should be given.
-    '''
-
-
-class TrivialSolutionError(Exception):
-    '''Error raised SS converges to trivial solution
-    '''
-    def __init__(self, message, comp_difference, iterations, err):
-        super(TrivialSolutionError, self).__init__(message)
-        self.comp_difference = comp_difference
-        self.iterations = iterations
-        self.err = err
-
-
-class PhaseCountReducedError(Exception):
-    '''Error raised SS inner flash loop says all Ks are under 1 or above 1
-    '''
-    def __init__(self, message, zs=None, Ks=None):
-        super(PhaseCountReducedError, self).__init__(message)
-        self.zs = zs
-        self.Ks = Ks
-
-class PhaseExistenceImpossible(Exception):
-    '''Error raised SS inner flash loop says all Ks are under 1 or above 1
-    '''
-    def __init__(self, message, zs=None, T=None, P=None):
-        super(PhaseExistenceImpossible, self).__init__(message)
-        self.zs = zs
-        self.T = T
-        self.P = P
