@@ -27,48 +27,47 @@ from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
-                                   list_available_methods)
+                                   list_available_methods_from_df_dict)
+
+# %% Register data sources and lazy load them
 
 folder = os.path.join(os.path.dirname(__file__), 'Misc')
+register_df_source(folder, 'Poling Dipole.csv')
+register_df_source(folder, 'cccbdb.nist.gov Dipoles.csv')
+register_df_source(folder, 'Muller Supporting Info Dipoles.csv')
 
-register_df_source(folder, name='Poling Dipole.csv')
-register_df_source(folder, name='cccbdb.nist.gov Dipoles.csv')
-register_df_source(folder, name='Muller Supporting Info Dipoles.csv')
-
-_dipole_dfs_loaded = False
-def load_dipole_dfs():
-    global _dipole_CCDB, _dipole_Muller, _dipole_Poling, _dipole_df_dict
-    _dipole_CCDB = data_source('cccbdb.nist.gov Dipoles.csv')
-    _dipole_Muller = data_source('Muller Supporting Info Dipoles.csv')
-    _dipole_Poling = data_source('Poling Dipole.csv')
-    _dipole_df_dict = {
-        'CCCBDB': _dipole_CCDB,
-        'MULLER': _dipole_Muller,
-        'POLING': _dipole_Poling,
+_dipole_data_loaded = False
+def _load_dipole_data():
+    global dipole_data_CCDB, dipole_data_Muller, dipole_data_Poling, dipole_sources
+    dipole_data_CCDB = data_source('cccbdb.nist.gov Dipoles.csv')
+    dipole_data_Muller = data_source('Muller Supporting Info Dipoles.csv')
+    dipole_data_Poling = data_source('Poling Dipole.csv')
+    dipole_sources = {
+        CCCBDB: dipole_data_CCDB,
+        MULLER: dipole_data_Muller,
+        POLING: dipole_data_Poling,
     }
 
 if PY37:
     def __getattr__(name):
-        if name in ('_dipole_Poling', '_dipole_CCDB', '_dipole_Muller'):
-            load_dipole_dfs()
+        if name in ('dipole_data_Poling', 'dipole_data_CCDB', 'dipole_data_Muller'):
+            _load_dipole_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_dipole_dfs()
+    _load_dipole_data()
 
-
+# %%
 
 CCCBDB = 'CCCBDB'
 MULLER = 'MULLER'
 POLING = 'POLING'
-
 dipole_methods = [CCCBDB, MULLER, POLING]
 
-
-def dipole_moment(CASRN, AvailableMethods=False, Method=None):
+def dipole_moment(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's dipole moment.
     Lookup is based on CASRNs. Will automatically select a data source to use
-    if no Method is provided; returns None if the data is not available.
+    if no method is provided; returns None if the data is not available.
 
     Prefered source is 'CCCBDB'. Considerable variation in reported data has
     found.
@@ -82,16 +81,16 @@ def dipole_moment(CASRN, AvailableMethods=False, Method=None):
     -------
     dipole : float
         Dipole moment, [debye]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain dipole moment with the
         given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         The method name to use. Accepted methods are 'CCCBDB', 'MULLER', or
         'POLING'. All valid values are also held in the list `dipole_methods`.
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         the dipole moment for the desired chemical, and will return methods
         instead of the dipole moment
@@ -129,11 +128,11 @@ def dipole_moment(CASRN, AvailableMethods=False, Method=None):
     .. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    if not _dipole_dfs_loaded: load_dipole_dfs()
-    if AvailableMethods:
-        return list_available_methods(_dipole_df_dict, CASRN, 'Dipole')
-    elif Method:
-        return retrieve_from_df_dict(_dipole_df_dict, CASRN, 'Dipole',
-                                     Method) 
+    if not _dipole_data_loaded: _load_dipole_data()
+    if get_methods:
+        return list_available_methods_from_df_dict(dipole_sources, CASRN, 'Dipole')
+    elif method:
+        return retrieve_from_df_dict(dipole_sources, CASRN, 'Dipole',
+                                     method) 
     else:
-        return retrieve_any_from_df_dict(_dipole_df_dict, CASRN, 'Dipole') 
+        return retrieve_any_from_df_dict(dipole_sources, CASRN, 'Dipole') 

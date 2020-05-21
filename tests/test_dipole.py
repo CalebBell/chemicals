@@ -28,33 +28,33 @@ from chemicals.dipole import *
 
 def test_dipole_moment_methods():
 
-    tot = dipole._dipole_Poling['Dipole'].sum()
+    tot = dipole.dipole_data_Poling['Dipole'].sum()
     assert_close(tot, 248.59999999999999)
 
-    tot = dipole._dipole_CCDB['Dipole'].sum()
+    tot = dipole.dipole_data_CCDB['Dipole'].sum()
     assert_close(tot, 632.97000000000003)
 
-    tot = dipole._dipole_Muller['Dipole'].sum()
+    tot = dipole.dipole_data_Muller['Dipole'].sum()
     assert_close(tot, 420.05190108045235)
 
-    assert dipole._dipole_CCDB.index.is_unique
-    assert dipole._dipole_Muller.index.is_unique
-    assert dipole._dipole_Poling.index.is_unique
+    assert dipole.dipole_data_CCDB.index.is_unique
+    assert dipole.dipole_data_Muller.index.is_unique
+    assert dipole.dipole_data_Poling.index.is_unique
 
 
 def test_dipole():
     d = dipole_moment(CASRN='64-17-5')
     assert_close(d, 1.44)
 
-    d = dipole_moment(CASRN='75-52-5', Method='POLING')
+    d = dipole_moment(CASRN='75-52-5', method='POLING')
     assert_close(d, 3.1)
 
-    d = dipole_moment(CASRN='56-81-5', Method='MULLER')
+    d = dipole_moment(CASRN='56-81-5', method='MULLER')
     assert_close(d, 4.21)
 
-    methods = dipole_moment(CASRN='78-78-4', AvailableMethods=True)
+    methods = dipole_moment(CASRN='78-78-4', get_methods=True)
     methods_fixed = ['CCCBDB', 'MULLER', 'POLING']
     assert methods == methods_fixed
     
     with pytest.raises(Exception):
-        dipole_moment(CASRN='78-78-4', Method='FAIL')
+        dipole_moment(CASRN='78-78-4', method='FAIL')

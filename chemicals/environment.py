@@ -20,69 +20,93 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from __future__ import division
-
-__all__ = ['GWP', 'ODP', 'logP', 'GWP_methods', 'ODP_methods', 
-           'logP_methods']
+__all__ = ['GWP', 'ODP', 'logP', 
+           'global_warming_potential',
+           'ozone_depletion_potential',
+           'octanol_water_partition_coefficient',
+           'GWP_methods', 'ODP_methods', 'logP_methods']
 
 import os
 import pandas as pd
 from chemicals.utils import PY37
-from chemicals.data_reader import register_df_source, data_source
+from chemicals.data_reader import (register_df_source,
+                                   data_source,
+                                   retrieve_from_df,
+                                   retrieve_any_from_df,
+                                   retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
+                                   list_available_methods_from_df_dict)
 
-
+# %% Register data sources and lazy load them
 
 folder = os.path.join(os.path.dirname(__file__), 'Environment')
-
-
-### Global Warming Potentials
-register_df_source(folder, name='Official Global Warming Potentials.tsv')
-register_df_source(folder, name='Ozone Depletion Potentials.tsv')
-register_df_source(folder, name='CRC logP table.tsv')
-register_df_source(folder, name='Syrres logP data.csv.gz', csv_kwargs={'compression': 'gzip'})
-
+register_df_source(folder, 'Official Global Warming Potentials.tsv')
+register_df_source(folder, 'Ozone Depletion Potentials.tsv')
+register_df_source(folder, 'CRC logP table.tsv')
+register_df_source(folder, 'Syrres logP data.csv.gz', csv_kwargs={'compression': 'gzip'})
 
 _GWP_ODP_loaded = False
-
-def load_GWP_ODP_dfs():
-    global _GWP_ODP_loaded, GWP_data, ODP_data
+def _load_GWP_ODP_data():
+    global _GWP_ODP_loaded, GWP_data, ODP_data, _GWP_keys_by_method
+    global _GWP_keys_by_method, _ODP_keys_by_method
     GWP_data = data_source('Official Global Warming Potentials.tsv')
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_loaded = True
+    _GWP_keys_by_method = {
+        'IPCC (2007) 100yr' : '100yr GWP',
+        'IPCC (2007) 100yr-SAR': 'SAR 100yr',
+        'IPCC (2007) 20yr': '20yr GWP',
+        'IPCC (2007) 500yr': '500yr GWP',
+    }
+    _ODP_keys_by_method = {
+        'ODP2 Max': 'ODP2 Max',
+        'ODP1 Max': 'ODP1 Max',
+        'ODP2 logarithmic average': 'ODP2 Design',
+        'ODP1 logarithmic average': 'ODP1 Design',
+        'ODP2 Min': 'ODP2 Min',
+        'ODP1 Min': 'ODP1 Min',
+        'ODP2 string': 'ODP2',
+        'ODP1 string': 'ODP1',
+    }
     
-loaded_logP = False
-def load_logP_dfs():
-    global loaded_logP, CRClogPDict, SyrresDict2
-    CRClogPDict = data_source('CRC logP table.tsv')
-    SyrresDict2 = data_source('Syrres logP data.csv.gz')
-    loaded_logP = True
+_logP_loaded = False
+def _load_logP_data():
+    global _logP_loaded, logP_data_CRC, logP_data_Syrres, logP_sources
+    logP_data_CRC = data_source('CRC logP table.tsv')
+    logP_data_Syrres = data_source('Syrres logP data.csv.gz')
+    _logP_loaded = True
+    logP_sources = {
+        'CRC': logP_data_CRC,
+        'SYRRES': logP_data_Syrres,
+    }
 
 if PY37:
     def __getattr__(name):
         if name in ('GWP_data', 'ODP_data'):
-            load_GWP_ODP_dfs()
+            _load_GWP_ODP_data()
             return globals()[name]
-        elif name in ('CRClogPDict', 'SyrresDict2'):
-            load_logP_dfs()
+        elif name in ('logP_data_CRC', 'logP_data_Syrres'):
+            _load_logP_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_GWP_ODP_dfs()
-    load_logP_dfs()
+    _load_GWP_ODP_data()
+    _load_logP_data()
 
 
 IPCC100 = 'IPCC (2007) 100yr'
 IPCC100SAR = 'IPCC (2007) 100yr-SAR'
 IPCC20 = 'IPCC (2007) 20yr'
 IPCC500 = 'IPCC (2007) 500yr'
-NONE = 'None'
 GWP_methods = [IPCC100, IPCC100SAR, IPCC20, IPCC500]
 
 
-def GWP(CASRN, AvailableMethods=False, Method=None):
+# %% Environmental data functions
+
+def GWP(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's Global Warming
     Potential, relative to CO2. Lookup is based on CASRNs. Will automatically
-    select a data source to use if no Method is provided; returns None if the
+    select a data source to use if no method is provided; returns None if the
     data is not available.
 
     Returns the GWP for the 100yr outlook by default.
@@ -96,17 +120,17 @@ def GWP(CASRN, AvailableMethods=False, Method=None):
     -------
     GWP : float
         Global warming potential, [(impact/mass chemical)/(impact/mass CO2)]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain GWP with the
         given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         The method name to use. Accepted methods are IPCC (2007) 100yr',
         'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'. 
         All valid values are also held in the list GWP_methods.
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         the GWP for the desired chemical, and will return methods
         instead of the GWP
@@ -131,36 +155,19 @@ def GWP(CASRN, AvailableMethods=False, Method=None):
        Changes in Atmospheric Constituents and in Radiative Forcing." 2007.
        https://www.ipcc.ch/publications_and_data/ar4/wg1/en/ch2s2-10-2.html.
     '''
-    if not _GWP_ODP_loaded:
-        load_GWP_ODP_dfs()
-    def list_methods():
-        methods = []
+    if not _GWP_ODP_loaded: _load_GWP_ODP_data()
+    if get_methods:
         if CASRN in GWP_data.index:
-            methods.append(IPCC100)
-            if not pd.isnull(GWP_data.at[CASRN, 'SAR 100yr']):
-                methods.append(IPCC100SAR)
-            methods.append(IPCC20)
-            methods.append(IPCC500)
-        methods.append(NONE)
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == IPCC100:
-        return float(GWP_data.at[CASRN, '100yr GWP'])
-    elif Method == IPCC100SAR:
-        return float(GWP_data.at[CASRN, 'SAR 100yr'])
-    elif Method == IPCC20:
-        return float(GWP_data.at[CASRN, '20yr GWP'])
-    elif Method == IPCC500:
-        return float(GWP_data.at[CASRN, '500yr GWP'])
-    elif Method == NONE:
-        return None
+            return [method for method, key in _GWP_keys_by_method.items()
+                    if not pd.isnull(GWP_data.at[CASRN, key])]
+        else:
+            return []
+    elif method:
+        key = _GWP_keys_by_method[method]
+        return retrieve_from_df(GWP_data, CASRN, key)
     else:
-        raise Exception('Failure in in function')
-
+        return retrieve_any_from_df(GWP_data, CASRN, _GWP_keys_by_method.values())
+global_warming_potential = GWP
 
 ### Ozone Depletion Potentials
 
@@ -173,14 +180,13 @@ ODP1MAX = 'ODP1 Max'
 ODP1MIN = 'ODP1 Min'
 ODP1STR = 'ODP1 string'
 ODP1LOG = 'ODP1 logarithmic average'
-NONE = 'None'
 ODP_methods = [ODP2MAX, ODP1MAX, ODP2LOG, ODP1LOG, ODP2MIN, ODP1MIN, ODP2STR, ODP1STR]
 
 
-def ODP(CASRN, AvailableMethods=False, Method=None):
+def ODP(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's Ozone Depletion
     Potential, relative to CFC-11 (trichlorofluoromethane). Lookup is based on
-    CASRNs. Will automatically select a data source to use if no Method is
+    CASRNs. Will automatically select a data source to use if no method is
     provided; returns None if the data is not available.
 
     Returns the ODP of a chemical according to [2]_ when a method is not
@@ -197,21 +203,21 @@ def ODP(CASRN, AvailableMethods=False, Method=None):
         Ozone Depletion potential, [(impact/mass chemical)/(impact/mass CFC-11)];
         if method selected has `string` in it, this will be returned as a
         string regardless of if a range is given or a number
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain ODP with the
         given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         The method name to use. Accepted methods are 'ODP2 Max', 'ODP2 Min', 
         'ODP2 string', 'ODP2 logarithmic average', and methods for older values
         are 'ODP1 Max', 'ODP1 Min', 'ODP1 string', and 'ODP1 logarithmic average'.
         All valid values are also held in the list ODP_methods.
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         ODP_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         the ODP for the desired chemical, and will return methods
         instead of the ODP
@@ -249,69 +255,32 @@ def ODP(CASRN, AvailableMethods=False, Method=None):
        Project-Report No. 52, Geneva, Switzerland, 516 p.
        https://www.wmo.int/pages/prog/arep/gaw/ozone_2010/documents/Ozone-Assessment-2010-complete.pdf
     '''
-    if not _GWP_ODP_loaded:
-        load_GWP_ODP_dfs()
-    def list_methods():
-        methods = []
+    if not _GWP_ODP_loaded: _load_GWP_ODP_data()
+    if get_methods:
         if CASRN in ODP_data.index:
-            if not pd.isnull(ODP_data.at[CASRN, 'ODP2 Max']):
-                methods.append(ODP2MAX)
-            if not pd.isnull(ODP_data.at[CASRN, 'ODP1 Max']):
-                methods.append(ODP1MAX)
-            if not pd.isnull(ODP_data.at[CASRN, 'ODP2 Design']):
-                methods.append(ODP2LOG)
-            if not pd.isnull(ODP_data.at[CASRN, 'ODP1 Design']):
-                methods.append(ODP1LOG)
-            if not pd.isnull(ODP_data.at[CASRN, 'ODP2 Min']):
-                methods.append(ODP2MIN)
-            if not pd.isnull(ODP_data.at[CASRN, 'ODP1 Min']):
-                methods.append(ODP1MIN)
-            if not pd.isnull(ODP_data.at[CASRN, 'ODP2']):
-                methods.append(ODP2STR)
-            if not pd.isnull(ODP_data.at[CASRN, 'ODP1']):
-                methods.append(ODP1STR)
-        methods.append(NONE)
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == ODP2MAX:
-        return float(ODP_data.at[CASRN, 'ODP2 Max'])
-    elif Method == ODP1MAX:
-        return float(ODP_data.at[CASRN, 'ODP1 Max'])
-    elif Method == ODP2MIN:
-        return float(ODP_data.at[CASRN, 'ODP2 Min'])
-    elif Method == ODP1MIN:
-        return float(ODP_data.at[CASRN, 'ODP1 Min'])
-    elif Method == ODP2LOG:
-        return float(ODP_data.at[CASRN, 'ODP2 Design'])
-    elif Method == ODP1LOG:
-        return float(ODP_data.at[CASRN, 'ODP1 Design'])
-    elif Method == ODP2STR:
-        return str(ODP_data.at[CASRN, 'ODP2'])
-    elif Method == ODP1STR:
-        return str(ODP_data.at[CASRN, 'ODP1'])
-    elif Method == NONE:
-        return None
+            return [method for method, key in _ODP_keys_by_method.items()
+                    if not pd.isnull(ODP_data.at[CASRN, key])]
+        else:
+            return []
+    elif method:
+        key = _ODP_keys_by_method[method]
+        return retrieve_from_df(ODP_data, CASRN, key)
     else:
-        raise Exception('Failure in in function')
-
+        return retrieve_any_from_df(ODP_data, CASRN, _ODP_keys_by_method.values())
+ozone_depletion_potential = ODP
 
 ### log P
 
 
 SYRRES = 'SYRRES'
 CRC = 'CRC'
-NONE = 'NONE'
 logP_methods = [SYRRES, CRC]
 
 
-def logP(CASRN, AvailableMethods=False, Method=None):
+def logP(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's octanol-water
     partition coefficient. Lookup is based on CASRNs. Will automatically
-    select a data source to use if no Method is provided; returns None if the
+    select a data source to use if no method is provided; returns None if the
     data is not available.
 
     Parameters
@@ -323,16 +292,16 @@ def logP(CASRN, AvailableMethods=False, Method=None):
     -------
     logP : float
         Octanol-water partition coefficient, [-]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain logP with the
         given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         The method name to use. Accepted methods are 'SYRRES', or 'CRC', 
         All valid values are also held in the list logP_methods.
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         the logP for the desired chemical, and will return methods
         instead of the logP
@@ -356,26 +325,11 @@ def logP(CASRN, AvailableMethods=False, Method=None):
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
-    if not loaded_logP:
-        load_logP_dfs()
-    def list_methods():
-        methods = []
-        if CASRN in CRClogPDict.index:
-            methods.append(CRC)
-        if CASRN in SyrresDict2.index:
-            methods.append(SYRRES)
-        methods.append(NONE)
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == CRC:
-        return float(CRClogPDict.at[CASRN, 'logP'])
-    elif Method == SYRRES:
-        return float(SyrresDict2.at[CASRN, 'logP'])
-    elif Method == NONE:
-        return None
+    if not _logP_loaded: _load_logP_data()
+    if get_methods:
+        return list_available_methods_from_df_dict(logP_sources, CASRN, 'logP')
+    elif method:
+        return retrieve_from_df_dict(logP_sources, CASRN, 'logP', method) 
     else:
-        raise Exception('Failure in in function')
+        return retrieve_any_from_df_dict(logP_sources, CASRN, 'logP') 
+octanol_water_partition_coefficient = logP

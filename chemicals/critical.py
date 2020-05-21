@@ -31,18 +31,18 @@ __all__.extend(['Tc_methods', 'Pc_methods', 'Vc_methods', 'Zc_methods',
 
 import os
 import pandas as pd
-from fluids.constants import R, R_inv, N_A
+from fluids.constants import R_inv, N_A
 from chemicals.utils import log, PY37
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
-                                   list_available_methods)
+                                   list_available_methods_from_df_dict)
 
 folder = os.path.join(os.path.dirname(__file__), 'Critical Properties')
 
 
-### Read the various data files
+# %% Register data sources and lazy load them
 
 def _add_Zc_to_df(df):
     # Some files don't have the `Zc` column; this adds it
@@ -63,46 +63,46 @@ register_df_source(folder, 'Mathews1972InorganicCriticalProps.tsv')
 register_df_source(folder, 'Appendix to PSRK Revision 4.tsv', postload=_add_Zc_to_df)
 register_df_source(folder, 'PassutDanner1973.tsv')
 register_df_source(folder, 'Yaws Collection.tsv', postload=_add_Zc_to_df)
-_critical_dfs_loaded = False
-def load_critical_dfs():
-    global _crit_IUPAC, _crit_Matthews, _crit_CRC, _crit_PSRKR4, _crit_Yaws
-    global _crit_PassutDanner, _critical_dfs_loaded, _Tc_dfs_dict, _Pc_dfs_dict
-    global _Vc_dfs_dict, _Zc_dfs_dict
-    _crit_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')
-    _crit_Matthews = data_source('Mathews1972InorganicCriticalProps.tsv')
-    _crit_CRC = data_source('CRCCriticalOrganics.tsv')
-    _crit_PSRKR4 = data_source('Appendix to PSRK Revision 4.tsv')
-    _crit_Yaws = data_source('Yaws Collection.tsv')
-    _crit_PassutDanner = data_source('PassutDanner1973.tsv')
-    _critical_dfs_loaded = True
-    _Tc_dfs_dict = {
-        'IUPAC': _crit_IUPAC,
-        'MATTHEWS': _crit_Matthews,
-        'CRC': _crit_CRC,
-        'PSRK': _crit_PSRKR4,
-        'PD': _crit_PassutDanner,
-        'YAWS': _crit_Yaws
+_critical_data_loaded = False
+def _load_critical_data():
+    global critical_data_IUPAC, critical_data_Matthews, critical_data_CRC
+    global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner
+    global Tc_sources, Pc_sources, Vc_sources, Zc_sources, _critical_data_loaded
+    critical_data_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')
+    critical_data_Matthews = data_source('Mathews1972InorganicCriticalProps.tsv')
+    critical_data_CRC = data_source('CRCCriticalOrganics.tsv')
+    critical_data_PSRKR4 = data_source('Appendix to PSRK Revision 4.tsv')
+    critical_data_Yaws = data_source('Yaws Collection.tsv')
+    critical_data_PassutDanner = data_source('PassutDanner1973.tsv')
+    _critical_data_loaded = True
+    Tc_sources = {
+        IUPAC: critical_data_IUPAC,
+        MATTHEWS: critical_data_Matthews,
+        CRC: critical_data_CRC,
+        PSRK: critical_data_PSRKR4,
+        PD: critical_data_PassutDanner,
+        YAWS: critical_data_Yaws
     }
-    _Pc_dfs_dict = _Tc_dfs_dict
-    # The Passut Danner tsv file doesn't have Vc; so its not included
-    # TODO: Think about adding Vc to the file by Ihmels
-    _Vc_dfs_dict = _Tc_dfs_dict.copy()
-    del _Vc_dfs_dict['PD']
-    _Zc_dfs_dict = _Vc_dfs_dict
+    # Create copies just incase new dfs need to be added later
+    Pc_sources = Tc_sources.copy()
+    # The Passut Danner tsv file doesn't have Vc, so its not included
+    Vc_sources = Tc_sources.copy()
+    del Vc_sources['PD']
+    Zc_sources = Vc_sources.copy()
 
 if PY37:
     def __getattr__(name):
-        if name in ('_crit_IUPAC', '_crit_Matthews', '_crit_CRC', '_crit_PSRKR4',
-                    '_crit_Yaws', '_crit_PassutDanner', '_Tc_dfs_dict',
-                    '_Pc_dfs_dict', '_Vc_dfs_dict', '_Zc_dfs_dict',):
-            load_critical_dfs()
+        if name in ('critical_data_IUPAC', 'critical_data_Matthews', 
+                    'critical_data_CRC', 'critical_data_PSRKR4',
+                    'critical_data_Yaws', 'critical_data_PassutDanner',
+                    'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources'):
+            _load_critical_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_critical_dfs()
+    _load_critical_data()
 
-
-### Strings defining each method
+# %% Critical point functions
 
 IUPAC = 'IUPAC'
 MATTHEWS = 'MATTHEWS'
@@ -112,11 +112,10 @@ PD = 'PD'
 YAWS = 'YAWS'
 Tc_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
 
-
-def critical_point_temperature(CASRN, AvailableMethods=False, Method=None):
+def Tc(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's critical
     temperature. Lookup is based on CASRNs. Will automatically select a data
-    source to use if no Method is provided; returns None if the data is not
+    source to use if no method is provided; returns None if the data is not
     available.
 
     Prefered sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
@@ -131,16 +130,16 @@ def critical_point_temperature(CASRN, AvailableMethods=False, Method=None):
     -------
     Tc : float
         Critical temperature, [K]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Tc with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
         'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held  
         in the list `Tc_methods`.
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         Tc for the desired chemical, and will return methods instead of Tc
 
@@ -244,21 +243,21 @@ def critical_point_temperature(CASRN, AvailableMethods=False, Method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    if not _critical_dfs_loaded: load_critical_dfs()
-    if AvailableMethods:
-        return list_available_methods(_Tc_dfs_dict, CASRN, 'Tc')
-    elif Method:
-        return retrieve_from_df_dict(_Tc_dfs_dict, CASRN, 'Tc', Method) 
+    if not _critical_data_loaded: _load_critical_data()
+    if get_methods:
+        return list_available_methods_from_df_dict(Tc_sources, CASRN, 'Tc')
+    elif method:
+        return retrieve_from_df_dict(Tc_sources, CASRN, 'Tc', method) 
     else:
-        return retrieve_any_from_df_dict(_Tc_dfs_dict, CASRN, 'Tc') 
-Tc = critical_point_temperature
+        return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc') 
+critical_point_temperature = Tc
 
 Pc_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
 
-def critical_point_pressure(CASRN, AvailableMethods=False, Method=None):
+def Pc(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's critical
     pressure. Lookup is based on CASRNs. Will automatically select a data
-    source to use if no Method is provided; returns None if the data is not
+    source to use if no method is provided; returns None if the data is not
     available.
 
     Prefered sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
@@ -278,16 +277,16 @@ def critical_point_pressure(CASRN, AvailableMethods=False, Method=None):
     -------
     Pc : float
         Critical pressure, [Pa]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Pc with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
         'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held  
         in the list `Pc_methods`.
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         Pc for the desired chemical, and will return methods instead of Pc
 
@@ -382,21 +381,21 @@ def critical_point_pressure(CASRN, AvailableMethods=False, Method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    if not _critical_dfs_loaded: load_critical_dfs()
-    if AvailableMethods:
-        return list_available_methods(_Pc_dfs_dict, CASRN, 'Pc')
-    elif Method:
-        return retrieve_from_df_dict(_Pc_dfs_dict, CASRN, 'Pc', Method) 
+    if not _critical_data_loaded: _load_critical_data()
+    if get_methods:
+        return list_available_methods_from_df_dict(Pc_sources, CASRN, 'Pc')
+    elif method:
+        return retrieve_from_df_dict(Pc_sources, CASRN, 'Pc', method) 
     else:
-        return retrieve_any_from_df_dict(_Pc_dfs_dict, CASRN, 'Pc') 
-Pc = critical_point_pressure
+        return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc') 
+critical_point_pressure = Pc
 
 Vc_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
 
-def critical_point_volume(CASRN, AvailableMethods=False, Method=None):
+def Vc(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's critical
     volume. Lookup is based on CASRNs. Will automatically select a data
-    source to use if no Method is provided; returns None if the data is not
+    source to use if no method is provided; returns None if the data is not
     available.
 
     Prefered sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
@@ -416,16 +415,16 @@ def critical_point_volume(CASRN, AvailableMethods=False, Method=None):
     -------
     Vc : float
         Critical volume, [m^3/mol]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Vc with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
         'CRC', 'PSRK', and 'YAWS'. All valid values are also held  
         in the list `Vc_methods`.
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         Vc for the desired chemical, and will return methods instead of Vc
         
@@ -514,22 +513,22 @@ def critical_point_volume(CASRN, AvailableMethods=False, Method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    if not _critical_dfs_loaded: load_critical_dfs()
-    if AvailableMethods:
-        return list_available_methods(_Vc_dfs_dict, CASRN, 'Vc')
-    elif Method:
-        return retrieve_from_df_dict(_Vc_dfs_dict, CASRN, 'Vc', Method)
+    if not _critical_data_loaded: _load_critical_data()
+    if get_methods:
+        return list_available_methods_from_df_dict(Vc_sources, CASRN, 'Vc')
+    elif method:
+        return retrieve_from_df_dict(Vc_sources, CASRN, 'Vc', method)
     else:
-        return retrieve_any_from_df_dict(_Vc_dfs_dict, CASRN, 'Vc') 
-Vc = critical_point_volume
+        return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc') 
+critical_point_volume = Vc
 
 Zc_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
 
 
-def compressibility_factor(CASRN, AvailableMethods=False, Method=None):
+def Zc(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's critical
     compressibility. Lookup is based on CASRNs. Will automatically select a
-    data source to use if no Method is provided; returns None if the data is
+    data source to use if no method is provided; returns None if the data is
     not available.
 
     Prefered sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
@@ -549,16 +548,16 @@ def compressibility_factor(CASRN, AvailableMethods=False, Method=None):
     -------
     Zc : float
         Critical compressibility, [-]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Vc with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
         'CRC', 'PSRK', and 'YAWS'. All valid values are also held  
         in `Zc_methods`.
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         Zc for the desired chemical, and will return methods instead of Zc
 
@@ -647,14 +646,14 @@ def compressibility_factor(CASRN, AvailableMethods=False, Method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    if not _critical_dfs_loaded: load_critical_dfs()
-    if AvailableMethods:
-        return list_available_methods(_Zc_dfs_dict, CASRN, 'Zc')
-    elif Method:
-        return retrieve_from_df_dict(_Zc_dfs_dict, CASRN, 'Zc', Method)
+    if not _critical_data_loaded: _load_critical_data()
+    if get_methods:
+        return list_available_methods_from_df_dict(Zc_sources, CASRN, 'Zc')
+    elif method:
+        return retrieve_from_df_dict(Zc_sources, CASRN, 'Zc', method)
     else:
-        return retrieve_any_from_df_dict(_Zc_dfs_dict, CASRN, 'Zc') 
-Zc = compressibility_factor
+        return retrieve_any_from_df_dict(Zc_sources, CASRN, 'Zc') 
+compressibility_factor = Zc
     
 
 rcovs_Mersmann_Kind = {'C': 0.77, 'Cl': 0.99, 'I': 1.33, 'H': 0.37, 'F': 0.71, 
@@ -1000,8 +999,8 @@ GRIGORAS = 'GRIGORAS'
 critical_surface_methods = (IHMELS, MEISSNER, GRIGORAS)
 
 
-def critical_surface(Tc=None, Pc=None, Vc=None, AvailableMethods=False,
-                     Method=None):
+def critical_surface(Tc=None, Pc=None, Vc=None, get_methods=False,
+                     method=None):
     r'''Function for calculating a critical property of a substance from its
     other two critical properties. Calls functions Ihmels, Meissner, and
     Grigoras, each of which use a general 'Critical surface' type of equation.
@@ -1015,9 +1014,9 @@ def critical_surface(Tc=None, Pc=None, Vc=None, AvailableMethods=False,
         Critical pressure of fluid (optional) [Pa]
     Vc : float
         Critical volume of fluid (optional) [m^3/mol]
-    AvailableMethods : bool
+    get_methods : bool
         Request available methods for given parameters
-    Method : string
+    method : string
         Request calculation uses the requested method
 
     Returns
@@ -1032,24 +1031,24 @@ def critical_surface(Tc=None, Pc=None, Vc=None, AvailableMethods=False,
     --------
     Decamethyltetrasiloxane [141-62-8]
 
-    >>> critical_surface(Tc=599.4, Pc=1.19E6, Method='IHMELS')
+    >>> critical_surface(Tc=599.4, Pc=1.19E6, method='IHMELS')
     0.0010927333333333334
     '''
-    if AvailableMethods:
+    if get_methods:
         if (Tc and Pc) or (Tc and Vc) or (Pc and Vc):
             return list(critical_surface_methods)
         else:
             return []
     
     # This is the calculate, given the method section
-    if not Method or Method == IHMELS:
+    if not method or method == IHMELS:
         Third = Ihmels(Tc=Tc, Pc=Pc, Vc=Vc)
-    elif Method == MEISSNER:
+    elif method == MEISSNER:
         Third = Meissner(Tc=Tc, Pc=Pc, Vc=Vc)
-    elif Method == GRIGORAS:
+    elif method == GRIGORAS:
         Third = Grigoras(Tc=Tc, Pc=Pc, Vc=Vc)
     else:
-        raise ValueError('invalid method' + repr(Method))
+        raise ValueError('invalid method' + repr(method))
     return Third
 
 

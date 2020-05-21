@@ -25,7 +25,7 @@ import pytest
 import numpy as np
 import pandas as pd
 from chemicals.environment import *
-from chemicals.environment import ODP_data, GWP_data, CRClogPDict, SyrresDict2
+from chemicals.environment import ODP_data, GWP_data, logP_data_CRC, logP_data_Syrres
 
 
 def test_GWP_data():
@@ -36,43 +36,43 @@ def test_GWP_data():
 
 def test_GWP():
     GWP1_calc = GWP(CASRN='74-82-8')
-    GWP2_calc = GWP(CASRN='74-82-8', Method='IPCC (2007) 100yr-SAR')
+    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (2007) 100yr-SAR')
     assert [GWP1_calc, GWP2_calc] == [25.0, 21.0]
 
-    GWP_available = GWP(CASRN='56-23-5', AvailableMethods=True)
-    assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr', 'NONE']
-    tot = pd.DataFrame( [GWP(i, Method=j) for i in GWP_data.index for j in GWP(i, AvailableMethods=True)]).sum()
+    GWP_available = GWP(CASRN='56-23-5', get_methods=True)
+    assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr']
+    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP(i, get_methods=True)]).sum()
     assert_allclose(tot, 960256)
 
     with pytest.raises(Exception):
-        GWP(CASRN='74-82-8', Method='BADMETHOD')
+        GWP(CASRN='74-82-8', method='BADMETHOD')
 
 
 def test_logP_data():
-    tot = np.abs(CRClogPDict['logP']).sum()
+    tot = np.abs(logP_data_CRC['logP']).sum()
     assert_allclose(tot, 1216.99)
-    assert CRClogPDict.index.is_unique
+    assert logP_data_CRC.index.is_unique
 
-    tot = np.abs(SyrresDict2['logP']).sum()
+    tot = np.abs(logP_data_Syrres['logP']).sum()
     assert_allclose(tot, 25658.06)
-    assert SyrresDict2.index.is_unique
+    assert logP_data_Syrres.index.is_unique
 
 
 def test_logP():
     vals = logP('67-56-1'), logP('124-18-5'), logP('7732-18-5')
     assert_allclose(vals, [-0.74, 6.25, -1.38])
 
-    tot_CRC = np.sum(np.abs(np.array([logP(i, Method='CRC') for i in CRClogPDict.index])))
+    tot_CRC = np.sum(np.abs(np.array([logP(i, method='CRC') for i in logP_data_CRC.index])))
     assert_allclose(tot_CRC, 1216.99)
 
-    tot_SYRRES = np.sum(np.abs(np.array([logP(i, Method='SYRRES') for i in SyrresDict2.index])))
+    tot_SYRRES = np.sum(np.abs(np.array([logP(i, method='SYRRES') for i in logP_data_Syrres.index])))
     assert_allclose(tot_SYRRES, 25658.060000000001)
 
     with pytest.raises(Exception):
-        logP(CASRN='74-82-8', Method='BADMETHOD')
+        logP(CASRN='74-82-8', method='BADMETHOD')
 
-    logP_available = logP('110-54-3', AvailableMethods=True)
-    assert logP_available == ['CRC', 'SYRRES', 'NONE']
+    logP_available = logP('110-54-3', get_methods=True)
+    assert logP_available == ['CRC', 'SYRRES']
 
     assert logP('1124321250-54-3') == None
 
@@ -88,22 +88,22 @@ def test_ODP_data():
 
 def test_ODP():
     V1 = ODP(CASRN='460-86-6')
-    V2 = ODP(CASRN='76-14-2', Method='ODP2 Max')
-    V3 = ODP(CASRN='76-14-2', Method='ODP1 Max')
+    V2 = ODP(CASRN='76-14-2', method='ODP2 Max')
+    V3 = ODP(CASRN='76-14-2', method='ODP1 Max')
     assert_allclose([V1, V2, V3], [7.5, 0.58, 1.0])
 
-    assert ODP(CASRN='148875-98-3', Method='ODP2 string') == '0.2-2.1'
+    assert ODP(CASRN='148875-98-3', method='ODP2 string') == '0.2-2.1'
 
-    methods = ['ODP2 Max', 'ODP1 Max', 'ODP2 logarithmic average', 'ODP1 logarithmic average', 'ODP2 Min', 'ODP1 Min', 'ODP2 string', 'ODP1 string', 'NONE']
+    methods = ['ODP2 Max', 'ODP1 Max', 'ODP2 logarithmic average', 'ODP1 logarithmic average', 'ODP2 Min', 'ODP1 Min', 'ODP2 string', 'ODP1 string']
 
-    assert methods == ODP(CASRN='148875-98-3', AvailableMethods=True)
+    assert methods == ODP(CASRN='148875-98-3', get_methods=True)
 
     with pytest.raises(Exception):
-        ODP(CASRN='148875-98-3', Method='BADMETHOD')
+        ODP(CASRN='148875-98-3', method='BADMETHOD')
 
     assert ODP(CASRN='14882353275-98-3') == None
 
-    dat_calc = [pd.to_numeric(pd.Series([ODP(i, Method=j) for i in ODP_data.index]), errors='coerce').sum() for j in ODP_methods]
+    dat_calc = [pd.to_numeric(pd.Series([ODP(i, method=j) for i in ODP_data.index]), errors='coerce').sum() for j in ODP_methods]
 
     dat = [77.641999999999996, 64.140000000000001, 63.10509761272651, 47.809027930358717, 58.521999999999998, 42.734000000000002, 54.342000000000006, 38.280000000000001]
     assert_allclose(dat_calc, dat)

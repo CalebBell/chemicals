@@ -25,126 +25,130 @@ import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.critical import *
-from chemicals.critical import (_crit_IUPAC, _crit_Matthews, _crit_CRC, 
-                                _crit_PSRKR4, _crit_Yaws, _crit_PassutDanner)
+from chemicals.critical import (critical_data_IUPAC,
+                                critical_data_Matthews,
+                                critical_data_CRC, 
+                                critical_data_PSRKR4, 
+                                critical_data_Yaws, 
+                                critical_data_PassutDanner)
 
 def test_data_IUPAC():
-    MW_sum = _crit_IUPAC['MW'].sum()
+    MW_sum = critical_data_IUPAC['MW'].sum()
     assert_allclose(MW_sum,122998.43799999992)
 
-    Tc_sum = _crit_IUPAC['Tc'].sum()
+    Tc_sum = critical_data_IUPAC['Tc'].sum()
     assert_allclose(Tc_sum, 462157.51300000004)
 
-    Pc_sum = _crit_IUPAC['Pc'].sum()
+    Pc_sum = critical_data_IUPAC['Pc'].sum()
     assert_allclose(Pc_sum, 2063753000.0)
 
-    Vc_sum = _crit_IUPAC['Vc'].sum()
+    Vc_sum = critical_data_IUPAC['Vc'].sum()
     assert_allclose(Vc_sum, 0.19953190000000001)
 
-    Zc_sum = _crit_IUPAC['Zc'].sum()
+    Zc_sum = critical_data_IUPAC['Zc'].sum()
     assert_allclose(Zc_sum, 109.892)
 
-    assert _crit_IUPAC.shape == (810, 7)
-    assert _crit_IUPAC.index.is_unique
+    assert critical_data_IUPAC.shape == (810, 7)
+    assert critical_data_IUPAC.index.is_unique
 
 
 def test_data_Matthews():
-    MW_sum = _crit_Matthews['MW'].sum()
+    MW_sum = critical_data_Matthews['MW'].sum()
     assert_allclose(MW_sum, 19541.760399999999)
 
-    Tc_sum = _crit_Matthews['Tc'].sum()
+    Tc_sum = critical_data_Matthews['Tc'].sum()
     assert_allclose(Tc_sum, 65343.210900000005)
 
-    Pc_sum = _crit_Matthews['Pc'].sum()
+    Pc_sum = critical_data_Matthews['Pc'].sum()
     assert_allclose(Pc_sum, 579365204.25)
 
-    Vc_sum = _crit_Matthews['Vc'].sum()
+    Vc_sum = critical_data_Matthews['Vc'].sum()
     assert_allclose(Vc_sum, 0.014921000000000002)
 
-    Zc_sum = _crit_Matthews['Zc'].sum()
+    Zc_sum = critical_data_Matthews['Zc'].sum()
     assert_allclose(Zc_sum, 12.141000000000002)
 
-    assert _crit_Matthews.shape == (120, 6)
-    assert _crit_Matthews.index.is_unique
+    assert critical_data_Matthews.shape == (120, 6)
+    assert critical_data_Matthews.index.is_unique
     
 def test_data_CRC():
-    Tc_sum = _crit_CRC['Tc'].sum()
+    Tc_sum = critical_data_CRC['Tc'].sum()
     assert_allclose(Tc_sum, 514092.75)
 
-    Pc_sum = _crit_CRC['Pc'].sum()
+    Pc_sum = critical_data_CRC['Pc'].sum()
     assert_allclose(Pc_sum, 2700259000.0)
 
-    Vc_sum = _crit_CRC['Vc'].sum()
+    Vc_sum = critical_data_CRC['Vc'].sum()
     assert_allclose(Vc_sum, 0.38876929999999998)
 
-    Zc_sum = _crit_CRC['Zc'].sum()
+    Zc_sum = critical_data_CRC['Zc'].sum()
     assert_allclose(Zc_sum, 207.98663028416496, 1e-6)
 
-    assert _crit_CRC.shape == (861, 8)
-    assert _crit_CRC.index.is_unique
+    assert critical_data_CRC.shape == (861, 8)
+    assert critical_data_CRC.index.is_unique
 
-    Tc_error_sum = _crit_CRC['Tc_error'].sum()
+    Tc_error_sum = critical_data_CRC['Tc_error'].sum()
     assert_allclose(Tc_error_sum, 2444.24)
 
-    Pc_error_sum = _crit_CRC['Pc_error'].sum()
+    Pc_error_sum = critical_data_CRC['Pc_error'].sum()
     assert_allclose(Pc_error_sum, 1.2587e+08)
 
-    Vc_error_sum = _crit_CRC['Vc_error'].sum()
+    Vc_error_sum = critical_data_CRC['Vc_error'].sum()
     assert_allclose(Vc_error_sum, 0.014151)
 
 
 def test_data_PSRKR4():
-    Tc_sum = _crit_PSRKR4['Tc'].sum()
+    Tc_sum = critical_data_PSRKR4['Tc'].sum()
     assert_allclose(Tc_sum, 597984.0)
 
-    Pc_sum = _crit_PSRKR4['Pc'].sum()
+    Pc_sum = critical_data_PSRKR4['Pc'].sum()
     assert_allclose(Pc_sum, 3708990509)
 
-    Vc_sum = _crit_PSRKR4['Vc'].sum()
+    Vc_sum = critical_data_PSRKR4['Vc'].sum()
     assert_allclose(Vc_sum, 0.40726849999999998)
 
-    Zc_sum = _crit_PSRKR4['Zc'].sum()
+    Zc_sum = critical_data_PSRKR4['Zc'].sum()
     assert_allclose(Zc_sum, 251.29839643655527, 1e-6)
 
-    omega_sum = _crit_PSRKR4['omega'].sum()
+    omega_sum = critical_data_PSRKR4['omega'].sum()
     assert_allclose(omega_sum, 410.50560000000002)
 
-    assert _crit_PSRKR4.shape == (995, 6)
-    assert _crit_PSRKR4.index.is_unique
+    assert critical_data_PSRKR4.shape == (995, 6)
+    assert critical_data_PSRKR4.index.is_unique
 
 
 def test_data_PassutDanner():
-    Tc_sum = _crit_PassutDanner['Tc'].sum()
+    Tc_sum = critical_data_PassutDanner['Tc'].sum()
     assert_allclose(Tc_sum, 111665.28333333334)
 
-    Pc_sum = _crit_PassutDanner['Pc'].sum()
+    Pc_sum = critical_data_PassutDanner['Pc'].sum()
     assert_allclose(Pc_sum, 579756767.55527318)
 
-    omega_sum = _crit_PassutDanner['omega'].sum()
+    omega_sum = critical_data_PassutDanner['omega'].sum()
     assert_allclose(omega_sum, 65.567000000000007)
 
-    assert _crit_PassutDanner.shape == (192, 4)
-    assert _crit_PassutDanner.index.is_unique
+    assert critical_data_PassutDanner.shape == (192, 4)
+    assert critical_data_PassutDanner.index.is_unique
 
 
 def test_data_Yaws():
-    Tc_sum = _crit_Yaws['Tc'].sum()
+    Tc_sum = critical_data_Yaws['Tc'].sum()
     assert_allclose(Tc_sum, 5862006.9500000002)
 
-    Pc_sum = _crit_Yaws['Pc'].sum()
+    Pc_sum = critical_data_Yaws['Pc'].sum()
     assert_allclose(Pc_sum, 62251189000.0)
 
-    Vc_sum = _crit_Yaws['Vc'].sum()
+    Vc_sum = critical_data_Yaws['Vc'].sum()
     assert_allclose(Vc_sum, 4.65511199)
 
-    Zc_sum = _crit_Yaws['Zc'].sum()
+    Zc_sum = critical_data_Yaws['Zc'].sum()
     assert_allclose(Zc_sum, 1859.6389176846883, 1e-6)
 
-    omega_sum = _crit_Yaws['omega'].sum()
+    omega_sum = critical_data_Yaws['omega'].sum()
     assert_allclose(omega_sum, 3170.3041999999996)
 
-    assert _crit_Yaws.shape == (7549, 6)
-    assert _crit_Yaws.index.is_unique
+    assert critical_data_Yaws.shape == (7549, 6)
+    assert critical_data_Yaws.index.is_unique
 
 
 def test_relationships():
@@ -169,13 +173,13 @@ def test_relationships():
     with pytest.raises(Exception):
         Grigoras(Tc=559.4)
 
-    Vc1 = critical_surface(Tc=599.4, Pc=1.19E6, Method='IHMELS')
-    Vc2 = critical_surface(Tc=599.4, Pc=1.19E6, Method='MEISSNER')
-    Vc3 = critical_surface(Tc=599.4, Pc=1.19E6, Method='GRIGORAS')
+    Vc1 = critical_surface(Tc=599.4, Pc=1.19E6, method='IHMELS')
+    Vc2 = critical_surface(Tc=599.4, Pc=1.19E6, method='MEISSNER')
+    Vc3 = critical_surface(Tc=599.4, Pc=1.19E6, method='GRIGORAS')
     assert_allclose([Vc1, Vc2, Vc3],
                     [0.0010927333333333334, 0.0010695726588235296, 0.00134532])
 
-    methods = critical_surface(Tc=599.4, Pc=1.19E6, AvailableMethods=True)
+    methods = critical_surface(Tc=599.4, Pc=1.19E6, get_methods=True)
     methods.sort()
     methods_listed = ['IHMELS', 'MEISSNER', 'GRIGORAS']
     methods_listed.sort()
@@ -183,11 +187,11 @@ def test_relationships():
     with pytest.raises(AssertionError):
         critical_surface()
     with pytest.raises(Exception):
-        critical_surface(Tc=599.4, Pc=1.19E6, Method='FAIL')
+        critical_surface(Tc=599.4, Pc=1.19E6, method='FAIL')
 
 @pytest.mark.slow
 def test_Tc_all_values():
-    sources = [_crit_IUPAC, _crit_Matthews, _crit_CRC, _crit_PSRKR4, _crit_PassutDanner, _crit_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
     CASs = set()
     [CASs.update(set(k.index.values)) for k in sources]
 
@@ -199,22 +203,22 @@ def test_Tc_all_values():
 def test_Tc():
     assert_allclose(514.0, Tc(CASRN='64-17-5'))
 
-    assert_allclose(647.3, Tc(CASRN='7732-18-5', Method='PSRK'))
+    assert_allclose(647.3, Tc(CASRN='7732-18-5', method='PSRK'))
 
-    assert_allclose(126.2, Tc(CASRN='7727-37-9', Method='MATTHEWS'))
+    assert_allclose(126.2, Tc(CASRN='7727-37-9', method='MATTHEWS'))
 
-    methods = Tc(CASRN='98-01-1', AvailableMethods=True)
+    methods = Tc(CASRN='98-01-1', get_methods=True)
     assert methods == ['IUPAC', 'PSRK', 'YAWS']
 
     # Error handling
     assert None == Tc(CASRN='BADCAS')
     
     with pytest.raises(Exception):
-        Tc(CASRN='98-01-1', Method='BADMETHOD')
+        Tc(CASRN='98-01-1', method='BADMETHOD')
 
 @pytest.mark.slow
 def test_Pc_main():
-    sources = [_crit_IUPAC, _crit_Matthews, _crit_CRC, _crit_PSRKR4, _crit_PassutDanner, _crit_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
     CASs = set()
     [CASs.update(set(k.index.values)) for k in sources]
 
@@ -225,22 +229,22 @@ def test_Pc_main():
 
     assert_allclose(6137000.0, Pc(CASRN='64-17-5'))
 
-    assert_allclose(22048321.0, Pc(CASRN='7732-18-5', Method='PSRK'))
+    assert_allclose(22048321.0, Pc(CASRN='7732-18-5', method='PSRK'))
 
-    assert_allclose(3394387.5, Pc(CASRN='7727-37-9', Method='MATTHEWS'))
+    assert_allclose(3394387.5, Pc(CASRN='7727-37-9', method='MATTHEWS'))
 
-    methods = Pc(CASRN='98-01-1', AvailableMethods=True)
+    methods = Pc(CASRN='98-01-1', get_methods=True)
     assert methods == ['IUPAC', 'PSRK', 'YAWS']
 
     # Error handling
     assert None == Pc(CASRN='BADCAS')
     # TODO: Only list critical surface as a method if it can be calculated!
     with pytest.raises(Exception):
-        Pc(CASRN='98-01-1', Method='BADMETHOD')
+        Pc(CASRN='98-01-1', method='BADMETHOD')
 
 @pytest.mark.slow
 def test_Vc_main():
-    sources = [_crit_IUPAC, _crit_Matthews, _crit_CRC, _crit_PSRKR4, _crit_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
     CASs = set()
     [CASs.update(set(k.index.values)) for k in sources]
 
@@ -251,22 +255,22 @@ def test_Vc_main():
 
     assert_allclose(0.000168, Vc(CASRN='64-17-5'))
 
-    assert_allclose(5.600e-05, Vc(CASRN='7732-18-5', Method='PSRK'))
+    assert_allclose(5.600e-05, Vc(CASRN='7732-18-5', method='PSRK'))
 
-    assert_allclose(8.950e-05, Vc(CASRN='7727-37-9', Method='MATTHEWS'))
+    assert_allclose(8.950e-05, Vc(CASRN='7727-37-9', method='MATTHEWS'))
 
-    methods = Vc(CASRN='98-01-1', AvailableMethods=True)
+    methods = Vc(CASRN='98-01-1', get_methods=True)
     assert methods == ['PSRK', 'YAWS']
 
     # Error handling
     assert None == Vc(CASRN='BADCAS')
     # TODO: Only list critical surface as a method if it can be calculated!
     with pytest.raises(Exception):
-        Vc(CASRN='98-01-1', Method='BADMETHOD')
+        Vc(CASRN='98-01-1', method='BADMETHOD')
 
 @pytest.mark.slow
 def test_Zc_main():
-    sources = [_crit_IUPAC, _crit_Matthews, _crit_CRC, _crit_PSRKR4, _crit_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
     CASs = set()
     [CASs.update(set(k.index.values)) for k in sources]
 
@@ -277,17 +281,17 @@ def test_Zc_main():
 
     assert_allclose(0.241, Zc(CASRN='64-17-5'))
 
-    assert_allclose(0.22941602891834947, Zc(CASRN='7732-18-5', Method='PSRK'))
+    assert_allclose(0.22941602891834947, Zc(CASRN='7732-18-5', method='PSRK'))
 
-    assert_allclose(0.29, Zc(CASRN='7727-37-9', Method='MATTHEWS'))
+    assert_allclose(0.29, Zc(CASRN='7727-37-9', method='MATTHEWS'))
 
-    methods = Zc(CASRN='98-01-1', AvailableMethods=True)
+    methods = Zc(CASRN='98-01-1', get_methods=True)
     assert methods == ['PSRK', 'YAWS']
 
     # Error handling
     assert None == Zc(CASRN='BADCAS')
     with pytest.raises(Exception):
-        Zc(CASRN='98-01-1', Method='BADMETHOD')
+        Zc(CASRN='98-01-1', method='BADMETHOD')
 
 
 def test_Mersmann_Kind_predictor():

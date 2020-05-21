@@ -20,92 +20,109 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from __future__ import division
-
 __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm', 
            'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen', 
            'Liu', 'Vetere', 'Watson', 'Hfus']
 
 import os
 import numpy as np
-import pandas as pd
-from fluids.constants import R, pi, N_A
-from chemicals.utils import log, isnan
+from fluids.constants import R
+from chemicals.utils import log
 from chemicals.utils import PY37
 from chemicals import miscdata
-from chemicals.data_reader import register_df_source, data_source
+from chemicals.data_reader import (register_df_source,
+                                   data_source,
+                                   retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
+                                   list_available_methods_from_df_dict)
 
 folder = os.path.join(os.path.dirname(__file__), 'Phase Change')
 
-register_df_source(folder, name='Yaws Boiling Points.tsv')
-register_df_source(folder, name='OpenNotebook Melting Points.tsv')
-register_df_source(folder, name='Ghazerati Appendix Vaporization Enthalpy.tsv',
+register_df_source(folder, 'Yaws Boiling Points.tsv')
+register_df_source(folder, 'OpenNotebook Melting Points.tsv')
+register_df_source(folder, 'Ghazerati Appendix Vaporization Enthalpy.tsv',
                    csv_kwargs={'dtype': {'Hvap298': float}})
-register_df_source(folder, name='CRC Handbook Heat of Vaporization.tsv')
-register_df_source(folder, name='CRC Handbook Heat of Fusion.tsv')
-register_df_source(folder, name='Ghazerati Appendix Sublimation Enthalpy.tsv')
-
-register_df_source(folder, name='Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
-register_df_source(folder, name='VDI PPDS Enthalpies of vaporization.tsv')
-register_df_source(folder, name='Alibakhshi one-coefficient enthalpy of vaporization.tsv')
+register_df_source(folder, 'CRC Handbook Heat of Vaporization.tsv')
+register_df_source(folder, 'CRC Handbook Heat of Fusion.tsv')
+register_df_source(folder, 'Ghazerati Appendix Sublimation Enthalpy.tsv')
+register_df_source(folder, 'Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
+register_df_source(folder, 'VDI PPDS Enthalpies of vaporization.tsv')
+register_df_source(folder, 'Alibakhshi one-coefficient enthalpy of vaporization.tsv')
 
 _phase_change_const_loaded = False
-def load_phase_change_constants():
-    global Yaws_data, Tm_ON_data, GharagheiziHvap_data, CRCHvap_data
-    global CRCHfus_data, GharagheiziHsub_data, _phase_change_const_loaded
-    
-    Yaws_data = data_source('Yaws Boiling Points.tsv')
+def _load_phase_change_constants():
+    global Tb_data_Yaws, Tm_ON_data, Hvap_data_Gharagheizi, Hvap_data_CRC
+    global Hfus_data_CRC, Hsub_data_Gharagheizi, _phase_change_const_loaded
+    global Tb_sources, Tm_sources, Hfus_sources
+    Tb_data_Yaws = data_source('Yaws Boiling Points.tsv')
     Tm_ON_data = data_source('OpenNotebook Melting Points.tsv')
-    GharagheiziHvap_data = data_source('Ghazerati Appendix Vaporization Enthalpy.tsv')
-    CRCHvap_data = data_source('CRC Handbook Heat of Vaporization.tsv')
-    CRCHfus_data = data_source('CRC Handbook Heat of Fusion.tsv')
-    GharagheiziHsub_data = data_source('Ghazerati Appendix Sublimation Enthalpy.tsv')
+    Hvap_data_Gharagheizi = data_source('Ghazerati Appendix Vaporization Enthalpy.tsv')
+    Hvap_data_CRC = data_source('CRC Handbook Heat of Vaporization.tsv')
+    Hfus_data_CRC = data_source('CRC Handbook Heat of Fusion.tsv')
+    Hsub_data_Gharagheizi = data_source('Ghazerati Appendix Sublimation Enthalpy.tsv')
     _phase_change_const_loaded = True
+    Tb_sources = {
+        CRC_ORG: miscdata.CRC_organic_data,
+        CRC_INORG: miscdata.CRC_inorganic_data,
+        YAWS: Tb_data_Yaws,
+    }
+    Tm_sources = {
+        OPEN_NTBKM: Tm_ON_data,
+        CRC_INORG: miscdata.CRC_inorganic_data,
+        CRC_ORG: miscdata.CRC_organic_data,
+    }
+    Hfus_sources = {
+        CRC: Hfus_data_CRC,
+    }
+    
 
 _phase_change_corrs_loaded = False
-def load_phase_change_correlations():
-    global Perrys2_150, _Perrys2_150_values, VDI_PPDS_4, _VDI_PPDS_4_values
-    global Alibakhshi_Cs, _phase_change_corrs_loaded
+def _load_phase_change_correlations():
+    global phase_change_data_Perrys2_150, phase_change_data_Perrys2_150_values
+    global phase_change_data_VDI_PPDS_4, phase_change_data_VDI_PPDS_4_values
+    global phase_change_data_Alibakhshi_Cs, _phase_change_corrs_loaded
 
     # 66554 for pandas; 19264 bytes for numpy
-    Perrys2_150 = data_source('Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
-    _Perrys2_150_values = np.array(Perrys2_150.values[:, 1:], dtype=float)
+    phase_change_data_Perrys2_150 = data_source('Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
+    phase_change_data_Perrys2_150_values = np.array(phase_change_data_Perrys2_150.values[:, 1:], dtype=float)
     
     # 52187 bytes for pandas, 13056 bytes for numpy
-    VDI_PPDS_4 = data_source('VDI PPDS Enthalpies of vaporization.tsv')
-    _VDI_PPDS_4_values = np.array(VDI_PPDS_4.values[:, 2:], dtype=float)
+    phase_change_data_VDI_PPDS_4 = data_source('VDI PPDS Enthalpies of vaporization.tsv')
+    phase_change_data_VDI_PPDS_4_values = np.array(phase_change_data_VDI_PPDS_4.values[:, 2:], dtype=float)
     
-    Alibakhshi_Cs = data_source('Alibakhshi one-coefficient enthalpy of vaporization.tsv')
+    phase_change_data_Alibakhshi_Cs = data_source('Alibakhshi one-coefficient enthalpy of vaporization.tsv')
     _phase_change_corrs_loaded = True
     
 if PY37:
     def __getattr__(name):
-        if name in ('Yaws_data', 'Tm_ON_data', 'GharagheiziHvap_data', 'CRCHvap_data',
-                    'CRCHfus_data', 'GharagheiziHsub_data'):
-            load_phase_change_constants()
+        if name in ('Tb_data_Yaws', 'Tm_ON_data', 'Hvap_data_Gharagheizi',
+                    'Hvap_data_CRC', 'Hfus_data_CRC', 'Hsub_data_Gharagheizi'):
+            _load_phase_change_constants()
             return globals()[name]
-        elif name in ('Perrys2_150', '_Perrys2_150_values', 'VDI_PPDS_4', '_VDI_PPDS_4_values', 'Alibakhshi_Cs'):
-            load_phase_change_correlations()
+        elif name in ('phase_change_data_Perrys2_150',
+                      'phase_change_data_Perrys2_150_values', 
+                      'phase_change_data_VDI_PPDS_4', 
+                      'phase_change_data_VDI_PPDS_4_values', 
+                      'phase_change_data_Alibakhshi_Cs'):
+            _load_phase_change_correlations()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_phase_change_constants()
-    load_phase_change_correlations()
+    _load_phase_change_constants()
+    _load_phase_change_correlations()
 
 ### Boiling Point at 1 atm
 
 CRC_ORG = 'CRC_ORG'
 CRC_INORG = 'CRC_INORG'
 YAWS = 'YAWS'
-NONE = 'NONE'
-
 Tb_methods = [CRC_INORG, CRC_ORG, YAWS]
 
 
-def Tb(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
+def Tb(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's boiling
     point. Lookup is based on CASRNs. Will automatically select a data
-    source to use if no Method is provided; returns None if the data is not
+    source to use if no method is provided; returns None if the data is not
     available.
 
     Prefered sources are 'CRC Physical Constants, organic' for organic
@@ -121,20 +138,17 @@ def Tb(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
     -------
     Tb : float
         Boiling temperature, [K]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Tb with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         Tb_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         Tb for the desired chemical, and will return methods instead of Tb
-    IgnoreMethods : list, optional
-        A list of methods to ignore in obtaining the full list of methods,
-        useful for for performance reasons and ignoring inaccurate methods
 
     Notes
     -----
@@ -160,37 +174,13 @@ def Tb(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    if not _phase_change_const_loaded:
-        load_phase_change_constants()
-    def list_methods():
-        methods = []
-        if CASRN in miscdata.CRC_inorganic_data.index and not isnan(miscdata.CRC_inorganic_data.at[CASRN, 'Tb']):
-            methods.append(CRC_INORG)
-        if CASRN in miscdata.CRC_organic_data.index and not isnan(miscdata.CRC_organic_data.at[CASRN, 'Tb']):
-            methods.append(CRC_ORG)
-        if CASRN in Yaws_data.index:
-            methods.append(YAWS)
-        if IgnoreMethods:
-            for Method in IgnoreMethods:
-                if Method in methods:
-                    methods.remove(Method)
-        methods.append(NONE)
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == CRC_INORG:
-        return float(miscdata.CRC_inorganic_data.at[CASRN, 'Tb'])
-    elif Method == CRC_ORG:
-        return float(miscdata.CRC_organic_data.at[CASRN, 'Tb'])
-    elif Method == YAWS:
-        return float(Yaws_data.at[CASRN, 'Tb'])
-    elif Method == NONE:
-        return None
+    if not _phase_change_const_loaded: _load_phase_change_constants()
+    if get_methods:
+        return list_available_methods_from_df_dict(Tb_sources, CASRN, 'Tb')
+    elif method:
+        return retrieve_from_df_dict(Tb_sources, CASRN, 'Tb', method) 
     else:
-        raise Exception('Failure in in function')
+        return retrieve_any_from_df_dict(Tb_sources, CASRN, 'Tb') 
 
 
 ### Melting Point
@@ -201,10 +191,10 @@ OPEN_NTBKM = 'OPEN_NTBKM'
 Tm_methods = [OPEN_NTBKM, CRC_INORG, CRC_ORG]
 
 
-def Tm(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
+def Tm(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's melting
     point. Lookup is based on CASRNs. Will automatically select a data
-    source to use if no Method is provided; returns None if the data is not
+    source to use if no method is provided; returns None if the data is not
     available.
 
     Prefered sources are 'Open Notebook Melting Points', with backup sources
@@ -221,19 +211,17 @@ def Tm(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
     -------
     Tm : float
         Melting temperature, [K]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Tm with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         Tm_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         Tm for the desired chemical, and will return methods instead of Tm
-    IgnoreMethods : list, optional
-        A list of methods to ignore in obtaining the full list of methods
 
     Notes
     -----
@@ -263,38 +251,13 @@ def Tm(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
-    if not _phase_change_const_loaded:
-        load_phase_change_constants()
-    def list_methods():
-        methods = []
-        if CASRN in Tm_ON_data.index:
-            methods.append(OPEN_NTBKM)
-        if CASRN in miscdata.CRC_inorganic_data.index and not isnan(miscdata.CRC_inorganic_data.at[CASRN, 'Tm']):
-            methods.append(CRC_INORG)
-        if CASRN in miscdata.CRC_organic_data.index and not isnan(miscdata.CRC_organic_data.at[CASRN, 'Tm']):
-            methods.append(CRC_ORG)
-        if IgnoreMethods:
-            for Method in IgnoreMethods:
-                if Method in methods:
-                    methods.remove(Method)
-        methods.append(NONE)
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == OPEN_NTBKM:
-        return float(Tm_ON_data.at[CASRN, 'Tm'])
-    elif Method == CRC_INORG:
-        return float(miscdata.CRC_inorganic_data.at[CASRN, 'Tm'])
-    elif Method == CRC_ORG:
-        return float(miscdata.CRC_organic_data.at[CASRN, 'Tm'])
-    elif Method == NONE:
-        return None
+    if not _phase_change_const_loaded: _load_phase_change_constants()
+    if get_methods:
+        return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Tm')
+    elif method:
+        return retrieve_from_df_dict(Tm_sources, CASRN, 'Tm', method) 
     else:
-        raise Exception('Failure in in function')
-
+        return retrieve_any_from_df_dict(Tm_sources, CASRN, 'Tm') 
 
 ### Enthalpy of Vaporization at T
 
@@ -927,10 +890,10 @@ CRC = 'CRC'
 Hfus_methods = [CRC]
 
 
-def Hfus(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]): 
+def Hfus(CASRN, get_methods=False, method=None): 
     r'''This function handles the retrieval of a chemical's heat of fusion.
     Lookup is based on CASRNs. Will automatically select a data
-    source to use if no Method is provided; returns None if the data is not
+    source to use if no method is provided; returns None if the data is not
     available.
 
     The prefered source is 'CRC'. Function has data for approximately 1100 
@@ -945,20 +908,17 @@ def Hfus(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
     -------
     Hfus : float
         Molar enthalpy of fusion at normal melting point, [J/mol]
-    methods : list, only returned if AvailableMethods == True
+    methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Tb with the given inputs
 
     Other Parameters
     ----------------
-    Method : string, optional
+    method : string, optional
         A string for the method name to use, as defined by constants in
         Hfus_methods
-    AvailableMethods : bool, optional
+    get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         hfus for the desired chemical, and will return methods instead of Hfus
-    IgnoreMethods : list, optional
-        A list of methods to ignore in obtaining the full list of methods,
-        useful for for performance reasons and ignoring inaccurate methods
 
     Notes
     -----
@@ -977,28 +937,12 @@ def Hfus(CASRN, AvailableMethods=False, Method=None, IgnoreMethods=[]):
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
-    if not _phase_change_const_loaded:
-        load_phase_change_constants()
-    def list_methods():
-        methods = []
-        if CASRN in CRCHfus_data.index:
-            methods.append(CRC)
-        methods.append(NONE)
-        if IgnoreMethods:
-            for Method in IgnoreMethods:
-                if Method in methods:
-                    methods.remove(Method)
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-
-    if Method == CRC:
-        return CRCHfus_data.at[CASRN, 'Hfus']
-    elif Method == NONE:
-        return None
+    if not _phase_change_const_loaded: _load_phase_change_constants()
+    if get_methods:
+        return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Hfus')
+    elif method:
+        return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method) 
     else:
-        raise ValueError('Unrecognized method')
+        return retrieve_any_from_df_dict(Hfus_sources, CASRN, 'Hfus') 
 
 

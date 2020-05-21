@@ -19,13 +19,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
-__all__ = ['df_sources', 'data_source', 'register_df_source', 'load_df',
-           'retrieve_from_df_dict', 'retrieve_from_df', 'retrieve_value_from_df',
-           'list_available_methods']
+__all__ = ['df_sources', 
+           'data_source', 
+           'register_df_source', 
+           'load_df',
+           'retrieve_any_from_df_dict',
+           'retrieve_from_df_dict',
+           'retrieve_any_from_df',
+           'retrieve_from_df',
+           'list_available_methods_from_df_dict',
+           'list_available_methods_from_df']
 
 import os
 import pandas as pd
-from chemicals.utils import isnan
 from collections.abc import Iterable
 path_join = os.path.join
 
@@ -69,19 +75,32 @@ def retrieve_any_from_df_dict(df_dict, index, key):
         if value is not None: return value
 
 def retrieve_from_df(df, index, key):
-    if isinstance(key, str):
-        return retrieve_value_from_df(df, index, key)
-    elif isinstance(key, Iterable):    
-        return [retrieve_value_from_df(df, index, i) for i in key]
-    else:
-        raise ValueError('key must be a string or an iterable of strings')
-    
-def retrieve_value_from_df(df, index, key):
     if index in df.index:
-        value = df.at[index, key]
-        try: return None if isnan(value) else float(value)
-        except: return value
+        if isinstance(key, str):
+            return get_value_from_df(df, index, key)
+        elif isinstance(key, Iterable):    
+            return [get_value_from_df(df, index, i) for i in key]
+        else:
+            raise ValueError('key must be a string or an iterable of strings')
 
-def list_available_methods(df_dict, index, key):
+def retrieve_any_from_df(df, index, keys):
+    if isinstance(keys, str) or not isinstance(keys, Iterable):    
+        raise ValueError('keys must be an iterable of strings')
+    if index not in df.index: return None
+    for key in keys:
+        value = df.at[index, key]
+        if not pd.isnull(value): return value
+
+def get_value_from_df(df, index, key):
+    value = df.at[index, key]
+    if not pd.isnull(value): return value
+            
+def list_available_methods_from_df_dict(df_dict, index, key):
     return [method for method, df in df_dict.items()
-            if retrieve_from_df(df, index, key) is not None]
+            if (index in df.index) and (get_value_from_df(df, index, key) is not None)]
+
+def list_available_methods_from_df(df, index, keys):
+    if index in df.index:
+        return [key for key in keys if not pd.isnull(df.at[index, key])]
+    else:
+        return []

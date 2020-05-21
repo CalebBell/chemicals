@@ -24,7 +24,12 @@ import pytest
 
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.phase_change import *
-from chemicals.phase_change import CRCHvap_data, CRCHfus_data, GharagheiziHvap_data, GharagheiziHsub_data, Yaws_data, Tm_ON_data, Perrys2_150, Alibakhshi_Cs, VDI_PPDS_4
+from chemicals.phase_change import (Hvap_data_CRC, Hfus_data_CRC,
+                                    Hvap_data_Gharagheizi, Hsub_data_Gharagheizi,
+                                    Tb_data_Yaws, Tm_ON_data,
+                                    phase_change_data_Perrys2_150,
+                                    phase_change_data_Alibakhshi_Cs, 
+                                    phase_change_data_VDI_PPDS_4)
 from chemicals.miscdata import CRC_inorganic_data, CRC_organic_data
 from thermo.identifiers import checkCAS
 
@@ -95,28 +100,28 @@ def test_Vetere():
 
 def test_Hvap_CRC_data():
 
-    HvapTb_tot = CRCHvap_data['HvapTb'].sum()
+    HvapTb_tot = Hvap_data_CRC['HvapTb'].sum()
     assert_close(HvapTb_tot, 30251890.0)
 
-    Hvap298_tot = CRCHvap_data['Hvap298'].sum()
+    Hvap298_tot = Hvap_data_CRC['Hvap298'].sum()
     assert_close(Hvap298_tot, 29343710.0)
 
-    Tb_tot = CRCHvap_data['Tb'].sum()
+    Tb_tot = Hvap_data_CRC['Tb'].sum()
     assert_close(Tb_tot, 407502.95600000001)
 
-    assert CRCHvap_data.index.is_unique
-    assert CRCHvap_data.shape == (926, 5)
+    assert Hvap_data_CRC.index.is_unique
+    assert Hvap_data_CRC.shape == (926, 5)
 
-    assert all([checkCAS(i) for i in list(CRCHvap_data.index)])
+    assert all([checkCAS(i) for i in list(Hvap_data_CRC.index)])
 
 
 def test_Hfus_CRC_data():
-    Hfus_total = CRCHfus_data['Hfus'].sum()
+    Hfus_total = Hfus_data_CRC['Hfus'].sum()
     assert_close(Hfus_total, 29131241)
-    assert CRCHfus_data.index.is_unique
-    assert CRCHfus_data.shape == (1112, 3)
+    assert Hfus_data_CRC.index.is_unique
+    assert Hfus_data_CRC.shape == (1112, 3)
 
-    assert all([checkCAS(i) for i in list(CRCHfus_data.index)])
+    assert all([checkCAS(i) for i in list(Hfus_data_CRC.index)])
 
 
 def test_Hfus():
@@ -126,29 +131,29 @@ def test_Hfus():
 
 def test_Gharagheizi_Hvap_data():
     # 51 CAS number DO NOT validate
-    Hvap298_tot = GharagheiziHvap_data['Hvap298'].sum()
+    Hvap298_tot = Hvap_data_Gharagheizi['Hvap298'].sum()
     assert_close(Hvap298_tot, 173584900)
 
-    assert GharagheiziHvap_data.index.is_unique
-    assert GharagheiziHvap_data.shape == (2730, 2)
+    assert Hvap_data_Gharagheizi.index.is_unique
+    assert Hvap_data_Gharagheizi.shape == (2730, 2)
 
 
 def test_Gharagheizi_Hsub_data():
-    tots = [GharagheiziHsub_data[i].sum() for i in ['Hsub', 'error']]
+    tots = [Hsub_data_Gharagheizi[i].sum() for i in ['Hsub', 'error']]
     assert_close(tots[0], 130537650)
     assert_close(tots[1], 1522960.0)
 
-    assert GharagheiziHsub_data.index.is_unique
-    assert GharagheiziHsub_data.shape == (1241, 3)
+    assert Hsub_data_Gharagheizi.index.is_unique
+    assert Hsub_data_Gharagheizi.shape == (1241, 3)
 
 
 def test_Yaws_Tb_data():
-    tot = Yaws_data.sum()
+    tot = Tb_data_Yaws.sum()
     assert_close(tot, 6631287.51)
 
-    assert Yaws_data.index.is_unique
-    assert Yaws_data.shape == (13461, 1)
-    assert all([checkCAS(i) for i in Yaws_data.index])
+    assert Tb_data_Yaws.index.is_unique
+    assert Tb_data_Yaws.shape == (13461, 1)
+    assert all([checkCAS(i) for i in Tb_data_Yaws.index])
 
 
 def test_Tm_ON_data():
@@ -160,43 +165,43 @@ def test_Tm_ON_data():
     assert all([checkCAS(i) for i in Tm_ON_data.index])
 
     
-def test_Perrys2_312_data():
+def test_Perrys2_150_data():
     # rtol=2E-4 for Tmin; only helium-4 needs a higher tolerance
     # Everything hits 0 at Tmax except Difluoromethane, methane, and water;
     # those needed their Tmax adjusted to their real Tc.
     # C1 is divided by 1000, to give units of J/mol instead of J/kmol
     # Terephthalic acid removed, was a constant value only.
     
-    assert all([checkCAS(i) for i in Perrys2_150.index])
-    tots_calc = [Perrys2_150[i].abs().sum() for i in [u'Tc', u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
+    assert all([checkCAS(i) for i in phase_change_data_Perrys2_150.index])
+    tots_calc = [phase_change_data_Perrys2_150[i].abs().sum() for i in [u'Tc', u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
     tots = [189407.42499999999, 18617223.739999998, 174.34494000000001, 112.51209900000001, 63.894040000000004, 70810.849999999991, 189407.005]
     assert_close1d(tots_calc, tots)
     
-    assert Perrys2_150.index.is_unique
-    assert Perrys2_150.shape == (344, 8)
+    assert phase_change_data_Perrys2_150.index.is_unique
+    assert phase_change_data_Perrys2_150.shape == (344, 8)
 
 
 def test_Alibakhshi_Cs_data():
     # Oops, a bunch of these now-lonely coefficients have an invalid CAS...
-#    assert all([checkCAS(i) for i in Alibakhshi_Cs.index])
-    tots_calc = [Alibakhshi_Cs[i].abs().sum() for i in [u'C']]
+    # assert all([checkCAS(i) for i in phase_change_data_Alibakhshi_Cs.index])
+    tots_calc = [phase_change_data_Alibakhshi_Cs[i].abs().sum() for i in [u'C']]
     tots = [28154.361500000003]
     assert_close1d(tots_calc, tots)
     
-    assert Alibakhshi_Cs.index.is_unique
-    assert Alibakhshi_Cs.shape == (1890, 2)
+    assert phase_change_data_Alibakhshi_Cs.index.is_unique
+    assert phase_change_data_Alibakhshi_Cs.shape == (1890, 2)
 
 
 def test_VDI_PPDS_4_data():
     '''I believe there are no errors here. 
     '''
-    assert all([checkCAS(i) for i in VDI_PPDS_4.index])
-    tots_calc = [VDI_PPDS_4[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc', u'MW']]
+    assert all([checkCAS(i) for i in phase_change_data_VDI_PPDS_4.index])
+    tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc', u'MW']]
     tots = [1974.2929800000002, 2653.9399000000003, 2022.530649, 943.25633100000005, 3124.9258610000002, 150142.28, 27786.919999999998]
     assert_close1d(tots_calc, tots)
     
-    assert VDI_PPDS_4.index.is_unique
-    assert VDI_PPDS_4.shape == (272, 8)
+    assert phase_change_data_VDI_PPDS_4.index.is_unique
+    assert phase_change_data_VDI_PPDS_4.shape == (272, 8)
 
 
 def test_Tb():
@@ -205,35 +210,33 @@ def test_Tb():
     Tbs = [399.15, 412.15, 653.15]
     assert_close1d(Tbs, Tbs_calc)
 
-    hits = [Tb(i, AvailableMethods=True) for i in ['993-50-0', '626-94-8', '7631-99-4']]
-    assert hits == [['CRC_INORG', 'NONE'], ['CRC_ORG', 'NONE'], ['YAWS', 'NONE']]
+    hits = [Tb(i, get_methods=True) for i in ['993-50-0', '626-94-8', '7631-99-4']]
+    assert hits == [['CRC_INORG'], ['CRC_ORG'], ['YAWS']]
 
     s1 = CRC_inorganic_data.loc[CRC_inorganic_data['Tb'].notnull()].index
     s2 = CRC_organic_data.loc[CRC_organic_data['Tb'].notnull()].index
-    s3 = Yaws_data.index
+    s3 = Tb_data_Yaws.index
 
     tots = []
     tots_exp = [639213.2310000042, 2280667.079999829, 6631287.510000873]
     # These should match the sums of the respective series
     for s, method in zip([s1, s2, s3], ['CRC_INORG', 'CRC_ORG', 'YAWS']):
-        tots.append(sum([Tb(i, Method=method) for i in s]))
+        tots.append(sum([Tb(i, method=method) for i in s]))
     assert_close1d(tots, tots_exp)
 
     with pytest.raises(Exception):
-        Tb('993-50-0', Method='BADMETHOD')
+        Tb('993-50-0', method='BADMETHOD')
 
     assert None == Tb('9923443-50-0')
-    assert ['NONE'] == Tb('9923443-50-0', AvailableMethods=True)
+    assert [] == Tb('9923443-50-0', get_methods=True)
 
     s = set(); s.update(s1); s.update(s2); s.update(s3)
 
-    w_methods = Tb('7732-18-5', AvailableMethods=True, IgnoreMethods=[])
-    assert w_methods == ['CRC_INORG', 'YAWS', 'NONE']
+    w_methods = Tb('7732-18-5', get_methods=True)
+    assert w_methods == ['CRC_INORG', 'YAWS']
 
-    Tbs = [Tb('7732-18-5', Method=i) for i in w_methods]
-    assert_close1d(Tbs[0:-1], [373.124, 373.15])
-
-    assert None == Tb('7732-18-5', IgnoreMethods=['CRC_ORG', 'CRC_INORG', 'YAWS'])
+    Tbs = [Tb('7732-18-5', method=i) for i in w_methods]
+    assert_close1d(Tbs, [373.124, 373.15])
 
 
 
@@ -243,8 +246,8 @@ def test_Tm():
     Tms = [263.15, 191.15, 274.15]
     assert_close1d(Tms, Tms_calc)
 
-    hits = [Tm(i, AvailableMethods=True) for i in ['996-50-9', '999-78-0', '993-50-0']]
-    assert hits == [['OPEN_NTBKM', 'NONE'], ['CRC_ORG', 'NONE'], ['CRC_INORG', 'NONE']]
+    hits = [Tm(i, get_methods=True) for i in ['996-50-9', '999-78-0', '993-50-0']]
+    assert hits == [['OPEN_NTBKM'], ['CRC_ORG'], ['CRC_INORG']]
 
 
     s1 = CRC_inorganic_data.loc[CRC_inorganic_data['Tm'].notnull()].index
@@ -254,20 +257,19 @@ def test_Tm():
     tots_exp = [1543322.6125999668, 2571284.480399755, 4059989.4249993376]
     # These should match the sums of the respective series
     for s, method in zip([s1, s2, s3], ['CRC_INORG', 'CRC_ORG', 'OPEN_NTBKM']):
-        tots.append(sum([Tm(i, Method=method) for i in s]))
+        tots.append(sum([Tm(i, method=method) for i in s]))
     assert_close1d(tots, tots_exp)
 
     with pytest.raises(Exception):
-        Tm('993-50-0', Method='BADMETHOD')
+        Tm('993-50-0', method='BADMETHOD')
 
     assert None == Tm('9923443-50-0')
-    assert ['NONE'] == Tm('9923443-50-0', AvailableMethods=True)
+    assert [] == Tm('9923443-50-0', get_methods=True)
 
 
-    w_methods = Tm('7732-18-5', AvailableMethods=True)
-    assert w_methods == ['OPEN_NTBKM', 'CRC_INORG', 'NONE']
+    w_methods = Tm('7732-18-5', get_methods=True)
+    assert w_methods == ['OPEN_NTBKM', 'CRC_INORG']
 
-    Tms = [Tm('7732-18-5', Method=i) for i in w_methods]
-    assert_close1d(Tms[0:-1], [273.15, 273.15])
+    Tms = [Tm('7732-18-5', method=i) for i in w_methods]
+    assert_close1d(Tms, [273.15, 273.15])
 
-    assert None == Tm('7732-18-5', IgnoreMethods=['CRC_ORG', 'CRC_INORG', 'OPEN_NTBKM'])
