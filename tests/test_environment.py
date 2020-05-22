@@ -47,6 +47,9 @@ def test_GWP():
     with pytest.raises(Exception):
         GWP(CASRN='74-82-8', method='BADMETHOD')
 
+    # No value
+    assert GWP('7732-18-5', method=None) is None
+
 
 def test_logP_data():
     tot = np.abs(logP_data_CRC['logP']).sum()

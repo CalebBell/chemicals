@@ -143,7 +143,7 @@ def lookup_VDI_tabular_data(CASRN, prop):
 
     Examples
     --------
-    >>> VDI_tabular_data('67-56-1', 'Mu (g)')
+    >>> lookup_VDI_tabular_data('67-56-1', 'Mu (g)')
     ([337.63, 360.0, 385.0, 410.0, 435.0, 460.0, 500.0], [1.11e-05, 1.18e-05, 1.27e-05, 1.36e-05, 1.46e-05, 1.59e-05, 2.04e-05])
 
     References

@@ -32,6 +32,7 @@ __all__ = ['df_sources',
 
 import os
 import pandas as pd
+from math import isnan
 from collections.abc import Iterable
 path_join = os.path.join
 
@@ -77,8 +78,8 @@ def retrieve_from_df(df, index, key):
     if index in df.index:
         if isinstance(key, str):
             return get_value_from_df(df, index, key)
-        elif isinstance(key, Iterable):    
-            return [df.at[index, i] for i in key]
+        elif isinstance(key, Iterable):
+            return [float(df.at[index, i]) for i in key]
         else:
             raise ValueError('key must be a string or an iterable of strings')
 
@@ -88,11 +89,16 @@ def retrieve_any_from_df(df, index, keys):
     if index not in df.index: return None
     for key in keys:
         value = df.at[index, key]
-        if not pd.isnull(value): return value
+        if not isnan(value): return value
 
 def get_value_from_df(df, index, key):
     value = df.at[index, key]
-    if not pd.isnull(value): return value
+    try:
+        if not isnan(value):
+            return float(value)
+    except TypeError:
+        # Not a number
+        return value
             
 def list_available_methods_from_df_dict(df_dict, index, key):
     return [method for method, df in df_dict.items()

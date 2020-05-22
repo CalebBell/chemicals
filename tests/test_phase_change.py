@@ -128,6 +128,9 @@ def test_Hfus():
     assert_close(Hfus('462-06-6'), 11310.0, rtol=1e-12)
     assert_close(Hfus(CASRN='75-07-0'), 2310.0)
     assert Hfus(CASRN='75000-07-0') is None
+    
+    Hfus_methods = Hfus('7732-18-5', get_methods=True)
+    assert Hfus_methods == ['CRC']
 
 def test_Gharagheizi_Hvap_data():
     # 51 CAS number DO NOT validate

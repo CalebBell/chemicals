@@ -924,7 +924,7 @@ def Hfus(CASRN, get_methods=False, method=None):
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if get_methods:
-        return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Hfus')
+        return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
     elif method:
         return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method) 
     else:
