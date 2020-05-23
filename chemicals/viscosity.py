@@ -147,8 +147,8 @@ def Viswanath_Natarajan_2(T, A, B):
     --------
     DDBST has 0.0004580 as a value at this temperature for 1-Butanol.
     
-    >>> Viswanath_Natarajan_2(348.15, -5.9719+log(100), 1007.0)
-    0.00045983686956829517
+    >>> Viswanath_Natarajan_2(348.15, -5.9719-log(100), 1007.0)
+    0.000459836869568295
     
     References
     ----------
@@ -238,7 +238,7 @@ def Viswanath_Natarajan_3(T, A, B, C):
     Examples
     --------
     >>> Viswanath_Natarajan_3(298.15, -2.7173-log10(1000), -1071.18, -129.51)
-    0.0006129806445142112
+    0.0006129806445142113
 
     References
     ----------
@@ -620,7 +620,7 @@ def lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
     Examples
     --------
     >>> lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=1.7)
-    1.7822676912698928e-05
+    1.7822676912698925e-05
 
     References
     ----------
@@ -1180,7 +1180,7 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
 
     Examples
     --------
-    >>> mu = Lorentz_Bray_Clarke(T=300.0, P=1e6, Vm=0.0023025, zs=[.4, .3, .3],
+    >>> Lorentz_Bray_Clarke(T=300.0, P=1e6, Vm=0.0023025, zs=[.4, .3, .3],
     ... MWs=[16.04246, 30.06904, 44.09562], Tcs=[190.564, 305.32, 369.83], 
     ... Pcs=[4599000.0, 4872000.0, 4248000.0], Vcs=[9.86e-05, 0.0001455, 0.0002])
     9.925488160761484e-06
@@ -1682,7 +1682,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
     >>> viscosity_converter(8.79, 'engler', 'parlin cup #7')
     52.5
     >>> viscosity_converter(700, 'Saybolt Universal Seconds', 'kinematic viscosity')
-    0.00015108914751515542
+    0.00015108914751515545
 
     References
     ----------
