@@ -58,8 +58,13 @@ def test_acentric_main():
 
     # Error handling
     assert None == omega(CASRN='BADCAS')
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         omega(CASRN='98-01-1', method='BADMETHOD')
+    with pytest.raises(ValueError):
+        omega(CASRN='98-01-1', method=1)
+    with pytest.raises(ValueError):
+        omega(CASRN='98-01-1', method=omega)
+    
 
 
 

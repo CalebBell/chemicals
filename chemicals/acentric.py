@@ -25,12 +25,13 @@ from __future__ import division
 __all__ = ['omega', 'LK_omega', 'Stiel_polar_factor']
 __all__.extend(['omega_methods', 'omega_definition'])
 
-from chemicals.utils import log, log10, isnan
-from chemicals.utils import mixing_simple, none_and_length_check
+from chemicals.utils import log, log10
 from chemicals import critical
-from chemicals.critical import Tc, Pc
 import numpy as np
 import pandas as pd
+from chemicals.data_reader import (retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
+                                   list_available_methods_from_df_dict)
 
 omega_methods = ('PSRK', 'PD', 'YAWS')
 
@@ -102,32 +103,41 @@ def omega(CASRN, get_methods=False, method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    def list_methods():
-        methods = []
-        if CASRN in critical.critical_data_PSRKR4.index and not isnan(critical.critical_data_PSRKR4.at[CASRN, 'omega']):
-            methods.append('PSRK')
-        if CASRN in critical.critical_data_PassutDanner.index and not isnan(critical.critical_data_PassutDanner.at[CASRN, 'omega']):
-            methods.append('PD')
-        if CASRN in critical.critical_data_Yaws.index and not isnan(critical.critical_data_Yaws.at[CASRN, 'omega']):
-            methods.append('YAWS')
-        return methods
+    if not critical._critical_data_loaded: critical._load_critical_data()
     if get_methods:
-        return list_methods()
-    if not method:
-        methods = list_methods()
-        if not methods:
-            return None
-        method = methods[0]
-    # This is the calculate, given the method section
-    if method == 'PSRK':
-        _omega = float(critical.critical_data_PSRKR4.at[CASRN, 'omega'])
-    elif method == 'PD':
-        _omega = float(critical.critical_data_PassutDanner.at[CASRN, 'omega'])
-    elif method == 'YAWS':
-        _omega = float(critical.critical_data_Yaws.at[CASRN, 'omega'])
+        return list_available_methods_from_df_dict(critical.omega_sources, CASRN, 'omega')
+    elif method:
+        return retrieve_from_df_dict(critical.omega_sources, CASRN, 'omega', method) 
     else:
-        raise Exception('Failure in in function')
-    return _omega
+        return retrieve_any_from_df_dict(critical.omega_sources, CASRN, 'omega') 
+
+
+#    def list_methods():
+#        methods = []
+#        if CASRN in critical.critical_data_PSRKR4.index and not isnan(critical.critical_data_PSRKR4.at[CASRN, 'omega']):
+#            methods.append('PSRK')
+#        if CASRN in critical.critical_data_PassutDanner.index and not isnan(critical.critical_data_PassutDanner.at[CASRN, 'omega']):
+#            methods.append('PD')
+#        if CASRN in critical.critical_data_Yaws.index and not isnan(critical.critical_data_Yaws.at[CASRN, 'omega']):
+#            methods.append('YAWS')
+#        return methods
+#    if get_methods:
+#        return list_methods()
+#    if not method:
+#        methods = list_methods()
+#        if not methods:
+#            return None
+#        method = methods[0]
+#    # This is the calculate, given the method section
+#    if method == 'PSRK':
+#        _omega = float(critical.critical_data_PSRKR4.at[CASRN, 'omega'])
+#    elif method == 'PD':
+#        _omega = float(critical.critical_data_PassutDanner.at[CASRN, 'omega'])
+#    elif method == 'YAWS':
+#        _omega = float(critical.critical_data_Yaws.at[CASRN, 'omega'])
+#    else:
+#        raise Exception('Failure in in function')
+#    return _omega
 
 
 def omega_definition(Psat, Pc):

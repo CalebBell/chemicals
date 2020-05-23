@@ -40,6 +40,8 @@ folder = os.path.join(os.path.dirname(__file__), 'Misc')
 register_df_source(folder, 'CRC Handbook Organic RI.csv', 
                    csv_kwargs={'dtype': {'RI': float, 'RIT': float}})
 
+CRC = 'CRC'
+
 _RI_data_loaded = False
 def _load_RI_data():
     global _RI_data_loaded, RI_data_CRC_organic, RI_sources
@@ -59,7 +61,6 @@ else:
 
 # %% Refractive index functions
 
-CRC = 'CRC'
 RI_methods = [CRC]
 
 def refractive_index(CASRN, get_methods=False, method=None,

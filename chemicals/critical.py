@@ -41,6 +41,12 @@ from chemicals.data_reader import (register_df_source,
 
 folder = os.path.join(os.path.dirname(__file__), 'Critical Properties')
 
+IUPAC = 'IUPAC'
+MATTHEWS = 'MATTHEWS'
+CRC = 'CRC'
+PSRK = 'PSRK'
+PD = 'PD'
+YAWS = 'YAWS'
 
 # %% Register data sources and lazy load them
 
@@ -67,7 +73,8 @@ _critical_data_loaded = False
 def _load_critical_data():
     global critical_data_IUPAC, critical_data_Matthews, critical_data_CRC
     global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner
-    global Tc_sources, Pc_sources, Vc_sources, Zc_sources, _critical_data_loaded
+    global Tc_sources, Pc_sources, Vc_sources, Zc_sources, omega_sources
+    global _critical_data_loaded
     critical_data_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')
     critical_data_Matthews = data_source('Mathews1972InorganicCriticalProps.tsv')
     critical_data_CRC = data_source('CRCCriticalOrganics.tsv')
@@ -90,12 +97,19 @@ def _load_critical_data():
     del Vc_sources['PD']
     Zc_sources = Vc_sources.copy()
 
+    omega_sources = {
+        PSRK: critical_data_PSRKR4,
+        PD: critical_data_PassutDanner,
+        YAWS: critical_data_Yaws
+    }
+
 if PY37:
     def __getattr__(name):
         if name in ('critical_data_IUPAC', 'critical_data_Matthews', 
                     'critical_data_CRC', 'critical_data_PSRKR4',
                     'critical_data_Yaws', 'critical_data_PassutDanner',
-                    'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources'):
+                    'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
+                    'omega_sources'):
             _load_critical_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
@@ -104,12 +118,6 @@ else:
 
 # %% Critical point functions
 
-IUPAC = 'IUPAC'
-MATTHEWS = 'MATTHEWS'
-CRC = 'CRC'
-PSRK = 'PSRK'
-PD = 'PD'
-YAWS = 'YAWS'
 Tc_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
 
 def Tc(CASRN, get_methods=False, method=None):

@@ -33,7 +33,10 @@ __all__ = ['df_sources',
 import os
 import pandas as pd
 from math import isnan
-from collections.abc import Iterable
+try:
+    from collections.abc import Iterable
+except:
+    from collections import Iterable
 path_join = os.path.join
 
 # %% Loading data from local databanks
@@ -63,10 +66,13 @@ def data_source(key):
 # %% Retrieving data from files
 
 def retrieve_from_df_dict(df_dict, index, key, method):
-    try: df = df_dict[method]
-    except KeyError: raise ValueError('invalid method ' + repr(method))
-    except TypeError: raise TypeError("method must be a string, "
-                                     f"not a '{type(method).__name__}' object")
+    try: 
+        df = df_dict[method]
+    except KeyError: 
+        raise ValueError('Invalid method: %s, allowed methods are %s' %(
+                method, list(df_dict.keys())))
+    except TypeError: 
+        raise TypeError("Method must be a string, not a %s object" %(type(method).__name__))
     return retrieve_from_df(df, index, key)
 
 def retrieve_any_from_df_dict(df_dict, index, key):
