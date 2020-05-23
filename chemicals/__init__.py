@@ -39,6 +39,7 @@ from . import phase_change
 from . import triple
 from . import acentric
 from . import exceptions
+from . import viscosity
 
 from .utils import *
 from .critical import *
@@ -57,11 +58,12 @@ from .phase_change import *
 from .triple import *
 from .acentric import *
 from .exceptions import *
+from .viscosity import *
 
 __all__ = ['utils', 'critical', 'elements', 'dipole', 'dippr', 'temperature', 
            'miscdata', 'environment', 'refractivity', 'solubility', 
            'lennard_jones', 'vapor_pressure', 'virial', 'phase_change',
-           'triple', 'exceptions', 'acentric']
+           'triple', 'exceptions', 'acentric', 'viscosity']
 
 __all__.extend(exceptions.__all__)
 __all__.extend(critical.__all__)
@@ -80,6 +82,7 @@ __all__.extend(virial.__all__)
 __all__.extend(phase_change.__all__)
 __all__.extend(triple.__all__)
 __all__.extend(acentric.__all__)
+__all__.extend(viscosity.__all__)
 
 chemicals_dir = os.path.dirname(__file__)
 
