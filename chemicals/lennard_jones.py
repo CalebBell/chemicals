@@ -51,6 +51,15 @@ from chemicals.data_reader import (register_df_source,
 folder = os.path.join(os.path.dirname(__file__), 'Viscosity')
 register_df_source(folder, 'MagalhaesLJ.tsv')
 
+FLYNN = 'Flynn (1960)'
+STIELTHODOS = 'Stiel and Thodos Tc, Zc (1962)'
+MAGALHAES = 'Magalhães, Lito, Da Silva, and Silva (2013)'
+TEEGOTOSTEWARD1 = 'Tee, Gotoh, and Stewart CSP with Tc (1966)'
+TEEGOTOSTEWARD2 = 'Tee, Gotoh, and Stewart CSP with Tc, omega (1966)'
+BSLC = 'Bird, Stewart, and Light (2002) critical relation'
+BSLB = 'Bird, Stewart, and Light (2002) boiling relation'
+BSLM = 'Bird, Stewart, and Light (2002) melting relation'
+
 _LJ_data_loaded = False
 def _load_LJ_data():
     global _LJ_data_loaded, LJ_data_Magalhaes, LJ_sources
@@ -69,16 +78,8 @@ if PY37:
 else:
     _load_LJ_data()
 
-FLYNN = 'Flynn (1960)'
-STIELTHODOS = 'Stiel and Thodos Tc, Zc (1962)'
-MAGALHAES = 'Magalhães, Lito, Da Silva, and Silva (2013)'
-TEEGOTOSTEWARD1 = 'Tee, Gotoh, and Stewart CSP with Tc (1966)'
-TEEGOTOSTEWARD2 = 'Tee, Gotoh, and Stewart CSP with Tc, omega (1966)'
-BSLC = 'Bird, Stewart, and Light (2002) critical relation'
-BSLB = 'Bird, Stewart, and Light (2002) boiling relation'
-BSLM = 'Bird, Stewart, and Light (2002) melting relation'
-Stockmayer_methods = [MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC, 
-                      TEEGOTOSTEWARD1, BSLB, BSLM]
+Stockmayer_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC, 
+                      TEEGOTOSTEWARD1, BSLB, BSLM)
 
 def Stockmayer(Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
                CASRN='', get_methods=False, method=None):
@@ -194,9 +195,9 @@ BSLC1 = 'Bird, Stewart, and Light (2002) critical relation with Vc'
 BSLC2 = 'Bird, Stewart, and Light (2002) critical relation with Tc, Pc'
 STIELTHODOSMD = 'Stiel and Thodos Vc, Zc (1962)'
 SILVALIUMACEDO = 'Silva, Liu, and Macedo (1998) critical relation with Tc, Pc'
-molecular_diameter_methods = [MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
+molecular_diameter_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
                               BSLC2, TEEGOTOSTEWARD3, STIELTHODOSMD, FLYNN,
-                              BSLC1, BSLB, BSLM]
+                              BSLC1, BSLB, BSLM)
 
 def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
           Vm=None, Vb=None, CASRN='', get_methods=False, method=None):

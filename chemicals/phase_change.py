@@ -50,6 +50,12 @@ register_df_source(folder, 'Table 2-150 Heats of Vaporization of Inorganic and O
 register_df_source(folder, 'VDI PPDS Enthalpies of vaporization.tsv')
 register_df_source(folder, 'Alibakhshi one-coefficient enthalpy of vaporization.tsv')
 
+CRC_ORG = 'CRC_ORG'
+CRC_INORG = 'CRC_INORG'
+YAWS = 'YAWS'
+OPEN_NTBKM = 'OPEN_NTBKM'
+CRC = 'CRC'
+
 _phase_change_const_loaded = False
 def _load_phase_change_constants():
     global Tb_data_Yaws, Tm_ON_data, Hvap_data_Gharagheizi, Hvap_data_CRC
@@ -117,10 +123,7 @@ else:
 
 ### Boiling Point at 1 atm
 
-CRC_ORG = 'CRC_ORG'
-CRC_INORG = 'CRC_INORG'
-YAWS = 'YAWS'
-Tb_methods = [CRC_INORG, CRC_ORG, YAWS]
+Tb_methods = (CRC_INORG, CRC_ORG, YAWS)
 
 def Tb(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's boiling
@@ -187,8 +190,7 @@ def Tb(CASRN, get_methods=False, method=None):
 
 ### Melting Point
 
-OPEN_NTBKM = 'OPEN_NTBKM'
-Tm_methods = [OPEN_NTBKM, CRC_INORG, CRC_ORG]
+Tm_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
 
 def Tm(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's melting
@@ -872,8 +874,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
 
 ### Heat of Fusion
 
-CRC = 'CRC'
-Hfus_methods = [CRC]
+Hfus_methods = (CRC,)
 
 def Hfus(CASRN, get_methods=False, method=None): 
     r'''This function handles the retrieval of a chemical's heat of fusion.
@@ -924,7 +925,7 @@ def Hfus(CASRN, get_methods=False, method=None):
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if get_methods:
-        return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Hfus')
+        return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
     elif method:
         return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method) 
     else:

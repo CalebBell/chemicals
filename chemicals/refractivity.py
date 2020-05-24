@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,8 @@ folder = os.path.join(os.path.dirname(__file__), 'Misc')
 register_df_source(folder, 'CRC Handbook Organic RI.csv', 
                    csv_kwargs={'dtype': {'RI': float, 'RIT': float}})
 
+CRC = 'CRC'
+
 _RI_data_loaded = False
 def _load_RI_data():
     global _RI_data_loaded, RI_data_CRC_organic, RI_sources
@@ -59,7 +61,6 @@ else:
 
 # %% Refractive index functions
 
-CRC = 'CRC'
 RI_methods = [CRC]
 
 def refractive_index(CASRN, get_methods=False, method=None,
@@ -121,8 +122,11 @@ def refractive_index(CASRN, get_methods=False, method=None,
             value = retrieve_from_df_dict(RI_sources, CASRN, key, method) 
         else:
             value = retrieve_any_from_df_dict(RI_sources, CASRN, key) 
-        if full_info and value is None:
-            value = (None, None)
+        if full_info:
+            if value is None:
+                value = (None, None)
+            else:
+                value = tuple(value)
         return value
 
 def polarizability_from_RI(RI, Vm):

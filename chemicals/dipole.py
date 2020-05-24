@@ -32,9 +32,15 @@ from chemicals.data_reader import (register_df_source,
 # %% Register data sources and lazy load them
 
 folder = os.path.join(os.path.dirname(__file__), 'Misc')
+
+CCCBDB = 'CCCBDB'
+MULLER = 'MULLER'
+POLING = 'POLING'
+
 register_df_source(folder, 'Poling Dipole.csv')
 register_df_source(folder, 'cccbdb.nist.gov Dipoles.csv')
 register_df_source(folder, 'Muller Supporting Info Dipoles.csv')
+
 
 _dipole_data_loaded = False
 def _load_dipole_data():
@@ -59,9 +65,6 @@ else:
 
 # %% Dipole moment functions
 
-CCCBDB = 'CCCBDB'
-MULLER = 'MULLER'
-POLING = 'POLING'
 dipole_methods = [CCCBDB, MULLER, POLING]
 
 def dipole_moment(CASRN, get_methods=False, method=None):

@@ -20,7 +20,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from numpy.testing import assert_allclose
+from math import isnan
+from fluids.numerics import assert_close, assert_close1d
 import pytest
 import pandas as pd
 import numpy as np
@@ -28,28 +29,38 @@ from chemicals.refractivity import *
 from chemicals.refractivity import RI_data_CRC_organic
 
 def test_refractivity_CRC():
-    assert_allclose(RI_data_CRC_organic['RI'].sum(), 6602.78821)
-    assert_allclose(RI_data_CRC_organic['RIT'].sum(), 1304152.35)
+    assert_close(RI_data_CRC_organic['RI'].sum(), 6602.78821)
+    assert_close(RI_data_CRC_organic['RIT'].sum(), 1304152.35)
 
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_refractivity_all_answers():
+    vals = [refractive_index(i) for i in  RI_data_CRC_organic.index.values]
+    RI_sum = sum([v[0] for v in vals])
+    T_sum = sum([v[1] for v in vals if not isnan(v[1])])
+    assert len(vals) == 4490
+    assert type(vals[0][0]) is float
+    assert type(vals[0][1]) is float
+    
+    assert_close(RI_sum, 6602.78821, rtol=1e-10)
+    assert_close(T_sum, 1304152.35, rtol=1e-10)
+    
+    
 def test_refractivity_general():
-    mat = np.array([refractive_index(i) for i in  RI_data_CRC_organic.index.values])
-    Ts = mat[:,1]
-    # Test refractive index sum
-    assert_allclose(mat[:,0].sum(), 6602.78821)
-    # Test temperature sum
-    assert_allclose(Ts[~np.isnan(Ts)].sum(), 1304152.35)
-
     vals = refractive_index(CASRN='64-17-5')
-    assert_allclose(vals, (1.3611, 293.15))
+    assert type(vals) is tuple
+    assert_close1d(vals, (1.3611, 293.15))
 
     # One value only
     val = refractive_index(CASRN='64-17-5', full_info=False)
-    assert_allclose(val, 1.3611)
+    assert_close(val, 1.3611)
 
     vals = refractive_index(CASRN='64-17-5', get_methods=True)
-    assert vals ==  ['CRC']
+    assert vals == ['CRC']
     assert RI_data_CRC_organic.index.is_unique
     assert RI_data_CRC_organic.shape == (4490, 2)
+    
+    assert refractive_index(CASRN='6400000-17-5', get_methods=True) == []
 
 
     with pytest.raises(Exception):
@@ -60,7 +71,7 @@ def test_refractivity_general():
 def test_polarizability_from_RI():
     # Ethanol, with known datum RI and Vm
     alpha = polarizability_from_RI(1.3611, 5.8676E-5)
-    assert_allclose(alpha, 5.147658123614415e-30)
+    assert_close(alpha, 5.147658123614415e-30)
     # Experimental value is 5.112 Angstrom^3 from cccbdb, http://cccbdb.nist.gov/polcalccomp2.asp?method=55&basis=9
     # Very good comparison.
 
@@ -68,16 +79,16 @@ def test_polarizability_from_RI():
 def test_molar_refractivity_from_RI():
     # Ethanol, with known datum RI and Vm
     Rm = molar_refractivity_from_RI(1.3611, 5.8676E-5)
-    assert_allclose(Rm, 1.2985217089649597e-05)
+    assert_close(Rm, 1.2985217089649597e-05)
     # Confirmed with a value of 12.5355 cm^3/mol in http://rasayanjournal.co.in/vol-4/issue-4/38.pdf
 
 
 def test_RI_from_molar_refractivity():
     RI = RI_from_molar_refractivity(1.2985e-5, 5.8676E-5)
-    assert_allclose(RI, 1.3610932757685672)
+    assert_close(RI, 1.3610932757685672)
     # Same value backwards
 
-    assert_allclose(RI_from_molar_refractivity(molar_refractivity_from_RI(1.3611, 5.8676E-5), 5.8676E-5), 1.3611)
+    assert_close(RI_from_molar_refractivity(molar_refractivity_from_RI(1.3611, 5.8676E-5), 5.8676E-5), 1.3611)
 
 
 

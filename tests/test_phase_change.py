@@ -128,6 +128,9 @@ def test_Hfus():
     assert_close(Hfus('462-06-6'), 11310.0, rtol=1e-12)
     assert_close(Hfus(CASRN='75-07-0'), 2310.0)
     assert Hfus(CASRN='75000-07-0') is None
+    
+    Hfus_methods = Hfus('7732-18-5', get_methods=True)
+    assert Hfus_methods == ['CRC']
 
 def test_Gharagheizi_Hvap_data():
     # 51 CAS number DO NOT validate
@@ -153,8 +156,10 @@ def test_Yaws_Tb_data():
 
     assert Tb_data_Yaws.index.is_unique
     assert Tb_data_Yaws.shape == (13461, 1)
-    assert all([checkCAS(i) for i in Tb_data_Yaws.index])
 
+@pytest.mark.slow
+def test_Yaws_Tb_CAS_valid():
+    assert all([checkCAS(i) for i in Tb_data_Yaws.index])
 
 def test_Tm_ON_data():
     tot = Tm_ON_data.sum()
@@ -162,6 +167,9 @@ def test_Tm_ON_data():
 
     assert Tm_ON_data.shape == (11549, 1)
     assert Tm_ON_data.index.is_unique
+    
+@pytest.mark.slow
+def test_Tm_ON_data_CAS_valid():
     assert all([checkCAS(i) for i in Tm_ON_data.index])
 
     
@@ -203,6 +211,22 @@ def test_VDI_PPDS_4_data():
     assert phase_change_data_VDI_PPDS_4.index.is_unique
     assert phase_change_data_VDI_PPDS_4.shape == (272, 8)
 
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_Tb_all_values():
+    s1 = CRC_inorganic_data.index[CRC_inorganic_data['Tb'].notnull()]
+    s2 = CRC_organic_data.index[CRC_organic_data['Tb'].notnull()]
+    s3 = Tb_data_Yaws.index
+
+    tots = []
+    tots_exp = [639213.2310000042, 2280667.079999829, 6631287.510000873]
+    # These should match the sums of the respective series
+    for s, method in zip([s1, s2, s3], ['CRC_INORG', 'CRC_ORG', 'YAWS']):
+        tots.append(sum([Tb(i, method=method) for i in s]))
+    assert_close1d(tots, tots_exp, rtol=1e-11)
+
+    s = set(); s.update(s1); s.update(s2); s.update(s3)
+    assert len(s) == 13868
 
 def test_Tb():
     # CRC_inorg, CRC org, Yaws
@@ -213,16 +237,6 @@ def test_Tb():
     hits = [Tb(i, get_methods=True) for i in ['993-50-0', '626-94-8', '7631-99-4']]
     assert hits == [['CRC_INORG'], ['CRC_ORG'], ['YAWS']]
 
-    s1 = CRC_inorganic_data.loc[CRC_inorganic_data['Tb'].notnull()].index
-    s2 = CRC_organic_data.loc[CRC_organic_data['Tb'].notnull()].index
-    s3 = Tb_data_Yaws.index
-
-    tots = []
-    tots_exp = [639213.2310000042, 2280667.079999829, 6631287.510000873]
-    # These should match the sums of the respective series
-    for s, method in zip([s1, s2, s3], ['CRC_INORG', 'CRC_ORG', 'YAWS']):
-        tots.append(sum([Tb(i, method=method) for i in s]))
-    assert_close1d(tots, tots_exp)
 
     with pytest.raises(Exception):
         Tb('993-50-0', method='BADMETHOD')
@@ -230,7 +244,6 @@ def test_Tb():
     assert None == Tb('9923443-50-0')
     assert [] == Tb('9923443-50-0', get_methods=True)
 
-    s = set(); s.update(s1); s.update(s2); s.update(s3)
 
     w_methods = Tb('7732-18-5', get_methods=True)
     assert w_methods == ['CRC_INORG', 'YAWS']
@@ -239,7 +252,22 @@ def test_Tb():
     assert_close1d(Tbs, [373.124, 373.15])
 
 
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_Tm_all_values():
+    s1 = CRC_inorganic_data.index[CRC_inorganic_data['Tm'].notnull()]
+    s2 = CRC_organic_data.index[CRC_organic_data['Tm'].notnull()]
+    s3 = Tm_ON_data.index
+    tots = []
+    tots_exp = [1543322.6125999668, 2571284.480399755, 4059989.4249993376]
+    # These should match the sums of the respective series
+    for s, method in zip([s1, s2, s3], ['CRC_INORG', 'CRC_ORG', 'OPEN_NTBKM']):
+        tots.append(sum([Tm(i, method=method) for i in s]))
+    assert_close1d(tots, tots_exp, rtol=1e-11)
 
+    s = set(); s.update(s1); s.update(s2); s.update(s3)
+    assert len(s) == 14723
+    
 def test_Tm():
     # Open notebook, CRC organic, CRC inorg
     Tms_calc = Tm('996-50-9'), Tm('999-78-0'), Tm('993-50-0')
@@ -249,21 +277,10 @@ def test_Tm():
     hits = [Tm(i, get_methods=True) for i in ['996-50-9', '999-78-0', '993-50-0']]
     assert hits == [['OPEN_NTBKM'], ['CRC_ORG'], ['CRC_INORG']]
 
-
-    s1 = CRC_inorganic_data.loc[CRC_inorganic_data['Tm'].notnull()].index
-    s2 = CRC_organic_data.loc[CRC_organic_data['Tm'].notnull()].index
-    s3 = Tm_ON_data.index
-    tots = []
-    tots_exp = [1543322.6125999668, 2571284.480399755, 4059989.4249993376]
-    # These should match the sums of the respective series
-    for s, method in zip([s1, s2, s3], ['CRC_INORG', 'CRC_ORG', 'OPEN_NTBKM']):
-        tots.append(sum([Tm(i, method=method) for i in s]))
-    assert_close1d(tots, tots_exp)
-
     with pytest.raises(Exception):
         Tm('993-50-0', method='BADMETHOD')
 
-    assert None == Tm('9923443-50-0')
+    assert  Tm('9923443-50-0') is None
     assert [] == Tm('9923443-50-0', get_methods=True)
 
 

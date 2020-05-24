@@ -36,6 +36,9 @@ from chemicals.data_reader import (register_df_source,
 folder = os.path.join(os.path.dirname(__file__), 'Triple Properties')
 register_df_source(folder, 'Staveley 1981.tsv')
 
+STAVELEY = 'STAVELEY'
+MELTING = 'MELTING'
+
 _triple_data_loaded = False
 def _load_triple_data():
     global triple_data_Staveley, _triple_data_loaded, Tt_sources, Pt_sources
@@ -55,9 +58,7 @@ if PY37:
 else:
     _load_triple_data()
 
-STAVELEY = 'STAVELEY'
-MELTING = 'MELTING'
-Tt_methods = [STAVELEY, MELTING]
+Tt_methods = (STAVELEY, MELTING)
 
 def Tt(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's triple temperature.
@@ -126,7 +127,7 @@ def Tt(CASRN, get_methods=False, method=None):
         return Tm(CASRN)    
 triple_point_temperature = Tt
 
-Pt_methods = [STAVELEY]
+Pt_methods = (STAVELEY,)
 
 def Pt(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's triple pressure.

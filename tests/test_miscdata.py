@@ -38,6 +38,9 @@ def test_CRC_inorganic():
 
     assert CRC_inorganic_data.index.is_unique
     assert CRC_inorganic_data.shape == (2438, 4)
+
+@pytest.mark.slow
+def test_CRC_inorganic_check_CAS():
     assert all([checkCAS(i) for i in CRC_inorganic_data.index])
 
 
@@ -48,6 +51,9 @@ def test_CRC_organic():
 
     assert CRC_organic_data.index.is_unique
     assert CRC_organic_data.shape == (10867, 5)
+
+@pytest.mark.slow
+def test_CRC_organic_check_CAS():
     for i in CRC_organic_data.index:
         assert checkCAS(i)
 
@@ -56,6 +62,10 @@ def test_lookup_VDI_tabular_data():
     dat = lookup_VDI_tabular_data('67-56-1', 'Mu (g)')
     sTs, sprops = sum(dat[0]), sum(dat[1])
     assert_close1d([sTs, sprops], [2887.63, 0.0001001])
+    
+    # Check multiple props
+    P_sum = sum(lookup_VDI_tabular_data('67-56-1', 'P')[1])
+    assert_close(P_sum, 13332648.3)
 
     with pytest.raises(Exception):
         lookup_VDI_tabular_data('67-56-1000', 'Mu (g)')
