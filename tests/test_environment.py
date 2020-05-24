@@ -41,14 +41,18 @@ def test_GWP():
 
     GWP_available = GWP(CASRN='56-23-5', get_methods=True)
     assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr']
-    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP(i, get_methods=True)]).sum()
-    assert_close(tot, 960256)
 
     with pytest.raises(Exception):
         GWP(CASRN='74-82-8', method='BADMETHOD')
 
     # No value
     assert GWP('7732-18-5', method=None) is None
+
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_GWP_all_values():
+    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP(i, get_methods=True)]).sum()
+    assert_close(tot, 960256, rtol=1e-11)
 
 
 def test_logP_data():
@@ -108,7 +112,10 @@ def test_ODP():
 
     assert ODP(CASRN='14882353275-98-3') == None
 
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_ODP_all_values():
     dat_calc = [pd.to_numeric(pd.Series([ODP(i, method=j) for i in ODP_data.index]), errors='coerce').sum() for j in ODP_methods]
 
     dat = [77.641999999999996, 64.140000000000001, 63.10509761272651, 47.809027930358717, 58.521999999999998, 42.734000000000002, 54.342000000000006, 38.280000000000001]
-    assert_close1d(dat_calc, dat)
+    assert_close1d(dat_calc, dat, rtol=1e-12)

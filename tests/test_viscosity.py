@@ -20,13 +20,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from numpy.testing import assert_allclose
 from random import uniform
 import pytest
 from math import log, log10
 import numpy as np
 import pandas as pd
-from fluids.numerics import assert_close
+from fluids.numerics import assert_close, assert_close1d
 from fluids.constants import psi, atm, foot, lb
 from fluids.core import R2K, F2K
 from chemicals.utils import normalize, mixing_simple
@@ -42,7 +41,7 @@ def test_Dutt_Prasad_data():
     assert all([checkCAS(i) for i in mu_data_Dutt_Prasad.index])
     tots_calc = [mu_data_Dutt_Prasad[i].abs().sum() for i in ['A', 'B', 'C', 'Tmin', 'Tmax']]
     tots = [195.89260000000002, 65395.299999999996, 9849.1899999999987, 25952, 35016]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
 
     assert mu_data_Dutt_Prasad.index.is_unique
     assert mu_data_Dutt_Prasad.shape == (100, 6)
@@ -52,7 +51,7 @@ def test_VN2E_data():
     assert all([checkCAS(i) for i in mu_data_VN2E.index])
     tots_calc = [mu_data_VN2E[i].abs().sum() for i in ['C', 'D', 'Tmin', 'Tmax']]
     tots = [567743298666.74878, 48.8643, 3690, 4860]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
 
     assert mu_data_VN2E.index.is_unique
     assert mu_data_VN2E.shape == (14, 6)
@@ -62,7 +61,7 @@ def test_VN3_data():
     assert all([checkCAS(i) for i in mu_data_VN3.index])
     tots_calc = [mu_data_VN3[i].abs().sum() for i in ['A', 'B', 'C', 'Tmin', 'Tmax']]
     tots = [645.18849999999998, 169572.65159999998, 50050.151870000002, 126495, 175660]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
 
     assert mu_data_VN3.index.is_unique
     assert mu_data_VN3.shape == (432, 7)
@@ -71,7 +70,7 @@ def test_VN2_data():
     assert all([checkCAS(i) for i in mu_data_VN3.index])
     tots_calc = [mu_data_VN2[i].abs().sum() for i in ['A', 'B', 'Tmin', 'Tmax']]
     tots = [674.10069999999996, 83331.98599999999, 39580, 47897]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
 
     assert mu_data_VN2.index.is_unique
     assert mu_data_VN2.shape == (135, 6)
@@ -83,7 +82,7 @@ def test_Perrys2_313_data():
     assert all([checkCAS(i) for i in mu_data_Perrys_8E_2_313.index])
     tots_calc = [mu_data_Perrys_8E_2_313[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'C5', u'Tmin', u'Tmax']]
     tots = [9166.6971369999992, 615425.94497999991, 1125.5317557875198, 9.054869390623603e+34, 402.21244000000002, 72467.140000000014, 136954.85999999999]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
     
     assert mu_data_Perrys_8E_2_313.index.is_unique
     assert mu_data_Perrys_8E_2_313.shape == (337, 8)
@@ -98,7 +97,7 @@ def test_Perrys2_312_data():
     assert all([checkCAS(i) for i in mu_data_Perrys_8E_2_312.index])
     tots_calc = [mu_data_Perrys_8E_2_312[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
     tots = [0.00019683902626010103, 250.10520100000002, 65862.829200000007, 191286, 74802.639999999999, 355064.37]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
     
     assert mu_data_Perrys_8E_2_312.index.is_unique
     assert mu_data_Perrys_8E_2_312.shape == (345, 7)
@@ -108,7 +107,7 @@ def test_VDI_PPDS_7_data():
     assert all([checkCAS(i) for i in mu_data_VDI_PPDS_7.index])
     tots_calc = [mu_data_VDI_PPDS_7[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [507.14607000000001, 1680.7624099999998, 165461.14259999999, 46770.887000000002, 0.057384780000000003]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
     
     assert mu_data_VDI_PPDS_7.index.is_unique
     assert mu_data_VDI_PPDS_7.shape == (271, 7)
@@ -118,96 +117,96 @@ def test_VDI_PPDS_8_data():
     assert all([checkCAS(i) for i in mu_data_VDI_PPDS_8.index])
     tots_calc = [mu_data_VDI_PPDS_8[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [0.00032879559999999999, 9.5561339999999995e-06, 2.8377710000000001e-09, 2.8713399999999998e-12, 2.8409200000000004e-15]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
     
     assert mu_data_VDI_PPDS_8.index.is_unique
     assert mu_data_VDI_PPDS_8.shape == (274, 6)
 
 def test_ViswanathNatarajan():
     mu = Viswanath_Natarajan_2(348.15, -5.9719-log(100), 1007.0)
-    assert_allclose(mu, 0.00045983686956829517)
+    assert_close(mu, 0.00045983686956829517)
 
     mu = Viswanath_Natarajan_2_exponential(298.15, 4900800,  -3.8075)
-    assert_allclose(mu, 0.0018571903840928496)
+    assert_close(mu, 0.0018571903840928496)
 
     mu = Viswanath_Natarajan_3(298.15, -2.7173-log10(1000), -1071.18, -129.51)
-    assert_allclose(mu, 0.0006129806445142112)
+    assert_close(mu, 0.0006129806445142112)
 
 
 def test_Letsou_Stiel():
     # Checked 2017-03-05
     mu = Letsou_Stiel(400., 46.07, 516.25, 6.383E6, 0.6371)
-    assert_allclose(mu, 0.0002036150875308151)
+    assert_close(mu, 0.0002036150875308151)
 
     # Butane, custom case; vs 0.000166 exp
     mu = Letsou_Stiel(298.15, 58.1222, 425.12, 3796000.0, 0.193)
-    assert_allclose(mu, 0.00015385075092073157)
+    assert_close(mu, 0.00015385075092073157)
 
 
 def test_Przedziecki_Sridhar():
     # Reid (1983) toluene, 383K
     mu = Przedziecki_Sridhar(383., 178., 591.8, 41E5, 316E-6, 95E-6, .263, 92.14)
-    assert_allclose(mu, 0.0002198147995603383)
+    assert_close(mu, 0.0002198147995603383)
 
 
 def test_Lucas():
     # methylcyclohexane
     mu = Lucas(300., 500E5, 572.2, 34.7E5, 0.236, 0, 0.00068)
-    assert_allclose(mu, 0.0010683738499316518)
+    assert_close(mu, 0.0010683738499316518)
 
     # Psat > P:
     mu = Lucas(300., 500E5, 572.2, 34.7E5, 0.236, 501E5, 0.00068)
-    assert_allclose(mu, 0.00068)
+    assert_close(mu, 0.00068)
 
 
 def test_Stiel_Thodos():
     # CCl4
     mu = Stiel_Thodos(300., 556.35, 4.5596E6, 153.8)
-    assert_allclose(mu, 1.0408926223608723e-05)
+    assert_close(mu, 1.0408926223608723e-05)
 
     # Tr > 1.5
     mu = Stiel_Thodos(900., 556.35, 4.5596E6, 153.8)
-    assert_allclose(mu, 2.899111242556782e-05)
+    assert_close(mu, 2.899111242556782e-05)
 
 
 def test_Yoon_Thodos():
     # CCl4
     mu = Yoon_Thodos(300., 556.35, 4.5596E6, 153.8)
-    assert_allclose(mu, 1.0194885727776819e-05)
+    assert_close(mu, 1.0194885727776819e-05)
 
 
 def test_Gharagheizi_gas_viscosity():
     mu = Gharagheizi_gas_viscosity(120., 190.564, 45.99E5, 16.04246)
-    assert_allclose(mu, 5.215761625399613e-06)
+    assert_close(mu, 5.215761625399613e-06)
 
 
 def test_Lucas_gas():
     mu = lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=1.7)
-    assert_allclose(mu, 1.7822676912698928e-05)
+    assert_close(mu, 1.7822676912698928e-05)
 
     mu = lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=None)
-    assert_allclose(mu, 1.371116974367763e-05)
+    assert_close(mu, 1.371116974367763e-05)
 
     mu = lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=8)
-    assert_allclose(mu, 1.7811559961984407e-05)
+    assert_close(mu, 1.7811559961984407e-05)
 
     # Helium, testing Q
     mu = lucas_gas(T=6, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
-    assert_allclose(mu, 1.3042945737346396e-06)
+    assert_close(mu, 1.3042945737346396e-06)
 
     mu = lucas_gas(T=150, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
-    assert_allclose(mu, 1.2558477184738118e-05)
+    assert_close(mu, 1.2558477184738118e-05)
 
 
 def test_Wilke():
     mu = Wilke([0.05, 0.95], [1.34E-5, 9.5029E-6], [64.06, 46.07])
-    assert_allclose(mu, 9.701614885866193e-06, rtol=1e-10)
+    assert_close(mu, 9.701614885866193e-06, rtol=1e-10)
 
 #    with pytest.raises(Exception):
 #        Wilke([0.05], [1.34E-5, 9.5029E-6], [64.06, 46.07])
         
     mu = Wilke_large([0.05, 0.95], [1.34E-5, 9.5029E-6], [64.06, 46.07])
-    assert_allclose(mu, 9.701614885866193e-06, rtol=1e-10)
+    assert_close(mu, 9.701614885866193e-06, rtol=1e-10)
     
     mu = Wilke_prefactored([0.05, 0.95], [1.34E-5, 9.5029E-6], *Wilke_prefactors([64.06, 46.07]))
     assert_close(mu, 9.701614885866193e-06, rtol=1e-10)
@@ -246,7 +245,7 @@ def test_Wilke():
 
 def test_Herning_Zipperer():
     mu = Herning_Zipperer([0.05, 0.95], [1.34E-5, 9.5029E-6], [64.06, 46.07])
-    assert_allclose(mu, 9.730630997268096e-06)
+    assert_close(mu, 9.730630997268096e-06)
 
 #    with pytest.raises(Exception):
 #        Herning_Zipperer([0.05], [1.34E-5, 9.5029E-6], [64.06, 46.07])
@@ -262,14 +261,14 @@ def test_Herning_Zipperer():
 
 def test_Brockaw():
     mu = Brokaw(308.2, [0.05, 0.95], [1.34E-5, 9.5029E-6], [64.06, 46.07], [0.42, 0.19], [347, 432])
-    assert_allclose(mu, 9.699085099801568e-06)
+    assert_close(mu, 9.699085099801568e-06)
 
 #    with pytest.raises(Exception):
 #        Brokaw(308.2, [0.95], [1.34E-5, 9.5029E-6], [64.06, 46.07], [0.42, 0.19], [347, 432])
 
     # Test < 0.1 MD
     mu = Brokaw(308.2, [0.05, 0.95], [1.34E-5, 9.5029E-6], [64.06, 46.07], [0.42, 0.05], [347, 432])
-    assert_allclose(mu, 9.70504431025103e-06)
+    assert_close(mu, 9.70504431025103e-06)
 
 
 def test_round_whole_even():
@@ -282,11 +281,11 @@ def test_round_whole_even():
 
 def test_viscosity_index():
     # 4/5 examples from the official document, one custom example
-    assert_allclose(92.4296472453428, viscosity_index(73.3E-6, 8.86E-6))
-    assert_allclose(156.42348293257797, viscosity_index(22.83E-6, 5.05E-6))
-    assert_allclose(111.30701701381422, viscosity_index(53.47E-6, 7.80E-6))
-    assert_allclose(92.03329369797858, viscosity_index(73.5E-6, 8.86E-6))
-    assert_allclose(192.9975428057893, viscosity_index(1000E-6, 100E-6)) # Custom
+    assert_close(92.4296472453428, viscosity_index(73.3E-6, 8.86E-6))
+    assert_close(156.42348293257797, viscosity_index(22.83E-6, 5.05E-6))
+    assert_close(111.30701701381422, viscosity_index(53.47E-6, 7.80E-6))
+    assert_close(92.03329369797858, viscosity_index(73.5E-6, 8.86E-6))
+    assert_close(192.9975428057893, viscosity_index(1000E-6, 100E-6)) # Custom
     assert 193 == viscosity_index(1000E-6, 100E-6, rounding=True) # custom, rounded
     assert 92 == viscosity_index(73.3E-6, 8.86E-6, rounding=True)
     assert None == viscosity_index(3E-6, 1.5E-6)
@@ -327,24 +326,24 @@ def test_viscosity_converter():
     # Barbey - todo viscosity_converter(95, 'barbey', 'parlin cup #7')
     
     visc = viscosity_converter(8.79, 'engler', 'parlin cup #7')
-    assert_allclose(visc, 52.5)
+    assert_close(visc, 52.5)
     
     # seconds/degrees string inputs and capitals
     visc = viscosity_converter(8.79, 'degrees engler', 'seconds parlin cup #7')
-    assert_allclose(visc, 52.5)
+    assert_close(visc, 52.5)
     
     visc = viscosity_converter(8.79, '    degrees engler', 'seconds parlin cup #7    ')
-    assert_allclose(visc, 52.5)
+    assert_close(visc, 52.5)
     
     visc = viscosity_converter(8.79, 'Engler', 'PARLIN cup #7')
-    assert_allclose(visc, 52.5)
+    assert_close(visc, 52.5)
     
     
     visc = viscosity_converter(8.78, 'engler', 'parlin cup #7')
-    assert_allclose(visc, 52.45389001785669)
+    assert_close(visc, 52.45389001785669)
     
     visc = viscosity_converter(5.91, 'engler', 'parlin cup #7', True)
-    assert_allclose(visc, 39.96017612902695)
+    assert_close(visc, 39.96017612902695)
     
     with pytest.raises(Exception):
         # limit is 5.92, but even that fails due to float conversion
@@ -361,15 +360,15 @@ def test_viscosity_converter():
         viscosity_converter(8.79, 'kinematic viscosity', 'NOTAREALSCALE')
         
     nu = viscosity_converter(8.79, 'engler', 'kinematic viscosity')
-    assert_allclose(nu, 6.5E-5)
+    assert_close(nu, 6.5E-5)
     
     with pytest.raises(Exception):
         viscosity_converter(8.79, 'pratt lambert e', 'kinematic viscosity')
         
     t = viscosity_converter(0.0002925, 'kinematic viscosity', 'pratt lambert g')
-    assert_allclose(t, 7.697368421052632)
+    assert_close(t, 7.697368421052632)
     nu = viscosity_converter(7.697368421052632, 'pratt lambert g', 'kinematic viscosity', )
-    assert_allclose(nu, .0002925)
+    assert_close(nu, .0002925)
     
     with pytest.raises(Exception):
         viscosity_converter(0.00002925, 'kinematic viscosity', 'pratt lambert g')
@@ -381,10 +380,10 @@ def test_viscosity_converter():
     viscosity_converter(6, 'pratt lambert g', 'kinematic viscosity', True)
     
     nu = viscosity_converter(700, 'Saybolt Universal Seconds', 'kinematic viscosity')
-    assert_allclose(nu, 0.00015108914751515542)
+    assert_close(nu, 0.00015108914751515542)
     
     t = viscosity_converter(0.00015108914751515542, 'kinematic viscosity', 'Saybolt Universal Seconds')
-    assert_allclose(t, 700)
+    assert_close(t, 700)
     
     for i in range(20):
         # fuzz the numerical solver for SUS a bit -increase to try harder, but
@@ -394,18 +393,18 @@ def test_viscosity_converter():
         SUS = uniform(31, 20000)
         nu = viscosity_converter(SUS, 'Saybolt Universal Seconds', 'kinematic viscosity')
         SUS2 = viscosity_converter(nu, 'kinematic viscosity', 'Saybolt Universal Seconds')
-        assert_allclose(SUS, SUS2)
+        assert_close(SUS, SUS2)
 
 
     # Barbey custom tests
     nu = viscosity_converter(483, 'barbey', 'kinematic viscosity')*1E6
-    assert_allclose(nu, 13.1)
+    assert_close(nu, 13.1)
     nu = viscosity_converter(1.4, 'barbey', 'kinematic viscosity')*1E6
-    assert_allclose(nu, 4400)
+    assert_close(nu, 4400)
     nu = viscosity_converter(6200, 'barbey', 'kinematic viscosity')*1E6
-    assert_allclose(nu, 1)
+    assert_close(nu, 1)
     nu = viscosity_converter(6300, 'barbey', 'kinematic viscosity', extrapolate=True)*1E6
-    assert_allclose(nu, 0.984, rtol=1E-3)
+    assert_close(nu, 0.984, rtol=1E-3)
     # The extrapolation when barbey is known and under 1.4 is not working and goes the wrong direction
     # viscosity_converter(1.39999, 'barbey', 'kinematic viscosity', extrapolate=True)*1E6
 
