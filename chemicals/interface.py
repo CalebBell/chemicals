@@ -33,32 +33,53 @@ import os
 import pandas as pd
 import numpy as np
 from chemicals.utils import log, exp
-from chemicals.utils import mixing_simple
+from chemicals.utils import mixing_simple, PY37
 from fluids.constants import N_A, k
+from chemicals.data_reader import register_df_source, data_source
 
 folder = os.path.join(os.path.dirname(__file__), 'Interface')
 
 
-sigma_data_Mulero_Cachadina = pd.read_csv(os.path.join(folder,
-                        'MuleroCachadinaParameters.tsv'), sep='\t', index_col=0)
-sigma_values_Mulero_Cachadina = np.array(sigma_data_Mulero_Cachadina.values[:, 1:], dtype=float)
+register_df_source(folder, 'MuleroCachadinaParameters.tsv')
+register_df_source(folder, 'Jasper-Lange.tsv')
+register_df_source(folder, 'Somayajulu.tsv')
+register_df_source(folder, 'SomayajuluRevised.tsv')
+register_df_source(folder, 'VDI PPDS surface tensions.tsv')
 
-sigma_data_Jasper_Lange = pd.read_csv(os.path.join(folder, 'Jasper-Lange.tsv'),
-                                      sep='\t', index_col=0)
-sigma_values_Jasper_Lange = np.array(sigma_data_Jasper_Lange.values[:, 1:], dtype=float)
+_interface_dfs_loaded = False
+def load_interface_dfs():
+    global _interface_dfs_loaded, sigma_data_Mulero_Cachadina, sigma_values_Mulero_Cachadina
+    global sigma_data_Jasper_Lange, sigma_values_Jasper_Lange
+    global sigma_data_Somayajulu, sigma_values_Somayajulu, sigma_data_Somayajulu2
+    global sigma_values_Somayajulu2, sigma_data_VDI_PPDS_11, sigma_values_VDI_PPDS_11
 
-sigma_data_Somayajulu = pd.read_csv(os.path.join(folder, 'Somayajulu.tsv'),
-                                    sep='\t', index_col=0)
-sigma_values_Somayajulu = np.array(sigma_data_Somayajulu.values[:, 1:], dtype=float)
+    sigma_data_Mulero_Cachadina = data_source('MuleroCachadinaParameters.tsv')
+    sigma_values_Mulero_Cachadina = np.array(sigma_data_Mulero_Cachadina.values[:, 1:], dtype=float)
 
-sigma_data_Somayajulu2 = pd.read_csv(os.path.join(folder, 'SomayajuluRevised.tsv'),
-                                     sep='\t', index_col=0)
-sigma_values_Somayajulu2 = np.array(sigma_data_Somayajulu2.values[:, 1:], dtype=float)
+    sigma_data_Jasper_Lange = data_source('Jasper-Lange.tsv')
+    sigma_values_Jasper_Lange = np.array(sigma_data_Jasper_Lange.values[:, 1:], dtype=float)
+    
+    sigma_data_Somayajulu = data_source('Somayajulu.tsv')
+    sigma_values_Somayajulu = np.array(sigma_data_Somayajulu.values[:, 1:], dtype=float)
 
-sigma_data_VDI_PPDS_11 = pd.read_csv(os.path.join(folder, 'VDI PPDS surface tensions.tsv'),
-                                     sep='\t', index_col=0)
-sigma_values_VDI_PPDS_11 = np.array(sigma_data_VDI_PPDS_11.values[:, 1:], dtype=float)
+    sigma_data_Somayajulu2 = data_source('SomayajuluRevised.tsv')
+    sigma_values_Somayajulu2 = np.array(sigma_data_Somayajulu2.values[:, 1:], dtype=float)
 
+    sigma_data_VDI_PPDS_11 = data_source('VDI PPDS surface tensions.tsv')
+    sigma_values_VDI_PPDS_11 = np.array(sigma_data_VDI_PPDS_11.values[:, 1:], dtype=float)
+
+if PY37:
+    def __getattr__(name):
+        if name in ('sigma_data_Mulero_Cachadina', 'sigma_values_Mulero_Cachadina', 
+                    'sigma_data_Jasper_Lange', 'sigma_values_Jasper_Lange',
+                    'sigma_data_Somayajulu', 'sigma_values_Somayajulu', 'sigma_data_Somayajulu2', 
+                    'sigma_values_Somayajulu2', 'sigma_data_VDI_PPDS_11', 'sigma_values_VDI_PPDS_11'
+                    ):
+            load_interface_dfs()
+            return globals()[name]
+        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+else:
+    load_interface_dfs()
 
 ### Regressed coefficient-based functions
 
