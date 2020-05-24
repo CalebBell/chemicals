@@ -38,6 +38,9 @@ def test_CRC_inorganic():
 
     assert CRC_inorganic_data.index.is_unique
     assert CRC_inorganic_data.shape == (2438, 4)
+
+@pytest.mark.slow
+def test_CRC_inorganic_check_CAS():
     assert all([checkCAS(i) for i in CRC_inorganic_data.index])
 
 
@@ -48,6 +51,9 @@ def test_CRC_organic():
 
     assert CRC_organic_data.index.is_unique
     assert CRC_organic_data.shape == (10867, 5)
+
+@pytest.mark.slow
+def test_CRC_organic_check_CAS():
     for i in CRC_organic_data.index:
         assert checkCAS(i)
 
