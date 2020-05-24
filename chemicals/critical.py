@@ -791,7 +791,6 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
     da_SI = da*1e-10 # Convert from angstrom to m
     return ((coeff/(ra/H_RADIUS_COV)**power)*da_SI)**3*N_A*atom_count
 
-
 ### Critical Property Relationships
 
 def _assert_two_critical_properties_provided(critical_properties):
@@ -861,7 +860,6 @@ def Ihmels(Tc=None, Pc=None, Vc=None):
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Tc = 5.0/443*(40*Pc*Vc + Vc)
         return Tc
-
 
 def Meissner(Tc=None, Pc=None, Vc=None):
     r'''Old (1942) relationship for estimating critical
@@ -992,12 +990,10 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
         Tc = 1.0/202*(10*Pc-29.0)*Vc
         return Tc
 
-
 IHMELS = 'IHMELS'
 MEISSNER = 'MEISSNER'
 GRIGORAS = 'GRIGORAS'
 critical_surface_methods = (IHMELS, MEISSNER, GRIGORAS)
-
 
 def critical_surface(Tc=None, Pc=None, Vc=None, get_methods=False,
                      method=None):
