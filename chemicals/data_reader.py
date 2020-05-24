@@ -100,15 +100,14 @@ def retrieve_any_from_df(df, index, keys):
 def get_value_from_df(df, index, key):
     value = df.at[index, key]
     try:
-        if not isnan(value):
-            return float(value)
+        return None if isnan(value) else float(value)
     except TypeError:
         # Not a number
         return value
             
 def list_available_methods_from_df_dict(df_dict, index, key):
     return [method for method, df in df_dict.items()
-            if (index in df.index) and (get_value_from_df(df, index, key) is not None)]
+            if (index in df.index) and not pd.isnull(df.at[index, key])]
 
 def list_available_methods_from_df(df, index, keys):
     if index in df.index:
