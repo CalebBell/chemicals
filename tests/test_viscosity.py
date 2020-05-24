@@ -326,23 +326,29 @@ def test_viscosity_converter():
     # Barbey - todo viscosity_converter(95, 'barbey', 'parlin cup #7')
     
     visc = viscosity_converter(8.79, 'engler', 'parlin cup #7')
+    assert type(visc) is float
     assert_close(visc, 52.5)
     
     # seconds/degrees string inputs and capitals
     visc = viscosity_converter(8.79, 'degrees engler', 'seconds parlin cup #7')
+    assert type(visc) is float
     assert_close(visc, 52.5)
     
     visc = viscosity_converter(8.79, '    degrees engler', 'seconds parlin cup #7    ')
+    assert type(visc) is float
     assert_close(visc, 52.5)
     
     visc = viscosity_converter(8.79, 'Engler', 'PARLIN cup #7')
+    assert type(visc) is float
     assert_close(visc, 52.5)
     
     
     visc = viscosity_converter(8.78, 'engler', 'parlin cup #7')
+    assert type(visc) is float
     assert_close(visc, 52.45389001785669)
     
     visc = viscosity_converter(5.91, 'engler', 'parlin cup #7', True)
+    assert type(visc) is float
     assert_close(visc, 39.96017612902695)
     
     with pytest.raises(Exception):
@@ -360,14 +366,17 @@ def test_viscosity_converter():
         viscosity_converter(8.79, 'kinematic viscosity', 'NOTAREALSCALE')
         
     nu = viscosity_converter(8.79, 'engler', 'kinematic viscosity')
+    assert type(nu) is float
     assert_close(nu, 6.5E-5)
     
     with pytest.raises(Exception):
         viscosity_converter(8.79, 'pratt lambert e', 'kinematic viscosity')
         
     t = viscosity_converter(0.0002925, 'kinematic viscosity', 'pratt lambert g')
+    assert type(nu) is float
     assert_close(t, 7.697368421052632)
     nu = viscosity_converter(7.697368421052632, 'pratt lambert g', 'kinematic viscosity', )
+    assert type(nu) is float
     assert_close(nu, .0002925)
     
     with pytest.raises(Exception):
@@ -380,32 +389,41 @@ def test_viscosity_converter():
     viscosity_converter(6, 'pratt lambert g', 'kinematic viscosity', True)
     
     nu = viscosity_converter(700, 'Saybolt Universal Seconds', 'kinematic viscosity')
+    assert type(nu) is float
     assert_close(nu, 0.00015108914751515542)
     
     t = viscosity_converter(0.00015108914751515542, 'kinematic viscosity', 'Saybolt Universal Seconds')
+    assert type(t) is float
     assert_close(t, 700)
     
+    # Barbey custom tests
+    nu = viscosity_converter(483, 'barbey', 'kinematic viscosity')*1E6
+    assert type(nu) is float
+    assert_close(nu, 13.1)
+    nu = viscosity_converter(1.4, 'barbey', 'kinematic viscosity')*1E6
+    assert type(nu) is float
+    assert_close(nu, 4400)
+    nu = viscosity_converter(6200, 'barbey', 'kinematic viscosity')*1E6
+    assert type(nu) is float
+    assert_close(nu, 1)
+    nu = viscosity_converter(6300, 'barbey', 'kinematic viscosity', extrapolate=True)*1E6
+    assert type(nu) is float
+    assert_close(nu, 0.984, rtol=1E-3)
+    # The extrapolation when barbey is known and under 1.4 is not working and goes the wrong direction
+    # viscosity_converter(1.39999, 'barbey', 'kinematic viscosity', extrapolate=True)*1E6
+
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_viscosity_converter_fuzz_SUS():
     for i in range(20):
         # fuzz the numerical solver for SUS a bit -increase to try harder, but
         # all efforts show the function is monotonic. It turns negative at 25.5
         # and stops working on the high side at 8000000000000. Plenty of room
         # for newton's method to converge!
-        SUS = uniform(31, 20000)
+        SUS = uniform(31.0, 20000.0)
         nu = viscosity_converter(SUS, 'Saybolt Universal Seconds', 'kinematic viscosity')
         SUS2 = viscosity_converter(nu, 'kinematic viscosity', 'Saybolt Universal Seconds')
         assert_close(SUS, SUS2)
 
-
-    # Barbey custom tests
-    nu = viscosity_converter(483, 'barbey', 'kinematic viscosity')*1E6
-    assert_close(nu, 13.1)
-    nu = viscosity_converter(1.4, 'barbey', 'kinematic viscosity')*1E6
-    assert_close(nu, 4400)
-    nu = viscosity_converter(6200, 'barbey', 'kinematic viscosity')*1E6
-    assert_close(nu, 1)
-    nu = viscosity_converter(6300, 'barbey', 'kinematic viscosity', extrapolate=True)*1E6
-    assert_close(nu, 0.984, rtol=1E-3)
-    # The extrapolation when barbey is known and under 1.4 is not working and goes the wrong direction
-    # viscosity_converter(1.39999, 'barbey', 'kinematic viscosity', extrapolate=True)*1E6
 
 
