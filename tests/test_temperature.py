@@ -20,20 +20,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from numpy.testing import assert_allclose
 import pytest
 from chemicals.temperature import *
 import numpy as np
-from fluids.numerics import assert_close, linspace
+from fluids.numerics import assert_close, assert_close1d, linspace
 
 
 def test_data():
     Ts_sums_calc = [np.array(i).sum() for i in [Ts_68, Ts_48, Ts_76, Ts_27]]
     Ts_sums = [186818.69999999998, 175181.39999999997, 368, 133893.09999999998]
-    assert_allclose(Ts_sums_calc, Ts_sums)
+    assert_close1d(Ts_sums_calc, Ts_sums)
     diffs_sums_calc = [abs(np.array(i)).sum() for i in [diffs_68, diffs_48, diffs_76, diffs_27]]
     diffs_sums = [46.304000000000016, 151.31800000000001, 0.038800000000000001, 411.17999999999995]
-    assert_allclose(diffs_sums_calc, diffs_sums)
+    assert_close1d(diffs_sums_calc, diffs_sums)
 
 
 def test_conversion():
@@ -81,4 +80,4 @@ def test_diff_68():
 
     dTs = [0, 0.006818871618271216, 0, -0.006253950277664615,
            0.01231818956580355, -0.31455]
-    assert_allclose(dTs, dTs_calc)
+    assert_close1d(dTs, dTs_calc)

@@ -62,6 +62,10 @@ def test_lookup_VDI_tabular_data():
     dat = lookup_VDI_tabular_data('67-56-1', 'Mu (g)')
     sTs, sprops = sum(dat[0]), sum(dat[1])
     assert_close1d([sTs, sprops], [2887.63, 0.0001001])
+    
+    # Check multiple props
+    P_sum = sum(lookup_VDI_tabular_data('67-56-1', 'P')[1])
+    assert_close(P_sum, 13332648.3)
 
     with pytest.raises(Exception):
         lookup_VDI_tabular_data('67-56-1000', 'Mu (g)')

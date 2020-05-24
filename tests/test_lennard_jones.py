@@ -78,6 +78,8 @@ def test_molecular_diameter_CSP():
     assert_close(sigma, 5.164483998730177)
     assert sigma_Silva_Liu_Macedo(1084, 3.84E5) is None
 
+@pytest.mark.slow
+@pytest.mark.fuzz
 def test_stockmayer_all_lookups():
     # Use the default method for each chemical in this file
     Stockmayers = sum([Stockmayer(CASRN=i) for i in LJ_data_Magalhaes.index])
