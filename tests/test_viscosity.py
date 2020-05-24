@@ -181,20 +181,20 @@ def test_Gharagheizi_gas_viscosity():
 
 
 def test_Lucas_gas():
-    mu = lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=1.7)
+    mu = Lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=1.7)
     assert_close(mu, 1.7822676912698928e-05)
 
-    mu = lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=None)
+    mu = Lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=None)
     assert_close(mu, 1.371116974367763e-05)
 
-    mu = lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=8)
+    mu = Lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=8)
     assert_close(mu, 1.7811559961984407e-05)
 
     # Helium, testing Q
-    mu = lucas_gas(T=6, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
+    mu = Lucas_gas(T=6, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
     assert_close(mu, 1.3042945737346396e-06)
 
-    mu = lucas_gas(T=150, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
+    mu = Lucas_gas(T=150, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
     assert_close(mu, 1.2558477184738118e-05)
 
 

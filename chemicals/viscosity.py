@@ -22,19 +22,11 @@ SOFTWARE.'''
 
 from __future__ import division
 
-__all__ = [
-'Viswanath_Natarajan_3',
-'Letsou_Stiel', 'Przedziecki_Sridhar', 
-'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential',
- 'Lucas', 
-'Yoon_Thodos', 'Stiel_Thodos', 'lucas_gas', 
-'Gharagheizi_gas_viscosity', 
-'Herning_Zipperer', 
+__all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 
+'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
+'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'Gharagheizi_gas_viscosity', 'Herning_Zipperer', 
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
-
-           'Brokaw',
-           'viscosity_index', 'viscosity_converter',
-           'Lorentz_Bray_Clarke']
+'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke']
 
 import os
 import numpy as np
@@ -43,6 +35,8 @@ from fluids.numerics import newton, interp
 from chemicals.utils import log, exp, log10
 from chemicals.utils import PY37
 from chemicals.data_reader import register_df_source, data_source
+
+__numba_additional_funcs__ = ('_round_whole_even',)
 
 folder = os.path.join(os.path.dirname(__file__), 'Viscosity')
 
@@ -565,10 +559,8 @@ def Stiel_Thodos(T, Tc, Pc, MW):
         mu_g = 34E-5*Tr**0.94/xi
     return mu_g*1e-3
 
-_lucas_Q_dict = {'7440-59-7': 1.38, '1333-74-0': 0.76, '7782-39-0': 0.52}
 
-
-def lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
+def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
     r'''Estimate the viscosity of a gas using an emperical
     formula developed in several sources, but as discussed in [1]_ as the
     original sources are in German or merely personal communications with the
@@ -619,7 +611,7 @@ def lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
 
     Examples
     --------
-    >>> lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=1.7)
+    >>> Lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=1.7)
     1.7822676912698925e-05
 
     References
@@ -640,15 +632,21 @@ def lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
         Fp = 1.0 + 30.55*(0.292 - Zc)**1.72
     else:
         Fp = 1.0 + 30.55*(0.292 - Zc)**1.72*abs(0.96 + 0.1*(Tr - 0.7))
-    if CASRN and CASRN in _lucas_Q_dict:
-        Q = _lucas_Q_dict[CASRN]
-        if Tr - 12.0 > 0.0:
-            value = 1.0
-        else:
-            value = -1.0
-        FQ = 1.22*Q**0.15*(1.0 + 0.00385*((Tr-12.0)**2)**(MW_inv)*value)
-    else:
-        FQ = 1.0
+    FQ = 1.0
+    if CASRN is not None:
+        Q = 0.0
+        if CASRN == '7440-59-7':
+            Q = 1.38
+        elif CASRN == '1333-74-0':
+            Q = 0.76
+        elif CASRN == '7782-39-0':
+            Q = 0.52
+        if Q != 0.0:
+            if Tr - 12.0 > 0.0:
+                value = 1.0
+            else:
+                value = -1.0
+            FQ = 1.22*Q**0.15*(1.0 + 0.00385*((Tr-12.0)**2)**(MW_inv)*value)
     eta = (0.807*Tr**0.618 - 0.357*exp(-0.449*Tr) + 0.340*exp(-4.058*Tr) + 0.018)*Fp*FQ/xi
     return eta*1E-7
 

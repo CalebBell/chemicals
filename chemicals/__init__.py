@@ -86,6 +86,11 @@ __all__.extend(acentric.__all__)
 __all__.extend(viscosity.__all__)
 __all__.extend(interface.__all__)
 
+submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata, 
+              environment, refractivity, solubility, lennard_jones, 
+              vapor_pressure, virial, phase_change, triple, acentric, viscosity,
+              interface]
+
 chemicals_dir = os.path.dirname(__file__)
 
 __version__ = '0.1.1'

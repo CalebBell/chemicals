@@ -1,4 +1,5 @@
 *.pyc
+*.pyo
 .gitignore
 .pypirc
 dist

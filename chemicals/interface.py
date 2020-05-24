@@ -405,9 +405,9 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
     if chemicaltype == 'alcohol':
         k, x, y, z, m = 2.28, 0.25, 0.175, 0, 0.8
     elif chemicaltype == 'acid':
-        k, x, y, z, m = 0.125, 0.50, -1.5, 1.85, 11/9.0
+        k, x, y, z, m = 0.125, 0.50, -1.5, 1.85, 11.0/9.0
     else:
-        k, x, y, z, m = 0.158, 0.50, -1.5, 1.85, 11/9.0
+        k, x, y, z, m = 0.158, 0.50, -1.5, 1.85, 11.0/9.0
     Tr = T/Tc
     Tbr = Tb/Tc
     Pc = Pc/1E5  # Convert to bar
@@ -756,7 +756,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
     --------
     >>> Winterfeld_Scriven_Davis([0.1606, 0.8394], [0.01547, 0.02877],
     ... [8610., 15530.])
-    0.024967388450439814
+    0.024967388450439817
 
     References
     ----------
@@ -767,9 +767,14 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     '''
-    Vms = [1e3/i for i in rhoms]
-    rho = 1./mixing_simple(xs, Vms)
     cmps = range(len(xs))
+
+    Vms = [1e3/i for i in rhoms]
+    rho = 0.0
+    for i in cmps:
+        rho += xs[i]*Vms[i]
+#    rho = 1./rho
+    rho = 1.4142135623730951/rho
     # For speed, transform the Vms array to contain
 #    xs[i]*Vms[i]*sigmas_05[i]*rho
     sigmas_05 = [i**0.5 for i in sigmas]
@@ -777,8 +782,10 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
         Vms[i] *= sigmas_05[i]*xs[i]*rho
     tot = 0.0
     for i in cmps:
-        for j in cmps:
+        # Symmetric - can be slightly optimized
+        for j in range(i):
             tot += Vms[i]*Vms[j]
+        tot += 0.5*Vms[i]*Vms[i]
     return tot
         
 

@@ -1,0 +1,62 @@
+# -*- coding: utf-8 -*-
+'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2020, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.'''
+
+from __future__ import division
+import sys
+import importlib.util
+import types
+import numpy as np
+import numba
+import chemicals
+import fluids.numba
+normal = chemicals
+
+__all__ = []
+
+__funcs = {}
+
+
+replaced = {'sum': np.sum}
+replaced, NUMERICS_SUBMOD = fluids.numba.create_numerics(replaced, vec=False)
+
+
+fluids.numba.transform_module(normal, __funcs, replaced, vec=False)
+
+
+globals().update(__funcs)
+globals().update(replaced)
+
+
+# Manual functions - required to maintain speed of PyPy/CPython while obtaining
+# maximum speed with numba. Try to avoid writing these, huge pain to maintain
+
+@numba.njit
+def zs_to_ws(zs, MWs):
+    ws = zs*MWs
+    Mavg = 1.0/np.sum(ws)
+    ws *= Mavg
+    return ws 
+
+utils.zs_to_ws = zs_to_ws
+
+
+

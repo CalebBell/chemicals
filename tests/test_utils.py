@@ -195,7 +195,7 @@ def test_mixing_logarithmic():
     prop = mixing_logarithmic([0.1, 0.9], [0.01, 0.02])
     assert_close(prop, 0.01866065983073615)
 
-    assert None == mixing_logarithmic([0.1], [0.01, 0.02])
+    assert None == mixing_logarithmic([0.01, 0.02], [0.1])
 
 def test_normalize():
     fractions_calc = normalize([3, 2, 1])
