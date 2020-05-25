@@ -1284,13 +1284,13 @@ def zs_to_ws(zs, MWs):
     '''
     cmps = range(len(zs))
     ws = [zs[i]*MWs[i] for i in cmps]
-    Mavg = 1.0/sum(ws)
+    Mavg = 0.0    # Cannot use sum and list comprehension with numba; otherwise Mavg = 1.0/sum(ws)
+    for v in ws:
+        Mavg += v
+    Mavg = 1.0/Mavg
     for i in cmps:
         ws[i] *= Mavg
     return ws
-#    Mavg = sum([zi*MWi for zi, MWi in zip(zs, MWs)])
-#    ws = [zi*MWi/Mavg for zi, MWi in zip(zs, MWs)]
-#    return ws
 
 
 def ws_to_zs(ws, MWs):
@@ -1938,7 +1938,11 @@ def mixing_simple(fracs, props):
     0.019000000000000003
     '''
     try:
-        return sum([fracs[i]*props[i] for i in range(len(fracs))])
+        tot = 0.0
+        for i in range(len(fracs)):
+            tot += fracs[i]*props[i]
+        return tot
+#        return sum([fracs[i]*props[i] for i in range(len(fracs))])
     except:
         return None
 
@@ -1973,9 +1977,13 @@ def mixing_logarithmic(fracs, props):
     >>> mixing_logarithmic([0.1, 0.9], [0.01, 0.02])
     0.01866065983073615
     '''
-    if not none_and_length_check([fracs, props]):
+    try:
+        tot = 0.0
+        for i in range(len(fracs)):
+            tot += fracs[i]*log(props[i])
+        return exp(tot)
+    except:
         return None
-    return exp(sum(frac*log(prop) for frac, prop in zip(fracs, props)))
 
 
 def phase_select_property(phase=None, s=None, l=None, g=None, V_over_F=None,

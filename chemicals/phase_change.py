@@ -525,24 +525,30 @@ def MK(T, Tc, omega):
        Hydrocarbons." Fluid Phase Equilibria 94 (March 15, 1994): 51-87.
        doi:10.1016/0378-3812(94)87051-9.
     '''
-    bs = [[5.2804, 0.080022, 7.2543],
-          [12.8650, 273.23, -346.45],
-          [1.1710, 465.08, -610.48],
-          [-13.1160, -638.51, 839.89],
-          [0.4858, -145.12, 160.05],
-          [-1.0880, 74.049, -50.711]]
+    bs0 = [5.2804, 0.080022, 7.2543]
+    bs1 = [12.8650, 273.23, -346.45]
+    bs2 = [1.1710, 465.08, -610.48]
+    bs3 = [-13.1160, -638.51, 839.89]
+    bs4 = [0.4858, -145.12, 160.05]
+    bs5 = [-1.0880, 74.049, -50.711]
 
     tau = 1. - T/Tc
-    H0 = (bs[0][0]*tau**(0.3333) + bs[1][0]*tau**(0.8333) + bs[2][0]*tau**(1.2083) +
-    bs[3][0]*tau + bs[4][0]*tau**(2) + bs[5][0]*tau**(3))*R*Tc
+    tau_third = tau**0.3333
+    tau_83 = tau**0.8333
+    tau_other = tau**1.2083
+    tau2 = tau*tau
+    tau3 = tau2*tau
+    
+    H0 = (bs0[0]*tau_third + bs1[0]*tau_83 + bs2[0]*tau_other +
+    bs3[0]*tau + bs4[0]*tau2 + bs5[0]*tau3)
 
-    H1 = (bs[0][1]*tau**(0.3333) + bs[1][1]*tau**(0.8333) + bs[2][1]*tau**(1.2083) +
-    bs[3][1]*tau + bs[4][1]*tau**(2) + bs[5][1]*tau**(3))*R*Tc
+    H1 = (bs0[1]*tau_third + bs1[1]*tau_83 + bs2[1]*tau_other +
+    bs3[1]*tau + bs4[1]*tau2 + bs5[1]*tau3)
 
-    H2 = (bs[0][2]*tau**(0.3333) + bs[1][2]*tau**(0.8333) + bs[2][2]*tau**(1.2083) +
-    bs[3][2]*tau + bs[4][2]*tau**(2) + bs[5][2]*tau**(3))*R*Tc
+    H2 = (bs0[2]*tau_third + bs1[2]*tau_83 + bs2[2]*tau_other +
+    bs3[2]*tau + bs4[2]*tau2 + bs5[2]*tau3)
 
-    return H0 + omega*H1 + omega**2*H2
+    return (H0 + omega*(H1 + omega*H2))*R*Tc
 
 def Velasco(T, Tc, omega):
     r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
