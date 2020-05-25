@@ -25,6 +25,7 @@ import os
 from . import utils
 from . import critical
 from . import elements
+from . import reactions
 from . import dipole
 from . import dippr
 from . import temperature
@@ -33,6 +34,7 @@ from . import environment
 from . import refractivity
 from . import solubility
 from . import lennard_jones
+from . import heat_capacity
 from . import vapor_pressure
 from . import virial
 from . import phase_change
@@ -44,6 +46,7 @@ from . import viscosity
 from .utils import *
 from .critical import *
 from .elements import *
+from .reactions import *
 from .dipole import *
 from .dippr import *
 from .temperature import *
@@ -52,6 +55,7 @@ from .environment import *
 from .refractivity import *
 from .solubility import *
 from .lennard_jones import *
+from .heat_capacity import *
 from .vapor_pressure import *
 from .virial import *
 from .phase_change import *
@@ -60,15 +64,16 @@ from .acentric import *
 from .exceptions import *
 from .viscosity import *
 
-__all__ = ['utils', 'critical', 'elements', 'dipole', 'dippr', 'temperature', 
-           'miscdata', 'environment', 'refractivity', 'solubility', 
-           'lennard_jones', 'vapor_pressure', 'virial', 'phase_change',
-           'triple', 'exceptions', 'acentric', 'viscosity']
+__all__ = ['utils', 'critical', 'elements', 'reactions', 'dipole', 'dippr', 
+           'temperature', 'miscdata', 'environment', 'refractivity', 'solubility', 
+           'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial', 
+           'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity']
 
 __all__.extend(exceptions.__all__)
 __all__.extend(critical.__all__)
 __all__.extend(utils.__all__)
 __all__.extend(elements.__all__)
+__all__.extend(reactions.__all__)
 __all__.extend(dipole.__all__)
 __all__.extend(dippr.__all__)
 __all__.extend(temperature.__all__)
@@ -77,6 +82,7 @@ __all__.extend(environment.__all__)
 __all__.extend(refractivity.__all__)
 __all__.extend(solubility.__all__)
 __all__.extend(lennard_jones.__all__)
+__all__.extend(heat_capacity.__all__)
 __all__.extend(vapor_pressure.__all__)
 __all__.extend(virial.__all__)
 __all__.extend(phase_change.__all__)
