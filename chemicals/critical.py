@@ -63,7 +63,6 @@ register_df_source(folder, 'IUPACOrganicCriticalProps.tsv')
 # CRC Handbook from TRC Organic data section (only in 2015)
 # No Inorganic table was taken, although it is already present;
 # data almost all from IUPAC
-               
 register_df_source(folder, 'CRCCriticalOrganics.tsv', postload=_add_Zc_to_df)
 register_df_source(folder, 'Mathews1972InorganicCriticalProps.tsv')
 register_df_source(folder, 'Appendix to PSRK Revision 4.tsv', postload=_add_Zc_to_df)
@@ -90,9 +89,11 @@ def _load_critical_data():
         PD: critical_data_PassutDanner,
         YAWS: critical_data_Yaws
     }
+    
     # Create copies just incase new dfs need to be added later
     Pc_sources = Tc_sources.copy()
     Vc_sources = Tc_sources.copy()
+    
     # The Passut Danner tsv file doesn't have Vc, so its not included
     del Vc_sources['PD']
     Zc_sources = Vc_sources.copy()
