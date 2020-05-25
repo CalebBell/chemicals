@@ -116,10 +116,10 @@ def test_S0g():
     with pytest.raises(Exception):
         S0g('98-00-0', method='BADMETHOD')
 
-    tot3 = sum([abs(S0g(i, method='YAWS')) for i in Hfg_S0g_YAWS_data.index[pd.notnull(Hfg_S0g_YAWS_data['S0(g)'])]])
+    tot3 = sum([abs(S0g(i, method='YAWS')) for i in Hfg_S0g_YAWS_data.index[pd.notnull(Hfg_S0g_YAWS_data['S0g'])]])
     assert_close(tot3, 2691892.382999995)
     
-    tot4 = sum([abs(S0g(i, method='CRC')) for i in CRC_standard_data.index[pd.notnull(CRC_standard_data['Sfg'])]])
+    tot4 = sum([abs(S0g(i, method='CRC')) for i in CRC_standard_data.index[pd.notnull(CRC_standard_data['S0g'])]])
     assert_close(tot4, 141558.30000000008)
 
 

@@ -77,7 +77,7 @@ for i, ele in enumerate(periodic_table):
 phases = ['g', 'g', 's', 's', 's', 's', 'g', 'g', 'g', 'g', 's', 's', 's', 's', 's', 's', 'g', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's']
 
 '''#From CRC Table:
-Sfs = []
+S0s = []
 Hfs = []
 
 other_values = {
@@ -90,32 +90,32 @@ for ele in periodic_table:
         if CAS == '7440-44-0': # carbon -> graphite (which is the standard state)
             CAS = '7782-42-5'
         S0c = CRC_standard_data.at[CAS, 'Sc']
-        S0l = CRC_standard_data.at[CAS, 'Sfl']
-        S0g = CRC_standard_data.at[CAS, 'Sfg']
+        S0l = CRC_standard_data.at[CAS, 'S0l']
+        S0g = CRC_standard_data.at[CAS, 'S0g']
         Hfc = CRC_standard_data.at[CAS, 'Hfc']
         Hfl = CRC_standard_data.at[CAS, 'Hfl']
         Hfg = CRC_standard_data.at[CAS, 'Hfg']        
         if ele.phase == 's':
-            Sf = S0c
+            S0 = S0c
             Hf = Hfc
         elif ele.phase == 'l':
-            Sf = S0l
+            S0 = S0l
             Hf = Hfl
         elif ele.phase == 'g':
-            Sf = S0g
+            S0 = S0g
             Hf = Hfg
-        if isnan(Sf):
-            Sf = None
+        if isnan(S0):
+            S0 = None
         if isnan(Hf):
             Hf = None
         if CAS in other_values:
-            Hf, Sf = other_values[CAS]
+            Hf, S0 = other_values[CAS]
             
-        Sfs.append(Sf)
+        S0s.append(S0)
         Hfs.append(Hf)
 
     except Exception as e:
-        Sfs.append(None)
+        S0s.append(None)
         Hfs.append(None)
 
 for Hf, ele in zip(Hfs, periodic_table):
@@ -124,7 +124,7 @@ for Hf, ele in zip(Hfs, periodic_table):
 '''
 
 # Note that atoms like Br2, I2, O2, N2 have values of S for two atoms not one
-Sfs = [130.7, 126.2, 29.1, 9.5, 5.9, 5.7, 191.6, 205.2, 202.8, 146.3, 51.3, 32.7, 28.3, 18.8, 41.1, 32.1, 223.1, 154.8, 64.7, 41.6, 34.6, 30.7, 28.9, 23.8, 32.0, 27.3, 30.0, 29.9, 33.2, 41.6, 40.8, 31.1, 35.1, 42.4, 152.2, 164.1, 76.8, 55.0, 44.4, 39.0, 36.4, 28.7, None, 28.5, 31.5, 37.6, 42.6, 51.8, 57.8, 51.18, 45.7, 49.7, 116.1, 169.7, 85.2, 62.5, 56.9, 72.0, 73.2, 71.5, None, 69.6, 77.8, 68.1, 73.2, 75.6, 75.3, 73.2, 74.0, 59.9, 51.0, 43.6, 41.5, 32.6, 36.9, 32.6, 35.5, 41.6, 47.4, 75.9, 64.2, 64.8, 56.7, None, None, 176.2, 95.4, 71.0, 56.5, 51.8, 51.9, 50.2, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+S0s = [130.7, 126.2, 29.1, 9.5, 5.9, 5.7, 191.6, 205.2, 202.8, 146.3, 51.3, 32.7, 28.3, 18.8, 41.1, 32.1, 223.1, 154.8, 64.7, 41.6, 34.6, 30.7, 28.9, 23.8, 32.0, 27.3, 30.0, 29.9, 33.2, 41.6, 40.8, 31.1, 35.1, 42.4, 152.2, 164.1, 76.8, 55.0, 44.4, 39.0, 36.4, 28.7, None, 28.5, 31.5, 37.6, 42.6, 51.8, 57.8, 51.18, 45.7, 49.7, 116.1, 169.7, 85.2, 62.5, 56.9, 72.0, 73.2, 71.5, None, 69.6, 77.8, 68.1, 73.2, 75.6, 75.3, 73.2, 74.0, 59.9, 51.0, 43.6, 41.5, 32.6, 36.9, 32.6, 35.5, 41.6, 47.4, 75.9, 64.2, 64.8, 56.7, None, None, 176.2, 95.4, 71.0, 56.5, 51.8, 51.9, 50.2, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
 Hfs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, None, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
 
 class PeriodicTable:
@@ -244,18 +244,18 @@ class Element:
     Hf : float
         Enthalpy of formation of the element in its standard state (0 by
         definition), [J/mol]
-    Sf : float
+    S0 : float
         Standard absolute entropy of the element in its standard state (1 bar,
         298.15 K), [J/mol/K]
     '''
     __slots__ = ['number', 'symbol', 'name', 'CAS', 'MW', 'AReneg', 'rcov',
                  'rvdw', 'maxbonds', 'elneg', 'ionization', 'elaffinity',
                  'period', 'group', 
-                 'InChI_key', 'PubChem', 'phase', 'Hf', 'Sf']
+                 'InChI_key', 'PubChem', 'phase', 'Hf', 'S0']
 
     def __init__(self, number, symbol, name, MW, CAS, AReneg, rcov, rvdw,
                  maxbonds, elneg, ionization, elaffinity, period, group,
-                 PubChem, phase, Hf, Sf, InChI_key=None):
+                 PubChem, phase, Hf, S0, InChI_key=None):
         self.number = number
         self.symbol = symbol
         self.name = name
@@ -277,7 +277,7 @@ class Element:
         self.PubChem = PubChem
         
         self.phase = phase
-        self.Sf = Sf
+        self.S0 = S0
         self.Hf = Hf
 
     @property
@@ -455,7 +455,7 @@ for values in openbabel_element_data:
     cid = cids[number-1]
     phase = phases[number-1]
     Hf = Hfs[number-1]
-    Sf = Sfs[number-1]
+    S0 = S0s[number-1]
 
     ele = Element(number=number, symbol=symbol, name=name, MW=MW,
                   CAS=CAS_by_number[number-1], AReneg=AReneg,
@@ -463,7 +463,7 @@ for values in openbabel_element_data:
                   ionization=ionization, elaffinity=elaffinity,
                   period=period, group=group,
                   InChI_key=InChI_key, phase=phase, PubChem=cid,
-                  Hf=Hf, Sf=Sf)
+                  Hf=Hf, S0=S0)
     element_list.append(ele)
 
 periodic_table = PeriodicTable(element_list)
