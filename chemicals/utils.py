@@ -20,8 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from __future__ import division
-
 __all__ = ['isobaric_expansion', 'isothermal_compressibility', 
 'Cp_minus_Cv', 'speed_of_sound', 'Joule_Thomson',
 'phase_identification_parameter', 'phase_identification_parameter_phase',
@@ -92,15 +90,15 @@ def to_num(values):
     >>> to_num(['1', '1.1', '1E5', '0xB4', ''])
     [1.0, 1.1, 100000.0, '0xB4', None]
     '''
+    float_ = float
     for i in range(len(values)):
         try:
-            values[i] = float(values[i])
+            values[i] = float_(values[i])
         except:
             if values[i] == '':
                 values[i] = None
             else:
                 values[i] = values[i].strip()
-                pass
     return values
 
 
