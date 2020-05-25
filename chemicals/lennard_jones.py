@@ -1008,7 +1008,7 @@ def collision_integral_Neufeld_Janzen_Aziz(Tstar, l=1, s=1):
        doi:10.1063/1.1678363
     '''
     if (l, s) not in Neufeld_collision:
-        raise Exception('Input values of l and s are not supported')
+        raise ValueError('Input values of l and s are not supported')
     A, B, C, D, E, F, G, H, R, S, W, P = Neufeld_collision[(l, s)]
     omega = A/Tstar**B + C/exp(D*Tstar) + E/exp(F*Tstar)
     if (l, s) in [(1, 1), (1, 2), (3, 3)]:

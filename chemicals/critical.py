@@ -841,7 +841,7 @@ def Ihmels(Tc=None, Pc=None, Vc=None):
     Devations of 20% for <200K or >1000K points.
 
     Examples
-    --------a
+    --------
     Succinic acid [110-15-6]
 
     >>> Ihmels(Tc=851.0, Vc=0.000308)

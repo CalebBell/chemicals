@@ -333,7 +333,8 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
     elif old_scale in HENRY_SCALES_SI:
         Hxp = atm/val
     else:
-        raise ValueError("Not recognized input scale: %s" %old_scale)
+        raise ValueError("Not recognized input scale")
+#        raise ValueError("Not recognized input scale: %s" %old_scale)
     
     # Convert from the constant `Hxp` to the desired unit
     if new_scale in HENRY_SCALES_HCP:
@@ -372,7 +373,8 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
     elif new_scale in HENRY_SCALES_SI:
         conv_val = atm/Hxp
     else:
-        raise ValueError("Not recognized input scale: %s" %new_scale)
+        raise ValueError("Not recognized input scale")
+#        raise ValueError("Not recognized input scale: %s" %new_scale)
 
     return conv_val
         

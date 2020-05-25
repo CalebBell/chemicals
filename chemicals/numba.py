@@ -30,6 +30,22 @@ import chemicals
 import fluids.numba
 normal = chemicals
 
+'''
+
+Known to not work - reason
+
+elements.py - everything is dict-based; separate function implementations?
+
+viscosity.viscosity_converter - scipy splines
+
+lennard_jones.collision_integral_Kim_Monroe - dict lookup
+lennard_jones.collision_integral_Neufeld_Janzen_Aziz - dict lookup
+
+temperature.T_converter - global, function-in-function, scipy splines
+
+critical.Ihmels and friends - assert, adding None (consider re-designing interface, will make pint easier)
+
+'''
 __all__ = []
 
 __funcs = {}

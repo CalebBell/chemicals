@@ -729,8 +729,11 @@ def Lee_Kesler(T, Tc, Pc, omega):
        The Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
     '''
     Tr = T/Tc
-    f0 = 5.92714 - 6.09648/Tr - 1.28862*log(Tr) + 0.169347*Tr**6
-    f1 = 15.2518 - 15.6875/Tr - 13.4721*log(Tr) + 0.43577*Tr**6
+    logTr = log(Tr)
+    Tr6 = Tr*Tr
+    Tr6 *= Tr6*Tr6
+    f0 = 5.92714 - 6.09648/Tr - 1.28862*logTr+ 0.169347*Tr6
+    f1 = 15.2518 - 15.6875/Tr - 13.4721*logTr + 0.43577*Tr6
     return exp(f0 + omega*f1)*Pc
 
 
@@ -929,9 +932,11 @@ def Edalat(T, Tc, Pc, omega):
     tau = 1. - T/Tc
     a = -6.1559 - 4.0855*omega
     c = -0.8747 - 7.8874*omega
-    d = 1./(-0.4893 - 0.9912*omega + 3.1551*omega**2)
+    d = 1./(-0.4893 - 0.9912*omega + 3.1551*omega*omega)
     b = 1.5737 - 1.0540*omega - 4.4365E-3*d
-    lnPr = (a*tau + b*tau**1.5 + c*tau**3 + d*tau**6)/(1.-tau)
+    tau_15 = tau**1.5
+    tau3 = tau_15*tau_15
+    lnPr = (a*tau + b*tau_15 + c*tau3 + d*tau3*tau3)/(1.-tau)
     return exp(lnPr)*Pc
 
 

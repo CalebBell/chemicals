@@ -93,7 +93,7 @@ def test_visc_misc():
     assert_close(chemicals.numba.viscosity_index(73.3E-6, 8.86E-6, rounding=True),
                  chemicals.viscosity_index(73.3E-6, 8.86E-6, rounding=True), rtol=1e-14)
     
-    
+@pytest.mark.skipif(numba is None, reason="Numba is missing")    
 def test_interface_misc():
     
     # Tested quite a bit with numba/PyPy
@@ -107,4 +107,51 @@ def test_interface_misc():
     rhoms = np.array([8610., 15530.]*n)
     xs2, sigmas2, rhoms2 = xs.tolist(), sigmas.tolist(), rhoms.tolist()
     assert_close(chemicals.numba.Winterfeld_Scriven_Davis(xs, sigmas, rhoms), 
-                 Winterfeld_Scriven_Davis(xs2, sigmas2, rhoms2))    
+                 Winterfeld_Scriven_Davis(xs2, sigmas2, rhoms2))
+    
+    
+    n = 1
+    xs = np.array([0.1606, 0.8394]*n)
+    sigmas_Tb = np.array([0.01424, 0.02530]*n)
+    Tbs = np.array([309.21, 312.95]*n)
+    Tcs = np.array([469.7, 508.0]*n)
+    assert_close(chemicals.Diguilio_Teja(T=298.15, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs),
+    chemicals.numba.Diguilio_Teja(T=298.15, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs), rtol=1e-12)
+    
+    # Exception is correctly raised with numba
+    with pytest.raises(ValueError):
+        chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs)
+        
+        
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_virial():
+    # Takes 8 seconds to compile. Fun!
+    assert_close(chemicals.numba.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
+                 chemicals.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
+                rtol=1e-13)
+
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_phase_change():
+    # Function had some duplicated powers; numba was optimizing them on me anyway
+    # Had list-in-list constants being indexed. I thought that would take a lot of time
+    # but instead removing it only saved 25%, and ~8% in CPython, and zilch in PyPy.
+    # PyPy takes 19% of the time numba does here, numba has a high overhead.
+    assert_close(chemicals.numba.MK(553.15, 751.35, 0.302),
+             chemicals.MK(553.15, 751.35, 0.302), rtol=1e-12)
+
+
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_vapor_pressure():
+    # PyPy 75 ns, CPython 2470 ns, numba 214 ns
+    assert_close(chemicals.numba.dPsat_IAPWS_dT(300.), 
+                 chemicals.dPsat_IAPWS_dT(300.), rtol=1e-14)
+    
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_temperature():
+    # Note also the last four decimals are different!
+    # 494 us numba, 388 us PyPy, 1740 us CPython
+    assert_close(chemicals.numba.ITS90_68_difference(1000.),
+                 chemicals.ITS90_68_difference(1000.0), rtol=1e-12)
+    
+    # Probably never going to work
+#    chemicals.numba.T_converter(500, 'ITS-68', 'ITS-48')

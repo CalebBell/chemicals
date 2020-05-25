@@ -847,12 +847,13 @@ def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
        the Surface Tensions of Mixtures." The Chemical Engineering Journal 38,
        no. 3 (July 1988): 205-8. doi:10.1016/0300-9467(88)80079-0.
     '''
-
-    Tc = mixing_simple(xs, Tcs)
+    Tc, Tb, sigmar = 0.0, 0.0, 0.0
+    for i in range(len(xs)):
+        Tc += Tcs[i]*xs[i]
+        Tb += Tbs[i]*xs[i]
+        sigmar += sigmas_Tb[i]*xs[i]
     if T > Tc:
         raise ValueError('T > Tc according to Kays rule - model is not valid in this range.')
-    Tb = mixing_simple(xs, Tbs)
-    sigmar = mixing_simple(xs, sigmas_Tb)
     Tst = (Tc/T - 1.)/(Tc/Tb - 1.0)
     return 1.002855*Tst**1.118091*(T/Tb)*sigmar
 
