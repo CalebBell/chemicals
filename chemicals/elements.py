@@ -21,8 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from __future__ import division
-
 __all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions', 
            'atom_fractions','mixture_atomic_composition', 'atom_matrix',
            'similarity_variable', 'atoms_to_Hill', 
@@ -35,7 +33,7 @@ import re
 import string
 
 CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7440-42-8', '7440-44-0', '7727-37-9', '7782-44-7', '7782-41-4', '7440-01-9', '7440-23-5', '7439-95-4', '7429-90-5', '7440-21-3', '7723-14-0', '7704-34-9', '7782-50-5', '7440-37-1', '7440-09-7', '7440-70-2', '7440-20-2', '7440-32-6', '7440-62-2', '7440-47-3', '7439-96-5', '7439-89-6', '7440-48-4', '7440-02-0', '7440-50-8', '7440-66-6', '7440-55-3', '7440-56-4', '7440-38-2', '7782-49-2', '10097-32-2', '7439-90-9', '7440-17-7', '7440-24-6', '7440-65-5', '7440-67-7', '7440-03-1', '7439-98-7', '7440-26-8', '7440-18-8', '7440-16-6', '7440-05-3', '7440-22-4', '7440-43-9', '7440-74-6', '7440-31-5', '7440-36-0', '13494-80-9', '7553-56-2', '7440-63-3', '7440-46-2', '7440-39-3', '7439-91-0', '7440-45-1', '7440-10-0', '7440-00-8', '7440-12-2', '7440-19-9', '7440-53-1', '7440-54-2', '7440-27-9', '7429-91-6', '7440-60-0', '7440-52-0', '7440-30-4', '7440-64-4', '7439-94-3', '7440-58-6', '7440-25-7', '7440-33-7', '7440-15-5', '7440-04-2', '7439-88-5', '7440-06-4', '7440-57-5', '7439-97-6', '7440-28-0', '7439-92-1', '7440-69-9', '7440-08-6', '7440-68-8', '10043-92-2', '7440-73-5', '7440-14-4', '7440-34-8', '7440-29-1', '7440-13-3', '7440-61-1', '7439-99-8', '7440-07-5', '7440-35-9', '7440-51-9', '7440-40-6', '7440-71-3', '7429-92-7', '7440-72-4', '7440-11-1', '10028-14-5', '22537-19-5', '53850-36-5', '53850-35-4', '54038-81-2', '54037-14-8', '54037-57-9', '54038-01-6', '54083-77-1', '54386-24-2', '54084-26-3', '54084-70-7', '54085-16-4', '54085-64-2', '54100-71-9', '54101-14-3', '54144-19-3']
-CAS_by_number = list(CAS_by_number_standard)
+CAS_by_number = CAS_by_number_standard.copy()
 '''CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118.'''
 
 
@@ -47,9 +45,9 @@ groups = [1, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 
 Lanthanides and Actinides are set to None.'''
 
 s_block = [1, 2, 3, 4, 11, 12, 19, 20, 37, 38, 55, 56, 87, 88]
-d_block = list(range(21, 31)) + list(range(39, 49)) + list(range(71, 81)) + list(range(103, 113))
-f_block = list(range(57, 71)) + list(range(89, 103))
-p_block = list(range(5, 11)) + list(range(13, 19)) + list(range(31, 37)) + list(range(49, 55)) + list(range(81, 87)) + list(range(113, 119))
+d_block = [*range(21, 31), *range(39, 49), *range(71, 81), *range(103, 113)]
+f_block = [*range(57, 71), *range(89, 103)]
+p_block = [*range(5, 11), *range(13, 19), *range(31, 37), *range(49, 55), *range(81, 87), *range(113, 119)]
 blocks = {'s': s_block, 'd': d_block, 'f': f_block, 'p': p_block}
 '''Blocks of the elements, stored in a dictionary with four keys and lists.
 Indexed by atomic numbers off-by-one up to 118.'''
@@ -57,7 +55,7 @@ Indexed by atomic numbers off-by-one up to 118.'''
 InChI_keys = ['YZCKVEUIGOORGS-UHFFFAOYSA-N', 'SWQJXJOGLNCZEY-UHFFFAOYSA-N', 'WHXSMMKQMYFTQS-UHFFFAOYSA-N', 'ATBAMAFKBVZNFJ-UHFFFAOYSA-N', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', 'OKTJSMMVPCPJKN-UHFFFAOYSA-N', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', 'QVGXLLKOCUKJST-UHFFFAOYSA-N', 'YCKRFDGAMUMZLT-UHFFFAOYSA-N', 'GKAOGPIIYCISHV-UHFFFAOYSA-N', 'KEAYESYHFKHZAL-UHFFFAOYSA-N', 'FYYHWMGAXLPEAU-UHFFFAOYSA-N', 'XAGFODPZIPBFFR-UHFFFAOYSA-N', 'XUIMIQQOPSSXEZ-UHFFFAOYSA-N', 'OAICVXFJPJFONN-UHFFFAOYSA-N', 'NINIDFKCEFEMDL-UHFFFAOYSA-N', 'ZAMOUSCENKQFHK-UHFFFAOYSA-N', 'XKRFYHLGVUSROY-UHFFFAOYSA-N', 'ZLMJMSJWJFRBEC-UHFFFAOYSA-N', 'OYPRJOBELJOOCE-UHFFFAOYSA-N', 'SIXSYDAISGFNSX-UHFFFAOYSA-N', 'RTAQQCXQSZGOHL-UHFFFAOYSA-N', 'LEONUFNNVUYDNQ-UHFFFAOYSA-N', 'VYZAMTAEIAYCRO-UHFFFAOYSA-N', 'PWHULOQIROXLJO-UHFFFAOYSA-N', 'XEEYBQQBJWHFJM-UHFFFAOYSA-N', 'GUTLYIVDDKVIGB-UHFFFAOYSA-N', 'PXHVJJICTQNCMI-UHFFFAOYSA-N', 'RYGMFSIKBFXOCR-UHFFFAOYSA-N', 'HCHKCACWOHOZIP-UHFFFAOYSA-N', 'GYHNNYVSQQEPJS-UHFFFAOYSA-N', 'GNPVGFCGXDBREM-UHFFFAOYSA-N', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', 'WKBOTKDWSSQWDR-UHFFFAOYSA-N', 'DNNSSWSSYDEUBZ-UHFFFAOYSA-N', 'IGLNJRXAVVLDKE-UHFFFAOYSA-N', 'CIOAGBVUUVVLOB-UHFFFAOYSA-N', 'VWQVUPCCIRVNHF-UHFFFAOYSA-N', 'QCWXUUIWCKQGHC-UHFFFAOYSA-N', 'GUCVJGMIXFAOAE-UHFFFAOYSA-N', 'ZOKXTWBITQBERF-UHFFFAOYSA-N', 'GKLVYJBZJHMRIY-UHFFFAOYSA-N', 'KJTLSVCANCCWHF-UHFFFAOYSA-N', 'MHOVAHRLVXNVSD-UHFFFAOYSA-N', 'KDLHZDBZIXYQEI-UHFFFAOYSA-N', 'BQCADISMDOOEFD-UHFFFAOYSA-N', 'BDOSMKKIYDKNTQ-UHFFFAOYSA-N', 'APFVFJFRJDLVQX-UHFFFAOYSA-N', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', 'WATWJIUSRGPENY-UHFFFAOYSA-N', 'PORWMNRCUJJQNO-UHFFFAOYSA-N', 'ZCYVEMRRCGMTRW-UHFFFAOYSA-N', 'FHNFHKCVQCLJFQ-UHFFFAOYSA-N', 'TVFDJXOCXUVLDH-UHFFFAOYSA-N', 'DSAJWYNOEDNPEQ-UHFFFAOYSA-N', 'FZLIPJUXYLNCLC-UHFFFAOYSA-N', 'GWXLDORMOJMVQZ-UHFFFAOYSA-N', 'PUDIUYLPXJFUGB-UHFFFAOYSA-N', 'QEFYFXOXNSNQGX-UHFFFAOYSA-N', 'VQMWBBYLQSCNPO-UHFFFAOYSA-N', 'KZUNJOHGWZRPMI-UHFFFAOYSA-N', 'OGPBJKLSAFTDLK-UHFFFAOYSA-N', 'UIWYJDYFSGRHKR-UHFFFAOYSA-N', 'GZCRRIHWUXGPOV-UHFFFAOYSA-N', 'KBQHZAAAGSGFKK-UHFFFAOYSA-N', 'KJZYNXUDTRRSPN-UHFFFAOYSA-N', 'UYAHIZSMUZPPFV-UHFFFAOYSA-N', 'FRNOGLGSGLTDKL-UHFFFAOYSA-N', 'NAWDYIZEMPQZHO-UHFFFAOYSA-N', 'OHSVLFRHMCKCQY-UHFFFAOYSA-N', 'VBJZVLUMGGDVMO-UHFFFAOYSA-N', 'GUVRBAGPIYLISA-UHFFFAOYSA-N', 'WFKWXMTUELFFGS-UHFFFAOYSA-N', 'WUAPFZMCVAUBPE-UHFFFAOYSA-N', 'SYQBFIAQOQZEGI-UHFFFAOYSA-N', 'GKOZUEZYRPOHIO-UHFFFAOYSA-N', 'BASFCYQUMIYNBI-UHFFFAOYSA-N', 'PCHJSUWPFVWCPO-UHFFFAOYSA-N', 'QSHDDOUJBYECFT-UHFFFAOYSA-N', 'BKVIYDNLLOSFOA-UHFFFAOYSA-N', 'WABPQHHGFIMREM-UHFFFAOYSA-N', 'JCXGWMGPZLAOME-UHFFFAOYSA-N', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', 'RYXHOMYVWAEKHL-UHFFFAOYSA-N', 'SYUHGPGVQRZVTB-UHFFFAOYSA-N', 'KLMCZVJOEAUDNE-UHFFFAOYSA-N', 'HCWPIIXVSYCSAN-UHFFFAOYSA-N', 'QQINRWTZWGJFDB-UHFFFAOYSA-N', 'ZSLUVFAKFWKJRC-UHFFFAOYSA-N', 'XLROVYAPLOFLNU-UHFFFAOYSA-N', 'JFALSRSLKYAFGM-UHFFFAOYSA-N', 'LFNLGNPSGWYGGD-UHFFFAOYSA-N', 'OYEHPCDNVJXUIW-UHFFFAOYSA-N', 'LXQXZNRPTYVCNG-UHFFFAOYSA-N', 'NIWWFAAXEMMFMS-UHFFFAOYSA-N', 'PWVKJRSRVJTHTR-UHFFFAOYSA-N', 'HGLDOAKPQXAFKI-UHFFFAOYSA-N', 'CKBRQZNRCSJHFT-UHFFFAOYSA-N', 'MIORUQGGZCBUGO-UHFFFAOYSA-N', 'MQVSLOYRCXQRPM-UHFFFAOYSA-N', 'ORQBXQOJMQIAOY-UHFFFAOYSA-N', 'CNQCVBJFEGMYDW-UHFFFAOYSA-N', 'YGPLJIIQQIDVFJ-UHFFFAOYSA-N', 'PUKKTGLVJQVIOF-UHFFFAOYSA-N', 'VAOUCABZIBBBJH-UHFFFAOYSA-N', 'INOXRQQPOOCQPH-UHFFFAOYSA-N', 'OBDWMWVOVYJOMI-UHFFFAOYSA-N', 'VAJSJTKWMRUWBF-UHFFFAOYSA-N', 'NCBMSFCPDGXTHD-UHFFFAOYSA-N', 'LJROPTGWFUZRDB-UHFFFAOYSA-N', 'NOTIIDSZELDPOP-UHFFFAOYSA-N', 'KUGNSLWRKGRKGS-UHFFFAOYSA-N', 'WIHJCBVMYKIGOT-UHFFFAOYSA-N', 'QDXZEHQJHSHEQF-UHFFFAOYSA-N', 'ONFASNXETZOODS-UHFFFAOYSA-N', 'INMSAURDCVBGHH-UHFFFAOYSA-N', 'GOANEQIZDYDFCO-UHFFFAOYSA-N']
 # Big problem: Atoms like N2, O2 point to only the singlet
 
-homonuclear_elements = set([1, 7, 8, 9, 17, 35, 53]) # includes Br2, I2
+homonuclear_elements = {1, 7, 8, 9, 17, 35, 53} # includes Br2, I2
 #homonuclear_elemental_gases = [periodic_table[i] for i in ['hydrogen', 'nitrogen', 'oxygen', 'fluorine', 'chlorine', 'bromine', 'iodine']]
 homonuclear_elemental_gases = [1, 7, 8, 9, 17] # 35, 53
 homonuclear_elemental_singlets_CASs = ["12385-13-6", "17778-88-0", "17778-80-2", "14762-94-8", "22537-15-1"]
@@ -79,12 +77,13 @@ for i, ele in enumerate(periodic_table):
 phases = ['g', 'g', 's', 's', 's', 's', 'g', 'g', 'g', 'g', 's', 's', 's', 's', 's', 's', 'g', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's']
 
 '''#From CRC Table:
-S0s = []
+Sfs = []
 Hfs = []
 
-other_values = {'7440-31-5': (0, 51.18), # Tin (white) instead of gray from CODATA
-'10097-32-2': (0, 152.2) # bromine as a liquid
-               }
+other_values = {
+    '7440-31-5': (0, 51.18), # Tin (white) instead of gray from CODATA
+    '10097-32-2': (0, 152.2) # bromine as a liquid
+}
 for ele in periodic_table:
     try:
         CAS = ele.CAS_standard
@@ -97,27 +96,26 @@ for ele in periodic_table:
         Hfl = CRC_standard_data.at[CAS, 'Hfl']
         Hfg = CRC_standard_data.at[CAS, 'Hfg']        
         if ele.phase == 's':
-            S0 = S0c
+            Sf = S0c
             Hf = Hfc
         elif ele.phase == 'l':
-            S0 = S0l
+            Sf = S0l
             Hf = Hfl
         elif ele.phase == 'g':
-            S0 = S0g
+            Sf = S0g
             Hf = Hfg
-        if isnan(S0):
-            S0 = None
+        if isnan(Sf):
+            Sf = None
         if isnan(Hf):
             Hf = None
         if CAS in other_values:
-            Hf, S0 = other_values[CAS]
+            Hf, Sf = other_values[CAS]
             
-        S0s.append(S0)
+        Sfs.append(Sf)
         Hfs.append(Hf)
-    
 
     except Exception as e:
-        S0s.append(None)
+        Sfs.append(None)
         Hfs.append(None)
 
 for Hf, ele in zip(Hfs, periodic_table):
@@ -126,10 +124,10 @@ for Hf, ele in zip(Hfs, periodic_table):
 '''
 
 # Note that atoms like Br2, I2, O2, N2 have values of S for two atoms not one
-S0s = [130.7, 126.2, 29.1, 9.5, 5.9, 5.7, 191.6, 205.2, 202.8, 146.3, 51.3, 32.7, 28.3, 18.8, 41.1, 32.1, 223.1, 154.8, 64.7, 41.6, 34.6, 30.7, 28.9, 23.8, 32.0, 27.3, 30.0, 29.9, 33.2, 41.6, 40.8, 31.1, 35.1, 42.4, 152.2, 164.1, 76.8, 55.0, 44.4, 39.0, 36.4, 28.7, None, 28.5, 31.5, 37.6, 42.6, 51.8, 57.8, 51.18, 45.7, 49.7, 116.1, 169.7, 85.2, 62.5, 56.9, 72.0, 73.2, 71.5, None, 69.6, 77.8, 68.1, 73.2, 75.6, 75.3, 73.2, 74.0, 59.9, 51.0, 43.6, 41.5, 32.6, 36.9, 32.6, 35.5, 41.6, 47.4, 75.9, 64.2, 64.8, 56.7, None, None, 176.2, 95.4, 71.0, 56.5, 51.8, 51.9, 50.2, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+Sfs = [130.7, 126.2, 29.1, 9.5, 5.9, 5.7, 191.6, 205.2, 202.8, 146.3, 51.3, 32.7, 28.3, 18.8, 41.1, 32.1, 223.1, 154.8, 64.7, 41.6, 34.6, 30.7, 28.9, 23.8, 32.0, 27.3, 30.0, 29.9, 33.2, 41.6, 40.8, 31.1, 35.1, 42.4, 152.2, 164.1, 76.8, 55.0, 44.4, 39.0, 36.4, 28.7, None, 28.5, 31.5, 37.6, 42.6, 51.8, 57.8, 51.18, 45.7, 49.7, 116.1, 169.7, 85.2, 62.5, 56.9, 72.0, 73.2, 71.5, None, 69.6, 77.8, 68.1, 73.2, 75.6, 75.3, 73.2, 74.0, 59.9, 51.0, 43.6, 41.5, 32.6, 36.9, 32.6, 35.5, 41.6, 47.4, 75.9, 64.2, 64.8, 56.7, None, None, 176.2, 95.4, 71.0, 56.5, 51.8, 51.9, 50.2, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
 Hfs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, None, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
 
-class PeriodicTable(object):
+class PeriodicTable:
     '''Periodic Table object for use in dealing with elements.
 
     Parameters
@@ -173,16 +171,9 @@ class PeriodicTable(object):
 
     def __contains__(self, key):
         for i in self.indexes:
-            if key in i:
-                return True
-        try:
-            self.number_to_elements[int(key)]
-            return True
-        except:
-            pass
+            if key in i: return True
         return False
-        
-
+    
     def __len__(self):
         return 118
 
@@ -191,26 +182,16 @@ class PeriodicTable(object):
 
     def __getitem__(self, key):
         for i in self.indexes:
-            if key in i:
-                return i[key]
-        try:
-            return self.number_to_elements[int(key)]
-        except:
-            pass
-        raise KeyError('Key is not in the periodic table.')
+            if key in i: return i[key]
+        raise KeyError('key is not in the periodic table')
 
     def __getattr__(self, key):
         for i in self.indexes:
-            if key in i:
-                return i[key]
-        try:
-            return self.number_to_elements[int(key)]
-        except:
-            pass
-        raise AttributeError('Key is not in the periodic table.')
+            if key in i: return i[key]
+        raise AttributeError('key is not in the periodic table')
 
 
-class Element(object):
+class Element:
     '''Class for storing data on chemical elements. Supports most common
     properties. If a property is not available, it is set to None.
 
@@ -263,18 +244,18 @@ class Element(object):
     Hf : float
         Enthalpy of formation of the element in its standard state (0 by
         definition), [J/mol]
-    S0 : float
+    Sf : float
         Standard absolute entropy of the element in its standard state (1 bar,
         298.15 K), [J/mol/K]
     '''
     __slots__ = ['number', 'symbol', 'name', 'CAS', 'MW', 'AReneg', 'rcov',
                  'rvdw', 'maxbonds', 'elneg', 'ionization', 'elaffinity',
                  'period', 'group', 
-                 'InChI_key', 'PubChem', 'phase', 'Hf', 'S0']
+                 'InChI_key', 'PubChem', 'phase', 'Hf', 'Sf']
 
     def __init__(self, number, symbol, name, MW, CAS, AReneg, rcov, rvdw,
                  maxbonds, elneg, ionization, elaffinity, period, group,
-                 PubChem, phase, Hf, S0, InChI_key=None):
+                 PubChem, phase, Hf, Sf, InChI_key=None):
         self.number = number
         self.symbol = symbol
         self.name = name
@@ -296,7 +277,7 @@ class Element(object):
         self.PubChem = PubChem
         
         self.phase = phase
-        self.S0 = S0
+        self.Sf = Sf
         self.Hf = Hf
 
     @property
@@ -454,8 +435,6 @@ openbabel_element_data = [
 [118, "Og", 0.00, 1.60, 1.60, 2.00,  6,        294, 0.00,       0,          0, 0.99, 0.00, 0.06, "Oganesson"],
 ]
 
-
-
 element_list = []
 '''Load the data from OpenBabel, and store it as both a
 list of elements first, and then as an instance of Periodic Table.'''
@@ -476,7 +455,7 @@ for values in openbabel_element_data:
     cid = cids[number-1]
     phase = phases[number-1]
     Hf = Hfs[number-1]
-    S0 = S0s[number-1]
+    Sf = Sfs[number-1]
 
     ele = Element(number=number, symbol=symbol, name=name, MW=MW,
                   CAS=CAS_by_number[number-1], AReneg=AReneg,
@@ -484,7 +463,7 @@ for values in openbabel_element_data:
                   ionization=ionization, elaffinity=elaffinity,
                   period=period, group=group,
                   InChI_key=InChI_key, phase=phase, PubChem=cid,
-                  Hf=Hf, S0=S0)
+                  Hf=Hf, Sf=Sf)
     element_list.append(ele)
 
 periodic_table = PeriodicTable(element_list)
@@ -752,9 +731,6 @@ def atom_matrix(atomss, atom_IDs=None):
         
     return element_matrix
 
-
-
-
 def similarity_variable(atoms, MW=None):
     r'''Calculates the similarity variable of an compound, as defined in [1]_.
     Currently only applied for certain heat capacity estimation routines.
@@ -795,7 +771,6 @@ def similarity_variable(atoms, MW=None):
     if not MW:
         MW = molecular_weight(atoms)
     return sum(atoms.values())/MW
-
 
 def atoms_to_Hill(atoms):
     r'''Determine the Hill formula of a compound, given a dictionary of its
@@ -912,7 +887,6 @@ bracketed_charge_re_str = r'\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$'
 formula_token_matcher_rational = bracketed_charge_re = None
 letter_set = set(string.ascii_letters)
 
-
 def nested_formula_parser(formula, check=True):
     r'''Improved formula parser which handles braces and their multipliers, 
     as well as rational element counts.
@@ -1000,9 +974,6 @@ def nested_formula_parser(formula, check=True):
                 ans[ele] = count
     return ans
 
-
-
-
 def charge_from_formula(formula):
     r'''Basic formula parser to determine the charge from a formula - given
     that the charge is already specified as one element of the formula.
@@ -1057,7 +1028,6 @@ def charge_from_formula(formula):
             return multiplier*int(splits[1])
     else:
         return multiplier*count
-
 
 def serialize_formula(formula):
     r'''Basic formula serializer to construct a consistently-formatted formula.
