@@ -20,8 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from __future__ import division
-
 __all__ = ['omega', 'LK_omega', 'Stiel_polar_factor', 'omega_methods', 'omega_definition']
 
 from chemicals.utils import log, log10
@@ -31,7 +29,6 @@ from chemicals.data_reader import (retrieve_from_df_dict,
                                    list_available_methods_from_df_dict)
 
 omega_methods = ('PSRK', 'PD', 'YAWS')
-
 
 def omega(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's acentric factor,
@@ -108,7 +105,6 @@ def omega(CASRN, get_methods=False, method=None):
     else:
         return retrieve_any_from_df_dict(critical.omega_sources, CASRN, 'omega') 
 
-
 def omega_definition(Psat, Pc):
     r'''Returns the acentric factor of a fluid according to its fundamental
     definition using the vapor pressure at a reduced temperature of 0.7Tc.
@@ -144,7 +140,6 @@ def omega_definition(Psat, Pc):
        New York: McGraw-Hill Professional, 2000.
     '''
     return -log10(Psat/Pc) - 1.0
-
 
 def LK_omega(Tb, Tc, Pc):
     r'''Estimates the acentric factor of a fluid using a correlation in [1]_.
@@ -194,7 +189,6 @@ def LK_omega(Tb, Tc, Pc):
              0.169347*T_br_6)/(15.2518 - 15.6875/T_br - 13.4721*log_T_br +
              0.43577*T_br_6)
     return omega
-
 
 def Stiel_polar_factor(Psat, Pc, omega):
     r'''This function handles the calculation of a chemical's Stiel Polar
