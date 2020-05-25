@@ -30,7 +30,7 @@ import pytest
 try:
     import numba
     import chemicals.numba
-#    import chemicals.numba_vectorized
+    import chemicals.numba_vectorized
 except:
     numba = None
 import numpy as np
@@ -146,6 +146,13 @@ def test_vapor_pressure():
     assert_close(chemicals.numba.dPsat_IAPWS_dT(300.), 
                  chemicals.dPsat_IAPWS_dT(300.), rtol=1e-14)
     
+    
+    Psats_vec_expect = [34478.367349639906, 33596697.716487624, 109799836.81382856, 179376011.49286702, 234627689.09298804]
+    Ts = np.linspace(100, 1000, 5)
+    Psats_calc = chemicals.numba_vectorized.Antoine(Ts, 8.7687, 395.744, -6.469, 10)
+    assert_close(Psats_calc, Psats_vec_expect, rtol=1e-11)
+    
+
 @pytest.mark.skipif(numba is None, reason="Numba is missing")
 def test_temperature():
     # Note also the last four decimals are different!

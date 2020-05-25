@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2020, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
 from __future__ import division
-import chemicals
-import chemicals.vectorized
-from chemicals import *
-from fluids.numerics import assert_close, assert_close1d
-import pytest
+import sys
+import importlib.util
+import types
 import numpy as np
+import chemicals as normal_chemicals
+import numba
+import fluids.numba
 
-def test_Tc_multi():
-    Tcs_simple = [chemicals.critical.Tc(i) for i in ['108-88-3', '7732-18-5']]
-    Tcs_vec = chemicals.vectorized.Tc(['108-88-3', '7732-18-5'])
-    assert_close1d(Tcs_simple, Tcs_vec)
+__all__ = []
+__funcs = {}
 
-    
+
+replaced = {}
+replaced, NUMERICS_SUBMOD = fluids.numba.create_numerics(replaced, vec=True)
+normal = normal_chemicals
+
+fluids.numba.transform_module(normal, __funcs, replaced, vec=True)
+
+globals().update(__funcs)
+globals().update(replaced)
