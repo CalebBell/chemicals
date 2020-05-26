@@ -36,7 +36,6 @@ CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7
 CAS_by_number = CAS_by_number_standard.copy()
 '''CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118.'''
 
-
 periods = [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
 '''Periods of the elements, indexed by atomic numbers off-by-one up to 118.'''
 
@@ -76,7 +75,8 @@ for i, ele in enumerate(periodic_table):
 '''
 phases = ['g', 'g', 's', 's', 's', 's', 'g', 'g', 'g', 'g', 's', 's', 's', 's', 's', 's', 'g', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's']
 
-'''#From CRC Table:
+'''# From CRC Table:
+from chemicals.heat_capacity import CRC_standard_data
 S0s = []
 Hfs = []
 
@@ -89,15 +89,15 @@ for ele in periodic_table:
         CAS = ele.CAS_standard
         if CAS == '7440-44-0': # carbon -> graphite (which is the standard state)
             CAS = '7782-42-5'
-        S0c = CRC_standard_data.at[CAS, 'Sc']
+        S0c = CRC_standard_data.at[CAS, 'S0s']
         S0l = CRC_standard_data.at[CAS, 'S0l']
         S0g = CRC_standard_data.at[CAS, 'S0g']
-        Hfc = CRC_standard_data.at[CAS, 'Hfc']
+        Hfs = CRC_standard_data.at[CAS, 'Hfs']
         Hfl = CRC_standard_data.at[CAS, 'Hfl']
         Hfg = CRC_standard_data.at[CAS, 'Hfg']        
         if ele.phase == 's':
             S0 = S0c
-            Hf = Hfc
+            Hf = Hfs
         elif ele.phase == 'l':
             S0 = S0l
             Hf = Hfl
@@ -312,6 +312,7 @@ class Element:
             if self.number in v:
                 return k
 
+
 # New file format; same data, coverted to Python lists for convenience with a few regular expressions
 # https://github.com/openbabel/openbabel/blob/master/src/elementtable.h
 openbabel_element_data = [
@@ -434,7 +435,6 @@ openbabel_element_data = [
 [117, "Ts", 0.00, 1.60, 1.60, 2.00,  6,        294, 0.00,       0,          0, 0.99, 0.00, 0.07, "Tennessine"],
 [118, "Og", 0.00, 1.60, 1.60, 2.00,  6,        294, 0.00,       0,          0, 0.99, 0.00, 0.06, "Oganesson"],
 ]
-
 element_list = []
 '''Load the data from OpenBabel, and store it as both a
 list of elements first, and then as an instance of Periodic Table.'''
@@ -449,21 +449,18 @@ for values in openbabel_element_data:
     elneg = None if elneg == 0.0 else elneg
     ionization = None if ionization == 0.0 else ionization  # in eV
     elaffinity = None if elaffinity == 0.0 else elaffinity  # in eV
-    period = periods[number-1]
-    group = groups[number-1]
-    InChI_key = InChI_keys[number-1]
-    cid = cids[number-1]
-    phase = phases[number-1]
-    Hf = Hfs[number-1]
-    S0 = S0s[number-1]
-
-    ele = Element(number=number, symbol=symbol, name=name, MW=MW,
-                  CAS=CAS_by_number[number-1], AReneg=AReneg,
-                  rcov=rcov, rvdw=rvdw, maxbonds=maxbonds, elneg=elneg,
-                  ionization=ionization, elaffinity=elaffinity,
-                  period=period, group=group,
-                  InChI_key=InChI_key, phase=phase, PubChem=cid,
-                  Hf=Hf, S0=S0)
+    index = number-1
+    period = periods[index]
+    group = groups[index]
+    InChI_key = InChI_keys[index]
+    cid = cids[index]
+    phase = phases[index]
+    Hf = Hfs[index]
+    S0 = S0s[index]
+    CAS = CAS_by_number[index]
+    ele = Element(number, symbol, name, MW, CAS, AReneg, rcov, rvdw,
+                  maxbonds, elneg, ionization, elaffinity, period, group,
+                  cid, phase, Hf, S0, InChI_key)
     element_list.append(ele)
 
 periodic_table = PeriodicTable(element_list)

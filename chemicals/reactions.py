@@ -32,7 +32,6 @@ import scipy.linalg
 from fractions import Fraction
 from chemicals.utils import ceil, log10, PY37
 from chemicals import heat_capacity
-from chemicals.elements import periodic_table
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -66,6 +65,7 @@ def _load_reaction_data():
         CRC: heat_capacity.CRC_standard_data,
     }
     S0s_sources = {
+        CRC: heat_capacity.CRC_standard_data,
     }
     Hfg_sources = {
         API_TDB_G: Hfg_API_TDB_data,
@@ -79,6 +79,7 @@ def _load_reaction_data():
         CRC: heat_capacity.CRC_standard_data,
     }
     Hfs_sources = {
+        CRC: heat_capacity.CRC_standard_data,
     }
 
 if PY37:
@@ -102,9 +103,10 @@ else:
 Hfs_methods = ()
 
 def Hfs(CASRN, get_methods=False, method=None):
-    r'''This function handles the retrieval of a chemical's gas standard
-    phase heat of formation. The lookup is based on CASRNs. No data is available
-    yet.
+    r'''This function handles the retrieval of a chemical's solid/crystaline 
+    standard phase heat of formation. The lookup is based on CASRNs. Will 
+    automatically select a data source to use if no method is provided; returns 
+    None if the data is not available.
 
     Parameters
     ----------
@@ -129,12 +131,14 @@ def Hfs(CASRN, get_methods=False, method=None):
 
     Notes
     -----
-    No data sources are available for this function yet.
+    Sources are:
+
+        * 'CRC', from the CRC handbook (1360 values)
 
     Examples
     --------
-    >>> Hfs('67-56-1')
-    -238400.0
+    >>> Hfs('101-81-5') # Diphenylmethane
+    71500.0
 
     References
     ----------
@@ -144,10 +148,7 @@ def Hfs(CASRN, get_methods=False, method=None):
        Century." Journal of Physics: Conference Series 16, no. 1
        (January 1, 2005): 561. doi:10.1088/1742-6596/16/1/078.
     '''
-    CAS_to_elements = periodic_table.CAS_to_elements
-    if CASRN in CAS_to_elements: 
-        element = CAS_to_elements[CASRN]
-        if element.phase == 's': return element.Hf
+    if not _reaction_data_loaded: _load_reaction_data()
     if get_methods:
         return list_available_methods_from_df_dict(Hfs_sources, CASRN, 'Hfs')
     elif method:
@@ -164,7 +165,7 @@ Hfl_methods = (ATCT_L, CRC)
 
 def Hfl(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's liquid standard
-    phase heat of formation. The lookup is based on CASRNs.  Will automatically
+    phase heat of formation. The lookup is based on CASRNs. Will automatically
     select a data source to use if no method is provided; returns None if 
     the data is not available.
 
@@ -211,10 +212,7 @@ def Hfl(CASRN, get_methods=False, method=None):
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     '''
-    CAS_to_elements = periodic_table.CAS_to_elements
-    if CASRN in CAS_to_elements: 
-        element = CAS_to_elements[CASRN]
-        if element.phase == 'l': return element.Hf
+    if not _reaction_data_loaded: _load_reaction_data()
     if get_methods:
         return list_available_methods_from_df_dict(Hfl_sources, CASRN, 'Hfl')
     elif method:
@@ -292,10 +290,7 @@ def Hfg(CASRN, get_methods=False, method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    CAS_to_elements = periodic_table.CAS_to_elements
-    if CASRN in CAS_to_elements: 
-        element = CAS_to_elements[CASRN]
-        if element.phase == 'g': return element.Hf
+    if not _reaction_data_loaded: _load_reaction_data()
     if get_methods:
         return list_available_methods_from_df_dict(Hfg_sources, CASRN, 'Hfg')
     elif method:
@@ -308,13 +303,9 @@ S0s_methods = ()
 def S0s(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
-    in the solid state.
-
-    Lookup is based on CASRNs. Will automatically select a data
-    source to use if no method is provided; returns None if the data is not
+    in the solid state. Lookup is based on CASRNs. Will automatically select a 
+    data source to use if no method is provided; returns None if the data is not
     available.
-
-    No sources are available for this method yet.
 
     Parameters
     ----------
@@ -339,7 +330,9 @@ def S0s(CASRN, get_methods=False, method=None):
 
     Notes
     -----
-    No sources are available for this method yet.
+    Sources are:
+
+        * 'CRC', from the CRC handbook (1360 values)
 
     Examples
     --------
@@ -347,10 +340,7 @@ def S0s(CASRN, get_methods=False, method=None):
     29.1
 
     '''
-    CAS_to_elements = periodic_table.CAS_to_elements
-    if CASRN in CAS_to_elements: 
-        element = CAS_to_elements[CASRN]
-        if element.phase == 's': return element.S0
+    if not _reaction_data_loaded: _load_reaction_data()
     if get_methods:
         return list_available_methods_from_df_dict(S0s_sources, CASRN, 'S0s')
     elif method:
@@ -406,10 +396,7 @@ def S0l(CASRN, get_methods=False, method=None):
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     '''
-    CAS_to_elements = periodic_table.CAS_to_elements
-    if CASRN in CAS_to_elements: 
-        element = CAS_to_elements[CASRN]
-        if element.phase == 'l': return element.S0
+    if not _reaction_data_loaded: _load_reaction_data()
     if get_methods:
         return list_available_methods_from_df_dict(S0l_sources, CASRN, 'S0l')
     elif method:
@@ -471,10 +458,7 @@ def S0g(CASRN, get_methods=False, method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    CAS_to_elements = periodic_table.CAS_to_elements
-    if CASRN in CAS_to_elements: 
-        element = CAS_to_elements[CASRN]
-        if element.phase == 'g': return element.S0
+    if not _reaction_data_loaded: _load_reaction_data()
     if get_methods:
         return list_available_methods_from_df_dict(S0g_sources, CASRN, 'S0g')
     elif method:

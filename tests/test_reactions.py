@@ -31,7 +31,7 @@ from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data
 
 def test_API_TDB_data():
     assert Hfg_API_TDB_data.index.is_unique
-    assert Hfg_API_TDB_data['Hf'].abs().sum() == 101711260
+    assert Hfg_API_TDB_data['Hfg'].abs().sum() == 101711260
     assert Hfg_API_TDB_data.shape == (571, 2)
     assert all([checkCAS(i) for i in Hfg_API_TDB_data.index])
 
@@ -135,17 +135,17 @@ def test_Gibbs_formation():
     
     
 def test_Hf_basis_converter():
-    assert_allclose(Hf_basis_converter(44018, Hf_liq=-285830), -241812)
+    assert_close(Hf_basis_converter(44018, Hf_liq=-285830), -241812)
     
-    assert_allclose(Hf_basis_converter(44018, Hf_gas=-241812), -285830)
+    assert_close(Hf_basis_converter(44018, Hf_gas=-241812), -285830)
 
 
 def test_entropy_formation():
     Sf = entropy_formation(Hf=-74520, Gf=-50490)
-    assert_allclose(Sf, -80.59701492537314)
+    assert_close(Sf, -80.59701492537314)
     
     Sf = entropy_formation(Hf=-241818, Gf=-228572)
-    assert_allclose(Sf, -44.427301693778304)
+    assert_close(Sf, -44.427301693778304)
     
     
     
@@ -165,6 +165,6 @@ def test_balance_stoichiometry():
     ]
     
     for atomss, statuses, products in test_cases:
-        assert_allclose(balance_stoichiometry(stoichiometric_matrix(atomss, statuses)), products)
+        assert_close1d(balance_stoichiometry(stoichiometric_matrix(atomss, statuses)), products)
     
     

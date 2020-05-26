@@ -77,9 +77,9 @@ register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Su
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, TRC_gas_data, CRC_standard_data, Cp_data_PerryI
-    global Zabransky_dict_sat_s, Zabransky_dict_sat_p, Zabransky_dict_const_s
-    global Zabransky_dict_const_p, Zabransky_dict_iso_s, Zabransky_dict_iso_p
-    global type_to_Zabransky_dict, Zabransky_to_dict, _Cp_data_loaded
+    global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
+    global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
+    global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
     Cp_data_Poling = data_source('PolingDatabank.tsv')
     TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
     CRC_standard_data = data_source('CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
@@ -91,31 +91,31 @@ def _load_Cp_data():
     # Cp(Cal/mol/K) = Const + Lin*T + Quadinv/T^2 + Quadinv*T^2
     # Phases:
     # c, gls, l, g.
-    Zabransky_dict_sat_s = {}
-    Zabransky_dict_sat_p = {}
-    Zabransky_dict_const_s = {}
-    Zabransky_dict_const_p = {}
-    Zabransky_dict_iso_s = {}
-    Zabransky_dict_iso_p = {}
+    zabransky_dict_sat_s = {}
+    zabransky_dict_sat_p = {}
+    zabransky_dict_const_s = {}
+    zabransky_dict_const_p = {}
+    zabransky_dict_iso_s = {}
+    zabransky_dict_iso_p = {}
     # C means average heat capacity values, from less rigorous experiments
     # sat means heat capacity along the saturation line
     # p means constant-pressure values, 
     # second argument is whether or not it has a spline
-    type_to_Zabransky_dict = {
-        ('C', True): Zabransky_dict_const_s, 
-        ('C', False):   Zabransky_dict_const_p,
-        ('sat', True):  Zabransky_dict_sat_s,
-        ('sat', False): Zabransky_dict_sat_p,
-        ('p', True):    Zabransky_dict_iso_s,
-        ('p', False):   Zabransky_dict_iso_p
+    type_to_zabransky_dict = {
+        ('C', True): zabransky_dict_const_s, 
+        ('C', False):   zabransky_dict_const_p,
+        ('sat', True):  zabransky_dict_sat_s,
+        ('sat', False): zabransky_dict_sat_p,
+        ('p', True):    zabransky_dict_iso_s,
+        ('p', False):   zabransky_dict_iso_p
     }
-    Zabransky_to_dict = {
-        ZABRANSKY_SPLINE: Zabransky_dict_const_s,
-        ZABRANSKY_QUASIPOLYNOMIAL: Zabransky_dict_const_p,
-        ZABRANSKY_SPLINE_C: Zabransky_dict_iso_s,
-        ZABRANSKY_QUASIPOLYNOMIAL_C: Zabransky_dict_iso_p,
-        ZABRANSKY_SPLINE_SAT: Zabransky_dict_sat_s,
-        ZABRANSKY_QUASIPOLYNOMIAL_SAT: Zabransky_dict_sat_p
+    zabransky_dicts = {
+        ZABRANSKY_SPLINE: zabransky_dict_const_s,
+        ZABRANSKY_QUASIPOLYNOMIAL: zabransky_dict_const_p,
+        ZABRANSKY_SPLINE_C: zabransky_dict_iso_s,
+        ZABRANSKY_QUASIPOLYNOMIAL_C: zabransky_dict_iso_p,
+        ZABRANSKY_SPLINE_SAT: zabransky_dict_sat_s,
+        ZABRANSKY_QUASIPOLYNOMIAL_SAT: zabransky_dict_sat_p
     }
     with open(os.path.join(folder, 'Zabransky.tsv'), encoding='utf-8') as f:
         next(f)
@@ -124,15 +124,17 @@ def _load_Cp_data():
             (CAS, name, Type, uncertainty, Tmin, Tmax,
              a1s, a2s, a3s, a4s, a1p, a2p, a3p, a4p, a5p, a6p, Tc) = values
             spline = bool(a1s) # False if Quasypolynomial, True if spline
-            d = type_to_Zabransky_dict[(Type, spline)]
+            d = type_to_zabransky_dict[(Type, spline)]
             if spline:
+                coeffs = (a1s, a2s, a3s, a4s)
                 if CAS not in d:
-                    d[CAS] = [(a1s, a2s, a3s, a4s, Tmin, Tmax)]
+                    d[CAS] = [ZabranskySpline(coeffs, Tmin, Tmax)]
                 else:
-                    d[CAS].append((a1s, a2s, a3s, a4s, Tmin, Tmax))
+                    d[CAS].append(ZabranskySpline(coeffs, Tmin, Tmax))
             else:
                 # No duplicates for quasipolynomials
-                d[CAS] = (Tc, a1p, a2p, a3p, a4p, a5p, a6p, Tmin, Tmax)
+                coeffs = (a1p, a2p, a3p, a4p, a5p, a6p)
+                d[CAS] = ZabranskyQuasipolynomial(coeffs, Tc, Tmin, Tmax)
     # Used to generate data. Do not delete!
     # Cp_data_PerryI = {}
     # with open(os.path.join(folder, 'Perrys Table 2-151.tsv'), encoding='utf-8') as f:
@@ -182,14 +184,36 @@ def _load_Cp_data():
 if PY37:
     def __getattr__(name):
         if name in ('Cp_data_Poling', 'TRC_gas_data', 'CRC_standard_data',
-                    'Cp_data_PerryI', 'Zabransky_dict_sat_s', 'Zabransky_dict_sat_p', 
-                    'Zabransky_dict_const_s', 'Zabransky_dict_const_p', 'Zabransky_dict_iso_s',  
-                    'Zabransky_dict_iso_p', 'type_to_Zabransky_dict', 'Zabransky_to_dict'):
+                    'Cp_data_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p', 
+                    'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',  
+                    'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts'):
             _load_Cp_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
     _load_Cp_data()
+
+
+# %% Data types
+
+class ZabranskySpline:
+    __slots__ = ('coeffs', 'Tmin', 'Tmax')
+    
+    def __init__(self, coeffs, Tmin, Tmax):
+        self.coeffs = coeffs
+        self.Tmin = Tmin
+        self.Tmax = Tmax
+
+
+class ZabranskyQuasipolynomial:
+    __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax')
+    
+    def __init__(self, coeffs, Tc, Tmin, Tmax):
+        self.coeffs = coeffs
+        self.Tc = Tc
+        self.Tmin = Tmin
+        self.Tmax = Tmax
+
 
 # %% Heat capacities of gases
 
