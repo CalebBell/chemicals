@@ -35,6 +35,7 @@ except:
     numba = None
 import numpy as np
 
+@pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")
 def test_mixing_simple():
     a = np.array([1,2])
@@ -48,6 +49,7 @@ def test_mixing_simple():
     val = chemicals.numba.mixing_logarithmic(a, b)
     assert_close(val, 0.01866065983073615, rtol=1e-13)
     
+@pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")    
 def test_visc_misc():
     # Has a min, if statement
@@ -93,6 +95,7 @@ def test_visc_misc():
     assert_close(chemicals.numba.viscosity_index(73.3E-6, 8.86E-6, rounding=True),
                  chemicals.viscosity_index(73.3E-6, 8.86E-6, rounding=True), rtol=1e-14)
     
+@pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")    
 def test_interface_misc():
     
@@ -123,6 +126,7 @@ def test_interface_misc():
         chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs)
         
         
+@pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")
 def test_virial():
     # Takes 8 seconds to compile. Fun!
@@ -130,6 +134,7 @@ def test_virial():
                  chemicals.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
                 rtol=1e-13)
 
+@pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")
 def test_phase_change():
     # Function had some duplicated powers; numba was optimizing them on me anyway
@@ -140,6 +145,7 @@ def test_phase_change():
              chemicals.MK(553.15, 751.35, 0.302), rtol=1e-12)
 
 
+@pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")
 def test_vapor_pressure():
     # PyPy 75 ns, CPython 2470 ns, numba 214 ns
@@ -153,6 +159,7 @@ def test_vapor_pressure():
     assert_close(Psats_calc, Psats_vec_expect, rtol=1e-11)
     
 
+@pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")
 def test_temperature():
     # Note also the last four decimals are different!

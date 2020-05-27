@@ -27,13 +27,14 @@ def test_heat_capacity_CSP():
     # Example is for cis-2-butene at 350K from Poling. It is not consistent with
     # the example presented. The error is in the main expressesion.
     Cp1 = Rowlinson_Poling(350.0, 435.5, 0.203, 91.21)
+    assert_close(Cp1, 143.80196224081436, rtol=1e-12)
     Cp2 = Rowlinson_Poling(373.28, 535.55, 0.323, 119.342)
-    assert_close1d([Cp1, Cp2], [143.80194441498296, 177.62600344957252])
+    assert_close(Cp2, 177.6260232047048)
 
     # Example in VDI Heat Atlas, Example 11 in VDI D1 p 139.
     # Also formerly in ChemSep. Also in COCO.
     Cp = Rowlinson_Bondi(373.28, 535.55, 0.323, 119.342)
-    assert_close(Cp, 175.39760730048116)
+    assert_close(Cp, 175.3976263003074)
 
 
 def test_solid_models():
@@ -46,7 +47,7 @@ def test_solid_models():
     assert_close(dH, 283246.1242170376)
     
     dS = Lastovka_solid_integral_over_T(300, 0.2139)
-    assert_close(dS, 1947.553552666818)
+    assert_close(dS, 1947.5537561495557)
 
     Cp = Dadgostar_Shaw(355.6, 0.139)
     assert_close(Cp, 1802.5291501191516)
@@ -58,31 +59,31 @@ def test_solid_models():
 
     # I guess 5 J isn't bad! Could try recalculating alphas as well.
     Calculated = [Dadgostar_Shaw(T, alpha) for T, alpha in zip(Ts, alphas)]
-    assert_close(expecteds, Calculated, atol=5)
+    assert_close1d(expecteds, Calculated, atol=5)
 
 
 def test_Zabransky_quasi_polynomial():
     Cp = Zabransky_quasi_polynomial(330, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
-    assert_close(Cp, 165.4728226923247)
+    assert_close(Cp, 165.472878778683)
 
     H2 = Zabransky_quasi_polynomial_integral(300, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     H1 = Zabransky_quasi_polynomial_integral(200, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
-    assert_close(H2 - H1, 14662.026406892926)
+    assert_close(H2 - H1, 14662.031376528757)
     
     S2 = Zabransky_quasi_polynomial_integral_over_T(300, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     S1 = Zabransky_quasi_polynomial_integral_over_T(200, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
-    assert_close(S2-S1, 59.169972919442074) # result from quadrature, not the integral
+    assert_close(S2-S1, 59.16999297436473) # result from quadrature, not the integral
 
 
 def test_Zabransky_cubic():
     Cp = Zabransky_cubic(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
-    assert_close(Cp, 75.31462591538555)
+    assert_close(Cp, 75.31465144297991)
     
     H0 = Zabransky_cubic_integral(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
-    assert_close(H0, 31051.679845520584)
+    assert_close(H0, 31051.690370364562)
     
     S0 = Zabransky_cubic_integral_over_T(298.15, 20.9634, -10.1344, 2.8253,  -0.256738)
-    assert_close(S0, 24.73245695987246)
+    assert_close(S0, 24.732465342840854)
     
 
 def test_Lastovka_Shaw():
@@ -111,6 +112,57 @@ def test_Lastovka_Shaw_integral_over_T():
     dS = Lastovka_Shaw_integral_over_T(1000.0, 0.1333, cyclic_aliphatic=True)
     assert_close(dS, 3790.4489380423597)
 
+def test_Lastovka_Shaw_T_for_Hm():
+    sv, MW, Hm = 0.05, 12.0, 3727593.7203149837
+    T = Lastovka_Shaw_T_for_Hm(Hm=Hm, MW=MW, similarity_variable=sv)
+    assert_close(T, 153731.155415042)
+    
+    T = Lastovka_Shaw_T_for_Hm(Hm=55000, MW=80.0, similarity_variable=0.23)
+    assert_close(T, 600.0943429567604)
+    
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_Lastovka_Shaw_T_for_Hm_fuzz():
+    T_ref = 298.15
+    factor = 1.0
+    
+    # Originally tested with 50 points in everything
+    similarity_variables = linspace(.05, .5, 8)
+    MWs = linspace(12, 1200, 8)
+    Hms = [-i for i in logspace(log10(1e4), log10(1), 15)] + logspace(log10(1), log10(1e7), 15)
+    
+    for sv in similarity_variables:
+        for MW in MWs:
+            for Hm in Hms:
+                try:
+                    Lastovka_Shaw_T_for_Hm(Hm=Hm, MW=MW, similarity_variable=sv, T_ref=T_ref)
+                except Exception as e:
+                    if 'negative temperature' in str(e):
+                        continue
+    #                 print(sv, MW, Hm, e)
+
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_Lastovka_Shaw_T_for_Sm_fuzz():
+    T_ref = 298.15
+    factor = 1.0
+    
+    similarity_variables = linspace(.05, .5, 8)
+    MWs = linspace(12, 1200, 8)
+    Sms = logspace(log10(3000), log10(300), 15)
+    
+    for sv in similarity_variables:
+        for MW in MWs:
+            for Sm in Sms:
+                try:
+                    Lastovka_Shaw_T_for_Sm(Sm=Sm, MW=MW, similarity_variable=sv, T_ref=T_ref)
+                except Exception as e:
+                    if 'negative temperature' in str(e):
+                        continue
+                    elif isinstance(e, NotBoundedError):
+                        continue
+                    else:
+                        raise ValueError("Could not converge with unexpected error")
 
 def test_CRC_standard_data():
     tots_calc = [CRC_standard_data[i].abs().sum() for i in [u'Hfs', u'Gfs', u'S0s', u'Cps', u'Hfl', u'Gfl', u'S0l', 'Cpl', u'Hfg', u'Gfg', u'S0g', u'Cpg']]
@@ -141,20 +193,25 @@ def test_TRC_gas_data():
 
 def test_TRC_gas():
     Cps = [TRCCp(T, 4.0, 7.65E5, 720., 3.565, -0.052, -1.55E6, 52., 201.) for T in [150, 300]]
-    assert_close1d(Cps, [35.584319834110346, 42.06525682312236])
+    assert_close1d(Cps, [35.58433189527471, 42.06527108097466])
+    
+    # Test a zero division error
+    Cp_zero = TRCCp(298, 4.0, 32753000, 892, 76.209, -0.254, -58870000, 98, 298)
+    Cp_almost_zero = TRCCp(298*(1+1e-13), 4.0, 32753000, 892, 76.209, -0.254, -58870000, 98, 298)
+    assert_close(Cp_zero, Cp_almost_zero)
 
 
 def test_TRCCp_integral():
     dH = TRCCp_integral(298.15, 4.0, 7.65E5, 720., 3.565, -0.052, -1.55E6, 52., 201., 1.2)
-    assert_close(dH, 10802.532600592816)
+    assert_close(dH, 10802.536262068483)
     dH = TRCCp_integral(150, 4.0, 7.65E5, 720., 3.565, -0.052, -1.55E6, 52., 201., 1.2)
-    assert_close(dH, 5071.355751575949)
+    assert_close(dH, 5071.357470491908)
 
 
 def test_TRCCp_integral_over_T():
     coeffs = [4.0, 124000, 245, 50.538999999999994, -49.468999999999994, 220440000, 560, 78]
     dS = TRCCp_integral_over_T(300, *coeffs) - TRCCp_integral_over_T(200, *coeffs)
-    assert_close(dS, 23.44278146529652)
+    assert_close(dS, 23.4427894111345)
     
 def test_Zabransky_dicts():
     from chemicals.heat_capacity import (zabransky_dict_sat_s, 

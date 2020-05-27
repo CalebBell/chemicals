@@ -466,13 +466,16 @@ def Zuo_Stenby(T, Tc, Pc, omega):
     Tc_1, Pc_1, omega_1 = 190.56, 4599000.0*1e-5, 0.012
     Tc_2, Pc_2, omega_2 = 568.7, 2490000.0*1e-5, 0.4
     Pc = Pc*1e-5
+    Tr = T/Tc
 
-    ST_1 = 40.520*(1 - T/Tc)**1.287  # Methane
-    ST_2 = 52.095*(1 - T/Tc)**1.21548  # n-octane
+    ST_1 = 40.520*(1.0 - Tr)**1.287  # Methane
+    ST_2 = 52.095*(1.0 - Tr)**1.21548  # n-octane
     
-    ST_r_1 = log(1.0 + ST_1/(Tc_1**(1.0/3.0)*Pc_1**(2.0/3.0)))
-    ST_r_2 = log(1.0 + ST_2/(Tc_2**(1.0/3.0)*Pc_2**(2.0/3.0)))
-    sigma_r = ST_r_1 + (omega-omega_1)/(omega_2 - omega_1)*(ST_r_2-ST_r_1)
+    ST_r_1 = log(1.0 + 0.013537770442486932*ST_1) # Constant from 1/(Tc_1**(1.0/3.0)*Pc_1**(2.0/3.0))
+#    ST_r_1 = log(1.0 + ST_1/(Tc_1**(1.0/3.0)*Pc_1**(2.0/3.0)))
+    ST_r_2 = log(1.0 + 0.014154874587259097*ST_2) # Constant from /(Tc_2**(1.0/3.0)*Pc_2**(2.0/3.0))
+    sigma_r = ST_r_1 + (omega-omega_1)*(ST_r_2-ST_r_1)*2.5773195876288657
+#    sigma_r = ST_r_1 + (omega-omega_1)/(omega_2 - omega_1)*(ST_r_2-ST_r_1)
     sigma = Tc**(1.0/3.0)*Pc**(2.0/3.0)*(exp(sigma_r) - 1.0)
     sigma = sigma*1e-3  # N/m, please
     return sigma

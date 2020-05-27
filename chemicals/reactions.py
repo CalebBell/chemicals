@@ -28,7 +28,6 @@ __all__ = ['Hfg_API_TDB_data', 'Hfg_ATcT_data', 'Hfl_ATcT_data', 'Hfg_S0g_YAWS_d
            'balance_stoichiometry', 'stoichiometric_matrix']
            
 import os
-import scipy.linalg
 from fractions import Fraction
 from chemicals.utils import ceil, log10, PY37
 from chemicals import heat_capacity
@@ -116,7 +115,7 @@ def Hfs(CASRN, get_methods=False, method=None):
     Returns
     -------
     Hfs : float
-        Gas standard-state heat of formation, [J/mol]
+        Solid standard-state heat of formation, [J/mol]
     methods : list, only returned if get_methods == True
         List of methods which can be used to obtain Hf(s) with the given inputs
 
@@ -735,6 +734,7 @@ def stoichiometric_matrix(atomss, reactants):
     return matrix
 
 def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
+    import scipy.linalg
     done = scipy.linalg.null_space(matrix)
     if len(done[0]) > 1:
         raise ValueError("No solution")

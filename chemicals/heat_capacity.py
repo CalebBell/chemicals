@@ -19,6 +19,7 @@ SOFTWARE.'''
 
 __all__ = ['heat_capacity_gas_methods',
            'Lastovka_Shaw', 'Lastovka_Shaw_integral', 'Lastovka_Shaw_integral_over_T', 
+           'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm',
            'TRCCp', 'TRCCp_integral', 'TRCCp_integral_over_T', 
            'heat_capacity_liquid_methods',
            'Rowlinson_Poling', 'Rowlinson_Bondi', 'Dadgostar_Shaw', 
@@ -30,8 +31,10 @@ __all__ = ['heat_capacity_gas_methods',
            'Lastovka_solid_integral_over_T', 'heat_capacity_solid_methods']
 import os
 from io import open
-from chemicals.utils import R, log, exp, polylog2, to_num, PY37
+from chemicals.utils import R, log, exp, polylog2, to_num, PY37, property_mass_to_molar
+from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
+from fluids.numerics import py_newton as newton, brenth, secant
 
 
 # %% Methods introduced in this module
@@ -267,6 +270,7 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
         first = A2 + (A1-A2)/(1. + exp((a - A3)/A4))
         # Personal communication confirms the change
 
+    T_inv = 1.0/T
     B11 = 0.73917383
     B12 = 8.88308889
     C11 = 1188.28051
@@ -275,8 +279,16 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     B22 = 4.35656721
     C21 = 2897.01927
     C22 = 5987.80407
-    Cp = first + (B11 + B12*a)*((C11+C12*a)/T)**2*exp(-(C11 + C12*a)/T)/(1.-exp(-(C11+C12*a)/T))**2
-    Cp += (B21 + B22*a)*((C21+C22*a)/T)**2*exp(-(C21 + C22*a)/T)/(1.-exp(-(C21+C22*a)/T))**2
+    C11_C12a_T =(C11+C12*a)*T_inv
+    expm_C11_C12a_T = exp(-C11_C12a_T)
+    x1 = 1.0/(1.0 - expm_C11_C12a_T)
+    
+    C21_C22a_T = (C21+C22*a)*T_inv
+    expm_C21_C22a_T = exp(-C21_C22a_T)
+    x2 = 1.0/(1.0 - expm_C21_C22a_T)
+    
+    Cp = first + (B11 + B12*a)*(C11_C12a_T*C11_C12a_T)*expm_C11_C12a_T*x1*x1
+    Cp += (B21 + B22*a)*(C21_C22a_T*C21_C22a_T)*expm_C21_C22a_T*x2*x2
     return Cp*1000. # J/g/K to J/kg/K
 
 def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False):
@@ -321,8 +333,9 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False):
         A1 = 0.58
         A2 = 1.25
         A3 = 0.17338003 # 803 instead of 8003 in another paper
-        A4 = 0.014
-        first = A2 + (A1-A2)/(1.+exp((a-A3)/A4)) # One reference says exp((a-A3)/A4)
+#        A4 = 0.014
+        A4_inv = 71.42857142857143
+        first = A2 + (A1-A2)/(1. + exp((a-A3)*A4_inv)) # One reference says exp((a-A3)/A4)
         # Personal communication confirms the change
 
     B11 = 0.73917383
@@ -333,9 +346,12 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False):
     B22 = 4.35656721
     C21 = 2897.01927
     C22 = 5987.80407
-    return 1000.*(T*first - (B11 + B12*a)*(-C11 - C12*a)**2/(-C11 - C12*a + (C11 
-    + C12*a)*exp((-C11 - C12*a)/T)) - (B21 + B22*a)*(-C21 - C22*a)**2/(-C21 
-    - C22*a + (C21 + C22*a)*exp((-C21 - C22*a)/T)))
+    x1 = -C11 - C12*a
+    x2 = -C21 - C22*a
+    T_inv = 1.0/T
+    
+    return 1000.*(T*first - (B11 + B12*a)*(x1*x1)/(x1 - x1*exp(x1*T_inv)) 
+                  - (B21 + B22*a)*(x2*x2)/(x2 - x2*exp(x2*T_inv)))
 
 def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False):
     r'''Calculate the integral over temperature of ideal-gas constant-pressure 
@@ -382,8 +398,9 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
         A2 = 1.25
         A3 = 0.17338003 # 803 instead of 8003 in another paper
         A4 = 0.014
-        first = A2 + (A1-A2)/(1. + exp((a - A3)/A4))
+        first = A2 + (A1-A2)/(1. + cexp((a - A3)/A4))
 
+    T_inv = 1.0/T
     a2 = a*a
     B11 = 0.73917383
     B12 = 8.88308889
@@ -393,15 +410,143 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     B22 = 4.35656721
     C21 = 2897.01927
     C22 = 5987.80407
-    S = (first*log(T) + (-B11 - B12*a)*log(exp((-C11 - C12*a)/T) - 1.) 
-        + (-B11*C11 - B11*C12*a - B12*C11*a - B12*C12*a2)/(T*exp((-C11
-        - C12*a)/T) - T) - (B11*C11 + B11*C12*a + B12*C11*a + B12*C12*a2)/T)
-    S += ((-B21 - B22*a)*log(exp((-C21 - C22*a)/T) - 1.) + (-B21*C21 - B21*C22*a
-        - B22*C21*a - B22*C22*a2)/(T*exp((-C21 - C22*a)/T) - T) - (B21*C21
-        + B21*C22*a + B22*C21*a + B22*C22*a**2)/T)
+    S = (first*clog(T) + (-B11 - B12*a)*clog(cexp((-C11 - C12*a)*T_inv) - 1.) 
+        + (-B11*C11 - B11*C12*a - B12*C11*a - B12*C12*a2)/(T*cexp((-C11
+        - C12*a)*T_inv) - T) - (B11*C11 + B11*C12*a + B12*C11*a + B12*C12*a2)*T_inv)
+    S += ((-B21 - B22*a)*clog(cexp((-C21 - C22*a)*T_inv) - 1.) + (-B21*C21 - B21*C22*a
+        - B22*C21*a - B22*C22*a2)/(T*cexp((-C21 - C22*a)*T_inv) - T) - (B21*C21
+        + B21*C22*a + B22*C21*a + B22*C22*a2)*T_inv)
     # There is a non-real component, but it is only a function of similariy 
     # variable and so will always cancel out.
     return S.real*1000.
+
+def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15, 
+                           factor=1.0):
+    r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
+    the temperature which has a specified `Hm`, as is required in PH flashes,
+    as shown in [1]_.
+
+    Parameters
+    ----------
+    Hm : float
+        Molar enthalpy spec, [J/mol]
+    MW : float
+        Molecular weight of the pure compound or mixture average, [g/mol]
+    similarity_variable : float
+        Similarity variable as defined in [1]_, [mol/g]
+    T_ref : float, optional
+        Reference enthlapy temperature, [K]
+    factor : float, optional
+        A factor to increase or decrease the predicted value of the 
+        method, [-]
+
+    Returns
+    -------
+    T : float
+        Temperature of gas to meet the molar enthalpy spec, [K]
+
+    Notes
+    -----
+
+    See Also
+    --------
+    Lastovka_Shaw
+    Lastovka_Shaw_integral
+    Lastovka_Shaw_integral_over_T
+
+    Examples
+    --------
+    >>> Lastovka_Shaw_T_for_Hm(Hm=55000, MW=80.0, similarity_variable=0.23)
+    600.0943429567604
+    
+    References
+    ----------
+    .. [1] Lastovka, Vaclav, and John M. Shaw. "Predictive Correlations for
+       Ideal Gas Heat Capacities of Pure Hydrocarbons and Petroleum Fractions."
+       Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
+       doi:10.1016/j.fluid.2013.07.023.
+    '''
+    H_ref = Lastovka_Shaw_integral(T_ref, similarity_variable)
+    def err(T):
+        H1 = Lastovka_Shaw_integral(T, similarity_variable)
+        dH = H1 - H_ref
+        err = (property_mass_to_molar(dH, MW)*factor - Hm)
+        return err
+    try:
+        return newton(err, 500, ytol=1e-4)
+    except:
+        try:
+            return brenth(err, 1e-3, 1e5)
+        except Exception as e:
+            if err(1e-11) > 0:
+                raise ValueError("For gas only enthalpy spec to be correct, "
+                                 "model requires negative temperature")
+            raise e
+
+
+def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15, 
+                           factor=1.0):
+    r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
+    the temperature which has a specified `Sm`, as is required in PS flashes,
+    as shown in [1]_.
+
+    Parameters
+    ----------
+    Sm : float
+        Molar entropy spec, [J/mol/K]
+    MW : float
+        Molecular weight of the pure compound or mixture average, [g/mol]
+    similarity_variable : float
+        Similarity variable as defined in [1]_, [mol/g]
+    T_ref : float, optional
+        Reference enthlapy temperature, [K]
+    factor : float, optional
+        A factor to increase or decrease the predicted value of the 
+        method, [-]
+
+    Returns
+    -------
+    T : float
+        Temperature of gas to meet the molar entropy spec, [K]
+
+    Notes
+    -----
+
+    See Also
+    --------
+    Lastovka_Shaw
+    Lastovka_Shaw_integral
+    Lastovka_Shaw_integral_over_T
+
+    Examples
+    --------
+    >>> Lastovka_Shaw_T_for_Sm(Sm=112.80, MW=72.151, similarity_variable=0.2356)
+    603.4298291570277
+    
+    References
+    ----------
+    .. [1] Lastovka, Vaclav, and John M. Shaw. "Predictive Correlations for
+       Ideal Gas Heat Capacities of Pure Hydrocarbons and Petroleum Fractions."
+       Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
+       doi:10.1016/j.fluid.2013.07.023.
+    '''
+    S_ref = Lastovka_Shaw_integral_over_T(T_ref, similarity_variable)
+    def err(T):
+        S1 = Lastovka_Shaw_integral_over_T(T, similarity_variable)
+        dS = S1 - S_ref
+        err = (property_mass_to_molar(dS, MW)*factor - Sm)
+#         print(T, err)
+        return err
+    try:
+        return secant(err, 500, ytol=1e-4, high=10000)
+    except Exception as e:
+        try:
+            return brenth(err, 1e-3, 1e5)
+        except Exception as e:
+            if err(1e-11) > 0:
+                raise ValueError("For gas only entropy spec to be correct, "
+                                 "model requires negative temperature")
+            raise e
 
 def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     r'''Calculates ideal gas heat capacity using the model developed in [1]_.
@@ -436,7 +581,14 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
         y = 0.
     else:
         y = (T - a7)/(T + a6)
-    Cp = R*(a0 + (a1/T**2)*exp(-a2/T) + a3*y**2 + (a4 - a5/(T-a7)**2 )*y**8.)
+    T2 = T*T
+    y2 = y*y
+    T_m_a7 = T - a7
+    try:
+        Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4 - a5/(T_m_a7*T_m_a7))*y2*y2*y2*y2)
+    except ZeroDivisionError:
+        # When T_m_a7 approaches 0, T = a7
+        Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4)*y2*y2*y2*y2)
     return Cp
 
 def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
@@ -490,10 +642,11 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
         h = 0.0
     else:
         first = a6 + a7
-        second = (2.*a3 + 8.*a4)*log(1. - y)
-        third = (a3*(1. + 1./(1. - y)) + a4*(7. + 1./(1. - y)))*y
+        one_m_y = 1.0 - y
+        second = (2.*a3 + 8.*a4)*log(one_m_y)
+        third = (a3*(1. + 1./(one_m_y)) + a4*(7. + 1./(one_m_y)))*y
         fourth = a4*(3.*y2 + 5./3.*y*y2 + y4 + 0.6*y4*y + 1/3.*y4*y2)
-        fifth = 1/7.*(a4 - a5/((a6 + a7)**2))*y4*y2*y
+        fifth = 1/7.*(a4 - a5/(first*first))*y4*y2*y
         h = first*(second + third + fourth + fifth)
     return (a0 + a1*exp(-a2/T)/(a2*T) + I/T + h/T)*R*T
 
@@ -531,11 +684,12 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
     -----
     Analytical integral as provided in [1]_ and verified with numerical
     integration. 
+    
     Examples
     --------
     >>> TRCCp_integral_over_T(300, 4.0, 124000, 245, 50.539, -49.469, 
     ... 220440000, 560, 78)
-    213.80148972435018
+    213.80156219151885
     
     References
     ----------
@@ -549,7 +703,8 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
     else:
         y = (T - a7)/(T + a6)
 
-    z = T/(T + a6)*(a7 + a6)/a7
+    x3 = a7 + a6
+    z = T/(T + a6)*x3/a7
     if T <= a7:
         s = 0.
     else:
@@ -560,11 +715,19 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
         a7_a6_4 = a7_a6_2*a7_a6_2
         x1 = (a4*a72 - a5)/a62 # part of third, sum
         first = (a3 + ((a4*a72 - a5)/a62)*a7_a6_4)*a7_a6_2*log(z)
-        second = (a3 + a4)*log((T + a6)/(a6 + a7))
-        fourth = -(a3/a6*(a6 + a7) + a5*y**6/(7.*a7*(a6 + a7)))*y
-        third = sum([(x1*(-a7_a6)**(6-i) - a4)*y**i/i for i in range(1, 8)])
+        second = (a3 + a4)*log((T + a6)/(x3))
+        third = 0.0
+        y_pow = 1.0
+        a7_a6_pow = (a7_a6)**6
+
+        for i in range(1, 8):
+            y_pow = y_pow*y
+            a7_a6_pow = a7_a6_pow/-a7_a6
+            third += (x1*a7_a6_pow - a4)*y_pow/i
+        fourth = -(a3/a6*(x3) + a5*y_pow/y/(7.*a7*(x3)))*y
         s = first + second + third + fourth
     return R*(J + a0*log(T) + a1/(a2*a2)*(1. + a2/T)*exp(-a2/T) + s)
+    
 
 ### Heat capacities of liquids
 
@@ -829,7 +992,7 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
     Tr = T/Tc
-    return R*(a1*log(1-Tr) + a2/(1-Tr) + a3 + a4*Tr + a5*Tr**2 + a6*Tr**3)
+    return R*(a1*log(1.0-Tr) + a2/(1.0-Tr) + a3 + Tr*(Tr*(Tr*a6 + a5) + a4))
 
 
 def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
