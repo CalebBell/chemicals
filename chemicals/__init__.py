@@ -44,6 +44,7 @@ from . import exceptions
 from . import viscosity
 from . import interface
 from . import permittivity
+from . import thermal_conductivity
 
 from .utils import *
 from .critical import *
@@ -67,12 +68,13 @@ from .exceptions import *
 from .viscosity import *
 from .interface import *
 from .permittivity import *
+from .thermal_conductivity import *
 
 __all__ = ['utils', 'critical', 'elements', 'reactions', 'dipole', 'dippr', 
            'temperature', 'miscdata', 'environment', 'refractivity', 'solubility', 
            'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial', 
            'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity', 
-           'interface', 'permittivity']
+           'interface', 'permittivity', 'thermal_conductivity']
 
 __all__.extend(exceptions.__all__)
 __all__.extend(critical.__all__)
@@ -96,11 +98,12 @@ __all__.extend(acentric.__all__)
 __all__.extend(viscosity.__all__)
 __all__.extend(interface.__all__)
 __all__.extend(permittivity.__all__)
+__all__.extend(thermal_conductivity.__all__)
 
 submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata, 
               environment, refractivity, solubility, lennard_jones, 
               vapor_pressure, virial, phase_change, triple, acentric, viscosity,
-              interface, permittivity]
+              interface, permittivity, thermal_conductivity]
 
 chemicals_dir = os.path.dirname(__file__)
 
