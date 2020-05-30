@@ -93,6 +93,9 @@ def test_Hfg():
     with pytest.raises(Exception):
         Hfg('98-00-0', method='BADMETHOD')
 
+@pytest.mark.fuzz
+@pytest.mark.slow
+def test_Hfg_all_values():
     tot1 = sum([abs(Hfg(i, method='TRC')) for i in TRC_gas_data.index[pd.notnull(TRC_gas_data['Hfg'])]])
     assert_close(tot1, 495689880.0)
 
@@ -116,6 +119,9 @@ def test_S0g():
     with pytest.raises(Exception):
         S0g('98-00-0', method='BADMETHOD')
 
+@pytest.mark.fuzz
+@pytest.mark.slow
+def test_S0g_all_values():
     tot3 = sum([abs(S0g(i, method='YAWS')) for i in Hfg_S0g_YAWS_data.index[pd.notnull(Hfg_S0g_YAWS_data['S0g'])]])
     assert_close(tot3, 2691892.382999995)
     

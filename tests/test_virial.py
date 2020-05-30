@@ -20,7 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from numpy.testing import assert_allclose
 import pytest
 import numpy as np
 from fluids.numerics import linspace, assert_close, assert_close1d
@@ -36,6 +35,12 @@ def test_BVirial_Pitzer_Curl():
 
     with pytest.raises(Exception):
         BVirial_Pitzer_Curl(510., 425.2, 38E5, 0.193, order=-3)
+
+    values_expect = [-0.00020845362479301725, 1.0653775169998656e-06, -5.795710171294467e-09, 4.513533043400151e-11, -0.437891506790894, 8.720086532349054]
+    values = [BVirial_Pitzer_Curl(510., 425.2, 38E5, 0.193, order) for order in [0, 1, 2, 3, -1, -2]]
+    assert_close1d(values, values_expect, rtol=1e-12)
+
+
 
 @pytest.mark.slow
 @pytest.mark.sympy
@@ -54,12 +59,14 @@ def test_BVirial_Pitzer_Curl_calculus():
     # derivatives/integrals. For integrals, there is no way to get the 
     # indefinite integral.
     
-    # Test 160K points in vector form for order 1, 2, and 3
+    # Test points in vector form for order 1, 2, and 3
     # Use lambdify for fast evaluation
-    _Ts = linspace(5,500,20)
-    _Tcs = linspace(501,900,20)
-    _Pcs = linspace(2E5, 1E7,20)
-    _omegas = linspace(-1, 10,20)
+    pts = 3 # points total = pts^4
+    _Ts = linspace(5,500,pts)
+    _Tcs = linspace(501,900,pts)
+    _Pcs = linspace(2E5, 1E7,pts)
+    _omegas = linspace(-1, 10,pts)
+
     _Ts, _Tcs, _Pcs, _omegas = np.meshgrid(_Ts, _Tcs, _Pcs, _omegas)
     _Ts, _Tcs, _Pcs, _omegas = _Ts.ravel(), _Tcs.ravel(), _Pcs.ravel(), _omegas.ravel()
     for order in range(1,4):
@@ -89,26 +96,24 @@ def test_BVirial_Pitzer_Curl_calculus():
         Bcalc2 = [BVirial_Pitzer_Curl(T2, Tc2, Pc2, omega2, order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
         assert_close1d(Bcalcs, Bcalc2)
 
+def test_BVirial_Abbott_calculus():
+    B = BVirial_Abbott(510., 425.2, 38E5, 0.193)
+    assert_close(B, -0.00020570185009564064)
+    
+    with pytest.raises(Exception):
+        BVirial_Abbott(510., 425.2, 38E5, 0.193, order=-3)
 
-    # Check integrals using numerical methods - quad:
-    for order in range(-2, 0):
-        for trial in range(10):
-            T1, T2 = np.random.randint(5, 500, size=(2,))*np.random.rand(2)
-            _Tc = np.random.choice(_Tcs)
-            _Pc = np.random.choice(_Pcs)
-            _omega = np.random.choice(_omegas)
-            
-            dBint = BVirial_Pitzer_Curl(T2, _Tc, _Pc, _omega, order) - BVirial_Pitzer_Curl(T1, _Tc, _Pc, _omega, order)
-            dBquad = quad(BVirial_Pitzer_Curl, T1, T2, args=(_Tc, _Pc, _omega, order+1))[0]
-            assert_close(dBint, dBquad, rtol=1E-5)
+    values_expect = [-0.00020570185009564064, 1.0392492946983827e-06, -5.9022336392448295e-09, 4.782227646523899e-11, 0.30386992442862953, 330.826226911517]
+    values = [BVirial_Abbott(510., 425.2, 38E5, 0.193, order) for order in [0, 1, 2, 3, -1, -2]]
+    assert_close1d(values, values_expect, rtol=1e-12)
 
-
+@pytest.mark.slow
 @pytest.mark.sympy
-def test_BVirial_Abbott():
+def test_BVirial_Abbott_calculus():
     from sympy import symbols, Rational, diff, lambdify, integrate
 
     B = BVirial_Abbott(510., 425.2, 38E5, 0.193)
-    assert_allclose(B, -0.00020570185009564064)
+    assert_close(B, -0.00020570185009564064)
     
     with pytest.raises(Exception):
         BVirial_Abbott(510., 425.2, 38E5, 0.193, order=-3)
@@ -118,12 +123,13 @@ def test_BVirial_Abbott():
     B0 = 0.083 - 0.422/Tr**1.6
     B1 = 0.139 - 0.172/Tr**4.2
 
-    # Test 160K points in vector form for order 1, 2, and 3
+    # Test points in vector form for order 1, 2, and 3
     # Use lambdify for fast evaluation
-    _Ts = np.linspace(5,500,20)
-    _Tcs = np.linspace(501,900,20)
-    _Pcs = np.linspace(2E5, 1E7,20)
-    _omegas = np.linspace(-1, 10,20)
+    pts = 3
+    _Ts = np.linspace(5,500,pts)
+    _Tcs = np.linspace(501,900,pts)
+    _Pcs = np.linspace(2E5, 1E7,pts)
+    _omegas = np.linspace(-1, 10,pts)
     _Ts, _Tcs, _Pcs, _omegas = np.meshgrid(_Ts, _Tcs, _Pcs, _omegas)
     _Ts, _Tcs, _Pcs, _omegas = _Ts.ravel(), _Tcs.ravel(), _Pcs.ravel(), _omegas.ravel()
 
@@ -137,7 +143,7 @@ def test_BVirial_Abbott():
         
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         Bcalc2 = BVirial_Abbott(_Ts, _Tcs, _Pcs, _omegas, order)
-        assert_allclose(Bcalcs, Bcalc2)
+        assert_close1d(Bcalcs, Bcalc2)
 
 
     # Check integrals using SymPy:
@@ -153,44 +159,38 @@ def test_BVirial_Abbott():
         
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         
-        
         Bcalc2 = [BVirial_Abbott(T2, Tc2, Pc2, omega2, order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
-        assert_allclose(Bcalcs, Bcalc2)
+        assert_close1d(Bcalcs, Bcalc2)
 
-
-    # Check integrals using numerical methods - quad:
-    for order in range(-2, 0):
-        for trial in range(10):
-            T1, T2 = np.random.randint(5, 500, size=(2,))*np.random.rand(2)
-            _Tc = np.random.choice(_Tcs)
-            _Pc = np.random.choice(_Pcs)
-            _omega = np.random.choice(_omegas)
-            
-            dBint = BVirial_Abbott(T2, _Tc, _Pc, _omega, order) - BVirial_Abbott(T1, _Tc, _Pc, _omega, order)
-            dBquad = quad(BVirial_Abbott, T1, T2, args=(_Tc, _Pc, _omega, order+1))[0]
-            assert_allclose(dBint, dBquad, rtol=1E-5)
-
-@pytest.mark.sympy
 def test_BVirial_Tsonopoulos():
-    from sympy import symbols, Rational, diff, lambdify, integrate
-
     B = BVirial_Tsonopoulos(510., 425.2, 38E5, 0.193)
-    assert_allclose(B, -0.00020935295404416802)
+    assert_close(B, -0.00020935295404416802)
 
     with pytest.raises(Exception):
         BVirial_Tsonopoulos(510., 425.2, 38E5, 0.193, order=-3)
+
+
+    values_expect = [-0.00020935295404416802, 9.95742355603791e-07, -5.542344657946387e-09, 4.570351609785339e-11, -0.7019279964346002, -257.84756571017147]
+    values = [BVirial_Tsonopoulos(510., 425.2, 38E5, 0.193, order) for order in [0, 1, 2, 3, -1, -2]]
+    assert_close1d(values_expect, values)
+
+@pytest.mark.slow
+@pytest.mark.sympy
+def test_BVirial_Tsonopoulos_calculus():
+    from sympy import symbols, Rational, diff, lambdify, integrate
 
     T, Tc, Pc, omega, R = symbols('T, Tc, Pc, omega, R')
     Tr = T/Tc
     B0 = Rational(1445, 10000) - Rational(33,100)/Tr - Rational(1385,10000)/Tr**2 - Rational(121,10000)/Tr**3 - Rational(607,1000000)/Tr**8
     B1 = Rational(637,10000) + Rational(331,1000)/Tr**2 - Rational(423,1000)/Tr**3 - Rational(8,1000)/Tr**8
 
-    # Test 160K points in vector form for order 1, 2, and 3
+    # Test points in vector form for order 1, 2, and 3
     # Use lambdify for fast evaluation
-    _Ts = np.linspace(5,500,20)
-    _Tcs = np.linspace(501,900,20)
-    _Pcs = np.linspace(2E5, 1E7,20)
-    _omegas = np.linspace(-1, 10,20)
+    pts = 3
+    _Ts = np.linspace(5,500,pts)
+    _Tcs = np.linspace(501,900,pts)
+    _Pcs = np.linspace(2E5, 1E7,pts)
+    _omegas = np.linspace(-1, 10,pts)
     _Ts, _Tcs, _Pcs, _omegas = np.meshgrid(_Ts, _Tcs, _Pcs, _omegas)
     _Ts, _Tcs, _Pcs, _omegas = _Ts.ravel(), _Tcs.ravel(), _Pcs.ravel(), _omegas.ravel()
 
@@ -204,7 +204,7 @@ def test_BVirial_Tsonopoulos():
         
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         Bcalc2 = BVirial_Tsonopoulos(_Ts, _Tcs, _Pcs, _omegas, order)
-        assert_allclose(Bcalcs, Bcalc2)
+        assert_close1d(Bcalcs, Bcalc2)
 
     # Check integrals using SymPy:
     for order in range(-2, 0):
@@ -219,33 +219,15 @@ def test_BVirial_Tsonopoulos():
         
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         
-        
         Bcalc2 = [BVirial_Tsonopoulos(T2, Tc2, Pc2, omega2, order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
-        assert_allclose(Bcalcs, Bcalc2)
+        assert_close1d(Bcalcs, Bcalc2)
 
-
-    # Check integrals using numerical methods - quad:
-    for order in range(-2, 0):
-        for trial in range(10):
-            T1, T2 = np.random.randint(5, 500, size=(2,))*np.random.rand(2)
-            _Tc = np.random.choice(_Tcs)
-            _Pc = np.random.choice(_Pcs)
-            _omega = np.random.choice(_omegas)
-            
-            dBint = BVirial_Tsonopoulos(T2, _Tc, _Pc, _omega, order) - BVirial_Tsonopoulos(T1, _Tc, _Pc, _omega, order)
-            dBquad = quad(BVirial_Tsonopoulos, T1, T2, args=(_Tc, _Pc, _omega, order+1))[0]
-            assert_allclose(dBint, dBquad, rtol=1E-5)
-
-
-@pytest.mark.sympy
 def test_BVirial_Tsonopoulos_extended():
-    from sympy import symbols, Rational, diff, lambdify, integrate
-
     B = BVirial_Tsonopoulos_extended(510., 425.2, 38E5, 0.193, species_type='normal', dipole=0)
-    assert_allclose(B, -0.00020935295404416802)
+    assert_close(B, -0.00020935295404416802)
 
     B = BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469)
-    assert_allclose(B, -9.679718337596426e-05)
+    assert_close(B, -9.679718337596426e-05)
 
     with pytest.raises(Exception):
         BVirial_Tsonopoulos_extended(510., 425.2, 38E5, 0.193, order=-3)
@@ -258,14 +240,21 @@ def test_BVirial_Tsonopoulos_extended():
     Bs_calc = [BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608,
                                             a=0, b=0, species_type=i, dipole=0.1) for i in types]
     Bs = [-9.00253249139901e-05, -9.00253249139901e-05, -8.136808332317606e-05, -9.232253763245037e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.003498498098181e-05, -9.003498498098181e-05, -9.003498498098181e-05, -9.003498498098181e-05, -7.331249596682434e-05]
-    assert_allclose(Bs_calc, Bs)
+    assert_close1d(Bs_calc, Bs)
+
+
+@pytest.mark.slow
+@pytest.mark.sympy
+def test_BVirial_Tsonopoulos_extended_calculus():
+    from sympy import symbols, Rational, diff, lambdify, integrate
 
 
     # Use lambdify for fast evaluation
-    _Ts = np.linspace(5,500,20)
-    _Tcs = np.linspace(501,900,20)
-    _Pcs = np.linspace(2E5, 1E7,20)
-    _omegas = np.linspace(-1, 10,20)
+    pts = 3
+    _Ts = np.linspace(5,500,pts)
+    _Tcs = np.linspace(501,900,pts)
+    _Pcs = np.linspace(2E5, 1E7,pts)
+    _omegas = np.linspace(-1, 10,pts)
     _Ts, _Tcs, _Pcs, _omegas = np.meshgrid(_Ts, _Tcs, _Pcs, _omegas)
     _Ts, _Tcs, _Pcs, _omegas = _Ts.ravel(), _Tcs.ravel(), _Pcs.ravel(), _omegas.ravel()
 
@@ -291,7 +280,7 @@ def test_BVirial_Tsonopoulos_extended():
         
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         Bcalc2 = BVirial_Tsonopoulos_extended(_Ts, _Tcs, _Pcs, _omegas, order=order, a=a, b=b)
-        assert_allclose(Bcalcs, Bcalc2)
+        assert_close1d(Bcalcs, Bcalc2)
 
 
     # Check integrals using SymPy:
@@ -314,17 +303,4 @@ def test_BVirial_Tsonopoulos_extended():
         
         
         Bcalc2 = [BVirial_Tsonopoulos_extended(T2, Tc2, Pc2, omega2, a=a, b=b, order=order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
-        assert_allclose(Bcalcs, Bcalc2)
-
-
-    # Check integrals using numerical methods - quad:
-    for order in range(-2, 0):
-        for trial in range(10):
-            T1, T2 = np.random.randint(5, 500, size=(2,))*np.random.rand(2)
-            _Tc = np.random.choice(_Tcs)
-            _Pc = np.random.choice(_Pcs)
-            _omega = np.random.choice(_omegas)
-            
-            dBint = BVirial_Tsonopoulos_extended(T2, _Tc, _Pc, _omega, a=a, b=b, order=order) - BVirial_Tsonopoulos_extended(T1, _Tc, _Pc, _omega, a=a, b=b, order=order)
-            dBquad = quad(BVirial_Tsonopoulos_extended, T1, T2, args=(_Tc, _Pc, _omega, a, b, '', 0, order+1))[0]
-            assert_allclose(dBint, dBquad, rtol=3E-5)
+        assert_close1d(Bcalcs, Bcalc2)

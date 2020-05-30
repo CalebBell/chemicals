@@ -24,6 +24,7 @@ from fluids.numerics import assert_close, assert_close1d, linspace, logspace
 from chemicals.heat_capacity import *
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data, Cp_data_Poling
 from fluids.numerics import NotBoundedError
+
 def test_heat_capacity_CSP():
     # Example is for cis-2-butene at 350K from Poling. It is not consistent with
     # the example presented. The error is in the main expressesion.
