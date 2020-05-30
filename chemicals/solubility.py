@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,11 +19,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
-# TODO: Decide whether a solubility_parameter lookup method is actually needed.
-# If so, add framework for lazy loading and solubility_parameter_sources.
-# If not, replace the `solubility_parameter` function with `solubility_parameter_DEFINITION`
 
-__all__ = ['solubility_parameter_methods', 'solubility_parameter', 
+__all__ = ['solubility_parameter', 
            'solubility_eutectic', 'Tm_depression_eutectic',
            'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture']
            
@@ -31,17 +28,12 @@ import os
 from fluids.constants import R, atm
 from chemicals.utils import log, exp
 
-#folder = os.path.join(os.path.dirname(__file__), 'Solubility')
 
-DEFINITION = 'DEFINITION'
-solubility_parameter_methods = [DEFINITION]
 
-def solubility_parameter(T=298.15, Hvapm=None, Vml=None,
-                         CASRN='', get_methods=False, method=None):
+def solubility_parameter(T, Hvapm, Vml):
     r'''This function handles the calculation of a chemical's solubility
     parameter. Calculation is a function of temperature, but is not always
-    presented as such. No lookup values are available; either `Hvapm`, `Vml`,
-    and `T` are provided or the calculation cannot be performed.
+    presented as such. `Hvapm`, `Vml`, `T` are required.
 
     .. math::
         \delta = \sqrt{\frac{\Delta H_{vap} - RT}{V_m}}
@@ -54,27 +46,12 @@ def solubility_parameter(T=298.15, Hvapm=None, Vml=None,
         Heat of vaporization [J/mol/K]
     Vml : float
         Specific volume of the liquid [m^3/mol]
-    CASRN : str, optional
-        CASRN of the fluid, not currently used [-]
 
     Returns
     -------
     delta : float
         Solubility parameter, [Pa^0.5]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain the solubility parameter
-        with the given inputs
-
-    Other Parameters
-    ----------------
-    method : string, optional
-        A string for the method name to use, as defined by constants in
-        solubility_parameter_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        the solubility parameter for the desired chemical, and will return
-        methods instead of the solubility parameter
-
+        
     Notes
     -----
     Undefined past the critical point. For convenience, if Hvap is not defined,
@@ -97,23 +74,6 @@ def solubility_parameter(T=298.15, Hvapm=None, Vml=None,
     .. [1] Barton, Allan F. M. CRC Handbook of Solubility Parameters and Other
        Cohesion Parameters, Second Edition. CRC Press, 1991.
     '''
-    if get_methods:
-        methods = []
-        if T and Hvapm and Vml:
-            methods.append(DEFINITION)
-        return methods
-    elif method:
-        if method == DEFINITION:
-            try: return solubility_parameter_DEFINITION(Hvapm, T, Vml)
-            except TypeError: pass
-        else:
-            raise ValueError('invalid method ' + repr(method))
-    else:
-        try: return solubility_parameter_DEFINITION(Hvapm, T, Vml)
-        except TypeError: pass
-
-def solubility_parameter_DEFINITION(Hvapm, T, Vml):
-    r'''See :func:`chemicals.solubility_parameter`'''
     # Prevent taking the root of a negative number
     return None if (Hvapm < R*T or Vml < 0) else ((Hvapm - R*T)/Vml)**0.5
 

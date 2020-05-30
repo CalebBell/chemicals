@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-__all__ = ['Hfg_API_TDB_data', 'Hfg_ATcT_data', 'Hfl_ATcT_data', 'Hfg_S0g_YAWS_data', 
+__all__ = [ 
            'Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s', 
            'Hfl_methods', 'Hfg_methods', 'Hfs_methods',
            'S0l_methods', 'S0g_methods', 'S0s_methods',
