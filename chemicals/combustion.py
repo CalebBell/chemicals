@@ -153,8 +153,8 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
 
 def combustion_stoichiometry(atoms, MW=None):
     r"""
-    Return a CombustionStoichiometry object that contains the cstoichiometric
-    coefficients of chemical combustion as in [1]_.
+    Return a dictionary of stoichiometric coefficients of chemical combustion 
+    as in [1]_.
     
     Parameters
     ----------
@@ -350,14 +350,14 @@ def LHV_from_HHV(HHV, N_H2O):
 
 class CombustionData(NamedTuple):
     r"""
-    Return a CombustionData object that contains the stoichiometry 
+    Return a CombustionData object (a named tuple) that contains the stoichiometry 
     coefficients of the reactants and products, the lower and higher 
     heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
     and the molecular weight [MW; in g/mol].
     
     Parameters
     ----------
-    stoichiometry : CombustionStoichiometry
+    stoichiometry : dict[str, float]
         Stoichiometric coefficients of the reactants and products.
     HHV : float
         Higher heating value [J/mol].
