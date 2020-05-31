@@ -31,25 +31,29 @@ from chemicals.volume import (rho_data_COSTALD, rho_data_SNM0, rho_data_Perry_8E
 from chemicals.utils import Vm_to_rho
 from thermo.identifiers import checkCAS
 
-def test_volume_CSP():
+def Yen_Woods_saturation():
     V1_calc = Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245)
     V1 = 1.7695330765295693e-05
     V2_calc = Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.27)
     V2 = 1.8750391558570308e-05
     assert_allclose([V1_calc, V2_calc], [V1, V2])
 
+def test_Rackett():
     V1_calc = Rackett(300, 647.14, 22048320.0, 0.23)
     V1 = 1.640447929033162e-05
     V2_calc = Rackett(272.03889, 369.83, 4248000.0, 0.2763)
     V2 = 8.299225005462148e-05
     assert_allclose([V1_calc, V2_calc], [V1, V2])
 
+def test_Yamada_Gunn():
     V1_calc = Yamada_Gunn(300, 647.14, 22048320.0, 0.245)
     assert_allclose(V1_calc, 2.188284384699659e-05)
 
+def test_Townsend_Hales():
     V1_calc = Townsend_Hales(300, 647.14, 55.95E-6, 0.3449)
     assert_allclose(V1_calc, 1.8007361992619923e-05)
 
+def test_Bhirud_normal():
     V1_calc = Bhirud_normal(280.0, 469.7, 33.7E5, 0.252)
     V1 = 0.0001124965784251429
     V2_calc = Bhirud_normal(469.7*.99, 469.7, 33.7E5, 0.252)
@@ -60,6 +64,7 @@ def test_volume_CSP():
     with pytest.raises(Exception):
         Bhirud_normal(500, 469.7, 33.7E5, 0.252)
 
+def test_COSTALD():
     V1_calc = COSTALD(298, 647.13, 55.95E-6, 0.3449)
     V1 = 1.8133760480018036e-05
     # Propane, from API Handbook example; I have used their exact values,
@@ -71,6 +76,7 @@ def test_volume_CSP():
     rho_ex = Vm_to_rho(COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532), 44.097)
     assert_allclose(rho_ex, 530.3009967969841)
 
+def test_Campbell_Thodos():
     # Argon, with constants from [1]_ Table II and compared with listed
     # calculated result for critical volume in Table III. Tabulated s, lambda,
     # alpha, and beta are also a match.
@@ -92,6 +98,7 @@ def test_volume_CSP():
     V3 = 7.347366126245346e-05
     assert_allclose([V1_calc, V2_calc, V3_calc], [V1, V2, V3])
 
+def test_SNMO():
     # No examples for this model have been found, but it is simple and well
     # understood.
     V1_calc = SNM0(121, 150.8, 7.49e-05, -0.004)

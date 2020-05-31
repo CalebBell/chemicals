@@ -126,13 +126,13 @@ def test_interface_misc():
         chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs)
         
         
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
-def test_virial():
-    # Takes 8 seconds to compile. Fun!
-    assert_close(chemicals.numba.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
-                 chemicals.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
-                rtol=1e-13)
+#@pytest.mark.numba
+#@pytest.mark.skipif(numba is None, reason="Numba is missing")
+#def test_virial():
+#    # Takes 8 seconds to compile. Fun!
+#    assert_close(chemicals.numba.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
+#                 chemicals.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
+#                rtol=1e-13)
 
 @pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")
@@ -169,3 +169,36 @@ def test_temperature():
     
     # Probably never going to work
 #    chemicals.numba.T_converter(500, 'ITS-68', 'ITS-48')
+    
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_volume():
+    assert_close(chemicals.numba.Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245),
+                chemicals.Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245))
+    assert_close(chemicals.numba.COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532),
+                 chemicals.COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532))
+
+
+    # Test a slow one
+    # 81.2 us orig, then 67.6 after optimizations in CPython
+    # numba: 2.25 µs, PYPY: 1.31; numba with numpy: 4 us
+        
+    N = 100
+    xs = [0.4576, 0.5424]*N
+    MWs = [32.04, 18.01]*N
+    Tcs = [512.58, 647.29]*N
+    Pcs = [8.096E6, 2.209E7]*N
+    Zrs = [0.2332, 0.2374]*N
+    
+    xs2 = np.array(xs)
+    MWs2 = np.array(MWs)
+    Tcs2 = np.array(Tcs)
+    Pcs2 = np.array(Pcs)
+    Zrs2 = np.array(Zrs)
+    
+    orig = Rackett_mixture(T=298., xs=xs, MWs=MWs, Tcs=Tcs, Pcs=Pcs, Zrs=Zrs)
+    
+    new = chemicals.numba.Rackett_mixture(T=298., xs=xs2, MWs=MWs2, Tcs=Tcs2, Pcs=Pcs2, Zrs=Zrs2)
+    assert_close(orig, new)
+    
+    

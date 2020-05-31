@@ -31,7 +31,7 @@ import os
 import pandas as pd
 
 from fluids.numerics import np, splev, implementation_optimize_tck
-from fluids.constants import R
+from fluids.constants import R, atm_inv
 from chemicals.utils import log, exp, isnan
 from chemicals.utils import Vm_to_rho, mixing_simple
 
@@ -146,7 +146,7 @@ def Yen_Woods_saturation(T, Tc, Vc, Zc):
     Examples
     --------
     >>> Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245)
-    1.7695330765295693e-05
+    1.769533076529574e-05
 
     References
     ----------
@@ -155,13 +155,14 @@ def Yen_Woods_saturation(T, Tc, Vc, Zc):
        95-99. doi:10.1002/aic.690120119
     '''
     Tr = T/Tc
-    A = 17.4425 - 214.578*Zc + 989.625*Zc**2 - 1522.06*Zc**3
+    A = Zc*(Zc*(989.625 - 1522.06*Zc) - 214.578) + 17.4425
     if Zc <= 0.26:
-        B = -3.28257 + 13.6377*Zc + 107.4844*Zc**2 - 384.211*Zc**3
+        B = Zc*(Zc*(107.4844 - 384.211*Zc) + 13.6377) - 3.28257
     else:
-        B = 60.2091 - 402.063*Zc + 501.0*Zc**2 + 641.0*Zc**3
+        B = Zc*(Zc*(641.0*Zc + 501.0) - 402.063) + 60.2091
     D = 0.93 - B
-    Vm = Vc/(1 + A*(1-Tr)**(1/3.) + B*(1-Tr)**(2/3.) + D*(1-Tr)**(4/3.))
+    tau_cbrt = (1.0 - Tr)**(1/3.)
+    Vm = Vc/(tau_cbrt*(A + tau_cbrt*(B + D*tau_cbrt*tau_cbrt)) + 1.0)
     return Vm
 
 
@@ -210,7 +211,7 @@ def Rackett(T, Tc, Pc, Zc):
        Journal of Chemical & Engineering Data 15, no. 4 (1970): 514-517.
        doi:10.1021/je60047a012
     '''
-    return R*Tc/Pc*Zc**(1 + (1 - T/Tc)**(2/7.))
+    return R*Tc/Pc*Zc**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
 
 def Yamada_Gunn(T, Tc, Pc, omega):
@@ -261,7 +262,7 @@ def Yamada_Gunn(T, Tc, Pc, omega):
         Volumes. Rackett Equation." Journal of Chemical & Engineering Data 18,
         no. 2 (1973): 234-36. doi:10.1021/je60057a006
     '''
-    return R*Tc/Pc*(0.29056 - 0.08775*omega)**(1 + (1 - T/Tc)**(2/7.))
+    return R*Tc/Pc*(0.29056 - 0.08775*omega)**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
 
 def Townsend_Hales(T, Tc, Vc, omega):
@@ -306,7 +307,7 @@ def Townsend_Hales(T, Tc, Vc, omega):
        4, no. 5 (1972): 763-72. doi:10.1016/0021-9614(72)90050-X
     '''
     Tr = T/Tc
-    return Vc/(1 + 0.85*(1-Tr) + (1.692 + 0.986*omega)*(1-Tr)**(1/3.))
+    return Vc/(1.0 + 0.85*(1.0-Tr) + (1.692 + 0.986*omega)*(1.0-Tr)**(1.0/3.))
 
 Bhirud_normal_Trs = [0.98, 0.982, 0.984, 0.986, 0.988, 0.99, 0.992, 0.994,
             0.996, 0.998, 0.999, 1]
@@ -366,7 +367,7 @@ def Bhirud_normal(T, Tc, Pc, omega):
     Pentane
 
     >>> Bhirud_normal(280.0, 469.7, 33.7E5, 0.252)
-    0.0001124965784251429
+    0.00011249657842514176
 
     References
     ----------
@@ -376,10 +377,10 @@ def Bhirud_normal(T, Tc, Pc, omega):
     '''
     Tr = T/Tc
     if Tr <= 0.98:
-        lnU0 = 1.39644 - 24.076*Tr + 102.615*Tr**2 - 255.719*Tr**3 \
-            + 355.805*Tr**4 - 256.671*Tr**5 + 75.1088*Tr**6
-        lnU1 = 13.4412 - 135.7437*Tr + 533.380*Tr**2-1091.453*Tr**3 \
-            + 1231.43*Tr**4 - 728.227*Tr**5 + 176.737*Tr**6
+        lnU0 = Tr*(Tr*(Tr*(Tr*(Tr*(75.1088*Tr - 256.671) + 355.805) - 255.719)
+               + 102.615) - 24.076) + 1.39644
+        lnU1 = Tr*(Tr*(Tr*(Tr*(Tr*(176.737*Tr - 728.227) + 1231.43) - 1091.453)
+               + 533.38) - 135.7437) + 13.4412
     elif Tr > 1:
         raise ValueError('Critical phase, correlation does not apply')
     else:
@@ -537,6 +538,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=None, hydroxyl=False):
        Substances." Journal of Chemical & Engineering Data 30, no. 1
        (January 1, 1985): 102-11. doi:10.1021/je00039a032.
     '''
+    Tc_inv = 1.0/Tc
     Tr = T/Tc
     Tbr = Tb/Tc
     Pc = Pc/101325.
@@ -854,11 +856,16 @@ def Rackett_mixture(T, xs, MWs, Tcs, Pcs, Zrs):
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     '''
-    Tc = mixing_simple(xs, Tcs)
-    Zr = mixing_simple(xs, Zrs)
-    MW = mixing_simple(xs, MWs)
+    bigsum, Tc, Zr, MW = 0.0, 0.0, 0.0, 0.0
+    
+    # Fastest for numba and PyPy and CPython
+    for i in range(len(xs)):
+        x0 = Tcs[i]*xs[i]
+        Tc += x0
+        Zr += Zrs[i]*xs[i]
+        MW += MWs[i]*xs[i]
+        bigsum += x0/(Pcs[i]*MWs[i])
     Tr = T/Tc
-    bigsum = sum(xs[i]*Tcs[i]/Pcs[i]/MWs[i] for i in range(len(xs)))
     return (R*bigsum*Zr**(1.0 + (1.0 - Tr)**(2.0/7.0)))*MW
 
 
