@@ -72,6 +72,26 @@ heat_capacity_liquid_methods = (
 LASTOVKA_S = 'Lastovka, Fulem, Becerra and Shaw (2008)'
 PERRY151 = "Perry's Table 2-151"
 heat_capacity_solid_methods = (PERRY151, CRCSTD, LASTOVKA_S)
+# %% Data types
+
+class ZabranskySpline:
+    __slots__ = ('coeffs', 'Tmin', 'Tmax')
+    
+    def __init__(self, coeffs, Tmin, Tmax):
+        self.coeffs = coeffs
+        self.Tmin = Tmin
+        self.Tmax = Tmax
+
+
+class ZabranskyQuasipolynomial:
+    __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax')
+    
+    def __init__(self, coeffs, Tc, Tmin, Tmax):
+        self.coeffs = coeffs
+        self.Tc = Tc
+        self.Tmin = Tmin
+        self.Tmax = Tmax
+
 
 
 # %% Register data sources and lazy load them
@@ -200,26 +220,6 @@ if PY37:
 else:
     _load_Cp_data()
 
-
-# %% Data types
-
-class ZabranskySpline:
-    __slots__ = ('coeffs', 'Tmin', 'Tmax')
-    
-    def __init__(self, coeffs, Tmin, Tmax):
-        self.coeffs = coeffs
-        self.Tmin = Tmin
-        self.Tmax = Tmax
-
-
-class ZabranskyQuasipolynomial:
-    __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax')
-    
-    def __init__(self, coeffs, Tc, Tmin, Tmax):
-        self.coeffs = coeffs
-        self.Tc = Tc
-        self.Tmin = Tmin
-        self.Tmax = Tmax
 
 
 # %% Heat capacities of gases

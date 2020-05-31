@@ -39,6 +39,12 @@ from chemicals.data_reader import (register_df_source,
 
 
 # %% Register data sources and lazy load them
+CRC = 'CRC'
+YAWS = 'YAWS'
+API_TDB_G = 'API_TDB_G'
+ATCT_L = 'ATCT_L'
+ATCT_G = 'ATCT_G'
+TRC = 'TRC'
 
 folder = os.path.join(os.path.dirname(__file__), 'Reactions')
 register_df_source(folder, 'API TDB Albahri Hf (g).tsv')
@@ -99,7 +105,6 @@ else:
 # TODO: more data from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3692305/
 # has dippr standard heats of formation, about 55% of the database
 
-CRC = 'CRC'
 Hfs_methods = (CRC,)
 
 def Hfs(CASRN, get_methods=False, method=None):
@@ -156,10 +161,6 @@ def Hfs(CASRN, get_methods=False, method=None):
     else:
         return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
-YAWS = 'YAWS'
-API_TDB_G = 'API_TDB_G'
-ATCT_L = 'ATCT_L'
-ATCT_G = 'ATCT_G'
 Hfl_methods = (ATCT_L, CRC)
 
 def Hfl(CASRN, get_methods=False, method=None):
@@ -219,7 +220,6 @@ def Hfl(CASRN, get_methods=False, method=None):
     else:
         return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
-TRC = 'TRC'
 Hfg_methods = (ATCT_G, TRC, CRC, YAWS)
 
 def Hfg(CASRN, get_methods=False, method=None):
