@@ -19,11 +19,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
+from typing import Dict, NamedTuple
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
-from dataclasses import dataclass
 
 __all__ = ('CombustionData',
-           'CombustionStoichiometry',
            'combustion_data',
            'combustion_stoichiometry',
            'HHV_modified_Dulong',
@@ -51,10 +50,23 @@ STOICHIOMETRY = 'Stoichiometry'
 HHV_methods = (DULONG, STOICHIOMETRY)
 
 combustible_elements = ('C', 'H', 'N', 'O', 'S', 'Br', 'I', 'Cl', 'F', 'P')
+Hf_combustion_chemicals = {
+    'H2O': -285825,
+    'CO2': -393474,
+    'SO2': -296800,
+    'Br2': 30880,
+    'I2': 62417,
+    'HCl': -92173,
+    'HF': -272711,
+    'P4O10': -3009940,
+    'O2': 0,
+    'N2': 0,
+    "Ash": 0,
+}
 
 def combustion_data(formula, Hf=None, MW=None, method=None):
     r"""
-    Return a CombustionData object that contains the stoichiometry 
+    Return a CombustionData object (a named tuple) that contains the stoichiometry 
     coefficients of the reactants and products, the lower and higher 
     heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
     and the molecular weight [MW; in g/mol].
@@ -68,13 +80,20 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
     Hf : float, optional
         Heat of formation of given chemical [J/mol].
         Required if method is "Stoichiometry".
-    method : "Stoichiometry" or "Dulong"
+    method : "Stoichiometry" or "Dulong", optional
         Method to estimate LHV and HHV.    
     
     Returns
     -------
-    combustion_data : CombustionData
-        Data related to combustion [-].
+    stoichiometry : dict[str, float]
+        Stoichiometric coefficients of combustion. May inlcude the following 
+        keys: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 'HF' and 'P4O10'.
+    HHV : float
+        Higher heating value [J/mol].
+    Hf : float
+        Heat of formation [J/mol].
+    MW : float
+        Molecular weight [g/mol].
     
     Notes
     -----
@@ -106,7 +125,7 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
     Liquid methanol burning:
 
     >>> combustion_data({'H': 4, 'C': 1, 'O': 1}, Hf=-239100)
-    CombustionData(stoichiometry=CombustionStoichiometry(O2=-1.5, CO2=1, Br2=0.0, I2=0.0, HCl=0, HF=0, SO2=0, N2=0.0, P4O10=0.0, H2O=2.0, Ash=0), HHV=-7.26e+05, Hf=-2.39e+05, MW=32)
+    CombustionData(stoichiometry={'O2': -1.5, 'CO2': 1, 'H2O': 2.0}, HHV=-726024.0, Hf=-239100, MW=32.04186)
     
     References
     ----------
@@ -121,7 +140,7 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
     if not method:
         method = 'Dulong' if Hf is None else 'Stoichiometry'
     if method == DULONG:
-        HHV = HHV_modified_Dulong(mass_fractions(atoms, MW), MW)
+        HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
         if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
         Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
     elif method == STOICHIOMETRY:
@@ -144,6 +163,12 @@ def combustion_stoichiometry(atoms, MW=None):
     MW : float, optional
         Molecular weight of chemical.
 
+    Returns
+    -------
+    stoichiometry : dict[str, float]
+        Stoichiometric coefficients of combustion. May inlcude the following 
+        keys: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 'HF' and 'P4O10'.
+
     Notes
     -----
     The stoichiometry is given by:
@@ -153,12 +178,16 @@ def combustion_stoichiometry(atoms, MW=None):
 
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
+    When atoms with unknown combustion products are present (e.g. Na, Ca), 
+    ash is added as a combustion product to preserve the mass balance (assuming
+    ash has a molecular weight of 1 g/mol).
+
     Examples
     --------
     Methane gas burning:
     
     >>> combustion_stoichiometry({'C': 1, 'H':4})
-    CombustionStoichiometry(O2=-2.0, CO2=1, Br2=0.0, I2=0.0, HCl=0, HF=0, SO2=0, N2=0.0, P4O10=0.0, H2O=2.0, Ash=0)
+    {'O2': -2.0, 'CO2': 1, 'H2O': 2.0}
 
     References
     ----------
@@ -170,21 +199,22 @@ def combustion_stoichiometry(atoms, MW=None):
     C, H, N, O, S, Br, I, Cl, F, P = combustion_atoms.values()
     MW = MW or molecular_weight(atoms)
     Ash = MW - molecular_weight(combustion_atoms)
-    return CombustionStoichiometry(
-        (Cl + F)/4. + O/2. - (C + S + H/4. + 5*P/4.), # O2
-        C, # CO2
-        Br/2., # Br2
-        I/2., # I2
-        Cl, # HCl
-        F, # HF
-        S, # SO2
-        N/2., # N2
-        P/4., # P4O10
-        (H - Cl - F)/2., # H2O
-        Ash if Ash / MW > 0.0001 else 0 # Ash
-    )
+    stoichiometry = {
+        'O2': (Cl + F)/4. + O/2. - (C + S + H/4. + 5*P/4.),
+        'CO2': C,
+        'Br2': Br/2.,
+        'I2': I/2.,
+        'HCl': Cl,
+        'HF': F,
+        'SO2': S,
+        'N2': N/2.,
+        'P4O10': P/4.,
+        'H2O': (H - Cl - F)/2.,
+        'Ash': Ash if Ash / MW > 0.0001 else 0
+    }
+    return {i:j for i,j in stoichiometry.items() if j}
 
-def HHV_stoichiometry(stoichiometry, Hf):
+def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
     """
     Return the higher heating value [HHV; in J/mol] based on the 
     theoretical combustion stoichiometry and the heat of formation of
@@ -192,12 +222,18 @@ def HHV_stoichiometry(stoichiometry, Hf):
     
     Parameters
     ----------
-    stoichiometry : dict[str, float] or CombustionStoichiometry
-        Stoichiometric coefficients of combustion. If stoichiometry is a 
-        dictionary, it should inlcude the following keys: 'H2O', 'CO2', 'SO2', 
-        'Br2', 'I2', 'HCl', 'Hf' and 'P4O10'.
+    stoichiometry : dict[str, float]
+        Stoichiometric coefficients of combustion. May inlcude the following 
+        keys: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 'HF' and 'P4O10'.
     Hf : float
         Heat of formation [J/mol].
+    Hf_chemicals : dict[str, float]
+        Heat of formation of chemicals present in stoichiometry.
+    
+    Returns
+    -------
+    HHV : float
+        Higher heating value [J/mol].
     
     Notes
     -----
@@ -210,34 +246,36 @@ def HHV_stoichiometry(stoichiometry, Hf):
     
     The HHV is calculated as the heat of reaction.
     
+    Examples
+    --------
+    Burning methane gas:
+        
+    >>> HHV_stoichiometry({'O2': -2.0, 'CO2': 1, 'H2O': 2.0}, -74520.0)
+    -890604.0
+    
     References
     ----------
     .. [1] Green, D. W. Distillation. In Perry’s Chemical Engineers’ Handbook,
        9 ed.; McGraw-Hill Education, 2018
     
     """
-    if isinstance(stoichiometry, CombustionStoichiometry):
-        stoichiometry = stoichiometry.__dict__
-    return (- 285825 * stoichiometry['H2O']
-            - 393474 * stoichiometry['CO2']
-            - 296800 * stoichiometry['SO2']
-            + 30880 * stoichiometry['Br2']
-            + 62417 * stoichiometry['I2']
-            - 92173 * stoichiometry['HCl']
-            - 272711 * stoichiometry['HF']
-            - 3009940 * stoichiometry['P4O10'] - Hf)
+    Hfs = Hf_chemicals or Hf_combustion_chemicals
+    return sum([Hfs[i] * j for i, j in stoichiometry.items()]) - Hf
 
-def HHV_modified_Dulong(mass_fractions, MW=1.):
+def HHV_modified_Dulong(mass_fractions):
     r"""
-    Return higher heating value [HHV; in J/mol] based on the modified 
+    Return higher heating value [HHV; in J/g] based on the modified 
     Dulong's equation.
     
     Parameters
     ----------
     mass_fractions : dict[str, float]
         Dictionary of atomic mass fractions [-].
-    MW : float
-        Molecular weight of substance [g/mol].
+    
+    Returns
+    -------
+    HHV : float
+        Higher heating value [J/mol].
     
     Notes
     -----
@@ -253,8 +291,8 @@ def HHV_modified_Dulong(mass_fractions, MW=1.):
     --------
     Dry bituminous coal:
     
-    >>> HHV_modified_Dulong({'C': 0.67, 'H': 0.05, 'S': 0.015, 'N': 1.5, 'O': 0.087, 'Ash': 0.098})
-    -283.75550000000004
+    >>> HHV_modified_Dulong({'C': 0.716, 'H': 0.054, 'S': 0.016, 'N': 0.016, 'O': 0.093, 'Ash': 0.105})
+    -304.0395
     
     References
     ----------
@@ -269,7 +307,7 @@ def HHV_modified_Dulong(mass_fractions, MW=1.):
     if O > 0.105:
         raise ValueError("Dulong's formula is only valid at 10 wt. % Oxygen "
                         f"or less ({O:.0%} given)")
-    return - MW * (338*C  + 1428*(H - O/8)+ 95*S)    
+    return - (338*C  + 1428*(H - O/8)+ 95*S)    
 
 def LHV_from_HHV(HHV, N_H2O):
     """Return the lower heating value [LHV; in J/mol] of a chemical given
@@ -309,80 +347,7 @@ def LHV_from_HHV(HHV, N_H2O):
     """
     return HHV + 44011.496 * N_H2O
 
-
-# %% Combustion reaction data types
-
-@dataclass(frozen=True)
-class CombustionStoichiometry:
-    """
-    Create a CombustionStoichiometry object that contains the stoichiometry 
-    coefficients of the reactants and products.
-    
-    Parameters
-    ----------
-    O2: float
-        Molecular oxygen [mol].
-    CO2: float
-        Carbon dioxide [mol].
-    Br2: float
-        Molecular bromine [mol].
-    I2: float
-        Molecular iodine [mol].
-    HCl: float
-        Hydrochloric acid [mol].
-    HF: float
-        Hydrofloric acid [mol].
-    SO2: float
-        Sulfur dioxide [mol].
-    N2: float
-        Molecular nitrogen [mol].
-    P4O10: float
-        Phosphorous pentoxide [mol].
-    H2O: float
-        Water [mol].
-    Ash: float
-        Other products not accounted for in stoichiometry [mol].
-    
-    Attributes
-    ----------
-    O2: float
-        Molecular oxygen [mol].
-    CO2: float
-        Carbon dioxide [mol].
-    Br2: float
-        Molecular bromine [mol].
-    I2: float
-        Molecular iodine [mol].
-    HCl: float
-        Hydrochloric acid [mol].
-    HF: float
-        Hydrofloric acid [mol].
-    SO2: float
-        Sulfur dioxide [mol].
-    N2: float
-        Molecular nitrogen [mol].
-    P4O10: float
-        Phosphorous pentoxide [mol].
-    H2O: float
-        Water [mol].
-    Ash: float
-        Other products not accounted for in stoichiometry [mol].
-    
-    """
-    O2: float
-    CO2: float
-    Br2: float
-    I2: float
-    HCl: float
-    HF: float
-    SO2: float
-    N2: float
-    P4O10: float
-    H2O: float
-    Ash: float
-
-@dataclass(frozen=True)
-class CombustionData:
+class CombustionData(NamedTuple):
     """
     Return a CombustionData object that contains the stoichiometry 
     coefficients of the reactants and products, the lower and higher 
@@ -400,26 +365,13 @@ class CombustionData:
     MW : float
         Molecular weight [g/mol].
     
-    Attributes
-    ----------
-    stoichiometry : CombustionStoichiometry
-        Stoichiometric coefficients of the reactants and products.
-    HHV : float
-        Higher heating value [J/mol].
-    Hf : float
-        Heat of formation [J/mol].
-    MW : float
-        Molecular weight [g/mol].
-    
     """
-    stoichiometry: CombustionStoichiometry 
+    stoichiometry: Dict[str, float]
     HHV: float
     Hf: float
     MW: float
-    
+
     @property
     def LHV(self):
-        """Lower heating value [J/mol]."""
-        return LHV_from_HHV(self.HHV, self.stoichiometry.H2O)
-
-
+        """Lower heating value [LHV; in J/mol]"""
+        return LHV_from_HHV(self.HHV, self.stoichiometry['H2O'])
