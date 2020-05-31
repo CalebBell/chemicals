@@ -30,7 +30,7 @@ __all__ = ['Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
 import os
 import pandas as pd
 
-from fluids.numerics import np
+from fluids.numerics import np, splev, implementation_optimize_tck
 from fluids.constants import R
 from chemicals.utils import log, exp, isnan
 from chemicals.utils import Vm_to_rho, mixing_simple
@@ -308,17 +308,21 @@ def Townsend_Hales(T, Tc, Vc, omega):
     Tr = T/Tc
     return Vc/(1 + 0.85*(1-Tr) + (1.692 + 0.986*omega)*(1-Tr)**(1/3.))
 
-from scipy.interpolate import interp1d
 Bhirud_normal_Trs = [0.98, 0.982, 0.984, 0.986, 0.988, 0.99, 0.992, 0.994,
             0.996, 0.998, 0.999, 1]
 Bhirud_normal_lnU0s = [-1.6198, -1.604, -1.59, -1.578, -1.564, -1.548, -1.533,
               -1.515, -1.489, -1.454, -1.425, -1.243]
 Bhirud_normal_lnU1 = [-0.4626, -0.459, -0.451, -0.441, -0.428, -0.412, -0.392,
               -0.367, -0.337, -0.302, -0.283, -0.2629]
-Bhirud_normal_lnU0_interp = interp1d(Bhirud_normal_Trs, Bhirud_normal_lnU0s, kind='cubic')
-Bhirud_normal_lnU1_interp = interp1d(Bhirud_normal_Trs, Bhirud_normal_lnU1, kind='cubic')
 
+Bhirud_normal_lnU0_tck = implementation_optimize_tck([[0.98, 0.98, 0.98, 0.98, 0.984, 0.986, 0.988, 0.99, 0.992, 0.994, 0.996, 0.998, 1.0, 1.0, 1.0, 1.0],
+                                                     [-1.6198000000000001, -1.6090032590995371, -1.5930934818009272, -1.5785097772986094, -1.5645133351302174, -1.547436882180519, -1.5337391361477044, -1.5156065732286643, -1.4938345709376377, -1.4430551430207872, -1.4529816189930713, -1.243, 0.0, 0.0, 0.0, 0.0],
+                                                     3])
+Bhirud_normal_lnU1_tck = implementation_optimize_tck([[0.98, 0.98, 0.98, 0.98, 0.984, 0.986, 0.988, 0.99, 0.992, 0.994, 0.996, 0.998, 1.0, 1.0, 1.0, 1.0],
+                                                      [-0.4626000000000001, -0.4624223420145324, -0.4543553159709354, -0.4416003593769303, -0.4284319856698448, -0.41267169794369013, -0.39288122255539465, -0.3678034118347314, -0.3379051301056794, -0.30257606774255136, -0.2767190885302606, -0.2629, 0.0, 0.0, 0.0, 0.0],
+                                                     3])
 
+        
 def Bhirud_normal(T, Tc, Pc, omega):
     r'''Calculates saturation liquid density using the Bhirud [1]_ CSP method.
     Uses Critical temperature and pressure and acentric factor.
@@ -377,10 +381,10 @@ def Bhirud_normal(T, Tc, Pc, omega):
         lnU1 = 13.4412 - 135.7437*Tr + 533.380*Tr**2-1091.453*Tr**3 \
             + 1231.43*Tr**4 - 728.227*Tr**5 + 176.737*Tr**6
     elif Tr > 1:
-        raise Exception('Critical phase, correlation does not apply')
+        raise ValueError('Critical phase, correlation does not apply')
     else:
-        lnU0 = Bhirud_normal_lnU0_interp(Tr)
-        lnU1 = Bhirud_normal_lnU1_interp(Tr)
+        lnU0 = float(splev(Tr, Bhirud_normal_lnU0_tck))
+        lnU1 = float(splev(Tr, Bhirud_normal_lnU1_tck))
 
     Unonpolar = exp(lnU0 + omega*lnU1)
     Vm = Unonpolar*R*T/Pc
