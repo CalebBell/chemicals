@@ -99,7 +99,8 @@ else:
 # TODO: more data from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3692305/
 # has dippr standard heats of formation, about 55% of the database
 
-Hfs_methods = ()
+CRC = 'CRC'
+Hfs_methods = (CRC,)
 
 def Hfs(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's solid/crystaline 
@@ -155,7 +156,6 @@ def Hfs(CASRN, get_methods=False, method=None):
     else:
         return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
-CRC = 'CRC'
 YAWS = 'YAWS'
 API_TDB_G = 'API_TDB_G'
 ATCT_L = 'ATCT_L'
@@ -297,7 +297,7 @@ def Hfg(CASRN, get_methods=False, method=None):
     else:
         return retrieve_any_from_df_dict(Hfg_sources, CASRN, 'Hfg')
 
-S0s_methods = ()
+S0s_methods = (CRC,)
 
 def S0s(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's absolute
@@ -347,7 +347,7 @@ def S0s(CASRN, get_methods=False, method=None):
     else:
         return retrieve_any_from_df_dict(S0s_sources, CASRN, 'S0s')
 
-S0l_methods = ()
+S0l_methods = (CRC,)
 
 def S0l(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's absolute
