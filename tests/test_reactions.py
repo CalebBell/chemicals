@@ -94,6 +94,13 @@ def test_Hfg():
     with pytest.raises(Exception):
         Hfg('98-00-0', method='BADMETHOD')
 
+def test_Hfs():
+    assert_close(Hfs('101-81-5'), 71500)
+    assert_close(Hfs('101-81-5', method='CRC'), 71500)
+    assert ['CRC'] == Hfs('101-81-5', get_methods=True)
+    
+    
+    
 @pytest.mark.fuzz
 @pytest.mark.slow
 def test_Hfg_all_values():
@@ -128,7 +135,21 @@ def test_S0g_all_values():
     
     tot4 = sum([abs(S0g(i, method='CRC')) for i in CRC_standard_data.index[pd.notnull(CRC_standard_data['S0g'])]])
     assert_close(tot4, 141558.30000000008)
-
+    
+    
+def test_S0s():
+    assert_close(S0s('7439-93-2'), 29.1) # Lithium
+    assert_close(S0s('7439-93-2', method='CRC'), 29.1)
+    
+    methods = S0s('7439-93-2', get_methods=True)
+    assert methods == ['CRC']
+    
+def test_S0l():
+    assert_close(S0l('7439-97-6'), 75.9) # Lithium
+    assert_close(S0l('7439-97-6', method='CRC'), 75.9)
+    
+    methods = S0l('7439-97-6', get_methods=True)
+    assert methods == ['CRC']
 
 def test_Gibbs_formation():
     Gf =  Gibbs_formation(-285830, 69.91,  [0, 0], [130.571, 205.147], [1, .5])
@@ -145,7 +166,15 @@ def test_Hf_basis_converter():
     assert_close(Hf_basis_converter(44018, Hf_liq=-285830), -241812)
     
     assert_close(Hf_basis_converter(44018, Hf_gas=-241812), -285830)
-
+    
+    with pytest.raises(ValueError):
+        Hf_basis_converter(44018, Hf_liq=None) 
+    with pytest.raises(ValueError):
+        Hf_basis_converter(2000, Hf_gas=None, Hf_liq=None) 
+    with pytest.raises(ValueError):
+        Hf_basis_converter(Hvapm=-1, Hf_liq=1) 
+    with pytest.raises(ValueError):
+        Hf_basis_converter(Hvapm=None, Hf_liq=1)
 
 def test_entropy_formation():
     Sf = entropy_formation(Hf=-74520, Gf=-50490)
