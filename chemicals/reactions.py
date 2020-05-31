@@ -653,7 +653,8 @@ def stoichiometric_matrix(atomss, reactants):
     Returns
     -------
     matrix : list[list[float]]
-        Chemical reaction matrix for further processing, [-]
+        Chemical reaction matrix for further processing; rows contain element
+         counts of each compound, and the columns represent each chemical, [-]
 
     Notes
     -----
@@ -727,6 +728,49 @@ def stoichiometric_matrix(atomss, reactants):
     return matrix
 
 def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
+    r'''This function balances a chemical reaction.
+
+    Parameters
+    ----------
+    matrix : list[list[float]]
+        Chemical reaction matrix for further processing; rows contain element
+         counts of each compound, and the columns represent each chemical, [-]
+
+    Returns
+    -------
+    coefficients : list[float]
+        Balanced coefficients; all numbers are positive, [-]
+
+    Notes
+    -----
+    Balance the reaction 4 NH3 + 5 O2 = 4 NO + 6 H2O, without knowing the 
+    coefficients:
+        
+    >>> matrix = stoichiometric_matrix([{'N': 1, 'H': 3}, {'O': 2}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}], [True, True, False, False])
+    >>> matrix
+    [[3, 0, 0, -2], [1, 0, -1, 0], [0, 2, -1, -1]]
+    >>> balance_stoichiometry(matrix)
+    [4.0, 5.0, 4.0, 6.0]
+    >>> balance_stoichiometry(matrix, allow_fractional=True)
+    [1.0, 1.25, 1.0, 1.5]
+    
+    This algorithm relies on `scipy`.
+    The behavior of this function for inputs which do not have a unique 
+    solution is undefined.
+    
+    This algorithm may suffer from floating point issues. If you believe there
+    is an error in the result, please report your reaction to the developers.
+
+    References
+    ----------
+    .. [1] Sen, S. K., Hans Agarwal, and Sagar Sen. "Chemical Equation 
+       Balancing: An Integer Programming Approach." Mathematical and Computer 
+       Modelling 44, no. 7 (October 1, 2006): 678-91.
+       https://doi.org/10.1016/j.mcm.2006.02.004.
+    .. [2] URAVNOTE, NOVOODKRITI PARADOKSI V. TEORIJI, and ENJA KEMIJSKIH 
+       REAKCIJ. "New Discovered Paradoxes in Theory of Balancing Chemical 
+       Reactions." Materiali in Tehnologije 45, no. 6 (2011): 503-22.
+    '''
     import scipy.linalg
     done = scipy.linalg.null_space(matrix)
     if len(done[0]) > 1:

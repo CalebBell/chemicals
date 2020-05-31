@@ -76,7 +76,7 @@ __all__ = ['utils', 'critical', 'elements', 'reactions', 'dipole', 'dippr',
            'temperature', 'miscdata', 'environment', 'refractivity', 'solubility', 
            'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial', 
            'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity', 
-           'interface', 'permittivity', 'thermal_conductivity', 'combustion']
+           'interface', 'permittivity', 'thermal_conductivity', 'combustion',]
 
 __all__.extend(exceptions.__all__)
 __all__.extend(critical.__all__)
@@ -106,7 +106,8 @@ __all__.extend(combustion.__all__)
 submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata, 
               environment, refractivity, solubility, lennard_jones, 
               vapor_pressure, virial, phase_change, triple, acentric, viscosity,
-              interface, permittivity, thermal_conductivity, combustion]
+              interface, permittivity, thermal_conductivity, combustion,
+              heat_capacity, reactions]
 
 chemicals_dir = os.path.dirname(__file__)
 
