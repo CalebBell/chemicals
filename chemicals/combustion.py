@@ -215,7 +215,7 @@ def combustion_stoichiometry(atoms, MW=None):
     return {i:j for i,j in stoichiometry.items() if j}
 
 def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
-    """
+    r"""
     Return the higher heating value [HHV; in J/mol] based on the 
     theoretical combustion stoichiometry and the heat of formation of
     the chemical as in [1]_.
@@ -310,7 +310,8 @@ def HHV_modified_Dulong(mass_fractions):
     return - (338*C  + 1428*(H - O/8)+ 95*S)    
 
 def LHV_from_HHV(HHV, N_H2O):
-    """Return the lower heating value [LHV; in J/mol] of a chemical given
+    r"""
+    Return the lower heating value [LHV; in J/mol] of a chemical given
     the higher heating value [HHV; in J/mol] and the number of water
     molecules formed per molecule burned.
     
@@ -348,7 +349,7 @@ def LHV_from_HHV(HHV, N_H2O):
     return HHV + 44011.496 * N_H2O
 
 class CombustionData(NamedTuple):
-    """
+    r"""
     Return a CombustionData object that contains the stoichiometry 
     coefficients of the reactants and products, the lower and higher 
     heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
