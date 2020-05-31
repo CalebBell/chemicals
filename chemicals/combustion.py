@@ -129,7 +129,7 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
     
     References
     ----------
-    .. [1] Green, D. W. Distillation. In Perry’s Chemical Engineers’ Handbook,
+    .. [1] Green, D. W. Waste management. In Perry’s Chemical Engineers’ Handbook,
        9 ed.; McGraw-Hill Education, 2018
     
     """
@@ -153,8 +153,7 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
 
 def combustion_stoichiometry(atoms, MW=None):
     r"""
-    Return a dictionary of stoichiometric coefficients of chemical combustion 
-    as in [1]_.
+    Return a dictionary of stoichiometric coefficients of chemical combustion.
     
     Parameters
     ----------
@@ -189,11 +188,6 @@ def combustion_stoichiometry(atoms, MW=None):
     >>> combustion_stoichiometry({'C': 1, 'H':4})
     {'O2': -2.0, 'CO2': 1, 'H2O': 2.0}
 
-    References
-    ----------
-    .. [1] Green, D. W. Distillation. In Perry’s Chemical Engineers’ Handbook,
-       9 ed.; McGraw-Hill Education, 2018
-
     """
     combustion_atoms = {i:atoms.get(i, 0) for i in combustible_elements}
     C, H, N, O, S, Br, I, Cl, F, P = combustion_atoms.values()
@@ -218,7 +212,7 @@ def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
     r"""
     Return the higher heating value [HHV; in J/mol] based on the 
     theoretical combustion stoichiometry and the heat of formation of
-    the chemical as in [1]_.
+    the chemical.
     
     Parameters
     ----------
@@ -253,11 +247,6 @@ def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
     >>> HHV_stoichiometry({'O2': -2.0, 'CO2': 1, 'H2O': 2.0}, -74520.0)
     -890604.0
     
-    References
-    ----------
-    .. [1] Green, D. W. Distillation. In Perry’s Chemical Engineers’ Handbook,
-       9 ed.; McGraw-Hill Education, 2018
-    
     """
     Hfs = Hf_chemicals or Hf_combustion_chemicals
     return sum([Hfs[i] * j for i, j in stoichiometry.items()]) - Hf
@@ -265,7 +254,7 @@ def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
 def HHV_modified_Dulong(mass_fractions):
     r"""
     Return higher heating value [HHV; in J/g] based on the modified 
-    Dulong's equation.
+    Dulong's equation [1]_.
     
     Parameters
     ----------
@@ -296,7 +285,7 @@ def HHV_modified_Dulong(mass_fractions):
     
     References
     ----------
-    .. [1] Green, D. W. Distillation. In Perry’s Chemical Engineers’ Handbook,
+    .. [1] Green, D. W. Waste management. In Perry’s Chemical Engineers’ Handbook,
        9 ed.; McGraw-Hill Education, 2018
     
     """
