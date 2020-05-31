@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-from fluids.numerics import assert_close, assert_close1d
+from fluids.numerics import assert_close, assert_close1d, assert_close2d
 import pytest
 import pandas as pd
 
@@ -53,16 +53,14 @@ def test_Hfg_ATcT_data():
     tots = [300788330, 300592764, 829204]
     assert_close1d(tots_calc, tots)
 
-# TODO: Left off here
 def test_Hfg_API_TDB_data():
-    assert_close(Hfg('7732-18-5'), -241820.0)
     assert_close(Hfg('7732-18-5', method='API_TDB_G'), -241820.0)
 
-    assert Hfg('7732-18-5', get_methods=True) == ['API_TDB_G', 'ATCT_G', 'CRC', 'TRC', 'YAWS']
+    assert Hfg('7732-18-5', get_methods=True) == ['ATCT_G', 'CRC', 'API_TDB_G', 'TRC', 'YAWS']
 
     assert None == Hfg('98-00-1')
 
-    tot = sum([abs(Hfg(i)) for i in Hfg_API_TDB_data.index])
+    tot = sum([abs(Hfg(i, method='API_TDB_G')) for i in Hfg_API_TDB_data.index])
     assert_close(tot, 101711260.0)
 
     with pytest.raises(Exception):
@@ -84,10 +82,13 @@ def test_Hfl():
 
 
 def test_Hfg():
+    # default method ATCT_G
+    assert_close(Hfg('7732-18-5'), -241822.0)
+
     Hfs = [Hfg('67-56-1', method=i) for i in Hfg_methods]
     assert_close1d(Hfs, [-200700., -190100., -201000., -200900.])
 
-    assert Hfg('67-56-1', get_methods=True) == ['API_TDB_G', 'ATCT_G', 'CRC', 'TRC', 'YAWS']
+    assert Hfg('67-56-1', get_methods=True) == ['ATCT_G', 'CRC', 'API_TDB_G','TRC', 'YAWS']
     assert_close(-211800.0, Hfg('98-00-0'))
 
     with pytest.raises(Exception):
@@ -174,3 +175,6 @@ def test_balance_stoichiometry():
         assert_close1d(balance_stoichiometry(stoichiometric_matrix(atomss, statuses)), products)
     
     
+def test_stoichiometric_matrix():
+    res = stoichiometric_matrix([{'Mg': 1, 'O': 1}, {'Mg': 1}, {'O': 2}], [True, False, False])
+    assert_close2d([[1, -1, 0], [1, 0, -2]], res)

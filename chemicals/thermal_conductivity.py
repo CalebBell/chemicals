@@ -108,7 +108,7 @@ def Sheffy_Johnson(T, M, Tm):
     Examples
     --------
     >>> Sheffy_Johnson(300, 47, 280)
-    0.17740150413112196
+    0.17740150413112193
 
     References
     ----------
@@ -116,7 +116,7 @@ def Sheffy_Johnson(T, M, Tm):
        Liquids at High Temperatures." Journal of Chemical & Engineering Data
        6, no. 2 (April 1, 1961): 245-49. doi:10.1021/je60010a019
     '''
-    return 1.951*(1 - 0.00126*(T - Tm))*Tm**-0.216*M**-0.3
+    return 1.951*(1.0 - 0.00126*(T - Tm))*Tm**-0.216*M**-0.3
 
 
 def Sato_Riedel(T, M, Tb, Tc):
@@ -474,7 +474,7 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
         
     >>> Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 
     ... 0.000754, {'C': 12, 'H': 26})
-    0.08952713798442789
+    0.0895271829899285
 
     References
     ----------
@@ -744,7 +744,7 @@ def Eucken(MW, Cvm, mu):
     2-methylbutane at low pressure, 373.15 K. Mathes calculation in [1]_.
 
     >>> Eucken(MW=72.151, Cvm=135.9, mu=8.77E-6)
-    0.018792644287722975
+    0.018792645058456698
 
     References
     ----------
@@ -787,7 +787,7 @@ def Eucken_modified(MW, Cvm, mu):
     2-methylbutane at low pressure, 373.15 K. Mathes calculation in [1]_.
 
     >>> Eucken_modified(MW=72.151, Cvm=135.9, mu=8.77E-6)
-    0.023593536999201956
+    0.02359353760551249
 
     References
     ----------
@@ -916,7 +916,7 @@ def Chung(T, MW, Tc, omega, Cvm, mu):
     2-methylbutane at low pressure, 373.15 K. Mathes calculation in [2]_.
 
     >>> Chung(T=373.15, MW=72.151, Tc=460.4, omega=0.227, Cvm=135.9, mu=8.77E-6)
-    0.023015653729496946
+    0.023015653797111124
 
     References
     ----------
@@ -1000,7 +1000,7 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
 
     >>> Eli_Hanley(T=373.15, MW=72.151, Tc=460.4, Vc=3.06E-4, Zc=0.267,
     ... omega=0.227, Cvm=135.9)
-    0.02247951789135337
+    0.02247951724514095
 
     References
     ----------
@@ -1312,7 +1312,7 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     --------
     >>> Eli_Hanley_dense(T=473., MW=42.081, Tc=364.9, Vc=1.81E-4, Zc=0.274,
     ... omega=0.144, Cvm=82.70, Vm=1.721E-4)
-    0.06038475936515042
+    0.06038475754111894
 
     References
     ----------
@@ -1460,7 +1460,7 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     --------
     >>> Chung_dense(T=473., MW=42.081, Tc=364.9, Vc=184.6E-6, omega=0.142,
     ... Cvm=82.67, Vm=172.1E-6, mu=134E-7, dipole=0.4)
-    0.06160570379787278
+    0.06160569232570781
 
     References
     ----------

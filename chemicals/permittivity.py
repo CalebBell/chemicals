@@ -105,9 +105,10 @@ def permittivity_IAPWS(T, rho):
     Examples
     --------
     >>> permittivity_IAPWS(373., 958.46)
-    55.56584297721836
+    55.56584187269734
     
     >>> permittivity_IAPWS(650., 40.31090)
+    1.2659205723606064
 
     References
     ----------

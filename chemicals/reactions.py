@@ -67,9 +67,9 @@ def _load_reaction_data():
         CRC: heat_capacity.CRC_standard_data,
     }
     Hfg_sources = {
-        API_TDB_G: Hfg_API_TDB_data,
         ATCT_G: Hfg_ATcT_data,
         CRC: heat_capacity.CRC_standard_data,
+        API_TDB_G: Hfg_API_TDB_data,
         TRC: heat_capacity.TRC_gas_data,
         YAWS: Hfg_S0g_YAWS_data,
     }
@@ -665,48 +665,41 @@ def stoichiometric_matrix(atomss, reactants):
     MgO2 -> Mg + 1/2 O2
     (k=1)
     
-    >>> stoichiometric_matrix([{'Hg': 1, 'O': 1}, {u'Hg': 1}, {'O': 2}], [True, False, False])
-    [[1, -1, 0.0], [1, 0.0, -2]]
+    >>> stoichiometric_matrix([{'Mg': 1, 'O': 1}, {'Mg': 1}, {'O': 2}], [True, False, False])
+    [[1, -1, 0], [1, 0, -2]]
     
     
     Cl2 + propylene -> allyl chloride + HCl
     
     >>> stoichiometric_matrix([{'Cl': 2}, {'C': 3, 'H': 6}, {'C': 3, 'Cl': 1, 'H': 5}, {'Cl': 1, 'H': 1}], [True, True, False, False, False])
-    [[0.0, 6, -5, -1], [0.0, 3, -3, 0.0], [2, 0.0, -1, -1]]
+    [[0, 3, -3, 0], [2, 0, -1, -1], [0, 6, -5, -1]]
 
     
     Al + 4HNO3 -> Al(NO3)3 + NO + 2H2O 
     (k=1)
 
     >>> stoichiometric_matrix([{'Al': 1}, {'H': 1, 'N': 1, 'O': 3}, {'Al': 1, 'N': 3, 'O': 9}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}], [True, True, False, False, False])
-    [[0.0, 1, 0.0, 0.0, -2],
-     [1, 0.0, -1, 0.0, 0.0],
-     [0.0, 3, -9, -1, -1],
-     [0.0, 1, -3, -1, 0.0]]
-
+    [[1, 0, -1, 0, 0], [0, 1, 0, 0, -2], [0, 1, -3, -1, 0], [0, 3, -9, -1, -1]]
     
     4Fe + 3O2 -> 2(Fe2O3)
     (k=2)
     
     >>> stoichiometric_matrix([{'Fe': 1}, {'O': 2}, {'Fe':2, 'O': 3}], [True, True, False])
-    [[1, 0.0, -2], [0.0, 2, -3]]
+    [[1, 0, -2], [0, 2, -3]]
 
     
     4NH3 + 5O2 -> 4NO + 6(H2O)
     (k=4)
     
     >>> stoichiometric_matrix([{'N': 1, 'H': 3}, {'O': 2}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}], [True, True, False, False])
-    [[3, 0.0, 0.0, -2], [0.0, 2, -1, -1], [1, 0.0, -1, 0.0]]
+    [[3, 0, 0, -2], [1, 0, -1, 0], [0, 2, -1, -1]]
 
     
     No unique solution:
     C2H5NO2 + C3H7NO3 + 2C6H14N4O2 + 3C5H9NO2 + 2C9H11NO2 -> 8H2O + C50H73N15O11
     
     >>> stoichiometric_matrix([{'C': 2, 'H': 5, 'N': 1, 'O': 2}, {'C': 3, 'H': 7, 'N': 1, 'O': 3}, {'C': 6, 'H': 14, 'N': 4, 'O': 2}, {'C': 5, 'H': 9, 'N': 1, 'O': 2}, {'C': 9, 'H': 11, 'N': 1, 'O': 2}, {'H': 2, 'O': 1}, {'C': 50, 'H': 73, 'N': 15, 'O': 11}], [True, True, True, True, True, False, False])
-    [[5, 7, 14, 9, 11, -2, -73],
-     [2, 3, 6, 5, 9, 0.0, -50],
-     [2, 3, 2, 2, 2, -1, -11],
-     [1, 1, 4, 1, 1, 0.0, -15]]
+    [[2, 3, 6, 5, 9, 0, -50], [5, 7, 14, 9, 11, -2, -73], [1, 1, 4, 1, 1, 0, -15], [2, 3, 2, 2, 2, -1, -11]]
 
     References
     ----------
@@ -722,7 +715,7 @@ def stoichiometric_matrix(atomss, reactants):
     elements = set()
     for atoms in atomss:
         elements.update(atoms.keys())
-    elements = list(elements)
+    elements = sorted(list(elements)) # Ensure reproducibility
     n_elements = len(elements)
 
     matrix = [[0]*n_compounds for _ in range(n_elements)]

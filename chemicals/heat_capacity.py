@@ -223,22 +223,26 @@ class ZabranskyQuasipolynomial:
 def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     r'''Calculate ideal-gas constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
+    
     .. math::
         C_p^0 = \left(A_2 + \frac{A_1 - A_2}{1 + \exp(\frac{\alpha-A_3}{A_4})}\right)
         + (B_{11} + B_{12}\alpha)\left(-\frac{(C_{11} + C_{12}\alpha)}{T}\right)^2
         \frac{\exp(-(C_{11} + C_{12}\alpha)/T)}{[1-\exp(-(C_{11}+C_{12}\alpha)/T)]^2}\\
         + (B_{21} + B_{22}\alpha)\left(-\frac{(C_{21} + C_{22}\alpha)}{T}\right)^2
         \frac{\exp(-(C_{21} + C_{22}\alpha)/T)}{[1-\exp(-(C_{21}+C_{22}\alpha)/T)]^2}
+        
     Parameters
     ----------
     T : float
         Temperature of gas [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+        
     Returns
     -------
     Cpg : float
         Gas constant-pressure heat capacitiy, [J/kg/K]
+        
     Notes
     -----
     Original model is in terms of J/g/K. Note that the model is for predicting
@@ -250,6 +254,7 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     --------
     >>> Lastovka_Shaw(1000.0, 0.1333)
     2467.113309084757
+    
     References
     ----------
     .. [1] Lastovka, Vaclav, and John M. Shaw. "Predictive Correlations for
@@ -294,29 +299,35 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
 def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False):
     r'''Calculate the integral of ideal-gas constant-pressure heat capacitiy 
     with the similarity variable concept and method as shown in [1]_.
+    
     Parameters
     ----------
     T : float
         Temperature of gas [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+        
     Returns
     -------
     H : float
         Difference in enthalpy from 0 K, [J/kg]
+        
     Notes
     -----
     Original model is in terms of J/g/K. Note that the model is for predicting
     mass heat capacity, not molar heat capacity like most other methods!
     Integral was computed with SymPy.
+    
     See Also
     --------
     Lastovka_Shaw
     Lastovka_Shaw_integral_over_T
+    
     Examples
     --------
     >>> Lastovka_Shaw_integral(300.0, 0.1333)
     5283095.816018478
+    
     References
     ----------
     .. [1] Lastovka, Vaclav, and John M. Shaw. "Predictive Correlations for
@@ -357,21 +368,25 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     r'''Calculate the integral over temperature of ideal-gas constant-pressure 
     heat capacitiy with the similarity variable concept and method as shown in
     [1]_.
+    
     Parameters
     ----------
     T : float
         Temperature of gas [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+        
     Returns
     -------
     S : float
         Difference in entropy from 0 K, [J/kg/K]
+        
     Notes
     -----
     Original model is in terms of J/g/K. Note that the model is for predicting
     mass heat capacity, not molar heat capacity like most other methods!
     Integral was computed with SymPy.
+    
     See Also
     --------
     Lastovka_Shaw
@@ -380,6 +395,7 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     --------
     >>> Lastovka_Shaw_integral_over_T(300.0, 0.1333)
     3609.791928945323
+    
     References
     ----------
     .. [1] Lastovka, Vaclav, and John M. Shaw. "Predictive Correlations for
@@ -521,7 +537,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
     Examples
     --------
     >>> Lastovka_Shaw_T_for_Sm(Sm=112.80, MW=72.151, similarity_variable=0.2356)
-    603.4298291570277
+    603.4298291570275
     
     References
     ----------
@@ -551,27 +567,33 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
 def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     r'''Calculates ideal gas heat capacity using the model developed in [1]_.
     The ideal gas heat capacity is given by:
+        
     .. math::
         C_p = R\left(a_0 + (a_1/T^2) \exp(-a_2/T) + a_3 y^2
         + (a_4 - a_5/(T-a_7)^2 )y^j \right)
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
+        
     Parameters
     ----------
     T : float
         Temperature [K]
     a1-a7 : float
         Coefficients
+        
     Returns
     -------
     Cp : float
         Ideal gas heat capacity , [J/mol/K]
+        
     Notes
     -----
     j is set to 8. Analytical integrals are available for this expression.
+    
     Examples
     --------
     >>> TRCCp(300, 4.0, 7.65E5, 720., 3.565, -0.052, -1.55E6, 52., 201.)
-    42.06525682312236
+    42.06527108097466
+    
     References
     ----------
     .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
@@ -595,6 +617,7 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
     r'''Integrates ideal gas heat capacity using the model developed in [1]_.
     Best used as a delta only.
     The difference in enthalpy with respect to 0 K is given by:
+        
     .. math::
         \frac{H(T) - H^{ref}}{RT} = a_0 + a_1x(a_2)/(a_2T) + I/T + h(T)/T
         
@@ -605,6 +628,7 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
         
         h(T) = 0 \text{ for } T \le a_7
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
+        
     Parameters
     ----------
     T : float
@@ -613,19 +637,22 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
         Coefficients
     I : float, optional
         Integral offset
+        
     Returns
     -------
     H-H(0) : float
         Difference in enthalpy from 0 K , [J/mol]
+        
     Notes
     -----
     Analytical integral as provided in [1]_ and verified with numerical
     integration. 
+    
     Examples
     --------
     >>> TRCCp_integral(298.15, 4.0, 7.65E5, 720., 3.565, -0.052, -1.55E6, 52., 
     ... 201., 1.2)
-    10802.532600592816
+    10802.536262068483
     
     References
     ----------
@@ -654,6 +681,7 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
     r'''Integrates ideal gas heat capacity over T using the model developed in 
     [1]_. Best used as a delta only.
     The difference in ideal-gas entropy with respect to 0 K is given by:
+        
     .. math::
         \frac{S^\circ}{R} = J + a_0\ln T + \frac{a_1}{a_2^2}\left(1
         + \frac{a_2}{T}\right)x(a_2) + s(T)
@@ -668,6 +696,7 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
         
         z = \frac{T}{T+a_6} \cdot \frac{a_7 + a_6}{a_7}
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
+        
     Parameters
     ----------
     T : float
@@ -676,10 +705,12 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
         Coefficients
     J : float, optional
         Integral offset
+        
     Returns
     -------
     S-S(0) : float
         Difference in entropy from 0 K , [J/mol/K]
+    
     Notes
     -----
     Analytical integral as provided in [1]_ and verified with numerical
@@ -738,6 +769,7 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
     .. math::
         \frac{Cp^{L} - Cp^{g}}{R} = 1.586 + \frac{0.49}{1-T_r} +
         \omega\left[ 4.2775 + \frac{6.3(1-T_r)^{1/3}}{T_r} + \frac{0.4355}{1-T_r}\right]
+        
     Parameters
     ----------
     T : float
@@ -748,18 +780,22 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
         Acentric factor for fluid, [-]
     Cpgm : float
         Constant-pressure gas heat capacity, [J/mol/K]
+        
     Returns
     -------
     Cplm : float
         Liquid constant-pressure heat capacitiy, [J/mol/K]
+        
     Notes
     -----
     Poling compared 212 substances, and found error at 298K larger than 10%
     for 18 of them, mostly associating. Of the other 194 compounds, AARD is 2.5%.
+    
     Examples
     --------
     >>> Rowlinson_Poling(350.0, 435.5, 0.203, 91.21)
-    143.80194441498296
+    143.80196224081436
+    
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
@@ -774,9 +810,11 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
     r'''Calculate liquid constant-pressure heat capacitiy with the CSP method
     shown in [1]_.
     The heat capacity of a liquid is given by:
+        
     .. math::
         \frac{Cp^L - Cp^{ig}}{R} = 1.45 + 0.45(1-T_r)^{-1} + 0.25\omega
         [17.11 + 25.2(1-T_r)^{1/3}T_r^{-1} + 1.742(1-T_r)^{-1}]
+        
     Parameters
     ----------
     T : float
@@ -787,17 +825,21 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
         Acentric factor for fluid, [-]
     Cpgm : float
         Constant-pressure gas heat capacity, [J/mol/K]
+        
     Returns
     -------
     Cplm : float
         Liquid constant-pressure heat capacitiy, [J/mol/K]
+        
     Notes
     -----
     Less accurate than `Rowlinson_Poling`.
+    
     Examples
     --------
     >>> Rowlinson_Bondi(T=373.28, Tc=535.55, omega=0.323, Cpgm=119.342)
-    175.39760730048116
+    175.3976263003074
+    
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
@@ -815,19 +857,23 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
 def Dadgostar_Shaw(T, similarity_variable):
     r'''Calculate liquid constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
+    
     .. math::
         C_{p} = 24.5(a_{11}\alpha + a_{12}\alpha^2)+ (a_{21}\alpha
         + a_{22}\alpha^2)T +(a_{31}\alpha + a_{32}\alpha^2)T^2
+        
     Parameters
     ----------
     T : float
         Temperature of liquid [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+        
     Returns
     -------
     Cpl : float
         Liquid constant-pressure heat capacitiy, [J/kg/K]
+        
     Notes
     -----
     Many restrictions on its use.
@@ -835,10 +881,12 @@ def Dadgostar_Shaw(T, similarity_variable):
     mass heat capacity, not molar heat capacity like most other methods!
     a11 = -0.3416; a12 = 2.2671; a21 = 0.1064; a22 = -0.3874l;
     a31 = -9.8231E-05; a32 = 4.182E-04
+    
     Examples
     --------
     >>> Dadgostar_Shaw(355.6, 0.139)
     1802.5291501191516
+    
     References
     ----------
     .. [1] Dadgostar, Nafiseh, and John M. Shaw. "A Predictive Correlation for
@@ -869,29 +917,35 @@ def Dadgostar_Shaw(T, similarity_variable):
 def Dadgostar_Shaw_integral(T, similarity_variable):
     r'''Calculate the integral of liquid constant-pressure heat capacitiy 
     with the similarity variable concept and method as shown in [1]_.
+    
     Parameters
     ----------
     T : float
         Temperature of gas [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+        
     Returns
     -------
     H : float
         Difference in enthalpy from 0 K, [J/kg]
+        
     Notes
     -----
     Original model is in terms of J/g/K. Note that the model is for predicting
     mass heat capacity, not molar heat capacity like most other methods!
     Integral was computed with SymPy.
+    
     See Also
     --------
     Dadgostar_Shaw
     Dadgostar_Shaw_integral_over_T
+    
     Examples
     --------
     >>> Dadgostar_Shaw_integral(300.0, 0.1333)
     238908.15142664989
+    
     References
     ----------
     .. [1] Dadgostar, Nafiseh, and John M. Shaw. "A Predictive Correlation for
@@ -915,29 +969,35 @@ def Dadgostar_Shaw_integral(T, similarity_variable):
 def Dadgostar_Shaw_integral_over_T(T, similarity_variable):
     r'''Calculate the integral of liquid constant-pressure heat capacitiy 
     with the similarity variable concept and method as shown in [1]_.
+    
     Parameters
     ----------
     T : float
         Temperature of gas [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+        
     Returns
     -------
     S : float
         Difference in entropy from 0 K, [J/kg/K]
+        
     Notes
     -----
     Original model is in terms of J/g/K. Note that the model is for predicting
     mass heat capacity, not molar heat capacity like most other methods!
     Integral was computed with SymPy.
+    
     See Also
     --------
     Dadgostar_Shaw
     Dadgostar_Shaw_integral
+    
     Examples
     --------
     >>> Dadgostar_Shaw_integral_over_T(300.0, 0.1333)
     1201.1409113147927
+    
     References
     ----------
     .. [1] Dadgostar, Nafiseh, and John M. Shaw. "A Predictive Correlation for
@@ -959,9 +1019,11 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable):
 
 def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
+    
     .. math::
         \frac{C}{R}=A_1\ln(1-T_r) + \frac{A_2}{1-T_r}
         + \sum_{j=0}^m A_{j+3} T_r^j
+        
     Parameters
     ----------
     T : float
@@ -970,10 +1032,12 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
         Critical temperature of fluid, [K]
     a1-a6 : float
         Coefficients
+        
     Returns
     -------
     Cp : float
         Liquid heat capacity, [J/mol/K]
+        
     Notes
     -----
     Used only for isobaric heat capacities, not saturation heat capacities.
@@ -981,10 +1045,12 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     critical temperature. Used by the authors of [1]_ when critical temperature
     was available for the fluid.
     Analytical integrals are available for this expression.
+    
     Examples
     --------
     >>> Zabransky_quasi_polynomial(330, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
-    165.4728226923247
+    165.472878778683
+    
     References
     ----------
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
@@ -998,20 +1064,24 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
 def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates the integral of liquid heat capacity using the  
     quasi-polynomial model developed in [1]_.
+    
     Parameters
     ----------
     T : float
         Temperature [K]
     a1-a6 : float
         Coefficients
+        
     Returns
     -------
     H : float
         Difference in enthalpy from 0 K, [J/mol]
+        
     Notes
     -----
     The analytical integral was derived with SymPy; it is a simple polynomial
     plus some logarithms.
+    
     Examples
     --------
     >>> H2 = Zabransky_quasi_polynomial_integral(300, 591.79, -3.12743, 
@@ -1019,7 +1089,8 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     >>> H1 = Zabransky_quasi_polynomial_integral(200, 591.79, -3.12743, 
     ... 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     >>> H2 - H1
-    14662.026406892925
+    14662.031376528757
+    
     References
     ----------
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
@@ -1035,22 +1106,26 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
 def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates the integral of liquid heat capacity over T using the 
     quasi-polynomial model  developed in [1]_.
+    
     Parameters
     ----------
     T : float
         Temperature [K]
     a1-a6 : float
         Coefficients
+        
     Returns
     -------
     S : float
         Difference in entropy from 0 K, [J/mol/K]
+        
     Notes
     -----
     The analytical integral was derived with Sympy. It requires the 
     Polylog(2,x) function, which is unimplemented in SciPy. A very accurate 
-    numerical approximation was implemented as :obj:`thermo.utils.polylog2`.
+    numerical approximation was implemented as :obj:`chemicals.utils.polylog2`.
     Relatively slow due to the use of that special function.
+    
     Examples
     --------
     >>> S2 = Zabransky_quasi_polynomial_integral_over_T(300, 591.79, -3.12743, 
@@ -1058,7 +1133,7 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     >>> S1 = Zabransky_quasi_polynomial_integral_over_T(200, 591.79, -3.12743, 
     ... 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     >>> S2 - S1
-    59.16997291893654
+    59.16999297436473
     
     References
     ----------
@@ -1077,24 +1152,29 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
     .. math::
         \frac{C}{R}=\sum_{j=0}^3 A_{j+1} \left(\frac{T}{100}\right)^j
+        
     Parameters
     ----------
     T : float
         Temperature [K]
     a1-a4 : float
         Coefficients
+        
     Returns
     -------
     Cp : float
         Liquid heat capacity, [J/mol/K]
+        
     Notes
     -----
     Most often form used in [1]_.
     Analytical integrals are available for this expression.
+    
     Examples
     --------
     >>> Zabransky_cubic(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
-    75.31462591538556
+    75.31465144297991
+    
     References
     ----------
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
@@ -1107,23 +1187,28 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
 def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     r'''Calculates the integral of liquid heat capacity using the model 
     developed in [1]_.
+    
     Parameters
     ----------
     T : float
         Temperature [K]
     a1-a4 : float
         Coefficients
+        
     Returns
     -------
     H : float
         Difference in enthalpy from 0 K, [J/mol]
+        
     Notes
     -----
     The analytical integral was derived with Sympy; it is a simple polynomial.
+    
     Examples
     --------
     >>> Zabransky_cubic_integral(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
-    31051.679845520586
+    31051.690370364562
+    
     References
     ----------
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
@@ -1136,25 +1221,30 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
 def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     r'''Calculates the integral of liquid heat capacity over T using the model 
     developed in [1]_.
+    
     Parameters
     ----------
     T : float
         Temperature [K]
     a1-a4 : float
         Coefficients
+        
     Returns
     -------
     S : float
         Difference in entropy from 0 K, [J/mol/K]
+        
     Notes
     -----
     The analytical integral was derived with Sympy; it is a simple polynomial,
     plus a logarithm
+    
     Examples
     --------
     >>> Zabransky_cubic_integral_over_T(298.15, 20.9634, -10.1344, 2.8253, 
     ... -0.256738)
-    24.73245695987246
+    24.732465342840854
+    
     References
     ----------
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
@@ -1169,20 +1259,24 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
 def Lastovka_solid(T, similarity_variable):
     r'''Calculate solid constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
+    
     .. math::
         C_p = 3(A_1\alpha + A_2\alpha^2)R\left(\frac{\theta}{T}\right)^2
         \frac{\exp(\theta/T)}{[\exp(\theta/T)-1]^2}
         + (C_1\alpha + C_2\alpha^2)T + (D_1\alpha + D_2\alpha^2)T^2
+        
     Parameters
     ----------
     T : float
         Temperature of solid [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+    
     Returns
     -------
     Cps : float
         Solid constant-pressure heat capacitiy, [J/kg/K]
+    
     Notes
     -----
     Many restrictions on its use. Trained on data with MW from 12.24 g/mol
@@ -1197,10 +1291,12 @@ def Lastovka_solid(T, similarity_variable):
     mass heat capacity, not molar heat capacity like most other methods!
     A1 = 0.013183; A2 = 0.249381; theta = 151.8675; C1 = 0.026526;
     C2 = -0.024942; D1 = 0.000025; D2 = -0.000123.
+    
     Examples
     --------
     >>> Lastovka_solid(300, 0.2139)
-    1682.063629222013
+    1682.063746990921
+    
     References
     ----------
     .. [1] Laštovka, Václav, Michal Fulem, Mildred Becerra, and John M. Shaw.
@@ -1229,27 +1325,33 @@ def Lastovka_solid_integral(T, similarity_variable):
     variable concept and method as shown in [1]_.
     
     Uses a explicit form as derived with Sympy.
+    
     Parameters
     ----------
     T : float
         Temperature of solid [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+        
     Returns
     -------
     H : float
         Difference in enthalpy from 0 K, [J/kg]
+        
     Notes
     -----
     Original model is in terms of J/g/K. Note that the model is for predicting
     mass heat capacity, not molar heat capacity like most other methods!
+    
     See Also
     --------
     Lastovka_solid
+    
     Examples
     --------
     >>> Lastovka_solid_integral(300, 0.2139)
-    283246.1242170376
+    283246.1519409121
+    
     References
     ----------
     .. [1] Laštovka, Václav, Michal Fulem, Mildred Becerra, and John M. Shaw.
@@ -1278,27 +1380,33 @@ def Lastovka_solid_integral_over_T(T, similarity_variable):
     similarity variable concept and method as shown in [1]_.
     
     Uses a explicit form as derived with Sympy.
+    
     Parameters
     ----------
     T : float
         Temperature of solid [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+    
     Returns
     -------
     S : float
         Difference in entropy from 0 K, [J/kg/K]
+    
     Notes
     -----
     Original model is in terms of J/g/K. Note that the model is for predicting
     mass heat capacity, not molar heat capacity like most other methods!
+    
     See Also
     --------
     Lastovka_solid
+    
     Examples
     --------
     >>> Lastovka_solid_integral_over_T(300, 0.2139)
-    1947.553552666818
+    1947.5537561495557
+    
     References
     ----------
     .. [1] Laštovka, Václav, Michal Fulem, Mildred Becerra, and John M. Shaw.
