@@ -453,7 +453,7 @@ def COSTALD(T, Tc, Vc, omega):
         T = Tc
     Tr = T/Tc
     tau = 1.0 - Tr
-    tau_cbrt = (tau)**(1/3.)
+    tau_cbrt = (tau)**(1.0/3.)
     V_delta = (-0.296123 + Tr*(Tr*(-0.0480645*Tr - 0.0427258) + 0.386914))/(Tr - 1.00001)
     V_0 = tau_cbrt*(tau_cbrt*(tau_cbrt*(0.190454*tau_cbrt - 0.81446) + 1.43907) - 1.52816) + 1.0
     return Vc*V_0*(1.0 - omega*V_delta)
@@ -915,7 +915,7 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
 
     Examples
     --------
-    >>> COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29], [0.000117, 5.6e-05], [0.559,0.344] )
+    >>> COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29], [0.000117, 5.6e-05], [0.559,0.344])
     2.7065887732713534e-05
 
     References
@@ -924,19 +924,26 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
        Saturated Densities of Liquids and Their Mixtures." AIChE Journal
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
     '''
-    cmps = range(len(xs))
-#    sum1, sum2, sum3 = 0.0, 0.0, 0.0
-#    for i in cmps:
-#        sum1 += xi*Vci
-        
-        
-    sum1 = sum([xi*Vci for xi, Vci in zip(xs, Vcs)])
-    sum2 = sum([xi*Vci**(2.0/3.) for xi, Vci in zip(xs, Vcs)])
-    sum3 = sum([xi*Vci**(1.0/3.) for xi, Vci in zip(xs, Vcs)])
+    N = len(xs)
+    sum1, sum2, sum3, omega = 0.0, 0.0, 0.0, 0.0
+    for i in range(N):
+        sum1 += xs[i]*Vcs[i]
+        p = Vcs[i]**(1.0/3.)
+        v = xs[i]*p
+        sum2 += v
+        sum3 += v*p
+        omega += xs[i]*omegas[i]
+
+    root_two = 1.4142135623730951 #2.0**0.5
     Vm = 0.25*(sum1 + 3.0*sum2*sum3)
-    VijTcij = [[(Tcs[i]*Tcs[j]*Vcs[i]*Vcs[j])**0.5 for j in cmps] for i in cmps]
-    omega = mixing_simple(xs, omegas)
-    Tcm = sum([xs[i]*xs[j]*VijTcij[i][j]/Vm for j in cmps for i in cmps])
+    Vm_inv_root = root_two*(Vm)**-0.5
+    vec = [Tcs[i]**0.5*Vcs[i]**0.5*xs[i]*Vm_inv_root for i in range(N)]
+    
+    Tcm = 0.0
+    for i in range(N):
+        for j in range(i):
+            Tcm += vec[i]*vec[j]
+        Tcm += 0.5*vec[i]*vec[i]
     return COSTALD(T, Tcm, Vm, omega)
 
 

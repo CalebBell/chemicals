@@ -1282,13 +1282,13 @@ def zs_to_ws(zs, MWs):
     >>> zs_to_ws([0.5, 0.5], [10, 20])
     [0.3333333333333333, 0.6666666666666666]
     '''
-    cmps = range(len(zs))
-    ws = [zs[i]*MWs[i] for i in cmps]
+    cmps = len(zs)
+    ws = [zs[i]*MWs[i] for i in range(cmps)]
     Mavg = 0.0    # Cannot use sum and list comprehension with numba; otherwise Mavg = 1.0/sum(ws)
     for v in ws:
         Mavg += v
     Mavg = 1.0/Mavg
-    for i in cmps:
+    for i in range(cmps):
         ws[i] *= Mavg
     return ws
 

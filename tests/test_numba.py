@@ -48,10 +48,40 @@ def test_mixing_simple():
     b = np.array([.01, .02])
     val = chemicals.numba.mixing_logarithmic(a, b)
     assert_close(val, 0.01866065983073615, rtol=1e-13)
-    
+
 @pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")    
-def test_visc_misc():
+def test_thermal_conductivity_misc():
+    assert_close(chemicals.numba.Bahadori_liquid(273.15, 170),
+                 Bahadori_liquid(273.15, 170))
+
+    assert_close(chemicals.numba.Missenard(304., 6330E5, 591.8, 41E5, 0.129),
+                 chemicals.Missenard(304., 6330E5, 591.8, 41E5, 0.129))
+
+    assert_close(chemicals.numba.DIPPR9H(np.array([0.258, 0.742]), np.array([0.1692, 0.1528])),
+                 DIPPR9H([0.258, 0.742], [0.1692, 0.1528]))
+    
+    assert_close(chemicals.numba.Filippov(np.array([0.258, 0.742]), np.array([0.1692, 0.1528])),
+                 Filippov([0.258, 0.742], [0.1692, 0.1528]))
+    
+    assert_close(chemicals.numba.DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='linear'),
+                 chemicals.DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='linear'))
+
+    assert_close(chemicals.numba.Eli_Hanley(T=373.15, MW=72.151, Tc=460.4, Vc=3.06E-4, Zc=0.267, omega=0.227, Cvm=135.9),
+                 chemicals.Eli_Hanley(T=373.15, MW=72.151, Tc=460.4, Vc=3.06E-4, Zc=0.267, omega=0.227, Cvm=135.9))
+
+    assert_close(chemicals.numba.Eli_Hanley_dense(T=473., MW=42.081, Tc=364.9, Vc=1.81E-4, Zc=0.274, omega=0.144, Cvm=82.70, Vm=1.721E-4),
+                 chemicals.Eli_Hanley_dense(T=473., MW=42.081, Tc=364.9, Vc=1.81E-4, Zc=0.274, omega=0.144, Cvm=82.70, Vm=1.721E-4))
+
+    assert_close(chemicals.numba.Chung_dense(T=473., MW=42.081, Tc=364.9, Vc=184.6E-6, omega=0.142, Cvm=82.67, Vm=172.1E-6, mu=134E-7, dipole=0.4),
+                 chemicals.Chung_dense(T=473., MW=42.081, Tc=364.9, Vc=184.6E-6, omega=0.142, Cvm=82.67, Vm=172.1E-6, mu=134E-7, dipole=0.4))
+
+    # Does not work - atom input
+#    chemicals.numba.Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 0.000754, {'C': 12, 'H': 26})
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")    
+def test_viscosity_misc():
     # Has a min, if statement
     args = (300., 500E5, 572.2, 34.7E5, 0.236, 0, 0.00068)
     ans = chemicals.numba.Lucas(*args)
@@ -178,7 +208,8 @@ def test_volume():
     assert_close(chemicals.numba.COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532),
                  chemicals.COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532))
 
-
+    assert_close(chemicals.numba.Bhirud_normal(280.0, 469.7, 33.7E5, 0.252),
+                 Bhirud_normal(280.0, 469.7, 33.7E5, 0.252))
     # Test a slow one
     # 81.2 us orig, then 67.6 after optimizations in CPython
     # numba: 2.25 µs, PYPY: 1.31; numba with numpy: 4 us
@@ -202,3 +233,21 @@ def test_volume():
     assert_close(orig, new)
     
     
+    
+    # Test COSTALD_mixture - even slower
+    # timing after optimization at 200 elements - 1.6 m CPython, 41.1 µs numba, 82 µs PyPy
+    T = 300.0
+    N = 15
+    xs = normalize([0.4576, 0.5424]*N)
+    Tcs = [512.58, 647.29]*N
+    Vcs =  [0.000117, 5.6e-05]*N
+    omegas = [0.559,0.344]*N
+    
+    xs2 = np.array(xs)
+    Tcs2 = np.array(Tcs)
+    Vcs2 = np.array(Vcs)
+    omegas2 = np.array(omegas)
+    assert_close(COSTALD_mixture(xs, T, Tcs, Vcs, omegas),
+                 chemicals.numba.COSTALD_mixture(xs2, T, Tcs2, Vcs2, omegas2))
+    
+

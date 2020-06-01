@@ -62,17 +62,16 @@ globals().update(__funcs)
 globals().update(replaced)
 
 
-# Manual functions - required to maintain speed of PyPy/CPython while obtaining
-# maximum speed with numba. Try to avoid writing these, huge pain to maintain
+'''
+Add Function to use regular expressions, replace [0.0]*N by np.zeros
+Will make functions like zs_to_ws work smoothly at optimal performance.
 
-@numba.njit
-def zs_to_ws(zs, MWs):
-    ws = zs*MWs
-    Mavg = 1.0/np.sum(ws)
-    ws *= Mavg
-    return ws 
+    import inspect
+    to_change = ['zs_to_ws']
+    for s in to_change:
+        source = inspect.getsource(getattr(chemicals, s))
+        source = source.replace(', kwargs={}', '').replace(', **kwargs', '')
+        
+        exec(source, globals(), globals())
 
-utils.zs_to_ws = zs_to_ws
-
-
-
+'''

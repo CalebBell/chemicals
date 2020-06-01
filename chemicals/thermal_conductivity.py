@@ -33,7 +33,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from fluids.numerics import horner
+from fluids.numerics import horner, bisplev, implementation_optimize_tck
 from fluids.constants import R, R_inv, N_A, k
 from chemicals.utils import log, exp, PY37
 from chemicals.data_reader import register_df_source, data_source
@@ -548,21 +548,21 @@ def DIPPR9G(T, P, Tc, Pc, kl):
     return kl*(0.98 + 0.0079*Pr*Tr**1.4 + 0.63*Tr**1.2*(Pr/(30. + Pr)))
 
 
-global Qfunc_Missenard
-Qfunc_Missenard = None
-def _create_Qfunc_Missenard():
-    global Qfunc_Missenard
-    from scipy.interpolate import interp2d
-
-    Trs_Missenard = [0.8, 0.7, 0.6, 0.5]
-    Prs_Missenard = [1, 5, 10, 50, 100, 200]
-    Qs_Missenard = np.array([[0.036, 0.038, 0.038, 0.038, 0.038, 0.038],
-                             [0.018, 0.025, 0.027, 0.031, 0.032, 0.032],
-                             [0.015, 0.020, 0.022, 0.024, 0.025, 0.025],
-                             [0.012, 0.0165, 0.017, 0.019, 0.020, 0.020]])
-    Qfunc_Missenard = interp2d(Prs_Missenard, Trs_Missenard, Qs_Missenard)
-
-
+Trs_Missenard = [0.8, 0.7, 0.6, 0.5]
+Prs_Missenard = [1, 5, 10, 50, 100, 200]
+Qs_Missenard = [[0.036, 0.038, 0.038, 0.038, 0.038, 0.038],
+                [0.018, 0.025, 0.027, 0.031, 0.032, 0.032],
+                [0.015, 0.020, 0.022, 0.024, 0.025, 0.025],
+                [0.012, 0.0165, 0.017, 0.019, 0.020, 0.020]]
+# tck obtained with interp1d's regrid_smth
+Missenard_tck = implementation_optimize_tck([[1.0, 1.0, 5.0, 10.0, 50.0, 100.0, 200.0, 200.0], 
+                                             [0.5, 0.5, 0.6, 0.7, 0.8, 0.8], 
+                                             [0.012, 0.015, 0.018, 0.036, 0.0165, 0.02,
+                                              0.025, 0.038, 0.017, 0.022, 0.027, 0.038,
+                                              0.019, 0.024, 0.031, 0.038, 0.02, 0.025, 
+                                              0.032, 0.038, 0.02, 0.025, 0.032, 0.038],
+                                              1,1])
+            
 def Missenard(T, P, Tc, Pc, kl):
     r'''Adjustes for pressure the thermal conductivity of a liquid using an
     emperical formula based on [1]_, but as given in [2]_.
@@ -608,11 +608,9 @@ def Missenard(T, P, Tc, Pc, kl):
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    if Qfunc_Missenard is None:
-        _create_Qfunc_Missenard()
     Tr = T/Tc
     Pr = P/Pc
-    Q = float(Qfunc_Missenard(Pr, Tr))
+    Q = float(bisplev(Pr, Tr, Missenard_tck))
     return kl*(1. + Q*Pr**0.7)
 
 ### Thermal conductivity of liquid mixtures
@@ -660,7 +658,10 @@ def DIPPR9H(ws, ks):
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     '''
-    return sum(ws[i]/(ks[i]*ks[i]) for i in range(len(ws)))**(-0.5)
+    kl = 0.0
+    for i in range(len(ws)):
+        kl += ws[i]/(ks[i]*ks[i])
+    return kl**-0.5
 
 
 def Filippov(ws, ks):
@@ -1023,7 +1024,15 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     f = Tc/190.4*theta
     h = Vc/9.92E-5*psi
     T0 = T/f
-    eta0 = 1E-7*sum([Ci*T0**((i+1. - 4.)/3.) for i, Ci in enumerate(Cs)])
+    
+    T0_third = T0**(1.0/3.0)
+    T0_moving = 1.0/T0
+    tot = 0.0
+    for i in range(9):
+        tot += Cs[i]*T0_moving
+        T0_moving *= T0_third
+        
+    eta0 = 1e-7*tot
     k0 = 1944*eta0
 
     H = (f*16.04/MW)**0.5*h**(-2.0/3.)
@@ -1312,7 +1321,7 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     --------
     >>> Eli_Hanley_dense(T=473., MW=42.081, Tc=364.9, Vc=1.81E-4, Zc=0.274,
     ... omega=0.144, Cvm=82.70, Vm=1.721E-4)
-    0.06038475754111894
+    0.06038475754109959
 
     References
     ----------
@@ -1340,7 +1349,15 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     h = Vc/9.92E-5*psi
     T0 = T/f
     rho0 = 16.04/(Vm*1E6)*h  # Vm must be in cm^3/mol here.
-    eta0 = 1E-7*sum([Cs[i]*T0**((i + 1.0 - 4.0)/3.) for i in range(len(Cs))])
+    
+    T0_third = T0**(1.0/3.0)
+    T0_moving = 1.0/T0
+    tot = 0.0
+    for i in range(9):
+        tot += Cs[i]*T0_moving
+        T0_moving *= T0_third    
+    
+    eta0 = 1E-7*tot
     k1 = 1944*eta0
     b1 = -0.25276920E0
     b2 = 0.334328590E0
@@ -1375,7 +1392,15 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     f = Tc/190.4*theta
     h = Vc/9.92E-5*psi
     T0 = T/f
-    eta0 = 1E-7*sum([Cs[i]*T0**((i+1-4)/3.) for i in range(len(Cs))])
+
+    T0_third = T0**(1.0/3.0)
+    T0_moving = 1.0/T0
+    tot = 0.0
+    for i in range(9):
+        tot += Cs[i]*T0_moving
+        T0_moving *= T0_third    
+
+    eta0 = 1E-7*tot
     H = (16.04*f/MW)**0.5*h**(-2.0/3.)
     etas = eta0*H*MW/16.04
     k = ks + etas*1e3/(MW)*1.32*(Cvm - 1.5*R)
