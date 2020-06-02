@@ -1001,7 +1001,7 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
 
     >>> Eli_Hanley(T=373.15, MW=72.151, Tc=460.4, Vc=3.06E-4, Zc=0.267,
     ... omega=0.227, Cvm=135.9)
-    0.02247951724514095
+    0.02247951724514062
 
     References
     ----------

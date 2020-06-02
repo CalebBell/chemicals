@@ -24,6 +24,7 @@ from __future__ import division
 from chemicals import *
 import chemicals.vectorized
 from math import *
+from random import random
 from fluids.constants import *
 from fluids.numerics import assert_close, assert_close1d
 import pytest
@@ -34,6 +35,84 @@ try:
 except:
     numba = None
 import numpy as np
+
+
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_return_1d_array():
+    
+    # Functions which initialize an array, and then need to return the correct value 
+    N = 30
+    zs = zs_orig = normalize([random() for i in range(N)])
+    MWs = [random()*200 for i in range(N)]
+    zs2 = np.array(zs)
+    MWs2 = np.array(MWs)
+    
+    # Took the slightest performance hit to CPython only, 186 us original, 190 us revised
+    # at 1000 elements; no performance difference < 50 compounds
+    ws = zs_to_ws(zs, MWs)
+    ws_np = chemicals.numba.zs_to_ws(zs2, MWs2)
+    assert type(ws_np) is np.ndarray
+    assert_close1d(ws, ws_np)
+    
+    zs = ws_to_zs(ws, MWs)
+    zs_np = chemicals.numba.ws_to_zs(ws_np, MWs2)
+    assert type(zs_np) is np.ndarray
+    assert_close1d(zs, zs_np)
+    
+    # Treat MWs as Vfs; doesn't matter to math
+    Vfs = zs_to_Vfs(zs, MWs)
+    Vfs_np = chemicals.numba.zs_to_Vfs(zs2, MWs2)
+    assert type(Vfs_np) is np.ndarray
+    assert_close1d(Vfs, Vfs_np)
+    
+    zs = Vfs_to_zs(Vfs, MWs)
+    zs_np = chemicals.numba.Vfs_to_zs(Vfs_np, MWs2)
+    assert type(Vfs_np) is np.ndarray
+    assert_close1d(zs, zs_np)
+    
+    # Functions which have a return list comprehension 
+    vals = [-2651.3181821109024, -2085.574403592012, -2295.0860830203587]
+    dxsn1 = chemicals.dxs_to_dxsn1(vals)
+    dxsn1_np = chemicals.numba.dxs_to_dxsn1(np.array(vals))
+    assert_close1d(dxsn1, dxsn1_np)
+    assert type(dxsn1_np) is np.ndarray
+
+    dxs, xs = [-0.0028, -0.00719, -0.00859], [0.7, 0.2, 0.1]
+    dns = dxs_to_dns(dxs, xs)
+    dns_np = chemicals.numba.dxs_to_dns(np.array(dxs), np.array(xs))
+    assert type(dns_np) is np.ndarray
+    assert_close1d(dns, dns_np)
+    
+    dns = [0.001459, -0.002939, -0.004334]
+    dn_partials = dns_to_dn_partials(dns, -0.0016567)
+    dn_partials_np = chemicals.numba.dns_to_dn_partials(np.array(dns), -0.0016567)
+    assert type(dn_partials_np) is np.ndarray
+    assert_close1d(dn_partials_np, dn_partials)
+
+    dxs = [-0.0026404, -0.00719, -0.00859]
+    xs = [0.7, 0.2, 0.1]
+    F = -0.0016567
+    dn_partials = dxs_to_dn_partials(dxs, xs, F)
+    dn_partials_np = chemicals.numba.dxs_to_dn_partials(np.array(dxs), np.array(xs), F)
+    assert_close1d(dn_partials, dn_partials_np)
+    assert type(dn_partials_np) is np.ndarray
+
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_return_2d_array():
+    d2xs = [[0.152, 0.08, 0.547], [0.08, 0.674, 0.729], [0.547, 0.729, 0.131]]
+    xs = [0.7, 0.2, 0.1]
+    dxdn_partials = d2xs_to_dxdn_partials(d2xs, xs)
+    a, b = np.array(d2xs), np.array(xs)
+    dxdn_partials_np = chemicals.numba.d2xs_to_dxdn_partials(a, b)
+    
+    assert type(dxdn_partials_np) is np.ndarray
+    assert_close1d(dxdn_partials, dxdn_partials_np)
+
+
 
 @pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")

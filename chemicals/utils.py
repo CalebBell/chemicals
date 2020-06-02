@@ -783,7 +783,7 @@ def Cp_minus_Cv(T, dP_dT, dP_dV):
        Chemical Thermodynamics for Process Simulation. 1st edition. Weinheim: 
        Wiley-VCH, 2012.
     '''
-    return -T*dP_dT**2/dP_dV
+    return -T*dP_dT*dP_dT/dP_dV
     
     
 def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
@@ -845,7 +845,7 @@ def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
        the Peng-Robinson Equation of State." Chemical Engineering Education 35,
        no. 2 (March 1, 2001): 112-115. 
     '''
-    if not MW:
+    if MW is None:
         return (-V*V*dP_dV*Cp/Cv)**0.5
     else:
         return (-V*V*1000.0*dP_dV*Cp/(Cv*MW))**0.5
@@ -895,9 +895,9 @@ def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
        the Peng-Robinson Equation of State." Chemical Engineering Education 35,
        no. 2 (March 1, 2001): 112-115. 
     '''
-    if dV_dT:
+    if dV_dT is not None:
         return (T*dV_dT - V)/Cp
-    elif beta:
+    elif beta is not None:
         return V/Cp*(beta*T - 1.)
     else:
         raise Exception('Either dV_dT or beta is needed')
@@ -1030,7 +1030,7 @@ def Z(T, P, V):
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    return V*P/T/R
+    return V*P/(R*T)
 
 
 def B_to_Z(B, T, P):
@@ -1282,16 +1282,19 @@ def zs_to_ws(zs, MWs):
     >>> zs_to_ws([0.5, 0.5], [10, 20])
     [0.3333333333333333, 0.6666666666666666]
     '''
-    cmps = len(zs)
-    ws = [zs[i]*MWs[i] for i in range(cmps)]
-    Mavg = 0.0    # Cannot use sum and list comprehension with numba; otherwise Mavg = 1.0/sum(ws)
-    for v in ws:
+    # Cannot use sum and list comprehension with numba; otherwise Mavg = 1.0/sum(ws)
+    # use [0.0]*N initialization for easy transformation into a numpy array in numba
+    N = len(zs)
+    Mavg = 0.0
+    ws = [0.0]*N
+    for i in range(N):
+        v = zs[i]*MWs[i]
+        ws[i] = v
         Mavg += v
     Mavg = 1.0/Mavg
-    for i in range(cmps):
+    for i in range(N):
         ws[i] *= Mavg
     return ws
-
 
 def ws_to_zs(ws, MWs):
     r'''Converts a list of mass fractions to mole fractions. Requires molecular
@@ -1322,8 +1325,16 @@ def ws_to_zs(ws, MWs):
     >>> ws_to_zs([0.3333333333333333, 0.6666666666666666], [10, 20])
     [0.5, 0.5]
     '''
-    tot = sum([w/MW for w, MW in zip(ws, MWs)])
-    zs = [w/MW/tot for w, MW in zip(ws, MWs)]
+    N = len(ws)
+    zs = [0.0]*N
+    tot = 0.0
+    for i in range(N):
+        v = ws[i]/MWs[i]
+        tot += v
+        zs[i] = v
+    tot = 1.0/tot
+    for i in range(N):
+        zs[i] *= tot
     return zs
 
 
@@ -1361,9 +1372,17 @@ def zs_to_Vfs(zs, Vms):
     >>> zs_to_Vfs([0.637, 0.363], [8.0234e-05, 9.543e-05])
     [0.5960229712956298, 0.4039770287043703]
     '''
-    vol_is = [zi*Vmi for zi, Vmi in zip(zs, Vms)]
-    tot = sum(vol_is)
-    return [vol_i/tot for vol_i in vol_is]
+    N = len(zs)
+    Vfs = [0.0]*N
+    tot = 0.0
+    for i in range(N):
+        v = zs[i]*Vms[i]
+        tot += v
+        Vfs[i] = v
+    tot = 1.0/tot
+    for i in range(N):
+        Vfs[i] *= tot
+    return Vfs
 
 
 def Vfs_to_zs(Vfs, Vms):
@@ -1401,9 +1420,17 @@ def Vfs_to_zs(Vfs, Vms):
     >>> Vfs_to_zs([0.596, 0.404], [8.0234e-05, 9.543e-05])
     [0.6369779395901142, 0.3630220604098858]
     '''
-    mols_i = [Vfi/Vmi for Vfi, Vmi in zip(Vfs, Vms)]
-    mols = sum(mols_i)
-    return [mol_i/mols for mol_i in mols_i]
+    N = len(Vfs)
+    zs = [0.0]*N
+    tot = 0.0
+    for i in range(N):
+        v = Vfs[i]/Vms[i]
+        zs[i] = v
+        tot += v
+    tot = 1.0/tot
+    for i in range(N):
+        zs[i] *= tot
+    return zs
 
 
 def dxs_to_dns(dxs, xs):
@@ -1599,15 +1626,14 @@ def d2xs_to_dxdn_partials(d2xs, xs):
     >>> d2xs_to_dxdn_partials(d2xs, [0.7, 0.2, 0.1])
     [[-0.02510000000000001, -0.18369999999999997, 0.005199999999999982], [-0.0971, 0.41030000000000005, 0.18719999999999992], [0.3699, 0.4653, -0.41080000000000005]]
     '''
-    cmps = range(len(xs))
-    
-    
-    double_sums = []
-    for j in cmps:
+    N = len(xs)    
+
+    double_sums = [0.0]*N
+    for j in range(N):
         tot = 0.0
-        for k in cmps:
+        for k in range(N):
             tot += xs[k]*d2xs[j][k]
-        double_sums.append(tot)
+        double_sums[j] = tot
     
     # Oddly, the below saw found to be successful for NRTL but not PR
     # Mysterious, interesting sum which is surprisingly efficient to calculate
@@ -1617,8 +1643,9 @@ def d2xs_to_dxdn_partials(d2xs, xs):
 #        symmetric_sum += xs[k]*d2xsi[k]
 #    print(symmetric_sum)
     
-    return [[d2xj - tot for (d2xj, tot) in zip(d2xsi, double_sums)]
-             for d2xsi in d2xs]
+    return [[d2xs[i][j] - double_sums[j] for j in range(N)]
+             for i in range(N)]
+
 
 
 def dxs_to_dxsn1(dxs):

@@ -28,6 +28,7 @@ import numpy as np
 import numba
 import chemicals
 import fluids.numba
+import re
 normal = chemicals
 
 '''
@@ -61,17 +62,55 @@ fluids.numba.transform_module(normal, __funcs, replaced, vec=False)
 globals().update(__funcs)
 globals().update(replaced)
 
+def return_value_numpy(source):
+    ret = re.search(r'return +\[', source)
+    if ret:
+        start_return, start_bracket = ret.regs[-1]
+        enclosing = 1
+        for i, v in enumerate(source[start_bracket:]):
+            if v == '[':
+                enclosing += 1
+            if v == ']':
+                enclosing -= 1
+            if not enclosing:
+                break
+        return source[:start_bracket-1] + 'np.array([%s)' %source[start_bracket:i+start_bracket+1]        
+    return source
+
+
+# Magic to make a lists into arrays
+list_mult_expr = r'\[ *([+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)) *\] *\* *([a-zA-Z0-9]+)'
+numpy_not_list_expr = r'np.full((\4,), \1)'
+
+import inspect
+to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
+             'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
+             'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
+             'utils.d2xs_to_dxdn_partials']
+for s in to_change:
+    mod, func = s.split('.')
+    source = inspect.getsource(getattr(getattr(chemicals, mod), func))
+    source = return_value_numpy(source)
+#    source = source.replace(', kwargs={}', '').replace(', **kwargs', '')
+    source = re.sub(list_mult_expr, numpy_not_list_expr, source)
+    exec(source, globals(), globals())
+
+    obj = numba.jit(cache=False)(globals()[func])
+    globals()[func] = obj
+    obj.__doc__ = ''
+    
+#    setattr(globals()[mod], func, obj)
+    
+    
+    
+    
+    
+
+
 
 '''
 Add Function to use regular expressions, replace [0.0]*N by np.zeros
 Will make functions like zs_to_ws work smoothly at optimal performance.
 
-    import inspect
-    to_change = ['zs_to_ws']
-    for s in to_change:
-        source = inspect.getsource(getattr(chemicals, s))
-        source = source.replace(', kwargs={}', '').replace(', **kwargs', '')
-        
-        exec(source, globals(), globals())
 
 '''
