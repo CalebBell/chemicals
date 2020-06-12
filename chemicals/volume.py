@@ -28,7 +28,6 @@ __all__ = ['Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
 'ideal_gas', 'Goodman']
 
 import os
-import pandas as pd
 
 from fluids.numerics import np, splev, implementation_optimize_tck
 from fluids.constants import R, atm_inv
@@ -937,7 +936,10 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
     root_two = 1.4142135623730951 #2.0**0.5
     Vm = 0.25*(sum1 + 3.0*sum2*sum3)
     Vm_inv_root = root_two*(Vm)**-0.5
-    vec = [Tcs[i]**0.5*Vcs[i]**0.5*xs[i]*Vm_inv_root for i in range(N)]
+    vec = [0.0]*N
+    for i in range(N):
+        vec[i] = (Tcs[i]*Vcs[i])**0.5*xs[i]*Vm_inv_root
+#    vec = [Tcs[i]**0.5*Vcs[i]**0.5*xs[i]*Vm_inv_root for i in range(N)]
     
     Tcm = 0.0
     for i in range(N):

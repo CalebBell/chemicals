@@ -314,7 +314,7 @@ def test_volume():
     
     
     # Test COSTALD_mixture - even slower
-    # timing after optimization at 200 elements - 1.6 m CPython, 41.1 µs numba, 82 µs PyPy
+    # timing after optimization at 200 elements - 1.49 m CPython, 27.1 µs numba, 63.5 µs PyPy
     T = 300.0
     N = 15
     xs = normalize([0.4576, 0.5424]*N)

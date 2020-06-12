@@ -30,7 +30,6 @@ __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Meybodi_Daryasafar_Karimi']
 
 import os
-import pandas as pd
 import numpy as np
 from chemicals.utils import log, exp
 from chemicals.utils import mixing_simple, PY37

@@ -31,8 +31,6 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 
 import os
 import numpy as np
-import pandas as pd
-
 from fluids.numerics import horner, bisplev, implementation_optimize_tck
 from fluids.constants import R, R_inv, N_A, k
 from chemicals.utils import log, exp, PY37
@@ -1496,27 +1494,44 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    ais = [2.4166E+0, -5.0924E-1, 6.6107E+0, 1.4543E+1, 7.9274E-1, -5.8634E+0, 9.1089E+1]
-    bis = [7.4824E-1, -1.5094E+0, 5.6207E+0, -8.9139E+0, 8.2019E-1, 1.2801E+1, 1.2811E+2]
-    cis = [-9.1858E-1, -4.9991E+1, 6.4760E+1, -5.6379E+0, -6.9369E-1, 9.5893E+0, -5.4217E+1]
-    dis = [1.2172E+2, 6.9983E+1, 2.7039E+1, 7.4344E+1, 6.3173E+0, 6.5529E+1, 5.2381E+2]
+#    ais = [2.4166E+0, -5.0924E-1, 6.6107E+0, 1.4543E+1, 7.9274E-1, -5.8634E+0, 9.1089E+1]
+#    bis = [7.4824E-1, -1.5094E+0, 5.6207E+0, -8.9139E+0, 8.2019E-1, 1.2801E+1, 1.2811E+2]
+#    cis = [-9.1858E-1, -4.9991E+1, 6.4760E+1, -5.6379E+0, -6.9369E-1, 9.5893E+0, -5.4217E+1]
+#    dis = [1.2172E+2, 6.9983E+1, 2.7039E+1, 7.4344E+1, 6.3173E+0, 6.5529E+1, 5.2381E+2]
     Tr = T/Tc
-    mur = 131.3*dipole/(Vc*1E6*Tc)**0.5
+    mur = 131.3*dipole*(Vc*1E6*Tc)**-0.5
     mur4 = mur*mur
     mur4 *= mur4 
 
     # From Chung Method
-    alpha = Cvm/R - 1.5
-    beta = 0.7862 - 0.7109*omega + 1.3168*omega**2
-    Z = 2 + 10.5*(T/Tc)**2
-    psi = 1 + alpha*((0.215 + 0.28288*alpha - 1.061*beta + 0.26665*Z)/(0.6366 + beta*Z + 1.061*alpha*beta))
+    alpha = Cvm*R_inv - 1.5
+    beta = 0.7862 - 0.7109*omega + 1.3168*omega*omega
+    Z = 2.0 + 10.5*Tr*Tr
+    psi = 1.0 + alpha*((0.215 + 0.28288*alpha - 1.061*beta + 0.26665*Z)/(0.6366 + beta*Z + 1.061*alpha*beta))
 
-    y = Vc/(6*Vm)
-    B1, B2, B3, B4, B5, B6, B7 = [ais[i] + bis[i]*omega + cis[i]*mur4 + dis[i]*association for i in range(7)]
-    G1 = (1 - 0.5*y)/(1. - y)**3
-    G2 = (B1/y*(1 - exp(-B4*y)) + B2*G1*exp(B5*y) + B3*G1)/(B1*B4 + B2 + B3)
-    q = 3.586E-3*(Tc/(MW/1000.))**0.5/(Vc*1E6)**(2/3.)
-    return 31.2*mu*psi/(MW/1000.)*(G2**-1 + B6*y) + q*B7*y**2*Tr**0.5*G2
+    y = Vc/(6.0*Vm)
+##    B1, B2, B3, B4, B5, B6, B7 = [ais[i] + bis[i]*omega + cis[i]*mur4 + dis[i]*association for i in range(7)]
+#    B1 = ais[0] + bis[0]*omega + cis[0]*mur4 + dis[0]*association
+#    B2 = ais[1] + bis[1]*omega + cis[1]*mur4 + dis[1]*association
+#    B3 = ais[2] + bis[2]*omega + cis[2]*mur4 + dis[2]*association
+#    B4 = ais[3] + bis[3]*omega + cis[3]*mur4 + dis[3]*association
+#    B5 = ais[4] + bis[4]*omega + cis[4]*mur4 + dis[4]*association
+#    B6 = ais[5] + bis[5]*omega + cis[5]*mur4 + dis[5]*association
+#    B7 = ais[6] + bis[6]*omega + cis[6]*mur4 + dis[6]*association
+    B1 = 2.4166 + 0.74824*omega + -0.91858*mur4 + 121.72*association
+    B2 = -0.50924 + -1.5094*omega + -49.991*mur4 + 69.983*association
+    B3 = 6.6107 + 5.6207*omega + 64.76*mur4 + 27.039*association
+    B4 = 14.543 + -8.9139*omega + -5.6379*mur4 + 74.344*association
+    B5 = 0.79274 + 0.82019*omega + -0.69369*mur4 + 6.3173*association
+    B6 = -5.8634 + 12.801*omega + 9.5893*mur4 + 65.529*association
+    B7 = 91.089 + 128.11*omega + -54.217*mur4 + 523.81*association
+
+    x0 = 1.0 - y
+    G1 = (1.0 - 0.5*y)/(x0*x0*x0)
+    G2 = (B1/y*(1.0 - exp(-B4*y)) + B2*G1*exp(B5*y) + B3*G1)/(B1*B4 + B2 + B3)
+    MW_kg_inv = 1000.0/MW
+    q = 3.586E-3*(Tc*MW_kg_inv)**0.5*(Vc*1E6)**(-2.0/3.)
+    return 31.2*mu*psi*MW_kg_inv*(1.0/G2 + B6*y) + q*B7*y*y*Tr**0.5*G2
 
 
 ### Thermal conductivity of gas mixtures

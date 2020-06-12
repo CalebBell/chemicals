@@ -31,7 +31,6 @@ __all__ = ['df_sources',
            'list_available_methods_from_df']
 
 import os
-import pandas as pd
 from math import isnan
 try:
     from collections.abc import Iterable
@@ -41,6 +40,8 @@ path_join = os.path.join
 
 # %% Loading data from local databanks
 
+pd = None
+
 df_sources = {}
 load_cmds = {}
 
@@ -49,6 +50,9 @@ def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs={},
     load_cmds[name] = (folder, name, sep, index_col, csv_kwargs, postload)
 
 def load_df(key):
+    global pd
+    if pd is None:
+        import pandas as pd
     folder, name, sep, index_col, csv_kwargs, postload = load_cmds[key]
     path = path_join(folder, name)
     df = pd.read_csv(path, sep=sep, index_col=index_col, **csv_kwargs)

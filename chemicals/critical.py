@@ -30,7 +30,6 @@ __all__.extend(['Tc_methods', 'Pc_methods', 'Vc_methods', 'Zc_methods',
                 'critical_surface_methods'])
 
 import os
-import pandas as pd
 from fluids.constants import R_inv, N_A
 from chemicals.utils import log, PY37
 from chemicals.data_reader import (register_df_source,
@@ -53,6 +52,7 @@ YAWS = 'YAWS'
 def _add_Zc_to_df(df):
     # Some files don't have the `Zc` column; this adds it
     # TODO: Think about adding these to the files
+    import pandas as pd
     if 'Zc' in df: return
     df['Zc'] = pd.Series(df['Pc']*df['Vc']*R_inv/df['Tc'], index=df.index)
 
