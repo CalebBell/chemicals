@@ -329,4 +329,12 @@ def test_volume():
     assert_close(COSTALD_mixture(xs, T, Tcs, Vcs, omegas),
                  chemicals.numba.COSTALD_mixture(xs2, T, Tcs2, Vcs2, omegas2))
     
-
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_rachford_rice():
+    n = 10
+    zs = np.array([0.5, 0.3, 0.2]*n)
+    Ks = np.array([1.685, 0.742, 0.532]*n)
+    
+    assert_close(chemicals.numba.Rachford_Rice_flash_error(0.5, zs=zs, Ks=Ks),
+                 Rachford_Rice_flash_error(0.5, zs=zs, Ks=Ks))

@@ -66,7 +66,9 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
              'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
              'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
-             'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture']
+             'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
+             'rachford_rice.Rachford_Rice_solution', 'rachford_rice.Rachford_Rice_solution_LN2',
+             'rachford_rice.Rachford_Rice_solution_numpy']
 
 fluids.numba.transform_lists_to_arrays(chemicals, to_change, __funcs)
 globals().update(__funcs)

@@ -30,7 +30,7 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar',
 
 import os
 import numpy as np
-from fluids.numerics import newton, interp
+from fluids.numerics import secant, interp
 from chemicals.utils import log, exp, log10
 from chemicals.utils import PY37
 from chemicals.data_reader import register_df_source, data_source
@@ -1732,7 +1732,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         if not extrapolate:
             range_check(val, old_scale)
         to_solve = lambda nu: Saybolt_universal_eq(nu) - val
-        val = newton(to_solve, 1)
+        val = secant(to_solve, 1)
     elif old_scale in viscosity_converters_to_nu:
         if not extrapolate:
             range_check(val, old_scale)

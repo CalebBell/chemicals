@@ -22,7 +22,7 @@ SOFTWARE.'''
 
 __all__ = ['RI_methods', 'refractive_index', 
            'polarizability_from_RI', 'molar_refractivity_from_RI', 
-           'RI_from_molar_refractivity']
+           'RI_from_molar_refractivity', 'RI_IAPWS']
 
 import os
 from fluids.constants import pi, N_A
@@ -246,3 +246,71 @@ def RI_from_molar_refractivity(Rm, Vm):
     Rm = ((-2*Rm - Vm)/(Rm-Vm))**0.5
     return Rm
 
+
+def RI_IAPWS(T, rho, wavelength=0.5893):
+    r'''Calculates the refractive index of water at a given temperature,
+    density, and wavelength.
+
+    .. math::
+
+        n(\rho, T, \lambda) = \left(\frac{2A + 1}{1-A}\right)^{0.5}\\
+
+        A(\delta, \theta, \Lambda) = \delta\left(a_0 + a_1\delta +
+        a_2\theta + a_3\Lambda^2\theta + a_4\Lambda^{-2}
+        \frac{a_5}{\Lambda^2-\Lambda_{UV}^2} + \frac{a_6}
+        {\Lambda^2 - \Lambda_{IR}^2} + a_7\delta^2\right)
+
+        \delta = \rho/(1000 \text{ kg/m}^3)\\
+        \theta = T/273.15\text{K}\\
+        \Lambda = \lambda/0.589 \mu m
+
+        \Lambda_{IR} = 5.432937 \\
+        \Lambda_{UV} = 0.229202
+
+    Parameters
+    ----------
+    T : float
+        Temperature of the water [K]
+    rho : float
+        Density of the water [kg/m^3]
+    wavelength : float
+        Wavelength of fluid [micrometers]
+
+    Returns
+    -------
+    RI : float
+        Refractive index of the water, [-]
+
+    Notes
+    -----
+    This function is valid in the following range:
+    261.15 K < T < 773.15 K
+    0 < rho < 1060 kg/m^3
+    0.2 < wavelength < 1.1 micrometers
+
+    Test values are from IAPWS 2010 book.
+
+    Examples
+    --------
+    >>> RI_IAPWS(298.15, 997.047435, 0.5893)
+    1.3328581926471605
+
+    References
+    ----------
+    .. [1] IAPWS, 1997. Release on the Refractive Index of Ordinary Water
+       Substance as a Function of Wavelength, Temperature and Pressure.
+    '''
+    ais = [0.244257733, 0.0097463448, -0.00373235, 0.0002686785, 0.0015892057,
+           0.0024593426, 0.90070492, -0.0166626219]
+    delta = rho/1000.
+    theta = T/273.15
+    Lambda = wavelength/0.589
+
+    LambdaIR = 5.432937
+    LambdaUV = 0.229202
+
+    A = delta*(ais[0] + ais[1]*delta + ais[2]*theta + ais[3]*Lambda**2*theta + \
+    ais[4]*Lambda**-2 + ais[5]/(Lambda**2 - LambdaUV**2) + \
+    ais[6]/(Lambda**2 - LambdaIR**2) + ais[7]*delta**2)
+    n = ((2*A + 1.)/(1. - A))**0.5
+    return n

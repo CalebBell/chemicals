@@ -37,7 +37,7 @@ from io import open
 from chemicals.utils import R, log, exp, polylog2, to_num, PY37, property_mass_to_molar
 from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
-from fluids.numerics import py_newton as newton, brenth, secant
+from fluids.numerics import newton, brenth, secant
 
 
 # %% Methods introduced in this module
@@ -493,7 +493,7 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
         err = (property_mass_to_molar(dH, MW)*factor - Hm)
         return err
     try:
-        return newton(err, 500, ytol=1e-4)
+        return secant(err, 500, ytol=1e-4)
     except:
         try:
             return brenth(err, 1e-3, 1e5)

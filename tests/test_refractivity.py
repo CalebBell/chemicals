@@ -91,4 +91,5 @@ def test_RI_from_molar_refractivity():
     assert_close(RI_from_molar_refractivity(molar_refractivity_from_RI(1.3611, 5.8676E-5), 5.8676E-5), 1.3611)
 
 
-
+def test_RI_IAPWS():
+    assert_close(RI_IAPWS(298.15, 997.047435, 0.5893), 1.3328581926471605, rtol=1e-12)
