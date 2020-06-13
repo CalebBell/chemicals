@@ -300,17 +300,17 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
     .. [1] IAPWS, 1997. Release on the Refractive Index of Ordinary Water
        Substance as a Function of Wavelength, Temperature and Pressure.
     '''
-    ais = [0.244257733, 0.0097463448, -0.00373235, 0.0002686785, 0.0015892057,
-           0.0024593426, 0.90070492, -0.0166626219]
-    delta = rho/1000.
+    delta = rho*1e-3
     theta = T/273.15
     Lambda = wavelength/0.589
 
     LambdaIR = 5.432937
     LambdaUV = 0.229202
+    
+    Lambda2 = Lambda*Lambda
 
-    A = delta*(ais[0] + ais[1]*delta + ais[2]*theta + ais[3]*Lambda**2*theta + \
-    ais[4]*Lambda**-2 + ais[5]/(Lambda**2 - LambdaUV**2) + \
-    ais[6]/(Lambda**2 - LambdaIR**2) + ais[7]*delta**2)
+    A = delta*(0.244257733 + 0.0097463448*delta + -0.00373235*theta + 0.0002686785*Lambda2*theta + 
+    0.0015892057/Lambda2 + 0.0024593426/(Lambda2 - LambdaUV*LambdaUV) + 
+    0.90070492/(Lambda2 - LambdaIR*LambdaIR) - 0.0166626219*delta*delta)
     n = ((2*A + 1.)/(1. - A))**0.5
     return n
