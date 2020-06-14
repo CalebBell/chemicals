@@ -352,8 +352,7 @@ class PiecewiseHeatCapacity:
         integral = 0.
         for model in self._models:
             Tmax = model.Tmax
-            Tmin = model.Tmin
-            if Ta < Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
+            if Ta < model.Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
             if Tb <= Tmax:
                 return integral + model.calculate_integral(Ta, Tb)
             else:
@@ -385,8 +384,7 @@ class PiecewiseHeatCapacity:
         integral = 0.
         for model in self._models:
             Tmax = model.Tmax
-            Tmin = model.Tmin
-            if Ta < Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
+            if Ta < model.Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
             if Tb <= Tmax:
                 return integral + model.calculate_integral_over_T(Ta, Tb)
             else:
