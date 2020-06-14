@@ -299,11 +299,11 @@ class PiecewiseHeatCapacity:
     @property
     def Tmin(self):
         """[float] Minimum temperature of all available models [K]."""
-        return min([i.Tmin for i in self._models])
+        return self._models[0].Tmin
     @property
     def Tmax(self):
         """[float] Maximum temperature of all available models [K]."""
-        return max([i.Tmax for i in self._models])
+        return self._models[-1].Tmax
     
     @property
     def models(self):
@@ -328,8 +328,9 @@ class PiecewiseHeatCapacity:
             Liquid heat capacity as T, [J/mol/K]
         
         '''
-        for model in self._models:
-            if model.Tmin <= T <= model.Tmax: return model.calculate(T)
+        if T >= self.Tmin:
+            for model in self._models:
+                if T <= model.Tmax: return model.calculate(T)
         raise ValueError(f"no valid model at T=%d K" % T)
     
     def calculate_integral(self, Ta, Tb):
