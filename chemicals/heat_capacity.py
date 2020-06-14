@@ -75,28 +75,7 @@ PERRY151 = "Perry's Table 2-151"
 heat_capacity_solid_methods = (PERRY151, CRCSTD, LASTOVKA_S)
 # %% Data types
 
-class HeatCapacityModelMetaclass(type):
-    """Metaclass for heat capacity model classes."""
-    def __instancecheck__(self, instance):
-        try:
-            instance.Tmin
-            instance.Tmax
-            instance.calculate
-            instance.calculate_integral
-            instance.calculate_integral_over_T
-        except AttributeError: return False
-        return True
-    
-    def __subclasscheck__(self, subclass):
-        try:
-            subclass.calculate
-            subclass.calculate_integral
-            subclass.calculate_integral_over_T
-        except AttributeError: return False
-        return True
-
-
-class HeatCapacityModel(metaclass=HeatCapacityModelMetaclass):
+class HeatCapacityModel:
     """Abstract class heat capacity model subclasses."""
     
     def __init_subclass__(cls):
@@ -112,7 +91,7 @@ class HeatCapacityModel(metaclass=HeatCapacityModelMetaclass):
 # @jitclass([('coeffs', types.UniTuple(types.float64, 4)),
 #            ('Tmin', types.float64),
 #            ('Tmax', types.float64)])
-class ZabranskySpline:
+class ZabranskySpline(HeatCapacityModel):
     r'''
     Implementation of the cubic spline method presented in [1]_ for 
     calculating the heat capacity of a chemical.
@@ -205,7 +184,7 @@ class ZabranskySpline:
 #            ('Tc', types.float64),
 #            ('Tmin', types.float64),
 #            ('Tmax', types.float64)])
-class ZabranskyQuasipolynomial:
+class ZabranskyQuasipolynomial(HeatCapacityModel):
     r'''
     Quasi-polynomial object for calculating the heat capacity of a chemical.
     Implements the enthalpy and entropy integrals as well.
@@ -371,9 +350,7 @@ class PiecewiseHeatCapacity:
         
         '''   
         integral = 0.
-        defined = hasattr
         for model in self._models:
-            if not defined(model, 'integrate_by_T'): continue
             Tmax = model.Tmax
             Tmin = model.Tmin
             if Ta < Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
