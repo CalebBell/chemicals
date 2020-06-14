@@ -38,7 +38,8 @@ from chemicals.utils import R, log, exp, polylog2, to_num, PY37, property_mass_t
 from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
 from fluids.numerics import py_newton as newton, brenth, secant
-
+# from numba.experimental import jitclass
+# from numba import types, njit
 
 # %% Methods introduced in this module
 
@@ -74,7 +75,68 @@ PERRY151 = "Perry's Table 2-151"
 heat_capacity_solid_methods = (PERRY151, CRCSTD, LASTOVKA_S)
 # %% Data types
 
+class HeatCapacityModelMetaclass(type):
+    """Metaclass for heat capacity model classes."""
+    def __instancecheck__(self, instance):
+        try:
+            instance.Tmin
+            instance.Tmax
+            instance.calculate
+            instance.calculate_integral
+            instance.calculate_integral_over_T
+        except AttributeError: return False
+        return True
+    
+    def __subclasscheck__(self, subclass):
+        try:
+            subclass.calculate
+            subclass.calculate_integral
+            subclass.calculate_integral_over_T
+        except AttributeError: return False
+        return True
+
+
+class HeatCapacityModel(metaclass=HeatCapacityModelMetaclass):
+    """Abstract class heat capacity model subclasses."""
+    
+    def __init_subclass__(cls):
+        cls_attrs = ('calculate', 'calculate_integral', 'calculate_integral_over_T')
+        hasattr_ = hasattr
+        for attr in cls_attrs:
+            if not hasattr_(cls, attr):
+                raise NotImplementedError(
+                    "HeatCapacityModel subclass must implement a '%s' method" % attr
+                )
+            
+
+# @jitclass([('coeffs', types.UniTuple(types.float64, 4)),
+#            ('Tmin', types.float64),
+#            ('Tmax', types.float64)])
 class ZabranskySpline:
+    r'''
+    Implementation of the cubic spline method presented in [1]_ for 
+    calculating the heat capacity of a chemical.
+    Implements the enthalpy and entropy integrals as well.
+    
+    .. math::
+        \frac{C}{R}=\sum_{j=0}^3 A_{j+1} \left(\frac{T}{100}\right)^j
+    
+    Parameters
+    ----------
+    coeffs : list[float]
+        Six coefficients for the equation.
+    Tmin : float
+        Minimum temperature any experimental data was available at.
+    Tmax : float
+        Maximum temperature any experimental data was available at.
+    
+    References
+    ----------
+    .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
+       Heat Capacity of Liquids: Critical Review and Recommended Values.
+       2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
+    
+    '''
     __slots__ = ('coeffs', 'Tmin', 'Tmax')
     
     def __init__(self, coeffs, Tmin, Tmax):
@@ -82,8 +144,94 @@ class ZabranskySpline:
         self.Tmin = Tmin
         self.Tmax = Tmax
 
+    def calculate(self, T):
+        r'''
+        Return heat capacity as a function of temperature.
+            
+        Parameters
+        ----------
+        T : float
+            Temperature, [K]
+        
+        Returns
+        -------
+        Cp : float
+            Liquid heat capacity as T, [J/mol/K]
+        
+        '''        
+        return Zabransky_cubic(T, *self.coeffs)
 
+    def calculate_integral(self, Ta, Tb):
+        r'''
+        Return the enthalpy integral of heat capacity from  `Ta` to `Tb`.
+            
+        Parameters
+        ----------
+        Ta : float
+            Initial temperature, [K]
+        Tb : float
+            Final temperature, [K]
+            
+        Returns
+        -------
+        dS : float
+            Enthalpy difference between `Ta` and `Tb`, [J/mol/K]
+        
+        '''
+        return (Zabransky_cubic_integral(Tb, *self.coeffs)
+                - Zabransky_cubic_integral(Ta, *self.coeffs))
+        
+    def calculate_integral_over_T(self, Ta, Tb):
+        r'''
+        Return the entropy integral of heat capacity from `Ta` to `Tb`.
+            
+        Parameters
+        ----------
+        Ta : float
+            Initial temperature, [K]
+        Tb : float
+            Final temperature, [K]
+            
+        Returns
+        -------
+        dS : float
+            Entropy difference between `Ta` and `Tb`, [J/mol/K]
+        '''        
+        return (Zabransky_cubic_integral_over_T(Tb, *self.coeffs)
+                - Zabransky_cubic_integral_over_T(Ta, *self.coeffs))
+
+
+# @jitclass([('coeffs', types.UniTuple(types.float64, 6)),
+#            ('Tc', types.float64),
+#            ('Tmin', types.float64),
+#            ('Tmax', types.float64)])
 class ZabranskyQuasipolynomial:
+    r'''
+    Quasi-polynomial object for calculating the heat capacity of a chemical.
+    Implements the enthalpy and entropy integrals as well.
+    
+    .. math::
+        \frac{C}{R}=A_1\ln(1-T_r) + \frac{A_2}{1-T_r}
+        + \sum_{j=0}^m A_{j+3} T_r^j
+    
+    Parameters
+    ----------
+    coeffs : list[float]
+        Six coefficients for the equation.
+    Tc : float
+        Critical temperature of the chemical, as used in the formula.
+    Tmin : float
+        Minimum temperature any experimental data was available at.
+    Tmax : float
+        Maximum temperature any experimental data was available at.
+    
+    References
+    ----------
+    .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
+       Heat Capacity of Liquids: Critical Review and Recommended Values.
+       2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
+    
+    '''
     __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax')
     
     def __init__(self, coeffs, Tc, Tmin, Tmax):
@@ -92,6 +240,182 @@ class ZabranskyQuasipolynomial:
         self.Tmin = Tmin
         self.Tmax = Tmax
 
+    def calculate(self, T):
+        r'''
+        Return the heat capacity as a function of temperature.
+            
+        Parameters
+        ----------
+        T : float
+            Temperature, [K]
+        
+        Returns
+        -------
+        Cp : float
+            Liquid heat capacity as T, [J/mol/K]
+        
+        '''
+        return Zabransky_quasi_polynomial(T, self.Tc, *self.coeffs)
+                                          
+    def calculate_integral(self, Ta, Tb):
+        r'''
+        Return the enthalpy integral of heat capacity from `Ta` to `Tb`.
+            
+        Parameters
+        ----------
+        Ta : float
+            Initial temperature, [K]
+        Tb : float
+            Final temperature, [K]
+            
+        Returns
+        -------
+        dH : float
+            Enthalpy difference between `Ta` and `Tb`, [J/mol]
+        
+        '''        
+        return (Zabransky_quasi_polynomial_integral(Tb, self.Tc, *self.coeffs)
+               - Zabransky_quasi_polynomial_integral(Ta, self.Tc, *self.coeffs))
+    
+    def calculate_integral_over_T(self, Ta, Tb):
+        r'''
+        Return the entropy integral of heat capacity from `Ta` to `Tb`.
+            
+        Parameters
+        ----------
+        Ta : float
+            Initial temperature, [K]
+        Tb : float
+            Final temperature, [K]
+        
+        Returns
+        -------
+        dS : float
+            Entropy difference between `Ta` and `Tb`, [J/mol/K]
+        
+        '''        
+        return (Zabransky_quasi_polynomial_integral_over_T(Tb, self.Tc, *self.coeffs)
+               - Zabransky_quasi_polynomial_integral_over_T(Ta, self.Tc, *self.coeffs))
+
+
+class PiecewiseHeatCapacity:
+    r"""
+    PiecewiseHeatCapacity object for calculating heat capacity and the enthalpy and 
+    entropy integrals using piecewise models.
+    
+    Parameters
+    ----------
+    models : Iterable[HeatCapacityModel]
+        Piecewise heat capacity model objects.
+    
+    """
+    __slots__ = ('_models')
+    
+    def __init__(self, models):
+        self.models = models
+    
+    def __iter__(self):
+        return self._models.__iter__()
+    
+    @property
+    def Tmin(self):
+        """[float] Minimum temperature of all available models [K]."""
+        return min([i.Tmin for i in self._models])
+    @property
+    def Tmax(self):
+        """[float] Maximum temperature of all available models [K]."""
+        return max([i.Tmax for i in self._models])
+    
+    @property
+    def models(self):
+        r"""tuple[HeatCapacityModel] Heat capacity model objects."""
+        return self._models
+    @models.setter
+    def models(self, models):
+        self._models = tuple(sorted(models, key=lambda x: x.Tmin))
+    
+    def calculate(self, T):
+        r'''
+        Return the heat capacity as a function of temperature.
+            
+        Parameters
+        ----------
+        T : float
+            Temperature, [K]
+        
+        Returns
+        -------
+        Cp : float
+            Liquid heat capacity as T, [J/mol/K]
+        
+        '''
+        for model in self._models:
+            if model.Tmin <= T <= model.Tmax: return model.calculate(T)
+        raise ValueError(f"no valid model at T=%d K" % T)
+    
+    def calculate_integral(self, Ta, Tb):
+        r'''
+        Return the enthalpy integral of heat capacity from `Ta` to `Tb`.
+            
+        Parameters
+        ----------
+        Ta : float
+            Initial temperature, [K]
+        Tb : float
+            Final temperature, [K]
+            
+        Returns
+        -------
+        dH : float
+            Enthalpy difference between `Ta` and `Tb`, [J/mol]
+        
+        '''   
+        integral = 0.
+        defined = hasattr
+        for model in self._models:
+            if not defined(model, 'integrate_by_T'): continue
+            Tmax = model.Tmax
+            Tmin = model.Tmin
+            if Ta < Tmin: raise ValueError(f"no valid model between T=%d K" % Ta)
+            if Tb <= Tmax:
+                return integral + model.calculate_integral(Ta, Tb)
+            else:
+                integral += model.calculate_integral(Ta, Tmax)
+                Ta = Tmax
+        raise ValueError(f"no valid model at T=%d to %d K" % Tb)
+    
+    def calculate_integral_over_T(self, Ta, Tb):
+        r'''
+        Return the entropy integral of heat capacity from `Ta` to `Tb`.
+            
+        Parameters
+        ----------
+        Ta : float
+            Initial temperature, [K]
+        Tb : float
+            Final temperature, [K]
+            
+        Notes
+        -----
+        Analytically integrates piecewise through all models.
+            
+        Returns
+        -------
+        dS : float
+            Entropy difference between `Ta` and `Tb`, [J/mol/K]
+        
+        '''        
+        integral = 0.
+        for model in self._models:
+            Tmax = model.Tmax
+            Tmin = model.Tmin
+            if Ta < Tmin: raise ValueError(f"no valid model between T=%d K" % Ta)
+            if Tb <= Tmax:
+                return integral + model.calculate_integral_over_T(Ta, Tb)
+            else:
+                integral += model.calculate_integral_over_T(Ta, Tmax)
+                Ta = Tmax
+        raise ValueError(f"no valid model at T=%d to %d K" % Tb)
 
 
 # %% Register data sources and lazy load them
@@ -162,6 +486,8 @@ def _load_Cp_data():
                 # No duplicates for quasipolynomials
                 coeffs = (a1p, a2p, a3p, a4p, a5p, a6p)
                 d[CAS] = ZabranskyQuasipolynomial(coeffs, Tc, Tmin, Tmax)
+    for dct in (zabransky_dict_const_s, zabransky_dict_iso_s):
+        for CAS in dct: dct[CAS] = PiecewiseHeatCapacity(dct[CAS])
     # Used to generate data. Do not delete!
     # Cp_data_PerryI = {}
     # with open(os.path.join(folder, 'Perrys Table 2-151.tsv'), encoding='utf-8') as f:
@@ -1021,6 +1347,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable):
     S = T*T*0.5*(a2*a32 + a*a31) + T*(a2*a22 + a*a21) + a*constant*(a*a12 + a11)*log(T)
     return S*1000. # J/g/K to J/kg/K
 
+# @njit(cache=True)
 def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
     
@@ -1064,7 +1391,7 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     Tr = T/Tc
     return R*(a1*log(1.0-Tr) + a2/(1.0-Tr) + a3 + Tr*(Tr*(Tr*a6 + a5) + a4))
 
-
+# @njit(cache=True)
 def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates the integral of liquid heat capacity using the  
     quasi-polynomial model developed in [1]_.
@@ -1107,6 +1434,7 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(T*(T*(T*(T*a6/(4.*Tc3) + a5/(3.*Tc2)) + a4/(2.*Tc)) - a1 + a3) 
               + T*a1*log(1. - T/Tc) - 0.5*Tc*(a1 + a2)*log(term*term))
 
+# @njit(cache=True)
 def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates the integral of liquid heat capacity over T using the 
     quasi-polynomial model  developed in [1]_.
@@ -1152,6 +1480,7 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(a3*logT -a1*polylog2(T/Tc) - a2*(-logT + 0.5*log(term*term))
               + T*(T*(T*a6/(3.*Tc3) + a5/(2.*Tc2)) + a4/Tc))
 
+# @njit(cache=True)
 def Zabransky_cubic(T, a1, a2, a3, a4):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
     .. math::
@@ -1188,6 +1517,7 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
     T = T/100.
     return R*(((a4*T + a3)*T + a2)*T + a1)
 
+# @njit(cache=True)
 def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     r'''Calculates the integral of liquid heat capacity using the model 
     developed in [1]_.
@@ -1222,6 +1552,7 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     T = T/100.
     return 100*R*T*(T*(T*(T*a4*0.25 + a3/3.) + a2*0.5) + a1)
 
+# @njit(cache=True)
 def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     r'''Calculates the integral of liquid heat capacity over T using the model 
     developed in [1]_.
