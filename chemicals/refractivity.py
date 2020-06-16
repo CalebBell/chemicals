@@ -389,8 +389,9 @@ def RI_to_brix(RI):
     Notes
     -----
     The scale is officially defined from 0 to 85; but the data source contains
-    values up to 95. Linear extrapolation outside of the bounds is performed;
-    and a table of 96 values are linearly interpolated.
+    values up to 95. 
+    
+    No further extrapolation to values under 0 or above 95 is performed.
     
     The ICUMSA (International Committee of Uniform Method of Sugar Analysis)
     published a document setting out the reference values in 1974; but an 

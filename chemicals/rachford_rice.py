@@ -1303,7 +1303,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         low = -log((V_over_F_max-low)/(low-V_over_F_min))
         high = -log((V_over_F_max-high)/(high-V_over_F_min))
         try:
-            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, args=(zs, cis_ys, x0, V_over_F_min, N))[0], low, high)
+            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, zs, cis_ys, x0, V_over_F_min, N)[0], low, high)
         except NotBoundedError:
             return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True)
             # err_low = 1e100

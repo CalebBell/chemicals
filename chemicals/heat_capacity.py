@@ -795,7 +795,7 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
         err = (property_mass_to_molar(dH, MW)*factor - Hm)
         return err
     try:
-        return newton(err, 500, ytol=1e-4)
+        return secant(err, 500, ytol=1e-4)
     except:
         try:
             return brenth(err, 1e-3, 1e5)
