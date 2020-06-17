@@ -53,7 +53,7 @@ __all__ = []
 __funcs = {}
 
 
-replaced = {'sum': np.sum}
+replaced = {'sum': np.sum, 'combinations': fluids.numba.combinations}
 replaced, NUMERICS_SUBMOD = fluids.numba.create_numerics(replaced, vec=False)
 
 
@@ -68,7 +68,14 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
              'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
              'rachford_rice.Rachford_Rice_solution', 'rachford_rice.Rachford_Rice_solution_LN2',
-             'rachford_rice.Rachford_Rice_solution_numpy']
+             'rachford_rice.Rachford_Rice_solution_numpy',
+             'rachford_rice.Rachford_Rice_polynomial', 
+             'rachford_rice.Rachford_Rice_polynomial_3',
+             'rachford_rice.Rachford_Rice_polynomial_4',
+             'rachford_rice.Rachford_Rice_polynomial_5',
+             'rachford_rice.Rachford_Rice_solution_polynomial',
+             
+             ]
 
 fluids.numba.transform_lists_to_arrays(chemicals, to_change, __funcs)
 globals().update(__funcs)

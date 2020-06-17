@@ -31,6 +31,7 @@ __all__ = ['Rachford_Rice_flash_error',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop']
 
 from fluids.constants import R
+from itertools import combinations
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der
 from chemicals.utils import exp, log
@@ -43,7 +44,9 @@ __numba_additional_funcs__ = ['Rachford_Rice_polynomial_3',
                               'Rachford_Rice_polynomial_4',
                               'Rachford_Rice_polynomial_5', 'Rachford_Rice_err_fprime',
                               'Rachford_Rice_err_fprime2', 'Rachford_Rice_err',
-                              'Rachford_Rice_numpy_err', 'Rachford_Rice_err_LN2']
+                              'Rachford_Rice_numpy_err', 'Rachford_Rice_err_LN2',
+                              '_Rachford_Rice_polynomial_coeff',
+                              'err_RR_poly', 'err_and_der_RR_poly']
 
 def Rachford_Rice_polynomial_3(zs, Cs):
     z0, z1, z2 = zs
@@ -132,30 +135,30 @@ def Rachford_Rice_polynomial_5(zs, Cs):
     return [1.0, b, c, d, e]
 
     
-_RR_poly_idx_cache = {}
+# _RR_poly_idx_cache = {}
 def _Rachford_Rice_polynomial_coeff(value, zs, Cs, N):
-    global_list = []
-    # This part can be cached, so its performance implication is small
-    # I believe for high-N, this is causing out of memory errors
-    # However, even when using yield, still out-of-memories
-    def better_recurse(prev_value, max_value, working=None):
-        if working is None:
-            working = []
-        for i in range(prev_value, max_value):
-            if N == max_value:
-#                yield working + [i]
-#                return
-                global_list.append(working + [i])
-            else:
-                better_recurse(i + 1, max_value + 1, working + [i])
-#        return global_list
-    
-    if (value, N) in _RR_poly_idx_cache:
-        global_list = _RR_poly_idx_cache[(value, N)]
-    else:
-        better_recurse(0, value)
-        _RR_poly_idx_cache[(value, N)] = global_list
-    
+#     global_list = []
+#     # This part can be cached, so its performance implication is small
+#     # I believe for high-N, this is causing out of memory errors
+#     # However, even when using yield, still out-of-memories
+#     def better_recurse(prev_value, max_value, working=None):
+#         if working is None:
+#             working = []
+#         for i in range(prev_value, max_value):
+#             if N == max_value:
+# #                yield working + [i]
+# #                return
+#                 global_list.append(working + [i])
+#             else:
+#                 better_recurse(i + 1, max_value + 1, working + [i])
+# #        return global_list
+#
+#     if (value, N) in _RR_poly_idx_cache:
+#         global_list = _RR_poly_idx_cache[(value, N)]
+#     else:
+#         better_recurse(0, value)
+#         _RR_poly_idx_cache[(value, N)] = global_list
+#
 #     zs_sum_mat = []
 #     Cs_inv_mat = []
 #     for i in range(N):
@@ -175,8 +178,17 @@ def _Rachford_Rice_polynomial_coeff(value, zs, Cs, N):
 #     zs_sum_mat = [[zi + zj for zj in zs] for zi in zs]
 
     # If there were some way to use cse this might work much faster
+    # c = 0.0
+    # for x in range(N):
+    #     for y in range(x):
+    #         c += (1.0 - zs[x] - zs[y])*(Cs[x]*Cs[y])
+    # return c
+
+
     c = 0.0
-    for idxs in global_list:
+
+    for idxs in combinations(list(range(N)), 1+N-value):
+f    #for idxs in global_list:
         C_msum = 1.0
         z_tot = 1.0
         for i in idxs:
@@ -287,30 +299,41 @@ def Rachford_Rice_polynomial(zs, Ks):
        https://doi.org/10.1016/S0009-2509(01)00267-6.
     '''
     N = len(zs)
-    Cs = [Ki - 1.0 for Ki in Ks]
+    Cs = [0.0]*N
+    for i in range(N):
+        Cs[i] = Ks[i] - 1.0
     if N == 2:
         C0, C1 = Cs
         z0, z1 = zs
-        return [1.0, (C0*z0 + C1*z1)/(C0*C1*(z0 + z1))]
+        Cs[0] = 1.0
+        Cs[1] = (C0*z0 + C1*z1)/(C0*C1*(z0 + z1))
+        return Cs
     elif N == 3:
         return Rachford_Rice_polynomial_3(zs, Cs)
     elif N == 4:
         return Rachford_Rice_polynomial_4(zs, Cs)
     elif N == 5:
         return Rachford_Rice_polynomial_5(zs, Cs)
-    
-    
-    Cs_inv = [1.0/Ci for Ci in Cs]
-    coeffs = [1.0]
+
+    Cs_inv = [0.0]*N
+    for i in range(N):
+        Cs_inv[i] = 1.0/Cs[i]
+    #coeffs = [1.0]
+    coeffs = [0.0]*N
+    coeffs[0] = 1.0
     
 #    if N > 2:
     c = 0.0
     for i in range(0, N):
         c += (1.0 - zs[i])*Cs_inv[i]
-    coeffs.append(c)
+    coeffs[1] = c
+    #coeffs.append(c)
+    for v, i in zip(range(N - 1, 2, -1), range(2, N-1)):
+        coeffs[i] = _Rachford_Rice_polynomial_coeff(v, zs, Cs_inv, N)
+
     
-    coeffs.extend([_Rachford_Rice_polynomial_coeff(v, zs, Cs_inv, N) 
-                    for v in range(N-1, 2, -1)])
+    # coeffs.extend([_Rachford_Rice_polynomial_coeff(v, zs, Cs_inv, N)
+    #                 for v in range(N-1, 2, -1)])
         
     c = 0.0
     for i in range(0, N):
@@ -319,9 +342,13 @@ def Rachford_Rice_polynomial(zs, Ks):
             if j != i:
                 C_sumprod *= C
         c += zs[i]*C_sumprod
-    coeffs.append(c)
+    coeffs[-1] = c
     return coeffs
 
+def err_RR_poly(VF, poly):
+    return horner(poly, VF)
+def err_and_der_RR_poly(VF, poly):
+    return horner_and_der(poly, VF)
 
 def Rachford_Rice_solution_polynomial(zs, Ks):
     r'''Solves the Rachford-Rice equation by transforming it into a polynomial,
@@ -395,13 +422,21 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
        Flash Calculations." Pennsylvania State University, 1991.
     '''
     N = len(zs)
-    if N > 30:
-        raise ValueError("Unlikely to solve")
+    if N > 30: # numba: delete
+        raise ValueError("Unlikely to solve") # numba: delete
     poly = Rachford_Rice_polynomial(zs, Ks)
 
-    Kmin = min(Ks)
-    Kmax = max(Ks)
-    z_of_Kmax = zs[Ks.index(Kmax)]
+    Kmin = min(Ks) # numba: delete
+    Kmax = max(Ks)# numba: delete
+    z_of_Kmax = zs[Ks.index(Kmax)]# numba: delete
+#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if Ks[i] > Kmax: # numba: uncomment
+#            z_of_Kmax = zs[i] # numba: uncomment
+#            Kmax = Ks[i] # numba: uncomment
+#        if Ks[i] < Kmin: # numba: uncomment
+#            Kmin = Ks[i] # numba: uncomment
+    
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax - 1.))
     V_over_F_max = 1./(1.-Kmin)
     
@@ -419,41 +454,42 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
     if N > 5:
         # For safety, obtain limits of K 
         x0 = 0.5*(V_over_F_min + V_over_F_max)
-        def err(VF):
-            return horner(poly, VF)
-        def err_and_der(VF):
-            return horner_and_der(poly, VF)
         
+        found = False
         try:
-            V_over_F = secant(err, x0)
+            V_over_F = secant(err_RR_poly, x0, args=(poly,))
+            found = True
             # V_over_F = secant(err, x0, low=V_over_F_min, high=V_over_F_max, bisection=True)
             # V_over_F = newton(err_and_der, x0, fprime=True, low=V_over_F_min, high=V_over_F_max, bisection=True)
             if V_over_F < V_over_F_min or V_over_F > V_over_F_max:
-                raise ValueError("Newton converged to another root")
+                found = False
         except:
-            V_over_F = brenth(err, V_over_F_min, V_over_F_max)
+            pass
+        if not found:
+            V_over_F = brenth(err_RR_poly, V_over_F_min, V_over_F_max, args=(poly,))
     else:
         if N == 4:
-            coeffs = poly
+            coeffs = (poly[0], poly[1], poly[2], poly[3])
         elif N == 3:
-            coeffs = (0.0,) + tuple(poly)
+            coeffs = (0.0, poly[0], poly[1], poly[2])
+#            (0.0,) + tuple(poly)
         elif N == 2:
-            coeffs = (0.0, 0.0) + tuple(poly)
+            coeffs = (0.0, 0.0, poly[0], poly[1])
         if N == 5:
-            roots = roots_quartic(*poly)
+            roots = roots_quartic(poly[0], poly[1], poly[2], poly[3], poly[4])
         else:
-            roots = roots_cubic(*coeffs)
+            roots = roots_cubic(coeffs[0], coeffs[1], coeffs[2], coeffs[3])
         if N == 2:
             V_over_F = roots[0]
         else:
-            V_over_F = None
+            found = True
             for root in roots:
                 if abs(root.imag) < 1e-9 and V_over_F_min <= root.real <= V_over_F_max:
 #                if root.imag == 0.0 and V_over_F_min <= root <= V_over_F_max:
                     V_over_F = root.real
                     break
-            if V_over_F is None:
-                raise ValueError("Bad roots", roots, "Root should be between V_over_F_min and V_over_F_max")
+            if not found:
+                raise ValueError("Bad roots")#, roots, "Root should be between V_over_F_min and V_over_F_max")
     
     xs = [zi/(1.+V_over_F*(Ki-1.)) for zi, Ki in zip(zs, Ks)]
     ys = [Ki*xi for xi, Ki in zip(xs, Ks)]
@@ -796,8 +832,7 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
     '''
     limit_betas = False
     Ks = [Ks_y, Ks_z]
-    max_beta_step = 1e100
-    def new_betas(betas, d_betas, damping):
+    def RR2_new_betas(betas, d_betas, damping, max_beta_step=1e100):
         for i in range(len(d_betas)):
             if d_betas[i] > max_beta_step:
                 d_betas[i] = max_beta_step
@@ -820,57 +855,57 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
     if not Rachford_Rice_valid_solution_naive(ns, [beta_y, beta_z], Ks, limit_betas=limit_betas):
         raise ValueError("Initial guesses will not lead to convergence")
 
-    if 0:
-        import matplotlib.pyplot as plt
-        from matplotlib import cm
-        betas = linspace(-10, 10, 500)
-        errs = []
-        for b0 in betas:
-            r = []
-            for b1 in betas:
-                Fs = Rachford_Rice_flashN_f_jac([b0, b1], ns, Ks)[0]
-                err = abs(Fs[0]) + abs(Fs[1])
-                r.append(err)
-            errs.append(r)
-            
-        trunc_err_low = 1e-9
-        trunc_err_high = 1e5
-        X, Y = np.meshgrid(betas, betas)
-        z = np.array(errs).T
-        if trunc_err_low is not None:
-            z[np.where(abs(z) < trunc_err_low)] = trunc_err_low
-        if trunc_err_high is not None:
-            z[np.where(abs(z) > trunc_err_high)] = trunc_err_high
-        color_map = cm.viridis
-
-        fig, ax = plt.subplots()
-        im = ax.pcolormesh(X, Y, z, cmap=color_map) # , norm=LogNorm(vmin=trunc_err_low, vmax=trunc_err_high)
-        cbar = fig.colorbar(im, ax=ax)
-        cbar.set_label('Relative error')
-        plt.show()
-    if 0:
-        from scipy.optimize import differential_evolution
-        def obj(x):
-            try:
-                x = x.tolist()
-            except:
-                pass
-            Fs = Rachford_Rice_flashN_f_jac(x, ns, Ks)[0]
-            err = 0.0
-            # if sum(x) > 1:
-            #     err += abs(1-sum(x))
-            err += abs(Fs[0]) + abs(Fs[1])
-            return err
-        ans = differential_evolution(obj, [(-30.0, 30.0) for j in range(2)], **{'popsize':200, 'init': 'random', 'atol': 1e-12})
-        objf = float(ans['fun'])
+#    if 0:
+#        import matplotlib.pyplot as plt
+#        from matplotlib import cm
+#        betas = linspace(-10, 10, 500)
+#        errs = []
+#        for b0 in betas:
+#            r = []
+#            for b1 in betas:
+#                Fs = Rachford_Rice_flashN_f_jac([b0, b1], ns, Ks)[0]
+#                err = abs(Fs[0]) + abs(Fs[1])
+#                r.append(err)
+#            errs.append(r)
+#            
+#        trunc_err_low = 1e-9
+#        trunc_err_high = 1e5
+#        X, Y = np.meshgrid(betas, betas)
+#        z = np.array(errs).T
+#        if trunc_err_low is not None:
+#            z[np.where(abs(z) < trunc_err_low)] = trunc_err_low
+#        if trunc_err_high is not None:
+#            z[np.where(abs(z) > trunc_err_high)] = trunc_err_high
+#        color_map = cm.viridis
+#
+#        fig, ax = plt.subplots()
+#        im = ax.pcolormesh(X, Y, z, cmap=color_map) # , norm=LogNorm(vmin=trunc_err_low, vmax=trunc_err_high)
+#        cbar = fig.colorbar(im, ax=ax)
+#        cbar.set_label('Relative error')
+#        plt.show()
+#    if 0:
+#        from scipy.optimize import differential_evolution
+#        def obj(x):
+#            try:
+#                x = x.tolist()
+#            except:
+#                pass
+#            Fs = Rachford_Rice_flashN_f_jac(x, ns, Ks)[0]
+#            err = 0.0
+#            # if sum(x) > 1:
+#            #     err += abs(1-sum(x))
+#            err += abs(Fs[0]) + abs(Fs[1])
+#            return err
+#        ans = differential_evolution(obj, [(-30.0, 30.0) for j in range(2)], **{'popsize':200, 'init': 'random', 'atol': 1e-12})
+#        objf = float(ans['fun'])
 
     (beta_y, beta_z), iter = newton_system(Rachford_Rice_flashN_f_jac, jac=True, 
                                            x0=[beta_y, beta_z], args=(ns, Ks),
-                                           ytol=1e-14, damping_func=new_betas)
+                                           ytol=1e-14, damping_func=RR2_new_betas)
 
 #    (beta_y, beta_z), iter = newton_system(Rachford_Rice_flash2_f_jac, jac=True, 
 #                                           x0=[beta_y, beta_z], args=(ns, Ks_y, Ks_z),
-#                                           ytol=1e-14, damping_func=new_betas)
+#                                           ytol=1e-14, damping_func=RR2_new_betas)
 
     xs = [zi/(1.+beta_y*(Ky-1.) + beta_z*(Kz-1.)) for Ky, Kz, zi in zip(Ks_y, Ks_z, ns)]
     ys = [Ky*xi for xi, Ky in zip(xs, Ks_y)]
@@ -1840,11 +1875,3 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
 #    P = 1/sum(zs[i]*fugacities[i]/Psats[i]/gammas[i] for i in range(len(zs)))
 #    return P
 #
-
-
-#get_T_bub_est(1E6, zs=[0.5, 0.5], Tbs=[194.67, 341.87], Tcs=[304.2, 507.4], Pcs=[7.38E6, 3.014E6])
-
-
-#get_T_dew_est(1E6, zs=[0.5, 0.5], Tbs=[194.67, 341.87], Tcs=[304.2, 507.4], Pcs=[7.38E6, 3.014E6], T_bub_est = 290.6936541653881)
-
-
