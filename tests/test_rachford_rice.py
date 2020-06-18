@@ -25,6 +25,7 @@ from numpy.testing import assert_allclose
 import pytest
 import numpy as np
 import pandas as pd
+from chemicals.exceptions import PhaseCountReducedError
 from fluids.constants import calorie, R
 from chemicals.rachford_rice import *
 from chemicals.rachford_rice import Rachford_Rice_solution_numpy
@@ -156,6 +157,7 @@ def test_flash_inner_loop():
                             'Rachford-Rice (Halley)', 'Rachford-Rice (NumPy)',
                             'Li-Johns-Ahmadi',
                              'Rachford-Rice (polynomial)']
+    
 
 
     # Seems like a bad idea
@@ -707,3 +709,13 @@ def test_check_flash_inner():
     assert_allclose(xs_expect, xs)
     assert_allclose(ys_expect, ys)
     assert_allclose(VF, VF_expect)
+    
+    
+    zs = [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
+    Ks = [9.340698220307541e-10, 0.7685310477822435, 3.399419742763956e-17]
+    guess = 4.440892098500627e-16
+    with pytest.raises(PhaseCountReducedError):
+        Rachford_Rice_solution_LN2(zs, Ks, guess)
+
+    with pytest.raises(PhaseCountReducedError):
+        Rachford_Rice_solution(zs, Ks, guess)

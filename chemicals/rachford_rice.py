@@ -33,7 +33,7 @@ __all__ = ['Rachford_Rice_flash_error',
 from fluids.constants import R
 from itertools import combinations
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
-from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der
+from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley
 from chemicals.utils import exp, log
 from chemicals.utils import normalize
 from chemicals.exceptions import PhaseCountReducedError
@@ -46,7 +46,10 @@ __numba_additional_funcs__ = ['Rachford_Rice_polynomial_3',
                               'Rachford_Rice_err_fprime2', 'Rachford_Rice_err',
                               'Rachford_Rice_numpy_err', 'Rachford_Rice_err_LN2',
                               '_Rachford_Rice_polynomial_coeff',
-                              'err_RR_poly', 'err_and_der_RR_poly']
+                              'err_RR_poly', 'err_and_der_RR_poly',
+                              'Rachford_Rice_numpy_err_fprime2',
+                              'LJA_err', 'LJA_fprime2',
+                              '_Rachford_Rice_analytical_3']
 
 def Rachford_Rice_polynomial_3(zs, Cs):
     z0, z1, z2 = zs
@@ -188,7 +191,7 @@ def _Rachford_Rice_polynomial_coeff(value, zs, Cs, N):
     c = 0.0
 
     for idxs in combinations(list(range(N)), 1+N-value):
-f    #for idxs in global_list:
+    #for idxs in global_list:
         C_msum = 1.0
         z_tot = 1.0
         for i in idxs:
@@ -475,24 +478,30 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
 #            (0.0,) + tuple(poly)
         elif N == 2:
             coeffs = (0.0, 0.0, poly[0], poly[1])
-        if N == 5:
-            roots = roots_quartic(poly[0], poly[1], poly[2], poly[3], poly[4])
-        else:
-            roots = roots_cubic(coeffs[0], coeffs[1], coeffs[2], coeffs[3])
+            
+#        roots = np.roots(poly) # numba: uncomment
+        if N == 5: # numba: delete
+            roots = roots_quartic(poly[0], poly[1], poly[2], poly[3], poly[4]) # numba: delete
+        else: # numba: delete
+            roots = roots_cubic(coeffs[0], coeffs[1], coeffs[2], coeffs[3]) # numba: delete
         if N == 2:
             V_over_F = roots[0]
         else:
-            found = True
+            found = False
             for root in roots:
                 if abs(root.imag) < 1e-9 and V_over_F_min <= root.real <= V_over_F_max:
 #                if root.imag == 0.0 and V_over_F_min <= root <= V_over_F_max:
                     V_over_F = root.real
+                    found = True
                     break
             if not found:
                 raise ValueError("Bad roots")#, roots, "Root should be between V_over_F_min and V_over_F_max")
-    
-    xs = [zi/(1.+V_over_F*(Ki-1.)) for zi, Ki in zip(zs, Ks)]
-    ys = [Ki*xi for xi, Ki in zip(xs, Ks)]
+
+    xs = [0.0]*N
+    ys = [0.0]*N
+    for i in range(N):
+        xs[i] = zs[i]/(1. + V_over_F*(Ks[i]-1.0))
+        ys[i] = xs[i]*Ks[i]
     return V_over_F, xs, ys
         
 
@@ -1043,7 +1052,9 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False,
 #            Kmax = Ks[i] # numba: uncomment
 #        if Ks[i] < Kmin: # numba: uncomment
 #            Kmin = Ks[i] # numba: uncomment
-
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
     V_over_F_max = 1./(1.-Kmin)
 
@@ -1107,20 +1118,20 @@ def Rachford_Rice_numpy_err(V_over_F, zs_k_minus_1, K_minus_1):
 #    return err # numba: uncomment
     return float(err) # numba: delete
 
+def Rachford_Rice_numpy_err_fprime2(V_over_F, zs_k_minus_1, K_minus_1):
+    x0 = 1.0/(K_minus_1*V_over_F + 1.0)
+    
+    err = zs_k_minus_1*x0
+    fprime = -err*K_minus_1*x0
+    fprime2 = -2.0*fprime*K_minus_1*x0
+#    print(float(err.sum()), float(fprime.sum()), float(fprime2.sum()), V_over_F)
+    return float(err.sum()), float(fprime.sum()), float(fprime2.sum())
+#    return err.sum(), fprime.sum(), fprime2.sum() 
 
 
-#def Rachford_Rice_numpy_err_fprime(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
-#    err0, err1 = 0.0, 0.0
-#    for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
-#        VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
-#        err0 += num0*VF_kim1_1_inv
-#        err1 += num1*VF_kim1_1_inv*VF_kim1_1_inv
-##            print(err0, V_over_F)
-#    return err0, err1
 
 
-
-def Rachford_Rice_solution_numpy(zs, Ks, limit=True):
+def Rachford_Rice_solution_numpy(zs, Ks, limit=False):
     '''Undocumented version of Rachford_Rice_solution which works with numpy
     instead. Can be up to 15x faster for cases of 30000+ compounds;
     typically 7-10 x faster.
@@ -1165,10 +1176,12 @@ def Rachford_Rice_solution_numpy(zs, Ks, limit=True):
     K_minus_1 = Ks - 1.0
     zs_k_minus_1 = zs*K_minus_1
     
-#    Rachford_Rice_numpy_err = Rachford_Rice_err
     try:
-        V_over_F = secant(Rachford_Rice_numpy_err, x0, high=V_over_F_max*one_epsilon_smaller,
-                          low=V_over_F_min*one_epsilon_larger, ytol=1e-5, xtol=1.48e-8, args=(zs_k_minus_1, K_minus_1))
+        V_over_F = halley(Rachford_Rice_numpy_err_fprime2, x0, high=V_over_F_max*one_epsilon_smaller,
+                          low=V_over_F_min*one_epsilon_larger, xtol=1e-12, args=(zs_k_minus_1, K_minus_1),
+                          bisection=True)
+#        V_over_F = secant(Rachford_Rice_numpy_err, x0, high=V_over_F_max*one_epsilon_smaller,
+#                          low=V_over_F_min*one_epsilon_larger, ytol=1e-5, xtol=1.48e-8, args=(zs_k_minus_1, K_minus_1))
     except:
         V_over_F = brenth(Rachford_Rice_numpy_err, V_over_F_max*one_epsilon_smaller, V_over_F_min*one_epsilon_larger,
                           args=(zs_k_minus_1, K_minus_1))
@@ -1301,7 +1314,10 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
 #            Kmax = Ks[i] # numba: uncomment
 #        if Ks[i] < Kmin: # numba: uncomment
 #            Kmin = Ks[i] # numba: uncomment
-    
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+
     one_m_Kmin = 1.0 - Kmin
     N = len(zs)
     
@@ -1325,7 +1341,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
 
     # Should always converge - no poles
     try:
-#        V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: uncomment
+#        V_over_F = halley(Rachford_Rice_err_LN2, guess, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: uncomment
         if one_m_Kmin == 1.0: # numba: delete
             V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
         else: # numba: delete
@@ -1333,14 +1349,12 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     except:
 #        return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True) # numba: delete
 #        raise ValueError("Could not solve") # numba: uncomment
-#        return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks) 
-        low, high = V_over_F_min + 1e-8, V_over_F_max - 1e-8
-        low = -log((V_over_F_max-low)/(low-V_over_F_min))
-        high = -log((V_over_F_max-high)/(high-V_over_F_min))
-        try:
-            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, zs, cis_ys, x0, V_over_F_min, N)[0], low, high)
-        except NotBoundedError:
-            return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True)
+#        return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks)
+        return flash_inner_loop(zs=zs, Ks=Ks, check=True, method=FLASH_INNER_HALLEY)
+        try: # numba: delete
+            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, zs, cis_ys, x0, V_over_F_min, N)[0], low, high)  # numba: delete
+        except NotBoundedError:  # numba: delete
+            return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True)  # numba: delete
             # err_low = 1e100
             # try:
             #     err_low = Rachford_Rice_flash_error(V_over_F_min, zs, Ks)
@@ -1365,6 +1379,26 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         cis_ys[i] = Ks[i]*xi
     return V_over_F, xs, cis_ys
 
+def LJA_err(x1, t1, terms_2, terms_3, N2):
+    err = 1. + t1*x1
+    for i in range(N2):
+        # evaluations: 2 mult, 1 div, 1 add
+        err += x1/(terms_2[i] + terms_3[i]*x1)
+    return err
+
+def LJA_fprime2(v, t1, terms_2, terms_3, N2):
+    err = 1. + t1*v
+    fprime = t1
+    fprime2 = 0.0
+    for i in range(N2):
+        x0 = terms_3[i]*v
+        x1 = terms_2[i] + x0
+        x2 = 1.0/x1
+        x3 = x0*x2
+        err += v*x2
+        fprime += x2*(1.0 - x3)
+        fprime2 += 2.0*terms_3[i]*(x3 - 1.0)*x2*x2
+    return err, fprime, fprime2
 
 def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
     r'''Solves the objective function of the Li-Johns-Ahmadi flash equation.
@@ -1423,9 +1457,10 @@ def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
        doi:10.1016/j.fluid.2011.12.005.
     '''
     # Re-order both Ks and Zs by K value, higher coming first
-    p = sorted(zip(Ks,zs), reverse=True)
-    Ks_sorted, zs_sorted = [K for (K,z) in p], [z for (K,z) in p]
-
+    p = sorted(zip(Ks,zs), reverse=True) # numba: delete
+    Ks_sorted, zs_sorted = [K for (K,z) in p], [z for (K,z) in p] # numba: delete
+#    sorted_idxs = np.argsort(Ks)[::-1] # numba: uncomment
+#    Ks_sorted, zs_sorted = Ks[sorted_idxs], zs[sorted_idxs] # numba: uncomment
 
     # Largest K value and corresponding overall mole fraction
     k1 = Ks_sorted[0]
@@ -1446,7 +1481,9 @@ def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
     else:
         x_max2 = x_max
     
-    length = len(zs)-1
+    N = len(zs)
+    N2 = N - 2
+    length = N - 1
     kn_m_1 = kn - 1.0
     k1_m_1 = (k1 - 1.0)
     kn_m_1_inv = 1.0/kn_m_1
@@ -1456,51 +1493,39 @@ def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
 
     Ks_iter = Ks_sorted[1:length]
     zs_iter = zs_sorted[1:length]
+
+    for i in range(N2):
+        ki = Ks_iter[i]
+        term_1 = 1.0/((ki - kn)*kn_m_1_inv*zs_iter[i]*k1_m_1)
+        Ks_iter[i] = (ki - 1.0)*z1*term_1
+        zs_iter[i] = (k1 - ki)*term_1
     
-    
-    terms_2, terms_3 = [], []
-    for ki, zi in zip(Ks_iter, zs_iter):
-        term_1 = 1.0/((ki-kn)*kn_m_1_inv*zi*k1_m_1)
-        terms_2.append((ki - 1.0)*z1*term_1)
-        terms_3.append((k1 - ki)*term_1)
+    terms_2, terms_3 = Ks_iter, zs_iter
         
-        
-        
-#    terms_1 = [(ki-kn)*kn_m_1_inv*zi*k1_m_1 for ki, zi in zip(Ks_iter, zs_iter)]
-#    terms_2 = [(ki - 1.0)*z1 for ki in Ks_iter]
-#    terms_3 = []
-    
-    def objective(x1):
-        err = 1. + t1*x1
-        for term2, term3 in zip(terms_2, terms_3):
-            # evaluations: 2 mult, 1 div, 2 add
-            err += x1/(term2 + term3*x1)
-#        for ki, zi, term1, term2 in zip(Ks_iter, zs_iter, terms_1, terms_2):
-#            # evaluations: 2 mult, 1 div, 2 add
-#            err += term1*x1/(term2 + (k1-ki)*x1)
-#        print(err, x1)
-        return err
 
     try:
-        x1 = secant(objective, x_guess, low=x_min, high=x_max, ytol=1e-13)
+        x1 = halley(LJA_fprime2, x_guess, low=x_min, high=x_max, xtol=1e-12, bisection=True, args=(t1, terms_2, terms_3, N2))
+#        x1 = secant(LJA_err, x_guess, low=x_min, high=x_max, ytol=1e-13, args=(t1, terms_2, terms_3, N2))
         # newton skips out of its specified range in some cases, finding another solution
         # Check for that with asserts, and use brenth if it did
         # Must also check that V_over_F is right.
         V_over_F = (z1 - x1)/(x1*k1_m_1)
 #        print('V_over_F', V_over_F)
-        
-        assert x1 >= x_min
-        assert x1 <= x_max
+#        assert x1 >= x_min
+#        assert x1 <= x_max
 #        assert 0.0 <= V_over_F <= 1.0
-    except Exception as e:
+    except:
 #        print('using bounding')
 #        from fluids.numerics import py_bisect as bisect
 #        x1 = bisect(objective, x_min, x_max, ytol=1e-12)
-        x1 = brenth(objective, x_min, x_max) # , xtol=1e-12, rtol=0
+        x1 = brenth(LJA_err, x_min, x_max, args=(t1, terms_2, terms_3, N2)) # , xtol=1e-12, rtol=0
         V_over_F = (-x1 + z1)/(x1*(k1 - 1.))
-    xs = [zi/(1.+V_over_F*(Ki-1.)) for zi, Ki in zip(zs, Ks)]
-    ys = [Ki*xi for xi, Ki in zip(xs, Ks)]
-    return V_over_F, xs, ys
+
+    for i in range(N):
+        xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
+        Ks_sorted[i] = xi
+        zs_sorted[i] = Ks[i]*xi
+    return V_over_F, Ks_sorted, zs_sorted
 
 
 def _Rachford_Rice_analytical_3(zs, Ks):
@@ -1590,8 +1615,14 @@ def _Rachford_Rice_analytical_3(zs, Ks):
                 K3*(x10 + x11 - x3 + x9) + x0 + x1 - x10 - x11 - x12 - x13
                 - x14 - x15 - x16 + x2 + x3 + x4 + x5 + x6 + x7 + x8 - x9
                 - z1 - z2 - z3))
-    xs = [zi/(1.+V_over_F*(Ki-1.)) for zi, Ki in zip(zs, Ks)]
-    ys = [Ki*xi for xi, Ki in zip(xs, Ks)]
+                
+                
+    xs = [0.0]*3
+    ys = [0.0]*3
+    for i in range(3):
+        xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
+        xs[i] = xi
+        ys[i] = Ks[i]*xi
     return V_over_F, xs, ys
 
 
@@ -1765,12 +1796,13 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
     >>> flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
     (0.6907302627738537, [0.3394086969663437, 0.36505605903717053, 0.29553524399648573], [0.5719036543882892, 0.2708715958055805, 0.1572247498061304])
     '''
-    if get_methods:
-        l = len(zs)
-        return flash_inner_loop_list_methods(l)
+    l = len(zs)
+    if get_methods: # numba : delete
+        return flash_inner_loop_list_methods(l)  # numba : delete
     if method is None:
-        l = len(zs)
-        method = FLASH_INNER_ANALYTICAL if l < 3 else (FLASH_INNER_NUMPY if (not IS_PYPY and l >= 10) else FLASH_INNER_LN2)    
+        method2 = FLASH_INNER_ANALYTICAL if l < 3 else (FLASH_INNER_NUMPY if (not IS_PYPY and l >= 10) else FLASH_INNER_LN2)    
+    else:
+        method2 = method
     if check:
         K_low, K_high = False, False
         for zi, Ki in zip(zs, Ks):
@@ -1782,50 +1814,57 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
                 if K_high and K_low:
                     break
         if not K_low or not K_high:
-            raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" %(Ks))
-        
+            raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" %(Ks)) # numba: delete
+#            raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
         
         for zi in zs:
             if zi == 0.0:
+                # Cannot pre-allocate - has to be a list
                 zero_indexes = []
                 zs2, Ks2 = [], []
-                for i in range(len(zs)):
+                for i in range(l):
                     if zs[i] == 0.0:
                         zero_indexes.append(i)
                     else:
                         zs2.append(zs[i])
                         Ks2.append(Ks[i])
-                V_over_F, xs, ys = flash_inner_loop(zs2, Ks2, method=method, limit=limit, guess=guess, check=True)
+#                zs2, Ks2 = np.array(zs2), np.array(Ks2) # numba: uncomment
+                V_over_F, xs, ys = Rachford_Rice_solution(zs2, Ks2)
+#                V_over_F, xs, ys = flash_inner_loop(zs2, Ks2, method=method, limit=limit, guess=guess, check=True)
+#                xs = xs.tolist() # numba: uncomment
+#                ys = ys.tolist() # numba: uncomment
                 for idx in zero_indexes:
                     xs.insert(idx, 0.0)
                     ys.insert(idx, 0.0)
+                
+#                xs, ys = np.array(xs), np.array(ys) # numba: uncomment
                 return V_over_F, xs, ys
-        return Rachford_Rice_solution_trace(zs, Ks, guess)
+#        return Rachford_Rice_solution_trace(zs, Ks, guess)
 
-    if method == FLASH_INNER_LN2:
+    if method2 == FLASH_INNER_LN2:
         return Rachford_Rice_solution_LN2(zs, Ks, guess)
-    elif method == FLASH_INNER_SECANT:
+    elif method2 == FLASH_INNER_SECANT:
         return Rachford_Rice_solution(zs, Ks, limit=limit)
-    elif method == FLASH_INNER_ANALYTICAL:
-        l = len(zs)
+    elif method2 == FLASH_INNER_ANALYTICAL:
         if l == 2:
             z1, z2 = zs
             K1, K2 = Ks
-            try:
-                z1z2 = z1 + z2
-                K1z1 = K1*z1
-                K2z2 = K2*z2
-                t1 = z1z2 - K1z1 - K2z2 
-                V_over_F = (t1)/(t1 + K2*K1z1 + K1*K2z2 - K1*z2 - K2*z1)
-            except ZeroDivisionError:
+            z1z2 = z1 + z2
+            K1z1 = K1*z1
+            K2z2 = K2*z2
+            t1 = z1z2 - K1z1 - K2z2 
+            den = t1 + K2*K1z1 + K1*K2z2 - K1*z2 - K2*z1
+            if den != 0.0:
+                V_over_F = (t1)/(den)
+            else:
                 return Rachford_Rice_solution(zs=zs, Ks=Ks)
         elif l == 3:
             try:
                 sln = _Rachford_Rice_analytical_3(zs, Ks)
-                if sln[0].imag != 0.0:
-                    raise ValueError("Failed analytically")
+                if sln[0].imag != 0.0: # numba: delete
+                    raise ValueError("Failed analytically") # numba: delete
                 return sln
-            except (ValueError, ZeroDivisionError):
+            except:
                 return Rachford_Rice_solution(zs=zs, Ks=Ks)
         elif l == 4:
             return Rachford_Rice_solution_polynomial(zs, Ks)
@@ -1836,42 +1875,32 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
         elif l == 1:
             raise ValueError("Input dimensions are for one component! Rachford-Rice does not apply")
         else:
-            raise Exception('Only solutions for components counts 2, 3, and 4 are available analytically')
+            raise ValueError('Only solutions for components counts 2, 3, and 4 are available analytically')
         # Need to avoid zero divisions here - specifically when the composition of one component in the feed is 0.0
-        xs = []
-        for zi, Ki in zip(zs, Ks):
+        xs = [0.0]*l
+        ys = [0.0]*l
+        for i in range(l):
             try:
-                xs.append(zi/(1.+V_over_F*(Ki-1.)))
-            except ZeroDivisionError:
-                xs.append(0.0)
-#        xs = [(zi/(1.+V_over_F*(Ki-1.)) if zi != 0.0 else 0.0) ] # if zi != 0.0
-        ys = [Ki*xi for xi, Ki in zip(xs, Ks)]
+                xs[i] = zs[i]/(1.+V_over_F*(Ks[i] - 1.))
+            except:
+                pass
+            ys[i] = xs[i]*Ks[i]
         return V_over_F, xs, ys
     
-    elif method == FLASH_INNER_NUMPY:
+    elif method2 == FLASH_INNER_NUMPY:
         try:
             return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks, limit=limit)
         except:
             return Rachford_Rice_solution(zs=zs, Ks=Ks, limit=limit)
-    elif method == FLASH_INNER_NR:
+    elif method2 == FLASH_INNER_NR:
         return Rachford_Rice_solution(zs=zs, Ks=Ks, limit=limit, fprime=True)
-    elif method == FLASH_INNER_HALLEY:
+    elif method2 == FLASH_INNER_HALLEY:
         return Rachford_Rice_solution(zs=zs, Ks=Ks, limit=limit, fprime=True, 
                                       fprime2=True)
     
-    elif method == FLASH_INNER_LJA:
+    elif method2 == FLASH_INNER_LJA:
         return Li_Johns_Ahmadi_solution(zs=zs, Ks=Ks)
-    elif method == FLASH_INNER_POLY:
+    elif method2 == FLASH_INNER_POLY:
         return Rachford_Rice_solution_polynomial(zs=zs, Ks=Ks)
     else:
-        raise Exception('Incorrect method input')
-
-#    if not fugacities:
-#        fugacities = [1 for i in range(len(Psats))]
-#    if not gammas:
-#        gammas = [1 for i in range(len(Psats))]
-#    if not none_and_length_check((zs, Psats, fugacities, gammas)):
-#        raise Exception('Input dimentions are inconsistent or some input parameters are missing.')
-#    P = 1/sum(zs[i]*fugacities[i]/Psats[i]/gammas[i] for i in range(len(zs)))
-#    return P
-#
+        raise ValueError('Incorrect method input')

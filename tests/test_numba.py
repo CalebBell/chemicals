@@ -27,6 +27,7 @@ from math import *
 from random import random
 from fluids.constants import *
 from fluids.numerics import assert_close, assert_close1d
+from numpy.testing import assert_allclose
 import pytest
 try:
     import numba
@@ -338,3 +339,48 @@ def test_rachford_rice():
     
     assert_close(chemicals.numba.Rachford_Rice_flash_error(0.5, zs=zs, Ks=Ks),
                  Rachford_Rice_flash_error(0.5, zs=zs, Ks=Ks))
+
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_rachford_rice_polynomial():
+    zs, Ks = [.4, .6], [2, .5]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+
+    zs = [0.5, 0.3, 0.2]
+    Ks = [1.685, 0.742, 0.532]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+    
+    zs = [0.2, 0.3, 0.4, 0.1]
+    Ks = [2.5250, 0.7708, 1.0660, 0.2401]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+    
+    zs = [0.2, 0.3, 0.4, 0.05, 0.05]
+    Ks = [2.5250, 0.7708, 1.0660, 0.2401, 0.3140]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+    
+    # 6 and higher use generic routine
+    zs = [0.05, 0.10, 0.15, 0.30, 0.30, 0.10]
+    Ks = [6.0934, 2.3714, 1.3924, 1.1418, 0.6457, 0.5563]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+
