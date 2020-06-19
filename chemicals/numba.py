@@ -77,7 +77,13 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'rachford_rice.Rachford_Rice_numpy_err_fprime2',
              'rachford_rice.Li_Johns_Ahmadi_solution',
              'rachford_rice._Rachford_Rice_analytical_3',
-             'rachford_rice.flash_inner_loop'
+             'rachford_rice.flash_inner_loop',
+             'rachford_rice.Rachford_Rice_solution2',
+             'rachford_rice.Rachford_Rice_solutionN',
+             'rachford_rice.RRN_new_betas',
+             'rachford_rice.Rachford_Rice_flashN_f_jac',
+             'rachford_rice.Rachford_Rice_flash2_f_jac',
+             'rachford_rice.Rachford_Rice_valid_solution_naive',
              ]
 
 fluids.numba.transform_lists_to_arrays(chemicals, to_change, __funcs)

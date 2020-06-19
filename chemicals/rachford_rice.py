@@ -33,7 +33,7 @@ __all__ = ['Rachford_Rice_flash_error',
 from fluids.constants import R
 from itertools import combinations
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
-from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley
+from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct
 from chemicals.utils import exp, log
 from chemicals.utils import normalize
 from chemicals.exceptions import PhaseCountReducedError
@@ -49,8 +49,10 @@ __numba_additional_funcs__ = ['Rachford_Rice_polynomial_3',
                               'err_RR_poly', 'err_and_der_RR_poly',
                               'Rachford_Rice_numpy_err_fprime2',
                               'LJA_err', 'LJA_fprime2',
-                              '_Rachford_Rice_analytical_3']
+                              '_Rachford_Rice_analytical_3',
+                              'Rachford_Rice_valid_solution_naive', 'RRN_new_betas']
 
+ 
 def Rachford_Rice_polynomial_3(zs, Cs):
     z0, z1, z2 = zs
     C0, C1, C2 = Cs
@@ -564,12 +566,14 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
 
 def Rachford_Rice_flashN_f_jac(betas, ns, Ks):
     N = len(betas)
-    betas = [float(i) for i in betas]
     Fs = [0.0]*N
-    dFs_dBetas = [[0.0]*N for i in range(N)]
+    dFs_dBetas = [[0.0]*N for i in range(N)] # numba: delete
+#    dFs_dBetas = np.zeros((N, N)) # numba: uncomment
     
-    Ksm1 = [[i-1.0 for i in Ks_i] for Ks_i in Ks]
-    zsKsm1 = [[zi*Ksim1 for zi, Ksim1 in zip(ns, Ksm1i)] for Ksm1i in Ksm1]
+    Ksm1 = [[i-1.0 for i in Ks_i] for Ks_i in Ks] # numba: delete
+#    Ksm1 = Ks - 1.0 # numba: uncomment
+    zsKsm1 = [[zi*Ksim1 for zi, Ksim1 in zip(ns, Ksm1i)] for Ksm1i in Ksm1] # numba: delete
+#    zsKsm1 = ns*Ksm1 # numba: uncomment
     
     for i, zi in enumerate(ns):
         denom = 1.0
@@ -594,34 +598,43 @@ def Rachford_Rice_flashN_f_jac(betas, ns, Ks):
     return Fs, dFs_dBetas
 
 
-def Rachford_Rice_flash2_f_jac(betas, zs, Ks_y, Ks_z):
+def Rachford_Rice_flash2_f_jac(betas, zs, Ks):
     # In a more clever system like RR 2, can compute entire numerators before hand.
-    beta_y, beta_z = float(betas[0]), float(betas[1])
+    beta_y = betas[0]
+    beta_z = betas[1]
+    Ks_y = Ks[0]
+    Ks_z = Ks[1]
     F0 = 0.0
     F1 = 0.0
     dF0_dy = 0.0
     dF0_dz = 0.0
     dF1_dz = 0.0
 
-    for zi, Ky_i, Kz_i in zip(zs, Ks_y, Ks_z):
-        Ky_m1 = (Ky_i - 1.0)
-        ziKy_m1 = zi*Ky_m1
-
-        Kz_m1 = (Kz_i - 1.0)
-        ziKz_m1 = zi*Kz_m1
-
+    for i in range(len(zs)):
+        zi = zs[i]
+        Ky_m1 = (Ks_y[i] - 1.0)
+        Kz_m1 = (Ks_z[i] - 1.0)
         denom_inv = 1.0/(1.0 + beta_y*Ky_m1 + beta_z*Kz_m1) # same in all
-        delta_F0 = ziKy_m1*denom_inv
-        delta_F1 = ziKz_m1*denom_inv
+        delta_F0 = zi*Ky_m1*denom_inv
+        delta_F1 = zi*Kz_m1*denom_inv
 
         F0 += delta_F0
         F1 += delta_F1
+        c0 = Kz_m1*denom_inv
         dF0_dy -= delta_F0*Ky_m1*denom_inv
-        dF0_dz -= delta_F0*Kz_m1*denom_inv
-        dF1_dz -= delta_F1*Kz_m1*denom_inv
+        dF0_dz -= delta_F0*c0
+        dF1_dz -= delta_F1*c0
 
-    return [F0, F1], [[dF0_dy, dF0_dz], [dF0_dz, dF1_dz]]
-
+#    Fs = [0.0]*2 # numba: uncomment
+#    Fs[0] = F0  # numba: uncomment
+#    Fs[1] = F1  # numba: uncomment
+#    dFs = np.zeros((2,2)) # numba: uncomment
+#    dFs[0][0] = dF0_dy # numba: uncomment
+#    dFs[0][1] = dF0_dz # numba: uncomment
+#    dFs[1][0] = dF0_dz # numba: uncomment
+#    dFs[1][1] = dF1_dz # numba: uncomment
+#    return Fs, dFs # numba: uncomment
+    return [F0, F1], [[dF0_dy, dF0_dz], [dF0_dz, dF1_dz]] # numba: delete
 
 def Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=False):
     if limit_betas:
@@ -688,22 +701,6 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
        no. 6 (June 2018): 452. https://doi.org/10.3390/e20060452.
     '''
     limit_betas = False
-    def new_betas(betas, d_betas, damping):
-        betas_test = [beta_i + d_beta*damping for beta_i, d_beta in zip(betas, d_betas)]
-        for i in range(20):
-            is_valid = Rachford_Rice_valid_solution_naive(ns, betas_test, Ks, limit_betas=limit_betas)
-            if is_valid:
-                break
-            
-            damping = 0.5*damping
-#            for i in range(len(betas_test)):
-#                betas_test[i] = betas_test[i]  + d_betas[i]*damping
-            betas_test = [beta_i + d_beta*damping for beta_i, d_beta in zip(betas, d_betas)]
-#            print('out of bounds', damping, betas_test)
-        if not is_valid:
-            raise ValueError("Should never happen - N phase RR still out of bounds after 20 iterations")
-        return betas_test
-    
     if not Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=limit_betas):
         raise ValueError("Initial guesses will not lead to convergence")
     
@@ -713,7 +710,7 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
     
     betas, iter = newton_system(Rachford_Rice_flashN_f_jac, jac=True, 
                                            x0=betas, args=(ns, Ks),
-                                           ytol=1e-14, damping_func=new_betas)
+                                           ytol=1e-14, damping_func=RRN_new_betas)
 #    print(betas, iter, 'current progress')
     comps = []
     ref_comp = []
@@ -735,6 +732,33 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
         raise ValueError("Converged to nonphysical solution")
 
     return betas, comps
+
+
+def RRN_new_betas(betas, d_betas, damping, ns, Ks):
+    N = len(betas)
+    limit_betas = False
+    max_beta_step = 1e100
+    if 0:
+        for i in range(N):
+            if d_betas[i] > max_beta_step:
+                d_betas[i] = max_beta_step
+            elif d_betas[i] < -max_beta_step:
+                d_betas[i] = -max_beta_step
+            
+    betas_test = [0.0]*N
+    for i in range(N):
+        betas_test[i] = betas[i] + d_betas[i]*damping
+    for i in range(20):
+        is_valid = Rachford_Rice_valid_solution_naive(ns, betas_test, Ks, limit_betas=limit_betas)
+        if is_valid:
+            break
+        
+        damping = 0.5*damping
+        for i in range(N):
+            betas_test[i] = betas[i] + d_betas[i]*damping
+    if not is_valid:
+        raise ValueError("Should never happen - multiphase phase RR still out of bounds after 20 iterations")
+    return betas_test
 
 
 def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
@@ -840,28 +864,14 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
        https://doi.org/10.1016/0378-3812(95)02797-I.
     '''
     limit_betas = False
-    Ks = [Ks_y, Ks_z]
-    def RR2_new_betas(betas, d_betas, damping, max_beta_step=1e100):
-        for i in range(len(d_betas)):
-            if d_betas[i] > max_beta_step:
-                d_betas[i] = max_beta_step
-            elif d_betas[i] < -max_beta_step:
-                d_betas[i] = -max_beta_step
-
-        betas_test = [beta_i + d_beta*damping for beta_i, d_beta in zip(betas, d_betas)]
-        for i in range(20):
-            is_valid = Rachford_Rice_valid_solution_naive(ns, betas_test, Ks, limit_betas=limit_betas)
-            if is_valid:
-                break
-            
-            damping = 0.5*damping
-            betas_test = [beta_i + d_beta*damping for beta_i, d_beta in zip(betas, d_betas)]
-#            print('out of bounds', damping, betas_test)
-        if not is_valid:
-            raise ValueError("Should never happen - 3 phase RR still out of bounds after 20 iterations")
-        return betas_test
     
-    if not Rachford_Rice_valid_solution_naive(ns, [beta_y, beta_z], Ks, limit_betas=limit_betas):
+    Ks = [Ks_y, Ks_z] # numba: delete
+#    Ks = np.vstack((Ks_y, Ks_z)) # numba: uncomment
+    betas = [0.0]*2
+    betas[0] = beta_y
+    betas[1] = beta_z
+    
+    if not Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=limit_betas):
         raise ValueError("Initial guesses will not lead to convergence")
 
 #    if 0:
@@ -907,19 +917,32 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
 #            return err
 #        ans = differential_evolution(obj, [(-30.0, 30.0) for j in range(2)], **{'popsize':200, 'init': 'random', 'atol': 1e-12})
 #        objf = float(ans['fun'])
-
-    (beta_y, beta_z), iter = newton_system(Rachford_Rice_flashN_f_jac, jac=True, 
-                                           x0=[beta_y, beta_z], args=(ns, Ks),
-                                           ytol=1e-14, damping_func=RR2_new_betas)
-
-#    (beta_y, beta_z), iter = newton_system(Rachford_Rice_flash2_f_jac, jac=True, 
-#                                           x0=[beta_y, beta_z], args=(ns, Ks_y, Ks_z),
-#                                           ytol=1e-14, damping_func=RR2_new_betas)
-
-    xs = [zi/(1.+beta_y*(Ky-1.) + beta_z*(Kz-1.)) for Ky, Kz, zi in zip(Ks_y, Ks_z, ns)]
-    ys = [Ky*xi for xi, Ky in zip(xs, Ks_y)]
-    zs = [Kz*xi for xi, Kz in zip(xs, Ks_z)]
-    if (1.0 - sum(zs)) > 1e-10:
+        
+#    betas, iters = newton_system(Rachford_Rice_flashN_f_jac, x0=betas, jac=True, 
+#                                        xtol=1e-11, ytol=1e100, maxiter=100, 
+#                                            args=(ns, Ks), damping=1.0,
+#                                           damping_func=RRN_new_betas)
+    # Rachford_Rice_flash2_f_jac is over twice as fast! Do not change to the generic one.
+    betas, iters = newton_system(Rachford_Rice_flash2_f_jac, x0=betas, jac=True, 
+                                            xtol=1e-11, ytol=1e100, maxiter=100,
+                                           args=(ns, Ks), damping=1.0,
+                                           damping_func=RRN_new_betas, solve_func=solve_2_direct)
+    beta_y = betas[0]
+    beta_z = betas[1]
+    
+    N = len(ns)
+    xs = [0.0]*N
+    ys = [0.0]*N
+    zs = [0.0]*N
+    z_tot = 0.0
+    for i in range(N):
+        xi = ns[i]/(1. + beta_y*(Ks_y[i] - 1.0) + beta_z*(Ks_z[i] - 1.0))
+        xs[i] = xi
+        ys[i] = xi*Ks_y[i]
+        zs[i] = xi*Ks_z[i]
+        z_tot += zs[i]
+        
+    if (1.0 - z_tot) > 1e-10:
         raise ValueError("Converged to nonphysical solution")
     return beta_y, beta_z, xs, ys, zs
 
@@ -1204,8 +1227,6 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
     
     F0, dF0, ddF0 = 0.0, 0.0, 0.0
     for i in range(N):
-#            x5 = (Ks[i]-1.0)/(t50 - cis_ys[i])
-        
         x5 = 1.0/(t50 - cis_ys[i])
         zix5 = zs[i]*x5
         F0 += zix5

@@ -439,7 +439,7 @@ def test_Rachford_Rice_solution2():
     jac_expect = [[-0.7622803760231517, -0.539733935411029], [-0.539733935411029, -0.86848106463838]]
     
     for func in (Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac):
-        f, jac = Rachford_Rice_flash2_f_jac(betas, zs, Ks_y, Ks_z)
+        f, jac = func(betas, zs, [Ks_y, Ks_z])
         assert_allclose(f, fs_expect)
         assert_allclose(jac, jac_expect)
     
@@ -470,7 +470,7 @@ def test_Rachford_Rice_solution2():
     Ks_y = [1.64571122126, 1.91627717926, 0.71408616431, 0.28582415424, 0.04917567928, 0.00326226927, 0.00000570946]
     Ks_z = [1.61947897153, 2.65352105653, 0.68719907526, 0.18483049029, 0.01228448216, 0.00023212526, 0.00000003964]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=0.9)
-    assert_allclose([ans[0], ans[1]], [0.8701633566336909, 2.1803031624194252e-06,])
+    assert_allclose([ans[0], ans[1]], [0.8701633566336909, 2.1803031624194252e-06,], rtol=1e-6)
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.8701633566336909, 2.1803031624194252e-06], n=n_composition_fuzz)
 
     # Example 4 in Okuno 2010 (only of their examples with a test)
