@@ -564,389 +564,6 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
         err += zs[i]*(Ks[i] - 1.0)/(1.0 + V_over_F*(Ks[i] - 1.0))
     return err
 
-def Rachford_Rice_flashN_f_jac(betas, ns, Ks):
-    N = len(betas)
-    Fs = [0.0]*N
-    dFs_dBetas = [[0.0]*N for i in range(N)] # numba: delete
-#    dFs_dBetas = np.zeros((N, N)) # numba: uncomment
-    
-    Ksm1 = [[i-1.0 for i in Ks_i] for Ks_i in Ks] # numba: delete
-#    Ksm1 = Ks - 1.0 # numba: uncomment
-    zsKsm1 = [[zi*Ksim1 for zi, Ksim1 in zip(ns, Ksm1i)] for Ksm1i in Ksm1] # numba: delete
-#    zsKsm1 = ns*Ksm1 # numba: uncomment
-    
-    for i, zi in enumerate(ns):
-        denom = 1.0
-        for j, beta_i in enumerate(betas):
-            denom += beta_i*Ksm1[j][i]
-        denom_inv = 1.0/denom
-        denom_inv2 = denom_inv*denom_inv
-        
-        for j in range(N):
-            Fs[j] += zsKsm1[j][i]*denom_inv
-
-        for j in range(N):
-            for k in range(N):
-                if k <= j:
-                    term = zsKsm1[j][i]*Ksm1[k][i]*denom_inv2
-                    if k == j:
-                        dFs_dBetas[k][j] -= term
-                    else:
-                        dFs_dBetas[k][j] -= term
-                        dFs_dBetas[j][k] -= term
-
-    return Fs, dFs_dBetas
-
-
-def Rachford_Rice_flash2_f_jac(betas, zs, Ks):
-    # In a more clever system like RR 2, can compute entire numerators before hand.
-    beta_y = betas[0]
-    beta_z = betas[1]
-    Ks_y = Ks[0]
-    Ks_z = Ks[1]
-    F0 = 0.0
-    F1 = 0.0
-    dF0_dy = 0.0
-    dF0_dz = 0.0
-    dF1_dz = 0.0
-
-    for i in range(len(zs)):
-        zi = zs[i]
-        Ky_m1 = (Ks_y[i] - 1.0)
-        Kz_m1 = (Ks_z[i] - 1.0)
-        denom_inv = 1.0/(1.0 + beta_y*Ky_m1 + beta_z*Kz_m1) # same in all
-        delta_F0 = zi*Ky_m1*denom_inv
-        delta_F1 = zi*Kz_m1*denom_inv
-
-        F0 += delta_F0
-        F1 += delta_F1
-        c0 = Kz_m1*denom_inv
-        dF0_dy -= delta_F0*Ky_m1*denom_inv
-        dF0_dz -= delta_F0*c0
-        dF1_dz -= delta_F1*c0
-
-#    Fs = [0.0]*2 # numba: uncomment
-#    Fs[0] = F0  # numba: uncomment
-#    Fs[1] = F1  # numba: uncomment
-#    dFs = np.zeros((2,2)) # numba: uncomment
-#    dFs[0][0] = dF0_dy # numba: uncomment
-#    dFs[0][1] = dF0_dz # numba: uncomment
-#    dFs[1][0] = dF0_dz # numba: uncomment
-#    dFs[1][1] = dF1_dz # numba: uncomment
-#    return Fs, dFs # numba: uncomment
-    return [F0, F1], [[dF0_dy, dF0_dz], [dF0_dz, dF1_dz]] # numba: delete
-
-def Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=False):
-    if limit_betas:
-        for beta in betas:
-            if beta < 0.0 or beta > 1.0:
-                return False
-    
-    for i, ni in enumerate(ns):
-        sum_critiria = 1.0
-        for j, beta_i in enumerate(betas):
-            sum_critiria += beta_i*(Ks[j][i] - 1.0)
-        if sum_critiria < 0.0:
-            # Will result in negative composition for xi, yi, and zi
-            return False
-    return True
-
-
-def Rachford_Rice_solutionN(ns, Ks, betas):
-    r'''Solves the (phases -1) objectives functions of the Rachford-Rice flash 
-    equation for an N-phase system. Initial guesses are required for all phase 
-    fractions except the last. The Newton method is used, with an
-    analytical Jacobian.
-        
-    Parameters
-    ----------
-    ns : list[float]
-        Overall mole fractions of all species, [-]
-    Ks : list[list[float]]
-        Equilibrium K-values of all phases with respect to the `x` (reference) 
-        phase, [-]
-    betas : list[float]
-        Phase fraction initial guesses only for the first N - 1 phases;
-        each value corresponds to the phase fraction of each set of the K 
-        values; if a phase fraction is specified for the last phase as well,
-        it is ignored [-]
-        
-    Returns
-    -------
-    betas : list[float]
-        Phase fractions of all of the phases; one each for each K value set
-        given, plus the reference phase phase fraction [-]
-    compositions : list[list[float]]
-        Mole fractions of each species in each phase; order each phase
-        in the same order as the K values were provided, and then the `x` phase
-        last, which was the reference phase [-]
-    
-    Notes
-    -----
-    Besides testing with three phases, only one 5 phase problem has been solved
-    with this algorithm, from [1]_.
-    
-    Examples
-    --------
-    >>> ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
-    >>> Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
-    >>> Ks_z = [1.52713341421, 0.02456487977, 1.46348240453, 1.16090546194, 0.24166289908, 0.14815282572, 14.3128010831]
-    >>> Rachford_Rice_solutionN(ns, [Ks_y, Ks_z], [.1, .6])
-    ... ([0.6868328915094767, 0.060194243976686025, 0.25297286451383727], [[0.21147483364299702, 0.07313470386530294, 0.31982891387635903, 0.33293382568889657, 0.036586042443791586, 0.004616341311925657, 0.021425339171727318], [0.26156812278601893, 0.00200221914149187, 0.20392660665189805, 0.2431536850887592, 0.03786610596908295, 0.03355679851539994, 0.2179264618483492], [0.1712804659711611, 0.08150738616425436, 0.1393433949193188, 0.20945175387703213, 0.15668977784027893, 0.22650123851718013, 0.01522598271177459]])
-    
-    References
-    ----------
-    .. [1] Gao, Ran, Xiaolong Yin, and Zhiping Li. "Hybrid Newton-Successive 
-       Substitution Method for Multiphase Rachford-Rice Equations." Entropy 20,
-       no. 6 (June 2018): 452. https://doi.org/10.3390/e20060452.
-    '''
-    limit_betas = False
-    if not Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=limit_betas):
-        raise ValueError("Initial guesses will not lead to convergence")
-    
-    # Handle the case of the supplementary answer
-    if len(betas) > len(Ks):
-        betas = betas[:-1]
-    
-    betas, iter = newton_system(Rachford_Rice_flashN_f_jac, jac=True, 
-                                           x0=betas, args=(ns, Ks),
-                                           ytol=1e-14, damping_func=RRN_new_betas)
-#    print(betas, iter, 'current progress')
-    comps = []
-    ref_comp = []
-    for i, ni in enumerate(ns):
-        denom = 1.0
-        for j, beta_i in enumerate(betas):
-            denom += beta_i*(Ks[j][i]-1.0)
-        denom_inv = 1.0/denom
-        ref_comp.append(ni*denom_inv)
-
-    for Ks_j in Ks:
-        comp = [Ki*xi for Ki, xi in zip(Ks_j, ref_comp)]
-        comps.append(comp)
-
-    comps.append(ref_comp)
-    betas.append(1.0 - sum(betas))
-
-    if (1.0 - sum(ref_comp)) > 1e-10:
-        raise ValueError("Converged to nonphysical solution")
-
-    return betas, comps
-
-
-def RRN_new_betas(betas, d_betas, damping, ns, Ks):
-    N = len(betas)
-    limit_betas = False
-    max_beta_step = 1e100
-    if 0:
-        for i in range(N):
-            if d_betas[i] > max_beta_step:
-                d_betas[i] = max_beta_step
-            elif d_betas[i] < -max_beta_step:
-                d_betas[i] = -max_beta_step
-            
-    betas_test = [0.0]*N
-    for i in range(N):
-        betas_test[i] = betas[i] + d_betas[i]*damping
-    for i in range(20):
-        is_valid = Rachford_Rice_valid_solution_naive(ns, betas_test, Ks, limit_betas=limit_betas)
-        if is_valid:
-            break
-        
-        damping = 0.5*damping
-        for i in range(N):
-            betas_test[i] = betas[i] + d_betas[i]*damping
-    if not is_valid:
-        raise ValueError("Should never happen - multiphase phase RR still out of bounds after 20 iterations")
-    return betas_test
-
-
-def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
-    r'''Solves the two objective functions of the Rachford-Rice flash equation
-    for a three-phase system. Initial guesses are required for both phase 
-    fractions, `beta_y` and `beta_z`. The Newton method is used, with an
-    analytical Jacobian.
-
-    .. math::
-        F_0 = \sum_i \frac{z_i (K_y -1)}{1 + \beta_y(K_y-1) + \beta_z(K_z-1)} = 0
-
-    .. math::
-        F_1 = \sum_i \frac{z_i (K_z -1)}{1 + \beta_y(K_y-1) + \beta_z(K_z-1)} = 0
-        
-    Parameters
-    ----------
-    ns : list[float]
-        Overall mole fractions of all species (would be `zs` except that is
-        conventially used for one of the three phases), [-]
-    Ks_y : list[float]
-        Equilibrium K-values of `y` phase to `x` phase, [-]
-    Ks_z : list[float]
-        Equilibrium K-values of `z` phase to `x` phase, [-]
-    beta_y : float, optional
-        Initial guess for `y` phase (between 0 and 1), [-]
-    beta_z : float, optional
-        Initial guess for `z` phase (between 0 and 1), [-]
-        
-    Returns
-    -------
-    beta_y : float
-        Phase fraction of `y` phase, [-]
-    beta_z : float
-        Phase fraction of `z` phase, [-]
-    xs : list[float]
-        Mole fractions of each species in the `x` phase, [-]
-    ys : list[float]
-        Mole fractions of each species in the `y` phase, [-]
-    zs : list[float]
-        Mole fractions of each species in the `z` phase, [-]
-    
-    Notes
-    -----
-    The elements of the Jacobian are calculated as follows:
-
-    .. math::
-        \frac{\partial F_0}{\partial \beta_y} = \sum_i \frac{-z_i (K_y -1)^2}
-        {\left(1 + \beta_y(K_y-1) + \beta_z(K_z-1)\right)^2}
-
-    .. math::
-        \frac{\partial F_1}{\partial \beta_z} = \sum_i \frac{-z_i (K_z -1)^2}
-        {\left(1  + \beta_y(K_y-1) + \beta_z(K_z-1)\right)^2}
-
-    .. math::
-        \frac{\partial F_1}{\partial \beta_y} = \sum_i \frac{\partial F_0}
-        {\partial \beta_z}  = \frac{-z_i (K_z -1)(K_y - 1)}{\left(1 
-        + \beta_y(K_y-1) + \beta_z(K_z-1)\right)^2}
-        
-    In general, the solution which Newton's method converges to may not be the 
-    desired one, so further constraints are required.
-    
-    Okuno's method in [1]_ provides a polygonal region where the correct answer
-    lies. It has not been implemented.
-    
-    The Leibovici and Neoschil method [4]_ provides a method to compute/update 
-    the damping parameter, which is suposed to ensure convergence. It claims to
-    be able to calculate the maximum damping factor for Newton's method, if it
-    tries to go out of bounds.
-    
-    A custom region which is believed to be the same as that of Okuno is 
-    implemented instead - the region which ensures positive compositions for
-    all compounds in all phases, but does not restrict the phase fractions to
-    be between 0 and 1 or even positive.
-    
-    With the convergence restraint, it is believed if a solution lies within
-    (0, 1) for both variables, the correct solution will be converged to so long
-    as the initial guesses are within the correct region.
-        
-    Examples
-    --------
-    >>> ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
-    >>> Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
-    >>> Ks_z = [1.52713341421, 0.02456487977, 1.46348240453, 1.16090546194, 0.24166289908, 0.14815282572, 14.3128010831]
-    >>> Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=.1, beta_z=.6)
-    ... (0.6868328915094766, 0.06019424397668606, [0.1712804659711611, 0.08150738616425436, 0.1393433949193188, 0.20945175387703213, 0.15668977784027893, 0.22650123851718007, 0.015225982711774586], [0.21147483364299702, 0.07313470386530294, 0.31982891387635903, 0.33293382568889657, 0.036586042443791586, 0.004616341311925655, 0.02142533917172731], [0.26156812278601893, 0.00200221914149187, 0.20392660665189805, 0.2431536850887592, 0.03786610596908295, 0.03355679851539993, 0.21792646184834918])
-    
-    References
-    ----------
-    .. [1] Okuno, Ryosuke, Russell Johns, and Kamy Sepehrnoori. "A New 
-       Algorithm for Rachford-Rice for Multiphase Compositional Simulation." 
-       SPE Journal 15, no. 02 (June 1, 2010): 313-25. 
-       https://doi.org/10.2118/117752-PA.
-    .. [2] Li, Zhidong, and Abbas Firoozabadi. "Initialization of Phase 
-       Fractions in Rachford–Rice Equations for Robust and Efficient 
-       Three-Phase Split Calculation." Fluid Phase Equilibria 332 (October 25,
-       2012): 21-27. https://doi.org/10.1016/j.fluid.2012.06.021.
-    .. [3] Gao, Ran, Xiaolong Yin, and Zhiping Li. "Hybrid Newton-Successive 
-       Substitution Method for Multiphase Rachford-Rice Equations." Entropy 20,
-       no. 6 (June 2018): 452. https://doi.org/10.3390/e20060452.
-    .. [4] Leibovici, Claude F., and Jean Neoschil. "A Solution of 
-       Rachford-Rice Equations for Multiphase Systems." Fluid Phase Equilibria 
-       112, no. 2 (December 1, 1995): 217-21. 
-       https://doi.org/10.1016/0378-3812(95)02797-I.
-    '''
-    limit_betas = False
-    
-    Ks = [Ks_y, Ks_z] # numba: delete
-#    Ks = np.vstack((Ks_y, Ks_z)) # numba: uncomment
-    betas = [0.0]*2
-    betas[0] = beta_y
-    betas[1] = beta_z
-    
-    if not Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=limit_betas):
-        raise ValueError("Initial guesses will not lead to convergence")
-
-#    if 0:
-#        import matplotlib.pyplot as plt
-#        from matplotlib import cm
-#        betas = linspace(-10, 10, 500)
-#        errs = []
-#        for b0 in betas:
-#            r = []
-#            for b1 in betas:
-#                Fs = Rachford_Rice_flashN_f_jac([b0, b1], ns, Ks)[0]
-#                err = abs(Fs[0]) + abs(Fs[1])
-#                r.append(err)
-#            errs.append(r)
-#            
-#        trunc_err_low = 1e-9
-#        trunc_err_high = 1e5
-#        X, Y = np.meshgrid(betas, betas)
-#        z = np.array(errs).T
-#        if trunc_err_low is not None:
-#            z[np.where(abs(z) < trunc_err_low)] = trunc_err_low
-#        if trunc_err_high is not None:
-#            z[np.where(abs(z) > trunc_err_high)] = trunc_err_high
-#        color_map = cm.viridis
-#
-#        fig, ax = plt.subplots()
-#        im = ax.pcolormesh(X, Y, z, cmap=color_map) # , norm=LogNorm(vmin=trunc_err_low, vmax=trunc_err_high)
-#        cbar = fig.colorbar(im, ax=ax)
-#        cbar.set_label('Relative error')
-#        plt.show()
-#    if 0:
-#        from scipy.optimize import differential_evolution
-#        def obj(x):
-#            try:
-#                x = x.tolist()
-#            except:
-#                pass
-#            Fs = Rachford_Rice_flashN_f_jac(x, ns, Ks)[0]
-#            err = 0.0
-#            # if sum(x) > 1:
-#            #     err += abs(1-sum(x))
-#            err += abs(Fs[0]) + abs(Fs[1])
-#            return err
-#        ans = differential_evolution(obj, [(-30.0, 30.0) for j in range(2)], **{'popsize':200, 'init': 'random', 'atol': 1e-12})
-#        objf = float(ans['fun'])
-        
-#    betas, iters = newton_system(Rachford_Rice_flashN_f_jac, x0=betas, jac=True, 
-#                                        xtol=1e-11, ytol=1e100, maxiter=100, 
-#                                            args=(ns, Ks), damping=1.0,
-#                                           damping_func=RRN_new_betas)
-    # Rachford_Rice_flash2_f_jac is over twice as fast! Do not change to the generic one.
-    betas, iters = newton_system(Rachford_Rice_flash2_f_jac, x0=betas, jac=True, 
-                                            xtol=1e-11, ytol=1e100, maxiter=100,
-                                           args=(ns, Ks), damping=1.0,
-                                           damping_func=RRN_new_betas, solve_func=solve_2_direct)
-    beta_y = betas[0]
-    beta_z = betas[1]
-    
-    N = len(ns)
-    xs = [0.0]*N
-    ys = [0.0]*N
-    zs = [0.0]*N
-    z_tot = 0.0
-    for i in range(N):
-        xi = ns[i]/(1. + beta_y*(Ks_y[i] - 1.0) + beta_z*(Ks_z[i] - 1.0))
-        xs[i] = xi
-        ys[i] = xi*Ks_y[i]
-        zs[i] = xi*Ks_z[i]
-        z_tot += zs[i]
-        
-    if (1.0 - z_tot) > 1e-10:
-        raise ValueError("Converged to nonphysical solution")
-    return beta_y, beta_z, xs, ys, zs
-
-
 def Rachford_Rice_err_fprime(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
     err0, err1 = 0.0, 0.0
     for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
@@ -1937,3 +1554,389 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
         return Rachford_Rice_solution_polynomial(zs=zs, Ks=Ks)
     else:
         raise ValueError('Incorrect method input')
+        
+        
+### N phase RR
+
+def Rachford_Rice_flashN_f_jac(betas, ns, Ks):
+    N = len(betas)
+    Fs = [0.0]*N
+    dFs_dBetas = [[0.0]*N for i in range(N)] # numba: delete
+#    dFs_dBetas = np.zeros((N, N)) # numba: uncomment
+    
+    Ksm1 = [[i-1.0 for i in Ks_i] for Ks_i in Ks] # numba: delete
+#    Ksm1 = Ks - 1.0 # numba: uncomment
+    zsKsm1 = [[zi*Ksim1 for zi, Ksim1 in zip(ns, Ksm1i)] for Ksm1i in Ksm1] # numba: delete
+#    zsKsm1 = ns*Ksm1 # numba: uncomment
+    
+    for i, zi in enumerate(ns):
+        denom = 1.0
+        for j, beta_i in enumerate(betas):
+            denom += beta_i*Ksm1[j][i]
+        denom_inv = 1.0/denom
+        denom_inv2 = denom_inv*denom_inv
+        
+        for j in range(N):
+            Fs[j] += zsKsm1[j][i]*denom_inv
+
+        for j in range(N):
+            for k in range(N):
+                if k <= j:
+                    term = zsKsm1[j][i]*Ksm1[k][i]*denom_inv2
+                    if k == j:
+                        dFs_dBetas[k][j] -= term
+                    else:
+                        dFs_dBetas[k][j] -= term
+                        dFs_dBetas[j][k] -= term
+
+    return Fs, dFs_dBetas
+
+
+def Rachford_Rice_flash2_f_jac(betas, zs, Ks):
+    # In a more clever system like RR 2, can compute entire numerators before hand.
+    beta_y = betas[0]
+    beta_z = betas[1]
+    Ks_y = Ks[0]
+    Ks_z = Ks[1]
+    F0 = 0.0
+    F1 = 0.0
+    dF0_dy = 0.0
+    dF0_dz = 0.0
+    dF1_dz = 0.0
+
+    for i in range(len(zs)):
+        zi = zs[i]
+        Ky_m1 = (Ks_y[i] - 1.0)
+        Kz_m1 = (Ks_z[i] - 1.0)
+        denom_inv = 1.0/(1.0 + beta_y*Ky_m1 + beta_z*Kz_m1) # same in all
+        delta_F0 = zi*Ky_m1*denom_inv
+        delta_F1 = zi*Kz_m1*denom_inv
+
+        F0 += delta_F0
+        F1 += delta_F1
+        c0 = Kz_m1*denom_inv
+        dF0_dy -= delta_F0*Ky_m1*denom_inv
+        dF0_dz -= delta_F0*c0
+        dF1_dz -= delta_F1*c0
+
+#    Fs = [0.0]*2 # numba: uncomment
+#    Fs[0] = F0  # numba: uncomment
+#    Fs[1] = F1  # numba: uncomment
+#    dFs = np.zeros((2,2)) # numba: uncomment
+#    dFs[0][0] = dF0_dy # numba: uncomment
+#    dFs[0][1] = dF0_dz # numba: uncomment
+#    dFs[1][0] = dF0_dz # numba: uncomment
+#    dFs[1][1] = dF1_dz # numba: uncomment
+#    return Fs, dFs # numba: uncomment
+    return [F0, F1], [[dF0_dy, dF0_dz], [dF0_dz, dF1_dz]] # numba: delete
+
+def Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=False):
+    if limit_betas:
+        for beta in betas:
+            if beta < 0.0 or beta > 1.0:
+                return False
+    
+    for i, ni in enumerate(ns):
+        sum_critiria = 1.0
+        for j, beta_i in enumerate(betas):
+            sum_critiria += beta_i*(Ks[j][i] - 1.0)
+        if sum_critiria < 0.0:
+            # Will result in negative composition for xi, yi, and zi
+            return False
+    return True
+
+
+def Rachford_Rice_solutionN(ns, Ks, betas):
+    r'''Solves the (phases -1) objectives functions of the Rachford-Rice flash 
+    equation for an N-phase system. Initial guesses are required for all phase 
+    fractions except the last. The Newton method is used, with an
+    analytical Jacobian.
+        
+    Parameters
+    ----------
+    ns : list[float]
+        Overall mole fractions of all species, [-]
+    Ks : list[list[float]]
+        Equilibrium K-values of all phases with respect to the `x` (reference) 
+        phase, [-]
+    betas : list[float]
+        Phase fraction initial guesses only for the first N - 1 phases;
+        each value corresponds to the phase fraction of each set of the K 
+        values; if a phase fraction is specified for the last phase as well,
+        it is ignored [-]
+        
+    Returns
+    -------
+    betas : list[float]
+        Phase fractions of all of the phases; one each for each K value set
+        given, plus the reference phase phase fraction [-]
+    compositions : list[list[float]]
+        Mole fractions of each species in each phase; order each phase
+        in the same order as the K values were provided, and then the `x` phase
+        last, which was the reference phase [-]
+    
+    Notes
+    -----
+    Besides testing with three phases, only one 5 phase problem has been solved
+    with this algorithm, from [1]_.
+    
+    Examples
+    --------
+    >>> ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
+    >>> Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
+    >>> Ks_z = [1.52713341421, 0.02456487977, 1.46348240453, 1.16090546194, 0.24166289908, 0.14815282572, 14.3128010831]
+    >>> Rachford_Rice_solutionN(ns, [Ks_y, Ks_z], [.1, .6])
+    ... ([0.6868328915094767, 0.060194243976686025, 0.25297286451383727], [[0.21147483364299702, 0.07313470386530294, 0.31982891387635903, 0.33293382568889657, 0.036586042443791586, 0.004616341311925657, 0.021425339171727318], [0.26156812278601893, 0.00200221914149187, 0.20392660665189805, 0.2431536850887592, 0.03786610596908295, 0.03355679851539994, 0.2179264618483492], [0.1712804659711611, 0.08150738616425436, 0.1393433949193188, 0.20945175387703213, 0.15668977784027893, 0.22650123851718013, 0.01522598271177459]])
+    
+    References
+    ----------
+    .. [1] Gao, Ran, Xiaolong Yin, and Zhiping Li. "Hybrid Newton-Successive 
+       Substitution Method for Multiphase Rachford-Rice Equations." Entropy 20,
+       no. 6 (June 2018): 452. https://doi.org/10.3390/e20060452.
+    '''
+    limit_betas = False
+    if not Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=limit_betas):
+        raise ValueError("Initial guesses will not lead to convergence")
+    
+    # Handle the case of the supplementary answer
+    if len(betas) > len(Ks):
+        betas = betas[:-1]
+    
+    betas, iter = newton_system(Rachford_Rice_flashN_f_jac, jac=True, 
+                                           x0=betas, args=(ns, Ks),
+                                           ytol=1e-14, damping_func=RRN_new_betas)
+#    print(betas, iter, 'current progress')
+    comps = []
+    ref_comp = []
+    for i, ni in enumerate(ns):
+        denom = 1.0
+        for j, beta_i in enumerate(betas):
+            denom += beta_i*(Ks[j][i]-1.0)
+        denom_inv = 1.0/denom
+        ref_comp.append(ni*denom_inv)
+
+    for Ks_j in Ks:
+        comp = [Ki*xi for Ki, xi in zip(Ks_j, ref_comp)]
+        comps.append(comp)
+
+    comps.append(ref_comp)
+    betas.append(1.0 - sum(betas))
+
+    if (1.0 - sum(ref_comp)) > 1e-10:
+        raise ValueError("Converged to nonphysical solution")
+
+    return betas, comps
+
+
+def RRN_new_betas(betas, d_betas, damping, ns, Ks):
+    N = len(betas)
+    limit_betas = False
+    max_beta_step = 1e100
+    if 0:
+        for i in range(N):
+            if d_betas[i] > max_beta_step:
+                d_betas[i] = max_beta_step
+            elif d_betas[i] < -max_beta_step:
+                d_betas[i] = -max_beta_step
+            
+    betas_test = [0.0]*N
+    for i in range(N):
+        betas_test[i] = betas[i] + d_betas[i]*damping
+    for i in range(20):
+        is_valid = Rachford_Rice_valid_solution_naive(ns, betas_test, Ks, limit_betas=limit_betas)
+        if is_valid:
+            break
+        
+        damping = 0.5*damping
+        for i in range(N):
+            betas_test[i] = betas[i] + d_betas[i]*damping
+    if not is_valid:
+        raise ValueError("Should never happen - multiphase phase RR still out of bounds after 20 iterations")
+    return betas_test
+
+
+def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
+    r'''Solves the two objective functions of the Rachford-Rice flash equation
+    for a three-phase system. Initial guesses are required for both phase 
+    fractions, `beta_y` and `beta_z`. The Newton method is used, with an
+    analytical Jacobian.
+
+    .. math::
+        F_0 = \sum_i \frac{z_i (K_y -1)}{1 + \beta_y(K_y-1) + \beta_z(K_z-1)} = 0
+
+    .. math::
+        F_1 = \sum_i \frac{z_i (K_z -1)}{1 + \beta_y(K_y-1) + \beta_z(K_z-1)} = 0
+        
+    Parameters
+    ----------
+    ns : list[float]
+        Overall mole fractions of all species (would be `zs` except that is
+        conventially used for one of the three phases), [-]
+    Ks_y : list[float]
+        Equilibrium K-values of `y` phase to `x` phase, [-]
+    Ks_z : list[float]
+        Equilibrium K-values of `z` phase to `x` phase, [-]
+    beta_y : float, optional
+        Initial guess for `y` phase (between 0 and 1), [-]
+    beta_z : float, optional
+        Initial guess for `z` phase (between 0 and 1), [-]
+        
+    Returns
+    -------
+    beta_y : float
+        Phase fraction of `y` phase, [-]
+    beta_z : float
+        Phase fraction of `z` phase, [-]
+    xs : list[float]
+        Mole fractions of each species in the `x` phase, [-]
+    ys : list[float]
+        Mole fractions of each species in the `y` phase, [-]
+    zs : list[float]
+        Mole fractions of each species in the `z` phase, [-]
+    
+    Notes
+    -----
+    The elements of the Jacobian are calculated as follows:
+
+    .. math::
+        \frac{\partial F_0}{\partial \beta_y} = \sum_i \frac{-z_i (K_y -1)^2}
+        {\left(1 + \beta_y(K_y-1) + \beta_z(K_z-1)\right)^2}
+
+    .. math::
+        \frac{\partial F_1}{\partial \beta_z} = \sum_i \frac{-z_i (K_z -1)^2}
+        {\left(1  + \beta_y(K_y-1) + \beta_z(K_z-1)\right)^2}
+
+    .. math::
+        \frac{\partial F_1}{\partial \beta_y} = \sum_i \frac{\partial F_0}
+        {\partial \beta_z}  = \frac{-z_i (K_z -1)(K_y - 1)}{\left(1 
+        + \beta_y(K_y-1) + \beta_z(K_z-1)\right)^2}
+        
+    In general, the solution which Newton's method converges to may not be the 
+    desired one, so further constraints are required.
+    
+    Okuno's method in [1]_ provides a polygonal region where the correct answer
+    lies. It has not been implemented.
+    
+    The Leibovici and Neoschil method [4]_ provides a method to compute/update 
+    the damping parameter, which is suposed to ensure convergence. It claims to
+    be able to calculate the maximum damping factor for Newton's method, if it
+    tries to go out of bounds.
+    
+    A custom region which is believed to be the same as that of Okuno is 
+    implemented instead - the region which ensures positive compositions for
+    all compounds in all phases, but does not restrict the phase fractions to
+    be between 0 and 1 or even positive.
+    
+    With the convergence restraint, it is believed if a solution lies within
+    (0, 1) for both variables, the correct solution will be converged to so long
+    as the initial guesses are within the correct region.
+        
+    Examples
+    --------
+    >>> ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
+    >>> Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
+    >>> Ks_z = [1.52713341421, 0.02456487977, 1.46348240453, 1.16090546194, 0.24166289908, 0.14815282572, 14.3128010831]
+    >>> Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=.1, beta_z=.6)
+    ... (0.6868328915094766, 0.06019424397668606, [0.1712804659711611, 0.08150738616425436, 0.1393433949193188, 0.20945175387703213, 0.15668977784027893, 0.22650123851718007, 0.015225982711774586], [0.21147483364299702, 0.07313470386530294, 0.31982891387635903, 0.33293382568889657, 0.036586042443791586, 0.004616341311925655, 0.02142533917172731], [0.26156812278601893, 0.00200221914149187, 0.20392660665189805, 0.2431536850887592, 0.03786610596908295, 0.03355679851539993, 0.21792646184834918])
+    
+    References
+    ----------
+    .. [1] Okuno, Ryosuke, Russell Johns, and Kamy Sepehrnoori. "A New 
+       Algorithm for Rachford-Rice for Multiphase Compositional Simulation." 
+       SPE Journal 15, no. 02 (June 1, 2010): 313-25. 
+       https://doi.org/10.2118/117752-PA.
+    .. [2] Li, Zhidong, and Abbas Firoozabadi. "Initialization of Phase 
+       Fractions in Rachford–Rice Equations for Robust and Efficient 
+       Three-Phase Split Calculation." Fluid Phase Equilibria 332 (October 25,
+       2012): 21-27. https://doi.org/10.1016/j.fluid.2012.06.021.
+    .. [3] Gao, Ran, Xiaolong Yin, and Zhiping Li. "Hybrid Newton-Successive 
+       Substitution Method for Multiphase Rachford-Rice Equations." Entropy 20,
+       no. 6 (June 2018): 452. https://doi.org/10.3390/e20060452.
+    .. [4] Leibovici, Claude F., and Jean Neoschil. "A Solution of 
+       Rachford-Rice Equations for Multiphase Systems." Fluid Phase Equilibria 
+       112, no. 2 (December 1, 1995): 217-21. 
+       https://doi.org/10.1016/0378-3812(95)02797-I.
+    '''
+    limit_betas = False
+    
+    Ks = [Ks_y, Ks_z] # numba: delete
+#    Ks = np.vstack((Ks_y, Ks_z)) # numba: uncomment
+    betas = [0.0]*2
+    betas[0] = beta_y
+    betas[1] = beta_z
+    
+    if not Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=limit_betas):
+        raise ValueError("Initial guesses will not lead to convergence")
+
+#    if 0:
+#        import matplotlib.pyplot as plt
+#        from matplotlib import cm
+#        betas = linspace(-10, 10, 500)
+#        errs = []
+#        for b0 in betas:
+#            r = []
+#            for b1 in betas:
+#                Fs = Rachford_Rice_flashN_f_jac([b0, b1], ns, Ks)[0]
+#                err = abs(Fs[0]) + abs(Fs[1])
+#                r.append(err)
+#            errs.append(r)
+#            
+#        trunc_err_low = 1e-9
+#        trunc_err_high = 1e5
+#        X, Y = np.meshgrid(betas, betas)
+#        z = np.array(errs).T
+#        if trunc_err_low is not None:
+#            z[np.where(abs(z) < trunc_err_low)] = trunc_err_low
+#        if trunc_err_high is not None:
+#            z[np.where(abs(z) > trunc_err_high)] = trunc_err_high
+#        color_map = cm.viridis
+#
+#        fig, ax = plt.subplots()
+#        im = ax.pcolormesh(X, Y, z, cmap=color_map) # , norm=LogNorm(vmin=trunc_err_low, vmax=trunc_err_high)
+#        cbar = fig.colorbar(im, ax=ax)
+#        cbar.set_label('Relative error')
+#        plt.show()
+#    if 0:
+#        from scipy.optimize import differential_evolution
+#        def obj(x):
+#            try:
+#                x = x.tolist()
+#            except:
+#                pass
+#            Fs = Rachford_Rice_flashN_f_jac(x, ns, Ks)[0]
+#            err = 0.0
+#            # if sum(x) > 1:
+#            #     err += abs(1-sum(x))
+#            err += abs(Fs[0]) + abs(Fs[1])
+#            return err
+#        ans = differential_evolution(obj, [(-30.0, 30.0) for j in range(2)], **{'popsize':200, 'init': 'random', 'atol': 1e-12})
+#        objf = float(ans['fun'])
+        
+#    betas, iters = newton_system(Rachford_Rice_flashN_f_jac, x0=betas, jac=True, 
+#                                        xtol=1e-11, ytol=1e100, maxiter=100, 
+#                                            args=(ns, Ks), damping=1.0,
+#                                           damping_func=RRN_new_betas)
+    # Rachford_Rice_flash2_f_jac is over twice as fast! Do not change to the generic one.
+    betas, iters = newton_system(Rachford_Rice_flash2_f_jac, x0=betas, jac=True, 
+                                            xtol=1e-11, ytol=1e100, maxiter=100,
+                                           args=(ns, Ks), damping=1.0,
+                                           damping_func=RRN_new_betas, solve_func=solve_2_direct)
+    beta_y = betas[0]
+    beta_z = betas[1]
+    
+    N = len(ns)
+    xs = [0.0]*N
+    ys = [0.0]*N
+    zs = [0.0]*N
+    z_tot = 0.0
+    for i in range(N):
+        xi = ns[i]/(1. + beta_y*(Ks_y[i] - 1.0) + beta_z*(Ks_z[i] - 1.0))
+        xs[i] = xi
+        ys[i] = xi*Ks_y[i]
+        zs[i] = xi*Ks_z[i]
+        z_tot += zs[i]
+        
+    if (1.0 - z_tot) > 1e-10:
+        raise ValueError("Converged to nonphysical solution")
+    return beta_y, beta_z, xs, ys, zs
+
