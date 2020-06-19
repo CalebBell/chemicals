@@ -340,6 +340,13 @@ def test_rachford_rice():
     assert_close(chemicals.numba.Rachford_Rice_flash_error(0.5, zs=zs, Ks=Ks),
                  Rachford_Rice_flash_error(0.5, zs=zs, Ks=Ks))
 
+    zs = np.array([0.5, 0.3, 0.2])
+    Ks = np.array([1.685, 0.742, 0.532])
+    VF_new, xs_new, ys_new = chemicals.numba.flash_inner_loop(zs=zs, Ks=Ks)
+    VF, xs, ys = flash_inner_loop(zs=zs.tolist(), Ks=Ks.tolist())
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
 
 @pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")

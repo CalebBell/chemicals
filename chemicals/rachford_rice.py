@@ -1087,7 +1087,6 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False,
     else:
         V_over_F_min2 = V_over_F_min
         V_over_F_max2 = V_over_F_max
-    
     x0 = (V_over_F_min2 + V_over_F_max2)*0.5
     
     K_minus_1 = [0.0]*N
@@ -1109,19 +1108,17 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False,
 
     try:
         low, high = V_over_F_min*one_epsilon_larger, V_over_F_max*one_epsilon_smaller
-#        V_over_F = newton(Rachford_Rice_err_fprime, x0, ytol=1e-12, fprime=True, high=high, # numba: uncomment
-#                          low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1)) # numba: uncomment
-        if fprime2: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_fprime2, x0, ytol=1e-5, fprime=True, fprime2=True, # numba: delete
-                              high=high, low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1)) # numba: delete
-        elif fprime: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_fprime, x0, ytol=1e-12, fprime=True, high=high, # numba: delete
-                              low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1)) # numba: delete
-        else: # numba: delete
+        if fprime2:
+            V_over_F = halley(Rachford_Rice_err_fprime2, x0, ytol=1e-5, #fprime=True, fprime2=True,
+                              high=high, low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1))
+        elif fprime:
+            V_over_F = newton(Rachford_Rice_err_fprime, x0, ytol=1e-12, fprime=True, high=high,
+                              low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1))
+        else:
 #            print(V_over_F_max, V_over_F_min)
-            V_over_F = secant(Rachford_Rice_err, x0, ytol=1e-5, xtol=1.48e-8, high=high, # numba: delete
-                              low=low, bisection=True, require_xtol=True, # numba: delete
-                              args=(zs_k_minus_1, K_minus_1)) # numba: delete
+            V_over_F = secant(Rachford_Rice_err, x0, ytol=1e-5, xtol=1.48e-8, high=high,
+                              low=low, bisection=True, require_xtol=True,
+                              args=(zs_k_minus_1, K_minus_1))
         
 #        assert V_over_F >= V_over_F_min2
 #        assert V_over_F <= V_over_F_max2
@@ -1840,26 +1837,37 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
         
         for zi in zs:
             if zi == 0.0:
-                # Cannot pre-allocate - has to be a list
-                zero_indexes = []
-                zs2, Ks2 = [], []
+                # Count the number of zeros
+                zeros = 0
+                for zi in zs:
+                    if zi == 0.0:
+                        zeros += 1
+                
+                # Allocate appropriate lists
+                zero_indexes = [0]*zeros
+                zs2 = [0.0]*(l-zeros)
+                Ks2 = [0.0]*(l-zeros)
+                running_zeros = 0
                 for i in range(l):
                     if zs[i] == 0.0:
-                        zero_indexes.append(i)
+                        zero_indexes[running_zeros] = i
+                        running_zeros += 1
                     else:
-                        zs2.append(zs[i])
-                        Ks2.append(Ks[i])
-#                zs2, Ks2 = np.array(zs2), np.array(Ks2) # numba: uncomment
+                        zs2[i-running_zeros] = zs[i]
+                        Ks2[i-running_zeros] = Ks[i]
                 V_over_F, xs, ys = Rachford_Rice_solution(zs2, Ks2)
-#                V_over_F, xs, ys = flash_inner_loop(zs2, Ks2, method=method, limit=limit, guess=guess, check=True)
-#                xs = xs.tolist() # numba: uncomment
-#                ys = ys.tolist() # numba: uncomment
-                for idx in zero_indexes:
-                    xs.insert(idx, 0.0)
-                    ys.insert(idx, 0.0)
-                
-#                xs, ys = np.array(xs), np.array(ys) # numba: uncomment
-                return V_over_F, xs, ys
+
+                # Reset the values into a main array
+                xs2 = [0.0]*l
+                ys2 = [0.0]*l
+                running_zeros = 0
+                for i in range(l):
+                    if zs[i] != 0.0:
+                        xs2[i] = xs[i - running_zeros]
+                        ys2[i] = ys[i - running_zeros]
+                    else:
+                        running_zeros += 1
+                return V_over_F, xs2, ys2
 #        return Rachford_Rice_solution_trace(zs, Ks, guess)
 
     if method2 == FLASH_INNER_LN2:
@@ -1876,19 +1884,23 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
             t1 = z1z2 - K1z1 - K2z2 
             den = t1 + K2*K1z1 + K1*K2z2 - K1*z2 - K2*z1
             if den != 0.0:
-                V_over_F = (t1)/(den)
+                V_over_F = t1/den
             else:
                 return Rachford_Rice_solution(zs=zs, Ks=Ks)
         elif l == 3:
+            fail = False
             try:
                 sln = _Rachford_Rice_analytical_3(zs, Ks)
-                if sln[0].imag != 0.0: # numba: delete
-                    raise ValueError("Failed analytically") # numba: delete
-                return sln
             except:
+                fail = True
+            if not fail and sln[0].imag != 0.0:
+                fail = True
+            if fail:
                 return Rachford_Rice_solution(zs=zs, Ks=Ks)
+            return sln
         elif l == 4:
             return Rachford_Rice_solution_polynomial(zs, Ks)
+        # Better to use a numerical solution
 #            poly = Rachford_Rice_polynomial_4(zs, [Ki - 1.0 for Ki in Ks])
 #            V_over_F = roots_cubic_a1(poly[1], poly[2], poly[3])[2].real
         elif l == 5:
