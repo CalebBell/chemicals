@@ -304,6 +304,10 @@ class ZabranskyQuasipolynomial(HeatCapacity):
         return (Zabransky_quasi_polynomial_integral_over_T(Tb, self.Tc, *self.coeffs)
                - Zabransky_quasi_polynomial_integral_over_T(Ta, self.Tc, *self.coeffs))
 
+# @jitclass([('_modles', types.Tuple(ZabranskyQuasipolynomial, ZabranskySpline)), # NUMBA: UNCOMMENT
+#            ('Tc', types.float64),                        # NUMBA: UNCOMMENT
+#            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
+#            ('Tmax', types.float64)])                     # NUMBA: UNCOMMENT
 class PiecewiseHeatCapacity:
     r"""
     Create a PiecewiseHeatCapacity object for calculating heat capacity and the 
@@ -315,7 +319,7 @@ class PiecewiseHeatCapacity:
         Piecewise heat capacity objects.
     
     """
-    __slots__ = ('_models')
+    __slots__ = ('_models') # NUMBA: DELETE
     
     def __init__(self, models):
         self.models = models
