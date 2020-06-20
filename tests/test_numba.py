@@ -26,7 +26,8 @@ import chemicals.vectorized
 from math import *
 from random import random
 from fluids.constants import *
-from fluids.numerics import assert_close, assert_close1d
+from fluids.numerics import assert_close, assert_close1d, assert_close2d
+from numpy.testing import assert_allclose
 import pytest
 try:
     import numba
@@ -314,7 +315,7 @@ def test_volume():
     
     
     # Test COSTALD_mixture - even slower
-    # timing after optimization at 200 elements - 1.6 m CPython, 41.1 µs numba, 82 µs PyPy
+    # timing after optimization at 200 elements - 1.49 m CPython, 27.1 µs numba, 63.5 µs PyPy
     T = 300.0
     N = 15
     xs = normalize([0.4576, 0.5424]*N)
@@ -329,4 +330,93 @@ def test_volume():
     assert_close(COSTALD_mixture(xs, T, Tcs, Vcs, omegas),
                  chemicals.numba.COSTALD_mixture(xs2, T, Tcs2, Vcs2, omegas2))
     
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_rachford_rice():
+    n = 10
+    zs = np.array([0.5, 0.3, 0.2]*n)
+    Ks = np.array([1.685, 0.742, 0.532]*n)
+    
+    assert_close(chemicals.numba.Rachford_Rice_flash_error(0.5, zs=zs, Ks=Ks),
+                 Rachford_Rice_flash_error(0.5, zs=zs, Ks=Ks))
+
+    zs = np.array([0.5, 0.3, 0.2])
+    Ks = np.array([1.685, 0.742, 0.532])
+    VF_new, xs_new, ys_new = chemicals.numba.flash_inner_loop(zs=zs, Ks=Ks)
+    VF, xs, ys = flash_inner_loop(zs=zs.tolist(), Ks=Ks.tolist())
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_Rachford_Rice_solutionN():
+    ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
+    Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
+    Ks_z = [1.52713341421, 0.02456487977, 1.46348240453, 1.16090546194, 0.24166289908, 0.14815282572, 14.3128010831]
+    ns2, Ks2, betas2 = np.array(ns), np.array([Ks_y, Ks_z]), np.array([.1, .6])
+    betas_new, zs_new = chemicals.numba.Rachford_Rice_solutionN(ns2, Ks2, betas2)
+    betas, zs = Rachford_Rice_solutionN(ns, [Ks_y, Ks_z], [.1, .6])
+    assert_close1d(betas, betas_new, rtol=1e-14)
+    assert_close2d(zs, zs_new, rtol=1e-14)
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_Rachford_Rice_solution2():
+    ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
+    Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
+    Ks_z = [1.52713341421, 0.02456487977, 1.46348240453, 1.16090546194, 0.24166289908, 0.14815282572, 14.3128010831]
+    ns2, Ksy2, Ksz2 = np.array(ns), np.array(Ks_y), np.array(Ks_z)
+    
+    beta0_new, beta1_new, z0_new, z1_new, z2_new = chemicals.numba.Rachford_Rice_solution2(ns2, Ksy2, Ksz2, beta_y=.1, beta_z=.6)
+    beta0, beta1, z0, z1, z2 = Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=.1, beta_z=.6)
+    assert_close(beta0_new, beta0)
+    assert_close(beta1_new, beta1)
+    assert_close1d(z0, z0_new)
+    assert_close1d(z1, z1_new)
+    assert_close1d(z2, z2_new)
+    
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_rachford_rice_polynomial():
+    zs, Ks = [.4, .6], [2, .5]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+
+    zs = [0.5, 0.3, 0.2]
+    Ks = [1.685, 0.742, 0.532]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+    
+    zs = [0.2, 0.3, 0.4, 0.1]
+    Ks = [2.5250, 0.7708, 1.0660, 0.2401]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+    
+    zs = [0.2, 0.3, 0.4, 0.05, 0.05]
+    Ks = [2.5250, 0.7708, 1.0660, 0.2401, 0.3140]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
+    
+    # 6 and higher use generic routine
+    zs = [0.05, 0.10, 0.15, 0.30, 0.30, 0.10]
+    Ks = [6.0934, 2.3714, 1.3924, 1.1418, 0.6457, 0.5563]
+    VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
+    VF, xs, ys = Rachford_Rice_solution_polynomial(zs, Ks)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
 

@@ -38,7 +38,6 @@ from chemicals import miscdata
 from chemicals.data_reader import register_df_source, data_source
 
 import numpy as np
-import pandas as pd
 
 folder = os.path.join(os.path.dirname(__file__), 'Vapor Pressure')
 

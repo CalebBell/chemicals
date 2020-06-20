@@ -27,7 +27,6 @@ __all__ = ['GWP', 'ODP', 'logP',
            'GWP_methods', 'ODP_methods', 'logP_methods']
 
 import os
-import pandas as pd
 from chemicals.utils import PY37
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -157,6 +156,7 @@ def GWP(CASRN, get_methods=False, method=None):
     '''
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if get_methods:
+        import pandas as pd
         if CASRN in GWP_data.index:
             return [method for method, key in _GWP_keys_by_method.items()
                     if not pd.isnull(GWP_data.at[CASRN, key])]
@@ -255,6 +255,7 @@ def ODP(CASRN, get_methods=False, method=None):
     '''
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if get_methods:
+        import pandas as pd
         if CASRN in ODP_data.index:
             return [method for method, key in _ODP_keys_by_method.items()
                     if not pd.isnull(ODP_data.at[CASRN, key])]

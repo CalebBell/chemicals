@@ -30,8 +30,7 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar',
 
 import os
 import numpy as np
-import pandas as pd
-from fluids.numerics import newton, interp
+from fluids.numerics import secant, interp
 from chemicals.utils import log, exp, log10
 from chemicals.utils import PY37
 from chemicals.data_reader import register_df_source, data_source
@@ -754,10 +753,13 @@ def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
        Technical Gas Mixtures from the Viscosity of Individual Gases, german",
        Gas u. Wasserfach (1936) 79, No. 49, 69.
     '''
+    N = len(zs)
     if MW_roots is None:
-        MW_roots = [MWi**0.5 for MWi in MWs]
+        MW_roots = [0.0]*N
+        for i in range(N):
+            MW_roots[i] = MWs[i]**0.5
     denominator = k = 0.0
-    for i in range(len(zs)):
+    for i in range(N):
         v = zs[i]*MW_roots[i]
         k += v*mus[i]
         denominator += v
@@ -1193,8 +1195,8 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
        Doherty Memorial Fund of AIME, Society of Petroleum Engineers, 2000.
     '''
     Tc, Pc, Vc, MW = 0.0, 0.0, 0.0, 0.0
-    cmps = range(len(zs))
-    for i in cmps:
+    N = len(zs)
+    for i in range(N):
         Tc += Tcs[i]*zs[i]
         Pc += Pcs[i]*zs[i]
         Vc += Vcs[i]*zs[i]
@@ -1207,7 +1209,9 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
     
     rhor = rhom/rhoc    
     # mu star is computed here
-    mus_low_gas = [Stiel_Thodos(T, Tcs[i], Pcs[i], MWs[i]) for i in cmps]
+    mus_low_gas = [0.0]*N
+    for i in range(N):
+        mus_low_gas[i] = Stiel_Thodos(T, Tcs[i], Pcs[i], MWs[i])
     mu_low_gas = Herning_Zipperer(zs, mus_low_gas, MWs)
     
     # Polynomial - in horner form, validated
@@ -1680,7 +1684,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
     >>> viscosity_converter(8.79, 'engler', 'parlin cup #7')
     52.5
     >>> viscosity_converter(700, 'Saybolt Universal Seconds', 'kinematic viscosity')
-    0.00015108914751515545
+    0.00015108914751515542
 
     References
     ----------
@@ -1728,7 +1732,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         if not extrapolate:
             range_check(val, old_scale)
         to_solve = lambda nu: Saybolt_universal_eq(nu) - val
-        val = newton(to_solve, 1)
+        val = secant(to_solve, 1)
     elif old_scale in viscosity_converters_to_nu:
         if not extrapolate:
             range_check(val, old_scale)

@@ -22,9 +22,10 @@ SOFTWARE.'''
 
 __all__ = ['RI_methods', 'refractive_index', 
            'polarizability_from_RI', 'molar_refractivity_from_RI', 
-           'RI_from_molar_refractivity']
+           'RI_from_molar_refractivity', 'RI_IAPWS']
 
 import os
+from fluids.numerics import interp
 from fluids.constants import pi, N_A
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -246,3 +247,170 @@ def RI_from_molar_refractivity(Rm, Vm):
     Rm = ((-2*Rm - Vm)/(Rm-Vm))**0.5
     return Rm
 
+
+def RI_IAPWS(T, rho, wavelength=0.5893):
+    r'''Calculates the refractive index of water at a given temperature,
+    density, and wavelength.
+
+    .. math::
+
+        n(\rho, T, \lambda) = \left(\frac{2A + 1}{1-A}\right)^{0.5}\\
+
+        A(\delta, \theta, \Lambda) = \delta\left(a_0 + a_1\delta +
+        a_2\theta + a_3\Lambda^2\theta + a_4\Lambda^{-2}
+        \frac{a_5}{\Lambda^2-\Lambda_{UV}^2} + \frac{a_6}
+        {\Lambda^2 - \Lambda_{IR}^2} + a_7\delta^2\right)
+
+        \delta = \rho/(1000 \text{ kg/m}^3)\\
+        \theta = T/273.15\text{K}\\
+        \Lambda = \lambda/0.589 \mu m
+
+        \Lambda_{IR} = 5.432937 \\
+        \Lambda_{UV} = 0.229202
+
+    Parameters
+    ----------
+    T : float
+        Temperature of the water [K]
+    rho : float
+        Density of the water [kg/m^3]
+    wavelength : float
+        Wavelength of fluid [micrometers]
+
+    Returns
+    -------
+    RI : float
+        Refractive index of the water, [-]
+
+    Notes
+    -----
+    This function is valid in the following range:
+    261.15 K < T < 773.15 K
+    0 < rho < 1060 kg/m^3
+    0.2 < wavelength < 1.1 micrometers
+
+    Test values are from IAPWS 2010 book.
+
+    Examples
+    --------
+    >>> RI_IAPWS(298.15, 997.047435, 0.5893)
+    1.3328581926471605
+
+    References
+    ----------
+    .. [1] IAPWS, 1997. Release on the Refractive Index of Ordinary Water
+       Substance as a Function of Wavelength, Temperature and Pressure.
+    '''
+    delta = rho*1e-3
+    theta = T/273.15
+    Lambda = wavelength/0.589
+
+    LambdaIR = 5.432937
+    LambdaUV = 0.229202
+    
+    Lambda2 = Lambda*Lambda
+
+    A = delta*(0.244257733 + 0.0097463448*delta + -0.00373235*theta + 0.0002686785*Lambda2*theta + 
+    0.0015892057/Lambda2 + 0.0024593426/(Lambda2 - LambdaUV*LambdaUV) + 
+    0.90070492/(Lambda2 - LambdaIR*LambdaIR) - 0.0166626219*delta*delta)
+    n = ((2*A + 1.)/(1. - A))**0.5
+    return n
+
+ICUMSA_1974_brix = list(range(96))
+ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175, 
+                   1.34325, 1.34477, 1.34629, 1.34782, 1.34937, 1.35093, 1.35250, 
+                   1.35408, 1.35568, 1.35729, 1.35891, 1.36054, 1.36218, 1.36384, 
+                   1.36551, 1.36720, 1.36889, 1.37060, 1.37233, 1.37406, 1.37582, 
+                   1.37758, 1.37936, 1.38115, 1.38296, 1.38478, 1.38661, 1.38846, 
+                   1.39032, 1.39220, 1.39409, 1.39600, 1.39792, 1.39986, 1.40181, 
+                   1.40378, 1.40576, 1.40776, 1.40978, 1.41181, 1.41385, 1.41592, 
+                   1.41799, 1.42009, 1.42220, 1.42432, 1.42647, 1.42863, 1.43080, 
+                   1.43299, 1.43520, 1.43743, 1.43967, 1.44193, 1.44420, 1.44650, 
+                   1.44881, 1.45113, 1.45348, 1.45584, 1.45822, 1.46061, 1.46303, 
+                   1.46546, 1.46790, 1.47037, 1.47285, 1.47535, 1.47787, 1.48040, 
+                   1.48295, 1.48552, 1.48811, 1.49071, 1.49333, 1.49597, 1.49862,
+                   1.50129, 1.50398, 1.5067, 1.5094, 1.5122, 1.5149, 1.5177, 
+                   1.5205, 1.5234, 1.5262, 1.5291, 1.5320]
+
+def brix_to_RI(brix):
+    ''' Convert a refractive index measurement on the `brix` scale to a 
+    standard refractive index.
+    
+    Parameters
+    ----------
+    brix : float
+        Degrees brix to be converted, [°Bx]
+
+    Returns
+    -------
+    RI : float
+        Refractive index, [-]
+
+    Notes
+    -----
+    The scale is officially defined from 0 to 85; but the data source contains
+    values up to 95. Linear extrapolation outside of the bounds is performed;
+    and a table of 96 values are linearly interpolated.
+    
+    The ICUMSA (International Committee of Uniform Method of Sugar Analysis)
+    published a document setting out the reference values in 1974; but an 
+    original data source has not been found and reviewed.
+
+    Examples
+    --------
+    >>> brix_to_RI(5.8)
+    1.341452
+    >>> brix_to_RI(0)
+    1.33299
+    >>> brix_to_RI(100)
+    1.532
+
+    References
+    ----------
+    .. [1] "Refractometer　Data Book-Refractive Index and Brix | ATAGO CO.,
+       LTD." Accessed June 13, 2020. 
+       https://www.atago.net/en/databook-refractometer_relationship.php.
+    '''
+    return interp(brix, ICUMSA_1974_brix, ICUMSA_1974_RIs)
+
+def RI_to_brix(RI):
+    ''' Convert a standard refractive index measurement to the `brix` scale.
+    
+    Parameters
+    ----------
+    RI : float
+        Refractive index, [-]
+
+    Returns
+    -------
+    brix : float
+        Degrees brix to be converted, [°Bx]
+
+    Notes
+    -----
+    The scale is officially defined from 0 to 85; but the data source contains
+    values up to 95. 
+    
+    No further extrapolation to values under 0 or above 95 is performed.
+    
+    The ICUMSA (International Committee of Uniform Method of Sugar Analysis)
+    published a document setting out the reference values in 1974; but an 
+    original data source has not been found and reviewed.
+
+    Examples
+    --------
+    >>> RI_to_brix(1.341452)
+    5.800000000000059
+    >>> RI_to_brix(1.33299)
+    0.0
+    >>> RI_to_brix(1.532)
+    95.0
+    
+
+    References
+    ----------
+    .. [1] "Refractometer　Data Book-Refractive Index and Brix | ATAGO CO.,
+       LTD." Accessed June 13, 2020. 
+       https://www.atago.net/en/databook-refractometer_relationship.php.
+    '''
+    return interp(RI, ICUMSA_1974_RIs, ICUMSA_1974_brix)

@@ -41,8 +41,6 @@ from chemicals.utils import R, log, exp, polylog2, to_num, PY37, property_mass_t
 from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
 from fluids.numerics import newton, brenth, secant
-from numba.experimental import jitclass
-from numba import types
 
 # %% Methods introduced in this module
 
@@ -827,7 +825,7 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
         err = (property_mass_to_molar(dH, MW)*factor - Hm)
         return err
     try:
-        return newton(err, 500, ytol=1e-4)
+        return secant(err, 500, ytol=1e-4)
     except:
         try:
             return brenth(err, 1e-3, 1e5)
@@ -1398,6 +1396,7 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     '''
     Tr = T/Tc
     return R*(a1*log(1.0-Tr) + a2/(1.0-Tr) + a3 + Tr*(Tr*(Tr*a6 + a5) + a4))
+
 
 # @njit(cache=True)
 def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):

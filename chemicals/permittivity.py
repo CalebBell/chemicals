@@ -26,7 +26,6 @@ __all__ = ['permittivity_IAPWS']
 
 import os
 import numpy as np
-import pandas as pd
 from fluids.constants import N_A, epsilon_0, k
 from chemicals.utils import PY37
 from chemicals.data_reader import register_df_source, data_source
