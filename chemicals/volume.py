@@ -458,7 +458,7 @@ def COSTALD(T, Tc, Vc, omega):
     return Vc*V_0*(1.0 - omega*V_delta)
 
 
-def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=None, hydroxyl=False):
+def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
     r'''Calculate saturation liquid density using the Campbell-Thodos [1]_
     CSP method.
 
@@ -541,7 +541,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=None, hydroxyl=False):
     Tr = T/Tc
     Tbr = Tb/Tc
     Pc = Pc/101325.
-    s = Tbr * log(Pc)/(1.0 - Tbr)
+    s = Tbr*log(Pc)/(1.0 - Tbr)
     Lambda = Pc**(1.0/3.)/(M**0.5*Tc**(5/6.))
     alpha = 0.3883 - 0.0179*s
     beta = 0.00318*s - 0.0211 + 0.625*Lambda**(1.35)
@@ -549,11 +549,15 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=None, hydroxyl=False):
         theta = Pc*dipole*dipole/(Tc*Tc)
         alpha -= 130540 * theta**2.41
         beta += 9.74E6 * theta**3.38
-    if hydroxyl:
-        beta = 0.00318*s - 0.0211 + 0.625*Lambda**(1.35) + 5.90*theta**0.835
-        alpha = (0.69*Tbr - 0.3342 + 5.79E-10/Tbr**32.75)*Pc**0.145
+        if hydroxyl:
+            beta += 5.90*theta**0.835
+            alpha = (0.69*Tbr - 0.3342 + 5.79E-10*Tbr**-32.75)*Pc**0.145
     Zra = alpha + beta*(1.0 - Tr)
-    Vs = R*Tc/(Pc*101325.0)*Zra**(1.0 + (1.0 - Tr)**(2.0/7.))
+    if T == Tc:
+        p = 1.0
+    else:
+        p = (1.0 + (1.0 - Tr)**(2.0/7.))
+    Vs = R*Tc/(Pc*101325.0)*Zra**p
     return Vs
 
 
@@ -623,7 +627,7 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
     rho0 = 1. + 1.169*tau**(1/3.) + 1.818*tau**(2/3.) - 2.658*tau + 2.161*tau**(4/3.)
     V0 = 1./rho0
 
-    if not delta_SRK:
+    if delta_SRK is None:
         return Vc*V0
     else:
         return Vc*V0/(1. + delta_SRK*(alpha_SRK - 1.0)**(1.0/3.0))
@@ -939,7 +943,6 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
     vec = [0.0]*N
     for i in range(N):
         vec[i] = (Tcs[i]*Vcs[i])**0.5*xs[i]*Vm_inv_root
-#    vec = [Tcs[i]**0.5*Vcs[i]**0.5*xs[i]*Vm_inv_root for i in range(N)]
     
     Tcm = 0.0
     for i in range(N):
