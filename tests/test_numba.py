@@ -420,3 +420,11 @@ def test_rachford_rice_polynomial():
     assert_close1d(xs, xs_new)
     assert_close1d(ys, ys_new)
 
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_lazy_loading():
+    # Numba interfers with to_num
+    # The data_reader functions are not part of the public API so are not converted
+    chemicals.numba.heat_capacity.zabransky_dicts
+    chemicals.numba.heat_capacity.CRC_standard_data
