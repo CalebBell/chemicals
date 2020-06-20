@@ -31,15 +31,18 @@ __all__ = ['heat_capacity_gas_methods',
            'Zabransky_cubic_integral', 'Zabransky_cubic_integral_over_T',
            'heat_capacity_solid_methods',
            'Lastovka_solid', 'Lastovka_solid_integral', 
-           'Lastovka_solid_integral_over_T', 'heat_capacity_solid_methods']
+           'Lastovka_solid_integral_over_T', 'heat_capacity_solid_methods',
+           'HeatCapacityMetaclass', 'HeatCapacity', 
+           'ZabranskySpline', 'ZabranskyQuasipolynomial',
+           'PiecewiseHeatCapacity']
 import os
 from io import open
 from chemicals.utils import R, log, exp, polylog2, to_num, PY37, property_mass_to_molar
 from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
-from fluids.numerics import py_newton as newton, brenth, secant
-# from numba.experimental import jitclass
-# from numba import types, njit
+from fluids.numerics import newton, brenth, secant
+from numba.experimental import jitclass
+from numba import types
 
 # %% Methods introduced in this module
 
@@ -73,25 +76,52 @@ heat_capacity_liquid_methods = (
 LASTOVKA_S = 'Lastovka, Fulem, Becerra and Shaw (2008)'
 PERRY151 = "Perry's Table 2-151"
 heat_capacity_solid_methods = (PERRY151, CRCSTD, LASTOVKA_S)
+
 # %% Data types
 
-class HeatCapacityModel:
-    """Abstract class heat capacity model subclasses."""
+### Abstract heat capacity classes ###
+
+class HeatCapacityMetaclass(type):
+    """Metaclass for heat capacity model classes."""
     
+    def __instancecheck__(self, instance):
+        try:
+            instance.Tmin
+            instance.Tmax
+            instance.calculate
+            instance.calculate_integral
+            instance.calculate_integral_over_T
+        except AttributeError: return False
+        return True
+
+    def __subclasscheck__(self, subclass):
+        try:
+            subclass.calculate
+            subclass.calculate_integral
+            subclass.calculate_integral_over_T
+        except AttributeError: return False
+        return True
+
+
+class HeatCapacity(metaclass=HeatCapacityMetaclass):
+    """Abstract class for heat capacity subclasses."""
+    __slots__ = ()
     def __init_subclass__(cls):
         cls_attrs = ('calculate', 'calculate_integral', 'calculate_integral_over_T')
         hasattr_ = hasattr
         for attr in cls_attrs:
             if not hasattr_(cls, attr):
                 raise NotImplementedError(
-                    "HeatCapacityModel subclass must implement a '%s' method" % attr
+                    "HeatCapacity subclass must implement a '%s' method" % attr
                 )
+    
             
+### Heat capacity subclasses ###
 
-# @jitclass([('coeffs', types.UniTuple(types.float64, 4)),
-#            ('Tmin', types.float64),
-#            ('Tmax', types.float64)])
-class ZabranskySpline(HeatCapacityModel):
+# @jitclass([('coeffs', types.UniTuple(types.float64, 4)), # NUMBA: UNCOMMENT
+#            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
+#            ('Tmax', types.float64)])                     # NUMBA: UNCOMMENT
+class ZabranskySpline(HeatCapacity):
     r'''
     Implementation of the cubic spline method presented in [1]_ for 
     calculating the heat capacity of a chemical.
@@ -116,7 +146,7 @@ class ZabranskySpline(HeatCapacityModel):
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     
     '''
-    __slots__ = ('coeffs', 'Tmin', 'Tmax')
+    __slots__ = ('coeffs', 'Tmin', 'Tmax') # NUMBA: DELETE
     
     def __init__(self, coeffs, Tmin, Tmax):
         self.coeffs = coeffs
@@ -180,11 +210,11 @@ class ZabranskySpline(HeatCapacityModel):
                 - Zabransky_cubic_integral_over_T(Ta, *self.coeffs))
 
 
-# @jitclass([('coeffs', types.UniTuple(types.float64, 6)),
-#            ('Tc', types.float64),
-#            ('Tmin', types.float64),
-#            ('Tmax', types.float64)])
-class ZabranskyQuasipolynomial(HeatCapacityModel):
+# @jitclass([('coeffs', types.UniTuple(types.float64, 6)), # NUMBA: UNCOMMENT
+#            ('Tc', types.float64),                        # NUMBA: UNCOMMENT
+#            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
+#            ('Tmax', types.float64)])                     # NUMBA: UNCOMMENT
+class ZabranskyQuasipolynomial(HeatCapacity):
     r'''
     Quasi-polynomial object for calculating the heat capacity of a chemical.
     Implements the enthalpy and entropy integrals as well.
@@ -211,7 +241,7 @@ class ZabranskyQuasipolynomial(HeatCapacityModel):
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     
     '''
-    __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax')
+    __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax') # NUMBA: DELETE
     
     def __init__(self, coeffs, Tc, Tmin, Tmax):
         self.coeffs = coeffs
@@ -276,16 +306,15 @@ class ZabranskyQuasipolynomial(HeatCapacityModel):
         return (Zabransky_quasi_polynomial_integral_over_T(Tb, self.Tc, *self.coeffs)
                - Zabransky_quasi_polynomial_integral_over_T(Ta, self.Tc, *self.coeffs))
 
-
 class PiecewiseHeatCapacity:
     r"""
-    PiecewiseHeatCapacity object for calculating heat capacity and the enthalpy and 
-    entropy integrals using piecewise models.
+    Create a PiecewiseHeatCapacity object for calculating heat capacity and the 
+    enthalpy and entropy integrals using piecewise models.
     
     Parameters
     ----------
-    models : Iterable[HeatCapacityModel]
-        Piecewise heat capacity model objects.
+    models : Iterable[HeatCapacity]
+        Piecewise heat capacity objects.
     
     """
     __slots__ = ('_models')
@@ -359,7 +388,7 @@ class PiecewiseHeatCapacity:
             else:
                 integral += model.calculate_integral(Ta, Tmax)
                 Ta = Tmax
-        raise ValueError(f"no valid model at T=%d to %d K" % Tb)
+        raise ValueError(f"no valid model at T=%d K" % Tb)
     
     def calculate_integral_over_T(self, Ta, Tb):
         r'''
@@ -391,7 +420,7 @@ class PiecewiseHeatCapacity:
             else:
                 integral += model.calculate_integral_over_T(Ta, Tmax)
                 Ta = Tmax
-        raise ValueError(f"no valid model at T=%d to %d K" % Tb)
+        raise ValueError(f"no valid model at T=%d K" % Tb)
 
 
 # %% Register data sources and lazy load them
@@ -446,8 +475,11 @@ def _load_Cp_data():
     }
     with open(os.path.join(folder, 'Zabransky.tsv'), encoding='utf-8') as f:
         next(f)
+        def to_num(x): # TODO: Temporary until fluids is updated
+            try: return float(x)
+            except: return x
         for line in f:
-            values = to_num(line.strip('\n').split('\t'))
+            values = [to_num(i) for i in (line.strip('\n').split('\t'))]
             (CAS, name, Type, uncertainty, Tmin, Tmax,
              a1s, a2s, a3s, a4s, a1p, a2p, a3p, a4p, a5p, a6p, Tc) = values
             spline = bool(a1s) # False if Quasypolynomial, True if spline
