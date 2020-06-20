@@ -34,9 +34,10 @@ from chemicals.rachford_rice import Rachford_Rice_flash2_f_jac, Rachford_Rice_fl
 from fluids.numerics import assert_close, normalize
 from random import uniform
 import random
-from thermo import Wilson_K_value
 
 def test_RR_numpy():
+    def Wilson_K_value(T, P, Tc, Pc, omega):
+        return Pc/P*exp((5.37*(1.0 + omega)*(1.0 - Tc/T)))
     Tcs = [369.83, 407.8, 425.12, 433.8, 460.4, 469.7, 507.6, 126.2, 190.56400000000002, 304.2, 305.32]
     Pcs = [4248000.0, 3640000.0, 3796000.0, 3196000.0, 3380000.0, 3370000.0, 3025000.0, 3394387.5, 4599000.0, 7376460.0, 4872000.0]
     omegas = [0.152, 0.17600000000000002, 0.193, 0.19699999999999998, 0.22699999999999998, 0.251, 0.2975, 0.04, 0.008, 0.2252, 0.098]
