@@ -57,8 +57,9 @@ replaced = {'sum': np.sum, 'combinations': fluids.numba.combinations}
 replaced, NUMERICS_SUBMOD = fluids.numba.create_numerics(replaced, vec=False)
 
 
-fluids.numba.transform_module(normal, __funcs, replaced, vec=False)
-
+blacklist = set(['to_num'])
+fluids.numba.transform_module(normal, __funcs, replaced, vec=False,
+                              blacklist=blacklist)
 
 
 

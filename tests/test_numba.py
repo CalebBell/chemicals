@@ -26,7 +26,7 @@ import chemicals.vectorized
 from math import *
 from random import random
 from fluids.constants import *
-from fluids.numerics import assert_close, assert_close1d
+from fluids.numerics import assert_close, assert_close1d, assert_close2d
 from numpy.testing import assert_allclose
 import pytest
 try:
@@ -347,6 +347,35 @@ def test_rachford_rice():
     assert_close(VF, VF_new)
     assert_close1d(xs, xs_new)
     assert_close1d(ys, ys_new)
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_Rachford_Rice_solutionN():
+    ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
+    Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
+    Ks_z = [1.52713341421, 0.02456487977, 1.46348240453, 1.16090546194, 0.24166289908, 0.14815282572, 14.3128010831]
+    ns2, Ks2, betas2 = np.array(ns), np.array([Ks_y, Ks_z]), np.array([.1, .6])
+    betas_new, zs_new = chemicals.numba.Rachford_Rice_solutionN(ns2, Ks2, betas2)
+    betas, zs = Rachford_Rice_solutionN(ns, [Ks_y, Ks_z], [.1, .6])
+    assert_close1d(betas, betas_new, rtol=1e-14)
+    assert_close2d(zs, zs_new, rtol=1e-14)
+
+@pytest.mark.numba
+@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def test_Rachford_Rice_solution2():
+    ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
+    Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
+    Ks_z = [1.52713341421, 0.02456487977, 1.46348240453, 1.16090546194, 0.24166289908, 0.14815282572, 14.3128010831]
+    ns2, Ksy2, Ksz2 = np.array(ns), np.array(Ks_y), np.array(Ks_z)
+    
+    beta0_new, beta1_new, z0_new, z1_new, z2_new = chemicals.numba.Rachford_Rice_solution2(ns2, Ksy2, Ksz2, beta_y=.1, beta_z=.6)
+    beta0, beta1, z0, z1, z2 = Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=.1, beta_z=.6)
+    assert_close(beta0_new, beta0)
+    assert_close(beta1_new, beta1)
+    assert_close1d(z0, z0_new)
+    assert_close1d(z1, z1_new)
+    assert_close1d(z2, z2_new)
+    
 
 @pytest.mark.numba
 @pytest.mark.skipif(numba is None, reason="Numba is missing")

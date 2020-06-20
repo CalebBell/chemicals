@@ -33,7 +33,7 @@ __all__ = ['Rachford_Rice_flash_error',
 from fluids.constants import R
 from itertools import combinations
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
-from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct
+from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
 from chemicals.utils import exp, log
 from chemicals.utils import normalize
 from chemicals.exceptions import PhaseCountReducedError
@@ -1558,16 +1558,17 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
         
 ### N phase RR
 
-def Rachford_Rice_flashN_f_jac(betas, ns, Ks):
+def Rachford_Rice_flashN_f_jac(betas, ns, Ks, Ksm1=None, zsKsm1=None):
     N = len(betas)
     Fs = [0.0]*N
     dFs_dBetas = [[0.0]*N for i in range(N)] # numba: delete
 #    dFs_dBetas = np.zeros((N, N)) # numba: uncomment
-    
-    Ksm1 = [[i-1.0 for i in Ks_i] for Ks_i in Ks] # numba: delete
-#    Ksm1 = Ks - 1.0 # numba: uncomment
-    zsKsm1 = [[zi*Ksim1 for zi, Ksim1 in zip(ns, Ksm1i)] for Ksm1i in Ksm1] # numba: delete
-#    zsKsm1 = ns*Ksm1 # numba: uncomment
+    if Ksm1 is None:
+        Ksm1 = [[i-1.0 for i in Ks_i] for Ks_i in Ks] # numba: delete
+#        Ksm1 = Ks - 1.0 # numba: uncomment
+    if zsKsm1 is None:
+        zsKsm1 = [[zi*Ksim1 for zi, Ksim1 in zip(ns, Ksm1i)] for Ksm1i in Ksm1] # numba: delete
+#        zsKsm1 = ns*Ksm1 # numba: uncomment
     
     for i, zi in enumerate(ns):
         denom = 1.0
@@ -1580,15 +1581,12 @@ def Rachford_Rice_flashN_f_jac(betas, ns, Ks):
             Fs[j] += zsKsm1[j][i]*denom_inv
 
         for j in range(N):
-            for k in range(N):
-                if k <= j:
-                    term = zsKsm1[j][i]*Ksm1[k][i]*denom_inv2
-                    if k == j:
-                        dFs_dBetas[k][j] -= term
-                    else:
-                        dFs_dBetas[k][j] -= term
-                        dFs_dBetas[j][k] -= term
-
+            f = zsKsm1[j][i]*denom_inv2
+            for k in range(j):
+                term = f*Ksm1[k][i]
+                dFs_dBetas[k][j] -= term
+                dFs_dBetas[j][k] -= term
+            dFs_dBetas[j][j] -= f*Ksm1[j][i]
     return Fs, dFs_dBetas
 
 
@@ -1677,8 +1675,7 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
     
     Notes
     -----
-    Besides testing with three phases, only one 5 phase problem has been solved
-    with this algorithm, from [1]_.
+    This algorithm has been used without issue for 4 and 5 phase flashes.
     
     Examples
     --------
@@ -1699,36 +1696,69 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
         raise ValueError("Initial guesses will not lead to convergence")
     
     # Handle the case of the supplementary answer
-    if len(betas) > len(Ks):
+    phase_count_m1 = len(Ks)
+    if len(betas) > phase_count_m1:
         betas = betas[:-1]
+    phase_count = phase_count_m1 + 1
     
-    betas, iter = newton_system(Rachford_Rice_flashN_f_jac, jac=True, 
-                                           x0=betas, args=(ns, Ks),
-                                           ytol=1e-14, damping_func=RRN_new_betas)
+    if phase_count_m1 == 2:# numba: delete
+        solve_func = solve_2_direct# numba: delete
+    elif phase_count_m1 == 3:# numba: delete
+        solve_func = solve_3_direct# numba: delete
+    elif phase_count_m1 == 4:# numba: delete
+        solve_func = solve_4_direct# numba: delete
+    else:# numba: delete
+        solve_func = py_solve# numba: delete
+#    solve_func = np.linalg.solve # numba: uncomment
+    # numba is not smart enough to allow different matrix inverters
+
+    Ksm1 = [[i-1.0 for i in Ks_i] for Ks_i in Ks] # numba: delete
+#    Ksm1 = Ks - 1.0 # numba: uncomment
+    zsKsm1 = [[zi*Ksim1 for zi, Ksim1 in zip(ns, Ksm1i)] for Ksm1i in Ksm1] # numba: delete
+#    zsKsm1 = ns*Ksm1 # numba: uncomment
+
+    betas, _ = newton_system(Rachford_Rice_flashN_f_jac, jac=True, 
+                             x0=betas, args=(ns, Ks, Ksm1, zsKsm1), solve_func=solve_func,
+                             ytol=1e-14, damping_func=RRN_new_betas)
+    all_betas = [0.0]*phase_count
+    beta_sum = 0.0
+    for i in range(phase_count_m1):
+        beta_sum += betas[i]
+        all_betas[i] = betas[i]
+    all_betas[-1] = 1.0 - beta_sum
+
 #    print(betas, iter, 'current progress')
-    comps = []
-    ref_comp = []
-    for i, ni in enumerate(ns):
+    N = len(ns)
+    ref_comp = [0.0]*N
+    ref_comp_sum = 0.0
+    for i in range(N):
         denom = 1.0
-        for j, beta_i in enumerate(betas):
-            denom += beta_i*(Ks[j][i]-1.0)
-        denom_inv = 1.0/denom
-        ref_comp.append(ni*denom_inv)
+        for j in range(phase_count_m1):
+            denom += betas[j]*(Ks[j][i]-1.0)
+        zi = ns[i]/denom
+        ref_comp[i] = zi
+        ref_comp_sum += zi
 
-    for Ks_j in Ks:
-        comp = [Ki*xi for Ki, xi in zip(Ks_j, ref_comp)]
-        comps.append(comp)
+#    comps = np.empty((phase_count, N), np.float64) # numba: uncomment
+    comps = [] # numba: delete
+    for j in range(phase_count_m1):
+        comp = [0.0]*N
+        Ks_j = Ks[j]
+        for i in range(N):
+            comp[i] = ref_comp[i]*Ks_j[i]
+        comps.append(comp) # numba: delete
+#        comps[j] = comp # numba: uncomment
 
-    comps.append(ref_comp)
-    betas.append(1.0 - sum(betas))
+    comps.append(ref_comp) # numba: delete
+#    comps[phase_count_m1] = ref_comp  # numba: uncomment
 
-    if (1.0 - sum(ref_comp)) > 1e-10:
+    if (1.0 - ref_comp_sum) > 1e-10:
         raise ValueError("Converged to nonphysical solution")
 
-    return betas, comps
+    return all_betas, comps
 
 
-def RRN_new_betas(betas, d_betas, damping, ns, Ks):
+def RRN_new_betas(betas, d_betas, damping, ns, Ks, *args):
     N = len(betas)
     limit_betas = False
     max_beta_step = 1e100
