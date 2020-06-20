@@ -290,6 +290,18 @@ def test_volume():
 
     assert_close(chemicals.numba.Bhirud_normal(280.0, 469.7, 33.7E5, 0.252),
                  Bhirud_normal(280.0, 469.7, 33.7E5, 0.252))
+
+    assert_close(chemicals.numba.SNM0(121, 150.8, 7.49e-05, -0.004),
+                 SNM0(121, 150.8, 7.49e-05, -0.004))
+    
+    assert_close(chemicals.numba.SNM0(121, 150.8, 7.49e-05, -0.004, -0.03259620),
+                 SNM0(121, 150.8, 7.49e-05, -0.004, -0.03259620))
+
+    
+    kwargs = dict(T=405.45, Tb=239.82, Tc=405.45, Pc=111.7*101325, M=17.03, dipole=None)
+    assert_close(chemicals.numba.Campbell_Thodos(**kwargs), 
+                 Campbell_Thodos(**kwargs))
+
     # Test a slow one
     # 81.2 us orig, then 67.6 after optimizations in CPython
     # numba: 2.25 µs, PYPY: 1.31; numba with numpy: 4 us
@@ -315,7 +327,7 @@ def test_volume():
     
     
     # Test COSTALD_mixture - even slower
-    # timing after optimization at 200 elements - 1.49 m CPython, 27.1 µs numba, 63.5 µs PyPy
+    # timing after optimization at 200 elements - 1.49 m CPython, 27.1 µs numba, 63.5 µs PyPy3, 71.4 us PyPy2
     T = 300.0
     N = 15
     xs = normalize([0.4576, 0.5424]*N)
