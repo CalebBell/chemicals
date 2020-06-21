@@ -307,7 +307,7 @@ class ZabranskyQuasipolynomial(HeatCapacity):
 # @jitclass([('_modles', types.Tuple(ZabranskyQuasipolynomial, ZabranskySpline)), # NUMBA: UNCOMMENT
 #            ('Tc', types.float64),                        # NUMBA: UNCOMMENT
 #            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
-#            ('Tmax', types.float64)])                     # NUMBA: UNCOMMENT
+#            ('Tmax', types.float64),                      # NUMBA: UNCOMMENT
 class PiecewiseHeatCapacity:
     r"""
     Create a PiecewiseHeatCapacity object for calculating heat capacity and the 
@@ -319,7 +319,7 @@ class PiecewiseHeatCapacity:
         Piecewise heat capacity objects.
     
     """
-    __slots__ = ('_models') # NUMBA: DELETE
+    __slots__ = ('_models',) # NUMBA: DELETE
     
     def __init__(self, models):
         self.models = models
@@ -353,6 +353,16 @@ class PiecewiseHeatCapacity:
         T : float
             Temperature, [K]
         
+        Raises
+        ------
+        ValueError
+            If the temperature in not within the domain of any of the models 
+            (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
+        
+        See also
+        --------
+        PiecewiseHeatCapacity.force_calculate
+        
         Returns
         -------
         Cp : float
@@ -364,6 +374,35 @@ class PiecewiseHeatCapacity:
                 if T <= model.Tmax: return model.calculate(T)
         raise ValueError(f"no valid model at T=%d K" % T)
     
+    def force_calculate(self, T):
+        r'''
+        Return the heat capacity as a function of temperature. 
+            
+        Parameters
+        ----------
+        T : float
+            Temperature, [K]
+        
+        Notes
+        -----
+        This method extrapolates when temperature is not within the domain of 
+        any of the models (i.e if Tmin <= T <= Tmax cannot be satisfied by any
+        of the models).
+        
+        See also
+        --------
+        PiecewiseHeatCapacity.calculate
+        
+        Returns
+        -------
+        Cp : float
+            Liquid heat capacity as T, [J/mol/K]
+        
+        '''
+        for model in self._models:
+            if T <= model.Tmax: break
+        return model.calculate(T)
+    
     def calculate_integral(self, Ta, Tb):
         r'''
         Return the enthalpy integral of heat capacity from `Ta` to `Tb`.
@@ -374,15 +413,67 @@ class PiecewiseHeatCapacity:
             Initial temperature, [K]
         Tb : float
             Final temperature, [K]
-            
+        
+        Raises
+        ------
+        ValueError
+            If the temperature in not within the domain of any of the models 
+            (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
+        
+        Notes
+        -----
+        Analytically integrates piecewise through all models.
+        
+        See also
+        --------
+        PiecewiseHeatCapacity.force_calculate_integral
+        
         Returns
         -------
         dH : float
             Enthalpy difference between `Ta` and `Tb`, [J/mol]
         
-        '''   
-        integral = 0.
+        '''
+        if Tb < Ta: return -self.calculate_integral(Tb, Ta)
         if Ta < self.Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
+        elif Tb > self.Tmax: raise ValueError(f"no valid model at T=%d K" % Tb)
+        return self.force_calculate_integral(Ta, Tb)
+    
+    def force_calculate_integral(self, Ta, Tb):
+        r'''
+        Return the enthalpy integral of heat capacity from `Ta` to `Tb`.
+            
+        Parameters
+        ----------
+        Ta : float
+            Initial temperature, [K]
+        Tb : float
+            Final temperature, [K]
+        
+        Raises
+        ------
+        ValueError
+            If the temperature in not within the domain of any of the models 
+            (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
+        
+        Notes
+        -----
+        Analytically integrates piecewise through all models and extrapolates
+        when temperature is not within the domain of any of the models 
+        (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
+        
+        See also
+        --------
+        PiecewiseHeatCapacity.calculate_integral
+        
+        Returns
+        -------
+        dH : float
+            Enthalpy difference between `Ta` and `Tb`, [J/mol]
+        
+        '''
+        if Tb < Ta: return -self.force_calculate_integral(Tb, Ta)
+        integral = 0.
         for model in self._models:
             Tmax = model.Tmax
             if Tb <= Tmax:
@@ -390,7 +481,7 @@ class PiecewiseHeatCapacity:
             else:
                 integral += model.calculate_integral(Ta, Tmax)
                 Ta = Tmax
-        raise ValueError(f"no valid model at T=%d K" % Tb)
+        return integral + model.calculate_integral(Ta, Tb)
     
     def calculate_integral_over_T(self, Ta, Tb):
         r'''
@@ -406,15 +497,57 @@ class PiecewiseHeatCapacity:
         Notes
         -----
         Analytically integrates piecewise through all models.
-            
+        
+        Raises
+        ------
+        ValueError
+            If the temperature in not within the domain of any of the models 
+            (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
+        
+        See also
+        --------
+        PiecewiseHeatCapacity.force_calculate_integral_over_T
+        
         Returns
         -------
         dS : float
             Entropy difference between `Ta` and `Tb`, [J/mol/K]
         
-        '''        
-        integral = 0.
+        '''
+        if Tb < Ta: return -self.calculate_integral_over_T(Tb, Ta)
         if Ta < self.Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
+        elif Tb > self.Tmax: raise ValueError(f"no valid model at T=%d K" % Tb)
+        return self.force_calculate_integral_over_T(Ta, Tb)
+        
+    def force_calculate_integral_over_T(self, Ta, Tb):
+        r'''
+        Return the entropy integral of heat capacity from `Ta` to `Tb`.
+            
+        Parameters
+        ----------
+        Ta : float
+            Initial temperature, [K]
+        Tb : float
+            Final temperature, [K]
+            
+        Notes
+        -----
+        Analytically integrates piecewise through all models and extrapolates
+        when temperature is not within the domain of any of the models 
+        (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
+        
+        See also
+        --------
+        PiecewiseHeatCapacity.calculate_integral_over_T
+        
+        Returns
+        -------
+        dS : float
+            Entropy difference between `Ta` and `Tb`, [J/mol/K]
+        
+        '''
+        if Tb < Ta: return -self.force_calculate_integral_over_T(Tb, Ta)
+        integral = 0.
         for model in self._models:
             Tmax = model.Tmax
             if Tb <= Tmax:
@@ -422,8 +555,7 @@ class PiecewiseHeatCapacity:
             else:
                 integral += model.calculate_integral_over_T(Ta, Tmax)
                 Ta = Tmax
-        raise ValueError(f"no valid model at T=%d K" % Tb)
-
+        return integral + model.calculate_integral_over_T(Ta, Tb)
 
 # %% Register data sources and lazy load them
 
@@ -477,11 +609,8 @@ def _load_Cp_data():
     }
     with open(os.path.join(folder, 'Zabransky.tsv'), encoding='utf-8') as f:
         next(f)
-        def to_num(x): # TODO: Temporary until fluids is updated
-            try: return float(x)
-            except: return x
         for line in f:
-            values = [to_num(i) for i in (line.strip('\n').split('\t'))]
+            values = to_num(line.strip('\n').split('\t'))
             (CAS, name, Type, uncertainty, Tmin, Tmax,
              a1s, a2s, a3s, a4s, a1p, a2p, a3p, a4p, a5p, a6p, Tc) = values
             spline = bool(a1s) # False if Quasypolynomial, True if spline
