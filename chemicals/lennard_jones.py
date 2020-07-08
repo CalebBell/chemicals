@@ -40,7 +40,7 @@ __all__ = ['Stockmayer_methods', 'Stockmayer',
 import os
 from fluids.constants import k
 from chemicals.utils import exp, log, sin
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -48,7 +48,7 @@ from chemicals.data_reader import (register_df_source,
                                    list_available_methods_from_df_dict)
 # %% Register data sources and lazy load them
 
-folder = os.path.join(os.path.dirname(__file__), 'Viscosity')
+folder = os_path_join(source_path, 'Viscosity')
 register_df_source(folder, 'MagalhaesLJ.tsv')
 
 FLYNN = 'Flynn (1960)'
@@ -76,7 +76,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_LJ_data()
+    if can_load_data:
+        _load_LJ_data()
 
 Stockmayer_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC, 
                       TEEGOTOSTEWARD1, BSLB, BSLM)

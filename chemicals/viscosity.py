@@ -29,15 +29,14 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar',
 'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke']
 
 import os
-import numpy as np
-from fluids.numerics import secant, interp
+from fluids.numerics import secant, interp, numpy as np
 from chemicals.utils import log, exp, log10
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
 __numba_additional_funcs__ = ('_round_whole_even',)
 
-folder = os.path.join(os.path.dirname(__file__), 'Viscosity')
+folder = os_path_join(source_path, 'Viscosity')
 
 register_df_source(folder, 'Dutt Prasad 3 term.tsv', csv_kwargs={
             'dtype':{'A': float, 'B': float, 'C': float, 'Tmin': float, 'Tmax': float}})
@@ -107,7 +106,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_mu_data()
+    if can_load_data:
+        _load_mu_data()
 
 def Viswanath_Natarajan_2(T, A, B):
     r'''Calculate the viscosity of a liquid using the 2-term form

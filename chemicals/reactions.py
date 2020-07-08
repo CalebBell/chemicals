@@ -28,8 +28,7 @@ __all__ = [
            'balance_stoichiometry', 'stoichiometric_matrix']
            
 import os
-from fractions import Fraction
-from chemicals.utils import ceil, log10, PY37
+from chemicals.utils import ceil, log10, PY37, source_path, os_path_join, can_load_data
 from chemicals import heat_capacity
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -46,7 +45,7 @@ ATCT_L = 'ATCT_L'
 ATCT_G = 'ATCT_G'
 TRC = 'TRC'
 
-folder = os.path.join(os.path.dirname(__file__), 'Reactions')
+folder = os_path_join(source_path, 'Reactions')
 register_df_source(folder, 'API TDB Albahri Hf (g).tsv')
 register_df_source(folder, 'ATcT 1.112 (g).tsv')
 register_df_source(folder, 'ATcT 1.112 (l).tsv')
@@ -97,7 +96,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_reaction_data()
+    if can_load_data:
+        _load_reaction_data()
 
 
 # %% Lookup functions
@@ -781,6 +781,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     d = [i*min_value_inv for i in d]
 
     if not allow_fractional:
+        from fractions import Fraction
         max_denominator = 10**rounding
         fs = [Fraction(x).limit_denominator(max_denominator=max_denominator) for x in d]
         all_denominators = set([i.denominator for i in fs])

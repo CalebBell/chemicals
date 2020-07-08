@@ -11,7 +11,7 @@ _build
 __pycache__
 prof
 *Pyreverse*
-
+monkeytype.sqlite3
 # Compiled source #
 ###################
 *.com

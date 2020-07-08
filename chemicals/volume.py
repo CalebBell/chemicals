@@ -28,16 +28,14 @@ __all__ = ['Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
 'ideal_gas', 'Goodman']
 
 import os
-
 from fluids.numerics import np, splev, implementation_optimize_tck
 from fluids.constants import R, atm_inv
 from chemicals.utils import log, exp, isnan
 from chemicals.utils import Vm_to_rho, mixing_simple
-
-
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import data_source, register_df_source
-folder = os.path.join(os.path.dirname(__file__), 'Density')
+
+folder = os_path_join(source_path, 'Density')
 
 register_df_source(folder, 'COSTALD Parameters.tsv')
 register_df_source(folder, 'Mchaweh SN0 deltas.tsv')
@@ -91,7 +89,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_rho_data()
+    if can_load_data:
+        _load_rho_data()
 
 
 

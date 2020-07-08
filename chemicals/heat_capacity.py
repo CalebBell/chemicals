@@ -32,15 +32,14 @@ __all__ = ['heat_capacity_gas_methods',
            'heat_capacity_solid_methods',
            'Lastovka_solid', 'Lastovka_solid_integral', 
            'Lastovka_solid_integral_over_T', 'heat_capacity_solid_methods',
-           'HeatCapacityMetaclass', 'HeatCapacity', 
            'ZabranskySpline', 'ZabranskyQuasipolynomial',
            'PiecewiseHeatCapacity']
 import os
 from io import open
-from chemicals.utils import R, log, exp, polylog2, to_num, PY37, property_mass_to_molar
+from chemicals.utils import R, log, exp, to_num, PY37, property_mass_to_molar, source_path, os_path_join, can_load_data
 from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
-from fluids.numerics import newton, brenth, secant
+from fluids.numerics import newton, brenth, secant, polylog2
 
 # %% Methods introduced in this module
 
@@ -79,47 +78,12 @@ heat_capacity_solid_methods = (PERRY151, CRCSTD, LASTOVKA_S)
 
 ### Abstract heat capacity classes ###
 
-class HeatCapacityMetaclass(type):
-    """Metaclass for heat capacity model classes."""
-    
-    def __instancecheck__(self, instance):
-        try:
-            instance.Tmin
-            instance.Tmax
-            instance.calculate
-            instance.calculate_integral
-            instance.calculate_integral_over_T
-        except AttributeError: return False
-        return True
-
-    def __subclasscheck__(self, subclass):
-        try:
-            subclass.calculate
-            subclass.calculate_integral
-            subclass.calculate_integral_over_T
-        except AttributeError: return False
-        return True
-
-
-class HeatCapacity(metaclass=HeatCapacityMetaclass):
-    """Abstract class for heat capacity subclasses."""
-    __slots__ = ()
-    def __init_subclass__(cls):
-        cls_attrs = ('calculate', 'calculate_integral', 'calculate_integral_over_T')
-        hasattr_ = hasattr
-        for attr in cls_attrs:
-            if not hasattr_(cls, attr):
-                raise NotImplementedError(
-                    "HeatCapacity subclass must implement a '%s' method" % attr
-                )
-    
-            
 ### Heat capacity subclasses ###
 
 # @jitclass([('coeffs', types.UniTuple(types.float64, 4)), # NUMBA: UNCOMMENT
 #            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
 #            ('Tmax', types.float64)])                     # NUMBA: UNCOMMENT
-class ZabranskySpline(HeatCapacity):
+class ZabranskySpline(object):
     r'''
     Implementation of the cubic spline method presented in [1]_ for 
     calculating the heat capacity of a chemical.
@@ -212,7 +176,7 @@ class ZabranskySpline(HeatCapacity):
 #            ('Tc', types.float64),                        # NUMBA: UNCOMMENT
 #            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
 #            ('Tmax', types.float64)])                     # NUMBA: UNCOMMENT
-class ZabranskyQuasipolynomial(HeatCapacity):
+class ZabranskyQuasipolynomial(object):
     r'''
     Quasi-polynomial object for calculating the heat capacity of a chemical.
     Implements the enthalpy and entropy integrals as well.
@@ -308,7 +272,7 @@ class ZabranskyQuasipolynomial(HeatCapacity):
 #            ('Tc', types.float64),                        # NUMBA: UNCOMMENT
 #            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
 #            ('Tmax', types.float64),                      # NUMBA: UNCOMMENT
-class PiecewiseHeatCapacity:
+class PiecewiseHeatCapacity(object):
     r"""
     Create a PiecewiseHeatCapacity object for calculating heat capacity and the 
     enthalpy and entropy integrals using piecewise models.
@@ -372,7 +336,7 @@ class PiecewiseHeatCapacity:
         if T >= self.Tmin:
             for model in self._models:
                 if T <= model.Tmax: return model.calculate(T)
-        raise ValueError(f"no valid model at T=%d K" % T)
+        raise ValueError("no valid model at T=%g K" % T)
     
     def force_calculate(self, T):
         r'''
@@ -435,8 +399,8 @@ class PiecewiseHeatCapacity:
         
         '''
         if Tb < Ta: return -self.calculate_integral(Tb, Ta)
-        if Ta < self.Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
-        elif Tb > self.Tmax: raise ValueError(f"no valid model at T=%d K" % Tb)
+        if Ta < self.Tmin: raise ValueError("no valid model at T=%g K" % Ta)
+        elif Tb > self.Tmax: raise ValueError("no valid model at T=%g K" % Tb)
         return self.force_calculate_integral(Ta, Tb)
     
     def force_calculate_integral(self, Ta, Tb):
@@ -515,8 +479,8 @@ class PiecewiseHeatCapacity:
         
         '''
         if Tb < Ta: return -self.calculate_integral_over_T(Tb, Ta)
-        if Ta < self.Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
-        elif Tb > self.Tmax: raise ValueError(f"no valid model at T=%d K" % Tb)
+        if Ta < self.Tmin: raise ValueError("no valid model at T=%d K" % Ta)
+        elif Tb > self.Tmax: raise ValueError("no valid model at T=%d K" % Tb)
         return self.force_calculate_integral_over_T(Ta, Tb)
         
     def force_calculate_integral_over_T(self, Ta, Tb):
@@ -559,7 +523,7 @@ class PiecewiseHeatCapacity:
 
 # %% Register data sources and lazy load them
 
-folder = os.path.join(os.path.dirname(__file__), 'Heat Capacity')
+folder = os_path_join(source_path, 'Heat Capacity')
 register_df_source(folder, 'PolingDatabank.tsv')
 register_df_source(folder, 'TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
 register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
@@ -683,7 +647,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_Cp_data()
+    if can_load_data:
+        _load_Cp_data()
 
 
 
@@ -1595,7 +1560,7 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     -----
     The analytical integral was derived with Sympy. It requires the 
     Polylog(2,x) function, which is unimplemented in SciPy. A very accurate 
-    numerical approximation was implemented as :obj:`chemicals.utils.polylog2`.
+    numerical approximation was implemented as :obj:`fluids.numerics.polylog2`.
     Relatively slow due to the use of that special function.
     
     Examples

@@ -19,7 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
-from typing import Dict, NamedTuple
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
 
 __all__ = ('CombustionData',
@@ -39,7 +38,7 @@ def as_atoms(formula):
         atoms = formula
     else:
         raise ValueError("atoms must be either a string or dictionary, "
-                        f"not a '{type(formula).__name__}' object")
+                        "not a %s object" %(type(formula).__name__))
     return atoms
 
 
@@ -148,7 +147,7 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
         HHV = HHV_stoichiometry(stoichiometry, Hf)
     else:
         raise ValueError("method must be either 'Stoichiometric' or 'Dulong', "
-                        f"not {repr(method)}")
+                        "not %s" %(method))
     return CombustionData(stoichiometry, HHV, Hf, MW)
 
 def combustion_stoichiometry(atoms, MW=None):
@@ -295,7 +294,7 @@ def HHV_modified_Dulong(mass_fractions):
     S = mass_fractions.get('S', 0)
     if O > 0.105:
         raise ValueError("Dulong's formula is only valid at 10 wt. % Oxygen "
-                        f"or less ({O:.0%} given)")
+                         "or less (%s given)" %(O))
     return - (338*C  + 1428*(H - O/8)+ 95*S)    
 
 def LHV_from_HHV(HHV, N_H2O):
@@ -337,7 +336,7 @@ def LHV_from_HHV(HHV, N_H2O):
     """
     return HHV + 44011.496 * N_H2O
 
-class CombustionData(NamedTuple):
+class CombustionData(object):
     r"""
     Return a CombustionData object (a named tuple) that contains the stoichiometry 
     coefficients of the reactants and products, the lower and higher 
@@ -356,10 +355,11 @@ class CombustionData(NamedTuple):
         Molecular weight [g/mol].
     
     """
-    stoichiometry: Dict[str, float]
-    HHV: float
-    Hf: float
-    MW: float
+    def __init__(self, stoichiometry, HHV, Hf, MW):
+        self.stoichiometry = stoichiometry
+        self.HHV = HHV
+        self.Hf = Hf
+        self.MW = MW
 
     @property
     def LHV(self):

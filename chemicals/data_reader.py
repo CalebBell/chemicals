@@ -35,8 +35,14 @@ from math import isnan
 try:
     from collections.abc import Iterable
 except:
-    from collections import Iterable
-path_join = os.path.join
+    try:
+        from collections import Iterable
+    except:
+        Iterable = list
+try:
+    path_join = os.path.join
+except:
+    pass
 
 # %% Loading data from local databanks
 

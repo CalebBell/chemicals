@@ -440,3 +440,11 @@ def test_lazy_loading():
     # The data_reader functions are not part of the public API so are not converted
     chemicals.numba.heat_capacity.zabransky_dicts
     chemicals.numba.heat_capacity.CRC_standard_data
+
+
+
+'''
+Not working:
+    
+    utils.CAS2int,int2CAS,hash_any_primitive,sorted_CAS_key - no int/str conversion
+'''

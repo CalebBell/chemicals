@@ -30,10 +30,9 @@ __all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions',
            'serialize_formula', 'mixture_atomic_composition_ordered',
            'periodic_table']
 import re
-import string
 
 CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7440-42-8', '7440-44-0', '7727-37-9', '7782-44-7', '7782-41-4', '7440-01-9', '7440-23-5', '7439-95-4', '7429-90-5', '7440-21-3', '7723-14-0', '7704-34-9', '7782-50-5', '7440-37-1', '7440-09-7', '7440-70-2', '7440-20-2', '7440-32-6', '7440-62-2', '7440-47-3', '7439-96-5', '7439-89-6', '7440-48-4', '7440-02-0', '7440-50-8', '7440-66-6', '7440-55-3', '7440-56-4', '7440-38-2', '7782-49-2', '10097-32-2', '7439-90-9', '7440-17-7', '7440-24-6', '7440-65-5', '7440-67-7', '7440-03-1', '7439-98-7', '7440-26-8', '7440-18-8', '7440-16-6', '7440-05-3', '7440-22-4', '7440-43-9', '7440-74-6', '7440-31-5', '7440-36-0', '13494-80-9', '7553-56-2', '7440-63-3', '7440-46-2', '7440-39-3', '7439-91-0', '7440-45-1', '7440-10-0', '7440-00-8', '7440-12-2', '7440-19-9', '7440-53-1', '7440-54-2', '7440-27-9', '7429-91-6', '7440-60-0', '7440-52-0', '7440-30-4', '7440-64-4', '7439-94-3', '7440-58-6', '7440-25-7', '7440-33-7', '7440-15-5', '7440-04-2', '7439-88-5', '7440-06-4', '7440-57-5', '7439-97-6', '7440-28-0', '7439-92-1', '7440-69-9', '7440-08-6', '7440-68-8', '10043-92-2', '7440-73-5', '7440-14-4', '7440-34-8', '7440-29-1', '7440-13-3', '7440-61-1', '7439-99-8', '7440-07-5', '7440-35-9', '7440-51-9', '7440-40-6', '7440-71-3', '7429-92-7', '7440-72-4', '7440-11-1', '10028-14-5', '22537-19-5', '53850-36-5', '53850-35-4', '54038-81-2', '54037-14-8', '54037-57-9', '54038-01-6', '54083-77-1', '54386-24-2', '54084-26-3', '54084-70-7', '54085-16-4', '54085-64-2', '54100-71-9', '54101-14-3', '54144-19-3']
-CAS_by_number = CAS_by_number_standard.copy()
+CAS_by_number = list(CAS_by_number_standard)
 '''CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118.'''
 
 periods = [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
@@ -44,9 +43,9 @@ groups = [1, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 
 Lanthanides and Actinides are set to None.'''
 
 s_block = [1, 2, 3, 4, 11, 12, 19, 20, 37, 38, 55, 56, 87, 88]
-d_block = [*range(21, 31), *range(39, 49), *range(71, 81), *range(103, 113)]
-f_block = [*range(57, 71), *range(89, 103)]
-p_block = [*range(5, 11), *range(13, 19), *range(31, 37), *range(49, 55), *range(81, 87), *range(113, 119)]
+d_block = list(range(21, 31)) + list(range(39, 49)) + list(range(71, 81)) + list(range(103, 113))
+f_block = list(range(57, 71)) + list(range(89, 103))
+p_block = list(range(5, 11)) + list(range(13, 19)) + list(range(31, 37)) + list(range(49, 55)) + list(range(81, 87)) + list(range(113, 119))
 blocks = {'s': s_block, 'd': d_block, 'f': f_block, 'p': p_block}
 '''Blocks of the elements, stored in a dictionary with four keys and lists.
 Indexed by atomic numbers off-by-one up to 118.'''
@@ -882,7 +881,7 @@ def simple_formula_parser(formula):
 formula_token_matcher_rational_re_str = r'[A-Z][a-z]?|(?:\d*[.])?\d+|\d+|[()]'
 bracketed_charge_re_str = r'\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$'
 formula_token_matcher_rational = bracketed_charge_re = None
-letter_set = set(string.ascii_letters)
+letter_set = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
 def nested_formula_parser(formula, check=True):
     r'''Improved formula parser which handles braces and their multipliers, 

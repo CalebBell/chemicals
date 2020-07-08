@@ -254,6 +254,13 @@ def test_Zabransky_dicts():
         coeffs_sums = sum_([get_coeffs_sum(i) for i in spline_tuple])
         assert_close1d([Tmin_sums, Tmax_sums, coeffs_sums], values)
 
+def test_HeatCapacityClass_methods():
+    classes = [ZabranskySpline, ZabranskyQuasipolynomial]
+    for c in classes:
+        assert hasattr(c, 'calculate')
+        assert hasattr(c, 'calculate_integral')
+        assert hasattr(c, 'calculate_integral_over_T')
+
 def test_ZABRANSKY_SPLINE():
     from chemicals.heat_capacity import zabransky_dict_iso_s
     d = zabransky_dict_iso_s['7732-18-5']

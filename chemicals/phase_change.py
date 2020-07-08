@@ -25,10 +25,10 @@ __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm',
            'Liu', 'Vetere', 'Watson', 'Hfus']
 
 import os
-import numpy as np
+from fluids.numerics import numpy as np
 from fluids.constants import R
 from chemicals.utils import log
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals import miscdata
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -38,7 +38,7 @@ from chemicals.data_reader import (register_df_source,
 
 # %% Register data sources and lazy load them
 
-folder = os.path.join(os.path.dirname(__file__), 'Phase Change')
+folder = os_path_join(source_path, 'Phase Change')
 register_df_source(folder, 'Yaws Boiling Points.tsv')
 register_df_source(folder, 'OpenNotebook Melting Points.tsv')
 register_df_source(folder, 'Ghazerati Appendix Vaporization Enthalpy.tsv',
@@ -116,8 +116,9 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_phase_change_constants()
-    _load_phase_change_correlations()
+    if can_load_data:
+        _load_phase_change_constants()
+        _load_phase_change_correlations()
 
 # %% Phase change functions
 

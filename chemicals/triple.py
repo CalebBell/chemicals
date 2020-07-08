@@ -23,7 +23,7 @@ SOFTWARE.'''
 __all__ = ['Tt_methods', 'Tt', 'Pt_methods', 'Pt']
 
 import os
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.phase_change import Tm
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -33,7 +33,7 @@ from chemicals.data_reader import (register_df_source,
 
 
 # %% Register data sources and lazy load them
-folder = os.path.join(os.path.dirname(__file__), 'Triple Properties')
+folder = os_path_join(source_path, 'Triple Properties')
 register_df_source(folder, 'Staveley 1981.tsv')
 
 STAVELEY = 'STAVELEY'
@@ -56,7 +56,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_triple_data()
+    if can_load_data:
+        _load_triple_data()
 
 Tt_methods = (STAVELEY, MELTING)
 

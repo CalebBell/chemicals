@@ -240,5 +240,5 @@ def test_Psat_IAPWS():
 
 
 def test_Psub_Clapeyron():
-    Psub = Psub_Clapeyron(250, Tt=273.15, Pt=611.0, Hsub_t=51100.0)
+    Psub = Psub_Clapeyron(250.0, Tt=273.15, Pt=611.0, Hsub_t=51100.0)
     assert_allclose(Psub, 76.06457150831804)

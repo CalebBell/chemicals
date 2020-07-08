@@ -31,15 +31,14 @@ __all__.extend(['Tc_methods', 'Pc_methods', 'Vc_methods', 'Zc_methods',
 
 import os
 from fluids.constants import R_inv, N_A
-from chemicals.utils import log, PY37
+from chemicals.utils import log, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
 
-folder = os.path.join(os.path.dirname(__file__), 'Critical Properties')
-
+folder = os_path_join(source_path, 'Critical Properties')
 IUPAC = 'IUPAC'
 MATTHEWS = 'MATTHEWS'
 CRC = 'CRC'
@@ -115,7 +114,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_critical_data()
+    if can_load_data:
+        _load_critical_data()
 
 # %% Critical point functions
 

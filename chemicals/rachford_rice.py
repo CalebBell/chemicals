@@ -31,12 +31,16 @@ __all__ = ['Rachford_Rice_flash_error',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop']
 
 from fluids.constants import R
-from itertools import combinations
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
 from chemicals.utils import exp, log
 from chemicals.utils import normalize
 from chemicals.exceptions import PhaseCountReducedError
+try:
+    from itertools import combinations
+except:
+    pass
+
 
 R_inv = 1.0/R
 
@@ -987,7 +991,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
 #        return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks)
         return flash_inner_loop(zs=zs, Ks=Ks, check=True, method=FLASH_INNER_HALLEY)
         try: # numba: delete
-            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, zs, cis_ys, x0, V_over_F_min, N)[0], low, high)  # numba: delete
+            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, zs, cis_ys, x0, V_over_F_min, N)[0], V_over_F_min, V_over_F_max)  # numba: delete
         except NotBoundedError:  # numba: delete
             return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True)  # numba: delete
             # err_low = 1e100

@@ -30,16 +30,15 @@ __all__ = ['Antoine', 'Wagner_original', 'Wagner', 'TRC_Antoine_extended',
 
 import os
 from fluids.constants import R
+from fluids.numerics import numpy as np
 from math import e
 from chemicals.utils import log, exp, isnan
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.dippr import EQ101
 from chemicals import miscdata
 from chemicals.data_reader import register_df_source, data_source
 
-import numpy as np
-
-folder = os.path.join(os.path.dirname(__file__), 'Vapor Pressure')
+folder = os_path_join(source_path, 'Vapor Pressure')
 
 register_df_source(folder, 'Antoine Collection Poling.tsv')
 register_df_source(folder, 'Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
@@ -103,7 +102,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_vapor_pressure_dfs()
+    if can_load_data:
+        load_vapor_pressure_dfs()
 
     
     

@@ -36,28 +36,25 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows', 
 'solve_flow_composition_mix',
-'phase_select_property',  'allclose_variable', 
-'polylog2', 'v_to_v_molar', 'v_molar_to_v']
+'phase_select_property',  'allclose_variable', 'v_to_v_molar', 'v_molar_to_v']
 
 import os
 import sys
 from cmath import sqrt as csqrt
-from bisect import bisect_left
-import numpy as np
 from fluids.numerics import (brenth, newton, linspace, polyint, 
                              polyint_over_x, derivative, polyder,
                              horner, horner_and_der2, assert_close,
-                             quadratic_from_f_ders)
+                             quadratic_from_f_ders, numpy as np)
 from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
                   cos, cosh, degrees, e,  exp, fabs, 
-                  factorial, floor, fmod, frexp, fsum, hypot, isinf, 
-                  isnan, ldexp, log, log10, log1p, modf, pi, pow, 
+                  factorial, floor, fmod, frexp, isinf, 
+                  isnan, ldexp, log, log10, modf, pi, pow, 
                   radians, sin, sinh, sqrt, tan, tanh, trunc) # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
 
 __all__.extend(['acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 
 'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'e', 'exp', 
-'fabs', 'factorial', 'floor', 'fmod', 'frexp', 'fsum', 
-'hypot', 'isinf', 'isnan', 'ldexp',  'log', 'log10', 'log1p', 'modf', 
+'fabs', 'factorial', 'floor', 'fmod', 'frexp', 
+'isinf', 'isnan', 'ldexp',  'log', 'log10', 'modf', 
 'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc'])
 __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma', 
 # Obtained from SciPy 0.19 (2014 CODATA)
@@ -69,6 +66,24 @@ version_components = sys.version.split('.')
 PY_MAJOR, PY_MINOR = int(version_components[0]), int(version_components[1])
 PY37 = (PY_MAJOR, PY_MINOR) >= (3, 7)
 
+try:
+    source_path = os.path.dirname(__file__) # micropython
+except:
+    source_path = ''
+    
+if os.name == 'nt':
+    def os_path_join(*args):
+        return '\\'.join(args)
+else:
+    def os_path_join(*args):
+        return '/'.join(args)
+    
+can_load_data = True
+try:
+    if sys.implementation.name == 'micropython':
+        can_load_data = False
+except:
+    pass
 
 def to_num(values):
     r'''Legacy function to turn a list of strings into either floats
@@ -213,6 +228,30 @@ def hash_any_primitive(v):
     return hash(v)
 
 def sorted_CAS_key(CASs):
+    r'''Takes a list of CAS numbers as strings, and returns a tuple of the same
+    CAS numbers, sorted from smallest to largest. This is very convenient for
+    obtaining a unique hash of a set of compounds, so as to see if two
+    groups of compounds are the same.
+
+    Parameters
+    ----------
+    CASs : list[str]
+        CAS numbers as strings [-]
+
+    Returns
+    -------
+    CASs_sorted : tuple[str]
+        Sorted CAS numbers from lowest (first) to highest (last) [-]
+
+    Notes
+    -----
+    Does not check CAS numbers for validity.
+
+    Examples
+    --------
+    >>> sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
+    ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
+    '''
     int_CASs = [CAS2int(i) for i in CASs]
     return tuple(CAS for _, CAS in sorted(zip(int_CASs,CASs)))
 
@@ -278,18 +317,72 @@ def Parachor(MW, rhol, rhog, sigma):
     return sigma**0.25*MW/(rhol-rhog) # (N/m)**0.25*g/mol/(g/m^3)
 
 
-def property_molar_to_mass(A_molar, MW):  # pragma: no cover
+def property_molar_to_mass(A_molar, MW):
+    r'''Convert a quantity in molar units [thing/mol] to mass units [thing/kg].
+    The standard gram-mole is used here, as it is everwhere in this library.
+
+    .. math::
+        A_{\text{mass}} = \frac{1000 A_{\text{molar}}}{\text{MW}}
+        
+    Parameters
+    ----------
+    A_molar : float
+        Quantity in molar units [thing/mol]
+    MW : float
+        Molecular weight, [g/mol]
+
+    Returns
+    -------
+    A_mass : float
+        Quantity in molar units [thing/kg]
+        
+    Notes
+    -----
+    For legacy reasons, if the value `A_molar` is None, None is also returned 
+    and no exception is returned.
+
+    Examples
+    --------
+    >>> property_molar_to_mass(500, 18.015)
+    27754.648903691366
+    '''
     if A_molar is None:
         return None
-    A = A_molar*1000/MW
-    return A
+    return A_molar*1000.0/MW
 
 
-def property_mass_to_molar(A_mass, MW):  # pragma: no cover
+def property_mass_to_molar(A_mass, MW):
+    r'''Convert a quantity in mass units [thing/kg] to molar units [thing/mol].
+    The standard gram-mole is used here, as it is everwhere in this library.
+
+    .. math::
+        A_{\text{molar}} = \frac{A_{\text{mass}} \text{MW}}{1000}
+        
+    Parameters
+    ----------
+    A_mass : float
+        Quantity in molar units [thing/kg]
+    MW : float
+        Molecular weight, [g/mol]
+
+    Returns
+    -------
+    A_molar : float
+        Quantity in molar units [thing/mol]
+        
+    Notes
+    -----
+    For legacy reasons, if the value `A_mass` is None, None is also returned 
+    and no exception is returned.
+
+    Examples
+    --------
+    >>> property_mass_to_molar(20.0, 18.015)
+    0.3603
+    '''
     if A_mass is None:
         return None
-    A_molar = 1e-3*A_mass*MW
-    return A_molar
+    return 1e-3*A_mass*MW
 
 root_1000 = 1000**0.5
 root_1000_inv = 1.0/root_1000
@@ -324,7 +417,7 @@ def v_to_v_molar(v, MW):
     return v*MW**0.5*root_1000_inv
     
 def v_molar_to_v(v_molar, MW):
-    r'''Convert a velocity from units of the molar form velocity to standard 
+    r'''Convert a velocity from units of the molar velocity form to standard 
     m/s units.
 
     .. math::
@@ -900,7 +993,7 @@ def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
     elif beta is not None:
         return V/Cp*(beta*T - 1.)
     else:
-        raise Exception('Either dV_dT or beta is needed')
+        raise ValueError('Either dV_dT or beta is needed')
 
 
 def isentropic_exponent(Cp, Cv):
@@ -989,14 +1082,14 @@ def rho_to_Vm(rho, MW):
     Examples
     --------
     >>> rho_to_Vm(652.9, 86.18)
-    0.00013199571144126206
+    0.0001319957114412621
 
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    return (rho*1000./MW)**-1
+    return 1e-3*MW/rho
 
 
 def Z(T, P, V):
@@ -1106,7 +1199,7 @@ def B_from_Z(Z, T, P):
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    return (Z - 1)*R*T/P
+    return (Z - 1.0)*R*T/P
 
 
 def Z_from_virial_density_form(T, P, *args):
@@ -1195,7 +1288,7 @@ def Z_from_virial_density_form(T, P, *args):
     args.reverse()
     args.extend([1, -P/R/T])
     solns = np.roots(args)
-    rho = [i for i in solns if not i.imag and i.real > 0][0].real # Quicker than indexing where imag ==0
+    rho = float([i for i in solns if not i.imag and i.real > 0][0].real) # Quicker than indexing where imag ==0
     return P/rho/R/T
 
 
@@ -1248,7 +1341,7 @@ def Z_from_virial_pressure_form(P, *args):
     .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering. 
        Butterworth-Heinemann, 1985.
     '''
-    return 1 + P*sum([coeff*P**i for i, coeff in enumerate(args)])
+    return 1.0 + P*sum([coeff*P**i for i, coeff in enumerate(args)])
 
 
 def zs_to_ws(zs, MWs):
@@ -1565,11 +1658,64 @@ def dxs_to_dn_partials(dxs, xs, F):
 
 
 def d2ns_to_dn2_partials(d2ns, dns):
-    '''from sympy import *
-n1, n2 = symbols('n1, n2')
-f, g, h = symbols('f, g, h', cls=Function)
+    r'''Convert second-order mole number derivatives of a quantity 
+     to the following second-order partial derivative:
+                
+    .. math::
+            \frac{\partial^2 n F}{\partial n_j \partial n_i}
+            = \frac{\partial^2 F}{\partial n_i \partial n_j}
+            + \frac{\partial F}{\partial n_i}
+            + \frac{\partial F}{\partial n_j}
+    
+    
+    Requires the second order mole number derivatives and the first order 
+    mole number derivatives of the mixture only.
 
-diff(h(n1, n2)*f(n1,  n2), n1, n2)
+    Parameters
+    ----------
+    d2ns : list[float]
+        Second order derivatives of a quantity with respect to mole number 
+        (summing to 1), [prop/mol^2]
+    dns : list[float]
+        Derivatives of a quantity with respect to mole number (summing to
+        1), [prop/mol]
+
+    Returns
+    -------
+    second_partial_properties : list[list[float]]
+        Derivatives of a quantity with respect to mole number (summing to
+        1), [prop]
+
+    Notes
+    -----
+    Does not check that the sums add to one. Does not check that inputs are of
+    the same length.
+    
+    This was originally implemented to allow for the calculation of 
+    first mole number derivatices of log fugacity coefficients; the two
+    arguments are the second and first mole number derivatives of the overall 
+    mixture log fugacity coefficient.
+
+    
+    Derived with the following SymPy code.
+    
+    >>> from sympy import *
+    >>> n1, n2 = symbols('n1, n2')
+    >>> f, g, h = symbols('f, g, h', cls=Function)
+    >>> diff(h(n1, n2)*f(n1,  n2), n1, n2)
+    f(n1, n2)*Derivative(h(n1, n2), n1, n2) + h(n1, n2)*Derivative(f(n1, n2), n1, n2) + Derivative(f(n1, n2), n1)*Derivative(h(n1, n2), n2) + Derivative(f(n1, n2), n2)*Derivative(h(n1, n2), n1)
+        
+    See Also
+    --------
+    dxs_to_dns
+    dns_to_dn_partials
+    dxs_to_dn_partials
+
+    Examples
+    --------
+    >>> d2ns = [[0.152, 0.08, 0.547], [0.08, 0.674, 0.729], [0.547, 0.729, 0.131]]
+    >>> d2ns_to_dn2_partials(d2ns, [20.0, .124, 900.52])
+    [[40.152, 20.203999999999997, 921.067], [20.204, 0.922, 901.3729999999999], [921.067, 901.373, 1801.1709999999998]]
     '''
     cmps = range(len(dns))
     hess = []
@@ -1810,54 +1956,6 @@ def allclose_variable(a, b, limits, rtols=None, atols=None):
         if 1-matches/l > lim:
             return False
     return True
-
-
-
-def polylog2(x):
-    r'''Simple function to calculate PolyLog(2, x) from ranges 0 <= x <= 1,
-    with relative error guaranteed to be < 1E-7 from 0 to 0.99999. This
-    is a Pade approximation, with three coefficient sets with splits at 0.7 
-    and 0.99. An exception is raised if x is under 0 or above 1. 
-    
-
-    Parameters
-    ----------
-    x : float
-        Value to evaluate PolyLog(2, x) T
-
-    Returns
-    -------
-    y : float
-        Evaluated result
-
-    Notes
-    -----
-    Efficient (2-4 microseconds). No implementation of this function exists in 
-    SciPy. Derived with mpmath's pade approximation.
-    Required for the entropy integral of 
-    :obj:`thermo.heat_capacity.Zabransky_quasi_polynomial`.
-
-    Examples
-    --------
-    >>> polylog2(0.5)
-    0.5822405264516294
-    '''
-    if 0 <= x <= 0.7:
-        p = [0.06184590404457956, -0.7460693871557973, 2.2435704485433376, -2.1944070385048526, 0.3382265629285811, 0.2791966558569478]
-        q = [-0.005308735283483908, 0.1823421262956287, -1.2364596896290079, 2.9897802200092296, -2.9365321202088004, 1.0]
-        offset = 0.26
-    elif 0.7 < x <= 0.99:
-        p = [7543860.817140365, -10254250.429758755, -4186383.973408412, 7724476.972409749, -3130743.609030545, 600806.068543299, -62981.15051292659, 3696.7937385473397, -114.06795167646395, 1.4406337969700391]
-        q = [-1262997.3422452002, 10684514.56076485, -16931658.916668657, 10275996.02842749, -3079141.9506451315, 511164.4690136096, -49254.56172495263, 2738.0399260270983, -81.36790509581284, 1.0]
-        offset = 0.95
-    elif 0.99 < x <= 1:
-        p = [8.548256176424551e+34, 1.8485781239087334e+35, -2.1706889553798647e+34, 8.318563643438321e+32, -1.559802348661511e+31, 1.698939241177209e+29, -1.180285031647229e+27, 5.531049937687143e+24, -1.8085903366375877e+22, 4.203276811951035e+19, -6.98211620300421e+16, 82281997048841.92, -67157299796.61345, 36084814.54808544, -11478.108105137717, 1.6370226052761176]
-        q = [-1.9763570499484274e+35, 1.4813997374958851e+35, -1.4773854824041134e+34, 5.38853721252814e+32, -9.882387315028929e+30, 1.0635231532999732e+29, -7.334629044071992e+26, 3.420655574477631e+24, -1.1147787784365177e+22, 2.584530363912858e+19, -4.285376337404043e+16, 50430830490687.56, -41115254924.43107, 22072284.971253656, -7015.799744041691, 1.0]
-        offset = 0.999
-    else:
-        raise Exception('Approximation is valid between 0 and 1 only.')
-    x = x - offset
-    return horner(p, x)/horner(q, x)
 
 
 def normalize(values):

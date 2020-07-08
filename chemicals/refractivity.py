@@ -22,22 +22,23 @@ SOFTWARE.'''
 
 __all__ = ['RI_methods', 'refractive_index', 
            'polarizability_from_RI', 'molar_refractivity_from_RI', 
-           'RI_from_molar_refractivity', 'RI_IAPWS']
+           'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
+           'brix_to_RI']
 
 import os
 from fluids.numerics import interp
 from fluids.constants import pi, N_A
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
-from chemicals.utils import PY37
 
 
 # %% Register data sources and lazy load them
 
-folder = os.path.join(os.path.dirname(__file__), 'Misc')
+folder = os_path_join(source_path, 'Misc')
 register_df_source(folder, 'CRC Handbook Organic RI.csv', 
                    csv_kwargs={'dtype': {'RI': float, 'RIT': float}})
 
@@ -58,7 +59,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_RI_data()
+    if can_load_data:
+        _load_RI_data()
 
 # %% Refractive index functions
 
@@ -360,9 +362,9 @@ def brix_to_RI(brix):
     --------
     >>> brix_to_RI(5.8)
     1.341452
-    >>> brix_to_RI(0)
+    >>> brix_to_RI(0.0)
     1.33299
-    >>> brix_to_RI(100)
+    >>> brix_to_RI(95.0)
     1.532
 
     References
@@ -371,7 +373,7 @@ def brix_to_RI(brix):
        LTD." Accessed June 13, 2020. 
        https://www.atago.net/en/databook-refractometer_relationship.php.
     '''
-    return interp(brix, ICUMSA_1974_brix, ICUMSA_1974_RIs)
+    return interp(brix, ICUMSA_1974_brix, ICUMSA_1974_RIs, extrapolate=True)
 
 def RI_to_brix(RI):
     ''' Convert a standard refractive index measurement to the `brix` scale.
@@ -391,7 +393,7 @@ def RI_to_brix(RI):
     The scale is officially defined from 0 to 85; but the data source contains
     values up to 95. 
     
-    No further extrapolation to values under 0 or above 95 is performed.
+    Linear extrapolation to values under 0 or above 95 is performed.
     
     The ICUMSA (International Committee of Uniform Method of Sugar Analysis)
     published a document setting out the reference values in 1974; but an 
@@ -413,4 +415,4 @@ def RI_to_brix(RI):
        LTD." Accessed June 13, 2020. 
        https://www.atago.net/en/databook-refractometer_relationship.php.
     '''
-    return interp(RI, ICUMSA_1974_RIs, ICUMSA_1974_brix)
+    return interp(RI, ICUMSA_1974_RIs, ICUMSA_1974_brix, extrapolate=True)

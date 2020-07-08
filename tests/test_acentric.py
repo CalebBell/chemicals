@@ -58,6 +58,9 @@ def test_acentric_main():
 
     # Error handling
     assert None == omega(CASRN='BADCAS')
+    
+@pytest.mark.skip_types
+def test_acentric_main_bad_methods():
     with pytest.raises(ValueError):
         omega(CASRN='98-01-1', method='BADMETHOD')
     with pytest.raises(ValueError):
@@ -74,10 +77,10 @@ def test_acentric_correlation():
 
 
 def test_omega_definition():
-    omega = omega_definition(999542, 22048320.0)
+    omega = omega_definition(999542.0, 22048320.0)
     assert_close(omega, 0.3435744558761711, rtol=1e-12)
     
 def test_Stiel_polar_factor():
-    factor = Stiel_polar_factor(Psat=169745, Pc=22048321.0, omega=0.344)
+    factor = Stiel_polar_factor(Psat=169745.0, Pc=22048321.0, omega=0.344)
     assert_close(0.02322146744772713, factor)
 

@@ -30,13 +30,13 @@ __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Meybodi_Daryasafar_Karimi']
 
 import os
-import numpy as np
-from chemicals.utils import log, exp
-from chemicals.utils import mixing_simple, PY37
+from fluids.numerics import numpy as np
 from fluids.constants import N_A, k
+from chemicals.utils import log, exp
+from chemicals.utils import mixing_simple, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-folder = os.path.join(os.path.dirname(__file__), 'Interface')
+folder = os_path_join(source_path, 'Interface')
 
 
 register_df_source(folder, 'MuleroCachadinaParameters.tsv')
@@ -78,7 +78,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_interface_dfs()
+    if can_load_data:
+        load_interface_dfs()
 
 ### Regressed coefficient-based functions
 

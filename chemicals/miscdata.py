@@ -23,12 +23,12 @@ SOFTWARE.'''
 __all__ = ['lookup_VDI_tabular_data']
 
 import os
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
 # %% Register data sources and lazy load them
 
-folder = os.path.join(os.path.dirname(__file__), 'Misc')
+folder = os_path_join(source_path, 'Misc')
 
 ### CRC Handbook general tables
 register_df_source(folder, 'Physical Constants of Inorganic Compounds.csv')
@@ -67,8 +67,9 @@ if PY37:
             return VDI_saturation_dict
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_CRC_data()
-    _load_VDI_saturation_dict()
+    if can_load_data:
+        _load_CRC_data()
+        _load_VDI_saturation_dict()
 
 ### VDI Saturation
 

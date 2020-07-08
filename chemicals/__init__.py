@@ -115,6 +115,6 @@ submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
               interface, permittivity, thermal_conductivity, combustion,
               heat_capacity, reactions, volume, rachford_rice]
 
-chemicals_dir = os.path.dirname(__file__)
+chemicals_dir = utils.source_path
 
 __version__ = '0.1.1'

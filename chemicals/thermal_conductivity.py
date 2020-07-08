@@ -30,14 +30,13 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley']
 
 import os
-import numpy as np
-from fluids.numerics import horner, bisplev, implementation_optimize_tck
+from fluids.numerics import horner, bisplev, implementation_optimize_tck, numpy as np
 from fluids.constants import R, R_inv, N_A, k
-from chemicals.utils import log, exp, PY37
+from chemicals.utils import log, exp, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
 
-folder = os.path.join(os.path.dirname(__file__), 'Thermal Conductivity')
+folder = os_path_join(source_path, 'Thermal Conductivity')
 
 
 register_df_source(folder, 'Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv')
@@ -72,7 +71,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_k_data()
+    if can_load_data:
+        _load_k_data()
 
 ### Purely CSP Methods - Liquids
 

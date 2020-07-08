@@ -25,12 +25,12 @@ from __future__ import division
 __all__ = ['permittivity_IAPWS']
 
 import os
-import numpy as np
+from fluids.numerics import numpy as np
 from fluids.constants import N_A, epsilon_0, k
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-folder = os.path.join(os.path.dirname(__file__), 'Electrolytes')
+folder = os_path_join(source_path, 'Electrolytes')
 register_df_source(folder, 'Permittivity (Dielectric Constant) of Liquids.tsv')
 
 _permittivity_data_loaded = False
@@ -46,7 +46,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_permittivity_data()
+    if can_load_data:
+        _load_permittivity_data()
 
 
 

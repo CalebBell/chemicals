@@ -93,3 +93,18 @@ def test_RI_from_molar_refractivity():
 
 def test_RI_IAPWS():
     assert_close(RI_IAPWS(298.15, 997.047435, 0.5893), 1.3328581926471605, rtol=1e-12)
+
+
+def test_RI_to_brix():
+    assert_close(RI_to_brix(1.33299), 0.0)
+    assert_close(RI_to_brix(1.532), 95.)
+    assert_close(RI_to_brix(1.341452), 5.8)
+    assert_close(RI_to_brix(1.3), -23.069930069929285)
+    
+    
+def test_brix_to_RI():
+    assert_close(brix_to_RI(5.8), 1.341452)
+    assert_close(brix_to_RI(0), 1.33299)
+    assert_close(brix_to_RI(95.0), 1.532)
+    assert_close(brix_to_RI(RI_to_brix(1.3)), 1.3)
+    
