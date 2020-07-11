@@ -20,7 +20,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-__all__ = ['Tt_methods', 'Tt', 'Pt_methods', 'Pt']
+__all__ = ['Tt_all_methods', 'Tt_methods', 'Tt', 
+           'Pt_all_methods', 'Pt_methods', 'Pt']
 
 import os
 from chemicals.utils import PY37
@@ -58,7 +59,33 @@ if PY37:
 else:
     _load_triple_data()
 
-Tt_methods = (STAVELEY, MELTING)
+Tt_all_methods = (STAVELEY, MELTING)
+
+def Tt_methods(CASRN):
+    """
+    Return all methods available to obtain the Tt for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the Tt with the given 
+        inputs.
+
+    See Also
+    --------
+    Tt
+
+    """
+    if not _triple_data_loaded: _load_triple_data()
+    methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt68')
+    if Tm(CASRN): methods.append(MELTING)
+    return methods
 
 def Tt(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's triple temperature.
@@ -75,20 +102,13 @@ def Tt(CASRN, get_methods=False, method=None):
     Returns
     -------
     Tt : float
-        Triple point temperature, [K]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain Tt with the
-        given inputs
+        Triple point temperature, [K].
 
     Other Parameters
     ----------------
     method : string, optional
-        A string for the method name to use, as defined by constants in
-        Tt_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        the Tt for the desired chemical, and will return methods
-        instead of the Tt
+        A string for the method name to use, as defined in the variable,
+        `Tt_all_methods`.
 
     Notes
     -----
@@ -104,6 +124,10 @@ def Tt(CASRN, get_methods=False, method=None):
 
     >>> Tt('7664-41-7')
     195.48
+    
+    See Also
+    --------
+    Tt
 
     References
     ----------
@@ -112,11 +136,7 @@ def Tt(CASRN, get_methods=False, method=None):
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     '''
     if not _triple_data_loaded: _load_triple_data()
-    if get_methods:
-        methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt68')
-        if Tm(CASRN): methods.append(MELTING)
-        return methods
-    elif method:
+    if method:
         if method == MELTING:
             return Tm(CASRN)
         else:
@@ -127,7 +147,31 @@ def Tt(CASRN, get_methods=False, method=None):
         return Tm(CASRN)    
 triple_point_temperature = Tt
 
-Pt_methods = (STAVELEY,)
+Pt_all_methods = (STAVELEY,)
+
+def Pt_methods(CASRN):
+    """
+    Return all methods available to obtain the Pt for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the Pt with the given 
+        inputs.
+
+    See Also
+    --------
+    Pt
+
+    """
+    if not _triple_data_loaded: _load_triple_data()
+    return list_available_methods_from_df_dict(Pt_sources, CASRN, 'Pt')
 
 def Pt(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's triple pressure.
@@ -157,13 +201,9 @@ def Pt(CASRN, get_methods=False, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        A string for the method name to use, as defined by constants in
-        Pt_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        the Pt for the desired chemical, and will return methods
-        instead of the Pt
-
+        A string for the method name to use, as defined in the variable,
+        `Pt_all_methods`.
+        
     Notes
     -----
 
@@ -174,6 +214,10 @@ def Pt(CASRN, get_methods=False, method=None):
     >>> Pt('7664-41-7')
     6079.5
 
+    See Also
+    --------
+    Pt_methods
+
     References
     ----------
     .. [1] Staveley, L. A. K., L. Q. Lobo, and J. C. G. Calado. "Triple-Points
@@ -181,10 +225,7 @@ def Pt(CASRN, get_methods=False, method=None):
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     '''
     if not _triple_data_loaded: _load_triple_data()
-    if get_methods:
-        methods = list_available_methods_from_df_dict(Pt_sources, CASRN, 'Pt')
-        return methods
-    elif method:
+    if method:
         return retrieve_from_df_dict(Pt_sources, CASRN, 'Pt', method) 
     else:
         return retrieve_any_from_df_dict(Pt_sources, CASRN, 'Pt') 

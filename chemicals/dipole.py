@@ -19,7 +19,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
-__all__ = ['dipole_moment', 'dipole_methods']
+__all__ = ['dipole_moment', 
+           'dipole_methods',
+           'dipole_all_methods']
 
 import os
 from chemicals.utils import PY37
@@ -65,7 +67,31 @@ else:
 
 # %% Dipole moment functions
 
-dipole_methods = [CCCBDB, MULLER, POLING]
+dipole_all_methods = (CCCBDB, MULLER, POLING)
+
+def dipole_methods(CASRN):
+    """
+    Return all methods available to obtain the dipole moment for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the dipole moment with the given 
+        inputs.
+
+    See Also
+    --------
+    dipole_moment
+
+    """
+    if not _dipole_data_loaded: _load_dipole_data()
+    return list_available_methods_from_df_dict(dipole_sources, CASRN, 'Dipole')
 
 def dipole_moment(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's dipole moment.
@@ -92,11 +118,7 @@ def dipole_moment(CASRN, get_methods=False, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'CCCBDB', 'MULLER', or
-        'POLING'. All valid values are also held in the list `dipole_methods`.
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        the dipole moment for the desired chemical, and will return methods
-        instead of the dipole moment
+        'POLING'. All valid values are also held in the list `dipole_all_methods`.
 
     Notes
     -----
@@ -119,6 +141,10 @@ def dipole_moment(CASRN, get_methods=False, method=None):
     >>> dipole_moment(CASRN='64-17-5')
     1.44
 
+    See Also
+    --------
+    dipole_methods
+
     References
     ----------
     .. [1] NIST Computational Chemistry Comparison and Benchmark Database
@@ -132,9 +158,7 @@ def dipole_moment(CASRN, get_methods=False, method=None):
        New York: McGraw-Hill Professional, 2000.
     '''
     if not _dipole_data_loaded: _load_dipole_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(dipole_sources, CASRN, 'Dipole')
-    elif method:
+    if method:
         return retrieve_from_df_dict(dipole_sources, CASRN, 'Dipole', method) 
     else:
         return retrieve_any_from_df_dict(dipole_sources, CASRN, 'Dipole') 

@@ -22,7 +22,7 @@ SOFTWARE.'''
 
 __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm', 
            'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen', 
-           'Liu', 'Vetere', 'Watson', 'Hfus']
+           'Liu', 'Vetere', 'Watson', 'Hfus', 'Hfus_methods']
 
 import os
 import numpy as np
@@ -123,9 +123,32 @@ else:
 
 ### Boiling Point at 1 atm
 
-Tb_methods = (CRC_INORG, CRC_ORG, YAWS)
+Tb_all_methods = (CRC_INORG, CRC_ORG, YAWS)
 
-def Tb(CASRN, get_methods=False, method=None):
+def Tb_methods(CASRN):
+    """
+    Return all methods available to obtain the Tb for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the Tb with the given inputs.
+
+    See Also
+    --------
+    Tb
+
+    """
+    if not _phase_change_const_loaded: _load_phase_change_constants()
+    return list_available_methods_from_df_dict(Tb_sources, CASRN, 'Tb')
+
+def Tb(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's boiling
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -144,17 +167,12 @@ def Tb(CASRN, get_methods=False, method=None):
     -------
     Tb : float
         Boiling temperature, [K]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain Tb with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
-        A string for the method name to use, as defined by constants in
-        Tb_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        Tb for the desired chemical, and will return methods instead of Tb
+        A string for the method name to use, as defined in the variable,
+        `Tb_all_methods`.
 
     Notes
     -----
@@ -172,6 +190,10 @@ def Tb(CASRN, get_methods=False, method=None):
     >>> Tb('7732-18-5')
     373.124
 
+    See Also
+    --------
+    Tb_methods
+
     References
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
@@ -181,9 +203,7 @@ def Tb(CASRN, get_methods=False, method=None):
        Publishing, 2014.
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
-    if get_methods:
-        return list_available_methods_from_df_dict(Tb_sources, CASRN, 'Tb')
-    elif method:
+    if method:
         return retrieve_from_df_dict(Tb_sources, CASRN, 'Tb', method) 
     else:
         return retrieve_any_from_df_dict(Tb_sources, CASRN, 'Tb') 
@@ -192,7 +212,30 @@ def Tb(CASRN, get_methods=False, method=None):
 
 Tm_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
 
-def Tm(CASRN, get_methods=False, method=None):
+def Tm_methods(CASRN):
+    """
+    Return all methods available to obtain the Tm for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the Tm with the given inputs.
+
+    See Also
+    --------
+    Tm
+
+    """
+    if not _phase_change_const_loaded: _load_phase_change_constants()
+    return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Tm')
+
+def Tm(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's melting
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -212,17 +255,12 @@ def Tm(CASRN, get_methods=False, method=None):
     -------
     Tm : float
         Melting temperature, [K]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain Tm with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
-        A string for the method name to use, as defined by constants in
-        Tm_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        Tm for the desired chemical, and will return methods instead of Tm
+        A string for the method name to use, as defined by the vairable
+        `Tm_all_methods`.
 
     Notes
     -----
@@ -244,6 +282,10 @@ def Tm(CASRN, get_methods=False, method=None):
     >>> Tm(CASRN='7732-18-5')
     273.15
 
+    See Also
+    --------
+    Tm_methods
+
     References
     ----------
     .. [1] Bradley, Jean-Claude, Antony Williams, and Andrew Lang.
@@ -253,8 +295,6 @@ def Tm(CASRN, get_methods=False, method=None):
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
-    if get_methods:
-        return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Tm')
     elif method:
         return retrieve_from_df_dict(Tm_sources, CASRN, 'Tm', method) 
     else:
@@ -880,7 +920,30 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
 
 ### Heat of Fusion
 
-Hfus_methods = (CRC,)
+Hfus_all_methods = (CRC,)
+
+def Hfus_methods(CASRN):
+    """
+    Return all methods available to obtain the Hfus for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the Hfus with the given inputs.
+
+    See Also
+    --------
+    Hfus
+
+    """
+    if not _phase_change_const_loaded: _load_phase_change_constants()
+    return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
 
 def Hfus(CASRN, get_methods=False, method=None): 
     r'''This function handles the retrieval of a chemical's heat of fusion.
@@ -900,17 +963,12 @@ def Hfus(CASRN, get_methods=False, method=None):
     -------
     Hfus : float
         Molar enthalpy of fusion at normal melting point, [J/mol]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain Tb with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
-        A string for the method name to use, as defined by constants in
-        Hfus_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        hfus for the desired chemical, and will return methods instead of Hfus
+        A string for the method name to use, as defined by the variable,
+        `Hfus_all_methods`.
 
     Notes
     -----
@@ -924,15 +982,17 @@ def Hfus(CASRN, get_methods=False, method=None):
     >>> Hfus('7732-18-5')
     6010.0
 
+    See Also
+    --------
+    Hfus_methods
+
     References
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
-    if get_methods:
-        return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
-    elif method:
+    if method:
         return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method) 
     else:
         return retrieve_any_from_df_dict(Hfus_sources, CASRN, 'Hfus') 

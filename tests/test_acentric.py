@@ -53,7 +53,7 @@ def test_acentric_main():
     omega_calc = omega('629-92-5', method='YAWS')
     assert_close(omega_calc, 0.852, rtol=1e-13)
 
-    methods = omega('74-98-6', get_methods=True)
+    methods = omega_methods('74-98-6')
     assert methods == ['PSRK', 'PD', 'YAWS']
 
     # Error handling

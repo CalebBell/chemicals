@@ -20,7 +20,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-__all__ = ['omega', 'LK_omega', 'Stiel_polar_factor', 'omega_methods', 'omega_definition']
+__all__ = ['omega', 'LK_omega', 'Stiel_polar_factor',
+           'omega_methods', 'omega_all_methods', 'omega_definition']
 
 from chemicals.utils import log, log10
 from chemicals import critical
@@ -28,11 +29,31 @@ from chemicals.data_reader import (retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
 
-omega_methods = ('PSRK', 'PD', 'YAWS')
+omega_all_methods = ('PSRK', 'PD', 'YAWS')
 
-def omega(CASRN, get_methods=False, method=None):
-    r'''This function handles the retrieval of a chemical's acentric factor,
-    `omega`,
+def omega_methods(CASRN):
+    """
+    Return all methods available for obtaining omega for the desired chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain omega with the given inputs.
+
+    See Also
+    --------
+    omega
+
+    """
+    return list_available_methods_from_df_dict(critical.omega_sources, CASRN, 'omega')
+
+def omega(CASRN, method=None):
+    r'''Retrieve a chemical's acentric factor, `omega`.
 
     Will automatically select a method to use if no method is provided;
     returns None if the data is not available and cannot be calculated.
@@ -54,18 +75,12 @@ def omega(CASRN, get_methods=False, method=None):
     -------
     omega : float
         Acentric factor of compound
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain omega with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'PSRK', 'PD', or 'YAWS'.
-        All valid values are also held in the variable omega_methods.
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        omega for the desired chemical, and will return methods instead of
-        omega.
+        All valid values are also held in the variable `omega_all_methods`.
 
     Notes
     -----
@@ -77,6 +92,10 @@ def omega(CASRN, get_methods=False, method=None):
           data published in (Passut & Danner, 1973) [16]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
+
+    See Also
+    --------
+    omega_methods
 
     References
     ----------
@@ -97,10 +116,7 @@ def omega(CASRN, get_methods=False, method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
-    if not critical._critical_data_loaded: critical._load_critical_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(critical.omega_sources, CASRN, 'omega')
-    elif method:
+    if method:
         return retrieve_from_df_dict(critical.omega_sources, CASRN, 'omega', method) 
     else:
         return retrieve_any_from_df_dict(critical.omega_sources, CASRN, 'omega') 

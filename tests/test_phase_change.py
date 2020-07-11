@@ -129,8 +129,7 @@ def test_Hfus():
     assert_close(Hfus(CASRN='75-07-0'), 2310.0)
     assert Hfus(CASRN='75000-07-0') is None
     
-    Hfus_methods = Hfus('7732-18-5', get_methods=True)
-    assert Hfus_methods == ['CRC']
+    assert Hfus_methods('7732-18-5') == ['CRC']
 
 def test_Gharagheizi_Hvap_data():
     # 51 CAS number DO NOT validate
@@ -234,7 +233,7 @@ def test_Tb():
     Tbs = [399.15, 412.15, 653.15]
     assert_close1d(Tbs, Tbs_calc)
 
-    hits = [Tb(i, get_methods=True) for i in ['993-50-0', '626-94-8', '7631-99-4']]
+    hits = [Tb_methods(i) for i in ['993-50-0', '626-94-8', '7631-99-4']]
     assert hits == [['CRC_INORG'], ['CRC_ORG'], ['YAWS']]
 
 
@@ -242,10 +241,10 @@ def test_Tb():
         Tb('993-50-0', method='BADMETHOD')
 
     assert None == Tb('9923443-50-0')
-    assert [] == Tb('9923443-50-0', get_methods=True)
+    assert [] == Tb_methods('9923443-50-0')
 
 
-    w_methods = Tb('7732-18-5', get_methods=True)
+    w_methods = Tb_methods('7732-18-5')
     assert w_methods == ['CRC_INORG', 'YAWS']
 
     Tbs = [Tb('7732-18-5', method=i) for i in w_methods]
@@ -274,17 +273,17 @@ def test_Tm():
     Tms = [263.15, 191.15, 274.15]
     assert_close1d(Tms, Tms_calc)
 
-    hits = [Tm(i, get_methods=True) for i in ['996-50-9', '999-78-0', '993-50-0']]
+    hits = [Tm_methods(i) for i in ['996-50-9', '999-78-0', '993-50-0']]
     assert hits == [['OPEN_NTBKM'], ['CRC_ORG'], ['CRC_INORG']]
 
     with pytest.raises(Exception):
         Tm('993-50-0', method='BADMETHOD')
 
     assert  Tm('9923443-50-0') is None
-    assert [] == Tm('9923443-50-0', get_methods=True)
+    assert [] == Tm_methods('9923443-50-0')
 
 
-    w_methods = Tm('7732-18-5', get_methods=True)
+    w_methods = Tm_methods('7732-18-5')
     assert w_methods == ['OPEN_NTBKM', 'CRC_INORG']
 
     Tms = [Tm('7732-18-5', method=i) for i in w_methods]
