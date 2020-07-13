@@ -20,10 +20,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-__all__ = [ 
-           'Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s', 
+__all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s', 
            'Hfl_methods', 'Hfg_methods', 'Hfs_methods',
            'S0l_methods', 'S0g_methods', 'S0s_methods',
+           'Hfl_all_methods', 'Hfg_all_methods', 'Hfs_all_methods',
+           'S0l_all_methods', 'S0g_all_methods', 'S0s_all_methods',
            'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
            'balance_stoichiometry', 'stoichiometric_matrix']
            
@@ -105,9 +106,33 @@ else:
 # TODO: more data from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3692305/
 # has dippr standard heats of formation, about 55% of the database
 
-Hfs_methods = (CRC,)
+Hfs_all_methods = (CRC,)
 
-def Hfs(CASRN, get_methods=False, method=None):
+def Hfs_methods(CASRN):
+    """
+    Return all methods available to obtain the Hfs for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the Hfs with the given 
+        inputs.
+
+    See Also
+    --------
+    Hfs
+
+    """
+    if not _reaction_data_loaded: _load_reaction_data()
+    return list_available_methods_from_df_dict(Hfs_sources, CASRN, 'Hfs')
+
+def Hfs(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's solid/crystaline 
     standard phase heat of formation. The lookup is based on CASRNs. Will 
     automatically select a data source to use if no method is provided; returns 
@@ -122,17 +147,12 @@ def Hfs(CASRN, get_methods=False, method=None):
     -------
     Hfs : float
         Solid standard-state heat of formation, [J/mol]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain Hf(s) with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
         A string for the method name to use, as defined by constants in
         Hfs_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        Hf(s) for the desired chemical, and will return methods instead of Hf(s)
 
     Notes
     -----
@@ -145,6 +165,10 @@ def Hfs(CASRN, get_methods=False, method=None):
     >>> Hfs('101-81-5') # Diphenylmethane
     71500.0
 
+    See Also
+    --------
+    Hfs_methods
+
     References
     ----------
     .. [1] Ruscic, Branko, Reinhardt E. Pinzon, Gregor von Laszewski, Deepti
@@ -154,16 +178,38 @@ def Hfs(CASRN, get_methods=False, method=None):
        (January 1, 2005): 561. doi:10.1088/1742-6596/16/1/078.
     '''
     if not _reaction_data_loaded: _load_reaction_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(Hfs_sources, CASRN, 'Hfs')
-    elif method:
+    if method:
         return retrieve_from_df_dict(Hfs_sources, CASRN, 'Hfs', method) 
     else:
         return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
-Hfl_methods = (ATCT_L, CRC)
+Hfl_all_methods = (ATCT_L, CRC)
 
-def Hfl(CASRN, get_methods=False, method=None):
+def Hfl_methods(CASRN):
+    """
+    Return all methods available to obtain the Hfl for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the Hfl with the given 
+        inputs.
+
+    See Also
+    --------
+    Hfl
+
+    """
+    if not _reaction_data_loaded: _load_reaction_data()
+    return list_available_methods_from_df_dict(Hfl_sources, CASRN, 'Hfl')
+
+def Hfl(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's liquid standard
     phase heat of formation. The lookup is based on CASRNs. Will automatically
     select a data source to use if no method is provided; returns None if 
@@ -178,17 +224,12 @@ def Hfl(CASRN, get_methods=False, method=None):
     -------
     Hfl : float
         Liquid standard-state heat of formation, [J/mol]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain Hf(l) with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
-        A string for the method name to use, as defined by constants in
-        Hfl_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        Hf(l) for the desired chemical, and will return methods instead of Hf(l)
+        A string for the method name to use, as defined in the variable,
+        `Hfl_all_methods`.
 
     Notes
     -----
@@ -201,6 +242,10 @@ def Hfl(CASRN, get_methods=False, method=None):
     --------
     >>> Hfl('67-56-1')
     -238400.0
+    
+    See Also
+    --------
+    Hfl_methods
 
     References
     ----------
@@ -213,16 +258,38 @@ def Hfl(CASRN, get_methods=False, method=None):
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     '''
     if not _reaction_data_loaded: _load_reaction_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(Hfl_sources, CASRN, 'Hfl')
-    elif method:
+    if method:
         return retrieve_from_df_dict(Hfl_sources, CASRN, 'Hfl', method) 
     else:
         return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
-Hfg_methods = (ATCT_G, TRC, CRC, YAWS)
+Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS)
 
-def Hfg(CASRN, get_methods=False, method=None):
+def Hfg_methods(CASRN):
+    """
+    Return all methods available to obtain the Hfg for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the Hfg with the given 
+        inputs.
+
+    See Also
+    --------
+    Hfg
+
+    """
+    if not _reaction_data_loaded: _load_reaction_data()
+    return list_available_methods_from_df_dict(Hfg_sources, CASRN, 'Hfg')
+
+def Hfg(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's gas heat of
     formation. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -237,17 +304,12 @@ def Hfg(CASRN, get_methods=False, method=None):
     -------
     Hfg : float
         Ideal gas phase heat of formation, [J/mol]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain Hf(g) with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
         A string for the method name to use, as defined by constants in
         Hfg_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        Hf(g) for the desired chemical, and will return methods instead of Hf(g)
 
     Notes
     -----
@@ -272,6 +334,10 @@ def Hfg(CASRN, get_methods=False, method=None):
     >>> Hfg('67-56-1', method='TRC')
     -190100.0
 
+    See Also
+    --------
+    Hfg_methods
+
     References
     ----------
     .. [1] Ruscic, Branko, Reinhardt E. Pinzon, Gregor von Laszewski, Deepti
@@ -290,16 +356,38 @@ def Hfg(CASRN, get_methods=False, method=None):
        Publishing, 2014.
     '''
     if not _reaction_data_loaded: _load_reaction_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(Hfg_sources, CASRN, 'Hfg')
-    elif method:
+    if method:
         return retrieve_from_df_dict(Hfg_sources, CASRN, 'Hfg', method) 
     else:
         return retrieve_any_from_df_dict(Hfg_sources, CASRN, 'Hfg')
 
-S0s_methods = (CRC,)
+S0s_all_methods = (CRC,)
 
-def S0s(CASRN, get_methods=False, method=None):
+def S0s_methods(CASRN):
+    """
+    Return all methods available to obtain the S0s for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the S0s with the given 
+        inputs.
+
+    See Also
+    --------
+    S0s
+
+    """
+    if not _reaction_data_loaded: _load_reaction_data()
+    return list_available_methods_from_df_dict(S0s_sources, CASRN, 'S0s')
+
+def S0s(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the solid state. Lookup is based on CASRNs. Will automatically select a 
@@ -315,17 +403,12 @@ def S0s(CASRN, get_methods=False, method=None):
     -------
     S0s : float
         Ideal gas standard absolute entropy of compound, [J/mol/K]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain S0(s) with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
         A string for the method name to use, as defined by constants in
-        S0s_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        S0(s) for the desired chemical, and will return methods instead of S0(s)
+        `S0s_all_methods`.
 
     Notes
     -----
@@ -337,19 +420,45 @@ def S0s(CASRN, get_methods=False, method=None):
     --------
     >>> S0s('7439-93-2') # Lithium
     29.1
+    
+    See Also
+    --------
+    S0s_methods
 
     '''
     if not _reaction_data_loaded: _load_reaction_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(S0s_sources, CASRN, 'S0s')
-    elif method:
+    if method:
         return retrieve_from_df_dict(S0s_sources, CASRN, 'S0s', method) 
     else:
         return retrieve_any_from_df_dict(S0s_sources, CASRN, 'S0s')
 
-S0l_methods = (CRC,)
+S0l_all_methods = (CRC,)
 
-def S0l(CASRN, get_methods=False, method=None):
+def S0l_methods(CASRN):
+    """
+    Return all methods available to obtain the S0l for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the S0l with the given 
+        inputs.
+
+    See Also
+    --------
+    S0l
+
+    """
+    if not _reaction_data_loaded: _load_reaction_data()
+    return list_available_methods_from_df_dict(S0l_sources, CASRN, 'S0l')
+
+def S0l(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the liquid state.
@@ -367,17 +476,12 @@ def S0l(CASRN, get_methods=False, method=None):
     -------
     S0l : float
         Ideal gas standard absolute entropy of compound, [J/mol/K]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain S0(l) with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
-        A string for the method name to use, as defined by constants in
-        S0l_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        S0(l) for the desired chemical, and will return methods instead of S0(l)
+        A string for the method name to use, as defined in the variable,
+        `S0l_all_methods`.
 
     Notes
     -----
@@ -390,22 +494,48 @@ def S0l(CASRN, get_methods=False, method=None):
     >>> S0l('7439-97-6') # Mercury
     75.9
 
+    See Also
+    --------
+    S0l_methods
+
     References
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     '''
     if not _reaction_data_loaded: _load_reaction_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(S0l_sources, CASRN, 'S0l')
-    elif method:
+    if method:
         return retrieve_from_df_dict(S0l_sources, CASRN, 'S0l', method) 
     else:
         return retrieve_any_from_df_dict(S0l_sources, CASRN, 'S0l')
 
-S0g_methods = (CRC, YAWS)
+S0g_all_methods = (CRC, YAWS)
 
-def S0g(CASRN, get_methods=False, method=None):
+def S0g_methods(CASRN):
+    """
+    Return all methods available to obtain the S0g for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the S0g with the given 
+        inputs.
+
+    See Also
+    --------
+    S0g
+
+    """
+    if not _reaction_data_loaded: _load_reaction_data()
+    return list_available_methods_from_df_dict(S0g_sources, CASRN, 'S0g')
+
+def S0g(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the ideal gas state.
@@ -423,18 +553,13 @@ def S0g(CASRN, get_methods=False, method=None):
     -------
     S0g : float
         Ideal gas standard absolute entropy of compound, [J/mol/K]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain S0(g) with the given inputs
-
+        
     Other Parameters
     ----------------
     method : string, optional
-        A string for the method name to use, as defined by constants in
-        S0g_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        S0(g) for the desired chemical, and will return methods instead of S0(g)
-
+        A string for the method name to use, as defined in the variable,
+        `S0g_all_methods`
+        
     Notes
     -----
     Function has data for approximately 5400 chemicals. Sources are:
@@ -448,6 +573,10 @@ def S0g(CASRN, get_methods=False, method=None):
     239.9
     >>> S0g('67-56-1', method='YAWS')
     239.88
+    
+    See Also
+    --------
+    S0g_methods
 
     References
     ----------
@@ -458,9 +587,7 @@ def S0g(CASRN, get_methods=False, method=None):
        Publishing, 2014.
     '''
     if not _reaction_data_loaded: _load_reaction_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(S0g_sources, CASRN, 'S0g')
-    elif method:
+    if method:
         return retrieve_from_df_dict(S0g_sources, CASRN, 'S0g', method) 
     else:
         return retrieve_any_from_df_dict(S0g_sources, CASRN, 'S0g')

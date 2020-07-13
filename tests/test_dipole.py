@@ -52,7 +52,7 @@ def test_dipole():
     d = dipole_moment(CASRN='56-81-5', method='MULLER')
     assert_close(d, 4.21)
 
-    methods = dipole_moment(CASRN='78-78-4', get_methods=True)
+    methods = dipole_methods(CASRN='78-78-4')
     methods_fixed = ['CCCBDB', 'MULLER', 'POLING']
     assert methods == methods_fixed
     

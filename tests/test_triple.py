@@ -50,7 +50,7 @@ def test_Tt():
     Tt3 = 90.69
     assert_close1d([Tt1_calc, Tt2_calc, Tt3_calc], [Tt1, Tt2, Tt3])
 
-    m = Tt('7439-90-9', get_methods=True)
+    m = Tt_methods('7439-90-9')
     assert m == ['STAVELEY', 'MELTING']
     assert None == Tt('72433223439-90-9')
     with pytest.raises(Exception):
@@ -67,7 +67,7 @@ def test_Pt():
     Pt1 = 6079.5
     assert_close(Pt1_calc, Pt1)
 
-    m = Pt('7664-41-7', get_methods=True)
+    m = Pt_methods('7664-41-7')
     assert m == ['STAVELEY']
     assert None == Pt('72433223439-90-9')
     with pytest.raises(Exception):

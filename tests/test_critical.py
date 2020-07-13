@@ -178,7 +178,7 @@ def test_relationships():
     assert_close1d([Vc1, Vc2, Vc3],
                     [0.0010927333333333334, 0.0010695726588235296, 0.00134532])
 
-    methods = critical_surface(Tc=599.4, Pc=1.19E6, get_methods=True)
+    methods = critical_surface_methods(Tc=599.4, Pc=1.19E6)
     methods.sort()
     methods_listed = ['IHMELS', 'MEISSNER', 'GRIGORAS']
     methods_listed.sort()
@@ -211,7 +211,7 @@ def test_Tc():
 
     assert_close(126.2, Tc(CASRN='7727-37-9', method='MATTHEWS'))
 
-    methods = Tc(CASRN='98-01-1', get_methods=True)
+    methods = Tc_methods(CASRN='98-01-1')
     assert methods == ['IUPAC', 'PSRK', 'YAWS']
 
     # Error handling
@@ -237,7 +237,7 @@ def test_Pc_main():
 
     assert_close(3394387.5, Pc(CASRN='7727-37-9', method='MATTHEWS'))
 
-    methods = Pc(CASRN='98-01-1', get_methods=True)
+    methods = Pc_methods(CASRN='98-01-1')
     assert methods == ['IUPAC', 'PSRK', 'YAWS']
 
     # Error handling
@@ -263,7 +263,7 @@ def test_Vc_main():
 
     assert_close(8.950e-05, Vc(CASRN='7727-37-9', method='MATTHEWS'))
 
-    methods = Vc(CASRN='98-01-1', get_methods=True)
+    methods = Vc_methods(CASRN='98-01-1')
     assert methods == ['PSRK', 'YAWS']
 
     # Error handling
@@ -289,7 +289,7 @@ def test_Zc_main():
 
     assert_close(0.29, Zc(CASRN='7727-37-9', method='MATTHEWS'))
 
-    methods = Zc(CASRN='98-01-1', get_methods=True)
+    methods = Zc_methods(CASRN='98-01-1')
     assert methods == ['PSRK', 'YAWS']
 
     # Error handling

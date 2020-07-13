@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-__all__ = ['RI_methods', 'refractive_index', 
+__all__ = ['RI', 'RI_methods', 'RI_all_methods', 'refractive_index', 
            'polarizability_from_RI', 'molar_refractivity_from_RI', 
            'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
            'brix_to_RI']
@@ -64,10 +64,33 @@ else:
 
 # %% Refractive index functions
 
-RI_methods = [CRC]
+RI_all_methods = (CRC,)
 
-def refractive_index(CASRN, get_methods=False, method=None,
-                     full_info=True):
+def RI_methods(CASRN):
+    """
+    Return all methods available to obtain the RI for the desired 
+    chemical.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-].
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the RI with the given 
+        inputs.
+
+    See Also
+    --------
+    RI
+
+    """
+    if not _RI_data_loaded: _load_RI_data()
+    return list_available_methods_from_df_dict(RI_sources, CASRN, 'RI')
+
+def RI(CASRN, method=None, full_info=True):
     r'''This function handles the retrieval of a chemical's refractive
     index. Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
@@ -85,17 +108,12 @@ def refractive_index(CASRN, get_methods=False, method=None,
         Refractive Index on the Na D line, [-]
     T : float, only returned if full_info == True
         Temperature at which refractive index reading was made
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain RI with the given inputs
 
     Other Parameters
     ----------------
     method : string, optional
         A string for the method name to use, as defined by constants in
         RI_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        RI for the desired chemical, and will return methods instead of RI
     full_info : bool, optional
         If True, function will return the temperature at which the refractive
         index reading was made
@@ -108,29 +126,28 @@ def refractive_index(CASRN, get_methods=False, method=None,
 
     Examples
     --------
-    >>> refractive_index(CASRN='64-17-5')
+    >>> RI(CASRN='64-17-5')
     (1.3611, 293.15)
 
     References
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
+    
     '''
     if not _RI_data_loaded: _load_RI_data()
-    if get_methods:
-        return list_available_methods_from_df_dict(RI_sources, CASRN, 'RI')
+    key = ('RI', 'RIT') if full_info else 'RI'
+    if method:
+        value = retrieve_from_df_dict(RI_sources, CASRN, key, method) 
     else:
-        key = ('RI', 'RIT') if full_info else 'RI'
-        if method:
-            value = retrieve_from_df_dict(RI_sources, CASRN, key, method) 
+        value = retrieve_any_from_df_dict(RI_sources, CASRN, key) 
+    if full_info:
+        if value is None:
+            value = (None, None)
         else:
-            value = retrieve_any_from_df_dict(RI_sources, CASRN, key) 
-        if full_info:
-            if value is None:
-                value = (None, None)
-            else:
-                value = tuple(value)
-        return value
+            value = tuple(value)
+    return value
+refractive_index = RI
 
 def polarizability_from_RI(RI, Vm):
     r'''Returns the polarizability of a fluid given its molar volume and

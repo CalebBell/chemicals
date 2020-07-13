@@ -55,13 +55,11 @@ def test_refractivity_general():
     val = refractive_index(CASRN='64-17-5', full_info=False)
     assert_close(val, 1.3611)
 
-    vals = refractive_index(CASRN='64-17-5', get_methods=True)
+    vals = RI_methods(CASRN='64-17-5')
     assert vals == ['CRC']
     assert RI_data_CRC_organic.index.is_unique
-    assert RI_data_CRC_organic.shape == (4490, 2)
-    
-    assert refractive_index(CASRN='6400000-17-5', get_methods=True) == []
-
+    assert RI_data_CRC_organic.shape == (4490, 2)    
+    assert RI_methods(CASRN='6400000-17-5') == []
 
     with pytest.raises(Exception):
         refractive_index(CASRN='64-17-5', method='FAIL')

@@ -39,7 +39,7 @@ def test_GWP():
     GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (2007) 100yr-SAR')
     assert [GWP1_calc, GWP2_calc] == [25.0, 21.0]
 
-    GWP_available = GWP(CASRN='56-23-5', get_methods=True)
+    GWP_available = GWP_methods(CASRN='56-23-5')
     assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr']
 
     with pytest.raises(Exception):
@@ -51,7 +51,7 @@ def test_GWP():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_GWP_all_values():
-    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP(i, get_methods=True)]).sum()
+    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP_methods(i)]).sum()
     assert_close(tot, 960256, rtol=1e-11)
 
 
@@ -72,7 +72,7 @@ def test_logP():
     with pytest.raises(Exception):
         logP(CASRN='74-82-8', method='BADMETHOD')
 
-    logP_available = logP('110-54-3', get_methods=True)
+    logP_available = logP_methods('110-54-3')
     assert logP_available == ['CRC', 'SYRRES']
 
     assert logP('1124321250-54-3') == None
@@ -105,7 +105,7 @@ def test_ODP():
 
     methods = ['ODP2 Max', 'ODP1 Max', 'ODP2 logarithmic average', 'ODP1 logarithmic average', 'ODP2 Min', 'ODP1 Min', 'ODP2 string', 'ODP1 string']
 
-    assert methods == ODP(CASRN='148875-98-3', get_methods=True)
+    assert methods == ODP_methods(CASRN='148875-98-3')
 
     with pytest.raises(Exception):
         ODP(CASRN='148875-98-3', method='BADMETHOD')
@@ -115,7 +115,7 @@ def test_ODP():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_ODP_all_values():
-    dat_calc = [pd.to_numeric(pd.Series([ODP(i, method=j) for i in ODP_data.index]), errors='coerce').sum() for j in ODP_methods]
+    dat_calc = [pd.to_numeric(pd.Series([ODP(i, method=j) for i in ODP_data.index]), errors='coerce').sum() for j in ODP_all_methods]
 
     dat = [77.641999999999996, 64.140000000000001, 63.10509761272651, 47.809027930358717, 58.521999999999998, 42.734000000000002, 54.342000000000006, 38.280000000000001]
     assert_close1d(dat_calc, dat, rtol=1e-12)
