@@ -122,7 +122,7 @@ if PY37:
             _load_critical_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
-else:
+else: # pragma: no cover
     if can_load_data:
         _load_critical_data()
 
@@ -886,9 +886,8 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
 ### Critical Property Relationships
 
 def _assert_two_critical_properties_provided(critical_properties):
-    assert sum([bool(i) for i in critical_properties]) == 2, (
-        'Two and only two of Tc, Pc, and Vc must be provided'
-    )
+    if sum([bool(i) for i in critical_properties]) != 2:
+        raise ValueError('Two and only two of Tc, Pc, and Vc must be provided')
 
 def Ihmels(Tc=None, Pc=None, Vc=None):
     r'''Most recent, and most recommended method of estimating critical
@@ -1028,12 +1027,12 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
 
     Parameters
     ----------
-    Tc : float
-        Critical temperature of fluid (optional) [K]
-    Pc : float
-        Critical pressure of fluid (optional) [Pa]
-    Vc : float
-        Critical volume of fluid (optional) [m^3/mol]
+    Tc : float, optional
+        Critical temperature of fluid [K]
+    Pc : float, optional
+        Critical pressure of fluid [Pa]
+    Vc : float, optional
+        Critical volume of fluid [m^3/mol]
 
     Returns
     -------
@@ -1187,34 +1186,35 @@ def third_property(CASRN=None, T=False, P=False, V=False):
 
     Examples
     --------
-    >>> # Decamethyltetrasiloxane [141-62-8]
+    Decamethyltetrasiloxane [141-62-8]
+    
     >>> third_property('141-62-8', V=True)
     0.0010920041152263375
 
-    >>> # Succinic acid 110-15-6
+    Succinic acid [110-15-6]
+    
     >>> third_property('110-15-6', P=True)
     6095016.233766234
     '''
-    assert sum([T, P, V]) == 1, (
-        "only one of the following arguments can be True: T, P, V"
-    )
+    if sum([T, P, V]) != 1:
+        raise ValueError("only one of the following arguments can be True: T, P, V")
     Third = None
     if V:
         Tc = critical_point_temperature(CASRN)
         Pc = critical_point_pressure(CASRN)
-        if Tc and Pc:
-            Third = critical_surface(Tc=Tc, Pc=Pc, Vc=None)
+        if Tc is not None and Pc is not None:
+            return critical_surface(Tc=Tc, Pc=Pc)
     elif P:
         Tc = critical_point_temperature(CASRN)
         Vc = critical_point_volume(CASRN)
-        if Tc and Vc:
-            Third = critical_surface(Tc=Tc, Vc=Vc, Pc=None)
-    else: # T
+        if Tc is not None and Vc is not None:
+            return critical_surface(Tc=Tc, Vc=Vc)
+    else:
         Pc = critical_point_pressure(CASRN)
         Vc = critical_point_volume(CASRN)
-        if Pc and Vc:
-            Third = critical_surface(Pc=Pc, Vc=Vc, Tc=None)
-    return Third
+        if Pc is not None and Vc is not None:
+            return critical_surface(Pc=Pc, Vc=Vc)
+    raise ValueError("Could not find the required two properties")
 
 ### Crtical Temperature of Mixtures - Estimation routines
 

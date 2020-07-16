@@ -439,8 +439,6 @@ element_list = []
 list of elements first, and then as an instance of Periodic Table.'''
 for values in openbabel_element_data:
     number, symbol, AReneg, rcov, _, rvdw, maxbonds, MW, elneg, ionization, elaffinity, _, _, _, name = values
-    number = int(number)
-    name = str(name)
     AReneg = None if AReneg == 0 else AReneg
     rcov = None if rcov == 1.6 else rcov  # in Angstrom
     rvdw = None if rvdw == 2.0 else rvdw  # in Angstrom
@@ -561,7 +559,7 @@ def mass_fractions(atoms, MW=None):
         if i in periodic_table:
             mfracs[i] = periodic_table[i].MW*atoms[i]/MW
         else:
-            raise Exception('Molecule includes unknown atoms')
+            raise ValueError('Molecule includes unknown atoms')
     return mfracs
 
 
@@ -936,7 +934,7 @@ def nested_formula_parser(formula, check=True):
         token_letters = set([j for i in tokens for j in i if j in letter_set])
         formula_letters = set(i for i in formula if i in letter_set)
         if formula_letters != token_letters:
-            raise Exception('Input may not be a formula; extra letters were detected')
+            raise ValueError('Input may not be a formula; extra letters were detected')
     
     for token in tokens:
         if token == "(":
@@ -1009,7 +1007,7 @@ def charge_from_formula(formula):
     
     hit = False
     if '(' in formula:
-        if bracketed_charge_re is None:
+        if bracketed_charge_re is None: # pragma: no cover
             bracketed_charge_re = re.compile(bracketed_charge_re_str)
         hit = bracketed_charge_re.findall(formula)
         if hit:

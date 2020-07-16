@@ -43,13 +43,15 @@ __all__ = []
 __funcs = {}
 
 
+uncachable = ['Rachford_Rice_solution', 'Rachford_Rice_solution_LN2', 'Rachford_Rice_solution_polynomial', 'Rachford_Rice_solution_numpy', 'Li_Johns_Ahmadi_solution', 'flash_inner_loop', 'Rachford_Rice_solutionN', 'Rachford_Rice_solution2']
+
 replaced = {'sum': np.sum, 'combinations': fluids.numba.combinations}
 replaced, NUMERICS_SUBMOD = fluids.numba.create_numerics(replaced, vec=False)
 
 
 blacklist = set(['to_num'])
 fluids.numba.transform_module(normal, __funcs, replaced, vec=False,
-                              blacklist=blacklist)
+                              blacklist=blacklist, cache_blacklist=uncachable)
 
 
 
@@ -58,7 +60,9 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
              'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
              'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
-             'rachford_rice.Rachford_Rice_solution', 'rachford_rice.Rachford_Rice_solution_LN2',
+             
+             'rachford_rice.Rachford_Rice_solution',
+             'rachford_rice.Rachford_Rice_solution_LN2',
              'rachford_rice.Rachford_Rice_solution_numpy',
              'rachford_rice.Rachford_Rice_polynomial', 
              'rachford_rice.Rachford_Rice_polynomial_3',
@@ -77,6 +81,6 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'rachford_rice.Rachford_Rice_valid_solution_naive',
              ]
 
-fluids.numba.transform_lists_to_arrays(chemicals, to_change, __funcs)
+fluids.numba.transform_lists_to_arrays(chemicals, to_change, __funcs, cache_blacklist=uncachable)
 globals().update(__funcs)
 globals().update(replaced)

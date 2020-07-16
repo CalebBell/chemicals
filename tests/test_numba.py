@@ -440,6 +440,11 @@ def test_lazy_loading():
     # The data_reader functions are not part of the public API so are not converted
     chemicals.numba.heat_capacity.zabransky_dicts
     chemicals.numba.heat_capacity.CRC_standard_data
+    
+    assert 'jitclass' in str(chemicals.numba.heat_capacity.ZabranskySpline)
+    assert 'jitclass' in str(chemicals.numba.heat_capacity.ZabranskyQuasipolynomial)
+    assert 'jitclass' in str(chemicals.numba.heat_capacity.zabransky_dict_iso_s['2016-57-1'].models[0])
+
 
 
 

@@ -183,10 +183,12 @@ def test_relationships():
     methods_listed = ['IHMELS', 'MEISSNER', 'GRIGORAS']
     methods_listed.sort()
     assert methods == methods_listed
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         critical_surface()
     with pytest.raises(Exception):
         critical_surface(Tc=599.4, Pc=1.19E6, method='FAIL')
+        
+    assert [] == critical_surface_methods(Tc=100)
 
 @pytest.mark.slow
 def test_Tc_all_values():
@@ -397,6 +399,9 @@ def test_mixing_modified_Wilson_Vc():
 def test_third_property():
     with pytest.raises(Exception):
         third_property('141-62-8')
-    assert third_property('1410-62-8', V=True) is None
-
-
+    with pytest.raises(Exception):
+        third_property('1410-62-8', V=True)
+        
+    assert_close(third_property('110-15-6', V=True), 0.00039809186906019007)
+    assert_close(third_property('110-15-6', P=True), 6095016.233766234)
+    assert_close(third_property('110-15-6', T=True), 658.410835214447)

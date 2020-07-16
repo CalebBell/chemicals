@@ -946,7 +946,7 @@ def Hfus_methods(CASRN):
     if not _phase_change_const_loaded: _load_phase_change_constants()
     return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
 
-def Hfus(CASRN, get_methods=False, method=None): 
+def Hfus(CASRN, method=None): 
     r'''This function handles the retrieval of a chemical's heat of fusion.
     Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not

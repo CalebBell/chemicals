@@ -20,8 +20,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 __all__ = ['dipole_moment', 
-           'dipole_methods',
-           'dipole_all_methods']
+           'dipole_moment_methods',
+           'dipole_moment_all_methods']
 
 import os
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
@@ -62,15 +62,15 @@ if PY37:
             _load_dipole_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
-else:
+else: # pragma: no cover
     if can_load_data:
         _load_dipole_data()
 
 # %% Dipole moment functions
 
-dipole_all_methods = (CCCBDB, MULLER, POLING)
+dipole_moment_all_methods = (CCCBDB, MULLER, POLING)
 
-def dipole_methods(CASRN):
+def dipole_moment_methods(CASRN):
     """
     Return all methods available to obtain the dipole moment for the desired 
     chemical.
@@ -144,7 +144,7 @@ def dipole_moment(CASRN, get_methods=False, method=None):
 
     See Also
     --------
-    dipole_methods
+    dipole_moment_methods
 
     References
     ----------

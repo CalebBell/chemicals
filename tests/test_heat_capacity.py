@@ -24,6 +24,7 @@ from fluids.numerics import assert_close, assert_close1d, linspace, logspace
 from chemicals.heat_capacity import *
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data, Cp_data_Poling
 from fluids.numerics import NotBoundedError
+from chemicals.heat_capacity import zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s
 
 def test_heat_capacity_CSP():
     # Example is for cis-2-butene at 350K from Poling. It is not consistent with
@@ -324,3 +325,9 @@ def test_ZABRANSKY_SPLINE():
     assert_close(d.calculate(310), 375.543177681642)
     assert_close(d.force_calculate_integral(290, 340), 18857.29436766774)
     assert_close(d.force_calculate_integral_over_T(290, 340), 59.96511735461314)
+
+
+def test_zabransky_dict_types():
+    for d in (zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s):
+        for v in d.values():
+            assert type(v) is PiecewiseHeatCapacity
