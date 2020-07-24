@@ -484,72 +484,6 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
             for i in range(N):
                 ys[i] = xs[i]*Ks[i]
             return (T_calc, P, VF, xs, ys)
-
-#    # Old code - may converge where the other will not
-#    if P is not None and VF == 1.0:
-#        def to_solve(T_guess):
-#            # Avoid some nasty unpleasantness in newton
-#            T_guess = abs(T_guess)
-#            P_dew = 0.
-#            for i in range(len(zs)):
-#                P_dew += zs[i]/(Pcs[i]*exp((5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]/T_guess))))
-#            P_dew = 1./P_dew
-##            print(P_dew - P, T_guess)
-#            return P_dew - P
-#        # 2/3 average critical point
-#        T_guess = sum([.666*Tcs[i]*zs[i] for i in cmps])
-#        try:
-#            T_dew = abs(newton(to_solve, T_guess, maxiter=50, ytol=1e-2))
-#        except Exception as e:
-##            print(e)
-#            T_dew = None
-#        if T_dew is None or T_dew > T_MAX*5.0:
-#            # Went insanely high T, bound it with brenth
-#            T_low_guess = sum([.1*Tcs[i]*zs[i] for i in cmps])
-#            try:
-#                T_dew = brenth(to_solve, T_MAX, T_low_guess)
-#            except NotBoundedError:
-#                raise Exception("Bisecting solver could not find a solution between %g K and %g K" %(T_MAX, T_low_guess))
-#        return flash_wilson(zs, Tcs, Pcs, omegas, T=T_dew, P=P)
-#    elif P is not None and VF == 0.0:
-#        def to_solve(T_guess):
-#            T_guess = abs(T_guess)
-#            P_bubble = 0.0
-#            for i in cmps:
-#                P_bubble += zs[i]*Pcs[i]*exp((5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]/T_guess)))
-#            return P_bubble - P
-#        # 2/3 average critical point
-#        T_guess = sum([.55*Tcs[i]*zs[i] for i in cmps])
-#        try:
-#            T_bubble = abs(newton(to_solve, T_guess, maxiter=50, ytol=1e-2))
-#        except Exception as e:
-#            T_bubble = None
-#        if T_bubble is None or T_bubble > T_MAX*5.0:
-#            # Went insanely high T, bound it with brenth
-#            T_low_guess = sum([.1*Tcs[i]*zs[i] for i in cmps])
-#            try:
-#                T_bubble = brenth(to_solve, T_MAX, T_low_guess)
-#            except NotBoundedError:
-#                raise Exception("Bisecting solver could not find a solution between %g K and %g K" %(T_MAX, T_low_guess))
-#
-#        return flash_wilson(zs, Tcs, Pcs, omegas, T=T_bubble, P=P)
-#    elif P is not None and VF is not None:
-#        # Solve for in the middle of Pdew
-#        T_low = flash_wilson(zs, Tcs, Pcs, omegas, P=P, VF=1)[0]
-#        T_high = flash_wilson(zs, Tcs, Pcs, omegas, P=P, VF=0)[0]
-##        print(T_low, T_high)
-#        info = []
-#        def err(T):
-#            T_calc, P_calc, VF_calc, xs, ys = flash_wilson(zs, Tcs, Pcs, omegas, T=T, P=P)
-##            if abs(VF_calc) > 100: # Did not work at all
-##                VF_calc = abs(VF_calc)
-#            info[:] = T_calc, P_calc, VF_calc, xs, ys
-##            print(T, VF_calc - VF)
-#            return VF_calc - VF
-#        # Nasty function for tolerance; the default works and is good enough, could remove some
-#        # iterations in the fuure
-#        P = brenth(err, T_low, T_high, xtol=1e-14)
-#        return tuple(info)
     else:
         raise ValueError("Provide two of P, T, and VF")
 
@@ -746,11 +680,133 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
 
 
 def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
+    r'''PVT flash model using ideal, composition-independent equation.
+    Solves the various cases of composition-independent models.
+    
+    Capable of solving with two of `T`, `P`, and `VF` for the other one;
+    that results in three solve modes, but for `VF=1` and `VF=0`, there are
+    additional solvers; for a total of seven solvers implemented.
+    
+    The function takes a list of callables that take `T` in Kelvin as an argument,
+    and return vapor pressure. The callables can include the effect of
+    non-ideal pure component fugacity coefficients. For the (`T`, `P`) and
+    (`P`, `VF`) cases, the Poynting correction factor can be easily included as
+    well but not the (`T`, `VF`) case as the callable only takes `T` as an 
+    argument. Normally the Poynting correction factor is used with activity 
+    coefficient models with composition dependence.            
+
+    Both `flash_wilson` and `flash_Tb_Tc_Pc` are specialized cases of this 
+    function and have the same functionality but with the model built right in.
+    
+    Even when using more complicated models, this is useful for obtaining initial
+
+    This model uses `flash_inner_loop` to solve the Rachford-Rice problem.
+    
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of the phase being flashed, [-]
+    funcs : list[Callable]
+        Functions to calculate ideal or real vapor pressures, take temperature
+        in Kelvin and return pressure in Pa, [-]
+    Tcs : list[float], optional
+        Critical temperatures of all species; uses as upper bounds and only
+        for the case that `T` is not specified; if they are needed and not
+        given, it is assumed a method `solve_prop` exists in each of `funcs` 
+        which will accept `P` in Pa and return temperature in `K`, [K]
+    T : float, optional
+        Temperature, [K]
+    P : float, optional
+        Pressure, [Pa]
+    VF : float, optional
+        Molar vapor fraction, [-]
+
+    Returns
+    -------
+    T : float
+        Temperature, [K]
+    P : float
+        Pressure, [Pa]
+    VF : float
+        Molar vapor fraction, [-]
+    xs : list[float]
+        Mole fractions of liquid phase, [-]
+    ys : list[float]
+        Mole fractions of vapor phase, [-]
+
+    Notes
+    -----
+    For the cases where `VF` is 1 or 0 and T is known, an explicit solution is
+    used. For the same cases where `P` and `VF` are known, there is no explicit
+    solution available.
+
+    There is an internal `Tmax` parameter, set to 50000 K; which, in the event
+    of convergence of the Secant method, is used as a bounded for a bounded
+    solver. It is used in the PVF solvers.
+
+    Examples
+    --------
+    Basic case with four compounds, usingthe Antoine equation as a model and
+    solving for vapor pressure:
+    
+    >>> from chemicals import Antoine, Ambrose_Walton
+    >>> Tcs = [369.83, 425.12, 469.7, 507.6]
+    >>> Antoine_As = [8.92828, 8.93266, 8.97786, 9.00139]
+    >>> Antoine_Bs = [803.997, 935.773, 1064.84, 1170.88]
+    >>> Antoine_Cs = [-26.11, -34.361, -41.136, -48.833]
+    >>> Psat_funcs = []
+    >>> for i in range(4):
+    ...     def Psat_func(T, A=Antoine_As[i], B=Antoine_Bs[i], C=Antoine_Cs[i]):
+    ...         return Antoine(T, A, B, C)
+    ...     Psat_funcs.append(Psat_func)
+    >>> zs = [.4, .3, .2, .1]
+    >>> T, P, VF, xs, ys = flash_ideal(T=330.55, P=1e6, zs=zs, funcs=Psat_funcs, Tcs=Tcs)
+    >>> round(VF, 10)
+    1.00817e-05
+    
+    Similar case, using the Ambrose-Walton corresponding states method to estimate
+    vapor pressures:
+        
+    >>> Tcs = [369.83, 425.12, 469.7, 507.6]
+    >>> Pcs = [4248000.0, 3796000.0, 3370000.0, 3025000.0]
+    >>> omegas = [0.152, 0.193, 0.251, 0.2975]
+    >>> Psat_funcs = []
+    >>> for i in range(4):
+    ...     def Psat_func(T, Tc=Tcs[i], Pc=Pcs[i], omega=omegas[i]):
+    ...         return Ambrose_Walton(T, Tc, Pc, omega)
+    ...     Psat_funcs.append(Psat_func)
+    >>> _, P, VF, xs, ys = flash_ideal(T=329.151, VF=0, zs=zs, funcs=Psat_funcs, Tcs=Tcs)
+    >>> round(P, 3)
+    1000013.343
+    
+    Case with fugacities in the liquid phase, vapor phase, activity coefficients
+    in the liquid phase, and Poynting correction factors.
+
+    >>> Tcs = [647.14, 514.0]
+    >>> Antoine_As = [10.1156, 10.3368]
+    >>> Antoine_Bs = [1687.54, 1648.22]
+    >>> Antoine_Cs = [-42.98, -42.232]
+    >>> gammas = [1.1, .75]
+    >>> fugacities_gas = [.995, 0.98]
+    >>> fugacities_liq = [.9999, .9998]
+    >>> Poyntings = [1.000001, .999999]
+    >>> zs = [.5, .5]
+    >>> funcs = []
+    >>> for i in range(2):
+    ...     def K_over_P(T, A=Antoine_As[i], B=Antoine_Bs[i], C=Antoine_Cs[i], fl=fugacities_liq[i],
+    ...                  fg=fugacities_gas[i], gamma=gammas[i], poy=Poyntings[i]):
+    ...         return Antoine(T, A, B, C)*gamma*poy*fl/fg
+    ...     funcs.append(K_over_P)
+    >>> _, _, VF, xs, ys = flash_ideal(zs, funcs, Tcs=Tcs, P=1e5, T=364.0)
+    >>> VF, xs, ys
+    (0.510863971792927, [0.5573493403937615, 0.4426506596062385], [0.4450898279593881, 0.5549101720406119])
+
+    Note that while this works for PT composition independent flashes - an 
+    outer iterating loop is needed for composition dependence!
+    '''
     T_MAX = 50000.0
     N = len(zs)
     cmps = range(N)
-    if Tcs is None: # numba: delete
-        Tcs = [fi.solve_prop(1e6) for fi in funcs] # numba: delete
     if T is not None and P is not None:
         P_inv = 1.0/P
         Ks = [0.0]*N
@@ -793,7 +849,9 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
             return err
         P = brenth(to_solve, P_low, P_high, args=(info,))
         return tuple(info)
-    elif P is not None and VF == 1:
+    if Tcs is None: # numba: delete
+        Tcs = [fi.solve_prop(1e6) for fi in funcs] # numba: delete
+    if P is not None and VF == 1:
         def to_solve(T_guess):
             T_guess = abs(T_guess)
             P_dew = 0.
