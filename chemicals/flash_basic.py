@@ -372,7 +372,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
     N = len(zs)
     # Assume T and P to begin with
     if T is not None and P is not None:
-        # numba is failing its type inference here
+        # numba is failing its type inferences
         P_inv = 1.0/P
         T_inv = 1.0/T
         Ks = [0.0]*N
@@ -439,9 +439,9 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
         cse([tot, diff(tot, P)], optimizations='basic')
         '''
         P_guess = P_bubble + VF*(P_dew - P_bubble) # Linear interpolation
-        P = newton(err_Wilson_TVF, P_guess, fprime=True, bisection=True,
+        P_calc = newton(err_Wilson_TVF, P_guess, fprime=True, bisection=True,
                    low=P_dew, high=P_bubble, args=(N, VF, zs, K_Ps))
-        P_inv = 1.0/P
+        P_inv = 1.0/P_calc
         xs = K_Ps
         ys = [0.0]*N
         for i in range(N):
@@ -449,7 +449,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
             xi = zs[i]/(1.0 + VF*(Ki - 1.0))
             ys[i] = Ki*xi
             xs[i] = xi
-        return (T, P, VF, xs, ys)
+        return (T, P_calc, VF, xs, ys)
     elif P is not None and VF is not None:
         P_inv = 1.0/P
         Ks = [0.0]*N
@@ -470,20 +470,20 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
         if T_high <= 0.0:
             raise ValueError("No temperature exists which makes Wilson K factor above 1 - decrease pressure")
         if T_high < 0.1*T_MAX:
-            T = 0.5*(T_low + T_high)
+            T_guess = 0.5*(T_low + T_high)
         else:
-            T = 0.0
+            T_guess = 0.0
             for i in range(N):
-                T += zs[i]*Tcs[i]
-            T *= 0.666666
-            if T < T_low:
-                T = T_low + 1.0 # Take a nominal step
-        T = newton(err_Wilson_PVF, T, fprime=True, low=T_low, xtol=1e-13, bisection=True, args=(N, P_inv, VF, Tcs, Pcs, Ks, zs, xs, x50s)) # High bound not actually a bound, only low bound
-        if 1e-10 < T < T_MAX:
+                T_guess += zs[i]*Tcs[i]
+            T_guess *= 0.666666
+            if T_guess < T_low:
+                T_guess = T_low + 1.0 # Take a nominal step
+        T_calc = newton(err_Wilson_PVF, T_guess, fprime=True, low=T_low, xtol=1e-13, bisection=True, args=(N, P_inv, VF, Tcs, Pcs, Ks, zs, xs, x50s)) # High bound not actually a bound, only low bound
+        if 1e-10 < T_calc < T_MAX:
             ys = x50s
             for i in range(N):
                 ys[i] = xs[i]*Ks[i]
-            return (T, P, VF, xs, ys)
+            return (T_calc, P, VF, xs, ys)
 
 #    # Old code - may converge where the other will not
 #    if P is not None and VF == 1.0:
