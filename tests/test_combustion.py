@@ -20,12 +20,69 @@ import pytest
 from chemicals.combustion import *
 from fluids.numerics import assert_close, assert_close1d
 
+
+def test_combustion_stoichiometry():
+    # methane
+    stoichiometry_calc = combustion_stoichiometry({'C': 1, 'H':4})
+    assert len(stoichiometry_calc) == 3
+    assert_close(stoichiometry_calc['O2'], -2.0)
+    assert_close(stoichiometry_calc['CO2'], 1.0)
+    assert_close(stoichiometry_calc['H2O'], 2.0)
+    
+    # buckyballs!
+    C60_products = combustion_stoichiometry({'C': 60})
+    assert_close(C60_products['CO2'], 60)
+    assert_close(C60_products['O2'], -60)
+    
+    # test with its own oxygen included
+    products = combustion_stoichiometry({'C': 4, 'O': 8})
+    assert_close(products['CO2'], 4)
+    assert_close(products['O2'], 0)
+    
+    products = combustion_stoichiometry({'N':2})
+    assert_close(products['N2'], 1)
+    assert_close(products['O2'], 0)
+    
+    # test combustion of everything except N2
+    products = combustion_stoichiometry({'C':2, 'H': 3, 'P': 1, 'I': 2, 'Cl': 3, 'F': 2, 'Br': 1, 'S': 5, 'O': 1})
+    assert_close(products['CO2'], 2)
+    assert_close(products['Br2'], 0.5)
+    assert_close(products['I2'], 1)
+    assert_close(products['HCl'], 3)
+    assert_close(products['HF'], 2)
+    assert_close(products['SO2'], 5)
+    assert 'N2' not in products
+    assert_close(products['P4O10'], 0.25)
+    assert_close(products['H2O'], -1.0)
+    assert_close(products['O2'], -7.25)
+    
+    # test missing elements
+    # For many elements, it would be feasible to change the behavior to include additional reactions;
+    # I.e. lithium burns to LiOH
+    
+    products = combustion_stoichiometry({'C':2, 'H': 3, 'Li': 3}, missing_handling='elemental')
+    assert_close(products['Li'], 3)
+    
+    # test ash handling
+    products = combustion_stoichiometry({'C':2, 'H': 3, 'Li': 3}, missing_handling='Ash')
+    assert_close(products['CO2'], 2.0)
+    assert_close(products['H2O'], 1.5)
+    assert_close(products['O2'], -2.75)
+    assert_close(products['Ash'], 20.823)
+    
+    products = combustion_stoichiometry({'C':2, 'H': 3, 'Li': 3}, MW=47.86822, missing_handling='ash')
+    assert_close(products['CO2'], 2.0)
+    assert_close(products['H2O'], 1.5)
+    assert_close(products['O2'], -2.75)
+    assert_close(products['Ash'], 20.823)
+    
+    with pytest.raises(ValueError):
+        combustion_stoichiometry({'C':2, 'H': 3, 'Li': 3}, MW=47.86822, missing_handling='ash')
+    
 def test_combustion():
     
     ### Lower level functions ###
     
-    stoichiometry_calc = tuple(combustion_stoichiometry({'C': 1, 'H':4}).values())
-    assert_close1d(stoichiometry_calc, [-2.0, 1.0, 2.0])
     
     # Methane gas
     H_calc = HHV_stoichiometry({'O2': -2.0, 'CO2': 1, 'H2O': 2.0}, -74520.0)

@@ -311,7 +311,6 @@ def test_flash_ideal_Ambrose_Walton():
     
 
 def test_flash_ideal_Antoine():
-
     Tcs = [369.83, 425.12, 469.7, 507.6]
     Antoine_As = [8.92828, 8.93266, 8.97786, 9.00139]
     Antoine_Bs = [803.997, 935.773, 1064.84, 1170.88]

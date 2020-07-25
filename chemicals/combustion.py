@@ -21,14 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
 
-__all__ = ('CombustionData',
+__all__ = ('combustion_stoichiometry',
+           'CombustionData',
            'combustion_data',
-           'combustion_stoichiometry',
            'HHV_modified_Dulong',
            'HHV_stoichiometry',
            'LHV_from_HHV')
 
-# %% Supporting functions
 
 # TODO: Consider moving this to elements.py
 def as_atoms(formula):
@@ -42,130 +41,64 @@ def as_atoms(formula):
     return atoms
 
 
-# %% Combustion functions
 
 DULONG = 'Dulong'
 STOICHIOMETRY = 'Stoichiometry'
 HHV_methods = (DULONG, STOICHIOMETRY)
 
 combustible_elements = ('C', 'H', 'N', 'O', 'S', 'Br', 'I', 'Cl', 'F', 'P')
+combustible_elements_set = frozenset(combustible_elements)
+
 Hf_combustion_chemicals = {
-    'H2O': -285825,
-    'CO2': -393474,
-    'SO2': -296800,
-    'Br2': 30880,
-    'I2': 62417,
-    'HCl': -92173,
-    'HF': -272711,
-    'P4O10': -3009940,
-    'O2': 0,
-    'N2': 0,
-    "Ash": 0,
+    'H2O': -285825.0,
+    'CO2': -393474.0,
+    'SO2': -296800.0,
+    'Br2': 30880.0,
+    'I2': 62417.0,
+    'HCl': -92173.0,
+    'HF': -272711.0,
+    'P4O10': -3009940.0,
+    'O2': 0.0,
+    'N2': 0.0,
+    "Ash": 0.0,
 }
 
-def combustion_data(formula, Hf=None, MW=None, method=None):
-    r"""
-    Return a CombustionData object (a named tuple) that contains the stoichiometry 
-    coefficients of the reactants and products, the lower and higher 
-    heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
-    and the molecular weight [MW; in g/mol].
 
-    Parameters
-    ----------
-    formula : str, or dict[str, float]
-        Chemical formula as a string or a dictionary of atoms and their counts.
-    MW : float, optional
-        Molecular weight of chemical [g/mol].
-    Hf : float, optional
-        Heat of formation of given chemical [J/mol].
-        Required if method is "Stoichiometry".
-    method : "Stoichiometry" or "Dulong", optional
-        Method to estimate LHV and HHV.    
-    
-    Returns
-    -------
-    stoichiometry : dict[str, float]
-        Stoichiometric coefficients of combustion. May inlcude the following 
-        keys: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 'HF' and 'P4O10'.
-    HHV : float
-        Higher heating value [J/mol].
-    Hf : float
-        Heat of formation [J/mol].
-    MW : float
-        Molecular weight [g/mol].
-    
-    Notes
-    -----
-    The combustion reaction is based on the following equation:
-    
-    .. math::
-        C_c H_h O_o N_n S_s Br_b I_i Cl_x F_f P_p + kO_2 -> cCO_2 + \frac{b}{2}Br_2 + \frac{i}{2}I + xHCl + fHF + sSO_2 + \frac{n}{2}N_2 + \frac{p}{4}P_4O_{10} +\frac{h + x + f}{2}H_2O
-        
-        k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
-    If the method is "Stoichiometry", the HHV is found using 
-    through an energy balance on the reaction (i.e. heat of reaction).
-    If the method is "Dulong", Dulong's equation is used [1]_:
-
-    .. math:: 
-        Hc (J/mol) = MW \cdot (338C + 1428(H - O/8)+ 95S)
-        
-    The LHV is calculated as follows:
-        
-    .. math::
-        LHV = HHV + H_{vap} \cdot H_2O
-        
-        H_{vap} = 44011.496 \frac{J}{mol H_2O}
-        
-        H_2O = \frac{mol H_2O}{mol}
-        
-    Examples
-    --------
-    Liquid methanol burning:
-
-    >>> combustion_data({'H': 4, 'C': 1, 'O': 1}, Hf=-239100)
-    CombustionData(stoichiometry={'O2': -1.5, 'CO2': 1, 'H2O': 2.0}, HHV=-726024.0, Hf=-239100, MW=32.04186)
+def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
+    r"""Return a dictionary of stoichiometric coefficients of chemical 
+    combustion, given a dictionary of a molecule's constituent atoms and their 
+    counts. 
     
-    References
-    ----------
-    .. [1] Green, D. W. Waste management. In Perry’s Chemical Engineers’ Handbook,
-       9 ed.; McGraw-Hill Education, 2018
-    
-    """
-    atoms = as_atoms(formula)
-    stoichiometry = combustion_stoichiometry(atoms)
-    if not MW:
-        MW = molecular_weight(atoms)
-    if not method:
-        method = 'Dulong' if Hf is None else 'Stoichiometry'
-    if method == DULONG:
-        HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
-        if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
-        Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
-    elif method == STOICHIOMETRY:
-        if Hf is None: raise ValueError("must specify Hf if method is 'Stoichiometry'")
-        HHV = HHV_stoichiometry(stoichiometry, Hf)
-    else:
-        raise ValueError("method must be either 'Stoichiometric' or 'Dulong', "
-                        "not %s" %(method))
-    return CombustionData(stoichiometry, HHV, Hf, MW)
-
-def combustion_stoichiometry(atoms, MW=None):
-    r"""
-    Return a dictionary of stoichiometric coefficients of chemical combustion.
+    This function is based on the combustion of hydrocarbons; the products for 
+    some inorganics can be hard to predict, and no special handling is included
+    here for them. This reaction is the standard one at standard pressure with
+    an excess of oxygen; it does not account for partial combustion or nitrous
+    oxides.
     
     Parameters
     ----------
-    atoms : dict
-        Dictionary of atoms and their counts.
+    atoms : dict[str, int]
+        Dictionary of atoms and their counts, [-]
     MW : float, optional
-        Molecular weight of chemical.
+        Molecular weight of chemical, used only if `missing_handling` is 'Ash', 
+        [g/mol]
+    missing_handling : str, optional
+        How to handle compounds which do not appear in the stoichiometric
+        reaction below. If 'elemental', returns those atoms in the monatomic 
+        state; if 'Ash', converts all missing attoms to 'Ash' in the output at
+        a `MW` of 1 g/mol, [-]
 
     Returns
     -------
     stoichiometry : dict[str, float]
         Stoichiometric coefficients of combustion. May inlcude the following 
-        keys: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 'HF' and 'P4O10'.
+        keys for complete combustion: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 
+        'HF' 'P4O10'; if `missing_handling` is 'elemental' can include the 
+        other elements; if `missing_handling` is 'Ash', Ash will be present in 
+        the output if the compounds whose reactions are not included here.
+        'O2' is always present, with negative values indicating oxygen is
+        required. [-]
 
     Notes
     -----
@@ -176,9 +109,16 @@ def combustion_stoichiometry(atoms, MW=None):
 
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
-    When atoms with unknown combustion products are present (e.g. Na, Ca), 
-    ash is added as a combustion product to preserve the mass balance (assuming
-    ash has a molecular weight of 1 g/mol).
+    Also included in the results is the moles of O2 required per mole of
+    the mixture of the molecule.
+    
+    HF and HCl are gaseous products in their standard state. P4O10 is a solid
+    in its standard state. Bromine is a liquid as is iodine. Water depends on
+    the chosen definition of heating value. The other products are gases.
+    
+    Atoms not in ['C', 'H', 'N', 'O', 'S', 'Br', 'I', 'Cl', 'F', 'P'] are 
+    returned as pure species; i.e. sodium hydroxide produces water and pure
+    Na.
 
     Examples
     --------
@@ -188,24 +128,78 @@ def combustion_stoichiometry(atoms, MW=None):
     {'O2': -2.0, 'CO2': 1, 'H2O': 2.0}
 
     """
-    combustion_atoms = {i:atoms.get(i, 0) for i in combustible_elements}
-    C, H, N, O, S, Br, I, Cl, F, P = combustion_atoms.values()
-    MW = MW or molecular_weight(atoms)
-    Ash = MW - molecular_weight(combustion_atoms)
-    stoichiometry = {
-        'O2': (Cl + F)/4. + O/2. - (C + S + H/4. + 5*P/4.),
-        'CO2': C,
-        'Br2': Br/2.,
-        'I2': I/2.,
-        'HCl': Cl,
-        'HF': F,
-        'SO2': S,
-        'N2': N/2.,
-        'P4O10': P/4.,
-        'H2O': (H - Cl - F)/2.,
-        'Ash': Ash if Ash / MW > 0.0001 else 0
-    }
-    return {i:j for i,j in stoichiometry.items() if j}
+    products = {}
+    nC, nH, nN, nO, nS, nBr, nI, nCl, nF, nP = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+
+    if 'C' in atoms:
+        products['CO2'] = nC = atoms['C']
+    if 'H' in atoms:
+        nH = atoms['H']
+    if 'N' in atoms:
+        nN = atoms['N']
+    if 'O' in atoms:
+        nO = atoms['O']
+    if 'S' in atoms:
+        nS = atoms['S']
+    if 'Br' in atoms:
+        nBr = atoms['Br']
+    if 'I' in atoms:
+        nI = atoms['I']
+    if 'Cl' in atoms:
+        nCl = atoms['Cl']
+    if 'F' in atoms:
+        nF = atoms['F']
+    if 'P' in atoms:
+        nP = atoms['P']
+
+    products['O2'] = -(nC + nS + .25*nH + 1.25*nP - .25*(nCl + nF) - .5*nO)
+    nCO2 = nC
+    nBr2 = .5*nBr
+    nI2 = .5*nI
+
+    nHCl = nCl
+    nHF = nF
+
+    nSO2 = nS
+
+    nN2 = .5*nN
+    nP4O10 = .25*nP
+    nH2O = 0.5*(nH - nCl - nF)
+    
+    if nCO2 !=  0.0:
+        products['CO2'] = nCO2
+    if nBr2 != 0.0:
+        products['Br2'] = nBr2
+    if nI2 != 0.0:
+        products['I2'] = nI2
+    if nCl != 0.0:
+        products['HCl'] = nCl
+    if nHF != 0.0:
+        products['HF'] = nHF
+    if nSO2 != 0.0:
+        products['SO2'] = nSO2
+    if nN2 != 0.0:
+        products['N2'] = nN2
+    if nP4O10 != 0.0:
+        products['P4O10'] = nP4O10
+    if nH2O != 0.0:
+        products['H2O'] = nH2O
+    
+    
+    if missing_handling == 'elemental':
+        for atom, value in atoms.items():
+            if atom not in combustible_elements_set:
+                products[atom] = value
+    elif missing_handling == 'ash':
+        combustion_atoms = {i: atoms.get(i, 0) for i in combustible_elements}        
+        MW = MW or molecular_weight(atoms)
+        Ash = MW - molecular_weight(combustion_atoms)
+        if Ash/MW > 0.0001:
+            products['Ash'] = Ash
+    else:
+        raise ValueError("Allowed values for `missing_handling` are 'elemental' and 'ash'.")
+    return products
+
 
 def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
     r"""
@@ -335,6 +329,94 @@ def LHV_from_HHV(HHV, N_H2O):
     
     """
     return HHV + 44011.496 * N_H2O
+
+def combustion_data(formula, Hf=None, MW=None, method=None):
+    r"""
+    Return a CombustionData object (a named tuple) that contains the stoichiometry 
+    coefficients of the reactants and products, the lower and higher 
+    heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
+    and the molecular weight [MW; in g/mol].
+
+    Parameters
+    ----------
+    formula : str, or dict[str, float]
+        Chemical formula as a string or a dictionary of atoms and their counts.
+    MW : float, optional
+        Molecular weight of chemical [g/mol].
+    Hf : float, optional
+        Heat of formation of given chemical [J/mol].
+        Required if method is "Stoichiometry".
+    method : "Stoichiometry" or "Dulong", optional
+        Method to estimate LHV and HHV.    
+    
+    Returns
+    -------
+    stoichiometry : dict[str, float]
+        Stoichiometric coefficients of combustion. May inlcude the following 
+        keys: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 'HF' and 'P4O10'.
+    HHV : float
+        Higher heating value [J/mol].
+    Hf : float
+        Heat of formation [J/mol].
+    MW : float
+        Molecular weight [g/mol].
+    
+    Notes
+    -----
+    The combustion reaction is based on the following equation:
+    
+    .. math::
+        C_c H_h O_o N_n S_s Br_b I_i Cl_x F_f P_p + kO_2 -> cCO_2 + \frac{b}{2}Br_2 + \frac{i}{2}I + xHCl + fHF + sSO_2 + \frac{n}{2}N_2 + \frac{p}{4}P_4O_{10} +\frac{h + x + f}{2}H_2O
+        
+        k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
+
+    If the method is "Stoichiometry", the HHV is found using 
+    through an energy balance on the reaction (i.e. heat of reaction).
+    If the method is "Dulong", Dulong's equation is used [1]_:
+
+    .. math:: 
+        Hc (J/mol) = MW \cdot (338C + 1428(H - O/8)+ 95S)
+        
+    The LHV is calculated as follows:
+        
+    .. math::
+        LHV = HHV + H_{vap} \cdot H_2O
+        
+        H_{vap} = 44011.496 \frac{J}{mol H_2O}
+        
+        H_2O = \frac{mol H_2O}{mol}
+        
+    Examples
+    --------
+    Liquid methanol burning:
+
+    >>> combustion_data({'H': 4, 'C': 1, 'O': 1}, Hf=-239100)
+    CombustionData(stoichiometry={'O2': -1.5, 'CO2': 1, 'H2O': 2.0}, HHV=-726024.0, Hf=-239100, MW=32.04186)
+    
+    References
+    ----------
+    .. [1] Green, D. W. Waste management. In Perry’s Chemical Engineers’ Handbook,
+       9 ed.; McGraw-Hill Education, 2018
+    
+    """
+    atoms = as_atoms(formula)
+    stoichiometry = combustion_stoichiometry(atoms)
+    if not MW:
+        MW = molecular_weight(atoms)
+    if not method:
+        method = 'Dulong' if Hf is None else 'Stoichiometry'
+    if method == DULONG:
+        HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
+        if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
+        Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
+    elif method == STOICHIOMETRY:
+        if Hf is None: raise ValueError("must specify Hf if method is 'Stoichiometry'")
+        HHV = HHV_stoichiometry(stoichiometry, Hf)
+    else:
+        raise ValueError("method must be either 'Stoichiometric' or 'Dulong', "
+                        "not %s" %(method))
+    return CombustionData(stoichiometry, HHV, Hf, MW)
+
 
 class CombustionData(object):
     r"""
