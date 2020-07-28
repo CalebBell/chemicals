@@ -61,7 +61,10 @@ feature makes the chemicals library an attractive dependence for software
 modeling chemical processes. In fact, `The Biorefinery Simulation and Techno-Economic Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
 is reliant on the chemicals library for the simulation of unit operations.
 
-TODO: 
+If you need to know something about a chemical, give chemicals a try.
+
+# TODO: 
+
 # Do we want to keep the title of this section?
 
 # Should we prioritize a logo for ChEDL and have it in all libraries?
@@ -75,8 +78,6 @@ TODO:
 # Note on pint?
 
 # Once we do finish working on the README, we should update the docs/index.rst file
-
-If you need to know something about a chemical, give chemicals a try.
 
 Installation
 ------------
@@ -97,6 +98,8 @@ package management, you can install chemicals in your environment from
 To get the git version, run:
 
     $ git clone git://github.com/CalebBell/chemicals.git
+
+# TODO: Add conda installation
 
 Documentation
 -------------
@@ -145,16 +148,17 @@ chemical properties is done by CASRN:
 
 Such "lookup functions" search through many databanks until the value for the 
 given CASRN is found. When no value is available, None is returned. Note that some 
-properties, including Hfs and S0s are missing for water. You can optionally
-pass a "method" to select which databank to retrieve data:
+properties, including the solid heat of formation and absolute entropy of 
+formation are missing for water. You can optionally pass a "method" to select 
+which from databank to retrieve data:
 
 .. code-block:: python
 
     >>> Tb(CAS_water, method='YAWS')
     373.15
  
-To view all available methods, just use the functions with "_methods" tagged
-at the end of the name:
+To view all available methods for a given chemical, just use the functions with 
+"_methods" tagged at the end of the name:
 
 .. code-block:: python
     
@@ -241,7 +245,7 @@ Citation
 
 # TODO: Do we want to keep this name and change thermo's description?
 
-To cite chemicals in publications use::
+To cite chemicals in publications use:
 
     Caleb Bell and Contributors (2016-2020). chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
     https://github.com/CalebBell/chemicals.
