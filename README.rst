@@ -63,11 +63,17 @@ is reliant on the chemicals library for the simulation of unit operations.
 
 TODO: 
 # Do we want to keep the title of this section?
+
 # Should we prioritize a logo for ChEDL and have it in all libraries?
+
 # Note how thermo is reliant on the chemicals library too
+
 # Note on flash capabilities?
+
 # Note on numba?
+
 # Note on pint?
+
 # Once we do finish working on the README, we should update the docs/index.rst file
 
 If you need to know something about a chemical, give chemicals a try.
@@ -108,7 +114,8 @@ chemical properties is done by CASRN:
 .. code-block:: python
 
     >>> from chemicals import CAS_from_any, MW, Tb, Tm, Tc, Pc, Vc, Hfus, Hfs, Hfl, Hfg, S0s, S0l, S0g
-    >>> CAS_water = CAS_from_any('Water') # Search for CASRN by a common name or a unique identifier such as the IchI key
+    >>> # Search for CASRN by a common name or a unique identifier such as the IchI key
+    >>> CAS_water = CAS_from_any('Water')
     >>> MW(CAS_water)   # Molecular weight [g/mol]
     18.01528
     >>> Tb(CAS_water)   # Normal boiling point [K]
@@ -171,7 +178,6 @@ CASRN                                             ...
 999-52-0                3-chloroheptane   621.08  ...  0.418  0.248495
 999-78-0         4,4-dimethyl-2-pentyne   552.81  ...  0.191  0.281303
 999-97-3           hexamethyldisilazane   544.00  ...  0.510  0.260213
-
 [7549 rows x 6 columns]
 
 An extensive set of functions for calculating all sorts of chemical properties 
@@ -200,6 +206,7 @@ for the calculation of chemical properties (both thermodynamic and transport)
 and extending the local databank.
 
 # TODO: Do we want to mention phase equilibrium and flash algorithms?
+
 # Should we move this to the Developer's guide?
 
 Latest source code
@@ -232,7 +239,7 @@ any changes you make back, and benefit the community.
 Citation
 --------
 
-TODO: Do we want to keep this name and change thermo's description?
+# TODO: Do we want to keep this name and change thermo's description?
 
 To cite chemicals in publications use::
 
