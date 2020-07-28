@@ -12,6 +12,12 @@ __pycache__
 prof
 *Pyreverse*
 
+# Docs #
+########
+# No need to save these files
+docs/_build/*
+docs/make.bat
+
 # Compiled source #
 ###################
 *.com
