@@ -134,7 +134,7 @@ chemical properties is done by CASRN:
     >>> Hfus(CAS_water) # Heat of fusion [J/mol]
     6010.0
     >>> Hfs(CAS_water)  # Solid heat of formation [J/mol] 
-    None, 
+    None 
     >>> Hfl(CAS_water)  # Liquid heat of formation [J/mol]
     -285825.0
     >>> Hfg(CAS_water)  # Gas heat of formation [J/mol] 
