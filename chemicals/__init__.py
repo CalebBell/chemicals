@@ -25,7 +25,7 @@ import os
 from . import utils
 from . import critical
 from . import elements
-from . import reactions
+from . import reaction
 from . import dipole
 from . import dippr
 from . import temperature
@@ -52,7 +52,7 @@ from . import rachford_rice
 from .utils import *
 from .critical import *
 from .elements import *
-from .reactions import *
+from .reaction import *
 from .dipole import *
 from .dippr import *
 from .temperature import *
@@ -75,7 +75,7 @@ from .thermal_conductivity import *
 from .combustion import *
 from .volume import *
 from .rachford_rice import *
-__all__ = ['utils', 'critical', 'elements', 'reactions', 'dipole', 'dippr', 
+__all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr', 
            'temperature', 'miscdata', 'environment', 'refractivity', 'solubility', 
            'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial', 
            'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity', 
@@ -86,7 +86,7 @@ __all__.extend(exceptions.__all__)
 __all__.extend(critical.__all__)
 __all__.extend(utils.__all__)
 __all__.extend(elements.__all__)
-__all__.extend(reactions.__all__)
+__all__.extend(reaction.__all__)
 __all__.extend(dipole.__all__)
 __all__.extend(dippr.__all__)
 __all__.extend(temperature.__all__)
@@ -113,7 +113,7 @@ submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
               environment, refractivity, solubility, lennard_jones, 
               vapor_pressure, virial, phase_change, triple, acentric, viscosity,
               interface, permittivity, thermal_conductivity, combustion,
-              heat_capacity, reactions, volume, rachford_rice]
+              heat_capacity, reaction, volume, rachford_rice]
 
 chemicals_dir = os.path.dirname(__file__)
 

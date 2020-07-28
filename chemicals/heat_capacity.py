@@ -860,6 +860,7 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     --------
     Lastovka_Shaw
     Lastovka_Shaw_integral
+    
     Examples
     --------
     >>> Lastovka_Shaw_integral_over_T(300.0, 0.1333)
