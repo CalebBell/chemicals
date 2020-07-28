@@ -190,6 +190,7 @@ are available along with their respective coefficients for a wide range of chemi
 >>> from chemicals import Antoine
 >>> from chemicals.vapor_pressure import AntoinePoling
 >>> antoine_coefficients = AntoinePoling.loc[CAS_water] # For calculating saturated vapor pressure 
+>>> antoine_coefficients
 Chemical     water 
 A              10.1
 B          1.69e+03
@@ -198,8 +199,8 @@ Tmin            273
 Tmax            473
 Name: 7732-18-5, dtype: object
 >>> _, A, B, C, *_ = antoine_coefficients
->>> T = 373.15
->>> Antoine(T, A, B, C)
+>>> T = 373.15 # Temperature [K]
+>>> Antoine(T, A, B, C) # Vapor pressure [Pa]
 101047.25357066597
 
 Roadmap
