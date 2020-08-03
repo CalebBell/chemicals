@@ -12,6 +12,11 @@ __pycache__
 prof
 *Pyreverse*
 monkeytype.sqlite3
+# Docs #
+########
+# No need to save these files
+docs/_build/*
+docs/make.bat
 # Compiled source #
 ###################
 *.com
