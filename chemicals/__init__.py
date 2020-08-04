@@ -25,7 +25,7 @@ import os
 from . import utils
 from . import critical
 from . import elements
-from . import reactions
+from . import reaction
 from . import dipole
 from . import dippr
 from . import temperature

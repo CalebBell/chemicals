@@ -39,8 +39,14 @@ import numpy as np
 
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def mark_as_numba(func):
+    func = pytest.mark.numba(func)
+    func = pytest.mark.slow(func)
+    func = pytest.mark.skipif(numba is None, reason="Numba is missing")(func)
+    return func
+    
+
+@mark_as_numba
 def test_return_1d_array():
     
     # Functions which initialize an array, and then need to return the correct value 
@@ -101,8 +107,7 @@ def test_return_1d_array():
     assert type(dn_partials_np) is np.ndarray
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_return_2d_array():
     d2xs = [[0.152, 0.08, 0.547], [0.08, 0.674, 0.729], [0.547, 0.729, 0.131]]
     xs = [0.7, 0.2, 0.1]
@@ -115,8 +120,7 @@ def test_return_2d_array():
 
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_mixing_simple():
     a = np.array([1,2])
     b = np.array([.1, .2])
@@ -129,8 +133,7 @@ def test_mixing_simple():
     val = chemicals.numba.mixing_logarithmic(a, b)
     assert_close(val, 0.01866065983073615, rtol=1e-13)
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")    
+@mark_as_numba
 def test_thermal_conductivity_misc():
     assert_close(chemicals.numba.Bahadori_liquid(273.15, 170),
                  Bahadori_liquid(273.15, 170))
@@ -159,8 +162,7 @@ def test_thermal_conductivity_misc():
     # Does not work - atom input
 #    chemicals.numba.Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 0.000754, {'C': 12, 'H': 26})
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")    
+@mark_as_numba
 def test_viscosity_misc():
     # Has a min, if statement
     args = (300., 500E5, 572.2, 34.7E5, 0.236, 0, 0.00068)
@@ -205,8 +207,7 @@ def test_viscosity_misc():
     assert_close(chemicals.numba.viscosity_index(73.3E-6, 8.86E-6, rounding=True),
                  chemicals.viscosity_index(73.3E-6, 8.86E-6, rounding=True), rtol=1e-14)
     
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")    
+@mark_as_numba
 def test_interface_misc():
     
     # Tested quite a bit with numba/PyPy
@@ -236,16 +237,14 @@ def test_interface_misc():
         chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs)
         
         
-#@pytest.mark.numba
-#@pytest.mark.skipif(numba is None, reason="Numba is missing")
+##@mark_as_numba
 #def test_virial():
 #    # Takes 8 seconds to compile. Fun!
 #    assert_close(chemicals.numba.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
 #                 chemicals.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
 #                rtol=1e-13)
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_phase_change():
     # Function had some duplicated powers; numba was optimizing them on me anyway
     # Had list-in-list constants being indexed. I thought that would take a lot of time
@@ -255,8 +254,7 @@ def test_phase_change():
              chemicals.MK(553.15, 751.35, 0.302), rtol=1e-12)
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_vapor_pressure():
     # PyPy 75 ns, CPython 2470 ns, numba 214 ns
     assert_close(chemicals.numba.dPsat_IAPWS_dT(300.), 
@@ -269,8 +267,7 @@ def test_vapor_pressure():
     assert_close(Psats_calc, Psats_vec_expect, rtol=1e-11)
     
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_temperature():
     # Note also the last four decimals are different!
     # 494 us numba, 388 us PyPy, 1740 us CPython
@@ -280,8 +277,7 @@ def test_temperature():
     # Probably never going to work
 #    chemicals.numba.T_converter(500, 'ITS-68', 'ITS-48')
     
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_volume():
     assert_close(chemicals.numba.Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245),
                 chemicals.Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245))
@@ -342,8 +338,7 @@ def test_volume():
     assert_close(COSTALD_mixture(xs, T, Tcs, Vcs, omegas),
                  chemicals.numba.COSTALD_mixture(xs2, T, Tcs2, Vcs2, omegas2))
     
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_rachford_rice():
     n = 10
     zs = np.array([0.5, 0.3, 0.2]*n)
@@ -360,8 +355,7 @@ def test_rachford_rice():
     assert_close1d(xs, xs_new)
     assert_close1d(ys, ys_new)
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_Rachford_Rice_solutionN():
     ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
     Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
@@ -372,8 +366,7 @@ def test_Rachford_Rice_solutionN():
     assert_close1d(betas, betas_new, rtol=1e-14)
     assert_close2d(zs, zs_new, rtol=1e-14)
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_Rachford_Rice_solution2():
     ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
     Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
@@ -389,8 +382,7 @@ def test_Rachford_Rice_solution2():
     assert_close1d(z2, z2_new)
     
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_rachford_rice_polynomial():
     zs, Ks = [.4, .6], [2, .5]
     VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
@@ -433,8 +425,7 @@ def test_rachford_rice_polynomial():
     assert_close1d(ys, ys_new)
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_lazy_loading():
     # Numba interfers with to_num
     # The data_reader functions are not part of the public API so are not converted

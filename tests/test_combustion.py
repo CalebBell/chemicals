@@ -80,14 +80,38 @@ def test_combustion_stoichiometry():
     with pytest.raises(ValueError):
         combustion_stoichiometry({'C':2, 'H': 3, 'Li': 3}, MW=47.86822, missing_handling='BADMETHOD')
     
+def test_HHV_stoichiometry():
+    # Methane gas
+    H_calc = HHV_stoichiometry({'O2': -2.0, 'CO2': 1, 'H2O': 2.0}, -74520.0)
+    assert_close(H_calc, -890604.0)
+    
+    H_Nicotinic_acid = -2730506.5
+    H_calc = HHV_stoichiometry(combustion_stoichiometry({'H': 5, 'C': 6, 'O': 2, 'N': 1}), Hf=-344900)
+    assert_close(H_calc, H_Nicotinic_acid)
+    
+    H_methanol = -726024.0
+    H_calc = HHV_stoichiometry(combustion_stoichiometry({'H': 4, 'C': 1, 'O': 1}), Hf=-239100)
+    assert_close(H_calc, H_methanol)
+    
+    # Custom example of compound, to show all lines used
+    H_custom = -7090590.5
+    H_calc = HHV_stoichiometry(combustion_stoichiometry({'C': 10, 'H': 5, 'N': 3, 'O': 5, 'S': 2, 'Br': 8,
+    'I':3, 'Cl': 3, 'F':2, 'P': 3}), Hf=-300000)
+    assert_close(H_calc, H_custom)
+    
+    # Custom example, with different Hf for each compound
+    H_custom = -7090575.75
+    H_calc = HHV_stoichiometry(combustion_stoichiometry({'C': 10, 'H': 5, 'N': 3, 'O': 5, 'S': 2, 'Br': 8,
+    'I':3, 'Cl': 3, 'F':2, 'P': 3}), Hf=-300000, Hf_chemicals={'H2O': -285824, 'CO2': -393473, 'SO2': -296801,
+                                                'Br2': 30881, 'I2': 62416, 'HCl': -92172, 'HF': -272710,
+                                                'P4O10': -3009941, 'O2': 0.0, 'N2': 0.0})
+    assert_close(H_calc, H_custom)
+    
+
 def test_combustion():
     
     ### Lower level functions ###
     
-    
-    # Methane gas
-    H_calc = HHV_stoichiometry({'O2': -2.0, 'CO2': 1, 'H2O': 2.0}, -74520.0)
-    assert_close(H_calc, -890604.0)
     
     # Dulong dry bituminous coal
     H_calc = HHV_modified_Dulong({'C': 0.716, 'H': 0.054, 'S': 0.016, 'N': 0.016, 'O': 0.093, 'Ash': 0.105})
