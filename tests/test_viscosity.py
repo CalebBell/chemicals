@@ -33,7 +33,7 @@ from chemicals.viscosity import *
 from chemicals.viscosity import (mu_data_Dutt_Prasad, mu_data_VN3, mu_data_VN2,
                                  mu_data_VN2E, mu_data_Perrys_8E_2_313, mu_data_Perrys_8E_2_312,
                                  mu_data_VDI_PPDS_7, mu_data_VDI_PPDS_8)
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 
 ### Check data integrity
 

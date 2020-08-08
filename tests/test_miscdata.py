@@ -26,7 +26,7 @@ from fluids.numerics import assert_close, assert_close1d
 from chemicals import miscdata
 from chemicals.miscdata import *
 from chemicals.miscdata import VDI_saturation_dict, CRC_inorganic_data, CRC_organic_data
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 
 
 ### CRC Inorganic compounds

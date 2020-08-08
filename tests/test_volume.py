@@ -29,7 +29,7 @@ from chemicals.volume import (rho_data_COSTALD, rho_data_SNM0, rho_data_Perry_8E
                               rho_data_VDI_PPDS_2, rho_data_CRC_inorg_l_const, rho_data_CRC_inorg_s_const, 
                               rho_data_CRC_virial)
 from chemicals.utils import Vm_to_rho
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 
 def Yen_Woods_saturation():
     V1_calc = Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245)

@@ -24,7 +24,7 @@ from fluids.numerics import assert_close, assert_close1d, assert_close2d
 import pytest
 import pandas as pd
 
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 from chemicals.reaction import *
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data
 from chemicals.reaction import Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, Hfg_S0g_YAWS_data

@@ -24,7 +24,7 @@ from numpy.testing import assert_allclose
 import pytest
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.thermal_conductivity import *
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 from chemicals.thermal_conductivity import k_data_Perrys_8E_2_314, k_data_Perrys_8E_2_315, k_data_VDI_PPDS_10, k_data_VDI_PPDS_9
 
 def test_Perrys2_314_data():

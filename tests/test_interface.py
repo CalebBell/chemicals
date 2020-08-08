@@ -27,7 +27,7 @@ from fluids.numerics import assert_close, assert_close1d
 from chemicals.interface import *
 from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_Lange, sigma_data_Somayajulu,
                                  sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 
 
 def test_CSP():

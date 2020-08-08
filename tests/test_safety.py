@@ -24,7 +24,7 @@ from numpy.testing import assert_allclose
 import pytest
 import pandas as pd
 import numpy as np
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 from chemicals.safety import *
 
 SUZUKI = 'Suzuki (1994)'
@@ -43,7 +43,7 @@ NONE = 'None'
 # TODO clean up file
 @pytest.mark.xfail
 def test_OntarioExposureLimits():
-    from thermo.safety import _OntarioExposureLimits
+    from chemicals.safety import _OntarioExposureLimits
     pts = [_OntarioExposureLimits[i]["TWA (ppm)"] for i in _OntarioExposureLimits.keys()]
     tot = pd.DataFrame(pts)[0].sum()
     assert_allclose(tot, 41047.08621213534)
