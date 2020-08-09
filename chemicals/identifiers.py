@@ -22,9 +22,8 @@ SOFTWARE.'''
 
 from __future__ import division
 
-__all__ = ['checkCAS', 'CAS_from_any', 'PubChem', 'MW', 'formula', 'smiles', 
-           'InChI', 'InChI_Key', 'IUPAC_name', 'name', 'synonyms', 
-           'common_mixtures', 'mixture_from_any', 'cryogenics', 'dippr_compounds',
+__all__ = ['checkCAS', 'CAS_from_any', 'search_chemical', 
+           'mixture_from_any', 'cryogenics', 'dippr_compounds',
            'get_pubchem_db']
 
 import os
@@ -260,11 +259,49 @@ class ChemicalMetadataDB(object):
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
 
 
-CAS_from_any_cache = {}
+chemical_search_cache = {}
 
 def CAS_from_any(ID, autoload=False, cache=True):
-    '''Looks up the CAS number of a chemical by searching and testing for the
-    string being any of the following types of chemical identifiers:
+    '''Wrapper around `search_chemical` which returns the CAS number of the
+    found chemical directly.
+
+    Parameters
+    ----------
+    ID : str
+        One of the name formats described above
+
+    Returns
+    -------
+    CASRN : string
+        A three-piece, dash-separated set of numbers
+
+    Notes
+    -----
+    An exception is raised if the name cannot be identified. The PubChem 
+    database includes a wide variety of other synonyms, but these may not be
+    present for all chemcials. See `search_chemical` for more details.
+
+    Examples
+    --------
+    >>> CAS_from_any('water')
+    '7732-18-5'
+    >>> CAS_from_any('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
+    '64-17-5'
+    >>> CAS_from_any('CCCCCCCCCC')
+    '124-18-5'
+    >>> CAS_from_any('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
+    '64-17-5'
+    >>> CAS_from_any('pubchem=702')
+    '64-17-5'
+    >>> CAS_from_any('O') # only elements can be specified by symbol
+    '17778-80-2'
+
+    '''
+    return search_chemical(ID, autoload=False, cache=True).CASs
+
+def search_chemical(ID, autoload=False, cache=True):
+    '''Looks up metadata about a chemical by searching and testing for the
+    input string being any of the following types of chemical identifiers:
     
     * Name, in IUPAC form or common form or a synonym registered in PubChem
     * InChI name, prefixed by 'InChI=1S/' or 'InChI=1/'
@@ -288,8 +325,9 @@ def CAS_from_any(ID, autoload=False, cache=True):
 
     Returns
     -------
-    CASRN : string
-        A three-piece, dash-separated set of numbers
+    chemical_metadata : ChemicalMetadata
+        A class containing attributes which describe the chemical's metadata,
+        [-]
 
     Notes
     -----
@@ -299,61 +337,60 @@ def CAS_from_any(ID, autoload=False, cache=True):
 
     Examples
     --------
-    >>> CAS_from_any('water')
-    '7732-18-5'
-    >>> CAS_from_any('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
-    '64-17-5'
-    >>> CAS_from_any('CCCCCCCCCC')
-    '124-18-5'
-    >>> CAS_from_any('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
-    '64-17-5'
-    >>> CAS_from_any('pubchem=702')
-    '64-17-5'
-    >>> CAS_from_any('O') # only elements can be specified by symbol
+    >>> search_chemical('water')
+    <ChemicalMetadata, name=water, formula=H2O, smiles=O, MW=18.0153>
+    >>> search_chemical('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
+    <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
+    >>> search_chemical('CCCCCCCCCC')
+    <ChemicalMetadata, name=DECANE, formula=C10H22, smiles=CCCCCCCCCC, MW=142.286>
+    >>> search_chemical('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
+    <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
+    >>> search_chemical('pubchem=702')
+    <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
+    >>> search_chemical('O') # only elements can be specified by symbol
     '17778-80-2'
     '''
-    if cache and ID in CAS_from_any_cache:
-        return CAS_from_any_cache[ID]    
+    if cache and ID in chemical_search_cache:
+        return chemical_search_cache[ID]
+    if not _pubchem_db_loaded: get_pubchem_db()
     
     ID_arg = ID
     ID = ID.strip()
     ID_lower = ID.lower()
     if ID in periodic_table:
         if periodic_table[ID].number not in homonuclear_elemental_gases:
-            return periodic_table[ID].CAS
+            return pubchem_db.search_CAS(periodic_table[ID].CAS)
         else:
             for i in [periodic_table.symbol_to_elements, 
                       periodic_table.number_to_elements,
                       periodic_table.CAS_to_elements]:
                 if i == periodic_table.number_to_elements:
                     if int(ID in i):
-                        CAS = periodic_table[int(ID)].CAS
+                        obj = pubchem_db.search_CAS(periodic_table[int(ID)].CAS)
                         if cache:
-                            CAS_from_any_cache[ID_arg] = CAS
-                        return CAS
+                            chemical_search_cache[ID_arg] = obj
+                        return obj
                 else:
                     if ID in i:
-                        CAS = periodic_table[ID].CAS
+                        obj = pubchem_db.search_CAS(periodic_table[ID].CAS)
                         if cache:
-                            CAS_from_any_cache[ID_arg] = CAS
-                        return CAS
+                            chemical_search_cache[ID_arg] = obj
+                        return obj
     if checkCAS(ID):
         CAS_lookup = pubchem_db.search_CAS(ID, autoload)
         if CAS_lookup:
-            CAS = CAS_lookup.CASs
             if cache:
-                CAS_from_any_cache[ID_arg] = CAS
-            return CAS
+                chemical_search_cache[ID_arg] = CAS_lookup
+            return CAS_lookup
         # handle the case of synonyms
         CAS_alternate_loopup = pubchem_db.search_name(ID, autoload)
         if CAS_alternate_loopup:
-            CAS = CAS_alternate_loopup.CASs
             if cache:
-                CAS_from_any_cache[ID_arg] = CAS
-            return CAS
+                chemical_search_cache[ID_arg] = CAS_alternate_loopup
+            return CAS_alternate_loopup
             
         if not autoload:
-            return CAS_from_any(ID, autoload=True)
+            return search_chemical(ID, autoload=True)
         raise ValueError('A valid CAS number (%s) was recognized, but is not in the database' %(ID))
         
         
@@ -369,52 +406,48 @@ def CAS_from_any(ID, autoload=False, cache=True):
         if inchi_search:
             inchi_lookup = pubchem_db.search_InChI(inchi_search, autoload)
             if inchi_lookup:
-                CAS = inchi_lookup.CASs
                 if cache:
-                    CAS_from_any_cache[ID_arg] = CAS
-                return CAS
+                    chemical_search_cache[ID_arg] = inchi_lookup
+                return inchi_lookup
             else:
                 if not autoload:
-                    return CAS_from_any(ID, autoload=True)
+                    return search_chemical(ID, autoload=True)
                 raise ValueError('A valid InChI name (%s) was recognized, but it is not in the database' %(inchi_search))
         if ID_lower[0:9] == 'inchikey=':
             inchi_key_lookup = pubchem_db.search_InChI_key(ID[9:], autoload)
             if inchi_key_lookup:
-                CAS = inchi_key_lookup.CASs
                 if cache:
-                    CAS_from_any_cache[ID_arg] = CAS
-                return CAS
+                    chemical_search_cache[ID_arg] = inchi_key_lookup
+                return inchi_key_lookup
             else:
                 if not autoload:
-                    CAS = CAS_from_any(ID, autoload=True)
+                    obj = search_chemical(ID, autoload=True)
                     if cache:
-                        CAS_from_any_cache[ID_arg] = CAS
-                    return CAS
+                        chemical_search_cache[ID_arg] = obj
+                    return obj
                 raise ValueError('A valid InChI Key (%s) was recognized, but it is not in the database' %(inchi_key_lookup))
     if ID_len > 8:
         if ID_lower[0:8] == 'pubchem=':
             pubchem_lookup = pubchem_db.search_pubchem(ID[8:], autoload)
             if pubchem_lookup:
-                CAS = pubchem_lookup.CASs
                 if cache:
-                    CAS_from_any_cache[ID_arg] = CAS
-                return CAS
+                    chemical_search_cache[ID_arg] = pubchem_lookup
+                return pubchem_lookup
                 
             else:
                 if not autoload:
-                    return CAS_from_any(ID, autoload=True)
+                    return search_chemical(ID, autoload=True)
                 raise ValueError('A PubChem integer (%s) identifier was recognized, but it is not in the database.' %(ID[8:]))
     if ID_len > 7:
         if ID_lower[0:7] == 'smiles=':
             smiles_lookup = pubchem_db.search_smiles(ID[7:], autoload)
             if smiles_lookup:
-                CAS = smiles_lookup.CASs
                 if cache:
-                    CAS_from_any_cache[ID_arg] = CAS
-                return CAS
+                    chemical_search_cache[ID_arg] = smiles_lookup
+                return smiles_lookup
             else:
                 if not autoload:
-                    return CAS_from_any(ID, autoload=True)
+                    return search_chemical(ID, autoload=True)
                 raise ValueError('A SMILES identifier (%s) was recognized, but it is not in the database.' %(ID[7:]))
 
     # Try the smiles lookup anyway
@@ -422,28 +455,25 @@ def CAS_from_any(ID, autoload=False, cache=True):
     # Pybel API also prints messages to console on failure
     smiles_lookup = pubchem_db.search_smiles(ID, autoload)
     if smiles_lookup:
-        CAS = smiles_lookup.CASs
         if cache:
-            CAS_from_any_cache[ID_arg] = CAS
-        return CAS
+            chemical_search_cache[ID_arg] = smiles_lookup
+        return smiles_lookup
     
     try:
         formula_query = pubchem_db.search_formula(serialize_formula(ID), autoload)
         if formula_query and type(formula_query) == ChemicalMetadata:
-            CAS = formula_query.CASs
             if cache:
-                CAS_from_any_cache[ID_arg] = CAS
-            return CAS
+                chemical_search_cache[ID_arg] = formula_query
+            return formula_query
     except:
         pass
     
     # Try a direct lookup with the name - the fastest
     name_lookup = pubchem_db.search_name(ID, autoload)
     if name_lookup:
-        CAS = name_lookup.CASs
         if cache:
-            CAS_from_any_cache[ID_arg] = CAS
-        return CAS
+            chemical_search_cache[ID_arg] = name_lookup
+        return name_lookup
     
 #     Permutate through various name options
     ID_no_space = ID.replace(' ', '')
@@ -453,148 +483,31 @@ def CAS_from_any(ID, autoload=False, cache=True):
         for name2 in [name, name.lower()]:
             name_lookup = pubchem_db.search_name(name2, autoload)
             if name_lookup:
-                CAS = name_lookup.CASs
                 if cache:
-                    CAS_from_any_cache[ID_arg] = CAS
-                return CAS
+                    chemical_search_cache[ID_arg] = name_lookup
+                return name_lookup
     
     if ID[-1] == ')' and '(' in ID:#
         # Try to matck in the form 'water (H2O)'
         first_identifier, second_identifier = ID[0:-1].split('(', 1)
         try:
-            CAS1 = CAS_from_any(first_identifier)
-            CAS2 = CAS_from_any(second_identifier)
+            CAS1 = search_chemical(first_identifier)
+            CAS2 = search_chemical(second_identifier)
             assert CAS1 == CAS2
             CAS = CAS1
             if cache:
-                CAS_from_any_cache[ID_arg] = CAS
+                chemical_search_cache[ID_arg] = CAS
             return CAS
         except:
             pass
         
     if not autoload:
-        return CAS_from_any(ID, autoload=True)
+        return search_chemical(ID, autoload=True)
             
     raise ValueError('Chemical name (%s) not recognized' %(ID))
 
 
 
-
-
-def PubChem(CASRN):
-    '''Given a CASRN in the database, obtain the PubChem database
-    number of the compound.
-
-    Parameters
-    ----------
-    CASRN : string
-        Valid CAS number in PubChem database [-]
-
-    Returns
-    -------
-    pubchem : int
-        PubChem database id, as an integer [-]
-
-    Notes
-    -----
-    CASRN must be an indexing key in the pubchem database.
-
-    Examples
-    --------
-    >>> PubChem('7732-18-5')
-    962
-
-    References
-    ----------
-    .. [1] Pubchem.
-    '''
-    return pubchem_db.search_CAS(CASRN).pubchemid
-
-
-
-def MW(CASRN):
-    '''Given a CASRN in the database, obtain the Molecular weight of the
-    compound, if it is in the database.
-
-    Parameters
-    ----------
-    CASRN : string
-        Valid CAS number in PubChem database
-
-    Returns
-    -------
-    MolecularWeight : float
-
-    Notes
-    -----
-    CASRN must be an indexing key in the pubchem database. No MW Calculation is
-    performed; nor are any historical isotopic corrections applied.
-
-    Examples
-    --------
-    >>> MW('7732-18-5')
-    18.01528
-
-    References
-    ----------
-    .. [1] Pubchem.
-    '''
-    return pubchem_db.search_CAS(CASRN).MW
-
-
-def formula(CASRN):
-    '''
-    >>> formula('7732-18-5')
-    'H2O'
-    '''
-    return pubchem_db.search_CAS(CASRN).formula
-
-
-def smiles(CASRN):
-    '''
-    >>> smiles('7732-18-5')
-    'O'
-    '''
-    return pubchem_db.search_CAS(CASRN).smiles
-
-
-def InChI(CASRN):
-    '''
-    >>> InChI('7732-18-5')
-    'H2O/h1H2'
-    '''
-    return pubchem_db.search_CAS(CASRN).InChI
-
-
-def InChI_Key(CASRN):
-    '''
-    >>> InChI_Key('7732-18-5')
-    'XLYOFNOQVPJJNP-UHFFFAOYSA-N'
-    '''
-    return pubchem_db.search_CAS(CASRN).InChI_key
-
-
-def IUPAC_name(CASRN):
-    '''
-    >>> IUPAC_name('7732-18-5')
-    'oxidane'
-    '''
-    return pubchem_db.search_CAS(CASRN).iupac_name
-
-def name(CASRN):
-    '''
-    >>> name('7732-18-5')
-    'water'
-    '''
-    return pubchem_db.search_CAS(CASRN).common_name
-
-
-def synonyms(CASRN):
-    '''
-    >>> synonyms('98-00-0')
-    ['furan-2-ylmethanol', 'furfuryl alcohol', '2-furanmethanol', '2-furancarbinol', '2-furylmethanol', '2-furylcarbinol', '98-00-0', '2-furanylmethanol', 'furfuranol', 'furan-2-ylmethanol', '2-furfuryl alcohol', '5-hydroxymethylfuran', 'furfural alcohol', 'alpha-furylcarbinol', '2-hydroxymethylfuran', 'furfuralcohol', 'furylcarbinol', 'furyl alcohol', '2-(hydroxymethyl)furan', 'furan-2-yl-methanol', 'furfurylalcohol', 'furfurylcarb', 'methanol, (2-furyl)-', '2-furfurylalkohol', 'furan-2-methanol', '2-furane-methanol', '2-furanmethanol, homopolymer', '(2-furyl)methanol', '2-hydroxymethylfurane', 'furylcarbinol (van)', '2-furylmethan-1-ol', '25212-86-6', '93793-62-5', 'furanmethanol', 'polyfurfuryl alcohol', 'pffa', 'poly(furfurylalcohol)', 'poly-furfuryl alcohol', '(fur-2-yl)methanol', '.alpha.-furylcarbinol', '2-hydroxymethyl-furan', 'poly(furfuryl alcohol)', '.alpha.-furfuryl alcohol', 'agn-pc-04y237', 'h159', 'omega-hydroxypoly(furan-2,5-diylmethylene)', '(2-furyl)-methanol (furfurylalcohol)', '40795-25-3', '88161-36-8']
-    '''
-    return pubchem_db.search_CAS(CASRN).all_names
 
 
 ### DIPPR Database, chemical list only
@@ -604,6 +517,11 @@ def synonyms(CASRN):
 def dippr_compounds():
     '''Loads and returns a set of compounds known in the DIPPR database. This
     can be useful for knowing if a chemical is of industrial relevance.
+
+    Returns
+    -------
+    dippr_compounds : set([str])
+        A set of CAS numbers from the 2014 edition of the DIPPR database.
     '''
     dippr_compounds = set()
     with open(os.path.join(folder, 'dippr_2014.csv')) as f:
@@ -628,8 +546,6 @@ class CommonMixtureMetadata(object):
         self.zs = zs
         self.synonyms = synonyms
 
-common_mixtures = {}
-common_mixtures_by_synonym = {}
 
 def mixture_from_any(ID):
     '''Search by string for a mixture in the included common mixture database.
@@ -685,15 +601,9 @@ def IDs_to_CASs(IDs):
         except:
             if hasattr(IDs, 'strip'):
                 CASs = [IDs]
-#            else:
-#                pass
-#                raise Exception('Could not recognize the mixture IDs')
     if CASs is None:
         CASs = [CAS_from_any(ID) for ID in IDs]
     return CASs
-
-
-# TODO LIST OF REFRIGERANTS FOR USE IN HEAT TRANSFER CORRELATIONS
 
 cryogenics = {'132259-10-0': 'Air', '7440-37-1': 'Argon', '630-08-0':
 'carbon monoxide', '7782-39-0': 'deuterium', '7782-41-4': 'fluorine',
@@ -703,6 +613,9 @@ cryogenics = {'132259-10-0': 'Air', '7440-37-1': 'Argon', '630-08-0':
 
 _pubchem_db_loaded = False
 def get_pubchem_db():
+    '''Helper function to delay the creation of the pubchem_db object. This
+    avoids loading the database when it is not needed.
+    '''
     global _pubchem_db_loaded, pubchem_db
     if _pubchem_db_loaded:
         return pubchem_db
@@ -712,9 +625,12 @@ def get_pubchem_db():
     return pubchem_db
 
 mixture_composition_loaded = False
+global common_mixtures_by_synonym, common_mixtures
 
 def load_mixture_composition():
-    global mixture_composition_loaded
+    global mixture_composition_loaded, common_mixtures_by_synonym, common_mixtures
+    common_mixtures = {}
+    common_mixtures_by_synonym = {}
     with open(os.path.join(folder, 'Mixtures Compositions.tsv')) as f:
         '''Read in a dict of 90 or so mixutres, their components, and synonyms.
         Small errors in mole fractions not adding to 1 are known.
@@ -744,7 +660,11 @@ if PY37:
     def __getattr__(name):
         if name == 'pubchem_db':
             return get_pubchem_db()
+        elif name == 'common_mixtures' or name == 'common_mixtures_by_synonym':
+            load_mixture_composition()
+            return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
     if can_load_data:
         get_pubchem_db()
+        load_mixture_composition()

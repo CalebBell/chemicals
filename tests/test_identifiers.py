@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016-2017, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016-2020, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ from chemicals.utils import CAS2int, int2CAS
 from chemicals.elements import periodic_table, nested_formula_parser, serialize_formula, molecular_weight
 import os
 from chemicals.identifiers import ChemicalMetadataDB, folder, pubchem_db
+from chemicals.identifiers import common_mixtures
 
 # Force the whole db to load
 try:
@@ -183,16 +184,16 @@ def test_mixture_from_any():
         mixture_from_any(['water', 'methanol'])
     with pytest.raises(Exception):
         mixture_from_any('NOTAMIXTURE')
-
+        
     for name in ['Air', 'air', u'Air', ['air']]:
-        assert mixture_from_any(name) == 'Air'
+        assert mixture_from_any(name) == common_mixtures['Air']
 
     names = ['R-401A ', ' R-401A ', 'R401A ', 'r401a', 'r-401A', 'refrigerant-401A', 'refrigerant 401A']
     for name in names:
-        assert mixture_from_any(name) == 'R401A'
+        assert mixture_from_any(name) == common_mixtures['R401A']
         
-    assert mixture_from_any('R512A') == 'R512A'
-    assert mixture_from_any([u'air']) == 'Air'
+    assert mixture_from_any('R512A') == common_mixtures['R512A']
+    assert mixture_from_any([u'air']) == common_mixtures['Air']
     
     
 def test_CAS_from_any():
