@@ -348,7 +348,7 @@ def search_chemical(ID, autoload=False, cache=True):
     >>> search_chemical('pubchem=702')
     <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
     >>> search_chemical('O') # only elements can be specified by symbol
-    '17778-80-2'
+    <ChemicalMetadata, name=oxygen, formula=O, smiles=[O], MW=15.9994>
     '''
     if cache and ID in chemical_search_cache:
         return chemical_search_cache[ID]

@@ -1686,7 +1686,7 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     --------
     >>> Zabransky_cubic_integral_over_T(298.15, 20.9634, -10.1344, 2.8253, 
     ... -0.256738)
-    24.732465342840854
+    24.732465342840914
     
     References
     ----------

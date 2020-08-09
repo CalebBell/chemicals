@@ -31,7 +31,7 @@ from chemicals.phase_change import (Hvap_data_CRC, Hfus_data_CRC,
                                     phase_change_data_Alibakhshi_Cs, 
                                     phase_change_data_VDI_PPDS_4)
 from chemicals.miscdata import CRC_inorganic_data, CRC_organic_data
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 
 
 def test_Watson():

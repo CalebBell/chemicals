@@ -176,7 +176,7 @@ def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
     Methane gas burning:
     
     >>> combustion_stoichiometry({'C': 1, 'H':4})
-    {'O2': -2.0, 'CO2': 1, 'H2O': 2.0}
+    {'CO2': 1, 'O2': -2.0, 'H2O': 2.0}
 
     """
     products = {}
@@ -307,11 +307,7 @@ def combustion_products_mixture(atoms_list, zs, reactivities=None, CASs=None,
     >>> combustion_products_mixture([{'H': 4, 'C': 1}, {'H': 6, 'C': 2}, {'Ar': 1}, {'C': 15, 'H': 32}],
     ... [.9, .05, .04, .01], reactivities=[True, True, True, False], 
     ... CASs=['74-82-8', '74-84-0', '7440-37-1', '629-62-9'])
-    {'CO2': 1.0,
-     'O2': -1.975,
-     'H2O': 1.9500000000000002,
-     'Ar': 0.04,
-     '629-62-9': 0.01}
+    {'CO2': 1.0, 'O2': -1.975, 'H2O': 1.9500000000000002, 'Ar': 0.04, '629-62-9': 0.01}
     '''
     # Attempted to use a .copy() on a base dict but that was slower
     products = {}
@@ -551,7 +547,7 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
     Liquid methanol burning:
 
     >>> combustion_data({'H': 4, 'C': 1, 'O': 1}, Hf=-239100)
-    CombustionData(stoichiometry={'O2': -1.5, 'CO2': 1, 'H2O': 2.0}, HHV=-726024.0, Hf=-239100, MW=32.04186)
+    CombustionData(stoichiometry={'CO2': 1, 'O2': -1.5, 'H2O': 2.0}, HHV=-726024.0, Hf=-239100, MW=32.04186)
     
     References
     ----------
@@ -597,6 +593,10 @@ class CombustionData(object):
         Molecular weight [g/mol].
     
     """
+    
+    def __repr__(self):
+        return 'CombustionData(stoichiometry=%s, HHV=%s, Hf=%s, MW=%s)' %(self.stoichiometry,
+                              self.HHV, self.Hf, self.MW)
     def __init__(self, stoichiometry, HHV, Hf, MW):
         self.stoichiometry = stoichiometry
         self.HHV = HHV

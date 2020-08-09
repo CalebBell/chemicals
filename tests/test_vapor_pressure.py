@@ -27,7 +27,7 @@ import pandas as pd
 from fluids.numerics import assert_close, derivative, assert_close1d
 from chemicals.vapor_pressure import *
 from chemicals.vapor_pressure import WagnerMcGarry, AntoinePoling, WagnerPoling, AntoineExtended, Perrys2_8, VDI_PPDS_3
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 from math import *
 
 ### Regression equations
