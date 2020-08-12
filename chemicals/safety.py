@@ -27,7 +27,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'Tflash', 'Tautoignition_methods', 'Tautoignition_all_methods', 
            'Tautoignition', 'LFL_methods', 'LFL_all_methods', 
            'LFL', 'UFL_methods', 'UFL_all_methods', 'UFL', 'fire_mixing', 
-           'inerts', 'LFL_mixture', 'UFL_mixture', 
+           'inerts', 
            'Suzuki_LFL', 'Suzuki_UFL', 
            'Crowl_Louvar_LFL', 'Crowl_Louvar_UFL', 
            'DIPPR_SERAT_data', 
@@ -42,9 +42,9 @@ from chemicals.data_reader import (register_df_source,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
 
-# %% Utilities 
+### Utilities 
 
-def ppmv_to_mgm3(ppmv, MW, T=298.15, P=101325.):
+def ppmv_to_mgm3(ppmv, MW, T=298.15, P=101325.0):
     r'''
     Converts a concentration in ppmv to units of mg/m^3. Used in
     industrial toxicology.
@@ -55,14 +55,14 @@ def ppmv_to_mgm3(ppmv, MW, T=298.15, P=101325.):
     Parameters
     ----------
     ppmv : float
-        Concentratoin of a component in a gas mixure [parts per million,
+        Concentration of a component in a gas mixure [parts per million,
         volumetric]
     MW : float
         Molecular weight of the trace gas [g/mol]
     T : float, optional
-        Temperature of the gas at which the ppmv is reported
+        Temperature of the gas at which the ppmv is reported, [K]
     P : float, optional
-        Pressure of the gas at which the ppmv is reported
+        Pressure of the gas at which the ppmv is reported, [Pa]
     
     Returns
     -------
@@ -76,8 +76,8 @@ def ppmv_to_mgm3(ppmv, MW, T=298.15, P=101325.):
     
     Examples
     --------
-    >>> ppmv_to_mgm3(1, 40)
-    1.6349623351068687
+    >>> ppmv_to_mgm3(1.0, 40.0)
+    1.6349617809430446
     
     References
     ----------
@@ -105,9 +105,9 @@ def mgm3_to_ppmv(mgm3, MW, T=298.15, P=101325.):
     MW : float
         Molecular weight of the trace gas [g/mol]
     T : float, optional
-        Temperature of the gas at which the ppmv is reported
+        Temperature of the gas at which the ppmv is reported, [K]
     P : float, optional
-        Pressure of the gas at which the ppmv is reported
+        Pressure of the gas at which the ppmv is reported, [Pa]
     
     Returns
     -------
@@ -122,8 +122,8 @@ def mgm3_to_ppmv(mgm3, MW, T=298.15, P=101325.):
     
     Examples
     --------
-    >>> mgm3_to_ppmv(1.635, 40)
-    1.0000230371625833
+    >>> mgm3_to_ppmv(1.635, 40.0)
+    1.0000233761164334
     
     References
     ----------
@@ -136,7 +136,7 @@ def mgm3_to_ppmv(mgm3, MW, T=298.15, P=101325.):
     ppm = parts/1E-6
     return ppm
 
-# %% Data
+### Data
 
 
 NTP_codes = {1: 'Known', 2: 'Reasonably Anticipated'}
@@ -281,12 +281,13 @@ TWA_all_methods = (ONTARIO,)
 
 def TWA_methods(CASRN):
     """
-    Return all methods available to obtain TWA for the desired chemical.
+    Return all methods available to obtain the Time-Weighted Average exposure  
+    limits (TWA) for the desired chemical.
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -296,8 +297,13 @@ def TWA_methods(CASRN):
     See Also
     --------
     TWA
-
+    
+    Examples
+    --------
+    >>> TWA_methods('71-43-2')
+    ['Ontario Limits']
     """
+    if not _safety_data_loaded: _load_safety_data()
     if CASRN in Ontario_exposure_limits_dict:
         data = Ontario_exposure_limits_dict[CASRN]
         if (data["TWA (ppm)"] or data["TWA (mg/m^3)"]): return [ONTARIO]
@@ -316,6 +322,7 @@ def TWA(CASRN, method=None):  # pragma: no cover
     (5.0742430905659505e-05, 'ppm')
     
     '''
+    if not _safety_data_loaded: _load_safety_data()
     if not method or method == ONTARIO:
         if CASRN in Ontario_exposure_limits_dict:
             data = Ontario_exposure_limits_dict[CASRN]
@@ -346,6 +353,7 @@ def STEL_methods(CASRN):
     STEL
 
     """
+    if not _safety_data_loaded: _load_safety_data()
     if CASRN in Ontario_exposure_limits_dict:
         data = Ontario_exposure_limits_dict[CASRN]
         if (data["STEL (ppm)"] or data["STEL (mg/m^3)"]): return [ONTARIO]
@@ -365,6 +373,7 @@ def STEL(CASRN, method=None):  # pragma: no cover
     >>> STEL('55720-99-5')
     (2.0, 'mg/m^3')
     '''
+    if not _safety_data_loaded: _load_safety_data()
     if not method or method == ONTARIO:
         if CASRN in Ontario_exposure_limits_dict:
             data = Ontario_exposure_limits_dict[CASRN]
@@ -395,6 +404,7 @@ def Ceiling_methods(CASRN):
     Ceiling limits
 
     """
+    if not _safety_data_loaded: _load_safety_data()
     if CASRN in Ontario_exposure_limits_dict:
         data = Ontario_exposure_limits_dict[CASRN]
         if (data["Ceiling (ppm)"] or data["Ceiling (mg/m^3)"]): return [ONTARIO]
@@ -412,6 +422,7 @@ def Ceiling(CASRN, method=None):  # pragma: no cover
     >>> Ceiling('1395-21-7')
     (6e-05, 'mg/m^3')
     '''
+    if not _safety_data_loaded: _load_safety_data()
     if not method or method == ONTARIO:
         if CASRN in Ontario_exposure_limits_dict:
             data = Ontario_exposure_limits_dict[CASRN]
@@ -458,9 +469,10 @@ def Skin(CASRN, method=None):  # pragma: no cover
     >>> Skin('1395-21-7')
     False
     '''
+    if not _safety_data_loaded: _load_safety_data()
     if not method or method == ONTARIO:
         if CASRN in Ontario_exposure_limits_dict:
-            return Ontario_exposure_limits_dict["Skin"]
+            return Ontario_exposure_limits_dict[CASRN]["Skin"]
     else:
         raise ValueError('Invalid method: %s, allowed methods are %s' %(
                          method, TWA_all_methods))
@@ -496,8 +508,7 @@ def Carcinogen_methods(CASRN):
     return list(Carcinogen_all_methods)
 
 def Carcinogen(CASRN, method=None):
-    r'''
-    Looks up if a chemical is listed as a carcinogen or not according to
+    r'''Looks up if a chemical is listed as a carcinogen or not according to
     either a specifc method or with all methods.
     Returns either the status as a string for a specified method, or the
     status of the chemical in all available data sources, in the format
@@ -524,12 +535,12 @@ def Carcinogen(CASRN, method=None):
     Supported methods are:
         * **IARC**: International Agency for Research on Cancer, [1]_. As
           extracted with a last update of  February 22, 2016. Has listing
-          information of 843 chemicals with CAS numbers. Chemicals without
+          information of 863 chemicals with CAS numbers. Chemicals without
           CAS numbers not included here. If two listings for the same CAS
-          were available, that closest to the CAS number was used. If two
+          were available, the harshest rating was used. If two
           listings were available published at different times, the latest
           value was used. All else equal, the most pessimistic value was used.
-        * **NTP**: National Toxicology Program, [2]_. Has data on 226
+        * **NTP**: National Toxicology Program, [2]_. Has data on 228
           chemicals.
     
     Examples
@@ -540,13 +551,14 @@ def Carcinogen(CASRN, method=None):
     References
     ----------
     .. [1] International Agency for Research on Cancer. Agents Classified by
-       the IARC Monographs, Volumes 1-115. Lyon, France: IARC; 2016 Available
+       the IARC Monographs, Volumes 1-115. Lyon, France: IARC; 2020 Available
        from: http://monographs.iarc.fr/ENG/Classification/
-    .. [2] NTP (National Toxicology Program). 2014. Report on Carcinogens,
-       Thirteenth Edition. Research Triangle Park, NC: U.S. Department of
+    .. [2] NTP (National Toxicology Program). 2016. Report on Carcinogens,
+       Fourteenth Edition. Research Triangle Park, NC: U.S. Department of
        Health and Human Services, Public Health Service.
-       http://ntp.niehs.nih.gov/pubhealth/roc/roc13/
+       https://ntp.niehs.nih.gov/whatwestudy/assessments/cancer/roc/index.html
     '''
+    if not _safety_data_loaded: _load_safety_data()
     if not method:
         return {
             IARC: IARC_codes[IARC_data.at[CASRN, 'group']] if CASRN in IARC_data.index else UNLISTED,
@@ -562,10 +574,6 @@ def Carcinogen(CASRN, method=None):
         raise ValueError('Invalid method: %s, allowed methods are %s' %(
                        method, Carcinogen_all_methods))
     return UNLISTED
-
-#print(Carcinogen2('61-82-5')) # {'National Toxicology Program 13th Report on Carcinogens': 'Reasonably Anticipated', 'International Agency for Research on Cancer': 'Not classifiable as to its carcinogenicity to humans (3)'}
-#print Carcinogen2('71-43-2') # {'National Toxicology Program 13th Report on Carcinogens': 'Known', 'International Agency for Research on Cancer': 'Carcinogenic to humans (1)'}
-#print Carcinogen2('7732-18-5') # {'National Toxicology Program 13th Report on Carcinogens': 'Unlisted', 'International Agency for Research on Cancer': 'Unlisted'}
 
 
 ### Fire-related functions
@@ -958,112 +966,9 @@ inerts = {"7440-37-1": "Argon", "124-38-9": "Carbon Dioxide", "7440-59-7":
           "water", "7782-50-5": "chlorine", "7782-41-4": "fluorine"}
 
 
-def LFL_mixture(ys=None, LFLs=None, CASRNs=None, AvailableMethods=False,
-                Method=None):  # pragma: no cover
-    '''Inert gases are ignored.
-    This API is considered experimental, and is expected to be removed in a
-    future release in favor of a more complete object-oriented interface.
-    >>> LFL_mixture(ys=normalize([0.0024, 0.0061, 0.0015]), LFLs=[.012, .053, .031])
-    0.02751172136637643
-    >>> LFL_mixture(LFLs=[None, None, None, None, None, None, None, None, None, None, None, None, None, None, 0.025, 0.06, 0.073, 0.020039, 0.011316], ys=[0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.10, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05], CASRNs=['7440-37-1', '124-38-9', '7440-59-7', '7440-01-9', '7727-37-9', '7440-63-3', '10102-43-9', '7782-44-7', '132259-10-0', '7439-90-9', '10043-92-2', '7732-18-5', '7782-50-5', '7782-41-4', '67-64-1', '67-56-1', '75-52-5', '590-19-2', '277-10-1'])
-    0.023964903630937385
-    '''
-    def list_methods():
-        methods = []
-        if CASRNs:
-            CASRNs2 = list(CASRNs)
-            LFLs2 = list(LFLs)
-            for i in inerts:
-                if i in CASRNs2:
-                    ind = CASRNs.index(i)
-                    CASRNs2.remove(i)
-                    LFLs2.remove(LFLs[ind])
-            if none_and_length_check([LFLs2]):
-                methods.append('Summed Inverse, inerts removed')
-        else:
-            if none_and_length_check([LFLs]):
-                methods.append('Summed Inverse')
-        methods.append('None')
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-    # This is the calculate, given the method section
-#    if not none_and_length_check([LFLs, ys]):
-#        raise Exception('Function inputs are incorrect format')
-    if Method == 'Summed Inverse':
-        return fire_mixing(ys, LFLs)
-    elif Method == 'Summed Inverse, inerts removed':
-        CASRNs2 = list(CASRNs)
-        LFLs2 = list(LFLs)
-        ys2 = list(ys)
-        for i in inerts:
-            if i in CASRNs2:
-                ind = CASRNs2.index(i)
-                CASRNs2.remove(i)
-                LFLs2.pop(ind)
-                ys2.pop(ind)
-        return fire_mixing(normalize(ys2), LFLs2)
-    elif Method == 'None':
-        return None
-    else:
-        raise Exception('Failure in in function')
 
 
-def UFL_mixture(ys=None, UFLs=None, CASRNs=None, AvailableMethods=False,
-                Method=None):  # pragma: no cover
-    '''Inert gases are ignored.
-    This API is considered experimental, and is expected to be removed in a
-    future release in favor of a more complete object-oriented interface.
-    >>> UFL_mixture(ys=normalize([0.0024, 0.0061, 0.0015]), UFLs=[.075, .15, .32])
-    0.12927551844869378
-    >>> LFL_mixture(LFLs=[None, None, None, None, None, None, None, None, None, None, None, None, None, None, 0.143, 0.36, 0.63, 0.1097, 0.072], ys=[0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.10, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05], CASRNs=['7440-37-1', '124-38-9', '7440-59-7', '7440-01-9', '7727-37-9', '7440-63-3', '10102-43-9', '7782-44-7', '132259-10-0', '7439-90-9', '10043-92-2', '7732-18-5', '7782-50-5', '7782-41-4', '67-64-1', '67-56-1', '75-52-5', '590-19-2', '277-10-1'])
-    0.14550641757359664
-    '''
-    def list_methods():
-        methods = []
-        if CASRNs:
-            CASRNs2 = list(CASRNs)
-            UFLs2 = list(UFLs)
-            for i in inerts:
-                if i in CASRNs2:
-                    ind = CASRNs.index(i)
-                    CASRNs2.remove(i)
-                    UFLs2.remove(UFLs[ind])
-            if none_and_length_check([UFLs2]):
-                methods.append('Summed Inverse, inerts removed')
-        if none_and_length_check([UFLs, ys]):
-            methods.append('Summed Inverse')
-        methods.append('None')
-        return methods
-    if AvailableMethods:
-        return list_methods()
-    if not Method:
-        Method = list_methods()[0]
-    # This is the calculate, given the method section
-#    if not none_and_length_check([UFLs, ys]):  # check same-length inputs
-#        raise Exception('Function inputs are incorrect format')
-    if Method == 'Summed Inverse':
-        return fire_mixing(ys, UFLs)
-    elif Method == 'Summed Inverse, inerts removed':
-        CASRNs2 = list(CASRNs)
-        UFLs2 = list(UFLs)
-        ys2 = list(ys)
-        for i in inerts:
-            if i in CASRNs2:
-                ind = CASRNs2.index(i)
-                CASRNs2.remove(i)
-                UFLs2.pop(ind)
-                ys2.pop(ind)
-        return fire_mixing(normalize(ys2), UFLs2)
-    elif Method == 'None':
-        return None
-    else:
-        raise Exception('Failure in in function')
-
-
-def Suzuki_LFL(Hc=None):
+def Suzuki_LFL(Hc):
     r'''
     Calculates lower flammability limit, using the Suzuki [1]_ correlation.
     Uses heat of combustion only.
@@ -1113,7 +1018,7 @@ def Suzuki_LFL(Hc=None):
     return LFL/100.
 
 
-def Suzuki_UFL(Hc=None):
+def Suzuki_UFL(Hc):
     r'''Calculates upper flammability limit, using the Suzuki [1]_ correlation.
     Uses heat of combustion only.
     The upper flammability limit of a gas is air is:

@@ -49,7 +49,7 @@ CASRN	Chemical	Listing
 77-09-8	Phenolphthalein	2
 77-78-1	Dimethyl Sulfate	2
 78-79-5	Isoprene	2
-79-01-6	Trichloroethylene	2
+79-01-6	Trichloroethylene	1
 79-06-1	Acrylamide	2
 79-44-7	Dimethylcarbamoyl Chloride	2
 79-46-9	2-Nitropropane	2
@@ -186,6 +186,7 @@ CASRN	Chemical	Listing
 7440-38-2	Arsenic (seeArsenic and Inorganic Arsenic Compounds)	1
 7440-41-7	Beryllium (seeBeryllium and Beryllium Compounds)	1
 7440-43-9	Cadmium (seeCadmium and Cadmium Compounds)	1
+7440-48-4	Cobalt (see Cobalt-Related Exposures)	2
 7446-34-6	Selenium Sulfide	2
 7496-02-8	6-Nitrochrysene (seeNitroarenes [Selected])	2
 7664-93-9	Sulfuric Acid (seeStrong Inorganic Acid Mists Containing Sulfuric Acid)	1

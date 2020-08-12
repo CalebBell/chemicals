@@ -76,15 +76,15 @@ def test_OntarioExposureLimits():
 def test_IARC_data():
     assert IARC_data.index.is_unique
     assert all([checkCAS(i) for i in IARC_data.index])
-    assert IARC_data.shape == (843, 4)
+    assert IARC_data.shape == (863, 4)
 
-    dict_exp = {11: 66, 1: 76, 3: 449, 12: 251, 4: 1}
+    dict_exp = {11: 76, 1: 75, 3: 438, 12: 274}
     dict_calc = IARC_data['group'].value_counts().to_dict()
     assert dict_exp == dict_calc
 
 
 def test_NTP_data():
-    dict_exp = {1: 35, 2: 191}
+    dict_exp = {1: 36, 2: 191}
     dict_calc = NTP_data['Listing'].value_counts().to_dict()
     assert dict_exp == dict_calc
 
@@ -104,7 +104,21 @@ def test_Carcinogen():
 
     with pytest.raises(Exception):
         Carcinogen('71-43-2', method='BADMETHOD')
-
+        
+    # New item 2020
+    assert Carcinogen('100-00-5')[IARC] == IARC_codes[12]
+    
+    # Trichloroethylene added to 14th ed of NTP as known carcinogen.
+    expected = {NTP: NTP_codes[1], IARC: IARC_codes[1]}
+    assert Carcinogen('79-01-6') == expected
+    
+    # Cobalt, added in 14th ed of NTP
+    expected = {NTP: NTP_codes[2], IARC: IARC_codes[11]}
+    assert Carcinogen('7440-48-4') == expected
+    
+def test_Skin():
+    assert Skin('108-94-1')
+    assert not Skin('1395-21-7')
 
 def test_safety_predictions():
 
