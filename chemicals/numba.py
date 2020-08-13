@@ -62,6 +62,7 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
              'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
              'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
+             'viscosity.Wilke_large', 'viscosity.Wilke_prefactored',
              
              'rachford_rice.Rachford_Rice_solution',
              'rachford_rice.Rachford_Rice_solution_LN2',

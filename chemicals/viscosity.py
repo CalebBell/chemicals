@@ -30,7 +30,7 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar',
 
 import os
 from fluids.numerics import secant, interp, numpy as np
-from chemicals.utils import log, exp, log10
+from chemicals.utils import log, exp, log10, sqrt
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
@@ -938,18 +938,22 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
        Chemical Physics 18, no. 4 (April 1, 1950): 517-19. 
        https://doi.org/10.1063/1.1747673.
     '''
-    cmps = range(len(ys))
-    # 1/sqrt(mus)
-    mu_root_invs = [mui**-0.5 for mui in mus]
-    # sqrt(mus)
-    mu_roots = [mu_root_invs[i]*mus[i] for i in cmps]
-    # 1/mus
-    mus_inv = [mu_root_invs[i]*mu_root_invs[i] for i in cmps]
-    
+    N = len(ys)
+    mu_root_invs = [0.0]*N
+    mu_roots = [0.0]*N
+    mus_inv = [0.0]*N
+    for i in range(N):
+        # 1/sqrt(mus)
+        mu_root_invs[i] = muirtinv = 1.0/sqrt(mus[i])
+        # sqrt(mus)
+        mu_roots[i] = muirtinv*mus[i]
+        # 1/mus
+        mus_inv[i] = muirtinv*muirtinv
+        
     mu = 0.0
-    for i in cmps:
+    for i in range(N): # numba's p range does not help here
         tot = 0.0
-        for j in cmps:
+        for j in range(N):
             phiij = mus[i]*mus_inv[j]*t0s[i][j] + mu_roots[i]*mu_root_invs[j]*t1s[i][j] + t2s[i][j]
             tot += ys[j]*phiij
         mu += ys[i]*mus[i]/tot
@@ -996,34 +1000,41 @@ def Wilke_large(ys, mus, MWs):
        https://doi.org/10.1063/1.1747673.
     '''
     # For the cases where memory is sparse or not desired to be consumed
-    cmps = range(len(ys))
+    N = len(MWs)
     
-    # Compute the MW and assorted power vectors
-    MW_25_invs = [MWi**-0.25 for MWi in MWs]
-    MW_roots_invs = [i*i for i in MW_25_invs]
-    MW_invs = [i*i for i in MW_roots_invs]
-    MW_roots = [MWs[i]*MW_roots_invs[i] for i in cmps]
-    MW_25 = [MW_roots[i]*MW_25_invs[i] for i in cmps]
+#   Compute the MW and assorted power vectors
+    MW_invs = [0.0]*N
+    MW_inv_mus = [0.0]*N
+    mu_roots = [0.0]*N
+    mus_inv_MW_roots = [0.0]*N
+    mu_root_invs_MW_25s = [0.0]*N
     
-    # Compute the various viscosity powers
-    # 1/sqrt(mus)
-    mu_root_invs = [mui**-0.5 for mui in mus]
-    # sqrt(mus)
-    mu_roots = [mu_root_invs[i]*mus[i] for i in cmps]
-    # 1/mus
-    mus_inv = [mu_root_invs[i]*mu_root_invs[i] for i in cmps]
-
+    for i in range(N):
+        MW_root = sqrt(MWs[i])
+        MW_root_inv = 1.0/MW_root
+        MW_25_inv = sqrt(MW_root_inv)
+        mu_root_inv = 1.0/sqrt(mus[i])
+        x0 = mu_root_inv*MW_root
+        # Stored values
+        mu_roots[i] = 2.0*mu_root_inv*mus[i]*MW_25_inv
+        MW_invs[i] = MW_root_inv*MW_root_inv
+        MW_inv_mus[i] = mus[i]*MW_root_inv
+        mus_inv_MW_roots[i] = mu_root_inv*x0
+        mu_root_invs_MW_25s[i] = x0*MW_25_inv
+    
     mu = 0.0
-    for i in cmps:
+    for i in range(N): 
+        # numba's p range does help here but only when large, when small it hinders
         tot = 0.0
         MWi = MWs[i]
-        MWs_root_invi = MW_roots_invs[i]
-        MW_25_invi = MW_25_invs[i]
-        for j in cmps:
-            phii_denom = (8.0*(1.0 + MWi*MW_invs[j]))**-0.5
-            phiij = phii_denom + phii_denom*(mus[i]*mus_inv[j]*MW_roots[j]*MWs_root_invi
-                                + mu_roots[i]*mu_root_invs[j]*2.0*MW_25[j]*MW_25_invi)
-            tot += ys[j]*phiij
+        MWs_root_invi = MW_inv_mus[i]
+        MW_25_invi = mu_roots[i]
+        # Not a symmetric matrix unfortunately
+        for j in range(N):
+            # sqrt call is important for PyPy to make this fast
+            phii_denom = ys[j]/sqrt(8.0*(1.0 + MWi*MW_invs[j]))
+            tot += phii_denom + phii_denom*(mus_inv_MW_roots[j]*MWs_root_invi
+                                + mu_root_invs_MW_25s[j]*MW_25_invi)
         mu += ys[i]*mus[i]/tot
     return mu
 
