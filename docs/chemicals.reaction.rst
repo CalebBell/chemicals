@@ -1,7 +1,7 @@
-thermo.reaction module
-======================
+chemicals.reaction module
+=========================
 
-.. automodule:: thermo.reaction
+.. automodule:: chemicals.reaction
     :members:
     :undoc-members:
     :show-inheritance:

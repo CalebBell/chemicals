@@ -48,11 +48,8 @@ If you need to know something about a chemical, give chemicals a try.
    :caption: API
    
    chemicals.acentric
-   chemicals.activity
-   chemicals.chemical
    chemicals.combustion
    chemicals.critical
-   chemicals.datasheet
    chemicals.dipole
    chemicals.dippr
    chemicals.elements
@@ -64,7 +61,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.miscdata
    chemicals.permittivity
    chemicals.phase_change
-   chemicals.rashford_rice
+   chemicals.rachford_rice
    chemicals.reaction
    chemicals.refractivity
    chemicals.safety

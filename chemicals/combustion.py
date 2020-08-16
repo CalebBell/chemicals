@@ -158,6 +158,7 @@ def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
     .. math::
         C_c H_h O_o N_n S_s Br_b I_i Cl_x F_f P_p + kO_2 -> cCO_2 + \frac{b}{2}Br_2 + \frac{i}{2}I + xHCl + fHF + sSO_2 + \frac{n}{2}N_2 + \frac{p}{4}P_4O_{10} +\frac{h + x + f}{2}H_2O
 
+    .. math::
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
     Also included in the results is the moles of O2 required per mole of
@@ -385,6 +386,7 @@ def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
     .. math::
         C_c H_h O_o N_n S_s Br_b I_i Cl_x F_f P_p + kO_2 -> cCO_2 + \frac{b}{2}Br_2 + \frac{i}{2}I + xHCl + fHF + sSO_2 + \frac{n}{2}N_2 + \frac{p}{4}P_4O_{10} +\frac{h + x + f}{2}H_2O
         
+    .. math::
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
     
     The HHV is calculated as the heat of reaction.
@@ -472,8 +474,10 @@ def LHV_from_HHV(HHV, N_H2O):
     .. math::
         LHV = HHV + H_{vap} \cdot H_2O
         
+    .. math::
         H_{vap} = 44011.496 \frac{J}{mol H_2O}
         
+    .. math::
         H_2O = \frac{mol H_2O}{mol}
     
     Examples
@@ -524,6 +528,7 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
     .. math::
         C_c H_h O_o N_n S_s Br_b I_i Cl_x F_f P_p + kO_2 -> cCO_2 + \frac{b}{2}Br_2 + \frac{i}{2}I + xHCl + fHF + sSO_2 + \frac{n}{2}N_2 + \frac{p}{4}P_4O_{10} +\frac{h + x + f}{2}H_2O
         
+    .. math::
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
     If the method is "Stoichiometry", the HHV is found using 
@@ -538,8 +543,10 @@ def combustion_data(formula, Hf=None, MW=None, method=None):
     .. math::
         LHV = HHV + H_{vap} \cdot H_2O
         
+    .. math::
         H_{vap} = 44011.496 \frac{J}{mol H_2O}
         
+    .. math::
         H_2O = \frac{mol H_2O}{mol}
         
     Examples

@@ -758,8 +758,7 @@ CROWLLOUVAR = 'Crowl and Louvar (2001)'
 LFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
 
 def LFL_methods(Hc=None, atoms=None, CASRN=''):
-    """
-    Return all methods available to obtain LFL for the desired chemical.
+    """Return all methods available to obtain LFL for the desired chemical.
 
     Parameters
     ----------
@@ -781,8 +780,10 @@ def LFL_methods(Hc=None, atoms=None, CASRN=''):
     
     Examples
     --------
-    >>> LFL_methods(Hc=-1e4, atoms={'C': 1, 'H': 4})
-    ['Suzuki (1994)', 'Crowl and Louvar (2001)']
+    Methane
+    
+    >>> LFL_methods(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
+    ['IEC 60079-20-1 (2010)', 'NFPA 497 (2008)', 'Suzuki (1994)', 'Crowl and Louvar (2001)']
 
     """
     if not _safety_data_loaded: _load_safety_data()
@@ -793,9 +794,8 @@ def LFL_methods(Hc=None, atoms=None, CASRN=''):
         methods.append(CROWLLOUVAR)
     return methods
 
-def LFL(Hc=None, atoms={}, CASRN='', method=None):
-    r'''
-    This function handles the retrieval or calculation of a chemical's
+def LFL(Hc=None, atoms=None, CASRN='', method=None):
+    r'''This function handles the retrieval or calculation of a chemical's
     Lower Flammability Limit. Lookup is based on CASRNs. Will automatically 
     select a data source to use if no Method is provided; returns None if the
     data is not available.
@@ -824,6 +824,8 @@ def LFL(Hc=None, atoms={}, CASRN='', method=None):
     --------
     >>> LFL(CASRN='71-43-2')
     0.012
+    >>> LFL(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
+    0.044000000000000004
     
     Notes
     -----
@@ -859,7 +861,7 @@ def LFL(Hc=None, atoms={}, CASRN='', method=None):
     
 UFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
 
-def UFL_methods(Hc=None, atoms={}, CASRN=''):
+def UFL_methods(Hc=None, atoms=None, CASRN=''):
     """
     Return all methods available to obtain UFL for the desired chemical.
 
@@ -880,17 +882,24 @@ def UFL_methods(Hc=None, atoms={}, CASRN=''):
     See Also
     --------
     UFL
+    
+    Examples
+    --------
+    Methane
+    
+    >>> UFL_methods(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
+    ['IEC 60079-20-1 (2010)', 'NFPA 497 (2008)', 'Suzuki (1994)', 'Crowl and Louvar (2001)']
 
     """
     if not _safety_data_loaded: _load_safety_data()
     methods = list_available_methods_from_df_dict(UFL_sources, CASRN, 'UFL')
-    if Hc:
+    if Hc is not None:
         methods.append(SUZUKI)
-    if atoms:
+    if atoms is not None:
         methods.append(CROWLLOUVAR)
     return methods
 
-def UFL(Hc=None, atoms={}, CASRN='', method=None):
+def UFL(Hc=None, atoms=None, CASRN='', method=None):
     r'''This function handles the retrieval or calculation of a chemical's
     Upper Flammability Limit. Lookup is based on CASRNs. Two predictive methods
     are currently implemented. Will automatically select a data source to use
@@ -900,6 +909,11 @@ def UFL(Hc=None, atoms={}, CASRN='', method=None):
     --------
     >>> UFL(CASRN='71-43-2')
     0.086
+    
+    Methane
+    
+    >>> UFL(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
+    0.17
     
     Parameters
     ----------
@@ -943,8 +957,8 @@ def UFL(Hc=None, atoms={}, CASRN='', method=None):
     if not method: 
         UFL = retrieve_any_from_df_dict(UFL_sources, CASRN, 'UFL') 
         if not UFL:
-            if Hc: UFL = Suzuki_UFL(Hc)
-            elif atoms: UFL = Crowl_Louvar_UFL(atoms)
+            if Hc is not None: UFL = Suzuki_UFL(Hc)
+            elif atoms is not None: UFL = Crowl_Louvar_UFL(atoms)
         return UFL
     elif method == SUZUKI:
         return Suzuki_UFL(Hc)
@@ -953,7 +967,8 @@ def UFL(Hc=None, atoms={}, CASRN='', method=None):
     else:
         return retrieve_from_df_dict(UFL_sources, CASRN, 'UFL', method) 
 
-def fire_mixing(ys=None, FLs=None):  # pragma: no cover
+
+def fire_mixing(ys, FLs):
     '''
     Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:
     Fundamentals with Applications. 2E. Upper Saddle River, N.J:
