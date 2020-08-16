@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
+    
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -145,6 +148,7 @@ IARC_codes = {1: 'Carcinogenic to humans (1)',
               12: 'Possibly carcinogenic to humans (2B)',  # 2B
               3: 'Not classifiable as to its carcinogenicity to humans (3)',
               4: 'Probably not carcinogenic to humans (4)'}
+
 folder = os.path.join(os.path.dirname(__file__), 'Safety')
 register_df_source(folder, 'NFPA 497 2008.tsv')
 register_df_source(folder, 'IS IEC 60079-20-1 2010.tsv')
@@ -152,6 +156,7 @@ register_df_source(folder, 'DIPPR Tflash Serat.csv')
 register_df_source(folder, 'National Toxicology Program Carcinogens.tsv')
 register_df_source(folder, 'IARC Carcinogen Database.tsv')
 _safety_data_loaded = False
+
 def _load_safety_data():
     global Ontario_exposure_limits_dict, NFPA_2008_data, IEC_2010_data
     global DIPPR_SERAT_data, NTP_data, IARC_data, Tflash_sources
@@ -280,8 +285,7 @@ ONTARIO = 'Ontario Limits'
 TWA_all_methods = (ONTARIO,)
 
 def TWA_methods(CASRN):
-    """
-    Return all methods available to obtain the Time-Weighted Average exposure  
+    """Return all methods available to obtain the Time-Weighted Average exposure  
     limits (TWA) for the desired chemical.
 
     Parameters
@@ -310,8 +314,7 @@ def TWA_methods(CASRN):
     return []
     
 def TWA(CASRN, method=None):  # pragma: no cover
-    '''
-    This function handles the retrieval of Time-Weighted Average limits on worker
+    '''This function handles the retrieval of Time-Weighted Average limits on worker
     exposure to dangerous chemicals.
     
     Examples
@@ -359,7 +362,7 @@ def STEL_methods(CASRN):
         if (data["STEL (ppm)"] or data["STEL (mg/m^3)"]): return [ONTARIO]
     return []
 
-def STEL(CASRN, method=None):  # pragma: no cover
+def STEL(CASRN, method=None):
     '''
     This function handles the retrieval of Short-term Exposure Limit on
     worker exposure to dangerous chemicals.
@@ -410,7 +413,7 @@ def Ceiling_methods(CASRN):
         if (data["Ceiling (ppm)"] or data["Ceiling (mg/m^3)"]): return [ONTARIO]
     return []
 
-def Ceiling(CASRN, method=None):  # pragma: no cover
+def Ceiling(CASRN, method=None):
     '''
     This function handles the retrieval of Ceiling limits on worker
     exposure to dangerous chemicals.
@@ -546,7 +549,7 @@ def Carcinogen(CASRN, method=None):
     Examples
     --------
     >>> Carcinogen('61-82-5')
-    {'National Toxicology Program 13th Report on Carcinogens': 'Reasonably Anticipated', 'International Agency for Research on Cancer': 'Not classifiable as to its carcinogenicity to humans (3)'}
+    {'International Agency for Research on Cancer': 'Not classifiable as to its carcinogenicity to humans (3)', 'National Toxicology Program 13th Report on Carcinogens': 'Reasonably Anticipated'}
     
     References
     ----------
@@ -754,7 +757,7 @@ CROWLLOUVAR = 'Crowl and Louvar (2001)'
 
 LFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
 
-def LFL_methods(Hc=None, atoms={}, CASRN=''):
+def LFL_methods(Hc=None, atoms=None, CASRN=''):
     """
     Return all methods available to obtain LFL for the desired chemical.
 
@@ -775,13 +778,18 @@ def LFL_methods(Hc=None, atoms={}, CASRN=''):
     See Also
     --------
     LFL
+    
+    Examples
+    --------
+    >>> LFL_methods(Hc=-1e4, atoms={'C': 1, 'H': 4})
+    ['Suzuki (1994)', 'Crowl and Louvar (2001)']
 
     """
     if not _safety_data_loaded: _load_safety_data()
     methods = list_available_methods_from_df_dict(LFL_sources, CASRN, 'LFL')
-    if Hc:
+    if Hc is not None:
         methods.append(SUZUKI)
-    if atoms:
+    if atoms is not None:
         methods.append(CROWLLOUVAR)
     return methods
 
@@ -950,8 +958,10 @@ def fire_mixing(ys=None, FLs=None):  # pragma: no cover
     Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:
     Fundamentals with Applications. 2E. Upper Saddle River, N.J:
     Prentice Hall, 2001.
+    
     >>> fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.012, .053, .031])
-    0.02751172136637643
+    0.02751172136637642
+    
     >>> fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.075, .15, .32])
     0.12927551844869378
     '''
@@ -969,8 +979,7 @@ inerts = {"7440-37-1": "Argon", "124-38-9": "Carbon Dioxide", "7440-59-7":
 
 
 def Suzuki_LFL(Hc):
-    r'''
-    Calculates lower flammability limit, using the Suzuki [1]_ correlation.
+    r'''Calculates lower flammability limit, using the Suzuki [1]_ correlation.
     Uses heat of combustion only.
     
     The lower flammability limit of a gas is air is:
@@ -1003,6 +1012,7 @@ def Suzuki_LFL(Hc):
     Examples
     --------
     Pentane, 1.5 % LFL in literature
+    
     >>> Suzuki_LFL(-3536600)
     0.014276107095811815
     
@@ -1022,16 +1032,20 @@ def Suzuki_UFL(Hc):
     r'''Calculates upper flammability limit, using the Suzuki [1]_ correlation.
     Uses heat of combustion only.
     The upper flammability limit of a gas is air is:
+        
     .. math::
         \text{UFL} = 6.3\Delta H_c^\circ + 0.567\Delta H_c^{\circ 2} + 23.5
+        
     Parameters
     ----------
     Hc : float
         Heat of combustion of gas [J/mol]
+        
     Returns
     -------
     UFL : float
         Upper flammability limit, mole fraction
+        
     Notes
     -----
     UFL in percent volume in air according to original equation.
@@ -1044,11 +1058,14 @@ def Suzuki_UFL(Hc):
     Sample calculations provided for all chemicals, both this method and
     High and Danner. Examples are from the article.
     Predicts a UFL of 1 at 7320190 J and a UFL of 0 at -5554160 J.
+    
     Examples
     --------
     Pentane, literature 7.8% UFL
+    
     >>> Suzuki_UFL(-3536600)
     0.0831119493052
+    
     References
     ----------
     .. [1] Suzuki, Takahiro, and Kozo Koide. "Short Communication: Correlation
@@ -1065,25 +1082,32 @@ def Crowl_Louvar_LFL(atoms):
     r'''Calculates lower flammability limit, using the Crowl-Louvar [1]_
     correlation. Uses molecular formula only.
     The lower flammability limit of a gas is air is:
+        
     .. math::
         C_mH_xO_y + zO_2 \to mCO_2 + \frac{x}{2}H_2O
         \text{LFL} = \frac{0.55}{4.76m + 1.19x - 2.38y + 1}
+        
     Parameters
     ----------
     atoms : dict
         Dictionary of atoms and atom counts
+        
     Returns
     -------
     LFL : float
         Lower flammability limit, mole fraction
+        
     Notes
     -----
     Coefficient of 0.55 taken from [2]_
+    
     Examples
     --------
     Hexane, example from [1]_, lit. 1.2 %
+    
     >>> Crowl_Louvar_LFL({'H': 14, 'C': 6})
     0.011899610558199915
+    
     References
     ----------
     .. [1] Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:
@@ -1109,25 +1133,32 @@ def Crowl_Louvar_UFL(atoms):
     r'''Calculates upper flammability limit, using the Crowl-Louvar [1]_
     correlation. Uses molecular formula only.
     The upper flammability limit of a gas is air is:
+        
     .. math::
         C_mH_xO_y + zO_2 \to mCO_2 + \frac{x}{2}H_2O
         \text{UFL} = \frac{3.5}{4.76m + 1.19x - 2.38y + 1}
+        
     Parameters
     ----------
     atoms : dict
         Dictionary of atoms and atom counts
+        
     Returns
     -------
     UFL : float
         Upper flammability limit, mole fraction
+        
     Notes
     -----
     Coefficient of 3.5 taken from [2]_
+    
     Examples
     --------
     Hexane, example from [1]_, lit. 7.5 %
+    
     >>> Crowl_Louvar_UFL({'H': 14, 'C': 6})
     0.07572479446127219
+    
     References
     ----------
     .. [1] Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:

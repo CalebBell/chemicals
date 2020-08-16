@@ -991,7 +991,7 @@ def Wilke_large(ys, mus, MWs):
     Examples
     --------
     >>> Wilke_large([0.05, 0.95], [1.34E-5, 9.5029E-6], [64.06, 46.07])
-    9.701614885866195e-06
+    9.701614885866193e-06
 
     References
     ----------
@@ -1033,6 +1033,7 @@ def Wilke_large(ys, mus, MWs):
         for j in range(N):
             # sqrt call is important for PyPy to make this fast
             phii_denom = ys[j]/sqrt(8.0*(1.0 + MWi*MW_invs[j]))
+            # Numba sees as 25% performance increase by making this an pow(x, -0.5)
             tot += phii_denom + phii_denom*(mus_inv_MW_roots[j]*MWs_root_invi
                                 + mu_root_invs_MW_25s[j]*MW_25_invi)
         mu += ys[i]*mus[i]/tot
