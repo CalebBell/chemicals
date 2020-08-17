@@ -337,7 +337,16 @@ def test_volume():
     omegas2 = np.array(omegas)
     assert_close(COSTALD_mixture(xs, T, Tcs, Vcs, omegas),
                  chemicals.numba.COSTALD_mixture(xs2, T, Tcs2, Vcs2, omegas2))
-    
+
+@mark_as_numba
+def test_solbility():
+    assert_close(Henry_converter(1.2e-5, old_scale='Hcp', new_scale='SI', rhom=55344.59,  MW=18.01528),
+                 chemicals.numba.Henry_converter(1.2e-5, old_scale='Hcp', new_scale='SI', rhom=55344.59,  MW=18.01528))
+
+@mark_as_numba
+def test_refractivity():
+    assert_close(brix_to_RI(5.8), chemicals.numba.brix_to_RI(5.8))
+
 @mark_as_numba
 def test_rachford_rice():
     n = 10
@@ -443,4 +452,6 @@ def test_lazy_loading():
 Not working:
     
     utils.CAS2int,int2CAS,hash_any_primitive,sorted_CAS_key - no int/str conversion
+    
+    solubility.Henry_pressure_mixture - None issue
 '''

@@ -83,6 +83,7 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'rachford_rice.Rachford_Rice_flash2_f_jac',
              'rachford_rice.Rachford_Rice_valid_solution_naive',
              'flash_basic.flash_wilson',
+             'solubility.Henry_pressure_mixture',
              ]
 
 fluids.numba.transform_lists_to_arrays(chemicals, to_change, __funcs, cache_blacklist=uncachable)
