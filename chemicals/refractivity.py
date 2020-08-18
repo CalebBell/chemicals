@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['RI', 'RI_methods', 'RI_all_methods', 'refractive_index', 
            'polarizability_from_RI', 'molar_refractivity_from_RI', 
@@ -67,9 +69,7 @@ else:
 RI_all_methods = (CRC,)
 
 def RI_methods(CASRN):
-    """
-    Return all methods available to obtain the RI for the desired 
-    chemical.
+    """Return all methods available to obtain the RI for the desired chemical.
 
     Parameters
     ----------
@@ -79,13 +79,12 @@ def RI_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the RI with the given 
+        Methods which can be used to obtain the RI with the given
         inputs.
 
     See Also
     --------
     RI
-
     """
     if not _RI_data_loaded: _load_RI_data()
     return list_available_methods_from_df_dict(RI_sources, CASRN, 'RI')
@@ -352,9 +351,9 @@ ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175
                    1.5205, 1.5234, 1.5262, 1.5291, 1.5320]
 
 def brix_to_RI(brix):
-    ''' Convert a refractive index measurement on the `brix` scale to a 
-    standard refractive index.
-    
+    """Convert a refractive index measurement on the `brix` scale to a standard
+    refractive index.
+
     Parameters
     ----------
     brix : float
@@ -389,12 +388,12 @@ def brix_to_RI(brix):
     .. [1] "Refractometer　Data Book-Refractive Index and Brix | ATAGO CO.,
        LTD." Accessed June 13, 2020. 
        https://www.atago.net/en/databook-refractometer_relationship.php.
-    '''
+    """
     return interp(brix, ICUMSA_1974_brix, ICUMSA_1974_RIs, extrapolate=True)
 
 def RI_to_brix(RI):
-    ''' Convert a standard refractive index measurement to the `brix` scale.
-    
+    """Convert a standard refractive index measurement to the `brix` scale.
+
     Parameters
     ----------
     RI : float
@@ -431,5 +430,5 @@ def RI_to_brix(RI):
     .. [1] "Refractometer　Data Book-Refractive Index and Brix | ATAGO CO.,
        LTD." Accessed June 13, 2020. 
        https://www.atago.net/en/databook-refractometer_relationship.php.
-    '''
+    """
     return interp(RI, ICUMSA_1974_RIs, ICUMSA_1974_brix, extrapolate=True)

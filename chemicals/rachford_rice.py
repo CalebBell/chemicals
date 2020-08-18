@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 
@@ -595,8 +596,7 @@ def Rachford_Rice_err(V_over_F, zs_k_minus_1, K_minus_1):
     
 
 
-def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False,
-                           limit=True):
+def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
     r'''Solves the objective function of the Rachford-Rice flash equation.
     Uses the method proposed in [2]_ to obtain an initial guess.
 
@@ -615,7 +615,9 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False,
     fprime2 : bool, optional
         Whether or not to use the second derivative of the objective function
         in the solver (parabolic Halley’s method is used if True) or not, [-]
-        
+    guess : float, optional
+        Optional initial guess for vapor fraction, [-]
+
     Returns
     -------
     V_over_F : float
@@ -701,13 +703,12 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False,
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
     V_over_F_max = 1./(1.-Kmin)
 
-    if limit:
-        V_over_F_min2 = V_over_F_min if V_over_F_min > 0.0 else 0.0
-        V_over_F_max2 = V_over_F_max if V_over_F_max < 1.0 else 1.0
+    V_over_F_min2 = V_over_F_min
+    V_over_F_max2 = V_over_F_max
+    if guess is not None and guess > V_over_F_min and guess < V_over_F_max:
+        x0 = guess
     else:
-        V_over_F_min2 = V_over_F_min
-        V_over_F_max2 = V_over_F_max
-    x0 = (V_over_F_min2 + V_over_F_max2)*0.5
+        x0 = (V_over_F_min2 + V_over_F_max2)*0.5
     
     K_minus_1 = [0.0]*N
     zs_k_minus_1 = [0.0]*N
@@ -771,11 +772,13 @@ def Rachford_Rice_numpy_err_fprime2(V_over_F, zs_k_minus_1, K_minus_1):
 
 
 
-def Rachford_Rice_solution_numpy(zs, Ks, limit=False):
-    '''Undocumented version of Rachford_Rice_solution which works with numpy
-    instead. Can be up to 15x faster for cases of 30000+ compounds;
-    typically 7-10 x faster.
-    '''
+def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
+    """Undocumented version of Rachford_Rice_solution which works with numpy
+    instead.
+
+    Can be up to 15x faster for cases of 30000+ compounds; typically 7-10 x
+    faster.
+    """
     zs, Ks = np.array(zs), np.array(Ks) # numba: delete
 #    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
 #    for i in range(len(zs)): # numba: uncomment
@@ -803,15 +806,13 @@ def Rachford_Rice_solution_numpy(zs, Ks, limit=False):
 
 #    , one_epsilon_larger
 
-    if limit:
-        # Range will cover a region which has the solution for 0 < VF < 1
-        V_over_F_min2 = max(0., V_over_F_min)
-        V_over_F_max2 = min(1., V_over_F_max)
+    V_over_F_min2 = V_over_F_min
+    V_over_F_max2 = V_over_F_max
+    if guess is not None and guess > V_over_F_min and guess < V_over_F_max:
+        x0 = guess
     else:
-        V_over_F_min2 = V_over_F_min
-        V_over_F_max2 = V_over_F_max
-
-    x0 = (V_over_F_min2 + V_over_F_max2)*0.5
+        x0 = (V_over_F_min2 + V_over_F_max2)*0.5
+    
     
     K_minus_1 = Ks - 1.0
     zs_k_minus_1 = zs*K_minus_1
@@ -1301,7 +1302,7 @@ def flash_inner_loop_list_methods(l):
 
 
 def flash_inner_loop(zs, Ks, get_methods=False, method=None,
-                     limit=True, guess=None, check=False):
+                     guess=None, check=False):
     r'''This function handles the solution of the inner loop of a flash
     calculation, solving for liquid and gas mole fractions and vapor fraction
     based on specified overall mole fractions and K values. As K values are
@@ -1411,7 +1412,7 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
                     else:
                         zs2[i-running_zeros] = zs[i]
                         Ks2[i-running_zeros] = Ks[i]
-                V_over_F, xs, ys = Rachford_Rice_solution(zs2, Ks2)
+                V_over_F, xs, ys = Rachford_Rice_solution(zs2, Ks2, guess)
 
                 # Reset the values into a main array
                 xs2 = [0.0]*l
@@ -1428,7 +1429,7 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
     if method2 == FLASH_INNER_LN2:
         return Rachford_Rice_solution_LN2(zs, Ks, guess)
     elif method2 == FLASH_INNER_SECANT:
-        return Rachford_Rice_solution(zs, Ks, limit=limit)
+        return Rachford_Rice_solution(zs, Ks)
     elif method2 == FLASH_INNER_ANALYTICAL:
         if l == 2:
             z1, z2 = zs
@@ -1441,7 +1442,7 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
             if den != 0.0:
                 V_over_F = t1/den
             else:
-                return Rachford_Rice_solution(zs=zs, Ks=Ks)
+                return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess)
         elif l == 3:
             fail = False
             try:
@@ -1451,7 +1452,7 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
             if not fail and sln[0].imag != 0.0:
                 fail = True
             if fail:
-                return Rachford_Rice_solution(zs=zs, Ks=Ks)
+                return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess)
             return sln
         elif l == 4:
             return Rachford_Rice_solution_polynomial(zs, Ks)
@@ -1477,13 +1478,13 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
     
     elif method2 == FLASH_INNER_NUMPY:
         try:
-            return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks, limit=limit)
+            return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks, guess=guess)
         except:
-            return Rachford_Rice_solution(zs=zs, Ks=Ks, limit=limit)
+            return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess)
     elif method2 == FLASH_INNER_NR:
-        return Rachford_Rice_solution(zs=zs, Ks=Ks, limit=limit, fprime=True)
+        return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess, fprime=True)
     elif method2 == FLASH_INNER_HALLEY:
-        return Rachford_Rice_solution(zs=zs, Ks=Ks, limit=limit, fprime=True, 
+        return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess, fprime=True, 
                                       fprime2=True)
     
     elif method2 == FLASH_INNER_LJA:

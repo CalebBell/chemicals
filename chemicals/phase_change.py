@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm', 
            'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen', 
@@ -127,9 +128,7 @@ else:
 Tb_all_methods = (CRC_INORG, CRC_ORG, YAWS)
 
 def Tb_methods(CASRN):
-    """
-    Return all methods available to obtain the Tb for the desired 
-    chemical.
+    """Return all methods available to obtain the Tb for the desired chemical.
 
     Parameters
     ----------
@@ -144,7 +143,6 @@ def Tb_methods(CASRN):
     See Also
     --------
     Tb
-
     """
     if not _phase_change_const_loaded: _load_phase_change_constants()
     return list_available_methods_from_df_dict(Tb_sources, CASRN, 'Tb')
@@ -155,7 +153,7 @@ def Tb(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Prefered sources are 'CRC Physical Constants, organic' for organic
+    Preferred sources are 'CRC Physical Constants, organic' for organic
     chemicals, and 'CRC Physical Constants, inorganic' for inorganic
     chemicals. Function has data for approximately 13000 chemicals.
 
@@ -214,9 +212,7 @@ def Tb(CASRN, method=None):
 Tm_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
 
 def Tm_methods(CASRN):
-    """
-    Return all methods available to obtain the Tm for the desired 
-    chemical.
+    """Return all methods available to obtain the Tm for the desired chemical.
 
     Parameters
     ----------
@@ -231,7 +227,6 @@ def Tm_methods(CASRN):
     See Also
     --------
     Tm
-
     """
     if not _phase_change_const_loaded: _load_phase_change_constants()
     return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Tm')
@@ -242,7 +237,7 @@ def Tm(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Prefered sources are 'Open Notebook Melting Points', with backup sources
+    Preferred sources are 'Open Notebook Melting Points', with backup sources
     'CRC Physical Constants, organic' for organic chemicals, and
     'CRC Physical Constants, inorganic' for inorganic chemicals. Function has
     data for approximately 14000 chemicals.
@@ -924,9 +919,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
 Hfus_all_methods = (CRC,)
 
 def Hfus_methods(CASRN):
-    """
-    Return all methods available to obtain the Hfus for the desired 
-    chemical.
+    """Return all methods available to obtain the Hfus for the desired chemical.
 
     Parameters
     ----------
@@ -941,7 +934,6 @@ def Hfus_methods(CASRN):
     See Also
     --------
     Hfus
-
     """
     if not _phase_change_const_loaded: _load_phase_change_constants()
     return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
@@ -952,7 +944,7 @@ def Hfus(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    The prefered source is 'CRC'. Function has data for approximately 1100 
+    The Preferred source is 'CRC'. Function has data for approximately 1100 
     chemicals.
 
     Parameters

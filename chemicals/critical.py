@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,12 +19,68 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+
+This module contains lookup functions for critical temperature, 
+critical pressure, critical volume, and critical compressibility factors.
+It also includes a few relationships between the critical properties, and a 
+variety of critical mixture property estimation routines.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Critical Temperature
+--------------------
+.. autofunction:: chemicals.critical.Tc
+.. autofunction:: chemicals.critical.Tc_methods
+.. autodata:: chemicals.critical.Tc_all_methods
+
+Critical Pressure
+-----------------
+.. autofunction:: chemicals.critical.Pc
+.. autofunction:: chemicals.critical.Pc_methods
+.. autodata:: chemicals.critical.Pc_all_methods
+
+Critical Volume
+---------------
+.. autofunction:: chemicals.critical.Vc
+.. autofunction:: chemicals.critical.Vc_methods
+.. autodata:: chemicals.critical.Vc_all_methods
+.. autofunction:: chemicals.critical.Mersmann_Kind_predictor
+
+Critical Compressibility Factor
+-------------------------------
+.. autofunction:: chemicals.critical.Zc
+.. autofunction:: chemicals.critical.Zc_methods
+.. autodata:: chemicals.critical.Zc_all_methods
+
+Critical Property Relationships
+-------------------------------
+.. autofunction:: chemicals.critical.critical_surface
+.. autofunction:: chemicals.critical.critical_surface_methods
+.. autodata:: chemicals.critical.critical_surface_all_methods
+.. autofunction:: chemicals.critical.third_property
+.. autofunction:: chemicals.critical.Ihmels
+.. autofunction:: chemicals.critical.Meissner
+.. autofunction:: chemicals.critical.Grigoras
+
+
+Critical Temperature of Mixtures
+--------------------------------
+.. autofunction:: chemicals.critical.Li
+.. autofunction:: chemicals.critical.Chueh_Prausnitz_Tc
+.. autofunction:: chemicals.critical.Grieves_Thodos
+.. autofunction:: chemicals.critical.modified_Wilson_Tc
+
+Critical Volume of Mixtures
+---------------------------
+.. autofunction:: chemicals.critical.Chueh_Prausnitz_Vc
+.. autofunction:: chemicals.critical.modified_Wilson_Vc
+"""
 
 __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
-           'critical_point_temperature',
-           'critical_point_pressure', 
-           'critical_point_volume',
            'Mersmann_Kind_predictor', 
            'third_property', 
            'critical_surface', 
@@ -37,6 +94,8 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
            'Tc_all_methods', 'Pc_all_methods', 
            'Vc_all_methods', 'Zc_all_methods', 
            'critical_surface_all_methods']
+
+__numba_additional_funcs__ = ['_assert_two_critical_properties_provided']
 
 import os
 from fluids.constants import R_inv, N_A
@@ -55,7 +114,7 @@ PSRK = 'PSRK'
 PD = 'PD'
 YAWS = 'YAWS'
 
-# %% Register data sources and lazy load them
+### Register data sources and lazy load them
 
 def _add_Zc_to_df(df):
     # Some files don't have the `Zc` column; this adds it
@@ -126,13 +185,13 @@ else: # pragma: no cover
     if can_load_data:
         _load_critical_data()
 
-# %% Critical point functions
+### Critical point functions
 
 Tc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
+'''Tuple of method name keys. See the `Tc` for the actual references'''
 
 def Tc_methods(CASRN):
-    """
-    Return all methods available to obtain Tc for the desired chemical.
+    """Return all methods available to obtain Tc for the desired chemical.
 
     Parameters
     ----------
@@ -147,7 +206,6 @@ def Tc_methods(CASRN):
     See Also
     --------
     Tc
-
     """
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Tc_sources, CASRN, 'Tc')
@@ -158,7 +216,7 @@ def Tc(CASRN, get_methods=False, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Prefered sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
+    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
     inorganic chemicals. Function has data for approximately 1000 chemicals.
 
     Parameters
@@ -195,10 +253,6 @@ def Tc(CASRN, get_methods=False, method=None):
           data published in [16]_
         * 'Yaws Critical Properties', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
-        * Critical Surface', an estimation method using a
-          simple quadratic method for estimating Tc from Pc and Vc. This is
-          ignored and not returned as a method by default, as no compounds
-          have values of Pc and Vc but not Tc currently.
 
     Examples
     --------
@@ -288,13 +342,12 @@ def Tc(CASRN, get_methods=False, method=None):
         return retrieve_from_df_dict(Tc_sources, CASRN, 'Tc', method) 
     else:
         return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc') 
-critical_point_temperature = Tc
 
 Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
+'''Tuple of method name keys. See the `Pc` for the actual references'''
 
 def Pc_methods(CASRN):
-    """
-    Return all methods available to obtain Pc for the desired chemical.
+    """Return all methods available to obtain Pc for the desired chemical.
 
     Parameters
     ----------
@@ -309,7 +362,6 @@ def Pc_methods(CASRN):
     See Also
     --------
     Pc
-
     """
     return list_available_methods_from_df_dict(Pc_sources, CASRN, 'Pc')
     
@@ -320,8 +372,8 @@ def Pc(CASRN, get_methods=False, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Prefered sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
-    inorganic chemicals. Function has data for approximately 1000 chemicals.
+    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
+    inorganic chemicals. Function has data for approximately 7500 chemicals.
 
     Examples
     --------
@@ -445,13 +497,12 @@ def Pc(CASRN, get_methods=False, method=None):
         return retrieve_from_df_dict(Pc_sources, CASRN, 'Pc', method) 
     else:
         return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc') 
-critical_point_pressure = Pc
 
 Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
+'''Tuple of method name keys. See the `Vc` for the actual references'''
 
 def Vc_methods(CASRN):
-    """
-    Return all methods available to obtain Vc for the desired chemical.
+    """Return all methods available to obtain Vc for the desired chemical.
 
     Parameters
     ----------
@@ -466,7 +517,6 @@ def Vc_methods(CASRN):
     See Also
     --------
     Vc
-
     """
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Vc_sources, CASRN, 'Vc')
@@ -477,8 +527,8 @@ def Vc(CASRN, get_methods=False, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Prefered sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
-    inorganic chemicals. Function has data for approximately 1000 chemicals.
+    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
+    inorganic chemicals. Function has data for approximately 7500 chemicals.
 
     Examples
     --------
@@ -596,13 +646,12 @@ def Vc(CASRN, get_methods=False, method=None):
         return retrieve_from_df_dict(Vc_sources, CASRN, 'Vc', method)
     else:
         return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc') 
-critical_point_volume = Vc
 
 Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
+'''Tuple of method name keys. See the `Zc` for the actual references'''
 
 def Zc_methods(CASRN):
-    """
-    Return all methods available to obtain Zc for the desired chemical.
+    """Return all methods available to obtain Zc for the desired chemical.
 
     Parameters
     ----------
@@ -617,7 +666,6 @@ def Zc_methods(CASRN):
     See Also
     --------
     Zc
-
     """
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Zc_sources, CASRN, 'Zc')
@@ -628,8 +676,8 @@ def Zc(CASRN, method=None):
     data source to use if no method is provided; returns None if the data is
     not available.
 
-    Prefered sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
-    inorganic chemicals. Function has data for approximately 1000 chemicals.
+    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
+    inorganic chemicals. Function has data for approximately 7500 chemicals.
 
     Examples
     --------
@@ -747,7 +795,6 @@ def Zc(CASRN, method=None):
         return retrieve_from_df_dict(Zc_sources, CASRN, 'Zc', method)
     else:
         return retrieve_any_from_df_dict(Zc_sources, CASRN, 'Zc') 
-compressibility_factor = Zc
 
 rcovs_Mersmann_Kind = {'C': 0.77, 'Cl': 0.99, 'I': 1.33, 'H': 0.37, 'F': 0.71, 
                        'S': 1.04, 'O': 0.6, 'N': 0.71, 'Si': 1.17, 'Br': 1.14}
@@ -832,7 +879,7 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
     
     Notes
     -----    
-    Using the :obj:`thermo.elements.periodic_table` covalent radii (from RDKit), 
+    Using the :obj:`chemicals.elements.periodic_table` covalent radii (from RDKit), 
     the coefficient and power should be 4.261206523632586 and 0.5597281770786228
     respectively for best results.
     
@@ -885,8 +932,15 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
 
 ### Critical Property Relationships
 
-def _assert_two_critical_properties_provided(critical_properties):
-    if sum([bool(i) for i in critical_properties]) != 2:
+def _assert_two_critical_properties_provided(Tc, Pc, Vc):
+    specs = 0 # numba compatibility
+    if Tc is not None:
+        specs += 1
+    if Pc is not None:
+        specs += 1
+    if Vc is not None:
+        specs += 1
+    if specs != 2:
         raise ValueError('Two and only two of Tc, Pc, and Vc must be provided')
 
 def Ihmels(Tc=None, Pc=None, Vc=None):
@@ -935,22 +989,22 @@ def Ihmels(Tc=None, Pc=None, Vc=None):
        & Engineering Data 55, no. 9 (September 9, 2010): 3474-80.
        doi:10.1021/je100167w.
     '''
-    _assert_two_critical_properties_provided([Tc, Pc, Vc])
-    if Tc and Vc:
+    _assert_two_critical_properties_provided(Tc, Pc, Vc)
+    if Tc is not None and Vc is not None:
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
-        Pc = -0.025+2.215*Tc/Vc
-        Pc = Pc*1E6  # MPa to Pa
-        return Pc
-    elif Tc and Pc:
-        Pc = Pc/1E6  # Pa to MPa
-        Vc = 443*Tc/(200*Pc+5)
-        Vc = Vc/1E6  # cm^3/mol to m^3/mol
-        return Vc
+        Pc_calc = -0.025+2.215*Tc/Vc
+        Pc_calc = Pc_calc*1E6  # MPa to Pa
+        return Pc_calc
+    elif Tc is not None and Pc is not None:
+        Pc = Pc*1e-6  # Pa to MPa
+        Vc_calc = 443.0*Tc/(200.0*Pc+5.0)
+        Vc_calc = Vc_calc/1E6  # cm^3/mol to m^3/mol
+        return Vc_calc
     else: # Pc and Vc
-        Pc = Pc/1E6  # Pa to MPa
+        Pc = Pc*1e-6  # Pa to MPa
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
-        Tc = 5.0/443*(40*Pc*Vc + Vc)
-        return Tc
+        Tc_calc = 5.0/443.0*(40.0*Pc*Vc + Vc)
+        return Tc_calc
 
 def Meissner(Tc=None, Pc=None, Vc=None):
     r'''Old (1942) relationship for estimating critical
@@ -998,7 +1052,7 @@ def Meissner(Tc=None, Pc=None, Vc=None):
            Constants." Industrial & Engineering Chemistry 34, no. 5
            (May 1, 1942): 521-26. doi:10.1021/ie50389a003.
     '''
-    _assert_two_critical_properties_provided([Tc, Pc, Vc])
+    _assert_two_critical_properties_provided(Tc, Pc, Vc)
     if Tc and Vc:
         Vc = Vc*1E6
         Pc = 20.8*Tc/(Vc-8)
@@ -1063,7 +1117,7 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
            Chemistry 11, no. 4 (May 1, 1990): 493-510.
            doi:10.1002/jcc.540110408
     '''
-    _assert_two_critical_properties_provided([Tc, Pc, Vc])
+    _assert_two_critical_properties_provided(Tc, Pc, Vc)
     if Tc and Vc:
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Pc = 2.9 + 20.2*Tc/Vc
@@ -1086,9 +1140,8 @@ GRIGORAS = 'GRIGORAS'
 critical_surface_all_methods = (IHMELS, MEISSNER, GRIGORAS)
 
 def critical_surface_methods(Tc=None, Pc=None, Vc=None):
-    """
-    Return all methods available to obtain the third critial property for 
-    the desired chemical.
+    """Return all methods available to obtain the third critial property for the
+    desired chemical.
 
     Parameters
     ----------
@@ -1102,20 +1155,21 @@ def critical_surface_methods(Tc=None, Pc=None, Vc=None):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the third critical property with 
+        Methods which can be used to obtain the third critical property with
         the given inputs.
 
     See Also
     --------
     critical_surface
-
     """
-    if (Tc and Pc) or (Tc and Vc) or (Pc and Vc):
+    if ((Tc is not None and Pc is not None) 
+         or (Tc is not None and Vc is not None) 
+         or (Pc is not None and Vc is not None)):
         return list(critical_surface_all_methods)
     else:
         return []
 
-def critical_surface(Tc=None, Pc=None, Vc=None, get_methods=False,
+def critical_surface(Tc=None, Pc=None, Vc=None,
                      method=None):
     r'''Function for calculating a critical property of a substance from its
     other two critical properties. Calls functions Ihmels, Meissner, and
@@ -1151,14 +1205,13 @@ def critical_surface(Tc=None, Pc=None, Vc=None, get_methods=False,
     
     '''
     if not method or method == IHMELS:
-        Third = Ihmels(Tc=Tc, Pc=Pc, Vc=Vc)
+        return Ihmels(Tc=Tc, Pc=Pc, Vc=Vc)
     elif method == MEISSNER:
-        Third = Meissner(Tc=Tc, Pc=Pc, Vc=Vc)
+        return Meissner(Tc=Tc, Pc=Pc, Vc=Vc)
     elif method == GRIGORAS:
-        Third = Grigoras(Tc=Tc, Pc=Pc, Vc=Vc)
+        return Grigoras(Tc=Tc, Pc=Pc, Vc=Vc)
     else:
         raise ValueError('invalid method %s'%method)
-    return Third
 
 def third_property(CASRN=None, T=False, P=False, V=False):
     r'''Function for calculating a critical property of a substance from its
@@ -1196,24 +1249,31 @@ def third_property(CASRN=None, T=False, P=False, V=False):
     >>> third_property('110-15-6', P=True)
     6095016.233766234
     '''
-    if sum([T, P, V]) != 1:
-        raise ValueError("only one of the following arguments can be True: T, P, V")
-    Third = None
+    specs = 0
+    if T:
+        specs += 1
+    if P:
+        specs += 1
     if V:
-        Tc = critical_point_temperature(CASRN)
-        Pc = critical_point_pressure(CASRN)
-        if Tc is not None and Pc is not None:
-            return critical_surface(Tc=Tc, Pc=Pc)
+        specs += 1
+    if specs != 1:
+        raise ValueError("Only one of the following arguments can be True: T, P, V")
+    if V:
+        Tc_value = Tc(CASRN)
+        Pc_value = Pc(CASRN)
+        if Tc_value is not None and Pc_value is not None:
+            return critical_surface(Tc=Tc_value, Pc=Pc_value)
     elif P:
-        Tc = critical_point_temperature(CASRN)
-        Vc = critical_point_volume(CASRN)
-        if Tc is not None and Vc is not None:
-            return critical_surface(Tc=Tc, Vc=Vc)
+        Tc_value = Tc(CASRN)
+        Vc_value = Vc(CASRN)
+        if Tc_value is not None and Vc_value is not None:
+            return critical_surface(Tc=Tc_value, Vc=Vc_value)
     else:
-        Pc = critical_point_pressure(CASRN)
-        Vc = critical_point_volume(CASRN)
-        if Pc is not None and Vc is not None:
-            return critical_surface(Pc=Pc, Vc=Vc)
+        Pc_value = Pc(CASRN)
+        Vc_value = Vc(CASRN)
+        if Pc_value is not None and Vc_value is not None:
+            return critical_surface(Pc=Pc_value, Vc=Vc_value)
+    # Fallthrough to this clause when one or both of the looked up properties fail
     raise ValueError("Could not find the required two properties")
 
 ### Crtical Temperature of Mixtures - Estimation routines
@@ -1271,9 +1331,13 @@ def Li(zs, Tcs, Vcs):
        The Canadian Journal of Chemical Engineering 49, no. 5
        (October 1, 1971): 709-10. doi:10.1002/cjce.5450490529.
     '''
-    denominator_inv = 1.0/sum(zs[i]*Vcs[i] for i in range(len(zs)))
-    Tcm = 0
-    for i in range(len(zs)):
+    N = len(zs)
+    denominator_inv = 0.0
+    for i in range(N):
+        denominator_inv += zs[i]*Vcs[i]
+    denominator_inv = 1.0/denominator_inv
+    Tcm = 0.0
+    for i in range(N):
         Tcm += zs[i]*Vcs[i]*Tcs[i]*denominator_inv
     return Tcm
 
@@ -1301,7 +1365,7 @@ def Chueh_Prausnitz_Tc(zs, Tcs, Vcs, taus):
     Vcs : array-like
         Critical volumes of all components, [m^3/mol]
     taus : array-like of shape `zs` by `zs`
-        Interaction parameters
+        Interaction parameters, [-]
 
     Returns
     -------
@@ -1319,7 +1383,7 @@ def Chueh_Prausnitz_Tc(zs, Tcs, Vcs, taus):
     >>> Chueh_Prausnitz_Tc([0.6449, 0.2359, 0.1192], [425.12, 469.7, 507.6],
     ... [0.000255, 0.000313, 0.000371], [[0, 1.92681, 6.80358],
     ... [1.92681, 0, 1.89312], [ 6.80358, 1.89312, 0]])
-    450.1225764723492
+    450.122576472349
 
     References
     ----------
@@ -1332,12 +1396,20 @@ def Chueh_Prausnitz_Tc(zs, Tcs, Vcs, taus):
        Extending Fast Estimation Methods." Fluid Phase Equilibria 392
        (April 25, 2015): 104-26. doi:10.1016/j.fluid.2015.02.001.
     '''
-    denominator = sum(zs[i]*Vcs[i]**(2/3.) for i in range(len(zs)))
-    Tcm = 0
-    for i in range(len(zs)):
-        Tcm += zs[i]*Vcs[i]**(2/3.)*Tcs[i]/denominator
-        for j in range(len(zs)):
-            Tcm += (zs[i]*Vcs[i]**(2/3.)/denominator)*(zs[j]*Vcs[j]**(2/3.)/denominator)*taus[i][j]
+    N = len(zs)
+    denominator_inv = 0.0
+    zi_Vc_23s = [0.0]*N
+    for i in range(N):
+        v = zs[i]*Vcs[i]**(2.0/3.)
+        zi_Vc_23s[i] = v
+        denominator_inv += v
+    denominator_inv = 1.0/denominator_inv
+    Tcm = 0.0
+    for i in range(N):
+        Tcm += zi_Vc_23s[i]*Tcs[i]
+        for j in range(N):
+            Tcm += zi_Vc_23s[i]*(zi_Vc_23s[j]*denominator_inv)*taus[i][j]
+    Tcm *= denominator_inv
     return Tcm
 
 def Grieves_Thodos(zs, Tcs, Aijs):
@@ -1389,9 +1461,14 @@ def Grieves_Thodos(zs, Tcs, Aijs):
        Extending Fast Estimation Methods." Fluid Phase Equilibria 392
        (April 25, 2015): 104-26. doi:10.1016/j.fluid.2015.02.001.
     '''
+    N = len(zs)
     Tcm = 0.0
-    for i in range(len(zs)):
-        Tcm += Tcs[i]/(1. + 1./zs[i]*sum(Aijs[i][j]*zs[j] for j in range(len(zs))))
+    for i in range(N):
+        tot = 0.0
+        row = Aijs[i]
+        for j in range(N):
+            tot += row[j]*zs[j]
+        Tcm += Tcs[i]/(1. + 1./zs[i]*tot)
     return Tcm
 
 def modified_Wilson_Tc(zs, Tcs, Aijs):
@@ -1435,7 +1512,7 @@ def modified_Wilson_Tc(zs, Tcs, Aijs):
     >>> modified_Wilson_Tc([0.6449, 0.2359, 0.1192], [425.12, 469.7, 507.6],
     ... [[0, 1.174450, 1.274390], [0.835914, 0, 1.21038],
     ... [0.746878, 0.80677, 0]])
-    450.0305966823031
+    450.03059668230316
 
     References
     ----------
@@ -1448,10 +1525,18 @@ def modified_Wilson_Tc(zs, Tcs, Aijs):
        Extending Fast Estimation Methods." Fluid Phase Equilibria 392
        (April 25, 2015): 104-26. doi:10.1016/j.fluid.2015.02.001.
     '''
-    C = -2500.0
-    Tcm = sum(zs[i]*Tcs[i] for i in range(len(zs)))
-    for i in range(len(zs)):
-        Tcm += C*zs[i]*log(zs[i] + sum(zs[j]*Aijs[i][j] for j in range(len(zs))))
+    N = len(zs)
+    Tcm = 0.0
+    for i in range(N):
+        Tcm += zs[i]*Tcs[i]
+    Tcm_add = 0.0
+    for i in range(N):
+        tot = 0.0
+        row = Aijs[i]
+        for j in range(N):
+            tot += zs[j]*row[j]
+        Tcm_add += zs[i]*log(zs[i] + tot)
+    Tcm += -2500.0*Tcm_add
     return Tcm
 
 ### Crtical Volume of Mixtures
@@ -1501,12 +1586,23 @@ def Chueh_Prausnitz_Vc(zs, Vcs, nus):
        Extending Fast Estimation Methods." Fluid Phase Equilibria 386
        (January 25, 2015): 13-29. doi:10.1016/j.fluid.2014.11.008.
     '''
-    denominator = sum(zs[i]*Vcs[i]**(2/3.) for i in range(len(zs)))
-    Vcm = 0
-    for i in range(len(zs)):
-        Vcm += zs[i]*Vcs[i]**(2/3.)*Vcs[i]/denominator
-        for j in range(len(zs)):
-            Vcm += (zs[i]*Vcs[i]**(2/3.)/denominator)*(zs[j]*Vcs[j]**(2/3.)/denominator)*nus[i][j]/1E6
+    N = len(zs)
+    denominator_inv = 0.0
+    zi_Vc_23s = [0.0]*N
+    for i in range(N):
+        v = zs[i]*Vcs[i]**(2.0/3.)
+        zi_Vc_23s[i] = v
+        denominator_inv += v
+    denominator_inv = 1.0/denominator_inv
+    
+    Vcm = 0.0
+    for i in range(N):
+        Vcm += zi_Vc_23s[i]*Vcs[i]
+        Vcm_tot = 0.0
+        for j in range(N):
+            Vcm_tot += zi_Vc_23s[i]*zi_Vc_23s[j]*nus[i][j]
+        Vcm += Vcm_tot*1e-6*denominator_inv
+    Vcm *= denominator_inv
     return Vcm
 
 
@@ -1565,8 +1661,16 @@ def modified_Wilson_Vc(zs, Vcs, Aijs):
        Extending Fast Estimation Methods." Fluid Phase Equilibria 392
        (April 25, 2015): 104-26. doi:10.1016/j.fluid.2015.02.001.
     '''
-    C = -2500.0
-    Vcm = sum(zs[i]*Vcs[i] for i in range(len(zs)))
-    for i in range(len(zs)):
-            Vcm += C*zs[i]*log(zs[i] + sum(zs[j]*Aijs[i][j] for j in range(len(zs))))/1E6
+    N = len(zs)
+    Vcm = 0.0
+    for i in range(N):
+        Vcm += zs[i]*Vcs[i]
+    Vcm_add = 0.0
+    for i in range(N):
+        tot = 0.0
+        row = Aijs[i]
+        for j in range(N):
+            tot += zs[j]*row[j]
+        Vcm_add += zs[i]*log(zs[i] + tot)
+    Vcm += -2500.0*Vcm_add*1e-6
     return Vcm

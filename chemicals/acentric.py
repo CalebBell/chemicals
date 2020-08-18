@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,34 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+
+This module contains a lookup function, a definition function, and correlations
+for a chemical's `acentric` factor, normally given the variable :math:`\omega`.
+
+A similar variable called the `stiel polar factor` can be calculated from its
+definition as well.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Lookup Functions
+----------------
+.. autofunction:: chemicals.acentric.omega
+.. autofunction:: chemicals.acentric.omega_methods
+.. autodata:: chemicals.acentric.omega_all_methods
+
+Definitions
+-----------
+.. autofunction:: chemicals.acentric.omega_definition
+.. autofunction:: chemicals.acentric.Stiel_polar_factor
+
+Correlations
+------------
+.. autofunction:: chemicals.acentric.LK_omega
+"""
 
 __all__ = ['omega', 'LK_omega', 'Stiel_polar_factor',
            'omega_methods', 'omega_all_methods', 'omega_definition']
@@ -30,10 +58,11 @@ from chemicals.data_reader import (retrieve_from_df_dict,
                                    list_available_methods_from_df_dict)
 
 omega_all_methods = ('PSRK', 'PD', 'YAWS')
+'''Tuple of method name keys. See the `omega` for the actual references'''
 
 def omega_methods(CASRN):
-    """
-    Return all methods available for obtaining omega for the desired chemical.
+    """Return all methods available for obtaining omega for the desired
+    chemical.
 
     Parameters
     ----------
@@ -48,15 +77,14 @@ def omega_methods(CASRN):
     See Also
     --------
     omega
-
     """
     return list_available_methods_from_df_dict(critical.omega_sources, CASRN, 'omega')
 
 def omega(CASRN, method=None):
     r'''Retrieve a chemical's acentric factor, `omega`.
 
-    Will automatically select a method to use if no method is provided;
-    returns None if the data is not available and cannot be calculated.
+    Automatically select a method to use if no method is provided;
+    returns None if the data is not available.
 
     .. math::
         \omega \equiv -\log_{10}\left[\lim_{T/T_c=0.7}(P^{sat}/P_c)\right]-1.0
@@ -181,12 +209,12 @@ def LK_omega(Tb, Tc, Pc):
 
     Notes
     -----
-    Internal units are atmosphere and Kelvin.
-    Example value from Reid (1987). Using ASPEN V8.4, LK method gives 0.325595.
+    The units of the above equation are atmosphere and Kelvin; values are 
+    converted internally.
 
     Examples
     --------
-    Isopropylbenzene
+    Isopropylbenzene, from Reid (1987).
 
     >>> LK_omega(425.6, 631.1, 32.1E5)
     0.32544249926397856
@@ -212,9 +240,6 @@ def Stiel_polar_factor(Psat, Pc, omega):
     Requires the vapor pressure `Psat` at a reduced temperature of 0.6,
     the critical pressure `Pc`, and the acentric factor `omega`.
 
-    Will automatically select a method to use if no method is provided;
-    returns None if the data is not available and cannot be calculated.
-
     .. math::
         x = \log P_r|_{T_r=0.6} + 1.70 \omega + 1.552
 
@@ -234,12 +259,13 @@ def Stiel_polar_factor(Psat, Pc, omega):
 
     Notes
     -----
-
     A few points have also been published in [2]_, which may be used for
     comparison. Currently this is only used for a surface tension correlation.
 
     Examples
     --------
+    Calculating the factor for water:
+    
     >>> Stiel_polar_factor(Psat=169745, Pc=22048321.0, omega=0.344)
     0.02322146744772713
 
@@ -255,5 +281,3 @@ def Stiel_polar_factor(Psat, Pc, omega):
     Pr = Psat/Pc
     factor = log10(Pr) + 1.70*omega + 1.552
     return factor
-
-

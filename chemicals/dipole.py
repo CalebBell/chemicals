@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,22 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+
+This module contains lookup functions for the property dipole moment.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Lookup Functions
+----------------
+.. autofunction:: chemicals.dipole.dipole_moment
+.. autofunction:: chemicals.dipole.dipole_moment_methods
+.. autodata:: chemicals.dipole.dipole_moment_all_methods
+
+"""
 __all__ = ['dipole_moment', 
            'dipole_moment_methods',
            'dipole_moment_all_methods']
@@ -69,10 +85,10 @@ else: # pragma: no cover
 # %% Dipole moment functions
 
 dipole_moment_all_methods = (CCCBDB, MULLER, POLING)
+'''Tuple of method name keys. See the `dipole` for the actual references'''
 
 def dipole_moment_methods(CASRN):
-    """
-    Return all methods available to obtain the dipole moment for the desired 
+    """Return all methods available to obtain the dipole moment for the desired
     chemical.
 
     Parameters
@@ -83,13 +99,12 @@ def dipole_moment_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the dipole moment with the given 
+        Methods which can be used to obtain the dipole moment with the given
         inputs.
 
     See Also
     --------
     dipole_moment
-
     """
     if not _dipole_data_loaded: _load_dipole_data()
     return list_available_methods_from_df_dict(dipole_sources, CASRN, 'Dipole')
@@ -99,7 +114,7 @@ def dipole_moment(CASRN, get_methods=False, method=None):
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
-    Prefered source is 'CCCBDB'. Considerable variation in reported data has
+    Preferred source is 'CCCBDB'. Considerable variation in reported data has
     found.
 
     Parameters
@@ -162,4 +177,4 @@ def dipole_moment(CASRN, get_methods=False, method=None):
     if method:
         return retrieve_from_df_dict(dipole_sources, CASRN, 'Dipole', method) 
     else:
-        return retrieve_any_from_df_dict(dipole_sources, CASRN, 'Dipole') 
+        return retrieve_any_from_df_dict(dipole_sources, CASRN, 'Dipole')

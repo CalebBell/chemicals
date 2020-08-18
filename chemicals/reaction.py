@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s', 
            'Hfl_methods', 'Hfg_methods', 'Hfs_methods',
@@ -109,9 +110,7 @@ else:
 Hfs_all_methods = (CRC,)
 
 def Hfs_methods(CASRN):
-    """
-    Return all methods available to obtain the Hfs for the desired 
-    chemical.
+    """Return all methods available to obtain the Hfs for the desired chemical.
 
     Parameters
     ----------
@@ -121,13 +120,12 @@ def Hfs_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Hfs with the given 
+        Methods which can be used to obtain the Hfs with the given
         inputs.
 
     See Also
     --------
     Hfs
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfs_sources, CASRN, 'Hfs')
@@ -186,9 +184,7 @@ def Hfs(CASRN, method=None):
 Hfl_all_methods = (ATCT_L, CRC)
 
 def Hfl_methods(CASRN):
-    """
-    Return all methods available to obtain the Hfl for the desired 
-    chemical.
+    """Return all methods available to obtain the Hfl for the desired chemical.
 
     Parameters
     ----------
@@ -198,13 +194,12 @@ def Hfl_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Hfl with the given 
+        Methods which can be used to obtain the Hfl with the given
         inputs.
 
     See Also
     --------
     Hfl
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfl_sources, CASRN, 'Hfl')
@@ -266,9 +261,7 @@ def Hfl(CASRN, method=None):
 Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS)
 
 def Hfg_methods(CASRN):
-    """
-    Return all methods available to obtain the Hfg for the desired 
-    chemical.
+    """Return all methods available to obtain the Hfg for the desired chemical.
 
     Parameters
     ----------
@@ -278,13 +271,12 @@ def Hfg_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Hfg with the given 
+        Methods which can be used to obtain the Hfg with the given
         inputs.
 
     See Also
     --------
     Hfg
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfg_sources, CASRN, 'Hfg')
@@ -364,9 +356,7 @@ def Hfg(CASRN, method=None):
 S0s_all_methods = (CRC,)
 
 def S0s_methods(CASRN):
-    """
-    Return all methods available to obtain the S0s for the desired 
-    chemical.
+    """Return all methods available to obtain the S0s for the desired chemical.
 
     Parameters
     ----------
@@ -376,13 +366,12 @@ def S0s_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the S0s with the given 
+        Methods which can be used to obtain the S0s with the given
         inputs.
 
     See Also
     --------
     S0s
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0s_sources, CASRN, 'S0s')
@@ -435,9 +424,7 @@ def S0s(CASRN, method=None):
 S0l_all_methods = (CRC,)
 
 def S0l_methods(CASRN):
-    """
-    Return all methods available to obtain the S0l for the desired 
-    chemical.
+    """Return all methods available to obtain the S0l for the desired chemical.
 
     Parameters
     ----------
@@ -447,13 +434,12 @@ def S0l_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the S0l with the given 
+        Methods which can be used to obtain the S0l with the given
         inputs.
 
     See Also
     --------
     S0l
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0l_sources, CASRN, 'S0l')
@@ -512,9 +498,7 @@ def S0l(CASRN, method=None):
 S0g_all_methods = (CRC, YAWS)
 
 def S0g_methods(CASRN):
-    """
-    Return all methods available to obtain the S0g for the desired 
-    chemical.
+    """Return all methods available to obtain the S0g for the desired chemical.
 
     Parameters
     ----------
@@ -524,13 +508,12 @@ def S0g_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the S0g with the given 
+        Methods which can be used to obtain the S0g with the given
         inputs.
 
     See Also
     --------
     S0g
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0g_sources, CASRN, 'S0g')

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 from chemicals import *
@@ -132,6 +133,36 @@ def test_mixing_simple():
     b = np.array([.01, .02])
     val = chemicals.numba.mixing_logarithmic(a, b)
     assert_close(val, 0.01866065983073615, rtol=1e-13)
+    
+    
+@mark_as_numba
+def test_dippr_correlations():
+    orders = (0, 1, -1, -1j)
+    args = (20, 33.19, 66.653, 6765.9, -123.63, 478.27)
+    for i in orders:
+        assert_close(chemicals.numba.EQ114(*args, order=i), chemicals.numba.EQ114(*args, order=i), rtol=1e-13)
+
+    args = (300, 276370., -2090.1, 8.125, -0.014116, 0.0000093701)
+    for i in orders:
+        assert_close(chemicals.numba.EQ100(*args, order=i), chemicals.numba.EQ100(*args, order=i), rtol=1e-13)
+        
+    # EQ102 -  numba-scipy does not support complex numbers so this does not work in numba
+
+    args = (300., 647.096, 17.863, 58.606, -95.396, 213.89, -141.26)
+    for i in orders:
+        assert_close(chemicals.numba.EQ116(*args, order=i), chemicals.numba.EQ116(*args, order=i), rtol=1e-13)
+    
+    args = (20., 3.3258E4, 3.6199E4, 1.2057E3, 1.5373E7, 3.2122E3, -1.5318E7, 3.2122E3)
+    for i in orders:
+        assert_close(chemicals.numba.EQ127(*args, order=i), chemicals.numba.EQ127(*args, order=i), rtol=1e-13)
+
+    args = (300., 33363., 26790., 2610.5, 8896., 1169)
+    for i in orders:
+        assert_close(chemicals.numba.EQ107(*args, order=i), chemicals.numba.EQ107(*args, order=i), rtol=1e-13)
+
+        args = (300.0, 0.02222, -26.38, -16750000, -3.894E19, 3.133E21)
+    for i in orders:
+        assert_close(chemicals.numba.EQ104(*args, order=i), chemicals.numba.EQ104(*args, order=i), rtol=1e-13)
 
 @mark_as_numba
 def test_thermal_conductivity_misc():
@@ -276,7 +307,41 @@ def test_temperature():
     
     # Probably never going to work
 #    chemicals.numba.T_converter(500, 'ITS-68', 'ITS-48')
+
+@mark_as_numba
+def test_critical():
+    assert_close(chemicals.numba.Li(np.array([0.6449, 0.2359, 0.1192]), np.array([425.12, 469.7, 507.6]),np.array([0.000255, 0.000313, 0.000371])),
+             Li([0.6449, 0.2359, 0.1192], [425.12, 469.7, 507.6], [0.000255, 0.000313, 0.000371]), rtol=1e-13)
+
+    assert_close(chemicals.numba.Chueh_Prausnitz_Tc(np.array([0.6449, 0.2359, 0.1192]), np.array([425.12, 469.7, 507.6]),
+        np.array([0.000255, 0.000313, 0.000371]), np.array([[0, 1.92681, 6.80358],
+        [1.92681, 0, 1.89312], [ 6.80358, 1.89312, 0]])),
+    Chueh_Prausnitz_Tc([0.6449, 0.2359, 0.1192], [425.12, 469.7, 507.6],
+        [0.000255, 0.000313, 0.000371], [[0, 1.92681, 6.80358],
+         [1.92681, 0, 1.89312], [ 6.80358, 1.89312, 0]]), rtol=1e-13)
+
+    zs = np.array([0.6449, 0.2359, 0.1192])
+    Tcs = np.array([425.12, 469.7, 507.6])
+    Aijs = np.array([[0, 1.2503, 1.516], [0.799807, 0, 1.23843], [0.659633, 0.807474, 0]])
     
+    
+    assert_close(chemicals.numba.Grieves_Thodos(zs, Tcs, Aijs),
+                 Grieves_Thodos(zs, Tcs, Aijs), rtol=1e-12)
+    
+    Aijs = np.array([[0, 1.174450, 1.274390], [0.835914, 0, 1.21038], [0.746878, 0.80677, 0]])
+    assert_close(chemicals.numba.modified_Wilson_Tc(zs, Tcs, Aijs),
+                 modified_Wilson_Tc(zs, Tcs, Aijs), rtol=1e-12)
+    
+    
+    assert_close(chemicals.numba.Chueh_Prausnitz_Vc(np.array([0.4271, 0.5729]), np.array([0.000273, 0.000256]), np.array([[0, 5.61847], [5.61847, 0]])),
+                 Chueh_Prausnitz_Vc([0.4271, 0.5729], [0.000273, 0.000256], [[0, 5.61847], [5.61847, 0]]), rtol=1e-13)
+
+    assert_close(chemicals.numba.modified_Wilson_Vc(np.array([0.4271, 0.5729]), np.array([0.000273, 0.000256]), np.array([[0, 0.6671250], [1.3939900, 0]])),
+                 modified_Wilson_Vc([0.4271, 0.5729], [0.000273, 0.000256], [[0, 0.6671250], [1.3939900, 0]]), rtol=1e-13)
+
+    # Not working yet: Ihmels, Meissner, Grigoras, critical_surface_methods
+    # Maybe a future numba update will make this work. 
+
 @mark_as_numba
 def test_volume():
     assert_close(chemicals.numba.Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245),

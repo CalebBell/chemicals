@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
 from chemicals.utils import property_molar_to_mass, property_mass_to_molar
@@ -256,11 +258,10 @@ def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
 def combustion_products_mixture(atoms_list, zs, reactivities=None, CASs=None,
                                 missing_handling='elemental', 
                                 combustion_stoichiometries=None):
-    '''Calculates the combustion products of a mixture of molecules and their,
-    mole fractions; requires a list of dictionaries of each molecule's 
-    constituent atoms and their counts.
-    Products for non-hydrocarbons may not be correct, but are still 
-    calculated.
+    """Calculates the combustion products of a mixture of molecules and their,
+    mole fractions; requires a list of dictionaries of each molecule's
+    constituent atoms and their counts. Products for non-hydrocarbons may not be
+    correct, but are still calculated.
 
     Parameters
     ----------
@@ -309,7 +310,7 @@ def combustion_products_mixture(atoms_list, zs, reactivities=None, CASs=None,
     ... [.9, .05, .04, .01], reactivities=[True, True, True, False], 
     ... CASs=['74-82-8', '74-84-0', '7440-37-1', '629-62-9'])
     {'CO2': 1.0, 'O2': -1.975, 'H2O': 1.9500000000000002, 'Ar': 0.04, '629-62-9': 0.01}
-    '''
+    """
     # Attempted to use a .copy() on a base dict but that was slower
     products = {}
     has_reactivities = reactivities is not None    
@@ -620,8 +621,9 @@ class CombustionData(object):
 def air_fuel_ratio_solver(ratio, Vm_air, Vm_fuel, MW_air, MW_fuel,
                           n_air=None, n_fuel=None,
                           basis='mass'):
-    '''Calculates molar flow rate of air or fuel from the other,
-    using a specified air-fuel ratio. Supports 'mole', 'mass', and 'volume'
+    """Calculates molar flow rate of air or fuel from the other, using a
+    specified air-fuel ratio. Supports 'mole', 'mass', and 'volume'.
+
     bases for the ratio variable. The ratio must be of the same units - 
     i.e. kg/kg instead of lb/kg.
     
@@ -686,8 +688,7 @@ def air_fuel_ratio_solver(ratio, Vm_air, Vm_fuel, MW_air, MW_fuel,
     ... MW_air=MW_air, MW_fuel=MW_fuel, n_air=n_air,
     ... n_fuel=n_fuel, basis='mole')
     (25.0, 5.0, 5.0, 8.073858296891782, 5.011182039683378)
-    
-    '''
+    """
     if basis == 'mole':
         if n_air is not None and n_fuel is None:
             n_fuel = n_air/ratio
@@ -725,10 +726,10 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
                          Vm_air=None, Vm_fuel=None, MW_air=None, MW_fuel=None,
                          ratio_basis='mass', reactivities=None,
                          combustion_stoichiometries=None):
-    '''Solves the system of equations describing a flow of air mixing with a flow of
-    combustibles and burning completely. All calculated variables are returned as
-    a dictionary.
-    
+    """Solves the system of equations describing a flow of air mixing with a
+    flow of combustibles and burning completely. All calculated variables are
+    returned as a dictionary.
+
     Supports solving with any 2 of the extensive variables, or one extensive
     and one intensive variable:
     
@@ -839,7 +840,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
     (13.131707317073175, 20.381372957130615, 13.15809740412517)
     >>> ans['n_air']
     65.65853658536588
-    '''
+    """
     TRACE_FRACTION_IN_AIR = 1e-10
     # Only one path to get n_air, n_fuel should ever be followed. Calculate all the
     # extra information redundantly at the end!
@@ -1211,10 +1212,10 @@ def combustion_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                            MW_air=None, MW_fuel=None, MW_third=None,
                            ratio_basis='mass', reactivities=None,
                            combustion_stoichiometries=None):
-    '''Solves the system of equations describing a flow of air mixing with two
-    flow of combustibles, one fixed and one potentially variable, and burning 
+    """Solves the system of equations describing a flow of air mixing with two
+    flow of combustibles, one fixed and one potentially variable, and burning
     completely. All calculated variables are returned as a dictionary.
-    
+
     The variables `Vm_air`, `Vm_fuel`, `Vm_third`, `MW_air`, `MW_fuel` and 
     `MW_third` are only
     required when an air-fuel ratio is given. Howver, the ratios cannot be
@@ -1311,7 +1312,7 @@ def combustion_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
     >>> ans = combustion_spec_solver(zs_air=zs_air, zs_fuel=zs_fuel, zs_third=zs_third, CASs=CASs, atomss=atomss, n_third=1.0, n_fuel=5.0, O2_excess=0.3, Vm_air=0.02493, Vm_fuel=0.02488, Vm_third=.024, MW_air=28.79341351, MW_fuel=18.55158039, MW_third=22.0)
     >>> ans['n_air']
     80.6317073170732
-    '''
+    """
     TRACE_FRACTION_IN_AIR = 1e-12
     if reactivities is None:
         reactivities = [True for i in zs_air]

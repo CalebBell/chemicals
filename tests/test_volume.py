@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from numpy.testing import assert_allclose
 import numpy as np
@@ -148,15 +150,14 @@ def test_Perry_l_data():
 
 
 def test_VDI_PPDS_2_data():
-    '''Plenty of interesting errors here.
-    The chemicals 463-58-1, 75-44-5, 75-15-0, 7446-11-9, 2551-62-4
-    do not match the tabulated data. They are all in the same section, so a
-    mixup was probably made there. The errors versus the tabulated data are
-    very large. 
-    
-    Note this table needed to have Tc and MW added to it as well, from the 
-    same source.
-    '''
+    """Plenty of interesting errors here. The chemicals 463-58-1, 75-44-5,
+    75-15-0, 7446-11-9, 2551-62-4 do not match the tabulated data. They are all
+    in the same section, so a mixup was probably made there. The errors versus
+    the tabulated data are very large.
+
+    Note this table needed to have Tc and MW added to it as well, from the same
+    source.
+    """
     assert all([checkCAS(i) for i in rho_data_VDI_PPDS_2.index])
     tots_calc = [rho_data_VDI_PPDS_2[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'rhoc', u'MW']]
     tots = [208878.27130000002, 117504.59450000001, 202008.99950000001, 85280.333600000013, 150142.28, 97269, 27786.919999999998]

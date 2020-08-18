@@ -1,7 +1,9 @@
-'''This file contains an exporter for the IARC carcinogen data.
-The .csv file from https://monographs.iarc.fr/list-of-classifications should be placed
-in the same directory as this script, and then the data file will be updated when this is run.
-'''
+"""This file contains an exporter for the IARC carcinogen data.
+
+The .csv file from https://monographs.iarc.fr/list-of-classifications should be
+placed in the same directory as this script, and then the data file will be
+updated when this is run.
+"""
 
 from math import isnan
 import pandas as pd

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,12 +19,39 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+
+This module contains lookup functions for three important environmental 
+properties - Global Warming Potential, Ozone Depletion Potential, and 
+octanol-water partition coefficient.
+
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Global Warming Potential
+------------------------
+.. autofunction:: chemicals.environment.GWP
+.. autofunction:: chemicals.environment.GWP_methods
+.. autodata:: chemicals.environment.GWP_all_methods
+
+Ozone Depletion Potential
+-------------------------
+.. autofunction:: chemicals.environment.ODP
+.. autofunction:: chemicals.environment.ODP_methods
+.. autodata:: chemicals.environment.ODP_all_methods
+
+Octanol-Water Partition Coefficient
+-----------------------------------
+.. autofunction:: chemicals.environment.logP
+.. autofunction:: chemicals.environment.logP_methods
+.. autodata:: chemicals.environment.logP_all_methods
+
+"""
 
 __all__ = ['GWP', 'ODP', 'logP', 
-           'global_warming_potential',
-           'ozone_depletion_potential',
-           'octanol_water_partition_coefficient',
            'GWP_all_methods', 'ODP_all_methods', 'logP_all_methods',
            'GWP_methods', 'ODP_methods', 'logP_methods']
 
@@ -37,7 +65,7 @@ from chemicals.data_reader import (register_df_source,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
 
-# %% Register data sources and lazy load them
+### Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Environment')
 register_df_source(folder, 'Official Global Warming Potentials.tsv')
@@ -90,7 +118,7 @@ if PY37:
             _load_logP_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
-else:
+else:  # pragma: no cover
     if can_load_data:
         _load_GWP_ODP_data()
         _load_logP_data()
@@ -100,13 +128,13 @@ IPCC100SAR = 'IPCC (2007) 100yr-SAR'
 IPCC20 = 'IPCC (2007) 20yr'
 IPCC500 = 'IPCC (2007) 500yr'
 GWP_all_methods = (IPCC100, IPCC100SAR, IPCC20, IPCC500)
+'''Tuple of method name keys. See the `GWP` for the actual references'''
 
 
-# %% Environmental data functions
+### Environmental data functions
 
 def GWP_methods(CASRN):
-    """
-    Return all methods available to obtain GWP for the desired chemical.
+    """Return all methods available to obtain GWP for the desired chemical.
 
     Parameters
     ----------
@@ -121,7 +149,6 @@ def GWP_methods(CASRN):
     See Also
     --------
     GWP
-
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if CASRN in GWP_data.index:
@@ -186,7 +213,6 @@ def GWP(CASRN, method=None):
         return retrieve_from_df(GWP_data, CASRN, key)
     else:
         return retrieve_any_from_df(GWP_data, CASRN, _GWP_keys_by_method.values())
-global_warming_potential = GWP
 
 ### Ozone Depletion Potentials
 
@@ -200,10 +226,10 @@ ODP1STR = 'ODP1 string'
 ODP1LOG = 'ODP1 logarithmic average'
 ODP_all_methods = (ODP2MAX, ODP1MAX, ODP2LOG, ODP1LOG,
                    ODP2MIN, ODP1MIN, ODP2STR, ODP1STR)
+'''Tuple of method name keys. See the `ODP` for the actual references'''
 
 def ODP_methods(CASRN):
-    """
-    Return all methods available to obtain ODP for the desired chemical.
+    """Return all methods available to obtain ODP for the desired chemical.
 
     Parameters
     ----------
@@ -218,7 +244,6 @@ def ODP_methods(CASRN):
     See Also
     --------
     ODP
-
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if CASRN in ODP_data.index:
@@ -296,17 +321,16 @@ def ODP(CASRN, method=None):
         return retrieve_from_df(ODP_data, CASRN, key)
     else:
         return retrieve_any_from_df(ODP_data, CASRN, _ODP_keys_by_method.values())
-ozone_depletion_potential = ODP
 
 ### log P
 
 SYRRES = 'SYRRES'
 CRC = 'CRC'
 logP_all_methods = (SYRRES, CRC)
+'''Tuple of method name keys. See the `logP` for the actual references'''
 
 def logP_methods(CASRN):
-    """
-    Return all methods available to obtain logP for the desired chemical.
+    """Return all methods available to obtain logP for the desired chemical.
 
     Parameters
     ----------
@@ -321,7 +345,6 @@ def logP_methods(CASRN):
     See Also
     --------
     logP
-
     """
     if not _logP_data_loaded: _load_logP_data()
     return list_available_methods_from_df_dict(logP_sources, CASRN, 'logP')
@@ -372,4 +395,3 @@ def logP(CASRN, method=None):
         return retrieve_from_df_dict(logP_sources, CASRN, 'logP', method) 
     else:
         return retrieve_any_from_df_dict(logP_sources, CASRN, 'logP') 
-octanol_water_partition_coefficient = logP

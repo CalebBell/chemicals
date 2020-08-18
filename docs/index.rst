@@ -54,6 +54,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.dippr
    chemicals.elements
    chemicals.environment
+   chemicals.flash_basic
    chemicals.heat_capacity
    chemicals.identifiers
    chemicals.interface

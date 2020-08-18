@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 
@@ -35,8 +36,8 @@ from chemicals.elements import (periodic_table, homonuclear_elemental_gases,
 folder = os_path_join(source_path, 'Identifiers')
 
 def checkCAS(CASRN):
-    '''Checks if a CAS number is valid. Returns False if the parser cannot 
-    parse the given string.
+    """Checks if a CAS number is valid. Returns False if the parser cannot parse
+    the given string.
 
     Parameters
     ----------
@@ -66,7 +67,7 @@ def checkCAS(CASRN):
     True
     >>> checkCAS('77332-18-5')
     False
-    '''
+    """
     try:
         check = CASRN[-1] # Don't store the int - it is not necessary and is slower
         
@@ -89,10 +90,11 @@ class ChemicalMetadata(object):
         
     @property
     def charge(self):
-        '''Charge of the species as an integer. Computed as a property as most
-        species do not have a charge and so storing it would be a waste of 
-        memory.
-        '''
+        """Charge of the species as an integer.
+
+        Computed as a property as most species do not have a charge and so
+        storing it would be a waste of memory.
+        """
         try:
             return self._charge
         except AttributeError:
@@ -262,7 +264,7 @@ class ChemicalMetadataDB(object):
 chemical_search_cache = {}
 
 def CAS_from_any(ID, autoload=False, cache=True):
-    '''Wrapper around `search_chemical` which returns the CAS number of the
+    """Wrapper around `search_chemical` which returns the CAS number of the
     found chemical directly.
 
     Parameters
@@ -295,14 +297,13 @@ def CAS_from_any(ID, autoload=False, cache=True):
     '64-17-5'
     >>> CAS_from_any('O') # only elements can be specified by symbol
     '17778-80-2'
-
-    '''
+    """
     return search_chemical(ID, autoload=False, cache=True).CASs
 
 def search_chemical(ID, autoload=False, cache=True):
-    '''Looks up metadata about a chemical by searching and testing for the
-    input string being any of the following types of chemical identifiers:
-    
+    """Looks up metadata about a chemical by searching and testing for the input
+    string being any of the following types of chemical identifiers:
+
     * Name, in IUPAC form or common form or a synonym registered in PubChem
     * InChI name, prefixed by 'InChI=1S/' or 'InChI=1/'
     * InChI key, prefixed by 'InChIKey='
@@ -349,7 +350,7 @@ def search_chemical(ID, autoload=False, cache=True):
     <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
     >>> search_chemical('O') # only elements can be specified by symbol
     <ChemicalMetadata, name=oxygen, formula=O, smiles=[O], MW=15.9994>
-    '''
+    """
     if cache and ID in chemical_search_cache:
         return chemical_search_cache[ID]
     if not _pubchem_db_loaded: get_pubchem_db()
@@ -361,10 +362,10 @@ def search_chemical(ID, autoload=False, cache=True):
         if periodic_table[ID].number not in homonuclear_elemental_gases:
             return pubchem_db.search_CAS(periodic_table[ID].CAS)
         else:
-            for i in [periodic_table.symbol_to_elements, 
-                      periodic_table.number_to_elements,
-                      periodic_table.CAS_to_elements]:
-                if i == periodic_table.number_to_elements:
+            for i in [periodic_table._symbol_to_elements, 
+                      periodic_table._number_to_elements,
+                      periodic_table._CAS_to_elements]:
+                if i == periodic_table._number_to_elements:
                     if int(ID in i):
                         obj = pubchem_db.search_CAS(periodic_table[int(ID)].CAS)
                         if cache:
@@ -515,14 +516,14 @@ def search_chemical(ID, autoload=False, cache=True):
 # list(pd.read_excel('http://www.aiche.org/sites/default/files/docs/pages/sponsor_compound_list-2014.xlsx')['Unnamed: 2'])[2:]
 # This is consistently faster than creating a list and then making the set.
 def dippr_compounds():
-    '''Loads and returns a set of compounds known in the DIPPR database. This
+    """Loads and returns a set of compounds known in the DIPPR database. This
     can be useful for knowing if a chemical is of industrial relevance.
 
     Returns
     -------
     dippr_compounds : set([str])
         A set of CAS numbers from the 2014 edition of the DIPPR database.
-    '''
+    """
     dippr_compounds = set()
     with open(os.path.join(folder, 'dippr_2014.csv')) as f:
         dippr_compounds.update(f.read().split('\n'))
@@ -548,8 +549,8 @@ class CommonMixtureMetadata(object):
 
 
 def mixture_from_any(ID):
-    '''Search by string for a mixture in the included common mixture database.
-    The database primarily contains refrigerant blends. The variable 
+    """Search by string for a mixture in the included common mixture database.
+    The database primarily contains refrigerant blends. The variable
     `common_mixtures` contains all loaded entries.
 
     Parameters
@@ -573,7 +574,7 @@ def mixture_from_any(ID):
     <MixtureMetadata, name=R512A, N=2, CASs=['811-97-2', '75-37-6'], ws=[0.05, 0.95], zs=[0.032949, 0.96705]>
     >>> mixture_from_any(['air'])
     <MixtureMetadata, name=Air, N=3, CASs=['7727-37-9', '7440-37-1', '7782-44-7'], ws=[0.7557, 0.0127, 0.2316], zs=[0.7812, 0.0092, 0.2096]>
-    '''
+    """
     if not mixture_composition_loaded:
         load_mixture_composition()
     if type(ID) == list:
@@ -613,9 +614,10 @@ cryogenics = {'132259-10-0': 'Air', '7440-37-1': 'Argon', '630-08-0':
 
 _pubchem_db_loaded = False
 def get_pubchem_db():
-    '''Helper function to delay the creation of the pubchem_db object. This
-    avoids loading the database when it is not needed.
-    '''
+    """Helper function to delay the creation of the pubchem_db object.
+
+    This avoids loading the database when it is not needed.
+    """
     global _pubchem_db_loaded, pubchem_db
     if _pubchem_db_loaded:
         return pubchem_db
@@ -632,11 +634,12 @@ def load_mixture_composition():
     common_mixtures = {}
     common_mixtures_by_synonym = {}
     with open(os.path.join(folder, 'Mixtures Compositions.tsv')) as f:
-        '''Read in a dict of 90 or so mixutres, their components, and synonyms.
-        Small errors in mole fractions not adding to 1 are known.
-        Errors in adding mass fraction are less common, present at the 5th decimal.
-        Mass basis is assumed for all mixtures.
-        '''
+        """Read in a dict of 90 or so mixutres, their components, and synonyms.
+
+        Small errors in mole fractions not adding to 1 are known. Errors in
+        adding mass fraction are less common, present at the 5th decimal. Mass
+        basis is assumed for all mixtures.
+        """
         next(f)
         for line in f:
             values = to_num(line.strip('\n').strip('\t').split('\t'))

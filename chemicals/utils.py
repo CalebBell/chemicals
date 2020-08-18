@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['isobaric_expansion', 'isothermal_compressibility', 
 'Cp_minus_Cv', 'speed_of_sound', 'Joule_Thomson',
@@ -1910,10 +1912,10 @@ def none_and_length_check(all_inputs, length=None):
 
 
 def allclose_variable(a, b, limits, rtols=None, atols=None):
-    '''Returns True if two arrays are element-wise equal within several 
-    different tolerances. Tolerance values are always positive, usually
-    very small. Based on numpy's allclose function.
-    
+    """Returns True if two arrays are element-wise equal within several
+    different tolerances. Tolerance values are always positive, usually very
+    small. Based on numpy's allclose function.
+
     Only atols or rtols needs to be specified; both are used if given.
     
     Parameters
@@ -1942,7 +1944,7 @@ def allclose_variable(a, b, limits, rtols=None, atols=None):
     >>> y = [2.7244328304561904e-08, 3.0105753470546008e-10, 2.724412872417824e-08,  3.0105303055834564e-10, 2.7243914341030203e-08, 3.0104819238021998e-10, 2.7243684057561379e-08, 3.0104299541023674e-10, 2.7243436694839306e-08, 3.010374130526363e-10]
     >>> allclose_variable(x, y, limits=[.0, .5], rtols=[1E-5, 1E-6])
     True
-    '''
+    """
     l = float(len(a))
     if rtols is None and atols is None:
         raise Exception('Either absolute errors or relative errors must be supplied.')

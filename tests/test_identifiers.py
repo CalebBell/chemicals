@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016-2020, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 import pandas as pd
 from numpy.testing import assert_allclose
@@ -263,9 +264,8 @@ def test_CAS_from_any():
         
         
 def test_periodic_table_variants():
-    '''Do a lookup in the periodic table and compare vs CAS_from_any.
-    '''
-    ids = [periodic_table.CAS_to_elements, periodic_table.name_to_elements, periodic_table.symbol_to_elements]
+    """Do a lookup in the periodic table and compare vs CAS_from_any."""
+    ids = [periodic_table._CAS_to_elements, periodic_table._name_to_elements, periodic_table._symbol_to_elements]
     failed_CASs = []
     for thing in ids:
         for i in thing.keys():
@@ -286,21 +286,21 @@ def test_periodic_table_variants():
     assert set(['Chlorine', 'Fluorine', 'Hydrogen', 'Nitrogen', 'Oxygen']) == set(failed_CASs)     
     
     
-    for CAS, d in periodic_table.CAS_to_elements.items():
+    for CAS, d in periodic_table._CAS_to_elements.items():
         assert CAS_from_any(d.smiles) == CAS
         
-    for CAS, d in periodic_table.CAS_to_elements.items():
+    for CAS, d in periodic_table._CAS_to_elements.items():
         assert CAS_from_any('SMILES=' + d.smiles) == CAS
         
-    for CAS, d in periodic_table.CAS_to_elements.items():
+    for CAS, d in periodic_table._CAS_to_elements.items():
         assert CAS_from_any('InChI=1S/' + d.InChI) == CAS
         
-    for CAS, d in periodic_table.CAS_to_elements.items():
+    for CAS, d in periodic_table._CAS_to_elements.items():
         assert CAS_from_any('InChIKey=' + d.InChI_key) == CAS
         
         
     fail = 0
-    for CAS, d in periodic_table.CAS_to_elements.items():
+    for CAS, d in periodic_table._CAS_to_elements.items():
         
         if d.PubChem != None:
             assert CAS_from_any('PubChem=' + str(d.PubChem)) == CAS
@@ -311,32 +311,32 @@ def test_periodic_table_variants():
     
     
 def test_fake_CAS_numbers():
-    '''File generated with :
-        
-known = []
-for i in reversed(range(100000)):
-    s = "20{0:0>5}000-00-0".format(i)
-    if checkCAS(s):
-        known.append(s+'\t\n')
-f = open('Fake CAS Registry.tsv', 'w')
-f.writelines(known)
-f.close()
-'''
+    """File generated with :
+
+    known = []
+    for i in reversed(range(100000)):
+        s = "20{0:0>5}000-00-0".format(i)
+        if checkCAS(s):
+            known.append(s+'\t\n')
+    f = open('Fake CAS Registry.tsv', 'w')
+    f.writelines(known)
+    f.close()
+    """
     # TODO
     
 
 @pytest.mark.slow
 def test_db_vs_ChemSep():
-    '''The CAS numbers are checked, as are most of the chemical formulas.
-    Some chemical structural formulas aren't supported by the current formula
-    parser and are ignored; otherwise it is a very effective test.
-    
+    """The CAS numbers are checked, as are most of the chemical formulas. Some
+    chemical structural formulas aren't supported by the current formula parser
+    and are ignored; otherwise it is a very effective test.
+
     DO NOT TRY TO OPTimizE THis FUNCTION - IT HAS ALREADY BEEN TRIED AND
     FAILED AT. THE TIME IS ONLY TAKEN py the PARSE function.
-    
-    EVEN THAT HAS BEEN REDUCED By 80% by using cElementTree instead of 
+
+    EVEN THAT HAS BEEN REDUCED By 80% by using cElementTree instead of
     ElementTree.
-    '''
+    """
     
     import xml.etree.cElementTree as ET
     folder = os.path.join(os.path.dirname(__file__), 'Data')

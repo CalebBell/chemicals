@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -8,7 +8,7 @@ in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-    
+
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'NFPA_2008_data', 'IEC_2010_data', 
@@ -285,7 +286,7 @@ ONTARIO = 'Ontario Limits'
 TWA_all_methods = (ONTARIO,)
 
 def TWA_methods(CASRN):
-    """Return all methods available to obtain the Time-Weighted Average exposure  
+    """Return all methods available to obtain the Time-Weighted Average exposure
     limits (TWA) for the desired chemical.
 
     Parameters
@@ -314,17 +315,16 @@ def TWA_methods(CASRN):
     return []
     
 def TWA(CASRN, method=None):  # pragma: no cover
-    '''This function handles the retrieval of Time-Weighted Average limits on worker
-    exposure to dangerous chemicals.
-    
+    """This function handles the retrieval of Time-Weighted Average limits on
+    worker exposure to dangerous chemicals.
+
     Examples
     --------
     >>> TWA('98-00-0')
     (10.0, 'ppm')
     >>> TWA('1303-00-0')
     (5.0742430905659505e-05, 'ppm')
-    
-    '''
+    """
     if not _safety_data_loaded: _load_safety_data()
     if not method or method == ONTARIO:
         if CASRN in Ontario_exposure_limits_dict:
@@ -338,8 +338,7 @@ def TWA(CASRN, method=None):  # pragma: no cover
                          method, TWA_all_methods))
 
 def STEL_methods(CASRN):
-    """
-    Return all methods available to obtain STEL for the desired chemical.
+    """Return all methods available to obtain STEL for the desired chemical.
 
     Parameters
     ----------
@@ -354,7 +353,6 @@ def STEL_methods(CASRN):
     See Also
     --------
     STEL
-
     """
     if not _safety_data_loaded: _load_safety_data()
     if CASRN in Ontario_exposure_limits_dict:
@@ -363,10 +361,9 @@ def STEL_methods(CASRN):
     return []
 
 def STEL(CASRN, method=None):
-    '''
-    This function handles the retrieval of Short-term Exposure Limit on
+    """This function handles the retrieval of Short-term Exposure Limit on
     worker exposure to dangerous chemicals.
-    
+
     Examples
     --------
     >>> STEL('67-64-1')
@@ -375,7 +372,7 @@ def STEL(CASRN, method=None):
     (0.7489774978301237, 'ppm')
     >>> STEL('55720-99-5')
     (2.0, 'mg/m^3')
-    '''
+    """
     if not _safety_data_loaded: _load_safety_data()
     if not method or method == ONTARIO:
         if CASRN in Ontario_exposure_limits_dict:
@@ -389,8 +386,8 @@ def STEL(CASRN, method=None):
                          method, TWA_all_methods))
 
 def Ceiling_methods(CASRN):
-    """
-    Return all methods available to obtain Ceiling limits for the desired chemical.
+    """Return all methods available to obtain Ceiling limits for the desired
+    chemical.
 
     Parameters
     ----------
@@ -405,7 +402,6 @@ def Ceiling_methods(CASRN):
     See Also
     --------
     Ceiling limits
-
     """
     if not _safety_data_loaded: _load_safety_data()
     if CASRN in Ontario_exposure_limits_dict:
@@ -414,17 +410,16 @@ def Ceiling_methods(CASRN):
     return []
 
 def Ceiling(CASRN, method=None):
-    '''
-    This function handles the retrieval of Ceiling limits on worker
-    exposure to dangerous chemicals.
-    
+    """This function handles the retrieval of Ceiling limits on worker exposure
+    to dangerous chemicals.
+
     Examples
     --------
     >>> Ceiling('75-07-0')
     (25.0, 'ppm')
     >>> Ceiling('1395-21-7')
     (6e-05, 'mg/m^3')
-    '''
+    """
     if not _safety_data_loaded: _load_safety_data()
     if not method or method == ONTARIO:
         if CASRN in Ontario_exposure_limits_dict:
@@ -438,9 +433,8 @@ def Ceiling(CASRN, method=None):
                          method, list(Ontario_exposure_limits_dict)))
 
 def Skin_methods(CASRN):
-    """
-    Return all methods available to obtain whether or not a chemical can
-    be absorbed through the skin.
+    """Return all methods available to obtain whether or not a chemical can be
+    absorbed through the skin.
 
     Parameters
     ----------
@@ -456,22 +450,20 @@ def Skin_methods(CASRN):
     See Also
     --------
     Skin
-
     """
     return [ONTARIO] if CASRN in Ontario_exposure_limits_dict else []
 
 def Skin(CASRN, method=None):  # pragma: no cover
-    '''
-    This function handles the retrieval of whether or not a chemical can
-    be absorbed through the skin, relevant to chemical safety calculations.
-    
+    """This function handles the retrieval of whether or not a chemical can be
+    absorbed through the skin, relevant to chemical safety calculations.
+
     Examples
     --------
     >>> Skin('108-94-1')
     True
     >>> Skin('1395-21-7')
     False
-    '''
+    """
     if not _safety_data_loaded: _load_safety_data()
     if not method or method == ONTARIO:
         if CASRN in Ontario_exposure_limits_dict:
@@ -490,8 +482,8 @@ COMBINED = 'Combined'
 Carcinogen_all_methods = (IARC, NTP)
 
 def Carcinogen_methods(CASRN):
-    """
-    Return all methods available to obtain Carcinogen listings for the desired chemical.
+    """Return all methods available to obtain Carcinogen listings for the
+    desired chemical.
 
     Parameters
     ----------
@@ -506,7 +498,6 @@ def Carcinogen_methods(CASRN):
     See Also
     --------
     Carcinogen
-
     """
     return list(Carcinogen_all_methods)
 
@@ -589,8 +580,7 @@ Tflash_all_methods = (IEC, NFPA, SERAT)
 # TODO: Left off here
 
 def Tflash_methods(CASRN):
-    """
-    Return all methods available to obtain Tflash for the desired chemical.
+    """Return all methods available to obtain Tflash for the desired chemical.
 
     Parameters
     ----------
@@ -605,7 +595,6 @@ def Tflash_methods(CASRN):
     See Also
     --------
     Tflash
-
     """
     if not _safety_data_loaded: _load_safety_data()
     return list_available_methods_from_df_dict(Tflash_sources, CASRN, 'Tflash')
@@ -640,7 +629,7 @@ def Tflash(CASRN, method=None):
     
     Notes
     -----
-    Prefered source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
+    Preferred source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
     'NFPA 497 (2008)' [2]_ having very similar data. A third source 
     'Serat DIPPR (2017)' [3]_ provides third hand experimental but evaluated 
     data from the DIPPR database, version unspecified, for 870 compounds.
@@ -677,8 +666,8 @@ def Tflash(CASRN, method=None):
 Tautoignition_all_methods = (IEC, NFPA)
 
 def Tautoignition_methods(CASRN):
-    """
-    Return all methods available to obtain Tautoignition for the desired chemical.
+    """Return all methods available to obtain Tautoignition for the desired
+    chemical.
 
     Parameters
     ----------
@@ -693,7 +682,6 @@ def Tautoignition_methods(CASRN):
     See Also
     --------
     Tautoignition
-
     """
     if not _safety_data_loaded: _load_safety_data()
     return list_available_methods_from_df_dict(Tautoignition_sources, CASRN, 'Tautoignition')
@@ -728,7 +716,7 @@ def Tautoignition(CASRN, method=None):
     
     Notes
     -----
-    Prefered source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
+    Preferred source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
     'NFPA 497 (2008)' [2]_ having very similar data.
     
     See Also
@@ -784,7 +772,6 @@ def LFL_methods(Hc=None, atoms=None, CASRN=''):
     
     >>> LFL_methods(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
     ['IEC 60079-20-1 (2010)', 'NFPA 497 (2008)', 'Suzuki (1994)', 'Crowl and Louvar (2001)']
-
     """
     if not _safety_data_loaded: _load_safety_data()
     methods = list_available_methods_from_df_dict(LFL_sources, CASRN, 'LFL')
@@ -829,7 +816,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     
     Notes
     -----
-    Prefered source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
+    Preferred source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
     'NFPA 497 (2008)' [2]_ having very similar data. If the heat of combustion
     is provided, the estimation method `Suzuki_LFL` can be used. If the atoms
     of the molecule are available, the method `Crowl_Louvar_LFL` can be used.
@@ -862,8 +849,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
 UFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
 
 def UFL_methods(Hc=None, atoms=None, CASRN=''):
-    """
-    Return all methods available to obtain UFL for the desired chemical.
+    """Return all methods available to obtain UFL for the desired chemical.
 
     Parameters
     ----------
@@ -889,7 +875,6 @@ def UFL_methods(Hc=None, atoms=None, CASRN=''):
     
     >>> UFL_methods(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
     ['IEC 60079-20-1 (2010)', 'NFPA 497 (2008)', 'Suzuki (1994)', 'Crowl and Louvar (2001)']
-
     """
     if not _safety_data_loaded: _load_safety_data()
     methods = list_available_methods_from_df_dict(UFL_sources, CASRN, 'UFL')
@@ -937,7 +922,7 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
     
     Notes
     -----
-    Prefered source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
+    Preferred source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
     'NFPA 497 (2008)' [2]_ having very similar data. If the heat of combustion
     is provided, the estimation method `Suzuki_UFL` can be used. If the atoms
     of the molecule are available, the method `Crowl_Louvar_UFL` can be used.
@@ -969,17 +954,16 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
 
 
 def fire_mixing(ys, FLs):
-    '''
-    Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:
-    Fundamentals with Applications. 2E. Upper Saddle River, N.J:
-    Prentice Hall, 2001.
-    
+    """Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:
+    Fundamentals with Applications. 2E. Upper Saddle River, N.J: Prentice Hall,
+    2001.
+
     >>> fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.012, .053, .031])
     0.02751172136637642
     
     >>> fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.075, .15, .32])
     0.12927551844869378
-    '''
+    """
     return 1./sum([yi/FLi for yi, FLi in zip(ys, FLs)])
 
 #print (fire_mixing(ys=[0.0024, 0.0061, 0.0015], FLs=[.075, .15, .32]), 0)

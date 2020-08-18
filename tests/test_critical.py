@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 import pytest
 import pandas as pd
@@ -222,16 +223,7 @@ def test_Tc():
     with pytest.raises(Exception):
         Tc(CASRN='98-01-1', method='BADMETHOD')
 
-@pytest.mark.slow
-def test_Pc_main():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
-    CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
-
-    # Use the default method for each chemical in this file
-    Pcs = [Pc(i) for i in CASs]
-    Pcs_default_sum = pd.Series(Pcs).sum()
-    assert_close(Pcs_default_sum, 63159160396.183258)
+def test_Pc():
 
     assert_close(6137000.0, Pc(CASRN='64-17-5'))
 
@@ -244,21 +236,22 @@ def test_Pc_main():
 
     # Error handling
     assert None == Pc(CASRN='BADCAS')
-    # TODO: Only list critical surface as a method if it can be calculated!
     with pytest.raises(Exception):
         Pc(CASRN='98-01-1', method='BADMETHOD')
 
+
 @pytest.mark.slow
-def test_Vc_main():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
+def test_Pc_all_values():
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
     CASs = set()
     [CASs.update(set(k.index.values)) for k in sources]
 
     # Use the default method for each chemical in this file
-    Vcs = [Vc(i) for i in CASs]
-    Vcs_default_sum = pd.Series(Vcs).sum()
-    assert_close(Vcs_default_sum, 4.7955320200000005)
+    Pcs = [Pc(i) for i in CASs]
+    Pcs_default_sum = pd.Series(Pcs).sum()
+    assert_close(Pcs_default_sum, 63159160396.183258)
 
+def test_Vc():
     assert_close(0.000168, Vc(CASRN='64-17-5'))
 
     assert_close(5.600e-05, Vc(CASRN='7732-18-5', method='PSRK'))
@@ -270,21 +263,21 @@ def test_Vc_main():
 
     # Error handling
     assert None == Vc(CASRN='BADCAS')
-    # TODO: Only list critical surface as a method if it can be calculated!
     with pytest.raises(Exception):
         Vc(CASRN='98-01-1', method='BADMETHOD')
 
 @pytest.mark.slow
-def test_Zc_main():
+def test_Vc_all_values():
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
     CASs = set()
     [CASs.update(set(k.index.values)) for k in sources]
 
     # Use the default method for each chemical in this file
-    Zcs = [Zc(i) for i in CASs]
-    Zcs_default_sum = pd.Series(Zcs).sum()
-    assert_close(Zcs_default_sum, 1930.7388004412558, 1e-6)
+    Vcs = [Vc(i) for i in CASs]
+    Vcs_default_sum = pd.Series(Vcs).sum()
+    assert_close(Vcs_default_sum, 4.7955320200000005)
 
+def test_Zc():
     assert_close(0.241, Zc(CASRN='64-17-5'))
 
     assert_close(0.22941602891834947, Zc(CASRN='7732-18-5', method='PSRK'))
@@ -298,6 +291,18 @@ def test_Zc_main():
     assert None == Zc(CASRN='BADCAS')
     with pytest.raises(Exception):
         Zc(CASRN='98-01-1', method='BADMETHOD')
+
+@pytest.mark.slow
+def test_Zc_all_values():
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
+    CASs = set()
+    [CASs.update(set(k.index.values)) for k in sources]
+
+    # Use the default method for each chemical in this file
+    Zcs = [Zc(i) for i in CASs]
+    Zcs_default_sum = pd.Series(Zcs).sum()
+    assert_close(Zcs_default_sum, 1930.7388004412558, 1e-6)
+
 
 
 def test_Mersmann_Kind_predictor():

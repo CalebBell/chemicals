@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['Tt_all_methods', 'Tt_methods', 'Tt', 
            'Pt_all_methods', 'Pt_methods', 'Pt']
@@ -63,9 +64,7 @@ else:
 Tt_all_methods = (STAVELEY, MELTING)
 
 def Tt_methods(CASRN):
-    """
-    Return all methods available to obtain the Tt for the desired 
-    chemical.
+    """Return all methods available to obtain the Tt for the desired chemical.
 
     Parameters
     ----------
@@ -75,13 +74,12 @@ def Tt_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Tt with the given 
+        Methods which can be used to obtain the Tt with the given
         inputs.
 
     See Also
     --------
     Tt
-
     """
     if not _triple_data_loaded: _load_triple_data()
     methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt68')
@@ -151,9 +149,7 @@ triple_point_temperature = Tt
 Pt_all_methods = (STAVELEY,)
 
 def Pt_methods(CASRN):
-    """
-    Return all methods available to obtain the Pt for the desired 
-    chemical.
+    """Return all methods available to obtain the Pt for the desired chemical.
 
     Parameters
     ----------
@@ -163,13 +159,12 @@ def Pt_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Pt with the given 
+        Methods which can be used to obtain the Pt with the given
         inputs.
 
     See Also
     --------
     Pt
-
     """
     if not _triple_data_loaded: _load_triple_data()
     return list_available_methods_from_df_dict(Pt_sources, CASRN, 'Pt')
@@ -230,5 +225,4 @@ def Pt(CASRN, get_methods=False, method=None):
         return retrieve_from_df_dict(Pt_sources, CASRN, 'Pt', method) 
     else:
         return retrieve_any_from_df_dict(Pt_sources, CASRN, 'Pt') 
-triple_point_pressure = Pt
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,34 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+
+This module contains implementations of various numered property equations
+used by the DIPPR, the Design Institude for Physical Property Research.
+
+No actual data is included in this module; it is just functional
+implementations of the formulas and some of their derivatives/integrals.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Equations
+---------
+.. autofunction:: chemicals.dippr.EQ100
+.. autofunction:: chemicals.dippr.EQ101
+.. autofunction:: chemicals.dippr.EQ102
+.. autofunction:: chemicals.dippr.EQ104
+.. autofunction:: chemicals.dippr.EQ105
+.. autofunction:: chemicals.dippr.EQ106
+.. autofunction:: chemicals.dippr.EQ107
+.. autofunction:: chemicals.dippr.EQ114
+.. autofunction:: chemicals.dippr.EQ115
+.. autofunction:: chemicals.dippr.EQ116
+.. autofunction:: chemicals.dippr.EQ127
+
+"""
 
 from __future__ import division
 
@@ -107,7 +135,7 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     elif order == -1j:
         return A*log(T) + T*(B + T*(C/2 + T*(D/3 + T*(E/4 + T*(F/5 + G*T/6)))))
     else:
-        raise Exception(order_not_found_msg)
+        raise ValueError(order_not_found_msg)
 
 
 def EQ101(T, A, B, C, D, E):
@@ -227,18 +255,19 @@ def EQ102(T, A, B, C, D, order=0):
         return (A*B*T**B/(T*(C/T + D/T**2 + 1)) 
                 + A*T**B*(C/T**2 + 2*D/T**3)/(C/T + D/T**2 + 1)**2)
     elif order == -1:
+        # numba-scipy does not support complex numbers so this does not work in numba
         # imaginary part is 0
-        return (2*A*T**(3+B)*hyp2f1(1, 3+B, 4+B, -2*T/(C - csqrt(C*C 
-                - 4*D)))/((3+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D))
-                -2*A*T**(3+B)*hyp2f1(1, 3+B, 4+B, -2*T/(C + csqrt(C*C - 4*D)))/(
+        return (2*A*T**(3+B)*hyp2f1(1.0, 3.0+B, 4.0+B, (-2*T/(C - csqrt(C*C 
+                - 4*D))))/((3+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D))
+                -2*A*T**(3+B)*hyp2f1(1.0, 3.0+B, 4+B, (-2*T/(C + csqrt(C*C - 4*D))))/(
                 (3+B)*(C + csqrt(C*C-4*D))*csqrt(C*C-4*D))).real
     elif order == -1j:
-        return (2*A*T**(2+B)*hyp2f1(1, 2+B, 3+B, -2*T/(C - csqrt(C*C - 4*D)))/(
+        return (2*A*T**(2+B)*hyp2f1(1.0, 2.0+B, 3.0+B, -2*T/(C - csqrt(C*C - 4*D)))/(
                 (2+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D)) -2*A*T**(2+B)*hyp2f1(
-                1, 2+B, 3+B, -2*T/(C + csqrt(C*C - 4*D)))/((2+B)*(C + csqrt(
+                1.0, 2.0+B, 3.0+B, -2*T/(C + csqrt(C*C - 4*D)))/((2+B)*(C + csqrt(
                 C*C-4*D))*csqrt(C*C-4*D))).real
     else:
-        raise Exception(order_not_found_msg)
+        raise ValueError(order_not_found_msg)
         
 
 def EQ104(T, A, B, C, D, E, order=0):
@@ -312,7 +341,7 @@ def EQ104(T, A, B, C, D, E, order=0):
     elif order == -1j:
         return A*log(T) - (72*B*T**8 + 24*C*T**6 + 9*D*T + 8*E)/(72*T**9)
     else:
-        raise Exception(order_not_found_msg)
+        raise ValueError(order_not_found_msg)
 
 
 def EQ105(T, A, B, C, D):
@@ -484,7 +513,7 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
         return (A*log(T) + B*C/tanh(C/T)/T - B*log(sinh(C/T)) 
                 - D*E*tanh(E/T)/T + D*log(cosh(E/T)))
     else:
-        raise Exception(order_not_found_msg)
+        raise ValueError(order_not_found_msg)
 
 
 def EQ114(T, Tc, A, B, C, D, order=0):
@@ -604,7 +633,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
                 - 6*D**2))/(60*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2 
                 - 15*C*D - 6*D**2)).real/30)
     else:
-        raise Exception(order_not_found_msg)
+        raise ValueError(order_not_found_msg)
 
 
 def EQ115(T, A, B, C=0, D=0, E=0):
@@ -767,7 +796,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         x47 = x35 - x37 + 2
         return A*x0 + 2.85714285714286*B*x4**0.35 - C*x1 + C*x11 + D*x0 - D*x3 - E*x1 - E*x11 + 0.75*E*x4**1.33333333333333 + 3*E*x6 + 1.5*E*x9 - x15*atan(x14*(x16 + x17)) + x15*atan(x14*(x16 + x18)) - x21*atan(x20*(x17 + x22)) + x21*atan(x20*(x18 + x22)) + x23*atan(x24*(x25 + x26)) - x23*atan(x24*(x25 + x27)) - x28*atan(x31*(x26 + x32)) + x28*atan(x31*(x27 + x32)) - x33*log(x36 - x38) + x33*log(x36 + x38) + x39*log(x36 - x40) - x39*log(x36 + x40) + x4**0.666666666666667*x5 - x42*log(x43 + x44) + x42*log(x46 + x47) + x45*log(x43 + x47) - x45*log(x44 + x46) + x5*x9 + x7*atan(x8) - x7*atanh(x8)
     else:
-        raise Exception(order_not_found_msg)
+        raise ValueError(order_not_found_msg)
 
 
 def EQ127(T, A, B, C, D, E, F, G, order=0):
@@ -875,4 +904,4 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
                 + F*G**2*(1/(G*T*exp(G/T) - G*T) + 1/(G*T) - log(exp(G/T) 
                 - 1)/G**2))
     else:
-        raise Exception(order_not_found_msg)
+        raise ValueError(order_not_found_msg)

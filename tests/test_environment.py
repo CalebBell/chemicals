@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 import pytest
 import numpy as np
@@ -47,6 +48,8 @@ def test_GWP():
 
     # No value
     assert GWP('7732-18-5', method=None) is None
+    
+    assert GWP_methods('14882353275-98-3') == []
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -111,6 +114,8 @@ def test_ODP():
         ODP(CASRN='148875-98-3', method='BADMETHOD')
 
     assert ODP(CASRN='14882353275-98-3') == None
+    
+    assert ODP_methods('14882353275-98-3') == []
 
 @pytest.mark.slow
 @pytest.mark.fuzz

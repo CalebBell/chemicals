@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,34 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+
+This module contains the ideal flash solver; two flash initialization routines;
+a vapor-liquid equilibrium constant correlation; a liquid-water equilibrium  
+constant correlation, and a definition function to show the commonly used calculation
+frameworks.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+    
+Ideal Flash Function
+--------------------
+.. autofunction:: chemicals.flash_basic.flash_ideal
+
+Flash Initialization
+--------------------
+.. autofunction:: chemicals.flash_basic.flash_wilson
+.. autofunction:: chemicals.flash_basic.flash_Tb_Tc_Pc
+
+Equilibrium Constants
+---------------------
+.. autofunction:: chemicals.flash_basic.K_value
+.. autofunction:: chemicals.flash_basic.Wilson_K_value
+.. autofunction:: chemicals.flash_basic.PR_water_K_value
+
+"""
 
 from __future__ import division
 from math import exp, log

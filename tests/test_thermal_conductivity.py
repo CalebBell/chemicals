@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from numpy.testing import assert_allclose
 import pytest
@@ -54,15 +55,16 @@ def test_Perrys2_315_data():
 
 
 def test_VDI_PPDS_10_data():
-    '''Average deviation of 2.4% from tabulated values. Many chemicals have
-    much higher deviations. 10% or more deviations:
-    ['75-34-3', '107-06-2', '106-93-4', '420-46-2', '71-55-6', '79-34-5', 
-    '67-72-1', '76-12-0', '76-13-1', '76-14-2', '540-54-5', '75-01-4', 
-    '75-35-4', '79-01-6', '127-18-4', '462-06-6', '108-90-7', '108-86-1', 
+    """Average deviation of 2.4% from tabulated values. Many chemicals have much
+    higher deviations. 10% or more deviations:
+
+    ['75-34-3', '107-06-2', '106-93-4', '420-46-2', '71-55-6', '79-34-5',
+    '67-72-1', '76-12-0', '76-13-1', '76-14-2', '540-54-5', '75-01-4',
+    '75-35-4', '79-01-6', '127-18-4', '462-06-6', '108-90-7', '108-86-1',
     '108-41-8', '100-44-7', '108-93-0', '100-61-8', '121-69-7', '91-66-7']
-    
+
     These have been checked - it appears the tabulated data is just incorrect.
-    '''
+    """
 
     assert all([checkCAS(i) for i in k_data_VDI_PPDS_10.index])
     tots_calc = [k_data_VDI_PPDS_10[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
@@ -74,13 +76,13 @@ def test_VDI_PPDS_10_data():
 
 
 def test_VDI_PPDS_9_data():
-    '''Average deviation of 0.71% from tabulated values. The following have 
-    larger deviations
-        
+    """Average deviation of 0.71% from tabulated values. The following have
+    larger deviations.
+
     ['124-18-5', '629-59-4', '629-78-7', '526-73-8', '95-63-6']
-    
+
     These have been checked - it appears the tabulated data is just incorrect.
-    '''
+    """
 
     assert all([checkCAS(i) for i in k_data_VDI_PPDS_9.index])
     tots_calc = [k_data_VDI_PPDS_9[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
