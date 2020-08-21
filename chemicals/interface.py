@@ -25,6 +25,7 @@ from __future__ import division
 
 __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Brock_Bird', 'Pitzer', 'Sastri_Rao', 'Zuo_Stenby', 
+           'sigma_IAPWS',
            'Mersmann_Kind_surface_tension',
            'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem', 
            'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 
@@ -81,6 +82,52 @@ if PY37:
 else:
     if can_load_data:
         load_interface_dfs()
+
+
+
+def sigma_IAPWS(T):
+    r'''Calculate the surface tension of pure water as a function of .
+    temperature. Assumes the 2011 IAPWS [1]_ formulation.
+
+    .. math::
+        \sigma = B\tau^\mu(1+b\tau)\\
+        \tau = 1-T/T_c\\
+        B = 0.2358 \text{N/m}\\
+        b = -0.625\\
+        \mu = 1.256
+
+    Parameters
+    ----------
+    T : float
+        Temperature of liquid [K]
+
+    Returns
+    -------
+    sigma : float
+        Air-water surface tension, [N/m]
+
+    Notes
+    -----
+    This function is valid from the triple temperature to the critical
+    temperature. No effects for pressure are included in the formulation.
+    Test values are from IAPWS 2010 book.
+
+    Examples
+    --------
+    >>> sigma_IAPWS(300.)
+    0.07168596252716256
+    >>> sigma_IAPWS(450.)
+    0.04289149915650591
+    >>> sigma_IAPWS(600.)
+    0.00837561087288565
+
+    References
+    ----------
+    .. [1] IAPWS. 2014. Revised Release on Surface Tension of Ordinary Water
+       Substance
+    '''
+    tau = 1. - T/647.096
+    return 0.2358*tau**1.256*(1.0 - 0.625*tau)
 
 ### Regressed coefficient-based functions
 

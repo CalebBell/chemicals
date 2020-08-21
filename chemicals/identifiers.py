@@ -236,9 +236,7 @@ class ChemicalMetadataDB(object):
         return False
     
     def search_pubchem(self, pubchem, autoload=True):
-        if type(pubchem) != int:
-            pubchem = int(pubchem)
-        return self._search_autoload(pubchem, self.pubchem_index, autoload=autoload)
+        return self._search_autoload(int(pubchem), self.pubchem_index, autoload=autoload)
         
     def search_CAS(self, CAS, autoload=True):
         if type(CAS) != int:

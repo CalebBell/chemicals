@@ -30,6 +30,10 @@ from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_
                                  sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
 from chemicals.identifiers import checkCAS
 
+def test_sigma_IAPWS():
+    assert_close(sigma_IAPWS(300.), 0.07168596252716256, rtol=1e-13)
+    assert_close(sigma_IAPWS(450.), 0.04289149915650591, rtol=1e-13)
+    assert_close(sigma_IAPWS(600.), 0.00837561087288565, rtol=1e-13)
 
 def test_CSP():
     # p-dichloribenzene at 412.15 K, from DIPPR; value differs due to a slight

@@ -1496,10 +1496,6 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-#    ais = [2.4166E+0, -5.0924E-1, 6.6107E+0, 1.4543E+1, 7.9274E-1, -5.8634E+0, 9.1089E+1]
-#    bis = [7.4824E-1, -1.5094E+0, 5.6207E+0, -8.9139E+0, 8.2019E-1, 1.2801E+1, 1.2811E+2]
-#    cis = [-9.1858E-1, -4.9991E+1, 6.4760E+1, -5.6379E+0, -6.9369E-1, 9.5893E+0, -5.4217E+1]
-#    dis = [1.2172E+2, 6.9983E+1, 2.7039E+1, 7.4344E+1, 6.3173E+0, 6.5529E+1, 5.2381E+2]
     Tr = T/Tc
     mur = 131.3*dipole*(Vc*1E6*Tc)**-0.5
     mur4 = mur*mur
@@ -1512,14 +1508,6 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     psi = 1.0 + alpha*((0.215 + 0.28288*alpha - 1.061*beta + 0.26665*Z)/(0.6366 + beta*Z + 1.061*alpha*beta))
 
     y = Vc/(6.0*Vm)
-##    B1, B2, B3, B4, B5, B6, B7 = [ais[i] + bis[i]*omega + cis[i]*mur4 + dis[i]*association for i in range(7)]
-#    B1 = ais[0] + bis[0]*omega + cis[0]*mur4 + dis[0]*association
-#    B2 = ais[1] + bis[1]*omega + cis[1]*mur4 + dis[1]*association
-#    B3 = ais[2] + bis[2]*omega + cis[2]*mur4 + dis[2]*association
-#    B4 = ais[3] + bis[3]*omega + cis[3]*mur4 + dis[3]*association
-#    B5 = ais[4] + bis[4]*omega + cis[4]*mur4 + dis[4]*association
-#    B6 = ais[5] + bis[5]*omega + cis[5]*mur4 + dis[5]*association
-#    B7 = ais[6] + bis[6]*omega + cis[6]*mur4 + dis[6]*association
     B1 = 2.4166 + 0.74824*omega + -0.91858*mur4 + 121.72*association
     B2 = -0.50924 + -1.5094*omega + -49.991*mur4 + 69.983*association
     B3 = 6.6107 + 5.6207*omega + 64.76*mur4 + 27.039*association

@@ -158,6 +158,14 @@ register_df_source(folder, 'National Toxicology Program Carcinogens.tsv')
 register_df_source(folder, 'IARC Carcinogen Database.tsv')
 _safety_data_loaded = False
 
+
+IEC = 'IEC 60079-20-1 (2010)'
+NFPA = 'NFPA 497 (2008)'
+SERAT = 'Serat DIPPR (2017)'
+
+SUZUKI = 'Suzuki (1994)'
+CROWLLOUVAR = 'Crowl and Louvar (2001)'
+
 def _load_safety_data():
     global Ontario_exposure_limits_dict, NFPA_2008_data, IEC_2010_data
     global DIPPR_SERAT_data, NTP_data, IARC_data, Tflash_sources
@@ -573,9 +581,6 @@ def Carcinogen(CASRN, method=None):
 ### Fire-related functions
 
 
-IEC = 'IEC 60079-20-1 (2010)'
-NFPA = 'NFPA 497 (2008)'
-SERAT = 'Serat DIPPR (2017)'
 Tflash_all_methods = (IEC, NFPA, SERAT)
 # TODO: Left off here
 
@@ -740,8 +745,6 @@ def Tautoignition(CASRN, method=None):
         return retrieve_any_from_df_dict(Tautoignition_sources, CASRN, 'Tautoignition') 
 
 
-SUZUKI = 'Suzuki (1994)'
-CROWLLOUVAR = 'Crowl and Louvar (2001)'
 
 LFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
 
