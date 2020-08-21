@@ -26,15 +26,15 @@ from __future__ import division
 
 __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad', 
 'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid', 
-'Mersmann_Kind_thermal_conductivity_liquid', 'DIPPR9G',
+'Mersmann_Kind_thermal_conductivity_liquid', 'DIPPR9G', 'k_IAPWS',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
 'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley']
 
 import os
 from fluids.numerics import horner, bisplev, implementation_optimize_tck, numpy as np
-from fluids.constants import R, R_inv, N_A, k
-from chemicals.utils import log, exp, PY37, source_path, os_path_join, can_load_data
+from fluids.constants import R, R_inv, N_A, k, pi
+from chemicals.utils import log, exp, sqrt, atan, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
 
@@ -75,6 +75,231 @@ if PY37:
 else:
     if can_load_data:
         _load_k_data()
+
+pi_inv = 1.0/pi # todo move to fluids.constants
+
+def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None):
+    r'''Calculate the thermal conductivity of water or steam according to the
+    2011 IAPWS [1]_ formulation. Critical enhancement is ignored unless
+    parameters for it are provided.
+
+    .. math::
+        \bar\lambda = \bar\lambda_0\times \bar\lambda_1(\bar T, \bar \rho)
+        + \bar\lambda_2(\bar T, \bar\rho)
+
+    .. math::
+        \bar\lambda_0 = \frac{\sqrt{\bar T}}
+        {\sum_{k=0}^4 \frac{L_k}{\bar T^k}}
+
+    .. math::
+        \bar \lambda_1(\bar T, \bar \rho) = \exp\left[ \bar\rho \sum_{i=0}^4
+        \left(\left(\frac{1}{\bar T} - 1 \right)^i
+        \sum_{j=0}^5 L_{ij}(\bar\rho - 1)^j\right)\right]
+
+    .. math::
+        \bar\lambda_2 = \Gamma\frac{\bar\rho \bar c_p \bar T}{\bar \mu} Z(y)
+
+    .. math::
+        Z(y) = \frac{2}{\pi y} \left\{\left[(1 - \kappa^{-1})\arctan(y)
+        + \kappa^{-1}y\right] - \left[1 - \exp\left(\frac{-1}{y^{-1}
+        + y^{-2}/3\bar\rho^2}\right)\right]\right\}
+
+    .. math::
+        y = \bar q_D \xi(\bar T, \bar \rho)
+
+    .. math::
+        \xi = \xi_0 \left(\frac{\Delta \bar\chi}{\Gamma_0}\right)^{\nu/\gamma}
+
+    .. math::
+        \Delta \bar\chi(\bar T, \bar \rho) = \bar\rho\left[
+        \zeta(\bar T, \bar \rho) - \zeta(\bar T_R, \bar \rho)\frac{\bar T_R}{\bar T}
+        \right]
+
+    .. math::
+        \zeta = \left(\frac{\partial \bar \rho}{\partial \bar p}\right)_{\bar T}
+
+    Parameters
+    ----------
+    T : float
+        Temperature water [K]
+    rho : float
+        Density of water [kg/m^3]
+    Cp : float, optional
+        Constant pressure heat capacity of water, [J/kg/K]
+    Cv : float, optional
+        Constant volume heat capacity of water, [J/kg/K]
+    mu : float, optional
+        Viscosity of water, [Pa*S]
+    drho_dP : float, optional
+        Partial derivative of density with respect to pressure at constant
+        temperature, [kg/m^3/Pa]
+
+    Returns
+    -------
+    k : float
+        Thermal condiuctivity, [W/m/K]
+
+    Notes
+    -----
+    Gamma = 177.8514;
+    
+    qd = 0.4E-9;
+    
+    nu = 0.630;
+    
+    gamma = 1.239;
+    
+    zeta0 = 0.13E-9;
+    
+    Gamma0 = 0.06;
+    
+    TRC = 1.5
+    
+    The formulation uses the industrial variant of the critical enhancement.
+    It matches to 5E-6 relative tolerance at the check temperature, and should
+    match even closer outside it.  
+
+    Examples
+    --------
+    >>> k_IAPWS(647.35, 750.)
+    0.5976194153179507
+
+    Region 1, test 1, from MPEI, exact match:
+
+    >>> k_IAPWS(T=620., rho=613.227777440324, Cp=7634.337046792,
+    ... Cv=3037.934412104, mu=70.905106751524E-6, drho_dP=5.209378197916E-6)
+    0.4814851951020004
+
+    Region 1, test 2, from IAPWS formulation, exact match:
+
+    >>> k_IAPWS(T=620., rho=699.226043, Cp=5320.47725, Cv=2916.92653,
+    ... mu=84.1527945E-6, drho_dP=1.84869007E-6)
+    0.5450389394624772
+
+    Region 2, test 1, from IAPWS formulation, exact match:
+
+    >>> k_IAPWS(T=650., rho=1.00452141, Cp=2070.10035, Cv=1596.75313,
+    ... mu=23.4877453E-6, drho_dP=3.36351419E-6)
+    0.052231102436372065
+
+    Region 3, test 1, from IAPWS formulation, exact match:
+
+    >>> k_IAPWS(T=647.35, rho=222., Cp=101054.488, Cv=4374.66458,
+    ... mu=31.2204749E-6, drho_dP=177.778595E-6)
+    0.36687941154060383
+
+    References
+    ----------
+    .. [1] Huber, M. L., R. A. Perkins, D. G. Friend, J. V. Sengers, M. J.
+       Assael, I. N. Metaxa, K. Miyagawa, R. Hellmann, and E. Vogel. "New
+       International Formulation for the Thermal Conductivity of H2O."
+       Journal of Physical and Chemical Reference Data 41, no. 3 (September 1,
+       2012): 033102. doi:10.1063/1.4738955.
+    '''
+    rhor = rho*0.003105590062111801#1/322.0
+    Tr = T*0.0015453657571674064 # 1/647.096
+    Tr_inv = 1.0/Tr 
+    
+#     Lijs = [[1.60397357, -0.646013523, 0.111443906, 0.102997357, -0.0504123634, 0.00609859258],
+#             [2.33771842, -2.78843778, 1.53616167, -0.463045512, 0.0832827019, -0.00719201245],
+#             [2.19650529, -4.54580785, 3.55777244, -1.40944978, 0.275418278, -0.0205938816],
+#             [-1.21051378, 1.60812989, -0.621178141, 0.0716373224, 0, 0],
+#             [-2.7203370, 4.57586331, -3.18369245, 1.1168348, -0.19268305, 0.012913842]]
+
+#     Aijs = [[6.53786807199516, 6.52717759281799, 5.35500529896124, 1.55225959906681, 1.11999926419994],
+#             [-5.61149954923348, -6.30816983387575, -3.96415689925446, 0.464621290821181, 0.595748562571649],
+#             [3.39624167361325, 8.08379285492595, 8.91990208918795, 8.93237374861479, 9.8895256507892],
+#             [-2.27492629730878, -9.82240510197603, -12.033872950579, -11.0321960061126, -10.325505114704],
+#             [10.2631854662709, 12.1358413791395, 9.19494865194302, 6.1678099993336, 4.66861294457414],
+#             [1.97815050331519, -5.54349664571295, -2.16866274479712, -0.965458722086812, -0.503243546373828]]
+    '''Unoptimized (but editable) code; the below is generated with sympy
+    Ls = [2.443221E-3, 1.323095E-2, 6.770357E-3, -3.454586E-3, 4.096266E-4]
+    lambda0 = 0
+    for i, L in enumerate(Ls):
+        lambda0 += L/Tr**i
+    lambda0 = Tr**0.5/lambda0
+    '''
+    lambda0 = sqrt(Tr)/(Tr_inv*(Tr_inv*(Tr_inv*(0.0004096266*Tr_inv - 0.003454586) 
+                        + 0.006770357) + 0.01323095) + 0.002443221)
+
+    '''Unoptimized (but editable) code; the below is generated with sympy
+    tot1 = 0
+    for i, Ljs in enumerate(Lijs):
+        tot2 = 0
+        for j, L in enumerate(Ljs):
+            tot2 += L*(rhor - 1.)**j
+        tot1 += (1./Tr -1.)**i*tot2
+    '''
+    x0 = rhor - 1.0
+    x1 = (Tr_inv - 1.0)
+    x12 = x1*x1
+    tot1 = (x0*(x0*(x0*(x0*(x0*(x1*(x1*(0.012913842*x12 - 0.0205938816) - 0.00719201245) + 0.00609859258)
+                            + x1*(x1*(0.275418278 - 0.19268305*x12) + 0.0832827019) - 0.0504123634) 
+                        + x1*(x1*(x1*(1.1168348*x1 + 0.0716373224) - 1.40944978) - 0.463045512) + 0.102997357) 
+                    + x1*(x1*(x1*(-3.18369245*x1 - 0.621178141) + 3.55777244) + 1.53616167) + 0.111443906)
+                + x1*(x1*(x1*(4.57586331*x1 + 1.60812989) - 4.54580785) - 2.78843778) - 0.646013523)
+            + x1*(x1*(x1*(-2.720337*x1 - 1.21051378) + 2.19650529) + 2.33771842) + 1.60397357)
+    lambda1 = exp(rhor*tot1)
+
+    if Cp is not None and Cv is not None and mu is not None and drho_dP is not None:
+        Cpr = Cp*0.0021667624917378636 #1/461.51805 # J/kg/K
+        if Cpr < 0.0 or Cpr > 1E13:
+            Cpr = 1E13
+            Cp = Cpr*461.51805 # This is correct
+        mur = mu*1E6
+        kappa_inv = Cv/Cp
+
+        Gamma = 177.8514
+        qd = 2500000000.0#(0.4E-9)**-1
+        nu = 0.630
+        xi0 = 0.13E-9
+        gamma = 1.239
+#         Gamma0 = 0.06
+        TRC = 1.5
+
+        zeta_drho_dP = drho_dP*68521.73913043478#22.064E6/322.0
+        if rhor <= 0.310559006:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(1.97815050331519*rhor + 10.2631854662709) - 2.27492629730878)
+                        + 3.39624167361325) - 5.61149954923348) + 6.53786807199516)
+        elif rhor <= 0.776397516:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(12.1358413791395 - 5.54349664571295*rhor) - 9.82240510197603)
+                        + 8.08379285492595) - 6.30816983387575) + 6.52717759281799)
+        elif rhor <= 1.242236025:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579) 
+                        + 8.91990208918795) - 3.96415689925446) + 5.35500529896124)
+        elif rhor <= 1.863354037:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(6.1678099993336 - 0.965458722086812*rhor) - 11.0321960061126)
+                        + 8.93237374861479) + 0.464621290821181) + 1.55225959906681)
+        else:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(4.66861294457414 - 0.503243546373828*rhor) - 10.325505114704)
+                        + 9.8895256507892) + 0.595748562571649) + 1.11999926419994)
+        '''Original code:
+        zeta_drho_dP_Tr = 1./sum([Aijs[i][j]*rhor**i for i in range(6)])
+        '''
+        zeta_drho_dP_Tr = 1./tot1
+        dchi = rhor*(zeta_drho_dP - zeta_drho_dP_Tr*TRC*Tr_inv)
+        if dchi < 0.0:
+            xi = 0.0
+        else:
+            # 16.666666666666668 = 1.0/Gamma0
+            xi = xi0*(dchi*16.666666666666668)**0.5084745762711864#(nu/gamma)
+        if xi < 0.0 or xi > 1E4:
+            xi = 1E4
+
+        y = qd*xi
+        y_inv = 1.0/y
+        if y < 1.2E-7:
+            Z_y = 0.0
+        else:
+            Z_y = 2.*pi_inv*y_inv*(((1.0 - kappa_inv)*atan(y) + kappa_inv*y) 
+                               - (1.0 - exp(-1.0/(y_inv + y*y/(3.0*rhor*rhor)))))
+        lambda2 = Gamma*rhor*Cpr*Tr/mur*Z_y
+
+    else:
+        lambda2 = 0.0
+
+    k = (lambda0*lambda1 + lambda2)*1e-3
+    return k
 
 ### Purely CSP Methods - Liquids
 
