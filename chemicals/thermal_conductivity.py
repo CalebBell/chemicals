@@ -1824,49 +1824,50 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
        New York: McGraw-Hill Professional, 2000.
     '''
     N = len(ys)
-    cmps = range(len(ys))
     S_roots = [0.0]*N
-    Ss_inv = [0.0]*N
-    Ss_roots = [0.0]*N
-    MW_powers = [0.0]*N
-    root_mus = [0.0]*N
+    bigis = [0.0]*N
+    Ss_invT = [0.0]*N
+    TSrootSsinv = [0.0]*N
+    bigis_inv = [0.0]*N
     
     for i in range(N):
         Si = 1.5*Tbs[i]
         S_roots[i] = sqrt(Si)
-        rt25MW = sqrt(sqrt(MWs[i]))
-        MW_powers[i] = rt25MW*sqrt(rt25MW) # correct and clever - compute MW^0.375
         T_Si = T + Si
-        Ss_inv[i] = 1.0/T_Si
-        Ss_roots[i] = sqrt(T_Si)
-        root_mus[i] = sqrt(mus[i])
-    
+        S_inv = 1.0/T_Si
+        Ss_invT[i] = T*S_inv
+        TSrootSsinv[i] = S_roots[i]*S_inv
+        rt05MW = sqrt(MWs[i])
+        rt25MW = sqrt(rt05MW)
+        bigis[i] = sqrt(T_Si*mus[i]/(rt05MW*rt25MW))# correct and clever - compute MW^0.375
+        bigis_inv[i] = 1.0/bigis[i]
+        
     k = 0.0
     for i in range(N):
         den = 0.0
+        S_rooti = S_roots[i]
         for j in range(N):
-            x0 = (T + S_roots[i]*S_roots[j])*Ss_inv[i]
-            bigi = Ss_roots[i]*root_mus[i]/MW_powers[i]
-            bigj = MW_powers[j]/(Ss_roots[j]*root_mus[j])
-            big = bigi*bigj
-            
-#            big = MW_powers[j]/MW_powers[i]*Ss_roots[i]/Ss_roots[j]*root_mus[i]/root_mus[j]
-            Aij = (1.0 + big)*(1.0 + big)*x0
+            # 1 multiply, 3 indexes into different arrays
+            x0 = Ss_invT[i] + TSrootSsinv[i]*S_roots[j]
+            # 2 multiplies, 3 indexes
+#            x0 = (T + S_rooti*S_roots[j])*Ss_inv[i]
+            big = 1.0 + bigis[i]*bigis_inv[j]
+            Aij = big*big*x0
             den += ys[j]*Aij
-        den *= 0.25 # constant factor
         k += ys[i]*ks[i]/den
+    k *= 4.0 # constant
     return k
     
-    
-    
-    Ss = [1.5*Tb for Tb in Tbs]
-    Sij = [[(Si*Sj)**0.5 for Sj in Ss] for Si in Ss]
-
-    Aij = [[0.25*(1. + (mus[i]/mus[j]*(MWs[j]/MWs[i])**0.75
-            *(T+Ss[i])/(T+Ss[j]))**0.5 )**2 *(T+Sij[i][j])/(T+Ss[i])
-            for j in cmps] for i in cmps]
-            
-    return sum([ys[i]*ks[i]/sum(ys[j]*Aij[i][j] for j in cmps) for i in cmps])
+    # Original, unoptimized implementation
+#    cmps = range(len(ys))
+#    Ss = [1.5*Tb for Tb in Tbs]
+#    Sij = [[(Si*Sj)**0.5 for Sj in Ss] for Si in Ss]
+#
+#    Aij = [[0.25*(1. + (mus[i]/mus[j]*(MWs[j]/MWs[i])**0.75
+#            *(T+Ss[i])/(T+Ss[j]))**0.5 )**2 *(T+Sij[i][j])/(T+Ss[i])
+#            for j in cmps] for i in cmps]
+#            
+#    return sum([ys[i]*ks[i]/sum(ys[j]*Aij[i][j] for j in cmps) for i in cmps])
 
 
 def Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots=None):
