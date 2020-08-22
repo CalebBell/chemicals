@@ -1763,7 +1763,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     than other kinetic theory models.
 
     .. math::
-        k = \sum \frac{y_i k_i}{\sum y_i A_{ij}}
+        k = \sum_i \frac{y_i k_i}{\sum_j y_i A_{ij}}
 
     .. math::
         A_{ij} = \frac{1}{4} \left\{ 1 + \left[\frac{\eta_i}{\eta_j}
@@ -1823,7 +1823,32 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     .. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
+    N = len(ys)
     cmps = range(len(ys))
+    S_roots = [0.0]*N
+    Ss = [0.0]*N
+    MW_powers = [0.0]*N
+    for i in range(N):
+        Ss[i] = 1.5*Tbs[i]
+        S_roots[i] = sqrt(Ss[i])
+        rtMW = sqrt(MWs[i])
+        MW_powers[i] = sqrt(rtMW)*rtMW # correct and clever
+    k = 0.0
+    for i in range(N):
+        den = 0.0
+        for j in range(N):
+            Sij = S_roots[i]*S_roots[j]
+            x0 = (T + Sij)/(T + Ss[i])
+            x1 = (T + Ss[i])/(T + Ss[j])
+            
+            big = sqrt(mus[i]/mus[j]*MW_powers[j]/MW_powers[i]*x1)
+            Aij = (1.0 + big)*(1.0 + big)*x0
+            den += ys[j]*Aij
+        den *= 0.25 # constant factor
+        k += ys[i]*ks[i]/den
+    return k
+    
+    
     Ss = [1.5*Tb for Tb in Tbs]
     Sij = [[(Si*Sj)**0.5 for Sj in Ss] for Si in Ss]
 
