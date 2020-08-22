@@ -29,7 +29,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs', 
 'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros', 
  'mixing_simple', 
-'mixing_logarithmic', 'to_num', 'CAS2int', 'sorted_CAS_key',
+'mixing_logarithmic', 'mixing_power', 'to_num', 'CAS2int', 'sorted_CAS_key',
 'int2CAS', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar', 
 'SG_to_API', 'API_to_SG', 'SG',   'Watson_K',
 'dxs_to_dns', 'dns_to_dn_partials', 'dxs_to_dn_partials', 'd2ns_to_dn2_partials',
@@ -1938,6 +1938,82 @@ def mixing_logarithmic(fracs, props):
         return exp(tot)
     except:
         return None
+
+def mixing_power(fracs, props, r):
+    r'''Power law mixing rule for any property, with a variable exponent
+    `r` as input. Optimiezd routines are available for r=-4,-3,-2,-1,1,2,3,4.
+
+    .. math::
+        \text{prop}_{mix}^r = \sum_i z_i \left(\text{prop}_i \right)^{r}
+        
+    Parameters
+    ----------
+    fracs : list[float]
+        Mole fractions of components (or mass, or volume, etc.), [-]
+    props : list[float]
+        Properties of all components, [various]
+    r : float
+        Power mixing exponent, [-]
+
+    Returns
+    -------
+    prop : float
+        Property for mixture, [`props`]
+
+    Notes
+    -----
+    This equation is entirely dimensionless; all dimensions cancel.
+
+    Examples
+    --------
+    >>> mixing_power([0.258, 0.742], [0.1692, 0.1528], -2)
+    0.15657104706719646
+
+    References
+    ----------
+    .. [1] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E. The
+       Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
+    '''
+    N = len(fracs)
+    prop = 0.0
+    if r == -4.0:
+        for i in range(N):
+            x = props[i]*props[i]
+            prop += fracs[i]/(x*x)
+        return prop**(1.0/r)
+    elif r == -3.0:
+        for i in range(N):
+            prop += fracs[i]/(props[i]*props[i]*props[i])
+        return prop**(1.0/r)
+    elif r == -2.0:
+        for i in range(N):
+            prop += fracs[i]/(props[i]*props[i])
+        return 1.0/sqrt(prop)
+    elif r == -1.0:
+        for i in range(N):
+            prop += fracs[i]/(props[i])
+        return 1.0/(prop)
+    elif r == 1.0:
+        for i in range(N):
+            prop += fracs[i]*(props[i])
+        return (prop)
+    elif r == 2.0:
+        for i in range(N):
+            prop += fracs[i]*(props[i]*props[i])
+        return sqrt(prop)
+    elif r == 3.0:
+        for i in range(N):
+            prop += fracs[i]*(props[i]*props[i]*props[i])
+        return prop**(1.0/3.0)
+    elif r == 4.0:
+        for i in range(N):
+            x = props[i]*props[i]
+            prop += fracs[i]*(x*x)
+        return sqrt(sqrt(prop))
+    
+    for i in range(len(fracs)):
+        prop += fracs[i]*(props[i]**r)
+    return prop**(1.0/r)
 
 
 def phase_select_property(phase=None, s=None, l=None, g=None, V_over_F=None,

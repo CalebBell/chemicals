@@ -487,3 +487,16 @@ def test_d2ns_to_dn2_partials():
     res = d2ns_to_dn2_partials(d2ns, [20.0, .124, 900.52])
     res_expect = [[40.152, 20.203999999999997, 921.067], [20.204, 0.922, 901.3729999999999], [921.067, 901.373, 1801.1709999999998]]
     assert_close2d(res, res_expect)
+
+
+def test_mixing_power():
+    zs = [.1, .4, .5]
+    props = [.01, .015, .025]
+    assert_close(mixing_power(zs, props, r=-4), 0.015110570481191988, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-3), 0.01586305104547743, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-2), 0.016718346377260586, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-1), 0.01764705882352941, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=1), 0.0195, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=2), 0.020310096011589902, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=3), 0.021001133725640605, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=4), 0.021572268349078574, rtol=1e-13)
