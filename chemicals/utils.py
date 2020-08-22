@@ -1963,6 +1963,16 @@ def mixing_power(fracs, props, r):
     Notes
     -----
     This equation is entirely dimensionless; all dimensions cancel.
+    
+    
+    The following recommendations in [1] exist for different properties:
+        
+    **Surface tension**: r = 1 Recommended by an author in [1]_; but often
+    non-linear behavior is shown and r= -1 to r=-3 is recommended.  r = -1
+    is most often used.
+    
+    **Liquid thermal conductivity**: r = -2 in [1]_; this is known also as 
+    procedure DIPPR9B.
 
     Examples
     --------
@@ -1971,8 +1981,8 @@ def mixing_power(fracs, props, r):
 
     References
     ----------
-    .. [1] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E. The
-       Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
     '''
     N = len(fracs)
     prop = 0.0
