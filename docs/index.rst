@@ -81,8 +81,7 @@ If you need to know something about a chemical, give chemicals a try.
    :maxdepth: 1
    :caption: Developer's guide
    
-   CONTRIBUTING
-   CODE_OF_CONDUCT
+   developers
 
 Installation
 ------------
