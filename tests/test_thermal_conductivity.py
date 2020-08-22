@@ -234,4 +234,21 @@ def test_Lindsay_Bromley():
 #    with pytest.raises(Exception):
 #        Lindsay_Bromley(323.15, [0.23], [1.939E-2, 1.231E-2], [1.002E-5, 1.015E-5], [248.31, 248.93], [46.07, 50.49])
 
+def test_Wassiljewa_Herning_Zipperer():
+    MWs = [40, 50, 60]
+    zs = [.1, .4, .5]
+    kgs = [.01, .015, .025]
+    
+    k = Wassiljewa_Herning_Zipperer(zs, kgs, MWs)
+    assert_close(k, 0.01984976897415608, rtol=1e-13)
+    
+    MWs = [40.0, 50.0, 60.0]
+    zs = [.1, .4, .5]
+    ks = [1.002E-5, 1.15E-5, 2e-5]
+    k = Wassiljewa_Herning_Zipperer(zs, ks, MWs)
+    assert_close(k, 1.5861181979916883e-05, rtol=1e-13)
+    
+    MW_roots = [i**0.5 for i in MWs]
+    k = Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots)
+    assert_close(k, 1.5861181979916883e-05, rtol=1e-13)
 

@@ -29,14 +29,15 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Mersmann_Kind_thermal_conductivity_liquid', 'DIPPR9G', 'k_IAPWS',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
 'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 
-'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley']
+'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
+'Wassiljewa_Herning_Zipperer']
 
 import os
 from fluids.numerics import horner, bisplev, implementation_optimize_tck, numpy as np
 from fluids.constants import R, R_inv, N_A, k, pi
 from chemicals.utils import log, exp, sqrt, atan, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
-
+from chemicals.viscosity import Herning_Zipperer
 
 folder = os_path_join(source_path, 'Thermal Conductivity')
 
@@ -828,6 +829,13 @@ def DIPPR9H(ws, ks):
 
     .. math::
         \lambda_m = \left( \sum_i w_i \lambda_i^{-2}\right)^{-1/2}
+        
+    This is also called the Vredeveld (1973) equation. A review in [3]_ finds
+    this the best model on average. However, they did caution that in some
+    cases a linear mole-fraction mixing rule performs better. This equation
+    according to Poling [1]_ should not be used if some components have 
+    thermal conductivities more than twice other components. They also say this
+    should not be used with water.
 
     Parameters
     ----------
@@ -851,6 +859,12 @@ def DIPPR9H(ws, ks):
 
     Average deviations of 3%. for 118 nonaqueous systems with 817 data points.
     Max deviation 20%. According to DIPPR.
+    
+    In some sources, this equation is given with the molecular weights included:
+    
+    .. math::
+        \lambda_m^{-2} = \frac{\sum_i z_i {MW}_i \lambda_i^{-2}}
+        {\sum_i z_i {MW}_i}
 
     Examples
     --------
@@ -863,11 +877,14 @@ def DIPPR9H(ws, ks):
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
+    .. [3] Focke, Walter W. "Correlating Thermal-Conductivity Data for Ternary
+       Liquid Mixtures." International Journal of Thermophysics 29, no. 4 
+       (August 1, 2008): 1342-60. https://doi.org/10.1007/s10765-008-0465-2.
     '''
     kl = 0.0
     for i in range(len(ws)):
         kl += ws[i]/(ks[i]*ks[i])
-    return kl**-0.5
+    return 1.0/sqrt(kl)
 
 
 def Filippov(ws, ks):
@@ -1203,11 +1220,11 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
 
     Examples
     --------
-    2-methylbutane at low pressure, 373.15 K. Mathes calculation in [2]_.
+    2-methylbutane at low pressure, 373.15 K. Matches calculation in [2]_.
 
     >>> Eli_Hanley(T=373.15, MW=72.151, Tc=460.4, Vc=3.06E-4, Zc=0.267,
     ... omega=0.227, Cvm=135.9)
-    0.02247951724514062
+    0.02247951724513664
 
     References
     ----------
@@ -1218,8 +1235,6 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     .. [2] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
     '''
-    Cs = [2.907741307E6, -3.312874033E6, 1.608101838E6, -4.331904871E5, 
-          7.062481330E4, -7.116620750E3, 4.325174400E2, -1.445911210E1, 2.037119479E-1]
 
     Tr = T/Tc
     if Tr > 2.0:
@@ -1233,18 +1248,25 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     
     T0_third = T0**(1.0/3.0)
     T0_moving = 1.0/T0
-    tot = 0.0
-    for i in range(9):
-        tot += Cs[i]*T0_moving
-        T0_moving *= T0_third
-        
+    tot = (2907741.307*T0_moving + T0_third*(-3312874.033*T0_moving 
+            + T0_third*(1608101.838*T0_moving + T0_third*(-433190.4871*T0_moving
+            + T0_third*(70624.8133*T0_moving + T0_third*(-7116.62075*T0_moving 
+         + T0_third*(432.51744*T0_moving + T0_third*(0.2037119479*T0_moving*T0_third 
+        - 14.4591121*T0_moving))))))))
+    
+#    Cs = [2.907741307E6, -3.312874033E6, 1.608101838E6, -4.331904871E5, 
+#          7.062481330E4, -7.116620750E3, 4.325174400E2, -1.445911210E1, 2.037119479E-1]
+#    tot = 0.0
+#    for i in range(9):
+#        tot += Cs[i]*T0_moving
+#        T0_moving *= T0_third
     eta0 = 1e-7*tot
-    k0 = 1944*eta0
+    k0 = 1944.0*eta0
 
-    H = (f*16.04/MW)**0.5*h**(-2.0/3.)
-    etas = eta0*H*MW/16.04
+    H = sqrt(f*16.04/MW)*h**(-2.0/3.)
+    etas = eta0*H*MW*0.06234413965087282 # /16.04
     ks = k0*H
-    return ks + etas/(MW*1e-3)*1.32*(Cvm - 1.5*R)
+    return ks + 1320.0*etas/MW*(Cvm - 1.5*R)
 
 
 def Gharagheizi_gas(T, MW, Tb, Pc, omega):
@@ -1305,7 +1327,9 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
     '''
     Pc = Pc*1e-4
     Tb_inv = 1.0/Tb
-    B = T + (2.*omega + 2.*T - 2.*T*(2.*omega + 3.2825)*Tb_inv + 3.2825)/(2.0*omega + T - T*(2.0*omega + 3.2825)*Tb_inv + 3.2825) - T*(2.0*omega + 3.2825)*Tb_inv
+    B = (T + (2.*omega + 2.*T - 2.*T*(2.*omega + 3.2825)*Tb_inv + 3.2825)
+         /(2.0*omega + T - T*(2.0*omega + 3.2825)*Tb_inv + 3.2825)
+         - T*(2.0*omega + 3.2825)*Tb_inv)
     
     x0 = (3.9752*omega + 0.1*Pc + 1.9876*B + 6.5243)
     A = (2.0*omega + T - T*(2.0*omega + 3.2825)*Tb_inv + 3.2825)/(0.1*MW*Pc*T) * x0*x0
@@ -1346,8 +1370,8 @@ def Bahadori_gas(T, MW):
 
     Examples
     --------
-    >>> Bahadori_gas(40+273.15, 20) # Point from article
-    0.031968165337873326
+    >>> Bahadori_gas(40+273.15, 20.0) # Point from article
+    0.03196816533787329
 
     References
     ----------
@@ -1355,16 +1379,16 @@ def Bahadori_gas(T, MW):
        Conductivity of Hydrocarbons." Chemical Engineering 115, no. 13
        (December 2008): 52-54
     '''
-    A = [4.3931323468E-1, -3.88001122207E-2, 9.28616040136E-4, -6.57828995724E-6]
-    B = [-2.9624238519E-3, 2.67956145820E-4, -6.40171884139E-6, 4.48579040207E-8]
-    C = [7.54249790107E-6, -6.46636219509E-7, 1.5124510261E-8, -1.0376480449E-10]
-    D = [-6.0988433456E-9, 5.20752132076E-10, -1.19425545729E-11, 8.0136464085E-14]
+    A = (4.3931323468E-1, -3.88001122207E-2, 9.28616040136E-4, -6.57828995724E-6)
+    B = (-2.9624238519E-3, 2.67956145820E-4, -6.40171884139E-6, 4.48579040207E-8)
+    C = (7.54249790107E-6, -6.46636219509E-7, 1.5124510261E-8, -1.0376480449E-10)
+    D = (-6.0988433456E-9, 5.20752132076E-10, -1.19425545729E-11, 8.0136464085E-14)
     X, Y = T, MW
-    a = A[0] + B[0]*X + C[0]*X**2 + D[0]*X**3
-    b = A[1] + B[1]*X + C[1]*X**2 + D[1]*X**3
-    c = A[2] + B[2]*X + C[2]*X**2 + D[2]*X**3
-    d = A[3] + B[3]*X + C[3]*X**2 + D[3]*X**3
-    return a + b*Y + c*Y**2 + d*Y**3
+    a = A[0] + X*(B[0] + X*(C[0] + D[0]*X))
+    b = A[1] + X*(B[1] + X*(C[1] + D[1]*X))
+    c = A[2] + X*(B[2] + X*(C[2] + D[2]*X))
+    d = A[3] + X*(B[3] + X*(C[3] + D[3]*X))
+    return a + Y*(b + Y*(c + d*Y))
 
 
 
@@ -1731,20 +1755,25 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
 
 
 ### Thermal conductivity of gas mixtures
+    
 
 def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     r'''Calculates thermal conductivity of a gas mixture according to
-    mixing rules in [1]_ and also in [2]_.
+    mixing rules in [1]_ and also in [2]_. It is significantly more complicated
+    than other kinetic theory models.
 
     .. math::
         k = \sum \frac{y_i k_i}{\sum y_i A_{ij}}
 
+    .. math::
         A_{ij} = \frac{1}{4} \left\{ 1 + \left[\frac{\eta_i}{\eta_j}
         \left(\frac{MW_j}{MW_i}\right)^{0.75} \left( \frac{T+S_i}{T+S_j}\right)
         \right]^{0.5} \right\}^2 \left( \frac{T+S_{ij}}{T+S_i}\right)
 
+    .. math::
         S_{ij} = S_{ji} = (S_i S_j)^{0.5}
         
+    .. math::
         S_i = 1.5 T_b
 
     Parameters
@@ -1754,7 +1783,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     ys : float
         Mole fractions of gas components
     ks : float
-        Liquid thermal conductivites of all components, [W/m/K]
+        Gas thermal conductivites of all components, [W/m/K]
     mus : float
         Gas viscosities of all components, [Pa*s]
     Tbs : float
@@ -1791,6 +1820,8 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
        (August 1, 1950): 1508-11. doi:10.1021/ie50488a017.
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
+    .. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
     '''
     cmps = range(len(ys))
     Ss = [1.5*Tb for Tb in Tbs]
@@ -1802,3 +1833,48 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
             
     return sum([ys[i]*ks[i]/sum(ys[j]*Aij[i][j] for j in cmps) for i in cmps])
 
+
+def Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots=None):
+    r'''Calculates thermal conductivity of a gas mixture according to
+    the kinetic theory expression of Wassiljewa with the interaction
+    term from the Herning-Zipperer expression. This is also used for
+    the prediction of gas mixture viscosity.
+
+    .. math::
+        k = \sum \frac{y_i k_i}{\sum y_i A_{ij}}
+
+    .. math::
+        A_{ij} = \left(\frac{MW_j}{MW_i}\right)^{0.5}
+
+    Parameters
+    ----------
+    zs : float
+        Mole fractions of gas components, [-]
+    ks : float
+        gas thermal conductivites of all components, [W/m/K]
+    MWs : float
+        Molecular weights of all components, [g/mol]
+    MW_roots : float, optional
+        Square roots of molecular weights of all components;
+        speeds up the calculation if provided, [g^0.5/mol^0.5]
+
+    Returns
+    -------
+    kg : float
+        Thermal conductivity of gas mixture, [W/m/K]
+
+    Notes
+    -----
+    This equation is entirely dimensionless; all dimensions cancel.
+
+    Examples
+    --------
+    >>> Wassiljewa_Herning_Zipperer(zs=[.1, .4, .5], ks=[1.002E-5, 1.15E-5, 2e-5], MWs=[40.0, 50.0, 60.0])
+    1.5861181979916883e-05
+    
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    return Herning_Zipperer(zs, ks, MWs, MW_roots)
