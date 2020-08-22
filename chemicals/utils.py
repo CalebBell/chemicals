@@ -26,13 +26,12 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Cp_minus_Cv', 'speed_of_sound', 'Joule_Thomson',
 'phase_identification_parameter', 'phase_identification_parameter_phase',
 'isentropic_exponent', 'Vm_to_rho', 'rho_to_Vm', 
-'Z', 'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form', 
-'Z_from_virial_pressure_form', 'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs', 
+'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs', 
 'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros', 
  'mixing_simple', 
 'mixing_logarithmic', 'to_num', 'CAS2int', 'sorted_CAS_key',
 'int2CAS', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar', 
-'SG_to_API', 'API_to_SG', 'SG',  
+'SG_to_API', 'API_to_SG', 'SG',   'Watson_K',
 'dxs_to_dns', 'dns_to_dn_partials', 'dxs_to_dn_partials', 'd2ns_to_dn2_partials',
 'd2xs_to_dxdn_partials', 'dxs_to_dxsn1', 'd2xs_to_d2xsn1',
  'vapor_mass_quality', 'mix_component_flows',
@@ -597,6 +596,53 @@ def SG(rho, rho_ref=999.0170824078306):
     return rho/rho_ref
 
 
+def Watson_K(Tb, SG):
+    r'''Calculates the Watson or UOP K Characterization factor
+    of a liquid of a liquid given its specific gravity, and its
+    average boiling point as shown in [1]_.
+
+    .. math::
+        K_W = \frac{T_b^{1/3}}{\text{SG at}~60^\circ\text{F}}
+    
+    Parameters
+    ----------
+    SG : float
+        Specific gravity of the fluid at 60 degrees Farenheight [-]
+    Tb : float
+        Average normal boiling point, [K]
+
+    Returns
+    -------
+    K_W : float
+        Watson characterization factor
+
+    Notes
+    -----
+    There are different ways to compute the average boiling point,
+    so two different definitions are often used - K_UOP using volume
+    average boiling point (VABP) using distillation points of 10%, 30%, 
+    50%, 70%, and 90%; and K_Watson using mean average boiling point (MeABP).
+
+    Examples
+    --------
+    >>> Watson_K(400, .8)
+    11.20351186639291
+    
+    Sample problem in Comments on Procedure 2B5.1 of [1]_;
+    a fluids has a MEAB of 580 F and a SG of 34.5.
+    
+    >>> from fluids.core import F2K
+    >>> Watson_K(F2K(580), API_to_SG(34.5))
+    11.884570347084471
+
+    References
+    ----------
+    .. [1] API Technical Data Book: General Properties & Characterization.
+       American Petroleum Institute, 7E, 2005.
+    '''
+    return (Tb*1.8)**(1.0/3.0)/SG
+
+
 def isobaric_expansion(V, dV_dT):
     r'''Calculate the isobaric coefficient of a thermal expansion, given its 
     molar volume at a certain `T` and `P`, and its derivative of molar volume
@@ -1126,225 +1172,6 @@ def Z(T, P, V):
        New York: McGraw-Hill Professional, 2000.
     '''
     return V*P/(R*T)
-
-
-def B_to_Z(B, T, P):
-    r'''Calculates the compressibility factor of a gas, given its
-    second virial coefficient.
-
-    .. math::
-        Z = 1 + \frac{BP}{RT}
-
-    Parameters
-    ----------
-    B : float
-        Second virial coefficient, [m^3/mol]
-    T : float
-        Temperature, [K]
-    P : float
-        Pressure [Pa]
-
-    Returns
-    -------
-    Z : float
-        Compressibility factor, [-]
-
-    Notes
-    -----
-    Other forms of the virial coefficient exist.
-
-    Examples
-    --------
-    >>> B_to_Z(-0.0015, 300, 1E5)
-    0.939863822478637
-
-    References
-    ----------
-    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
-       New York: McGraw-Hill Professional, 2000.
-    '''
-    return 1. + B*P/(R*T)
-
-
-def B_from_Z(Z, T, P):
-    r'''Calculates the second virial coefficient of a pure species, given the
-    compressibility factor of the gas.
-
-    .. math::
-        B = \frac{RT(Z-1)}{P}
-
-    Parameters
-    ----------
-    Z : float
-        Compressibility factor, [-]
-    T : float
-        Temperature, [K]
-    P : float
-        Pressure [Pa]
-
-    Returns
-    -------
-    B : float
-        Second virial coefficient, [m^3/mol]
-
-    Notes
-    -----
-    Other forms of the virial coefficient exist.
-
-    Examples
-    --------
-    >>> B_from_Z(0.94, 300, 1E5)
-    -0.0014966032712675846
-
-    References
-    ----------
-    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
-       New York: McGraw-Hill Professional, 2000.
-    '''
-    return (Z - 1.0)*R*T/P
-
-
-def Z_from_virial_density_form(T, P, *args):
-    r'''Calculates the compressibility factor of a gas given its temperature,
-    pressure, and molar density-form virial coefficients. Any number of
-    coefficients is supported.
-
-    .. math::
-        Z = \frac{PV}{RT} = 1 + \frac{B}{V} + \frac{C}{V^2} + \frac{D}{V^3}
-        + \frac{E}{V^4} \dots
-
-    Parameters
-    ----------
-    T : float
-        Temperature, [K]
-    P : float
-        Pressure, [Pa]
-    B to Z : float, optional
-        Virial coefficients, [various]
-
-    Returns
-    -------
-    Z : float
-        Compressibility factor at T, P, and with given virial coefficients, [-]
-
-    Notes
-    -----
-    For use with B or with B and C or with B and C and D, optimized equations 
-    are used to obtain the compressibility factor directly.
-    If more coefficients are provided, uses numpy's roots function to solve 
-    this equation. This takes substantially longer as the solution is 
-    numerical.
-    
-    If no virial coefficients are given, returns 1, as per the ideal gas law.
-    
-    The units of each virial coefficient are as follows, where for B, n=1, and
-    C, n=2, and so on.
-    
-    .. math::
-        \left(\frac{\text{m}^3}{\text{mol}}\right)^n
-
-    Examples
-    --------
-    >>> Z_from_virial_density_form(300, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
-    1.2843494052609186
-
-    References
-    ----------
-    .. [1] Prausnitz, John M., Rudiger N. Lichtenthaler, and Edmundo Gomes de 
-       Azevedo. Molecular Thermodynamics of Fluid-Phase Equilibria. 3rd 
-       edition. Upper Saddle River, N.J: Prentice Hall, 1998.
-    .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering. 
-       Butterworth-Heinemann, 1985.
-    '''
-    l = len(args)
-    if l == 1:
-        return 1/2. + (4*args[0]*P + R*T)**0.5/(2*(R*T)**0.5)
-#        return ((R*T*(4*args[0]*P + R*T))**0.5 + R*T)/(2*P)
-    if l == 2:
-        B, C = args
-        # A small imaginary part is ignored
-        return (P*(-(3*B*R*T/P + R**2*T**2/P**2)/(3*(-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)) - (-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)/3 + R*T/(3*P))/(R*T)).real
-    if l == 3:
-        # Huge mess. Ideally sympy could optimize a function for quick python 
-        # execution. Derived with kate's text highlighting
-        B, C, D = args
-        P2 = P**2 
-        RT = R*T
-        BRT = B*RT
-        T2 = T**2
-        R2 = R**2
-        RT23 = 3*R2*T2
-        mCRT = -C*RT
-        P2256 = 256*P2
-        
-        RT23P2256 = RT23/(P2256)
-        big1 = (D*RT/P - (-BRT/P - RT23/(8*P2))**2/12 - RT*(mCRT/(4*P) - RT*(BRT/(16*P) + RT23P2256)/P)/P)
-        big3 = (-BRT/P - RT23/(8*P2))
-        big4 = (mCRT/P - RT*(BRT/(2*P) + R2*T2/(8*P2))/P)
-        big5 = big3*(-D*RT/P + RT*(mCRT/(4*P) - RT*(BRT/(16*P) + RT23P2256)/P)/P)
-        big2 = 2*big1/(3*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3))
-        big7 = 2*BRT/(3*P) - big2 + 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(4*P2)
-        return (P*(((csqrt(big7)/2 + csqrt(4*BRT/(3*P) - (-2*C*RT/P - 2*RT*(BRT/(2*P) + R2*T2/(8*P2))/P)/csqrt(big7) + big2 - 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(2*P2))/2 + RT/(4*P))))/R/T).real
-
-    args = list(args)
-    args.reverse()
-    args.extend([1, -P/R/T])
-    solns = np.roots(args)
-    rho = float([i for i in solns if not i.imag and i.real > 0][0].real) # Quicker than indexing where imag ==0
-    return P/rho/R/T
-
-
-def Z_from_virial_pressure_form(P, *args):
-    r'''Calculates the compressibility factor of a gas given its pressure, and 
-    pressure-form virial coefficients. Any number of coefficients is supported.
-
-    .. math::
-        Z = \frac{Pv}{RT} = 1 + B'P + C'P^2 + D'P^3 + E'P^4 \dots
-
-    Parameters
-    ----------
-    P : float
-        Pressure, [Pa]
-    B to Z : float, optional
-        Pressure form Virial coefficients, [various]
-
-    Returns
-    -------
-    Z : float
-        Compressibility factor at P, and with given virial coefficients, [-]
-
-    Notes
-    -----
-    Note that although this function does not require a temperature input, it  
-    is still dependent on it because the coefficients themselves normally are
-    regressed in terms of temperature.
-    
-    The use of this form is less common than the density form. Its coefficients
-    are normally indicated with the "'" suffix.
-    
-    If no virial coefficients are given, returns 1, as per the ideal gas law.
-    
-    The units of each virial coefficient are as follows, where for B, n=1, and
-    C, n=2, and so on.
-    
-    .. math::
-        \left(\frac{1}{\text{Pa}}\right)^n
-
-    Examples
-    --------
-    >>> Z_from_virial_pressure_form(102919.99946855308, 4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19)
-    1.00283753944
-    
-    References
-    ----------
-    .. [1] Prausnitz, John M., Rudiger N. Lichtenthaler, and Edmundo Gomes de 
-       Azevedo. Molecular Thermodynamics of Fluid-Phase Equilibria. 3rd 
-       edition. Upper Saddle River, N.J: Prentice Hall, 1998.
-    .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering. 
-       Butterworth-Heinemann, 1985.
-    '''
-    return 1.0 + P*sum([coeff*P**i for i, coeff in enumerate(args)])
-
 
 def zs_to_ws(zs, MWs):
     r'''Converts a list of mole fractions to mass fractions. Requires molecular

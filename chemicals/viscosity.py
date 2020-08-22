@@ -28,11 +28,12 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'Gharagheizi_gas_viscosity', 'Herning_Zipperer', 
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
-'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke']
+'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'mu_IAPWS']
 
 import os
 from fluids.numerics import secant, interp, numpy as np
-from chemicals.utils import log, exp, log10, sqrt
+from chemicals.utils import log, exp, log10, sqrt, pi, atan, tan, sin, acos
+
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
@@ -110,6 +111,244 @@ if PY37:
 else:
     if can_load_data:
         _load_mu_data()
+
+
+
+def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
+    r'''Calculates and returns the viscosity of water according to the IAPWS
+    (2008) release.
+    
+    Viscosity is calculated as a function of three terms; 
+    the first is the dilute-gas limit; the second is the contribution due to
+    finite density; and the third and most complex is a critical enhancement 
+    term.
+
+    .. math::
+        \mu = \mu_0 \cdot \mu_1(T, \rho)
+        \cdot \mu_2(T, \rho)
+
+    .. math::
+        \mu_0(T) = \frac{100\sqrt{T}}{\sum_{i=0}^3 \frac{H_i}{T^i}}
+
+    .. math::
+        \mu_1(T, \rho) = \exp\left[\rho \sum_{i=0}^5
+        \left(\left(\frac{1}{T} - 1 \right)^i
+        \sum_{j=0}^6 H_{ij}(\rho - 1)^j\right)\right]
+
+    .. math::
+        \text{if }\xi < 0.3817016416 \text{ nm:}
+
+    .. math::
+        Y = 0.2 q_c \xi(q_D \xi)^5 \left(1 - q_c\xi + (q_c\xi)^2 -
+        \frac{765}{504}(q_D\xi)^2\right)
+
+    .. math::
+        \text{else:}
+
+    .. math::
+        Y = \frac{1}{12}\sin(3\psi_D) - \frac{1}{4q_c \xi}\sin(2\psi_D) +
+        \frac{1}{(q_c\xi)^2}\left[1 - 1.25(q_c\xi)^2\right]\sin(\psi_D)
+        - \frac{1}{(q_c\xi)^3}\left\{\left[1 - 1.5(q_c\xi)^2\right]\psi_D
+        - \left|(q_c\xi)^2 - 1\right|^{1.5}L(w)\right\}
+
+    .. math::
+        w = \left| \frac{q_c \xi -1}{q_c \xi +1}\right|^{0.5} \tan\left(
+        \frac{\psi_D}{2}\right)
+
+    .. math::
+        L(w) = \ln\frac{1 + w}{1 - w} \text{  if  }q_c \xi > 1
+
+    .. math::
+        L(w) = 2\arctan|w| \text{  if  }q_c \xi \le 1
+
+    .. math::
+        \psi_D = \arccos\left[\left(1 + q_D^2 \xi^2\right)^{-0.5}\right]
+
+    .. math::
+        \Delta \bar\chi(\bar T, \bar \rho) = \bar\rho\left[\zeta(\bar T, \bar
+        \rho) - \zeta(\bar T_R, \bar \rho)\frac{\bar T_R}{\bar T}\right]
+
+    .. math::
+        \xi = \xi_0 \left(\frac{\Delta \bar\chi}{\Gamma_0}\right)^{\nu/\gamma}
+
+    .. math::
+        \zeta = \left(\frac{\partial\bar\rho}{\partial \bar p}\right)_{\bar T}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of water [K]
+    rho : float
+        Density of water [kg/m^3]
+    drho_dP : float, optional
+        Partial derivative of density with respect to pressure at constant
+        temperature (at the temperature and density of water), [kg/m^3/Pa]
+    drho_dP_Tr : float, optional
+        Partial derivative of density with respect to pressure at constant
+        temperature (at the reference temperature (970.644 K) and the actual
+        density of water), [kg/m^3/Pa]
+
+    Returns
+    -------
+    mu : float
+        Viscosity, [Pa*s]
+
+    Notes
+    -----
+    There are three ways to use this formulation.
+    
+    1) Compute the Industrial formulation value which does not include the
+       critical enhacement, by leaving `drho_dP` and `drho_dP_Tr` None.
+    2) Compute the Scientific formulation value by accurately computing and
+       providing `drho_dP` and `drho_dP_Tr`, both with IAPWS-95.
+    3) Get a non-standard but 8 decimal place matching result by providing
+       `drho_dP` computed with either IAPWS-95 or IAPWS-97, but not providing
+       `drho_dP_Tr`; which is calculated internally. There is a formulation
+       for that term in the thermal conductivity IAPWS equation which is used.
+
+    xmu = 0.068
+    
+    qc = (1.9E-9)**-1
+    
+    qd = (1.1E-9)**-1
+    
+    nu = 0.630
+    
+    gamma = 1.239
+    
+    xi0 = 0.13E-9
+    
+    Gamma0 = 0.06
+    
+    TRC = 1.5
+    
+    This forulation is highly optimized, spending most of its time in the 
+    select logarithm, power, and complex square root.
+
+    Examples
+    --------
+    >>> mu_IAPWS(298.15, 998.)
+    0.000889735100149808
+
+    >>> mu_IAPWS(1173.15, 400.)
+    6.415460784836147e-05
+
+    Point 4 of formulation, compared with MPEI and IAPWS, matches.
+    
+    >>> mu_IAPWS(T=647.35, rho=322., drho_dP=1.213641949033E-2)
+    4.2961578738287e-05
+
+    References
+    ----------
+    .. [1] Huber, M. L., R. A. Perkins, A. Laesecke, D. G. Friend, J. V.
+       Sengers, M. J. Assael, I. N. Metaxa, E. Vogel, R. Mares, and
+       K. Miyagawa. "New International Formulation for the Viscosity of H2O."
+       Journal of Physical and Chemical Reference Data 38, no. 2
+       (June 1, 2009): 101-25. doi:10.1063/1.3088050.
+    '''
+    Tr = T*0.0015453657571674064 #/647.096
+    Tr_inv = 1.0/Tr
+    rhor = rho*0.003105590062111801 #1/322.
+    x0 = rhor - 1.
+    x1 = Tr_inv - 1.
+    '''
+    His = [1.67752, 2.20462, 0.6366564, -0.241605]
+    mu0 = 0
+    for i in range(4):
+        mu0 += His[i]/Tr**i
+    '''
+    mu0 = 100.0*sqrt(Tr)/(Tr_inv*(Tr_inv*(0.6366564 - 0.241605*Tr_inv) + 2.20462) + 1.67752)
+
+    '''
+    i_coefs = [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6]
+    j_coef = [0, 1, 2, 3, 0, 1, 2, 3, 5, 0, 1, 2, 3, 4, 0, 1, 0, 3, 4, 3, 5]
+    Hijs = [0.520094, .0850895, -1.08374, -0.289555, 0.222531, 0.999115,
+          1.88797, 1.26613, 0.120573, -0.281378, -0.906851, -0.772479,
+          -0.489837, -0.257040, 0.161913, 0.257399, -0.0325372, 0.0698452,
+          0.00872102, -0.00435673, -0.000593264]
+    tot = 0
+    for i in range(21):
+        tot += Hijs[i]*(rhor - 1.)**i_coefs[i]*(Tr_inv - 1.)**j_coef[i]
+    '''
+    x02 = x0*x0
+    tot = (x0*(x0*(x0*(0.161913 - 0.0325372*x0) - 0.281378) + 0.222531) 
+           + x1*(x0*(x0*(0.257399*x0 - 0.906851) + 0.999115) + x1*(x0*(1.88797 - 0.772479*x0) 
+            + x1*(x0*(x0*(x02*(0.0698452 - 0.00435673*x02) - 0.489837) + 1.26613) 
+            + x1*(x02*(0.00872102*x0*x02 - 0.25704) + x0*x1*(0.120573 - 0.000593264*x02*x02*x0)) - 0.289555) 
+            - 1.08374) + 0.0850895) + 0.520094)
+    mu1 = exp(rhor*tot)
+
+    if drho_dP:
+        xmu = 0.068
+        qc = 526315789.4736842#(1.9E-9)**-1
+        qD = 909090909.0909091#(1.1E-9)**-1
+#        nu = 0.630
+#        gamma = 1.239
+        xi0 = 0.13E-9
+#        Gamma0 = 0.06
+        TRC = 1.5
+
+        # Not a perfect match because of 
+        zeta_drho_dP = drho_dP*68521.73913043478 #22.064E6/322.0
+        if drho_dP_Tr is None:
+            # Brach needed to allow scientific points to work
+            if rhor <= 0.310559006:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(1.97815050331519*rhor + 10.2631854662709) - 2.27492629730878)
+                            + 3.39624167361325) - 5.61149954923348) + 6.53786807199516)
+            elif rhor <= 0.776397516:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(12.1358413791395 - 5.54349664571295*rhor) - 9.82240510197603)
+                            + 8.08379285492595) - 6.30816983387575) + 6.52717759281799)
+            elif rhor <= 1.242236025:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579) 
+                            + 8.91990208918795) - 3.96415689925446) + 5.35500529896124)
+            elif rhor <= 1.863354037:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(6.1678099993336 - 0.965458722086812*rhor) - 11.0321960061126)
+                            + 8.93237374861479) + 0.464621290821181) + 1.55225959906681)
+            else:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(4.66861294457414 - 0.503243546373828*rhor) - 10.325505114704)
+                            + 9.8895256507892) + 0.595748562571649) + 1.11999926419994)
+            drho_dP_Tr = 1./tot1
+        else:
+            drho_dP_Tr *= 68521.73913043478 #22.064E6/322.0
+        dchi = rhor*(zeta_drho_dP - drho_dP_Tr*TRC*Tr_inv)
+        if dchi < 0.0:
+            # By definition
+            return mu0*mu1*1e-6
+        
+        # 16.666 = 1/Gamma0
+        xi = xi0*(dchi*16.666666666666668)**0.5084745762711864 #(nu/gamma)
+        qD2 = qD*qD
+        xi2 = xi*xi
+        x2 = qD2*xi2
+        psiD = acos(1.0/sqrt(1.0 + x2))
+        qcxi = qc*xi
+        qcxi2 = qcxi*qcxi
+        qcxi_inv = 1.0/qcxi
+
+        w = sqrt(abs((qcxi - 1.0)/(qcxi + 1.0)))*tan(psiD*0.5)
+        if qc*xi > 1.0:
+            Lw = log((1.0 + w)/(1.0 - w))
+        else:
+            Lw = 2.0*atan(w)
+
+        if xi <= 0.381706416E-9:
+            # 1.5178571428571428 = 765./504
+            Y = 0.2*qcxi*x2*x2*qD*xi*(1.0 - qcxi + qcxi2 - 1.5178571428571428*x2)
+        else:
+            # sin(ax) = 2cos(ax/2)*sin(ax/2)
+            # It would be possible to compute the sin(2psiD) and sin(psiD) together with a sincos
+            # operation, but not the sin(3psid)
+            x3 = (abs(qcxi2 - 1.0))
+            Y = (1/12.*sin(3.0*psiD) + (-0.25*sin(2.0*psiD)
+                 +((1.0 - 1.25*qcxi2)*sin(psiD)
+                 -qcxi_inv*((1.0 - 1.5*qcxi2)*psiD - x3*sqrt(x3)*Lw))*qcxi_inv)*qcxi_inv )
+
+        mu2 = exp(xmu*Y)
+    else:
+        mu2 = 1.0
+    mu = mu0*mu1*mu2*1e-6
+    return mu
+
 
 def Viswanath_Natarajan_2(T, A, B):
     r'''Calculate the viscosity of a liquid using the 2-term form

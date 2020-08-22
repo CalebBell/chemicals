@@ -72,6 +72,7 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
              'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
              'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
              'viscosity.Wilke_large', 'viscosity.Wilke_prefactored',
+             'interface.Winterfeld_Scriven_Davis',
              
              'rachford_rice.Rachford_Rice_solution',
              'rachford_rice.Rachford_Rice_solution_LN2',

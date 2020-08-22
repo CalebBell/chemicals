@@ -25,6 +25,7 @@ import pytest
 import numpy as np
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
+from chemicals.utils import rho_to_Vm
 from chemicals.interface import *
 from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_Lange, sigma_data_Somayajulu,
                                  sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
@@ -141,6 +142,18 @@ def test_VDI_PPDS_11_data():
     for calc, fixed in zip(tots_calc, tots):
         assert_close(calc, fixed)
 
+def test_Weinaug_Katz():
+    # sample test case
+    sigma = Weinaug_Katz([5.1e-5, 7.2e-5], Vml=0.000125, Vmg=0.02011, xs=[.4, .6], ys=[.6, .4])
+    assert_close(sigma, 0.06547479150776776)
+    
+    # pure component check it checks out
+    Vml = rho_to_Vm(800.8088185536124, 100.15888)
+    Vmg = rho_to_Vm(4.97865317223119, 100.15888)
+    sigma = Weinaug_Katz([5.088443542210164e-05], Vml, Vmg, [1], [1])
+    assert_close(sigma, 0.026721669606560042, rtol=1e-13)
+
+
 def test_Winterfeld_Scriven_Davis():
     # The example is from [2]_; all results agree.
     # The original source has not been reviewed.
@@ -173,3 +186,11 @@ def test_Diguilio_Teja():
 def test_Meybodi_Daryasafar_Karimi():
     sigma = Meybodi_Daryasafar_Karimi(980, 760, 580, 914)
     assert_close(sigma, 0.02893598143089256)
+
+
+def test_API10A32():
+    from fluids.core import F2K, R2K
+    assert_close(API10A32(T=F2K(60), Tc=R2K(1334), K_W=12.4), 29.577333312096968, rtol=1e-13)
+    
+    
+    
