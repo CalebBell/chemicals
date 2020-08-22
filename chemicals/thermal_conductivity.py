@@ -1845,10 +1845,12 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     for i in range(N):
         den = 0.0
         for j in range(N):
-            Sij = S_roots[i]*S_roots[j]
-            x0 = (T + Sij)*Ss_inv[i]
+            x0 = (T + S_roots[i]*S_roots[j])*Ss_inv[i]
+            bigi = Ss_roots[i]*root_mus[i]/MW_powers[i]
+            bigj = MW_powers[j]/(Ss_roots[j]*root_mus[j])
+            big = bigi*bigj
             
-            big = MW_powers[j]/MW_powers[i]*Ss_roots[i]/Ss_roots[j]*root_mus[i]/root_mus[j]
+#            big = MW_powers[j]/MW_powers[i]*Ss_roots[i]/Ss_roots[j]*root_mus[i]/root_mus[j]
             Aij = (1.0 + big)*(1.0 + big)*x0
             den += ys[j]*Aij
         den *= 0.25 # constant factor
