@@ -39,7 +39,21 @@ def test_k_IAPWS():
     k_calc = [k_IAPWS(T=647.35, rho=rhos[i], Cp=Cps[i], Cv=Cvs[i], mu=mus[i], drho_dP=d_rho_d_Ps[i]) for i in range(len(rhos))]
     assert_close1d(k_calc, k_CP, rtol=5e-6)
 
-    
+#        Region 1, test 2, from IAPWS formulation, exact match:
+
+    k = k_IAPWS(T=620., rho=699.226043, Cp=5320.47725, Cv=2916.92653, mu=84.1527945E-6, drho_dP=1.84869007E-6)
+    assert_close(k, 0.5450389394624772, rtol=1e-13)
+
+#    Region 2, test 1, from IAPWS formulation, exact match:
+
+    k= k_IAPWS(T=650., rho=1.00452141, Cp=2070.10035, Cv=1596.75313, mu=23.4877453E-6, drho_dP=3.36351419E-6)
+    assert_close(k, 0.052231102436372065, rtol=1e-13)
+
+#    Region 3, test 1, from IAPWS formulation, exact match:
+
+    k = k_IAPWS(T=647.35, rho=222., Cp=101054.488, Cv=4374.66458, mu=31.2204749E-6, drho_dP=177.778595E-6)
+    assert_close(k, 0.36687941154060383, rtol=1e-13)
+
     
 def test_Perrys2_314_data():
     # In perry's, only 102 is used. No chemicals are missing.
@@ -129,7 +143,7 @@ def test_CSP_liq():
     kl = Bahadori_liquid(273.15, 170)
     assert_close(kl, 0.14274278108272603)
     
-    kl = Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 0.000754, {'C': 12, 'H': 26})
+    kl = Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 0.000754, 38)
     assert_close(kl, 0.0895271829899285)
 
 

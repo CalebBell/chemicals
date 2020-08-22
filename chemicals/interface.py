@@ -855,7 +855,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
     --------
     >>> Winterfeld_Scriven_Davis([0.1606, 0.8394], [0.01547, 0.02877],
     ... [8610., 15530.])
-    0.024967388450439817
+    0.02496738845043982
 
     References
     ----------

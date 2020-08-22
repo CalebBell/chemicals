@@ -162,31 +162,13 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None):
     Examples
     --------
     >>> k_IAPWS(647.35, 750.)
-    0.5976194153179507
+    0.5976194153179502
 
     Region 1, test 1, from MPEI, exact match:
 
     >>> k_IAPWS(T=620., rho=613.227777440324, Cp=7634.337046792,
     ... Cv=3037.934412104, mu=70.905106751524E-6, drho_dP=5.209378197916E-6)
-    0.4814851951020004
-
-    Region 1, test 2, from IAPWS formulation, exact match:
-
-    >>> k_IAPWS(T=620., rho=699.226043, Cp=5320.47725, Cv=2916.92653,
-    ... mu=84.1527945E-6, drho_dP=1.84869007E-6)
-    0.5450389394624772
-
-    Region 2, test 1, from IAPWS formulation, exact match:
-
-    >>> k_IAPWS(T=650., rho=1.00452141, Cp=2070.10035, Cv=1596.75313,
-    ... mu=23.4877453E-6, drho_dP=3.36351419E-6)
-    0.052231102436372065
-
-    Region 3, test 1, from IAPWS formulation, exact match:
-
-    >>> k_IAPWS(T=647.35, rho=222., Cp=101054.488, Cv=4374.66458,
-    ... mu=31.2204749E-6, drho_dP=177.778595E-6)
-    0.36687941154060383
+    0.48148519510200044
 
     References
     ----------
@@ -660,7 +642,7 @@ def Bahadori_liquid(T, M):
     return a + Y*(b + Y*(c + d*Y))
 
 
-def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
+def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, na):
     r'''Estimates the thermal conductivity of organic liquid substances
     according to the method of [1]_.
 
@@ -680,8 +662,8 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
         Critical temperature of the fluid [K]
     Vc : float
         Critical volume of the fluid [m^3/mol]
-    atoms : dict
-        Dictionary of atoms and their counts, [-]
+    na : float
+        Number of atoms in the molecule, [-]
 
     Returns
     -------
@@ -698,7 +680,7 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
     Dodecane at 400 K:
         
     >>> Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 
-    ... 0.000754, {'C': 12, 'H': 26})
+    ... 0.000754, 38)
     0.0895271829899285
 
     References
@@ -708,7 +690,6 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
        Pressure." Industrial & Engineering Chemistry Research, January 31, 
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     '''
-    na = sum(atoms.values())
     lambda_star = 2/3.*(na + 40.*(1. - T/Tc)**0.5)
     Vc = Vc*1000.0 # m^3/mol to m^3/kmol
     N_A2 = N_A*1000.0 # Their avogadro's constant is per kmol
