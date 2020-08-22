@@ -1826,27 +1826,35 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     N = len(ys)
     cmps = range(len(ys))
     S_roots = [0.0]*N
-    Ss = [0.0]*N
+    Ss_inv = [0.0]*N
+    Ss_roots = [0.0]*N
     MW_powers = [0.0]*N
+    root_mus = [0.0]*N
+    
     for i in range(N):
-        Ss[i] = 1.5*Tbs[i]
-        S_roots[i] = sqrt(Ss[i])
-        rtMW = sqrt(MWs[i])
-        MW_powers[i] = sqrt(rtMW)*rtMW # correct and clever
+        Si = 1.5*Tbs[i]
+        S_roots[i] = sqrt(Si)
+        rt25MW = sqrt(sqrt(MWs[i]))
+        MW_powers[i] = rt25MW*sqrt(rt25MW) # correct and clever - compute MW^0.375
+        T_Si = T + Si
+        Ss_inv[i] = 1.0/T_Si
+        Ss_roots[i] = sqrt(T_Si)
+        root_mus[i] = sqrt(mus[i])
+    
     k = 0.0
     for i in range(N):
         den = 0.0
         for j in range(N):
             Sij = S_roots[i]*S_roots[j]
-            x0 = (T + Sij)/(T + Ss[i])
-            x1 = (T + Ss[i])/(T + Ss[j])
+            x0 = (T + Sij)*Ss_inv[i]
             
-            big = sqrt(mus[i]/mus[j]*MW_powers[j]/MW_powers[i]*x1)
+            big = MW_powers[j]/MW_powers[i]*Ss_roots[i]/Ss_roots[j]*root_mus[i]/root_mus[j]
             Aij = (1.0 + big)*(1.0 + big)*x0
             den += ys[j]*Aij
         den *= 0.25 # constant factor
         k += ys[i]*ks[i]/den
     return k
+    
     
     
     Ss = [1.5*Tb for Tb in Tbs]
