@@ -853,10 +853,10 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
         # 3rd deriv adds 1 mult, 3 add
         x5x1x6 = x5*x1x6
         x7 = zix5*x5x1x6
-        dF0 -= x7
+        dF0 += x7
         ddF0 += x7*(t51 + x5x1x6 + x5x1x6)
 
-    return F0, dF0, ddF0
+    return F0, -dF0, ddF0
 
 def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     r'''Solves the a objective function for the Rachford-Rice flash equation

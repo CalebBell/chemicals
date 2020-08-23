@@ -95,6 +95,8 @@ def test_pubchem_dict():
 
 @pytest.mark.xfail
 def test_database_formulas():
+    # Failures are thing slike 3He, C2D4Br2, C14H18N3NaO10[99Tc], [1H]I
+    # The fix here is adding an isotope db and making the formula parser handle isotopes as well.
     # This worked until isotopes were added to formulas
     assert all([i.formula == serialize_formula(i.formula) for i in pubchem_db.CAS_index.values()])
 

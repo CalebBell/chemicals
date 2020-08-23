@@ -129,10 +129,7 @@ class ChemicalMetadataDB(object):
                            os.path.join(folder, 'chemical identifiers example user db.tsv'),
                            os.path.join(folder, 'Cation db.tsv'),
                            os.path.join(folder, 'Anion db.tsv'),
-                           os.path.join(folder, 'Inorganic db.tsv')]):
-        # TODO: delay creation of indexes, as most people won't be searching with all of them.
-        
-        
+                           os.path.join(folder, 'Inorganic db.tsv')]):        
         self.pubchem_index = {}
         self.smiles_index = {}
         self.InChI_index = {}
@@ -145,7 +142,6 @@ class ChemicalMetadataDB(object):
         self.user_dbs = user_dbs
         self.elements = elements
 
-#        self.load(self.main_db)
         for db in self.user_dbs:
             self.load(db)
         self.load_elements()
@@ -214,10 +210,10 @@ class ChemicalMetadataDB(object):
         f.close()
         
     @property
-    def can_autoload(self):
-        return (not self.loaded_main_db and self.main_db is not None)
+    def finished_loading(self):
+        return not (not self.loaded_main_db and self.main_db is not None)
         
-    def autoload_next(self):
+    def autoload_main_db(self):
         self.load(self.main_db)
         for db in self.user_dbs:
             self.load(db)
@@ -230,8 +226,8 @@ class ChemicalMetadataDB(object):
             if identifier in index:
                 return index[identifier]
             else:
-                if autoload and self.can_autoload:
-                    self.autoload_next()
+                if autoload and not self.finished_loading:
+                    self.autoload_main_db()
                     return self._search_autoload(identifier, index, autoload)
         return False
     
@@ -259,7 +255,6 @@ class ChemicalMetadataDB(object):
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
 
 
-chemical_search_cache = {}
 
 def CAS_from_any(ID, autoload=False, cache=True):
     """Wrapper around `search_chemical` which returns the CAS number of the
@@ -297,6 +292,9 @@ def CAS_from_any(ID, autoload=False, cache=True):
     '17778-80-2'
     """
     return search_chemical(ID, autoload=False, cache=True).CASs
+
+chemical_search_cache = {}
+chemical_search_cache_max_size = 200
 
 def search_chemical(ID, autoload=False, cache=True):
     """Looks up metadata about a chemical by searching and testing for the input
@@ -352,40 +350,37 @@ def search_chemical(ID, autoload=False, cache=True):
     if cache and ID in chemical_search_cache:
         return chemical_search_cache[ID]
     if not _pubchem_db_loaded: get_pubchem_db()
-    
+    hit = _search_chemical(ID, autoload)
+    if cache:
+        if len(chemical_search_cache) > chemical_search_cache_max_size:
+            # invalidate cache by time - first entry is removed relying on
+            # dict ordering new in Python 3.7
+            chemical_search_cache.pop(next(chemical_search_cache.keys().__iter__()))
+        chemical_search_cache[ID] = hit
+    return hit
+
+def _search_chemical(ID, autoload):
     ID_arg = ID
     ID = ID.strip()
     ID_lower = ID.lower()
     if ID in periodic_table:
-        if periodic_table[ID].number not in homonuclear_elemental_gases:
-            return pubchem_db.search_CAS(periodic_table[ID].CAS)
+        '''Special handling for homonuclear elements. Search '1'> H, 'H'> H, monotomic CAS > H
+        but "Hydrogen"> H2.
+        pubchem_db does not contain atomic numbers, so searching in the periodic table is necessary.
+        '''
+        if (ID in periodic_table._symbol_to_elements or ID in periodic_table._number_to_elements
+            or ID in periodic_table._CAS_to_elements):
+            obj = pubchem_db.search_CAS(periodic_table[ID].CAS)
         else:
-            for i in [periodic_table._symbol_to_elements, 
-                      periodic_table._number_to_elements,
-                      periodic_table._CAS_to_elements]:
-                if i == periodic_table._number_to_elements:
-                    if int(ID in i):
-                        obj = pubchem_db.search_CAS(periodic_table[int(ID)].CAS)
-                        if cache:
-                            chemical_search_cache[ID_arg] = obj
-                        return obj
-                else:
-                    if ID in i:
-                        obj = pubchem_db.search_CAS(periodic_table[ID].CAS)
-                        if cache:
-                            chemical_search_cache[ID_arg] = obj
-                        return obj
+            obj = pubchem_db.search_CAS(periodic_table[ID].CAS_standard)
+        return obj
     if checkCAS(ID):
         CAS_lookup = pubchem_db.search_CAS(ID, autoload)
         if CAS_lookup:
-            if cache:
-                chemical_search_cache[ID_arg] = CAS_lookup
             return CAS_lookup
         # handle the case of synonyms
         CAS_alternate_loopup = pubchem_db.search_name(ID, autoload)
         if CAS_alternate_loopup:
-            if cache:
-                chemical_search_cache[ID_arg] = CAS_alternate_loopup
             return CAS_alternate_loopup
             
         if not autoload:
@@ -405,8 +400,6 @@ def search_chemical(ID, autoload=False, cache=True):
         if inchi_search:
             inchi_lookup = pubchem_db.search_InChI(inchi_search, autoload)
             if inchi_lookup:
-                if cache:
-                    chemical_search_cache[ID_arg] = inchi_lookup
                 return inchi_lookup
             else:
                 if not autoload:
@@ -415,22 +408,16 @@ def search_chemical(ID, autoload=False, cache=True):
         if ID_lower[0:9] == 'inchikey=':
             inchi_key_lookup = pubchem_db.search_InChI_key(ID[9:], autoload)
             if inchi_key_lookup:
-                if cache:
-                    chemical_search_cache[ID_arg] = inchi_key_lookup
                 return inchi_key_lookup
             else:
                 if not autoload:
                     obj = search_chemical(ID, autoload=True)
-                    if cache:
-                        chemical_search_cache[ID_arg] = obj
                     return obj
                 raise ValueError('A valid InChI Key (%s) was recognized, but it is not in the database' %(inchi_key_lookup))
     if ID_len > 8:
         if ID_lower[0:8] == 'pubchem=':
             pubchem_lookup = pubchem_db.search_pubchem(ID[8:], autoload)
             if pubchem_lookup:
-                if cache:
-                    chemical_search_cache[ID_arg] = pubchem_lookup
                 return pubchem_lookup
                 
             else:
@@ -441,8 +428,6 @@ def search_chemical(ID, autoload=False, cache=True):
         if ID_lower[0:7] == 'smiles=':
             smiles_lookup = pubchem_db.search_smiles(ID[7:], autoload)
             if smiles_lookup:
-                if cache:
-                    chemical_search_cache[ID_arg] = smiles_lookup
                 return smiles_lookup
             else:
                 if not autoload:
@@ -454,15 +439,11 @@ def search_chemical(ID, autoload=False, cache=True):
     # Pybel API also prints messages to console on failure
     smiles_lookup = pubchem_db.search_smiles(ID, autoload)
     if smiles_lookup:
-        if cache:
-            chemical_search_cache[ID_arg] = smiles_lookup
         return smiles_lookup
     
     try:
         formula_query = pubchem_db.search_formula(serialize_formula(ID), autoload)
         if formula_query and type(formula_query) == ChemicalMetadata:
-            if cache:
-                chemical_search_cache[ID_arg] = formula_query
             return formula_query
     except:
         pass
@@ -470,8 +451,6 @@ def search_chemical(ID, autoload=False, cache=True):
     # Try a direct lookup with the name - the fastest
     name_lookup = pubchem_db.search_name(ID, autoload)
     if name_lookup:
-        if cache:
-            chemical_search_cache[ID_arg] = name_lookup
         return name_lookup
     
 #     Permutate through various name options
@@ -482,26 +461,22 @@ def search_chemical(ID, autoload=False, cache=True):
         for name2 in [name, name.lower()]:
             name_lookup = pubchem_db.search_name(name2, autoload)
             if name_lookup:
-                if cache:
-                    chemical_search_cache[ID_arg] = name_lookup
                 return name_lookup
     
     if ID[-1] == ')' and '(' in ID:#
-        # Try to matck in the form 'water (H2O)'
+        # Try to match in the form 'water (H2O)'
         first_identifier, second_identifier = ID[0:-1].split('(', 1)
         try:
-            CAS1 = search_chemical(first_identifier)
-            CAS2 = search_chemical(second_identifier)
+            CAS1 = search_chemical(first_identifier, autoload)
+            CAS2 = search_chemical(second_identifier, autoload)
             assert CAS1 == CAS2
             CAS = CAS1
-            if cache:
-                chemical_search_cache[ID_arg] = CAS
             return CAS
         except:
             pass
         
     if not autoload:
-        return search_chemical(ID, autoload=True)
+        return _search_chemical(ID, autoload=True)
             
     raise ValueError('Chemical name (%s) not recognized' %(ID))
 
