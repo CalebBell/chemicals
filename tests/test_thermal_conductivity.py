@@ -252,3 +252,7 @@ def test_Wassiljewa_Herning_Zipperer():
     k = Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots)
     assert_close(k, 1.5861181979916883e-05, rtol=1e-13)
 
+
+def test_DIPPR9I():
+    k = DIPPR9I(zs=[.682, .318], Vms=[1.723e-2, 7.338e-2], ks=[.6037, .1628])
+    assert_close(k, 0.25397430656658937, rtol=1e-13)

@@ -26,7 +26,7 @@ from __future__ import division
 
 __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad', 
 'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid', 
-'Mersmann_Kind_thermal_conductivity_liquid', 'DIPPR9G', 'k_IAPWS',
+'Mersmann_Kind_thermal_conductivity_liquid', 'DIPPR9G', 'DIPPR9I','k_IAPWS',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
 'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
@@ -886,6 +886,89 @@ def DIPPR9H(ws, ks):
         kl += ws[i]/(ks[i]*ks[i])
     return 1.0/sqrt(kl)
 
+def DIPPR9I(zs, Vms, ks):
+    r'''Calculates thermal conductivity of a liquid mixture according to
+    mixing rules in [1]_. This is recommended in [2]_ for aqueous and
+    nonaqueous systems.
+    
+    .. math::
+        k_{mix} = \sum_{i}\sum_j \phi_i\phi_j k_{i,j}
+    
+    .. math::
+        k_{i,j} = \frac{2}{\frac{1}{k_i} + \frac{1}{k_j}}
+    
+    .. math::
+        \phi_i = \frac{z_i V_{m,i}}{\sum_j^n z_j V_{m,j}}
+        
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of components, [-]
+    Vms : list[float]
+        Molar volumes of each component, [m^3/mol]
+    ks : float
+        Liquid thermal conductivites of all components, [W/m/K]
+
+    Returns
+    -------
+    kl : float
+        Thermal conductivity of liquid mixture, [W/m/K]
+
+    Notes
+    -----
+    This equation is entirely dimensionless; all dimensions cancel.
+    The example is from [2]_; all results agree.
+    
+    [2]_ found average deviations of 4-6% for 118 nonaqueous systems
+    and 15 aqueous systems at atmospheric pressure, with a maximum deviation of 
+    33%.
+    
+    The computational complexity here is N^2, with a division present in the
+    inner loop.
+
+    Examples
+    --------
+    >>> DIPPR9I(zs=[.682, .318], Vms=[1.723e-2, 7.338e-2], ks=[.6037, .1628])
+    0.25397430656658937
+
+    References
+    ----------
+    .. [1] Li, C. C. "Thermal Conductivity of Liquid Mixtures." AIChE Journal
+       22, no. 5 (1976): 927–30. https://doi.org/10.1002/aic.690220520.
+    .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
+       Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
+    '''
+    N = len(zs)
+    k = 0.0
+    # Precomputation
+    ks_inv = [0.0]*N
+    phis = [0.0]*N
+    tot = 0.0
+    for i in range(N):
+        val = zs[i]*Vms[i]
+        phis[i] = val
+        tot += val
+    tot = 1.0/tot
+    for i in range(N):
+        phis[i] *= tot
+        
+    # Compute the diagonal and store ks_inv
+    for i in range(N):
+        k_inv = 1.0/ks[i]
+        k += phis[i]*phis[i]*ks[i]
+        ks_inv[i] = k_inv
+    
+    # Main loop
+    main_k_sum = 0.0
+    for i in range(N):
+        tot = 0.0
+        for j in range(i):
+            tot += phis[j]/(ks_inv[i] + ks_inv[j])
+        main_k_sum += tot*phis[i]
+            
+    # factored out 4 - 2 from inner loop, two from symmetry
+    k += 4.0*main_k_sum
+    return k
 
 def Filippov(ws, ks):
     r'''Calculates thermal conductivity of a binary liquid mixture according to

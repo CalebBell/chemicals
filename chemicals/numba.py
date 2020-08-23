@@ -97,6 +97,7 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
              'critical.Chueh_Prausnitz_Tc',
              'critical.Chueh_Prausnitz_Vc',
              'thermal_conductivity.Lindsay_Bromley',
+             'thermal_conductivity.DIPPR9I',
              ]
     normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist)
 
