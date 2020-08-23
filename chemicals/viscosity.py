@@ -1258,7 +1258,7 @@ def Wilke_large(ys, mus, MWs):
         x0 = mu_root_inv*MW_root
         # Stored values
         mu_roots[i] = 2.0*mu_root_inv*mus[i]*MW_25_inv
-        MW_invs[i] = MW_root_inv*MW_root_inv
+        MW_invs[i] = 8.0*MW_root_inv*MW_root_inv
         MW_inv_mus[i] = mus[i]*MW_root_inv
         mus_inv_MW_roots[i] = mu_root_inv*x0
         mu_root_invs_MW_25s[i] = x0*MW_25_inv
@@ -1273,8 +1273,8 @@ def Wilke_large(ys, mus, MWs):
         # Not a symmetric matrix unfortunately
         for j in range(N):
             # sqrt call is important for PyPy to make this fast
-            phii_denom = ys[j]/sqrt(8.0*(1.0 + MWi*MW_invs[j]))
             # Numba sees as 25% performance increase by making this an pow(x, -0.5)
+            phii_denom = ys[j]/sqrt(8.0 + MWi*MW_invs[j])
             tot += phii_denom + phii_denom*(mus_inv_MW_roots[j]*MWs_root_invi
                                 + mu_root_invs_MW_25s[j]*MW_25_invi)
         mu += ys[i]*mus[i]/tot
