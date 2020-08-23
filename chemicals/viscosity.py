@@ -1289,19 +1289,25 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
     .. math::
         \eta_{mix} = \sum_{i=1}^n \frac{y_i \eta_i}{\sum_{j=1}^n y_j \phi_{ij}}
 
+    .. math::
         \phi_{ij} = \left( \frac{\eta_i}{\eta_j} \right)^{0.5} S_{ij} A_{ij}
 
+    .. math::
         A_{ij} = m_{ij} M_{ij}^{-0.5} \left[1 +
         \frac{M_{ij} - M_{ij}^{0.45}}
         {2(1+M_{ij}) + \frac{(1 + M_{ij}^{0.45}) m_{ij}^{-0.5}}{1 + m_{ij}}} \right]
 
+    .. math::
         m_{ij} = \left[ \frac{4}{(1+M_{ij}^{-1})(1+M_{ij})}\right]^{0.25}
 
+    .. math::
         M_{ij} = \frac{M_i}{M_j}
 
+    .. math::
         S_{ij} = \frac{1 + (T_i^* T_j^*)^{0.5} + (\delta_i \delta_j/4)}
         {[1+T_i^* + (\delta_i^2/4)]^{0.5}[1+T_j^*+(\delta_j^2/4)]^{0.5}}
 
+    .. math::
         T^* = kT/\epsilon
 
     Parameters
@@ -1309,7 +1315,7 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
     T : float
         Temperature of fluid, [K]
     ys : float
-        Mole fractions of gas components
+        Mole fractions of gas components, [-]
     mus : float
         Gas viscosities of all components, [Pa*s]
     MWs : float

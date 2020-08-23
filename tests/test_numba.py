@@ -517,6 +517,7 @@ def test_lazy_loading():
 Not working:
     
     utils.CAS2int,int2CAS,hash_any_primitive,sorted_CAS_key - no int/str conversion
+    viscosity.Brokaw
     
     solubility.Henry_pressure_mixture - None issue
 '''
