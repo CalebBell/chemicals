@@ -118,14 +118,16 @@ def permittivity_IAPWS(T, rho):
        Water Substance for Temperatures from 238 K to 873 K and Pressures up 
        to 1000 MPa.
     '''
-    k = 1.38064852e-23
-    dipole = 6.138E-30 # actual molecular dipole moment of water, in C*m
+#    k = 1.38064852e-23
+    # actual molecular dipole moment of water, in C*m
+    dipole2 = 3.7675044000000003e-59 # dipole = 6.138E-30 # but we square it 
     polarizability = 1.636E-40 # actual mean molecular polarizability of water, C^2/J*m^2
     MW = 0.018015268 # molecular weight of water, kg/mol
 #    N_A = 6.0221367e23
     delta = rho*0.003105590062111801 # 1/322.0
 #    delta = rho/322.
-    tau = 647.096/T
+    T_inv = 1.0/T
+    tau = 647.096*T_inv
     
     g = 1.0  + 0.196096504426E-2*delta*(T*0.0043859649122807015 - 1.0)**-1.2 # 0.00438.. == 1/228.0
 #    g = 1.0  + 0.196096504426E-2*delta*(T/228. - 1.0)**-1.2
@@ -152,8 +154,8 @@ def permittivity_IAPWS(T, rho):
         - 0.71469224439599998711*tau_15) + 0.97822448682600005032*sqrt(tau_rt)
         - 0.9577713793750000093*tau + 0.23751179414799999945*tau_25)
     
-    A = N_A*dipole*dipole*rho*g/(epsilon_0*k*T*MW)
-    B = N_A*polarizability*rho/(3.*epsilon_0*MW)
+    A = rho*g*T_inv*10.302249930663786#N_A*dipole2/(epsilon_0*k*MW)
+    B = rho*0.00020588442304500529#Na*polarizability/1(3.*epsilon_0*MW) simplifies to the constant
     epsilon = (1. + A + 5.*B + sqrt(9. + 2.*A + 18.*B + A*A + 10.*A*B + 9.*B*B
         ))/(4. - 4.*B)
     return epsilon
