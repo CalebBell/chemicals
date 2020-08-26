@@ -271,7 +271,12 @@ def Z_from_virial_pressure_form(P, *args):
     .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering. 
        Butterworth-Heinemann, 1985.
     '''
-    return 1.0 + P*sum([coeff*P**i for i, coeff in enumerate(args)])
+    tot = 0.0
+    fact = 1.0
+    for i in range(len(args)):
+        tot += args[i]*fact
+        fact *= P
+    return 1.0 + P*tot
 
 
 ### Second Virial Coefficients

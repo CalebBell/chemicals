@@ -268,8 +268,11 @@ def test_interface_misc():
         chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs)
         
         
-##@mark_as_numba
-#def test_virial():
+@mark_as_numba
+def test_virial():
+    Z = chemicals.numba.Z_from_virial_pressure_form(102919.99946855308, 4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19)
+    assert_close(Z, 1.00283753944, rtol=1e-13)
+    
 #    # Takes 8 seconds to compile. Fun!
 #    assert_close(chemicals.numba.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
 #                 chemicals.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
@@ -511,13 +514,3 @@ def test_lazy_loading():
     assert 'jitclass' in str(chemicals.numba.heat_capacity.zabransky_dict_iso_s['2016-57-1'].models[0])
 
 
-
-
-'''
-Not working:
-    
-    utils.CAS2int,int2CAS,hash_any_primitive,sorted_CAS_key - no int/str conversion
-    viscosity.Brokaw
-    
-    solubility.Henry_pressure_mixture - None issue
-'''

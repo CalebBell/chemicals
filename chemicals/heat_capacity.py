@@ -1041,14 +1041,14 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
         y = 0.
     else:
         y = (T - a7)/(T + a6)
-    T2 = T*T
+    T_inv = 1.0/T
     y2 = y*y
     T_m_a7 = T - a7
     if T == a7:
         # When T_m_a7 approaches 0, T = a7
-        Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4)*y2*y2*y2*y2)
+        Cp = R*(a0 + (a1*T_inv*T_inv)*exp(-a2*T_inv) + y2*(a3 + (a4)*y2*y2*y2))
     else:
-        Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4 - a5/(T_m_a7*T_m_a7))*y2*y2*y2*y2)
+        Cp = R*(a0 + (a1*T_inv*T_inv)*exp(-a2*T_inv) + y2*(a3 + (a4 - a5/(T_m_a7*T_m_a7))*y2*y2*y2))
     return Cp
 
 def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
@@ -1171,31 +1171,33 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
         y = 0.
     else:
         y = (T - a7)/(T + a6)
-
+    a6_inv = 1.0/a6
     x3 = a7 + a6
-    z = T/(T + a6)*x3/a7
+    z = T*x3/(a7*(T + a6))
     if T <= a7:
         s = 0.
     else:
         a72 = a7*a7
-        a62 = a6*a6
-        a7_a6 = a7/a6 # a7/a6
+        a62_inv = a6_inv*a6_inv
+        a7_a6 = a7*a6_inv # a7/a6
         a7_a6_2 = a7_a6*a7_a6
         a7_a6_4 = a7_a6_2*a7_a6_2
-        x1 = (a4*a72 - a5)/a62 # part of third, sum
-        first = (a3 + ((a4*a72 - a5)/a62)*a7_a6_4)*a7_a6_2*log(z)
+        x1 = (a4*a72 - a5)*a62_inv # part of third, sum
+        first = (a3 + ((a4*a72 - a5)*a62_inv)*a7_a6_4)*a7_a6_2*log(z)
         second = (a3 + a4)*log((T + a6)/(x3))
         third = 0.0
         y_pow = 1.0
-        a7_a6_pow = (a7_a6)**6
+        a7_a6_pow = a7_a6_2*a7_a6_4
+        na7_a6_inv = -1.0/a7_a6
 
         for i in range(1, 8):
             y_pow = y_pow*y
-            a7_a6_pow = a7_a6_pow/-a7_a6
+            a7_a6_pow *= na7_a6_inv
             third += (x1*a7_a6_pow - a4)*y_pow/i
-        fourth = -(a3/a6*(x3) + a5*y_pow/y/(7.*a7*(x3)))*y
+        fourth = -(a3*a6_inv*x3 + a5*y_pow/(7.0*y*a7*x3))*y
         s = first + second + third + fourth
-    return R*(J + a0*log(T) + a1/(a2*a2)*(1. + a2/T)*exp(-a2/T) + s)
+    x2 = a2/T
+    return R*(J + a0*log(T) + a1/(a2*a2)*(1. + x2)*exp(-x2) + s)
     
 
 ### Heat capacities of liquids
