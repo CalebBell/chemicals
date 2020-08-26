@@ -60,6 +60,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.interface
    chemicals.lennard_jones
    chemicals.miscdata
+   chemicals.numba
    chemicals.permittivity
    chemicals.phase_change
    chemicals.rachford_rice

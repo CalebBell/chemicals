@@ -842,7 +842,6 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
     '''
-    from cmath import log, exp
     a = similarity_variable
     if cyclic_aliphatic:
         A1 = -0.1793547

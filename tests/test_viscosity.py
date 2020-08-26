@@ -482,3 +482,11 @@ def test_mu_IAPWS():
     
     # Test case with zero
     assert_close(mu_IAPWS(347.0, 975.5266664069043, 4.439512743107522e-07), 0.00038316609714314585, rtol=1e-13)
+
+def test_Twu_1985():
+    from chemicals.viscosity import Twu_1985_internal
+    mu = Twu_1985_internal(T=609.67, Tb=1210.17, SG=0.8964)
+    assert_close(mu, 9.195790397643691, rtol=1e-13)
+    
+    mu = Twu_1985(T=R2K(609.67), Tb=R2K(1210.17), rho=0.8964*999.0170824078306)
+    assert_close(mu, 0.008235004218042592, rtol=1e-13)

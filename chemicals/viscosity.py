@@ -28,7 +28,7 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'Gharagheizi_gas_viscosity', 'Herning_Zipperer', 
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
-'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'mu_IAPWS']
+'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS']
 
 import os
 from fluids.numerics import secant, interp, numpy as np
@@ -37,7 +37,7 @@ from chemicals.utils import log, exp, log10, sqrt, pi, atan, tan, sin, acos
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-__numba_additional_funcs__ = ('_round_whole_even',)
+__numba_additional_funcs__ = ('_round_whole_even', 'Twu_1985_internal')
 
 folder = os_path_join(source_path, 'Viscosity')
 
@@ -1378,6 +1378,169 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
             phiij[i][j] = (mus[i]/mus[j])**0.5*Sij*Aij[i][j]
 
     return sum([ys[i]*mus[i]/sum([ys[j]*phiij[i][j] for j in cmps]) for i in cmps])
+
+### Petroleum liquids
+    
+def Twu_1985_internal(T, Tb, SG):
+    Tb2 = Tb*Tb
+    Tb10 = Tb2*Tb2
+    Tb10 *= Tb10*Tb2 # compute Tb^-10
+    Tb_inv = 1.0/Tb
+    Tb_sqrt_inv = 1.0/sqrt(Tb)
+    
+    # equation 15
+    Tc0 = Tb/(0.533272 + 0.191017e-3*Tb + 0.779681e-7*Tb2 - 0.284376e-10*Tb2*Tb
+             + 0.959468e28/(Tb10*Tb2*Tb))
+    alpha = 1.0 - Tb/Tc0
+    alpha3 = alpha*alpha*alpha
+    
+    SG0 = 0.843593  -0.128624*alpha - 3.36159*alpha3
+    alpha6 = alpha3*alpha3
+    SG0 -= 13749.5*alpha6*alpha6
+    dSG = SG - SG0
+    nu20 = (exp(4.73227 - 27.0975*alpha + alpha*(49.4491*alpha
+             - 50.4706*alpha3)) - 1.5)
+    
+    
+    nu10 = exp(0.801621 + 1.37179*log(nu20))
+    
+    x = abs(1.99873 - 56.7394*Tb_sqrt_inv)
+    f1 = 1.33932*x*dSG - 21.1141*dSG*dSG*Tb_sqrt_inv
+    f2 = x*dSG - 21.1141*dSG*dSG*Tb_sqrt_inv
+    
+    square_term2 = (1.0 + f2 + f2)/(1.0 - f2 - f2)
+    square_term2 *= square_term2 
+
+    square_term1 = (1.0 + f1 + f1)/(1.0 - f1 - f1)
+    square_term1 *= square_term1
+    
+    x0 = 450.0*Tb_inv
+    nu1 = exp(log(nu10 + x0)*square_term1) - x0
+    nu2 = exp(log(nu20 + x0)*square_term2) - x0
+    
+    T1 = 559.67 # 100 deg F
+    T2 = 669.67 # 210 deg F
+    logT1 = 6.3273473243178415 # log(559.67)
+    logT2 = 6.506785053735233 # log(669.67)
+    
+    Z1 = nu1 + 0.7 + exp(-1.47 - nu1*(1.84 + 0.51*nu1))
+    Z2 = nu2 + 0.7 + exp(-1.47 - nu2*(1.84 + 0.51*nu2))
+    
+    loglogZ1 = log(log(Z1))
+    try:
+        B = (loglogZ1 - log(log(Z2)))*-5.572963964974682 #/(logT1 - logT2)
+    except:
+        B = 0.0
+    try:
+        Z = exp(exp(loglogZ1 + B*(log(T) - logT1)))
+    except:
+        Z = 1.0
+    
+    # cSt
+    x0 = Z - 0.7
+    nu = x0 - exp(-0.7487 + x0*(x0*(0.6119 - 0.3193*x0) - 3.295))
+    return nu
+
+def Twu_1985(T, Tb, rho):
+    r'''Calculate the viscosity of a petroleum liquid using the 
+    Twu (1985) correlation
+    developed in [1]_. Based on a fit to n-alkanes that used as a 
+    reference. Requires the boiling point and density of
+    the system.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tb : float
+        Normal boiling point, [K]
+    rho : float
+        Liquid density liquid as measured at 60 deg F, [kg/m^3]
+
+    Returns
+    -------
+    mu : float
+        Liquid viscosity, [Pa*s]
+
+    Notes
+    -----
+    The formulas are as follows:
+    
+    .. math::
+        T_{c}^{\circ}=T_{b}\left(0.533272+0.191017 \times 10^{-3} T_{b}
+        +0.779681 \times 10^{-7} T_{b}^{2}
+        -0.284376 \times 10^{-10} T_{b}^{3}+0.959468 
+        \times 10^{28}/T_{b}^{13}\right)^{-1}
+        
+    .. math::
+        \alpha=1-T_{b} / T_{c}^{\circ}
+        
+    .. math::
+        \ln \left(\nu_2^{\circ}+1.5\right)=4.73227-27.0975 \alpha
+        +49.4491 \alpha^{2}-50.4706 \alpha^{4}
+
+    .. math::
+        \ln \left(\nu_1^{\circ}\right)=0.801621+1.37179 \ln \left(\nu_2^{\circ}\right)
+
+    .. math::
+        {SG}^{\circ}=0.843593-0.128624 \alpha-3.36159 \alpha^{3}-13749.5 \alpha^{12}
+
+    .. math::
+        \Delta {SG} = {SG} - {SG}^\circ
+
+    .. math::
+        |x|=\left|1.99873-56.7394 / \sqrt{T_{b}}\right|
+
+    .. math::
+        f_{1}=1.33932|x| \Delta {SG} - 21.1141 \Delta {SG}^{2} / \sqrt{T_{b}}
+
+    .. math::
+        f_{2}=|x| \Delta {SG}-21.1141 \Delta {SG}^{2} / \sqrt{T_{b}}
+
+    .. math::
+        \ln \left(\nu_{1}+\frac{450}{T_{b}}\right)=\ln \left(\nu_{1}^{\circ}
+        +\frac{450}{T_{b}}\right)\left(\frac{1+2 f_{1}}{1-2 f_{1}}\right)^{2}
+
+    .. math::
+        \ln \left(\nu_{2}+\frac{450}{T_{b}}\right)=\ln \left(\nu_{2}^{\circ}
+        +\frac{450}{T_{b}}\right)\left(\frac{1+2 f_{2}}{1-2 f_{2}}\right)^{2}
+
+    .. math::
+        Z = \nu+0.7+\exp \left(-1.47-1.84 \nu-0.51 \nu^{2}\right)
+
+    .. math::
+        B=\frac{\ln \ln Z_{1}-\ln \ln Z_{2}}{\ln T_1-\ln T_2}
+
+    .. math::
+        \ln \ln Z=\ln \ln Z_{1}+B(\ln T-\ln T_1)
+
+    .. math::
+        \nu=(Z-0.7)-\exp \left(-0.7487-3.295Z-0.7)+0.6119Z-0.7)^{2}-0.3193Z-0.7)^{3}\right)
+        
+        
+    Examples
+    --------
+    Sample point from article:
+    
+    >>> Twu_1985(T=338.7055, Tb=672.3166, rho=895.5189)
+    0.008235009644854494
+    
+    References
+    ----------
+    .. [1] Twu, Chorng H. "Internally Consistent Correlation for Predicting 
+       Liquid Viscosities of Petroleum Fractions." Industrial & Engineering 
+       Chemistry Process Design and Development 24, no. 4 (October 1, 1985):
+       1287-93. https://doi.org/10.1021/i200031a064.
+    '''
+    SG = rho*0.00100098388466972 #1/999.0170824078306
+    nu = Twu_1985_internal(T*1.8, Tb*1.8, SG)
+    nu = nu*1e-6 # to m^2/s
+    rho = SG*999.0170824078306 # calculate density from SG
+    mu = nu*rho
+    return mu
+
+
+
 ### Viscosity for Liquids or Gases
             
 def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):

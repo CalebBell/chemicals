@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-__all__ = ['RI', 'RI_methods', 'RI_all_methods', 'refractive_index', 
+__all__ = ['RI', 'RI_methods', 'RI_all_methods',
            'polarizability_from_RI', 'molar_refractivity_from_RI', 
            'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
            'brix_to_RI']
@@ -146,7 +146,6 @@ def RI(CASRN, method=None, full_info=True):
         else:
             value = tuple(value)
     return value
-refractive_index = RI
 
 def polarizability_from_RI(RI, Vm):
     r'''Returns the polarizability of a fluid given its molar volume and
