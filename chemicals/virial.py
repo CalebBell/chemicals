@@ -189,13 +189,13 @@ def Z_from_virial_density_form(T, P, *args):
         return 1/2. + (4*args[0]*P + R*T)**0.5/(2*(R*T)**0.5)
 #        return ((R*T*(4*args[0]*P + R*T))**0.5 + R*T)/(2*P)
     if l == 2:
-        B, C = args
+        B, C = args[0], args[1]
         # A small imaginary part is ignored
         return (P*(-(3*B*R*T/P + R**2*T**2/P**2)/(3*(-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)) - (-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)/3 + R*T/(3*P))/(R*T)).real
     if l == 3:
         # Huge mess. Ideally sympy could optimize a function for quick python 
         # execution. Derived with kate's text highlighting
-        B, C, D = args
+        B, C, D = args[0], args[1], args[2]
         P2 = P**2 
         RT = R*T
         BRT = B*RT
@@ -213,13 +213,16 @@ def Z_from_virial_density_form(T, P, *args):
         big2 = 2*big1/(3*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3))
         big7 = 2*BRT/(3*P) - big2 + 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(4*P2)
         return (P*(((csqrt(big7)/2 + csqrt(4*BRT/(3*P) - (-2*C*RT/P - 2*RT*(BRT/(2*P) + R2*T2/(8*P2))/P)/csqrt(big7) + big2 - 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(2*P2))/2 + RT/(4*P))))/R/T).real
-
-    args = list(args)
-    args.reverse()
-    args.extend([1, -P/R/T])
-    solns = np.roots(args)
-    rho = float([i for i in solns if not i.imag and i.real > 0][0].real) # Quicker than indexing where imag ==0
-    return P/rho/R/T
+    
+    size = l + 2
+    arr = [1.0+0.0j]*size
+    arr[-1] = -P/R/T
+    for i in range(l):
+        arr[-3-i] = args[i]
+    solns = np.roots(arr)
+    for rho in solns:
+        if rho.imag == 0.0 and rho.real > 0.0:
+            return P/(R*T*rho)
 
 
 def Z_from_virial_pressure_form(P, *args):
