@@ -1044,11 +1044,11 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     T2 = T*T
     y2 = y*y
     T_m_a7 = T - a7
-    try:
-        Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4 - a5/(T_m_a7*T_m_a7))*y2*y2*y2*y2)
-    except ZeroDivisionError:
+    if T == a7:
         # When T_m_a7 approaches 0, T = a7
         Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4)*y2*y2*y2*y2)
+    else:
+        Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4 - a5/(T_m_a7*T_m_a7))*y2*y2*y2*y2)
     return Cp
 
 def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):

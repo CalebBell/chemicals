@@ -36,7 +36,7 @@ def test_refractivity_CRC():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_refractivity_all_answers():
-    vals = [refractive_index(i) for i in  RI_data_CRC_organic.index.values]
+    vals = [RI(i) for i in  RI_data_CRC_organic.index.values]
     RI_sum = sum([v[0] for v in vals])
     T_sum = sum([v[1] for v in vals if not isnan(v[1])])
     assert len(vals) == 4490
@@ -48,12 +48,12 @@ def test_refractivity_all_answers():
     
     
 def test_refractivity_general():
-    vals = refractive_index(CASRN='64-17-5')
+    vals = RI(CASRN='64-17-5')
     assert type(vals) is tuple
     assert_close1d(vals, (1.3611, 293.15))
 
     # One value only
-    val = refractive_index(CASRN='64-17-5', full_info=False)
+    val = RI(CASRN='64-17-5', full_info=False)
     assert_close(val, 1.3611)
 
     vals = RI_methods(CASRN='64-17-5')
@@ -63,7 +63,7 @@ def test_refractivity_general():
     assert RI_methods(CASRN='6400000-17-5') == []
 
     with pytest.raises(Exception):
-        refractive_index(CASRN='64-17-5', method='FAIL')
+        RI(CASRN='64-17-5', method='FAIL')
 
 
 
