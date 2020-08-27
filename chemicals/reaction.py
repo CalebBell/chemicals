@@ -698,8 +698,12 @@ def Gibbs_formation(dHf, S0_abs, dHfs_std, S0_abs_elements, coeffs_elements,
     .. [1] "Standard Gibbs Free Energy of Formation Calculations Chemistry 
        Tutorial." Accessed March, 2019. https://www.ausetute.com.au/gibbsform.html.
     '''
-    dH = dHf - sum([Hi*ci for Hi, ci in zip(dHfs_std, coeffs_elements)])
-    dS = S0_abs - sum([Si*ci for Si, ci in zip(S0_abs_elements, coeffs_elements)])
+    N = len(coeffs_elements)
+    dH = dHf
+    dS = S0_abs
+    for i in range(N):
+        dH -= dHfs_std[i]*coeffs_elements[i]
+        dS -= S0_abs_elements[i]*coeffs_elements[i]
     return dH - T_ref*dS
 
 def entropy_formation(Hf, Gf, T_ref=298.15):

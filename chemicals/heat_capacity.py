@@ -44,6 +44,10 @@ from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
 from fluids.numerics import newton, brenth, secant, polylog2, numpy as np
 
+__numba_additional_funcs__ = ['Lastovka_Shaw_T_for_Hm_err',
+                              'Lastovka_Shaw_T_for_Sm_err'
+                              ]
+
 # %% Methods introduced in this module
 
 # Gases
@@ -874,6 +878,12 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     # variable and so will always cancel out.
     return S.real*1000.
 
+def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm):
+    H1 = Lastovka_Shaw_integral(T, similarity_variable)
+    dH = H1 - H_ref
+    err = (property_mass_to_molar(dH, MW) - Hm)
+    return err
+
 def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15, 
                            factor=1.0):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
@@ -920,23 +930,24 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
     '''
+    Hm /= factor
     H_ref = Lastovka_Shaw_integral(T_ref, similarity_variable)
-    def err(T):
-        H1 = Lastovka_Shaw_integral(T, similarity_variable)
-        dH = H1 - H_ref
-        err = (property_mass_to_molar(dH, MW)*factor - Hm)
-        return err
     try:
-        return secant(err, 500, ytol=1e-4)
+        return secant(Lastovka_Shaw_T_for_Hm_err, 500.0, ytol=1e-4, args=(MW, similarity_variable, H_ref, Hm))
     except:
         try:
-            return brenth(err, 1e-3, 1e5)
-        except Exception as e:
-            if err(1e-11) > 0:
+            return brenth(Lastovka_Shaw_T_for_Hm_err, 1e-3, 1e5, args=(MW, similarity_variable, H_ref, Hm))
+        except:
+            if Lastovka_Shaw_T_for_Hm_err(1e-11, MW, similarity_variable, H_ref, Hm) > 0:
                 raise ValueError("For gas only enthalpy spec to be correct, "
                                  "model requires negative temperature")
-            raise e
+            raise ValueError("Could not converge")
 
+def Lastovka_Shaw_T_for_Sm_err(T, MW, similarity_variable, S_ref, Sm):
+    S1 = Lastovka_Shaw_integral_over_T(T, similarity_variable)
+    dS = S1 - S_ref
+    err = (property_mass_to_molar(dS, MW) - Sm)
+    return err
 
 def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15, 
                            factor=1.0):
@@ -984,23 +995,20 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
     '''
+    Sm /= factor
     S_ref = Lastovka_Shaw_integral_over_T(T_ref, similarity_variable)
-    def err(T):
-        S1 = Lastovka_Shaw_integral_over_T(T, similarity_variable)
-        dS = S1 - S_ref
-        err = (property_mass_to_molar(dS, MW)*factor - Sm)
-#         print(T, err)
-        return err
     try:
-        return secant(err, 500, ytol=1e-4, high=10000)
-    except Exception as e:
+        return secant(Lastovka_Shaw_T_for_Sm_err, 500, ytol=1e-4, high=10000,
+                      args=(MW, similarity_variable, S_ref, Sm))
+    except:
         try:
-            return brenth(err, 1e-3, 1e5)
-        except Exception as e:
-            if err(1e-11) > 0:
+            return brenth(Lastovka_Shaw_T_for_Sm_err, 1e-3, 1e5,
+                          args=(MW, similarity_variable, S_ref, Sm))
+        except:
+            if Lastovka_Shaw_T_for_Sm_err(1e-11, MW, similarity_variable, S_ref, Sm) > 0.0:
                 raise ValueError("For gas only entropy spec to be correct, "
                                  "model requires negative temperature")
-            raise e
+            raise ValueError("Could not converge")
 
 def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     r'''Calculates ideal gas heat capacity using the model developed in [1]_.

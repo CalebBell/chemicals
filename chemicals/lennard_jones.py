@@ -34,7 +34,7 @@ __all__ = ['Stockmayer_methods', 'Stockmayer',
            'epsilon_Bird_Stewart_Lightfoot_boiling', 
            'epsilon_Bird_Stewart_Lightfoot_melting', 'epsilon_Stiel_Thodos', 
            'epsilon_Tee_Gotoh_Steward_1', 'epsilon_Tee_Gotoh_Steward_2', 
-           'Neufeld_collision', 'collision_integral_Neufeld_Janzen_Aziz', 
+           'collision_integral_Neufeld_Janzen_Aziz', 
            'As_collision', 'Bs_collision', 'Cs_collision', 
            'collision_integral_Kim_Monroe', 'Tstar']
 
@@ -937,25 +937,6 @@ def epsilon_Tee_Gotoh_Steward_2(Tc, omega):
 
 ### Collision Integral
 
-Neufeld_collision = {
-    (1, 1): [1.06036, 0.1561, 0.193, 0.47635, 1.03587, 1.52996, 1.76474, 3.89411, None, None, None, None],
-    (1, 2): [1.0022, 0.1553, 0.16105, 0.72751, 0.86125, 2.06848, 1.95162, 4.84492, None, None, None, None],
-    (1, 3): [0.96573, 0.15611, 0.44067, 1.5242, 2.38981, 5.08063, None, None, -0.0005373, 19.2866, -1.30775, 6.58711],
-    (1, 4): [0.93447, 0.15578, 0.39478, 1.85761, 2.45988, 6.15727, None, None, 0.0004246, 12.988, -1.36399, 3.3329],
-    (1, 5): [0.90972, 0.15565, 0.35967, 2.18528, 2.45169, 7.17936, None, None, -0.0003814, 9.38191, 0.14025, 9.93802],
-    (1, 6): [0.88928, 0.15562, 0.33305, 2.51303, 2.36298, 8.1169, None, None, -0.0004649, 9.86928, 0.12851, 9.82414],
-    (1, 7): [0.87208, 0.15568, 0.36583, 3.01399, 2.70659, 9.9231, None, None, -0.0004902, 10.2274, 0.12306, 9.97712],
-    (2, 2): [1.16145, 0.14874, 0.52487, 0.7732, 2.16178, 2.43787, None, None, -0.0006435, 18.0323, -0.7683, 7.27371],
-    (2, 3): [1.11521, 0.14796, 0.44844, 0.99548, 2.30009, 3.06031, None, None, 0.0004565, 38.5868, -0.69403, 2.56375],
-    (2, 4): [1.08228, 0.14807, 0.47128, 1.31596, 2.42738, 3.90018, None, None, -0.0005623, 3.08449, 0.28271, 3.22871],
-    (2, 5): [1.05581, 0.14822, 0.51203, 1.67007, 2.57317, 4.85939, None, None, -0.000712, 4.7121, 0.2173, 4.7353],
-    (2, 6): [1.03358, 0.14834, 0.53928, 2.01942, 2.7235, 5.84817, None, None, -0.0008576, 7.66012, 0.15493, 7.6011],
-    (3, 3): [1.05567, 0.1498, 0.30887, 0.86437, 1.35766, 2.44123, 1.2903, 5.55734, 0.0002339, 57.7757, -1.0898, 6.9475],
-    (3, 4): [1.02621, 0.1505, 0.55381, 1.4007, 2.06176, 4.26234, None, None, 0.0005227, 11.3331, -0.8209, 3.87185],
-    (3, 5): [0.99958, 0.15029, 0.50441, 1.64304, 2.06947, 4.87712, None, None, -0.0005184, 3.45031, 0.26821, 3.73348],
-    (4, 4): [1.12007, 0.14578, 0.53347, 1.11986, 2.28803, 3.27567, None, None, 0.0007427, 21.048, -0.28759, 6.69149]
-}
-
 def collision_integral_Neufeld_Janzen_Aziz(Tstar, l=1, s=1):
     r'''Calculates Lennard-Jones collision integral for any of 16 values of
     (l,j) for the wide range of 0.3 < Tstar < 100. Values are accurate to
@@ -1009,14 +990,45 @@ def collision_integral_Neufeld_Janzen_Aziz(Tstar, l=1, s=1):
        Chemical Physics 57, no. 3 (August 1, 1972): 1100-1102.
        doi:10.1063/1.1678363
     '''
-    if (l, s) not in Neufeld_collision:
+    if l == 1 and s == 1:
+        A, B, C, D, E, F, G, H = 1.06036, 0.1561, 0.193, 0.47635, 1.03587, 1.52996, 1.76474, 3.89411
+    elif l == 1 and s == 2:
+        A, B, C, D, E, F, G, H = 1.0022, 0.1553, 0.16105, 0.72751, 0.86125, 2.06848, 1.95162, 4.84492
+    elif l == 1 and s == 3:
+        A, B, C, D, E, F, R, S, W, P = 0.96573, 0.15611, 0.44067, 1.5242, 2.38981, 5.08063, -0.0005373, 19.2866, -1.30775, 6.58711
+    elif l == 1 and s == 4:
+        A, B, C, D, E, F, R, S, W, P = 0.93447, 0.15578, 0.39478, 1.85761, 2.45988, 6.15727, 0.0004246, 12.988, -1.36399, 3.3329
+    elif l == 1 and s == 5:
+        A, B, C, D, E, F, R, S, W, P = 0.90972, 0.15565, 0.35967, 2.18528, 2.45169, 7.17936, -0.0003814, 9.38191, 0.14025, 9.93802
+    elif l == 1 and s == 6:
+        A, B, C, D, E, F, R, S, W, P = 0.88928, 0.15562, 0.33305, 2.51303, 2.36298, 8.1169, -0.0004649, 9.86928, 0.12851, 9.82414
+    elif l == 1 and s == 7:
+        A, B, C, D, E, F, R, S, W, P = 0.87208, 0.15568, 0.36583, 3.01399, 2.70659, 9.9231, -0.0004902, 10.2274, 0.12306, 9.97712
+    elif l == 2 and s == 2:
+        A, B, C, D, E, F, R, S, W, P = 1.16145, 0.14874, 0.52487, 0.7732, 2.16178, 2.43787, -0.0006435, 18.0323, -0.7683, 7.27371
+    elif l == 2 and s == 3:
+        A, B, C, D, E, F, R, S, W, P = 1.11521, 0.14796, 0.44844, 0.99548, 2.30009, 3.06031, 0.0004565, 38.5868, -0.69403, 2.56375
+    elif l == 2 and s == 4:
+        A, B, C, D, E, F, R, S, W, P = 1.08228, 0.14807, 0.47128, 1.31596, 2.42738, 3.90018, -0.0005623, 3.08449, 0.28271, 3.22871
+    elif l == 2 and s == 5:
+        A, B, C, D, E, F, R, S, W, P = 1.05581, 0.14822, 0.51203, 1.67007, 2.57317, 4.85939, -0.000712, 4.7121, 0.2173, 4.7353
+    elif l == 2 and s == 6:
+        A, B, C, D, E, F, R, S, W, P = 1.03358, 0.14834, 0.53928, 2.01942, 2.7235, 5.84817, -0.0008576, 7.66012, 0.15493, 7.6011
+    elif l == 3 and s == 3:
+        A, B, C, D, E, F, G, H, R, S, W, P = 1.05567, 0.1498, 0.30887, 0.86437, 1.35766, 2.44123, 1.2903, 5.55734, 0.0002339, 57.7757, -1.0898, 6.9475
+    elif l == 3 and s == 4:
+        A, B, C, D, E, F, R, S, W, P = 1.02621, 0.1505, 0.55381, 1.4007, 2.06176, 4.26234, 0.0005227, 11.3331, -0.8209, 3.87185
+    elif l == 3 and s == 5:
+        A, B, C, D, E, F, R, S, W, P = 0.99958, 0.15029, 0.50441, 1.64304, 2.06947, 4.87712, -0.0005184, 3.45031, 0.26821, 3.73348
+    elif l == 4 and s == 4:
+        A, B, C, D, E, F, R, S, W, P = 1.12007, 0.14578, 0.53347, 1.11986, 2.28803, 3.27567, 0.0007427, 21.048, -0.28759, 6.69149
+    else:
         raise ValueError('Input values of l and s are not supported')
-    A, B, C, D, E, F, G, H, R, S, W, P = Neufeld_collision[(l, s)]
     omega = A/Tstar**B + C/exp(D*Tstar) + E/exp(F*Tstar)
-    if (l, s) in [(1, 1), (1, 2), (3, 3)]:
+    if (l == 1 and (s == 1 or s == 2)) or (s == 3 and l == 3):
         omega += G/exp(H*Tstar)
-    if (l, s) not in [(1, 1), (1, 2)]:
-        omega += R*Tstar**B*sin(S*Tstar**W-P)
+    if not (l == 1  and (s == 1 or s == 2)):
+        omega += R*Tstar**B*sin(S*Tstar**W - P)
     return omega
 
 As_collision = {(1, 1): -1.10367290,
@@ -1095,7 +1107,6 @@ def collision_integral_Kim_Monroe(Tstar, l=1, s=1):
     s : int
         term
 
-
     Returns
     -------
     Omega : float
@@ -1126,9 +1137,9 @@ def collision_integral_Kim_Monroe(Tstar, l=1, s=1):
     if (l, s) not in As_collision:
         raise ValueError('Input values of l and s are not supported')
     omega = As_collision[(l, s)]
+    Bs = Bs_collision[(l, s)]
+    Cs = Cs_collision[(l, s)]
     for ki in range(6):
-        Bs = Bs_collision[(l, s)]
-        Cs = Cs_collision[(l, s)]
         omega += Bs[ki]/Tstar**(ki+1) + Cs[ki]*log(Tstar)**(ki+1)
     return omega
 

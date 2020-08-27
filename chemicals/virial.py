@@ -215,14 +215,16 @@ def Z_from_virial_density_form(T, P, *args):
         return (P*(((csqrt(big7)/2 + csqrt(4*BRT/(3*P) - (-2*C*RT/P - 2*RT*(BRT/(2*P) + R2*T2/(8*P2))/P)/csqrt(big7) + big2 - 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(2*P2))/2 + RT/(4*P))))/R/T).real
     
     size = l + 2
-    arr = [1.0+0.0j]*size
+#    arr = np.ones(size, dtype=np.complex128) # numba: uncomment
+    arr = [1.0]*size # numba: delete
     arr[-1] = -P/R/T
     for i in range(l):
         arr[-3-i] = args[i]
     solns = np.roots(arr)
     for rho in solns:
-        if rho.imag == 0.0 and rho.real > 0.0:
-            return P/(R*T*rho)
+        if abs(rho.imag) < 1e-12 and rho.real > 0.0:
+            return P/(R*T*rho.real)
+    raise ValueError("Could not find real root")
 
 
 def Z_from_virial_pressure_form(P, *args):

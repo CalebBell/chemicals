@@ -37,7 +37,8 @@ from chemicals.utils import log, exp, log10, sqrt, pi, atan, tan, sin, acos
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-__numba_additional_funcs__ = ('_round_whole_even', 'Twu_1985_internal')
+__numba_additional_funcs__ = ('_round_whole_even', 'Twu_1985_internal',
+                              'Saybolt_universal_eq')
 
 folder = os_path_join(source_path, 'Viscosity')
 
@@ -2040,6 +2041,11 @@ viscosity_scales_linear = {
     'zahn cup #5': (23.6, 12)
 }
 
+    
+def Saybolt_universal_eq(nu):
+    return (4.6324*nu + (1E5 + 3264.*nu)/(nu*(nu*(1.646*nu + 23.97) 
+                                          + 262.7) + 3930.2))
+
 
 def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
     r'''Converts kinematic viscosity values from different scales which have
@@ -2142,10 +2148,6 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
 
     old_scale = old_scale.lower().replace('degrees', '').replace('seconds', '').strip()
     new_scale = new_scale.lower().replace('degrees', '').replace('seconds', '').strip()
-    
-    def Saybolt_universal_eq(nu):
-        return (4.6324*nu + (1E5 + 3264.*nu)/(nu*(nu*(1.646*nu + 23.97) 
-                                              + 262.7) + 3930.2))
 
     # Convert to kinematic viscosity
     if old_scale == 'kinematic viscosity':

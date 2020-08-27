@@ -187,6 +187,19 @@ def test_collision_integral():
 
     with pytest.raises(Exception):
         collision_integral_Kim_Monroe(0.3, l=8, s=22)
+        
+    all_keys = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (3, 3), (3, 4), (3, 5), (4, 4)]
+    for i in range(len(all_keys)):
+        collision_integral_Neufeld_Janzen_Aziz(2.125, l=all_keys[i][0], s=all_keys[i][1])
+
+    all_keys = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (3, 3), (3, 4), (3, 5), (4, 4)]
+    omegas = []
+    omegas_expect = [1.0533593020147094, 0.9364963413584679, 0.8755022331873744, 0.839027248432364, 0.8122702217656526, 0.7919953217020422, 0.7756030101007225, 1.1517125076228243, 1.0555472726724568, 0.9970058623517577, 0.9584301480609076, 0.9308189354078076, 0.9996578276482491, 0.9450853163684426, 0.9076763140230476, 1.0544584236379315]
+    for i in range(len(all_keys)):
+        omega = collision_integral_Neufeld_Janzen_Aziz(2.125, l=all_keys[i][0], s=all_keys[i][1])
+        omegas.append(omega)
+    assert_close1d(omegas, omegas_expect, rtol=1e-12)
+
 
 def test_Tstar():
     const = 308.43
