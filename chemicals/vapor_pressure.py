@@ -111,43 +111,43 @@ register_df_source(folder, 'VDI PPDS Boiling temperatures at different pressures
 
 _vapor_pressure_dfs_loaded = False
 def load_vapor_pressure_dfs():
-    global WagnerMcGarry, _WagnerMcGarry_values, AntoinePoling, _AntoinePoling_values
-    global WagnerPoling, _WagnerPoling_values, AntoineExtended, _AntoineExtended_values 
-    global Perrys2_8, _Perrys2_8_values, VDI_PPDS_3, _VDI_PPDS_3_values
+    global Psat_data_WagnerMcGarry, Psat_values_WagnerMcGarry, Psat_data_AntoinePoling, Psat_values_AntoinePoling
+    global Psat_data_WagnerPoling, Psat_values_WagnerPoling, Psat_data_AntoineExtended, Psat_values_AntoineExtended
+    global Psat_data_Perrys2_8, Psat_values_Perrys2_8, Psat_data_VDI_PPDS_3, Psat_values_VDI_PPDS_3
     global _vapor_pressure_dfs_loaded
 
     # 57463 bytes for df; 13720 bytes for numpy
-    WagnerMcGarry = data_source('Wagner Original McGarry.tsv')
-    _WagnerMcGarry_values = np.array(WagnerMcGarry.values[:, 1:], dtype=float)
+    Psat_data_WagnerMcGarry = data_source('Wagner Original McGarry.tsv')
+    Psat_values_WagnerMcGarry = np.array(Psat_data_WagnerMcGarry.values[:, 1:], dtype=float)
     
     # 58216 bytes for df; 13000 bytes for numpy
-    AntoinePoling = data_source('Antoine Collection Poling.tsv')
-    _AntoinePoling_values = np.array(AntoinePoling.values[:, 1:], dtype=float)
+    Psat_data_AntoinePoling = data_source('Antoine Collection Poling.tsv')
+    Psat_values_AntoinePoling = np.array(Psat_data_AntoinePoling.values[:, 1:], dtype=float)
 
     # 20928 bytes for df; 7488 bytes for numpy
-    WagnerPoling = data_source('Wagner Collection Poling.tsv')
-    _WagnerPoling_values = np.array(WagnerPoling.values[:, 1:], dtype=float)
+    Psat_data_WagnerPoling = data_source('Wagner Collection Poling.tsv')
+    Psat_values_WagnerPoling = np.array(Psat_data_WagnerPoling.values[:, 1:], dtype=float)
 
     # 21388 bytes for df; 7760 bytes for numpy
-    AntoineExtended = data_source('Antoine Extended Collection Poling.tsv')
-    _AntoineExtended_values = np.array(AntoineExtended.values[:, 1:], dtype=float)
+    Psat_data_AntoineExtended = data_source('Antoine Extended Collection Poling.tsv')
+    Psat_values_AntoineExtended = np.array(Psat_data_AntoineExtended.values[:, 1:], dtype=float)
 
     # 65740 bytes for df; 21760 bytes for numpy
-    Perrys2_8 = data_source('Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
-    _Perrys2_8_values = np.array(Perrys2_8.values[:, 1:], dtype=float)
+    Psat_data_Perrys2_8 = data_source('Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
+    Psat_values_Perrys2_8 = np.array(Psat_data_Perrys2_8.values[:, 1:], dtype=float)
 
     # 52742 bytes for df; 15400 bytes for numpy
-    VDI_PPDS_3 = data_source('VDI PPDS Boiling temperatures at different pressures.tsv')
-    _VDI_PPDS_3_values = np.array(VDI_PPDS_3.values[:, 1:], dtype=float)
+    Psat_data_VDI_PPDS_3 = data_source('VDI PPDS Boiling temperatures at different pressures.tsv')
+    Psat_values_VDI_PPDS_3 = np.array(Psat_data_VDI_PPDS_3.values[:, 1:], dtype=float)
     
     _vapor_pressure_dfs_loaded = True
     
 if PY37:
     def __getattr__(name):
-        if name in ('WagnerMcGarry', '_WagnerMcGarry_values', 'AntoinePoling', 
-                    '_AntoinePoling_values', 'WagnerPoling', '_WagnerPoling_values', 
-                    'AntoineExtended', '_AntoineExtended_values', 'Perrys2_8', 
-                    '_Perrys2_8_values', 'VDI_PPDS_3', '_VDI_PPDS_3_values'):
+        if name in ('Psat_data_WagnerMcGarry', 'Psat_values_WagnerMcGarry', 'Psat_data_AntoinePoling',
+                    'Psat_values_AntoinePoling', 'Psat_data_WagnerPoling', 'Psat_values_WagnerPoling',
+                    'Psat_data_AntoineExtended', 'Psat_values_AntoineExtended', 'Psat_data_Perrys2_8',
+                    'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3'):
             load_vapor_pressure_dfs()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
