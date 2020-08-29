@@ -19,6 +19,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains lookup functions for a chemical's triple temperature and
+pressure. The triple temperature is the unique co-existence point between a 
+pure chemicals's solid, gas, and liquid state.
+ 
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Triple Temperature
+------------------
+.. autofunction:: chemicals.triple.Tt
+.. autofunction:: chemicals.triple.Tt_methods
+.. autodata:: chemicals.triple.Tt_all_methods
+
+Triple Pressure
+---------------
+.. autofunction:: chemicals.triple.Pt
+.. autofunction:: chemicals.triple.Pt_methods
+.. autodata:: chemicals.triple.Pt_all_methods
+
 """
 
 __all__ = ['Tt_all_methods', 'Tt_methods', 'Tt', 
@@ -34,7 +56,7 @@ from chemicals.data_reader import (register_df_source,
                                    list_available_methods_from_df_dict)
 
 
-# %% Register data sources and lazy load them
+# Register data sources and lazy load them
 folder = os_path_join(source_path, 'Triple Properties')
 register_df_source(folder, 'Staveley 1981.tsv')
 
@@ -144,7 +166,6 @@ def Tt(CASRN, get_methods=False, method=None):
         Tt = retrieve_any_from_df_dict(Tt_sources, CASRN, 'Tt68') 
         if Tt: return Tt
         return Tm(CASRN)    
-triple_point_temperature = Tt
 
 Pt_all_methods = (STAVELEY,)
 
