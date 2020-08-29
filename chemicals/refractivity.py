@@ -119,7 +119,7 @@ def RI_methods(CASRN):
     if not _RI_data_loaded: _load_RI_data()
     return list_available_methods_from_df_dict(RI_sources, CASRN, 'RI')
 
-def RI(CASRN, method=None, full_info=True):
+def RI(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's refractive
     index. Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
@@ -135,7 +135,7 @@ def RI(CASRN, method=None, full_info=True):
     -------
     RI : float
         Refractive Index on the Na D line, [-]
-    T : float, only returned if full_info == True
+    T : float
         Temperature at which refractive index reading was made
 
     Other Parameters
@@ -143,9 +143,6 @@ def RI(CASRN, method=None, full_info=True):
     method : string, optional
         A string for the method name to use, as defined by constants in
         RI_methods
-    full_info : bool, optional
-        If True, function will return the temperature at which the refractive
-        index reading was made
 
     Notes
     -----
@@ -165,16 +162,15 @@ def RI(CASRN, method=None, full_info=True):
     
     '''
     if not _RI_data_loaded: _load_RI_data()
-    key = ('RI', 'RIT') if full_info else 'RI'
+    key = ('RI', 'RIT')
     if method:
         value = retrieve_from_df_dict(RI_sources, CASRN, key, method) 
     else:
         value = retrieve_any_from_df_dict(RI_sources, CASRN, key) 
-    if full_info:
-        if value is None:
-            value = (None, None)
-        else:
-            value = tuple(value)
+    if value is None:
+        value = (None, None)
+    else:
+        value = tuple(value)
     return value
 
 def polarizability_from_RI(RI, Vm):

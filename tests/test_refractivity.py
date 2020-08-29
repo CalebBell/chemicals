@@ -52,10 +52,6 @@ def test_refractivity_general():
     assert type(vals) is tuple
     assert_close1d(vals, (1.3611, 293.15))
 
-    # One value only
-    val = RI(CASRN='64-17-5', full_info=False)
-    assert_close(val, 1.3611)
-
     vals = RI_methods(CASRN='64-17-5')
     assert vals == ['CRC']
     assert RI_data_CRC_organic.index.is_unique
