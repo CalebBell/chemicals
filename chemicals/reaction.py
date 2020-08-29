@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s', 
            'Hfl_methods', 'Hfg_methods', 'Hfs_methods',
@@ -29,8 +30,7 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'balance_stoichiometry', 'stoichiometric_matrix']
            
 import os
-from fractions import Fraction
-from chemicals.utils import ceil, log10, PY37
+from chemicals.utils import ceil, log10, PY37, source_path, os_path_join, can_load_data
 from chemicals import heat_capacity
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -47,7 +47,7 @@ ATCT_L = 'ATCT_L'
 ATCT_G = 'ATCT_G'
 TRC = 'TRC'
 
-folder = os.path.join(os.path.dirname(__file__), 'Reactions')
+folder = os_path_join(source_path, 'Reactions')
 register_df_source(folder, 'API TDB Albahri Hf (g).tsv')
 register_df_source(folder, 'ATcT 1.112 (g).tsv')
 register_df_source(folder, 'ATcT 1.112 (l).tsv')
@@ -98,7 +98,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_reaction_data()
+    if can_load_data:
+        _load_reaction_data()
 
 
 # %% Lookup functions
@@ -109,9 +110,7 @@ else:
 Hfs_all_methods = (CRC,)
 
 def Hfs_methods(CASRN):
-    """
-    Return all methods available to obtain the Hfs for the desired 
-    chemical.
+    """Return all methods available to obtain the Hfs for the desired chemical.
 
     Parameters
     ----------
@@ -121,13 +120,12 @@ def Hfs_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Hfs with the given 
+        Methods which can be used to obtain the Hfs with the given
         inputs.
 
     See Also
     --------
     Hfs
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfs_sources, CASRN, 'Hfs')
@@ -186,9 +184,7 @@ def Hfs(CASRN, method=None):
 Hfl_all_methods = (ATCT_L, CRC)
 
 def Hfl_methods(CASRN):
-    """
-    Return all methods available to obtain the Hfl for the desired 
-    chemical.
+    """Return all methods available to obtain the Hfl for the desired chemical.
 
     Parameters
     ----------
@@ -198,13 +194,12 @@ def Hfl_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Hfl with the given 
+        Methods which can be used to obtain the Hfl with the given
         inputs.
 
     See Also
     --------
     Hfl
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfl_sources, CASRN, 'Hfl')
@@ -266,9 +261,7 @@ def Hfl(CASRN, method=None):
 Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS)
 
 def Hfg_methods(CASRN):
-    """
-    Return all methods available to obtain the Hfg for the desired 
-    chemical.
+    """Return all methods available to obtain the Hfg for the desired chemical.
 
     Parameters
     ----------
@@ -278,13 +271,12 @@ def Hfg_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Hfg with the given 
+        Methods which can be used to obtain the Hfg with the given
         inputs.
 
     See Also
     --------
     Hfg
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfg_sources, CASRN, 'Hfg')
@@ -364,9 +356,7 @@ def Hfg(CASRN, method=None):
 S0s_all_methods = (CRC,)
 
 def S0s_methods(CASRN):
-    """
-    Return all methods available to obtain the S0s for the desired 
-    chemical.
+    """Return all methods available to obtain the S0s for the desired chemical.
 
     Parameters
     ----------
@@ -376,13 +366,12 @@ def S0s_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the S0s with the given 
+        Methods which can be used to obtain the S0s with the given
         inputs.
 
     See Also
     --------
     S0s
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0s_sources, CASRN, 'S0s')
@@ -435,9 +424,7 @@ def S0s(CASRN, method=None):
 S0l_all_methods = (CRC,)
 
 def S0l_methods(CASRN):
-    """
-    Return all methods available to obtain the S0l for the desired 
-    chemical.
+    """Return all methods available to obtain the S0l for the desired chemical.
 
     Parameters
     ----------
@@ -447,13 +434,12 @@ def S0l_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the S0l with the given 
+        Methods which can be used to obtain the S0l with the given
         inputs.
 
     See Also
     --------
     S0l
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0l_sources, CASRN, 'S0l')
@@ -512,9 +498,7 @@ def S0l(CASRN, method=None):
 S0g_all_methods = (CRC, YAWS)
 
 def S0g_methods(CASRN):
-    """
-    Return all methods available to obtain the S0g for the desired 
-    chemical.
+    """Return all methods available to obtain the S0g for the desired chemical.
 
     Parameters
     ----------
@@ -524,13 +508,12 @@ def S0g_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the S0g with the given 
+        Methods which can be used to obtain the S0g with the given
         inputs.
 
     See Also
     --------
     S0g
-
     """
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0g_sources, CASRN, 'S0g')
@@ -715,8 +698,12 @@ def Gibbs_formation(dHf, S0_abs, dHfs_std, S0_abs_elements, coeffs_elements,
     .. [1] "Standard Gibbs Free Energy of Formation Calculations Chemistry 
        Tutorial." Accessed March, 2019. https://www.ausetute.com.au/gibbsform.html.
     '''
-    dH = dHf - sum([Hi*ci for Hi, ci in zip(dHfs_std, coeffs_elements)])
-    dS = S0_abs - sum([Si*ci for Si, ci in zip(S0_abs_elements, coeffs_elements)])
+    N = len(coeffs_elements)
+    dH = dHf
+    dS = S0_abs
+    for i in range(N):
+        dH -= dHfs_std[i]*coeffs_elements[i]
+        dS -= S0_abs_elements[i]*coeffs_elements[i]
     return dH - T_ref*dS
 
 def entropy_formation(Hf, Gf, T_ref=298.15):
@@ -908,6 +895,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     d = [i*min_value_inv for i in d]
 
     if not allow_fractional:
+        from fractions import Fraction
         max_denominator = 10**rounding
         fs = [Fraction(x).limit_denominator(max_denominator=max_denominator) for x in d]
         all_denominators = set([i.denominator for i in fs])

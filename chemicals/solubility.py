@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['solubility_parameter', 
            'solubility_eutectic', 'Tm_depression_eutectic',
@@ -75,7 +77,7 @@ def solubility_parameter(T, Hvapm, Vml):
        Cohesion Parameters, Second Edition. CRC Press, 1991.
     '''
     # Prevent taking the root of a negative number
-    return None if (Hvapm < R*T or Vml < 0) else ((Hvapm - R*T)/Vml)**0.5
+    return None if (Hvapm < R*T or Vml < 0.0) else ((Hvapm - R*T)/Vml)**0.5
 
 def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     r'''Returns the maximum solubility of a solute in a solvent.
@@ -172,13 +174,13 @@ def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
     '''
-    if x:
+    if x is not None:
         dTm = R*Tm**2*x/Hm
-    elif M and MW:
+    elif M is not None and MW is not None:
         MW = MW/1000. #g/mol to kg/mol
         dTm = R*Tm**2*MW*M/Hm
     else:
-        raise Exception('Either molality or mole fraction of the solute must be specified; MW of the solvent is required also if molality is provided')
+        raise ValueError('Either molality or mole fraction of the solute must be specified; MW of the solvent is required also if molality is provided')
     return dTm
 
 
@@ -427,13 +429,21 @@ def Henry_pressure_mixture(Hs, weights=None, zs=None):
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
     '''
-    cmps = range(len(Hs))
+    N = len(Hs)
+    if weights is None and zs is None:
+        raise ValueError("Weights or mole fractions are required")
     if weights is None:
+        z_solvent = 0.0
+        for i in range(N):
+            if Hs[i] is not None:
+                z_solvent += zs[i]
         # Default parameters - when weight specified only weight by that
-        z_solvent = sum(zs[i] for i in cmps if Hs[i] is not None)
-        weights = [zs[i]/z_solvent for i in cmps]
+        z_solvent_inv = 1.0/z_solvent
+        weights = [0.0]*N
+        for i in range(N):
+            weights[i] = zs[i]*z_solvent_inv
     num = 0.0
-    for i in cmps:
+    for i in range(N):
         if Hs[i] is not None:
             num += weights[i]*log(Hs[i])
     H = exp(num)

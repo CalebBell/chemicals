@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from math import exp, log
 from numpy.testing import assert_allclose
@@ -31,9 +32,57 @@ from chemicals.rachford_rice import *
 from chemicals.rachford_rice import Rachford_Rice_solution_numpy
 from chemicals.rachford_rice import Rachford_Rice_valid_solution_naive, Rachford_Rice_solution2
 from chemicals.rachford_rice import Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac
-from fluids.numerics import assert_close, normalize
+from fluids.numerics import assert_close, assert_close1d, normalize
 from random import uniform
 import random
+
+
+def RR_solution_mpmath(zs, Ks, dps=200):
+    # extremely important to validate high decimal precision with mpmath 
+    # numerical issues make this an open research problem with respect to maintaining speed
+    from mpmath import mp, mpf, findroot
+
+    def make_objf(zs_k_minus_1, K_minus_1):
+        def Rachford_Rice_err(V_over_F):
+            err = 0
+            for i in range(len(zs_k_minus_1)):
+                err += zs_k_minus_1[i]/(1 + V_over_F*K_minus_1[i])
+            return err
+        return Rachford_Rice_err
+
+    mp.dps = dps
+    N = len(zs)
+    zs_mp = [mpf(i) for i in zs]
+    Ks_mp = [mpf(i) for i in Ks]
+    Ks_minus_1 = [Ki - 1 for Ki in Ks_mp]
+
+    zs_k_minus_1 = [zs_mp[i]*Ks_minus_1[i] for i in range(N)]
+    objf = make_objf(zs_k_minus_1, Ks_minus_1)
+
+    V_over_F = findroot(objf, .5, tol=1e-100)
+    xs = [0]*N
+    ys = [0]*N
+    
+    for i in range(N):
+        xs[i] = float(zs[i]/(1 + V_over_F*Ks_minus_1[i]))
+        ys[i] = float(xs[i]*Ks[i])
+    return float(V_over_F), xs, ys
+
+
+
+def assert_same_RR_results(zs, Ks, f0, f1, rtol=1e-9):
+    N = len(zs)
+    V_over_F1, xs1, ys1 = f0(zs, Ks)
+    V_over_F2, xs2, ys2 = f1(zs, Ks)
+    assert_close(V_over_F1, V_over_F2, rtol=rtol)
+    assert_close1d(xs1, xs2, rtol=rtol)    
+    assert_close1d(ys1, ys2, rtol=rtol)    
+    
+    zs_recalc1 = [xs1[i]*(1.0 - V_over_F1) + ys1[i]*V_over_F1 for i in range(N)]
+    zs_recalc2 = [xs2[i]*(1.0 - V_over_F2) + ys2[i]*V_over_F2 for i in range(N)]
+    assert_close1d(zs, zs_recalc1, rtol=rtol)
+    assert_close1d(zs, zs_recalc2, rtol=rtol)
+
 
 def test_RR_numpy():
     def Wilson_K_value(T, P, Tc, Pc, omega):
@@ -598,41 +647,36 @@ def test_Rachford_Rice_solutionN():
     
     for comp_calc, comp_expect in zip(comps, comps_expect):
         assert_allclose(comp_calc, comp_expect, atol=1e-9)
-    
+
+@pytest.mark.slow
+@pytest.mark.mpmath
 def test_Rachford_Rice_solution_trace():
+    # Most of these end up being solved by Halley's method with no transformation
+    # after failing at LN2. 
+    
     zs = [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
     Ks = [8755306854.943026, 7.393334548416551e-16, 6.87130044872998e-79]
-    V_over_F, xs, ys = Rachford_Rice_solution_trace(zs, Ks)
-    assert_allclose(V_over_F, 1.0/3, rtol=1e-12)
-    assert_allclose(xs, [0.0, 0.5, 0.5], rtol=1e-12)
-    assert_allclose(ys, [1.0, 0.0, 0.0], rtol=1e-12)
-
+    assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
+    
+    zs = [0.2333333333333333, 0.1, 0.3333333333333333, 0.3333333333333333]
+    Ks = [8755306854.943026, 1.1, 7.393334548416551e-16, 6.87130044872998e-79]
+    assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
+    
     zs = [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
     Ks = [1e3, 1e4, 1e-17]
-    V_over_F, xs, ys = Rachford_Rice_solution_trace(zs, Ks)
-    assert_allclose(V_over_F, 2.0/3, rtol=1e-12)
-    assert_allclose(xs, [0.0, 0.0, 1.0], rtol=1e-12)
-    assert_allclose(ys, [0.5, 0.5, 0.0], rtol=1e-12)
-
-
-
+    assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
+    
     zs = [.25, .25, .25, .25]
     Ks = [100, .1, 1e-16, 1e-50]
-    V_over_F, xs, ys = Rachford_Rice_solution_trace(zs, Ks)
-    assert_allclose(V_over_F, 0.27525252525252525, rtol=1e-12)
-    assert_allclose(xs, [0.0027937345010515743, 0.3073107951156732, 0.34494773519163763, 0.34494773519163763], rtol=1e-12)
-    assert_allclose(ys, [0.9009009009009009, 0.09909909909909911, 0.0, 0.0], rtol=1e-12)
+    assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
     
-    recalc = (np.array(xs)*(1-V_over_F)+ np.array(ys)*V_over_F) 
-    assert_allclose(recalc, zs, rtol=1e-12)
-
     zs = [0.4, 0.6]
     Ks = [1e3, 1e-17]
-    V_over_F, xs, ys = Rachford_Rice_solution_trace(zs, Ks)
-    assert_close(V_over_F, 0.4, rtol=1e-12)
-    assert_allclose(xs, [0.0, 1.0], rtol=1e-12)
-    assert_allclose(ys, [1.0, 0.0], rtol=1e-12)
-    V_over_F, xs, ys
+    assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
+
+
+
+
 def test_Rachford_Rice_polynomial():
     zs, Ks = [.4, .6], [2, .5]
     poly = Rachford_Rice_polynomial(zs, Ks)

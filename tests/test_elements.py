@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,10 +18,12 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from numpy.testing import assert_allclose
 import pytest
+from fluids.numerics import assert_close
 
 from chemicals.elements import *
 from chemicals.elements import periodic_table
@@ -37,6 +39,9 @@ def test_molecular_weight():
 
     with pytest.raises(Exception):
         molecular_weight({'H': 12, 'C': 20, 'FAIL': 5})
+        
+    assert_close(molecular_weight({'H': 11, 'T': 1, 'C': 20, 'O': 5}), 334.3143892)
+    assert_close(molecular_weight({'H': 11, 'D': 1, 'C': 20, 'O': 5}), 333.312442)
 
 
 def test_mass_fractions():
@@ -82,7 +87,50 @@ def test_misc_elements():
     assert periodic_table['Fm'].InChI_key == 'MIORUQGGZCBUGO-UHFFFAOYSA-N'
     
     assert periodic_table.Na is periodic_table['Na']
+    
+    assert len(periodic_table) == 118
+    
+    with pytest.raises(AttributeError):
+        periodic_table.adamantium
+        
+    with pytest.raises(KeyError):
+        periodic_table['BadElement']
+    
+    assert periodic_table.H.CAS_standard != periodic_table.H.CAS
+    
+    assert not 'BadElement' in periodic_table
+    
+    
+    # Found some disagreement between sources about these - test the borders and
+    # a few random ones to write expected results in the tests as well as the code.
+    assert periodic_table.H.block == 's'
+    assert periodic_table.He.block == 's'
+    assert periodic_table.Fr.block == 's'
 
+    assert periodic_table.Sc.block == 'd'
+    assert periodic_table.Zn.block == 'd'
+    assert periodic_table.Cn.block == 'd'
+    
+    assert periodic_table.Ce.block == 'f'
+    assert periodic_table.Lu.block == 'f'
+    assert periodic_table.Th.block == 'f'
+    assert periodic_table.Lr.block == 'f'
+    
+    # Some categorize this as `d`
+    assert periodic_table.La.block == 'f'
+    assert periodic_table.Ac.block == 'f'
+    
+    d_block_border_elements = ['Sc', 'Y', 'Ti', 'Zr','Hf', 'Rf', 'Zn', 'Cd', 'Hg', 'Cn']
+    for ele in d_block_border_elements:
+        assert periodic_table[ele].block == 'd'
+        
+    p_block_border_elements = ['B', 'Ne', 'Al', 'Ar', 'Ga', 'Kr', 'In', 'Xe', 'Tl', 'Rn', 'Nh', 'Og']
+    for ele in p_block_border_elements:
+        assert periodic_table[ele].block == 'p'
+        
+    for i in periodic_table: 
+        str(i)
+        i.__repr__()
 
 def test_Hill_formula():
     Hill_formulas = {'ClNa': {'Na': 1, 'Cl': 1}, 'BrI': {'I': 1, 'Br': 1},
@@ -110,7 +158,17 @@ def test_simple_formula_parser():
         for formula, result in zip(formulas, results):
             assert f(formula) == result
 
-
+def test_nested_formula_parser():
+    with pytest.raises(ValueError):
+        nested_formula_parser('Adamantium(NH3)4.0001+2') 
+        
+    # repeat elements
+    res = nested_formula_parser('Pd(NH3)4.0001Na(NH3)2+2') 
+    assert res == {'Pd': 1, 'N': 6.0001, 'H': 18.0003, 'Na': 1}
+    
+    res = nested_formula_parser('Pd(NH3)4.0001Na(NH3H2)2+2') 
+    assert res == {'Pd': 1, 'N': 6.0001, 'H': 22.0003, 'Na': 1}
+    
 def test_charge_from_formula():
     assert charge_from_formula('Br3-') == -1
     assert charge_from_formula('Br3-1') == -1
@@ -134,11 +192,19 @@ def test_charge_from_formula():
     assert charge_from_formula('Br3(+1)') == 1
     assert charge_from_formula('Br3(+2)') == 2
     assert charge_from_formula('Br3(+3)') == 3
+    
+    with pytest.raises(ValueError):
+        charge_from_formula('Br3(-+)')
+        
 
 def test_serialize_formula():
     assert serialize_formula('Pd(NH3)4+3') == 'H12N4Pd+3'
-    
-    
+    assert 'H12N4Pd' == serialize_formula('Pd(NH3)4+0') 
+    assert 'H12N4Pd+' == serialize_formula('Pd(NH3)4+1') 
+    assert 'H12N4Pd-' == serialize_formula('Pd(NH3)4-1') 
+    assert 'H12N4Pd-5' == serialize_formula('Pd(NH3)4-5') 
+
+
 def test_mixture_atomic_composition_ordered():
     ns, names = mixture_atomic_composition_ordered([{'O': 2}, {'N': 1, 'O': 2}, {'C': 1, 'H': 4}], [0.95, 0.025, .025])
     assert names == ['H', 'C', 'N', 'O']

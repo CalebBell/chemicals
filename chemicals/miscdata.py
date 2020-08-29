@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,17 +19,18 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['lookup_VDI_tabular_data']
 
 import os
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
 # %% Register data sources and lazy load them
 
-folder = os.path.join(os.path.dirname(__file__), 'Misc')
+folder = os_path_join(source_path, 'Misc')
 
 ### CRC Handbook general tables
 register_df_source(folder, 'Physical Constants of Inorganic Compounds.csv')
@@ -36,13 +38,14 @@ register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
 
 _VDI_dict_loaded = False
 def _load_VDI_saturation_dict():
-    '''Read in a dict of assorted chemical properties at saturation for 58
+    """Read in a dict of assorted chemical properties at saturation for 58
     industrially important chemicals, from:
+
     Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
     This listing is the successor to that in:
     Schlunder, Ernst U, and International Center for Heat and Mass Transfer.
     Heat Exchanger Design Handbook. Washington: Hemisphere Pub. Corp., 1983.
-    '''
+    """
     import json
     global VDI_saturation_dict, _VDI_dict_loaded
     
@@ -67,8 +70,9 @@ if PY37:
             return VDI_saturation_dict
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_CRC_data()
-    _load_VDI_saturation_dict()
+    if can_load_data:
+        _load_CRC_data()
+        _load_VDI_saturation_dict()
 
 ### VDI Saturation
 

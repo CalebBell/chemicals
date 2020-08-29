@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from fluids.numerics import assert_close
 import pytest
@@ -52,7 +53,7 @@ def test_dipole():
     d = dipole_moment(CASRN='56-81-5', method='MULLER')
     assert_close(d, 4.21)
 
-    methods = dipole_methods(CASRN='78-78-4')
+    methods = dipole_moment_methods(CASRN='78-78-4')
     methods_fixed = ['CCCBDB', 'MULLER', 'POLING']
     assert methods == methods_fixed
     

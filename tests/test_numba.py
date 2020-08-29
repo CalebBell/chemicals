@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 from chemicals import *
@@ -39,8 +40,14 @@ import numpy as np
 
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+def mark_as_numba(func):
+    func = pytest.mark.numba(func)
+    func = pytest.mark.slow(func)
+    func = pytest.mark.skipif(numba is None, reason="Numba is missing")(func)
+    return func
+    
+
+@mark_as_numba
 def test_return_1d_array():
     
     # Functions which initialize an array, and then need to return the correct value 
@@ -101,8 +108,7 @@ def test_return_1d_array():
     assert type(dn_partials_np) is np.ndarray
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_return_2d_array():
     d2xs = [[0.152, 0.08, 0.547], [0.08, 0.674, 0.729], [0.547, 0.729, 0.131]]
     xs = [0.7, 0.2, 0.1]
@@ -115,8 +121,7 @@ def test_return_2d_array():
 
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_mixing_simple():
     a = np.array([1,2])
     b = np.array([.1, .2])
@@ -128,9 +133,38 @@ def test_mixing_simple():
     b = np.array([.01, .02])
     val = chemicals.numba.mixing_logarithmic(a, b)
     assert_close(val, 0.01866065983073615, rtol=1e-13)
+    
+    
+@mark_as_numba
+def test_dippr_correlations():
+    orders = (0, 1, -1, -1j)
+    args = (20, 33.19, 66.653, 6765.9, -123.63, 478.27)
+    for i in orders:
+        assert_close(chemicals.numba.EQ114(*args, order=i), chemicals.numba.EQ114(*args, order=i), rtol=1e-13)
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")    
+    args = (300, 276370., -2090.1, 8.125, -0.014116, 0.0000093701)
+    for i in orders:
+        assert_close(chemicals.numba.EQ100(*args, order=i), chemicals.numba.EQ100(*args, order=i), rtol=1e-13)
+        
+    # EQ102 -  numba-scipy does not support complex numbers so this does not work in numba
+
+    args = (300., 647.096, 17.863, 58.606, -95.396, 213.89, -141.26)
+    for i in orders:
+        assert_close(chemicals.numba.EQ116(*args, order=i), chemicals.numba.EQ116(*args, order=i), rtol=1e-13)
+    
+    args = (20., 3.3258E4, 3.6199E4, 1.2057E3, 1.5373E7, 3.2122E3, -1.5318E7, 3.2122E3)
+    for i in orders:
+        assert_close(chemicals.numba.EQ127(*args, order=i), chemicals.numba.EQ127(*args, order=i), rtol=1e-13)
+
+    args = (300., 33363., 26790., 2610.5, 8896., 1169)
+    for i in orders:
+        assert_close(chemicals.numba.EQ107(*args, order=i), chemicals.numba.EQ107(*args, order=i), rtol=1e-13)
+
+        args = (300.0, 0.02222, -26.38, -16750000, -3.894E19, 3.133E21)
+    for i in orders:
+        assert_close(chemicals.numba.EQ104(*args, order=i), chemicals.numba.EQ104(*args, order=i), rtol=1e-13)
+
+@mark_as_numba
 def test_thermal_conductivity_misc():
     assert_close(chemicals.numba.Bahadori_liquid(273.15, 170),
                  Bahadori_liquid(273.15, 170))
@@ -159,8 +193,7 @@ def test_thermal_conductivity_misc():
     # Does not work - atom input
 #    chemicals.numba.Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 0.000754, {'C': 12, 'H': 26})
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")    
+@mark_as_numba
 def test_viscosity_misc():
     # Has a min, if statement
     args = (300., 500E5, 572.2, 34.7E5, 0.236, 0, 0.00068)
@@ -205,8 +238,7 @@ def test_viscosity_misc():
     assert_close(chemicals.numba.viscosity_index(73.3E-6, 8.86E-6, rounding=True),
                  chemicals.viscosity_index(73.3E-6, 8.86E-6, rounding=True), rtol=1e-14)
     
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")    
+@mark_as_numba
 def test_interface_misc():
     
     # Tested quite a bit with numba/PyPy
@@ -236,16 +268,17 @@ def test_interface_misc():
         chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs)
         
         
-#@pytest.mark.numba
-#@pytest.mark.skipif(numba is None, reason="Numba is missing")
-#def test_virial():
+@mark_as_numba
+def test_virial():
+    Z = chemicals.numba.Z_from_virial_pressure_form(102919.99946855308, 4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19)
+    assert_close(Z, 1.00283753944, rtol=1e-13)
+    
 #    # Takes 8 seconds to compile. Fun!
 #    assert_close(chemicals.numba.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
 #                 chemicals.BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469),
 #                rtol=1e-13)
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_phase_change():
     # Function had some duplicated powers; numba was optimizing them on me anyway
     # Had list-in-list constants being indexed. I thought that would take a lot of time
@@ -255,8 +288,7 @@ def test_phase_change():
              chemicals.MK(553.15, 751.35, 0.302), rtol=1e-12)
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_vapor_pressure():
     # PyPy 75 ns, CPython 2470 ns, numba 214 ns
     assert_close(chemicals.numba.dPsat_IAPWS_dT(300.), 
@@ -269,8 +301,7 @@ def test_vapor_pressure():
     assert_close(Psats_calc, Psats_vec_expect, rtol=1e-11)
     
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_temperature():
     # Note also the last four decimals are different!
     # 494 us numba, 388 us PyPy, 1740 us CPython
@@ -279,9 +310,42 @@ def test_temperature():
     
     # Probably never going to work
 #    chemicals.numba.T_converter(500, 'ITS-68', 'ITS-48')
+
+@mark_as_numba
+def test_critical():
+    assert_close(chemicals.numba.Li(np.array([0.6449, 0.2359, 0.1192]), np.array([425.12, 469.7, 507.6]),np.array([0.000255, 0.000313, 0.000371])),
+             Li([0.6449, 0.2359, 0.1192], [425.12, 469.7, 507.6], [0.000255, 0.000313, 0.000371]), rtol=1e-13)
+
+    assert_close(chemicals.numba.Chueh_Prausnitz_Tc(np.array([0.6449, 0.2359, 0.1192]), np.array([425.12, 469.7, 507.6]),
+        np.array([0.000255, 0.000313, 0.000371]), np.array([[0, 1.92681, 6.80358],
+        [1.92681, 0, 1.89312], [ 6.80358, 1.89312, 0]])),
+    Chueh_Prausnitz_Tc([0.6449, 0.2359, 0.1192], [425.12, 469.7, 507.6],
+        [0.000255, 0.000313, 0.000371], [[0, 1.92681, 6.80358],
+         [1.92681, 0, 1.89312], [ 6.80358, 1.89312, 0]]), rtol=1e-13)
+
+    zs = np.array([0.6449, 0.2359, 0.1192])
+    Tcs = np.array([425.12, 469.7, 507.6])
+    Aijs = np.array([[0, 1.2503, 1.516], [0.799807, 0, 1.23843], [0.659633, 0.807474, 0]])
     
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+    
+    assert_close(chemicals.numba.Grieves_Thodos(zs, Tcs, Aijs),
+                 Grieves_Thodos(zs, Tcs, Aijs), rtol=1e-12)
+    
+    Aijs = np.array([[0, 1.174450, 1.274390], [0.835914, 0, 1.21038], [0.746878, 0.80677, 0]])
+    assert_close(chemicals.numba.modified_Wilson_Tc(zs, Tcs, Aijs),
+                 modified_Wilson_Tc(zs, Tcs, Aijs), rtol=1e-12)
+    
+    
+    assert_close(chemicals.numba.Chueh_Prausnitz_Vc(np.array([0.4271, 0.5729]), np.array([0.000273, 0.000256]), np.array([[0, 5.61847], [5.61847, 0]])),
+                 Chueh_Prausnitz_Vc([0.4271, 0.5729], [0.000273, 0.000256], [[0, 5.61847], [5.61847, 0]]), rtol=1e-13)
+
+    assert_close(chemicals.numba.modified_Wilson_Vc(np.array([0.4271, 0.5729]), np.array([0.000273, 0.000256]), np.array([[0, 0.6671250], [1.3939900, 0]])),
+                 modified_Wilson_Vc([0.4271, 0.5729], [0.000273, 0.000256], [[0, 0.6671250], [1.3939900, 0]]), rtol=1e-13)
+
+    # Not working yet: Ihmels, Meissner, Grigoras, critical_surface_methods
+    # Maybe a future numba update will make this work. 
+
+@mark_as_numba
 def test_volume():
     assert_close(chemicals.numba.Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245),
                 chemicals.Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245))
@@ -341,9 +405,17 @@ def test_volume():
     omegas2 = np.array(omegas)
     assert_close(COSTALD_mixture(xs, T, Tcs, Vcs, omegas),
                  chemicals.numba.COSTALD_mixture(xs2, T, Tcs2, Vcs2, omegas2))
-    
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+
+@mark_as_numba
+def test_solbility():
+    assert_close(Henry_converter(1.2e-5, old_scale='Hcp', new_scale='SI', rhom=55344.59,  MW=18.01528),
+                 chemicals.numba.Henry_converter(1.2e-5, old_scale='Hcp', new_scale='SI', rhom=55344.59,  MW=18.01528))
+
+@mark_as_numba
+def test_refractivity():
+    assert_close(brix_to_RI(5.8), chemicals.numba.brix_to_RI(5.8))
+
+@mark_as_numba
 def test_rachford_rice():
     n = 10
     zs = np.array([0.5, 0.3, 0.2]*n)
@@ -360,8 +432,7 @@ def test_rachford_rice():
     assert_close1d(xs, xs_new)
     assert_close1d(ys, ys_new)
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_Rachford_Rice_solutionN():
     ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
     Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
@@ -372,8 +443,7 @@ def test_Rachford_Rice_solutionN():
     assert_close1d(betas, betas_new, rtol=1e-14)
     assert_close2d(zs, zs_new, rtol=1e-14)
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_Rachford_Rice_solution2():
     ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
     Ks_y = [1.23466988745, 0.89727701141, 2.29525708098, 1.58954899888, 0.23349348597, 0.02038108640, 1.40715641002]
@@ -389,8 +459,7 @@ def test_Rachford_Rice_solution2():
     assert_close1d(z2, z2_new)
     
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_rachford_rice_polynomial():
     zs, Ks = [.4, .6], [2, .5]
     VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_polynomial(np.array(zs), np.array(Ks))
@@ -433,10 +502,15 @@ def test_rachford_rice_polynomial():
     assert_close1d(ys, ys_new)
 
 
-@pytest.mark.numba
-@pytest.mark.skipif(numba is None, reason="Numba is missing")
+@mark_as_numba
 def test_lazy_loading():
     # Numba interfers with to_num
     # The data_reader functions are not part of the public API so are not converted
     chemicals.numba.heat_capacity.zabransky_dicts
     chemicals.numba.heat_capacity.CRC_standard_data
+    
+    assert 'jitclass' in str(chemicals.numba.heat_capacity.ZabranskySpline)
+    assert 'jitclass' in str(chemicals.numba.heat_capacity.ZabranskyQuasipolynomial)
+    assert 'jitclass' in str(chemicals.numba.heat_capacity.zabransky_dict_iso_s['2016-57-1'].models[0])
+
+

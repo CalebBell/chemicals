@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from random import uniform
 import pytest
@@ -33,7 +35,7 @@ from chemicals.viscosity import *
 from chemicals.viscosity import (mu_data_Dutt_Prasad, mu_data_VN3, mu_data_VN2,
                                  mu_data_VN2E, mu_data_Perrys_8E_2_313, mu_data_Perrys_8E_2_312,
                                  mu_data_VDI_PPDS_7, mu_data_VDI_PPDS_8)
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 
 ### Check data integrity
 
@@ -427,3 +429,64 @@ def test_viscosity_converter_fuzz_SUS():
 
 
 
+def test_mu_IAPWS():
+    # # Main PDF table 4
+    Ts_mu20 = [298.15, 298.15, 373.15, 433.15, 433.15, 873.15, 873.15, 873.15, 1173.15, 1173.15, 1173.15]
+    rhos_mu20 = [998, 1200, 1000, 1, 1000, 1, 100, 600, 1, 100, 400]
+    mus20_listed = [889.735100E-6, 1437.649467E-6, 307.883622E-6, 14.538324E-6, 217.685358E-6, 32.619287E-6, 35.802262E-6, 77.430195E-6, 44.217245E-6, 47.640433E-6, 64.154608E-6]
+    for i in range(len(Ts_mu20)):
+        mu = mu_IAPWS(T=Ts_mu20[i], rho=rhos_mu20[i])
+        assert_close(mus20_listed[i], mu, rtol=4e-8)
+        
+    assert_close(mu_IAPWS(T=647.35, rho=122.0, drho_dP=17.109308489109e-6), 2.55206768504972e-05, rtol=1e-13)
+    mu = mu_IAPWS(T=647.35, rho=122.0, drho_dP=17.109308489109e-6, drho_dP_Tr=2.936891667997e-6)
+    assert_close(mu, 2.552067683647617e-05, rtol=1e-13)
+    
+    mu = mu_IAPWS(T=647.35, rho=222, drho_dP=175.456980972231e-6)
+    assert_close(mu, 3.133759043936869e-05, rtol=1e-13)
+    mu = mu_IAPWS(T=647.35, rho=222, drho_dP=175.456980972231e-6, drho_dP_Tr=3.119177410324e-6)
+    assert_close(mu, 3.1337589197275484e-05, rtol=1e-13)
+    
+    mu = mu_IAPWS(T=647.35, rho=272, drho_dP=1508.2800389184448e-6)
+    assert_close(mu, 3.6228143762668687e-05, rtol=1e-13)
+    mu = mu_IAPWS(T=647.35, rho=272, drho_dP=1508.2800389184448e-6, drho_dP_Tr=2.999611040849e-6)
+    assert_close(mu, 3.622814313612717e-05, rtol=1e-13)
+    
+    
+    mu = mu_IAPWS(T=647.35, rho=322, drho_dP=1.213641949033e-2, drho_dP_Tr=2.751438963343e-6)
+    assert_close(mu, 4.296157881023829e-05, rtol=1e-13)
+    mu = mu_IAPWS(T=647.35, rho=322, drho_dP=1.213641949033e-2)
+    assert_close(mu, 4.2961578738287014e-05, rtol=1e-13)
+    
+    
+    mu = mu_IAPWS(T=647.35, rho=372, drho_dP=1245.917204367233E-6, drho_dP_Tr=2.415440238773e-6)
+    assert_close(mu, 4.568820447470762e-05, rtol=1e-13)
+    mu = mu_IAPWS(T=647.35, rho=372, drho_dP=1245.917204367233E-6)
+    assert_close(mu, 4.5688204316365544e-05, rtol=1e-13)
+    
+    mu = mu_IAPWS(T=647.35, rho=422, drho_dP=130.393537965256e-6, drho_dP_Tr=2.046542440571e-6)
+    assert_close(mu, 4.943625601494998e-05, rtol=1e-13)
+    mu = mu_IAPWS(T=647.35, rho=422, drho_dP=130.393537965256e-6)
+    assert_close(mu, 4.943625789265867e-05, rtol=1e-13)
+    
+    mu = mu_IAPWS(T=647.35, rho=20, drho_dP=4.074182233978e-6)
+    assert_close(mu, 2.3253942194448227e-05, rtol=1e-13) # rhor <= 0.310559006
+    mu = mu_IAPWS(T=647.35, rho=20, drho_dP=4.074182233978e-6, drho_dP_Tr=2.352881641109e-6)
+    assert_close(mu, 2.3253942194448267e-05, rtol=1e-13)
+    
+    
+    mu = mu_IAPWS(T=647.35, rho=600, drho_dP=4.28639862246e-6, drho_dP_Tr=9.903267886625e-7)
+    assert_close(mu, 7.001987553170616e-05, rtol=1e-13)
+    mu = mu_IAPWS(T=647.35, rho=600, drho_dP=4.28639862246e-6)
+    assert_close(mu, 7.001987566162558e-05, rtol=1e-13)
+    
+    # Test case with zero
+    assert_close(mu_IAPWS(347.0, 975.5266664069043, 4.439512743107522e-07), 0.00038316609714314585, rtol=1e-13)
+
+def test_Twu_1985():
+    from chemicals.viscosity import Twu_1985_internal
+    mu = Twu_1985_internal(T=609.67, Tb=1210.17, SG=0.8964)
+    assert_close(mu, 9.195790397643691, rtol=1e-13)
+    
+    mu = Twu_1985(T=R2K(609.67), Tb=R2K(1210.17), rho=0.8964*999.0170824078306)
+    assert_close(mu, 0.008235004218042592, rtol=1e-13)

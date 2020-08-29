@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 import os
 
@@ -43,11 +45,13 @@ from . import acentric
 from . import exceptions
 from . import viscosity
 from . import interface
+from . import identifiers
 from . import permittivity
 from . import thermal_conductivity
 from . import combustion
 from . import volume
 from . import rachford_rice
+from . import flash_basic
 
 from .utils import *
 from .critical import *
@@ -69,18 +73,20 @@ from .triple import *
 from .acentric import *
 from .exceptions import *
 from .viscosity import *
+from .identifiers import *
 from .interface import *
 from .permittivity import *
 from .thermal_conductivity import *
 from .combustion import *
 from .volume import *
 from .rachford_rice import *
+from .flash_basic import *
 __all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr', 
            'temperature', 'miscdata', 'environment', 'refractivity', 'solubility', 
            'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial', 
            'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity', 
            'interface', 'permittivity', 'thermal_conductivity', 'combustion',
-           'volume', 'rachford_rice']
+           'volume', 'rachford_rice', 'flash_basic', 'identifiers']
 
 __all__.extend(exceptions.__all__)
 __all__.extend(critical.__all__)
@@ -108,13 +114,17 @@ __all__.extend(thermal_conductivity.__all__)
 __all__.extend(combustion.__all__)
 __all__.extend(volume.__all__)
 __all__.extend(rachford_rice.__all__)
+__all__.extend(flash_basic.__all__)
+__all__.extend(identifiers.__all__)
+
+
 
 submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata, 
               environment, refractivity, solubility, lennard_jones, 
               vapor_pressure, virial, phase_change, triple, acentric, viscosity,
               interface, permittivity, thermal_conductivity, combustion,
-              heat_capacity, reaction, volume, rachford_rice]
+              heat_capacity, reaction, volume, rachford_rice, flash_basic, identifiers]
 
-chemicals_dir = os.path.dirname(__file__)
+chemicals_dir = utils.source_path
 
 __version__ = '0.1.1'

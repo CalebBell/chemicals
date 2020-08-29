@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from numpy.testing import assert_allclose
 import pytest
@@ -27,7 +28,7 @@ import pandas as pd
 from fluids.numerics import assert_close, derivative, assert_close1d
 from chemicals.vapor_pressure import *
 from chemicals.vapor_pressure import WagnerMcGarry, AntoinePoling, WagnerPoling, AntoineExtended, Perrys2_8, VDI_PPDS_3
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 from math import *
 
 ### Regression equations
@@ -166,9 +167,11 @@ def test_AntoineExtended():
     assert all([checkCAS(i) for i in AntoineExtended.index])
     
 def test_VDI_PPDS_3_data():
-    '''I believe there are no errors here. Average temperature deviation
-    0.144% vs tabulated values. 
-    '''
+    """I believe there are no errors here.
+
+    Average temperature deviation
+    0.144% vs tabulated values.
+    """
     assert all([checkCAS(i) for i in VDI_PPDS_3.index])
     tots_calc = [VDI_PPDS_3[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'Pc', u'Tm']]
     tots = [2171.4607300000002, 694.38631999999996, 931.3604499999999, 919.88944000000004, 150225.16000000003, 1265565000, 56957.849999999991]
@@ -240,5 +243,5 @@ def test_Psat_IAPWS():
 
 
 def test_Psub_Clapeyron():
-    Psub = Psub_Clapeyron(250, Tt=273.15, Pt=611.0, Hsub_t=51100.0)
+    Psub = Psub_Clapeyron(250.0, Tt=273.15, Pt=611.0, Hsub_t=51100.0)
     assert_allclose(Psub, 76.06457150831804)

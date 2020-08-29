@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 import pytest
 import numpy as np
@@ -103,7 +105,24 @@ def test_int2CAS():
     with pytest.raises(Exception):
         CAS2int(7704349.0)
 
-
+def test_sorted_CAS_key():
+    expect = ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
+    res = sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
+    assert res == expect
+    res = sorted_CAS_key(['108-88-3', '98-00-0', '7732-18-5', '64-17-5'])
+    assert res == expect
+    
+    invalid_CAS_expect = ('641', '98-00-0', '108-88-3', '7732-8-5')
+    invalid_CAS_test = sorted_CAS_key(['7732-8-5', '641', '108-88-3', '98-00-0'])
+    assert invalid_CAS_expect == invalid_CAS_test
+    
+    
+def test_property_molar_to_mass():
+    assert_close(property_molar_to_mass(500, 18.015), 27754.648903691366, rtol=1e-14)
+    
+def test_property_mass_to_molar():
+    assert_close(property_mass_to_molar(20.0, 18.015), 0.3603, rtol=1e-14)
+    
 def test_zs_to_ws():
     ws_calc = zs_to_ws([0.5, 0.5], [10, 20])
     ws = [0.3333333333333333, 0.6666666666666666]
@@ -133,15 +152,6 @@ def test_molar_velocity_conv():
     
     v_calc = v_molar_to_v(67.10998435404377, 18.015)
     assert_close(v_calc, 500, rtol=1e-12)
-
-def test_B_To_Z():
-    Z_calc = B_to_Z(-0.0015, 300, 1E5)
-    assert_close(Z_calc, 0.9398638020957176)
-
-
-def test_B_from_Z():
-    B_calc = B_from_Z(0.94, 300, 1E5)
-    assert_close(B_calc, -0.0014966032712675846)
 
 
 def test_Z():
@@ -202,51 +212,6 @@ def test_normalize():
     fractions = [0.5, 0.3333333333333333, 0.16666666666666666]
     assert_close1d(fractions, fractions_calc)
 
-
-def test_Z_from_virial_density_form():
-    Z_calc = Z_from_virial_density_form(300, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
-    assert_close(Z_calc, 1.2843494052609186)
-    
-    Z_calc = Z_from_virial_density_form(300, 102031.881198762, 1e-4, 1e-5, 1e-6)
-    assert_close(Z_calc, 1.0736323841544937)
-
-    Z_calc = Z_from_virial_density_form(300, 96775.8831504971, 1e-4, 1e-5)
-    assert_close(Z_calc, 1.018326089216066)
-    
-    Z_calc = Z_from_virial_density_form(300, 95396.3561037084, 1e-4)
-    assert_close(Z_calc,  1.003809998713499)
-    
-    assert_close(1, Z_from_virial_density_form(300, 95396.3561037084))
-    
-    '''B-only solution, derived as follows:
-    
-    >>> B, C, D, E = symbols('B, C, D, E')
-    >>> P, V, Z, R, T = symbols('P, V, Z, R, T', positive=True, real=True, nonzero=True)
-    >>> rho = 1/V
-    >>> to_slv = Eq(P*V/R/T, 1 + B*rho)
-    >>> slns = solve(to_slv, V)
-    >>> simplify(slns[1]*P/R/T)
-    1/2 + sqrt(4*B*P + R*T)/(2*sqrt(R)*sqrt(T))
-    
-    To check this, simply disable the if statement and allow the numerical 
-    algorithm to run.
-    '''
-
-
-def test_Z_from_virial_pressure_form():
-    Z_calc = Z_from_virial_pressure_form(102919.99946855308, 4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19)
-    assert_close(Z_calc, 1.00283753944)
-    
-    Z_calc = Z_from_virial_pressure_form(102847.17619188508, 4.032286555169439e-09, 1.6197059494442215e-13)
-    assert_close(Z_calc, 1.00212796)
-
-    Z_calc = Z_from_virial_pressure_form(102671.27455742132, 4.032286555169439e-09)
-    assert_close(Z_calc, 1.000414)
-    
-    Z_calc = Z_calc = Z_from_virial_pressure_form(102671.27455742132)
-    assert_close(Z_calc, 1)
-
-
 def test_isobaric_expansion():
     beta = isobaric_expansion(0.000130229900873546, 1.58875261849113e-7)
     assert_close(beta, 0.0012199599384121608)
@@ -301,6 +266,8 @@ def test_SG():
     sg = SG(860)
     assert_close(sg, 0.8608461408159591)
 
+def test_Watson_K():
+    assert_close(Watson_K(400, .8), 11.20351186639291, rtol=1e-13)
 
 def test_allclose_variable():
     x = [2.7244322249597719e-08, 3.0105683900110473e-10, 2.7244124924802327e-08, 3.0105259397637556e-10, 2.7243929226310193e-08, 3.0104990272770901e-10, 2.7243666849384451e-08, 3.0104101821236015e-10, 2.7243433745917367e-08, 3.0103707421519949e-10]
@@ -323,29 +290,6 @@ def test_allclose_variable():
     assert allclose_variable(x, y, limits=[.0], atols=[.1])
 
 
-def test_polylog2():
-    x = polylog2(0.5)
-    assert_close(x, 0.5822405264516294)
-    
-    xs = linspace(0,0.99999, 50)
-#    ys_act = [float(polylog(2, x)) for x in xs]
-#    from sympy import polylog
-    ys_act = [0.0, 0.020513035768572635, 0.0412401364927588, 0.06218738124039796, 0.08336114665629184,
-              0.10476812813791354, 0.12641536301777412, 0.1483102559926201, 0.1704606070746889, 
-              0.19287464238138674, 0.21556104812821067, 0.23852900824703252, 0.261788246119884,
-              0.2853490709994786, 0.309222429784819, 0.33341996493707843, 0.3579540794622072, 
-              0.38283801005840257, 0.4080859097363812, 0.43371294147827794, 0.45973538481992837,
-              0.4861707576383267, 0.5130379559237574, 0.540357414944675, 0.5681512960135646, 
-              0.596443704089335, 0.6252609427828415, 0.6546318150738004, 0.6845879803506546,
-              0.7151643814663312, 0.7463997596771124, 0.7783372810645774, 0.811025306032588,
-              0.8445183447984893, 0.878878258148156, 0.9141757868110273, 0.9504925291123206, 
-              0.9879235426949309, 1.026580835488432, 1.0665981582977615, 1.108137763432647, 
-              1.1514002456979586, 1.1966394380910048, 1.244186068718536, 1.2944877067946645, 
-              
-              1.3481819162579485, 1.4062463083287482, 1.4703641942000052, 1.5441353484206717, 1.644808936992927]
-
-    ys = [polylog2(x) for x in xs]
-    assert_close1d(ys, ys_act, rtol=1E-7, atol=1E-10)
     
     
 def test_mix_component_flows():
@@ -538,3 +482,21 @@ def test_d2xs_to_d2xsn1():
                      [-6306.7035934284195, -7660.566469993495, -4006.4765740155844, -8585.461322283089]]
     assert_close2d(d2xs_to_d2xsn1(test_data), d2xsn1_expect, rtol=1e-12)
     
+def test_d2ns_to_dn2_partials():
+    d2ns = [[0.152, 0.08, 0.547], [0.08, 0.674, 0.729], [0.547, 0.729, 0.131]]
+    res = d2ns_to_dn2_partials(d2ns, [20.0, .124, 900.52])
+    res_expect = [[40.152, 20.203999999999997, 921.067], [20.204, 0.922, 901.3729999999999], [921.067, 901.373, 1801.1709999999998]]
+    assert_close2d(res, res_expect)
+
+
+def test_mixing_power():
+    zs = [.1, .4, .5]
+    props = [.01, .015, .025]
+    assert_close(mixing_power(zs, props, r=-4), 0.015110570481191988, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-3), 0.01586305104547743, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-2), 0.016718346377260586, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-1), 0.01764705882352941, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=1), 0.0195, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=2), 0.020310096011589902, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=3), 0.021001133725640605, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=4), 0.021572268349078574, rtol=1e-13)

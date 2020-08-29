@@ -48,23 +48,22 @@ If you need to know something about a chemical, give chemicals a try.
    :caption: API
    
    chemicals.acentric
-   chemicals.activity
-   chemicals.chemical
    chemicals.combustion
    chemicals.critical
-   chemicals.datasheet
    chemicals.dipole
    chemicals.dippr
    chemicals.elements
    chemicals.environment
+   chemicals.flash_basic
    chemicals.heat_capacity
    chemicals.identifiers
    chemicals.interface
    chemicals.lennard_jones
    chemicals.miscdata
+   chemicals.numba
    chemicals.permittivity
    chemicals.phase_change
-   chemicals.rashford_rice
+   chemicals.rachford_rice
    chemicals.reaction
    chemicals.refractivity
    chemicals.safety
@@ -83,8 +82,7 @@ If you need to know something about a chemical, give chemicals a try.
    :maxdepth: 1
    :caption: Developer's guide
    
-   CONTRIBUTING
-   CODE_OF_CONDUCT
+   developers
 
 Installation
 ------------

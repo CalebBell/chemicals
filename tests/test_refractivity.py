@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from math import isnan
 from fluids.numerics import assert_close, assert_close1d
@@ -35,7 +36,7 @@ def test_refractivity_CRC():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_refractivity_all_answers():
-    vals = [refractive_index(i) for i in  RI_data_CRC_organic.index.values]
+    vals = [RI(i) for i in  RI_data_CRC_organic.index.values]
     RI_sum = sum([v[0] for v in vals])
     T_sum = sum([v[1] for v in vals if not isnan(v[1])])
     assert len(vals) == 4490
@@ -47,12 +48,12 @@ def test_refractivity_all_answers():
     
     
 def test_refractivity_general():
-    vals = refractive_index(CASRN='64-17-5')
+    vals = RI(CASRN='64-17-5')
     assert type(vals) is tuple
     assert_close1d(vals, (1.3611, 293.15))
 
     # One value only
-    val = refractive_index(CASRN='64-17-5', full_info=False)
+    val = RI(CASRN='64-17-5', full_info=False)
     assert_close(val, 1.3611)
 
     vals = RI_methods(CASRN='64-17-5')
@@ -62,7 +63,7 @@ def test_refractivity_general():
     assert RI_methods(CASRN='6400000-17-5') == []
 
     with pytest.raises(Exception):
-        refractive_index(CASRN='64-17-5', method='FAIL')
+        RI(CASRN='64-17-5', method='FAIL')
 
 
 
@@ -91,3 +92,17 @@ def test_RI_from_molar_refractivity():
 
 def test_RI_IAPWS():
     assert_close(RI_IAPWS(298.15, 997.047435, 0.5893), 1.3328581926471605, rtol=1e-12)
+
+
+def test_RI_to_brix():
+    assert_close(RI_to_brix(1.33299), 0.0)
+    assert_close(RI_to_brix(1.532), 95.)
+    assert_close(RI_to_brix(1.341452), 5.8)
+    assert_close(RI_to_brix(1.3), -23.069930069929285)
+    
+    
+def test_brix_to_RI():
+    assert_close(brix_to_RI(5.8), 1.341452)
+    assert_close(brix_to_RI(0), 1.33299)
+    assert_close(brix_to_RI(95.0), 1.532)
+    assert_close(brix_to_RI(RI_to_brix(1.3)), 1.3)

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
-Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com> Copyright (C) 2020 Yoel Rene Cortes-Pena
+<yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +20,42 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+
+This module contains a complete periodic table, routines for working with
+chemical formulas, computing molecular weight, computing mass fractions and 
+atom fractions, and assorted other tasks.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Periodic Table and Elements
+---------------------------
+.. autodata:: chemicals.elements.periodic_table
+.. autoclass:: chemicals.elements.Element
+.. autoclass:: chemicals.elements.PeriodicTable
+          
+Working with Formulas
+---------------------
+.. autofunction:: chemicals.elements.simple_formula_parser
+.. autofunction:: chemicals.elements.nested_formula_parser
+.. autofunction:: chemicals.elements.charge_from_formula
+.. autofunction:: chemicals.elements.serialize_formula
+.. autofunction:: chemicals.elements.atoms_to_Hill
+
+Working with Parsed Formulas
+----------------------------
+.. autofunction:: chemicals.elements.molecular_weight
+.. autofunction:: chemicals.elements.similarity_variable
+.. autofunction:: chemicals.elements.atom_fractions
+.. autofunction:: chemicals.elements.mass_fractions
+.. autofunction:: chemicals.elements.mixture_atomic_composition
+.. autofunction:: chemicals.elements.mixture_atomic_composition_ordered
+.. autofunction:: chemicals.elements.atom_matrix
+
+"""
 
 __all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions', 
            'atom_fractions','mixture_atomic_composition', 'atom_matrix',
@@ -30,10 +66,9 @@ __all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions',
            'serialize_formula', 'mixture_atomic_composition_ordered',
            'periodic_table']
 import re
-import string
 
 CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7440-42-8', '7440-44-0', '7727-37-9', '7782-44-7', '7782-41-4', '7440-01-9', '7440-23-5', '7439-95-4', '7429-90-5', '7440-21-3', '7723-14-0', '7704-34-9', '7782-50-5', '7440-37-1', '7440-09-7', '7440-70-2', '7440-20-2', '7440-32-6', '7440-62-2', '7440-47-3', '7439-96-5', '7439-89-6', '7440-48-4', '7440-02-0', '7440-50-8', '7440-66-6', '7440-55-3', '7440-56-4', '7440-38-2', '7782-49-2', '10097-32-2', '7439-90-9', '7440-17-7', '7440-24-6', '7440-65-5', '7440-67-7', '7440-03-1', '7439-98-7', '7440-26-8', '7440-18-8', '7440-16-6', '7440-05-3', '7440-22-4', '7440-43-9', '7440-74-6', '7440-31-5', '7440-36-0', '13494-80-9', '7553-56-2', '7440-63-3', '7440-46-2', '7440-39-3', '7439-91-0', '7440-45-1', '7440-10-0', '7440-00-8', '7440-12-2', '7440-19-9', '7440-53-1', '7440-54-2', '7440-27-9', '7429-91-6', '7440-60-0', '7440-52-0', '7440-30-4', '7440-64-4', '7439-94-3', '7440-58-6', '7440-25-7', '7440-33-7', '7440-15-5', '7440-04-2', '7439-88-5', '7440-06-4', '7440-57-5', '7439-97-6', '7440-28-0', '7439-92-1', '7440-69-9', '7440-08-6', '7440-68-8', '10043-92-2', '7440-73-5', '7440-14-4', '7440-34-8', '7440-29-1', '7440-13-3', '7440-61-1', '7439-99-8', '7440-07-5', '7440-35-9', '7440-51-9', '7440-40-6', '7440-71-3', '7429-92-7', '7440-72-4', '7440-11-1', '10028-14-5', '22537-19-5', '53850-36-5', '53850-35-4', '54038-81-2', '54037-14-8', '54037-57-9', '54038-01-6', '54083-77-1', '54386-24-2', '54084-26-3', '54084-70-7', '54085-16-4', '54085-64-2', '54100-71-9', '54101-14-3', '54144-19-3']
-CAS_by_number = CAS_by_number_standard.copy()
+CAS_by_number = list(CAS_by_number_standard)
 '''CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118.'''
 
 periods = [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
@@ -44,9 +79,9 @@ groups = [1, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 
 Lanthanides and Actinides are set to None.'''
 
 s_block = [1, 2, 3, 4, 11, 12, 19, 20, 37, 38, 55, 56, 87, 88]
-d_block = [*range(21, 31), *range(39, 49), *range(71, 81), *range(103, 113)]
-f_block = [*range(57, 71), *range(89, 103)]
-p_block = [*range(5, 11), *range(13, 19), *range(31, 37), *range(49, 55), *range(81, 87), *range(113, 119)]
+d_block = list(range(21, 31)) + list(range(39, 49)) + list(range(72, 81)) + list(range(104, 113))
+f_block = list(range(57, 72)) + list(range(89, 104)) # 57, 89 are sometimes placed in the d block
+p_block = list(range(5, 11)) + list(range(13, 19)) + list(range(31, 37)) + list(range(49, 55)) + list(range(81, 87)) + list(range(113, 119))
 blocks = {'s': s_block, 'd': d_block, 'f': f_block, 'p': p_block}
 '''Blocks of the elements, stored in a dictionary with four keys and lists.
 Indexed by atomic numbers off-by-one up to 118.'''
@@ -128,7 +163,11 @@ S0s = [130.7, 126.2, 29.1, 9.5, 5.9, 5.7, 191.6, 205.2, 202.8, 146.3, 51.3, 32.7
 Hfs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, None, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
 
 class PeriodicTable:
-    '''Periodic Table object for use in dealing with elements.
+    """Periodic Table object for use in dealing with elements.
+
+    As there is only one periodic table of elements, this is automatically
+    initialized into the object `periodic_table`; there is no need to 
+    construct a new instance of this class.
 
     Parameters
     ----------
@@ -150,27 +189,32 @@ class PeriodicTable:
     .. [1] N M O'Boyle, M Banck, C A James, C Morley, T Vandermeersch, and
        G R Hutchison. "Open Babel: An open chemical toolbox." J. Cheminf.
        (2011), 3, 33. DOI:10.1186/1758-2946-3-33
-    '''
-    __slots__ = ('number_to_elements', 'symbol_to_elements',
-                 'name_to_elements', 'CAS_to_elements', 'indexes')
+    """
+    __slots__ = ('_number_to_elements', '_symbol_to_elements',
+                 '_name_to_elements', '_CAS_to_elements', '_indexes')
     def __init__(self, elements):
-        self.number_to_elements = {}
-        self.symbol_to_elements = {}
-        self.name_to_elements = {}
-        self.CAS_to_elements = {}
+        #: Dictionary lookup of number(int) -> Element; also has number(str) -> Element for convenience.
+        self._number_to_elements = {}
+        self._symbol_to_elements = {}
+        '''Dictionary lookup of symbol(str) -> Element.'''            
+        self._name_to_elements = {}
+        '''Dictionary lookup of name(str) -> Element; also has name(str.lower()) -> Element for convenience.'''            
+        self._CAS_to_elements = {}
+        '''Dictionary lookup of CAS(str) -> Element.'''    
     
         for ele in elements:
-            self.number_to_elements[ele.number] = ele
-            self.number_to_elements[str(ele.number)] = ele
-            self.symbol_to_elements[ele.symbol] = ele
-            self.name_to_elements[ele.name] = ele
-            self.name_to_elements[ele.name.lower()] = ele
-            self.CAS_to_elements[ele.CAS] = ele
-        self.indexes = (self.symbol_to_elements, self.number_to_elements, 
-                        self.name_to_elements, self.CAS_to_elements)
+            self._number_to_elements[ele.number] = ele
+            self._number_to_elements[str(ele.number)] = ele
+            self._symbol_to_elements[ele.symbol] = ele
+            self._name_to_elements[ele.name] = ele
+            self._name_to_elements[ele.name.lower()] = ele
+            self._CAS_to_elements[ele.CAS] = ele
+            
+        self._indexes = (self._symbol_to_elements, self._number_to_elements, 
+                        self._name_to_elements, self._CAS_to_elements)
 
     def __contains__(self, key):
-        for i in self.indexes:
+        for i in self._indexes:
             if key in i: return True
         return False
     
@@ -178,22 +222,25 @@ class PeriodicTable:
         return 118
 
     def __iter__(self):
-        return iter([self.number_to_elements[i] for i in range(1,119)])
+        return iter([self._number_to_elements[i] for i in range(1,119)])
 
     def __getitem__(self, key):
-        for i in self.indexes:
+        for i in self._indexes:
             if key in i: return i[key]
-        raise KeyError('key is not in the periodic table')
+        raise KeyError('Key is not in the periodic table')
 
     def __getattr__(self, key):
-        for i in self.indexes:
+        for i in self._indexes:
             if key in i: return i[key]
-        raise AttributeError('key is not in the periodic table')
+        raise AttributeError('Key is not in the periodic table')
 
 
 class Element:
-    '''Class for storing data on chemical elements. Supports most common
+    """Class for storing data on chemical elements. Supports most common
     properties. If a property is not available, it is set to None.
+    
+    The elements are created automatically and should be accessed via the 
+    `periodic_table` interface.
 
     Attributes
     ----------
@@ -247,12 +294,15 @@ class Element:
     S0 : float
         Standard absolute entropy of the element in its standard state (1 bar,
         298.15 K), [J/mol/K]
-    '''
+    """
     __slots__ = ['number', 'symbol', 'name', 'CAS', 'MW', 'AReneg', 'rcov',
                  'rvdw', 'maxbonds', 'elneg', 'ionization', 'elaffinity',
                  'period', 'group', 
                  'InChI_key', 'PubChem', 'phase', 'Hf', 'S0']
-
+    
+    def __repr__(self):
+        return "<Element %s (%s), number %d, MW=%s>" %(self.name, self.symbol, self.number, self.MW)
+    
     def __init__(self, number, symbol, name, MW, CAS, AReneg, rcov, rvdw,
                  maxbonds, elneg, ionization, elaffinity, period, group,
                  PubChem, phase, Hf, S0, InChI_key=None):
@@ -440,8 +490,6 @@ element_list = []
 list of elements first, and then as an instance of Periodic Table.'''
 for values in openbabel_element_data:
     number, symbol, AReneg, rcov, _, rvdw, maxbonds, MW, elneg, ionization, elaffinity, _, _, _, name = values
-    number = int(number)
-    name = str(name)
     AReneg = None if AReneg == 0 else AReneg
     rcov = None if rcov == 1.6 else rcov  # in Angstrom
     rvdw = None if rvdw == 2.0 else rvdw  # in Angstrom
@@ -464,7 +512,31 @@ for values in openbabel_element_data:
     element_list.append(ele)
 
 periodic_table = PeriodicTable(element_list)
-'''Single instance of the PeriodicTable class'''
+'''Single instance of the PeriodicTable class. Use this, not the PeriodicTable
+class directly.
+
+A brief overview of using the periodic table and its elements:
+
+>>> periodic_table.Na
+<Element Sodium (Na) number 11, MW=22.98977>
+>>> periodic_table.U.MW
+238.02891
+>>> periodic_table['Th'].CAS
+'7440-29-1'
+>>> periodic_table.lead.protons
+82
+>>> periodic_table['7440-57-5'].symbol
+'Au'
+>> len(periodic_table)
+118
+>>> 'gold' in periodic_table
+True
+>>> periodic_table.He.electrons, periodic_table.He.phase, periodic_table.He.Hf, periodic_table.He.S0
+(2, 'g', 0.0, 126.2)
+>>> periodic_table.Kr.block, periodic_table.Kr.period, periodic_table.Kr.group
+('p', 4, 18)
+
+'''
 del openbabel_element_data
 
 def molecular_weight(atoms):
@@ -562,7 +634,7 @@ def mass_fractions(atoms, MW=None):
         if i in periodic_table:
             mfracs[i] = periodic_table[i].MW*atoms[i]/MW
         else:
-            raise Exception('Molecule includes unknown atoms')
+            raise ValueError('Molecule includes unknown atoms')
     return mfracs
 
 
@@ -882,7 +954,7 @@ def simple_formula_parser(formula):
 formula_token_matcher_rational_re_str = r'[A-Z][a-z]?|(?:\d*[.])?\d+|\d+|[()]'
 bracketed_charge_re_str = r'\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$'
 formula_token_matcher_rational = bracketed_charge_re = None
-letter_set = set(string.ascii_letters)
+letter_set = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
 def nested_formula_parser(formula, check=True):
     r'''Improved formula parser which handles braces and their multipliers, 
@@ -937,7 +1009,7 @@ def nested_formula_parser(formula, check=True):
         token_letters = set([j for i in tokens for j in i if j in letter_set])
         formula_letters = set(i for i in formula if i in letter_set)
         if formula_letters != token_letters:
-            raise Exception('Input may not be a formula; extra letters were detected')
+            raise ValueError('Input may not be a formula; extra letters were detected')
     
     for token in tokens:
         if token == "(":
@@ -1010,7 +1082,7 @@ def charge_from_formula(formula):
     
     hit = False
     if '(' in formula:
-        if bracketed_charge_re is None:
+        if bracketed_charge_re is None: # pragma: no cover
             bracketed_charge_re = re.compile(bracketed_charge_re_str)
         hit = bracketed_charge_re.findall(formula)
         if hit:

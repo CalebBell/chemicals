@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,26 +19,27 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 
 __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad', 
 'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid', 
-'Mersmann_Kind_thermal_conductivity_liquid', 'DIPPR9G',
+'Mersmann_Kind_thermal_conductivity_liquid', 'DIPPR9G', 'DIPPR9I','k_IAPWS',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
 'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 
-'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley']
+'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
+'Wassiljewa_Herning_Zipperer']
 
 import os
-import numpy as np
-from fluids.numerics import horner, bisplev, implementation_optimize_tck
-from fluids.constants import R, R_inv, N_A, k
-from chemicals.utils import log, exp, PY37
+from fluids.numerics import horner, bisplev, implementation_optimize_tck, numpy as np
+from fluids.constants import R, R_inv, N_A, k, pi
+from chemicals.utils import log, exp, sqrt, atan, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
+from chemicals.viscosity import Herning_Zipperer
 
-
-folder = os.path.join(os.path.dirname(__file__), 'Thermal Conductivity')
+folder = os_path_join(source_path, 'Thermal Conductivity')
 
 
 register_df_source(folder, 'Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv')
@@ -72,7 +74,215 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_k_data()
+    if can_load_data:
+        _load_k_data()
+
+pi_inv = 1.0/pi # todo move to fluids.constants
+
+def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None):
+    r'''Calculate the thermal conductivity of water or steam according to the
+    2011 IAPWS [1]_ formulation. Critical enhancement is ignored unless
+    parameters for it are provided.
+
+    .. math::
+        \bar\lambda = \bar\lambda_0\times \bar\lambda_1(\bar T, \bar \rho)
+        + \bar\lambda_2(\bar T, \bar\rho)
+
+    .. math::
+        \bar\lambda_0 = \frac{\sqrt{\bar T}}
+        {\sum_{k=0}^4 \frac{L_k}{\bar T^k}}
+
+    .. math::
+        \bar \lambda_1(\bar T, \bar \rho) = \exp\left[ \bar\rho \sum_{i=0}^4
+        \left(\left(\frac{1}{\bar T} - 1 \right)^i
+        \sum_{j=0}^5 L_{ij}(\bar\rho - 1)^j\right)\right]
+
+    .. math::
+        \bar\lambda_2 = \Gamma\frac{\bar\rho \bar c_p \bar T}{\bar \mu} Z(y)
+
+    .. math::
+        Z(y) = \frac{2}{\pi y} \left\{\left[(1 - \kappa^{-1})\arctan(y)
+        + \kappa^{-1}y\right] - \left[1 - \exp\left(\frac{-1}{y^{-1}
+        + y^{-2}/3\bar\rho^2}\right)\right]\right\}
+
+    .. math::
+        y = \bar q_D \xi(\bar T, \bar \rho)
+
+    .. math::
+        \xi = \xi_0 \left(\frac{\Delta \bar\chi}{\Gamma_0}\right)^{\nu/\gamma}
+
+    .. math::
+        \Delta \bar\chi(\bar T, \bar \rho) = \bar\rho\left[
+        \zeta(\bar T, \bar \rho) - \zeta(\bar T_R, \bar \rho)\frac{\bar T_R}{\bar T}
+        \right]
+
+    .. math::
+        \zeta = \left(\frac{\partial \bar \rho}{\partial \bar p}\right)_{\bar T}
+
+    Parameters
+    ----------
+    T : float
+        Temperature water [K]
+    rho : float
+        Density of water [kg/m^3]
+    Cp : float, optional
+        Constant pressure heat capacity of water, [J/kg/K]
+    Cv : float, optional
+        Constant volume heat capacity of water, [J/kg/K]
+    mu : float, optional
+        Viscosity of water, [Pa*S]
+    drho_dP : float, optional
+        Partial derivative of density with respect to pressure at constant
+        temperature, [kg/m^3/Pa]
+
+    Returns
+    -------
+    k : float
+        Thermal condiuctivity, [W/m/K]
+
+    Notes
+    -----
+    Gamma = 177.8514;
+    
+    qd = 0.4E-9;
+    
+    nu = 0.630;
+    
+    gamma = 1.239;
+    
+    zeta0 = 0.13E-9;
+    
+    Gamma0 = 0.06;
+    
+    TRC = 1.5
+    
+    The formulation uses the industrial variant of the critical enhancement.
+    It matches to 5E-6 relative tolerance at the check temperature, and should
+    match even closer outside it.  
+
+    Examples
+    --------
+    >>> k_IAPWS(647.35, 750.)
+    0.5976194153179502
+
+    Region 1, test 1, from MPEI, exact match:
+
+    >>> k_IAPWS(T=620., rho=613.227777440324, Cp=7634.337046792,
+    ... Cv=3037.934412104, mu=70.905106751524E-6, drho_dP=5.209378197916E-6)
+    0.48148519510200044
+
+    References
+    ----------
+    .. [1] Huber, M. L., R. A. Perkins, D. G. Friend, J. V. Sengers, M. J.
+       Assael, I. N. Metaxa, K. Miyagawa, R. Hellmann, and E. Vogel. "New
+       International Formulation for the Thermal Conductivity of H2O."
+       Journal of Physical and Chemical Reference Data 41, no. 3 (September 1,
+       2012): 033102. doi:10.1063/1.4738955.
+    '''
+    rhor = rho*0.003105590062111801#1/322.0
+    Tr = T*0.0015453657571674064 # 1/647.096
+    Tr_inv = 1.0/Tr 
+    
+#     Lijs = [[1.60397357, -0.646013523, 0.111443906, 0.102997357, -0.0504123634, 0.00609859258],
+#             [2.33771842, -2.78843778, 1.53616167, -0.463045512, 0.0832827019, -0.00719201245],
+#             [2.19650529, -4.54580785, 3.55777244, -1.40944978, 0.275418278, -0.0205938816],
+#             [-1.21051378, 1.60812989, -0.621178141, 0.0716373224, 0, 0],
+#             [-2.7203370, 4.57586331, -3.18369245, 1.1168348, -0.19268305, 0.012913842]]
+
+#     Aijs = [[6.53786807199516, 6.52717759281799, 5.35500529896124, 1.55225959906681, 1.11999926419994],
+#             [-5.61149954923348, -6.30816983387575, -3.96415689925446, 0.464621290821181, 0.595748562571649],
+#             [3.39624167361325, 8.08379285492595, 8.91990208918795, 8.93237374861479, 9.8895256507892],
+#             [-2.27492629730878, -9.82240510197603, -12.033872950579, -11.0321960061126, -10.325505114704],
+#             [10.2631854662709, 12.1358413791395, 9.19494865194302, 6.1678099993336, 4.66861294457414],
+#             [1.97815050331519, -5.54349664571295, -2.16866274479712, -0.965458722086812, -0.503243546373828]]
+    '''Unoptimized (but editable) code; the below is generated with sympy
+    Ls = [2.443221E-3, 1.323095E-2, 6.770357E-3, -3.454586E-3, 4.096266E-4]
+    lambda0 = 0
+    for i, L in enumerate(Ls):
+        lambda0 += L/Tr**i
+    lambda0 = Tr**0.5/lambda0
+    '''
+    lambda0 = sqrt(Tr)/(Tr_inv*(Tr_inv*(Tr_inv*(0.0004096266*Tr_inv - 0.003454586) 
+                        + 0.006770357) + 0.01323095) + 0.002443221)
+
+    '''Unoptimized (but editable) code; the below is generated with sympy
+    tot1 = 0
+    for i, Ljs in enumerate(Lijs):
+        tot2 = 0
+        for j, L in enumerate(Ljs):
+            tot2 += L*(rhor - 1.)**j
+        tot1 += (1./Tr -1.)**i*tot2
+    '''
+    x0 = rhor - 1.0
+    x1 = (Tr_inv - 1.0)
+    x12 = x1*x1
+    tot1 = (x0*(x0*(x0*(x0*(x0*(x1*(x1*(0.012913842*x12 - 0.0205938816) - 0.00719201245) + 0.00609859258)
+                            + x1*(x1*(0.275418278 - 0.19268305*x12) + 0.0832827019) - 0.0504123634) 
+                        + x1*(x1*(x1*(1.1168348*x1 + 0.0716373224) - 1.40944978) - 0.463045512) + 0.102997357) 
+                    + x1*(x1*(x1*(-3.18369245*x1 - 0.621178141) + 3.55777244) + 1.53616167) + 0.111443906)
+                + x1*(x1*(x1*(4.57586331*x1 + 1.60812989) - 4.54580785) - 2.78843778) - 0.646013523)
+            + x1*(x1*(x1*(-2.720337*x1 - 1.21051378) + 2.19650529) + 2.33771842) + 1.60397357)
+    lambda1 = exp(rhor*tot1)
+
+    if Cp is not None and Cv is not None and mu is not None and drho_dP is not None:
+        Cpr = Cp*0.0021667624917378636 #1/461.51805 # J/kg/K
+        if Cpr < 0.0 or Cpr > 1E13:
+            Cpr = 1E13
+            Cp = Cpr*461.51805 # This is correct
+        mur = mu*1E6
+        kappa_inv = Cv/Cp
+
+        Gamma = 177.8514
+        qd = 2500000000.0#(0.4E-9)**-1
+        nu = 0.630
+        xi0 = 0.13E-9
+        gamma = 1.239
+#         Gamma0 = 0.06
+        TRC = 1.5
+
+        zeta_drho_dP = drho_dP*68521.73913043478#22.064E6/322.0
+        if rhor <= 0.310559006:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(1.97815050331519*rhor + 10.2631854662709) - 2.27492629730878)
+                        + 3.39624167361325) - 5.61149954923348) + 6.53786807199516)
+        elif rhor <= 0.776397516:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(12.1358413791395 - 5.54349664571295*rhor) - 9.82240510197603)
+                        + 8.08379285492595) - 6.30816983387575) + 6.52717759281799)
+        elif rhor <= 1.242236025:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579) 
+                        + 8.91990208918795) - 3.96415689925446) + 5.35500529896124)
+        elif rhor <= 1.863354037:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(6.1678099993336 - 0.965458722086812*rhor) - 11.0321960061126)
+                        + 8.93237374861479) + 0.464621290821181) + 1.55225959906681)
+        else:
+            tot1 = (rhor*(rhor*(rhor*(rhor*(4.66861294457414 - 0.503243546373828*rhor) - 10.325505114704)
+                        + 9.8895256507892) + 0.595748562571649) + 1.11999926419994)
+        '''Original code:
+        zeta_drho_dP_Tr = 1./sum([Aijs[i][j]*rhor**i for i in range(6)])
+        '''
+        zeta_drho_dP_Tr = 1./tot1
+        dchi = rhor*(zeta_drho_dP - zeta_drho_dP_Tr*TRC*Tr_inv)
+        if dchi < 0.0:
+            xi = 0.0
+        else:
+            # 16.666666666666668 = 1.0/Gamma0
+            xi = xi0*(dchi*16.666666666666668)**0.5084745762711864#(nu/gamma)
+        if xi < 0.0 or xi > 1E4:
+            xi = 1E4
+
+        y = qd*xi
+        y_inv = 1.0/y
+        if y < 1.2E-7:
+            Z_y = 0.0
+        else:
+            Z_y = 2.*pi_inv*y_inv*(((1.0 - kappa_inv)*atan(y) + kappa_inv*y) 
+                               - (1.0 - exp(-1.0/(y_inv + y*y/(3.0*rhor*rhor)))))
+        lambda2 = Gamma*rhor*Cpr*Tr/mur*Z_y
+
+    else:
+        lambda2 = 0.0
+
+    k = (lambda0*lambda1 + lambda2)*1e-3
+    return k
 
 ### Purely CSP Methods - Liquids
 
@@ -433,7 +643,7 @@ def Bahadori_liquid(T, M):
     return a + Y*(b + Y*(c + d*Y))
 
 
-def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
+def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, na):
     r'''Estimates the thermal conductivity of organic liquid substances
     according to the method of [1]_.
 
@@ -453,8 +663,8 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
         Critical temperature of the fluid [K]
     Vc : float
         Critical volume of the fluid [m^3/mol]
-    atoms : dict
-        Dictionary of atoms and their counts, [-]
+    na : float
+        Number of atoms in the molecule, [-]
 
     Returns
     -------
@@ -471,7 +681,7 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
     Dodecane at 400 K:
         
     >>> Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 
-    ... 0.000754, {'C': 12, 'H': 26})
+    ... 0.000754, 38)
     0.0895271829899285
 
     References
@@ -481,7 +691,6 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, atoms):
        Pressure." Industrial & Engineering Chemistry Research, January 31, 
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     '''
-    na = sum(atoms.values())
     lambda_star = 2/3.*(na + 40.*(1. - T/Tc)**0.5)
     Vc = Vc*1000.0 # m^3/mol to m^3/kmol
     N_A2 = N_A*1000.0 # Their avogadro's constant is per kmol
@@ -620,6 +829,13 @@ def DIPPR9H(ws, ks):
 
     .. math::
         \lambda_m = \left( \sum_i w_i \lambda_i^{-2}\right)^{-1/2}
+        
+    This is also called the Vredeveld (1973) equation. A review in [3]_ finds
+    this the best model on average. However, they did caution that in some
+    cases a linear mole-fraction mixing rule performs better. This equation
+    according to Poling [1]_ should not be used if some components have 
+    thermal conductivities more than twice other components. They also say this
+    should not be used with water.
 
     Parameters
     ----------
@@ -643,6 +859,12 @@ def DIPPR9H(ws, ks):
 
     Average deviations of 3%. for 118 nonaqueous systems with 817 data points.
     Max deviation 20%. According to DIPPR.
+    
+    In some sources, this equation is given with the molecular weights included:
+    
+    .. math::
+        \lambda_m^{-2} = \frac{\sum_i z_i {MW}_i \lambda_i^{-2}}
+        {\sum_i z_i {MW}_i}
 
     Examples
     --------
@@ -655,12 +877,98 @@ def DIPPR9H(ws, ks):
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
+    .. [3] Focke, Walter W. "Correlating Thermal-Conductivity Data for Ternary
+       Liquid Mixtures." International Journal of Thermophysics 29, no. 4 
+       (August 1, 2008): 1342-60. https://doi.org/10.1007/s10765-008-0465-2.
     '''
     kl = 0.0
     for i in range(len(ws)):
         kl += ws[i]/(ks[i]*ks[i])
-    return kl**-0.5
+    return 1.0/sqrt(kl)
 
+def DIPPR9I(zs, Vms, ks):
+    r'''Calculates thermal conductivity of a liquid mixture according to
+    mixing rules in [1]_. This is recommended in [2]_ for aqueous and
+    nonaqueous systems.
+    
+    .. math::
+        k_{mix} = \sum_{i}\sum_j \phi_i\phi_j k_{i,j}
+    
+    .. math::
+        k_{i,j} = \frac{2}{\frac{1}{k_i} + \frac{1}{k_j}}
+    
+    .. math::
+        \phi_i = \frac{z_i V_{m,i}}{\sum_j^n z_j V_{m,j}}
+        
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of components, [-]
+    Vms : list[float]
+        Molar volumes of each component, [m^3/mol]
+    ks : float
+        Liquid thermal conductivites of all components, [W/m/K]
+
+    Returns
+    -------
+    kl : float
+        Thermal conductivity of liquid mixture, [W/m/K]
+
+    Notes
+    -----
+    This equation is entirely dimensionless; all dimensions cancel.
+    The example is from [2]_; all results agree.
+    
+    [2]_ found average deviations of 4-6% for 118 nonaqueous systems
+    and 15 aqueous systems at atmospheric pressure, with a maximum deviation of 
+    33%.
+    
+    The computational complexity here is N^2, with a division present in the
+    inner loop.
+
+    Examples
+    --------
+    >>> DIPPR9I(zs=[.682, .318], Vms=[1.723e-2, 7.338e-2], ks=[.6037, .1628])
+    0.25397430656658937
+
+    References
+    ----------
+    .. [1] Li, C. C. "Thermal Conductivity of Liquid Mixtures." AIChE Journal
+       22, no. 5 (1976): 927–30. https://doi.org/10.1002/aic.690220520.
+    .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
+       Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
+    '''
+    N = len(zs)
+    k = 0.0
+    # Precomputation
+    ks_inv = [0.0]*N
+    phis = [0.0]*N
+    tot = 0.0
+    for i in range(N):
+        val = zs[i]*Vms[i]
+        phis[i] = val
+        tot += val
+    tot = 1.0/tot
+    for i in range(N):
+        phis[i] *= tot
+        
+    # Compute the diagonal and store ks_inv
+    for i in range(N):
+        k_inv = 1.0/ks[i]
+        k += phis[i]*phis[i]*ks[i]
+        ks_inv[i] = k_inv
+    
+    # Main loop
+    main_k_sum = 0.0
+    for i in range(N):
+        tot = 0.0
+        for j in range(i):
+            tot += phis[j]/(ks_inv[i] + ks_inv[j])
+        main_k_sum += tot*phis[i]
+            
+    # factored out 4 - 2 from inner loop, two from symmetry
+    k += 4.0*main_k_sum
+    return k
 
 def Filippov(ws, ks):
     r'''Calculates thermal conductivity of a binary liquid mixture according to
@@ -995,11 +1303,11 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
 
     Examples
     --------
-    2-methylbutane at low pressure, 373.15 K. Mathes calculation in [2]_.
+    2-methylbutane at low pressure, 373.15 K. Matches calculation in [2]_.
 
     >>> Eli_Hanley(T=373.15, MW=72.151, Tc=460.4, Vc=3.06E-4, Zc=0.267,
     ... omega=0.227, Cvm=135.9)
-    0.02247951724514062
+    0.02247951724513664
 
     References
     ----------
@@ -1010,8 +1318,6 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     .. [2] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
     '''
-    Cs = [2.907741307E6, -3.312874033E6, 1.608101838E6, -4.331904871E5, 
-          7.062481330E4, -7.116620750E3, 4.325174400E2, -1.445911210E1, 2.037119479E-1]
 
     Tr = T/Tc
     if Tr > 2.0:
@@ -1025,18 +1331,25 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     
     T0_third = T0**(1.0/3.0)
     T0_moving = 1.0/T0
-    tot = 0.0
-    for i in range(9):
-        tot += Cs[i]*T0_moving
-        T0_moving *= T0_third
-        
+    tot = (2907741.307*T0_moving + T0_third*(-3312874.033*T0_moving 
+            + T0_third*(1608101.838*T0_moving + T0_third*(-433190.4871*T0_moving
+            + T0_third*(70624.8133*T0_moving + T0_third*(-7116.62075*T0_moving 
+         + T0_third*(432.51744*T0_moving + T0_third*(0.2037119479*T0_moving*T0_third 
+        - 14.4591121*T0_moving))))))))
+    
+#    Cs = [2.907741307E6, -3.312874033E6, 1.608101838E6, -4.331904871E5, 
+#          7.062481330E4, -7.116620750E3, 4.325174400E2, -1.445911210E1, 2.037119479E-1]
+#    tot = 0.0
+#    for i in range(9):
+#        tot += Cs[i]*T0_moving
+#        T0_moving *= T0_third
     eta0 = 1e-7*tot
-    k0 = 1944*eta0
+    k0 = 1944.0*eta0
 
-    H = (f*16.04/MW)**0.5*h**(-2.0/3.)
-    etas = eta0*H*MW/16.04
+    H = sqrt(f*16.04/MW)*h**(-2.0/3.)
+    etas = eta0*H*MW*0.06234413965087282 # /16.04
     ks = k0*H
-    return ks + etas/(MW*1e-3)*1.32*(Cvm - 1.5*R)
+    return ks + 1320.0*etas/MW*(Cvm - 1.5*R)
 
 
 def Gharagheizi_gas(T, MW, Tb, Pc, omega):
@@ -1097,7 +1410,9 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
     '''
     Pc = Pc*1e-4
     Tb_inv = 1.0/Tb
-    B = T + (2.*omega + 2.*T - 2.*T*(2.*omega + 3.2825)*Tb_inv + 3.2825)/(2.0*omega + T - T*(2.0*omega + 3.2825)*Tb_inv + 3.2825) - T*(2.0*omega + 3.2825)*Tb_inv
+    B = (T + (2.*omega + 2.*T - 2.*T*(2.*omega + 3.2825)*Tb_inv + 3.2825)
+         /(2.0*omega + T - T*(2.0*omega + 3.2825)*Tb_inv + 3.2825)
+         - T*(2.0*omega + 3.2825)*Tb_inv)
     
     x0 = (3.9752*omega + 0.1*Pc + 1.9876*B + 6.5243)
     A = (2.0*omega + T - T*(2.0*omega + 3.2825)*Tb_inv + 3.2825)/(0.1*MW*Pc*T) * x0*x0
@@ -1138,8 +1453,8 @@ def Bahadori_gas(T, MW):
 
     Examples
     --------
-    >>> Bahadori_gas(40+273.15, 20) # Point from article
-    0.031968165337873326
+    >>> Bahadori_gas(40+273.15, 20.0) # Point from article
+    0.03196816533787329
 
     References
     ----------
@@ -1147,16 +1462,16 @@ def Bahadori_gas(T, MW):
        Conductivity of Hydrocarbons." Chemical Engineering 115, no. 13
        (December 2008): 52-54
     '''
-    A = [4.3931323468E-1, -3.88001122207E-2, 9.28616040136E-4, -6.57828995724E-6]
-    B = [-2.9624238519E-3, 2.67956145820E-4, -6.40171884139E-6, 4.48579040207E-8]
-    C = [7.54249790107E-6, -6.46636219509E-7, 1.5124510261E-8, -1.0376480449E-10]
-    D = [-6.0988433456E-9, 5.20752132076E-10, -1.19425545729E-11, 8.0136464085E-14]
+    A = (4.3931323468E-1, -3.88001122207E-2, 9.28616040136E-4, -6.57828995724E-6)
+    B = (-2.9624238519E-3, 2.67956145820E-4, -6.40171884139E-6, 4.48579040207E-8)
+    C = (7.54249790107E-6, -6.46636219509E-7, 1.5124510261E-8, -1.0376480449E-10)
+    D = (-6.0988433456E-9, 5.20752132076E-10, -1.19425545729E-11, 8.0136464085E-14)
     X, Y = T, MW
-    a = A[0] + B[0]*X + C[0]*X**2 + D[0]*X**3
-    b = A[1] + B[1]*X + C[1]*X**2 + D[1]*X**3
-    c = A[2] + B[2]*X + C[2]*X**2 + D[2]*X**3
-    d = A[3] + B[3]*X + C[3]*X**2 + D[3]*X**3
-    return a + b*Y + c*Y**2 + d*Y**3
+    a = A[0] + X*(B[0] + X*(C[0] + D[0]*X))
+    b = A[1] + X*(B[1] + X*(C[1] + D[1]*X))
+    c = A[2] + X*(B[2] + X*(C[2] + D[2]*X))
+    d = A[3] + X*(B[3] + X*(C[3] + D[3]*X))
+    return a + Y*(b + Y*(c + d*Y))
 
 
 
@@ -1494,10 +1809,6 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-#    ais = [2.4166E+0, -5.0924E-1, 6.6107E+0, 1.4543E+1, 7.9274E-1, -5.8634E+0, 9.1089E+1]
-#    bis = [7.4824E-1, -1.5094E+0, 5.6207E+0, -8.9139E+0, 8.2019E-1, 1.2801E+1, 1.2811E+2]
-#    cis = [-9.1858E-1, -4.9991E+1, 6.4760E+1, -5.6379E+0, -6.9369E-1, 9.5893E+0, -5.4217E+1]
-#    dis = [1.2172E+2, 6.9983E+1, 2.7039E+1, 7.4344E+1, 6.3173E+0, 6.5529E+1, 5.2381E+2]
     Tr = T/Tc
     mur = 131.3*dipole*(Vc*1E6*Tc)**-0.5
     mur4 = mur*mur
@@ -1510,14 +1821,6 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     psi = 1.0 + alpha*((0.215 + 0.28288*alpha - 1.061*beta + 0.26665*Z)/(0.6366 + beta*Z + 1.061*alpha*beta))
 
     y = Vc/(6.0*Vm)
-##    B1, B2, B3, B4, B5, B6, B7 = [ais[i] + bis[i]*omega + cis[i]*mur4 + dis[i]*association for i in range(7)]
-#    B1 = ais[0] + bis[0]*omega + cis[0]*mur4 + dis[0]*association
-#    B2 = ais[1] + bis[1]*omega + cis[1]*mur4 + dis[1]*association
-#    B3 = ais[2] + bis[2]*omega + cis[2]*mur4 + dis[2]*association
-#    B4 = ais[3] + bis[3]*omega + cis[3]*mur4 + dis[3]*association
-#    B5 = ais[4] + bis[4]*omega + cis[4]*mur4 + dis[4]*association
-#    B6 = ais[5] + bis[5]*omega + cis[5]*mur4 + dis[5]*association
-#    B7 = ais[6] + bis[6]*omega + cis[6]*mur4 + dis[6]*association
     B1 = 2.4166 + 0.74824*omega + -0.91858*mur4 + 121.72*association
     B2 = -0.50924 + -1.5094*omega + -49.991*mur4 + 69.983*association
     B3 = 6.6107 + 5.6207*omega + 64.76*mur4 + 27.039*association
@@ -1535,20 +1838,25 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
 
 
 ### Thermal conductivity of gas mixtures
+    
 
 def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     r'''Calculates thermal conductivity of a gas mixture according to
-    mixing rules in [1]_ and also in [2]_.
+    mixing rules in [1]_ and also in [2]_. It is significantly more complicated
+    than other kinetic theory models.
 
     .. math::
-        k = \sum \frac{y_i k_i}{\sum y_i A_{ij}}
+        k = \sum_i \frac{y_i k_i}{\sum_j y_i A_{ij}}
 
+    .. math::
         A_{ij} = \frac{1}{4} \left\{ 1 + \left[\frac{\eta_i}{\eta_j}
         \left(\frac{MW_j}{MW_i}\right)^{0.75} \left( \frac{T+S_i}{T+S_j}\right)
         \right]^{0.5} \right\}^2 \left( \frac{T+S_{ij}}{T+S_i}\right)
 
+    .. math::
         S_{ij} = S_{ji} = (S_i S_j)^{0.5}
         
+    .. math::
         S_i = 1.5 T_b
 
     Parameters
@@ -1558,7 +1866,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     ys : float
         Mole fractions of gas components
     ks : float
-        Liquid thermal conductivites of all components, [W/m/K]
+        Gas thermal conductivites of all components, [W/m/K]
     mus : float
         Gas viscosities of all components, [Pa*s]
     Tbs : float
@@ -1586,7 +1894,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     Examples
     --------
     >>> Lindsay_Bromley(323.15, [0.23, 0.77], [1.939E-2, 1.231E-2], [1.002E-5, 1.015E-5], [248.31, 248.93], [46.07, 50.49])
-    0.01390264417969313
+    0.013902644179693132
 
     References
     ----------
@@ -1595,14 +1903,97 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
        (August 1, 1950): 1508-11. doi:10.1021/ie50488a017.
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
+    .. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
     '''
-    cmps = range(len(ys))
-    Ss = [1.5*Tb for Tb in Tbs]
-    Sij = [[(Si*Sj)**0.5 for Sj in Ss] for Si in Ss]
+    N = len(ys)
+    S_roots = [0.0]*N
+    bigis = [0.0]*N
+    Ss_invT = [0.0]*N
+    TSrootSsinv = [0.0]*N
+    bigis_inv = [0.0]*N
+    
+    for i in range(N):
+        Si = 1.5*Tbs[i]
+        S_roots[i] = sqrt(Si)
+        T_Si = T + Si
+        S_inv = 1.0/T_Si
+        Ss_invT[i] = T*S_inv
+        TSrootSsinv[i] = S_roots[i]*S_inv
+        rt05MW = sqrt(MWs[i])
+        rt25MW = sqrt(rt05MW)
+        bigis[i] = sqrt(T_Si*mus[i]/(rt05MW*rt25MW))# correct and clever - compute MW^0.375
+        bigis_inv[i] = 1.0/bigis[i]
+        
+    k = 0.0
+    for i in range(N):
+        den = 0.0
+        S_rooti = S_roots[i]
+        for j in range(N):
+            # 1 multiply, 3 indexes into different arrays
+            x0 = Ss_invT[i] + TSrootSsinv[i]*S_roots[j]
+            # 2 multiplies, 3 indexes
+#            x0 = (T + S_rooti*S_roots[j])*Ss_inv[i]
+            big = 1.0 + bigis[i]*bigis_inv[j]
+            Aij = big*big*x0
+            den += ys[j]*Aij
+        k += ys[i]*ks[i]/den
+    k *= 4.0 # constant
+    return k
+    
+    # Original, unoptimized implementation
+#    cmps = range(len(ys))
+#    Ss = [1.5*Tb for Tb in Tbs]
+#    Sij = [[(Si*Sj)**0.5 for Sj in Ss] for Si in Ss]
+#
+#    Aij = [[0.25*(1. + (mus[i]/mus[j]*(MWs[j]/MWs[i])**0.75
+#            *(T+Ss[i])/(T+Ss[j]))**0.5 )**2 *(T+Sij[i][j])/(T+Ss[i])
+#            for j in cmps] for i in cmps]
+#            
+#    return sum([ys[i]*ks[i]/sum(ys[j]*Aij[i][j] for j in cmps) for i in cmps])
 
-    Aij = [[0.25*(1. + (mus[i]/mus[j]*(MWs[j]/MWs[i])**0.75
-            *(T+Ss[i])/(T+Ss[j]))**0.5 )**2 *(T+Sij[i][j])/(T+Ss[i])
-            for j in cmps] for i in cmps]
-            
-    return sum([ys[i]*ks[i]/sum(ys[j]*Aij[i][j] for j in cmps) for i in cmps])
 
+def Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots=None):
+    r'''Calculates thermal conductivity of a gas mixture according to
+    the kinetic theory expression of Wassiljewa with the interaction
+    term from the Herning-Zipperer expression. This is also used for
+    the prediction of gas mixture viscosity.
+
+    .. math::
+        k = \sum \frac{y_i k_i}{\sum y_i A_{ij}}
+
+    .. math::
+        A_{ij} = \left(\frac{MW_j}{MW_i}\right)^{0.5}
+
+    Parameters
+    ----------
+    zs : float
+        Mole fractions of gas components, [-]
+    ks : float
+        gas thermal conductivites of all components, [W/m/K]
+    MWs : float
+        Molecular weights of all components, [g/mol]
+    MW_roots : float, optional
+        Square roots of molecular weights of all components;
+        speeds up the calculation if provided, [g^0.5/mol^0.5]
+
+    Returns
+    -------
+    kg : float
+        Thermal conductivity of gas mixture, [W/m/K]
+
+    Notes
+    -----
+    This equation is entirely dimensionless; all dimensions cancel.
+
+    Examples
+    --------
+    >>> Wassiljewa_Herning_Zipperer(zs=[.1, .4, .5], ks=[1.002E-5, 1.15E-5, 2e-5], MWs=[40.0, 50.0, 60.0])
+    1.5861181979916883e-05
+    
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    return Herning_Zipperer(zs, ks, MWs, MW_roots)

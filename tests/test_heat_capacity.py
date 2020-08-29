@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+"""Chemical Engineering Design Library (ChEDL).
+
+Utilities for process modeling. Copyright (C) 2016, Caleb Bell
+<Caleb.Andrew.Bell@gmail.com> Permission is hereby granted, free of charge, to
+any person obtaining a copy of this software and associated documentation files
+(the "Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom
+the Software is furnished to do so, subject to the following conditions: The
+above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS
+IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
 
 import numpy as np
 import pytest
@@ -24,6 +25,7 @@ from fluids.numerics import assert_close, assert_close1d, linspace, logspace
 from chemicals.heat_capacity import *
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data, Cp_data_Poling
 from fluids.numerics import NotBoundedError
+from chemicals.heat_capacity import zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s
 
 def test_heat_capacity_CSP():
     # Example is for cis-2-butene at 350K from Poling. It is not consistent with
@@ -122,6 +124,16 @@ def test_Lastovka_Shaw_T_for_Hm():
     T = Lastovka_Shaw_T_for_Hm(Hm=55000, MW=80.0, similarity_variable=0.23)
     assert_close(T, 600.0943429567604)
     
+    T = Lastovka_Shaw_T_for_Hm(Hm=55000, MW=80.0, similarity_variable=0.23, factor=2)
+    assert_close(T, 469.688546084446)
+
+def test_Lastovka_Shaw_T_for_Sm():
+    T = Lastovka_Shaw_T_for_Sm(Sm=112.80, MW=72.151, similarity_variable=0.2356)
+    assert_close(T, 603.4298291570275)
+    
+    T = Lastovka_Shaw_T_for_Sm(Sm=112.80, MW=72.151, similarity_variable=0.2356, factor=2)
+    assert_close(T, 446.62661557878624)
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_Lastovka_Shaw_T_for_Hm_fuzz():
@@ -143,28 +155,31 @@ def test_Lastovka_Shaw_T_for_Hm_fuzz():
                         continue
     #                 print(sv, MW, Hm, e)
 
-@pytest.mark.slow
-@pytest.mark.fuzz
-def test_Lastovka_Shaw_T_for_Sm_fuzz():
-    T_ref = 298.15
-    factor = 1.0
-    
-    similarity_variables = linspace(.05, .5, 8)
-    MWs = linspace(12, 1200, 8)
-    Sms = logspace(log10(3000), log10(300), 15)
-    
-    for sv in similarity_variables:
-        for MW in MWs:
-            for Sm in Sms:
-                try:
-                    Lastovka_Shaw_T_for_Sm(Sm=Sm, MW=MW, similarity_variable=sv, T_ref=T_ref)
-                except Exception as e:
-                    if 'negative temperature' in str(e):
-                        continue
-                    elif isinstance(e, NotBoundedError):
-                        continue
-                    else:
-                        raise ValueError("Could not converge with unexpected error")
+
+# This test used to check that the only error raised was NotBoundedError
+# However, to ad dnumba compatibility the exception could not be caught as e.
+#@pytest.mark.slow
+#@pytest.mark.fuzz
+#def test_Lastovka_Shaw_T_for_Sm_fuzz():
+#    T_ref = 298.15
+#    factor = 1.0
+#    
+#    similarity_variables = linspace(.05, .5, 8)
+#    MWs = linspace(12, 1200, 8)
+#    Sms = logspace(log10(3000), log10(300), 15)
+#    
+#    for sv in similarity_variables:
+#        for MW in MWs:
+#            for Sm in Sms:
+#                try:
+#                    Lastovka_Shaw_T_for_Sm(Sm=Sm, MW=MW, similarity_variable=sv, T_ref=T_ref)
+#                except Exception as e:
+#                    if 'negative temperature' in str(e):
+#                        continue
+#                    elif isinstance(e, NotBoundedError):
+#                        continue
+#                    else:
+#                        raise ValueError("Could not converge with unexpected error")
 
 def test_CRC_standard_data():
     tots_calc = [CRC_standard_data[i].abs().sum() for i in [u'Hfs', u'Gfs', u'S0s', u'Cps', u'Hfl', u'Gfl', u'S0l', 'Cpl', u'Hfg', u'Gfg', u'S0g', u'Cpg']]
@@ -254,6 +269,13 @@ def test_Zabransky_dicts():
         coeffs_sums = sum_([get_coeffs_sum(i) for i in spline_tuple])
         assert_close1d([Tmin_sums, Tmax_sums, coeffs_sums], values)
 
+def test_HeatCapacityClass_methods():
+    classes = [ZabranskySpline, ZabranskyQuasipolynomial]
+    for c in classes:
+        assert hasattr(c, 'calculate')
+        assert hasattr(c, 'calculate_integral')
+        assert hasattr(c, 'calculate_integral_over_T')
+
 def test_ZABRANSKY_SPLINE():
     from chemicals.heat_capacity import zabransky_dict_iso_s
     d = zabransky_dict_iso_s['7732-18-5']
@@ -317,3 +339,9 @@ def test_ZABRANSKY_SPLINE():
     assert_close(d.calculate(310), 375.543177681642)
     assert_close(d.force_calculate_integral(290, 340), 18857.29436766774)
     assert_close(d.force_calculate_integral_over_T(290, 340), 59.96511735461314)
+
+
+def test_zabransky_dict_types():
+    for d in (zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s):
+        for v in d.values():
+            assert type(v) is PiecewiseHeatCapacity

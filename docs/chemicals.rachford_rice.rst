@@ -1,7 +1,7 @@
-chemicals.property_package module
-=================================
+chemicals.rachford_rice module
+==============================
 
-.. automodule:: chemicals.property_package
+.. automodule:: chemicals.rachford_rice
     :members:
     :undoc-members:
     :show-inheritance:

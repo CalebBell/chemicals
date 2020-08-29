@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,15 +18,43 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from numpy.testing import assert_allclose
 import pytest
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.thermal_conductivity import *
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 from chemicals.thermal_conductivity import k_data_Perrys_8E_2_314, k_data_Perrys_8E_2_315, k_data_VDI_PPDS_10, k_data_VDI_PPDS_9
 
+
+def test_k_IAPWS():
+    rhos = [1., 122., 222., 272., 322., 372., 422., 750.]
+    Cps = [2069.0812064568445, 11353.470032452065, 101243.30196479718, 794916.0384979197, 5420611.2721776245, 500237.6519254826, 62663.67284339393, 4570.624565173062]
+    Cvs = [1595.69907291979, 3243.791325724295, 4523.436913569467, 5491.264195750903, 6188.749461187972, 5181.406642440796, 3904.379773638152, 2833.6557941038973]
+    mus = [2.3377752122053447e-05, 2.5520676836476175e-05, 3.133758919727549e-05, 3.622814313612717e-05, 4.296157881024315e-05, 4.5688204474708324e-05, 4.943625601494995e-05, 9.401498317589303e-05]
+    d_rho_d_Ps = [3.3774067394654917e-06, 1.710930848910942e-05, 0.000175456980972237, 0.0015082800389184703, 0.012136419490369314, 0.0012459172043680759, 0.00013039353796524478, 1.0510776327652118e-06]
+    k_CP = [0.05192989239188059, 0.13092288520449896, 0.3677874588628728, 0.7579597763651718, 1.4437555614266426, 0.6503194015489409, 0.4488834872838822, 0.6009613455848507]
+    k_calc = [k_IAPWS(T=647.35, rho=rhos[i], Cp=Cps[i], Cv=Cvs[i], mu=mus[i], drho_dP=d_rho_d_Ps[i]) for i in range(len(rhos))]
+    assert_close1d(k_calc, k_CP, rtol=5e-6)
+
+#        Region 1, test 2, from IAPWS formulation, exact match:
+
+    k = k_IAPWS(T=620., rho=699.226043, Cp=5320.47725, Cv=2916.92653, mu=84.1527945E-6, drho_dP=1.84869007E-6)
+    assert_close(k, 0.5450389394624772, rtol=1e-13)
+
+#    Region 2, test 1, from IAPWS formulation, exact match:
+
+    k= k_IAPWS(T=650., rho=1.00452141, Cp=2070.10035, Cv=1596.75313, mu=23.4877453E-6, drho_dP=3.36351419E-6)
+    assert_close(k, 0.052231102436372065, rtol=1e-13)
+
+#    Region 3, test 1, from IAPWS formulation, exact match:
+
+    k = k_IAPWS(T=647.35, rho=222., Cp=101054.488, Cv=4374.66458, mu=31.2204749E-6, drho_dP=177.778595E-6)
+    assert_close(k, 0.36687941154060383, rtol=1e-13)
+
+    
 def test_Perrys2_314_data():
     # In perry's, only 102 is used. No chemicals are missing.
     # Tmaxs all match to 5E-4. Tmins match to 1E-3.
@@ -54,15 +82,16 @@ def test_Perrys2_315_data():
 
 
 def test_VDI_PPDS_10_data():
-    '''Average deviation of 2.4% from tabulated values. Many chemicals have
-    much higher deviations. 10% or more deviations:
-    ['75-34-3', '107-06-2', '106-93-4', '420-46-2', '71-55-6', '79-34-5', 
-    '67-72-1', '76-12-0', '76-13-1', '76-14-2', '540-54-5', '75-01-4', 
-    '75-35-4', '79-01-6', '127-18-4', '462-06-6', '108-90-7', '108-86-1', 
+    """Average deviation of 2.4% from tabulated values. Many chemicals have much
+    higher deviations. 10% or more deviations:
+
+    ['75-34-3', '107-06-2', '106-93-4', '420-46-2', '71-55-6', '79-34-5',
+    '67-72-1', '76-12-0', '76-13-1', '76-14-2', '540-54-5', '75-01-4',
+    '75-35-4', '79-01-6', '127-18-4', '462-06-6', '108-90-7', '108-86-1',
     '108-41-8', '100-44-7', '108-93-0', '100-61-8', '121-69-7', '91-66-7']
-    
+
     These have been checked - it appears the tabulated data is just incorrect.
-    '''
+    """
 
     assert all([checkCAS(i) for i in k_data_VDI_PPDS_10.index])
     tots_calc = [k_data_VDI_PPDS_10[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
@@ -74,13 +103,13 @@ def test_VDI_PPDS_10_data():
 
 
 def test_VDI_PPDS_9_data():
-    '''Average deviation of 0.71% from tabulated values. The following have 
-    larger deviations
-        
+    """Average deviation of 0.71% from tabulated values. The following have
+    larger deviations.
+
     ['124-18-5', '629-59-4', '629-78-7', '526-73-8', '95-63-6']
-    
+
     These have been checked - it appears the tabulated data is just incorrect.
-    '''
+    """
 
     assert all([checkCAS(i) for i in k_data_VDI_PPDS_9.index])
     tots_calc = [k_data_VDI_PPDS_9[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
@@ -114,7 +143,7 @@ def test_CSP_liq():
     kl = Bahadori_liquid(273.15, 170)
     assert_close(kl, 0.14274278108272603)
     
-    kl = Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 0.000754, {'C': 12, 'H': 26})
+    kl = Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 0.000754, 38)
     assert_close(kl, 0.0895271829899285)
 
 
@@ -205,4 +234,25 @@ def test_Lindsay_Bromley():
 #    with pytest.raises(Exception):
 #        Lindsay_Bromley(323.15, [0.23], [1.939E-2, 1.231E-2], [1.002E-5, 1.015E-5], [248.31, 248.93], [46.07, 50.49])
 
+def test_Wassiljewa_Herning_Zipperer():
+    MWs = [40, 50, 60]
+    zs = [.1, .4, .5]
+    kgs = [.01, .015, .025]
+    
+    k = Wassiljewa_Herning_Zipperer(zs, kgs, MWs)
+    assert_close(k, 0.01984976897415608, rtol=1e-13)
+    
+    MWs = [40.0, 50.0, 60.0]
+    zs = [.1, .4, .5]
+    ks = [1.002E-5, 1.15E-5, 2e-5]
+    k = Wassiljewa_Herning_Zipperer(zs, ks, MWs)
+    assert_close(k, 1.5861181979916883e-05, rtol=1e-13)
+    
+    MW_roots = [i**0.5 for i in MWs]
+    k = Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots)
+    assert_close(k, 1.5861181979916883e-05, rtol=1e-13)
 
+
+def test_DIPPR9I():
+    k = DIPPR9I(zs=[.682, .318], Vms=[1.723e-2, 7.338e-2], ks=[.6037, .1628])
+    assert_close(k, 0.25397430656658937, rtol=1e-13)

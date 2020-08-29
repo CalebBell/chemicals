@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,17 +18,23 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 import pytest
 import numpy as np
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
+from chemicals.utils import rho_to_Vm
 from chemicals.interface import *
 from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_Lange, sigma_data_Somayajulu,
                                  sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 
+def test_sigma_IAPWS():
+    assert_close(sigma_IAPWS(300.), 0.07168596252716256, rtol=1e-13)
+    assert_close(sigma_IAPWS(450.), 0.04289149915650591, rtol=1e-13)
+    assert_close(sigma_IAPWS(600.), 0.00837561087288565, rtol=1e-13)
 
 def test_CSP():
     # p-dichloribenzene at 412.15 K, from DIPPR; value differs due to a slight
@@ -123,8 +129,7 @@ def test_data():
     assert sigma_data_Somayajulu2.index.is_unique
 
 def test_VDI_PPDS_11_data():
-    '''I believe there are no errors here. 
-    '''
+    """I believe there are no errors here."""
     for i in sigma_data_VDI_PPDS_11.index:
         assert checkCAS(i)
     
@@ -136,6 +141,18 @@ def test_VDI_PPDS_11_data():
     tots = [18.495069999999998, 336.69950000000006, 6.5941200000000002, 7.7347200000000003, 6.4262199999999998, 150142.28, 56917.699999999997]
     for calc, fixed in zip(tots_calc, tots):
         assert_close(calc, fixed)
+
+def test_Weinaug_Katz():
+    # sample test case
+    sigma = Weinaug_Katz([5.1e-5, 7.2e-5], Vml=0.000125, Vmg=0.02011, xs=[.4, .6], ys=[.6, .4])
+    assert_close(sigma, 0.06547479150776776)
+    
+    # pure component check it checks out
+    Vml = rho_to_Vm(800.8088185536124, 100.15888)
+    Vmg = rho_to_Vm(4.97865317223119, 100.15888)
+    sigma = Weinaug_Katz([5.088443542210164e-05], Vml, Vmg, [1], [1])
+    assert_close(sigma, 0.026721669606560042, rtol=1e-13)
+
 
 def test_Winterfeld_Scriven_Davis():
     # The example is from [2]_; all results agree.
@@ -169,3 +186,11 @@ def test_Diguilio_Teja():
 def test_Meybodi_Daryasafar_Karimi():
     sigma = Meybodi_Daryasafar_Karimi(980, 760, 580, 914)
     assert_close(sigma, 0.02893598143089256)
+
+
+def test_API10A32():
+    from fluids.core import F2K, R2K
+    assert_close(API10A32(T=F2K(60), Tc=R2K(1334), K_W=12.4), 29.577333312096968, rtol=1e-13)
+    
+    
+    

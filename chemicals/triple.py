@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,13 +18,14 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['Tt_all_methods', 'Tt_methods', 'Tt', 
            'Pt_all_methods', 'Pt_methods', 'Pt']
 
 import os
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.phase_change import Tm
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -34,7 +35,7 @@ from chemicals.data_reader import (register_df_source,
 
 
 # %% Register data sources and lazy load them
-folder = os.path.join(os.path.dirname(__file__), 'Triple Properties')
+folder = os_path_join(source_path, 'Triple Properties')
 register_df_source(folder, 'Staveley 1981.tsv')
 
 STAVELEY = 'STAVELEY'
@@ -57,14 +58,13 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_triple_data()
+    if can_load_data:
+        _load_triple_data()
 
 Tt_all_methods = (STAVELEY, MELTING)
 
 def Tt_methods(CASRN):
-    """
-    Return all methods available to obtain the Tt for the desired 
-    chemical.
+    """Return all methods available to obtain the Tt for the desired chemical.
 
     Parameters
     ----------
@@ -74,13 +74,12 @@ def Tt_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Tt with the given 
+        Methods which can be used to obtain the Tt with the given
         inputs.
 
     See Also
     --------
     Tt
-
     """
     if not _triple_data_loaded: _load_triple_data()
     methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt68')
@@ -150,9 +149,7 @@ triple_point_temperature = Tt
 Pt_all_methods = (STAVELEY,)
 
 def Pt_methods(CASRN):
-    """
-    Return all methods available to obtain the Pt for the desired 
-    chemical.
+    """Return all methods available to obtain the Pt for the desired chemical.
 
     Parameters
     ----------
@@ -162,13 +159,12 @@ def Pt_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the Pt with the given 
+        Methods which can be used to obtain the Pt with the given
         inputs.
 
     See Also
     --------
     Pt
-
     """
     if not _triple_data_loaded: _load_triple_data()
     return list_available_methods_from_df_dict(Pt_sources, CASRN, 'Pt')
@@ -229,5 +225,4 @@ def Pt(CASRN, get_methods=False, method=None):
         return retrieve_from_df_dict(Pt_sources, CASRN, 'Pt', method) 
     else:
         return retrieve_any_from_df_dict(Pt_sources, CASRN, 'Pt') 
-triple_point_pressure = Pt
 

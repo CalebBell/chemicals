@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from fluids.numerics import assert_close
 import pytest
@@ -58,6 +59,9 @@ def test_acentric_main():
 
     # Error handling
     assert None == omega(CASRN='BADCAS')
+    
+@pytest.mark.skip_types
+def test_acentric_main_bad_methods():
     with pytest.raises(ValueError):
         omega(CASRN='98-01-1', method='BADMETHOD')
     with pytest.raises(ValueError):
@@ -74,10 +78,10 @@ def test_acentric_correlation():
 
 
 def test_omega_definition():
-    omega = omega_definition(999542, 22048320.0)
+    omega = omega_definition(999542.0, 22048320.0)
     assert_close(omega, 0.3435744558761711, rtol=1e-12)
     
 def test_Stiel_polar_factor():
-    factor = Stiel_polar_factor(Psat=169745, Pc=22048321.0, omega=0.344)
+    factor = Stiel_polar_factor(Psat=169745.0, Pc=22048321.0, omega=0.344)
     assert_close(0.02322146744772713, factor)
 

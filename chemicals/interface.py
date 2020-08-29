@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 207, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,25 +18,27 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 
 __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Brock_Bird', 'Pitzer', 'Sastri_Rao', 'Zuo_Stenby', 
-           'Mersmann_Kind_surface_tension',
+           'sigma_IAPWS',
+           'Mersmann_Kind_surface_tension', 'API10A32',
            'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem', 
-           'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 
+           'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 'Weinaug_Katz',
            'Meybodi_Daryasafar_Karimi']
 
 import os
-import numpy as np
-from chemicals.utils import log, exp
-from chemicals.utils import mixing_simple, PY37
+from fluids.numerics import numpy as np
 from fluids.constants import N_A, k
+from chemicals.utils import log, exp, sqrt
+from chemicals.utils import mixing_simple, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-folder = os.path.join(os.path.dirname(__file__), 'Interface')
+folder = os_path_join(source_path, 'Interface')
 
 
 register_df_source(folder, 'MuleroCachadinaParameters.tsv')
@@ -78,7 +80,54 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_interface_dfs()
+    if can_load_data:
+        load_interface_dfs()
+
+
+
+def sigma_IAPWS(T):
+    r'''Calculate the surface tension of pure water as a function of .
+    temperature. Assumes the 2011 IAPWS [1]_ formulation.
+
+    .. math::
+        \sigma = B\tau^\mu(1+b\tau)\\
+        \tau = 1-T/T_c\\
+        B = 0.2358 \text{N/m}\\
+        b = -0.625\\
+        \mu = 1.256
+
+    Parameters
+    ----------
+    T : float
+        Temperature of liquid [K]
+
+    Returns
+    -------
+    sigma : float
+        Air-water surface tension, [N/m]
+
+    Notes
+    -----
+    This function is valid from the triple temperature to the critical
+    temperature. No effects for pressure are included in the formulation.
+    Test values are from IAPWS 2010 book.
+
+    Examples
+    --------
+    >>> sigma_IAPWS(300.)
+    0.07168596252716256
+    >>> sigma_IAPWS(450.)
+    0.04289149915650591
+    >>> sigma_IAPWS(600.)
+    0.00837561087288565
+
+    References
+    ----------
+    .. [1] IAPWS. 2014. Revised Release on Surface Tension of Ordinary Water
+       Substance
+    '''
+    tau = 1. - T/647.096
+    return 0.2358*tau**1.256*(1.0 - 0.625*tau)
 
 ### Regressed coefficient-based functions
 
@@ -717,6 +766,54 @@ def Mersmann_Kind_surface_tension(T, Tm, Tb, Tc, Pc, n_associated=1):
     sigma = sigma_star*(k*Tc)**(1.0/3.0)*(Tm/Tc)*Pc**(2.0/3.0)*n_associated**(-1.0/3.0)
     return sigma
 
+
+def API10A32(T, Tc, K_W):
+    r'''Calculates the interfacial tension between 
+    a liquid petroleum fraction and air, using the oil's pseudocritical
+    temperature and Watson K Characterization factor.
+
+    .. math::
+        \sigma = \frac{673.7\left[\frac{\left(T_c - T\right)}{T_c}\right]^{1.232}}{K_W}
+    
+    Parameters
+    ----------
+    T : float
+        Liquid temperature, [K]
+    Tc : float
+        Pseudocritical temperature (or critical temperature if using
+        the equation with a pure component), [K]
+    K_W : float
+        Watson characterization factor
+
+    Returns
+    -------
+    sigma : float
+        Air-water surface tension, [N/m]
+
+    Notes
+    -----
+    [1]_ cautions that this should not be applied to coal liquids,
+    and that it will give higher errors at pressures above 500 psi.
+    [1]_ claims this has an average error of 10.7%.
+    
+    This function converges to zero at `Tc`; do not use it above that 
+    temperature!
+
+    Examples
+    --------    
+    Sample problem in Comments on Procedure 10A3.2.1 of [1]_;
+    
+    >>> from fluids.core import F2K, R2K
+    >>> API10A32(T=F2K(60), Tc=R2K(1334), K_W=12.4)
+    29.577333312096968
+
+    References
+    ----------
+    .. [1] API Technical Data Book: General Properties & Characterization.
+       American Petroleum Institute, 7E, 2005.
+    '''
+    return 673.7*((Tc-T)/Tc)**1.232/K_W
+
 ### Surface Tension Mixtures
 
 def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
@@ -758,7 +855,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
     --------
     >>> Winterfeld_Scriven_Davis([0.1606, 0.8394], [0.01547, 0.02877],
     ... [8610., 15530.])
-    0.024967388450439817
+    0.02496738845043982
 
     References
     ----------
@@ -769,25 +866,26 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     '''
-    cmps = range(len(xs))
-
-    Vms = [1e3/i for i in rhoms]
+    N = len(xs)
+    Vms = [0.0]*N
     rho = 0.0
-    for i in cmps:
+    for i in range(N):
+        Vms[i] = 1e3/rhoms[i]
         rho += xs[i]*Vms[i]
 #    rho = 1./rho
-    rho = 1.4142135623730951/rho
+    rho = 1.4142135623730951/rho # factor out rt2
     # For speed, transform the Vms array to contain
 #    xs[i]*Vms[i]*sigmas_05[i]*rho
-    sigmas_05 = [i**0.5 for i in sigmas]
-    for i in cmps:
-        Vms[i] *= sigmas_05[i]*xs[i]*rho
     tot = 0.0
-    for i in cmps:
+    for i in range(N):
+        val = sqrt(sigmas[i])*xs[i]*rho*Vms[i]
+        Vms[i] = val
+        tot += val*val
+    tot *= 0.5
+    for i in range(N):
         # Symmetric - can be slightly optimized
         for j in range(i):
             tot += Vms[i]*Vms[j]
-        tot += 0.5*Vms[i]*Vms[i]
     return tot
         
 
@@ -860,6 +958,65 @@ def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
     return 1.002855*Tst**1.118091*(T/Tb)*sigmar
 
 
+def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
+    r'''Calculates surface tension of a liquid mixture according to
+    mixing rules in [1]_ and also in [2]_. This is based on the
+    Parachor concept. This is called the Macleod-Sugden model in some places.
+
+    .. math::
+        \sigma_M = \left[\sum_i P_i\left( \frac{x_i}{V_{m,l}}
+         - \frac{y_i}{V_{m,g}}\right) \right]^4
+
+    Parameters
+    ----------
+    parachors : list[float]
+        Parachors of each component, [N^0.25*m^2.75/mol]
+    Vml : float
+        Liquid mixture molar volume, [m^3/mol]
+    Vmg : float
+        Gas mixture molar volume; this can be set to zero at
+        low pressures, [m^3/mol]
+    xs : list[float]
+        Mole fractions of all components in liquid phase, [-]
+    xs : list[float]
+        Mole fractions of all components in gas phase, [-]
+
+    Returns
+    -------
+    sigma : float
+        Air-liquid surface tension of mixture, [N/m]
+
+    Notes
+    -----
+    This expression is efficient and does not require pure component
+    surface tensions. Its accuracy is dubious.
+
+    Examples
+    --------
+    >>> Weinaug_Katz([5.1e-5, 7.2e-5], Vml=0.000125, Vmg=0.02011, xs=[.4, .6], ys=[.6, .4])
+    0.06547479150776776
+    
+    Neglect the vapor phase density by setting `Vmg` to a high value:
+        
+    >>> Weinaug_Katz([5.1e-5, 7.2e-5], Vml=0.000125, Vmg=1e100, xs=[.4, .6], ys=[.6, .4])
+    0.06701752894095361
+    
+    References
+    ----------
+    .. [1] Weinaug, Charles F., and Donald L. Katz. "Surface Tensions of 
+       Methane-Propane Mixtures." Industrial & Engineering Chemistry 35, 
+       no. 2 (February 1, 1943): 239-246. https://doi.org/10.1021/ie50398a028.
+    .. [2] Pedersen, Karen Schou, Aage Fredenslund, and Per Thomassen.
+       Properties of Oils and Natural Gases. Vol. 5. Gulf Pub Co, 1989.
+    '''
+    tot = 0.0
+    rhoml = 1.0/Vml
+    rhomg = 1.0/Vmg
+    for i in range(len(parachors)):
+        tot += parachors[i]*(xs[i]*rhoml - ys[i]*rhomg)
+    tot *= tot
+    tot *= tot # fourth power it
+    return tot
 
 ### Water-hydrocarbon interfacial tensions
 

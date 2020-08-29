@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 
@@ -28,16 +30,14 @@ __all__ = ['Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
 'ideal_gas', 'Goodman']
 
 import os
-
 from fluids.numerics import np, splev, implementation_optimize_tck
 from fluids.constants import R, atm_inv
 from chemicals.utils import log, exp, isnan
 from chemicals.utils import Vm_to_rho, mixing_simple
-
-
-from chemicals.utils import PY37
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import data_source, register_df_source
-folder = os.path.join(os.path.dirname(__file__), 'Density')
+
+folder = os_path_join(source_path, 'Density')
 
 register_df_source(folder, 'COSTALD Parameters.tsv')
 register_df_source(folder, 'Mchaweh SN0 deltas.tsv')
@@ -91,7 +91,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_rho_data()
+    if can_load_data:
+        _load_rho_data()
 
 
 
@@ -380,7 +381,7 @@ def Bhirud_normal(T, Tc, Pc, omega):
                + 102.615) - 24.076) + 1.39644
         lnU1 = Tr*(Tr*(Tr*(Tr*(Tr*(176.737*Tr - 728.227) + 1231.43) - 1091.453)
                + 533.38) - 135.7437) + 13.4412
-    elif Tr > 1:
+    elif Tr > 1.0:
         raise ValueError('Critical phase, correlation does not apply')
     else:
         lnU0 = float(splev(Tr, Bhirud_normal_lnU0_tck))

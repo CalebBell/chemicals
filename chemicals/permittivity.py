@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,19 +19,20 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 
 __all__ = ['permittivity_IAPWS']
 
 import os
-import numpy as np
+from fluids.numerics import numpy as np
 from fluids.constants import N_A, epsilon_0, k
-from chemicals.utils import PY37
+from chemicals.utils import sqrt, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-folder = os.path.join(os.path.dirname(__file__), 'Electrolytes')
+folder = os_path_join(source_path, 'Electrolytes')
 register_df_source(folder, 'Permittivity (Dielectric Constant) of Liquids.tsv')
 
 _permittivity_data_loaded = False
@@ -46,7 +48,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_permittivity_data()
+    if can_load_data:
+        _load_permittivity_data()
 
 
 
@@ -104,7 +107,7 @@ def permittivity_IAPWS(T, rho):
     Examples
     --------
     >>> permittivity_IAPWS(373., 958.46)
-    55.56584187269734
+    55.56584187269722
     
     >>> permittivity_IAPWS(650., 40.31090)
     1.2659205723606064
@@ -115,28 +118,45 @@ def permittivity_IAPWS(T, rho):
        Water Substance for Temperatures from 238 K to 873 K and Pressures up 
        to 1000 MPa.
     '''
-    k = 1.38064852e-23
-    dipole = 6.138E-30 # actual molecular dipole moment of water, in C*m
-    polarizability = 1.636E-40 # actual mean molecular polarizability of water, C^2/J*m^2
-    MW = 0.018015268 # molecular weight of water, kg/mol
+#    k = 1.38064852e-23
+    # actual molecular dipole moment of water, in C*m
+#    dipole2 = 3.7675044000000003e-59 # dipole = 6.138E-30 # but we square it 
+#    polarizability = 1.636E-40 # actual mean molecular polarizability of water, C^2/J*m^2
+#    MW = 0.018015268 # molecular weight of water, kg/mol
 #    N_A = 6.0221367e23
-    ih = [1, 1, 1, 2, 3, 3, 4, 5, 6, 7, 10]
-    jh = [0.25, 1, 2.5, 1.5, 1.5, 2.5, 2, 2, 5, 0.5, 10]
-    Nh = [0.978224486826, -0.957771379375, 0.237511794148, 0.714692244396,
-          -0.298217036956, -0.108863472196, 0.949327488264E-1, 
-          -.980469816509E-2, 0.165167634970E-4, 0.937359795772E-4, 
-          -0.12317921872E-9]
+    delta = rho*0.003105590062111801 # 1/322.0
+#    delta = rho/322.
+    T_inv = 1.0/T
+    tau = 647.096*T_inv
     
-    delta = rho/322.
-    tau = 647.096/T
+    g = 1.0  + 0.196096504426E-2*delta*(T*0.0043859649122807015 - 1.0)**-1.2 # 0.00438.. == 1/228.0
+#    g = 1.0  + 0.196096504426E-2*delta*(T/228. - 1.0)**-1.2
+#    ih = [1, 1, 1, 2, 3, 3, 4, 5, 6, 7, 10]
+#    jh = [0.25, 1, 2.5, 1.5, 1.5, 2.5, 2, 2, 5, 0.5, 10]
+#    Nh = [0.978224486826, -0.957771379375, 0.237511794148, 0.714692244396,
+#          -0.298217036956, -0.108863472196, 0.949327488264E-1, 
+#          -.980469816509E-2, 0.165167634970E-4, 0.937359795772E-4, 
+#          -0.12317921872E-9]
+#    
+#    for h in range(11):
+#        g += Nh[h]*delta**ih[h]*tau**jh[h] 
+    tau_rt = sqrt(tau)
+    tau_15 = tau*tau_rt
+    tau_25 = tau_15*tau
+    tau_2 = tau*tau
+    tau_5 = tau_25*tau_25
+        
+    g += delta*(-delta*(delta*(-delta*(delta*(delta*(delta*(-1.2317921872000001181e-10
+                                                            *delta*delta*delta*tau_5*tau_5 
+                    + 0.000093735979577200004786*tau_rt) 
+        + 0.000016516763497000000026*tau_5) - 0.0098046981650899995425*tau_2)
+        + 0.094932748826400001341*tau_2) + 0.10886347219599999681*tau_25 + 0.29821703695599999229*tau_15)
+        - 0.71469224439599998711*tau_15) + 0.97822448682600005032*sqrt(tau_rt)
+        - 0.9577713793750000093*tau + 0.23751179414799999945*tau_25)
     
-    g = 1.0  + 0.196096504426E-2*delta*(T/228. - 1.0)**-1.2
-    for h in range(11):
-        g += Nh[h]*delta**ih[h]*tau**jh[h] 
-    
-    A = N_A*dipole*dipole*rho*g/(epsilon_0*k*T*MW)
-    B = N_A*polarizability*rho/(3.*epsilon_0*MW)
-    epsilon = (1. + A + 5.*B + (9. + 2.*A + 18.*B + A*A + 10.*A*B + 9.*B*B
-        )**0.5)/(4. - 4.*B)
+    A = rho*g*T_inv*10.302249930663786#N_A*dipole2/(epsilon_0*k*MW)
+    B = rho*0.00020588442304500529#Na*polarizability/1(3.*epsilon_0*MW) simplifies to the constant
+    epsilon = (1. + A + 5.*B + sqrt(9. + A*(2.0 + A) + B*(18. + 10.*A + 9.*B)
+        ))/(4. - 4.*B)
     return epsilon
 

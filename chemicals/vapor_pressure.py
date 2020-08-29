@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 from __future__ import division
 
@@ -30,16 +32,15 @@ __all__ = ['Antoine', 'Wagner_original', 'Wagner', 'TRC_Antoine_extended',
 
 import os
 from fluids.constants import R
+from fluids.numerics import numpy as np
 from math import e
-from chemicals.utils import log, exp, isnan
-from chemicals.utils import PY37
+from chemicals.utils import log, exp, sqrt, isnan
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.dippr import EQ101
 from chemicals import miscdata
 from chemicals.data_reader import register_df_source, data_source
 
-import numpy as np
-
-folder = os.path.join(os.path.dirname(__file__), 'Vapor Pressure')
+folder = os_path_join(source_path, 'Vapor Pressure')
 
 register_df_source(folder, 'Antoine Collection Poling.tsv')
 register_df_source(folder, 'Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
@@ -103,7 +104,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    load_vapor_pressure_dfs()
+    if can_load_data:
+        load_vapor_pressure_dfs()
 
     
     
@@ -400,8 +402,11 @@ def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    x = max((T - to - 273.15)/Tc, 0.)
-    return 10.**(A - B/(T+C) + 0.43429*x**n + E*x**8 + F*x**12)
+    x = (T - to - 273.15)/Tc
+    if x < 0.0:
+        x = 0.0
+    x4 = x*x*x*x
+    return 10.**(A - B/(T+C) + 0.43429*x**n + x4*x4*(E + F*x4))
 
 
 def Wagner_original(T, Tc, Pc, a, b, c, d):
@@ -442,7 +447,7 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
 
     >>> Wagner_original(100.0, 190.53, 4596420., a=-6.00435, b=1.1885, 
     ... c=-0.834082, d=-1.22833)
-    34520.44601450496
+    34520.44601450499
 
     References
     ----------
@@ -455,8 +460,9 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
     '''
     Tr = T/Tc
     tau = 1.0 - Tr
-    tau3 = tau*tau*tau
-    return Pc*exp((a*tau + b*tau**1.5 + c*tau3 + d*tau3*tau3)/Tr)
+    tau2 = tau*tau
+    tau_Tr = tau/Tr
+    return Pc*exp(((d*tau2*tau + c)*tau2 + a + b*sqrt(tau))*tau_Tr)
 
 
 def Wagner(T, Tc, Pc, a, b, c, d):
@@ -561,7 +567,7 @@ def Psat_IAPWS(T):
     A = v2 + 0.11670521452767E4*v - 0.72421316703206E6
     B = -0.17073846940092E2*v2 + 0.12020824702470E5*v - 0.32325550322333E7
     C = 0.14915108613530E2*v2 - 0.48232657361591E4*v + 0.40511340542057E6
-    x = ((C + C)/((B*B - 4.0*A*C)**0.5 - B))
+    x = ((C + C)/(sqrt(B*B - 4.0*A*C) - B))
     x2 = x*x
     P = 1E6*x2*x2
     return P
@@ -608,7 +614,7 @@ def dPsat_IAPWS_dT(T):
     x6 = 5.28184261979789455e-6*x2
     x7 = x4 - x5 - x6 - 1.0
     x8 = 4668.20858110680001*T - 1113.62718545319967*x0 + 4.0*x2 - 2896852.66812823992
-    x9 = (x7*x7 - 9.56991643658934639e-14*x8*(-4823.26573615910002*T + 1150.61693433977007*x0 + 14.9151086135300002*x2 + 405113.405420569994))**0.5
+    x9 = sqrt(x7*x7 - 9.56991643658934639e-14*x8*(-4823.26573615910002*T + 1150.61693433977007*x0 + 14.9151086135300002*x2 + 405113.405420569994))
     x10 = -x4 + x5 + x6 + x9 + 1.0
     x10_inv = 1.0/x10
     x11 = 0.00153804662447919488*T - 1.0

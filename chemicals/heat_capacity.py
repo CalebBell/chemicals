@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,7 +19,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 __all__ = ['heat_capacity_gas_methods',
            'Lastovka_Shaw', 'Lastovka_Shaw_integral', 'Lastovka_Shaw_integral_over_T', 
@@ -29,18 +31,22 @@ __all__ = ['heat_capacity_gas_methods',
            'Zabransky_quasi_polynomial', 'Zabransky_quasi_polynomial_integral',
            'Zabransky_quasi_polynomial_integral_over_T', 'Zabransky_cubic', 
            'Zabransky_cubic_integral', 'Zabransky_cubic_integral_over_T',
+           'Dadgostar_Shaw_integral', 'Dadgostar_Shaw_integral_over_T',
            'heat_capacity_solid_methods',
            'Lastovka_solid', 'Lastovka_solid_integral', 
            'Lastovka_solid_integral_over_T', 'heat_capacity_solid_methods',
-           'HeatCapacityMetaclass', 'HeatCapacity', 
            'ZabranskySpline', 'ZabranskyQuasipolynomial',
            'PiecewiseHeatCapacity']
 import os
 from io import open
-from chemicals.utils import R, log, exp, polylog2, to_num, PY37, property_mass_to_molar
+from chemicals.utils import R, log, exp, to_num, PY37, property_mass_to_molar, source_path, os_path_join, can_load_data
 from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
-from fluids.numerics import newton, brenth, secant
+from fluids.numerics import newton, brenth, secant, polylog2, numpy as np
+
+__numba_additional_funcs__ = ['Lastovka_Shaw_T_for_Hm_err',
+                              'Lastovka_Shaw_T_for_Sm_err'
+                              ]
 
 # %% Methods introduced in this module
 
@@ -75,51 +81,8 @@ LASTOVKA_S = 'Lastovka, Fulem, Becerra and Shaw (2008)'
 PERRY151 = "Perry's Table 2-151"
 heat_capacity_solid_methods = (PERRY151, CRCSTD, LASTOVKA_S)
 
-# %% Data types
-
-### Abstract heat capacity classes ###
-
-class HeatCapacityMetaclass(type):
-    """Metaclass for heat capacity model classes."""
-    
-    def __instancecheck__(self, instance):
-        try:
-            instance.Tmin
-            instance.Tmax
-            instance.calculate
-            instance.calculate_integral
-            instance.calculate_integral_over_T
-        except AttributeError: return False
-        return True
-
-    def __subclasscheck__(self, subclass):
-        try:
-            subclass.calculate
-            subclass.calculate_integral
-            subclass.calculate_integral_over_T
-        except AttributeError: return False
-        return True
-
-
-class HeatCapacity(metaclass=HeatCapacityMetaclass):
-    """Abstract class for heat capacity subclasses."""
-    __slots__ = ()
-    def __init_subclass__(cls):
-        cls_attrs = ('calculate', 'calculate_integral', 'calculate_integral_over_T')
-        hasattr_ = hasattr
-        for attr in cls_attrs:
-            if not hasattr_(cls, attr):
-                raise NotImplementedError(
-                    "HeatCapacity subclass must implement a '%s' method" % attr
-                )
-    
-            
-### Heat capacity subclasses ###
-
-# @jitclass([('coeffs', types.UniTuple(types.float64, 4)), # NUMBA: UNCOMMENT
-#            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
-#            ('Tmax', types.float64)])                     # NUMBA: UNCOMMENT
-class ZabranskySpline(HeatCapacity):
+### Heat capacity classes
+class ZabranskySpline(object):
     r'''
     Implementation of the cubic spline method presented in [1]_ for 
     calculating the heat capacity of a chemical.
@@ -144,7 +107,10 @@ class ZabranskySpline(HeatCapacity):
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     
     '''
-    __slots__ = ('coeffs', 'Tmin', 'Tmax') # NUMBA: DELETE
+    try:
+        IS_NUMBA
+    except:
+        __slots__ = ('coeffs', 'Tmin', 'Tmax')
     
     def __init__(self, coeffs, Tmin, Tmax):
         self.coeffs = coeffs
@@ -206,13 +172,15 @@ class ZabranskySpline(HeatCapacity):
         '''        
         return (Zabransky_cubic_integral_over_T(Tb, *self.coeffs)
                 - Zabransky_cubic_integral_over_T(Ta, *self.coeffs))
+try:
+    if IS_NUMBA:
+        ZabranskySpline = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 4)),
+                ('Tmin', numba.float64),
+                ('Tmax', numba.float64)])(ZabranskySpline)
+except:
+    pass
 
-
-# @jitclass([('coeffs', types.UniTuple(types.float64, 6)), # NUMBA: UNCOMMENT
-#            ('Tc', types.float64),                        # NUMBA: UNCOMMENT
-#            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
-#            ('Tmax', types.float64)])                     # NUMBA: UNCOMMENT
-class ZabranskyQuasipolynomial(HeatCapacity):
+class ZabranskyQuasipolynomial(object):
     r'''
     Quasi-polynomial object for calculating the heat capacity of a chemical.
     Implements the enthalpy and entropy integrals as well.
@@ -239,7 +207,10 @@ class ZabranskyQuasipolynomial(HeatCapacity):
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     
     '''
-    __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax') # NUMBA: DELETE
+    try:
+        IS_NUMBA
+    except:
+        __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax')
     
     def __init__(self, coeffs, Tc, Tmin, Tmax):
         self.coeffs = coeffs
@@ -303,12 +274,17 @@ class ZabranskyQuasipolynomial(HeatCapacity):
         '''        
         return (Zabransky_quasi_polynomial_integral_over_T(Tb, self.Tc, *self.coeffs)
                - Zabransky_quasi_polynomial_integral_over_T(Ta, self.Tc, *self.coeffs))
+try:
+    if IS_NUMBA:
+        ZabranskyQuasipolynomial = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 6)),
+            ('Tc', numba.float64),
+            ('Tmin', numba.float64),
+            ('Tmax', numba.float64)])(ZabranskyQuasipolynomial)
+except:
+    pass
 
-# @jitclass([('_modles', types.Tuple(ZabranskyQuasipolynomial, ZabranskySpline)), # NUMBA: UNCOMMENT
-#            ('Tc', types.float64),                        # NUMBA: UNCOMMENT
-#            ('Tmin', types.float64),                      # NUMBA: UNCOMMENT
-#            ('Tmax', types.float64),                      # NUMBA: UNCOMMENT
-class PiecewiseHeatCapacity:
+
+class PiecewiseHeatCapacity(object):
     r"""
     Create a PiecewiseHeatCapacity object for calculating heat capacity and the 
     enthalpy and entropy integrals using piecewise models.
@@ -319,30 +295,16 @@ class PiecewiseHeatCapacity:
         Piecewise heat capacity objects.
     
     """
-    __slots__ = ('_models',) # NUMBA: DELETE
+    # Dev note - not possible to jitclass this as the model types are not explicit
+    __slots__ = ('models', 'Tmin', 'Tmax')
     
     def __init__(self, models):
-        self.models = models
+        self.models = tuple(sorted(models, key=lambda x: x.Tmin))
+        self.Tmin = self.models[0].Tmin
+        self.Tmax = self.models[-1].Tmax
     
     def __iter__(self):
-        return self._models.__iter__()
-    
-    @property
-    def Tmin(self):
-        """[float] Minimum temperature of all available models [K]."""
-        return self._models[0].Tmin
-    @property
-    def Tmax(self):
-        """[float] Maximum temperature of all available models [K]."""
-        return self._models[-1].Tmax
-    
-    @property
-    def models(self):
-        r"""tuple[HeatCapacityModel] Heat capacity model objects."""
-        return self._models
-    @models.setter
-    def models(self, models):
-        self._models = tuple(sorted(models, key=lambda x: x.Tmin))
+        return self.models.__iter__()
     
     def calculate(self, T):
         r'''
@@ -370,9 +332,9 @@ class PiecewiseHeatCapacity:
         
         '''
         if T >= self.Tmin:
-            for model in self._models:
+            for model in self.models:
                 if T <= model.Tmax: return model.calculate(T)
-        raise ValueError(f"no valid model at T=%d K" % T)
+        raise ValueError("no valid model at T=%g K" % T)
     
     def force_calculate(self, T):
         r'''
@@ -399,7 +361,7 @@ class PiecewiseHeatCapacity:
             Liquid heat capacity as T, [J/mol/K]
         
         '''
-        for model in self._models:
+        for model in self.models:
             if T <= model.Tmax: break
         return model.calculate(T)
     
@@ -435,8 +397,8 @@ class PiecewiseHeatCapacity:
         
         '''
         if Tb < Ta: return -self.calculate_integral(Tb, Ta)
-        if Ta < self.Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
-        elif Tb > self.Tmax: raise ValueError(f"no valid model at T=%d K" % Tb)
+        if Ta < self.Tmin: raise ValueError("no valid model at T=%g K" % Ta)
+        elif Tb > self.Tmax: raise ValueError("no valid model at T=%g K" % Tb)
         return self.force_calculate_integral(Ta, Tb)
     
     def force_calculate_integral(self, Ta, Tb):
@@ -474,7 +436,7 @@ class PiecewiseHeatCapacity:
         '''
         if Tb < Ta: return -self.force_calculate_integral(Tb, Ta)
         integral = 0.
-        for model in self._models:
+        for model in self.models:
             Tmax = model.Tmax
             if Tb <= Tmax:
                 return integral + model.calculate_integral(Ta, Tb)
@@ -515,8 +477,8 @@ class PiecewiseHeatCapacity:
         
         '''
         if Tb < Ta: return -self.calculate_integral_over_T(Tb, Ta)
-        if Ta < self.Tmin: raise ValueError(f"no valid model at T=%d K" % Ta)
-        elif Tb > self.Tmax: raise ValueError(f"no valid model at T=%d K" % Tb)
+        if Ta < self.Tmin: raise ValueError("no valid model at T=%d K" % Ta)
+        elif Tb > self.Tmax: raise ValueError("no valid model at T=%d K" % Tb)
         return self.force_calculate_integral_over_T(Ta, Tb)
         
     def force_calculate_integral_over_T(self, Ta, Tb):
@@ -548,7 +510,7 @@ class PiecewiseHeatCapacity:
         '''
         if Tb < Ta: return -self.force_calculate_integral_over_T(Tb, Ta)
         integral = 0.
-        for model in self._models:
+        for model in self.models:
             Tmax = model.Tmax
             if Tb <= Tmax:
                 return integral + model.calculate_integral_over_T(Ta, Tb)
@@ -557,22 +519,32 @@ class PiecewiseHeatCapacity:
                 Ta = Tmax
         return integral + model.calculate_integral_over_T(Ta, Tb)
 
+
 # %% Register data sources and lazy load them
 
-folder = os.path.join(os.path.dirname(__file__), 'Heat Capacity')
+folder = os_path_join(source_path, 'Heat Capacity')
 register_df_source(folder, 'PolingDatabank.tsv')
-register_df_source(folder, 'TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
+register_df_source(folder, 'TRC Thermodynamics of Organic Compounds in the Gas State.tsv', csv_kwargs={
+    'dtype':{'Tmin': float, 'Tmax': float, 'a0': float, 'a1': float, 'a2': float,
+             'a3': float, 'a4': float, 'a5': float, 'a6': float, 'a7': float, 
+             'I': float, 'J': float, 'Hfg': float}})
+
 register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
 
 _Cp_data_loaded = False
 def _load_Cp_data():
-    global Cp_data_Poling, TRC_gas_data, CRC_standard_data, Cp_data_PerryI
+    global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, gas_values_TRC
+    global CRC_standard_data, Cp_data_PerryI
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
     Cp_data_Poling = data_source('PolingDatabank.tsv')
     TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
     CRC_standard_data = data_source('CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
+    
+    gas_values_TRC = np.array(TRC_gas_data.values[:, 1:], dtype=float)
+    Cp_values_Poling = np.array(Cp_data_Poling.values[:, 1:], dtype=float)
+    
     # Read in a dict of heat capacities of irnorganic and elemental solids.
     # These are in section 2, table 151 in:
     # Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
@@ -625,7 +597,7 @@ def _load_Cp_data():
                 # No duplicates for quasipolynomials
                 coeffs = (a1p, a2p, a3p, a4p, a5p, a6p)
                 d[CAS] = ZabranskyQuasipolynomial(coeffs, Tc, Tmin, Tmax)
-    for dct in (zabransky_dict_const_s, zabransky_dict_iso_s):
+    for dct in (zabransky_dict_const_s, zabransky_dict_iso_s, zabransky_dict_sat_s):
         for CAS in dct: dct[CAS] = PiecewiseHeatCapacity(dct[CAS])
     # Used to generate data. Do not delete!
     # Cp_data_PerryI = {}
@@ -675,7 +647,7 @@ def _load_Cp_data():
 
 if PY37:
     def __getattr__(name):
-        if name in ('Cp_data_Poling', 'TRC_gas_data', 'CRC_standard_data',
+        if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'gas_values_TRC', 'CRC_standard_data',
                     'Cp_data_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p', 
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',  
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts'):
@@ -683,7 +655,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_Cp_data()
+    if can_load_data:
+        _load_Cp_data()
 
 
 
@@ -873,7 +846,6 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
     '''
-    from cmath import log, exp
     a = similarity_variable
     if cyclic_aliphatic:
         A1 = -0.1793547
@@ -905,6 +877,12 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     # There is a non-real component, but it is only a function of similariy 
     # variable and so will always cancel out.
     return S.real*1000.
+
+def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm):
+    H1 = Lastovka_Shaw_integral(T, similarity_variable)
+    dH = H1 - H_ref
+    err = (property_mass_to_molar(dH, MW) - Hm)
+    return err
 
 def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15, 
                            factor=1.0):
@@ -952,23 +930,24 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
     '''
+    Hm /= factor
     H_ref = Lastovka_Shaw_integral(T_ref, similarity_variable)
-    def err(T):
-        H1 = Lastovka_Shaw_integral(T, similarity_variable)
-        dH = H1 - H_ref
-        err = (property_mass_to_molar(dH, MW)*factor - Hm)
-        return err
     try:
-        return secant(err, 500, ytol=1e-4)
+        return secant(Lastovka_Shaw_T_for_Hm_err, 500.0, ytol=1e-4, args=(MW, similarity_variable, H_ref, Hm))
     except:
         try:
-            return brenth(err, 1e-3, 1e5)
-        except Exception as e:
-            if err(1e-11) > 0:
+            return brenth(Lastovka_Shaw_T_for_Hm_err, 1e-3, 1e5, args=(MW, similarity_variable, H_ref, Hm))
+        except:
+            if Lastovka_Shaw_T_for_Hm_err(1e-11, MW, similarity_variable, H_ref, Hm) > 0:
                 raise ValueError("For gas only enthalpy spec to be correct, "
                                  "model requires negative temperature")
-            raise e
+            raise ValueError("Could not converge")
 
+def Lastovka_Shaw_T_for_Sm_err(T, MW, similarity_variable, S_ref, Sm):
+    S1 = Lastovka_Shaw_integral_over_T(T, similarity_variable)
+    dS = S1 - S_ref
+    err = (property_mass_to_molar(dS, MW) - Sm)
+    return err
 
 def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15, 
                            factor=1.0):
@@ -1016,23 +995,20 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
     '''
+    Sm /= factor
     S_ref = Lastovka_Shaw_integral_over_T(T_ref, similarity_variable)
-    def err(T):
-        S1 = Lastovka_Shaw_integral_over_T(T, similarity_variable)
-        dS = S1 - S_ref
-        err = (property_mass_to_molar(dS, MW)*factor - Sm)
-#         print(T, err)
-        return err
     try:
-        return secant(err, 500, ytol=1e-4, high=10000)
-    except Exception as e:
+        return secant(Lastovka_Shaw_T_for_Sm_err, 500, ytol=1e-4, high=10000,
+                      args=(MW, similarity_variable, S_ref, Sm))
+    except:
         try:
-            return brenth(err, 1e-3, 1e5)
-        except Exception as e:
-            if err(1e-11) > 0:
+            return brenth(Lastovka_Shaw_T_for_Sm_err, 1e-3, 1e5,
+                          args=(MW, similarity_variable, S_ref, Sm))
+        except:
+            if Lastovka_Shaw_T_for_Sm_err(1e-11, MW, similarity_variable, S_ref, Sm) > 0.0:
                 raise ValueError("For gas only entropy spec to be correct, "
                                  "model requires negative temperature")
-            raise e
+            raise ValueError("Could not converge")
 
 def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     r'''Calculates ideal gas heat capacity using the model developed in [1]_.
@@ -1073,14 +1049,14 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
         y = 0.
     else:
         y = (T - a7)/(T + a6)
-    T2 = T*T
+    T_inv = 1.0/T
     y2 = y*y
     T_m_a7 = T - a7
-    try:
-        Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4 - a5/(T_m_a7*T_m_a7))*y2*y2*y2*y2)
-    except ZeroDivisionError:
+    if T == a7:
         # When T_m_a7 approaches 0, T = a7
-        Cp = R*(a0 + (a1/T2)*exp(-a2/T) + a3*y2 + (a4)*y2*y2*y2*y2)
+        Cp = R*(a0 + (a1*T_inv*T_inv)*exp(-a2*T_inv) + y2*(a3 + (a4)*y2*y2*y2))
+    else:
+        Cp = R*(a0 + (a1*T_inv*T_inv)*exp(-a2*T_inv) + y2*(a3 + (a4 - a5/(T_m_a7*T_m_a7))*y2*y2*y2))
     return Cp
 
 def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
@@ -1203,31 +1179,33 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
         y = 0.
     else:
         y = (T - a7)/(T + a6)
-
+    a6_inv = 1.0/a6
     x3 = a7 + a6
-    z = T/(T + a6)*x3/a7
+    z = T*x3/(a7*(T + a6))
     if T <= a7:
         s = 0.
     else:
         a72 = a7*a7
-        a62 = a6*a6
-        a7_a6 = a7/a6 # a7/a6
+        a62_inv = a6_inv*a6_inv
+        a7_a6 = a7*a6_inv # a7/a6
         a7_a6_2 = a7_a6*a7_a6
         a7_a6_4 = a7_a6_2*a7_a6_2
-        x1 = (a4*a72 - a5)/a62 # part of third, sum
-        first = (a3 + ((a4*a72 - a5)/a62)*a7_a6_4)*a7_a6_2*log(z)
+        x1 = (a4*a72 - a5)*a62_inv # part of third, sum
+        first = (a3 + ((a4*a72 - a5)*a62_inv)*a7_a6_4)*a7_a6_2*log(z)
         second = (a3 + a4)*log((T + a6)/(x3))
         third = 0.0
         y_pow = 1.0
-        a7_a6_pow = (a7_a6)**6
+        a7_a6_pow = a7_a6_2*a7_a6_4
+        na7_a6_inv = -1.0/a7_a6
 
         for i in range(1, 8):
             y_pow = y_pow*y
-            a7_a6_pow = a7_a6_pow/-a7_a6
+            a7_a6_pow *= na7_a6_inv
             third += (x1*a7_a6_pow - a4)*y_pow/i
-        fourth = -(a3/a6*(x3) + a5*y_pow/y/(7.*a7*(x3)))*y
+        fourth = -(a3*a6_inv*x3 + a5*y_pow/(7.0*y*a7*x3))*y
         s = first + second + third + fourth
-    return R*(J + a0*log(T) + a1/(a2*a2)*(1. + a2/T)*exp(-a2/T) + s)
+    x2 = a2/T
+    return R*(J + a0*log(T) + a1/(a2*a2)*(1. + x2)*exp(-x2) + s)
     
 
 ### Heat capacities of liquids
@@ -1596,7 +1574,7 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     -----
     The analytical integral was derived with Sympy. It requires the 
     Polylog(2,x) function, which is unimplemented in SciPy. A very accurate 
-    numerical approximation was implemented as :obj:`chemicals.utils.polylog2`.
+    numerical approximation was implemented as :obj:`fluids.numerics.polylog2`.
     Relatively slow due to the use of that special function.
     
     Examples
@@ -1719,7 +1697,7 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     --------
     >>> Zabransky_cubic_integral_over_T(298.15, 20.9634, -10.1344, 2.8253, 
     ... -0.256738)
-    24.732465342840854
+    24.732465342840914
     
     References
     ----------
@@ -1727,8 +1705,8 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
-    T = T/100.
-    return R*(T*(T*(T*a4/3 + a3/2) + a2) + a1*log(T))
+    T = T*1e-2
+    return R*(T*(T*(T*a4/3.0 + 0.5*a3) + a2) + a1*log(T))
 
 ### Solid
 
@@ -1789,7 +1767,7 @@ def Lastovka_solid(T, similarity_variable):
     D1 = 0.000025
     D2 = -0.000123
 
-    Cp = (3*(A1*similarity_variable + A2*similarity_variable**2)*R*(theta/T
+    Cp = (3.0*(A1*similarity_variable + A2*similarity_variable**2)*R*(theta/T
     )**2*exp(theta/T)/(exp(theta/T)-1)**2
     + (C1*similarity_variable + C2*similarity_variable**2)*T
     + (D1*similarity_variable + D2*similarity_variable**2)*T**2)

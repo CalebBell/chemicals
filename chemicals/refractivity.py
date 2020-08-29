@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+<Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -18,26 +19,28 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
-__all__ = ['RI', 'RI_methods', 'RI_all_methods', 'refractive_index', 
+__all__ = ['RI', 'RI_methods', 'RI_all_methods',
            'polarizability_from_RI', 'molar_refractivity_from_RI', 
-           'RI_from_molar_refractivity', 'RI_IAPWS']
+           'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
+           'brix_to_RI']
 
 import os
 from fluids.numerics import interp
 from fluids.constants import pi, N_A
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
-from chemicals.utils import PY37
 
 
 # %% Register data sources and lazy load them
 
-folder = os.path.join(os.path.dirname(__file__), 'Misc')
+folder = os_path_join(source_path, 'Misc')
 register_df_source(folder, 'CRC Handbook Organic RI.csv', 
                    csv_kwargs={'dtype': {'RI': float, 'RIT': float}})
 
@@ -58,16 +61,15 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
-    _load_RI_data()
+    if can_load_data:
+        _load_RI_data()
 
 # %% Refractive index functions
 
 RI_all_methods = (CRC,)
 
 def RI_methods(CASRN):
-    """
-    Return all methods available to obtain the RI for the desired 
-    chemical.
+    """Return all methods available to obtain the RI for the desired chemical.
 
     Parameters
     ----------
@@ -77,13 +79,12 @@ def RI_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain the RI with the given 
+        Methods which can be used to obtain the RI with the given
         inputs.
 
     See Also
     --------
     RI
-
     """
     if not _RI_data_loaded: _load_RI_data()
     return list_available_methods_from_df_dict(RI_sources, CASRN, 'RI')
@@ -145,7 +146,6 @@ def RI(CASRN, method=None, full_info=True):
         else:
             value = tuple(value)
     return value
-refractive_index = RI
 
 def polarizability_from_RI(RI, Vm):
     r'''Returns the polarizability of a fluid given its molar volume and
@@ -333,7 +333,7 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
     n = ((2*A + 1.)/(1. - A))**0.5
     return n
 
-ICUMSA_1974_brix = list(range(96))
+ICUMSA_1974_brix = list([float(i) for i in range(96)])
 ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175, 
                    1.34325, 1.34477, 1.34629, 1.34782, 1.34937, 1.35093, 1.35250, 
                    1.35408, 1.35568, 1.35729, 1.35891, 1.36054, 1.36218, 1.36384, 
@@ -350,9 +350,9 @@ ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175
                    1.5205, 1.5234, 1.5262, 1.5291, 1.5320]
 
 def brix_to_RI(brix):
-    ''' Convert a refractive index measurement on the `brix` scale to a 
-    standard refractive index.
-    
+    """Convert a refractive index measurement on the `brix` scale to a standard
+    refractive index.
+
     Parameters
     ----------
     brix : float
@@ -377,9 +377,9 @@ def brix_to_RI(brix):
     --------
     >>> brix_to_RI(5.8)
     1.341452
-    >>> brix_to_RI(0)
+    >>> brix_to_RI(0.0)
     1.33299
-    >>> brix_to_RI(100)
+    >>> brix_to_RI(95.0)
     1.532
 
     References
@@ -387,12 +387,12 @@ def brix_to_RI(brix):
     .. [1] "Refractometer　Data Book-Refractive Index and Brix | ATAGO CO.,
        LTD." Accessed June 13, 2020. 
        https://www.atago.net/en/databook-refractometer_relationship.php.
-    '''
-    return interp(brix, ICUMSA_1974_brix, ICUMSA_1974_RIs)
+    """
+    return interp(brix, ICUMSA_1974_brix, ICUMSA_1974_RIs, extrapolate=True)
 
 def RI_to_brix(RI):
-    ''' Convert a standard refractive index measurement to the `brix` scale.
-    
+    """Convert a standard refractive index measurement to the `brix` scale.
+
     Parameters
     ----------
     RI : float
@@ -408,7 +408,7 @@ def RI_to_brix(RI):
     The scale is officially defined from 0 to 85; but the data source contains
     values up to 95. 
     
-    No further extrapolation to values under 0 or above 95 is performed.
+    Linear extrapolation to values under 0 or above 95 is performed.
     
     The ICUMSA (International Committee of Uniform Method of Sugar Analysis)
     published a document setting out the reference values in 1974; but an 
@@ -429,5 +429,5 @@ def RI_to_brix(RI):
     .. [1] "Refractometer　Data Book-Refractive Index and Brix | ATAGO CO.,
        LTD." Accessed June 13, 2020. 
        https://www.atago.net/en/databook-refractometer_relationship.php.
-    '''
-    return interp(RI, ICUMSA_1974_RIs, ICUMSA_1974_brix)
+    """
+    return interp(RI, ICUMSA_1974_RIs, ICUMSA_1974_brix, extrapolate=True)

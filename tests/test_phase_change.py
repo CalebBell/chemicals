@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +18,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+"""
 
 import pytest
 
@@ -31,7 +32,7 @@ from chemicals.phase_change import (Hvap_data_CRC, Hfus_data_CRC,
                                     phase_change_data_Alibakhshi_Cs, 
                                     phase_change_data_VDI_PPDS_4)
 from chemicals.miscdata import CRC_inorganic_data, CRC_organic_data
-from thermo.identifiers import checkCAS
+from chemicals.identifiers import checkCAS
 
 
 def test_Watson():
@@ -200,8 +201,7 @@ def test_Alibakhshi_Cs_data():
 
 
 def test_VDI_PPDS_4_data():
-    '''I believe there are no errors here. 
-    '''
+    """I believe there are no errors here."""
     assert all([checkCAS(i) for i in phase_change_data_VDI_PPDS_4.index])
     tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc', u'MW']]
     tots = [1974.2929800000002, 2653.9399000000003, 2022.530649, 943.25633100000005, 3124.9258610000002, 150142.28, 27786.919999999998]
