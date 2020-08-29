@@ -1677,6 +1677,9 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
     -----
     This algorithm has been used without issue for 4 and 5 phase flashes.
     
+    Some helpful information was found in [1]_, although this method does not
+    follow it exactly.
+    
     Examples
     --------
     >>> ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]

@@ -106,7 +106,11 @@ def retrieve_any_from_df(df, index, keys):
     if index not in df.index: return None
     for key in keys:
         value = df.at[index, key]
-        if not isnan(value): return value
+        if not isnan(value):
+            try:
+                return float(value)
+            except:
+                return value
 
 def get_value_from_df(df, index, key):
     value = df.at[index, key]
