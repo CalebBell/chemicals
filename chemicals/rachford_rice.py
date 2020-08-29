@@ -325,7 +325,7 @@ def Rachford_Rice_polynomial(zs, Ks):
     
     The general form was derived to be slightly different than that in [1]_,
     but is confirmed to also be correct as it matches other methods for solving
-    the Rachford-Rice equation.
+    the Rachford-Rice equation. [2]_ has similar information to [1]_.
     
     The first coefficient is always 1.
     
@@ -595,6 +595,8 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
 
     .. math::        
         \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
+        
+    This objective function was proposed in [1]_.
 
     Examples
     --------
