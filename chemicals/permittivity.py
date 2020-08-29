@@ -20,6 +20,38 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various permittivity calculation routines and dataframes.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+    
+Correlations for Specific Substances
+------------------------------------
+.. autofunction:: chemicals.permittivity.permittivity_IAPWS
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: permittivity_data_CRC
+
+    Data from [1]_ with coefficients fit to a polynomial in terms of temperature
+    in K. :math:`\epsilon_r = A + BT + CT^2 + DT^3` is the equation, although
+    some chemcials only have a constant value.
+
+.. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+   Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.permittivity.permittivity_data_CRC
+
 """
 
 from __future__ import division
@@ -61,15 +93,20 @@ def permittivity_IAPWS(T, rho):
         \epsilon(\rho, T) =\frac{1 + A + 5B + (9 + 2A + 18B + A^2 + 10AB + 
         9B^2)^{0.5}}{4(1-B)}
         
+    .. math::
         A(\rho, T) = \frac{N_A\mu^2\rho g}{M\epsilon_0 kT}
         
+    .. math::
         B(\rho) = \frac{N_A\alpha\rho}{3M\epsilon_0}
         
+    .. math::
         g(\delta,\tau) = 1 + \sum_{i=1}^{11}n_i\delta^{I_i}\tau^{J_i} 
         + n_{12}\delta\left(\frac{647.096}{228}\tau^{-1} - 1\right)^{-1.2}
 
+    .. math::
         \delta = \rho/(322 \text{ kg/m}^3)
         
+    .. math::
         \tau = T/647.096\text{K}
 
     Parameters
@@ -93,15 +130,19 @@ def permittivity_IAPWS(T, rho):
     
     323.15 < T < 873.15 K 0 < p < 600 MPa.
     
-    Coefficients:
+    Coefficients and constants (they are optimized away in the function itself):
     
-    ih = [1, 1, 1, 2, 3, 3, 4, 5, 6, 7, 10];
-    jh = [0.25, 1, 2.5, 1.5, 1.5, 2.5, 2, 2, 5, 0.5, 10];
+    ih = [1, 1, 1, 2, 3, 3, 4, 5, 6, 7, 10]
+    
+    jh = [0.25, 1, 2.5, 1.5, 1.5, 2.5, 2, 2, 5, 0.5, 10]
+    
     Nh = [0.978224486826, -0.957771379375, 0.237511794148, 0.714692244396,
           -0.298217036956, -0.108863472196, 0.949327488264E-1, 
           -.980469816509E-2, 0.165167634970E-4, 0.937359795772E-4, 
-          -0.12317921872E-9];
+          -0.12317921872E-9]
+    
     polarizability = 1.636E-40
+    
     dipole = 6.138E-30
     
     Examples
