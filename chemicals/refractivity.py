@@ -20,6 +20,36 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various refractive index lookup, calculation,
+and unit conversion routines and dataframes.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+    
+Lookup Functions
+----------------
+.. autofunction:: chemicals.refractivity.RI
+.. autofunction:: chemicals.refractivity.RI_methods
+.. autodata:: chemicals.refractivity.RI_all_methods
+
+Correlations for Specific Substances
+------------------------------------
+.. autofunction:: chemicals.refractivity.RI_IAPWS
+
+Unit Conversions
+----------------
+.. autofunction:: chemicals.refractivity.brix_to_RI
+.. autofunction:: chemicals.refractivity.RI_to_brix
+
+Utility functions
+-----------------
+.. autofunction:: chemicals.refractivity.polarizability_from_RI
+.. autofunction:: chemicals.refractivity.molar_refractivity_from_RI
+.. autofunction:: chemicals.refractivity.RI_from_molar_refractivity
+
 """
 
 __all__ = ['RI', 'RI_methods', 'RI_all_methods',
@@ -38,7 +68,7 @@ from chemicals.data_reader import (register_df_source,
                                    list_available_methods_from_df_dict)
 
 
-# %% Register data sources and lazy load them
+# Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Misc')
 register_df_source(folder, 'CRC Handbook Organic RI.csv', 
@@ -64,7 +94,7 @@ else:
     if can_load_data:
         _load_RI_data()
 
-# %% Refractive index functions
+#  Refractive index functions
 
 RI_all_methods = (CRC,)
 
@@ -270,19 +300,27 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
     density, and wavelength.
 
     .. math::
+        n(\rho, T, \lambda) = \left(\frac{2A + 1}{1-A}\right)^{0.5}
 
-        n(\rho, T, \lambda) = \left(\frac{2A + 1}{1-A}\right)^{0.5}\\
-
+    .. math::
         A(\delta, \theta, \Lambda) = \delta\left(a_0 + a_1\delta +
         a_2\theta + a_3\Lambda^2\theta + a_4\Lambda^{-2}
         \frac{a_5}{\Lambda^2-\Lambda_{UV}^2} + \frac{a_6}
         {\Lambda^2 - \Lambda_{IR}^2} + a_7\delta^2\right)
 
-        \delta = \rho/(1000 \text{ kg/m}^3)\\
-        \theta = T/273.15\text{K}\\
+    .. math::
+        \delta = \rho/(1000 \text{ kg/m}^3)
+
+    .. math::
+        \theta = T/273.15\text{K}
+
+    .. math::
         \Lambda = \lambda/0.589 \mu m
 
-        \Lambda_{IR} = 5.432937 \\
+    .. math::
+        \Lambda_{IR} = 5.432937 
+
+    .. math::
         \Lambda_{UV} = 0.229202
 
     Parameters
