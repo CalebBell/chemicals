@@ -148,8 +148,8 @@ chemical properties is done by CASRN:
 
 Such "lookup functions" search through many databanks until the value for the 
 given CASRN is found. When no value is available, None is returned. Note that some 
-properties, including the solid heat of formation and absolute entropy of 
-formation are missing for water. You can optionally pass a "method" to select 
+properties, including the solid heat of formation (Hfs) and absolute entropy of 
+formation (S0s) are missing for water. You can optionally pass a "method" to select 
 which from databank to retrieve data:
 
 .. code-block:: python
