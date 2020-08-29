@@ -22,7 +22,9 @@ SOFTWARE.
 """
 
 __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
-           'molecular_diameter_all_methods', 'molecular_diameter', 'sigma_Flynn',
+           'molecular_diameter_all_methods', 'molecular_diameter', 'molecular_diameter_methods',
+           
+           'sigma_Flynn',
            'sigma_Bird_Stewart_Lightfoot_critical_2', 
            'sigma_Bird_Stewart_Lightfoot_critical_1', 
            'sigma_Bird_Stewart_Lightfoot_boiling', 
@@ -83,7 +85,7 @@ else:
 Stockmayer_all_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
                           TEEGOTOSTEWARD1, BSLB, BSLM)
 
-def Stockmayer_methods(CASRN, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
+def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
     """Return all methods available to obtain the Stockmayer parameter for the 
     desired chemical.
 
@@ -223,8 +225,56 @@ molecular_diameter_all_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
                                   BSLC2, TEEGOTOSTEWARD3, STIELTHODOSMD, FLYNN,
                                   BSLC1, BSLB, BSLM)
 
-def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
-          Vm=None, Vb=None, CASRN='', get_methods=False, method=None):
+def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
+                               omega=None, Vm=None, Vb=None, ):
+    """Return all methods available to obtain the molecular diameter for the 
+    desired chemical.
+
+    Parameters
+    ----------
+    CASRN : string, optional
+        CASRN [-]
+    Tc : float, optional
+        Critical temperature, [K]
+    Pc : float, optional
+        Critical pressure, [Pa]
+    Vc : float, optional
+        Critical volume, [m^3/mol]
+    Zc : float, optional
+        Critical compressibility, [-]
+    omega : float, optional
+        Acentric factor of compound, [-]
+    Vm : float, optional
+        Molar volume of liquid at the melting point of the fluid [K]
+    Vb : float, optional
+        Molar volume of liquid at the boiling point of the fluid [K]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain `molecular_diameter` with the given inputs.
+
+    See Also
+    --------
+    molecular_diameter
+    """
+    methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'sigma')
+    if Tc:
+        if Pc:
+            if omega: methods.append(TEEGOTOSTEWARD4)
+            methods.append(SILVALIUMACEDO)
+            methods.append(BSLC2)
+            methods.append(TEEGOTOSTEWARD3)
+    if Vc:
+        if Zc: methods.append(STIELTHODOSMD)
+        methods.append(FLYNN)
+        methods.append(BSLC1)
+    if Vb: methods.append(BSLB)
+    if Vm: methods.append(BSLM)
+    return methods
+
+def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
+          Vm=None, Vb=None, method=None):
     r'''This function handles the retrieval or calculation a chemical's
     L-J molecular diameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 9 CSP methods.
@@ -243,6 +293,8 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
 
     Parameters
     ----------
+    CASRN : string, optional
+        CASRN [-]
     Tc : float, optional
         Critical temperature, [K]
     Pc : float, optional
@@ -257,8 +309,6 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
         Molar volume of liquid at the melting point of the fluid [K]
     Vb : float, optional
         Molar volume of liquid at the boiling point of the fluid [K]
-    CASRN : string, optional
-        CASRN [-]
 
     Returns
     -------
@@ -297,22 +347,7 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
     if not _LJ_data_loaded: _load_LJ_data()
-    if get_methods:
-        methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'sigma')
-        if Tc:
-            if Pc:
-                if omega: methods.append(TEEGOTOSTEWARD4)
-                methods.append(SILVALIUMACEDO)
-                methods.append(BSLC2)
-                methods.append(TEEGOTOSTEWARD3)
-        if Vc:
-            if Zc: methods.append(STIELTHODOSMD)
-            methods.append(FLYNN)
-            methods.append(BSLC1)
-        if Vb: methods.append(BSLB)
-        if Vm: methods.append(BSLM)
-        return methods
-    if method:
+    if method is not None:
         if method == FLYNN:
             return sigma_Flynn(Vc)
         elif method == BSLC1:

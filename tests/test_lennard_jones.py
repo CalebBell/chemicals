@@ -114,7 +114,7 @@ def test_molecular_diameter_function():
 
     assert_close(4.23738, molecular_diameter(CASRN='64-17-5'))
 
-    methods = molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', get_methods=True)
+    methods = molecular_diameter_methods(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3')
     assert tuple(sorted(methods)) == tuple(sorted(molecular_diameter_all_methods))
 
     values_calc = [molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', method=i) for i in methods]
