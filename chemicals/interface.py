@@ -19,7 +19,114 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various surface tension estimation routines, dataframes
+of fit coefficients, fitting model equations, mixing rules, and 
+water-hydrocarbon interfacial tension estimation routines.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Pure Component Correlations
+---------------------------
+.. autofunction:: chemicals.interface.Brock_Bird
+.. autofunction:: chemicals.interface.Pitzer
+.. autofunction:: chemicals.interface.Sastri_Rao
+.. autofunction:: chemicals.interface.Zuo_Stenby
+.. autofunction:: chemicals.interface.Hakim_Steinberg_Stiel
+.. autofunction:: chemicals.interface.Miqueu
+.. autofunction:: chemicals.interface.Aleem
+.. autofunction:: chemicals.interface.Mersmann_Kind_surface_tension
+
+Mixing Rules
+------------
+.. autofunction:: chemicals.interface.Winterfeld_Scriven_Davis
+.. autofunction:: chemicals.interface.Weinaug_Katz
+.. autofunction:: chemicals.interface.Diguilio_Teja
+
+Correlations for Specific Substances
+------------------------------------
+.. autofunction:: chemicals.interface.sigma_IAPWS
+
+Petroleum Correlations
+----------------------
+.. autofunction:: chemicals.interface.API10A32
+
+Oil-Water Interfacial Tension Correlations
+------------------------------------------
+.. autofunction:: chemicals.interface.Meybodi_Daryasafar_Karimi
+
+Fit Correlations
+----------------
+.. autofunction:: chemicals.interface.REFPROP_sigma
+.. autofunction:: chemicals.interface.Somayajulu
+.. autofunction:: chemicals.interface.Jasper
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: sigma_data_Mulero_Cachadina
+
+    Data from [5]_ with :obj:`REFPROP_sigma` coefficients.
+
+.. data:: sigma_data_Jasper_Lange
+
+    Data as shown in [4]_ but originally in [3]_ with :obj:`Jasper` coefficients.
+
+.. data:: sigma_data_Somayajulu
+
+    Data from [1]_ with :obj:`Somayajulu` coefficients.
+
+.. data:: sigma_data_Somayajulu2
+
+    Data from [2]_ with :obj:`Somayajulu` coefficients. These should be 
+    preferred over the original coefficients.
+
+.. data:: sigma_data_VDI_PPDS_11
+
+    Data from [6]_ with :obj:`chemicals.dippr.EQ106` coefficients.
+
+.. [1] Somayajulu, G. R. "A Generalized Equation for Surface Tension from
+   the Triple Point to the Critical Point." International Journal of
+   Thermophysics 9, no. 4 (July 1988): 559-66. doi:10.1007/BF00503154.
+.. [2] Mulero, A., M. I. Parra, and I. Cachadina. "The Somayajulu
+   Correlation for the Surface Tension Revisited." Fluid Phase
+   Equilibria 339 (February 15, 2013): 81-88.
+   doi:10.1016/j.fluid.2012.11.038.
+.. [3] Jasper, Joseph J. "The Surface Tension of Pure Liquid Compounds."
+   Journal of Physical and Chemical Reference Data 1, no. 4
+   (October 1, 1972): 841-1010. doi:10.1063/1.3253106.
+.. [4] Speight, James. Lange's Handbook of Chemistry. 16 edition.
+   McGraw-Hill Professional, 2005.
+.. [5] Mulero, A., I. Cachadiña, and M. I. Parra. “Recommended
+   Correlations for the Surface Tension of Common Fluids.” Journal of
+   Physical and Chemical Reference Data 41, no. 4 (December 1, 2012):
+   043105. doi:10.1063/1.4768782.
+.. [6] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+   Berlin; New York:: Springer, 2010.
+
+The structure of each dataframe is shown below:
+    
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.interface.sigma_data_Mulero_Cachadina
+
+    In [3]: chemicals.interface.sigma_data_Jasper_Lange
+
+    In [4]: chemicals.interface.sigma_data_Somayajulu
+
+    In [5]: chemicals.interface.sigma_data_Somayajulu2
+
+    In [6]: chemicals.interface.sigma_data_VDI_PPDS_11
 """
+
 
 from __future__ import division
 
@@ -91,9 +198,17 @@ def sigma_IAPWS(T):
 
     .. math::
         \sigma = B\tau^\mu(1+b\tau)\\
+
+    .. math::
         \tau = 1-T/T_c\\
+
+    .. math::
         B = 0.2358 \text{N/m}\\
+
+    .. math::
         b = -0.625\\
+
+    .. math::
         \mu = 1.256
 
     Parameters
@@ -199,6 +314,7 @@ def Somayajulu(T, Tc, A, B, C):
     .. math::
         \sigma=aX^{5/4}+bX^{9/4}+cX^{13/4}
         
+    .. math::
         X=(T_c-T)/T_c
 
     Parameters
@@ -263,7 +379,7 @@ def Jasper(T, a, b):
 
     Returns
     -------
-    sigma: float
+    sigma : float
         Surface tension [N/m]
 
     Notes
@@ -298,6 +414,7 @@ def Brock_Bird(T, Tb, Tc, Pc):
     .. math::
         \sigma = P_c^{2/3}T_c^{1/3}Q(1-T_r)^{11/9}
 
+    .. math::
         Q = 0.1196 \left[ 1 + \frac{T_{br}\ln (P_c/1.01325)}{1-T_{br}}\right]-0.279
 
     Parameters
@@ -470,9 +587,15 @@ def Zuo_Stenby(T, Tc, Pc, omega):
 
     .. math::
         \sigma^{(1)} = 40.520(1-T_r)^{1.287}
+
+    .. math::
         \sigma^{(2)} = 52.095(1-T_r)^{1.21548}
+
+    .. math::
         \sigma_r = \sigma_r^{(1)}+ \frac{\omega - \omega^{(1)}}
         {\omega^{(2)}-\omega^{(1)}} (\sigma_r^{(2)}-\sigma_r^{(1)})
+
+    .. math::
         \sigma = T_c^{1/3}P_c^{2/3}[\exp{(\sigma_r)} -1]
 
     Parameters
@@ -536,8 +659,10 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
     .. math::
         \sigma = 4.60104\times 10^{-7} P_c^{2/3}T_c^{1/3}Q_p \left(\frac{1-T_r}{0.4}\right)^m
 
+    .. math::
         Q_p = 0.1574+0.359\omega-1.769\chi-13.69\chi^2-0.51\omega^2+1.298\omega\chi
 
+    .. math::
         m = 1.21+0.5385\omega-14.61\chi-32.07\chi^2-1.65\omega^2+22.03\omega\chi
 
     Parameters
@@ -650,6 +775,7 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
         \sigma = \phi \frac{MW^{1/3}} {6N_A^{1/3}}\rho_l^{2/3}\left[H_{vap}
         + C_{p,l}(T_b-T)\right]
 
+    .. math::
         \phi = 1 - 0.0047MW + 6.8\times 10^{-6} MW^2
             
     Parameters
@@ -718,6 +844,7 @@ def Mersmann_Kind_surface_tension(T, Tm, Tb, Tc, Pc, n_associated=1):
     .. math::
         \sigma^* = \frac{\sigma n_{ass}^{1/3}} {(kT_c)^{1/3} T_{rm}P_c^{2/3}}
         
+    .. math::
         \sigma^* = \left(\frac{T_b - T_m}{T_m}\right)^{1/3}
         \left[6.25(1-T_r) + 31.3(1-T_r)^{4/3}\right]
         
@@ -896,12 +1023,16 @@ def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
     .. math::
         \sigma = 1.002855(T^*)^{1.118091} \frac{T}{T_b} \sigma_r
 
-        T^*  = \frac{(T_c/T)-1}{(T_c/T_b)-1}
+    .. math::
+        T^* = \frac{(T_c/T)-1}{(T_c/T_b)-1}
 
+    .. math::
         \sigma_r = \sum x_i \sigma_i
 
+    .. math::
         T_b = \sum x_i T_{b,i}
 
+    .. math::
         T_c = \sum x_i T_{c,i}
 
     Parameters
