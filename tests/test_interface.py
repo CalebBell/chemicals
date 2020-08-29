@@ -150,7 +150,7 @@ def test_Weinaug_Katz():
     # pure component check it checks out
     Vml = rho_to_Vm(800.8088185536124, 100.15888)
     Vmg = rho_to_Vm(4.97865317223119, 100.15888)
-    sigma = Weinaug_Katz([5.088443542210164e-05], Vml, Vmg, [1], [1])
+    sigma = Weinaug_Katz([5.088443542210164e-05], Vml, Vmg, [1.0], [1.0])
     assert_close(sigma, 0.026721669606560042, rtol=1e-13)
 
 
