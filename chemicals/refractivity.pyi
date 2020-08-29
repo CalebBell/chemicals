@@ -9,10 +9,16 @@ from typing import (
 )
 
 
+def RI(CASRN: str, method: Optional[str] = ...) -> Tuple[float, float]: ...
+
+
 def RI_IAPWS(T: float, rho: float, wavelength: float = ...) -> float: ...
 
 
 def RI_from_molar_refractivity(Rm: float, Vm: float) -> float: ...
+
+
+def RI_methods(CASRN: str) -> List[str]: ...
 
 
 def RI_to_brix(RI: float) -> float: ...
@@ -31,13 +37,5 @@ def molar_refractivity_from_RI(RI: float, Vm: float) -> float: ...
 
 
 def polarizability_from_RI(RI: float, Vm: float) -> float: ...
-
-
-def refractive_index(
-    CASRN: str,
-    get_methods: bool = ...,
-    method: Optional[str] = ...,
-    full_info: bool = ...
-) -> Union[List[str], Tuple[float, float], float]: ...
 
 __all__: List[str]

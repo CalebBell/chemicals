@@ -126,6 +126,7 @@ def test_Hfus_CRC_data():
 
 
 def test_Hfus():
+    assert_close(Hfus('462-06-6', method='CRC'), 11310.0, rtol=1e-12)
     assert_close(Hfus('462-06-6'), 11310.0, rtol=1e-12)
     assert_close(Hfus(CASRN='75-07-0'), 2310.0)
     assert Hfus(CASRN='75000-07-0') is None
