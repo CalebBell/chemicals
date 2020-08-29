@@ -183,17 +183,6 @@ def test_Parachor():
     assert_close(P, 5.088443542210164e-05)
     
 
-def test_phase_select_property():
-    assert 150 == phase_select_property(phase='s', s=150, l=10)
-    assert None == phase_select_property(phase='s', l=1560.14)
-    assert 3312 == phase_select_property(phase='g', l=1560.14, g=3312.)
-    assert 1560.14 == phase_select_property(phase='l', l=1560.14, g=3312.)
-    assert None == phase_select_property(phase='two-phase', l=1560.14, g=12421.0)
-    assert None == phase_select_property(phase=None, l=1560.14, g=12421.0)
-    with pytest.raises(Exception):
-        phase_select_property(phase='notalphase', l=1560.14, g=12421.0)
-
-
 
 def test_mixing_simple():
     prop = mixing_simple([0.1, 0.9], [0.01, 0.02])

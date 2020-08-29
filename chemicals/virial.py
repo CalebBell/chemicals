@@ -174,7 +174,7 @@ def Z_from_virial_density_form(T, P, *args):
     Examples
     --------
     >>> Z_from_virial_density_form(300, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
-    1.2843494052609186
+    1.2843494052609183
 
     References
     ----------
