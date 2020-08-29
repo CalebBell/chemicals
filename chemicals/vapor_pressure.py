@@ -20,6 +20,54 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various vapor pressure estimation routines, dataframes
+of fit coefficients, some compound-specific equations, some analytical fitting
+routines, and sublimation pressure routines.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+
+Fit Correlations
+----------------
+.. autofunction:: chemicals.vapor_pressure.Antoine
+.. autofunction:: chemicals.vapor_pressure.Wagner
+.. autofunction:: chemicals.vapor_pressure.Wagner_original
+.. autofunction:: chemicals.vapor_pressure.TRC_Antoine_extended
+
+Vapor Pressure Estimation Correlations
+--------------------------------------
+.. autofunction:: chemicals.vapor_pressure.Lee_Kesler
+.. autofunction:: chemicals.vapor_pressure.Ambrose_Walton
+.. autofunction:: chemicals.vapor_pressure.boiling_critical_relation
+.. autofunction:: chemicals.vapor_pressure.Sanjari
+.. autofunction:: chemicals.vapor_pressure.Edalat
+
+Sublimation Pressure Estimation Correlations
+--------------------------------------------
+.. autofunction:: chemicals.vapor_pressure.Psub_Clapeyron
+
+Correlations for Specific Substances
+------------------------------------
+.. autofunction:: chemicals.vapor_pressure.Psat_IAPWS
+.. autofunction:: chemicals.vapor_pressure.dPsat_IAPWS_dT
+  
+Analytical Fit Equations
+------------------------
+.. autofunction:: chemicals.vapor_pressure.Antoine_coeffs_from_point
+.. autofunction:: chemicals.vapor_pressure.Antoine_AB_coeffs_from_point
+.. autofunction:: chemicals.vapor_pressure.DIPPR101_ABC_coeffs_from_point
+
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+
 """
 
 from __future__ import division
@@ -129,7 +177,7 @@ def Antoine(T, A, B, C, base=10.0):
         Antoine `B` parameter, [K]
     C : float
         Antoine `C` parameter, [K]
-    Base : float, optional
+    base : float, optional
         Optional base of logarithm; 10 by default
 
     Returns
@@ -369,6 +417,7 @@ def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
     .. math::
         \log_{10} P^{sat} = A - \frac{B}{T + C} + 0.43429x^n + Ex^8 + Fx^{12}
         
+    .. math::
         x = \max \left(\frac{T-t_o-273.15}{T_c}, 0 \right)
 
     Parameters
@@ -419,6 +468,7 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
         \ln P^{sat}= \ln P_c + \frac{a\tau + b \tau^{1.5} + c\tau^3 + d\tau^6}
         {T_r}
         
+    .. math::
         \tau = 1 - \frac{T}{T_c}
 
     Parameters
@@ -475,6 +525,7 @@ def Wagner(T, Tc, Pc, a, b, c, d):
         \ln P^{sat}= \ln P_c + \frac{a\tau + b \tau^{1.5} + c\tau^{2.5}
         + d\tau^5} {T_r}
 
+    .. math::
         \tau = 1 - \frac{T}{T_c}
 
     Parameters
@@ -641,6 +692,7 @@ def boiling_critical_relation(T, Tb, Tc, Pc):
     .. math::
         \ln P^{sat}_r = h\left( 1 - \frac{1}{T_r}\right)
 
+    .. math::
         h = T_{br} \frac{\ln(P_c/101325)}{1-T_{br}}
 
     Parameters
@@ -692,8 +744,10 @@ def Lee_Kesler(T, Tc, Pc, omega):
     .. math::
         \ln P^{sat}_r = f^{(0)} + \omega f^{(1)}
 
+    .. math::
         f^{(0)} = 5.92714-\frac{6.09648}{T_r}-1.28862\ln T_r + 0.169347T_r^6
 
+    .. math::
         f^{(1)} = 15.2518-\frac{15.6875}{T_r} - 13.4721 \ln T_r + 0.43577T_r^6
 
     Parameters
@@ -752,15 +806,19 @@ def Ambrose_Walton(T, Tc, Pc, omega):
     .. math::
         \ln P_r=f^{(0)}+\omega f^{(1)}+\omega^2f^{(2)}
 
+    .. math::
         f^{(0)}=\frac{-5.97616\tau + 1.29874\tau^{1.5}- 0.60394\tau^{2.5}
         -1.06841\tau^5}{T_r}
 
+    .. math::
         f^{(1)}=\frac{-5.03365\tau + 1.11505\tau^{1.5}- 5.41217\tau^{2.5}
         -7.46628\tau^5}{T_r}
 
+    .. math::
         f^{(2)}=\frac{-0.64771\tau + 2.41539\tau^{1.5}- 4.26979\tau^{2.5}
         +3.25259\tau^5}{T_r}
 
+    .. math::
         \tau = 1-T_{r}
 
     Parameters
@@ -820,10 +878,13 @@ def Sanjari(T, Tc, Pc, omega):
     .. math::
         P^{sat} = P_c\exp(f^{(0)} + \omega f^{(1)} + \omega^2 f^{(2)})
 
+    .. math::
         f^{(0)} = a_1 + \frac{a_2}{T_r} + a_3\ln T_r + a_4 T_r^{1.9}
 
+    .. math::
         f^{(1)} = a_5 + \frac{a_6}{T_r} + a_7\ln T_r + a_8 T_r^{1.9}
 
+    .. math::
         f^{(2)} = a_9 + \frac{a_{10}}{T_r} + a_{11}\ln T_r + a_{12} T_r^{1.9}
 
     Parameters
@@ -893,14 +954,19 @@ def Edalat(T, Tc, Pc, omega):
         \ln(P^{sat}/P_c) = \frac{a\tau + b\tau^{1.5} + c\tau^3 + d\tau^6}
         {1-\tau}
         
+    .. math::
         a = -6.1559 - 4.0855\omega
         
+    .. math::
         b = 1.5737 - 1.0540\omega - 4.4365\times 10^{-3} d
         
+    .. math::
         c = -0.8747 - 7.8874\omega
         
+    .. math::
         d = \frac{1}{-0.4893 - 0.9912\omega + 3.1551\omega^2}
         
+    .. math::
         \tau = 1 - \frac{T}{T_c}
         
     Parameters

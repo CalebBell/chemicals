@@ -37,7 +37,7 @@ from chemicals.data_reader import (register_df_source,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
 
-# %% Register data sources and lazy load them
+###  Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Phase Change')
 register_df_source(folder, 'Yaws Boiling Points.tsv')
@@ -121,7 +121,7 @@ else:
         _load_phase_change_constants()
         _load_phase_change_correlations()
 
-# %% Phase change functions
+### Phase change functions
 
 ### Boiling Point at 1 atm
 
