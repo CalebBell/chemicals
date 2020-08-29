@@ -2,7 +2,6 @@
 from typing import List
 from pandas.core.frame import DataFrame
 from typing import (
-    Dict,
     List,
     Optional,
     Union,
@@ -48,6 +47,9 @@ def DIPPR9G(T: float, P: float, Tc: float, Pc: float, kl: float) -> float: ...
 def DIPPR9H(ws: List[float], ks: List[float]) -> float: ...
 
 
+def DIPPR9I(zs: List[float], Vms: List[float], ks: List[float]) -> float: ...
+
+
 def Eli_Hanley(T: float, MW: float, Tc: float, Vc: float, Zc: float, omega: float, Cvm: float) -> float: ...
 
 
@@ -91,7 +93,7 @@ def Lindsay_Bromley(
 ) -> float: ...
 
 
-def Mersmann_Kind_thermal_conductivity_liquid(T: int, MW: float, Tc: float, Vc: float, atoms: Dict[str, int]) -> float: ...
+def Mersmann_Kind_thermal_conductivity_liquid(T: int, MW: float, Tc: float, Vc: float, na: int) -> float: ...
 
 
 def Missenard(T: float, P: float, Tc: float, Pc: float, kl: float) -> float: ...
@@ -112,9 +114,27 @@ def Sheffy_Johnson(T: int, M: int, Tm: int) -> float: ...
 def Stiel_Thodos_dense(T: float, MW: float, Tc: float, Pc: float, Vc: float, Zc: float, Vm: float, kg: float) -> float: ...
 
 
+def Wassiljewa_Herning_Zipperer(
+    zs: List[float],
+    ks: List[float],
+    MWs: Union[List[int], List[float]],
+    MW_roots: Optional[List[float]] = ...
+) -> float: ...
+
+
 def __getattr__(name: str) -> DataFrame: ...
 
 
 def _load_k_data() -> None: ...
+
+
+def k_IAPWS(
+    T: float,
+    rho: float,
+    Cp: Optional[float] = ...,
+    Cv: Optional[float] = ...,
+    mu: Optional[float] = ...,
+    drho_dP: Optional[float] = ...
+) -> float: ...
 
 __all__: List[str]

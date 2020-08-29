@@ -643,7 +643,7 @@ def Rachford_Rice_err(V_over_F, zs_k_minus_1, K_minus_1):
 
 
 def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
-    r'''Solves the objective function of the Rachford-Rice flash equation.
+    r'''Solves the objective function of the Rachford-Rice flash equation [1]_.
     Uses the method proposed in [2]_ to obtain an initial guess.
 
     .. math::
@@ -974,6 +974,9 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     >>> F = ai/(V_over_F - ci) # doctest: +SKIP
     >>> terms = [F, diff(F, y), diff(F, y, 2)] # doctest: +SKIP
     >>> cse(terms, optimizations='basic') # doctest: +SKIP
+    
+    Some helpful information about this transformation can also be found in
+    [3]_.
         
     Examples
     --------
@@ -1857,6 +1860,8 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
     With the convergence restraint, it is believed if a solution lies within
     (0, 1) for both variables, the correct solution will be converged to so long
     as the initial guesses are within the correct region.
+    
+    Some helpful information has also been found in [2]_ and [3]_.
         
     Examples
     --------

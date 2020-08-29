@@ -46,7 +46,7 @@ def test_combustion_stoichiometry():
     assert_close(products['O2'], 0)
     
     # test combustion of everything except N2
-    products = combustion_stoichiometry({'C':2, 'H': 3, 'P': 1, 'I': 2, 'Cl': 3, 'F': 2, 'Br': 1, 'S': 5, 'O': 1})
+    products = combustion_stoichiometry({'C':2.0, 'H': 3, 'P': 1, 'I': 2, 'Cl': 3, 'F': 2, 'Br': 1, 'S': 5, 'O': 1})
     assert_close(products['CO2'], 2)
     assert_close(products['Br2'], 0.5)
     assert_close(products['I2'], 1)
@@ -83,7 +83,7 @@ def test_combustion_stoichiometry():
     
 def test_HHV_stoichiometry():
     # Methane gas
-    H_calc = HHV_stoichiometry({'O2': -2.0, 'CO2': 1, 'H2O': 2.0}, -74520.0)
+    H_calc = HHV_stoichiometry({'O2': -2.0, 'CO2': 1.0, 'H2O': 2.0}, -74520.0)
     assert_close(H_calc, -890604.0)
     
     H_Nicotinic_acid = -2730506.5
@@ -91,12 +91,12 @@ def test_HHV_stoichiometry():
     assert_close(H_calc, H_Nicotinic_acid)
     
     H_methanol = -726024.0
-    H_calc = HHV_stoichiometry(combustion_stoichiometry({'H': 4, 'C': 1, 'O': 1}), Hf=-239100)
+    H_calc = HHV_stoichiometry(combustion_stoichiometry({'H': 4.0, 'C': 1, 'O': 1}), Hf=-239100)
     assert_close(H_calc, H_methanol)
     
     # Custom example of compound, to show all lines used
     H_custom = -7090590.5
-    H_calc = HHV_stoichiometry(combustion_stoichiometry({'C': 10, 'H': 5, 'N': 3, 'O': 5, 'S': 2, 'Br': 8,
+    H_calc = HHV_stoichiometry(combustion_stoichiometry({'C': 10, 'H': 5.0, 'N': 3, 'O': 5, 'S': 2, 'Br': 8,
     'I':3, 'Cl': 3, 'F':2, 'P': 3}), Hf=-300000)
     assert_close(H_calc, H_custom)
     
@@ -119,7 +119,7 @@ def test_combustion():
     assert_close(H_calc, -304.0395)
     
     # LHV methanol
-    H_calc = LHV_from_HHV(-726024.0, 2)
+    H_calc = LHV_from_HHV(-726024.0, 2.0)
     assert_close(H_calc, -638001.008)
     
     # Methanol given formula
@@ -147,17 +147,17 @@ def test_combustion():
 
     # Example with Stoichiometric method selected
     H_methanol = -726024.0
-    H_calc = combustion_data({'H': 4, 'C': 1, 'O': 1}, Hf=-239100, method='Stoichiometry').HHV
+    H_calc = combustion_data({'H': 4, 'C': 1, 'O': 1}, Hf=-239100.0, method='Stoichiometry').HHV
     assert_close(H_calc, H_methanol)
 
     # Custom example of compound, to show all lines used
     H_custom = -7090590.5
-    H_calc = combustion_data({'C': 10, 'H': 5, 'N': 3, 'O': 5, 'S': 2, 'Br': 8,
-    'I':3, 'Cl': 3, 'F':2, 'P': 3}, Hf=-300000).HHV
+    H_calc = combustion_data({'C': 10.0, 'H': 5.0, 'N': 3, 'O': 5, 'S': 2, 'Br': 8,
+    'I':3, 'Cl': 3, 'F':2, 'P': 3}, Hf=-300000.0).HHV
     assert_close(H_calc, H_custom)
 
     with pytest.raises(ValueError):
-        combustion_data({'H': 5, 'C': 6, 'O': 2, 'N': 1}, Hf=-344900, method='BADMETHOD')
+        combustion_data({'H': 5, 'C': 6, 'O': 2, 'N': 1}, Hf=-344900.0, method='BADMETHOD')
         
         
 def test_air_fuel_ratio_solver():
@@ -169,7 +169,7 @@ def test_air_fuel_ratio_solver():
     n_air = 25.0
     
     strings = ['mole', 'mass', 'volume']
-    ratios = [n_air/n_fuel, MW_air/MW_fuel*5, Vm_air/Vm_fuel*5]
+    ratios = [n_air/n_fuel, MW_air/MW_fuel*5.0, Vm_air/Vm_fuel*5.0]
     
     ans_expect = [n_air, n_fuel]
     ans_expect_full = ans_expect + ratios
@@ -220,8 +220,8 @@ def test_fuel_air_spec_solver():
  'frac_out_O2_dry': 0.08118672947779891,
  'mass_ratio': 24.83317358818291,
  'mole_ratio': 16.0,
- 'n_air': 80,
- 'n_fuel': 5,
+ 'n_air': 80.0,
+ 'n_fuel': 5.0,
  'n_out': 85.32000000000001,
  'ns_out': [63.325, 6.074999999999999, 0.0, 0.0, 0.0, 10.492500000000001, 5.4275],
  'volume_ratio': 16.032156677022826,
@@ -232,7 +232,7 @@ def test_fuel_air_spec_solver():
      'MW_fuel': 18.551580390000005,
      'Vm_air': 0.024932453821680217,
      'Vm_fuel': 0.024882445274415996,
-     'zs_air': [.79, .205, 0, 0, 0, .0045, .0005],
+     'zs_air': [.79, .205, 0.0, 0.0, 0.0, .0045, .0005],
      'atomss': [{'N': 2},  {'O': 2},  {'C': 1, 'H': 4},  {'C': 2, 'H': 6},  {'C': 3, 'H': 8},  {'H': 2, 'O': 1}, {'C': 1, 'O': 2}],
      'zs_fuel': [.025, .025, .85, .07, .029, .0005, .0005]}
 
@@ -251,9 +251,9 @@ def test_fuel_air_third_spec_solver():
          'Vm_air': 0.024932453821680217,
          'Vm_fuel': 0.024882445274415996,
          'Vm_third': 0.024820446149354414,
-         'n_third': 1,
-         'zs_air': [.79, .205, 0, 0, 0, .0045, .0005],
-         'zs_third': [0.1, 0.005, 0.5, 0.39, 0, 0.005, 0],
+         'n_third': 1.0,
+         'zs_air': [.79, .205, 0.0, 0.0, 0.0, .0045, .0005],
+         'zs_third': [0.1, 0.005, 0.5, 0.39, 0.0, 0.005, 0.0],
          'zs_fuel': [.025, .025, .85, .07, .029, .0005, .0005],
          'atomss': [{'N': 2},  {'O': 2},  {'C': 1, 'H': 4},  {'C': 2, 'H': 6},  {'C': 3, 'H': 8},  {'H': 2, 'O': 1}, {'C': 1, 'O': 2}],
     }
@@ -263,8 +263,8 @@ def test_fuel_air_third_spec_solver():
      'frac_out_O2_dry': 0.0503063746233793,
      'mass_ratio': 19.969067102685425,
      'mole_ratio': 13.333333333333334,
-     'n_air': 80,
-     'n_fuel': 5,
+     'n_air': 80.0,
+     'n_fuel': 5.0,
      'n_out': 86.51500000000001,
      'ns_out': [63.42500000000001,  3.7150000000000034,  0.0,  0.0,  0.0,  12.667499999999999,  6.707499999999999],
      'volume_ratio': 13.365681067247072,
@@ -279,7 +279,7 @@ def test_fuel_air_third_spec_solver():
      'mass_ratio': 19.969067102685425,
      'mole_ratio': 13.333333333333337,
      'n_air': 80.00000000000003,
-     'n_fuel': 5,
+     'n_fuel': 5.0,
      'n_out': 86.00000000000003,
      'ns_out': [63.425, 7.03, 0.0, 0.74, 0.145, 9.8675, 4.7925],
      'volume_ratio': 13.365681067247069,
