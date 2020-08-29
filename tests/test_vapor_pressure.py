@@ -180,6 +180,14 @@ def test_VDI_PPDS_3_data():
     assert Psat_data_VDI_PPDS_3.index.is_unique
     assert Psat_data_VDI_PPDS_3.shape == (275, 8)
 
+def test_Perrys2_8():
+    assert all([checkCAS(i) for i in Psat_data_Perrys2_8.index])
+    tots_calc = [Psat_data_Perrys2_8[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'C5', 'Tmin', 'Tmax']]
+    tots = [30288.457300000002, 2574584.506, 3394.9677, 1.1357374248600194, 1223.7, 70399.92, 187558.921]
+    assert_allclose(tots_calc, tots)
+
+    assert Psat_data_Perrys2_8.index.is_unique
+    assert Psat_data_Perrys2_8.shape == (340, 8)
 
 ### CSP relationships
 def test_boiling_critical_relation():
