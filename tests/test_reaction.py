@@ -153,20 +153,20 @@ def test_S0l():
     assert methods == ['CRC']
 
 def test_Gibbs_formation():
-    Gf =  Gibbs_formation(-285830, 69.91,  [0, 0], [130.571, 205.147], [1, .5])
+    Gf =  Gibbs_formation(-285830.0, 69.91,  [0.0, 0.0], [130.571, 205.147], [1.0, .5])
     assert_close(Gf, -237161.633825)
     
-    Gf = Gibbs_formation(-241818, 188.825,  [0, 0], [130.571, 205.147], [1, .5])
+    Gf = Gibbs_formation(-241818, 188.825,  [0.0, 0], [130.571, 205.147], [1.0, .5])
     assert_close(Gf, -228604.141075)
     
-    Gf = Gibbs_formation(-648980, 297.713, [0, 0, 0], [5.74, 152.206, 202.789], [1, .5, 1.5])
+    Gf = Gibbs_formation(-648980, 297.713, [0.0, 0.0, 0.0], [5.74, 152.206, 202.789], [1, .5, 1.5])
     assert_close(Gf, -622649.329975)
     
     
 def test_Hf_basis_converter():
-    assert_close(Hf_basis_converter(44018, Hf_liq=-285830), -241812)
+    assert_close(Hf_basis_converter(44018.0, Hf_liq=-285830.0), -241812)
     
-    assert_close(Hf_basis_converter(44018, Hf_gas=-241812), -285830)
+    assert_close(Hf_basis_converter(44018, Hf_gas=-241812.0), -285830)
     
     with pytest.raises(ValueError):
         Hf_basis_converter(44018, Hf_liq=None) 
@@ -178,7 +178,7 @@ def test_Hf_basis_converter():
         Hf_basis_converter(Hvapm=None, Hf_liq=1)
 
 def test_entropy_formation():
-    Sf = entropy_formation(Hf=-74520, Gf=-50490)
+    Sf = entropy_formation(Hf=-74520.0, Gf=-50490.0)
     assert_close(Sf, -80.59701492537314)
     
     Sf = entropy_formation(Hf=-241818, Gf=-228572)

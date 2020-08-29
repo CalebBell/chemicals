@@ -208,7 +208,8 @@ def test_flash_inner_loop():
                             'Li-Johns-Ahmadi',
                              'Rachford-Rice (polynomial)']
     
-
+    # case with a guess
+    flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], guess=.7)
 
     # Seems like a bad idea
     # TODO - handle with the `check` parameter
