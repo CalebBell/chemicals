@@ -1017,6 +1017,8 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     .. math::
         C_p = R\left(a_0 + (a_1/T^2) \exp(-a_2/T) + a_3 y^2
         + (a_4 - a_5/(T-a_7)^2 )y^j \right)
+        
+    .. math::
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
         
     Parameters
@@ -1067,11 +1069,13 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
     .. math::
         \frac{H(T) - H^{ref}}{RT} = a_0 + a_1x(a_2)/(a_2T) + I/T + h(T)/T
         
+    .. math::
         h(T) = (a_5 + a_7)\left[(2a_3 + 8a_4)\ln(1-y)+ \left\{a_3\left(1 + 
         \frac{1}{1-y}\right) + a_4\left(7 + \frac{1}{1-y}\right)\right\}y
         + a_4\left\{3y^2 + (5/3)y^3 + y^4 + (3/5)y^5 + (1/3)y^6\right\} 
         + (1/7)\left\{a_4 - \frac{a_5}{(a_6+a_7)^2}\right\}y^7\right]
         
+    .. math::
         h(T) = 0 \text{ for } T \le a_7
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
         
@@ -1138,9 +1142,14 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
         \frac{-a_7}{a_6}\right)^{6-i} - a_4\right\}\frac{y^i}{i}
         - \left\{\frac{a_3}{a_6}(a_6 + a_7) + \frac{a_5 y^6}{7a_7(a_6+a_7)}
         \right\}y\right]
+
+    .. math::
         s(T) = 0 \text{ for } T \le a_7
         
+    .. math::
         z = \frac{T}{T+a_6} \cdot \frac{a_7 + a_6}{a_7}
+
+    .. math::
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
         
     Parameters
@@ -1213,7 +1222,9 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
 def Rowlinson_Poling(T, Tc, omega, Cpgm):
     r'''Calculate liquid constant-pressure heat capacitiy with the [1]_ CSP method.
     This equation is not terrible accurate.
+
     The heat capacity of a liquid is given by:
+
     .. math::
         \frac{Cp^{L} - Cp^{g}}{R} = 1.586 + \frac{0.49}{1-T_r} +
         \omega\left[ 4.2775 + \frac{6.3(1-T_r)^{1/3}}{T_r} + \frac{0.4355}{1-T_r}\right]
@@ -1257,6 +1268,7 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
 def Rowlinson_Bondi(T, Tc, omega, Cpgm):
     r'''Calculate liquid constant-pressure heat capacitiy with the CSP method
     shown in [1]_.
+    
     The heat capacity of a liquid is given by:
         
     .. math::
@@ -1510,7 +1522,6 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(a1*log(1.0-Tr) + a2/(1.0-Tr) + a3 + Tr*(Tr*(Tr*a6 + a5) + a4))
 
 
-# @njit(cache=True)
 def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates the integral of liquid heat capacity using the  
     quasi-polynomial model developed in [1]_.
@@ -1553,7 +1564,6 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(T*(T*(T*(T*a6/(4.*Tc3) + a5/(3.*Tc2)) + a4/(2.*Tc)) - a1 + a3) 
               + T*a1*log(1. - T/Tc) - 0.5*Tc*(a1 + a2)*log(term*term))
 
-# @njit(cache=True)
 def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates the integral of liquid heat capacity over T using the 
     quasi-polynomial model  developed in [1]_.
@@ -1599,7 +1609,6 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(a3*logT -a1*polylog2(T/Tc) - a2*(-logT + 0.5*log(term*term))
               + T*(T*(T*a6/(3.*Tc3) + a5/(2.*Tc2)) + a4/Tc))
 
-# @njit(cache=True)
 def Zabransky_cubic(T, a1, a2, a3, a4):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
     .. math::
@@ -1636,7 +1645,6 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
     T = T/100.
     return R*(((a4*T + a3)*T + a2)*T + a1)
 
-# @njit(cache=True)
 def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     r'''Calculates the integral of liquid heat capacity using the model 
     developed in [1]_.
@@ -1671,7 +1679,6 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     T = T/100.
     return 100*R*T*(T*(T*(T*a4*0.25 + a3/3.) + a2*0.5) + a1)
 
-# @njit(cache=True)
 def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     r'''Calculates the integral of liquid heat capacity over T using the model 
     developed in [1]_.

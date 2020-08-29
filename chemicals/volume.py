@@ -108,13 +108,17 @@ def Yen_Woods_saturation(T, Tc, Vc, Zc):
     .. math::
         Vc/Vs = 1 + A(1-T_r)^{1/3} + B(1-T_r)^{2/3} + D(1-T_r)^{4/3}
 
+    .. math::
         D = 0.93-B
 
+    .. math::
         A = 17.4425 - 214.578Z_c + 989.625Z_c^2 - 1522.06Z_c^3
 
+    .. math::
         B = -3.28257 + 13.6377Z_c + 107.4844Z_c^2-384.211Z_c^3
         \text{ if } Zc \le 0.26
 
+    .. math::
         B = 60.2091 - 402.063Z_c + 501.0 Z_c^2 + 641.0 Z_c^3
         \text{ if } Zc \ge 0.26
 
@@ -331,12 +335,14 @@ def Bhirud_normal(T, Tc, Pc, omega):
     The density of a liquid is given by:
 
     .. math::
-        &\ln \frac{P_c}{\rho RT} = \ln U^{(0)} + \omega\ln U^{(1)}
+        \ln \frac{P_c}{\rho RT} = \ln U^{(0)} + \omega\ln U^{(1)}
 
-        &\ln U^{(0)} = 1.396 44 - 24.076T_r+ 102.615T_r^2
+    .. math::
+        \ln U^{(0)} = 1.396 44 - 24.076T_r+ 102.615T_r^2
         -255.719T_r^3+355.805T_r^4-256.671T_r^5 + 75.1088T_r^6
 
-        &\ln U^{(1)} = 13.4412 - 135.7437 T_r + 533.380T_r^2-
+    .. math::
+        \ln U^{(1)} = 13.4412 - 135.7437 T_r + 533.380T_r^2-
         1091.453T_r^3+1231.43T_r^4 - 728.227T_r^5 + 176.737T_r^6
 
     Parameters
@@ -403,9 +409,11 @@ def COSTALD(T, Tc, Vc, omega):
     .. math::
         V_s=V^*V^{(0)}[1-\omega_{SRK}V^{(\delta)}]
 
+    .. math::
         V^{(0)}=1-1.52816(1-T_r)^{1/3}+1.43907(1-T_r)^{2/3}
         - 0.81446(1-T_r)+0.190454(1-T_r)^{4/3}
 
+    .. math::
         V^{(\delta)}=\frac{-0.296123+0.386914T_r-0.0427258T_r^2-0.0480645T_r^3}
         {T_r-1.00001}
 
@@ -468,14 +476,19 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
     .. math::
         V_s = \frac{RT_c}{P_c}{Z_{RA}}^{[1+(1-T_r)^{2/7}]}
 
+    .. math::
         Z_{RA} = \alpha + \beta(1-T_r)
 
+    .. math::
         \alpha = 0.3883-0.0179s
 
+    .. math::
         s = T_{br} \frac{\ln P_c}{(1-T_{br})}
 
+    .. math::
         \beta = 0.00318s-0.0211+0.625\Lambda^{1.35}
 
+    .. math::
         \Lambda = \frac{P_c^{1/3}} { M^{1/2} T_c^{5/6}}
 
     For polar compounds:
@@ -483,8 +496,10 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
     .. math::
         \theta = P_c \mu^2/T_c^2
 
+    .. math::
         \alpha = 0.3883 - 0.0179s - 130540\theta^{2.41}
 
+    .. math::
         \beta = 0.00318s - 0.0211 + 0.625\Lambda^{1.35} + 9.74\times
         10^6 \theta^{3.38}
 
@@ -494,6 +509,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
         \alpha = \left[0.690T_{br} -0.3342 + \frac{5.79\times 10^{-10}}
         {T_{br}^{32.75}}\right] P_c^{0.145}
 
+    .. math::
         \beta = 0.00318s - 0.0211 + 0.625 \Lambda^{1.35} + 5.90\Theta^{0.835}
 
     Parameters
@@ -569,10 +585,13 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
     .. math::
         V_s = V_c/(1+1.169\tau^{1/3}+1.818\tau^{2/3}-2.658\tau+2.161\tau^{4/3}
 
+    .. math::
         \tau = 1-\frac{(T/T_c)}{\alpha_{SRK}}
 
+    .. math::
         \alpha_{SRK} = [1 + m(1-\sqrt{T/T_C}]^2
 
+    .. math::
         m = 0.480+1.574\omega-0.176\omega^2
 
     If the fit parameter `delta_SRK` is provided, the following is used:
@@ -698,10 +717,13 @@ def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
     .. math::
         V = V_s\left( 1 - C \ln \frac{B + P}{B + P^{sat}}\right)
 
+    .. math::
         \frac{B}{P_c} = -1 + a\tau^{1/3} + b\tau^{2/3} + d\tau + e\tau^{4/3}
 
+    .. math::
         e = \exp(f + g\omega_{SRK} + h \omega_{SRK}^2)
 
+    .. math::
         C = j + k \omega_{SRK}
 
     Parameters
@@ -885,10 +907,13 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
     .. math::
         T_{cm} = \frac{\sum_i\sum_j x_i x_j (V_{ij}T_{cij})}{V_m}
 
+    .. math::
         V_m = 0.25\left[ \sum x_i V_i + 3(\sum x_i V_i^{2/3})(\sum_i x_i V_i^{1/3})\right]
 
+    .. math::
         V_{ij}T_{cij} = (V_iT_{ci}V_{j}T_{cj})^{0.5}
 
+    .. math::
         \omega = \sum_i z_i \omega_i
 
     Parameters

@@ -224,7 +224,7 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
     TRC = 1.5
     
     This forulation is highly optimized, spending most of its time in the 
-    select logarithm, power, and complex square root.
+    logarithm, power, and square root.
 
     Examples
     --------
@@ -491,10 +491,13 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     .. math::
         \xi = \frac{2173.424 T_c^{1/6}}{\sqrt{MW} P_c^{2/3}}
 
+    .. math::
         \xi^{(0)} = (1.5174 - 2.135T_r + 0.75T_r^2)\cdot 10^{-5}
 
+    .. math::
         \xi^{(1)} = (4.2552 - 7.674 T_r + 3.4 T_r^2)\cdot 10^{-5}
 
+    .. math::
         \mu = (\xi^{(0)} + \omega \xi^{(1)})/\xi
 
     Parameters
@@ -550,8 +553,10 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
     .. math::
         \mu=\frac{V_o}{E(V-V_o)}
 
+    .. math::
         E=-1.12+\frac{V_c}{12.94+0.10MW-0.23P_c+0.0424T_{m}-11.58(T_{m}/T_c)}
 
+    .. math::
         V_o = 0.0085\omega T_c-2.02+\frac{V_{m}}{0.342(T_m/T_c)+0.894}
 
     Parameters
@@ -620,12 +625,16 @@ def Lucas(T, P, Tc, Pc, omega, P_sat, mu_l):
     .. math::
         \frac{\mu}{\mu_{sat}}=\frac{1+D(\Delta P_r/2.118)^A}{1+C\omega \Delta P_r}
 
+    .. math::
         \Delta P_r = \frac{P-P^{sat}}{P_c}
 
+    .. math::
         A=0.9991-\frac{4.674\times 10^{-4}}{1.0523T_r^{-0.03877}-1.0513}
 
+    .. math::
         D = \frac{0.3257}{(1.0039-T_r^{2.573})^{0.2906}}-0.2086
 
+    .. math::
         C = -0.07921+2.1616T_r-13.4040T_r^2+44.1706T_r^3-84.8291T_r^4+
         96.1209T_r^5-59.8127T_r^6+15.6719T_r^7
 
@@ -691,6 +700,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
         \eta \xi \times 10^8 = 46.10 T_r^{0.618} - 20.40 \exp(-0.449T_r) + 1
         9.40\exp(-4.058T_r)+1
 
+    .. math::
         \xi = 2173.424 T_c^{1/6} MW^{-1/2} P_c^{-2/3}
 
     Parameters
@@ -755,6 +765,7 @@ def Stiel_Thodos(T, Tc, Pc, MW):
     .. math::
         \mu_g = 34\times 10^{-5} T_r^{0.94}/\xi
 
+    .. math::
         \xi = \frac{T_c^{(1/6)}}{\sqrt{MW} P_c^{2/3}}
 
     Parameters
@@ -811,17 +822,23 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
         \eta  = \left[0.807T_r^{0.618}-0.357\exp(-0.449T_r) + 0.340\exp(-4.058
         T_r) + 0.018\right]F_p^\circ F_Q^\circ /\xi
 
+    .. math::
         F_p^\circ=1, 0 \le \mu_{r} < 0.022
 
+    .. math::
         F_p^\circ = 1+30.55(0.292-Z_c)^{1.72}, 0.022 \le \mu_{r} < 0.075
 
+    .. math::
         F_p^\circ = 1+30.55(0.292-Z_c)^{1.72}|0.96+0.1(T_r-0.7)| 0.075 < \mu_{r}
 
+    .. math::
         F_Q^\circ = 1.22Q^{0.15}\left\{ 1+0.00385[(T_r-12)^2]^{1/M}\text{sign}
         (T_r-12)\right\}
 
+    .. math::
         \mu_r = 52.46 \frac{\mu^2 P_c}{T_c^2}
 
+    .. math::
         \xi=0.176\left(\frac{T_c}{MW^3 P_c^4}\right)^{1/6}
 
     Parameters
@@ -1788,13 +1805,14 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     if nu_100 < 70:
 
     .. math::
-        L, H = interp(nu_100)
+        L, H = \text{interp}(nu_100)
 
     else:
 
     .. math::
         L = 0.8353\nu_{100}^2 + 14.67\nu_{100} - 216
 
+    .. math::
         H = 0.1684\nu_{100}^2 + 11.85\nu_{100} - 97
 
     if nu_40 > H:
@@ -1807,7 +1825,8 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     .. math::
         N = \frac{\log(H) - \log(\nu_{40})}{\log (\nu_{100})}
 
-         VI = \frac{10^N-1}{0.00715} + 100
+    .. math::
+        VI = \frac{10^N-1}{0.00715} + 100
 
     Parameters
     ----------
