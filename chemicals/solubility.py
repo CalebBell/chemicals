@@ -20,6 +20,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various solubility calculation routines and a Henry's law
+coefficient converter.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+    
+Henry's Law
+------------
+.. autofunction:: chemicals.solubility.Henry_pressure
+.. autofunction:: chemicals.solubility.Henry_pressure_mixture
+.. autofunction:: chemicals.solubility.Henry_converter
+
+Utility functions
+-----------------
+.. autofunction:: chemicals.solubility.solubility_eutectic
+.. autofunction:: chemicals.solubility.solubility_parameter
+.. autofunction:: chemicals.solubility.Tm_depression_eutectic
+
 """
 
 __all__ = ['solubility_parameter', 
@@ -87,6 +108,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
         1 - \frac{T}{T_{m,i}}\right) - \frac{\Delta C_{p,i}(T_{m,i}-T)}{RT}
         + \frac{\Delta C_{p,i}}{R}\ln\frac{T_m}{T}
 
+    .. math::
         \Delta C_{p,i} = C_{p,i}^L - C_{p,i}^S
 
     Parameters
@@ -138,6 +160,7 @@ def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
     .. math::
         \Delta T_m = \frac{R T_m^2 x}{\Delta H_m}
 
+    .. math::
         \Delta T_m = \frac{R T_m^2 (MW) M}{1000 \Delta H_m}
 
     Parameters

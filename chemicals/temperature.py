@@ -19,6 +19,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains functionality for converting between the temperature scales
+ITS-90, ITS-76, ITS-68, ITS-48, and ITS-27. These historical temperature scales
+can deviate quite a bit from modern temperature measurements! It is important 
+to convert old measurements of temperature to their modern equivalent.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+    
+Conversion functions
+--------------------
+.. autofunction:: chemicals.temperature.T_converter
+.. autofunction:: chemicals.temperature.ITS90_68_difference
+
 """
 
 from __future__ import division
@@ -218,22 +234,29 @@ def ITS90_68_difference(T):
 
     For temperatures under 13.8 K, no conversion is performed.
 
-    The first set of coefficients are:
+    The first set of coefficients is:
+    
     -0.005903, 0.008174, -0.061924, -0.193388, 1.490793, 1.252347, -9.835868,
     1.411912, 25.277595, -19.183815, -18.437089, 27.000895, -8.716324.
 
-    The second set of coefficients are:
+    The second set of coefficients is:
+    
     0, -0.148759, -0.267408, 1.08076, 1.269056, -4.089591, -1.871251,
     7.438081, -3.536296.
 
-    The third set of coefficients are:
+    The third set of coefficients is:
+        
     7.8687209E1, -4.7135991E-1, 1.0954715E-3, -1.2357884E-6, 6.7736583E-10,
     -1.4458081E-13.
+    
     These last coefficients use the temperature in degrees Celcius. A slightly
     older model used the following coefficients but a different equation over
     the same range:
+        
     -0.00317, -0.97737, 1.2559, 2.03295, -5.91887, -3.23561, 7.23364,
-    5.04151. The model for these coefficients was:
+    5.04151.
+    
+    The model for these coefficients was:
 
     .. math::
         T_{90} - T_{68} = c_0 + \sum_{i=1}^7 c_i[(T_{90}/K - 1173.15)/300]^i

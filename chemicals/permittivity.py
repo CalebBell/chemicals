@@ -21,7 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains various permittivity calculation routines and dataframes.
+This module contains various permittivity calculation routines and dataframes
+of coefficients for correlations.
 
 For reporting bugs, adding feature requests, or submitting pull requests,
 please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
