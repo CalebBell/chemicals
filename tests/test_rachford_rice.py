@@ -201,7 +201,7 @@ def test_flash_inner_loop():
     assert_allclose(V_over_F_5a, V_over_F_5b)
 
 
-    methods = flash_inner_loop(zs=[0.1, 0.2, 0.3, 0.4], Ks=[4.2, 1.75, 0.74, 0.34], get_methods=True)
+    methods = flash_inner_loop_methods(4)
     assert methods == ['Analytical', 'Leibovici and Nichita 2', 'Rachford-Rice (Secant)',
                             'Rachford-Rice (Newton-Raphson)', 
                             'Rachford-Rice (Halley)', 'Rachford-Rice (NumPy)',
@@ -418,7 +418,7 @@ def test_RR_3_component_analytical_killers():
     xs_expect = [0.32364856217161636, 0.6641943926907056, 0.01215704513767788]
     ys_expect = [0.3236485568923745, 0.6641943990933973, 0.012157044014228065]
     
-    methods = flash_inner_loop(zs, Ks, get_methods=True)
+    methods = flash_inner_loop_methods(3)
     for method in methods:
         V_over_F, xs, ys = flash_inner_loop(zs, Ks, method=method)
         assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
@@ -447,7 +447,7 @@ def test_RR_9_guess_outside_bounds():
     assert_allclose(ys, ys_expect, rtol=1e-5)
     
     # Check all the methods anyway 
-    methods = flash_inner_loop(zs, Ks, guess=guess, get_methods=True)
+    methods = flash_inner_loop_methods(len(zs))
     for method in methods:
         # 9 coeff root finding is numerically terrible - has a false root, and doesn't quite bracket
         # Cannot make work

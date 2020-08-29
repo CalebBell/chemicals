@@ -31,14 +31,20 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 .. contents:: :local:
 
-Two Phase
----------
+Two Phase - Interface
+---------------------
 .. autofunction:: chemicals.rachford_rice.flash_inner_loop
+.. autofunction:: chemicals.rachford_rice.flash_inner_loop_methods
+.. autodata:: chemicals.rachford_rice.flash_inner_loop_all_methods
+
+Two Phase - Implementations
+---------------------------
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_LN2
 .. autofunction:: chemicals.rachford_rice.Li_Johns_Ahmadi_solution
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
 
+ 
 Three Phase
 -----------
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution2
@@ -62,7 +68,8 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution_polynomial', 'Rachford_Rice_solution_LN2',
            'Rachford_Rice_solution2', 'Rachford_Rice_solutionN',
            'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
-           'Li_Johns_Ahmadi_solution', 'flash_inner_loop']
+           'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
+           'flash_inner_loop_all_methods', 'flash_inner_loop_methods']
 
 from fluids.constants import R
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
@@ -1321,31 +1328,48 @@ FLASH_INNER_POLY = 'Rachford-Rice (polynomial)'
 FLASH_INNER_LN2 = 'Leibovici and Nichita 2'
 
 
-flash_inner_loop_methods = [FLASH_INNER_ANALYTICAL, 
-                            FLASH_INNER_SECANT,
-                            FLASH_INNER_NR, FLASH_INNER_HALLEY,
-                            FLASH_INNER_NUMPY, FLASH_INNER_LJA,
-                            FLASH_INNER_POLY, FLASH_INNER_LN2]
+flash_inner_loop_all_methods = (FLASH_INNER_ANALYTICAL,
+                                FLASH_INNER_SECANT,
+                                FLASH_INNER_NR, FLASH_INNER_HALLEY,
+                                FLASH_INNER_NUMPY, FLASH_INNER_LJA,
+                                FLASH_INNER_POLY, FLASH_INNER_LN2)
+'''Tuple of method name keys. See the `flash_inner_loop` for the actual references'''
 
-def flash_inner_loop_list_methods(l):
+def flash_inner_loop_methods(N):
+    """Return all methods able to solve the Rachford-Rice equation
+    for the specified number of components.
+
+    Parameters
+    ----------
+    N : int
+        Number of components, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to solve the Rachford-rice equation
+
+    See Also
+    --------
+    flash_inner_loop
+    """
     methods = []
-    if l in (2, 3, 4, 5):
+    if N in (2, 3, 4, 5):
         methods.append(FLASH_INNER_ANALYTICAL)
-    if l >= 10 and not IS_PYPY:
+    if N >= 10 and not IS_PYPY:
         methods.append(FLASH_INNER_NUMPY)
-    if l >= 2:
+    if N >= 2:
         methods.extend([FLASH_INNER_LN2, FLASH_INNER_SECANT, FLASH_INNER_NR, FLASH_INNER_HALLEY])
-        if l < 10 and not IS_PYPY:
+        if N < 10 and not IS_PYPY:
             methods.append(FLASH_INNER_NUMPY)
-    if l >= 3:
+    if N >= 3:
         methods.append(FLASH_INNER_LJA)
-    if l < 20:
+    if N < 20:
         methods.append(FLASH_INNER_POLY)
     return methods
 
 
-def flash_inner_loop(zs, Ks, get_methods=False, method=None,
-                     guess=None, check=False):
+def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
     r'''This function handles the solution of the inner loop of a flash
     calculation, solving for liquid and gas mole fractions and vapor fraction
     based on specified overall mole fractions and K values. As K values are
@@ -1376,9 +1400,6 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
         Mole fractions of each species in the liquid phase, [-]
     ys : list[float]
         Mole fractions of each species in the vapor phase, [-]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain a solution with the given
-        inputs
 
     Other Parameters
     ----------------
@@ -1389,10 +1410,6 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
         'Leibovici and Nichita 2', 'Rachford-Rice (polynomial)', and 
         'Li-Johns-Ahmadi'. All valid values are also held
         in the list `flash_inner_loop_methods`.
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        a solution for the desired chemical, and will return methods instead of
-        `V_over_F`, `xs`, and `ys`.
 
     Notes
     -----
@@ -1405,7 +1422,7 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
           which numerically solves an objective function
           described in :obj:`Rachford_Rice_solution`.
         * 'Leibovici and Nichita 2', a transformation of the RR equation
-           described in :obj:`Rachford_Rice_solution_LN2`.
+          described in :obj:`Rachford_Rice_solution_LN2`.
         * 'Li-Johns-Ahmadi', which numerically solves an objective function
           described in :obj:`Li_Johns_Ahmadi_solution`.
 
@@ -1415,8 +1432,6 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
     (0.6907302627738541, [0.3394086969663436, 0.3650560590371706, 0.29553524399648573], [0.571903654388289, 0.27087159580558057, 0.1572247498061304])
     '''
     l = len(zs)
-    if get_methods: # numba : delete
-        return flash_inner_loop_list_methods(l)  # numba : delete
     if method is None:
         method2 = FLASH_INNER_ANALYTICAL if l < 3 else (FLASH_INNER_NUMPY if (not IS_PYPY and l >= 10) else FLASH_INNER_LN2)    
     else:

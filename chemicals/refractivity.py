@@ -97,6 +97,7 @@ else:
 #  Refractive index functions
 
 RI_all_methods = (CRC,)
+'''Tuple of method name keys. See the `RI` for the actual references'''
 
 def RI_methods(CASRN):
     """Return all methods available to obtain the RI for the desired chemical.
