@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains functions for solving the Rachford-Rice Equation. This is
+used to solve ideal flashes, and is the inner loop of the sequential-substitution
+flash algorithm. It is not used by full newton-algorithms. The 
+sequential-substitution is normally recommended because it does not suffer
+from the ~N^3 behavior of solving a matrix.
+ 
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Two Phase
+---------
+.. autofunction:: chemicals.rachford_rice.flash_inner_loop
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_LN2
+.. autofunction:: chemicals.rachford_rice.Li_Johns_Ahmadi_solution
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
+
+Three Phase
+-----------
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution2
+
+N Phase
+-------
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solutionN
+
+Two Phase Utility Functions
+---------------------------
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_polynomial
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_flash_error
+
+
 """
 
 from __future__ import division
@@ -404,6 +438,7 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
         - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
 
+    .. math::        
         \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
 
     If the `newton` method does not converge, a bisection method (brenth) is
@@ -542,12 +577,16 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
     .. math::
         F z_i = L x_i + V y_i
 
+    .. math::        
         x_i = \frac{z_i}{1 + \frac{V}{F}(K_i-1)}
 
+    .. math::        
         \sum_i y_i = \sum_i K_i x_i = 1
 
+    .. math::        
         \sum_i(y_i - x_i)=0
 
+    .. math::        
         \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
 
     Examples
@@ -635,6 +674,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
         - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
 
+    .. math::        
         \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
 
     Another algorithm for determining the range of the correct solution is
@@ -645,6 +685,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
     .. math::
         \left(\frac{V}{F}\right)_{min} = \frac{1}{1-K_{max}}
 
+    .. math::        
         \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
 
     If the `newton` method does not converge, a bisection method (brenth) is
@@ -662,6 +703,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
         \frac{d \text{ obj}}{d \frac{V}{F}} = \sum_i \frac{-z_i(K_i-1)^2}
         {(1 + \frac{V}{F}(K_i-1))^2} 
         
+    .. math::        
         \frac{d^2 \text{ obj}}{d (\frac{V}{F})^2} = \sum_i \frac{2z_i(K_i-1)^3}
         {(1 + \frac{V}{F}(K_i-1))^3} 
 
@@ -914,6 +956,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
         - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
 
+    .. math::        
         \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
 
     The first and second derivatives are derived with sympy as follows:
