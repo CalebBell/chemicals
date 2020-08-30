@@ -8,8 +8,8 @@ chemicals
 .. image:: http://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat
    :target: https://chemicals.readthedocs.io/en/latest/
    :alt: Documentation
-.. image:: http://img.shields.io/travis/CalebBell/chemicals/master.svg?style=flat
-   :target: https://travis-ci.org/CalebBell/chemicals
+.. image:: https://travis-ci.com/CalebBell/chemicals.svg?branch=release?style=flat
+   :target: https://travis-ci.com/github/CalebBell/chemicals
    :alt: Build_status
 .. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
    :target: https://github.com/CalebBell/chemicals/blob/master/LICENSE.txt
@@ -26,11 +26,9 @@ chemicals
 .. image:: http://img.shields.io/appveyor/ci/calebbell/chemicals.svg
    :target: https://ci.appveyor.com/project/calebbell/chemicals/branch/master
    :alt: Build_status
-.. image:: https://zenodo.org/badge/62404647.svg
+.. image:: https://zenodo.org/badge/264697738.svg
    :alt: Zenodo
-   :target: https://zenodo.org/badge/latestdoi/62404647
-
-# TODO: Upload package to Zenodo 
+   :target: https://zenodo.org/badge/latestdoi/264697738
 
 .. contents::
 

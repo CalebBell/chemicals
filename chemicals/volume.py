@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
 
@@ -20,6 +20,147 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various volume/density estimation routines, dataframes
+of fit coefficients, and mixing rules.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Pure Low Pressure Liquid Correlations
+-------------------------------------
+.. autofunction:: chemicals.volume.Rackett
+.. autofunction:: chemicals.volume.COSTALD
+.. autofunction:: chemicals.volume.Yen_Woods_saturation
+.. autofunction:: chemicals.volume.Yamada_Gunn
+.. autofunction:: chemicals.volume.Townsend_Hales
+.. autofunction:: chemicals.volume.Bhirud_normal
+.. autofunction:: chemicals.volume.Campbell_Thodos
+.. autofunction:: chemicals.volume.SNM0
+
+Pure High Pressure Liquid Correlations
+--------------------------------------
+.. autofunction:: chemicals.volume.COSTALD_compressed
+
+Liquid Mixing Rules
+-------------------
+.. autofunction:: chemicals.volume.Amgat
+.. autofunction:: chemicals.volume.Rackett_mixture
+.. autofunction:: chemicals.volume.COSTALD_mixture
+
+Gas Correlations
+----------------
+Gas volumes are predicted with one of:
+
+1) An equation of state
+2) A virial coefficient model
+3) The ideal gas law
+
+Equations of state do much more than predict volume however. An implementation
+of many of them can be found in `thermo <https://github.com/CalebBell/thermo>`_.
+
+Virial functions are implemented in :obj:`chemicals.virial`.
+
+.. autofunction:: chemicals.volume.ideal_gas
+
+Pure Solid Correlations
+-----------------------
+Solid density does not depend on pressure significantly, and unless operating
+in the geochemical or astronomical domain is normally neglected.
+
+.. autofunction:: chemicals.volume.Goodman
+
+Pure Component Solid Fit Correlations
+-------------------------------------
+.. autofunction:: chemicals.volume.CRC_inorganic
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: rho_data_COSTALD
+
+    Coefficients for the :obj:`COSTALD` method from [3]_; 192 fluids have 
+    coefficients published.
+
+.. data:: rho_data_SNM0
+
+    Coefficients for the :obj:`SNM0` method for 73 fluids from [2]_.
+
+.. data:: rho_data_Perry_8E_105_l
+    
+    Coefficients for :obj:`chemicals.dippr.EQ105` from [1]_ for 344 fluds. Note
+    this is in terms of molar density; to obtain molar volume, invert the result!
+
+.. data:: rho_data_VDI_PPDS_2
+
+    Coefficients in [5]_ developed by the PPDS using :obj:`chemicals.dippr.EQ116` 
+    but in terms of mass density [kg/m^3]; Valid up to the critical temperature,
+    and extrapolates to very low temperatures well.
+
+.. data:: rho_data_CRC_inorg_l
+
+    Single-temperature coefficient linear model in terms of mass density
+    for the density of inorganic liquids. Data is available for 177 fluids
+    normally valid over a
+    narrow range above the melting point, from [4]_; described in
+    :obj:`CRC_inorganic`.
+
+.. data:: rho_data_CRC_inorg_l_const
+
+    Constant inorganic liquid molar volumes published in [4]_.
+
+.. data:: rho_data_CRC_inorg_s_const
+
+    Constant solid densities molar volumes published in [4]_.
+
+.. data:: rho_data_CRC_virial
+
+    Coefficients for a tempereture polynomial (T in Kelvin) for the second `B` 
+    virial coefficient published in [4]_. The form of the equation is 
+    :math:`B = (a_1 + t(a_2 + t(a_3 + t(a_4 + a_5 t)))) \times 10^{-6}` with
+    :math:`t = \frac{298.15}{T} - 1` and then `B` will be in units of m^3/mol.
+            
+    
+.. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+    8E. McGraw-Hill Professional, 2007.
+.. [2] Mchaweh, A., A. Alsaygh, Kh. Nasrifar, and M. Moshfeghian.
+    "A Simplified Method for Calculating Saturated Liquid Densities."
+    Fluid Phase Equilibria 224, no. 2 (October 1, 2004): 157-67.
+    doi:10.1016/j.fluid.2004.06.054
+.. [3] Hankinson, Risdon W., and George H. Thomson. "A New Correlation for
+    Saturated Densities of Liquids and Their Mixtures." AIChE Journal
+    25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
+.. [4] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+    Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+.. [5] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+    Berlin; New York:: Springer, 2010.
+
+The structure of each dataframe is shown below:
+    
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.volume.rho_data_COSTALD
+
+    In [3]: chemicals.volume.rho_data_SNM0
+
+    In [4]: chemicals.volume.rho_data_Perry_8E_105_l
+
+    In [5]: chemicals.volume.rho_data_VDI_PPDS_2
+
+    In [6]: chemicals.volume.rho_data_CRC_inorg_l
+
+    In [7]: chemicals.volume.rho_data_CRC_inorg_l_const
+
+    In [8]: chemicals.volume.rho_data_CRC_inorg_s_const
+
+    In [9]: chemicals.volume.rho_data_CRC_virial
+
 """
 
 from __future__ import division
@@ -108,13 +249,17 @@ def Yen_Woods_saturation(T, Tc, Vc, Zc):
     .. math::
         Vc/Vs = 1 + A(1-T_r)^{1/3} + B(1-T_r)^{2/3} + D(1-T_r)^{4/3}
 
+    .. math::
         D = 0.93-B
 
+    .. math::
         A = 17.4425 - 214.578Z_c + 989.625Z_c^2 - 1522.06Z_c^3
 
+    .. math::
         B = -3.28257 + 13.6377Z_c + 107.4844Z_c^2-384.211Z_c^3
         \text{ if } Zc \le 0.26
 
+    .. math::
         B = 60.2091 - 402.063Z_c + 501.0 Z_c^2 + 641.0 Z_c^3
         \text{ if } Zc \ge 0.26
 
@@ -331,12 +476,14 @@ def Bhirud_normal(T, Tc, Pc, omega):
     The density of a liquid is given by:
 
     .. math::
-        &\ln \frac{P_c}{\rho RT} = \ln U^{(0)} + \omega\ln U^{(1)}
+        \ln \frac{P_c}{\rho RT} = \ln U^{(0)} + \omega\ln U^{(1)}
 
-        &\ln U^{(0)} = 1.396 44 - 24.076T_r+ 102.615T_r^2
+    .. math::
+        \ln U^{(0)} = 1.396 44 - 24.076T_r+ 102.615T_r^2
         -255.719T_r^3+355.805T_r^4-256.671T_r^5 + 75.1088T_r^6
 
-        &\ln U^{(1)} = 13.4412 - 135.7437 T_r + 533.380T_r^2-
+    .. math::
+        \ln U^{(1)} = 13.4412 - 135.7437 T_r + 533.380T_r^2-
         1091.453T_r^3+1231.43T_r^4 - 728.227T_r^5 + 176.737T_r^6
 
     Parameters
@@ -403,9 +550,11 @@ def COSTALD(T, Tc, Vc, omega):
     .. math::
         V_s=V^*V^{(0)}[1-\omega_{SRK}V^{(\delta)}]
 
+    .. math::
         V^{(0)}=1-1.52816(1-T_r)^{1/3}+1.43907(1-T_r)^{2/3}
         - 0.81446(1-T_r)+0.190454(1-T_r)^{4/3}
 
+    .. math::
         V^{(\delta)}=\frac{-0.296123+0.386914T_r-0.0427258T_r^2-0.0480645T_r^3}
         {T_r-1.00001}
 
@@ -468,14 +617,19 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
     .. math::
         V_s = \frac{RT_c}{P_c}{Z_{RA}}^{[1+(1-T_r)^{2/7}]}
 
+    .. math::
         Z_{RA} = \alpha + \beta(1-T_r)
 
+    .. math::
         \alpha = 0.3883-0.0179s
 
+    .. math::
         s = T_{br} \frac{\ln P_c}{(1-T_{br})}
 
+    .. math::
         \beta = 0.00318s-0.0211+0.625\Lambda^{1.35}
 
+    .. math::
         \Lambda = \frac{P_c^{1/3}} { M^{1/2} T_c^{5/6}}
 
     For polar compounds:
@@ -483,8 +637,10 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
     .. math::
         \theta = P_c \mu^2/T_c^2
 
+    .. math::
         \alpha = 0.3883 - 0.0179s - 130540\theta^{2.41}
 
+    .. math::
         \beta = 0.00318s - 0.0211 + 0.625\Lambda^{1.35} + 9.74\times
         10^6 \theta^{3.38}
 
@@ -494,6 +650,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
         \alpha = \left[0.690T_{br} -0.3342 + \frac{5.79\times 10^{-10}}
         {T_{br}^{32.75}}\right] P_c^{0.145}
 
+    .. math::
         \beta = 0.00318s - 0.0211 + 0.625 \Lambda^{1.35} + 5.90\Theta^{0.835}
 
     Parameters
@@ -569,10 +726,13 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
     .. math::
         V_s = V_c/(1+1.169\tau^{1/3}+1.818\tau^{2/3}-2.658\tau+2.161\tau^{4/3}
 
+    .. math::
         \tau = 1-\frac{(T/T_c)}{\alpha_{SRK}}
 
+    .. math::
         \alpha_{SRK} = [1 + m(1-\sqrt{T/T_C}]^2
 
+    .. math::
         m = 0.480+1.574\omega-0.176\omega^2
 
     If the fit parameter `delta_SRK` is provided, the following is used:
@@ -698,10 +858,13 @@ def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
     .. math::
         V = V_s\left( 1 - C \ln \frac{B + P}{B + P^{sat}}\right)
 
+    .. math::
         \frac{B}{P_c} = -1 + a\tau^{1/3} + b\tau^{2/3} + d\tau + e\tau^{4/3}
 
+    .. math::
         e = \exp(f + g\omega_{SRK} + h \omega_{SRK}^2)
 
+    .. math::
         C = j + k \omega_{SRK}
 
     Parameters
@@ -885,10 +1048,13 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
     .. math::
         T_{cm} = \frac{\sum_i\sum_j x_i x_j (V_{ij}T_{cij})}{V_m}
 
+    .. math::
         V_m = 0.25\left[ \sum x_i V_i + 3(\sum x_i V_i^{2/3})(\sum_i x_i V_i^{1/3})\right]
 
+    .. math::
         V_{ij}T_{cij} = (V_iT_{ci}V_{j}T_{cj})^{0.5}
 
+    .. math::
         \omega = \sum_i z_i \omega_i
 
     Parameters

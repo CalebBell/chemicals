@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,46 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains functions for solving the Rachford-Rice Equation. This is
+used to solve ideal flashes, and is the inner loop of the sequential-substitution
+flash algorithm. It is not used by full newton-algorithms. The 
+sequential-substitution is normally recommended because it does not suffer
+from the ~N^3 behavior of solving a matrix.
+ 
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Two Phase - Interface
+---------------------
+.. autofunction:: chemicals.rachford_rice.flash_inner_loop
+.. autofunction:: chemicals.rachford_rice.flash_inner_loop_methods
+.. autodata:: chemicals.rachford_rice.flash_inner_loop_all_methods
+
+Two Phase - Implementations
+---------------------------
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_LN2
+.. autofunction:: chemicals.rachford_rice.Li_Johns_Ahmadi_solution
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
+
+ 
+Three Phase
+-----------
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution2
+
+N Phase
+-------
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solutionN
+
+Two Phase Utility Functions
+---------------------------
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_polynomial
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_flash_error
+
+
 """
 
 from __future__ import division
@@ -28,7 +68,8 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution_polynomial', 'Rachford_Rice_solution_LN2',
            'Rachford_Rice_solution2', 'Rachford_Rice_solutionN',
            'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
-           'Li_Johns_Ahmadi_solution', 'flash_inner_loop']
+           'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
+           'flash_inner_loop_all_methods', 'flash_inner_loop_methods']
 
 from fluids.constants import R
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
@@ -284,7 +325,7 @@ def Rachford_Rice_polynomial(zs, Ks):
     
     The general form was derived to be slightly different than that in [1]_,
     but is confirmed to also be correct as it matches other methods for solving
-    the Rachford-Rice equation.
+    the Rachford-Rice equation. [2]_ has similar information to [1]_.
     
     The first coefficient is always 1.
     
@@ -404,6 +445,7 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
         - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
 
+    .. math::        
         \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
 
     If the `newton` method does not converge, a bisection method (brenth) is
@@ -542,13 +584,19 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
     .. math::
         F z_i = L x_i + V y_i
 
+    .. math::        
         x_i = \frac{z_i}{1 + \frac{V}{F}(K_i-1)}
 
+    .. math::        
         \sum_i y_i = \sum_i K_i x_i = 1
 
+    .. math::        
         \sum_i(y_i - x_i)=0
 
+    .. math::        
         \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
+        
+    This objective function was proposed in [1]_.
 
     Examples
     --------
@@ -597,7 +645,7 @@ def Rachford_Rice_err(V_over_F, zs_k_minus_1, K_minus_1):
 
 
 def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
-    r'''Solves the objective function of the Rachford-Rice flash equation.
+    r'''Solves the objective function of the Rachford-Rice flash equation [1]_.
     Uses the method proposed in [2]_ to obtain an initial guess.
 
     .. math::
@@ -635,6 +683,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
         - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
 
+    .. math::        
         \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
 
     Another algorithm for determining the range of the correct solution is
@@ -645,6 +694,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
     .. math::
         \left(\frac{V}{F}\right)_{min} = \frac{1}{1-K_{max}}
 
+    .. math::        
         \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
 
     If the `newton` method does not converge, a bisection method (brenth) is
@@ -662,6 +712,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
         \frac{d \text{ obj}}{d \frac{V}{F}} = \sum_i \frac{-z_i(K_i-1)^2}
         {(1 + \frac{V}{F}(K_i-1))^2} 
         
+    .. math::        
         \frac{d^2 \text{ obj}}{d (\frac{V}{F})^2} = \sum_i \frac{2z_i(K_i-1)^3}
         {(1 + \frac{V}{F}(K_i-1))^3} 
 
@@ -914,6 +965,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
         - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
 
+    .. math::        
         \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
 
     The first and second derivatives are derived with sympy as follows:
@@ -924,6 +976,9 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     >>> F = ai/(V_over_F - ci) # doctest: +SKIP
     >>> terms = [F, diff(F, y), diff(F, y, 2)] # doctest: +SKIP
     >>> cse(terms, optimizations='basic') # doctest: +SKIP
+    
+    Some helpful information about this transformation can also be found in
+    [3]_.
         
     Examples
     --------
@@ -1278,31 +1333,48 @@ FLASH_INNER_POLY = 'Rachford-Rice (polynomial)'
 FLASH_INNER_LN2 = 'Leibovici and Nichita 2'
 
 
-flash_inner_loop_methods = [FLASH_INNER_ANALYTICAL, 
-                            FLASH_INNER_SECANT,
-                            FLASH_INNER_NR, FLASH_INNER_HALLEY,
-                            FLASH_INNER_NUMPY, FLASH_INNER_LJA,
-                            FLASH_INNER_POLY, FLASH_INNER_LN2]
+flash_inner_loop_all_methods = (FLASH_INNER_ANALYTICAL,
+                                FLASH_INNER_SECANT,
+                                FLASH_INNER_NR, FLASH_INNER_HALLEY,
+                                FLASH_INNER_NUMPY, FLASH_INNER_LJA,
+                                FLASH_INNER_POLY, FLASH_INNER_LN2)
+'''Tuple of method name keys. See the `flash_inner_loop` for the actual references'''
 
-def flash_inner_loop_list_methods(l):
+def flash_inner_loop_methods(N):
+    """Return all methods able to solve the Rachford-Rice equation
+    for the specified number of components.
+
+    Parameters
+    ----------
+    N : int
+        Number of components, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to solve the Rachford-rice equation
+
+    See Also
+    --------
+    flash_inner_loop
+    """
     methods = []
-    if l in (2, 3, 4, 5):
+    if N in (2, 3, 4, 5):
         methods.append(FLASH_INNER_ANALYTICAL)
-    if l >= 10 and not IS_PYPY:
+    if N >= 10 and not IS_PYPY:
         methods.append(FLASH_INNER_NUMPY)
-    if l >= 2:
+    if N >= 2:
         methods.extend([FLASH_INNER_LN2, FLASH_INNER_SECANT, FLASH_INNER_NR, FLASH_INNER_HALLEY])
-        if l < 10 and not IS_PYPY:
+        if N < 10 and not IS_PYPY:
             methods.append(FLASH_INNER_NUMPY)
-    if l >= 3:
+    if N >= 3:
         methods.append(FLASH_INNER_LJA)
-    if l < 20:
+    if N < 20:
         methods.append(FLASH_INNER_POLY)
     return methods
 
 
-def flash_inner_loop(zs, Ks, get_methods=False, method=None,
-                     guess=None, check=False):
+def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
     r'''This function handles the solution of the inner loop of a flash
     calculation, solving for liquid and gas mole fractions and vapor fraction
     based on specified overall mole fractions and K values. As K values are
@@ -1333,9 +1405,6 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
         Mole fractions of each species in the liquid phase, [-]
     ys : list[float]
         Mole fractions of each species in the vapor phase, [-]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain a solution with the given
-        inputs
 
     Other Parameters
     ----------------
@@ -1346,10 +1415,6 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
         'Leibovici and Nichita 2', 'Rachford-Rice (polynomial)', and 
         'Li-Johns-Ahmadi'. All valid values are also held
         in the list `flash_inner_loop_methods`.
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        a solution for the desired chemical, and will return methods instead of
-        `V_over_F`, `xs`, and `ys`.
 
     Notes
     -----
@@ -1362,7 +1427,7 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
           which numerically solves an objective function
           described in :obj:`Rachford_Rice_solution`.
         * 'Leibovici and Nichita 2', a transformation of the RR equation
-           described in :obj:`Rachford_Rice_solution_LN2`.
+          described in :obj:`Rachford_Rice_solution_LN2`.
         * 'Li-Johns-Ahmadi', which numerically solves an objective function
           described in :obj:`Li_Johns_Ahmadi_solution`.
 
@@ -1372,8 +1437,6 @@ def flash_inner_loop(zs, Ks, get_methods=False, method=None,
     (0.6907302627738541, [0.3394086969663436, 0.3650560590371706, 0.29553524399648573], [0.571903654388289, 0.27087159580558057, 0.1572247498061304])
     '''
     l = len(zs)
-    if get_methods: # numba : delete
-        return flash_inner_loop_list_methods(l)  # numba : delete
     if method is None:
         method2 = FLASH_INNER_ANALYTICAL if l < 3 else (FLASH_INNER_NUMPY if (not IS_PYPY and l >= 10) else FLASH_INNER_LN2)    
     else:
@@ -1616,6 +1679,9 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
     -----
     This algorithm has been used without issue for 4 and 5 phase flashes.
     
+    Some helpful information was found in [1]_, although this method does not
+    follow it exactly.
+    
     Examples
     --------
     >>> ns = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
@@ -1799,6 +1865,8 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
     With the convergence restraint, it is believed if a solution lies within
     (0, 1) for both variables, the correct solution will be converged to so long
     as the initial guesses are within the correct region.
+    
+    Some helpful information has also been found in [2]_ and [3]_.
         
     Examples
     --------

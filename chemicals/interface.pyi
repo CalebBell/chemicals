@@ -8,6 +8,9 @@ from typing import (
 )
 
 
+def API10A32(T: float, Tc: float, K_W: float) -> float: ...
+
+
 def Aleem(T: float, MW: float, Tb: float, rhol: float, Hvap_Tb: float, Cpl: float) -> float: ...
 
 
@@ -60,6 +63,9 @@ def Sastri_Rao(T: float, Tb: float, Tc: float, Pc: float, chemicaltype: Optional
 def Somayajulu(T: int, Tc: float, A: float, B: float, C: float) -> float: ...
 
 
+def Weinaug_Katz(parachors: List[float], Vml: float, Vmg: float, xs: List[float], ys: List[float]) -> float: ...
+
+
 def Winterfeld_Scriven_Davis(xs: List[float], sigmas: List[float], rhoms: List[float]) -> float: ...
 
 
@@ -70,5 +76,8 @@ def __getattr__(name: str) -> DataFrame: ...
 
 
 def load_interface_dfs() -> None: ...
+
+
+def sigma_IAPWS(T: float) -> float: ...
 
 __all__: List[str]

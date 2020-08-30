@@ -694,7 +694,7 @@ def air_fuel_ratio_solver(ratio, Vm_air, Vm_fuel, MW_air, MW_fuel,
     >>> MW_fuel = 17.86651
     >>> n_fuel = 5.0
     >>> n_air = 25.0
-    >>> air_fuel_ratio_solver(ratio=5, Vm_air=Vm_air, Vm_fuel=Vm_fuel,
+    >>> air_fuel_ratio_solver(ratio=5.0, Vm_air=Vm_air, Vm_fuel=Vm_fuel,
     ... MW_air=MW_air, MW_fuel=MW_fuel, n_air=n_air,
     ... n_fuel=n_fuel, basis='mole')
     (25.0, 5.0, 5.0, 8.073858296891782, 5.011182039683378)

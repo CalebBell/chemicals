@@ -20,6 +20,102 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+This module contains various thermal conductivity estimation routines, dataframes
+of fit coefficients, and mixing rules.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Pure Low Pressure Liquid Correlations
+-------------------------------------
+.. autofunction:: chemicals.thermal_conductivity.Sheffy_Johnson
+.. autofunction:: chemicals.thermal_conductivity.Sato_Riedel
+.. autofunction:: chemicals.thermal_conductivity.Lakshmi_Prasad
+.. autofunction:: chemicals.thermal_conductivity.Gharagheizi_liquid
+.. autofunction:: chemicals.thermal_conductivity.Nicola_original
+.. autofunction:: chemicals.thermal_conductivity.Nicola
+.. autofunction:: chemicals.thermal_conductivity.Bahadori_liquid
+.. autofunction:: chemicals.thermal_conductivity.Mersmann_Kind_thermal_conductivity_liquid
+
+Pure High Pressure Liquid Correlations
+--------------------------------------
+.. autofunction:: chemicals.thermal_conductivity.DIPPR9G
+.. autofunction:: chemicals.thermal_conductivity.Missenard
+
+Liquid Mixing Rules
+-------------------
+.. autofunction:: chemicals.thermal_conductivity.DIPPR9H
+.. autofunction:: chemicals.thermal_conductivity.DIPPR9I
+.. autofunction:: chemicals.thermal_conductivity.Filippov
+
+Pure Low Pressure Gas Correlations
+----------------------------------
+.. autofunction:: chemicals.thermal_conductivity.Eucken
+.. autofunction:: chemicals.thermal_conductivity.Eucken_modified
+.. autofunction:: chemicals.thermal_conductivity.DIPPR9B
+.. autofunction:: chemicals.thermal_conductivity.Chung
+.. autofunction:: chemicals.thermal_conductivity.Eli_Hanley
+.. autofunction:: chemicals.thermal_conductivity.Gharagheizi_gas
+.. autofunction:: chemicals.thermal_conductivity.Bahadori_gas
+
+Pure High Pressure Gas Correlations
+-----------------------------------
+.. autofunction:: chemicals.thermal_conductivity.Stiel_Thodos_dense
+.. autofunction:: chemicals.thermal_conductivity.Eli_Hanley_dense
+.. autofunction:: chemicals.thermal_conductivity.Chung_dense
+
+Gas Mixing Rules
+----------------
+.. autofunction:: chemicals.thermal_conductivity.Lindsay_Bromley
+.. autofunction:: chemicals.thermal_conductivity.Wassiljewa_Herning_Zipperer
+
+Correlations for Specific Substances
+------------------------------------
+.. autofunction:: chemicals.thermal_conductivity.k_IAPWS
+
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: k_data_Perrys_8E_2_315
+
+    Data from [1]_ with :obj:`chemicals.dippr.EQ100` coefficients for liquids.
+
+.. data:: k_data_Perrys_8E_2_314
+
+    Data from [1]_ with :obj:`chemicals.dippr.EQ102` coefficients for gases.
+
+.. data:: k_data_VDI_PPDS_9
+
+    Data from [2]_ with polynomial coefficients for liquids.
+
+.. data:: k_data_VDI_PPDS_10
+
+    Data from [2]_ with polynomial coefficients for gases.
+
+.. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+   Eighth Edition. McGraw-Hill Professional, 2007.
+.. [2] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+   Berlin; New York:: Springer, 2010.
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.thermal_conductivity.k_data_Perrys_8E_2_315
+
+    In [3]: chemicals.thermal_conductivity.k_data_Perrys_8E_2_314
+
+    In [4]: chemicals.thermal_conductivity.k_data_VDI_PPDS_9
+
+    In [5]: chemicals.thermal_conductivity.k_data_VDI_PPDS_10
+
 """
 
 from __future__ import division
@@ -424,12 +520,14 @@ def Gharagheizi_liquid(T, M, Tb, Pc, omega):
     pressure and acentric factor.
 
     .. math::
-        &k = 10^{-4}\left[10\omega + 2P_c-2T+4+1.908(T_b+\frac{1.009B^2}{MW^2})
+        k = 10^{-4}\left[10\omega + 2P_c-2T+4+1.908(T_b+\frac{1.009B^2}{MW^2})
         +\frac{3.9287MW^4}{B^4}+\frac{A}{B^8}\right]
 
-        &A = 3.8588MW^8(1.0045B+6.5152MW-8.9756)
+    .. math::
+        A = 3.8588MW^8(1.0045B+6.5152MW-8.9756)
 
-        &B = 16.0407MW+2T_b-27.9074
+    .. math::
+        B = 16.0407MW+2T_b-27.9074
 
     Parameters
     ----------
@@ -593,12 +691,16 @@ def Bahadori_liquid(T, M):
     .. math::
         K = a + bY + CY^2 + dY^3
 
+    .. math::
         a = A_1 + B_1 X + C_1 X^2 + D_1 X^3
 
+    .. math::
         b = A_2 + B_2 X + C_2 X^2 + D_2 X^3
 
+    .. math::
         c = A_3 + B_3 X + C_3 X^2 + D_3 X^3
 
+    .. math::
         d = A_4 + B_4 X + C_4 X^2 + D_4 X^3
 
     Parameters
@@ -651,6 +753,7 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, na):
         \lambda^* = \frac{\lambda\cdot V_c^{2/3}\cdot T_c\cdot \text{MW}^{0.5}}
         {(k\cdot T_c)^{1.5}\cdot N_A^{7/6}}
 
+    .. math::
         \lambda^* = \frac{2}{3}\left(n_a + 40\sqrt{1-T_r}\right)
         
     Parameters
@@ -1185,13 +1288,17 @@ def Chung(T, MW, Tc, omega, Cvm, mu):
     .. math::
         \frac{\lambda M}{\eta C_v} = \frac{3.75 \Psi}{C_v/R}
 
+    .. math::
         \Psi = 1 + \alpha \left\{[0.215+0.28288\alpha-1.061\beta+0.26665Z]/
         [0.6366+\beta Z + 1.061 \alpha \beta]\right\}
 
+    .. math::
         \alpha = \frac{C_v}{R}-1.5
 
+    .. math::
         \beta = 0.7862-0.7109\omega + 1.3168\omega^2
 
+    .. math::
         Z=2+10.5T_r^2
 
     Parameters
@@ -1252,26 +1359,37 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     .. math::
         \lambda = \lambda^* + \frac{\eta^*}{MW}(1.32)\left(C_v - \frac{3R}{2}\right)
 
+    .. math::
         Tr = \text{min}(Tr, 2)
 
+    .. math::
         \theta = 1 + (\omega-0.011)\left(0.56553 - 0.86276\ln Tr - \frac{0.69852}{Tr}\right)
 
+    .. math::
         \psi = [1 + (\omega - 0.011)(0.38560 - 1.1617\ln Tr)]\frac{0.288}{Z_c}
 
+    .. math::
         f = \frac{T_c}{190.4}\theta
 
+    .. math::
         h = \frac{V_c}{9.92E-5}\psi
 
+    .. math::
         T_0 = T/f
 
+    .. math::
         \eta_0^*(T_0)= \sum_{n=1}^9 C_n T_0^{(n-4)/3}
 
+    .. math::
         \theta_0 = 1944 \eta_0
 
+    .. math::
         \lambda^* = \lambda_0 H
 
+    .. math::
         \eta^* = \eta^*_0 H \frac{MW}{16.04}
 
+    .. math::
         H = \left(\frac{16.04}{MW}\right)^{0.5}f^{0.5}/h^{2/3}
 
     Parameters
@@ -1365,6 +1483,7 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
         k = 7.9505\times 10^{-4} + 3.989\times 10^{-5} T
         -5.419\times 10^-5 M + 3.989\times 10^{-5} A
 
+    .. math::
        A = \frac{\left(2\omega + T - \frac{(2\omega + 3.2825)T}{T_b} + 3.2825\right)}{0.1MP_cT}
         \times (3.9752\omega + 0.1 P_c + 1.9876B + 6.5243)^2
 
@@ -1427,12 +1546,16 @@ def Bahadori_gas(T, MW):
     .. math::
         K = a + bY + CY^2 + dY^3
 
+    .. math::
         a = A_1 + B_1 X + C_1 X^2 + D_1 X^3
 
+    .. math::
         b = A_2 + B_2 X + C_2 X^2 + D_2 X^3
 
+    .. math::
         c = A_3 + B_3 X + C_3 X^2 + D_3 X^3
 
+    .. math::
         d = A_4 + B_4 X + C_4 X^2 + D_4 X^3
 
     Parameters
@@ -1482,21 +1605,22 @@ def Stiel_Thodos_dense(T, MW, Tc, Pc, Vc, Zc, Vm, kg):
     function of temperature using difference method of Stiel and Thodos [1]_
     as shown in [2]_.
 
-    if \rho_r < 0.5:
+    if :math:`\rho_r < 0.5`:
 
     .. math::
         (\lambda-\lambda^\circ)\Gamma Z_c^5=1.22\times 10^{-2} [\exp(0.535 \rho_r)-1]
 
-    if 0.5 < \rho_r < 2.0:
+    if :math:`0.5 < \rho_r < 2.0`:
 
     .. math::
         (\lambda-\lambda^\circ)\Gamma Z_c^5=1.22\times 10^{-2} [\exp(0.535 \rho_r)-1]
 
-    if 2 < \rho_r < 2.8:
+    if :math:`2 < \rho_r < 2.8`:
 
     .. math::
         (\lambda-\lambda^\circ)\Gamma Z_c^5=1.22\times 10^{-2} [\exp(0.535 \rho_r)-1]
 
+    .. math::
         \Gamma = 210 \left(\frac{T_cMW^3}{P_c^4}\right)^{1/6}
 
     Parameters
@@ -1563,41 +1687,56 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     .. math::
         Tr = min(Tr, 2)
 
+    .. math::
         Vr = min(Vr, 2)
 
+    .. math::
         f = \frac{T_c}{190.4}\theta
 
+    .. math::
         h = \frac{V_c}{9.92E-5}\psi
 
+    .. math::
         T_0 = T/f
 
+    .. math::
         \rho_0 = \frac{16.04}{V}h
 
+    .. math::
         \theta = 1 + (\omega-0.011)\left(0.09057 - 0.86276\ln Tr + \left(
         0.31664 - \frac{0.46568}{Tr}\right) (V_r - 0.5)\right)
 
+    .. math::
         \psi = [1 + (\omega - 0.011)(0.39490(V_r - 1.02355) - 0.93281(V_r -
         0.75464)\ln T_r]\frac{0.288}{Z_c}
 
+    .. math::
         \lambda_1 = 1944 \eta_0
 
+    .. math::
         \lambda_2 = \left\{b_1 + b_2\left[b_3 - \ln \left(\frac{T_0}{b_4}
         \right)\right]^2\right\}\rho_0
 
+    .. math::
         \lambda_3 = \exp\left(a_1 + \frac{a_2}{T_0}\right)\left\{\exp[(a_3 +
         \frac{a_4}{T_0^{1.5}})\rho_0^{0.1} + (\frac{\rho_0}{0.1617} - 1)
         \rho_0^{0.5}(a_5 + \frac{a_6}{T_0} + \frac{a_7}{T_0^2})] - 1\right\}
 
+    .. math::
         \lambda^{**} = [\lambda_1 + \lambda_2 + \lambda_3]H
 
+    .. math::
         H = \left(\frac{16.04}{MW}\right)^{0.5}f^{0.5}/h^{2/3}
 
+    .. math::
         X = \left\{\left[1 - \frac{T}{f}\left(\frac{df}{dT}\right)_v \right]
         \frac{0.288}{Z_c}\right\}^{1.5}
 
+    .. math::
         \left(\frac{df}{dT}\right)_v = \frac{T_c}{190.4}\left(\frac{d\theta}
         {d T}\right)_v
 
+    .. math::
         \left(\frac{d\theta}{d T}\right)_v = (\omega-0.011)\left[
         \frac{-0.86276}{T} + (V_r-0.5)\frac{0.46568T_c}{T^2}\right]
 
@@ -1728,24 +1867,33 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     .. math::
         \lambda = \frac{31.2 \eta^\circ \Psi}{M'}(G_2^{-1} + B_6 y)+qB_7y^2T_r^{1/2}G_2
 
+    .. math::
         \Psi = 1 + \alpha \left\{[0.215+0.28288\alpha-1.061\beta+0.26665Z]/
         [0.6366+\beta Z + 1.061 \alpha \beta]\right\}
 
+    .. math::
         \alpha = \frac{C_v}{R}-1.5
 
+    .. math::
         \beta = 0.7862-0.7109\omega + 1.3168\omega^2
 
+    .. math::
         Z=2+10.5T_r^2
 
+    .. math::
         q = 3.586\times 10^{-3} (T_c/M')^{1/2}/V_c^{2/3}
 
+    .. math::
         y = \frac{V_c}{6V}
 
+    .. math::
         G_1 = \frac{1-0.5y}{(1-y)^3}
 
+    .. math::
         G_2 = \frac{(B_1/y)[1-\exp(-B_4y)]+ B_2G_1\exp(B_5y) + B_3G_1}
         {B_1B_4 + B_2 + B_3}
 
+    .. math::
         B_i = a_i + b_i \omega + c_i \mu_r^4 + d_i \kappa
 
 
@@ -1785,6 +1933,7 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     Association factor is assumed 0. Relates to the polarity of the gas.
 
     Coefficients as follows:
+        
     ais = [2.4166E+0, -5.0924E-1, 6.6107E+0, 1.4543E+1, 7.9274E-1, -5.8634E+0, 9.1089E+1]
 
     bis = [7.4824E-1, -1.5094E+0, 5.6207E+0, -8.9139E+0, 8.2019E-1, 1.2801E+1, 1.2811E+2]

@@ -25,7 +25,7 @@ from fluids.numerics import assert_close, assert_close1d, assert_close2d
 import pytest
 import pandas as pd
 
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 from chemicals.reaction import *
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data
 from chemicals.reaction import Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, Hfg_S0g_YAWS_data
@@ -34,13 +34,13 @@ def test_API_TDB_data():
     assert Hfg_API_TDB_data.index.is_unique
     assert Hfg_API_TDB_data['Hfg'].abs().sum() == 101711260
     assert Hfg_API_TDB_data.shape == (571, 2)
-    assert all([checkCAS(i) for i in Hfg_API_TDB_data.index])
+    assert all([check_CAS(i) for i in Hfg_API_TDB_data.index])
 
 
 def test_ATcT_l():
     assert Hfl_ATcT_data.index.is_unique
     assert Hfl_ATcT_data.shape == (34,5)
-    assert all([checkCAS(i) for i in Hfl_ATcT_data.index])
+    assert all([check_CAS(i) for i in Hfl_ATcT_data.index])
     tots_calc = [Hfl_ATcT_data[i].abs().sum() for i in ['Hfl_0K', 'Hfl', 'uncertainty']]
     tots = [2179500.0, 6819443, 19290]
     assert_close1d(tots_calc, tots)
@@ -49,7 +49,7 @@ def test_ATcT_l():
 def test_Hfg_ATcT_data():
     assert Hfg_ATcT_data.index.is_unique
     assert Hfg_ATcT_data.shape == (595, 5)
-    assert all([checkCAS(i) for i in Hfg_ATcT_data.index])
+    assert all([check_CAS(i) for i in Hfg_ATcT_data.index])
     tots_calc = [Hfg_ATcT_data[i].abs().sum() for i in ['Hfg_0K', 'Hfg', 'uncertainty']]
     tots = [300788330, 300592764, 829204]
     assert_close1d(tots_calc, tots)
@@ -153,20 +153,20 @@ def test_S0l():
     assert methods == ['CRC']
 
 def test_Gibbs_formation():
-    Gf =  Gibbs_formation(-285830, 69.91,  [0, 0], [130.571, 205.147], [1, .5])
+    Gf =  Gibbs_formation(-285830.0, 69.91,  [0.0, 0.0], [130.571, 205.147], [1.0, .5])
     assert_close(Gf, -237161.633825)
     
-    Gf = Gibbs_formation(-241818, 188.825,  [0, 0], [130.571, 205.147], [1, .5])
+    Gf = Gibbs_formation(-241818, 188.825,  [0.0, 0], [130.571, 205.147], [1.0, .5])
     assert_close(Gf, -228604.141075)
     
-    Gf = Gibbs_formation(-648980, 297.713, [0, 0, 0], [5.74, 152.206, 202.789], [1, .5, 1.5])
+    Gf = Gibbs_formation(-648980, 297.713, [0.0, 0.0, 0.0], [5.74, 152.206, 202.789], [1, .5, 1.5])
     assert_close(Gf, -622649.329975)
     
     
 def test_Hf_basis_converter():
-    assert_close(Hf_basis_converter(44018, Hf_liq=-285830), -241812)
+    assert_close(Hf_basis_converter(44018.0, Hf_liq=-285830.0), -241812)
     
-    assert_close(Hf_basis_converter(44018, Hf_gas=-241812), -285830)
+    assert_close(Hf_basis_converter(44018, Hf_gas=-241812.0), -285830)
     
     with pytest.raises(ValueError):
         Hf_basis_converter(44018, Hf_liq=None) 
@@ -178,7 +178,7 @@ def test_Hf_basis_converter():
         Hf_basis_converter(Hvapm=None, Hf_liq=1)
 
 def test_entropy_formation():
-    Sf = entropy_formation(Hf=-74520, Gf=-50490)
+    Sf = entropy_formation(Hf=-74520.0, Gf=-50490.0)
     assert_close(Sf, -80.59701492537314)
     
     Sf = entropy_formation(Hf=-241818, Gf=-228572)

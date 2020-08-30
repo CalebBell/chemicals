@@ -29,7 +29,7 @@ from chemicals.utils import rho_to_Vm
 from chemicals.interface import *
 from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_Lange, sigma_data_Somayajulu,
                                  sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 
 def test_sigma_IAPWS():
     assert_close(sigma_IAPWS(300.), 0.07168596252716256, rtol=1e-13)
@@ -131,7 +131,7 @@ def test_data():
 def test_VDI_PPDS_11_data():
     """I believe there are no errors here."""
     for i in sigma_data_VDI_PPDS_11.index:
-        assert checkCAS(i)
+        assert check_CAS(i)
     
     assert sigma_data_VDI_PPDS_11.index.is_unique
     assert sigma_data_VDI_PPDS_11.shape == (272, 8)
@@ -150,7 +150,7 @@ def test_Weinaug_Katz():
     # pure component check it checks out
     Vml = rho_to_Vm(800.8088185536124, 100.15888)
     Vmg = rho_to_Vm(4.97865317223119, 100.15888)
-    sigma = Weinaug_Katz([5.088443542210164e-05], Vml, Vmg, [1], [1])
+    sigma = Weinaug_Katz([5.088443542210164e-05], Vml, Vmg, [1.0], [1.0])
     assert_close(sigma, 0.026721669606560042, rtol=1e-13)
 
 

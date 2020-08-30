@@ -3,7 +3,6 @@ from typing import List
 from typing import (
     List,
     Optional,
-    Union,
 )
 
 
@@ -13,6 +12,9 @@ def __getattr__(name: str): ...
 def _load_dipole_data() -> None: ...
 
 
-def dipole_moment(CASRN: str, get_methods: bool = ..., method: Optional[str] = ...) -> Union[List[str], float]: ...
+def dipole_moment(CASRN: str, get_methods: bool = ..., method: Optional[str] = ...) -> float: ...
+
+
+def dipole_moment_methods(CASRN: str) -> List[str]: ...
 
 __all__: List[str]

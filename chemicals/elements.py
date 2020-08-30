@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
-<Caleb.Andrew.Bell@gmail.com> Copyright (C) 2020 Yoel Rene Cortes-Pena
+<Caleb.Andrew.Bell@gmail.com> 
+Copyright (C) 2020 Yoel Rene Cortes-Pena
 <yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

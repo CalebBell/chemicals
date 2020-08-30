@@ -29,17 +29,17 @@ from fluids.constants import R as _R
 from scipy.integrate import quad
 
 def test_B_To_Z():
-    Z_calc = B_to_Z(-0.0015, 300, 1E5)
+    Z_calc = B_to_Z(-0.0015, 300.0, 1E5)
     assert_close(Z_calc, 0.9398638020957176)
 
 
 def test_B_from_Z():
-    B_calc = B_from_Z(0.94, 300, 1E5)
+    B_calc = B_from_Z(0.94, 300.0, 1E5)
     assert_close(B_calc, -0.0014966032712675846)
 
 
 def test_Z_from_virial_density_form():
-    Z_calc = Z_from_virial_density_form(300, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
+    Z_calc = Z_from_virial_density_form(300.0, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
     assert_close(Z_calc, 1.2843494052609186)
     
     Z_calc = Z_from_virial_density_form(300, 102031.881198762, 1e-4, 1e-5, 1e-6)

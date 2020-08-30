@@ -1,13 +1,10 @@
-# File after https://github.com/jowr/jopy/blob/master/appveyor.yml, copyright predominately Jorrit Wronski
-# Tell appveyor to not use msbuild
 build: false
 
 environment:
   matrix:
-    - PYTHON: 2.7
-    - PYTHON: 3.5
     - PYTHON: 3.6
     - PYTHON: 3.7
+    - PYTHON: 3.8
 
 platform:
   - x86
@@ -15,7 +12,7 @@ platform:
 
 init:
   - "ECHO %PYTHON%"
-  - cmd: SET PATH=C:\Miniconda36\Scripts;C:\Miniconda\Scripts;%PATH%
+  - cmd: SET PATH=C:\Miniconda3\Scripts;C:\Miniconda\Scripts;%PATH%
   - cmd: conda update -yq conda
   - cmd: conda install -yq conda-env conda-build 
   - cmd: conda create -yq -n condaenv python=%PYTHON%
@@ -23,8 +20,8 @@ init:
 install:
   - cmd: activate condaenv
   - cmd: conda install -yq numpy scipy pip pytest pandas matplotlib
-  - cmd: pip install pytest-cov coveralls sympy fluids coolprop
+  - cmd: pip install pytest-cov coveralls sympy fluids coveralls sympy fuzzywuzzy pint pytz
   - cmd: python setup.py install
 
 test_script:
-  - cmd: py.test --cov-report html --cov=chemicals -m "not slow and not rdkit"
+  - cmd: py.test --cov-report html --cov=chemicals -m "not slow and not online"

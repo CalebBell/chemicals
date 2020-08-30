@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,15 +19,121 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains lookup functions for melting and boiling point, heat of 
+fusion, various enthalpy of vaporization estimation routines, and dataframes
+of fit coefficients.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Boiling Point
+-------------
+.. autofunction:: chemicals.phase_change.Tb
+.. autofunction:: chemicals.phase_change.Tb_methods
+.. autodata:: chemicals.phase_change.Tb_all_methods
+
+Melting Point
+-------------
+.. autofunction:: chemicals.phase_change.Tm
+.. autofunction:: chemicals.phase_change.Tm_methods
+.. autodata:: chemicals.phase_change.Tm_all_methods
+
+Heat of Fusion
+--------------
+Heat of fusion does not strongly depend on temperature or pressure. This is the
+standard value, at 1 atm and the normal melting point.
+
+.. autofunction:: chemicals.phase_change.Hfus
+.. autofunction:: chemicals.phase_change.Hfus_methods
+.. autodata:: chemicals.phase_change.Hfus_all_methods
+
+Heat of Vaporization at Tb Correlations 
+---------------------------------------
+.. autofunction:: chemicals.phase_change.Riedel
+.. autofunction:: chemicals.phase_change.Chen
+.. autofunction:: chemicals.phase_change.Liu
+.. autofunction:: chemicals.phase_change.Vetere
+
+Heat of Vaporization at T Correlations 
+---------------------------------
+.. autofunction:: chemicals.phase_change.Pitzer
+.. autofunction:: chemicals.phase_change.SMK
+.. autofunction:: chemicals.phase_change.MK
+.. autofunction:: chemicals.phase_change.Velasco
+.. autofunction:: chemicals.phase_change.Pitzer
+.. autofunction:: chemicals.phase_change.Clapeyron
+.. autofunction:: chemicals.phase_change.Watson
+
+Heat of Vaporization at T Model Equations 
+-----------------------------------------
+.. autofunction:: chemicals.phase_change.Alibakhshi
+.. autofunction:: chemicals.phase_change.PPDS12
+
+Heat of Sublimation 
+-------------------
+No specific correlation is provided. This value is fairly strongly temperature
+dependent; the dependency comes almost entirely from the vaporization
+enthalpy's dependence. To calculate heat of sublimation at any temperature, use
+the equation :math:`H_{sub} = H_{fus} + H_{vap}`.
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: phase_change_data_Perrys2_150
+
+    A collection of 344 coefficient sets from the DIPPR database published
+    openly in [1]_. Provides temperature limits for all its fluids. 
+    See :obj:`chemicals.dippr.EQ106` for the model equation.
+
+.. data:: phase_change_data_VDI_PPDS_4
+
+    Coefficients for a equation form developed by the PPDS, published 
+    openly in [2]_. Extrapolates poorly at low temperatures. See :obj:`PPDS12` 
+    for the model equation.
+
+.. data:: phase_change_data_Alibakhshi_Cs
+
+    One-constant limited temperature range regression coefficients presented
+    in [3]_, with constants for ~2000 chemicals from the DIPPR database.
+    Valid up to 100 K below the critical point, and 50 K under the boiling
+    point. See :obj:`Alibakhshi` for the model equation.
+
+.. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+    8E. McGraw-Hill Professional, 2007.
+.. [2] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+    Berlin; New York:: Springer, 2010.
+.. [3] Alibakhshi, Amin. "Enthalpy of Vaporization, Its Temperature
+    Dependence and Correlation with Surface Tension: A Theoretical Approach."
+    Fluid Phase Equilibria 432 (January 25, 2017): 62-69.
+    https://doi.org/10.1016/j.fluid.2016.10.013.
+
+The structure of each dataframe is shown below:
+    
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.phase_change.phase_change_data_Perrys2_150
+
+    In [3]: chemicals.phase_change.phase_change_data_VDI_PPDS_4
+
+    In [4]: chemicals.phase_change.phase_change_data_Alibakhshi_Cs
+
 """
 
 __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm', 
            'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen', 
-           'Liu', 'Vetere', 'Watson', 'Hfus', 'Hfus_methods']
+           'Liu', 'Vetere', 'Alibakhshi','PPDS12', 'Watson', 'Hfus', 'Hfus_methods']
 
 import os
 from fluids.numerics import numpy as np
-from fluids.constants import R
+from fluids.constants import R, N_A, pi
 from chemicals.utils import log
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals import miscdata
@@ -37,7 +143,7 @@ from chemicals.data_reader import (register_df_source,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
 
-# %% Register data sources and lazy load them
+###  Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Phase Change')
 register_df_source(folder, 'Yaws Boiling Points.tsv')
@@ -121,11 +227,12 @@ else:
         _load_phase_change_constants()
         _load_phase_change_correlations()
 
-# %% Phase change functions
+### Phase change functions
 
 ### Boiling Point at 1 atm
 
 Tb_all_methods = (CRC_INORG, CRC_ORG, YAWS)
+'''Tuple of method name keys. See the `Tb` for the actual references'''
 
 def Tb_methods(CASRN):
     """Return all methods available to obtain the Tb for the desired chemical.
@@ -210,6 +317,7 @@ def Tb(CASRN, method=None):
 ### Melting Point
 
 Tm_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
+'''Tuple of method name keys. See the `Tm` for the actual references'''
 
 def Tm_methods(CASRN):
     """Return all methods available to obtain the Tm for the desired chemical.
@@ -422,14 +530,17 @@ def SMK(T, Tc, omega):
          \left[\left( \frac{\Delta H_{vap}} {RT_c} \right)^{(R2)} - \left(
          \frac{\Delta H_{vap}} {RT_c} \right)^{(R1)} \right]
 
+    .. math::
         \left( \frac{\Delta H_{vap}} {RT_c} \right)^{(R1)}
         = 6.537 \tau^{1/3} - 2.467 \tau^{5/6} - 77.251 \tau^{1.208} +
         59.634 \tau + 36.009 \tau^2 - 14.606 \tau^3
 
+    .. math::
         \left( \frac{\Delta H_{vap}} {RT_c} \right)^{(R2)} - \left(
         \frac{\Delta H_{vap}} {RT_c} \right)^{(R1)}=-0.133 \tau^{1/3} - 28.215
         \tau^{5/6} - 82.958 \tau^{1.208} + 99.00 \tau  + 19.105 \tau^2 -2.796 \tau^3
 
+    .. math::
         \tau = 1-T/T_c
 
     Parameters
@@ -518,9 +629,11 @@ def MK(T, Tc, omega):
     .. math::
         \Delta H_{vap} =  \Delta H_{vap}^{(0)} + \omega \Delta H_{vap}^{(1)} + \omega^2 \Delta H_{vap}^{(2)}
 
+    .. math::
         \frac{\Delta H_{vap}^{(i)}}{RT_c} = b^{(j)} \tau^{1/3} + b_2^{(j)} \tau^{5/6}
         + b_3^{(j)} \tau^{1.2083} + b_4^{(j)}\tau + b_5^{(j)} \tau^2 + b_6^{(j)} \tau^3
 
+    .. math::
         \tau = 1-T/T_c
 
     Parameters
@@ -914,9 +1027,114 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     H2 = Hvap_ref*((1.0 - Tr)/(1.0 - Trefr))**exponent
     return H2
 
+### Enthalpy of Vaporization model equations
+    
+def Alibakhshi(T, Tc, C):
+    r'''Calculates enthalpy of vaporization of a chemical at a temperature 
+    using a theoretically-derived single-coefficient fit equation developed in
+    [1]_. This model falls apart at ~0.8 Tc.
+
+    .. math::
+        \Delta H_{vap} = \left(4.5\pi N_A\right)^{1/3.}4.2\times 10^{-7}
+        (T_c - 6) - 0.5RT\log(T) + CT
+
+    Parameters
+    ----------
+    T : float
+        Temperature for which to calculate heat of vaporization, [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    C : float
+        Alibakhshi fit coefficient, [J/mol/K]
+
+    Returns
+    -------
+    Hvap : float
+        Enthalpy of vaporization at `T`, [J/mol]
+
+    Notes
+    -----
+    The authors of [1]_ evaluated their model on 1890 compounds for a 
+    temperature range of 50 K under `Tb` to 100 K below `Tc`, and obtained an
+    average absolute relative error of 4.5%.
+
+    Examples
+    --------
+    Predict the enthalpy of vaporization of water at 320 K:
+        
+    >>> Alibakhshi(T=320.0, Tc=647.14, C=-16.7171)
+    41961.30490225752
+    
+    The error is 2.5% compared to the correct value of 43048 J/mol.
+
+    References
+    ----------
+    .. [1] Alibakhshi, Amin. "Enthalpy of Vaporization, Its Temperature
+       Dependence and Correlation with Surface Tension: A Theoretical Approach."
+       Fluid Phase Equilibria 432 (January 25, 2017): 62-69.
+       https://doi.org/10.1016/j.fluid.2016.10.013.
+    '''
+    return (4.5*pi*N_A)**(1/3.)*4.2E-7*(Tc-6.) - R/2.*T*log(T) + C*T
+
+def PPDS12(T, Tc, A, B, C, D, E):
+    r'''Calculate the enthalpy of vaporization of a fluid using the 5-term 
+    power fit developed by the PPDS and named PPDS equation 12.
+    
+    .. math::
+       H_{vap} = RT_c \left(A\tau^{1/3} + B\tau^{2/3} + C\tau + D\tau^2 
+       + E\tau^6\right)
+    
+    .. math::
+        \tau = 1 - \frac{T}{T_c}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [-]
+    C : float
+        Coefficient, [-]
+    D : float
+        Coefficient, [-]
+    E : float
+        Coefficient, [-]
+
+    Returns
+    -------
+    Hvap : float
+        Enthalpy of vaporization at `T`, [J/mol]
+
+    Notes
+    -----
+    Coefficients can be found in [1]_, but no other source for these 
+    coefficients has been found.
+
+    Examples
+    --------
+    >>> PPDS12(300.0, 591.75, 4.60584, 13.97224, -10.592315, 2.120205, 4.277128)
+    37948.76862035925
+    
+    References
+    ----------
+    .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+       Berlin; New York:: Springer, 2010.
+    '''
+    tau = 1. - T/Tc
+    tau_cbrt = tau**(1/3.)
+    tau2 = tau*tau
+    Hvap = R*Tc*(tau_cbrt*(A + B*tau_cbrt) + C*tau
+                               + tau2*(D + E*tau2*tau2))
+    return Hvap
+
 ### Heat of Fusion
 
 Hfus_all_methods = (CRC,)
+'''Tuple of method name keys. See the `Hfus` for the actual references'''
 
 def Hfus_methods(CASRN):
     """Return all methods available to obtain the Hfus for the desired chemical.

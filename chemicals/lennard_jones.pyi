@@ -9,15 +9,24 @@ from typing import (
 
 
 def Stockmayer(
+    CASRN: str = ...,
     Tm: Optional[float] = ...,
     Tb: Optional[float] = ...,
     Tc: Optional[float] = ...,
     Zc: Optional[float] = ...,
     omega: Optional[float] = ...,
-    CASRN: str = ...,
-    get_methods: bool = ...,
     method: Optional[str] = ...
-) -> Optional[Union[List[str], float]]: ...
+) -> Optional[float]: ...
+
+
+def Stockmayer_methods(
+    CASRN: Optional[str] = ...,
+    Tm: Optional[float] = ...,
+    Tb: Optional[float] = ...,
+    Tc: Optional[float] = ...,
+    Zc: Optional[float] = ...,
+    omega: Optional[float] = ...
+) -> List[str]: ...
 
 
 def Tstar(T: float, epsilon_k: Optional[float] = ..., epsilon: Optional[float] = ...) -> float: ...
@@ -57,6 +66,7 @@ def epsilon_Tee_Gotoh_Steward_2(Tc: float, omega: float) -> float: ...
 
 
 def molecular_diameter(
+    CASRN: Optional[str] = ...,
     Tc: Optional[float] = ...,
     Pc: Optional[float] = ...,
     Vc: Optional[float] = ...,
@@ -64,10 +74,20 @@ def molecular_diameter(
     omega: Optional[float] = ...,
     Vm: Optional[float] = ...,
     Vb: Optional[float] = ...,
-    CASRN: str = ...,
-    get_methods: bool = ...,
     method: Optional[str] = ...
-) -> Optional[Union[List[str], float]]: ...
+) -> Optional[float]: ...
+
+
+def molecular_diameter_methods(
+    CASRN: Optional[str] = ...,
+    Tc: Optional[float] = ...,
+    Pc: Optional[float] = ...,
+    Vc: Optional[float] = ...,
+    Zc: Optional[float] = ...,
+    omega: Optional[float] = ...,
+    Vm: Optional[float] = ...,
+    Vb: Optional[float] = ...
+) -> List[str]: ...
 
 
 def sigma_Bird_Stewart_Lightfoot_boiling(Vb: float) -> float: ...

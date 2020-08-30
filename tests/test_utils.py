@@ -91,31 +91,6 @@ def test_none_and_length_check():
     assert False == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]]), length=3)
     assert False == none_and_length_check(np.array([[1, 1], [1, 1, 10], [1, 30], [10,0]]), length=3)
 
-
-
-def test_CAS2int():
-    assert CAS2int('7704-34-9') == 7704349
-
-    with pytest.raises(Exception):
-        CAS2int(7704349)
-
-def test_int2CAS():
-    assert int2CAS(7704349) == '7704-34-9'
-
-    with pytest.raises(Exception):
-        CAS2int(7704349.0)
-
-def test_sorted_CAS_key():
-    expect = ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
-    res = sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
-    assert res == expect
-    res = sorted_CAS_key(['108-88-3', '98-00-0', '7732-18-5', '64-17-5'])
-    assert res == expect
-    
-    invalid_CAS_expect = ('641', '98-00-0', '108-88-3', '7732-8-5')
-    invalid_CAS_test = sorted_CAS_key(['7732-8-5', '641', '108-88-3', '98-00-0'])
-    assert invalid_CAS_expect == invalid_CAS_test
-    
     
 def test_property_molar_to_mass():
     assert_close(property_molar_to_mass(500, 18.015), 27754.648903691366, rtol=1e-14)
@@ -182,17 +157,6 @@ def test_Parachor():
     P = Parachor(100.15888, 800.8088185536124, 4.97865317223119, 0.02672166960656005)
     assert_close(P, 5.088443542210164e-05)
     
-
-def test_phase_select_property():
-    assert 150 == phase_select_property(phase='s', s=150, l=10)
-    assert None == phase_select_property(phase='s', l=1560.14)
-    assert 3312 == phase_select_property(phase='g', l=1560.14, g=3312.)
-    assert 1560.14 == phase_select_property(phase='l', l=1560.14, g=3312.)
-    assert None == phase_select_property(phase='two-phase', l=1560.14, g=12421.0)
-    assert None == phase_select_property(phase=None, l=1560.14, g=12421.0)
-    with pytest.raises(Exception):
-        phase_select_property(phase='notalphase', l=1560.14, g=12421.0)
-
 
 
 def test_mixing_simple():
@@ -269,28 +233,6 @@ def test_SG():
 def test_Watson_K():
     assert_close(Watson_K(400, .8), 11.20351186639291, rtol=1e-13)
 
-def test_allclose_variable():
-    x = [2.7244322249597719e-08, 3.0105683900110473e-10, 2.7244124924802327e-08, 3.0105259397637556e-10, 2.7243929226310193e-08, 3.0104990272770901e-10, 2.7243666849384451e-08, 3.0104101821236015e-10, 2.7243433745917367e-08, 3.0103707421519949e-10]
-    y = [2.7244328304561904e-08, 3.0105753470546008e-10, 2.724412872417824e-08,  3.0105303055834564e-10, 2.7243914341030203e-08, 3.0104819238021998e-10, 2.7243684057561379e-08, 3.0104299541023674e-10, 2.7243436694839306e-08, 3.010374130526363e-10]
-
-    assert allclose_variable(x, y, limits=[.0, .5], rtols=[1E-5, 1E-6])
-        
-    with pytest.raises(Exception):
-        assert allclose_variable(x, y, limits=[.0, .1], rtols=[1E-5, 1E-6])
-        
-    with pytest.raises(Exception):
-        allclose_variable(x, y[1:], limits=[.0, .5], rtols=[1E-5, 1E-6])
-
-    with pytest.raises(Exception):
-        ans = allclose_variable(x, y, limits=[.0, .1])
-
-
-    x = [1,1,1,1,1,1,1,1,1]
-    y = [.9,.9,.9,.9,.9,.9,.9,.9, .9]
-    assert allclose_variable(x, y, limits=[.0], atols=[.1])
-
-
-    
     
 def test_mix_component_flows():
     names, flows = mix_component_flows(['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1'], 1, 1, [0.5, 0.5], [0.5, 0.5])

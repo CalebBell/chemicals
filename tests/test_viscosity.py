@@ -35,12 +35,12 @@ from chemicals.viscosity import *
 from chemicals.viscosity import (mu_data_Dutt_Prasad, mu_data_VN3, mu_data_VN2,
                                  mu_data_VN2E, mu_data_Perrys_8E_2_313, mu_data_Perrys_8E_2_312,
                                  mu_data_VDI_PPDS_7, mu_data_VDI_PPDS_8)
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 
 ### Check data integrity
 
 def test_Dutt_Prasad_data():
-    assert all([checkCAS(i) for i in mu_data_Dutt_Prasad.index])
+    assert all([check_CAS(i) for i in mu_data_Dutt_Prasad.index])
     tots_calc = [mu_data_Dutt_Prasad[i].abs().sum() for i in ['A', 'B', 'C', 'Tmin', 'Tmax']]
     tots = [195.89260000000002, 65395.299999999996, 9849.1899999999987, 25952, 35016]
     assert_close1d(tots_calc, tots)
@@ -50,7 +50,7 @@ def test_Dutt_Prasad_data():
 
 
 def test_VN2E_data():
-    assert all([checkCAS(i) for i in mu_data_VN2E.index])
+    assert all([check_CAS(i) for i in mu_data_VN2E.index])
     tots_calc = [mu_data_VN2E[i].abs().sum() for i in ['C', 'D', 'Tmin', 'Tmax']]
     tots = [567743298666.74878, 48.8643, 3690, 4860]
     assert_close1d(tots_calc, tots)
@@ -60,7 +60,7 @@ def test_VN2E_data():
 
 
 def test_VN3_data():
-    assert all([checkCAS(i) for i in mu_data_VN3.index])
+    assert all([check_CAS(i) for i in mu_data_VN3.index])
     tots_calc = [mu_data_VN3[i].abs().sum() for i in ['A', 'B', 'C', 'Tmin', 'Tmax']]
     tots = [645.18849999999998, 169572.65159999998, 50050.151870000002, 126495, 175660]
     assert_close1d(tots_calc, tots)
@@ -69,7 +69,7 @@ def test_VN3_data():
     assert mu_data_VN3.shape == (432, 7)
 
 def test_VN2_data():
-    assert all([checkCAS(i) for i in mu_data_VN3.index])
+    assert all([check_CAS(i) for i in mu_data_VN3.index])
     tots_calc = [mu_data_VN2[i].abs().sum() for i in ['A', 'B', 'Tmin', 'Tmax']]
     tots = [674.10069999999996, 83331.98599999999, 39580, 47897]
     assert_close1d(tots_calc, tots)
@@ -81,7 +81,7 @@ def test_VN2_data():
 def test_Perrys2_313_data():
     # All values calculated at Tmin and Tmax check out to at least 5E-3 precision
     # The rounding has some effect, but it is not worrying.
-    assert all([checkCAS(i) for i in mu_data_Perrys_8E_2_313.index])
+    assert all([check_CAS(i) for i in mu_data_Perrys_8E_2_313.index])
     tots_calc = [mu_data_Perrys_8E_2_313[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'C5', u'Tmin', u'Tmax']]
     tots = [9166.6971369999992, 615425.94497999991, 1125.5317557875198, 9.054869390623603e+34, 402.21244000000002, 72467.140000000014, 136954.85999999999]
     assert_close1d(tots_calc, tots)
@@ -96,7 +96,7 @@ def test_Perrys2_312_data():
     # ~1E-5 Pa*S, but listed values are ~1E-10 to 1E-12. Unsure of the cause.
     # All coumpounds match at 1E-3 for Tmin.
     
-    assert all([checkCAS(i) for i in mu_data_Perrys_8E_2_312.index])
+    assert all([check_CAS(i) for i in mu_data_Perrys_8E_2_312.index])
     tots_calc = [mu_data_Perrys_8E_2_312[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
     tots = [0.00019683902626010103, 250.10520100000002, 65862.829200000007, 191286, 74802.639999999999, 355064.37]
     assert_close1d(tots_calc, tots)
@@ -106,7 +106,7 @@ def test_Perrys2_312_data():
 
 
 def test_VDI_PPDS_7_data():
-    assert all([checkCAS(i) for i in mu_data_VDI_PPDS_7.index])
+    assert all([check_CAS(i) for i in mu_data_VDI_PPDS_7.index])
     tots_calc = [mu_data_VDI_PPDS_7[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [507.14607000000001, 1680.7624099999998, 165461.14259999999, 46770.887000000002, 0.057384780000000003]
     assert_close1d(tots_calc, tots)
@@ -116,7 +116,7 @@ def test_VDI_PPDS_7_data():
 
 def test_VDI_PPDS_8_data():
     # Coefficients for water are incorrect - obtained an average deviation of 150%!
-    assert all([checkCAS(i) for i in mu_data_VDI_PPDS_8.index])
+    assert all([check_CAS(i) for i in mu_data_VDI_PPDS_8.index])
     tots_calc = [mu_data_VDI_PPDS_8[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [0.00032879559999999999, 9.5561339999999995e-06, 2.8377710000000001e-09, 2.8713399999999998e-12, 2.8409200000000004e-15]
     assert_close1d(tots_calc, tots)
@@ -134,6 +134,9 @@ def test_ViswanathNatarajan():
     mu = Viswanath_Natarajan_3(298.15, -2.7173-log10(1000), -1071.18, -129.51)
     assert_close(mu, 0.0006129806445142112)
 
+def test_PPDS9():
+    mu = PPDS9(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    assert_close(mu, 0.00035091137378230684, rtol=1e-13)
 
 def test_Letsou_Stiel():
     # Checked 2017-03-05

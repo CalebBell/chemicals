@@ -50,6 +50,9 @@ def test_GWP():
     assert GWP('7732-18-5', method=None) is None
     
     assert GWP_methods('14882353275-98-3') == []
+    
+    
+    assert type(GWP(CASRN='74-82-8')) is float
 
 @pytest.mark.slow
 @pytest.mark.fuzz

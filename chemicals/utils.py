@@ -29,15 +29,14 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs', 
 'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros', 
  'mixing_simple', 
-'mixing_logarithmic', 'mixing_power', 'to_num', 'CAS2int', 'sorted_CAS_key',
-'int2CAS', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar', 
+'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar', 
 'SG_to_API', 'API_to_SG', 'SG',   'Watson_K',
 'dxs_to_dns', 'dns_to_dn_partials', 'dxs_to_dn_partials', 'd2ns_to_dn2_partials',
 'd2xs_to_dxdn_partials', 'dxs_to_dxsn1', 'd2xs_to_d2xsn1',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows', 
 'solve_flow_composition_mix',
-'phase_select_property',  'allclose_variable', 'v_to_v_molar', 'v_molar_to_v']
+'v_to_v_molar', 'v_molar_to_v']
 
 import os
 import sys
@@ -117,64 +116,6 @@ def to_num(values):
                 values[i] = values[i].strip()
     return values
 
-
-def CAS2int(i):
-    r'''Converts CAS number of a compounds from a string to an int. This is
-    helpful when storing large amounts of CAS numbers, as their strings take up
-    more memory than their numerical representational. All CAS numbers fit into
-    64 bit ints.
-
-    Parameters
-    ----------
-    CASRN : string
-        CASRN [-]
-
-    Returns
-    -------
-    CASRN : int
-        CASRN [-]
-
-    Notes
-    -----
-    Accomplishes conversion by removing dashes only, and then converting to an
-    int. An incorrect CAS number will change without exception.
-
-    Examples
-    --------
-    >>> CAS2int('7704-34-9')
-    7704349
-    '''
-    return int(i.replace('-', ''))
-
-
-def int2CAS(i):
-    r'''Converts CAS number of a compounds from an int to an string. This is
-    helpful when dealing with int CAS numbers.
-
-    Parameters
-    ----------
-    CASRN : int
-        CASRN [-]
-
-    Returns
-    -------
-    CASRN : string
-        CASRN [-]
-
-    Notes
-    -----
-    Handles CAS numbers with an unspecified number of digits. Does not work on
-    floats.
-
-    Examples
-    --------
-    >>> int2CAS(7704349)
-    '7704-34-9'
-    '''
-    i = str(i)
-    return i[:-3]+'-'+i[-3:-1]+'-'+i[-1]
-
-
 def hash_any_primitive(v):
     '''Method to hash a primitive - with basic support for lists and 
     dictionaries.     
@@ -227,35 +168,6 @@ def hash_any_primitive(v):
     elif isinstance(v, tuple):
         v = tuple(hash_any_primitive(i) for i in v)
     return hash(v)
-
-def sorted_CAS_key(CASs):
-    r'''Takes a list of CAS numbers as strings, and returns a tuple of the same
-    CAS numbers, sorted from smallest to largest. This is very convenient for
-    obtaining a unique hash of a set of compounds, so as to see if two
-    groups of compounds are the same.
-
-    Parameters
-    ----------
-    CASs : list[str]
-        CAS numbers as strings [-]
-
-    Returns
-    -------
-    CASs_sorted : tuple[str]
-        Sorted CAS numbers from lowest (first) to highest (last) [-]
-
-    Notes
-    -----
-    Does not check CAS numbers for validity.
-
-    Examples
-    --------
-    >>> sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
-    ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
-    '''
-    int_CASs = [CAS2int(i) for i in CASs]
-    return tuple(CAS for _, CAS in sorted(zip(int_CASs,CASs)))
-
 
 def Parachor(MW, rhol, rhog, sigma):
     r'''Calculate Parachor for a pure species, using its density in the
@@ -1738,53 +1650,6 @@ def none_and_length_check(all_inputs, length=None):
     return True
 
 
-def allclose_variable(a, b, limits, rtols=None, atols=None):
-    """Returns True if two arrays are element-wise equal within several
-    different tolerances. Tolerance values are always positive, usually very
-    small. Based on numpy's allclose function.
-
-    Only atols or rtols needs to be specified; both are used if given.
-    
-    Parameters
-    ----------
-    a, b : array_like
-        Input arrays to compare.
-    limits : array_like
-        Fractions of elements allowed to not match to within each tolerance.
-    rtols : array_like
-        The relative tolerance parameters.
-    atols : float
-        The absolute tolerance parameters.
-
-    Returns
-    -------
-    allclose : bool
-        Returns True if the two arrays are equal within the given
-        tolerances; False otherwise.
-            
-    Examples
-    --------
-    10 random similar variables, all of them matching to within 1E-5, allowing 
-    up to half to match up to 1E-6.
-    
-    >>> x = [2.7244322249597719e-08, 3.0105683900110473e-10, 2.7244124924802327e-08, 3.0105259397637556e-10, 2.7243929226310193e-08, 3.0104990272770901e-10, 2.7243666849384451e-08, 3.0104101821236015e-10, 2.7243433745917367e-08, 3.0103707421519949e-10]
-    >>> y = [2.7244328304561904e-08, 3.0105753470546008e-10, 2.724412872417824e-08,  3.0105303055834564e-10, 2.7243914341030203e-08, 3.0104819238021998e-10, 2.7243684057561379e-08, 3.0104299541023674e-10, 2.7243436694839306e-08, 3.010374130526363e-10]
-    >>> allclose_variable(x, y, limits=[.0, .5], rtols=[1E-5, 1E-6])
-    True
-    """
-    l = float(len(a))
-    if rtols is None and atols is None:
-        raise Exception('Either absolute errors or relative errors must be supplied.')
-    elif rtols is None:
-        rtols = [0 for i in atols]
-    elif atols is None:
-        atols = [0 for i in rtols]
-    
-    for atol, rtol, lim in zip(atols, rtols, limits):
-        matches = np.count_nonzero(np.isclose(a, b, rtol=rtol, atol=atol))
-        if 1-matches/l > lim:
-            return False
-    return True
 
 
 def normalize(values):
@@ -2024,65 +1889,6 @@ def mixing_power(fracs, props, r):
     for i in range(len(fracs)):
         prop += fracs[i]*(props[i]**r)
     return prop**(1.0/r)
-
-
-def phase_select_property(phase=None, s=None, l=None, g=None, V_over_F=None,
-                          self=None):
-    r'''Determines which phase's property should be set as a default, given
-    the phase a chemical is, and the property values of various phases. For the
-    case of liquid-gas phase, returns None. If the property is not available
-    for the current phase, or if the current phase is not known, returns None.
-
-    Parameters
-    ----------
-    phase : str
-        One of {'s', 'l', 'g', 'two-phase'}
-    s : float
-        Solid-phase property, [`prop`]
-    l : float
-        Liquid-phase property, [`prop`]
-    g : float
-        Gas-phase property, [`prop`]
-    V_over_F : float
-        Vapor phase fraction, [-]
-    self : Object, optional
-        If self is not None, the properties are assumed to be python properties
-        with a fget method available, [-]
-
-    Returns
-    -------
-    prop : float
-        The selected/calculated property for the relevant phase, [`prop`]
-
-    Notes
-    -----
-    Could calculate mole-fraction weighted properties for the two phase regime.
-    Could also implement equilibria with solid phases.
-    
-    The use of self and fget ensures the properties not needed are not 
-    calculated.
-
-    Examples
-    --------
-    >>> phase_select_property(phase='g', l=1560.14, g=3312.)
-    3312.0
-    '''
-    if phase == 's':
-        if self is not None and s is not None:
-            return s.fget(self)
-        return s
-    elif phase == 'l':
-        if self is not None and l is not None:
-            return l.fget(self)
-        return l
-    elif phase == 'g':
-        if self is not None and g is not None:
-            return g.fget(self)
-        return g
-    elif phase is None or phase == 'two-phase':
-        return None  
-    else:
-        raise Exception('Property not recognized')
 
 
 def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):

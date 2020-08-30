@@ -90,8 +90,8 @@ def test_stockmayer_function():
 
     assert_close(1291.41, Stockmayer(CASRN='64-17-5'))
 
-    methods = Stockmayer(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975, CASRN='110-54-3', get_methods=True)
-    assert tuple(methods) == Stockmayer_methods
+    methods = Stockmayer_methods(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975, CASRN='110-54-3')
+    assert tuple(methods) == Stockmayer_all_methods
 
     values_calc = [Stockmayer(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975, CASRN='110-54-3', method=i) for i in methods]
     values = [434.76, 427.33156230000003, 273.54201582027196, 318.10801442820025, 390.85200000000003, 392.8824, 393.15049999999997, 341.90399999999994]
@@ -114,8 +114,8 @@ def test_molecular_diameter_function():
 
     assert_close(4.23738, molecular_diameter(CASRN='64-17-5'))
 
-    methods = molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', get_methods=True)
-    assert tuple(methods) == molecular_diameter_methods
+    methods = molecular_diameter_methods(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3')
+    assert tuple(sorted(methods)) == tuple(sorted(molecular_diameter_all_methods))
 
     values_calc = [molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', method=i) for i in methods]
     values = [5.61841, 5.989061939666203, 5.688003783388763, 6.27423491655056, 6.080607912773406, 6.617051217297049, 5.960764840627408, 6.0266865190488215, 6.054448122758386, 5.9078666913304225]

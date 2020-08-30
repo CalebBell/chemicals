@@ -20,11 +20,155 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various viscosity estimation routines, dataframes
+of fit coefficients, and mixing rules.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Pure Low Pressure Liquid Correlations
+-------------------------------------
+.. autofunction:: chemicals.viscosity.Letsou_Stiel
+.. autofunction:: chemicals.viscosity.Przedziecki_Sridhar
+
+Pure High Pressure Liquid Correlations
+--------------------------------------
+.. autofunction:: chemicals.viscosity.Lucas
+
+Liquid Mixing Rules
+-------------------
+No specific correlations are implemented but 
+:obj:`chemicals.utils.mixing_logarithmic` with weight fractions is the
+ recommended form.
+
+Pure Low Pressure Gas Correlations
+----------------------------------
+.. autofunction:: chemicals.viscosity.Yoon_Thodos
+.. autofunction:: chemicals.viscosity.Stiel_Thodos
+.. autofunction:: chemicals.viscosity.Lucas_gas
+.. autofunction:: chemicals.viscosity.Gharagheizi_gas_viscosity
+
+Pure High Pressure Gas Correlations
+-----------------------------------
+No correlations are implemented yet. 
+
+Gas Mixing Rules
+----------------
+.. autofunction:: chemicals.viscosity.Herning_Zipperer
+.. autofunction:: chemicals.viscosity.Brokaw
+.. autofunction:: chemicals.viscosity.Wilke
+.. autofunction:: chemicals.viscosity.Wilke_prefactors
+.. autofunction:: chemicals.viscosity.Wilke_prefactored
+.. autofunction:: chemicals.viscosity.Wilke_large
+
+Correlations for Specific Substances
+------------------------------------
+.. autofunction:: chemicals.viscosity.mu_IAPWS
+
+Petroleum Correlations
+----------------------
+.. autofunction:: chemicals.viscosity.Twu_1985
+.. autofunction:: chemicals.viscosity.Lorentz_Bray_Clarke
+
+Fit Correlations
+----------------
+.. autofunction:: chemicals.viscosity.PPDS9
+.. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2
+.. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2_exponential
+.. autofunction:: chemicals.viscosity.Viswanath_Natarajan_3
+
+
+Conversion functions
+--------------------
+.. autofunction:: chemicals.viscosity.viscosity_converter
+.. autofunction:: chemicals.viscosity.viscosity_index
+ 
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: mu_data_Dutt_Prasad
+
+    Coefficient sfor :obj:`chemicals.viscosity.Viswanath_Natarajan_3` from [1]_ 
+    for 100 fluids.
+
+.. data:: mu_data_VN3
+
+    Coefficients for :obj:`chemicals.viscosity.Viswanath_Natarajan_3` from [1]_ 
+    with data for 432 fluids.
+
+.. data:: mu_data_VN2
+
+    Coefficients for :obj:`chemicals.viscosity.Viswanath_Natarajan_2` from [1]_
+    with data for 135 fluids.
+
+.. data:: mu_data_VN2E
+
+    Coefficients for :obj:`chemicals.viscosity.Viswanath_Natarajan_2_exponential`
+    from [1]_ with data for 14 fluids.
+
+.. data:: mu_data_Perrys_8E_2_313
+
+    A collection of 337 coefficient sets for :obj:`chemicals.dippr.EQ101` from the
+    DIPPR database published openly in [3]_. 
+
+.. data:: mu_data_Perrys_8E_2_312
+
+    A collection of 345 coefficient sets for :obj:`chemicals.dippr.EQ102` from the 
+    DIPPR database published openly in [3]_. 
+
+.. data:: mu_data_VDI_PPDS_7
+
+    Coefficients for the model equation :obj:`PPDS9`, published openly in [2]_.
+    Provides no temperature limits, but has been designed
+    for extrapolation. Extrapolated to low temperatures it provides a 
+    smooth exponential increase. However, for some chemicals such as
+    glycerol, extrapolated to higher temperatures viscosity is predicted
+    to increase above a certain point.
+
+.. data:: mu_data_VDI_PPDS_8
+
+    Coefficients for a tempereture polynomial (T in Kelvin) developed by the 
+    PPDS, published openly in [2]_. :math:`\mu = A + BT + CT^2 + DT^3 + ET^4`.
+    
+.. [1] Viswanath, Dabir S., and G. Natarajan. Databook On The Viscosity Of
+   Liquids. New York: Taylor & Francis, 1989
+.. [2] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+   Berlin; New York:: Springer, 2010.
+.. [3] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+   Eighth Edition. McGraw-Hill Professional, 2007.
+
+The structure of each dataframe is shown below:
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.viscosity.mu_data_Dutt_Prasad
+
+    In [3]: chemicals.viscosity.mu_data_VN3
+
+    In [4]: chemicals.viscosity.mu_data_VN2
+
+    In [5]: chemicals.viscosity.mu_data_VN2E
+
+    In [6]: chemicals.viscosity.mu_data_Perrys_8E_2_313
+
+    In [7]: chemicals.viscosity.mu_data_Perrys_8E_2_312
+
+    In [8]: chemicals.viscosity.mu_data_VDI_PPDS_7
+
+    In [9]: chemicals.viscosity.mu_data_VDI_PPDS_8
+
 """
 
 from __future__ import division
 
-__all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 
+__all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'Gharagheizi_gas_viscosity', 'Herning_Zipperer', 
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
@@ -224,7 +368,7 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
     TRC = 1.5
     
     This forulation is highly optimized, spending most of its time in the 
-    select logarithm, power, and complex square root.
+    logarithm, power, and square root.
 
     Examples
     --------
@@ -482,6 +626,58 @@ def Viswanath_Natarajan_3(T, A, B, C):
     '''
     return 10.0**(A + B/(C - T))
 
+def PPDS9(T, A, B, C, D, E):
+    r'''Calculate the viscosity of a liquid using the 5-term exponential power
+    fit developed by the PPDS and named PPDS equation 9.
+    
+    .. math::
+       \mu = E \exp\left[A \left(\frac{C-T}{T-D}\right)^{1/3}  
+        + B \left(\frac{C-T}{T-D}\right)^{4/3}  \right]
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [-]
+    C : float
+        Coefficient, [K]
+    D : float
+        Coefficient, [K]
+    E : float
+        Coefficient, [Pa*s]
+
+    Returns
+    -------
+    mu : float
+        Liquid viscosity, [Pa*s]
+
+    Notes
+    -----
+    No other source for these coefficients has been found.
+
+    Examples
+    --------
+    >>> PPDS9(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    0.00035091137378230684
+    
+    References
+    ----------
+    .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+       Berlin; New York:: Springer, 2010.
+    '''
+    term = (C - T)/(T-D)
+    if term < 0:
+        term1 = -((T - C)/(T-D))**(1/3.)
+    else:
+        term1 = term**(1/3.)
+    term2 = term*term1
+    mu = E*exp(A*term1 + B*term2)
+    return mu
+
+
 
 def Letsou_Stiel(T, MW, Tc, Pc, omega):
     r'''Calculates the viscosity of a liquid using an emperical model
@@ -491,10 +687,13 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     .. math::
         \xi = \frac{2173.424 T_c^{1/6}}{\sqrt{MW} P_c^{2/3}}
 
+    .. math::
         \xi^{(0)} = (1.5174 - 2.135T_r + 0.75T_r^2)\cdot 10^{-5}
 
+    .. math::
         \xi^{(1)} = (4.2552 - 7.674 T_r + 3.4 T_r^2)\cdot 10^{-5}
 
+    .. math::
         \mu = (\xi^{(0)} + \omega \xi^{(1)})/\xi
 
     Parameters
@@ -550,8 +749,10 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
     .. math::
         \mu=\frac{V_o}{E(V-V_o)}
 
+    .. math::
         E=-1.12+\frac{V_c}{12.94+0.10MW-0.23P_c+0.0424T_{m}-11.58(T_{m}/T_c)}
 
+    .. math::
         V_o = 0.0085\omega T_c-2.02+\frac{V_{m}}{0.342(T_m/T_c)+0.894}
 
     Parameters
@@ -620,12 +821,16 @@ def Lucas(T, P, Tc, Pc, omega, P_sat, mu_l):
     .. math::
         \frac{\mu}{\mu_{sat}}=\frac{1+D(\Delta P_r/2.118)^A}{1+C\omega \Delta P_r}
 
+    .. math::
         \Delta P_r = \frac{P-P^{sat}}{P_c}
 
+    .. math::
         A=0.9991-\frac{4.674\times 10^{-4}}{1.0523T_r^{-0.03877}-1.0513}
 
+    .. math::
         D = \frac{0.3257}{(1.0039-T_r^{2.573})^{0.2906}}-0.2086
 
+    .. math::
         C = -0.07921+2.1616T_r-13.4040T_r^2+44.1706T_r^3-84.8291T_r^4+
         96.1209T_r^5-59.8127T_r^6+15.6719T_r^7
 
@@ -691,6 +896,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
         \eta \xi \times 10^8 = 46.10 T_r^{0.618} - 20.40 \exp(-0.449T_r) + 1
         9.40\exp(-4.058T_r)+1
 
+    .. math::
         \xi = 2173.424 T_c^{1/6} MW^{-1/2} P_c^{-2/3}
 
     Parameters
@@ -755,6 +961,7 @@ def Stiel_Thodos(T, Tc, Pc, MW):
     .. math::
         \mu_g = 34\times 10^{-5} T_r^{0.94}/\xi
 
+    .. math::
         \xi = \frac{T_c^{(1/6)}}{\sqrt{MW} P_c^{2/3}}
 
     Parameters
@@ -811,17 +1018,23 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
         \eta  = \left[0.807T_r^{0.618}-0.357\exp(-0.449T_r) + 0.340\exp(-4.058
         T_r) + 0.018\right]F_p^\circ F_Q^\circ /\xi
 
+    .. math::
         F_p^\circ=1, 0 \le \mu_{r} < 0.022
 
+    .. math::
         F_p^\circ = 1+30.55(0.292-Z_c)^{1.72}, 0.022 \le \mu_{r} < 0.075
 
+    .. math::
         F_p^\circ = 1+30.55(0.292-Z_c)^{1.72}|0.96+0.1(T_r-0.7)| 0.075 < \mu_{r}
 
+    .. math::
         F_Q^\circ = 1.22Q^{0.15}\left\{ 1+0.00385[(T_r-12)^2]^{1/M}\text{sign}
         (T_r-12)\right\}
 
+    .. math::
         \mu_r = 52.46 \frac{\mu^2 P_c}{T_c^2}
 
+    .. math::
         \xi=0.176\left(\frac{T_c}{MW^3 P_c^4}\right)^{1/6}
 
     Parameters
@@ -1788,13 +2001,14 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     if nu_100 < 70:
 
     .. math::
-        L, H = interp(nu_100)
+        L, H = \text{interp}(nu_100)
 
     else:
 
     .. math::
         L = 0.8353\nu_{100}^2 + 14.67\nu_{100} - 216
 
+    .. math::
         H = 0.1684\nu_{100}^2 + 11.85\nu_{100} - 97
 
     if nu_40 > H:
@@ -1807,7 +2021,8 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     .. math::
         N = \frac{\log(H) - \log(\nu_{40})}{\log (\nu_{100})}
 
-         VI = \frac{10^N-1}{0.00715} + 100
+    .. math::
+        VI = \frac{10^N-1}{0.00715} + 100
 
     Parameters
     ----------

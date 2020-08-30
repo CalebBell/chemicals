@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-__all__ = ['Stockmayer_methods', 'Stockmayer', 
-           'molecular_diameter_methods', 'molecular_diameter', 'sigma_Flynn', 
+__all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
+           'molecular_diameter_all_methods', 'molecular_diameter', 'molecular_diameter_methods',
+           
+           'sigma_Flynn',
            'sigma_Bird_Stewart_Lightfoot_critical_2', 
            'sigma_Bird_Stewart_Lightfoot_critical_1', 
            'sigma_Bird_Stewart_Lightfoot_boiling', 
@@ -30,12 +32,12 @@ __all__ = ['Stockmayer_methods', 'Stockmayer',
            'sigma_Stiel_Thodos', 'sigma_Tee_Gotoh_Steward_1',
            'sigma_Tee_Gotoh_Steward_2',
            'sigma_Silva_Liu_Macedo', 'epsilon_Flynn', 
-           'epsilon_Bird_Stewart_Lightfoot_critical', 
-           'epsilon_Bird_Stewart_Lightfoot_boiling', 
-           'epsilon_Bird_Stewart_Lightfoot_melting', 'epsilon_Stiel_Thodos', 
-           'epsilon_Tee_Gotoh_Steward_1', 'epsilon_Tee_Gotoh_Steward_2', 
-           'collision_integral_Neufeld_Janzen_Aziz', 
-           'As_collision', 'Bs_collision', 'Cs_collision', 
+           'epsilon_Bird_Stewart_Lightfoot_critical',
+           'epsilon_Bird_Stewart_Lightfoot_boiling',
+           'epsilon_Bird_Stewart_Lightfoot_melting', 'epsilon_Stiel_Thodos',
+           'epsilon_Tee_Gotoh_Steward_1', 'epsilon_Tee_Gotoh_Steward_2',
+           'collision_integral_Neufeld_Janzen_Aziz',
+           'As_collision', 'Bs_collision', 'Cs_collision',
            'collision_integral_Kim_Monroe', 'Tstar']
 
 import os
@@ -47,7 +49,7 @@ from chemicals.data_reader import (register_df_source,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
-# %% Register data sources and lazy load them
+#  Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Viscosity')
 register_df_source(folder, 'MagalhaesLJ.tsv')
@@ -80,11 +82,51 @@ else:
     if can_load_data:
         _load_LJ_data()
 
-Stockmayer_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC, 
-                      TEEGOTOSTEWARD1, BSLB, BSLM)
+Stockmayer_all_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
+                          TEEGOTOSTEWARD1, BSLB, BSLM)
 
-def Stockmayer(Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
-               CASRN='', get_methods=False, method=None):
+def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
+    """Return all methods available to obtain the Stockmayer parameter for the 
+    desired chemical.
+
+    Parameters
+    ----------
+    CASRN : string, optional
+        CASRN [-]
+    Tm : float, optional
+        Melting temperature of compound [K]
+    Tb : float, optional
+        Boiling temperature of compound [K]
+    Tc : float, optional
+        Critical temperature of compound, [K]
+    Zc : float, optional
+        Critical compressibility of compound, [-]
+    omega : float, optional
+        Acentric factor of compound, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain `Stockmayer` with the given inputs.
+
+    See Also
+    --------
+    Stockmayer
+    """
+    if not _LJ_data_loaded: _load_LJ_data()
+    methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'epsilon')
+    if Tc:
+        if omega: methods.append(TEEGOTOSTEWARD2)
+        if Zc: methods.append(STIELTHODOS)
+        methods.append(FLYNN)
+        methods.append(BSLC)
+        methods.append(TEEGOTOSTEWARD1)
+    if Tb: methods.append(BSLB)
+    if Tm: methods.append(BSLM)
+    return methods
+
+def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
+               method=None):
     r'''This function handles the retrieval or calculation a chemical's
     Stockmayer parameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 7 CSP methods.
@@ -103,36 +145,29 @@ def Stockmayer(Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
 
     Parameters
     ----------
-    Tm : float, optional
-        Melting temperature of fluid [K]
-    Tb : float, optional
-        Boiling temperature of fluid [K]
-    Tc : float, optional
-        Critical temperature, [K]
-    Zc : float, optional
-        Critical compressibility, [-]
-    omega : float, optional
-        Acentric factor of compound, [-]
     CASRN : string, optional
         CASRN [-]
+    Tm : float, optional
+        Melting temperature of compound [K]
+    Tb : float, optional
+        Boiling temperature of compound [K]
+    Tc : float, optional
+        Critical temperature of compound, [K]
+    Zc : float, optional
+        Critical compressibility of compound, [-]
+    omega : float, optional
+        Acentric factor of compound, [-]
 
     Returns
     -------
     epsilon_k : float
         Lennard-Jones depth of potential-energy minimum over k, [K]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain epsilon with the given
-        inputs
 
     Other Parameters
     ----------------
     method : string, optional
         A string for the method name to use, as defined by constants in
-        Stockmayer_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        epsilon for the desired chemical, and will return methods instead of
-        epsilon
+        Stockmayer_all_methods
 
     Notes
     -----
@@ -153,18 +188,7 @@ def Stockmayer(Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
     if not _LJ_data_loaded: _load_LJ_data()
-    if get_methods:
-        methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'epsilon')
-        if Tc:
-            if omega: methods.append(TEEGOTOSTEWARD2)
-            if Zc: methods.append(STIELTHODOS)
-            methods.append(FLYNN)
-            methods.append(BSLC)
-            methods.append(TEEGOTOSTEWARD1)
-        if Tb: methods.append(BSLB)
-        if Tm: methods.append(BSLM)
-        return methods
-    elif method:
+    if method is not None:
         if method == FLYNN:
             return epsilon_Flynn(Tc)
         elif method == BSLC:
@@ -197,12 +221,60 @@ BSLC1 = 'Bird, Stewart, and Light (2002) critical relation with Vc'
 BSLC2 = 'Bird, Stewart, and Light (2002) critical relation with Tc, Pc'
 STIELTHODOSMD = 'Stiel and Thodos Vc, Zc (1962)'
 SILVALIUMACEDO = 'Silva, Liu, and Macedo (1998) critical relation with Tc, Pc'
-molecular_diameter_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
-                              BSLC2, TEEGOTOSTEWARD3, STIELTHODOSMD, FLYNN,
-                              BSLC1, BSLB, BSLM)
+molecular_diameter_all_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
+                                  BSLC2, TEEGOTOSTEWARD3, STIELTHODOSMD, FLYNN,
+                                  BSLC1, BSLB, BSLM)
 
-def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
-          Vm=None, Vb=None, CASRN='', get_methods=False, method=None):
+def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
+                               omega=None, Vm=None, Vb=None, ):
+    """Return all methods available to obtain the molecular diameter for the 
+    desired chemical.
+
+    Parameters
+    ----------
+    CASRN : string, optional
+        CASRN [-]
+    Tc : float, optional
+        Critical temperature, [K]
+    Pc : float, optional
+        Critical pressure, [Pa]
+    Vc : float, optional
+        Critical volume, [m^3/mol]
+    Zc : float, optional
+        Critical compressibility, [-]
+    omega : float, optional
+        Acentric factor of compound, [-]
+    Vm : float, optional
+        Molar volume of liquid at the melting point of the fluid [K]
+    Vb : float, optional
+        Molar volume of liquid at the boiling point of the fluid [K]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain `molecular_diameter` with the given inputs.
+
+    See Also
+    --------
+    molecular_diameter
+    """
+    methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'sigma')
+    if Tc:
+        if Pc:
+            if omega: methods.append(TEEGOTOSTEWARD4)
+            methods.append(SILVALIUMACEDO)
+            methods.append(BSLC2)
+            methods.append(TEEGOTOSTEWARD3)
+    if Vc:
+        if Zc: methods.append(STIELTHODOSMD)
+        methods.append(FLYNN)
+        methods.append(BSLC1)
+    if Vb: methods.append(BSLB)
+    if Vm: methods.append(BSLM)
+    return methods
+
+def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
+          Vm=None, Vb=None, method=None):
     r'''This function handles the retrieval or calculation a chemical's
     L-J molecular diameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 9 CSP methods.
@@ -221,6 +293,8 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
 
     Parameters
     ----------
+    CASRN : string, optional
+        CASRN [-]
     Tc : float, optional
         Critical temperature, [K]
     Pc : float, optional
@@ -235,8 +309,6 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
         Molar volume of liquid at the melting point of the fluid [K]
     Vb : float, optional
         Molar volume of liquid at the boiling point of the fluid [K]
-    CASRN : string, optional
-        CASRN [-]
 
     Returns
     -------
@@ -250,7 +322,7 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
     ----------------
     method : string, optional
         A string for the method name to use, as defined by constants in
-        molecular_diameter_methods
+        molecular_diameter_all_methods
     get_methods : bool, optional
         If True, function will determine which methods can be used to obtain
         sigma for the desired chemical, and will return methods instead of
@@ -275,22 +347,7 @@ def molecular_diameter(Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
     if not _LJ_data_loaded: _load_LJ_data()
-    if get_methods:
-        methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'sigma')
-        if Tc:
-            if Pc:
-                if omega: methods.append(TEEGOTOSTEWARD4)
-                methods.append(SILVALIUMACEDO)
-                methods.append(BSLC2)
-                methods.append(TEEGOTOSTEWARD3)
-        if Vc:
-            if Zc: methods.append(STIELTHODOSMD)
-            methods.append(FLYNN)
-            methods.append(BSLC1)
-        if Vb: methods.append(BSLB)
-        if Vm: methods.append(BSLM)
-        return methods
-    if method:
+    if method is not None:
         if method == FLYNN:
             return sigma_Flynn(Vc)
         elif method == BSLC1:

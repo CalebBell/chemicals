@@ -25,7 +25,6 @@ import pandas as pd
 from numpy.testing import assert_allclose
 import pytest
 from chemicals.identifiers import *
-from chemicals.utils import CAS2int, int2CAS
 from chemicals.elements import periodic_table, nested_formula_parser, serialize_formula, molecular_weight
 import os
 from chemicals.identifiers import ChemicalMetadataDB, folder, pubchem_db
@@ -40,11 +39,12 @@ except:
 def test_dippr_list():
     dippr_set = dippr_compounds()
     # TODO CASs formulas
-    assert 12916928773 == sum([CAS2int(i) for i in dippr_set])
-    assert all([checkCAS(i) for i in dippr_set])
+    assert 12916928773 == sum([CAS_to_int(i) for i in dippr_set])
+    assert all([check_CAS(i) for i in dippr_set])
 
 
 @pytest.mark.slow
+@pytest.mark.online
 def test_dippr_2016_matched_meta():
     df2 = pd.read_excel('https://www.aiche.org/sites/default/files/docs/pages/dippr_compound_list_2016.xlsx')
     names = df2['Name'].tolist()
@@ -70,28 +70,29 @@ def test_Matthews_critical_names():
 #        except:
 #            print(CAS, name)
 
-@pytest.mark.slow
-def test_Laliberte_metadata_identifiers():
-    from thermo.electrochem import _Laliberte_Density_ParametersDict, _Laliberte_Viscosity_ParametersDict, _Laliberte_Heat_Capacity_ParametersDict
-    lalib = _Laliberte_Density_ParametersDict.copy()
-    lalib.update(_Laliberte_Viscosity_ParametersDict)
-    lalib.update(_Laliberte_Heat_Capacity_ParametersDict)
-    
-    for CAS, d in lalib.items():
-        c = None
-        formula = d['Formula']
-        name = d['Name']
-        if formula not in set(['HCHO2', 'CH3CH2OH', 'HCH3CO2']):
-            assert CAS_from_any(formula) == CAS
-#        try:
-#            CAS_from_any(name)
-#        except:
-#            print(name)
-
+# TODO uncomment when electrochem is back
+#@pytest.mark.slow
+#def test_Laliberte_metadata_identifiers():
+#    from thermo.electrochem import _Laliberte_Density_ParametersDict, _Laliberte_Viscosity_ParametersDict, _Laliberte_Heat_Capacity_ParametersDict
+#    lalib = _Laliberte_Density_ParametersDict.copy()
+#    lalib.update(_Laliberte_Viscosity_ParametersDict)
+#    lalib.update(_Laliberte_Heat_Capacity_ParametersDict)
+#    
+#    for CAS, d in lalib.items():
+#        c = None
+#        formula = d['Formula']
+#        name = d['Name']
+#        if formula not in set(['HCHO2', 'CH3CH2OH', 'HCH3CO2']):
+#            assert CAS_from_any(formula) == CAS
+##        try:
+##            CAS_from_any(name)
+##        except:
+##            print(name)
+#
 
 @pytest.mark.slow
 def test_pubchem_dict():
-    assert all([checkCAS(i.CASs) for i in pubchem_db.CAS_index.values()])
+    assert all([check_CAS(i.CASs) for i in pubchem_db.CAS_index.values()])
 
 @pytest.mark.xfail
 def test_database_formulas():
@@ -119,7 +120,7 @@ def test_organic_user_db():
     assert all([i.formula == serialize_formula(i.formula) for i in db.CAS_index.values()])
 
     # Check CAS validity
-    assert all([checkCAS(i.CASs) for i in db.CAS_index.values()])
+    assert all([check_CAS(i.CASs) for i in db.CAS_index.values()])
 
     # MW checker
     for i in db.CAS_index.values():
@@ -130,15 +131,15 @@ def test_organic_user_db():
 
 
     for CAS, d in db.CAS_index.items():
-        assert CAS_from_any('InChI=1S/' + d.InChI) == int2CAS(CAS)
+        assert CAS_from_any('InChI=1S/' + d.InChI) == int_to_CAS(CAS)
         
     for CAS, d in db.CAS_index.items():
-        assert CAS_from_any('InChIKey=' + d.InChI_key) == int2CAS(CAS)
+        assert CAS_from_any('InChIKey=' + d.InChI_key) == int_to_CAS(CAS)
 
     # Test the pubchem ids which aren't -1
     for CAS, d in db.CAS_index.items():
         if d.pubchemid != -1:
-            assert CAS_from_any('PubChem=' + str(d.pubchemid)) == int2CAS(CAS)
+            assert CAS_from_any('PubChem=' + str(d.pubchemid)) == int_to_CAS(CAS)
 
     CAS_lenth = len(db.CAS_index)
     assert CAS_lenth == len(db.smiles_index)
@@ -172,7 +173,7 @@ def test_inorganic_db():
     assert all([i.formula == serialize_formula(i.formula) for i in db.CAS_index.values()])
 
     # Check CAS validity
-    assert all([checkCAS(i.CASs) for i in db.CAS_index.values()])
+    assert all([check_CAS(i.CASs) for i in db.CAS_index.values()])
 
     # MW checker
     for i in db.CAS_index.values():
@@ -318,7 +319,7 @@ def test_fake_CAS_numbers():
     known = []
     for i in reversed(range(100000)):
         s = "20{0:0>5}000-00-0".format(i)
-        if checkCAS(s):
+        if check_CAS(s):
             known.append(s+'\t\n')
     f = open('Fake CAS Registry.tsv', 'w')
     f.writelines(known)
@@ -406,3 +407,30 @@ def test_db_vs_ChemSep():
     # but that's proving difficult due to things like 1-hexene - 
     # is it 'CCCCC=C' or 'C=CCCCC'?
 #test_db_vs_ChemSep() 
+    
+    
+
+
+def test_CAS2int():
+    assert CAS_to_int('7704-34-9') == 7704349
+
+    with pytest.raises(Exception):
+        CAS_to_int(7704349)
+
+def test_int2CAS():
+    assert int_to_CAS(7704349) == '7704-34-9'
+
+    with pytest.raises(Exception):
+        CAS_to_int(7704349.0)
+
+def test_sorted_CAS_key():
+    expect = ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
+    res = sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
+    assert res == expect
+    res = sorted_CAS_key(['108-88-3', '98-00-0', '7732-18-5', '64-17-5'])
+    assert res == expect
+    
+    invalid_CAS_expect = ('641', '98-00-0', '108-88-3', '7732-8-5')
+    invalid_CAS_test = sorted_CAS_key(['7732-8-5', '641', '108-88-3', '98-00-0'])
+    assert invalid_CAS_expect == invalid_CAS_test
+    

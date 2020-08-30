@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
-1/0
 try:
     import test_acentric
 except:
@@ -20,7 +19,7 @@ import test_miscdata
 import test_permittivity
 import test_phase_change
 import test_rachford_rice
-import test_reactions
+import test_reaction
 import test_refractivity
 import test_solubility
 import test_temperature
@@ -34,7 +33,7 @@ import test_viscosity
 import test_volume
 
 # dynamically generated code - numba, units, vectorize - not part of this test suite
-to_test = [test_acentric, test_combustion, test_critical, test_dipole, test_dippr, test_elements, test_environment, test_heat_capacity, test_interface, test_lennard_jones, test_miscdata, test_permittivity, test_phase_change, test_rachford_rice, test_reactions, test_refractivity, test_solubility, test_temperature, test_thermal_conductivity, test_triple, test_utils, test_vapor_pressure, test_vectorized, test_virial, test_viscosity, test_volume]
+to_test = [test_acentric, test_combustion, test_critical, test_dipole, test_dippr, test_elements, test_environment, test_heat_capacity, test_interface, test_lennard_jones, test_miscdata, test_permittivity, test_phase_change, test_rachford_rice, test_reaction, test_refractivity, test_solubility, test_temperature, test_thermal_conductivity, test_triple, test_utils, test_vapor_pressure, test_vectorized, test_virial, test_viscosity, test_volume]
 
 
 skip_marks = ['slow', 'fuzz', 'skip_types']

@@ -20,6 +20,113 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various vapor pressure estimation routines, dataframes
+of fit coefficients, some compound-specific equations, some analytical fitting
+routines, and sublimation pressure routines.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+
+Fit Correlations
+----------------
+.. autofunction:: chemicals.vapor_pressure.Antoine
+.. autofunction:: chemicals.vapor_pressure.Wagner
+.. autofunction:: chemicals.vapor_pressure.Wagner_original
+.. autofunction:: chemicals.vapor_pressure.TRC_Antoine_extended
+
+Vapor Pressure Estimation Correlations
+--------------------------------------
+.. autofunction:: chemicals.vapor_pressure.Lee_Kesler
+.. autofunction:: chemicals.vapor_pressure.Ambrose_Walton
+.. autofunction:: chemicals.vapor_pressure.boiling_critical_relation
+.. autofunction:: chemicals.vapor_pressure.Sanjari
+.. autofunction:: chemicals.vapor_pressure.Edalat
+
+Sublimation Pressure Estimation Correlations
+--------------------------------------------
+.. autofunction:: chemicals.vapor_pressure.Psub_Clapeyron
+
+Correlations for Specific Substances
+------------------------------------
+.. autofunction:: chemicals.vapor_pressure.Psat_IAPWS
+.. autofunction:: chemicals.vapor_pressure.dPsat_IAPWS_dT
+  
+Analytical Fit Equations
+------------------------
+.. autofunction:: chemicals.vapor_pressure.Antoine_coeffs_from_point
+.. autofunction:: chemicals.vapor_pressure.Antoine_AB_coeffs_from_point
+.. autofunction:: chemicals.vapor_pressure.DIPPR101_ABC_coeffs_from_point
+
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: Psat_data_WagnerMcGarry
+
+    Coefficients for the Wagner 3,6 original model equation documented in
+    :obj:`Wagner_original` with data for 245 chemicals, from [1]_.
+
+.. data:: Psat_data_WagnerPoling
+
+    Coefficients for the Wagner 2.5, 5 model equation documented in 
+    :obj:`Wagner` in [2]_, with data for 104 chemicals.
+
+.. data:: Psat_data_AntoinePoling
+
+    Standard Antoine equation coefficients, as documented in the function
+    :obj:`Antoine` and with data for 325 fluids from [2]_.
+    Coefficients were altered to be in units of Pa and Celcius.
+
+.. data:: Psat_data_AntoineExtended
+
+    Data for 97 chemicals in [2]_ for the TRC extended Antoine model 
+    :obj:`TRC_Antoine_extended`.
+    
+.. data:: Psat_data_Perrys2_8
+
+    A collection of 341 coefficient sets for :obj:`thermo.dippr.EQ101` from 
+    the DIPPR database published openly in [4]_. 
+
+.. data:: Psat_data_VDI_PPDS_3
+
+    Coefficients for the Wagner equation :obj:`Wagner`, published 
+    openly in [3]_. 
+
+.. [1] McGarry, Jack. "Correlation and Prediction of the Vapor Pressures of
+    Pure Liquids over Large Pressure Ranges." Industrial & Engineering
+    Chemistry Process Design and Development 22, no. 2 (April 1, 1983):
+    313-22. doi:10.1021/i200021a023.
+.. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+    New York: McGraw-Hill Professional, 2000.
+.. [3] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+    Berlin; New York:: Springer, 2010.
+.. [4] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+    Eighth Edition. McGraw-Hill Professional, 2007.
+
+The structure of each dataframe is shown below:
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.vapor_pressure.Psat_data_WagnerMcGarry
+
+    In [3]: chemicals.vapor_pressure.Psat_data_WagnerPoling
+
+    In [4]: chemicals.vapor_pressure.Psat_data_AntoinePoling
+
+    In [5]: chemicals.vapor_pressure.Psat_data_AntoineExtended
+
+    In [6]: chemicals.vapor_pressure.Psat_data_Perrys2_8
+
+    In [7]: chemicals.vapor_pressure.Psat_data_VDI_PPDS_3
+
 """
 
 from __future__ import division
@@ -63,43 +170,43 @@ register_df_source(folder, 'VDI PPDS Boiling temperatures at different pressures
 
 _vapor_pressure_dfs_loaded = False
 def load_vapor_pressure_dfs():
-    global WagnerMcGarry, _WagnerMcGarry_values, AntoinePoling, _AntoinePoling_values
-    global WagnerPoling, _WagnerPoling_values, AntoineExtended, _AntoineExtended_values 
-    global Perrys2_8, _Perrys2_8_values, VDI_PPDS_3, _VDI_PPDS_3_values
+    global Psat_data_WagnerMcGarry, Psat_values_WagnerMcGarry, Psat_data_AntoinePoling, Psat_values_AntoinePoling
+    global Psat_data_WagnerPoling, Psat_values_WagnerPoling, Psat_data_AntoineExtended, Psat_values_AntoineExtended
+    global Psat_data_Perrys2_8, Psat_values_Perrys2_8, Psat_data_VDI_PPDS_3, Psat_values_VDI_PPDS_3
     global _vapor_pressure_dfs_loaded
 
     # 57463 bytes for df; 13720 bytes for numpy
-    WagnerMcGarry = data_source('Wagner Original McGarry.tsv')
-    _WagnerMcGarry_values = np.array(WagnerMcGarry.values[:, 1:], dtype=float)
+    Psat_data_WagnerMcGarry = data_source('Wagner Original McGarry.tsv')
+    Psat_values_WagnerMcGarry = np.array(Psat_data_WagnerMcGarry.values[:, 1:], dtype=float)
     
     # 58216 bytes for df; 13000 bytes for numpy
-    AntoinePoling = data_source('Antoine Collection Poling.tsv')
-    _AntoinePoling_values = np.array(AntoinePoling.values[:, 1:], dtype=float)
+    Psat_data_AntoinePoling = data_source('Antoine Collection Poling.tsv')
+    Psat_values_AntoinePoling = np.array(Psat_data_AntoinePoling.values[:, 1:], dtype=float)
 
     # 20928 bytes for df; 7488 bytes for numpy
-    WagnerPoling = data_source('Wagner Collection Poling.tsv')
-    _WagnerPoling_values = np.array(WagnerPoling.values[:, 1:], dtype=float)
+    Psat_data_WagnerPoling = data_source('Wagner Collection Poling.tsv')
+    Psat_values_WagnerPoling = np.array(Psat_data_WagnerPoling.values[:, 1:], dtype=float)
 
     # 21388 bytes for df; 7760 bytes for numpy
-    AntoineExtended = data_source('Antoine Extended Collection Poling.tsv')
-    _AntoineExtended_values = np.array(AntoineExtended.values[:, 1:], dtype=float)
+    Psat_data_AntoineExtended = data_source('Antoine Extended Collection Poling.tsv')
+    Psat_values_AntoineExtended = np.array(Psat_data_AntoineExtended.values[:, 1:], dtype=float)
 
     # 65740 bytes for df; 21760 bytes for numpy
-    Perrys2_8 = data_source('Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
-    _Perrys2_8_values = np.array(Perrys2_8.values[:, 1:], dtype=float)
+    Psat_data_Perrys2_8 = data_source('Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
+    Psat_values_Perrys2_8 = np.array(Psat_data_Perrys2_8.values[:, 1:], dtype=float)
 
     # 52742 bytes for df; 15400 bytes for numpy
-    VDI_PPDS_3 = data_source('VDI PPDS Boiling temperatures at different pressures.tsv')
-    _VDI_PPDS_3_values = np.array(VDI_PPDS_3.values[:, 1:], dtype=float)
+    Psat_data_VDI_PPDS_3 = data_source('VDI PPDS Boiling temperatures at different pressures.tsv')
+    Psat_values_VDI_PPDS_3 = np.array(Psat_data_VDI_PPDS_3.values[:, 1:], dtype=float)
     
     _vapor_pressure_dfs_loaded = True
     
 if PY37:
     def __getattr__(name):
-        if name in ('WagnerMcGarry', '_WagnerMcGarry_values', 'AntoinePoling', 
-                    '_AntoinePoling_values', 'WagnerPoling', '_WagnerPoling_values', 
-                    'AntoineExtended', '_AntoineExtended_values', 'Perrys2_8', 
-                    '_Perrys2_8_values', 'VDI_PPDS_3', '_VDI_PPDS_3_values'):
+        if name in ('Psat_data_WagnerMcGarry', 'Psat_values_WagnerMcGarry', 'Psat_data_AntoinePoling',
+                    'Psat_values_AntoinePoling', 'Psat_data_WagnerPoling', 'Psat_values_WagnerPoling',
+                    'Psat_data_AntoineExtended', 'Psat_values_AntoineExtended', 'Psat_data_Perrys2_8',
+                    'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3'):
             load_vapor_pressure_dfs()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
@@ -129,7 +236,7 @@ def Antoine(T, A, B, C, base=10.0):
         Antoine `B` parameter, [K]
     C : float
         Antoine `C` parameter, [K]
-    Base : float, optional
+    base : float, optional
         Optional base of logarithm; 10 by default
 
     Returns
@@ -369,6 +476,7 @@ def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
     .. math::
         \log_{10} P^{sat} = A - \frac{B}{T + C} + 0.43429x^n + Ex^8 + Fx^{12}
         
+    .. math::
         x = \max \left(\frac{T-t_o-273.15}{T_c}, 0 \right)
 
     Parameters
@@ -419,6 +527,7 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
         \ln P^{sat}= \ln P_c + \frac{a\tau + b \tau^{1.5} + c\tau^3 + d\tau^6}
         {T_r}
         
+    .. math::
         \tau = 1 - \frac{T}{T_c}
 
     Parameters
@@ -475,6 +584,7 @@ def Wagner(T, Tc, Pc, a, b, c, d):
         \ln P^{sat}= \ln P_c + \frac{a\tau + b \tau^{1.5} + c\tau^{2.5}
         + d\tau^5} {T_r}
 
+    .. math::
         \tau = 1 - \frac{T}{T_c}
 
     Parameters
@@ -641,6 +751,7 @@ def boiling_critical_relation(T, Tb, Tc, Pc):
     .. math::
         \ln P^{sat}_r = h\left( 1 - \frac{1}{T_r}\right)
 
+    .. math::
         h = T_{br} \frac{\ln(P_c/101325)}{1-T_{br}}
 
     Parameters
@@ -692,8 +803,10 @@ def Lee_Kesler(T, Tc, Pc, omega):
     .. math::
         \ln P^{sat}_r = f^{(0)} + \omega f^{(1)}
 
+    .. math::
         f^{(0)} = 5.92714-\frac{6.09648}{T_r}-1.28862\ln T_r + 0.169347T_r^6
 
+    .. math::
         f^{(1)} = 15.2518-\frac{15.6875}{T_r} - 13.4721 \ln T_r + 0.43577T_r^6
 
     Parameters
@@ -752,15 +865,19 @@ def Ambrose_Walton(T, Tc, Pc, omega):
     .. math::
         \ln P_r=f^{(0)}+\omega f^{(1)}+\omega^2f^{(2)}
 
+    .. math::
         f^{(0)}=\frac{-5.97616\tau + 1.29874\tau^{1.5}- 0.60394\tau^{2.5}
         -1.06841\tau^5}{T_r}
 
+    .. math::
         f^{(1)}=\frac{-5.03365\tau + 1.11505\tau^{1.5}- 5.41217\tau^{2.5}
         -7.46628\tau^5}{T_r}
 
+    .. math::
         f^{(2)}=\frac{-0.64771\tau + 2.41539\tau^{1.5}- 4.26979\tau^{2.5}
         +3.25259\tau^5}{T_r}
 
+    .. math::
         \tau = 1-T_{r}
 
     Parameters
@@ -820,10 +937,13 @@ def Sanjari(T, Tc, Pc, omega):
     .. math::
         P^{sat} = P_c\exp(f^{(0)} + \omega f^{(1)} + \omega^2 f^{(2)})
 
+    .. math::
         f^{(0)} = a_1 + \frac{a_2}{T_r} + a_3\ln T_r + a_4 T_r^{1.9}
 
+    .. math::
         f^{(1)} = a_5 + \frac{a_6}{T_r} + a_7\ln T_r + a_8 T_r^{1.9}
 
+    .. math::
         f^{(2)} = a_9 + \frac{a_{10}}{T_r} + a_{11}\ln T_r + a_{12} T_r^{1.9}
 
     Parameters
@@ -893,14 +1013,19 @@ def Edalat(T, Tc, Pc, omega):
         \ln(P^{sat}/P_c) = \frac{a\tau + b\tau^{1.5} + c\tau^3 + d\tau^6}
         {1-\tau}
         
+    .. math::
         a = -6.1559 - 4.0855\omega
         
+    .. math::
         b = 1.5737 - 1.0540\omega - 4.4365\times 10^{-3} d
         
+    .. math::
         c = -0.8747 - 7.8874\omega
         
+    .. math::
         d = \frac{1}{-0.4893 - 0.9912\omega + 3.1551\omega^2}
         
+    .. math::
         \tau = 1 - \frac{T}{T_c}
         
     Parameters

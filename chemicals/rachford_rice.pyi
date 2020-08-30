@@ -82,7 +82,7 @@ def Rachford_Rice_flash_error(V_over_F: float, zs: List[float], Ks: List[float])
 
 
 def Rachford_Rice_numpy_err_fprime2(
-    V_over_F: Union[float64, float],
+    V_over_F: float64,
     zs_k_minus_1: ndarray,
     K_minus_1: ndarray
 ) -> Tuple[float, float, float]: ...
@@ -103,9 +103,9 @@ def Rachford_Rice_polynomial_5(zs: List[float], Cs: List[float]) -> List[float]:
 def Rachford_Rice_solution(
     zs: List[float],
     Ks: Union[List[float], List[float]],
-    fprime: Union[bool, float] = ...,
+    fprime: Optional[Union[bool, float]] = ...,
     fprime2: bool = ...,
-    limit: bool = ...
+    guess: None = ...
 ) -> Tuple[float, List[float], List[float]]: ...
 
 
@@ -135,21 +135,13 @@ def Rachford_Rice_solution_LN2(
 def Rachford_Rice_solution_numpy(
     zs: List[float],
     Ks: Union[List[float], List[float]],
-    limit: bool = ...
+    guess: None = ...
 ) -> Tuple[float, List[float], List[float]]: ...
 
 
 def Rachford_Rice_solution_polynomial(
     zs: List[float],
     Ks: Union[List[float], List[float]]
-) -> Tuple[float, List[float], List[float]]: ...
-
-
-def Rachford_Rice_solution_trace(
-    zs: List[float],
-    Ks: Union[List[float], List[float]],
-    guess: float = ...,
-    trace: float = ...
 ) -> Tuple[float, List[float], List[float]]: ...
 
 
@@ -176,14 +168,12 @@ def err_RR_poly(VF: float, poly: List[float]) -> float: ...
 def flash_inner_loop(
     zs: List[float],
     Ks: Union[List[float], List[float]],
-    get_methods: bool = ...,
     method: Optional[str] = ...,
-    limit: bool = ...,
     guess: Optional[float] = ...,
     check: bool = ...
-) -> Union[Tuple[float, List[float], List[float]], List[str]]: ...
+) -> Tuple[float, List[float], List[float]]: ...
 
 
-def flash_inner_loop_list_methods(l: int) -> List[str]: ...
+def flash_inner_loop_methods(N: int) -> List[str]: ...
 
 __all__: List[str]

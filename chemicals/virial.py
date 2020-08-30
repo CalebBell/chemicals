@@ -174,7 +174,7 @@ def Z_from_virial_density_form(T, P, *args):
     Examples
     --------
     >>> Z_from_virial_density_form(300, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
-    1.2843494052609186
+    1.2843494052609183
 
     References
     ----------
@@ -223,7 +223,7 @@ def Z_from_virial_density_form(T, P, *args):
     solns = np.roots(arr)
     for rho in solns:
         if abs(rho.imag) < 1e-12 and rho.real > 0.0:
-            return P/(R*T*rho.real)
+            return float(P/(R*T*rho.real))
     raise ValueError("Could not find real root")
 
 

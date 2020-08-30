@@ -2,6 +2,8 @@
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2020 Yoel Rene Cortes-Pena
+<yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +22,125 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains many heat capacity model equations, heat capacity estimation
+equations, enthalpy and entropy integrals of those heat capacity equations, 
+enthalpy/entropy flash initialization routines, and many dataframes of 
+coefficients.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+    
+Gas Heat Capacity Model Equations
+---------------------------------
+.. autofunction:: chemicals.heat_capacity.TRCCp
+.. autofunction:: chemicals.heat_capacity.TRCCp_integral
+.. autofunction:: chemicals.heat_capacity.TRCCp_integral_over_T
+
+Gas Heat Capacity Estimation Models
+-----------------------------------
+.. autofunction:: chemicals.heat_capacity.Lastovka_Shaw
+.. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_integral
+.. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_integral_over_T
+.. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_T_for_Hm
+.. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_T_for_Sm
+
+Liquid Heat Capacity Model Equations
+------------------------------------
+.. autofunction:: chemicals.heat_capacity.Zabransky_quasi_polynomial
+.. autofunction:: chemicals.heat_capacity.Zabransky_quasi_polynomial_integral
+.. autofunction:: chemicals.heat_capacity.Zabransky_quasi_polynomial_integral_over_T
+.. autofunction:: chemicals.heat_capacity.Zabransky_cubic
+.. autofunction:: chemicals.heat_capacity.Zabransky_cubic_integral
+.. autofunction:: chemicals.heat_capacity.Zabransky_cubic_integral_over_T
+.. autofunction:: chemicals.heat_capacity.Zabransky_quasi_polynomial
+.. autoclass:: chemicals.heat_capacity.ZabranskySpline
+.. autoclass:: chemicals.heat_capacity.ZabranskyQuasipolynomial
+
+Liquid Heat Capacity Estimation Models
+--------------------------------------
+.. autofunction:: chemicals.heat_capacity.Rowlinson_Poling
+.. autofunction:: chemicals.heat_capacity.Rowlinson_Bondi
+.. autofunction:: chemicals.heat_capacity.Dadgostar_Shaw
+.. autofunction:: chemicals.heat_capacity.Dadgostar_Shaw_integral
+.. autofunction:: chemicals.heat_capacity.Dadgostar_Shaw_integral_over_T
+
+Solid Heat Capacity Estimation Models
+-------------------------------------
+.. autofunction:: chemicals.heat_capacity.Lastovka_solid
+.. autofunction:: chemicals.heat_capacity.Lastovka_solid_integral
+.. autofunction:: chemicals.heat_capacity.Lastovka_solid_integral_over_T
+
+Utility methods
+---------------
+.. autoclass:: chemicals.heat_capacity.PiecewiseHeatCapacity
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: Cp_data_Poling
+
+    Constains data for gases and liquids from [3]_. 
+    Simple polynomials for gas heat capacity (not suitable for extrapolation) are available for 308 chemicals. Additionally, constant values in at 298.15 K are available for 348 gases. Constant values in at 298.15 K are available for 245 liquids.
+
+.. data:: TRC_gas_data
+
+    A rigorous expression from [1]_ for modeling gas heat capacity.
+    Coefficients for 1961 chemicals are available.
+
+.. data:: CRC_standard_data
+
+    Constant values tabulated in [4]_ at 298.15 K. Data is available for
+    533 gases. Data is available for 433 liquids. Data is available for 529
+    solids.
+
+.. data:: Cp_data_PerryI
+
+    Simple polynomials from [5]_ with vaious exponents selected for each expression.
+    Coefficients are in units of calories/mol/K. The full expression is
+    :math:`C_p = a + bT + c/T^2 + dT^2`. Data is available for 284 compounds.
+    Some compounds have gas data, some have liquid data, and have solid 
+    (crystal structure) data, sometimes multiple coefficients for different 
+    solid phases.
+
+.. data:: zabransky_dicts
+
+    Complicated fits covering different cases and with different forms from [2]_.
+    
+.. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
+    in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
+.. [2] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
+    Heat Capacity of Liquids: Critical Review and Recommended Values.
+    2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
+.. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+    New York: McGraw-Hill Professional, 2000.
+.. [4] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+    Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+.. [5] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+    Eighth Edition. McGraw-Hill Professional, 2007.
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.heat_capacity.Cp_data_Poling
+
+    In [3]: chemicals.heat_capacity.TRC_gas_data
+
+    In [4]: chemicals.heat_capacity.CRC_standard_data
+
+    In [5]: chemicals.heat_capacity.Cp_data_PerryI['124-38-9'] # gas only
+
+    In [6]: chemicals.heat_capacity.Cp_data_PerryI['7704-34-9'] # crystal and gas
+
+    In [7]: chemicals.heat_capacity.Cp_data_PerryI['7440-57-5'] # crystal and liquid
+
+    In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
+
 """
 
 __all__ = ['heat_capacity_gas_methods',
@@ -48,7 +169,7 @@ __numba_additional_funcs__ = ['Lastovka_Shaw_T_for_Hm_err',
                               'Lastovka_Shaw_T_for_Sm_err'
                               ]
 
-# %% Methods introduced in this module
+### Methods introduced in this module
 
 # Gases
 TRCIG = 'TRC Thermodynamics of Organic Compounds in the Gas State (1994)'
@@ -520,7 +641,7 @@ class PiecewiseHeatCapacity(object):
         return integral + model.calculate_integral_over_T(Ta, Tb)
 
 
-# %% Register data sources and lazy load them
+### Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Heat Capacity')
 register_df_source(folder, 'PolingDatabank.tsv')
@@ -660,7 +781,7 @@ else:
 
 
 
-# %% Heat capacities of gases
+### Heat capacities of gases
 
 def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     r'''Calculate ideal-gas constant-pressure heat capacitiy with the similarity
@@ -669,7 +790,7 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     .. math::
         C_p^0 = \left(A_2 + \frac{A_1 - A_2}{1 + \exp(\frac{\alpha-A_3}{A_4})}\right)
         + (B_{11} + B_{12}\alpha)\left(-\frac{(C_{11} + C_{12}\alpha)}{T}\right)^2
-        \frac{\exp(-(C_{11} + C_{12}\alpha)/T)}{[1-\exp(-(C_{11}+C_{12}\alpha)/T)]^2}\\
+        \frac{\exp(-(C_{11} + C_{12}\alpha)/T)}{[1-\exp(-(C_{11}+C_{12}\alpha)/T)]^2}
         + (B_{21} + B_{22}\alpha)\left(-\frac{(C_{21} + C_{22}\alpha)}{T}\right)^2
         \frac{\exp(-(C_{21} + C_{22}\alpha)/T)}{[1-\exp(-(C_{21}+C_{22}\alpha)/T)]^2}
         
@@ -689,9 +810,31 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     -----
     Original model is in terms of J/g/K. Note that the model is for predicting
     mass heat capacity, not molar heat capacity like most other methods!
-    A1 = 0.58, A2 = 1.25, A3 = 0.17338003, A4 = 0.014, B11 = 0.73917383,
-    B12 = 8.88308889, C11 = 1188.28051, C12 = 1813.04613, B21 = 0.0483019,
-    B22 = 4.35656721, C21 = 2897.01927, C22 = 5987.80407.
+    
+    A1 = 0.58
+    
+    A2 = 1.25
+    
+    A3 = 0.17338003
+    
+    A4 = 0.014
+    
+    B11 = 0.73917383
+    
+    B12 = 8.88308889
+    
+    C11 = 1188.28051
+    
+    C12 = 1813.04613
+    
+    B21 = 0.0483019
+    
+    B22 = 4.35656721
+    
+    C21 = 2897.01927
+    
+    C22 = 5987.80407
+    
     Examples
     --------
     >>> Lastovka_Shaw(1000.0, 0.1333)
@@ -1017,6 +1160,8 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     .. math::
         C_p = R\left(a_0 + (a_1/T^2) \exp(-a_2/T) + a_3 y^2
         + (a_4 - a_5/(T-a_7)^2 )y^j \right)
+        
+    .. math::
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
         
     Parameters
@@ -1038,7 +1183,7 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     Examples
     --------
     >>> TRCCp(300, 4.0, 7.65E5, 720., 3.565, -0.052, -1.55E6, 52., 201.)
-    42.06527108097466
+    42.065271080974654
     
     References
     ----------
@@ -1067,11 +1212,13 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
     .. math::
         \frac{H(T) - H^{ref}}{RT} = a_0 + a_1x(a_2)/(a_2T) + I/T + h(T)/T
         
+    .. math::
         h(T) = (a_5 + a_7)\left[(2a_3 + 8a_4)\ln(1-y)+ \left\{a_3\left(1 + 
         \frac{1}{1-y}\right) + a_4\left(7 + \frac{1}{1-y}\right)\right\}y
         + a_4\left\{3y^2 + (5/3)y^3 + y^4 + (3/5)y^5 + (1/3)y^6\right\} 
         + (1/7)\left\{a_4 - \frac{a_5}{(a_6+a_7)^2}\right\}y^7\right]
         
+    .. math::
         h(T) = 0 \text{ for } T \le a_7
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
         
@@ -1138,9 +1285,14 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
         \frac{-a_7}{a_6}\right)^{6-i} - a_4\right\}\frac{y^i}{i}
         - \left\{\frac{a_3}{a_6}(a_6 + a_7) + \frac{a_5 y^6}{7a_7(a_6+a_7)}
         \right\}y\right]
+
+    .. math::
         s(T) = 0 \text{ for } T \le a_7
         
+    .. math::
         z = \frac{T}{T+a_6} \cdot \frac{a_7 + a_6}{a_7}
+
+    .. math::
         y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
         
     Parameters
@@ -1166,7 +1318,7 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
     --------
     >>> TRCCp_integral_over_T(300, 4.0, 124000, 245, 50.539, -49.469, 
     ... 220440000, 560, 78)
-    213.80156219151885
+    213.80156219151888
     
     References
     ----------
@@ -1213,7 +1365,9 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
 def Rowlinson_Poling(T, Tc, omega, Cpgm):
     r'''Calculate liquid constant-pressure heat capacitiy with the [1]_ CSP method.
     This equation is not terrible accurate.
+
     The heat capacity of a liquid is given by:
+
     .. math::
         \frac{Cp^{L} - Cp^{g}}{R} = 1.586 + \frac{0.49}{1-T_r} +
         \omega\left[ 4.2775 + \frac{6.3(1-T_r)^{1/3}}{T_r} + \frac{0.4355}{1-T_r}\right]
@@ -1257,6 +1411,7 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
 def Rowlinson_Bondi(T, Tc, omega, Cpgm):
     r'''Calculate liquid constant-pressure heat capacitiy with the CSP method
     shown in [1]_.
+    
     The heat capacity of a liquid is given by:
         
     .. math::
@@ -1465,7 +1620,6 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable):
     S = T*T*0.5*(a2*a32 + a*a31) + T*(a2*a22 + a*a21) + a*constant*(a*a12 + a11)*log(T)
     return S*1000. # J/g/K to J/kg/K
 
-# @njit(cache=True)
 def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
     
@@ -1510,7 +1664,6 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(a1*log(1.0-Tr) + a2/(1.0-Tr) + a3 + Tr*(Tr*(Tr*a6 + a5) + a4))
 
 
-# @njit(cache=True)
 def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates the integral of liquid heat capacity using the  
     quasi-polynomial model developed in [1]_.
@@ -1553,7 +1706,6 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(T*(T*(T*(T*a6/(4.*Tc3) + a5/(3.*Tc2)) + a4/(2.*Tc)) - a1 + a3) 
               + T*a1*log(1. - T/Tc) - 0.5*Tc*(a1 + a2)*log(term*term))
 
-# @njit(cache=True)
 def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates the integral of liquid heat capacity over T using the 
     quasi-polynomial model  developed in [1]_.
@@ -1599,18 +1751,24 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(a3*logT -a1*polylog2(T/Tc) - a2*(-logT + 0.5*log(term*term))
               + T*(T*(T*a6/(3.*Tc3) + a5/(2.*Tc2)) + a4/Tc))
 
-# @njit(cache=True)
 def Zabransky_cubic(T, a1, a2, a3, a4):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
+    
     .. math::
-        \frac{C}{R}=\sum_{j=0}^3 A_{j+1} \left(\frac{T}{100}\right)^j
+        \frac{C}{R}=\sum_{j=0}^3 A_{j+1} \left(\frac{T}{100 \text{K}}\right)^j
         
     Parameters
     ----------
     T : float
         Temperature [K]
-    a1-a4 : float
-        Coefficients
+    a1 : float
+        Coefficient, [-]
+    a2 : float
+        Coefficient, [-]
+    a3 : float
+        Coefficient, [-]
+    a4 : float
+        Coefficient, [-]
         
     Returns
     -------
@@ -1636,7 +1794,6 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
     T = T/100.
     return R*(((a4*T + a3)*T + a2)*T + a1)
 
-# @njit(cache=True)
 def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     r'''Calculates the integral of liquid heat capacity using the model 
     developed in [1]_.
@@ -1645,8 +1802,14 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     ----------
     T : float
         Temperature [K]
-    a1-a4 : float
-        Coefficients
+    a1 : float
+        Coefficient, [-]
+    a2 : float
+        Coefficient, [-]
+    a3 : float
+        Coefficient, [-]
+    a4 : float
+        Coefficient, [-]
         
     Returns
     -------
@@ -1669,9 +1832,8 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
     T = T/100.
-    return 100*R*T*(T*(T*(T*a4*0.25 + a3/3.) + a2*0.5) + a1)
+    return 100.0*R*T*(T*(T*(T*a4*0.25 + a3*(1.0/3.)) + a2*0.5) + a1)
 
-# @njit(cache=True)
 def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     r'''Calculates the integral of liquid heat capacity over T using the model 
     developed in [1]_.
@@ -1680,8 +1842,14 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     ----------
     T : float
         Temperature [K]
-    a1-a4 : float
-        Coefficients
+    a1 : float
+        Coefficient, [-]
+    a2 : float
+        Coefficient, [-]
+    a3 : float
+        Coefficient, [-]
+    a4 : float
+        Coefficient, [-]
         
     Returns
     -------
@@ -1743,8 +1911,20 @@ def Lastovka_solid(T, similarity_variable):
     point.
     Original model is in terms of J/g/K. Note that the model s for predicting
     mass heat capacity, not molar heat capacity like most other methods!
-    A1 = 0.013183; A2 = 0.249381; theta = 151.8675; C1 = 0.026526;
-    C2 = -0.024942; D1 = 0.000025; D2 = -0.000123.
+    
+    A1 = 0.013183
+    
+    A2 = 0.249381
+    
+    :math:`\theta` = 151.8675
+    
+    C1 = 0.026526
+    
+    C2 = -0.024942
+    
+    D1 = 0.000025
+    
+    D2 = -0.000123
     
     Examples
     --------
@@ -1778,7 +1958,7 @@ def Lastovka_solid_integral(T, similarity_variable):
     r'''Integrates solid constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
     
-    Uses a explicit form as derived with Sympy.
+    uses an explicit form as derived with Sympy.
     
     Parameters
     ----------
@@ -1833,7 +2013,7 @@ def Lastovka_solid_integral_over_T(T, similarity_variable):
     r'''Integrates over T solid constant-pressure heat capacitiy with the 
     similarity variable concept and method as shown in [1]_.
     
-    Uses a explicit form as derived with Sympy.
+    uses an explicit form as derived with Sympy.
     
     Parameters
     ----------
