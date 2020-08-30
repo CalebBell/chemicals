@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +20,62 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains lookup functions enthalpies and standard entropies of
+formation. Lookup functions are availa for the liquid, solid, and gas states.
+A compound may be in more than one lookup function.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Solid Heat of Formation
+-----------------------
+.. autofunction:: chemicals.reaction.Hfs
+.. autofunction:: chemicals.reaction.Hfs_methods
+.. autodata:: chemicals.reaction.Hfs_all_methods
+
+Liquid Heat of Formation
+------------------------
+.. autofunction:: chemicals.reaction.Hfl
+.. autofunction:: chemicals.reaction.Hfl_methods
+.. autodata:: chemicals.reaction.Hfl_all_methods
+
+Gas Heat of Formation
+---------------------
+.. autofunction:: chemicals.reaction.Hfg
+.. autofunction:: chemicals.reaction.Hfg_methods
+.. autodata:: chemicals.reaction.Hfg_all_methods
+
+Solid Absolute Entropy
+----------------------
+.. autofunction:: chemicals.reaction.S0s
+.. autofunction:: chemicals.reaction.S0s_methods
+.. autodata:: chemicals.reaction.S0s_all_methods
+
+Liquid Absolute Entropy
+-----------------------
+.. autofunction:: chemicals.reaction.S0l
+.. autofunction:: chemicals.reaction.S0l_methods
+.. autodata:: chemicals.reaction.S0l_all_methods
+
+Gas Absolute Entropy
+--------------------
+.. autofunction:: chemicals.reaction.S0g
+.. autofunction:: chemicals.reaction.S0g_methods
+.. autodata:: chemicals.reaction.S0g_all_methods
+
+Utility Functions
+-----------------
+.. autofunction:: chemicals.reaction.Gibbs_formation
+.. autofunction:: chemicals.reaction.entropy_formation
+.. autofunction:: chemicals.reaction.Hf_basis_converter
+
+Chemical Reactions
+------------------
+.. autofunction:: chemicals.reaction.balance_stoichiometry
+.. autofunction:: chemicals.reaction.stoichiometric_matrix
 """
 
 __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s', 
@@ -108,6 +165,7 @@ else:
 # has dippr standard heats of formation, about 55% of the database
 
 Hfs_all_methods = (CRC,)
+'''Tuple of method name keys. See the `Hfs` for the actual references'''
 
 def Hfs_methods(CASRN):
     """Return all methods available to obtain the Hfs for the desired chemical.
@@ -182,6 +240,7 @@ def Hfs(CASRN, method=None):
         return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
 Hfl_all_methods = (ATCT_L, CRC)
+'''Tuple of method name keys. See the `Hfl` for the actual references'''
 
 def Hfl_methods(CASRN):
     """Return all methods available to obtain the Hfl for the desired chemical.
@@ -259,6 +318,7 @@ def Hfl(CASRN, method=None):
         return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
 Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS)
+'''Tuple of method name keys. See the `Hfg` for the actual references'''
 
 def Hfg_methods(CASRN):
     """Return all methods available to obtain the Hfg for the desired chemical.
@@ -354,6 +414,7 @@ def Hfg(CASRN, method=None):
         return retrieve_any_from_df_dict(Hfg_sources, CASRN, 'Hfg')
 
 S0s_all_methods = (CRC,)
+'''Tuple of method name keys. See the `S0s` for the actual references'''
 
 def S0s_methods(CASRN):
     """Return all methods available to obtain the S0s for the desired chemical.
@@ -422,6 +483,7 @@ def S0s(CASRN, method=None):
         return retrieve_any_from_df_dict(S0s_sources, CASRN, 'S0s')
 
 S0l_all_methods = (CRC,)
+'''Tuple of method name keys. See the `S0l` for the actual references'''
 
 def S0l_methods(CASRN):
     """Return all methods available to obtain the S0l for the desired chemical.
@@ -496,6 +558,7 @@ def S0l(CASRN, method=None):
         return retrieve_any_from_df_dict(S0l_sources, CASRN, 'S0l')
 
 S0g_all_methods = (CRC, YAWS)
+'''Tuple of method name keys. See the `S0g` for the actual references'''
 
 def S0g_methods(CASRN):
     """Return all methods available to obtain the S0g for the desired chemical.

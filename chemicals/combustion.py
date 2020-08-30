@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
-<Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,28 @@ For reporting bugs, adding feature requests, or submitting pull requests,
 please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
 
 .. contents:: :local:
+    
+Combustion Stoichiometry
+------------------------
+.. autofunction:: chemicals.combustion.combustion_stoichiometry
+.. autofunction:: chemicals.combustion.combustion_products_mixture
 
+Heat of Combustion
+------------------
+.. autofunction:: chemicals.combustion.HHV_stoichiometry
+.. autofunction:: chemicals.combustion.HHV_modified_Dulong
+.. autofunction:: chemicals.combustion.LHV_from_HHV
+
+Heat of Combustion and Stiochiometry
+------------------------------------
+.. autofunction:: chemicals.combustion.combustion_data
+.. autoclass:: chemicals.combustion.CombustionData
+
+Basic Combustion Spec Solvers
+-----------------------------
+.. autofunction:: chemicals.combustion.fuel_air_spec_solver
+.. autofunction:: chemicals.combustion.combustion_spec_solver
+.. autofunction:: chemicals.combustion.air_fuel_ratio_solver
 
 """
 
@@ -48,8 +69,6 @@ __all__ = ('combustion_stoichiometry',
            'combustion_spec_solver')
 
    
-
-# TODO: Consider moving this to elements.py
 def as_atoms(formula):
     if isinstance(formula, str):
         atoms = simple_formula_parser(formula)
@@ -59,8 +78,6 @@ def as_atoms(formula):
         raise ValueError("atoms must be either a string or dictionary, "
                         "not a %s object" %(type(formula).__name__))
     return atoms
-
-
 
 DULONG = 'Dulong'
 STOICHIOMETRY = 'Stoichiometry'

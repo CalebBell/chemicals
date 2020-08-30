@@ -66,7 +66,6 @@ Critical Property Relationships
 .. autofunction:: chemicals.critical.Meissner
 .. autofunction:: chemicals.critical.Grigoras
 
-
 Critical Temperature of Mixtures
 --------------------------------
 .. autofunction:: chemicals.critical.Li
