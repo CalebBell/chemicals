@@ -1,4 +1,4 @@
-chemicals.elements module
-=========================
+Periodic Table (chemicals.elements)
+===================================
 
 .. automodule:: chemicals.elements

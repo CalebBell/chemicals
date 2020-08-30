@@ -1,4 +1,4 @@
-chemicals.viscosity module
-==========================
+Viscosity (chemicals.viscosity)
+===============================
 
 .. automodule:: chemicals.viscosity

@@ -1,4 +1,4 @@
-chemicals.heat_capacity module
-==============================
+Heat Capacity (chemicals.heat_capacity)
+=======================================
 
 .. automodule:: chemicals.heat_capacity

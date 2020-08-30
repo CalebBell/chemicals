@@ -20,6 +20,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains miscellaneous functions which may be useful. This includes
+definitions of some chemical properties, and conversions between others.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
 """
 
 __all__ = ['isobaric_expansion', 'isothermal_compressibility', 
@@ -466,7 +475,7 @@ def API_to_SG(API):
     References
     ----------
     .. [1] API Technical Data Book: General Properties & Characterization.
-    American Petroleum Institute, 7E, 2005.
+       American Petroleum Institute, 7E, 2005.
     '''
     return 141.5/(API + 131.5)
 

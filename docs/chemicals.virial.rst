@@ -1,4 +1,4 @@
-chemicals.virial module
-=======================
+Virial Coefficients (chemicals.virial)
+======================================
 
 .. automodule:: chemicals.virial

@@ -1,4 +1,4 @@
-chemicals.environment module
-============================
+Environmental Properties (chemicals.environment)
+================================================
 
 .. automodule:: chemicals.environment

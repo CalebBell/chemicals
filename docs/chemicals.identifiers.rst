@@ -1,4 +1,4 @@
-chemicals.identifiers module
-============================
+Chemical Metadata (chemicals.identifiers)
+=========================================
 
 .. automodule:: chemicals.identifiers

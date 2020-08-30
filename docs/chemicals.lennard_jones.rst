@@ -1,4 +1,4 @@
-chemicals.lennard_jones module
-==============================
+Lennard-Jones Models (chemicals.lennard_jones)
+==============================================
 
 .. automodule:: chemicals.lennard_jones

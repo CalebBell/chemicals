@@ -1,4 +1,4 @@
-chemicals.reaction module
-=========================
+Chemical Reactions (chemicals.reaction)
+=======================================
 
 .. automodule:: chemicals.reaction

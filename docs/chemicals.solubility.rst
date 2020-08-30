@@ -1,4 +1,4 @@
-chemicals.solubility module
-===========================
+Solubility (chemicals.solubility)
+=================================
 
 .. automodule:: chemicals.solubility

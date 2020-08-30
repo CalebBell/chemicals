@@ -1,4 +1,4 @@
-chemicals.volume module
-=======================
+Density/Volume (chemicals.volume)
+=================================
 
 .. automodule:: chemicals.volume

@@ -1,4 +1,4 @@
-chemicals.vapor_pressure module
-===============================
+Vapor Pressure (chemicals.vapor_pressure)
+=========================================
 
 .. automodule:: chemicals.vapor_pressure
