@@ -70,7 +70,7 @@ Heat of Vaporization at T Correlations
 Heat of Vaporization at T Model Equations 
 -----------------------------------------
 .. autofunction:: chemicals.phase_change.Alibakhshi
-
+.. autofunction:: chemicals.phase_change.PPDS12
 
 Heat of Sublimation 
 -------------------
@@ -84,7 +84,7 @@ the equation :math:`H_{sub} = H_{fus} + H_{vap}`.
 
 __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm', 
            'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen', 
-           'Liu', 'Vetere', 'Alibakhshi', 'Watson', 'Hfus', 'Hfus_methods']
+           'Liu', 'Vetere', 'Alibakhshi','PPDS12', 'Watson', 'Hfus', 'Hfus_methods']
 
 import os
 from fluids.numerics import numpy as np
@@ -1030,6 +1030,60 @@ def Alibakhshi(T, Tc, C):
        https://doi.org/10.1016/j.fluid.2016.10.013.
     '''
     return (4.5*pi*N_A)**(1/3.)*4.2E-7*(Tc-6.) - R/2.*T*log(T) + C*T
+
+def PPDS12(T, Tc, A, B, C, D, E):
+    r'''Calculate the enthalpy of vaporization of a fluid using the 5-term 
+    powerfit developed by the PPDS and named PPDS equation 12.
+    
+    .. math::
+       \H_{vap} = RT_c \left(A\tau^{1/3} + B\tau^{2/3} + C\tau + D\tau^2 
+       + E\tau^6\right)
+    
+    .. math::
+        \tau = 1 - \frac{T}{T_c}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [-]
+    C : float
+        Coefficient, [-]
+    D : float
+        Coefficient, [-]
+    E : float
+        Coefficient, [-]
+
+    Returns
+    -------
+    Hvap : float
+        Enthalpy of vaporization at `T`, [J/mol]
+
+    Notes
+    -----
+    No other source for these coefficients has been found.
+
+    Examples
+    --------
+    >>> PPDS12(300.0, 591.75, 4.60584, 13.97224, -10.592315, 2.120205, 4.277128)
+    37948.76862035927
+    
+    References
+    ----------
+    .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+       Berlin; New York:: Springer, 2010.
+    '''
+    tau = 1. - T/Tc
+    tau_cbrt = tau**(1/3.)
+    tau2 = tau*tau
+    Hvap = R*Tc*(tau_cbrt*(A + B*tau_cbrt) + C*tau
+                               + tau2*(D + E*tau2*tau2))
+    return Hvap
 
 ### Heat of Fusion
 

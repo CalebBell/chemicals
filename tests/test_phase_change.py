@@ -294,3 +294,8 @@ def test_Tm():
 def test_Alibakhshi():
     Hvap = Alibakhshi(T=320.0, Tc=647.14, C=-16.7171)
     assert_close(Hvap, 41961.30490225752, rtol=1e-13)
+    
+def test_PPDS12():
+    Hvap = PPDS12(300.0, 591.75, 4.60584, 13.97224, -10.592315, 2.120205, 4.277128)
+    assert_close(Hvap, 37948.76862035927, rtol=1e-13)
+    
