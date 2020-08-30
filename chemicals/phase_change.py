@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,6 +19,62 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains lookup functions for melting and boiling point, heat of 
+fusion, various enthalpy of vaporization estimation routines, and dataframes
+of fit coefficients.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Boiling Point
+-------------
+.. autofunction:: chemicals.phase_change.Tb
+.. autofunction:: chemicals.phase_change.Tb_methods
+.. autodata:: chemicals.phase_change.Tb_all_methods
+
+Melting Point
+-------------
+.. autofunction:: chemicals.phase_change.Tm
+.. autofunction:: chemicals.phase_change.Tm_methods
+.. autodata:: chemicals.phase_change.Tm_all_methods
+
+Heat of Fusion
+--------------
+Heat of fusion does not strongly depend on temperature or pressure. This is the
+standard value, at 1 atm and the normal melting point.
+
+.. autofunction:: chemicals.phase_change.Hfus
+.. autofunction:: chemicals.phase_change.Hfus_methods
+.. autodata:: chemicals.phase_change.Hfus_all_methods
+
+Heat of Vaporization at Tb Correlations 
+---------------------------------------
+.. autofunction:: chemicals.phase_change.Riedel
+.. autofunction:: chemicals.phase_change.Chen
+.. autofunction:: chemicals.phase_change.Liu
+.. autofunction:: chemicals.phase_change.Vetere
+
+Heat of Vaporization at T Correlations 
+---------------------------------
+.. autofunction:: chemicals.phase_change.Pitzer
+.. autofunction:: chemicals.phase_change.SMK
+.. autofunction:: chemicals.phase_change.MK
+.. autofunction:: chemicals.phase_change.Velasco
+.. autofunction:: chemicals.phase_change.Pitzer
+.. autofunction:: chemicals.phase_change.Clapeyron
+.. autofunction:: chemicals.phase_change.Watson
+
+Heat of Sublimation 
+-------------------
+No specific correlation is provided. This value is fairly strongly temperature
+dependent; the dependency comes almost entirely from the vaporization
+enthalpy's dependence. To calculate heat of sublimation at any temperature, use
+the equation :math:`H_{sub} = H_{fus} + H_{vap}`.
+
+
 """
 
 __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm', 
@@ -126,6 +182,7 @@ else:
 ### Boiling Point at 1 atm
 
 Tb_all_methods = (CRC_INORG, CRC_ORG, YAWS)
+'''Tuple of method name keys. See the `Tb` for the actual references'''
 
 def Tb_methods(CASRN):
     """Return all methods available to obtain the Tb for the desired chemical.
@@ -210,6 +267,7 @@ def Tb(CASRN, method=None):
 ### Melting Point
 
 Tm_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
+'''Tuple of method name keys. See the `Tm` for the actual references'''
 
 def Tm_methods(CASRN):
     """Return all methods available to obtain the Tm for the desired chemical.
@@ -422,14 +480,17 @@ def SMK(T, Tc, omega):
          \left[\left( \frac{\Delta H_{vap}} {RT_c} \right)^{(R2)} - \left(
          \frac{\Delta H_{vap}} {RT_c} \right)^{(R1)} \right]
 
+    .. math::
         \left( \frac{\Delta H_{vap}} {RT_c} \right)^{(R1)}
         = 6.537 \tau^{1/3} - 2.467 \tau^{5/6} - 77.251 \tau^{1.208} +
         59.634 \tau + 36.009 \tau^2 - 14.606 \tau^3
 
+    .. math::
         \left( \frac{\Delta H_{vap}} {RT_c} \right)^{(R2)} - \left(
         \frac{\Delta H_{vap}} {RT_c} \right)^{(R1)}=-0.133 \tau^{1/3} - 28.215
         \tau^{5/6} - 82.958 \tau^{1.208} + 99.00 \tau  + 19.105 \tau^2 -2.796 \tau^3
 
+    .. math::
         \tau = 1-T/T_c
 
     Parameters
@@ -518,9 +579,11 @@ def MK(T, Tc, omega):
     .. math::
         \Delta H_{vap} =  \Delta H_{vap}^{(0)} + \omega \Delta H_{vap}^{(1)} + \omega^2 \Delta H_{vap}^{(2)}
 
+    .. math::
         \frac{\Delta H_{vap}^{(i)}}{RT_c} = b^{(j)} \tau^{1/3} + b_2^{(j)} \tau^{5/6}
         + b_3^{(j)} \tau^{1.2083} + b_4^{(j)}\tau + b_5^{(j)} \tau^2 + b_6^{(j)} \tau^3
 
+    .. math::
         \tau = 1-T/T_c
 
     Parameters
@@ -917,6 +980,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
 ### Heat of Fusion
 
 Hfus_all_methods = (CRC,)
+'''Tuple of method name keys. See the `Hfus` for the actual references'''
 
 def Hfus_methods(CASRN):
     """Return all methods available to obtain the Hfus for the desired chemical.

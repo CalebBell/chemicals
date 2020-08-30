@@ -84,6 +84,7 @@ else:
         _load_triple_data()
 
 Tt_all_methods = (STAVELEY, MELTING)
+'''Tuple of method name keys. See the `Tt` for the actual references'''
 
 def Tt_methods(CASRN):
     """Return all methods available to obtain the Tt for the desired chemical.
@@ -168,6 +169,7 @@ def Tt(CASRN, get_methods=False, method=None):
         return Tm(CASRN)    
 
 Pt_all_methods = (STAVELEY,)
+'''Tuple of method name keys. See the `Pt` for the actual references'''
 
 def Pt_methods(CASRN):
     """Return all methods available to obtain the Pt for the desired chemical.
