@@ -12,6 +12,8 @@ __pycache__
 prof
 *Pyreverse*
 monkeytype.sqlite3
+*.spyproject*
+
 # Docs #
 ########
 # No need to save these files
