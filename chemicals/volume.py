@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
 
@@ -75,6 +75,91 @@ in the geochemical or astronomical domain is normally neglected.
 Pure Component Solid Fit Correlations
 -------------------------------------
 .. autofunction:: chemicals.volume.CRC_inorganic
+
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: rho_data_COSTALD
+
+    Coefficients for the :obj:`COSTALD` method from [3]_; 192 fluids have 
+    coefficients published.
+
+.. data:: rho_data_SNM0
+
+    Coefficients for the :obj:`SNM0` method for 73 fluids from [2]_.
+
+.. data:: rho_data_Perry_8E_105_l
+    
+    Coefficients for :obj:`chemicals.dippr.EQ105` from [1]_ for 344 fluds. Note
+    this is in terms of molar density; to obtain molar volume, invert the result!
+
+.. data:: rho_data_VDI_PPDS_2
+
+    Coefficients in [5]_ developed by the PPDS using :obj:`chemicals.dippr.EQ116` 
+    but in terms of mass density [kg/m^3]; Valid up to the critical temperature,
+    and extrapolates to very low temperatures well.
+
+.. data:: rho_data_CRC_inorg_l
+
+    Single-temperature coefficient linear model in terms of mass density
+    for the density of inorganic liquids. Data is available for 177 fluids
+    normally valid over a
+    narrow range above the melting point, from [4]_; described in
+    :obj:`CRC_inorganic`.
+
+.. data:: rho_data_CRC_inorg_l_const
+
+    Constant inorganic liquid molar volumes published in [4]_.
+
+.. data:: rho_data_CRC_inorg_s_const
+
+    Constant solid densities molar volumes published in [4]_.
+
+.. data:: rho_data_CRC_virial
+
+    Coefficients for a tempereture polynomial (T in Kelvin) for the second `B` 
+    virial coefficient published in [4]_. The form of the equation is 
+    :math:`B = (a_1 + t(a_2 + t(a_3 + t(a_4 + a_5 t)))) \times 10^{-6}` with
+    :math:`t = \frac{298.15}{T} - 1` and then `B` will be in units of m^3/mol.
+            
+    
+.. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+    8E. McGraw-Hill Professional, 2007.
+.. [2] Mchaweh, A., A. Alsaygh, Kh. Nasrifar, and M. Moshfeghian.
+    "A Simplified Method for Calculating Saturated Liquid Densities."
+    Fluid Phase Equilibria 224, no. 2 (October 1, 2004): 157-67.
+    doi:10.1016/j.fluid.2004.06.054
+.. [3] Hankinson, Risdon W., and George H. Thomson. "A New Correlation for
+    Saturated Densities of Liquids and Their Mixtures." AIChE Journal
+    25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
+.. [4] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+    Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+.. [5] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+    Berlin; New York:: Springer, 2010.
+
+The structure of each dataframe is shown below:
+    
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.volume.rho_data_COSTALD
+
+    In [3]: chemicals.volume.rho_data_SNM0
+
+    In [4]: chemicals.volume.rho_data_Perry_8E_105_l
+
+    In [5]: chemicals.volume.rho_data_VDI_PPDS_2
+
+    In [6]: chemicals.volume.rho_data_CRC_inorg_l
+
+    In [7]: chemicals.volume.rho_data_CRC_inorg_l_const
+
+    In [8]: chemicals.volume.rho_data_CRC_inorg_s_const
+
+    In [9]: chemicals.volume.rho_data_CRC_virial
 
 """
 
