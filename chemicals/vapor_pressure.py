@@ -67,6 +67,65 @@ Fit Coefficients
 All of these coefficients are lazy-loaded, so they must be accessed as an
 attribute of this module.
 
+.. data:: Psat_data_WagnerMcGarry
+
+    Coefficients for the Wagner 3,6 original model equation documented in
+    :obj:`Wagner_original` with data for 245 chemicals, from [1]_.
+
+.. data:: Psat_data_WagnerPoling
+
+    Coefficients for the Wagner 2.5, 5 model equation documented in 
+    :obj:`Wagner` in [2]_, with data for 104 chemicals.
+
+.. data:: Psat_data_AntoinePoling
+
+    Standard Antoine equation coefficients, as documented in the function
+    :obj:`Antoine` and with data for 325 fluids from [2]_.
+    Coefficients were altered to be in units of Pa and Celcius.
+
+.. data:: Psat_data_AntoineExtended
+
+    Data for 97 chemicals in [2]_ for the TRC extended Antoine model 
+    :obj:`TRC_Antoine_extended`.
+    
+.. data:: Psat_data_Perrys2_8
+
+    A collection of 341 coefficient sets for :obj:`thermo.dippr.EQ101` from 
+    the DIPPR database published openly in [4]_. 
+
+.. data:: Psat_data_VDI_PPDS_3
+
+    Coefficients for the Wagner equation :obj:`Wagner`, published 
+    openly in [3]_. 
+
+.. [1] McGarry, Jack. "Correlation and Prediction of the Vapor Pressures of
+    Pure Liquids over Large Pressure Ranges." Industrial & Engineering
+    Chemistry Process Design and Development 22, no. 2 (April 1, 1983):
+    313-22. doi:10.1021/i200021a023.
+.. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+    New York: McGraw-Hill Professional, 2000.
+.. [3] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+    Berlin; New York:: Springer, 2010.
+.. [4] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+    Eighth Edition. McGraw-Hill Professional, 2007.
+
+The structure of each dataframe is shown below:
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.vapor_pressure.Psat_data_WagnerMcGarry
+
+    In [3]: chemicals.vapor_pressure.Psat_data_WagnerPoling
+
+    In [4]: chemicals.vapor_pressure.Psat_data_AntoinePoling
+
+    In [5]: chemicals.vapor_pressure.Psat_data_AntoineExtended
+
+    In [6]: chemicals.vapor_pressure.Psat_data_Perrys2_8
+
+    In [7]: chemicals.vapor_pressure.Psat_data_VDI_PPDS_3
 
 """
 
