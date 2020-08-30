@@ -28,7 +28,7 @@ import pandas as pd
 from fluids.numerics import assert_close, derivative, assert_close1d
 from chemicals.vapor_pressure import *
 from chemicals.vapor_pressure import Psat_data_WagnerMcGarry, Psat_data_AntoinePoling, Psat_data_WagnerPoling, Psat_data_AntoineExtended, Psat_data_Perrys2_8, Psat_data_VDI_PPDS_3
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 from math import *
 
 ### Regression equations
@@ -134,7 +134,7 @@ def test_WagnerMcGarry():
     assert Psat_data_WagnerMcGarry.index.is_unique
     assert Psat_data_WagnerMcGarry.shape == (245, 8)
     for i in Psat_data_WagnerMcGarry.index:
-        assert checkCAS(i)
+        assert check_CAS(i)
 
 
 def test_AntoinePoling():
@@ -144,7 +144,7 @@ def test_AntoinePoling():
 
     assert Psat_data_AntoinePoling.index.is_unique
     assert Psat_data_AntoinePoling.shape == (325, 6)
-    assert all([checkCAS(i) for i in Psat_data_AntoinePoling.index])
+    assert all([check_CAS(i) for i in Psat_data_AntoinePoling.index])
 
 
 def test_WagnerPoling():
@@ -154,7 +154,7 @@ def test_WagnerPoling():
 
     assert Psat_data_WagnerPoling.index.is_unique
     assert Psat_data_WagnerPoling.shape == (104, 9)
-    assert all([checkCAS(i) for i in Psat_data_WagnerPoling.index])
+    assert all([check_CAS(i) for i in Psat_data_WagnerPoling.index])
 
 
 def test_AntoineExtended():
@@ -164,7 +164,7 @@ def test_AntoineExtended():
 
     assert Psat_data_AntoineExtended.index.is_unique
     assert Psat_data_AntoineExtended.shape == (97, 11)
-    assert all([checkCAS(i) for i in Psat_data_AntoineExtended.index])
+    assert all([check_CAS(i) for i in Psat_data_AntoineExtended.index])
     
 def test_VDI_PPDS_3_data():
     """I believe there are no errors here.
@@ -172,7 +172,7 @@ def test_VDI_PPDS_3_data():
     Average temperature deviation
     0.144% vs tabulated values.
     """
-    assert all([checkCAS(i) for i in Psat_data_VDI_PPDS_3.index])
+    assert all([check_CAS(i) for i in Psat_data_VDI_PPDS_3.index])
     tots_calc = [Psat_data_VDI_PPDS_3[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'Pc', u'Tm']]
     tots = [2171.4607300000002, 694.38631999999996, 931.3604499999999, 919.88944000000004, 150225.16000000003, 1265565000, 56957.849999999991]
     assert_allclose(tots_calc, tots)
@@ -181,7 +181,7 @@ def test_VDI_PPDS_3_data():
     assert Psat_data_VDI_PPDS_3.shape == (275, 8)
 
 def test_Perrys2_8():
-    assert all([checkCAS(i) for i in Psat_data_Perrys2_8.index])
+    assert all([check_CAS(i) for i in Psat_data_Perrys2_8.index])
     tots_calc = [Psat_data_Perrys2_8[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'C5', 'Tmin', 'Tmax']]
     tots = [30288.457300000002, 2574584.506, 3394.9677, 1.1357374248600194, 1223.7, 70399.92, 187558.921]
     assert_allclose(tots_calc, tots)

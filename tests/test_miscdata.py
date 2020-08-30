@@ -27,7 +27,7 @@ from fluids.numerics import assert_close, assert_close1d
 from chemicals import miscdata
 from chemicals.miscdata import *
 from chemicals.miscdata import VDI_saturation_dict, CRC_inorganic_data, CRC_organic_data
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 
 
 ### CRC Inorganic compounds
@@ -42,7 +42,7 @@ def test_CRC_inorganic():
 
 @pytest.mark.slow
 def test_CRC_inorganic_check_CAS():
-    assert all([checkCAS(i) for i in CRC_inorganic_data.index])
+    assert all([check_CAS(i) for i in CRC_inorganic_data.index])
 
 
 def test_CRC_organic():
@@ -56,7 +56,7 @@ def test_CRC_organic():
 @pytest.mark.slow
 def test_CRC_organic_check_CAS():
     for i in CRC_organic_data.index:
-        assert checkCAS(i)
+        assert check_CAS(i)
 
 
 def test_lookup_VDI_tabular_data():

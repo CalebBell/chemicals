@@ -91,31 +91,6 @@ def test_none_and_length_check():
     assert False == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]]), length=3)
     assert False == none_and_length_check(np.array([[1, 1], [1, 1, 10], [1, 30], [10,0]]), length=3)
 
-
-
-def test_CAS2int():
-    assert CAS2int('7704-34-9') == 7704349
-
-    with pytest.raises(Exception):
-        CAS2int(7704349)
-
-def test_int2CAS():
-    assert int2CAS(7704349) == '7704-34-9'
-
-    with pytest.raises(Exception):
-        CAS2int(7704349.0)
-
-def test_sorted_CAS_key():
-    expect = ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
-    res = sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
-    assert res == expect
-    res = sorted_CAS_key(['108-88-3', '98-00-0', '7732-18-5', '64-17-5'])
-    assert res == expect
-    
-    invalid_CAS_expect = ('641', '98-00-0', '108-88-3', '7732-8-5')
-    invalid_CAS_test = sorted_CAS_key(['7732-8-5', '641', '108-88-3', '98-00-0'])
-    assert invalid_CAS_expect == invalid_CAS_test
-    
     
 def test_property_molar_to_mass():
     assert_close(property_molar_to_mass(500, 18.015), 27754.648903691366, rtol=1e-14)

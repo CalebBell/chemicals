@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,23 +19,41 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains a database of metadata on ~70000 chemicals from the PubChem
+datase. It contains comprehensive feature for searching the metadata.
+It also includes a small database of common mixture compositions.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Periodic Table and Elements
+---------------------------
+.. autodata:: chemicals.elements.periodic_table
+.. autoclass:: chemicals.elements.Element
+
+CAS Number Utilities
+--------------------
+
 """
 
 from __future__ import division
 
-__all__ = ['checkCAS', 'CAS_from_any', 'search_chemical', 
+__all__ = ['check_CAS', 'CAS_from_any', 'search_chemical',
            'mixture_from_any', 'cryogenics', 'dippr_compounds',
-           'get_pubchem_db']
+           'get_pubchem_db', 'CAS2int', 'sorted_CAS_key', 'int2CAS']
 
 import os
 from io import open
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data, to_num, CAS2int, int2CAS
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data, to_num
 from chemicals.elements import (periodic_table, homonuclear_elemental_gases,
                              charge_from_formula, serialize_formula)
 
 folder = os_path_join(source_path, 'Identifiers')
 
-def checkCAS(CASRN):
+def check_CAS(CASRN):
     """Checks if a CAS number is valid. Returns False if the parser cannot parse
     the given string.
 
@@ -63,9 +81,9 @@ def checkCAS(CASRN):
 
     Examples
     --------
-    >>> checkCAS('7732-18-5')
+    >>> check_CAS('7732-18-5')
     True
-    >>> checkCAS('77332-18-5')
+    >>> check_CAS('77332-18-5')
     False
     """
     try:
@@ -80,6 +98,91 @@ def checkCAS(CASRN):
     except:
         return False
 
+
+
+def CAS2int(i):
+    r'''Converts CAS number of a compounds from a string to an int. This is
+    helpful when storing large amounts of CAS numbers, as their strings take up
+    more memory than their numerical representational. All CAS numbers fit into
+    64 bit ints.
+
+    Parameters
+    ----------
+    CASRN : string
+        CASRN [-]
+
+    Returns
+    -------
+    CASRN : int
+        CASRN [-]
+
+    Notes
+    -----
+    Accomplishes conversion by removing dashes only, and then converting to an
+    int. An incorrect CAS number will change without exception.
+
+    Examples
+    --------
+    >>> CAS2int('7704-34-9')
+    7704349
+    '''
+    return int(i.replace('-', ''))
+
+
+def int2CAS(i):
+    r'''Converts CAS number of a compounds from an int to an string. This is
+    helpful when dealing with int CAS numbers.
+
+    Parameters
+    ----------
+    CASRN : int
+        CASRN [-]
+
+    Returns
+    -------
+    CASRN : string
+        CASRN [-]
+
+    Notes
+    -----
+    Handles CAS numbers with an unspecified number of digits. Does not work on
+    floats.
+
+    Examples
+    --------
+    >>> int2CAS(7704349)
+    '7704-34-9'
+    '''
+    i = str(i)
+    return i[:-3]+'-'+i[-3:-1]+'-'+i[-1]
+
+def sorted_CAS_key(CASs):
+    r'''Takes a list of CAS numbers as strings, and returns a tuple of the same
+    CAS numbers, sorted from smallest to largest. This is very convenient for
+    obtaining a unique hash of a set of compounds, so as to see if two
+    groups of compounds are the same.
+
+    Parameters
+    ----------
+    CASs : list[str]
+        CAS numbers as strings [-]
+
+    Returns
+    -------
+    CASs_sorted : tuple[str]
+        Sorted CAS numbers from lowest (first) to highest (last) [-]
+
+    Notes
+    -----
+    Does not check CAS numbers for validity.
+
+    Examples
+    --------
+    >>> sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
+    ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
+    '''
+    int_CASs = [CAS2int(i) for i in CASs]
+    return tuple(CAS for _, CAS in sorted(zip(int_CASs,CASs)))
 
 class ChemicalMetadata(object):
     __slots__ = ['pubchemid', 'formula', 'MW', 'smiles', 'InChI', 'InChI_key',
@@ -374,7 +477,7 @@ def _search_chemical(ID, autoload):
         else:
             obj = pubchem_db.search_CAS(periodic_table[ID].CAS_standard)
         return obj
-    if checkCAS(ID):
+    if check_CAS(ID):
         CAS_lookup = pubchem_db.search_CAS(ID, autoload)
         if CAS_lookup:
             return CAS_lookup

@@ -32,7 +32,7 @@ from chemicals.phase_change import (Hvap_data_CRC, Hfus_data_CRC,
                                     phase_change_data_Alibakhshi_Cs, 
                                     phase_change_data_VDI_PPDS_4)
 from chemicals.miscdata import CRC_inorganic_data, CRC_organic_data
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 
 
 def test_Watson():
@@ -113,7 +113,7 @@ def test_Hvap_CRC_data():
     assert Hvap_data_CRC.index.is_unique
     assert Hvap_data_CRC.shape == (926, 5)
 
-    assert all([checkCAS(i) for i in list(Hvap_data_CRC.index)])
+    assert all([check_CAS(i) for i in list(Hvap_data_CRC.index)])
 
 
 def test_Hfus_CRC_data():
@@ -122,7 +122,7 @@ def test_Hfus_CRC_data():
     assert Hfus_data_CRC.index.is_unique
     assert Hfus_data_CRC.shape == (1112, 3)
 
-    assert all([checkCAS(i) for i in list(Hfus_data_CRC.index)])
+    assert all([check_CAS(i) for i in list(Hfus_data_CRC.index)])
 
 
 def test_Hfus():
@@ -160,7 +160,7 @@ def test_Yaws_Tb_data():
 
 @pytest.mark.slow
 def test_Yaws_Tb_CAS_valid():
-    assert all([checkCAS(i) for i in Tb_data_Yaws.index])
+    assert all([check_CAS(i) for i in Tb_data_Yaws.index])
 
 def test_Tm_ON_data():
     tot = Tm_ON_data.sum()
@@ -171,7 +171,7 @@ def test_Tm_ON_data():
     
 @pytest.mark.slow
 def test_Tm_ON_data_CAS_valid():
-    assert all([checkCAS(i) for i in Tm_ON_data.index])
+    assert all([check_CAS(i) for i in Tm_ON_data.index])
 
     
 def test_Perrys2_150_data():
@@ -181,7 +181,7 @@ def test_Perrys2_150_data():
     # C1 is divided by 1000, to give units of J/mol instead of J/kmol
     # Terephthalic acid removed, was a constant value only.
     
-    assert all([checkCAS(i) for i in phase_change_data_Perrys2_150.index])
+    assert all([check_CAS(i) for i in phase_change_data_Perrys2_150.index])
     tots_calc = [phase_change_data_Perrys2_150[i].abs().sum() for i in [u'Tc', u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
     tots = [189407.42499999999, 18617223.739999998, 174.34494000000001, 112.51209900000001, 63.894040000000004, 70810.849999999991, 189407.005]
     assert_close1d(tots_calc, tots)
@@ -192,7 +192,7 @@ def test_Perrys2_150_data():
 
 def test_Alibakhshi_Cs_data():
     # Oops, a bunch of these now-lonely coefficients have an invalid CAS...
-    # assert all([checkCAS(i) for i in phase_change_data_Alibakhshi_Cs.index])
+    # assert all([check_CAS(i) for i in phase_change_data_Alibakhshi_Cs.index])
     tots_calc = [phase_change_data_Alibakhshi_Cs[i].abs().sum() for i in [u'C']]
     tots = [28154.361500000003]
     assert_close1d(tots_calc, tots)
@@ -203,7 +203,7 @@ def test_Alibakhshi_Cs_data():
 
 def test_VDI_PPDS_4_data():
     """I believe there are no errors here."""
-    assert all([checkCAS(i) for i in phase_change_data_VDI_PPDS_4.index])
+    assert all([check_CAS(i) for i in phase_change_data_VDI_PPDS_4.index])
     tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc', u'MW']]
     tots = [1974.2929800000002, 2653.9399000000003, 2022.530649, 943.25633100000005, 3124.9258610000002, 150142.28, 27786.919999999998]
     assert_close1d(tots_calc, tots)

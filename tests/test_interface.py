@@ -29,7 +29,7 @@ from chemicals.utils import rho_to_Vm
 from chemicals.interface import *
 from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_Lange, sigma_data_Somayajulu,
                                  sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 
 def test_sigma_IAPWS():
     assert_close(sigma_IAPWS(300.), 0.07168596252716256, rtol=1e-13)
@@ -131,7 +131,7 @@ def test_data():
 def test_VDI_PPDS_11_data():
     """I believe there are no errors here."""
     for i in sigma_data_VDI_PPDS_11.index:
-        assert checkCAS(i)
+        assert check_CAS(i)
     
     assert sigma_data_VDI_PPDS_11.index.is_unique
     assert sigma_data_VDI_PPDS_11.shape == (272, 8)

@@ -25,7 +25,7 @@ from numpy.testing import assert_allclose
 import pytest
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.thermal_conductivity import *
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 from chemicals.thermal_conductivity import k_data_Perrys_8E_2_314, k_data_Perrys_8E_2_315, k_data_VDI_PPDS_10, k_data_VDI_PPDS_9
 
 
@@ -58,7 +58,7 @@ def test_k_IAPWS():
 def test_Perrys2_314_data():
     # In perry's, only 102 is used. No chemicals are missing.
     # Tmaxs all match to 5E-4. Tmins match to 1E-3.
-    assert all([checkCAS(i) for i in k_data_Perrys_8E_2_314.index])
+    assert all([check_CAS(i) for i in k_data_Perrys_8E_2_314.index])
     tots_calc = [k_data_Perrys_8E_2_314[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
     tots = [48935634.823768869, 297.41545078799999, 421906466448.71423, 232863514627157.62, 125020.26000000001, 347743.42000000004]
     assert_close(tots_calc, tots)
@@ -72,7 +72,7 @@ def test_Perrys2_315_data():
     # All perry's use #100.
     # Tmins all match at 5E-4.
     # Tmaxs all match at 2E-3.
-    assert all([checkCAS(i) for i in k_data_Perrys_8E_2_315.index])
+    assert all([check_CAS(i) for i in k_data_Perrys_8E_2_315.index])
     tots_calc = [k_data_Perrys_8E_2_315[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'C5', u'Tmin', u'Tmax']]
     tots = [82.001667499999996, 0.19894598900000002, 0.0065330144999999999, 0.00046928630199999995, 1.0268010799999999e-07, 70996.369999999995, 138833.41]
     assert_close1d(tots_calc, tots)
@@ -93,7 +93,7 @@ def test_VDI_PPDS_10_data():
     These have been checked - it appears the tabulated data is just incorrect.
     """
 
-    assert all([checkCAS(i) for i in k_data_VDI_PPDS_10.index])
+    assert all([check_CAS(i) for i in k_data_VDI_PPDS_10.index])
     tots_calc = [k_data_VDI_PPDS_10[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [2.2974640014599998, 0.015556001460000001, 1.9897655000000001e-05, 6.7747269999999993e-09, 2.3260109999999999e-12]
     assert_close1d(tots_calc, tots)
@@ -111,7 +111,7 @@ def test_VDI_PPDS_9_data():
     These have been checked - it appears the tabulated data is just incorrect.
     """
 
-    assert all([checkCAS(i) for i in k_data_VDI_PPDS_9.index])
+    assert all([check_CAS(i) for i in k_data_VDI_PPDS_9.index])
     tots_calc = [k_data_VDI_PPDS_9[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [63.458699999999993, 0.14461469999999998, 0.00042270770000000005, 1.7062660000000002e-06, 3.2715370000000003e-09]
     assert_close1d(tots_calc, tots)

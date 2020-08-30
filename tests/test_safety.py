@@ -25,7 +25,7 @@ from numpy.testing import assert_allclose
 import pytest
 import pandas as pd
 import numpy as np
-from chemicals.identifiers import checkCAS
+from chemicals.identifiers import check_CAS
 from chemicals.safety import *
 
 SUZUKI = 'Suzuki (1994)'
@@ -76,7 +76,7 @@ def test_OntarioExposureLimits():
 
 def test_IARC_data():
     assert IARC_data.index.is_unique
-    assert all([checkCAS(i) for i in IARC_data.index])
+    assert all([check_CAS(i) for i in IARC_data.index])
     assert IARC_data.shape == (863, 4)
 
     dict_exp = {11: 76, 1: 75, 3: 438, 12: 274}

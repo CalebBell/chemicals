@@ -25,7 +25,6 @@ import pandas as pd
 from numpy.testing import assert_allclose
 import pytest
 from chemicals.identifiers import *
-from chemicals.utils import CAS2int, int2CAS
 from chemicals.elements import periodic_table, nested_formula_parser, serialize_formula, molecular_weight
 import os
 from chemicals.identifiers import ChemicalMetadataDB, folder, pubchem_db
@@ -41,7 +40,7 @@ def test_dippr_list():
     dippr_set = dippr_compounds()
     # TODO CASs formulas
     assert 12916928773 == sum([CAS2int(i) for i in dippr_set])
-    assert all([checkCAS(i) for i in dippr_set])
+    assert all([check_CAS(i) for i in dippr_set])
 
 
 @pytest.mark.slow
@@ -93,7 +92,7 @@ def test_Matthews_critical_names():
 
 @pytest.mark.slow
 def test_pubchem_dict():
-    assert all([checkCAS(i.CASs) for i in pubchem_db.CAS_index.values()])
+    assert all([check_CAS(i.CASs) for i in pubchem_db.CAS_index.values()])
 
 @pytest.mark.xfail
 def test_database_formulas():
@@ -121,7 +120,7 @@ def test_organic_user_db():
     assert all([i.formula == serialize_formula(i.formula) for i in db.CAS_index.values()])
 
     # Check CAS validity
-    assert all([checkCAS(i.CASs) for i in db.CAS_index.values()])
+    assert all([check_CAS(i.CASs) for i in db.CAS_index.values()])
 
     # MW checker
     for i in db.CAS_index.values():
@@ -174,7 +173,7 @@ def test_inorganic_db():
     assert all([i.formula == serialize_formula(i.formula) for i in db.CAS_index.values()])
 
     # Check CAS validity
-    assert all([checkCAS(i.CASs) for i in db.CAS_index.values()])
+    assert all([check_CAS(i.CASs) for i in db.CAS_index.values()])
 
     # MW checker
     for i in db.CAS_index.values():
@@ -320,7 +319,7 @@ def test_fake_CAS_numbers():
     known = []
     for i in reversed(range(100000)):
         s = "20{0:0>5}000-00-0".format(i)
-        if checkCAS(s):
+        if check_CAS(s):
             known.append(s+'\t\n')
     f = open('Fake CAS Registry.tsv', 'w')
     f.writelines(known)
@@ -408,3 +407,30 @@ def test_db_vs_ChemSep():
     # but that's proving difficult due to things like 1-hexene - 
     # is it 'CCCCC=C' or 'C=CCCCC'?
 #test_db_vs_ChemSep() 
+    
+    
+
+
+def test_CAS2int():
+    assert CAS2int('7704-34-9') == 7704349
+
+    with pytest.raises(Exception):
+        CAS2int(7704349)
+
+def test_int2CAS():
+    assert int2CAS(7704349) == '7704-34-9'
+
+    with pytest.raises(Exception):
+        CAS2int(7704349.0)
+
+def test_sorted_CAS_key():
+    expect = ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
+    res = sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
+    assert res == expect
+    res = sorted_CAS_key(['108-88-3', '98-00-0', '7732-18-5', '64-17-5'])
+    assert res == expect
+    
+    invalid_CAS_expect = ('641', '98-00-0', '108-88-3', '7732-8-5')
+    invalid_CAS_test = sorted_CAS_key(['7732-8-5', '641', '108-88-3', '98-00-0'])
+    assert invalid_CAS_expect == invalid_CAS_test
+    

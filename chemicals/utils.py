@@ -29,8 +29,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs', 
 'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros', 
  'mixing_simple', 
-'mixing_logarithmic', 'mixing_power', 'to_num', 'CAS2int', 'sorted_CAS_key',
-'int2CAS', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar', 
+'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar', 
 'SG_to_API', 'API_to_SG', 'SG',   'Watson_K',
 'dxs_to_dns', 'dns_to_dn_partials', 'dxs_to_dn_partials', 'd2ns_to_dn2_partials',
 'd2xs_to_dxdn_partials', 'dxs_to_dxsn1', 'd2xs_to_d2xsn1',
@@ -117,64 +116,6 @@ def to_num(values):
                 values[i] = values[i].strip()
     return values
 
-
-def CAS2int(i):
-    r'''Converts CAS number of a compounds from a string to an int. This is
-    helpful when storing large amounts of CAS numbers, as their strings take up
-    more memory than their numerical representational. All CAS numbers fit into
-    64 bit ints.
-
-    Parameters
-    ----------
-    CASRN : string
-        CASRN [-]
-
-    Returns
-    -------
-    CASRN : int
-        CASRN [-]
-
-    Notes
-    -----
-    Accomplishes conversion by removing dashes only, and then converting to an
-    int. An incorrect CAS number will change without exception.
-
-    Examples
-    --------
-    >>> CAS2int('7704-34-9')
-    7704349
-    '''
-    return int(i.replace('-', ''))
-
-
-def int2CAS(i):
-    r'''Converts CAS number of a compounds from an int to an string. This is
-    helpful when dealing with int CAS numbers.
-
-    Parameters
-    ----------
-    CASRN : int
-        CASRN [-]
-
-    Returns
-    -------
-    CASRN : string
-        CASRN [-]
-
-    Notes
-    -----
-    Handles CAS numbers with an unspecified number of digits. Does not work on
-    floats.
-
-    Examples
-    --------
-    >>> int2CAS(7704349)
-    '7704-34-9'
-    '''
-    i = str(i)
-    return i[:-3]+'-'+i[-3:-1]+'-'+i[-1]
-
-
 def hash_any_primitive(v):
     '''Method to hash a primitive - with basic support for lists and 
     dictionaries.     
@@ -227,35 +168,6 @@ def hash_any_primitive(v):
     elif isinstance(v, tuple):
         v = tuple(hash_any_primitive(i) for i in v)
     return hash(v)
-
-def sorted_CAS_key(CASs):
-    r'''Takes a list of CAS numbers as strings, and returns a tuple of the same
-    CAS numbers, sorted from smallest to largest. This is very convenient for
-    obtaining a unique hash of a set of compounds, so as to see if two
-    groups of compounds are the same.
-
-    Parameters
-    ----------
-    CASs : list[str]
-        CAS numbers as strings [-]
-
-    Returns
-    -------
-    CASs_sorted : tuple[str]
-        Sorted CAS numbers from lowest (first) to highest (last) [-]
-
-    Notes
-    -----
-    Does not check CAS numbers for validity.
-
-    Examples
-    --------
-    >>> sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
-    ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
-    '''
-    int_CASs = [CAS2int(i) for i in CASs]
-    return tuple(CAS for _, CAS in sorted(zip(int_CASs,CASs)))
-
 
 def Parachor(MW, rhol, rhog, sigma):
     r'''Calculate Parachor for a pure species, using its density in the
