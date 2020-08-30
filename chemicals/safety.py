@@ -19,17 +19,85 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains functions for lookup the following properties for a chemical
+
+* Short-term Exposure Limit (STEL)
+* Time-Weighted Average Exposure Limit (TWA)  
+* Celing limit for working exposure
+* Whether a chemicals is absorbed thorough human skin
+* Whether a chemical is a carcinogen, suspected of being a carcinogen, or has
+  been identified as unlikely to be a carcinogen
+  
+* Flash point
+* Auto ignition point
+* Lower flammability limit
+* Upper flammability limit
+
+In addition, several estimation methods for chemicals without flammability
+limits are provided and for calculating the flammability limits of mixtures.
+
+This module also contains several utility functions.    
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Short-term Exposure Limit
+-------------------------
+.. autofunction:: chemicals.safety.STEL
+.. autofunction:: chemicals.safety.STEL_methods
+.. autodata:: chemicals.safety.STEL_all_methods
+
+Time-Weighted Average Exposure Limit
+------------------------------------
+.. autofunction:: chemicals.safety.TWA
+.. autofunction:: chemicals.safety.TWA_methods
+.. autodata:: chemicals.safety.TWA_all_methods
+
+Ceiling Limit
+-------------
+.. autofunction:: chemicals.safety.Ceiling
+.. autofunction:: chemicals.safety.Ceiling_methods
+.. autodata:: chemicals.safety.Ceiling_all_methods
+
+Skin Absorbance
+---------------
+.. autofunction:: chemicals.safety.Skin
+.. autofunction:: chemicals.safety.Skin_methods
+.. autodata:: chemicals.safety.Skin_all_methods
+
+Carcinogenicity
+---------------
+.. autofunction:: chemicals.safety.Carcinogen
+.. autofunction:: chemicals.safety.Carcinogen_methods
+.. autodata:: chemicals.safety.Carcinogen_all_methods
+
+Flash Point
+-----------
+.. autofunction:: chemicals.safety.T_flash
+.. autofunction:: chemicals.safety.T_flash_methods
+.. autodata:: chemicals.safety.T_flash_all_methods
+
+Autoignition Point
+------------------
+.. autofunction:: chemicals.safety.T_autoignition
+.. autofunction:: chemicals.safety.T_autoignition_methods
+.. autodata:: chemicals.safety.T_autoignition_all_methods
 """
 
 __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'NFPA_2008_data', 'IEC_2010_data', 
            'Ontario_exposure_limits_dict', 'NTP_data',
            'NTP_codes', 'IARC_data', 'IARC_codes', 
-           'TWA_all_methods', 'TWA_methods', 'TWA', 'STEL', 'Ceiling', 
-           'Skin', 'Carcinogen_methods', 'Carcinogen_all_methods', 
-           'Carcinogen', 'Tflash_all_methods', 'Tflash_methods', 
-           'Tflash', 'Tautoignition_methods', 'Tautoignition_all_methods', 
-           'Tautoignition', 'LFL_methods', 'LFL_all_methods', 
+           'Skin_all_methods',  'Ceiling_all_methods', 'STEL_all_methods',
+           'TWA_all_methods',
+           'TWA_methods', 'TWA', 'STEL', 'STEL_methods', 'Ceiling', 'Ceiling_methods',
+           'Skin', 'Skin_methods', 'Carcinogen_methods', 'Carcinogen_all_methods', 
+           'Carcinogen', 'T_flash_all_methods', 'T_flash_methods',
+           'T_flash', 'T_autoignition_methods', 'T_autoignition_all_methods',
+           'T_autoignition', 'LFL_methods', 'LFL_all_methods',
            'LFL', 'UFL_methods', 'UFL_all_methods', 'UFL', 'fire_mixing', 
            'inerts', 
            'Suzuki_LFL', 'Suzuki_UFL', 
@@ -153,7 +221,7 @@ IARC_codes = {1: 'Carcinogenic to humans (1)',
 folder = os.path.join(os.path.dirname(__file__), 'Safety')
 register_df_source(folder, 'NFPA 497 2008.tsv')
 register_df_source(folder, 'IS IEC 60079-20-1 2010.tsv')
-register_df_source(folder, 'DIPPR Tflash Serat.csv')
+register_df_source(folder, 'DIPPR T_flash Serat.csv')
 register_df_source(folder, 'National Toxicology Program Carcinogens.tsv')
 register_df_source(folder, 'IARC Carcinogen Database.tsv')
 _safety_data_loaded = False
@@ -177,7 +245,7 @@ def _load_safety_data():
         Ontario_exposure_limits_dict = json.load(stream)
     NFPA_2008_data = data_source('NFPA 497 2008.tsv')
     IEC_2010_data = data_source('IS IEC 60079-20-1 2010.tsv')
-    DIPPR_SERAT_data = data_source('DIPPR Tflash Serat.csv')
+    DIPPR_SERAT_data = data_source('DIPPR T_flash Serat.csv')
     NTP_data = data_source('National Toxicology Program Carcinogens.tsv')
     IARC_data = data_source('IARC Carcinogen Database.tsv')
     Tflash_sources = {IEC: IEC_2010_data,
@@ -292,6 +360,16 @@ else:
 
 ONTARIO = 'Ontario Limits'
 TWA_all_methods = (ONTARIO,)
+'''Tuple of method name keys. See the :obj:`TWA` for the actual references'''
+
+STEL_all_methods = (ONTARIO,)
+'''Tuple of method name keys. See the :obj:`STEL` for the actual references'''
+
+Ceiling_all_methods = (ONTARIO,)
+'''Tuple of method name keys. See the :obj:`Ceiling` for the actual references'''
+
+Skin_all_methods = (ONTARIO,)
+'''Tuple of method name keys. See the :obj:`Skin` for the actual references'''
 
 def TWA_methods(CASRN):
     """Return all methods available to obtain the Time-Weighted Average exposure
@@ -369,8 +447,8 @@ def STEL_methods(CASRN):
     return []
 
 def STEL(CASRN, method=None):
-    """This function handles the retrieval of Short-term Exposure Limit on
-    worker exposure to dangerous chemicals.
+    """This function handles the retrieval of Short-term Exposure Limit (STEL)
+    on worker exposure to dangerous chemicals.
 
     Examples
     --------
@@ -488,6 +566,7 @@ UNLISTED = 'Unlisted'
 COMBINED = 'Combined'
 
 Carcinogen_all_methods = (IARC, NTP)
+'''Tuple of method name keys. See the :obj:`Carcinogen` for the actual references'''
 
 def Carcinogen_methods(CASRN):
     """Return all methods available to obtain Carcinogen listings for the
@@ -581,11 +660,11 @@ def Carcinogen(CASRN, method=None):
 ### Fire-related functions
 
 
-Tflash_all_methods = (IEC, NFPA, SERAT)
-# TODO: Left off here
+T_flash_all_methods = (IEC, NFPA, SERAT)
+'''Tuple of method name keys. See the :obj:`T_flash` for the actual references'''
 
-def Tflash_methods(CASRN):
-    """Return all methods available to obtain Tflash for the desired chemical.
+def T_flash_methods(CASRN):
+    """Return all methods available to obtain T_flash for the desired chemical.
 
     Parameters
     ----------
@@ -595,16 +674,16 @@ def Tflash_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain Tflash with the given inputs.
+        Methods which can be used to obtain T_flash with the given inputs.
 
     See Also
     --------
-    Tflash
+    T_flash
     """
     if not _safety_data_loaded: _load_safety_data()
-    return list_available_methods_from_df_dict(Tflash_sources, CASRN, 'Tflash')
+    return list_available_methods_from_df_dict(Tflash_sources, CASRN, 'T_flash')
 
-def Tflash(CASRN, method=None):
+def T_flash(CASRN, method=None):
     r'''
     This function handles the retrieval or calculation of a chemical's
     flash point. Lookup is based on CASRNs. No predictive methods are currently
@@ -613,7 +692,7 @@ def Tflash(CASRN, method=None):
     
     Examples
     --------
-    >>> Tflash(CASRN='64-17-5')
+    >>> T_flash(CASRN='64-17-5')
     285.15
     
     Parameters
@@ -623,14 +702,14 @@ def Tflash(CASRN, method=None):
     
     Returns
     -------
-    Tflash : float
+    T_flash : float
         Flash point of the chemical, [K]
     
     Other Parameters
     ----------------
     method : string, optional
         A string for the method name to use, as defined in the variable,
-        `Tflash_all_methods`,
+        `T_flash_all_methods`,
     
     Notes
     -----
@@ -644,7 +723,7 @@ def Tflash(CASRN, method=None):
     
     See Also
     --------
-    Tflash_methods
+    T_flash_methods
     
     References
     ----------
@@ -663,15 +742,16 @@ def Tflash(CASRN, method=None):
     '''
     if not _safety_data_loaded: _load_safety_data()
     if method:
-        return retrieve_from_df_dict(Tflash_sources, CASRN, 'Tflash', method) 
+        return retrieve_from_df_dict(Tflash_sources, CASRN, 'T_flash', method)
     else:
-        return retrieve_any_from_df_dict(Tflash_sources, CASRN, 'Tflash') 
+        return retrieve_any_from_df_dict(Tflash_sources, CASRN, 'T_flash')
 
 
-Tautoignition_all_methods = (IEC, NFPA)
+T_autoignition_all_methods = (IEC, NFPA)
+'''Tuple of method name keys. See the :obj:`T_autoignition` for the actual references'''
 
-def Tautoignition_methods(CASRN):
-    """Return all methods available to obtain Tautoignition for the desired
+def T_autoignition_methods(CASRN):
+    """Return all methods available to obtain T_autoignition for the desired
     chemical.
 
     Parameters
@@ -682,16 +762,16 @@ def Tautoignition_methods(CASRN):
     Returns
     -------
     methods : list[str]
-        Methods which can be used to obtain Tautoignition with the given inputs.
+        Methods which can be used to obtain T_autoignition with the given inputs.
 
     See Also
     --------
-    Tautoignition
+    T_autoignition
     """
     if not _safety_data_loaded: _load_safety_data()
-    return list_available_methods_from_df_dict(Tautoignition_sources, CASRN, 'Tautoignition')
+    return list_available_methods_from_df_dict(Tautoignition_sources, CASRN, 'T_autoignition')
 
-def Tautoignition(CASRN, method=None):
+def T_autoignition(CASRN, method=None):
     r'''
     This function handles the retrieval or calculation of a chemical's
     autoifnition temperature. Lookup is based on CASRNs. No predictive methods
@@ -712,11 +792,11 @@ def Tautoignition(CASRN, method=None):
     ----------------
     method : string, optional
         A string for the method name to use, as defined in the variable,
-        `Tautoignition_all_methods`.
+        `T_autoignition_all_methods`.
     
     Examples
     --------
-    >>> Tautoignition(CASRN='71-43-2')
+    >>> T_autoignition(CASRN='71-43-2')
     771.15
     
     Notes
@@ -726,7 +806,7 @@ def Tautoignition(CASRN, method=None):
     
     See Also
     --------
-    Tautoignition_methods
+    T_autoignition_methods
     
     References
     ----------
@@ -740,13 +820,14 @@ def Tautoignition(CASRN, method=None):
     '''
     if not _safety_data_loaded: _load_safety_data()
     if method:
-        return retrieve_from_df_dict(Tautoignition_sources, CASRN, 'Tautoignition', method) 
+        return retrieve_from_df_dict(Tautoignition_sources, CASRN, 'T_autoignition', method)
     else:
-        return retrieve_any_from_df_dict(Tautoignition_sources, CASRN, 'Tautoignition') 
+        return retrieve_any_from_df_dict(Tautoignition_sources, CASRN, 'T_autoignition')
 
 
 
 LFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
+'''Tuple of method name keys. See the :obj:`LFL` for the actual references'''
 
 def LFL_methods(Hc=None, atoms=None, CASRN=''):
     """Return all methods available to obtain LFL for the desired chemical.
@@ -850,6 +931,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
         return retrieve_from_df_dict(LFL_sources, CASRN, 'LFL', method) 
     
 UFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
+'''Tuple of method name keys. See the :obj:`UFL` for the actual references'''
 
 def UFL_methods(Hc=None, atoms=None, CASRN=''):
     """Return all methods available to obtain UFL for the desired chemical.
