@@ -43,7 +43,7 @@ from __future__ import division
 
 __all__ = ['check_CAS', 'CAS_from_any', 'search_chemical',
            'mixture_from_any', 'cryogenics', 'dippr_compounds',
-           'get_pubchem_db', 'CAS2int', 'sorted_CAS_key', 'int2CAS']
+           'get_pubchem_db', 'CAS_to_int', 'sorted_CAS_key', 'int_to_CAS']
 
 import os
 from io import open
@@ -100,7 +100,7 @@ def check_CAS(CASRN):
 
 
 
-def CAS2int(i):
+def CAS_to_int(i):
     r'''Converts CAS number of a compounds from a string to an int. This is
     helpful when storing large amounts of CAS numbers, as their strings take up
     more memory than their numerical representational. All CAS numbers fit into
@@ -123,13 +123,13 @@ def CAS2int(i):
 
     Examples
     --------
-    >>> CAS2int('7704-34-9')
+    >>> CAS_to_int('7704-34-9')
     7704349
     '''
     return int(i.replace('-', ''))
 
 
-def int2CAS(i):
+def int_to_CAS(i):
     r'''Converts CAS number of a compounds from an int to an string. This is
     helpful when dealing with int CAS numbers.
 
@@ -150,7 +150,7 @@ def int2CAS(i):
 
     Examples
     --------
-    >>> int2CAS(7704349)
+    >>> int_to_CAS(7704349)
     '7704-34-9'
     '''
     i = str(i)
@@ -181,7 +181,7 @@ def sorted_CAS_key(CASs):
     >>> sorted_CAS_key(['7732-18-5', '64-17-5', '108-88-3', '98-00-0'])
     ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
     '''
-    int_CASs = [CAS2int(i) for i in CASs]
+    int_CASs = [CAS_to_int(i) for i in CASs]
     return tuple(CAS for _, CAS in sorted(zip(int_CASs,CASs)))
 
 class ChemicalMetadata(object):
@@ -206,7 +206,7 @@ class ChemicalMetadata(object):
         
     @property
     def CASs(self):
-        return int2CAS(self.CAS)
+        return int_to_CAS(self.CAS)
     
     def __init__(self, pubchemid, CAS, formula, MW, smiles, InChI, InChI_key,
                  iupac_name, common_name, all_names):
@@ -339,7 +339,7 @@ class ChemicalMetadataDB(object):
         
     def search_CAS(self, CAS, autoload=True):
         if type(CAS) != int:
-            CAS = CAS2int(CAS)
+            CAS = CAS_to_int(CAS)
         return self._search_autoload(CAS, self.CAS_index, autoload=autoload)
 
     def search_smiles(self, smiles, autoload=True):

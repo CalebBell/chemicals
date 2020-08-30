@@ -39,7 +39,7 @@ except:
 def test_dippr_list():
     dippr_set = dippr_compounds()
     # TODO CASs formulas
-    assert 12916928773 == sum([CAS2int(i) for i in dippr_set])
+    assert 12916928773 == sum([CAS_to_int(i) for i in dippr_set])
     assert all([check_CAS(i) for i in dippr_set])
 
 
@@ -131,15 +131,15 @@ def test_organic_user_db():
 
 
     for CAS, d in db.CAS_index.items():
-        assert CAS_from_any('InChI=1S/' + d.InChI) == int2CAS(CAS)
+        assert CAS_from_any('InChI=1S/' + d.InChI) == int_to_CAS(CAS)
         
     for CAS, d in db.CAS_index.items():
-        assert CAS_from_any('InChIKey=' + d.InChI_key) == int2CAS(CAS)
+        assert CAS_from_any('InChIKey=' + d.InChI_key) == int_to_CAS(CAS)
 
     # Test the pubchem ids which aren't -1
     for CAS, d in db.CAS_index.items():
         if d.pubchemid != -1:
-            assert CAS_from_any('PubChem=' + str(d.pubchemid)) == int2CAS(CAS)
+            assert CAS_from_any('PubChem=' + str(d.pubchemid)) == int_to_CAS(CAS)
 
     CAS_lenth = len(db.CAS_index)
     assert CAS_lenth == len(db.smiles_index)
@@ -412,16 +412,16 @@ def test_db_vs_ChemSep():
 
 
 def test_CAS2int():
-    assert CAS2int('7704-34-9') == 7704349
+    assert CAS_to_int('7704-34-9') == 7704349
 
     with pytest.raises(Exception):
-        CAS2int(7704349)
+        CAS_to_int(7704349)
 
 def test_int2CAS():
-    assert int2CAS(7704349) == '7704-34-9'
+    assert int_to_CAS(7704349) == '7704-34-9'
 
     with pytest.raises(Exception):
-        CAS2int(7704349.0)
+        CAS_to_int(7704349.0)
 
 def test_sorted_CAS_key():
     expect = ('64-17-5', '98-00-0', '108-88-3', '7732-18-5')
