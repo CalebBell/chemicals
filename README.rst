@@ -26,11 +26,9 @@ chemicals
 .. image:: http://img.shields.io/appveyor/ci/calebbell/chemicals.svg
    :target: https://ci.appveyor.com/project/calebbell/chemicals/branch/master
    :alt: Build_status
-.. image:: https://zenodo.org/badge/62404647.svg
+.. image:: https://zenodo.org/badge/264697738.svg
    :alt: Zenodo
-   :target: https://zenodo.org/badge/latestdoi/62404647
-
-# TODO: Upload package to Zenodo 
+   :target: https://zenodo.org/badge/latestdoi/264697738
 
 .. contents::
 
