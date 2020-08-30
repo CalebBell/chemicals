@@ -343,22 +343,27 @@ class Element:
     
     @property
     def protons(self): 
+        r'''The number of protons of the element.'''
         return self.number
     
     @property
     def electrons(self): 
+        r'''The number of electrons of the element.'''
         return self.number
 
     @property
     def smiles(self): 
+        r'''The SMILES identification string of the element.'''
         return '[' + self.symbol + ']'
 
     @property
     def InChI(self): 
+        r'''The InChI identifier of the element. One of 's', 'd', 'f', or 'p'.'''
         return self.symbol # 'InChI=1S/' +
     
     @property
     def block(self):
+        r'''Which block of the periodic table the element is in.'''
         for k, v in blocks.items():
             if self.number in v:
                 return k
