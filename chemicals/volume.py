@@ -20,6 +20,62 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains various volume/density estimation routines, dataframes
+of fit coefficients, and mixing rules.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Pure Low Pressure Liquid Correlations
+-------------------------------------
+.. autofunction:: chemicals.volume.Rackett
+.. autofunction:: chemicals.volume.COSTALD
+.. autofunction:: chemicals.volume.Yen_Woods_saturation
+.. autofunction:: chemicals.volume.Yamada_Gunn
+.. autofunction:: chemicals.volume.Townsend_Hales
+.. autofunction:: chemicals.volume.Bhirud_normal
+.. autofunction:: chemicals.volume.Campbell_Thodos
+.. autofunction:: chemicals.volume.SNM0
+
+Pure High Pressure Liquid Correlations
+--------------------------------------
+.. autofunction:: chemicals.volume.COSTALD_compressed
+
+Liquid Mixing Rules
+-------------------
+.. autofunction:: chemicals.volume.Amgat
+.. autofunction:: chemicals.volume.Rackett_mixture
+.. autofunction:: chemicals.volume.COSTALD_mixture
+
+Gas Correlations
+----------------
+Gas volumes are predicted with one of:
+
+1) An equation of state
+2) A virial coefficient model
+3) The ideal gas law
+
+Equations of state do much more than predict volume however. An implementation
+of many of them can be found in `thermo <https://github.com/CalebBell/thermo>`_.
+
+Virial functions are implemented in :obj:`chemicals.virial`.
+
+.. autofunction:: chemicals.volume.ideal_gas
+
+Pure Solid Correlations
+-----------------------
+Solid density does not depend on pressure significantly, and unless operating
+in the geochemical or astronomical domain is normally neglected.
+
+.. autofunction:: chemicals.volume.Goodman
+
+Pure Component Solid Fit Correlations
+-------------------------------------
+.. autofunction:: chemicals.volume.CRC_inorganic
+
 """
 
 from __future__ import division
