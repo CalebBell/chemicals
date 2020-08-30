@@ -20,7 +20,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains functions for lookup the following properties for a chemical
+This module contains functions for lookup the following properties for a 
+chemical:
 
 * Short-term Exposure Limit (STEL)
 * Time-Weighted Average Exposure Limit (TWA)  
@@ -85,6 +86,32 @@ Autoignition Point
 .. autofunction:: chemicals.safety.T_autoignition
 .. autofunction:: chemicals.safety.T_autoignition_methods
 .. autodata:: chemicals.safety.T_autoignition_all_methods
+
+Lower Flammability Limit
+------------------------
+.. autofunction:: chemicals.safety.LFL
+.. autofunction:: chemicals.safety.LFL_methods
+.. autodata:: chemicals.safety.LFL_all_methods
+.. autofunction:: chemicals.safety.Suzuki_LFL
+.. autofunction:: chemicals.safety.Crowl_Louvar_LFL
+
+Upper Flammability Limit
+------------------------
+.. autofunction:: chemicals.safety.UFL
+.. autofunction:: chemicals.safety.UFL_methods
+.. autodata:: chemicals.safety.UFL_all_methods
+.. autofunction:: chemicals.safety.Suzuki_UFL
+.. autofunction:: chemicals.safety.Crowl_Louvar_UFL
+
+Mixture Flammability Limit
+--------------------------
+.. autofunction:: chemicals.safety.fire_mixing
+
+Utility Methods
+---------------
+.. autofunction:: chemicals.safety.ppmv_to_mgm3
+.. autofunction:: chemicals.safety.mgm3_to_ppmv
+
 """
 
 __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
@@ -99,11 +126,9 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'T_flash', 'T_autoignition_methods', 'T_autoignition_all_methods',
            'T_autoignition', 'LFL_methods', 'LFL_all_methods',
            'LFL', 'UFL_methods', 'UFL_all_methods', 'UFL', 'fire_mixing', 
-           'inerts', 
            'Suzuki_LFL', 'Suzuki_UFL', 
            'Crowl_Louvar_LFL', 'Crowl_Louvar_UFL', 
-           'DIPPR_SERAT_data', 
-           'NFPA_combustible_classification')
+           'DIPPR_SERAT_data')
 
 import os
 from fluids.core import F2K
@@ -400,10 +425,30 @@ def TWA_methods(CASRN):
         if (data["TWA (ppm)"] or data["TWA (mg/m^3)"]): return [ONTARIO]
     return []
     
-def TWA(CASRN, method=None):  # pragma: no cover
-    """This function handles the retrieval of Time-Weighted Average limits on
-    worker exposure to dangerous chemicals.
+def TWA(CASRN, method=None):
+    """Return the Time-Weighted Average exposure
+    limits (TWA) for the desired chemical if it is available.
 
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+    method : str
+        Name of method to use, [-]
+
+    Returns
+    -------
+    TWA : float
+        Time-Weighted Average exposure, [ppm or mg/m^3]
+    units : str
+        One of ppm or mg/m^3, [-]
+    
+    Notes
+    -----
+    The ppm value is preferentially returned if both are available. While they
+    can be converted in specific cases, it is better to work with the specified
+    units of the original source.
+    
     Examples
     --------
     >>> TWA('98-00-0')
@@ -428,8 +473,8 @@ def STEL_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -449,6 +494,26 @@ def STEL_methods(CASRN):
 def STEL(CASRN, method=None):
     """This function handles the retrieval of Short-term Exposure Limit (STEL)
     on worker exposure to dangerous chemicals.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+    method : str
+        Name of method to use, [-]
+
+    Returns
+    -------
+    STEL : float
+        Short-term Exposure Limit, [ppm or mg/m^3]
+    units : str
+        One of ppm or mg/m^3, [-]
+    
+    Notes
+    -----
+    The ppm value is preferentially returned if both are available. While they
+    can be converted in specific cases, it is better to work with the specified
+    units of the original source.
 
     Examples
     --------
@@ -477,8 +542,8 @@ def Ceiling_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -487,7 +552,7 @@ def Ceiling_methods(CASRN):
 
     See Also
     --------
-    Ceiling limits
+    Ceiling
     """
     if not _safety_data_loaded: _load_safety_data()
     if CASRN in Ontario_exposure_limits_dict:
@@ -498,6 +563,20 @@ def Ceiling_methods(CASRN):
 def Ceiling(CASRN, method=None):
     """This function handles the retrieval of Ceiling limits on worker exposure
     to dangerous chemicals.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+    method : str
+        Name of method to use, [-]
+
+    Returns
+    -------
+    Ceiling : float
+        Ceiling Limit, [ppm or mg/m^3]
+    units : str
+        One of ppm or mg/m^3, [-]
 
     Examples
     --------
@@ -524,8 +603,8 @@ def Skin_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -539,9 +618,21 @@ def Skin_methods(CASRN):
     """
     return [ONTARIO] if CASRN in Ontario_exposure_limits_dict else []
 
-def Skin(CASRN, method=None):  # pragma: no cover
+def Skin(CASRN, method=None):
     """This function handles the retrieval of whether or not a chemical can be
     absorbed through the skin, relevant to chemical safety calculations.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+    method : str
+        Name of method to use, [-]
+
+    Returns
+    -------
+    skin : bool
+        Whether or not the substance is absorbed through human skin, [-]
 
     Examples
     --------
@@ -574,8 +665,8 @@ def Carcinogen_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -597,7 +688,7 @@ def Carcinogen(CASRN, method=None):
     
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
         
     Returns
@@ -668,8 +759,8 @@ def T_flash_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -697,7 +788,7 @@ def T_flash(CASRN, method=None):
     
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
     
     Returns
@@ -756,8 +847,8 @@ def T_autoignition_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -780,7 +871,7 @@ def T_autoignition(CASRN, method=None):
     
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
     
     Returns
@@ -838,8 +929,8 @@ def LFL_methods(Hc=None, atoms=None, CASRN=''):
         Heat of combustion of gas [J/mol].
     atoms : dict, optional
         Dictionary of atoms and atom counts.
-    CASRN : string, optional
-        CASRN [-].
+    CASRN : str, optional
+        CASRN, [-]
 
     Returns
     -------
@@ -877,8 +968,8 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
         Heat of combustion of gas [J/mol].
     atoms : dict, optional
         Dictionary of atoms and atom counts.
-    CASRN : string, optional
-        CASRN [-].
+    CASRN : str, optional
+        CASRN, [-]
     
     Returns
     -------
@@ -902,8 +993,8 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     -----
     Preferred source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
     'NFPA 497 (2008)' [2]_ having very similar data. If the heat of combustion
-    is provided, the estimation method `Suzuki_LFL` can be used. If the atoms
-    of the molecule are available, the method `Crowl_Louvar_LFL` can be used.
+    is provided, the estimation method :obj:`Suzuki_LFL` can be used. If the atoms
+    of the molecule are available, the method :obj:`Crowl_Louvar_LFL` can be used.
     
     References
     ----------
@@ -942,8 +1033,8 @@ def UFL_methods(Hc=None, atoms=None, CASRN=''):
         Heat of combustion of gas [J/mol].
     atoms : dict, optional
         Dictionary of atoms and atom counts.
-    CASRN : string, optional
-        CASRN [-].
+    CASRN : str, optional
+        CASRN, [-]
 
     Returns
     -------
@@ -991,7 +1082,7 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
         Heat of combustion of gas [J/mol]
     atoms : dict, optional
         Dictionary of atoms and atom counts
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     
     Returns
@@ -1009,8 +1100,8 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
     -----
     Preferred source is 'IEC 60079-20-1 (2010)' [1]_, with the secondary source
     'NFPA 497 (2008)' [2]_ having very similar data. If the heat of combustion
-    is provided, the estimation method `Suzuki_UFL` can be used. If the atoms
-    of the molecule are available, the method `Crowl_Louvar_UFL` can be used.
+    is provided, the estimation method :obj:`Suzuki_UFL` can be used. If the atoms
+    of the molecule are available, the method :obj:`Crowl_Louvar_UFL` can be used.
     
     References
     ----------
@@ -1037,36 +1128,56 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
     else:
         return retrieve_from_df_dict(UFL_sources, CASRN, 'UFL', method) 
 
-
 def fire_mixing(ys, FLs):
-    """Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:
-    Fundamentals with Applications. 2E. Upper Saddle River, N.J: Prentice Hall,
-    2001.
-
+    '''Le Chatelier's mixing rule for lower and upper flammability limits of
+    mixtures of gases.
+    
+    Parameters
+    ----------
+    ys : list[float]
+        Normalized mole fractions of all flammable components in a gas, [-]
+    FLs : list[float]
+        Lower or upper flammability limits for each flammable component in a
+        gas, [-]
+    
+    Returns
+    -------
+    FL : float
+        Lower or upper flammability limit of a gas, [-]
+    
+    Notes
+    -----
+    This equation has a higher accuracy for lower flammability limits than
+    upper flammability limits. Some sources recommend not using it for
+    upper flammability limits.
+    
+    Examples
+    --------
+    Sample problems from [1]_ for the lower and upper flammability limit.
+    
     >>> fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.012, .053, .031])
     0.02751172136637642
     
     >>> fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.075, .15, .32])
     0.12927551844869378
-    """
-    return 1./sum([yi/FLi for yi, FLi in zip(ys, FLs)])
 
-#print (fire_mixing(ys=[0.0024, 0.0061, 0.0015], FLs=[.075, .15, .32]), 0)
-inerts = {"7440-37-1": "Argon", "124-38-9": "Carbon Dioxide", "7440-59-7":
-          "Helium", "7440-01-9": "Neon", "7727-37-9": "Nitrogen",
-          "7440-63-3": "Xenon", "10102-43-9": "Nitric Oxide", "10102-44-0":
-          "Nitrogen Dioxide", "7782-44-7": "Oxygen", "132259-10-0": "Air",
-          "7439-90-9": "krypton", "10043-92-2": "radon", "7732-18-5":
-          "water", "7782-50-5": "chlorine", "7782-41-4": "fluorine"}
-
-
-
+    References
+    ----------
+    .. [1] Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:
+       Fundamentals with Applications. 2E. Upper Saddle River, N.J: Prentice 
+       Hall, 2001.
+    '''
+    tot = 0.0
+    for i in range(len(ys)):
+        tot += ys[i]/FLs[i]
+    return 1.0/tot
 
 def Suzuki_LFL(Hc):
     r'''Calculates lower flammability limit, using the Suzuki [1]_ correlation.
     Uses heat of combustion only.
     
     The lower flammability limit of a gas is air is:
+        
     .. math::
         \text{LFL} = \frac{-3.42}{\Delta H_c^{\circ}} + 0.569
         \Delta H_c^{\circ} + 0.0538\Delta H_c^{\circ 2} + 1.80
@@ -1262,21 +1373,3 @@ def Crowl_Louvar_UFL(atoms):
     if 'O' in atoms:
         nO = atoms['O']
     return 3.5/(4.76*nC + 1.19*nH - 2.38*nO + 1.)
-
-
-def NFPA_combustible_classification(Tflash, Tb=None, Psat_100F=None):
-    if Tflash < F2K(100):
-        if Tflash < F2K(73) and Tb < F2K(100):
-            # Also unstable flammable liquids
-            return '1A'
-        elif Tflash < F2K(73) and Tb >= F2K(100):
-            return '1B'
-        elif F2K(73) <= Tflash < F2K(100):
-            # Class IC liquids shall include those having flash points at or above 73°F (22.8°C) and below 100°F (37.8°C).
-            return '1C'
-    if F2K(100) <= Tflash < F2K(140):
-        return '2'
-    if F2K(140) <= Tflash < F2K(200):
-        return '3A'
-    if F2K(200) <= Tflash:
-        return '3B'

@@ -93,8 +93,8 @@ def dipole_moment_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -119,7 +119,7 @@ def dipole_moment(CASRN, get_methods=False, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns

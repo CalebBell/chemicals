@@ -66,8 +66,8 @@ def omega_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -96,7 +96,7 @@ def omega(CASRN, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns

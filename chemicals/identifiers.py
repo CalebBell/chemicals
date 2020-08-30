@@ -59,13 +59,14 @@ It is convenient to tag some chemicals with labels like "refrigerant", or in
 a certain database or not. The following chemical groups are available.
 
 .. autodata:: chemicals.identifiers.cryogenics
+.. autodata:: chemicals.identifiers.inerts
 .. autofunction:: chemicals.identifiers.dippr_compounds
 """
 
 from __future__ import division
 
 __all__ = ['check_CAS', 'CAS_from_any', 'search_chemical',
-           'mixture_from_any', 'cryogenics', 'dippr_compounds', 'IDs_to_CASs',
+           'mixture_from_any', 'cryogenics', 'inerts', 'dippr_compounds', 'IDs_to_CASs',
            'get_pubchem_db', 'CAS_to_int', 'sorted_CAS_key', 'int_to_CAS']
 
 import os
@@ -82,7 +83,7 @@ def check_CAS(CASRN):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         A three-piece, dash-separated set of numbers
 
     Returns
@@ -129,7 +130,7 @@ def CAS_to_int(i):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns
@@ -160,7 +161,7 @@ def int_to_CAS(i):
 
     Returns
     -------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Notes
@@ -387,6 +388,8 @@ class ChemicalMetadataDB(object):
         return not (not self.loaded_main_db and self.main_db is not None)
         
     def autoload_main_db(self):
+        '''Load the main database when needed.
+        '''
         self.load(self.main_db)
         for db in self.user_dbs:
             self.load(db)
@@ -454,7 +457,7 @@ def CAS_from_any(ID, autoload=False, cache=True):
 
     Returns
     -------
-    CASRN : string
+    CASRN : str
         A three-piece, dash-separated set of numbers
 
     Notes
@@ -816,6 +819,15 @@ cryogenics = {'132259-10-0': 'Air', '7440-37-1': 'Argon', '630-08-0':
 '7440-59-7': 'helium', '1333-74-0': 'hydrogen', '7439-90-9': 'krypton',
 '74-82-8': 'methane', '7440-01-9': 'neon', '7727-37-9': 'nitrogen',
 '7782-44-7': 'oxygen', '7440-63-3': 'xenon'}
+
+inerts = {"7440-37-1": "Argon", "124-38-9": "Carbon Dioxide", "7440-59-7":
+      "Helium", "7440-01-9": "Neon", "7727-37-9": "Nitrogen",
+      "7440-63-3": "Xenon", "10102-43-9": "Nitric Oxide", "10102-44-0":
+      "Nitrogen Dioxide", "7782-44-7": "Oxygen", "132259-10-0": "Air",
+      "7439-90-9": "krypton", "10043-92-2": "radon", "7732-18-5":
+      "water", "7782-50-5": "chlorine", "7782-41-4": "fluorine"}
+
+
 
 _pubchem_db_loaded = False
 def get_pubchem_db():

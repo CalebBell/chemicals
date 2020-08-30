@@ -91,7 +91,7 @@ def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=Non
 
     Parameters
     ----------
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     Tm : float, optional
         Melting temperature of compound [K]
@@ -145,7 +145,7 @@ def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
 
     Parameters
     ----------
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     Tm : float, optional
         Melting temperature of compound [K]
@@ -232,7 +232,7 @@ def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
 
     Parameters
     ----------
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     Tc : float, optional
         Critical temperature, [K]
@@ -293,7 +293,7 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
 
     Parameters
     ----------
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     Tc : float, optional
         Critical temperature, [K]

@@ -123,7 +123,7 @@ def lookup_VDI_tabular_data(CASRN, prop):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
     prop : string
         Property [-]

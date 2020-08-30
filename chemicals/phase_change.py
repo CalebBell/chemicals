@@ -58,7 +58,7 @@ Heat of Vaporization at Tb Correlations
 .. autofunction:: chemicals.phase_change.Vetere
 
 Heat of Vaporization at T Correlations 
----------------------------------
+--------------------------------------
 .. autofunction:: chemicals.phase_change.Pitzer
 .. autofunction:: chemicals.phase_change.SMK
 .. autofunction:: chemicals.phase_change.MK
@@ -239,8 +239,8 @@ def Tb_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -266,7 +266,7 @@ def Tb(CASRN, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns
@@ -316,7 +316,7 @@ def Tb(CASRN, method=None):
 
 ### Melting Point
 
-Tm_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
+Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
 '''Tuple of method name keys. See the `Tm` for the actual references'''
 
 def Tm_methods(CASRN):
@@ -324,8 +324,8 @@ def Tm_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -352,7 +352,7 @@ def Tm(CASRN, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns
@@ -1141,8 +1141,8 @@ def Hfus_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -1167,7 +1167,7 @@ def Hfus(CASRN, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns

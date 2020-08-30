@@ -27,6 +27,8 @@ import pandas as pd
 import numpy as np
 from chemicals.identifiers import check_CAS
 from chemicals.safety import *
+from chemicals.utils import normalize
+from fluids.numerics import assert_close, assert_close1d
 
 SUZUKI = 'Suzuki (1994)'
 CROWLLOUVAR = 'Crowl and Louvar (2001)'
@@ -286,3 +288,9 @@ def test_unit_conv_TLV():
     ppmv = mgm3_to_ppmv(1.635, 40)
     assert_allclose(ppmv, 1.0000233761164334)
 
+def test_fire_mixing():
+    LFL = fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.012, .053, .031])
+    assert_close(LFL, 0.02751172136637642, rtol=1e-13)
+    
+    UFL = fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.075, .15, .32])
+    assert_close(UFL, 0.12927551844869378, rtol=1e-13)

@@ -49,7 +49,7 @@ def test_CSP():
     # TODO: Find parameters where Brock Bird is negative
 
     # Chlorobenzene from Poling, as compared with a % error value at 293 K.
-    sigma1 = Pitzer(293., 633.0, 4530000.0, 0.249)
+    sigma1 = Pitzer_sigma(293., 633.0, 4530000.0, 0.249)
     assert_close(sigma1, 0.03458453513446387)
 
     sigma1 = Sastri_Rao(293.15, 404.75, 633.0, 4530000.0)

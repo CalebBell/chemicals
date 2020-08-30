@@ -104,8 +104,8 @@ def RI_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -129,7 +129,7 @@ def RI(CASRN, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns

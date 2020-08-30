@@ -32,7 +32,7 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 Pure Component Correlations
 ---------------------------
 .. autofunction:: chemicals.interface.Brock_Bird
-.. autofunction:: chemicals.interface.Pitzer
+.. autofunction:: chemicals.interface.Pitzer_sigma
 .. autofunction:: chemicals.interface.Sastri_Rao
 .. autofunction:: chemicals.interface.Zuo_Stenby
 .. autofunction:: chemicals.interface.Hakim_Steinberg_Stiel
@@ -131,7 +131,7 @@ The structure of each dataframe is shown below:
 from __future__ import division
 
 __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
-           'Brock_Bird', 'Pitzer', 'Sastri_Rao', 'Zuo_Stenby', 
+           'Brock_Bird', 'Pitzer_sigma', 'Sastri_Rao', 'Zuo_Stenby', 
            'sigma_IAPWS',
            'Mersmann_Kind_surface_tension', 'API10A32',
            'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem', 
@@ -469,7 +469,7 @@ def Brock_Bird(T, Tb, Tc, Pc):
     return sigma
 
 
-def Pitzer(T, Tc, Pc, omega):
+def Pitzer_sigma(T, Tc, Pc, omega):
     r'''Calculates air-water surface tension using the correlation derived
     by [1]_ from the works of [2]_ and [3]_. Based on critical property CSP
     methods.
@@ -503,7 +503,7 @@ def Pitzer(T, Tc, Pc, omega):
     --------
     Chlorobenzene from Poling, as compared with a % error value at 293 K.
 
-    >>> Pitzer(293., 633.0, 4530000.0, 0.249)
+    >>> Pitzer_sigma(293., 633.0, 4530000.0, 0.249)
     0.03458453513446388
 
     References
