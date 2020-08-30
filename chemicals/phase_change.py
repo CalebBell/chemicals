@@ -79,6 +79,51 @@ dependent; the dependency comes almost entirely from the vaporization
 enthalpy's dependence. To calculate heat of sublimation at any temperature, use
 the equation :math:`H_{sub} = H_{fus} + H_{vap}`.
 
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: phase_change_data_Perrys2_150
+
+    A collection of 344 coefficient sets from the DIPPR database published
+    openly in [1]_. Provides temperature limits for all its fluids. 
+    See :obj:`chemicals.dippr.EQ106` for the model equation.
+
+.. data:: phase_change_data_VDI_PPDS_4
+
+    Coefficients for a equation form developed by the PPDS, published 
+    openly in [2]_. Extrapolates poorly at low temperatures. See :obj:`PPDS12` 
+    for the model equation.
+
+.. data:: phase_change_data_Alibakhshi_Cs
+
+    One-constant limited temperature range regression coefficients presented
+    in [3]_, with constants for ~2000 chemicals from the DIPPR database.
+    Valid up to 100 K below the critical point, and 50 K under the boiling
+    point. See :obj:`Alibakhshi` for the model equation.
+
+.. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+    8E. McGraw-Hill Professional, 2007.
+.. [2] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+    Berlin; New York:: Springer, 2010.
+.. [3] Alibakhshi, Amin. "Enthalpy of Vaporization, Its Temperature
+    Dependence and Correlation with Surface Tension: A Theoretical Approach."
+    Fluid Phase Equilibria 432 (January 25, 2017): 62-69.
+    https://doi.org/10.1016/j.fluid.2016.10.013.
+
+The structure of each dataframe is shown below:
+    
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.phase_change.phase_change_data_Perrys2_150
+
+    In [3]: chemicals.phase_change.phase_change_data_VDI_PPDS_4
+
+    In [4]: chemicals.phase_change.phase_change_data_Alibakhshi_Cs
 
 """
 
