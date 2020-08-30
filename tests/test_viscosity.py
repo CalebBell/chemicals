@@ -134,6 +134,9 @@ def test_ViswanathNatarajan():
     mu = Viswanath_Natarajan_3(298.15, -2.7173-log10(1000), -1071.18, -129.51)
     assert_close(mu, 0.0006129806445142112)
 
+def test_PPDS9():
+    mu = PPDS9(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    assert_close(mu, 0.00035091137378230684, rtol=1e-13)
 
 def test_Letsou_Stiel():
     # Checked 2017-03-05
