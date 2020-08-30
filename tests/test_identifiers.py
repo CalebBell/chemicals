@@ -45,6 +45,7 @@ def test_dippr_list():
 
 
 @pytest.mark.slow
+@pytest.mark.online
 def test_dippr_2016_matched_meta():
     df2 = pd.read_excel('https://www.aiche.org/sites/default/files/docs/pages/dippr_compound_list_2016.xlsx')
     names = df2['Name'].tolist()
@@ -70,24 +71,25 @@ def test_Matthews_critical_names():
 #        except:
 #            print(CAS, name)
 
-@pytest.mark.slow
-def test_Laliberte_metadata_identifiers():
-    from thermo.electrochem import _Laliberte_Density_ParametersDict, _Laliberte_Viscosity_ParametersDict, _Laliberte_Heat_Capacity_ParametersDict
-    lalib = _Laliberte_Density_ParametersDict.copy()
-    lalib.update(_Laliberte_Viscosity_ParametersDict)
-    lalib.update(_Laliberte_Heat_Capacity_ParametersDict)
-    
-    for CAS, d in lalib.items():
-        c = None
-        formula = d['Formula']
-        name = d['Name']
-        if formula not in set(['HCHO2', 'CH3CH2OH', 'HCH3CO2']):
-            assert CAS_from_any(formula) == CAS
-#        try:
-#            CAS_from_any(name)
-#        except:
-#            print(name)
-
+# TODO uncomment when electrochem is back
+#@pytest.mark.slow
+#def test_Laliberte_metadata_identifiers():
+#    from thermo.electrochem import _Laliberte_Density_ParametersDict, _Laliberte_Viscosity_ParametersDict, _Laliberte_Heat_Capacity_ParametersDict
+#    lalib = _Laliberte_Density_ParametersDict.copy()
+#    lalib.update(_Laliberte_Viscosity_ParametersDict)
+#    lalib.update(_Laliberte_Heat_Capacity_ParametersDict)
+#    
+#    for CAS, d in lalib.items():
+#        c = None
+#        formula = d['Formula']
+#        name = d['Name']
+#        if formula not in set(['HCHO2', 'CH3CH2OH', 'HCH3CO2']):
+#            assert CAS_from_any(formula) == CAS
+##        try:
+##            CAS_from_any(name)
+##        except:
+##            print(name)
+#
 
 @pytest.mark.slow
 def test_pubchem_dict():
