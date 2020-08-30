@@ -77,6 +77,70 @@ Utility methods
 ---------------
 .. autoclass:: chemicals.heat_capacity.PiecewiseHeatCapacity
 
+Fit Coefficients
+----------------
+All of these coefficients are lazy-loaded, so they must be accessed as an
+attribute of this module.
+
+.. data:: Cp_data_Poling
+
+    Constains data for gases and liquids from [3]_. 
+    Simple polynomials for gas heat capacity (not suitable for extrapolation) are available for 308 chemicals. Additionally, constant values in at 298.15 K are available for 348 gases. Constant values in at 298.15 K are available for 245 liquids.
+
+.. data:: TRC_gas_data
+
+    A rigorous expression from [1]_ for modeling gas heat capacity.
+    Coefficients for 1961 chemicals are available.
+
+.. data:: CRC_standard_data
+
+    Constant values tabulated in [4]_ at 298.15 K. Data is available for
+    533 gases. Data is available for 433 liquids. Data is available for 529
+    solids.
+
+.. data:: Cp_data_PerryI
+
+    Simple polynomials from [5]_ with vaious exponents selected for each expression.
+    Coefficients are in units of calories/mol/K. The full expression is
+    :math:`C_p = a + bT + c/T^2 + dT^2`. Data is available for 284 compounds.
+    Some compounds have gas data, some have liquid data, and have solid 
+    (crystal structure) data, sometimes multiple coefficients for different 
+    solid phases.
+
+.. data:: zabransky_dicts
+
+    Complicated fits covering different cases and with different forms from [2]_.
+    
+.. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
+    in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
+.. [2] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
+    Heat Capacity of Liquids: Critical Review and Recommended Values.
+    2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
+.. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+    New York: McGraw-Hill Professional, 2000.
+.. [4] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+    Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+.. [5] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+    Eighth Edition. McGraw-Hill Professional, 2007.
+
+.. ipython::
+
+    In [1]: import chemicals
+
+    In [2]: chemicals.heat_capacity.Cp_data_Poling
+
+    In [3]: chemicals.heat_capacity.TRC_gas_data
+
+    In [4]: chemicals.heat_capacity.CRC_standard_data
+
+    In [5]: chemicals.heat_capacity.Cp_data_PerryI['124-38-9'] # gas only
+
+    In [6]: chemicals.heat_capacity.Cp_data_PerryI['7704-34-9'] # crystal and gas
+
+    In [7]: chemicals.heat_capacity.Cp_data_PerryI['7440-57-5'] # crystal and liquid
+
+    In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
+
 """
 
 __all__ = ['heat_capacity_gas_methods',
