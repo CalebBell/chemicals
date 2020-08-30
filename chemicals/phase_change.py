@@ -67,6 +67,11 @@ Heat of Vaporization at T Correlations
 .. autofunction:: chemicals.phase_change.Clapeyron
 .. autofunction:: chemicals.phase_change.Watson
 
+Heat of Vaporization at T Model Equations 
+-----------------------------------------
+.. autofunction:: chemicals.phase_change.Alibakhshi
+
+
 Heat of Sublimation 
 -------------------
 No specific correlation is provided. This value is fairly strongly temperature
@@ -79,11 +84,11 @@ the equation :math:`H_{sub} = H_{fus} + H_{vap}`.
 
 __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm', 
            'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen', 
-           'Liu', 'Vetere', 'Watson', 'Hfus', 'Hfus_methods']
+           'Liu', 'Vetere', 'Alibakhshi', 'Watson', 'Hfus', 'Hfus_methods']
 
 import os
 from fluids.numerics import numpy as np
-from fluids.constants import R
+from fluids.constants import R, N_A, pi
 from chemicals.utils import log
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals import miscdata
@@ -976,6 +981,55 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     Trefr = T_ref/Tc
     H2 = Hvap_ref*((1.0 - Tr)/(1.0 - Trefr))**exponent
     return H2
+
+### Enthalpy of Vaporization model equations
+    
+def Alibakhshi(T, Tc, C):
+    r'''Calculates enthalpy of vaporization of a chemical at a temperature 
+    using a theoretically-derived single-coefficient fit equation developed in
+    [1]_. This model falls apart at ~0.8 Tc.
+
+    .. math::
+        \Delta H_{vap} = \left(4.5\pi N_A\right)^{1/3.}4.2\times 10^{-7}
+        (T_c - 6) - 0.5RT\log(T) + CT
+
+    Parameters
+    ----------
+    T : float
+        Temperature for which to calculate heat of vaporization, [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    C : float
+        Alibakhshi fit coefficient, [J/mol/K]
+
+    Returns
+    -------
+    Hvap : float
+        Enthalpy of vaporization at `T`, [J/mol]
+
+    Notes
+    -----
+    The authors of [1]_ evaluated their model on 1890 compounds for a 
+    temperature range of 50 K under `Tb` to 100 K below `Tc`, and obtained an
+    average absolute relative error of 4.5%.
+
+    Examples
+    --------
+    Predict the enthalpy of vaporization of water at 320 K:
+        
+    >>> Alibakhshi(T=320.0, Tc=647.14, C=-16.7171)
+    41961.30490225752
+    
+    The error is 2.5% compared to the correct value of 43048 J/mol.
+
+    References
+    ----------
+    .. [1] Alibakhshi, Amin. "Enthalpy of Vaporization, Its Temperature
+       Dependence and Correlation with Surface Tension: A Theoretical Approach."
+       Fluid Phase Equilibria 432 (January 25, 2017): 62-69.
+       https://doi.org/10.1016/j.fluid.2016.10.013.
+    '''
+    return (4.5*pi*N_A)**(1/3.)*4.2E-7*(Tc-6.) - R/2.*T*log(T) + C*T
 
 ### Heat of Fusion
 

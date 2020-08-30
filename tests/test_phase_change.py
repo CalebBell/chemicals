@@ -290,3 +290,7 @@ def test_Tm():
     Tms = [Tm('7732-18-5', method=i) for i in w_methods]
     assert_close1d(Tms, [273.15, 273.15])
 
+
+def test_Alibakhshi():
+    Hvap = Alibakhshi(T=320.0, Tc=647.14, C=-16.7171)
+    assert_close(Hvap, 41961.30490225752, rtol=1e-13)
