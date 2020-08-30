@@ -1033,10 +1033,10 @@ def Alibakhshi(T, Tc, C):
 
 def PPDS12(T, Tc, A, B, C, D, E):
     r'''Calculate the enthalpy of vaporization of a fluid using the 5-term 
-    powerfit developed by the PPDS and named PPDS equation 12.
+    power fit developed by the PPDS and named PPDS equation 12.
     
     .. math::
-       \H_{vap} = RT_c \left(A\tau^{1/3} + B\tau^{2/3} + C\tau + D\tau^2 
+       H_{vap} = RT_c \left(A\tau^{1/3} + B\tau^{2/3} + C\tau + D\tau^2 
        + E\tau^6\right)
     
     .. math::
@@ -1066,7 +1066,8 @@ def PPDS12(T, Tc, A, B, C, D, E):
 
     Notes
     -----
-    No other source for these coefficients has been found.
+    Coefficients can be found in [1]_, but no other source for these 
+    coefficients has been found.
 
     Examples
     --------
