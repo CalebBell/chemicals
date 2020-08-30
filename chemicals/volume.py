@@ -340,7 +340,6 @@ def Rackett(T, Tc, Pc, Zc):
 
     Notes
     -----
-    Units are dependent on gas constant R, imported from scipy
     According to Reid et. al, underpredicts volume for compounds with Zc < 0.22
 
     Examples
