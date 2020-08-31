@@ -69,7 +69,7 @@ __all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions',
 import re
 
 CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7440-42-8', '7440-44-0', '7727-37-9', '7782-44-7', '7782-41-4', '7440-01-9', '7440-23-5', '7439-95-4', '7429-90-5', '7440-21-3', '7723-14-0', '7704-34-9', '7782-50-5', '7440-37-1', '7440-09-7', '7440-70-2', '7440-20-2', '7440-32-6', '7440-62-2', '7440-47-3', '7439-96-5', '7439-89-6', '7440-48-4', '7440-02-0', '7440-50-8', '7440-66-6', '7440-55-3', '7440-56-4', '7440-38-2', '7782-49-2', '10097-32-2', '7439-90-9', '7440-17-7', '7440-24-6', '7440-65-5', '7440-67-7', '7440-03-1', '7439-98-7', '7440-26-8', '7440-18-8', '7440-16-6', '7440-05-3', '7440-22-4', '7440-43-9', '7440-74-6', '7440-31-5', '7440-36-0', '13494-80-9', '7553-56-2', '7440-63-3', '7440-46-2', '7440-39-3', '7439-91-0', '7440-45-1', '7440-10-0', '7440-00-8', '7440-12-2', '7440-19-9', '7440-53-1', '7440-54-2', '7440-27-9', '7429-91-6', '7440-60-0', '7440-52-0', '7440-30-4', '7440-64-4', '7439-94-3', '7440-58-6', '7440-25-7', '7440-33-7', '7440-15-5', '7440-04-2', '7439-88-5', '7440-06-4', '7440-57-5', '7439-97-6', '7440-28-0', '7439-92-1', '7440-69-9', '7440-08-6', '7440-68-8', '10043-92-2', '7440-73-5', '7440-14-4', '7440-34-8', '7440-29-1', '7440-13-3', '7440-61-1', '7439-99-8', '7440-07-5', '7440-35-9', '7440-51-9', '7440-40-6', '7440-71-3', '7429-92-7', '7440-72-4', '7440-11-1', '10028-14-5', '22537-19-5', '53850-36-5', '53850-35-4', '54038-81-2', '54037-14-8', '54037-57-9', '54038-01-6', '54083-77-1', '54386-24-2', '54084-26-3', '54084-70-7', '54085-16-4', '54085-64-2', '54100-71-9', '54101-14-3', '54144-19-3']
-CAS_by_number = list(CAS_by_number_standard)
+CAS_by_number = CAS_by_number_standard.copy()
 '''CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118.'''
 
 periods = [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
@@ -80,9 +80,9 @@ groups = [1, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 
 Lanthanides and Actinides are set to None.'''
 
 s_block = [1, 2, 3, 4, 11, 12, 19, 20, 37, 38, 55, 56, 87, 88]
-d_block = list(range(21, 31)) + list(range(39, 49)) + list(range(72, 81)) + list(range(104, 113))
-f_block = list(range(57, 72)) + list(range(89, 104)) # 57, 89 are sometimes placed in the d block
-p_block = list(range(5, 11)) + list(range(13, 19)) + list(range(31, 37)) + list(range(49, 55)) + list(range(81, 87)) + list(range(113, 119))
+d_block = [*range(21, 31), *range(39, 49), *range(72, 81), *range(104, 113)]
+f_block = [*range(57, 72), *range(89, 104)] # 57, 89 are sometimes placed in the d block
+p_block = [*range(5, 11), *range(13, 19), *range(31, 37), *range(49, 55), *range(81, 87), *range(113, 119)]
 blocks = {'s': s_block, 'd': d_block, 'f': f_block, 'p': p_block}
 '''Blocks of the elements, stored in a dictionary with four keys and lists.
 Indexed by atomic numbers off-by-one up to 118.'''
@@ -91,7 +91,7 @@ InChI_keys = ['YZCKVEUIGOORGS-UHFFFAOYSA-N', 'SWQJXJOGLNCZEY-UHFFFAOYSA-N', 'WHX
 # Big problem: Atoms like N2, O2 point to only the singlet
 
 homonuclear_elements = {1, 7, 8, 9, 17, 35, 53} # includes Br2, I2
-#homonuclear_elemental_gases = [periodic_table[i] for i in ['hydrogen', 'nitrogen', 'oxygen', 'fluorine', 'chlorine', 'bromine', 'iodine']]
+# homonuclear_elemental_gases = [periodic_table[i] for i in ['hydrogen', 'nitrogen', 'oxygen', 'fluorine', 'chlorine', 'bromine', 'iodine']]
 homonuclear_elemental_gases = [1, 7, 8, 9, 17] # 35, 53
 homonuclear_elemental_singlets_CASs = ["12385-13-6", "17778-88-0", "17778-80-2", "14762-94-8", "22537-15-1"]
 for i, CAS in zip(homonuclear_elemental_gases, homonuclear_elemental_singlets_CASs):
@@ -194,25 +194,27 @@ class PeriodicTable:
     __slots__ = ('_number_to_elements', '_symbol_to_elements',
                  '_name_to_elements', '_CAS_to_elements', '_indexes')
     def __init__(self, elements):
-        #: Dictionary lookup of number(int) -> Element; also has number(str) -> Element for convenience.
-        self._number_to_elements = {}
-        self._symbol_to_elements = {}
-        '''Dictionary lookup of symbol(str) -> Element.'''            
-        self._name_to_elements = {}
-        '''Dictionary lookup of name(str) -> Element; also has name(str.lower()) -> Element for convenience.'''            
-        self._CAS_to_elements = {}
-        '''Dictionary lookup of CAS(str) -> Element.'''    
+        #: Dictionary lookup of number(int) -> Element;
+        #: also has number(str) -> Element for convenience.
+        self._number_to_elements = number_to_elements = {}        
+        #: Dictionary lookup of symbol(str) -> Element.
+        self._symbol_to_elements = symbol_to_elements = {}        
+        #: Dictionary lookup of name(str) -> Element;
+        #: also has name(str.lower()) -> Element for convenience.
+        self._name_to_elements = name_to_elements = {}
+        #: Dictionary lookup of CAS(str) -> Element.
+        self._CAS_to_elements = CAS_to_elements = {}
     
         for ele in elements:
-            self._number_to_elements[ele.number] = ele
-            self._number_to_elements[str(ele.number)] = ele
-            self._symbol_to_elements[ele.symbol] = ele
-            self._name_to_elements[ele.name] = ele
-            self._name_to_elements[ele.name.lower()] = ele
-            self._CAS_to_elements[ele.CAS] = ele
+            number_to_elements[ele.number] = ele
+            number_to_elements[str(ele.number)] = ele
+            symbol_to_elements[ele.symbol] = ele
+            name_to_elements[ele.name] = ele
+            name_to_elements[ele.name.lower()] = ele
+            CAS_to_elements[ele.CAS] = ele
             
-        self._indexes = (self._symbol_to_elements, self._number_to_elements, 
-                        self._name_to_elements, self._CAS_to_elements)
+        self._indexes = (symbol_to_elements, number_to_elements, 
+                         name_to_elements, CAS_to_elements)
 
     def __contains__(self, key):
         for i in self._indexes:
@@ -228,12 +230,12 @@ class PeriodicTable:
     def __getitem__(self, key):
         for i in self._indexes:
             if key in i: return i[key]
-        raise KeyError('Key is not in the periodic table')
+        raise KeyError("'%s' is not in the periodic table" %(key))
 
     def __getattr__(self, key):
         for i in self._indexes:
             if key in i: return i[key]
-        raise AttributeError('Key is not in the periodic table')
+        raise AttributeError("'%s' is not in the periodic table" %(key))
 
 
 class Element:
@@ -572,6 +574,7 @@ def molecular_weight(atoms):
     References
     ----------
     .. [1] RDKit: Open-source cheminformatics; http://www.rdkit.org
+    
     '''
     MW = 0
     for i in atoms:
