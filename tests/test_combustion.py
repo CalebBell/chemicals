@@ -39,11 +39,12 @@ def test_combustion_stoichiometry():
     # test with its own oxygen included
     products = combustion_stoichiometry({'C': 4, 'O': 8})
     assert_close(products['CO2'], 4)
-    assert_close(products['O2'], 0)
+    # O2 coefficient is 0., so it shouldn't be included just like H2O
+    with pytest.raises(KeyError): products['O2']         
     
     products = combustion_stoichiometry({'N':2})
     assert_close(products['N2'], 1)
-    assert_close(products['O2'], 0)
+    with pytest.raises(KeyError): products['O2'] 
     
     # test combustion of everything except N2
     products = combustion_stoichiometry({'C':2.0, 'H': 3, 'P': 1, 'I': 2, 'Cl': 3, 'F': 2, 'Br': 1, 'S': 5, 'O': 1})
