@@ -783,12 +783,56 @@ else:
 
 ### Heat capacities of gases
 
-def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
+def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
+    """
+    Return Term A in Lastovka-Shaw equation.
+
+    Parameters
+    ----------
+    similarity_variable : float
+        Similarity variable as defined in [1]_, [mol/g]
+    cyclic_aliphatic: bool, optional
+        Whether or not chemcial is cyclic aliphatic, [-]
+
+    Returns
+    -------
+    term_A : float
+        Term A in Lastovka-Shaw equation, [J/g]
+
+    References
+    ----------
+    .. [1] Lastovka, Vaclav, and John M. Shaw. "Predictive Correlations for
+       Ideal Gas Heat Capacities of Pure Hydrocarbons and Petroleum Fractions."
+       Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
+       doi:10.1016/j.fluid.2013.07.023.
+
+    """
+    a = similarity_variable
+    if cyclic_aliphatic:
+        A1 = -0.1793547
+        A2 = 3.86944439
+        term_A = A1 + A2*a
+    else:
+        # A1 = 0.58
+        A2 = 1.25
+        A1_minus_A2 = -0.67 # (A1 - A2)
+        A3 = 0.17338003 # 803 instead of 8003 in another paper
+        # A4 = 0.014
+        A4_inv = 71.42857142857143 # 1 / A4
+        term_A = A2 + A1_minus_A2/(1. + exp((a-A3)*A4_inv)) # One reference says exp((a-A3)/A4)
+        # Personal communication confirms the change
+    return term_A
+
+def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_A=None):
     r'''Calculate ideal-gas constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
     
     .. math::
-        C_p^0 = \left(A_2 + \frac{A_1 - A_2}{1 + \exp(\frac{\alpha-A_3}{A_4})}\right)
+        term_A = A1 + A2*a \text{ if cyclic aliphatic} 
+        
+        term_A = \left(A_2 + \frac{A_1 - A_2}{1 + \exp(\frac{\alpha-A_3}{A_4})}\right) \text{ if not cyclic aliphatic}
+        
+        C_p^0 = term_A
         + (B_{11} + B_{12}\alpha)\left(-\frac{(C_{11} + C_{12}\alpha)}{T}\right)^2
         \frac{\exp(-(C_{11} + C_{12}\alpha)/T)}{[1-\exp(-(C_{11}+C_{12}\alpha)/T)]^2}
         + (B_{21} + B_{22}\alpha)\left(-\frac{(C_{21} + C_{22}\alpha)}{T}\right)^2
@@ -799,21 +843,30 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     T : float
         Temperature of gas [K]
     similarity_variable : float
-        similarity variable as defined in [1]_, [mol/g]
-        
+        Similarity variable as defined in [1]_, [mol/g]
+    cyclic_aliphatic: bool, optional
+        Whether or not chemcial is cyclic aliphatic, [-]
+    MW : float, optional
+        Molecular weight, [g/mol]
+    term_A : float, optional
+        Term A in Lastovka-Shaw equation, [J/g]
+    
     Returns
     -------
     Cpg : float
-        Gas constant-pressure heat capacitiy, [J/kg/K]
+        Gas constant-pressure heat capacitiy, [J/mol/K if MW given; J/kg/K otherwise]
         
     Notes
     -----
-    Original model is in terms of J/g/K. Note that the model is for predicting
-    mass heat capacity, not molar heat capacity like most other methods!
+    Original model is in terms of J/g/K.
     
-    A1 = 0.58
+    A1 = -0.1793547 \text{ if cyclic aliphatic}
     
-    A2 = 1.25
+    A1 = 0.58 \text{ if not cyclic aliphatic}
+    
+    A2 = 3.86944439 \text{ if cyclic aliphatic}
+    
+    A2 = 1.25 \text{ if not cyclic aliphatic}
     
     A3 = 0.17338003
     
@@ -837,8 +890,15 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     
     Examples
     --------
-    >>> Lastovka_Shaw(1000.0, 0.1333)
+    Estimate the heat capacity of n-decane gas in J/kg/K:
+    
+    >>> Lastovka_Shaw(1000.0, 0.22491)
     2467.113309084757
+    
+    Estimate the heat capacity of n-decane gas in J/mol/K:
+    
+    >>> Lastovka_Shaw(1000.0, 0.22491, MW=142.28)
+    530.7462731824618
     
     References
     ----------
@@ -846,19 +906,10 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
        Ideal Gas Heat Capacities of Pure Hydrocarbons and Petroleum Fractions."
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
+    
     '''
     a = similarity_variable
-    if cyclic_aliphatic:
-        A1 = -0.1793547
-        A2 = 3.86944439
-        first = A1 + A2*a
-    else:
-        A1 = 0.58
-        A2 = 1.25
-        A3 = 0.17338003 # 803 instead of 8003 in another paper
-        A4 = 0.014
-        first = A2 + (A1-A2)/(1. + exp((a - A3)/A4))
-        # Personal communication confirms the change
+    if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
 
     T_inv = 1.0/T
     B11 = 0.73917383
@@ -877,11 +928,12 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False):
     expm_C21_C22a_T = exp(-C21_C22a_T)
     x2 = 1.0/(1.0 - expm_C21_C22a_T)
     
-    Cp = first + (B11 + B12*a)*(C11_C12a_T*C11_C12a_T)*expm_C11_C12a_T*x1*x1
+    Cp = term_A + (B11 + B12*a)*(C11_C12a_T*C11_C12a_T)*expm_C11_C12a_T*x1*x1
     Cp += (B21 + B22*a)*(C21_C22a_T*C21_C22a_T)*expm_C21_C22a_T*x2*x2
-    return Cp*1000. # J/g/K to J/kg/K
+    return Cp * MW if MW else Cp*1000. # J/g/K to J/kg/K
 
-def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False):
+def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
+                           MW=None, term_A=None):
     r'''Calculate the integral of ideal-gas constant-pressure heat capacitiy 
     with the similarity variable concept and method as shown in [1]_.
     
@@ -889,18 +941,21 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False):
     ----------
     T : float
         Temperature of gas [K]
-    similarity_variable : float
-        similarity variable as defined in [1]_, [mol/g]
+    cyclic_aliphatic: bool, optional
+        Whether or not chemcial is cyclic aliphatic, [-]
+    MW : float, optional
+        Molecular weight, [g/mol]
+    term_A : float, optional
+        Term A in Lastovka-Shaw equation, [J/g]
         
     Returns
     -------
     H : float
-        Difference in enthalpy from 0 K, [J/kg]
+        Difference in enthalpy from 0 K, [J/mol if MW given; J/kg otherwise]
         
     Notes
     -----
-    Original model is in terms of J/g/K. Note that the model is for predicting
-    mass heat capacity, not molar heat capacity like most other methods!
+    Original model is in terms of J/g/K. 
     Integral was computed with SymPy.
     
     See Also
@@ -919,20 +974,10 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False):
        Ideal Gas Heat Capacities of Pure Hydrocarbons and Petroleum Fractions."
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
+    
     '''
     a = similarity_variable
-    if cyclic_aliphatic:
-        A1 = -0.1793547
-        A2 = 3.86944439
-        first = A1 + A2*a
-    else:
-        A1 = 0.58
-        A2 = 1.25
-        A3 = 0.17338003 # 803 instead of 8003 in another paper
-#        A4 = 0.014
-        A4_inv = 71.42857142857143
-        first = A2 + (A1-A2)/(1. + exp((a-A3)*A4_inv)) # One reference says exp((a-A3)/A4)
-        # Personal communication confirms the change
+    if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
 
     B11 = 0.73917383
     B12 = 8.88308889
@@ -946,10 +991,12 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False):
     x2 = -C21 - C22*a
     T_inv = 1.0/T
     
-    return 1000.*(T*first - (B11 + B12*a)*(x1*x1)/(x1 - x1*exp(x1*T_inv)) 
+    H = (T*term_A - (B11 + B12*a)*(x1*x1)/(x1 - x1*exp(x1*T_inv)) 
                   - (B21 + B22*a)*(x2*x2)/(x2 - x2*exp(x2*T_inv)))
+    return H * MW if MW else H*1000. # J/g to J/kg
 
-def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False):
+def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False,
+                                  MW=None, term_A=None):
     r'''Calculate the integral over temperature of ideal-gas constant-pressure 
     heat capacitiy with the similarity variable concept and method as shown in
     [1]_.
@@ -959,12 +1006,18 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     T : float
         Temperature of gas [K]
     similarity_variable : float
-        similarity variable as defined in [1]_, [mol/g]
+        Similarity variable as defined in [1]_, [mol/g]
+    cyclic_aliphatic: bool, optional
+        Whether or not chemcial is cyclic aliphatic, [-]
+    MW : float, optional
+        Molecular weight, [g/mol]
+    term_A : float, optional
+        Term A in Lastovka-Shaw equation, [J/g]
         
     Returns
     -------
     S : float
-        Difference in entropy from 0 K, [J/kg/K]
+        Difference in entropy from 0 K, [J/mol/K if MW given; J/kg/K otherwise]
         
     Notes
     -----
@@ -990,16 +1043,7 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
        doi:10.1016/j.fluid.2013.07.023.
     '''
     a = similarity_variable
-    if cyclic_aliphatic:
-        A1 = -0.1793547
-        A2 = 3.86944439
-        first = A1 + A2*a
-    else:
-        A1 = 0.58
-        A2 = 1.25
-        A3 = 0.17338003 # 803 instead of 8003 in another paper
-        A4 = 0.014
-        first = A2 + (A1-A2)/(1. + cexp((a - A3)/A4))
+    if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
 
     T_inv = 1.0/T
     a2 = a*a
@@ -1011,7 +1055,7 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     B22 = 4.35656721
     C21 = 2897.01927
     C22 = 5987.80407
-    S = (first*clog(T) + (-B11 - B12*a)*clog(cexp((-C11 - C12*a)*T_inv) - 1.) 
+    S = (term_A*clog(T) + (-B11 - B12*a)*clog(cexp((-C11 - C12*a)*T_inv) - 1.) 
         + (-B11*C11 - B11*C12*a - B12*C11*a - B12*C12*a2)/(T*cexp((-C11
         - C12*a)*T_inv) - T) - (B11*C11 + B11*C12*a + B12*C11*a + B12*C12*a2)*T_inv)
     S += ((-B21 - B22*a)*clog(cexp((-C21 - C22*a)*T_inv) - 1.) + (-B21*C21 - B21*C22*a
@@ -1019,16 +1063,16 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
         + B21*C22*a + B22*C21*a + B22*C22*a2)*T_inv)
     # There is a non-real component, but it is only a function of similariy 
     # variable and so will always cancel out.
-    return S.real*1000.
+    return S.real * MW if MW else S.real*1000. # J/g/K to J/kg/K
 
-def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm):
-    H1 = Lastovka_Shaw_integral(T, similarity_variable)
+def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm, cyclic_aliphatic, term_A):
+    H1 = Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic, MW, term_A)
     dH = H1 - H_ref
-    err = (property_mass_to_molar(dH, MW) - Hm)
+    err = (dH - Hm)
     return err
 
 def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15, 
-                           factor=1.0):
+                           factor=1.0, cyclic_aliphatic=None, term_A=None):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
     the temperature which has a specified `Hm`, as is required in PH flashes,
     as shown in [1]_.
@@ -1046,6 +1090,10 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
     factor : float, optional
         A factor to increase or decrease the predicted value of the 
         method, [-]
+    cyclic_aliphatic: bool, optional
+        Whether or not chemcial is cyclic aliphatic, [-]
+    term_A : float, optional
+        Term A in Lastovka-Shaw equation, [J/g]
 
     Returns
     -------
@@ -1074,26 +1122,29 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
        doi:10.1016/j.fluid.2013.07.023.
     '''
     Hm /= factor
-    H_ref = Lastovka_Shaw_integral(T_ref, similarity_variable)
+    a = similarity_variable
+    if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
+    H_ref = Lastovka_Shaw_integral(T_ref, similarity_variable, cyclic_aliphatic, MW, term_A)
+    args = (MW, a, H_ref, Hm, cyclic_aliphatic, term_A)
     try:
-        return secant(Lastovka_Shaw_T_for_Hm_err, 500.0, ytol=1e-4, args=(MW, similarity_variable, H_ref, Hm))
+        return secant(Lastovka_Shaw_T_for_Hm_err, 500.0, ytol=1e-4, args=args)
     except:
         try:
-            return brenth(Lastovka_Shaw_T_for_Hm_err, 1e-3, 1e5, args=(MW, similarity_variable, H_ref, Hm))
+            return brenth(Lastovka_Shaw_T_for_Hm_err, 1e-3, 1e5, args)
         except:
-            if Lastovka_Shaw_T_for_Hm_err(1e-11, MW, similarity_variable, H_ref, Hm) > 0:
+            if Lastovka_Shaw_T_for_Hm_err(1e-11, *args) > 0:
                 raise ValueError("For gas only enthalpy spec to be correct, "
                                  "model requires negative temperature")
             raise ValueError("Could not converge")
 
-def Lastovka_Shaw_T_for_Sm_err(T, MW, similarity_variable, S_ref, Sm):
-    S1 = Lastovka_Shaw_integral_over_T(T, similarity_variable)
+def Lastovka_Shaw_T_for_Sm_err(T, MW, similarity_variable, S_ref, Sm, cyclic_aliphatic, term_A):
+    S1 = Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic, MW, term_A)
     dS = S1 - S_ref
-    err = (property_mass_to_molar(dS, MW) - Sm)
+    err = (dS - Sm)
     return err
 
 def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15, 
-                           factor=1.0):
+                           factor=1.0, cyclic_aliphatic=None, term_A=None):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
     the temperature which has a specified `Sm`, as is required in PS flashes,
     as shown in [1]_.
@@ -1111,6 +1162,10 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
     factor : float, optional
         A factor to increase or decrease the predicted value of the 
         method, [-]
+    cyclic_aliphatic: bool, optional
+        Whether or not chemcial is cyclic aliphatic, [-]
+    term_A : float, optional
+        Term A in Lastovka-Shaw equation, [J/g]
 
     Returns
     -------
@@ -1139,16 +1194,19 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
        doi:10.1016/j.fluid.2013.07.023.
     '''
     Sm /= factor
-    S_ref = Lastovka_Shaw_integral_over_T(T_ref, similarity_variable)
+    a = similarity_variable
+    if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
+    S_ref = Lastovka_Shaw_integral_over_T(T_ref, a, cyclic_aliphatic, MW, term_A)
+    args = (MW, a, S_ref, Sm, cyclic_aliphatic, term_A)
     try:
         return secant(Lastovka_Shaw_T_for_Sm_err, 500, ytol=1e-4, high=10000,
-                      args=(MW, similarity_variable, S_ref, Sm))
+                      args=args)
     except:
         try:
             return brenth(Lastovka_Shaw_T_for_Sm_err, 1e-3, 1e5,
-                          args=(MW, similarity_variable, S_ref, Sm))
+                          args=args)
         except:
-            if Lastovka_Shaw_T_for_Sm_err(1e-11, MW, similarity_variable, S_ref, Sm) > 0.0:
+            if Lastovka_Shaw_T_for_Sm_err(1e-11, *args) > 0.0:
                 raise ValueError("For gas only entropy spec to be correct, "
                                  "model requires negative temperature")
             raise ValueError("Could not converge")
@@ -1457,7 +1515,25 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
     + 25.2*(1-Tr)**(1/3.)/Tr + 1.742/(1.-Tr)))
     return Cplm
 
-def Dadgostar_Shaw(T, similarity_variable):
+def Dadgostar_Shaw_terms(similarity_variable):
+    a = similarity_variable
+    a2 = a*a
+    a11 = -0.3416
+    a12 = 2.2671
+    a21 = 0.1064
+    a22 = -0.3874
+    a31 = -9.8231E-05
+    a32 = 4.182E-04
+    # Didn't seem to improve the comparison; sum of errors on some
+    # points included went from 65.5  to 286.
+    # Author probably used more precision in their calculation.
+    #    constant = 3*R*(theta/T)**2*exp(theta/T)/(exp(theta/T)-1)**2
+    constant = 24.5
+    return (constant * (a11*a + a12*a2),
+            a21*a + a22*a2,
+            a31*a + a32*a2)
+
+def Dadgostar_Shaw(T, similarity_variable, MW=None):
     r'''Calculate liquid constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
     
@@ -1471,11 +1547,13 @@ def Dadgostar_Shaw(T, similarity_variable):
         Temperature of liquid [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+    MW : float, optional
+        Molecular weight of the pure compound or mixture average, [g/mol]
         
     Returns
     -------
     Cpl : float
-        Liquid constant-pressure heat capacitiy, [J/kg/K]
+        Liquid constant-pressure heat capacitiy, [J/mol/K if MW given; J/kg/K otherwise]
         
     Notes
     -----
@@ -1497,27 +1575,11 @@ def Dadgostar_Shaw(T, similarity_variable):
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
     '''
-    a = similarity_variable
-    a11 = -0.3416
-    a12 = 2.2671
-    a21 = 0.1064
-    a22 = -0.3874
-    a31 = -9.8231E-05
-    a32 = 4.182E-04
+    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
+    Cp = (first + second*T + third*T**2)
+    return Cp * MW if MW else Cp*1000. # J/g/K to J/kg/K
 
-    # Didn't seem to improve the comparison; sum of errors on some
-    # points included went from 65.5  to 286.
-    # Author probably used more precision in their calculation.
-#    theta = 151.8675
-#    constant = 3*R*(theta/T)**2*exp(theta/T)/(exp(theta/T)-1)**2
-    constant = 24.5
-
-    Cp = (constant*(a11*a + a12*a**2) + (a21*a + a22*a**2)*T
-          + (a31*a + a32*a**2)*T**2)
-    Cp = Cp*1000 # J/g/K to J/kg/K
-    return Cp
-
-def Dadgostar_Shaw_integral(T, similarity_variable):
+def Dadgostar_Shaw_integral(T, similarity_variable, MW=None):
     r'''Calculate the integral of liquid constant-pressure heat capacitiy 
     with the similarity variable concept and method as shown in [1]_.
     
@@ -1527,11 +1589,13 @@ def Dadgostar_Shaw_integral(T, similarity_variable):
         Temperature of gas [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+    MW : float, optional
+        Molecular weight of the pure compound or mixture average, [g/mol]
         
     Returns
     -------
     H : float
-        Difference in enthalpy from 0 K, [J/kg]
+        Difference in enthalpy from 0 K, [J/mol if MW given; J/kg otherwise]
         
     Notes
     -----
@@ -1556,20 +1620,12 @@ def Dadgostar_Shaw_integral(T, similarity_variable):
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
     '''
-    a = similarity_variable
-    a2 = a*a
     T2 = T*T
-    a11 = -0.3416
-    a12 = 2.2671
-    a21 = 0.1064
-    a22 = -0.3874
-    a31 = -9.8231E-05
-    a32 = 4.182E-04
-    constant = 24.5
-    H = T2*T/3.*(a2*a32 + a*a31) + T2*0.5*(a2*a22 + a*a21) + T*constant*(a2*a12 + a*a11)
-    return H*1000. # J/g/K to J/kg/K
+    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
+    H = T2*T/3.*third + T2*0.5*second + T*first
+    return H * MW if MW else H*1000. # J/g to J/kg
 
-def Dadgostar_Shaw_integral_over_T(T, similarity_variable):
+def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
     r'''Calculate the integral of liquid constant-pressure heat capacitiy 
     with the similarity variable concept and method as shown in [1]_.
     
@@ -1579,11 +1635,13 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable):
         Temperature of gas [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+    MW : float, optional
+        Molecular weight of the pure compound or mixture average, [g/mol]
         
     Returns
     -------
     S : float
-        Difference in entropy from 0 K, [J/kg/K]
+        Difference in entropy from 0 K, [J/mol/K if MW given; J/kg/K otherwise]
         
     Notes
     -----
@@ -1608,17 +1666,9 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable):
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
     '''
-    a = similarity_variable
-    a2 = a*a
-    a11 = -0.3416
-    a12 = 2.2671
-    a21 = 0.1064
-    a22 = -0.3874
-    a31 = -9.8231E-05
-    a32 = 4.182E-04
-    constant = 24.5
-    S = T*T*0.5*(a2*a32 + a*a31) + T*(a2*a22 + a*a21) + a*constant*(a*a12 + a11)*log(T)
-    return S*1000. # J/g/K to J/kg/K
+    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
+    S = T*T*0.5*third + T*second + first*log(T)
+    return S * MW if MW else S*1000. # J/g/K to J/kg/K
 
 def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
@@ -1878,7 +1928,7 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
 
 ### Solid
 
-def Lastovka_solid(T, similarity_variable):
+def Lastovka_solid(T, similarity_variable, MW=None):
     r'''Calculate solid constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
     
@@ -1893,11 +1943,13 @@ def Lastovka_solid(T, similarity_variable):
         Temperature of solid [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
-    
+    MW : float, optional
+        Molecular weight of the pure compound or mixture average, [g/mol]
+        
     Returns
     -------
     Cps : float
-        Solid constant-pressure heat capacitiy, [J/kg/K]
+        Solid constant-pressure heat capacitiy, [J/mol/K if MW given; J/kg/K otherwise]
     
     Notes
     -----
@@ -1951,10 +2003,9 @@ def Lastovka_solid(T, similarity_variable):
     )**2*exp(theta/T)/(exp(theta/T)-1)**2
     + (C1*similarity_variable + C2*similarity_variable**2)*T
     + (D1*similarity_variable + D2*similarity_variable**2)*T**2)
-    Cp = Cp*1000 # J/g/K to J/kg/K
-    return Cp
+    return Cp * MW if MW else Cp * 1000 # J/g/K to J/kg/K
 
-def Lastovka_solid_integral(T, similarity_variable):
+def Lastovka_solid_integral(T, similarity_variable, MW=None):
     r'''Integrates solid constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
     
@@ -1966,11 +2017,13 @@ def Lastovka_solid_integral(T, similarity_variable):
         Temperature of solid [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
+    MW : float, optional
+        Molecular weight of the pure compound or mixture average, [g/mol]
         
     Returns
     -------
     H : float
-        Difference in enthalpy from 0 K, [J/kg]
+        Difference in enthalpy from 0 K, [J/mol if MW given; J/kg otherwise]
         
     Notes
     -----
@@ -2002,14 +2055,13 @@ def Lastovka_solid_integral(T, similarity_variable):
     D1 = 0.000025
     D2 = -0.000123
     similarity_variable2 = similarity_variable*similarity_variable
-    
-    return (T*T*T*(1000.*D1*similarity_variable/3. 
-        + 1000.*D2*similarity_variable2/3.) + T*T*(500.*C1*similarity_variable 
-        + 500.*C2*similarity_variable2)
-        + (3000.*A1*R*similarity_variable*theta
-        + 3000.*A2*R*similarity_variable2*theta)/(exp(theta/T) - 1.))
+    T2 = T*T
+    H = (T*T2*(D1*similarity_variable + D2*similarity_variable2)/3.
+         + 0.5*T2*(C1*similarity_variable + C2*similarity_variable2)
+         + 3.0*R*(A1*similarity_variable*theta + A2*similarity_variable2*theta)/(exp(theta/T) - 1.))
+    return H * MW if MW else H * 1000 # J/g/K to J/kg/K
 
-def Lastovka_solid_integral_over_T(T, similarity_variable):
+def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
     r'''Integrates over T solid constant-pressure heat capacitiy with the 
     similarity variable concept and method as shown in [1]_.
     
@@ -2021,11 +2073,13 @@ def Lastovka_solid_integral_over_T(T, similarity_variable):
         Temperature of solid [K]
     similarity_variable : float
         similarity variable as defined in [1]_, [mol/g]
-    
+    MW : float, optional
+        Molecular weight of the pure compound or mixture average, [g/mol]
+        
     Returns
     -------
     S : float
-        Difference in entropy from 0 K, [J/kg/K]
+        Difference in entropy from 0 K, [J/mol/K if MW given; J/kg/K otherwise]
     
     Notes
     -----
@@ -2060,10 +2114,9 @@ def Lastovka_solid_integral_over_T(T, similarity_variable):
     sim2 = similarity_variable*similarity_variable
     exp_theta_T = exp(theta/T)
     
-    return (-3000.*R*similarity_variable*(A1 + A2*similarity_variable)*log(exp_theta_T - 1.) 
-    + T**2*(500.*D1*similarity_variable + 500.*D2*sim2)
-    + T*(1000.*C1*similarity_variable + 1000.*C2*sim2)
-    + (3000.*A1*R*similarity_variable*theta 
-    + 3000.*A2*R*sim2*theta)/(T*exp_theta_T - T) 
-    + (3000.*A1*R*similarity_variable*theta 
-    + 3000.*A2*R*sim2*theta)/T)
+    S = (-3.0*R*similarity_variable*(A1 + A2*similarity_variable)*log(exp_theta_T - 1.) 
+    + 0.5*T**2*(D1*similarity_variable + D2*sim2)
+    + T*(C1*similarity_variable + C2*sim2)
+    + 3.0*(A1*R*similarity_variable*theta + A2*R*sim2*theta)/(T*exp_theta_T - T) 
+    + 3.0*(A1*R*similarity_variable*theta + A2*R*sim2*theta)/T)
+    return S * MW if MW else S * 1000 # J/g/K to J/kg/K
