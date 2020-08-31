@@ -318,6 +318,11 @@ autosummary_generate = True
     #return False
     
 from sphinx.ext.autodoc import between
+import chemicals
+try:
+    import chemicals.numba
+except:
+    pass
 
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything

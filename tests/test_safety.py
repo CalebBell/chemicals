@@ -27,6 +27,8 @@ import pandas as pd
 import numpy as np
 from chemicals.identifiers import check_CAS
 from chemicals.safety import *
+from chemicals.utils import normalize
+from fluids.numerics import assert_close, assert_close1d
 
 SUZUKI = 'Suzuki (1994)'
 CROWLLOUVAR = 'Crowl and Louvar (2001)'
@@ -167,7 +169,7 @@ def test_safety_atom_predictions():
 
 
 def test_NFPA_497_2008():
-    tots_calc = [NFPA_2008_data[i].sum() for i in ['Tflash', 'Tautoignition', 'LFL', 'UFL']]
+    tots_calc = [NFPA_2008_data[i].sum() for i in ['T_flash', 'T_autoignition', 'LFL', 'UFL']]
     tots = [52112.200000000019, 127523.69999999998, 4.2690000000000001, 29.948999999999998]
     assert_allclose(tots_calc, tots)
 
@@ -176,7 +178,7 @@ def test_NFPA_497_2008():
 
 
 def test_IEC_2010():
-    tots_calc = [IEC_2010_data[i].sum() for i in ['Tflash', 'Tautoignition', 'LFL', 'UFL']]
+    tots_calc = [IEC_2010_data[i].sum() for i in ['T_flash', 'T_autoignition', 'LFL', 'UFL']]
     tots = [83054.500000000015, 199499.94999999998, 6.4436999999999998, 40.034999999999997]
     assert_allclose(tots_calc, tots)
 
@@ -184,7 +186,7 @@ def test_IEC_2010():
     assert IEC_2010_data.shape == (327, 5)
 
 def test_DIPPR_SERAT():
-    assert_allclose(DIPPR_SERAT_data['Tflash'].sum(), 285171.13471004181)
+    assert_allclose(DIPPR_SERAT_data['T_flash'].sum(), 285171.13471004181)
 
     assert DIPPR_SERAT_data.index.is_unique
     assert DIPPR_SERAT_data.shape == (870, 2)
@@ -192,48 +194,48 @@ def test_DIPPR_SERAT():
 
 
 def test_Tflash():
-    T1 = Tflash('8006-61-9', method=NFPA)
-    T2 = Tflash('71-43-2')
-    T3 = Tflash('71-43-2', method=IEC)
+    T1 = T_flash('8006-61-9', method=NFPA)
+    T2 = T_flash('71-43-2')
+    T3 = T_flash('71-43-2', method=IEC)
 
     Ts = [227.15, 262.15, 262.15]
     assert_allclose([T1, T2, T3], Ts)
 
-    methods = Tflash_methods('110-54-3')
-    assert methods == list(Tflash_all_methods)
+    methods = T_flash_methods('110-54-3')
+    assert methods == list(T_flash_all_methods)
     
-    tot1 = pd.Series([Tflash(i) for i in IEC_2010_data.index]).sum()
-    tot2 = pd.Series([Tflash(i) for i in NFPA_2008_data.index]).sum()
-    tot3 = pd.Series([Tflash(i) for i in DIPPR_SERAT_data.index]).sum()
+    tot1 = pd.Series([T_flash(i) for i in IEC_2010_data.index]).sum()
+    tot2 = pd.Series([T_flash(i) for i in NFPA_2008_data.index]).sum()
+    tot3 = pd.Series([T_flash(i) for i in DIPPR_SERAT_data.index]).sum()
     assert_allclose([tot1, tot2, tot3], [86127.510323478724, 59397.72151504083, 286056.08653090859])
 
-    tot_default = pd.Series([Tflash(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index, *DIPPR_SERAT_data.index])]).sum()
+    tot_default = pd.Series([T_flash(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index, *DIPPR_SERAT_data.index])]).sum()
     assert_allclose(tot_default, 324881.68653090857)
     
-    assert None == Tflash(CASRN='132451235-2151234-1234123')
+    assert None == T_flash(CASRN='132451235-2151234-1234123')
 
     with pytest.raises(Exception):
-        Tflash(CASRN='8006-61-9', method='BADMETHOD')
+        T_flash(CASRN='8006-61-9', method='BADMETHOD')
 
 
 def test_Tautoignition():
-    T1 = Tautoignition('8006-61-9', method=NFPA)
-    T2 = Tautoignition('71-43-2')
-    T3 = Tautoignition('71-43-2', method=IEC)
+    T1 = T_autoignition('8006-61-9', method=NFPA)
+    T2 = T_autoignition('71-43-2')
+    T3 = T_autoignition('71-43-2', method=IEC)
 
     Ts = [553.15, 771.15, 771.15]
     assert_allclose([T1, T2, T3], Ts)
 
-    methods = Tautoignition_methods('8006-61-9')
-    assert methods == list(Tautoignition_all_methods)
+    methods = T_autoignition_methods('8006-61-9')
+    assert methods == list(T_autoignition_all_methods)
 
-    tot_default = pd.Series([Tautoignition(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index])]).sum()
+    tot_default = pd.Series([T_autoignition(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index])]).sum()
     assert_allclose(tot_default, 229841.29999999993)
 
-    assert None == Tautoignition(CASRN='132451235-2151234-1234123')
+    assert None == T_autoignition(CASRN='132451235-2151234-1234123')
 
     with pytest.raises(Exception):
-        Tautoignition(CASRN='8006-61-9', method='BADMETHOD')
+        T_autoignition(CASRN='8006-61-9', method='BADMETHOD')
 
 
 def test_LFL():
@@ -286,3 +288,9 @@ def test_unit_conv_TLV():
     ppmv = mgm3_to_ppmv(1.635, 40)
     assert_allclose(ppmv, 1.0000233761164334)
 
+def test_fire_mixing():
+    LFL = fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.012, .053, .031])
+    assert_close(LFL, 0.02751172136637642, rtol=1e-13)
+    
+    UFL = fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.075, .15, .32])
+    assert_close(UFL, 0.12927551844869378, rtol=1e-13)

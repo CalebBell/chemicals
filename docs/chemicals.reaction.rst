@@ -1,7 +1,4 @@
-chemicals.reaction module
-=========================
+Chemical Reactions (chemicals.reaction)
+=======================================
 
 .. automodule:: chemicals.reaction
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,7 +1,4 @@
-chemicals.combustion module
-===========================
+Combustion Calculations (chemicals.combustion)
+==============================================
 
 .. automodule:: chemicals.combustion
-    :members:
-    :undoc-members:
-    :show-inheritance:

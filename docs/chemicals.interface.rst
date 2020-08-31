@@ -1,4 +1,4 @@
-chemicals.interface module
-==========================
+Surface Tension (chemicals.interface)
+=====================================
 
 .. automodule:: chemicals.interface

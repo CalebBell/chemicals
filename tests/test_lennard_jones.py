@@ -201,11 +201,11 @@ def test_collision_integral():
     assert_close1d(omegas, omegas_expect, rtol=1e-12)
 
 
-def test_Tstar():
+def test_T_star():
     const = 308.43
-    Tst1 = Tstar(T=318.2, epsilon_k=const)
-    Tst2 = Tstar(T=318.2, epsilon=const*k)
+    Tst1 = T_star(T=318.2, epsilon_k=const)
+    Tst2 = T_star(T=318.2, epsilon=const*k)
     assert_close1d([Tst1, Tst2], [1.0316765554582887]*2)
 
     with pytest.raises(Exception):
-        Tstar(300)
+        T_star(300)

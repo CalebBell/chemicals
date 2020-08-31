@@ -66,7 +66,6 @@ Critical Property Relationships
 .. autofunction:: chemicals.critical.Meissner
 .. autofunction:: chemicals.critical.Grigoras
 
-
 Critical Temperature of Mixtures
 --------------------------------
 .. autofunction:: chemicals.critical.Li
@@ -195,8 +194,8 @@ def Tc_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -221,7 +220,7 @@ def Tc(CASRN, get_methods=False, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns
@@ -351,8 +350,8 @@ def Pc_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -382,7 +381,7 @@ def Pc(CASRN, get_methods=False, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns
@@ -506,8 +505,8 @@ def Vc_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -537,7 +536,7 @@ def Vc(CASRN, get_methods=False, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns
@@ -655,8 +654,8 @@ def Zc_methods(CASRN):
 
     Parameters
     ----------
-    CASRN : string
-        CASRN [-].
+    CASRN : str
+        CASRN, [-]
 
     Returns
     -------
@@ -686,7 +685,7 @@ def Zc(CASRN, method=None):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns
@@ -1223,7 +1222,7 @@ def third_property(CASRN=None, T=False, P=False, V=False):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         The CAS number of the desired chemical
     T : bool
         Estimate critical temperature

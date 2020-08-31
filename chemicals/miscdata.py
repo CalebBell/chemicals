@@ -20,6 +20,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains several tables which are common to different lookup 
+functions.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Temperature Dependent data
+---------------------------
+.. autofunction:: chemicals.miscdata.lookup_VDI_tabular_data
+
 """
 
 __all__ = ['lookup_VDI_tabular_data']
@@ -28,7 +41,7 @@ import os
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-# %% Register data sources and lazy load them
+### Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Misc')
 
@@ -123,7 +136,7 @@ def lookup_VDI_tabular_data(CASRN, prop):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
     prop : string
         Property [-]

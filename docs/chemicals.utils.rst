@@ -1,5 +1,5 @@
-chemicals.utils module
-======================
+Utilities (chemicals.utils)
+===========================
 
 .. automodule:: chemicals.utils
     :members:

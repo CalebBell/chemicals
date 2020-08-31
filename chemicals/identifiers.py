@@ -29,20 +29,44 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 .. contents:: :local:
 
-Periodic Table and Elements
----------------------------
-.. autodata:: chemicals.elements.periodic_table
-.. autoclass:: chemicals.elements.Element
+Search Functions
+----------------
+.. autofunction:: chemicals.identifiers.CAS_from_any
+.. autofunction:: chemicals.identifiers.search_chemical
+.. autofunction:: chemicals.identifiers.IDs_to_CASs
 
 CAS Number Utilities
 --------------------
+.. autofunction:: chemicals.identifiers.check_CAS
+.. autofunction:: chemicals.identifiers.CAS_to_int
+.. autofunction:: chemicals.identifiers.int_to_CAS
+.. autofunction:: chemicals.identifiers.sorted_CAS_key
 
+Database Objects
+----------------
+There is an object used to represent a chemical's metadata, an object used to
+represent a common mixture's composition, and an object used to hold the 
+mixture metadata.
+
+.. autoclass:: chemicals.identifiers.ChemicalMetadata
+.. autoclass:: chemicals.identifiers.CommonMixtureMetadata
+.. autoclass:: chemicals.identifiers.ChemicalMetadataDB
+.. autofunction:: chemicals.identifiers.get_pubchem_db
+
+Chemical Groups
+---------------
+It is convenient to tag some chemicals with labels like "refrigerant", or in 
+a certain database or not. The following chemical groups are available.
+
+.. autodata:: chemicals.identifiers.cryogenics
+.. autodata:: chemicals.identifiers.inerts
+.. autofunction:: chemicals.identifiers.dippr_compounds
 """
 
 from __future__ import division
 
 __all__ = ['check_CAS', 'CAS_from_any', 'search_chemical',
-           'mixture_from_any', 'cryogenics', 'dippr_compounds',
+           'mixture_from_any', 'cryogenics', 'inerts', 'dippr_compounds', 'IDs_to_CASs',
            'get_pubchem_db', 'CAS_to_int', 'sorted_CAS_key', 'int_to_CAS']
 
 import os
@@ -59,7 +83,7 @@ def check_CAS(CASRN):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         A three-piece, dash-separated set of numbers
 
     Returns
@@ -98,8 +122,6 @@ def check_CAS(CASRN):
     except:
         return False
 
-
-
 def CAS_to_int(i):
     r'''Converts CAS number of a compounds from a string to an int. This is
     helpful when storing large amounts of CAS numbers, as their strings take up
@@ -108,7 +130,7 @@ def CAS_to_int(i):
 
     Parameters
     ----------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Returns
@@ -128,7 +150,6 @@ def CAS_to_int(i):
     '''
     return int(i.replace('-', ''))
 
-
 def int_to_CAS(i):
     r'''Converts CAS number of a compounds from an int to an string. This is
     helpful when dealing with int CAS numbers.
@@ -140,7 +161,7 @@ def int_to_CAS(i):
 
     Returns
     -------
-    CASRN : string
+    CASRN : str
         CASRN [-]
 
     Notes
@@ -185,8 +206,39 @@ def sorted_CAS_key(CASs):
     return tuple(CAS for _, CAS in sorted(zip(int_CASs,CASs)))
 
 class ChemicalMetadata(object):
-    __slots__ = ['pubchemid', 'formula', 'MW', 'smiles', 'InChI', 'InChI_key',
-                 'iupac_name', 'common_name', 'all_names', 'CAS', '_charge']
+    """Class for storing metadata on chemicals. 
+
+    Attributes
+    ----------
+    pubchemid : int
+        Identification number on pubchem database; access their information
+        online at https://pubchem.ncbi.nlm.nih.gov/compound/<pubchemid>
+        [-]
+    formula : str
+        Formula of the compound; in the same format as
+        :obj:`chemicals.elements.serialize_formula` generates, [-]
+    MW : float
+        Molecular weight of the compound as calculated with the standard
+        atomic abundances; consistent with the element weights in 
+        :obj:`chemicals.elements.periodic_table`, [g/mol]
+    smiles : str
+        SMILES identification string, [-]
+    InChI : str
+        InChI identification string as given in pubchem (there can be multiple
+        valid InChI strings for a compound), [-]
+    InChI_key : str
+        InChI key identification string (meant to be unique to a compound), [-]
+    iupac_name : str
+        IUPAC name as given in pubchem, [-]
+    common_name : str
+        Common name as given in pubchem, [-]
+    all_names : list[str]
+        List of synonyms of the compound, [-]
+    CAS : int
+        CAS number of the compound; stored as an int for memory efficiency, [-]
+    """
+    __slots__ = ('pubchemid', 'formula', 'MW', 'smiles', 'InChI', 'InChI_key',
+                 'iupac_name', 'common_name', 'all_names', 'CAS', '_charge')
     def __repr__(self):
         return ('<ChemicalMetadata, name=%s, formula=%s, smiles=%s, MW=%g>'
                 %(self.common_name, self.formula, self.smiles, self.MW))
@@ -206,6 +258,8 @@ class ChemicalMetadata(object):
         
     @property
     def CASs(self):
+        """CAs number of the compound as a string.
+        """
         return int_to_CAS(self.CAS)
     
     def __init__(self, pubchemid, CAS, formula, MW, smiles, InChI, InChI_key,
@@ -224,6 +278,12 @@ class ChemicalMetadata(object):
         
 
 class ChemicalMetadataDB(object):
+    '''Object which holds the main database of chemical metadata.
+    
+    .. warning:: To allow the `chemicals` to grow and improve, the details of 
+       this class may change in the future without notice!
+
+    '''
     loaded_main_db = False
     def __init__(self, 
                  elements=True,
@@ -232,7 +292,12 @@ class ChemicalMetadataDB(object):
                            os.path.join(folder, 'chemical identifiers example user db.tsv'),
                            os.path.join(folder, 'Cation db.tsv'),
                            os.path.join(folder, 'Anion db.tsv'),
-                           os.path.join(folder, 'Inorganic db.tsv')]):        
+                           os.path.join(folder, 'Inorganic db.tsv')]):       
+        '''Construct the database from its parameters, loading all of the files in
+        `user_dbs`, the periodic table, and defering loading of `main_db`
+        as it is very large until a search doesn't find a chemical in the smaller
+        database.
+        '''
         self.pubchem_index = {}
         self.smiles_index = {}
         self.InChI_index = {}
@@ -250,6 +315,8 @@ class ChemicalMetadataDB(object):
         self.load_elements()
         
     def load_elements(self):
+        '''Load elements into the indexes.
+        '''
         if not self.elements:
             return None
         for ele in periodic_table:
@@ -286,6 +353,8 @@ class ChemicalMetadataDB(object):
 
 
     def load(self, file_name):
+        '''Load a particular file into the indexes.
+        '''
         f = open(file_name, encoding='utf-8')
         for line in f:
             # This is effectively the documentation for the file format of the file
@@ -314,9 +383,13 @@ class ChemicalMetadataDB(object):
         
     @property
     def finished_loading(self):
+        '''Whether or not the database has loaded the main database.
+        '''
         return not (not self.loaded_main_db and self.main_db is not None)
         
     def autoload_main_db(self):
+        '''Load the main database when needed.
+        '''
         self.load(self.main_db)
         for db in self.user_dbs:
             self.load(db)
@@ -335,26 +408,40 @@ class ChemicalMetadataDB(object):
         return False
     
     def search_pubchem(self, pubchem, autoload=True):
+        '''Search for a chemical by its pubchem number. Accepts strings or ints.
+        '''
         return self._search_autoload(int(pubchem), self.pubchem_index, autoload=autoload)
         
     def search_CAS(self, CAS, autoload=True):
+        '''Search for a chemical by its CAS number. Accepts strings or ints.
+        '''
         if type(CAS) != int:
             CAS = CAS_to_int(CAS)
         return self._search_autoload(CAS, self.CAS_index, autoload=autoload)
 
     def search_smiles(self, smiles, autoload=True):
+        '''Search for a chemical by its smiles string.
+        '''
         return self._search_autoload(smiles, self.smiles_index, autoload=autoload)
 
     def search_InChI(self, InChI, autoload=True):
+        '''Search for a chemical by its InChI string.
+        '''
         return self._search_autoload(InChI, self.InChI_index, autoload=autoload)
 
     def search_InChI_key(self, InChI_key, autoload=True):
+        '''Search for a chemical by its InChI key.
+        '''
         return self._search_autoload(InChI_key, self.InChI_key_index, autoload=autoload)
 
     def search_name(self, name, autoload=True):
+        '''Search for a chemical by its name.
+        '''
         return self._search_autoload(name, self.name_index, autoload=autoload)
     
     def search_formula(self, formula, autoload=True):
+        '''Search for a chemical by its serialized formula.
+        '''
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
 
 
@@ -370,7 +457,7 @@ def CAS_from_any(ID, autoload=False, cache=True):
 
     Returns
     -------
-    CASRN : string
+    CASRN : str
         A three-piece, dash-separated set of numbers
 
     Notes
@@ -452,7 +539,7 @@ def search_chemical(ID, autoload=False, cache=True):
     """
     if cache and ID in chemical_search_cache:
         return chemical_search_cache[ID]
-    if not _pubchem_db_loaded: get_pubchem_db()
+    if not _pubchem_db_loaded: get_pubchem_db()  # pragma: no cover
     hit = _search_chemical(ID, autoload)
     if cache:
         if len(chemical_search_cache) > chemical_search_cache_max_size:
@@ -606,6 +693,28 @@ def dippr_compounds():
     return dippr_compounds
 
 class CommonMixtureMetadata(object):
+    """Class for storing metadata on predefined chemical mixtures. 
+
+    Attributes
+    ----------
+    name : str
+        Name of the mixture, [-]
+    source : str
+        Source of the mixture composition, [-]
+    N : int
+        Number of chemicals in the mixture, [-]
+    CASs : list[str]
+        CAS numbers of the mixture, [-]
+    ws : list[float]
+        Mass fractions of chemicals in the mixture, [-]
+    zs : list[float]
+        Mole fractions of chemicals in the mixture, [-]
+    names : list[str]
+        List of names of the chemicals in the mixture, [-]
+    synonyms : list[str]
+        List of synonyms of the mixture which can also be used to look it up,
+        [-]
+    """
     __slots__ = ['name', 'CASs', 'N', 'source', 'names', 'ws', 'zs',
                  'synonyms']
     def __repr__(self):
@@ -631,7 +740,7 @@ def mixture_from_any(ID):
 
     Parameters
     ----------
-    ID : str
+    ID : list[str] or str
         A string or 1-element list containing the name which may represent a
         mixture.
 
@@ -651,7 +760,7 @@ def mixture_from_any(ID):
     >>> mixture_from_any(['air'])
     <MixtureMetadata, name=Air, N=3, CASs=['7727-37-9', '7440-37-1', '7782-44-7'], ws=[0.7557, 0.0127, 0.2316], zs=[0.7812, 0.0092, 0.2096]>
     """
-    if not mixture_composition_loaded:
+    if not mixture_composition_loaded:  # pragma: no cover
         load_mixture_composition()
     if type(ID) == list:
         if len(ID) == 1:
@@ -668,25 +777,57 @@ def mixture_from_any(ID):
 
 
 def IDs_to_CASs(IDs):
-    CASs = None
+    """Find the CAS numbers for multiple chemicals names at once. Also supports
+    having a string input which is a common mixture name in the database.
+    An error will be raised if any of the chemicals cannot be found.
+    
+
+    Parameters
+    ----------
+    IDs : list[str] or str
+        A string or 1-element list containing the name which may represent a
+        mixture.
+
+    Returns
+    -------
+    CASs : list[str]
+        CAS numbers of found chemicals, [-]
+
+    Notes
+    -----
+    White space, '-', and upper case letters are removed in the search.
+
+    Examples
+    --------
+    >>> IDs_to_CASs('R512A')
+    ['811-97-2', '75-37-6']
+    >>> IDs_to_CASs(['norflurane', '1,1-difluoroethane'])
+    ['811-97-2', '75-37-6']
+    """
     if hasattr(IDs, 'strip') or (isinstance(IDs, list) and len(IDs) == 1):
         try:
             # Assume the name was a pre-defined mixture
             mixname = mixture_from_any(IDs)
-            _d = _MixtureDict[mixname]
-            CASs = _d["CASs"]
+            return mixname.CASs
         except:
-            if hasattr(IDs, 'strip'):
-                CASs = [IDs]
-    if CASs is None:
-        CASs = [CAS_from_any(ID) for ID in IDs]
-    return CASs
+            if hasattr(IDs, 'strip'): # It it one chemical?
+                return [CAS_from_any(IDs)]
+    return [CAS_from_any(ID) for ID in IDs]
 
 cryogenics = {'132259-10-0': 'Air', '7440-37-1': 'Argon', '630-08-0':
 'carbon monoxide', '7782-39-0': 'deuterium', '7782-41-4': 'fluorine',
 '7440-59-7': 'helium', '1333-74-0': 'hydrogen', '7439-90-9': 'krypton',
 '74-82-8': 'methane', '7440-01-9': 'neon', '7727-37-9': 'nitrogen',
 '7782-44-7': 'oxygen', '7440-63-3': 'xenon'}
+
+inerts = {"7440-37-1": "Argon", "124-38-9": "Carbon Dioxide", "7440-59-7":
+      "Helium", "7440-01-9": "Neon", "7727-37-9": "Nitrogen",
+      "7440-63-3": "Xenon", "10102-43-9": "Nitric Oxide", "10102-44-0":
+      "Nitrogen Dioxide", "7782-44-7": "Oxygen", "132259-10-0": "Air",
+      "7439-90-9": "krypton", "10043-92-2": "radon", "7732-18-5":
+      "water", "7782-50-5": "chlorine", "7782-41-4": "fluorine"}
+
+
 
 _pubchem_db_loaded = False
 def get_pubchem_db():
@@ -695,7 +836,7 @@ def get_pubchem_db():
     This avoids loading the database when it is not needed.
     """
     global _pubchem_db_loaded, pubchem_db
-    if _pubchem_db_loaded:
+    if _pubchem_db_loaded:  # pragma: no cover
         return pubchem_db
     else:
         pubchem_db = ChemicalMetadataDB()
@@ -742,8 +883,8 @@ if PY37:
         elif name == 'common_mixtures' or name == 'common_mixtures_by_synonym':
             load_mixture_composition()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
-else:
+        raise AttributeError("module %s has no attribute %s" %(__name__, name))  # pragma: no cover
+else:  # pragma: no cover
     if can_load_data:
         get_pubchem_db()
         load_mixture_composition()

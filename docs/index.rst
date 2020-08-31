@@ -54,6 +54,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.dippr
    chemicals.elements
    chemicals.environment
+   chemicals.exceptions
    chemicals.flash_basic
    chemicals.heat_capacity
    chemicals.identifiers
@@ -73,6 +74,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.triple
    chemicals.utils
    chemicals.vapor_pressure
+   chemicals.vectorized
    chemicals.virial
    chemicals.viscosity
    chemicals.volume

@@ -1,4 +1,4 @@
-chemicals.dipole module
-=======================
+Dipole Moment (chemicals.dipole)
+================================
 
 .. automodule:: chemicals.dipole

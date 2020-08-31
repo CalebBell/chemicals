@@ -19,20 +19,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-"""
 
-from __future__ import division
-import types
-import numpy as np
-import chemicals
+Basic module which wraps all chemicals functions with numpy's np.vectorize
+function.
 
-
-'''Basic module which wraps all chemicals functions with numpy's vectorize.
 All other object - dicts, classes, etc - are not wrapped. Supports star 
 imports; so the same objects exported when importing from the main library
 will be imported from here. 
 
 >>> from chemicals.vectorized import *
+>>> Antoine(np.linspace(100, 200, 5), A=8.95894, B=510.595, C=-15.95)
+array([7.65674361e+02, 1.89116754e+04, 1.41237759e+05, 5.60609191e+05,
+       1.53010431e+06])
 
 Inputs do not need to be numpy arrays; they can be any iterable:
 
@@ -50,7 +48,20 @@ The correct syntax is as follows:
 
 >>> import chemicals.vectorized # Necessary
 >>> from chemicals.vectorized import * # May be used without first importing chemicals
-'''
+
+.. warning:: `np.vectorize` does not use NumPy to accelerate any computations;
+   it is a convenience wrapper. If you are working on a problem large enough for
+   speed to be an issue and Numba is compatible with your version of Python,
+   an interface to that library is available at :obj:`chemicals.numba` which does
+   accelerate NumPy array computations and is normally faster than using numpy
+   directly.
+
+"""
+
+from __future__ import division
+import types
+import numpy as np
+import chemicals
 
 __all__ = []
 

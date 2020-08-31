@@ -19,15 +19,67 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This module contains lookup functions and estimation methods for the 
+parameters molecular diameter `sigma` and the Stockmayer parameter `epsilon`.
+These are used for diffusivity calculations. It also contains several
+methods for computing the collision integral, another parameter used in the
+Lennard-Jones model.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+Stockmayer Parameter
+--------------------
+.. autofunction:: chemicals.lennard_jones.Stockmayer
+.. autofunction:: chemicals.lennard_jones.Stockmayer_methods
+.. autodata:: chemicals.lennard_jones.Stockmayer_all_methods
+
+Stockmayer Parameter Correlations
+---------------------------------
+.. autofunction:: chemicals.lennard_jones.epsilon_Flynn
+.. autofunction:: chemicals.lennard_jones.epsilon_Bird_Stewart_Lightfoot_critical
+.. autofunction:: chemicals.lennard_jones.epsilon_Bird_Stewart_Lightfoot_boiling
+.. autofunction:: chemicals.lennard_jones.epsilon_Bird_Stewart_Lightfoot_melting
+.. autofunction:: chemicals.lennard_jones.epsilon_Stiel_Thodos
+.. autofunction:: chemicals.lennard_jones.epsilon_Tee_Gotoh_Steward_1
+.. autofunction:: chemicals.lennard_jones.epsilon_Tee_Gotoh_Steward_2
+
+Molecular Diameter
+------------------
+.. autofunction:: chemicals.lennard_jones.molecular_diameter
+.. autofunction:: chemicals.lennard_jones.molecular_diameter_methods
+.. autodata:: chemicals.lennard_jones.molecular_diameter_all_methods
+
+Molecular Diameter Correlations
+-------------------------------
+.. autofunction:: chemicals.lennard_jones.sigma_Flynn
+.. autofunction:: chemicals.lennard_jones.sigma_Bird_Stewart_Lightfoot_critical_2
+.. autofunction:: chemicals.lennard_jones.sigma_Bird_Stewart_Lightfoot_critical_1
+.. autofunction:: chemicals.lennard_jones.sigma_Bird_Stewart_Lightfoot_boiling
+.. autofunction:: chemicals.lennard_jones.sigma_Bird_Stewart_Lightfoot_melting
+.. autofunction:: chemicals.lennard_jones.sigma_Stiel_Thodos
+.. autofunction:: chemicals.lennard_jones.sigma_Tee_Gotoh_Steward_1
+.. autofunction:: chemicals.lennard_jones.sigma_Tee_Gotoh_Steward_2
+.. autofunction:: chemicals.lennard_jones.sigma_Silva_Liu_Macedo
+
+Utility Functions
+-----------------
+.. autofunction:: chemicals.lennard_jones.T_star
+
 """
+
+
 
 __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
            'molecular_diameter_all_methods', 'molecular_diameter', 'molecular_diameter_methods',
-           
+
            'sigma_Flynn',
-           'sigma_Bird_Stewart_Lightfoot_critical_2', 
-           'sigma_Bird_Stewart_Lightfoot_critical_1', 
-           'sigma_Bird_Stewart_Lightfoot_boiling', 
+           'sigma_Bird_Stewart_Lightfoot_critical_2',
+           'sigma_Bird_Stewart_Lightfoot_critical_1',
+           'sigma_Bird_Stewart_Lightfoot_boiling',
            'sigma_Bird_Stewart_Lightfoot_melting',
            'sigma_Stiel_Thodos', 'sigma_Tee_Gotoh_Steward_1',
            'sigma_Tee_Gotoh_Steward_2',
@@ -38,7 +90,7 @@ __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
            'epsilon_Tee_Gotoh_Steward_1', 'epsilon_Tee_Gotoh_Steward_2',
            'collision_integral_Neufeld_Janzen_Aziz',
            'As_collision', 'Bs_collision', 'Cs_collision',
-           'collision_integral_Kim_Monroe', 'Tstar']
+           'collision_integral_Kim_Monroe', 'T_star']
 
 import os
 from fluids.constants import k
@@ -84,6 +136,7 @@ else:
 
 Stockmayer_all_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
                           TEEGOTOSTEWARD1, BSLB, BSLM)
+'''Tuple of method name keys. See the `Stockmayer` for the actual references'''
 
 def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
     """Return all methods available to obtain the Stockmayer parameter for the 
@@ -91,7 +144,7 @@ def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=Non
 
     Parameters
     ----------
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     Tm : float, optional
         Melting temperature of compound [K]
@@ -145,7 +198,7 @@ def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
 
     Parameters
     ----------
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     Tm : float, optional
         Melting temperature of compound [K]
@@ -224,15 +277,16 @@ SILVALIUMACEDO = 'Silva, Liu, and Macedo (1998) critical relation with Tc, Pc'
 molecular_diameter_all_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
                                   BSLC2, TEEGOTOSTEWARD3, STIELTHODOSMD, FLYNN,
                                   BSLC1, BSLB, BSLM)
+'''Tuple of method name keys. See the `molecular_diameter` for the actual references'''
 
 def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
-                               omega=None, Vm=None, Vb=None, ):
+                               omega=None, Vm=None, Vb=None):
     """Return all methods available to obtain the molecular diameter for the 
     desired chemical.
 
     Parameters
     ----------
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     Tc : float, optional
         Critical temperature, [K]
@@ -293,7 +347,7 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
 
     Parameters
     ----------
-    CASRN : string, optional
+    CASRN : str, optional
         CASRN [-]
     Tc : float, optional
         Critical temperature, [K]
@@ -314,19 +368,12 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
     -------
     sigma : float
         Lennard-Jones molecular diameter, [Angstrom]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain epsilon with the given
-        inputs
 
     Other Parameters
     ----------------
     method : string, optional
         A string for the method name to use, as defined by constants in
         molecular_diameter_all_methods
-    get_methods : bool, optional
-        If True, function will determine which methods can be used to obtain
-        sigma for the desired chemical, and will return methods instead of
-        sigma
 
     Notes
     -----
@@ -994,9 +1041,9 @@ def epsilon_Tee_Gotoh_Steward_2(Tc, omega):
 
 ### Collision Integral
 
-def collision_integral_Neufeld_Janzen_Aziz(Tstar, l=1, s=1):
+def collision_integral_Neufeld_Janzen_Aziz(T_star, l=1, s=1):
     r'''Calculates Lennard-Jones collision integral for any of 16 values of
-    (l,j) for the wide range of 0.3 < Tstar < 100. Values are accurate to
+    (l,j) for the wide range of 0.3 < T_star < 100. Values are accurate to
     0.1 % of actual values, but the calculation of actual values is
     computationally intensive and so these simplifications are used, developed
     in [1]_.
@@ -1032,7 +1079,7 @@ def collision_integral_Neufeld_Janzen_Aziz(Tstar, l=1, s=1):
     `collision_integral_Kim_Monroe`.
 
     Calculations begin to yield overflow errors in some values of (l, 2) after
-    Tstar = 75, beginning with (1, 7). Also susceptible are (1, 5) and (1, 6).
+    T_star = 75, beginning with (1, 7). Also susceptible are (1, 5) and (1, 6).
 
     Examples
     --------
@@ -1081,11 +1128,11 @@ def collision_integral_Neufeld_Janzen_Aziz(Tstar, l=1, s=1):
         A, B, C, D, E, F, R, S, W, P = 1.12007, 0.14578, 0.53347, 1.11986, 2.28803, 3.27567, 0.0007427, 21.048, -0.28759, 6.69149
     else:
         raise ValueError('Input values of l and s are not supported')
-    omega = A/Tstar**B + C/exp(D*Tstar) + E/exp(F*Tstar)
+    omega = A / T_star ** B + C / exp(D * T_star) + E / exp(F * T_star)
     if (l == 1 and (s == 1 or s == 2)) or (s == 3 and l == 3):
-        omega += G/exp(H*Tstar)
+        omega += G/exp(H * T_star)
     if not (l == 1  and (s == 1 or s == 2)):
-        omega += R*Tstar**B*sin(S*Tstar**W - P)
+        omega += R * T_star ** B * sin(S * T_star ** W - P)
     return omega
 
 As_collision = {(1, 1): -1.10367290,
@@ -1144,9 +1191,9 @@ Cs_collision = {
     (4, 4): [-1.4676253, 0.53048161, -0.11909781, 0.016123847, -0.0012174905, 0.0000395451]
 }
 
-def collision_integral_Kim_Monroe(Tstar, l=1, s=1):
+def collision_integral_Kim_Monroe(T_star, l=1, s=1):
     r'''Calculates Lennard-Jones collision integral for any of 16 values of
-    (l,j) for the wide range of 0.3 < Tstar < 400. Values are accurate to
+    (l,j) for the wide range of 0.3 < T_star < 400. Values are accurate to
     0.007 % of actual values, but the calculation of actual values is
     computationally intensive and so these simplifications are used, developed
     in [1]_.
@@ -1197,13 +1244,13 @@ def collision_integral_Kim_Monroe(Tstar, l=1, s=1):
     Bs = Bs_collision[(l, s)]
     Cs = Cs_collision[(l, s)]
     for ki in range(6):
-        omega += Bs[ki]/Tstar**(ki+1) + Cs[ki]*log(Tstar)**(ki+1)
+        omega += Bs[ki] / T_star ** (ki + 1) + Cs[ki] * log(T_star) ** (ki + 1)
     return omega
 
 ### Misc
 
-def Tstar(T, epsilon_k=None, epsilon=None):
-    r'''This function calculates the parameter `Tstar` as needed in performing
+def T_star(T, epsilon_k=None, epsilon=None):
+    r'''This function calculates the parameter `T_star` as needed in performing
     collision integral calculations.
 
     .. math::
@@ -1211,7 +1258,7 @@ def Tstar(T, epsilon_k=None, epsilon=None):
 
     Examples
     --------
-    >>> Tstar(T=318.2, epsilon_k=308.43)
+    >>> T_star(T=318.2, epsilon_k=308.43)
     1.0316765554582887
 
     Parameters
@@ -1223,7 +1270,7 @@ def Tstar(T, epsilon_k=None, epsilon=None):
 
     Returns
     -------
-    Tstar : float
+    T_star : float
         Dimentionless temperature for calculating collision integral, [-]
 
     Notes
@@ -1242,5 +1289,5 @@ def Tstar(T, epsilon_k=None, epsilon=None):
     elif epsilon:
         _Tstar = k*T/epsilon
     else:
-        raise Exception('Either epsilon/k or epsilon must be provided')
+        raise ValueError('Either epsilon/k or epsilon must be provided')
     return _Tstar

@@ -1,4 +1,4 @@
-chemicals.dippr module
-======================
+DIPPR Fit Equations (chemicals.dippr)
+=====================================
 
 .. automodule:: chemicals.dippr

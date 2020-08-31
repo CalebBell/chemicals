@@ -1,4 +1,4 @@
-chemicals.triple module
-=======================
+Triple Point (chemicals.triple)
+===============================
 
 .. automodule:: chemicals.triple

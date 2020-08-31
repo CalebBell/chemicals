@@ -1,7 +1,4 @@
-chemicals.identifiers module
-============================
+Chemical Metadata (chemicals.identifiers)
+=========================================
 
 .. automodule:: chemicals.identifiers
-    :members:
-    :undoc-members:
-    :show-inheritance:

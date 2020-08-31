@@ -1,7 +1,4 @@
-chemicals.miscdata module
-=========================
+Miscellaneous Data (chemicals.miscdata)
+=======================================
 
 .. automodule:: chemicals.miscdata
-    :members:
-    :undoc-members:
-    :show-inheritance:

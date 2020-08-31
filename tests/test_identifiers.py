@@ -198,6 +198,26 @@ def test_mixture_from_any():
         
     assert mixture_from_any('R512A') == common_mixtures['R512A']
     assert mixture_from_any([u'air']) == common_mixtures['Air']
+
+def test_IDs_to_CASs():
+    expect = ['811-97-2', '75-37-6']
+    assert IDs_to_CASs('R512A') == expect
+    assert IDs_to_CASs(['R512A']) == expect
+    assert IDs_to_CASs(['norflurane', '1,1-difluoroethane']) == expect
+    
+    assert IDs_to_CASs(['norflurane']) == ['811-97-2']
+    assert IDs_to_CASs('norflurane') == ['811-97-2']
+    
+def test_search_chemical():
+    hit0 = search_chemical('water') 
+    hit1 = search_chemical('water') 
+    assert hit0 is hit1
+    
+    with pytest.raises(ValueError):
+        # Not that smart/weird
+        search_chemical('(oxidane)')
+        
+    assert search_chemical('water').charge == 0
     
     
 def test_CAS_from_any():
