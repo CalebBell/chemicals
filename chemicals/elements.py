@@ -942,7 +942,7 @@ def simple_formula_parser(formula):
     {'C': 1, 'O': 2}
     '''
     global _simple_formula_parser_re
-    if _simple_formula_parser_re is None:
+    if not _simple_formula_parser_re:
         _simple_formula_parser_re = re.compile(_simple_formula_parser_re_str)
     formula = formula.split('+')[0].split('-')[0]
     counts = {}
