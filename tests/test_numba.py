@@ -39,6 +39,26 @@ except:
 import numpy as np
 
 
+def swap_funcs_and_test(names, substitutions, test):
+    '''
+    names : list[str]
+        object names to switch out
+    substitutions : list[obj]
+        Objects to put in
+    test : function
+        Unit test to run in the file
+    '''
+    originals = {}
+    glob = test.__globals__
+    for name, sub in zip(names, substitutions):
+        originals[name] = glob[name]
+        glob[name] = sub
+    try:
+        test()
+    except Exception as e:
+        glob.update(originals)
+        raise e
+    glob.update(originals)
 
 def mark_as_numba(func):
     func = pytest.mark.numba(func)
@@ -513,4 +533,12 @@ def test_lazy_loading():
     assert 'jitclass' in str(chemicals.numba.heat_capacity.ZabranskyQuasipolynomial)
     assert 'jitclass' in str(chemicals.numba.heat_capacity.zabransky_dict_iso_s['2016-57-1'].models[0])
 
-
+    
+@mark_as_numba
+def test_safety_functions():
+    import test_safety
+    swap_funcs_and_test(['NFPA_30_classification'], 
+                        [chemicals.numba.NFPA_30_classification], 
+                        test_safety.test_NFPA_30_classification)
+    
+        

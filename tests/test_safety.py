@@ -25,6 +25,7 @@ from numpy.testing import assert_allclose
 import pytest
 import pandas as pd
 import numpy as np
+from fluids.core import F2K
 from chemicals.identifiers import check_CAS
 from chemicals.safety import *
 from chemicals.utils import normalize
@@ -294,3 +295,52 @@ def test_fire_mixing():
     
     UFL = fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.075, .15, .32])
     assert_close(UFL, 0.12927551844869378, rtol=1e-13)
+
+
+def test_NFPA_30_classification():
+    assert NFPA_30_classification(253.15, 283.55) == 'IA' # ethylene oxide
+    assert NFPA_30_classification(253.15, Psat_100F=268062) == 'IA' # ethylene oxide
+    
+    assert NFPA_30_classification(227.15, 249.05) == 'IA' # methyl chloride
+    assert NFPA_30_classification(227.15, Psat_100F=812201) == 'IA' # methyl chloride
+    
+    assert NFPA_30_classification(233.15, 309.21) == 'IA' # pentane
+    assert NFPA_30_classification(233.15, Psat_100F=107351) == 'IA' # pentane
+    assert NFPA_30_classification(233.15, Psat_100F=101325) == 'IA' # pentane fake point to trigger border
+    assert NFPA_30_classification(233.15, Psat_100F=101324.99999) == 'IB' # pentane fake point to trigger border
+    assert NFPA_30_classification(233.15, Tb=310.92777777777) == 'IA' # pentane fake point under border
+    assert NFPA_30_classification(233.15, Tb=310.92777777777777) == 'IB' # pentane fake point above border
+    
+    assert NFPA_30_classification(253.15, 329.23) == 'IB' # acetone
+    assert NFPA_30_classification(253.15, Psat_100F=51979) == 'IB' # acetone
+    
+    assert NFPA_30_classification(262.15, 353.23) == 'IB' # benzene
+    assert NFPA_30_classification(262.15, Psat_100F=22215) == 'IB' # benzene
+    
+    assert NFPA_30_classification(308.15, 390.75) == 'IC' # butyl alcohol
+    assert NFPA_30_classification(308.15, Psat_100F=2158) == 'IC' # butyl alcohol
+    assert NFPA_30_classification(308.15) == 'IC' # butyl alcohol
+    
+    assert NFPA_30_classification(F2K(100)) == 'II' # made up
+    assert NFPA_30_classification(F2K(140)*(1-1e-13)) == 'II' # made up
+    assert NFPA_30_classification(F2K(120), Tb=1e100) == 'II' # made up
+    assert NFPA_30_classification(F2K(120), Tb=-1e100) == 'II' # made up
+    assert NFPA_30_classification(F2K(120), Psat_100F=-1e100) == 'II' # made up
+    assert NFPA_30_classification(F2K(120), Psat_100F=1e100) == 'II' # made up
+    
+    assert NFPA_30_classification(F2K(140)) == 'IIIA' # made up
+    assert NFPA_30_classification(F2K(200)*(1-1e-13)) == 'IIIA' # made up
+    assert NFPA_30_classification(F2K(170), Tb=1e100) == 'IIIA' # made up
+    assert NFPA_30_classification(F2K(170), Tb=-1e100) == 'IIIA' # made up
+    assert NFPA_30_classification(F2K(170), Psat_100F=-1e100) == 'IIIA' # made up
+    assert NFPA_30_classification(F2K(170), Psat_100F=1e100) == 'IIIA' # made up
+    
+    assert NFPA_30_classification(F2K(200)) == 'IIIB' # made up
+    assert NFPA_30_classification(F2K(200)*(1+1e-13)) == 'IIIB' # made up
+    assert NFPA_30_classification(F2K(300), Tb=1e100) == 'IIIB' # made up
+    assert NFPA_30_classification(F2K(3000), Tb=-1e100) == 'IIIB' # made up
+    assert NFPA_30_classification(F2K(300000), Psat_100F=-1e100) == 'IIIB' # made up
+    assert NFPA_30_classification(F2K(300000000), Psat_100F=1e100) == 'IIIB' # made up
+
+    with pytest.raises(ValueError):
+        NFPA_30_classification(253.15)
