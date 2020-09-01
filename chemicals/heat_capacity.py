@@ -799,6 +799,10 @@ def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     term_A : float
         Term A in Lastovka-Shaw equation, [J/g]
 
+    See Also
+    --------
+    Lastovka_Shaw
+
     References
     ----------
     .. [1] Lastovka, Vaclav, and John M. Shaw. "Predictive Correlations for
@@ -1516,6 +1520,28 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
     return Cplm
 
 def Dadgostar_Shaw_terms(similarity_variable):
+    """
+    Return terms for the computation of Dadgostar-Shaw heat capacity equation.
+
+    Parameters
+    ----------
+    similarity_variable : float
+        similarity variable as defined in [1]_, [mol/g]
+
+    Returns
+    -------
+    first : float
+        First term.
+    second : float
+        Second term.
+    third : float
+        Third term.
+
+    See Also
+    --------
+    Dadgostar_Shaw
+
+    """
     a = similarity_variable
     a2 = a*a
     a11 = -0.3416
@@ -1533,7 +1559,7 @@ def Dadgostar_Shaw_terms(similarity_variable):
             a21*a + a22*a2,
             a31*a + a32*a2)
 
-def Dadgostar_Shaw(T, similarity_variable, MW=None):
+def Dadgostar_Shaw(T, similarity_variable, MW=None, terms=None):
     r'''Calculate liquid constant-pressure heat capacitiy with the similarity
     variable concept and method as shown in [1]_.
     
@@ -1549,6 +1575,8 @@ def Dadgostar_Shaw(T, similarity_variable, MW=None):
         similarity variable as defined in [1]_, [mol/g]
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
+    terms : float, optional
+        Terms in Dadgostar-Shaw equation as computed by :func:`~chemicals.heat_capacity.Dadgostar_Shaw_terms`
         
     Returns
     -------
@@ -1575,11 +1603,11 @@ def Dadgostar_Shaw(T, similarity_variable, MW=None):
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
     '''
-    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
+    first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
     Cp = (first + second*T + third*T**2)
     return Cp * MW if MW else Cp*1000. # J/g/K to J/kg/K
 
-def Dadgostar_Shaw_integral(T, similarity_variable, MW=None):
+def Dadgostar_Shaw_integral(T, similarity_variable, MW=None, terms=None):
     r'''Calculate the integral of liquid constant-pressure heat capacitiy 
     with the similarity variable concept and method as shown in [1]_.
     
@@ -1591,6 +1619,8 @@ def Dadgostar_Shaw_integral(T, similarity_variable, MW=None):
         similarity variable as defined in [1]_, [mol/g]
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
+    terms : float, optional
+        Terms in Dadgostar-Shaw equation as computed by :func:`~chemicals.heat_capacity.Dadgostar_Shaw_terms`
         
     Returns
     -------
@@ -1619,13 +1649,14 @@ def Dadgostar_Shaw_integral(T, similarity_variable, MW=None):
        the Constant-Pressure Specific Heat Capacity of Pure and Ill-Defined
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
+    
     '''
     T2 = T*T
-    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
+    first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
     H = T2*T/3.*third + T2*0.5*second + T*first
     return H * MW if MW else H*1000. # J/g to J/kg
 
-def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
+def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None, terms=None):
     r'''Calculate the integral of liquid constant-pressure heat capacitiy 
     with the similarity variable concept and method as shown in [1]_.
     
@@ -1637,6 +1668,8 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
         similarity variable as defined in [1]_, [mol/g]
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
+    terms : float, optional
+        Terms in Dadgostar-Shaw equation as computed by :func:`~chemicals.heat_capacity.Dadgostar_Shaw_terms`
         
     Returns
     -------
@@ -1665,8 +1698,9 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
        the Constant-Pressure Specific Heat Capacity of Pure and Ill-Defined
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
+    
     '''
-    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
+    first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
     S = T*T*0.5*third + T*second + first*log(T)
     return S * MW if MW else S*1000. # J/g/K to J/kg/K
 
