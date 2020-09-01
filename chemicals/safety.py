@@ -111,6 +111,7 @@ Utility Methods
 ---------------
 .. autofunction:: chemicals.safety.ppmv_to_mgm3
 .. autofunction:: chemicals.safety.mgm3_to_ppmv
+.. autofunction:: chemicals.safety.NFPA_30_classification
 
 """
 
@@ -128,7 +129,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'LFL', 'UFL_methods', 'UFL_all_methods', 'UFL', 'fire_mixing', 
            'Suzuki_LFL', 'Suzuki_UFL', 
            'Crowl_Louvar_LFL', 'Crowl_Louvar_UFL', 
-           'DIPPR_SERAT_data')
+           'DIPPR_SERAT_data','NFPA_30_classification')
 
 import os
 from fluids.core import F2K
@@ -1373,3 +1374,85 @@ def Crowl_Louvar_UFL(atoms):
     if 'O' in atoms:
         nO = atoms['O']
     return 3.5/(4.76*nC + 1.19*nH - 2.38*nO + 1.)
+
+def NFPA_30_classification(T_flash, Tb=None, Psat_100F=None):
+    r'''Classify a chemical's flammability/combustibility according
+    to the NFPA 30 standard Flammable and Combustible Liquids Code.
+
+    Class IA: Flash Point < 73°F; Boiling Point < 100°F
+    Class IB: Flash Point < 73°F; 100°F <= Boiling Point
+    Class IC: 73°F <= Flash Point < 100°F
+    Class II: 100°F <= Flash Point < 140°F
+    Class IIIA: 140°F <= Flash Point < 200°F
+    Class IIIB: 200°F <= Flash Point
+    
+    Class I liquids are designated as flammable; class II and II 
+    liquids are designated as combustible.
+
+    Parameters
+    ----------
+    T_flash : float
+        Flash point (closed‐cup method, adjusted for sea level), [K]
+    Tb : float, optional
+        Normal boiling point (needed to classify IA and IB liquids), [K]
+    Psat_100F : float, optional
+        Vapor pressure at 100°F (needed to classify IA and IB liquids), [K]
+
+    Returns
+    -------
+    classification : str
+        One of 'IA', 'IB', 'IC', 'II', 'IIIA', 'IIIB', [-]
+
+    Notes
+    -----
+    Only one of `Tb` or `Psat_100F` is needed.
+    
+    Class 'IA' also includes unstable liquids.
+
+    Examples
+    --------
+    Ethylene oxide
+    
+    >>> NFPA_30_classification(253.15, 283.55)
+    'IA' 
+    
+    Butyl alcohol
+    
+    >>> NFPA_30_classification(308.15)
+    'IC'
+    
+    References
+    ----------
+    .. [1] NFPA (National Fire Prevention Association). NFPA 30: Flammable and 
+       Combustible Liquids Code, 2008. National Fire Protection Association
+       (NFPA), 2007.
+    '''
+    F_100 = 310.92777777777777
+    F_73 = 295.92777777777775
+    F_140 = 333.15
+    F_200 = 366.4833333333333
+    Tb_above_100F = False # For numba only
+    if Tb is not None:
+        Tb_above_100F = Tb >= F_100
+    elif Psat_100F is not None:
+        Tb_above_100F = Psat_100F < 101325.0
+    elif T_flash < F_73:
+        raise ValueError("Tb or Psat_100F is required to classify the provided inputs")
+    
+    if T_flash < F_100:
+        if T_flash < F_73 and not Tb_above_100F:
+            # Also unstable flammable liquids
+            # ethylene oxide, methyl chloride, pentane should go here
+            return 'IA'
+        elif T_flash < F_73 and Tb_above_100F:
+            # acetone, benzene, ethyl alcohol, and isopropyl alcohol.
+            return 'IB'
+        elif F_73 <= T_flash < F_100:
+            # butyl alcohol, diethyl glycol, styrene, and turpentine.
+            return 'IC'
+    if F_100 <= T_flash < F_140:
+        return 'II'
+    if F_140 <= T_flash < F_200:
+        return 'IIIA'
+    if F_200 <= T_flash:
+        return 'IIIB'
