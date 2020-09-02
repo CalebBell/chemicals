@@ -2124,7 +2124,7 @@ def Perry_151(T, a, b, c, d):
     
     .. math:: C_n = 4.184 (a + bT + \frac{c}{T^2} + dT^2)
     
-    Coefficients are listed in section 2, table 151 of [9]_. Note that the
+    Coefficients are listed in section 2, table 151 of [1]_. Note that the
     original model was in a Calorie basis, but has been translated to Joules.
     
     Examples
