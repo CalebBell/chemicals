@@ -2217,10 +2217,9 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     theta_div_T = theta/T
     exp_term = exp(theta_div_T)
     a = similarity_variable
-    a2 = a * a
-    Cp = (3.0*(A1*a + A2*a2)*R*(theta_div_T)**2*exp_term/(exp_term-1)**2
-          + (C1*a + C2*a2)*T
-          + (D1*a + D2*a2)*T**2)
+    Cp = a*(3.0*(A1 + A2*a)*R*(theta_div_T)**2*exp_term/(exp_term-1)**2
+          + (C1 + C2*a)*T
+          + (D1 + D2*a)*T**2)
     return Cp*1000. if MW is None else Cp*MW
 
 def Lastovka_solid_integral(T, similarity_variable, MW=None):
