@@ -1607,8 +1607,8 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
        New York: McGraw-Hill Professional, 2000.
     '''
     Tr = T/Tc
-    Cplm = Cpgm+ R*(1.586 + 0.49/(1.-Tr) + omega*(4.2775
-    + 6.3*(1-Tr)**(1/3.)/Tr + 0.4355/(1.-Tr)))
+    one_minus_Tr = 1. - Tr
+    Cplm = Cpgm+ R*(1.586 + 0.49/one_minus_Tr + omega*(4.2775 + 6.3*one_minus_Tr**(1/3.)/Tr + 0.4355/one_minus_Tr))
     return Cplm
 
 def Rowlinson_Bondi(T, Tc, omega, Cpgm):
@@ -1656,8 +1656,8 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
        Butterworth, London (1969).
     '''
     Tr = T/Tc
-    Cplm = Cpgm + R*(1.45 + 0.45/(1.-Tr) + 0.25*omega*(17.11
-    + 25.2*(1-Tr)**(1/3.)/Tr + 1.742/(1.-Tr)))
+    one_minus_Tr = 1. - Tr
+    Cplm = Cpgm + R*(1.45 + 0.45/(one_minus_Tr) + 0.25*omega*(17.11 + 25.2*(one_minus_Tr)**(1/3.)/Tr + 1.742/one_minus_Tr))
     return Cplm
 
 def Dadgostar_Shaw_terms(similarity_variable):
@@ -2141,7 +2141,8 @@ def Perry_151(T, a, b, c, d):
        Eighth Edition. McGraw-Hill Professional, 2007.
     
     """
-    return (a + b*T + c/T**2 + d*T**2) * 4.184
+    T2 = T**2
+    return (a + b*T + c/T2 + d*T2) * 4.184
 
 def Lastovka_solid(T, similarity_variable, MW=None):
     r'''Calculate solid constant-pressure heat capacity with the similarity
@@ -2213,11 +2214,13 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     C2 = -0.024942
     D1 = 0.000025
     D2 = -0.000123
-
-    Cp = (3.0*(A1*similarity_variable + A2*similarity_variable**2)*R*(theta/T
-    )**2*exp(theta/T)/(exp(theta/T)-1)**2
-    + (C1*similarity_variable + C2*similarity_variable**2)*T
-    + (D1*similarity_variable + D2*similarity_variable**2)*T**2)
+    theta_div_T = theta/T
+    exp_term = exp(theta_div_T)
+    a = similarity_variable
+    a2 = a * a
+    Cp = (3.0*(A1*a + A2*a2)*R*(theta_div_T)**2*exp_term/(exp_term-1)**2
+          + (C1*a + C2*a2)*T
+          + (D1*a + D2*a2)*T**2)
     return Cp*1000. if MW is None else Cp*MW
 
 def Lastovka_solid_integral(T, similarity_variable, MW=None):
@@ -2269,11 +2272,11 @@ def Lastovka_solid_integral(T, similarity_variable, MW=None):
     C2 = -0.024942
     D1 = 0.000025
     D2 = -0.000123
-    similarity_variable2 = similarity_variable*similarity_variable
+    a = similarity_variable
     T2 = T*T
-    H = (T*T2*(D1*similarity_variable + D2*similarity_variable2)/3.
-         + 0.5*T2*(C1*similarity_variable + C2*similarity_variable2)
-         + 3.0*R*(A1*similarity_variable*theta + A2*similarity_variable2*theta)/(exp(theta/T) - 1.))
+    H = a*(T*T2*(D1 + D2*a)/3.
+           + 0.5*T2*(C1 + C2*a)
+           + 3.0*R*theta*(A1 + A2*a)/(exp(theta/T) - 1.))
     return H*1000. if MW is None else H*MW
 
 def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
@@ -2326,12 +2329,11 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
     D1 = 0.000025
     D2 = -0.000123
     
-    sim2 = similarity_variable*similarity_variable
+    a = similarity_variable
     exp_theta_T = exp(theta/T)
-    
-    S = (-3.0*R*similarity_variable*(A1 + A2*similarity_variable)*log(exp_theta_T - 1.) 
-    + 0.5*T**2*(D1*similarity_variable + D2*sim2)
-    + T*(C1*similarity_variable + C2*sim2)
-    + 3.0*(A1*R*similarity_variable*theta + A2*R*sim2*theta)/(T*exp_theta_T - T) 
-    + 3.0*(A1*R*similarity_variable*theta + A2*R*sim2*theta)/T)
+    A_term = (A1 + A2*a)
+    S = a*(-3.0*R*A_term*log(exp_theta_T - 1.) 
+           + 0.5*T**2*(D1 + D2*a)
+           + T*(C1 + C2*a)
+           + 3.0*R*theta*A_term*(1/(T*exp_theta_T - T) + 1/T))
     return S*1000. if MW is None else S*MW
