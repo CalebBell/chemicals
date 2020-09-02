@@ -65,6 +65,7 @@ Critical Property Relationships
 .. autofunction:: chemicals.critical.Ihmels
 .. autofunction:: chemicals.critical.Meissner
 .. autofunction:: chemicals.critical.Grigoras
+.. autofunction:: chemicals.critical.Hekayati_Raeissi
 
 Critical Temperature of Mixtures
 --------------------------------
@@ -83,7 +84,7 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
            'Mersmann_Kind_predictor', 
            'third_property', 
            'critical_surface', 
-           'Ihmels', 'Meissner', 'Grigoras', 'Li', 
+           'Ihmels', 'Meissner', 'Grigoras', 'Hekayati_Raeissi', 'Li', 
            'Chueh_Prausnitz_Tc', 'Grieves_Thodos',
            'modified_Wilson_Tc', 'Chueh_Prausnitz_Vc', 
            'modified_Wilson_Vc',
@@ -97,7 +98,7 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
 __numba_additional_funcs__ = ['_assert_two_critical_properties_provided']
 
 import os
-from fluids.constants import R_inv, N_A
+from fluids.constants import R, R_inv, N_A
 from chemicals.utils import log, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -1132,6 +1133,121 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Tc = 1.0/202*(10*Pc-29.0)*Vc
         return Tc
+
+def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
+    r'''Estimation model for missing critical constants of a fluid
+    according to [1]_. Based on the molecular weight and saturation
+    molar volume of a fluid, and requires one of `Tc` or `Pc`. 
+    Optionally, `Vc` can be provided to increase the accuracy of
+    the prediction of `Tc` or `Pc` a little.
+
+    Parameters
+    ----------
+    MW : float
+        Molecular weight of fluid, [g/mol]
+    V_sat : float, optional
+        Molar volume of liquid at the saturation pressure of the fluid 
+        at 298.15 K. Used if `Vc` is not provided. [m^3/mol]
+    Tc : float, optional
+        Critical temperature of fluid (optional) [K]
+    Pc : float, optional
+        Critical pressure of fluid (optional) [Pa]
+    Vc : float, optional
+        Critical volume of fluid (optional) [m^3/mol]
+
+    Returns
+    -------
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of fluid [Pa]
+    Vc : float
+        Critical volume of fluid [m^3/mol]
+
+    Notes
+    -----
+    Internal units are kPa, m^3/kmol, and K.
+
+    Examples
+    --------
+    Toluene
+
+    >>> Hekayati_Raeissi(MW=92.13842, V_sat=0.00010686, Pc=4108000.0)
+    (599.7965819136947, 4108000.0, 0.000314909150453723)
+
+    References
+    ----------
+    .. [1] Hekayati, Javad, and Sona Raeissi. "Estimation of the Critical 
+       Properties of Compounds Using Volume-Based Thermodynamics." AIChE Journal
+       n/a, no. n/a (n.d.): e17004. https://doi.org/10.1002/aic.17004.
+    '''
+    if Tc is None and Pc is None:
+        raise ValueError("One of `Tc` or `Pc` are required.")
+    if Pc is not None:
+        Pc *= 1e-3 # Pa to kPa
+    if Vc is not None:
+        Vc *= 1e3 # m^3/mol to m^3/kmol
+    if V_sat is not None:
+        V_sat *= 1e3
+    Tc_calc = Pc_calc = 0.0
+    Vc_estimated = False
+    
+    
+    if Vc is None:
+        if V_sat is None:
+            raise ValueError("V_sat is required when Vc is not provided")
+        Vc_estimated = True
+        # Direct estimation of Vc from V and MW
+        # 3.2 Equations 30-33
+        a3 = -2.636518E+00  
+        b3 = 1.048744E-02  
+        c3 = 1.222756E+00  
+        d3 = 6.924349E-09  
+        e3 = -1.102846E-05  
+        f3 = 1.871249E-03  
+
+        chi1 = a3
+        chi2 = b3*MW + c3
+        chi3 = MW*(MW*(d3*MW + e3) + f3)
+        Vc = V_sat*(chi1*V_sat*V_sat + chi2) + chi3
+
+    if Vc_estimated:
+        # equqtions 21-24; slightly less accurate than Equations 25-28
+        a1 = -1.434646E+02 
+        b1 = 1.781802E-01 
+        c1 = 4.196576E+01 
+        d1 = -3.443955E-05 
+        e1 = 9.812262E-03 
+        f1 = 1.106396E-01 
+        psi1 = a1
+        psi2 = b1*MW + c1
+        psi3 = d1*MW*MW + e1*MW + f1
+        fact = V_sat*V_sat*(psi1*V_sat + psi2) + psi3
+        if Pc is None:
+            if Tc is not None:
+                Pc_calc = R*Tc/fact
+        elif Tc is None:
+            if Pc is not None:
+                Tc_calc = fact*Pc/R
+    else:
+        # Equations 25-28
+        a2 = -1.822904E-3
+        b2 = 1.947108E-5
+        c2 = 3.794091E0
+        d2 = -2.472981E-8
+        xi1 = a2*MW
+        xi2 = b2*MW*MW + c2
+        xi3 = d2*MW*MW*MW
+        fact = xi1*Vc*Vc + xi2*Vc + xi3
+        if Tc is None:
+            Tc_calc = fact*Pc/R
+        elif Pc is None:
+            Pc_calc = R*Tc/fact
+    Tc_ans = Tc if Tc is not None else Tc_calc
+    Pc_ans = Pc if Pc is not None else Pc_calc
+    Pc_ans *= 1e3
+    Vc *= 1e-3
+    return (Tc_ans, Pc_ans, Vc)
 
 IHMELS = 'IHMELS'
 MEISSNER = 'MEISSNER'

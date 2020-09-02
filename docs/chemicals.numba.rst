@@ -34,8 +34,9 @@ Today, the list of things known not to work is as follows:
 - In :py:mod:`chemicals.flash_basic`, :py:func:`~.flash_Tb_Tc_Pc` and :py:func:`~.flash_ideal` have not been ported but can be made compatible.
 - In :py:mod:`chemicals.dippr`, only :py:func:`~.EQ102` is unsupported as it uses a complex hyp2f1 call.
 - In :py:mod:`chemicals.reaction`, :py:func:`~.stoichiometric_matrix` (dictionaries), :py:func:`~.balance_stoichiometry` (scipy functions, fractional numbers).
+- In :py:mod:`chemicals.safety`, :py:func:`~.LFL_ISO_10156_2017` (dictionaries)
 
-- The assorted functions :py:func:`~.collision_integral_Kim_Monroe`    :py:func:`~.NFPA_combustible_classification`  :py:func:`~.fire_mixing`   :py:func:`~.Henry_pressure_mixture`   :py:func:`~.T_converter`  :py:func:`~.Wilke`  :py:func:`~.Wilke_prefactors` :py:func:`~.Brokaw` :py:func:`~.viscosity_converter` :py:func:`~.CAS_to_int`  :py:func:`~.int_to_CAS`   :py:func:`~.hash_any_primitive`   :py:func:`~.sorted_CAS_key`  may or may not be able to be ported but have not yet been.
+- The assorted functions :py:func:`~.collision_integral_Kim_Monroe` :py:func:`~.Henry_pressure_mixture`   :py:func:`~.T_converter`  :py:func:`~.Wilke`  :py:func:`~.Wilke_prefactors` :py:func:`~.Brokaw` :py:func:`~.viscosity_converter` :py:func:`~.CAS_to_int`  :py:func:`~.int_to_CAS`   :py:func:`~.hash_any_primitive`   :py:func:`~.sorted_CAS_key`  may or may not be able to be ported but have not yet been.
 
 
 All of the regular Numba-compiled functions are built with the `nogil` flag,
