@@ -74,6 +74,7 @@ Liquid Heat Capacity Estimation Models
 
 Solid Heat Capacity Estimation Models
 -------------------------------------
+.. autofunction:: chemicals.heat_capacity.Perry_151
 .. autofunction:: chemicals.heat_capacity.Lastovka_solid
 .. autofunction:: chemicals.heat_capacity.Lastovka_solid_integral
 .. autofunction:: chemicals.heat_capacity.Lastovka_solid_integral_over_T
@@ -103,7 +104,7 @@ attribute of this module.
     533 gases. Data is available for 433 liquids. Data is available for 529
     solids.
 
-.. data:: Cp_data_PerryI
+.. data:: Cp_dict_PerryI
 
     Simple polynomials from [5]_ with vaious exponents selected for each expression.
     Coefficients are in units of calories/mol/K. The full expression is
@@ -138,11 +139,11 @@ attribute of this module.
 
     In [4]: chemicals.heat_capacity.CRC_standard_data
 
-    In [5]: chemicals.heat_capacity.Cp_data_PerryI['124-38-9'] # gas only
+    In [5]: chemicals.heat_capacity.Cp_dict_PerryI['124-38-9'] # gas only
 
-    In [6]: chemicals.heat_capacity.Cp_data_PerryI['7704-34-9'] # crystal and gas
+    In [6]: chemicals.heat_capacity.Cp_dict_PerryI['7704-34-9'] # crystal and gas
 
-    In [7]: chemicals.heat_capacity.Cp_data_PerryI['7440-57-5'] # crystal and liquid
+    In [7]: chemicals.heat_capacity.Cp_dict_PerryI['7440-57-5'] # crystal and liquid
 
     In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
 
@@ -664,7 +665,7 @@ register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Su
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, gas_values_TRC
-    global CRC_standard_data, Cp_data_PerryI
+    global CRC_standard_data, Cp_dict_PerryI
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
@@ -730,7 +731,7 @@ def _load_Cp_data():
     for dct in (zabransky_dict_const_s, zabransky_dict_iso_s, zabransky_dict_sat_s):
         for CAS in dct: dct[CAS] = PiecewiseHeatCapacity(dct[CAS])
     # Used to generate data. Do not delete!
-    # Cp_data_PerryI = {}
+    # Cp_dict_PerryI = {}
     # with open(os.path.join(folder, 'Perrys Table 2-151.tsv'), encoding='utf-8') as f:
     #     '''Read in a dict of heat capacities of irnorganic and elemental solids.
     #     These are in section 2, table 151 in:
@@ -772,13 +773,13 @@ def _load_Cp_data():
     '''
     import json
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
-        Cp_data_PerryI = json.loads(f.read())
+        Cp_dict_PerryI = json.loads(f.read())
     _Cp_data_loaded = True
 
 if PY37:
     def __getattr__(name):
         if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'gas_values_TRC', 'CRC_standard_data',
-                    'Cp_data_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p', 
+                    'Cp_dict_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p', 
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',  
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts'):
             _load_Cp_data()
@@ -2101,6 +2102,46 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     return R*(T*(T*(T*a4/3.0 + 0.5*a3) + a2) + a1*log(T))
 
 ### Solid
+
+def Perry_151(T, a, b, c, d):
+    r"""
+    Return the solid molar heat capacity of a chemical using the Perry 151 method,
+    as described in [1]_.
+    
+    Parameters
+    ----------
+    a,b,c,d : float
+        Regressed coefficients.
+    
+    Returns
+    -------
+    Cps : float
+        Solid constant-pressure heat capacity, [J/mol/K]
+    
+    Notes
+    -----
+    The solid heat capacity is given by:
+    
+    .. math:: C_n = 4.184 (a + bT + \frac{c}{T^2} + dT^2)
+    
+    Coefficients are listed in section 2, table 151 of [9]_. Note that the
+    original model was in a Calorie basis, but has been translated to Joules.
+    
+    Examples
+    --------
+    Heat capacity of solid aluminum at 300 K:
+        
+    >>> Perry_151(300, 4.8, 0.00322, 0., 0.)
+    24.124944
+    
+    References
+    ----------
+    .. [1] Green, Don, and Robert Perry.
+       Perry's Chemical Engineers' Handbook,
+       Eighth Edition. McGraw-Hill Professional, 2007.
+    
+    """
+    return (a + b*T + c/T**2 + d*T**2) * 4.184
 
 def Lastovka_solid(T, similarity_variable, MW=None):
     r'''Calculate solid constant-pressure heat capacity with the similarity
