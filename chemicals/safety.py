@@ -1532,7 +1532,7 @@ def NFPA_30_classification(T_flash, Tb=None, Psat_100F=None):
     Ethylene oxide
     
     >>> NFPA_30_classification(253.15, 283.55)
-    'IA' 
+    'IA'
     
     Butyl alcohol
     

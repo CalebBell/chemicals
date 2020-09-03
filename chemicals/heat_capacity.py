@@ -1038,12 +1038,12 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
     Estimate the heat capacity of n-decane gas in J/kg/K:
     
     >>> Lastovka_Shaw(1000.0, 0.22491)
-    2467.113309084757
+    3730.2807601773725
     
     Estimate the heat capacity of n-decane gas in J/mol/K:
     
     >>> Lastovka_Shaw(1000.0, 0.22491, MW=142.28)
-    530.7462731824618
+    530.7443465580366
     
     References
     ----------
@@ -1257,7 +1257,7 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
     Examples
     --------
     >>> Lastovka_Shaw_T_for_Hm(Hm=55000, MW=80.0, similarity_variable=0.23)
-    600.0943429567604
+    600.0943429567602
     
     References
     ----------
@@ -1329,7 +1329,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
     Examples
     --------
     >>> Lastovka_Shaw_T_for_Sm(Sm=112.80, MW=72.151, similarity_variable=0.2356)
-    603.4298291570275
+    603.4298291570276
     
     References
     ----------
@@ -1831,7 +1831,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None, terms=None):
     Examples
     --------
     >>> Dadgostar_Shaw_integral_over_T(300.0, 0.1333)
-    1201.1409113147927
+    1201.1409113147918
     
     References
     ----------
@@ -2255,7 +2255,7 @@ def Lastovka_solid_integral(T, similarity_variable, MW=None):
     Examples
     --------
     >>> Lastovka_solid_integral(300, 0.2139)
-    283246.1519409121
+    283246.1519409122
     
     References
     ----------
@@ -2311,7 +2311,7 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
     Examples
     --------
     >>> Lastovka_solid_integral_over_T(300, 0.2139)
-    1947.5537561495557
+    1947.5537561495564
     
     References
     ----------

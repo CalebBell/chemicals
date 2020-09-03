@@ -248,7 +248,16 @@ def test_Psat_IAPWS():
     assert_close(dPsat_IAPWS_dT(600.0), 160315.50500711359916, rtol=5e-15)
     assert_close(dPsat_IAPWS_dT(100.0), -0.094715356431800557785, rtol=5e-15)
 
-
+def test_Tsat_IAPWS():
+    # 3 checks from book
+    Tsat = Tsat_IAPWS(1E5)
+    assert_close(Tsat, 372.7559186113376, rtol=1e-13)
+    Tsat = Tsat_IAPWS(1E6)
+    assert_close(Tsat, 453.0356323914666, rtol=1e-13)
+    Tsat = Tsat_IAPWS(1E7)
+    assert_close(Tsat, 584.1494879985282, rtol=1e-13)
+    
+    assert_close(Tsat_IAPWS(Psat_IAPWS(553.123521)), 553.123521, rtol=1e-13)
 
 def test_Psub_Clapeyron():
     Psub = Psub_Clapeyron(250.0, Tt=273.15, Pt=611.0, Hsub_t=51100.0)

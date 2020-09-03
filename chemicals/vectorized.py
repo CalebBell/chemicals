@@ -39,10 +39,11 @@ Inputs do not need to be numpy arrays; they can be any iterable:
 array([591.75, 647.14])
 
 Note that because this needs to import chemicals itself, chemicals.vectorized
-needs to be imported separately; the following will cause an error:
+needs to be imported separately; the following will cause an error as
+the chemicals.vectorized module has not yet been imported:
     
 >>> import chemicals
->>> chemicals.vectorized # Won't work, has not been imported yet
+>>> chemicals.vectorized # doctest: +SKIP
 
 The correct syntax is as follows:
 
