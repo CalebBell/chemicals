@@ -22,6 +22,7 @@ install:
   - cmd: conda install -yq numpy scipy pip pytest pandas matplotlib
   - cmd: pip install pytest-cov coveralls sympy fluids coveralls sympy fuzzywuzzy pint pytz
   - cmd: python setup.py install
+  - cmd: rmdir /Q /S chemicals
 
 test_script:
   - cmd: py.test --cov-report html --cov=chemicals -m "not slow and not online"
