@@ -54,7 +54,9 @@ Correlations for Specific Substances
 ------------------------------------
 .. autofunction:: chemicals.vapor_pressure.Psat_IAPWS
 .. autofunction:: chemicals.vapor_pressure.dPsat_IAPWS_dT
-  
+.. autofunction:: chemicals.vapor_pressure.Tsat_IAPWS
+
+
 Analytical Fit Equations
 ------------------------
 .. autofunction:: chemicals.vapor_pressure.Antoine_coeffs_from_point
@@ -133,7 +135,8 @@ from __future__ import division
 
 __all__ = ['Antoine', 'Wagner_original', 'Wagner', 'TRC_Antoine_extended', 
            'boiling_critical_relation', 'Lee_Kesler', 'Ambrose_Walton', 
-           'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Psub_Clapeyron', 
+           'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Tsat_IAPWS',
+           'Psub_Clapeyron', 
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
            'DIPPR101_ABC_coeffs_from_point']
 
@@ -688,7 +691,6 @@ def dPsat_IAPWS_dT(T):
     using the IAPWS explicit equation. This was derived with SymPy, using the
     CSE method.
 
-
     Parameters
     ----------
     T : float
@@ -738,6 +740,69 @@ def dPsat_IAPWS_dT(T):
             - 1.42736343074136086e-12*x12 + 4.6158250046507185e-10) + (0.00263438245944447809*x11 
             + 4.0*x12 + 4668.20858110680001)*(4.6158250046507185e-10*T - 1.10113079121562103e-10*x0 
             - 1.42736343074136086e-12*x2 - 3.8769014372169964e-8))/x9)*x10_inv)*x20)
+
+def Tsat_IAPWS(P):
+    r'''Calculates the saturation temperature of water using the IAPWS explicit
+    equation.
+    
+    .. math::
+        T_s = \frac{n_{10} + D - \left[(n_{10}+D)^2 - 4(n_9 + n_{10}D) \right]^{0.5}}{2}
+
+    .. math:
+        D = \frac{2G}{-F - (F^2 - 4EG)^{0.5}}
+    
+    .. math::
+        E = \beta^2 + n_3 \beta + n_6
+    
+    .. math::
+        F = n_1 \beta^2 + n_4\beta + n_7
+    
+    .. math::
+        G = n_2\beta^2 + n_5\beta + n_8
+    
+    .. math::
+        \beta = \left(P_{sat} \right)^{0.25}
+        
+
+    Parameters
+    ----------
+    Psat : float
+        Vapor pressure at T [Pa]
+
+    Returns
+    -------
+    T : float
+        Temperature of water along the saturation curve at `Psat`, [K]
+
+    Notes
+    -----
+    The range of validity of this equation is 273.15 K < T < 647.096 K, the 
+    IAPWS critical point.
+    
+    The coefficients `n1` to `n10` are (0.11670521452767E4, -0.72421316703206E6, 
+    -0.17073846940092E2, 0.12020824702470E5, -0.32325550322333E7, 0.14915108613530E2,
+    -0.48232657361591E4, 0.40511340542057E6, -0.23855557567849, 0.65017534844798E3)
+
+    Examples
+    --------
+    >>> Tsat_IAPWS(1E5)
+    372.75591861133773
+
+    References
+    ----------
+    .. [1] Kretzschmar, Hans-Joachim, and Wolfgang Wagner. International Steam
+       Tables: Properties of Water and Steam Based on the Industrial
+       Formulation IAPWS-IF97. Springer, 2019.
+    '''
+    B = sqrt(sqrt(P*1E-6))
+    E = B*(B + -0.17073846940092E2) + 0.14915108613530E2
+    F = B*(0.11670521452767E4*B + 0.12020824702470E5) + -0.48232657361591E4
+    G = B*(-0.72421316703206E6*B + -0.32325550322333E7) + 0.40511340542057E6
+    D = 2.0*G/(-F - sqrt(F*F - 4.0*E*G))
+    n10 = 0.65017534844798E3
+    x0 = (n10 + D)
+    T = (n10 + D - sqrt(x0*x0 - 4.0*(-0.23855557567849+n10*D)))*0.5
+    return T
 
 ### CSP Methods
 

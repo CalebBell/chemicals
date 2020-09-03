@@ -94,6 +94,7 @@ Lower Flammability Limit
 .. autodata:: chemicals.safety.LFL_all_methods
 .. autofunction:: chemicals.safety.Suzuki_LFL
 .. autofunction:: chemicals.safety.Crowl_Louvar_LFL
+.. autofunction:: chemicals.safety.LFL_ISO_10156_2017
 
 Upper Flammability Limit
 ------------------------
@@ -128,7 +129,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'T_autoignition', 'LFL_methods', 'LFL_all_methods',
            'LFL', 'UFL_methods', 'UFL_all_methods', 'UFL', 'fire_mixing', 
            'Suzuki_LFL', 'Suzuki_UFL', 
-           'Crowl_Louvar_LFL', 'Crowl_Louvar_UFL', 
+           'Crowl_Louvar_LFL', 'Crowl_Louvar_UFL', 'LFL_ISO_10156_2017',
            'DIPPR_SERAT_data','NFPA_30_classification')
 
 import os
@@ -290,7 +291,7 @@ if PY37:
             _load_safety_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
-else:
+else: # pragma: no cover
     _load_safety_data()
 
 # # Used to read Ontario Expore Limits data from original file (DO NOT DELETE!)
@@ -1129,6 +1130,123 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
     else:
         return retrieve_from_df_dict(UFL_sources, CASRN, 'UFL', method) 
 
+ISO_10156_2017_Kks = {
+    '7782-44-7': 1.0, # O2,
+    '7727-37-9': 1.0, # N2
+    '124-38-9': 1.5, # CO2
+    '7440-59-7': 0.9, # He
+    '7440-37-1': 0.55, # Ar
+    '7440-01-9': 0.7, # Ne
+    '7439-90-9': 0.5, # Kr
+    '7440-63-3': 0.5, # Xe
+    '7446-09-5': 1.5, # SO2
+    '2551-62-4': 4.0, # SF6
+    '75-73-0': 2.0, # CF4
+    '76-19-7': 1.5, # C3F8
+    '354-33-6': 3.5, # C2HF5
+}
+
+def LFL_ISO_10156_2017(zs, LFLs, CASs):
+    r'''Calculate the lower flammability limit of a mixture of combustible gases
+    and inert gases according to ISO 10156 (2017) [1]_. 
+    
+    .. math::
+        \text{LFL} = \frac{1}{\sum_{i=1}^{n_{combustible}}\frac{A_i}{\text{LFL}_i'}}
+    
+    .. math::
+        \text{LFL}_i' = \frac{1 - \text{LFL}_m' - (1 - K)
+        \frac{\sum_j^{n_{inert}} B_j}{\sum_j^{n_{combustible}} A_j} \text{LFL}_m'
+        }
+        {100 - \text{LFL}_m'}\text{LFL}_i
+        
+    .. math::
+        K = \sum_i^{n_{inert}} z_i K_k
+        
+    The `B` sum is the total mole fraction of all inert gas compounds;
+    and the `A` sum is the total mole fraction of all combustible compounds.
+    :math:`K_k` are the looked up inert gas coefficients.
+    :math:`\text{LFL}_m'` is calculated as the Le Chatelier's lower
+    flammability limit if there were no inert gases in the mixture.
+    
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of all components in a gas including inerts, [-]
+    LFLs : list[float]
+        Lower or upper flammability limits for each flammable component in a
+        gas, [-]
+    CASs : list[str]
+        CAS numbers of each compound; required to look up inert gas factors, [-]
+    
+    Returns
+    -------
+    LFL : float
+        Lower or flammability limit of a gas mixture, [-]
+    
+    Notes
+    -----
+    Inert gas parameters are available for O2, N2, CO2, He, Ar, Ne, Kr, Xe,
+    SO2, SF6, CF4, C3F8, and C2HF5.
+    
+    Examples
+    --------
+    All the sample problems from [1]_ have been implemented as tests.
+    
+    >>> zs = [.15, .15, .3, .35+.05*.79, .05*.21]
+    >>> LFLs = [.04, .044, None, None, None]
+    >>> CASs = ['1333-74-0', '74-82-8', '124-38-9', '7727-37-9', '7782-44-7']
+    >>> LFL_ISO_10156_2017(zs, LFLs, CASs)
+    0.14273722742907632
+
+    References
+    ----------
+    .. [1] Standardization, International Organization for. ISO 10156: 2017 :
+       Gas Cylinders - Gases and Gas Mixtures - Determination of Fire Potential
+       and Oxidizing Ability for the Selection of Cylinder Valve Outlets, 2017.
+    '''
+    N = len(zs)
+    has_inerts = False
+    for CAS in CASs:
+        if CAS in ISO_10156_2017_Kks:
+            has_inerts = True
+            break
+    
+    if has_inerts:
+        combustible_idxs = []
+        combustible_zs = []
+        for i, CAS in enumerate(CASs):
+            # Combustible
+            if CAS not in ISO_10156_2017_Kks:
+                combustible_idxs.append(i)
+                combustible_zs.append(zs[i])
+
+        combustible_zs_norm = normalize(combustible_zs)
+        Lm_prime = 0.0
+        for idx, zi in zip(combustible_idxs, combustible_zs_norm):
+            Lm_prime += zi/LFLs[idx]
+        Lm_prime = 1.0/Lm_prime
+        
+        combustible_frac = sum(combustible_zs)
+        inert_frac = 1.0 - combustible_frac
+        K = 0.0
+        for i, CAS in enumerate(CASs):
+            if CAS in ISO_10156_2017_Kks:
+                K += ISO_10156_2017_Kks[CAS]*zs[i]
+        K /= inert_frac
+        
+        factor = ((1.0 - Lm_prime - (1.0 - K)*inert_frac/combustible_frac*Lm_prime)
+                  /(1.0 - Lm_prime))
+        Lm = 0.0
+        for idx, zi in zip(combustible_idxs, combustible_zs):
+            Lm += zi/(factor*LFLs[idx])
+        Lm = 1.0/Lm
+        return Lm
+
+    tot = 0.0
+    for i in range(len(zs)):
+        tot += zs[i]/LFLs[i]
+    return 1.0/tot
+
 def fire_mixing(ys, FLs):
     '''Le Chatelier's mixing rule for lower and upper flammability limits of
     mixtures of gases.
@@ -1414,7 +1532,7 @@ def NFPA_30_classification(T_flash, Tb=None, Psat_100F=None):
     Ethylene oxide
     
     >>> NFPA_30_classification(253.15, 283.55)
-    'IA' 
+    'IA'
     
     Butyl alcohol
     

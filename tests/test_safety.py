@@ -260,6 +260,35 @@ def test_LFL():
     with pytest.raises(Exception):
         LFL(CASRN='8006-61-9', method='BADMETHOD')
 
+def test_LFL_ISO_10156_2017():
+    # Example 1
+    zs = [.8, .2]
+    LFLs = [.044, 0.024]
+    CASs = ['74-82-8', '74-84-0']
+    res = LFL_ISO_10156_2017(zs, LFLs, CASs)
+    assert_close(res, 0.037714285714285714, rtol=1e-13)
+    
+    # Example 2
+    zs = [.48, .5+.79*.02, .02*.21]
+    LFLs = [0.04, None, None]
+    CASs = ['1333-74-0', '7727-37-9', '7782-44-7']
+    res = LFL_ISO_10156_2017(zs, LFLs, CASs)
+    assert_close(res, 0.08333333333333333, rtol=1e-13)
+    
+    # Example 3
+    zs = [.4, .6]
+    LFLs = [.044, None]
+    CASs = ['74-82-8', '124-38-9']
+    res = LFL_ISO_10156_2017(zs, LFLs, CASs)
+    assert_close(res, 0.11379707112970712, rtol=1e-13)
+    
+    # Example 4
+    zs = [.15, .15, .3, .35+.05*.79, .05*.21]
+    LFLs = [.04, .044, None, None, None]
+    CASs = ['1333-74-0', '74-82-8', '124-38-9', '7727-37-9', '7782-44-7']
+    res = LFL_ISO_10156_2017(zs, LFLs, CASs)
+    assert_close(res, 0.14273722742907632, rtol=1e-13)
+    
 def test_UFL():
     UFL1 = UFL(CASRN='8006-61-9')
     UFL2 = UFL(CASRN='71-43-2', method=NFPA)

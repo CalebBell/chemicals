@@ -410,3 +410,31 @@ def test_third_property():
     assert_close(third_property('110-15-6', V=True), 0.00039809186906019007)
     assert_close(third_property('110-15-6', P=True), 6095016.233766234)
     assert_close(third_property('110-15-6', T=True), 658.410835214447)
+
+
+def test_Hekayati_Raeissi():
+    # Tc, Pc estimation with estimated Vc
+    ans = Hekayati_Raeissi(MW=92.13842, V_sat=0.00010685961260743776, Pc=4108000.0)
+    assert_close1d(ans, (599.7951343525503, 4108000.0, 0.0003149083374202421), rtol=1e-10)
+    ans = Hekayati_Raeissi(MW=92.13842, V_sat=0.00010685961260743776, Tc=599.7951343525503)
+    assert_close1d(ans, (599.7951343525503, 4108000.0, 0.0003149083374202421), rtol=1e-10)
+    
+    ans = Hekayati_Raeissi(MW=92.13842, V_sat=0.00010685961260743776, Pc=4108000.0, Vc=0.000316)
+    assert_close1d(ans, (600.331367806081, 4108000.0, 0.000316), rtol=1e-10)
+    ans = Hekayati_Raeissi(MW=92.13842, V_sat=0.00010685961260743776, Tc=600.331367806081, Vc=0.000316)
+    assert_close1d(ans, (600.331367806081, 4108000.0, 0.000316), rtol=1e-10)
+    
+    ans = Hekayati_Raeissi(MW=92.13842, Pc=4108000.0, Vc=0.000316)
+    assert_close1d(ans, (600.331367806081, 4108000.0, 0.000316), rtol=1e-10)
+    ans = Hekayati_Raeissi(MW=92.13842, Tc=600.331367806081, Vc=0.000316)
+    assert_close1d(ans, (600.331367806081, 4108000.0, 0.000316), rtol=1e-10)
+    
+    # All inputs provided test
+    ans = Hekayati_Raeissi(MW=92.13842, Tc=600., Vc=0.000316, Pc=1e7)
+    assert_close1d(ans, (600.0, 10000000.0, 0.000316), rtol=1e-7)
+    
+    with pytest.raises(ValueError):
+        Hekayati_Raeissi(MW=92.13842, Pc=4108000.0)
+
+    with pytest.raises(ValueError):
+        Hekayati_Raeissi(MW=92.13842, Vc=0.000316)
