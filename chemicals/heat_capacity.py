@@ -664,7 +664,7 @@ register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Su
 
 _Cp_data_loaded = False
 def _load_Cp_data():
-    global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, gas_values_TRC
+    global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, TRC_gas_values
     global CRC_standard_data, Cp_dict_PerryI
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
@@ -673,7 +673,7 @@ def _load_Cp_data():
     TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
     CRC_standard_data = data_source('CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
     
-    gas_values_TRC = np.array(TRC_gas_data.values[:, 1:], dtype=float)
+    TRC_gas_values = np.array(TRC_gas_data.values[:, 1:], dtype=float)
     Cp_values_Poling = np.array(Cp_data_Poling.values[:, 1:], dtype=float)
     
     # Read in a dict of heat capacities of irnorganic and elemental solids.
@@ -778,7 +778,7 @@ def _load_Cp_data():
 
 if PY37:
     def __getattr__(name):
-        if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'gas_values_TRC', 'CRC_standard_data',
+        if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
                     'Cp_dict_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p', 
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',  
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts'):
@@ -2197,7 +2197,7 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     Examples
     --------
     >>> Lastovka_solid(300, 0.2139)
-    1682.063746990921
+    1682.0637469909211
     
     References
     ----------
@@ -2217,10 +2217,9 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     theta_div_T = theta/T
     exp_term = exp(theta_div_T)
     a = similarity_variable
-    a2 = a * a
-    Cp = (3.0*(A1*a + A2*a2)*R*(theta_div_T)**2*exp_term/(exp_term-1)**2
-          + (C1*a + C2*a2)*T
-          + (D1*a + D2*a2)*T**2)
+    Cp = a*(3.0*(A1 + A2*a)*R*(theta_div_T)**2*exp_term/(exp_term-1)**2
+          + (C1 + C2*a)*T
+          + (D1 + D2*a)*T**2)
     return Cp*1000. if MW is None else Cp*MW
 
 def Lastovka_solid_integral(T, similarity_variable, MW=None):
