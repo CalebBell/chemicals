@@ -41,11 +41,15 @@ Gas Heat Capacity Model Equations
 
 Gas Heat Capacity Estimation Models
 -----------------------------------
+.. autofunction:: chemicals.heat_capacity.Poling
+.. autofunction:: chemicals.heat_capacity.Poling_integral
+.. autofunction:: chemicals.heat_capacity.Poling_integral_over_T
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_integral
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_integral_over_T
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_T_for_Hm
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_T_for_Sm
+.. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_term_A
 
 Liquid Heat Capacity Model Equations
 ------------------------------------
@@ -66,9 +70,11 @@ Liquid Heat Capacity Estimation Models
 .. autofunction:: chemicals.heat_capacity.Dadgostar_Shaw
 .. autofunction:: chemicals.heat_capacity.Dadgostar_Shaw_integral
 .. autofunction:: chemicals.heat_capacity.Dadgostar_Shaw_integral_over_T
+.. autofunction:: chemicals.heat_capacity.Dadgostar_Shaw_terms
 
 Solid Heat Capacity Estimation Models
 -------------------------------------
+.. autofunction:: chemicals.heat_capacity.Perry_151
 .. autofunction:: chemicals.heat_capacity.Lastovka_solid
 .. autofunction:: chemicals.heat_capacity.Lastovka_solid_integral
 .. autofunction:: chemicals.heat_capacity.Lastovka_solid_integral_over_T
@@ -98,7 +104,7 @@ attribute of this module.
     533 gases. Data is available for 433 liquids. Data is available for 529
     solids.
 
-.. data:: Cp_data_PerryI
+.. data:: Cp_dict_PerryI
 
     Simple polynomials from [5]_ with vaious exponents selected for each expression.
     Coefficients are in units of calories/mol/K. The full expression is
@@ -133,19 +139,20 @@ attribute of this module.
 
     In [4]: chemicals.heat_capacity.CRC_standard_data
 
-    In [5]: chemicals.heat_capacity.Cp_data_PerryI['124-38-9'] # gas only
+    In [5]: chemicals.heat_capacity.Cp_dict_PerryI['124-38-9'] # gas only
 
-    In [6]: chemicals.heat_capacity.Cp_data_PerryI['7704-34-9'] # crystal and gas
+    In [6]: chemicals.heat_capacity.Cp_dict_PerryI['7704-34-9'] # crystal and gas
 
-    In [7]: chemicals.heat_capacity.Cp_data_PerryI['7440-57-5'] # crystal and liquid
+    In [7]: chemicals.heat_capacity.Cp_dict_PerryI['7440-57-5'] # crystal and liquid
 
     In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
 
 """
 
 __all__ = ['heat_capacity_gas_methods',
+           'Poling', 'Poling_integral', 'Poling_integral_over_T',
            'Lastovka_Shaw', 'Lastovka_Shaw_integral', 'Lastovka_Shaw_integral_over_T', 
-           'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm',
+           'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'Lastovka_Shaw_term_A',
            'TRCCp', 'TRCCp_integral', 'TRCCp_integral_over_T', 
            'heat_capacity_liquid_methods',
            'Rowlinson_Poling', 'Rowlinson_Bondi', 'Dadgostar_Shaw', 
@@ -153,11 +160,13 @@ __all__ = ['heat_capacity_gas_methods',
            'Zabransky_quasi_polynomial_integral_over_T', 'Zabransky_cubic', 
            'Zabransky_cubic_integral', 'Zabransky_cubic_integral_over_T',
            'Dadgostar_Shaw_integral', 'Dadgostar_Shaw_integral_over_T',
+           'Dadgostar_Shaw_terms', 
            'heat_capacity_solid_methods',
            'Lastovka_solid', 'Lastovka_solid_integral', 
            'Lastovka_solid_integral_over_T', 'heat_capacity_solid_methods',
            'ZabranskySpline', 'ZabranskyQuasipolynomial',
-           'PiecewiseHeatCapacity']
+           'PiecewiseHeatCapacity',
+           ]
 import os
 from io import open
 from chemicals.utils import R, log, exp, to_num, PY37, property_mass_to_molar, source_path, os_path_join, can_load_data
@@ -165,9 +174,10 @@ from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
 from fluids.numerics import newton, brenth, secant, polylog2, numpy as np
 
-__numba_additional_funcs__ = ['Lastovka_Shaw_T_for_Hm_err',
-                              'Lastovka_Shaw_T_for_Sm_err'
-                              ]
+__numba_additional_funcs__ = [
+    'Lastovka_Shaw_T_for_Hm_err',
+    'Lastovka_Shaw_T_for_Sm_err',
+]
 
 ### Methods introduced in this module
 
@@ -655,7 +665,7 @@ register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Su
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, gas_values_TRC
-    global CRC_standard_data, Cp_data_PerryI
+    global CRC_standard_data, Cp_dict_PerryI
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
@@ -721,7 +731,7 @@ def _load_Cp_data():
     for dct in (zabransky_dict_const_s, zabransky_dict_iso_s, zabransky_dict_sat_s):
         for CAS in dct: dct[CAS] = PiecewiseHeatCapacity(dct[CAS])
     # Used to generate data. Do not delete!
-    # Cp_data_PerryI = {}
+    # Cp_dict_PerryI = {}
     # with open(os.path.join(folder, 'Perrys Table 2-151.tsv'), encoding='utf-8') as f:
     #     '''Read in a dict of heat capacities of irnorganic and elemental solids.
     #     These are in section 2, table 151 in:
@@ -763,13 +773,13 @@ def _load_Cp_data():
     '''
     import json
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
-        Cp_data_PerryI = json.loads(f.read())
+        Cp_dict_PerryI = json.loads(f.read())
     _Cp_data_loaded = True
 
 if PY37:
     def __getattr__(name):
         if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'gas_values_TRC', 'CRC_standard_data',
-                    'Cp_data_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p', 
+                    'Cp_dict_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p', 
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',  
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts'):
             _load_Cp_data()
@@ -783,6 +793,135 @@ else:
 
 ### Heat capacities of gases
 
+def Poling(T, a, b, c, d, e):
+    r"""
+    Return the ideal-gas molar heat capacity of a chemical using 
+    polynomial regressed coefficients as described by Poling et. al. [1]_.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    a,b,c,d,e : float
+        Regressed coefficients.
+    
+    Returns
+    -------
+    Cpgm : float
+        Gas molar heat capacity, [J/mol/K]
+    
+    Notes
+    -----
+    The ideal gas heat capacity is given by:
+    
+    .. math:: C_n = R*(a + bT + cT^2 + dT^3 + eT^4)
+    
+    The data is based on the Poling data bank.
+    
+    See Also
+    --------
+    Poling_integral
+    Poling_integral_over_T
+    
+    Examples
+    --------
+    Compute the gas heat capacity of Methane at 300 K:
+    
+    >>> Poling(T=300., a=4.568, b=-0.008975, c=3.631e-05, d=-3.407e-08, e=1.091e-11)
+    35.85097338842521
+    
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+           New York: McGraw-Hill Professional, 2000.
+    
+    """
+    return R*(a + b*T + c*T**2 + d*T**3 + e*T**4)
+ 
+def Poling_integral(T, a, b, c, d, e):
+    r"""
+    Return the integral of the ideal-gas constant-pressure heat capacity 
+    of a chemical using polynomial regressed coefficients as described by
+    Poling et. al. [1]_.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    a,b,c,d,e : float
+        Regressed coefficients.
+    
+    Returns
+    -------
+    H : float
+        Difference in enthalpy from 0 K, [J/mol]
+        
+    Notes
+    -----
+    Integral was computed with SymPy.
+    
+    See Also
+    --------
+    Poling
+    Poling_integral_over_T
+    
+    Examples
+    --------
+    Compute the gas enthalpy of Methane at 300 K (with reference to 0 K):
+    
+    >>> Poling_integral(T=300., a=4.568, b=-0.008975, c=3.631e-05, d=-3.407e-08, e=1.091e-11)
+    10223.67533722261
+    
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+           New York: McGraw-Hill Professional, 2000.
+    
+    """
+    return R*(((((0.2*e)*T + 0.25*d)*T + c/3.)*T + 0.5*b)*T + a)*T
+ 
+def Poling_integral_over_T(T, a, b, c, d, e):
+    r"""
+    Return the integral over temperature of the ideal-gas constant-pressure 
+    heat capacity of a chemical using polynomial regressed coefficients as
+    described by Poling et. al. [1]_.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    a,b,c,d,e : float
+        Regressed coefficients.
+    
+    Returns
+    -------
+    S : float
+        Difference in entropy from 0 K, [J/mol]
+        
+    Notes
+    -----
+    Integral was computed with SymPy.
+    
+    See Also
+    --------
+    Poling
+    Poling_integral
+    
+    Examples
+    --------
+    Compute the gas entropy of Methane at 300 K (with reference to 0 K):
+    
+    >>> Poling_integral_over_T(T=300., a=4.568, b=-0.008975, c=3.631e-05, d=-3.407e-08, e=1.091e-11)
+    205.4652632805835
+    
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+           New York: McGraw-Hill Professional, 2000.
+    
+    """
+    return R*(((((0.25*e)*T + d/3.)*T + 0.5*c)*T + b)*T + a*log(T))
+
 def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     """
     Return Term A in Lastovka-Shaw equation.
@@ -792,7 +931,7 @@ def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     similarity_variable : float
         Similarity variable as defined in [1]_, [mol/g]
     cyclic_aliphatic: bool, optional
-        Whether or not chemcial is cyclic aliphatic, [-]
+        Whether or not chemical is cyclic aliphatic, [-]
 
     Returns
     -------
@@ -802,6 +941,8 @@ def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     See Also
     --------
     Lastovka_Shaw
+    Lastovka_Shaw_integral
+    Lastovka_Shaw_integral_over_T
 
     References
     ----------
@@ -828,7 +969,7 @@ def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     return term_A
 
 def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_A=None):
-    r'''Calculate ideal-gas constant-pressure heat capacitiy with the similarity
+    r'''Calculate ideal-gas constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
     
     .. math::
@@ -849,7 +990,7 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
     similarity_variable : float
         Similarity variable as defined in [1]_, [mol/g]
     cyclic_aliphatic: bool, optional
-        Whether or not chemcial is cyclic aliphatic, [-]
+        Whether or not chemical is cyclic aliphatic, [-]
     MW : float, optional
         Molecular weight, [g/mol]
     term_A : float, optional
@@ -858,7 +999,7 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
     Returns
     -------
     Cpg : float
-        Gas constant-pressure heat capacitiy, [J/mol/K if MW given; J/kg/K otherwise]
+        Gas constant-pressure heat capacity, [J/mol/K if MW given; J/kg/K otherwise]
         
     Notes
     -----
@@ -934,11 +1075,11 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
     
     Cp = term_A + (B11 + B12*a)*(C11_C12a_T*C11_C12a_T)*expm_C11_C12a_T*x1*x1
     Cp += (B21 + B22*a)*(C21_C22a_T*C21_C22a_T)*expm_C21_C22a_T*x2*x2
-    return Cp * MW if MW else Cp*1000. # J/g/K to J/kg/K
+    return Cp*1000. if MW is None else Cp*MW
 
 def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
                            MW=None, term_A=None):
-    r'''Calculate the integral of ideal-gas constant-pressure heat capacitiy 
+    r'''Calculate the integral of ideal-gas constant-pressure heat capacity 
     with the similarity variable concept and method as shown in [1]_.
     
     Parameters
@@ -946,7 +1087,7 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
     T : float
         Temperature of gas [K]
     cyclic_aliphatic: bool, optional
-        Whether or not chemcial is cyclic aliphatic, [-]
+        Whether or not chemical is cyclic aliphatic, [-]
     MW : float, optional
         Molecular weight, [g/mol]
     term_A : float, optional
@@ -997,12 +1138,12 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
     
     H = (T*term_A - (B11 + B12*a)*(x1*x1)/(x1 - x1*exp(x1*T_inv)) 
                   - (B21 + B22*a)*(x2*x2)/(x2 - x2*exp(x2*T_inv)))
-    return H * MW if MW else H*1000. # J/g to J/kg
+    return H*1000. if MW is None else H*MW
 
 def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False,
                                   MW=None, term_A=None):
     r'''Calculate the integral over temperature of ideal-gas constant-pressure 
-    heat capacitiy with the similarity variable concept and method as shown in
+    heat capacity with the similarity variable concept and method as shown in
     [1]_.
     
     Parameters
@@ -1012,7 +1153,7 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     similarity_variable : float
         Similarity variable as defined in [1]_, [mol/g]
     cyclic_aliphatic: bool, optional
-        Whether or not chemcial is cyclic aliphatic, [-]
+        Whether or not chemical is cyclic aliphatic, [-]
     MW : float, optional
         Molecular weight, [g/mol]
     term_A : float, optional
@@ -1067,7 +1208,7 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
         + B21*C22*a + B22*C21*a + B22*C22*a2)*T_inv)
     # There is a non-real component, but it is only a function of similariy 
     # variable and so will always cancel out.
-    return S.real * MW if MW else S.real*1000. # J/g/K to J/kg/K
+    return S.real*1000. if MW is None else S.real*MW
 
 def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm, cyclic_aliphatic, term_A):
     H1 = Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic, MW, term_A)
@@ -1095,7 +1236,7 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
         A factor to increase or decrease the predicted value of the 
         method, [-]
     cyclic_aliphatic: bool, optional
-        Whether or not chemcial is cyclic aliphatic, [-]
+        Whether or not chemical is cyclic aliphatic, [-]
     term_A : float, optional
         Term A in Lastovka-Shaw equation, [J/g]
 
@@ -1167,7 +1308,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
         A factor to increase or decrease the predicted value of the 
         method, [-]
     cyclic_aliphatic: bool, optional
-        Whether or not chemcial is cyclic aliphatic, [-]
+        Whether or not chemical is cyclic aliphatic, [-]
     term_A : float, optional
         Term A in Lastovka-Shaw equation, [J/g]
 
@@ -1425,7 +1566,7 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
 ### Heat capacities of liquids
 
 def Rowlinson_Poling(T, Tc, omega, Cpgm):
-    r'''Calculate liquid constant-pressure heat capacitiy with the [1]_ CSP method.
+    r'''Calculate liquid constant-pressure heat capacity with the [1]_ CSP method.
     This equation is not terrible accurate.
 
     The heat capacity of a liquid is given by:
@@ -1448,7 +1589,7 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
     Returns
     -------
     Cplm : float
-        Liquid constant-pressure heat capacitiy, [J/mol/K]
+        Liquid constant-pressure heat capacity, [J/mol/K]
         
     Notes
     -----
@@ -1466,12 +1607,12 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
        New York: McGraw-Hill Professional, 2000.
     '''
     Tr = T/Tc
-    Cplm = Cpgm+ R*(1.586 + 0.49/(1.-Tr) + omega*(4.2775
-    + 6.3*(1-Tr)**(1/3.)/Tr + 0.4355/(1.-Tr)))
+    one_minus_Tr = 1. - Tr
+    Cplm = Cpgm+ R*(1.586 + 0.49/one_minus_Tr + omega*(4.2775 + 6.3*one_minus_Tr**(1/3.)/Tr + 0.4355/one_minus_Tr))
     return Cplm
 
 def Rowlinson_Bondi(T, Tc, omega, Cpgm):
-    r'''Calculate liquid constant-pressure heat capacitiy with the CSP method
+    r'''Calculate liquid constant-pressure heat capacity with the CSP method
     shown in [1]_.
     
     The heat capacity of a liquid is given by:
@@ -1494,7 +1635,7 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
     Returns
     -------
     Cplm : float
-        Liquid constant-pressure heat capacitiy, [J/mol/K]
+        Liquid constant-pressure heat capacity, [J/mol/K]
         
     Notes
     -----
@@ -1515,8 +1656,8 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
        Butterworth, London (1969).
     '''
     Tr = T/Tc
-    Cplm = Cpgm + R*(1.45 + 0.45/(1.-Tr) + 0.25*omega*(17.11
-    + 25.2*(1-Tr)**(1/3.)/Tr + 1.742/(1.-Tr)))
+    one_minus_Tr = 1. - Tr
+    Cplm = Cpgm + R*(1.45 + 0.45/(one_minus_Tr) + 0.25*omega*(17.11 + 25.2*(one_minus_Tr)**(1/3.)/Tr + 1.742/one_minus_Tr))
     return Cplm
 
 def Dadgostar_Shaw_terms(similarity_variable):
@@ -1560,7 +1701,7 @@ def Dadgostar_Shaw_terms(similarity_variable):
             a31*a + a32*a2)
 
 def Dadgostar_Shaw(T, similarity_variable, MW=None, terms=None):
-    r'''Calculate liquid constant-pressure heat capacitiy with the similarity
+    r'''Calculate liquid constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
     
     .. math::
@@ -1576,12 +1717,12 @@ def Dadgostar_Shaw(T, similarity_variable, MW=None, terms=None):
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
     terms : float, optional
-        Terms in Dadgostar-Shaw equation as computed by :func:`~chemicals.heat_capacity.Dadgostar_Shaw_terms`
+        Terms in Dadgostar-Shaw equation as computed by :obj:`Dadgostar_Shaw_terms`
         
     Returns
     -------
     Cpl : float
-        Liquid constant-pressure heat capacitiy, [J/mol/K if MW given; J/kg/K otherwise]
+        Liquid constant-pressure heat capacity, [J/mol/K if MW given; J/kg/K otherwise]
         
     Notes
     -----
@@ -1605,10 +1746,10 @@ def Dadgostar_Shaw(T, similarity_variable, MW=None, terms=None):
     '''
     first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
     Cp = (first + second*T + third*T**2)
-    return Cp * MW if MW else Cp*1000. # J/g/K to J/kg/K
+    return Cp*1000. if MW is None else Cp*MW
 
 def Dadgostar_Shaw_integral(T, similarity_variable, MW=None, terms=None):
-    r'''Calculate the integral of liquid constant-pressure heat capacitiy 
+    r'''Calculate the integral of liquid constant-pressure heat capacity 
     with the similarity variable concept and method as shown in [1]_.
     
     Parameters
@@ -1620,7 +1761,7 @@ def Dadgostar_Shaw_integral(T, similarity_variable, MW=None, terms=None):
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
     terms : float, optional
-        Terms in Dadgostar-Shaw equation as computed by :func:`~chemicals.heat_capacity.Dadgostar_Shaw_terms`
+        Terms in Dadgostar-Shaw equation as computed by :obj:`Dadgostar_Shaw_terms`
         
     Returns
     -------
@@ -1654,10 +1795,10 @@ def Dadgostar_Shaw_integral(T, similarity_variable, MW=None, terms=None):
     T2 = T*T
     first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
     H = T2*T/3.*third + T2*0.5*second + T*first
-    return H * MW if MW else H*1000. # J/g to J/kg
+    return H*1000. if MW is None else H*MW
 
 def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None, terms=None):
-    r'''Calculate the integral of liquid constant-pressure heat capacitiy 
+    r'''Calculate the integral of liquid constant-pressure heat capacity 
     with the similarity variable concept and method as shown in [1]_.
     
     Parameters
@@ -1669,7 +1810,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None, terms=None):
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
     terms : float, optional
-        Terms in Dadgostar-Shaw equation as computed by :func:`~chemicals.heat_capacity.Dadgostar_Shaw_terms`
+        Terms in Dadgostar-Shaw equation as computed by :obj:`Dadgostar_Shaw_terms`
         
     Returns
     -------
@@ -1702,7 +1843,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None, terms=None):
     '''
     first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
     S = T*T*0.5*third + T*second + first*log(T)
-    return S * MW if MW else S*1000. # J/g/K to J/kg/K
+    return S*1000. if MW is None else S*MW
 
 def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     r'''Calculates liquid heat capacity using the model developed in [1]_.
@@ -1962,8 +2103,49 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
 
 ### Solid
 
+def Perry_151(T, a, b, c, d):
+    r"""
+    Return the solid molar heat capacity of a chemical using the Perry 151 method,
+    as described in [1]_.
+    
+    Parameters
+    ----------
+    a,b,c,d : float
+        Regressed coefficients.
+    
+    Returns
+    -------
+    Cps : float
+        Solid constant-pressure heat capacity, [J/mol/K]
+    
+    Notes
+    -----
+    The solid heat capacity is given by:
+    
+    .. math:: C_n = 4.184 (a + bT + \frac{c}{T^2} + dT^2)
+    
+    Coefficients are listed in section 2, table 151 of [1]_. Note that the
+    original model was in a Calorie basis, but has been translated to Joules.
+    
+    Examples
+    --------
+    Heat capacity of solid aluminum at 300 K:
+        
+    >>> Perry_151(300, 4.8, 0.00322, 0., 0.)
+    24.124944
+    
+    References
+    ----------
+    .. [1] Green, Don, and Robert Perry.
+       Perry's Chemical Engineers' Handbook,
+       Eighth Edition. McGraw-Hill Professional, 2007.
+    
+    """
+    T2 = T**2
+    return (a + b*T + c/T2 + d*T2) * 4.184
+
 def Lastovka_solid(T, similarity_variable, MW=None):
-    r'''Calculate solid constant-pressure heat capacitiy with the similarity
+    r'''Calculate solid constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
     
     .. math::
@@ -1983,7 +2165,7 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     Returns
     -------
     Cps : float
-        Solid constant-pressure heat capacitiy, [J/mol/K if MW given; J/kg/K otherwise]
+        Solid constant-pressure heat capacity, [J/mol/K if MW given; J/kg/K otherwise]
     
     Notes
     -----
@@ -2032,15 +2214,17 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     C2 = -0.024942
     D1 = 0.000025
     D2 = -0.000123
-
-    Cp = (3.0*(A1*similarity_variable + A2*similarity_variable**2)*R*(theta/T
-    )**2*exp(theta/T)/(exp(theta/T)-1)**2
-    + (C1*similarity_variable + C2*similarity_variable**2)*T
-    + (D1*similarity_variable + D2*similarity_variable**2)*T**2)
-    return Cp * MW if MW else Cp * 1000 # J/g/K to J/kg/K
+    theta_div_T = theta/T
+    exp_term = exp(theta_div_T)
+    a = similarity_variable
+    a2 = a * a
+    Cp = (3.0*(A1*a + A2*a2)*R*(theta_div_T)**2*exp_term/(exp_term-1)**2
+          + (C1*a + C2*a2)*T
+          + (D1*a + D2*a2)*T**2)
+    return Cp*1000. if MW is None else Cp*MW
 
 def Lastovka_solid_integral(T, similarity_variable, MW=None):
-    r'''Integrates solid constant-pressure heat capacitiy with the similarity
+    r'''Integrates solid constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
     
     uses an explicit form as derived with Sympy.
@@ -2088,15 +2272,15 @@ def Lastovka_solid_integral(T, similarity_variable, MW=None):
     C2 = -0.024942
     D1 = 0.000025
     D2 = -0.000123
-    similarity_variable2 = similarity_variable*similarity_variable
+    a = similarity_variable
     T2 = T*T
-    H = (T*T2*(D1*similarity_variable + D2*similarity_variable2)/3.
-         + 0.5*T2*(C1*similarity_variable + C2*similarity_variable2)
-         + 3.0*R*(A1*similarity_variable*theta + A2*similarity_variable2*theta)/(exp(theta/T) - 1.))
-    return H * MW if MW else H * 1000 # J/g/K to J/kg/K
+    H = a*(T*T2*(D1 + D2*a)/3.
+           + 0.5*T2*(C1 + C2*a)
+           + 3.0*R*theta*(A1 + A2*a)/(exp(theta/T) - 1.))
+    return H*1000. if MW is None else H*MW
 
 def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
-    r'''Integrates over T solid constant-pressure heat capacitiy with the 
+    r'''Integrates over T solid constant-pressure heat capacity with the 
     similarity variable concept and method as shown in [1]_.
     
     uses an explicit form as derived with Sympy.
@@ -2145,12 +2329,11 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
     D1 = 0.000025
     D2 = -0.000123
     
-    sim2 = similarity_variable*similarity_variable
+    a = similarity_variable
     exp_theta_T = exp(theta/T)
-    
-    S = (-3.0*R*similarity_variable*(A1 + A2*similarity_variable)*log(exp_theta_T - 1.) 
-    + 0.5*T**2*(D1*similarity_variable + D2*sim2)
-    + T*(C1*similarity_variable + C2*sim2)
-    + 3.0*(A1*R*similarity_variable*theta + A2*R*sim2*theta)/(T*exp_theta_T - T) 
-    + 3.0*(A1*R*similarity_variable*theta + A2*R*sim2*theta)/T)
-    return S * MW if MW else S * 1000 # J/g/K to J/kg/K
+    A_term = (A1 + A2*a)
+    S = a*(-3.0*R*A_term*log(exp_theta_T - 1.) 
+           + 0.5*T**2*(D1 + D2*a)
+           + T*(C1 + C2*a)
+           + 3.0*R*theta*A_term*(1/(T*exp_theta_T - T) + 1/T))
+    return S*1000. if MW is None else S*MW
