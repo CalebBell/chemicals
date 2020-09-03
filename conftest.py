@@ -10,3 +10,5 @@ def pytest_ignore_collect(path):
         return True
     if 'units' in path:
         return True
+    if 'setup' in path:
+        return True
