@@ -68,7 +68,7 @@ def test_CSP():
     sigma_calc = Miqueu(300., 340.1, 0.000199, 0.1687)
     assert_close(sigma_calc, 0.003474100774091376)
     
-    sigma_calc = Mersmann_Kind_surface_tension(298.15, 164.15, 328.25, 497.1, 3430000.0)
+    sigma_calc = Mersmann_Kind_sigma(298.15, 164.15, 328.25, 497.1, 3430000.0)
     assert_close(0.016744311449290426, sigma_calc)
 
     

@@ -693,7 +693,7 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
     1-butanol, as compared to value in CRC Handbook of 0.02493.
 
     >>> Hakim_Steinberg_Stiel(298.15, 563.0, 4414000.0, 0.59, StielPolar=-0.07872)
-    0.021907902575190447
+    0.02190790257519
 
     References
     ----------
