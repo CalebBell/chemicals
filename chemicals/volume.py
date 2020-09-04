@@ -31,6 +31,7 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 Pure Low Pressure Liquid Correlations
 -------------------------------------
+.. autofunction:: chemicals.volume.VDI_PPDS
 .. autofunction:: chemicals.volume.Rackett
 .. autofunction:: chemicals.volume.COSTALD
 .. autofunction:: chemicals.volume.Yen_Woods_saturation
@@ -165,7 +166,7 @@ The structure of each dataframe is shown below:
 
 from __future__ import division
 
-__all__ = ['Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales', 
+__all__ = ['VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales', 
 'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic', 
 'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture', 
 'ideal_gas', 'Goodman']
@@ -235,10 +236,50 @@ else:
     if can_load_data:
         _load_rho_data()
 
+def VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
+    r'''Calculates saturation liquid volume, using the critical properties
+    and fitted coefficients from [1]_.
 
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    rhoc : float
+        Critical density of fluid [kg/m^3]
+    a,b,c,d : float
+        Fitted coefficients [-]
+    MW : float, optional
+        Molecular weight of chemical [g/mol]
+
+    Returns
+    -------
+    Vs : float
+        Saturation liquid molar volume or density, [m^3/mol if MW given; kg/m^3 otherwise]
+
+    Examples
+    --------
+    Calculate density of nitrogen in kg/m3 at 300 K:
+    
+    >>> VDI_PPDS(300, 126.19, 313, 470.922, 493.251, -560.469, 389.611)
+    313.0
+    
+    Calculate molar volume of nitrogen in m3/mol at 300 K:
+    
+    >>> VDI_PPDS(300, 126.19, 313, 470.922, 493.251, -560.469, 389.611, 28.01)
+    8.9488817891e-05
+
+    References
+    ----------
+    .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition. 
+           Berlin; New York:: Springer, 2010.
+    '''
+    tau = 1. - T/Tc if T < Tc else 0.
+    rho = rhoc + a*tau**0.35 + b*tau**(2/3.) + c*tau + d*tau**(4/3.)
+    return rho if MW is None else 0.001 * MW / rho 
 
 ### Critical-properties based
-
 
 def Yen_Woods_saturation(T, Tc, Vc, Zc):
     r'''Calculates saturation liquid volume, using the Yen and Woods [1]_ CSP
