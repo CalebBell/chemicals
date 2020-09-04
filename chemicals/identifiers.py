@@ -232,13 +232,13 @@ class ChemicalMetadata(object):
         IUPAC name as given in pubchem, [-]
     common_name : str
         Common name as given in pubchem, [-]
-    all_names : list[str]
+    synonyms : list[str]
         List of synonyms of the compound, [-]
     CAS : int
         CAS number of the compound; stored as an int for memory efficiency, [-]
     """
     __slots__ = ('pubchemid', 'formula', 'MW', 'smiles', 'InChI', 'InChI_key',
-                 'iupac_name', 'common_name', 'all_names', 'CAS', '_charge')
+                 'iupac_name', 'common_name', 'synonyms', 'CAS', '_charge')
     def __repr__(self):
         return ('<ChemicalMetadata, name=%s, formula=%s, smiles=%s, MW=%g>'
                 %(self.common_name, self.formula, self.smiles, self.MW))
@@ -263,7 +263,7 @@ class ChemicalMetadata(object):
         return int_to_CAS(self.CAS)
     
     def __init__(self, pubchemid, CAS, formula, MW, smiles, InChI, InChI_key,
-                 iupac_name, common_name, all_names):
+                 iupac_name, common_name, synonyms):
         self.pubchemid = pubchemid
         self.CAS = CAS
         self.formula = formula
@@ -274,7 +274,7 @@ class ChemicalMetadata(object):
         self.InChI_key = InChI_key
         self.iupac_name = iupac_name
         self.common_name = common_name
-        self.all_names = all_names
+        self.synonyms = synonyms
         
 
 class ChemicalMetadataDB(object):
@@ -322,20 +322,20 @@ class ChemicalMetadataDB(object):
         for ele in periodic_table:
             
             CAS = int(ele.CAS.replace('-', '')) # Store as int for easier lookup
-            all_names = [ele.name.lower()]
+            synonyms = [ele.name.lower()]
             
             obj = ChemicalMetadata(pubchemid=ele.PubChem, CAS=CAS, 
                                    formula=ele.symbol, MW=ele.MW, smiles=ele.smiles,
                                    InChI=ele.InChI, InChI_key=ele.InChI_key,
                                    iupac_name=ele.name.lower(), 
                                    common_name=ele.name.lower(), 
-                                   all_names=all_names)
+                                   synonyms=synonyms)
             
             
             if ele.InChI_key in self.InChI_key_index:
                 if ele.number not in homonuclear_elemental_gases:
                     obj_old = self.InChI_key_index[ele.InChI_key]
-                    for name in obj_old.all_names:
+                    for name in obj_old.synonyms:
                         self.name_index[name] = obj    
             
             self.InChI_key_index[ele.InChI_key] = obj
@@ -344,10 +344,10 @@ class ChemicalMetadataDB(object):
             self.smiles_index[ele.smiles] = obj
             self.InChI_index[ele.InChI] = obj
             if ele.number in homonuclear_elemental_gases:
-                for name in all_names:
+                for name in synonyms:
                     self.name_index['monatomic ' + name] = obj    
             else:
-                for name in all_names:
+                for name in synonyms:
                     self.name_index[name] = obj    
             self.formula_index[obj.formula] = obj
 
@@ -362,12 +362,12 @@ class ChemicalMetadataDB(object):
             (pubchemid, CAS, formula, MW, smiles, InChI, InChI_key, iupac_name, common_name) = values[0:9]
             CAS = int(CAS.replace('-', '')) # Store as int for easier lookup
             
-            all_names = values[7:]
+            synonyms = values[7:]
             pubchemid = int(pubchemid)
 
             obj = ChemicalMetadata(pubchemid, CAS, formula, float(MW), smiles,
                                     InChI, InChI_key, iupac_name, common_name, 
-                                    all_names)
+                                    synonyms)
             
             # Lookup indexes
             self.CAS_index[CAS] = obj
@@ -375,7 +375,7 @@ class ChemicalMetadataDB(object):
             self.smiles_index[smiles] = obj
             self.InChI_index[InChI] = obj
             self.InChI_key_index[InChI_key] = obj
-            for name in all_names:
+            for name in synonyms:
                 self.name_index[name] = obj
             self.formula_index[obj.formula] = obj
                     
