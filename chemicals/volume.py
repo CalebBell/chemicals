@@ -607,7 +607,7 @@ def COSTALD(T, Tc, Vc, omega):
     return Vc*V_0*(1.0 - omega*V_delta)
 
 
-def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
+def Campbell_Thodos(T, Tb, Tc, Pc, MW, dipole=0.0, has_hydroxyl=False):
     r'''Calculate saturation liquid density using the Campbell-Thodos [1]_
     CSP method.
 
@@ -629,7 +629,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
         \beta = 0.00318s-0.0211+0.625\Lambda^{1.35}
 
     .. math::
-        \Lambda = \frac{P_c^{1/3}} { M^{1/2} T_c^{5/6}}
+        \Lambda = \frac{P_c^{1/3}} { MW^{1/2} T_c^{5/6}}
 
     For polar compounds:
 
@@ -662,11 +662,11 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
         Critical temperature of fluid [K]
     Pc : float
         Critical pressure of fluid [Pa]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
     dipole : float, optional
         Dipole moment of the fluid [debye]
-    hydroxyl : bool, optional
+    has_hydroxyl : bool, optional
         Swith to use the hydroxyl variant for polar fluids
 
     Returns
@@ -684,7 +684,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
     --------
     Ammonia, from [1]_.
 
-    >>> Campbell_Thodos(T=405.45, Tb=239.82, Tc=405.45, Pc=111.7*101325, M=17.03, dipole=1.47)
+    >>> Campbell_Thodos(T=405.45, Tb=239.82, Tc=405.45, Pc=111.7*101325, MW=17.03, dipole=1.47)
     7.347366126245346e-05
 
     References
@@ -695,25 +695,24 @@ def Campbell_Thodos(T, Tb, Tc, Pc, M, dipole=0.0, hydroxyl=False):
        (January 1, 1985): 102-11. doi:10.1021/je00039a032.
     '''
     Tc_inv = 1.0/Tc
-    Tr = T/Tc
-    Tbr = Tb/Tc
+    Tr = T * Tc_inv
+    Tbr = Tb * Tc_inv
     Pc = Pc/101325.
     s = Tbr*log(Pc)/(1.0 - Tbr)
-    Lambda = Pc**(1.0/3.)/(M**0.5*Tc**(5/6.))
-    alpha = 0.3883 - 0.0179*s
+    Lambda = Pc**(1.0/3.)/(MW**0.5*Tc**(5/6.))
     beta = 0.00318*s - 0.0211 + 0.625*Lambda**(1.35)
-    if dipole is not None:
+    if dipole is None:
+        alpha = 0.3883 - 0.0179*s
+    else:
         theta = Pc*dipole*dipole/(Tc*Tc)
-        alpha -= 130540 * theta**2.41
         beta += 9.74E6 * theta**3.38
-        if hydroxyl:
+        if has_hydroxyl:
             beta += 5.90*theta**0.835
             alpha = (0.69*Tbr - 0.3342 + 5.79E-10*Tbr**-32.75)*Pc**0.145
+        else:
+            alpha = 0.3883 - 0.0179*s - 130540 * theta**2.41
     Zra = alpha + beta*(1.0 - Tr)
-    if T == Tc:
-        p = 1.0
-    else:
-        p = (1.0 + (1.0 - Tr)**(2.0/7.))
+    p = 1.0 if T == Tc else (1.0 + (1.0 - Tr)**(2.0/7.))
     Vs = R*Tc/(Pc*101325.0)*Zra**p
     return Vs
 
@@ -793,7 +792,7 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
         return Vc*V0/(1. + delta_SRK*(alpha_SRK - 1.0)**(1.0/3.0))
 
 
-def CRC_inorganic(T, rho0, k, Tm):
+def CRC_inorganic(T, rho0, k, Tm, MW=None):
     r'''Calculates liquid density of a molten element or salt at temperature
     above the melting point. Some coefficients are given nearly up to the
     boiling point.
@@ -813,11 +812,13 @@ def CRC_inorganic(T, rho0, k, Tm):
         Linear temperature dependence of the mass density, [kg/m^3/K]
     Tm : float
         The normal melting point, used in the correlation [K]
+    MW : float, optional
+        Molecular weight of chemical [g/mol]
 
     Returns
     -------
     rho : float
-        Mass density of molten metal or salt, [kg/m^3]
+        Mass density of molten metal or salt, [m^3/mol if MW given; kg/m^3 otherwise]
 
     Notes
     -----
@@ -830,7 +831,6 @@ def CRC_inorganic(T, rho0, k, Tm):
     Coefficients for one compound could be used to predict the temperature
     dependence of density of a similar compound.
 
-
     Examples
     --------
     >>> CRC_inorganic(300, 2370.0, 2.687, 239.08)
@@ -841,11 +841,8 @@ def CRC_inorganic(T, rho0, k, Tm):
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
         Chemistry and Physics, 95E. [Boca Raton, FL]: CRC press, 2014.
     '''
-    return rho0 - k*(T-Tm)
-
-
-
-
+    rho = rho0 - k*(T-Tm)
+    return rho if MW is None else 0.001 * MW / rho 
 
 
 def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):

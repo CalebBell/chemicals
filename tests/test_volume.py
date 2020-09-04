@@ -89,14 +89,14 @@ def test_Campbell_Thodos():
     # calculated result for critical volume in Table V. Tabulated s, lambda,
     # alpha, and beta are also a match. Deviation of 0.1% is due to author's
     # rearrangement of the formula.
-    V2_calc = Campbell_Thodos(T=647.3, Tb=373.15, Tc=647.3, Pc=218.3*101325, M=18.015, dipole=1.85, hydroxyl=True)
+    V2_calc = Campbell_Thodos(T=647.3, Tb=373.15, Tc=647.3, Pc=218.3*101325, MW=18.015, dipole=1.85, has_hydroxyl=True)
     V2 = 5.4787019341952454e-05
 
     # Ammonia, with constants from [1]_ Table II and compared with listed
     # calculated result for critical volume in Table IV. Tabulated s, lambda,
     # alpha, and beta are also a match. Deviation of 0.1% is due to author's
     # rearrangement of the formula.
-    V3_calc = Campbell_Thodos(T=405.45, Tb=239.82, Tc=405.45, Pc=111.7*101325, M=17.03, dipole=1.47)
+    V3_calc = Campbell_Thodos(T=405.45, Tb=239.82, Tc=405.45, Pc=111.7*101325, MW=17.03, dipole=1.47)
     V3 = 7.347366126245346e-05
     assert_allclose([V1_calc, V2_calc, V3_calc], [V1, V2, V3])
 
