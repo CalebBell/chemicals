@@ -32,6 +32,7 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 Correlations for Specific Substances
 ------------------------------------
 .. autofunction:: chemicals.permittivity.permittivity_IAPWS
+.. autofunction:: chemicals.permittivity.permittivity_CRC
 
 Fit Coefficients
 ----------------
@@ -57,11 +58,9 @@ attribute of this module.
 
 from __future__ import division
 
-__all__ = ['permittivity_IAPWS']
+__all__ = ['permittivity_IAPWS', 'permittivity_CRC']
 
-import os
 from fluids.numerics import numpy as np
-from fluids.constants import N_A, epsilon_0, k
 from chemicals.utils import sqrt, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
@@ -84,7 +83,34 @@ else:
     if can_load_data:
         _load_permittivity_data()
 
+def permittivity_CRC(T, a, b, c, d):
+    r"""
+    Return the relative permittivity (epsilon) of a chemical using 
+    a polynomical equation as in [1]_.
+    
+    Parameters
+    ----------
+    a,b,c,d : float
+        Regressed coefficients.
+    
+    Notes
+    -----    
+    The permittivity is given by :math:`\epsilon_r = A + BT + CT^2 + DT^3`
+    
+    Examples
+    --------
+    Calculate the permittivity of 4-Nitroaniline:
+    
+    >>> permittivity_CRC(450., 487, -1.5, 0.00129, 0.)
+    73.225
+    
+    References
+    ----------
+    .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
 
+    """
+    return a + T*(b + T*(c + d*T))
 
 def permittivity_IAPWS(T, rho):
     r'''Calculate the relative permittivity of pure water as a function of.

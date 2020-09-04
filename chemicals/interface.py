@@ -38,7 +38,7 @@ Pure Component Correlations
 .. autofunction:: chemicals.interface.Hakim_Steinberg_Stiel
 .. autofunction:: chemicals.interface.Miqueu
 .. autofunction:: chemicals.interface.Aleem
-.. autofunction:: chemicals.interface.Mersmann_Kind_surface_tension
+.. autofunction:: chemicals.interface.Mersmann_Kind_sigma
 
 Mixing Rules
 ------------
@@ -133,7 +133,7 @@ from __future__ import division
 __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Brock_Bird', 'Pitzer_sigma', 'Sastri_Rao', 'Zuo_Stenby', 
            'sigma_IAPWS',
-           'Mersmann_Kind_surface_tension', 'API10A32',
+           'Mersmann_Kind_sigma', 'API10A32',
            'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem', 
            'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 'Weinaug_Katz',
            'Meybodi_Daryasafar_Karimi']
@@ -303,7 +303,8 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
        and Modeling 53, no. 12 (2013): 3418-30. doi:10.1021/ci4005699.
     '''
     Tr = T/Tc
-    sigma = sigma0*(1.-Tr)**n0 + sigma1*(1.-Tr)**n1 + sigma2*(1.-Tr)**n2
+    one_minus_Tr = 1 - Tr
+    sigma = sigma0*(one_minus_Tr)**n0 + sigma1*(one_minus_Tr)**n1 + sigma2*(one_minus_Tr)**n2
     return sigma
 
 
@@ -837,7 +838,7 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
     return sphericity*MW**(1.0/3.0)/(6.*N_A**(1.0/3.0))*rhol**(2.0/3.)*(Hvap_Tb + Cpl*(Tb-T))
 
 
-def Mersmann_Kind_surface_tension(T, Tm, Tb, Tc, Pc, n_associated=1):
+def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
     r'''Estimates the surface tension of organic liquid substances
     according to the method of [1]_.
 
@@ -878,7 +879,7 @@ def Mersmann_Kind_surface_tension(T, Tm, Tb, Tc, Pc, n_associated=1):
     --------
     MTBE at STP (the actual value is 0.0181):
         
-    >>> Mersmann_Kind_surface_tension(298.15, 164.15, 328.25, 497.1, 3430000.0)
+    >>> Mersmann_Kind_sigma(298.15, 164.15, 328.25, 497.1, 3430000.0)
     0.016744311449290426
 
     References
