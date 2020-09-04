@@ -4,3 +4,4 @@ numpydoc
 scipy
 fluids>=0.1.68
 IPython
+pint

@@ -828,7 +828,7 @@ def Poling(T, a, b, c, d, e):
     Compute the gas heat capacity of Methane at 300 K:
     
     >>> Poling(T=300., a=4.568, b=-0.008975, c=3.631e-05, d=-3.407e-08, e=1.091e-11)
-    35.85097338842521
+    35.850973388425
     
     References
     ----------
@@ -836,7 +836,7 @@ def Poling(T, a, b, c, d, e):
            New York: McGraw-Hill Professional, 2000.
     
     """
-    return R*(a + b*T + c*T**2 + d*T**3 + e*T**4)
+    return R*(T*(T*(T*(T*e + d) + c) + b) + a)
  
 def Poling_integral(T, a, b, c, d, e):
     r"""
@@ -878,7 +878,7 @@ def Poling_integral(T, a, b, c, d, e):
            New York: McGraw-Hill Professional, 2000.
     
     """
-    return R*(((((0.2*e)*T + 0.25*d)*T + c/3.)*T + 0.5*b)*T + a)*T
+    return R*(((((0.2*e)*T + 0.25*d)*T + c*(1.0/3.))*T + 0.5*b)*T + a)*T
  
 def Poling_integral_over_T(T, a, b, c, d, e):
     r"""
@@ -896,7 +896,7 @@ def Poling_integral_over_T(T, a, b, c, d, e):
     Returns
     -------
     S : float
-        Difference in entropy from 0 K, [J/mol]
+        Difference in entropy from 0 K, [J/mol/K]
         
     Notes
     -----
@@ -912,7 +912,7 @@ def Poling_integral_over_T(T, a, b, c, d, e):
     Compute the gas entropy of Methane at 300 K (with reference to 0 K):
     
     >>> Poling_integral_over_T(T=300., a=4.568, b=-0.008975, c=3.631e-05, d=-3.407e-08, e=1.091e-11)
-    205.4652632805835
+    205.46526328058
     
     References
     ----------
@@ -920,7 +920,7 @@ def Poling_integral_over_T(T, a, b, c, d, e):
            New York: McGraw-Hill Professional, 2000.
     
     """
-    return R*(((((0.25*e)*T + d/3.)*T + 0.5*c)*T + b)*T + a*log(T))
+    return R*(((((0.25*e)*T + d*(1.0/3.))*T + 0.5*c)*T + b)*T + a*log(T))
 
 def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     """
@@ -975,8 +975,10 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
     .. math::
         term_A = A1 + A2*a \text{ if cyclic aliphatic} 
         
+    .. math::
         term_A = \left(A_2 + \frac{A_1 - A_2}{1 + \exp(\frac{\alpha-A_3}{A_4})}\right) \text{ if not cyclic aliphatic}
         
+    .. math::
         C_p^0 = term_A
         + (B_{11} + B_{12}\alpha)\left(-\frac{(C_{11} + C_{12}\alpha)}{T}\right)^2
         \frac{\exp(-(C_{11} + C_{12}\alpha)/T)}{[1-\exp(-(C_{11}+C_{12}\alpha)/T)]^2}

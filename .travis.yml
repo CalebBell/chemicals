@@ -26,6 +26,7 @@ install:
   - source activate test-environment
   - pip install -r requirements_test.txt
   - python setup.py -q install
+  - rm -rf chemicals
 script:
   - py.test . -v --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not thermo and not numba"
 after_success:
