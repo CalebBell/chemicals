@@ -25,7 +25,15 @@ SOFTWARE.
 from __future__ import division
 from math import exp, log, sqrt
 
-__all__ = ['iapws97_dG_dpi_region1', 'iapws97_dG_dpi_region2']
+__all__ = ['iapws97_dG_dpi_region1', 'iapws97_dGr_dpi_region2', 'iapws97_dGr_dpi_region5',
+           
+           'iapws97_boundary_2_3', 'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
+           'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
+           'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
+           'iapws97_boundary_3qu', 'iapws97_boundary_3rx', 'iapws97_boundary_3wx',
+           'iapws97_boundary_3ab', 'iapws97_boundary_3op'
+           
+           ]
 
 
 # The intention is to have a partial sovler for IAPWS-95 and IAPWS-97
@@ -38,6 +46,139 @@ __all__ = ['iapws97_dG_dpi_region1', 'iapws97_dG_dpi_region2']
 # IAPWS-95: T, rho -> P
 # IAPWS-95: P, rho -> V
 # I have been casually working this for over 5 years
+
+
+def iapws97_boundary_2_3(T):
+    '''Above this pressure we are in region 3.
+    
+    >>> iapws97_boundary_2_3(0.623150000E3)
+    16529164.2526216
+    '''
+    return (0.34805185628969E9 - T*(0.11671859879975E7 - 0.10192970039326E4*T))
+
+def iapws97_boundary_3uv(P):
+    '''
+    >>> iapws97_boundary_3uv(22.3E6)
+    647.7996121480069'''
+    return (P*(P*(2.867916822636969863e-21*P - 2.228141349037550121e-13) 
+               + 8.905796021353068107e-6) + 528.1996462630620499)
+#    P = P/1E6
+#    T = sum([nis3uv[i]*P**Iis3uv[i] for i in range(4)])
+#    return T
+
+def iapws97_boundary_3ef(P):
+    '''
+    >>> iapws97_boundary_3ef(40E6)
+    713.959399239744
+    '''
+    return 3.7278880039999996e-6*P + 564.843879079744056
+#    P = P/1E6
+#    T = 3.727888004*(P-22.064)+647.096
+#    return T
+
+def iapws97_boundary_3cd(P):
+    '''
+    >>> iapws97_boundary_3cd(25E6)
+    649.3659208321279'''
+    return (P*(P*(1.59090746562728991e-22*P - 1.2728354929587799e-14) 
+               + 2.78233532206914969e-6) + 585.27696669634895)
+#    P = P/1E6
+#    T = sum([nis3cd[i]*P**Iis3cd[i] for i in range(4)])
+#    return T
+
+def iapws97_boundary_3gh(P):
+    '''
+    >>> iapws97_boundary_3gh(25E6)
+    656.69805722612
+    '''
+    return (P*(P*(P*(7.51608051114156857e-18 - 7.87105249910382769e-26*P)
+                  - 2.69029173140129987e-10) + 0.0042814358479154593) - 24928.4240900418008)
+#    P = P/1E6
+#    T = sum([nis3gh[i]*P**Iis3gh[i] for i in range(5)])
+#    return T
+
+def iapws97_boundary_3ij(P):
+    '''
+    >>> iapws97_boundary_3ij(25E6)
+    660.7865756716819'''
+    return (P*(P*(P*(5.15308185433081825e-29*P - 5.87071076864458977e-21) 
+                  + 2.60763050899561981e-13) - 6.16179320924617007e-7) + 584.814781649163024)
+#    P = P/1E6
+#    T = sum([nis3ij[i]*P**Iis3ij[i] for i in range(5)])
+#    return T
+
+def iapws97_boundary_3jk(P):
+    '''
+    >>> iapws97_boundary_3jk(25E6)
+    668.1915358826951'''
+    return (P*(P*(P*(1.37897492684193974e-28*P - 1.57391839848015003e-20) 
+                  + 6.97072596851896056e-13) - 7.70600270141674947e-6) + 617.229772068439047)
+#    P = P/1E6
+#    T = sum([nis3jk[i]*P**Iis3jk[i] for i in range(5)])
+#    return T
+
+def iapws97_boundary_3mn(P):
+    '''
+    >>> iapws97_boundary_3mn(22.8E6)
+    649.6054132953997'''
+    return (P*(P*(1.92871054508107992e-21*P - 1.58365725441647998e-13)
+               + 7.61978122720127966e-6) + 535.339483742384004)
+#    P = P/1E6
+#    T = sum([nis3mn[i]*P**Iis3mn[i] for i in range(4)])
+#    return T
+
+def iapws97_boundary_3qu(P):
+    '''
+    >>> iapws97_boundary_3qu(22E6)
+    645.6355027340121'''
+    return (P*(P*(1.22240301070144985e-21*P - 1.02020639611015996e-13) 
+               + 5.29062258221221963e-6) + 565.60364823912596)
+#    P = P/1E6
+#    T = sum([nis3qu[i]*P**Iis3qu[i] for i in range(4)])
+#    return T
+
+def iapws97_boundary_3rx(P):
+    '''
+    >>> iapws97_boundary_3rx(22E6)
+    648.26227536701
+    '''
+    return (P*(P*(2.43293362700451993e-13 - 2.94905044740798962e-21*P)
+               - 1.02961025163668997e-6) + 584.561202520005963)
+#    P = P/1E6
+#    T = sum([nis3rx[i]*P**Iis3rx[i] for i in range(4)])
+#    return T
+
+### Log P boundaries
+def iapws97_boundary_3wx(logP_MPa, logP_MPa_inv):
+    '''
+    >>> iapws97_boundary_3wx(log(22.3), 1/log(22.3))
+    648.204947950734
+    '''
+    return (logP_MPa*(14.7370491183190993*logP_MPa + 97.3505869861951965) 
+            + 7.28052609145380014 + logP_MPa_inv*(329.196213998375015 + 873.371668682416953*logP_MPa_inv))
+#    P = P/1E6
+#    T = sum([nis3wx[i]*logP_MPa**Iis3wx[i] for i in range(5)])
+#    return T
+
+def iapws97_boundary_3ab(logP_MPa, logP_MPa_inv):
+    '''
+    >>> iapws97_boundary_3ab(log(40), 1/log(40))
+    693.0341408296053'''
+    return (logP_MPa*(21.3144632222113017*logP_MPa - 187.661219490113012)
+            + 1547.93642129415002 - logP_MPa_inv*(1918.87498864292002 - 918.419702359447001*logP_MPa_inv))
+#    T = sum([nis3ab[i]*logP_MPa**Iis3ab[i] for i in range(5)])
+#    return T
+
+def iapws97_boundary_3op(logP_MPa, logP_MPa_inv):
+    '''
+    >>> iapws97_boundary_3op(log(22.8), 1/log(22.8))
+    650.010694314133'''
+    return (logP_MPa*(64.2859598466067013*logP_MPa - 332.500170441277987) 
+            + 969.461372400213008 + logP_MPa_inv*(773.845935768222034 - 1523.13732937084001*logP_MPa_inv))
+#    T = sum([nis3op[i]*logP_MPa**Iis3op[i] for i in range(5)])
+#    return T
+
+
 
 
 def iapws97_dG_dpi_region1(tau, pi):
@@ -99,8 +240,8 @@ def iapws97_dG_dpi_region1(tau, pi):
    + 0.000607063015658739955*taut2 - 0.000283190801238040004)*taut_inv8*taut_inv)
 
 
-def iapws97_dG_dpi_region2(tau, pi):
-    r'''Calculates dG_dpi for region 2.
+def iapws97_dGr_dpi_region2(tau, pi):
+    r'''Calculates dGr_dpi for region 2.
 
     Parameters
     ----------
@@ -111,9 +252,9 @@ def iapws97_dG_dpi_region2(tau, pi):
 
     Returns
     -------
-    dG_dpi : float
-        Derivative of dimentionless Gibbs energy G/(RT) with respect to `pi`,
-        [-]
+    dGr_dpi : float
+        Derivative of dimentionless residual Gibbs energy G/(RT) with respect 
+        to `pi`, [-]
 
     Notes
     -----
@@ -121,7 +262,7 @@ def iapws97_dG_dpi_region2(tau, pi):
 
     Examples
     --------
-    >>> iapws97_dG_dpi_region2(.656, 16)
+    >>> iapws97_dGr_dpi_region2(.656, 16)
     -0.0062926319312
     '''
     taut = tau - 0.5
@@ -153,3 +294,34 @@ def iapws97_dG_dpi_region2(tau, pi):
     - 0.00787855544867100029) - 0.000378979750326299998) - 0.000066065283340406)) 
     + taut*(taut*(taut*(-0.0503252787279300021*taut3 - 0.0575812590834320001) - 0.0459960136963650026) 
     - 0.0178348622923579989) - 0.00177317424732129992)
+
+
+def iapws97_dGr_dpi_region5(tau, pi):
+    r'''Calculates dGr_dpi for region 5.
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (1000 K)/T [-]
+    pi : float
+        Dimensionless pressure, P/(1 MPa), [-]
+
+    Returns
+    -------
+    dGr_dpi : float
+        Derivative of dimentionless residual Gibbs energy G/(RT) with respect 
+        to `pi`, [-]
+
+    Notes
+    -----
+    Used in density solution.
+
+    Examples
+    --------
+    >>> iapws97_dGr_dpi_region5(.5, 30.0)
+    0.0004009761854002
+    '''
+    tau3 = tau*tau
+    tau3 *= tau
+    return (pi*tau3*(4.48800748189699983e-6 + tau3*(1.13758364468865005e-7*pi*tau - 8.23265509069419973e-6*tau3))
+            + tau*(tau*(0.000901537616739440007 - 0.00502700776776479966*tau) + 0.00157364048552589993))
