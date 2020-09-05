@@ -31,7 +31,7 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 Pure Low Pressure Liquid Correlations
 -------------------------------------
-.. autofunction:: chemicals.volume.VDI_PPDS
+.. autofunction:: chemicals.volume.volume_VDI_PPDS
 .. autofunction:: chemicals.volume.Rackett
 .. autofunction:: chemicals.volume.COSTALD
 .. autofunction:: chemicals.volume.Yen_Woods_saturation
@@ -166,7 +166,7 @@ The structure of each dataframe is shown below:
 
 from __future__ import division
 
-__all__ = ['VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales', 
+__all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales', 
 'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic', 
 'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture', 
 'ideal_gas', 'Goodman']
@@ -236,7 +236,7 @@ else:
     if can_load_data:
         _load_rho_data()
 
-def VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
+def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     r'''Calculates saturation liquid volume, using the critical properties
     and fitted coefficients from [1]_.
 
@@ -262,12 +262,12 @@ def VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     --------
     Calculate density of nitrogen in kg/m3 at 300 K:
     
-    >>> VDI_PPDS(300, 126.19, 313, 470.922, 493.251, -560.469, 389.611)
+    >>> volume_VDI_PPDS(300, 126.19, 313, 470.922, 493.251, -560.469, 389.611)
     313.0
     
     Calculate molar volume of nitrogen in m3/mol at 300 K:
     
-    >>> VDI_PPDS(300, 126.19, 313, 470.922, 493.251, -560.469, 389.611, 28.01)
+    >>> volume_VDI_PPDS(300, 126.19, 313, 470.922, 493.251, -560.469, 389.611, 28.01)
     8.9488817891e-05
 
     References
@@ -713,7 +713,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, MW, dipole=0.0, has_hydroxyl=False):
     Returns
     -------
     Vs : float
-        Saturation liquid volume
+        Saturation liquid volume, [m^3/mol]
 
     Notes
     -----
@@ -726,7 +726,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, MW, dipole=0.0, has_hydroxyl=False):
     Ammonia, from [1]_.
 
     >>> Campbell_Thodos(T=405.45, Tb=239.82, Tc=405.45, Pc=111.7*101325, MW=17.03, dipole=1.47)
-    7.347366126245346e-05
+    7.347366126245e-05
 
     References
     ----------
@@ -1231,6 +1231,6 @@ def Goodman(T, Tt, Vml):
        Density and Liquid Density at the Triple Point." Journal of Chemical &
        Engineering Data 49, no. 6 (2004): 1512-14. doi:10.1021/je034220e.
     '''
-    return 1.0/((1.28 - 0.16*(T/Tt))*(1.0/Vml))
+    return Vml/(1.28 - 0.16*(T/Tt))
 
 
