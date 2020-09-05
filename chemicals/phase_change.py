@@ -192,17 +192,17 @@ def _load_phase_change_constants():
 
 _phase_change_corrs_loaded = False
 def _load_phase_change_correlations():
-    global phase_change_data_Perrys2_150, phase_change_data_Perrys2_150_values
-    global phase_change_data_VDI_PPDS_4, phase_change_data_VDI_PPDS_4_values
+    global phase_change_data_Perrys2_150, phase_change_values_Perrys2_150
+    global phase_change_data_VDI_PPDS_4, phase_change_values_VDI_PPDS_4
     global phase_change_data_Alibakhshi_Cs, _phase_change_corrs_loaded
 
     # 66554 for pandas; 19264 bytes for numpy
     phase_change_data_Perrys2_150 = data_source('Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
-    phase_change_data_Perrys2_150_values = np.array(phase_change_data_Perrys2_150.values[:, 1:], dtype=float)
+    phase_change_values_Perrys2_150 = np.array(phase_change_data_Perrys2_150.values[:, 1:], dtype=float)
     
     # 52187 bytes for pandas, 13056 bytes for numpy
     phase_change_data_VDI_PPDS_4 = data_source('VDI PPDS Enthalpies of vaporization.tsv')
-    phase_change_data_VDI_PPDS_4_values = np.array(phase_change_data_VDI_PPDS_4.values[:, 2:], dtype=float)
+    phase_change_values_VDI_PPDS_4 = np.array(phase_change_data_VDI_PPDS_4.values[:, 2:], dtype=float)
     
     phase_change_data_Alibakhshi_Cs = data_source('Alibakhshi one-coefficient enthalpy of vaporization.tsv')
     _phase_change_corrs_loaded = True
@@ -215,9 +215,9 @@ if PY37:
             _load_phase_change_constants()
             return globals()[name]
         elif name in ('phase_change_data_Perrys2_150',
-                      'phase_change_data_Perrys2_150_values', 
+                      'phase_change_values_Perrys2_150', 
                       'phase_change_data_VDI_PPDS_4', 
-                      'phase_change_data_VDI_PPDS_4_values', 
+                      'phase_change_values_VDI_PPDS_4', 
                       'phase_change_data_Alibakhshi_Cs'):
             _load_phase_change_correlations()
             return globals()[name]
