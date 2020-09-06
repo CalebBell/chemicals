@@ -180,8 +180,8 @@ def test_Yoon_Thodos():
     assert_close(mu, 1.0194885727776819e-05)
 
 
-def test_Gharagheizi_gas_viscosity():
-    mu = Gharagheizi_gas_viscosity(120., 190.564, 45.99E5, 16.04246)
+def test_viscosity_gas_Gharagheizi():
+    mu = viscosity_gas_Gharagheizi(120., 190.564, 45.99E5, 16.04246)
     assert_close(mu, 5.215761625399613e-06)
 
 
