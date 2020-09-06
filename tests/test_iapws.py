@@ -28,6 +28,8 @@ from math import *
 from chemicals.iapws import *
 from fluids.numerics import assert_close, linspace, logspace
 from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G, REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N, REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z
+from chemicals.vapor_pressure import Psat_IAPWS
+
 
 def test_iapws97_dG_dpi_region1():
     assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
@@ -225,23 +227,75 @@ def test_iapws97_rho():
 def test_iapws97_region_3_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     Ts = linspace(623.15+1e-10, 1073.15, 1000)
+    # Do some points near where more region transitions are, and then up to the limit.
+    for P_lim in (25.5e6, 100e6):
+        def test_Ps(T, N):
+             # Do not check too low to the boundary
+             # Sometimes CoolProp says a different region
+            lower_P = iapws97_boundary_2_3(T)*(1+4e-6)
+            if lower_P >= P_lim:
+                # No valid points in region 3
+                return []
+            upper_P = iapws97_boundary_2_3(T)*10.0
+            upper_P = min(upper_P, P_lim)
+            return logspace(log10(lower_P), log10(upper_P), N)
+    
+        for T in Ts:
+            for P in test_Ps(T, 1000):
+                assert iapws97_identify_region_TP(T, P) == 3
+                rho_implemented = iapws97_rho(T=T, P=P)
+                rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
+    #            try:
+                assert_close(rho_CoolProp, rho_implemented, rtol=1e-10)
+    #            except:
+    #                print([T, P, 1-rho_CoolProp/rho_implemented])
+#test_iapws97_region_3_rho_coolprop()
+    
+    
+@pytest.mark.CoolProp
+@pytest.mark.slow
+def test_iapws97_region_5_rho_coolprop():
+    # Working great!
+    from CoolProp.CoolProp import PropsSI
+    Ts = linspace(1073.15+1e-10, 2273.15, 100)
     def test_Ps(T, N):
-         # Do not check too low to the boundary
-         # Sometimes CoolProp says a different region
-        lower_P = iapws97_boundary_2_3(T)*(1+4e-6)
-        if lower_P >= 100e6:
-            # No valid points in region 3
-            return []
-        upper_P = iapws97_boundary_2_3(T)*10.0
-        upper_P = min(upper_P, 100e6)
-        return logspace(log10(lower_P), log10(upper_P), N)
+        return logspace(log10(1e-6), log10(50e6), N)
 
     for T in Ts:
         for P in test_Ps(T, 1000):
-            assert iapws97_identify_region_TP(T, P) == 3
+            assert iapws97_identify_region_TP(T, P) == 5
             rho_implemented = iapws97_rho(T=T, P=P)
             rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
-#            try:
             assert_close(rho_CoolProp, rho_implemented, rtol=1e-10)
-#            except:
-#                print([T, P, 1-rho_CoolProp/rho_implemented])
+
+
+@pytest.mark.CoolProp
+@pytest.mark.slow
+@pytest.mark.xfail
+def test_iapws97_region_2_rho_coolprop():
+    # Need to fix - either find where error is and fix there, or stop using horner's method
+    # gas
+    from CoolProp.CoolProp import PropsSI
+    P_lim = 1e-6
+    Ts = linspace(273.15+1e-10, 1073.15-1e-10, 100)
+    def test_Ps(T, N):
+        upper_P = iapws97_boundary_2_3(T)*(1.0-1e-10)
+        if T <= 623.15:
+            upper_P = min(Psat_IAPWS(T)*(1.0-1e-10), upper_P)
+        
+        
+        if upper_P < P_lim or upper_P > 100e6:
+            # No valid points in region 2
+            return []
+
+        return logspace(log10(P_lim), log10(upper_P), N)
+
+    for T in Ts:
+        for P in test_Ps(T, 1000):
+            assert iapws97_identify_region_TP(T, P) == 2
+            rho_implemented = iapws97_rho(T=T, P=P)
+            rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
+            try:
+                assert_close(rho_CoolProp, rho_implemented, rtol=2e-10)
+            except:
+                print([T, P, 1-rho_implemented/rho_CoolProp])
