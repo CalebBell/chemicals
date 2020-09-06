@@ -143,7 +143,7 @@ def test_CSP_liq():
     kl = Bahadori_liquid(273.15, 170)
     assert_close(kl, 0.14274278108272603)
     
-    kl = Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 0.000754, 38)
+    kl = kl_Mersmann_Kind(400, 170.33484, 658.0, 0.000754, 38)
     assert_close(kl, 0.0895271829899285)
 
 
