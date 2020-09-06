@@ -24,6 +24,7 @@ SOFTWARE.
 """
 from __future__ import division
 from math import exp, log, sqrt
+from chemicals.vapor_pressure import Psat_IAPWS
 
 __all__ = ['iapws97_dG_dpi_region1', 'iapws97_dGr_dpi_region2', 'iapws97_dGr_dpi_region5',
            
@@ -31,7 +32,8 @@ __all__ = ['iapws97_dG_dpi_region1', 'iapws97_dGr_dpi_region2', 'iapws97_dGr_dpi
            'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
            'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
            'iapws97_boundary_3qu', 'iapws97_boundary_3rx', 'iapws97_boundary_3wx',
-           'iapws97_boundary_3ab', 'iapws97_boundary_3op'
+           'iapws97_boundary_3ab', 'iapws97_boundary_3op',
+           'iapws97_identify_region_TP'
            
            ]
 
@@ -179,7 +181,7 @@ def iapws97_boundary_3op(logP_MPa, logP_MPa_inv):
 #    return T
 
 
-
+### Fast dG_dpi and dGr_dpi for density calls
 
 def iapws97_dG_dpi_region1(tau, pi):
     r'''Calculates dG_dpi for region 1.
@@ -325,3 +327,24 @@ def iapws97_dGr_dpi_region5(tau, pi):
     tau3 *= tau
     return (pi*tau3*(4.48800748189699983e-6 + tau3*(1.13758364468865005e-7*pi*tau - 8.23265509069419973e-6*tau3))
             + tau*(tau*(0.000901537616739440007 - 0.00502700776776479966*tau) + 0.00157364048552589993))
+
+
+def iapws97_identify_region_TP(T, P):
+    under_623 = T <= 623.15
+    if under_623:
+        Psat = Psat_IAPWS(T)
+    two_to_three = iapws97_boundary_2_3(T)
+    if 273.15 <= T <= 623.15 and Psat < P <= 100E6:
+        return 1
+    elif 273.15 <= T <= 623.15 and P <= Psat:
+        return 2
+    elif 623.15 <= T <= 1073.15 and P <= 100E6 and P <= two_to_three:
+        return 2
+    elif 623.15 <= T <= 1073.15 and P <= 100E6 and P > two_to_three:
+        return 3
+    elif 1073.15 <= T <= 2273.15 and P <= 50E6:
+        return 5
+    else:
+        raise ValueError("For box (1,2,3,4) 273.15 K <= T <= 1073.15 K and P <= 100 MPa;"
+                         "for box 5, 1073.15 K <= T <= 2273.15 K and P <= 50 MPa.")
+
