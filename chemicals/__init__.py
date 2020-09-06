@@ -127,6 +127,11 @@ submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
               interface, permittivity, thermal_conductivity, combustion,
               heat_capacity, reaction, volume, rachford_rice, flash_basic, identifiers, safety]
 
+def all_submodules():
+    import chemicals.iapws
+    return submodules + [chemicals.iapws]
+
+
 chemicals_dir = utils.source_path
 
 __version__ = '0.1.3'
