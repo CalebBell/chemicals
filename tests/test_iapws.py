@@ -34,10 +34,18 @@ from chemicals.vapor_pressure import Psat_IAPWS
 def test_iapws97_dG_dpi_region1():
     assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
                  0.12923271825448354, rtol=1e-14)
+    
+    # Point that had bad error with horner's method
+    assert_close(iapws97_dG_dpi_region1(1386 / 600.15, 10001325 / 16.53E6),
+                 0.09345587583404263, rtol=1e-14)
 
 
 def test_iapws97_dG_dpi_region2():
     assert_close(iapws97_dGr_dpi_region2(.656, 16), -0.006292631931275252, rtol=1e-14)
+    
+    
+    # Point that had bad error with horner's method
+    assert_close(iapws97_dGr_dpi_region2(0.788009171330091, 26.87134177929712), -0.018525334158583723, rtol=1e-14)
 
 def test_iapws97_dG_dpi_region5():
     assert_close(iapws97_dGr_dpi_region5(.5, 30.0), 0.0004009761854002751, rtol=1e-14)
@@ -269,15 +277,47 @@ def test_iapws97_region_5_rho_coolprop():
             assert_close(rho_CoolProp, rho_implemented, rtol=1e-10)
 
 
+def iapws97_dGr_dpi_region2_fastest(tau, pi):
+    '''Fastest implementation, maybe near possible. Horner's method in places
+    has caused issues however and this has some error in some regions.
+    '''
+    taut = tau - 0.5
+    pi2 = pi*pi
+    taut2 = taut*taut
+    taut3 = taut*taut2
+    taut4 = taut2*taut2
+    taut6 = taut4*taut2
+    taut8 = taut4*taut4
+    taut13 = taut6*taut4*taut3
+    taut21 = taut13*taut8
+    taut29 = taut21*taut8
+    # 53 from 13*13*!3*!3*3
+    # 57 from 
+    return (pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi2*pi2*pi2*(pi2*(pi2
+        *(pi*(pi*(pi*(pi*taut13*taut13*(taut13*taut*(1.32995316841867198e-15 - 0.0000226487297378903988*taut13*taut4*taut)
+        + 1.75410265428146418e-27) - 2.93678005497663003e-14*taut29*taut8*taut2) + 0.0000832192847496054092*taut*taut21*taut29*taut3)
+    - 1.24017662339841913e-24*taut21) + taut8*taut8*taut4*(taut13*taut2*(6.1258633752463995e-12
+    - 0.0000840049353964159951*taut13) + 1.78371690710842005e-23)) - 6.05920510335077989*taut21*taut21*taut13*taut2) 
+    + taut29*(1.71088510070543998*taut21 - 1.29412653835175996e-9)) + taut4*(taut6
+    *(-1.00181793795109993e-8*taut4 - 1.02347470959289996e-12) + 1.04069652101739995e-18))
+    + 1.78287415218792009e-7*taut13) + taut4*taut4*(9.00496908836719986e-11 - 65.8490727183984035*taut13*taut13*taut2))
+    + taut6*taut4*taut*(-0.27262789705017304*taut6*taut6*taut2 - 8.83526622937069987e-6) - 4.13416950269890026e-17)
+    + taut3*(taut13*(-143.374451604623999*taut13*taut6 - 0.012702883392812999) - 1.00288598706366e-10))
+    + 0.0000114610381688305001*taut6*taut) + taut*(taut*(1.92901490874028006e-6*taut + 5.11628714091400033e-8)
+    - 3.15389238237468004e-9)) + taut*(taut2*(taut3*(-0.122004760687946995*taut21*taut8 
+    - 0.00451017736264439952) - 0.0000968330317157100001) + 1.31612001853305008e-6) + 6.14452130769269999e-8)
+    + taut*(taut*(taut2*(taut3*(-0.0000533490958281740028*taut21*taut8 - 0.0875945913011459965) 
+    - 0.00787855544867100029) - 0.000378979750326299998) - 0.000066065283340406)) 
+    + taut*(taut*(taut*(-0.0503252787279300021*taut3 - 0.0575812590834320001) - 0.0459960136963650026) 
+    - 0.0178348622923579989) - 0.00177317424732129992)
+
+
 @pytest.mark.CoolProp
 @pytest.mark.slow
-@pytest.mark.xfail
 def test_iapws97_region_2_rho_coolprop():
-    # Need to fix - either find where error is and fix there, or stop using horner's method
-    # gas
     from CoolProp.CoolProp import PropsSI
     P_lim = 1e-6
-    Ts = linspace(273.15+1e-10, 1073.15-1e-10, 100)
+    Ts = linspace(273.15+1e-10,  1073.15-1e-10, 100)
     def test_Ps(T, N):
         upper_P = iapws97_boundary_2_3(T)*(1.0-1e-10)
         if T <= 623.15:
@@ -295,8 +335,27 @@ def test_iapws97_region_2_rho_coolprop():
             assert iapws97_identify_region_TP(T, P) == 2
             rho_implemented = iapws97_rho(T=T, P=P)
             rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
+#            try:
+            assert_close(rho_CoolProp, rho_implemented, rtol=2e-15)
+#            except:
+#                print([T, P, 1-rho_implemented/rho_CoolProp])
+
+
+@pytest.mark.CoolProp
+@pytest.mark.slow
+def test_iapws97_region_1_rho_coolprop():
+    from CoolProp.CoolProp import PropsSI
+    Ts = linspace(273.15+1e-10,  623.15-1e-10, 500)
+    def test_Ps(T, N):
+        Psat = Psat_IAPWS(T)*(1+1e-10)
+        return logspace(log10(Psat), log10(100e6), N)
+
+    for T in Ts:
+        for P in test_Ps(T, 500):
+            assert iapws97_identify_region_TP(T, P) == 1
+            rho_implemented = iapws97_rho(T=T, P=P)
+            rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
             try:
-                assert_close(rho_CoolProp, rho_implemented, rtol=2e-15)
+                assert_close(rho_CoolProp, rho_implemented, rtol=2e-13)
             except:
                 print([T, P, 1-rho_implemented/rho_CoolProp])
-test_iapws97_region_2_rho_coolprop()

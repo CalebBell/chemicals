@@ -27,7 +27,6 @@ from math import exp, log, sqrt
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
 
 __all__ = ['iapws97_dG_dpi_region1', 'iapws97_dGr_dpi_region2', 'iapws97_dGr_dpi_region5',
-           
            'iapws97_boundary_2_3', 'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
            'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
            'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
@@ -220,35 +219,37 @@ def iapws97_dG_dpi_region1(tau, pi):
     taut = tau - 1.222
     pit2 = pit*pit
     pit3 = pit2*pit
-    pit13 = pit3*pit3
-    pit13 *= pit13*pit
-    taut2 = taut*taut
-    taut3 = taut2*taut
-    taut4 = taut2*taut2
-    taut8 = taut4*taut4
+    pit7 = pit3*pit3*pit
+    pit14 = pit7*pit7
+    taut3 = taut*taut*taut
+    taut6 = taut3*taut3
+    taut10 = taut6*taut3*taut
     taut_inv = 1.0/taut
     taut_inv2 = taut_inv*taut_inv
-    taut_inv3 = taut_inv2*taut_inv
     taut_inv4 = taut_inv2*taut_inv2
-    taut_inv8 = taut_inv4*taut_inv4
-    taut_inv32 = taut_inv8*taut_inv8
-    taut_inv32 *= taut_inv32
-    
-    return (pit*(pit*(pit*(pit*(pit3*(pit13*(pit2*(pit3*pit3*(pit*(pit*(
-            taut_inv32*taut_inv8*(2.99318679335865594e-24*pit*taut_inv - 5.65070932023524029e-23))
-    + 3.58428679202129995e-22*taut_inv32*taut_inv8*taut) 
-    - 7.6373766822105502e-22*taut_inv32*taut_inv3*taut_inv3) - 3.33001080055983015e-19*taut_inv32*taut)
-    + 1.44400475720615078e-17*taut_inv32*taut_inv3) + 1.0*(1.39398969845072005e-9*taut4*taut
-    + 1.01874413933127995e-8)*taut_inv8*taut_inv3) + 2.02584984300584983e-6*taut_inv8) 
-    + 1.0*(taut3*(5.73669197516959969e-13*taut8*taut4 + 2.60684891582404009e-6)
-    + 8.97011276319999943e-6)*taut_inv4*taut_inv) + (taut4*(2.55615384360309023e-9*taut4*taut2 
-    + 8.48123939559359992e-6) + 0.0000950389345351620047)*taut_inv4)
-    + (taut3*(1.45389992595188003e-15*taut8*taut8*taut + 8.82836906616919934e-6*taut3
-   - 0.0000953227878139740028*taut + 0.000600035615860519981)
-   + 0.000943686421465339954)*taut_inv3) + (0.0000528383579699300023*taut8*taut4
-   + taut8*((0.0218417171754139994*taut + 0.0325297487705049973)*taut + 0.0189900682184190005)
-   + 0.000607063015658739955*taut2 - 0.000283190801238040004)*taut_inv8*taut_inv)
-
+    taut_inv5 = taut_inv4*taut_inv
+    taut_inv7 = taut_inv5*taut_inv2
+    taut_inv17 = taut_inv5*taut_inv5*taut_inv7
+    pit14taut_inv17 = taut_inv17*pit14
+    return (pit*(-0.0000953227878139740028*taut + 0.000600035615860519981 + 8.82836906616919934e-6*(taut3) 
+            + 0.000943686421465339954*(taut_inv2*taut_inv) + 1.45389992595188003e-15*(taut10*taut6*taut))
+            + 0.0218417171754139994*taut + 0.0189900682184190005*taut_inv + 0.0325297487705049973 
+            + pit2*(8.48123939559359992e-6 + 0.0000950389345351620047*(taut_inv4) +
+            2.55615384360309023e-9*(taut6)) + 2.60684891582404009e-6*(pit3)*(taut_inv2)
+            + 8.97011276319999943e-6*(pit3)*(taut_inv5) + 5.73669197516959969e-13*(pit3)*(taut10) 
+            + 0.0000528383579699300023*(taut3) 
+            + 1.39398969845072005e-9*(pit7)*(taut_inv5*taut_inv) 
+            + taut_inv7*(2.02584984300584983e-6*(pit3*pit)*taut_inv
+            + 1.01874413933127995e-8*(pit7)*(taut_inv4) 
+            + 0.000607063015658739955 - 0.000283190801238040004*taut_inv2)
+            
+            + pit14taut_inv17*(1.44400475720615078e-17*(pit3*pit3)*(taut_inv7*taut_inv5)
+            - 3.33001080055983015e-19*pit7*pit*taut_inv7*taut_inv7
+            + pit14taut_inv17*(3.58428679202129995e-22*(pit)*(taut_inv5)
+            - 7.6373766822105502e-22*taut_inv4 
+            - 5.65070932023524029e-23*pit2*taut_inv5*taut_inv 
+            + 2.99318679335865594e-24*(pit3)*(taut_inv7))))
+#
 
 def iapws97_dGr_dpi_region2(tau, pi):
     r'''Calculates dGr_dpi for region 2.
@@ -277,64 +278,42 @@ def iapws97_dGr_dpi_region2(tau, pi):
     '''
     taut = tau - 0.5
     pi2 = pi*pi
+    pi3 = pi*pi2
+    pi4 = pi*pi3
+    pi5 = pi2*pi3
+    pi6 = pi3*pi3
+    pi7 = pi6*pi
+    pi9 = pi7*pi2
+    pi15 = pi9*pi6
+    pi19 = pi9*pi9*pi
+    pi23 = pi9*pi9*pi5
     taut2 = taut*taut
     taut3 = taut*taut2
     taut4 = taut2*taut2
-    taut6 = taut4*taut2
-    taut8 = taut4*taut4
-    taut13 = taut6*taut4*taut3
-    taut21 = taut13*taut8
-    taut29 = taut21*taut8
-    # 53 from 13*13*!3*!3*3
-    # 57 from 
-    return (pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi2*pi2*pi2*(pi2*(pi2
-        *(pi*(pi*(pi*(pi*taut13*taut13*(taut13*taut*(1.32995316841867198e-15 - 0.0000226487297378903988*taut13*taut4*taut)
-        + 1.75410265428146418e-27) - 2.93678005497663003e-14*taut29*taut8*taut2) + 0.0000832192847496054092*taut*taut21*taut29*taut3)
-    - 1.24017662339841913e-24*taut21) + taut8*taut8*taut4*(taut13*taut2*(6.1258633752463995e-12
-    - 0.0000840049353964159951*taut13) + 1.78371690710842005e-23)) - 6.05920510335077989*taut21*taut21*taut13*taut2) 
-    + taut29*(1.71088510070543998*taut21 - 1.29412653835175996e-9)) + taut4*(taut6
-    *(-1.00181793795109993e-8*taut4 - 1.02347470959289996e-12) + 1.04069652101739995e-18))
-    + 1.78287415218792009e-7*taut13) + taut4*taut4*(9.00496908836719986e-11 - 65.8490727183984035*taut13*taut13*taut2))
-    + taut6*taut4*taut*(-0.27262789705017304*taut6*taut6*taut2 - 8.83526622937069987e-6) - 4.13416950269890026e-17)
-    + taut3*(taut13*(-143.374451604623999*taut13*taut6 - 0.012702883392812999) - 1.00288598706366e-10))
-    + 0.0000114610381688305001*taut6*taut) + taut*(taut*(1.92901490874028006e-6*taut + 5.11628714091400033e-8)
-    - 3.15389238237468004e-9)) + taut*(taut2*(taut3*(-0.122004760687946995*taut21*taut8 
-    - 0.00451017736264439952) - 0.0000968330317157100001) + 1.31612001853305008e-6) + 6.14452130769269999e-8)
-    + taut*(taut*(taut2*(taut3*(-0.0000533490958281740028*taut21*taut8 - 0.0875945913011459965) 
-    - 0.00787855544867100029) - 0.000378979750326299998) - 0.000066065283340406)) 
-    + taut*(taut*(taut*(-0.0503252787279300021*taut3 - 0.0575812590834320001) - 0.0459960136963650026) 
-    - 0.0178348622923579989) - 0.00177317424732129992)
-
-def iapws97_dGr_dpi_region2 (tau, pi):
-    taut = tau - 0.5
-    pi2 = pi**2
-    pi6 = pi**6
-    taut2 = taut**2
-    taut3 = taut**3
-    taut6 = taut**6
-    taut4 = taut**4
-    taut7 = taut**7
-    taut36 = taut**36
-    pi3 = pi**3
-    taut35 = taut**35
-    pi5 = pi**5
-    pi7 = pi**7
-    pi9 = pi**9
-    pi15 = pi**15
-    pi19 = pi**19
-    pi23 = pi**23
-    return (-2.93678005497663003e-14*pi**22*taut**39 + 0.0000832192847496054092*pi**21*taut**53 
-            - 1.24017662339841913e-24*pi**20*taut**21 - 6.05920510335077989*pi**17*taut**57 
-            + 1.78287415218792009e-7*pi**8*taut**13 + 0.0000114610381688305001*pi**4*taut7
+    taut6 = taut3*taut3
+    taut7 = taut*taut6
+    taut10 = taut4*taut6
+    taut20 = taut10*taut10
+    taut35 = taut20*taut10*taut3*taut2
+    taut36 = taut*taut35
+    taut50 = taut35*taut10*taut2*taut3
+    return (pi19*(-2.93678005497663003e-14*pi3*taut35*taut4 + 0.0000832192847496054092*pi2*taut36*taut10*taut7 
+            - 1.24017662339841913e-24*pi*taut10*taut10*taut) - 6.05920510335077989*pi15*pi2*taut50*taut7
+            + pi4*taut7*(1.78287415218792009e-7*pi4*taut6 + 0.0000114610381688305001)
             - 0.000066065283340406*pi*taut - 0.000378979750326299998*pi*taut2
             - 0.00787855544867100029*pi*taut4 - 0.0875945913011459965*pi*taut7
-            - 0.0000533490958281740028*pi*taut36 - 0.0000226487297378903988*taut**58*pi23
-            + 1.71088510070543998*taut**50*pi15 - 0.0000840049353964159951*taut**48*pi19
-            + 1.32995316841867198e-15*taut**40*pi23 - 1.29412653835175996e-9*taut**29*pi15
-            + 1.75410265428146418e-27*taut**26*pi23 - 0.27262789705017304*taut**25*pi6
-            + 1.78371690710842005e-23*taut**20*pi19 - 0.012702883392812999*taut**16*pi5
-            - 1.00181793795109993e-8*taut**14*pi9 - 8.83526622937069987e-6*taut**11*pi6
-            - 1.02347470959289996e-12*taut**10*pi9 + 9.00496908836719986e-11*taut**8*pi7
+            - 0.0000533490958281740028*pi*taut36 
+            + taut10*(taut20*taut10*(taut10*(1.71088510070543998*pi15 
+                            - 0.0000226487297378903988*taut4*taut4*pi23)
+                      - 0.0000840049353964159951*taut4*taut4*pi19)
+            # Cannot factor out taut here due to numerical issues
+            + taut10*(1.32995316841867198e-15*taut20*pi23 - 1.29412653835175996e-9*taut7*taut2*pi15
+                      + 1.78371690710842005e-23*pi19 + 1.75410265428146418e-27*taut6*pi23
+                      - 0.27262789705017304*taut4*taut*pi6)
+             
+             - 0.012702883392812999*taut6*pi5
+            - 1.00181793795109993e-8*taut4*pi9 - 8.83526622937069987e-6*taut*pi6
+            - 1.02347470959289996e-12*pi9) + 9.00496908836719986e-11*taut4*taut4*pi7
             + 1.31612001853305008e-6*taut*pi2 - 3.15389238237468004e-9*taut*pi3
             - 0.0178348622923579989*taut - 0.0000968330317157100001*pi2*taut3
             - 0.00451017736264439952*pi2*taut6 - 0.122004760687946995*pi2*taut35
@@ -1240,7 +1219,7 @@ def iapws97_rho(T, P):
     >>> iapws97_rho(648.6, 22.5e6)
     353.06081088726
     >>> iapws97_rho(330.0, 8e5)
-    985.1049808079207
+    985.10498080770
     >>> iapws97_rho(823, 14e6)
     40.39293607288123
     >>> iapws97_rho(2000, 3e7)
