@@ -296,6 +296,7 @@ def test_iapws97_region_2_rho_coolprop():
             rho_implemented = iapws97_rho(T=T, P=P)
             rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
             try:
-                assert_close(rho_CoolProp, rho_implemented, rtol=2e-10)
+                assert_close(rho_CoolProp, rho_implemented, rtol=2e-15)
             except:
                 print([T, P, 1-rho_implemented/rho_CoolProp])
+test_iapws97_region_2_rho_coolprop()
