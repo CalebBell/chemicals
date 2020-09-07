@@ -55,7 +55,7 @@ setup(
   name = 'chemicals',
   packages = ['chemicals'],
   license='MIT',
-  version = '0.1.3',
+  version = '0.1.4',
   description = 'Chemical properties component of Chemical Engineering Design Library (ChEDL)',
   author = 'Caleb Bell',
   install_requires=['fluids>=0.1.80', 'scipy', 'pandas'],
