@@ -26,7 +26,7 @@ from __future__ import division
 from math import exp, log, sqrt
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
 
-__all__ = ['iapws97_dG_dpi_region1', 'iapws97_dGr_dpi_region2', 'iapws97_dGr_dpi_region5',
+__all__ = ['iapws97_dGr_dpi_region2', 'iapws97_dGr_dpi_region5',
            'iapws97_boundary_2_3', 'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
            'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
            'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
@@ -36,6 +36,9 @@ __all__ = ['iapws97_dG_dpi_region1', 'iapws97_dGr_dpi_region2', 'iapws97_dGr_dpi
            'iapws97_rho',
            
            'iapws95_d2A_d2deltar', 'iapws95_dA_ddeltar',
+           
+           
+           'iapws97_G_region1', 'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
            ]
 
 __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c', 
@@ -191,6 +194,45 @@ def iapws97_boundary_3op(logP_MPa, logP_MPa_inv):
 
 
 ### Fast dG_dpi and dGr_dpi for density calls
+def iapws97_G_region1(tau, pi):
+    pit = 7.1 - pi
+    taut = tau - 1.222
+    taut_inv = 1.0/taut
+    
+    pit2 = pit*pit
+    pit4 = pit2*pit2
+    taut_inv2 = pit4*pit4 # abuse taut_inv2 variable as a temporary
+    pit21 = taut_inv2*taut_inv2*pit4*pit
+    pit29 = pit21*taut_inv2
+    
+    taut_inv2 = taut*taut # abuse taut_inv2 variable as a temporary
+    taut3 = taut_inv2*taut
+    taut5 = taut_inv2*taut3
+    
+    taut_inv2 = taut_inv*taut_inv
+    taut_inv3 = taut_inv2*taut_inv
+    taut_inv9 = taut_inv3*taut_inv3*taut_inv3
+    taut_inv29 = taut_inv9*taut_inv9*taut_inv9*taut_inv2
+    return (-0.02184171717541399937*pit*taut - 0.01899006821841900047*pit*taut_inv 
+            - 0.0325297487705049973*pit - 0.00005283835796993000233*pit*taut3 
+            - 0.000607063015658739955*pit*taut_inv3*taut_inv3*taut_inv 
+            + 0.0002831908012380400042*pit*taut_inv9 + 3.385516916838500201*taut
+            + 0.00004766139390698700138*taut*pit2 - 0.8454818716911399745*taut_inv
+            - 3.756360367204000017 - 0.0003000178079302599906*pit2
+            - 4.414184533084599669e-6*pit2*taut3 - 0.0004718432107326699771*pit2*taut_inv3 
+            - 7.269499629759400146e-16*pit2*taut5*taut5*taut5*taut*taut 
+            - 0.9579196338787200338*taut*taut + 0.1463297121316700089*taut_inv2 
+            - 2.827079798531199973e-6*pit2*pit - 0.00003167964484505400157*pit2*pit*taut_inv3*taut_inv 
+            - 8.520512812010300437e-10*pit2*pit*taut5*taut + 0.157720385132280011*taut3 
+            - 6.517122289560100218e-7*pit4*taut_inv2 - 2.242528190799999857e-6*pit4*taut_inv3*taut_inv2 
+            - 1.434172993792399922e-13*pit4*taut5*taut5 - 0.01661641719950100043*taut3*taut 
+            - 4.051699686011699983e-7*pit4*pit*taut_inv3*taut_inv3*taut_inv2 + 0.0008121462998356799657*taut5
+            - 1.742487123063400057e-10*pit4*pit4*taut_inv3*taut_inv3 - 1.273430174164099942e-9*pit4*pit4*taut_inv9*taut_inv2
+            - 6.876213129553099646e-19*pit21*taut_inv29 + 1.44783078285210013e-20*pit21*pit2*taut_inv29*taut_inv2 
+            + 2.633578166279499979e-23*pit29*taut_inv29*taut_inv9
+            - 1.194762264007099993e-23*pit29*pit*taut_inv29*taut_inv9*taut_inv 
+            + 1.822809458140400033e-24*pit29*pit2*taut_inv29*taut_inv9*taut_inv2
+            - 9.353708729245799802e-26*pit29*pit2*pit*taut_inv29*taut_inv9*taut_inv3)
 
 def iapws97_dG_dpi_region1(tau, pi):
     r'''Calculates dG_dpi for region 1.
@@ -251,7 +293,26 @@ def iapws97_dG_dpi_region1(tau, pi):
             - 7.6373766822105502e-22*taut_inv4 
             - 5.65070932023524029e-23*pit2*taut_inv5*taut_inv 
             + 2.99318679335865594e-24*(pit3)*(taut_inv7))))
-#
+
+def iapws97_d2G_dpi2_region1(tau, pi):
+    pit = 7.1 - pi
+    taut = tau - 1.222
+    taut_inv = 1.0/taut
+
+    pit2 = pit*pit
+    pit3 = pit2*pit
+    pit6 = pit2*pit2*pit2
+    pit15 = pit6*pit6*pit3
+    
+    taut2 = taut*taut
+    taut5 = taut2*taut2*taut
+    
+    taut_inv2 = taut_inv*taut_inv
+    taut_inv3 = taut_inv*taut_inv2
+    taut_inv8 = taut_inv3*taut_inv3*taut_inv2
+    taut_inv29 = taut_inv8*taut_inv8*taut_inv8*taut_inv3*taut_inv2
+    return (-0.00001696247879118719984*pit - 0.0001900778690703240094*pit*taut_inv3*taut_inv - 5.112307687206180469e-9*pit*taut5*taut + 0.00009532278781397400275*taut - 0.0006000356158605199813 - 7.820546747472120262e-6*pit2*taut_inv2 - 0.00002691033828959999829*pit2*taut_inv3*taut_inv2 - 1.721007592550879906e-12*pit2*taut5*taut5 - 8.103399372023399331e-6*pit2*pit*taut_inv8 - 8.828369066169199338e-6*taut2*taut - 0.0009436864214653399542*taut_inv3 - 9.757927889155040732e-9*pit6*taut_inv3*taut_inv3 - 7.131208975318960007e-8*pit6*taut_inv8*taut_inv3 - 1.453899925951880029e-15*taut5*taut5*taut5*taut2 - 2.888009514412301439e-16*pit15*pit2*pit2*taut_inv29 + 7.326023761231625652e-18*(pit15*pit6)*(taut_inv29*taut_inv2) + 2.138465471018954057e-20*(pit15*pit6*pit6)*(taut_inv29*taut_inv8*taut_inv) - 1.039443169686176943e-20*pit15*pit6*pit6*pit*taut_inv29*taut_inv8*taut_inv2 + 1.695212796070572203e-21*(pit15*pit6*pit6*pit2)*(taut_inv29*taut_inv8*taut_inv3) - 9.278879059411833807e-23*pit15*pit15*taut_inv29*taut_inv8*taut_inv3*taut_inv)
+
 
 def iapws97_dGr_dpi_region2(tau, pi):
     r'''Calculates dGr_dpi for region 2.

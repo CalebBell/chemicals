@@ -31,14 +31,150 @@ from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3
 from chemicals.vapor_pressure import Psat_IAPWS
 
 
+### IAPWS Region 1 tests
+nis1 = [0.14632971213167, -0.84548187169114, -0.37563603672040E1,
+       0.33855169168385E1, -0.95791963387872, 0.15772038513228,
+       -0.16616417199501E-1, 0.81214629983568E-3, 0.28319080123804E-3,
+       -0.60706301565874E-3, -0.18990068218419E-1, -0.32529748770505E-1,
+       -0.21841717175414E-1, -0.52838357969930E-4, -0.47184321073267E-3,
+       -0.30001780793026E-3, 0.47661393906987E-4, -0.44141845330846E-5,
+       -0.72694996297594E-15, -0.31679644845054E-4, -0.28270797985312E-5,
+       -0.85205128120103E-9, -0.22425281908000E-5, -0.65171222895601E-6,
+       -0.14341729937924E-12, -0.40516996860117E-6, -0.12734301741641E-8,
+       -0.17424871230634E-9, -0.68762131295531E-18, 0.14478307828521E-19,
+       0.26335781662795E-22, -0.11947622640071E-22, 0.18228094581404E-23,
+       -0.93537087292458E-25]
+lis1 = [0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1., 1., 1., 2., 2., 2., 2., 2., 3., 3., 3., 4., 4., 4., 5., 8., 8., 21., 23., 29., 30., 31., 32.]
+lis1 = [int(i) for i in lis1]
+Jis1 = [-2., -1., 0., 1., 2., 3., 4., 5., -9., -7., -1., 0., 1., 3., -3., 0., 1., 3., 17., -4., 0., 6., -5., -2., 10., -8., -11., -6., -29., -31., -38., -39., -40., -41.]
+Jis1 = [int(i) for i in Jis1]
+
+
+def iapws97_G_region1_naive(tau, pi):
+    return sum([nis1[i]*(7.1-pi)**lis1[i]*(tau-1.222)**Jis1[i] for i in range(34)])
+
+def iapws97_dG_dpi_region1_naive(tau, pi):
+    return sum([-nis1[i]*lis1[i]*(7.1-pi)**(lis1[i]-1)*(tau-1.222)**Jis1[i] for i in range(34)])
+
+def iapws97_d2G_d2pi_region1_naive(tau, pi):
+    return sum([nis1[i]*lis1[i]*(lis1[i]-1)*(7.1-pi)**(lis1[i]-2)*(tau-1.222)**Jis1[i] for i in range(34)])
+
+def iapws97_dG_dtau_region1_naive(tau, pi):
+    return sum([nis1[i]*Jis1[i]*(7.1-pi)**lis1[i]*(tau-1.222)**(Jis1[i]-1) for i in range(34)])
+
+def iapws97_d2G_d2tau_region1_naive(tau, pi):
+    return sum([nis1[i]*Jis1[i]*(Jis1[i]-1)*(7.1-pi)**lis1[i]*(tau-1.222)**(Jis1[i]-2) for i in range(34)])
+
+def iapws97_d2G_dpidtau_region1_naive(tau, pi):
+    return sum([-nis1[i]*Jis1[i]*lis1[i]*(7.1-pi)**(lis1[i]-1)*(tau-1.222)**(Jis1[i]-1) for i in range(34)])
+
+
+# Section 2 - ideal gas part
+J0is2 = [0., 1., -5., -4., -3., -2., -1., 2., 3.]
+J0is2 = [int(i) for i in J0is2]
+
+def iapws97_G0_region2_naive(tau, pi):
+    return log(pi) + sum( [n0is2[i]*tau**J0is2[i] for i in range(9)] )
+
+#        self.G0 = log(pi) + sum( [n0is2[i]*tau**J0is2[i] for i in range(9)] )
+#        self.dG0_dpi = 1./pi
+#        self.ddG0_ddpi = -1/pi**2
+#        self.dG0_dtau = sum( [n0is2[i]*J0is2[i]*tau**(J0is2[i]-1) for i in range(9)] )
+#        self.ddG0_ddtau = sum( [n0is2[i]*J0is2[i]*(J0is2[i]-1)*tau**(J0is2[i]-2) for i in range(9)] )
+
+
+
+n0is2 = [-0.96927686500217E1, 0.10086655968018E2, -0.56087911283020E-2,
+        0.71452738081455E-1, -0.40710498223928, 0.14240819171444E1,
+        -0.43839511319450E1, -0.28408632460772, 0.21268463753307E-1]
+# Section 2 - residual part
+
+lis2 = [1., 1., 1., 1., 1., 2., 2., 2., 2., 2., 3., 3., 3., 3., 3., 4., 4., 4.,
+        5., 6., 6., 6., 7., 7., 7., 8., 8., 9., 10., 10., 10., 16., 16., 18.,
+        20., 20., 20., 21., 22., 23., 24., 24., 24.]
+lis2 = [int(i) for i in lis2]
+Jis2 = [0., 1., 2., 3., 6., 1., 2., 4., 7., 36., 0., 1., 3., 6., 35., 1., 2.,
+        3., 7., 3., 16., 35., 0., 11., 25., 8., 36., 13., 4., 10., 14., 29.,
+        50., 57., 20., 35., 48., 21., 53., 39., 26., 40., 58.]
+Jis2 = [int(i) for i in Jis2]
+nis2 = [-0.17731742473213E-2, -0.17834862292358E-1, -0.45996013696365E-1,
+        -0.57581259083432E-1, -0.50325278727930E-1, -0.33032641670203E-4,
+        -0.18948987516315E-3, -0.39392777243355E-2, -0.43797295650573E-1,
+        -0.26674547914087E-4, 0.20481737692309E-7, 0.43870667284435E-6,
+        -0.32277677238570E-4, -0.15033924542148E-2, -0.40668253562649E-1,
+        -0.78847309559367E-9, 0.12790717852285E-7, 0.48225372718507E-6,
+        0.22922076337661E-5, -0.16714766451061E-10, -0.21171472321355E-2,
+        -0.23895741934104E2, -0.59059564324270E-17, -0.12621808899101E-5,
+        -0.38946842435739E-1, 0.11256211360459E-10, -0.82311340897998E1,
+        0.19809712802088E-7, 0.10406965210174E-18, -0.10234747095929E-12,
+        -0.10018179379511E-8, -0.80882908646985E-10, 0.10693031879409,
+        -0.33662250574171, 0.89185845355421E-24, 0.30629316876232E-12,
+        -0.42002467698208E-5, -0.59056029685639E-25, 0.37826947613457E-5,
+        -0.12768608934681E-14, 0.73087610595061E-28, 0.55414715350778E-16,
+        -0.94369707241210E-6]
+
+def iapws97_Gr_region2_naive(tau, pi):
+    return sum([nis2[i]*pi**lis2[i]*(tau-0.5)**Jis2[i] for i in range(43)])
+
+def iapws97_dGr_dpi_region2_naive(tau, pi):
+    return sum([nis2[i]*lis2[i]*pi**(lis2[i]-1)*(tau-0.5)**Jis2[i] for i in range(43)])
+
+def iapws97_ddGr_ddpi_region2_naive(tau, pi):
+    return sum([nis2[i]*lis2[i]*(lis2[i]-1)*pi**(lis2[i]-2)*(tau-0.5)**Jis2[i] for i in range(43)])
+
+def iapws97_dGr_dtau_region2_naive(tau, pi):
+    return sum([nis2[i]*pi**lis2[i]*Jis2[i]*(tau-0.5)**(Jis2[i]-1) for i in range(43)])
+
+def iapws97_ddGr_ddtau_region2_naive(tau, pi):
+    return sum([nis2[i]*pi**lis2[i]*Jis2[i]*(Jis2[i]-1)*(tau-0.5)**(Jis2[i]-2) for i in range(43)])
+
+def iapws97_ddGr_dpi_dtau_region2_naive(tau, pi):
+    return sum([nis2[i]*lis2[i]*pi**(lis2[i]-1)*Jis2[i]*(tau-0.5)**(Jis2[i]-1) for i in range(43)])
+
+
+
 def test_iapws97_dG_dpi_region1():
+    assert_close(iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6),
+                 iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6), rtol=1e-14)
+    
     assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
                  0.12923271825448354, rtol=1e-14)
     
     # Point that had bad error with horner's method
     assert_close(iapws97_dG_dpi_region1(1386 / 600.15, 10001325 / 16.53E6),
                  0.09345587583404263, rtol=1e-14)
+    assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
+                 iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6), rtol=1e-14)
 
+@pytest.mark.slow
+def test_iapws97_dG_dpi_region1_fuzz():
+    funcs_naive = [iapws97_dG_dpi_region1_naive, iapws97_G_region1_naive, iapws97_d2G_d2pi_region1_naive]
+    funcs_fast = [iapws97_dG_dpi_region1, iapws97_G_region1, iapws97_d2G_dpi2_region1]
+    atols = [0, 1e-14, 0]
+    rtols = [2e-13, 1e-12, 3e-12]
+
+    funcs_naive = [iapws97_G_region1_naive]
+    funcs_fast = [iapws97_G_region1]
+    atols = [1e-14]
+    rtols = [1e-12]
+    
+    N = 500
+    Ts = linspace(273.15, 623.15, N)
+    def test_Ps(T, N):
+        Psat = Psat_IAPWS(T)
+        return logspace(log10(Psat), log10(100e6), N)
+    
+    for naive, fast, rtol, atol in zip(funcs_naive, funcs_fast, rtols, atols):
+        for T in Ts:
+            tau = 1386.0/T
+            for P in test_Ps(T, N):
+                pi = P/16.53E6
+                assert_close(naive(tau, pi),
+#                             fast(tau, pi), rtol=1e-13)
+                             fast(tau, pi), rtol=rtol, atol=atol)
+
+
+test_iapws97_dG_dpi_region1_fuzz()
 
 def test_iapws97_dG_dpi_region2():
     assert_close(iapws97_dGr_dpi_region2(.656, 16), -0.006292631931275252, rtol=1e-14)
