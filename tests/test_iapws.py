@@ -153,12 +153,12 @@ def test_iapws97_dG_dpi_region1_fuzz():
     atols = [0, 1e-14, 0]
     rtols = [2e-13, 1e-12, 3e-12]
 
-    funcs_naive = [iapws97_G_region1_naive]
-    funcs_fast = [iapws97_G_region1]
-    atols = [1e-14]
-    rtols = [1e-12]
+    funcs_naive = [iapws97_d2G_d2pi_region1_naive]
+    funcs_fast = [iapws97_d2G_dpi2_region1]
+    atols = [0]
+    rtols = [3e-12]
     
-    N = 500
+    N = 1000
     Ts = linspace(273.15, 623.15, N)
     def test_Ps(T, N):
         Psat = Psat_IAPWS(T)
@@ -170,11 +170,10 @@ def test_iapws97_dG_dpi_region1_fuzz():
             for P in test_Ps(T, N):
                 pi = P/16.53E6
                 assert_close(naive(tau, pi),
-#                             fast(tau, pi), rtol=1e-13)
                              fast(tau, pi), rtol=rtol, atol=atol)
 
 
-test_iapws97_dG_dpi_region1_fuzz()
+#test_iapws97_dG_dpi_region1_fuzz()
 
 def test_iapws97_dG_dpi_region2():
     assert_close(iapws97_dGr_dpi_region2(.656, 16), -0.006292631931275252, rtol=1e-14)
