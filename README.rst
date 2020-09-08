@@ -37,7 +37,8 @@ Key Features & Capabilities
 
 The chemicals library features an extensive compilation of pure component 
 chemical data that can serve engineers, scientists, technicians, and anyone 
-working with chemicals. The chemicals library facilitates the retrieval of:
+working with chemicals. The chemicals library facilitates the retrieval and 
+calculation of:
 
 - Chemical constants including formula, molecular weight, normal boiling and 
   melting points, triple point, heat of formation, absolute entropy of 
@@ -50,32 +51,29 @@ working with chemicals. The chemicals library facilitates the retrieval of:
   and pressure dependent chemical properties including vapor pressure, 
   heat capacity, molar volume, thermal conductivity, surface tension, dynamic 
   viscosity, heat of vaporization, relative permitivity, etc.
+  
+- Methods to solve thermodynamic phase equilibrium, including flash routines, 
+  vapor-liquid equilibrium constant correlations, and both numerical and 
+  analytical solutions for the Rashford Rice and Li-Johns-Ahmadi equations. 
+  Rashford Rice solutions for systems of 3 or more phases are also available.
 
 Data for over 20,000 chemicals are made available as local databanks in this 
 library. All databanks are loaded on-demand, saving loading time and RAM. For
 example, if only data on the normal boiling point is required, the chemicals 
 library will only load normal boiling point datasets. This on-demand loading 
 feature makes the chemicals library an attractive dependence for software
-modeling chemical processes. In fact, `The Biorefinery Simulation and Techno-Economic Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
+modeling chemical processes. In fact, `The Biorefinery Simulation and Techno-Economic 
+Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
 is reliant on the chemicals library for the simulation of unit operations.
 
+The chemicals library also supports integration with 
+`Numba <https://numba.pydata.org/>`_, a powerful accelerator that works 
+well with NumPy; `Pint <https://pint.readthedocs.io/en/stable/>`_ Quantity 
+objects to keep track of units of measure; and 
+`NumPy <https://numpy.org/doc/stable/reference/generated/numpy.vectorize.html>`_ 
+vectorized functions. 
+
 If you need to know something about a chemical, give chemicals a try.
-
-# TODO: 
-
-# Do we want to keep the title of this section?
-
-# Should we prioritize a logo for ChEDL and have it in all libraries?
-
-# Note how thermo is reliant on the chemicals library too
-
-# Note on flash capabilities?
-
-# Note on numba?
-
-# Note on pint?
-
-# Once we do finish working on the README, we should update the docs/index.rst file
 
 Installation
 ------------
@@ -160,6 +158,7 @@ To view all available methods for a given chemical, just use the functions with
 
 .. code-block:: python
     
+    >>> from chemicals import Tb_methods
     >>> Tb_methods(CAS_water)
     ['CRC_INORG', 'YAWS']
 
@@ -186,8 +185,8 @@ An extensive set of functions for calculating all sorts of chemical properties
 are available along with their respective coefficients for a wide range of chemicals:
 
 >>> from chemicals import Antoine
->>> from chemicals.vapor_pressure import AntoinePoling
->>> antoine_coefficients = AntoinePoling.loc[CAS_water] # For calculating saturated vapor pressure 
+>>> from chemicals.vapor_pressure import Psat_data_AntoinePoling
+>>> antoine_coefficients = Psat_data_AntoinePoling.loc[CAS_water] # For calculating saturated vapor pressure 
 >>> antoine_coefficients
 Chemical     water 
 A              10.1
@@ -201,16 +200,31 @@ Name: 7732-18-5, dtype: object
 >>> Antoine(T, A, B, C) # Vapor pressure [Pa]
 101047.25357066597
 
+To use JIT compiled functions, import the `numba` module:
+
+>>> from chemicals import numba
+>>> numba.Antoine(T, A, B, C)
+101047.25357066603
+
+To use Quantity objects, import the `units` module: 
+
+>>> from chemicals import units
+>>> from chemicals.units import u
+>>> units.Antoine(T * u.K, A, B * u.K, C * u.K)
+101047.25357 pascal
+
+To use vectorized functions, import the `vectorized` module:
+
+>>> from chemicals import vectorized
+>>> vectorized.Antoine([300, 350], A, B, C)
+array([ 3546.98, 41603.98 ])
+
 Roadmap
 -------
 
 The authors' main development item is to provide the latest methods
 for the calculation of chemical properties (both thermodynamic and transport) 
 and extending the local databank.
-
-# TODO: Do we want to mention phase equilibrium and flash algorithms?
-
-# Should we move this to the Developer's guide?
 
 Latest source code
 ------------------
@@ -241,8 +255,6 @@ any changes you make back, and benefit the community.
 
 Citation
 --------
-
-# TODO: Do we want to keep this name and change thermo's description?
 
 To cite chemicals in publications use:
 
