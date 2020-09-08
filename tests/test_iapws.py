@@ -148,17 +148,20 @@ def test_iapws97_dG_dpi_region1():
 
 @pytest.mark.slow
 def test_iapws97_dG_dpi_region1_fuzz():
-    funcs_naive = [iapws97_dG_dpi_region1_naive, iapws97_G_region1_naive, iapws97_d2G_d2pi_region1_naive]
-    funcs_fast = [iapws97_dG_dpi_region1, iapws97_G_region1, iapws97_d2G_dpi2_region1]
-    atols = [0, 1e-14, 0]
-    rtols = [2e-13, 1e-12, 3e-12]
+    funcs_naive = [iapws97_dG_dpi_region1_naive, iapws97_G_region1_naive, iapws97_d2G_d2pi_region1_naive,
+                   iapws97_dG_dtau_region1_naive, iapws97_d2G_d2tau_region1_naive, iapws97_d2G_dpidtau_region1_naive]
+    funcs_fast = [iapws97_dG_dpi_region1, iapws97_G_region1, iapws97_d2G_dpi2_region1,
+                  iapws97_dG_dtau_region1, iapws97_d2G_d2tau_region1, iapws97_d2G_dpidtau_region1]
+    atols = [0, 1e-14, 0, 3e-15, 0.0, 1e-16]
+    rtols = [2e-13, 1e-12, 3e-12, 1e-13, 1e-12, 2e-12]
 
-    funcs_naive = [iapws97_d2G_d2pi_region1_naive]
-    funcs_fast = [iapws97_d2G_dpi2_region1]
-    atols = [0]
-    rtols = [3e-12]
+    # for testing faster
+#    funcs_naive = [iapws97_d2G_dpidtau_region1_naive]
+#    funcs_fast = [iapws97_d2G_dpidtau_region1]
+#    atols = [1e-16]
+#    rtols = [2e-12]
     
-    N = 1000
+    N = 500
     Ts = linspace(273.15, 623.15, N)
     def test_Ps(T, N):
         Psat = Psat_IAPWS(T)

@@ -39,6 +39,7 @@ __all__ = ['iapws97_dGr_dpi_region2', 'iapws97_dGr_dpi_region5',
            
            
            'iapws97_G_region1', 'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
+           'iapws97_dG_dtau_region1', 'iapws97_d2G_d2tau_region1', 'iapws97_d2G_dpidtau_region1',
            ]
 
 __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c', 
@@ -341,6 +342,103 @@ def iapws97_d2G_dpi2_region1(tau, pi):
             - 1.039443169686176943e-20*pit27*pit*taut_inv38*taut_inv
             + 1.695212796070572203e-21*pit27*pit2*taut_inv38*taut_inv2 
             - 9.278879059411833807e-23*pit27*pit3*taut_inv38*taut_inv3)
+
+
+def iapws97_dG_dtau_region1(tau, pi):
+    pit = 7.1 - pi
+    taut = tau - 1.222
+    taut_inv = 1.0/taut
+    
+    pit2 = pit*pit
+    pit4 = pit2*pit2
+    tmp = pit4*pit4 # 8
+    pit21 = tmp*tmp*pit4*pit # 20
+    pit29 = pit21*tmp
+    
+    taut2 = taut*taut
+    taut4 = taut2*taut2
+    
+    taut_inv2 = taut_inv*taut_inv
+    taut_inv3 = taut_inv2*taut_inv
+    tmp = taut_inv3*taut_inv3 # 6
+    taut_inv9 = tmp*taut_inv3
+    taut_inv30 = taut_inv9*tmp # 15
+    taut_inv30 *= taut_inv30
+    return (-0.02184171717541399937*pit - 0.0001585150739097900138*pit*taut2 +
+            0.01899006821841900047*pit*taut_inv2 + 0.004249441109611180011*pit*taut_inv3*taut_inv3*taut_inv2
+            - 0.002548717211142359929*pit*taut_inv9*taut_inv - 1.915839267757440068*taut
+            + 3.385516916838500201 + 0.00004766139390698700138*pit2 - 0.00001324255359925379985*pit2*taut2 
+            + 0.001415529632198009877*pit2*taut_inv3*taut_inv 
+            - 1.235814937059098064e-14*pit2*taut4*taut4*taut4*taut4 + 0.4731611553968400052*taut2 
+            + 0.8454818716911399745*taut_inv2 - 5.112307687206180469e-9*pit2*pit*taut4*taut
+            + 0.0001267185793802160063*pit2*pit*taut_inv3*taut_inv2 - 0.06646566879800400174*taut2*taut
+            - 0.2926594242633400178*taut_inv3 + 1.303424457912020044e-6*pit4*taut_inv3
+            + 0.00001121264095399999929*pit4*taut_inv3*taut_inv3 - 1.434172993792399922e-12*pit4*taut4*taut4*taut 
+            + 0.00406073149917839972*taut4 + 3.241359748809359987e-6*pit4*pit*taut_inv9 
+            + 1.045492273838040137e-9*pit4*pit4*taut_inv3*taut_inv3*taut_inv 
+            + 1.400773191580509978e-8*pit4*pit4*taut_inv9*taut_inv3 + 1.99410180757039883e-17*pit21*taut_inv30 
+            - 4.488275426841510012e-19*pit21*pit2*taut_inv30*taut_inv2 
+            - 1.000759703186210033e-21*pit29*taut_inv30*taut_inv9 
+            + 4.659572829627690075e-22*pit29*pit*taut_inv30*taut_inv9*taut_inv 
+            - 7.291237832561599838e-23*pit29*pit2*taut_inv30*taut_inv9*taut_inv2 
+            + 3.835020578990777884e-24*pit29*pit2*pit*taut_inv30*taut_inv9*taut_inv3)
+
+def iapws97_d2G_d2tau_region1(tau, pi):
+    pit = 7.1 - pi
+    taut = tau - 1.222
+    taut_inv = 1.0/taut
+    
+    pit2 = pit*pit
+    pit4 = pit2*pit2
+    taut_inv2 = pit4*pit4 # abuse taut_inv2 variable as a temporary
+    pit21 = taut_inv2*taut_inv2*pit4*pit
+    pit29 = pit21*taut_inv2
+    
+    taut2 = taut*taut
+    taut4 = taut2*taut2
+    
+    taut_inv2 = taut_inv*taut_inv
+    taut_inv4 = taut_inv2*taut_inv2
+    taut_inv9 = taut_inv4*taut_inv4*taut_inv
+    taut_inv31 = taut_inv9*taut_inv9*taut_inv9*taut_inv4
+    return (-0.0003170301478195800275*pit*taut - 0.03798013643683800095*pit*taut_inv2*taut_inv
+            - 0.03399552887688944008*pit*taut_inv9 + 0.02548717211142359843*pit*taut_inv9*taut_inv2
+            + 0.9463223107936800105*taut - 0.00002648510719850759971*taut*pit2 - 1.915839267757440068
+            - 0.005662118528792039508*pit2*taut_inv4*taut_inv
+            - 1.977303899294556903e-13*pit2*taut4*taut4*taut4*taut2*taut - 0.1993970063940120052*taut2
+            - 2.556153843603090152e-8*pit2*pit*taut4 - 0.0006335928969010799772*pit2*pit*taut_inv4*taut_inv2
+            + 0.01624292599671359888*taut2*taut - 1.690963743382279949*taut_inv2*taut_inv 
+            - 3.910273373736060131e-6*pit4*taut_inv4 - 0.00006727584572399999572*pit4*taut_inv4*taut_inv2*taut_inv 
+            - 1.29075569441316001e-11*pit4*taut4*taut4 + 0.8779782727900200534*taut_inv4 
+            - 0.0000291722377392842403*pit4*pit*taut_inv9*taut_inv - 7.318445916866280962e-9*pit4*pit4*taut_inv4*taut_inv4 
+            - 1.680927829896611973e-7*pit4*pit4*taut_inv9*taut_inv4 - 5.982305422711196613e-16*pit21*taut_inv31 
+            + 1.436248136589283204e-17*pit21*pit2*taut_inv31*taut_inv2 + 3.902962842426219073e-20*pit29*taut_inv31*taut_inv9
+            - 1.863829131851076105e-20*pit29*pit*taut_inv31*taut_inv9*taut_inv
+            + 2.989407511350256051e-21*pit29*pit2*taut_inv31*taut_inv9*taut_inv2 
+            - 1.610708643176126667e-22*pit29*pit2*pit*taut_inv31*taut_inv9*taut_inv2*taut_inv)
+
+def iapws97_d2G_dpidtau_region1(tau, pi):
+    pit = 7.1 - pi
+    taut = tau - 1.222
+    taut_inv = 1.0/taut
+    
+    pit2 = pit*pit
+    pit3 = pit2*pit
+    pit7 = pit3*pit3*pit
+    pit28 = pit7*pit7
+    pit28 *= pit28
+    
+    taut2 = taut*taut
+    taut8 = taut2*taut2
+    taut8 *= taut8
+    
+    taut_inv2 = taut_inv*taut_inv
+    taut_inv3 = taut_inv2*taut_inv
+    taut_inv30 = taut_inv3*taut_inv3 # 6 temporarily
+    taut_inv9 = taut_inv30*taut_inv3
+    taut_inv30 = taut_inv9*taut_inv30
+    taut_inv30 *= taut_inv30 # 30 finally
+    return (-0.00009532278781397400275*pit + 0.00002648510719850759971*pit*taut2 - 0.002831059264396019754*pit*taut_inv3*taut_inv + 2.471629874118196128e-14*pit*taut8*taut8 + 0.02184171717541399937 + 1.533692306161854223e-8*pit2*taut2*taut2*taut - 0.0003801557381406480188*pit2*taut_inv3*taut_inv2 + 0.0001585150739097900138*taut2 - 0.01899006821841900047*taut_inv2 - 5.213697831648080174e-6*pit3*taut_inv3 - 0.00004485056381599999715*pit3*taut_inv3*taut_inv3 + 5.736691975169599686e-12*pit3*taut8*taut - 0.00001620679874404679866*pit3*pit*taut_inv9 - 8.3639381907043211e-9*pit7*taut_inv3*taut_inv3*taut_inv - 1.120618553264407982e-7*pit7*taut_inv9*taut_inv3 - 0.004249441109611180011*taut_inv3*taut_inv3*taut_inv2 + 0.002548717211142359929*taut_inv9*taut_inv - 4.187613795897837728e-16*pit7*pit7*pit3*pit3*taut_inv30 + 1.03230334817354737e-17*pit7*pit7*pit7*pit*taut_inv30*taut_inv2 + 2.902203139240009378e-20*pit28*taut_inv30*taut_inv9 - 1.397871848888307079e-20*pit28*pit*taut_inv30*taut_inv9*taut_inv + 2.26028372809409602e-21*pit28*pit2*taut_inv30*taut_inv9*taut_inv2 - 1.227206585277048923e-22*pit28*pit3*taut_inv30*taut_inv9*taut_inv3)
 
 
 def iapws97_dGr_dpi_region2(tau, pi):
