@@ -158,7 +158,7 @@ def test_iapws97_dG_dpi_region1_fuzz():
     atols = [1e-14]
     rtols = [1e-12]
     
-    N = 500
+    N = 1000
     Ts = linspace(273.15, 623.15, N)
     def test_Ps(T, N):
         Psat = Psat_IAPWS(T)

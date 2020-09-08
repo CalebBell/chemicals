@@ -213,26 +213,30 @@ def iapws97_G_region1(tau, pi):
     taut_inv3 = taut_inv2*taut_inv
     taut_inv9 = taut_inv3*taut_inv3*taut_inv3
     taut_inv29 = taut_inv9*taut_inv9*taut_inv9*taut_inv2
-    return (-0.02184171717541399937*pit*taut - 0.01899006821841900047*pit*taut_inv 
-            - 0.0325297487705049973*pit - 0.00005283835796993000233*pit*taut3 
-            - 0.000607063015658739955*pit*taut_inv3*taut_inv3*taut_inv 
-            + 0.0002831908012380400042*pit*taut_inv9 + 3.385516916838500201*taut
+    return (pit*(-0.02184171717541399937*taut - 0.01899006821841900047*taut_inv 
+            - 0.0325297487705049973 - 0.00005283835796993000233*taut3 
+            - 0.000607063015658739955*taut_inv3*taut_inv3*taut_inv 
+            + 0.0002831908012380400042*taut_inv9) + 3.385516916838500201*taut
             + 0.00004766139390698700138*taut*pit2 - 0.8454818716911399745*taut_inv
-            - 3.756360367204000017 - 0.0003000178079302599906*pit2
-            - 4.414184533084599669e-6*pit2*taut3 - 0.0004718432107326699771*pit2*taut_inv3 
-            - 7.269499629759400146e-16*pit2*taut5*taut5*taut5*taut*taut 
+            - 3.756360367204000017
             - 0.9579196338787200338*taut*taut + 0.1463297121316700089*taut_inv2 
-            - 2.827079798531199973e-6*pit2*pit - 0.00003167964484505400157*pit2*pit*taut_inv3*taut_inv 
-            - 8.520512812010300437e-10*pit2*pit*taut5*taut + 0.157720385132280011*taut3 
+            + pit2*(-0.0003000178079302599906
+            - 4.414184533084599669e-6*taut3 - 0.0004718432107326699771*taut_inv3 
+            - 7.269499629759400146e-16*taut5*taut5*taut5*taut*taut 
+            - 2.827079798531199973e-6*pit - 0.00003167964484505400157*pit*taut_inv3*taut_inv 
+            - 8.520512812010300437e-10*pit*taut5*taut) + 0.157720385132280011*taut3 
+            + 0.0008121462998356799657*taut5
             - 6.517122289560100218e-7*pit4*taut_inv2 - 2.242528190799999857e-6*pit4*taut_inv3*taut_inv2 
             - 1.434172993792399922e-13*pit4*taut5*taut5 - 0.01661641719950100043*taut3*taut 
-            - 4.051699686011699983e-7*pit4*pit*taut_inv3*taut_inv3*taut_inv2 + 0.0008121462998356799657*taut5
+            - 4.051699686011699983e-7*pit4*pit*taut_inv3*taut_inv3*taut_inv2 
             - 1.742487123063400057e-10*pit4*pit4*taut_inv3*taut_inv3 - 1.273430174164099942e-9*pit4*pit4*taut_inv9*taut_inv2
-            - 6.876213129553099646e-19*pit21*taut_inv29 + 1.44783078285210013e-20*pit21*pit2*taut_inv29*taut_inv2 
-            + 2.633578166279499979e-23*pit29*taut_inv29*taut_inv9
-            - 1.194762264007099993e-23*pit29*pit*taut_inv29*taut_inv9*taut_inv 
-            + 1.822809458140400033e-24*pit29*pit2*taut_inv29*taut_inv9*taut_inv2
-            - 9.353708729245799802e-26*pit29*pit2*pit*taut_inv29*taut_inv9*taut_inv3)
+
+            + taut_inv29*(1.44783078285210013e-20*pit21*pit2*taut_inv2 
+            - 6.876213129553099646e-19*pit21 
+            + pit29*taut_inv9*(2.633578166279499979e-23
+            - 1.194762264007099993e-23*pit*taut_inv 
+            + 1.822809458140400033e-24*pit2*taut_inv2
+            - 9.353708729245799802e-26*pit2*pit*taut_inv3)))
 
 def iapws97_dG_dpi_region1(tau, pi):
     r'''Calculates dG_dpi for region 1.
