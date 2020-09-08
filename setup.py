@@ -66,7 +66,7 @@ setup(
   platforms=["Windows", "Linux", "Mac OS", "Unix"],
   author_email = 'Caleb.Andrew.Bell@gmail.com',
   url = 'https://github.com/CalebBell/chemicals',
-  download_url = 'https://github.com/CalebBell/chemicals/tarball/0.1.3',
+  download_url = 'https://github.com/CalebBell/chemicals/tarball/0.1.4',
   keywords = ['chemical engineering', 'chemistry', 'mechanical engineering', 
   'thermodynamics', 'databases', 'cheminformatics', 'engineering','viscosity',
   'density', 'heat capacity', 'thermal conductivity', 'surface tension', 
