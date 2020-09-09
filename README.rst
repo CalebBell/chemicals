@@ -85,17 +85,9 @@ If you have an installation of Python with pip, simple install it with:
 
     $ pip install chemicals
     
-Alternatively, if you are using `conda <https://conda.io/en/latest/>`_ as your 
-package management, you can install chemicals in your environment from 
-`conda-forge <https://conda-forge.org/>`_ channel with:
-
-    $ conda install -c conda-forge chemicals
-
 To get the git version, run:
 
     $ git clone git://github.com/CalebBell/chemicals.git
-
-# TODO: Add conda installation
 
 Documentation
 -------------
