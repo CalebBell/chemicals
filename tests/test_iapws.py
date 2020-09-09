@@ -31,7 +31,8 @@ from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3
 from chemicals.vapor_pressure import Psat_IAPWS
 
 
-### IAPWS Region 1 tests
+### IAPWS Naive Functions
+### Regoin 1
 nis1 = [0.14632971213167, -0.84548187169114, -0.37563603672040E1,
        0.33855169168385E1, -0.95791963387872, 0.15772038513228,
        -0.16616417199501E-1, 0.81214629983568E-3, 0.28319080123804E-3,
@@ -68,7 +69,7 @@ def iapws97_d2G_d2tau_region1_naive(tau, pi):
 def iapws97_d2G_dpidtau_region1_naive(tau, pi):
     return sum([-nis1[i]*Jis1[i]*lis1[i]*(7.1-pi)**(lis1[i]-1)*(tau-1.222)**(Jis1[i]-1) for i in range(34)])
 
-
+### Region 2
 # Section 2 - ideal gas part
 J0is2 = [0., 1., -5., -4., -3., -2., -1., 2., 3.]
 J0is2 = [int(i) for i in J0is2]
@@ -79,7 +80,7 @@ def iapws97_G0_region2_naive(tau, pi):
 def iapws97_dG0_dtau_region2_naive(tau, pi):
     return sum([n0is2[i]*J0is2[i]*tau**(J0is2[i]-1) for i in range(9)])
 
-def iapws97_ddG0_ddtau_region2_naive(tau, pi):
+def iapws97_d2G0_d2tau_region2_naive(tau, pi):
     return sum([n0is2[i]*J0is2[i]*(J0is2[i]-1)*tau**(J0is2[i]-2) for i in range(9)])
 
 n0is2 = [-0.96927686500217E1, 0.10086655968018E2, -0.56087911283020E-2,
@@ -129,7 +130,7 @@ def iapws97_d2Gr_d2tau_region2_naive(tau, pi):
 def iapws97_d2Gr_dpidtau_region2_naive(tau, pi):
     return sum([nis2[i]*lis2[i]*pi**(lis2[i]-1)*Jis2[i]*(tau-0.5)**(Jis2[i]-1) for i in range(43)])
 
-
+### Region 3
 # Section 3 - In terms of density
 lis3 = [None, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3,
         3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 8, 9, 9, 10, 10, 11]
@@ -168,6 +169,7 @@ def iapws97_d2A_d2tau_region3_naive(tau, delta):
 def iapws97_d2A_ddeltadtau_region3_naive(tau, delta):
     return (sum([nis3[i]*lis3[i]*Jis3[i]*delta**(lis3[i]-1)*tau**(Jis3[i]-1) for i in range(1, 40)]))
 
+### Region 5
 # Section 5 - ideal gas part
 J0is5 = [0., 1., -3., -2., -1., 2.]
 n0is5 = [-0.13179983674201E2, 0.68540841634434E1, -0.24805148933466E-1,
@@ -197,20 +199,10 @@ def iapws97_d2Gr_dpidtau_region5_naive(tau, pi):
     return sum( [nis5[i]*lis5[i]*pi**(lis5[i]-1)*Jis5[i]*tau**(Jis5[i]-1) for i in range(6)] )
 
 
-
-def test_iapws97_dG_dpi_region1():
-    assert_close(iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6),
-                 iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6), rtol=1e-14)
+### Fast equation fuzz tests
+# check that floating points are behaving nicely
+# The only two constants in this world are death and floating point error.
     
-    assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
-                 0.12923271825448354, rtol=1e-14)
-    
-    # Point that had bad error with horner's method
-    assert_close(iapws97_dG_dpi_region1(1386 / 600.15, 10001325 / 16.53E6),
-                 0.09345587583404263, rtol=1e-14)
-    assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
-                 iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6), rtol=1e-14)
-
 @pytest.mark.slow
 def test_iapws97_region1_fuzz():
     funcs_naive = [iapws97_dG_dpi_region1_naive, iapws97_G_region1_naive, iapws97_d2G_d2pi_region1_naive,
@@ -243,12 +235,12 @@ def test_iapws97_region1_fuzz():
 
 @pytest.mark.slow
 def test_iapws97_region2_fuzz():
-    funcs_naive = [iapws97_d2Gr_dpidtau_region2_naive, iapws97_d2Gr_d2tau_region2_naive, iapws97_dGr_dtau_region2_naive, iapws97_d2Gr_d2pi_region2_naive, iapws97_Gr_region2_naive, iapws97_dGr_dpi_region2_naive]
-    funcs_fast = [iapws97_d2Gr_dpidtau_region2, iapws97_d2Gr_d2tau_region2, iapws97_dGr_dtau_region2, iapws97_d2Gr_d2pi_region2, iapws97_Gr_region2, iapws97_dGr_dpi_region2]
-    atols = [0, 0, 0.0, 3e-18, 0, 0, ]
-    rtols = [2e-14, 2e-14, 2e-15, 1e-14, 2e-15, 2e-15]
+    funcs_naive = [iapws97_d2G0_d2tau_region2_naive, iapws97_dG0_dtau_region2_naive, iapws97_G0_region2_naive, iapws97_d2Gr_dpidtau_region2_naive, iapws97_d2Gr_d2tau_region2_naive, iapws97_dGr_dtau_region2_naive, iapws97_d2Gr_d2pi_region2_naive, iapws97_Gr_region2_naive, iapws97_dGr_dpi_region2_naive]
+    funcs_fast = [iapws97_d2G0_d2tau_region2, iapws97_dG0_dtau_region2, iapws97_G0_region2, iapws97_d2Gr_dpidtau_region2, iapws97_d2Gr_d2tau_region2, iapws97_dGr_dtau_region2, iapws97_d2Gr_d2pi_region2, iapws97_Gr_region2, iapws97_dGr_dpi_region2]
+    atols = [0, 0, 1e-14, 0, 0, 0.0, 3e-18, 0, 0, ]
+    rtols = [1e-14, 1e-14, 5e-15, 2e-14, 2e-14, 2e-15, 1e-14, 2e-15, 2e-15]
     
-    N = 500
+    N = 1000
     P_lim = 1e-6
     Ts = linspace(273.15, 1073.15, N)
     def test_Ps(T, N):
@@ -325,6 +317,21 @@ def test_iapws97_region5_fuzz():
                 assert_close(naive(tau, pi),
                              fast(tau, pi), rtol=rtol, atol=atol)
 test_iapws97_region5_fuzz()
+### Fast tests
+
+def test_iapws97_dG_dpi_region1():
+    assert_close(iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6),
+                 iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6), rtol=1e-14)
+    
+    assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
+                 0.12923271825448354, rtol=1e-14)
+    
+    # Point that had bad error with horner's method
+    assert_close(iapws97_dG_dpi_region1(1386 / 600.15, 10001325 / 16.53E6),
+                 0.09345587583404263, rtol=1e-14)
+    assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
+                 iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6), rtol=1e-14)
+
 
 def test_iapws97_dG_dpi_region2():
     assert_close(iapws97_dGr_dpi_region2(.656, 16), -0.006292631931275252, rtol=1e-14)

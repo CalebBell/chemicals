@@ -44,6 +44,8 @@ __all__ = ['iapws97_dGr_dpi_region5',
            'iapws97_Gr_region2', 'iapws97_dGr_dpi_region2', 'iapws97_d2Gr_d2pi_region2',
            'iapws97_dGr_dtau_region2', 'iapws97_d2Gr_d2tau_region2', 'iapws97_d2Gr_dpidtau_region2',
            
+           'iapws97_G0_region2', 'iapws97_dG0_dtau_region2', 'iapws97_d2G0_d2tau_region2',
+           
            'iapws97_A_region3', 'iapws97_dA_ddelta_region3', 'iapws97_d2A_d2delta_region3',
            'iapws97_dA_dtau_region3', 'iapws97_d2A_d2tau_region3', 'iapws97_d2A_ddeltadtau_region3',
            ]
@@ -447,6 +449,30 @@ def iapws97_d2G_dpidtau_region1(tau, pi):
     return (-0.00009532278781397400275*pit + 0.00002648510719850759971*pit*taut2 - 0.002831059264396019754*pit*taut_inv3*taut_inv + 2.471629874118196128e-14*pit*taut8*taut8 + 0.02184171717541399937 + 1.533692306161854223e-8*pit2*taut2*taut2*taut - 0.0003801557381406480188*pit2*taut_inv3*taut_inv2 + 0.0001585150739097900138*taut2 - 0.01899006821841900047*taut_inv2 - 5.213697831648080174e-6*pit3*taut_inv3 - 0.00004485056381599999715*pit3*taut_inv3*taut_inv3 + 5.736691975169599686e-12*pit3*taut8*taut - 0.00001620679874404679866*pit3*pit*taut_inv9 - 8.3639381907043211e-9*pit7*taut_inv3*taut_inv3*taut_inv - 1.120618553264407982e-7*pit7*taut_inv9*taut_inv3 - 0.004249441109611180011*taut_inv3*taut_inv3*taut_inv2 + 0.002548717211142359929*taut_inv9*taut_inv - 4.187613795897837728e-16*pit7*pit7*pit3*pit3*taut_inv30 + 1.03230334817354737e-17*pit7*pit7*pit7*pit*taut_inv30*taut_inv2 + 2.902203139240009378e-20*pit28*taut_inv30*taut_inv9 - 1.397871848888307079e-20*pit28*pit*taut_inv30*taut_inv9*taut_inv + 2.26028372809409602e-21*pit28*pit2*taut_inv30*taut_inv9*taut_inv2 - 1.227206585277048923e-22*pit28*pit3*taut_inv30*taut_inv9*taut_inv3)
 
 ### Region 2
+
+def iapws97_G0_region2(tau, pi):
+    tau_inv = 1.0/tau
+    return (tau*(tau*(0.0212684637533070015*tau - 0.284086324607719987) 
+            + 10.0866559680180004) + tau_inv*(tau_inv*(tau_inv*(tau_inv*(0.0714527380814549973 
+            - 0.00560879112830200022*tau_inv) - 0.407104982239279989) + 1.42408191714439991)
+            - 4.38395113194500041) + log(pi) - 9.69276865002169963)
+
+def iapws97_dG0_dtau_region2(tau, pi):
+    # does not depend on pi but leave as argument for consistency
+    tau_inv = 1.0/tau
+    return (tau*(0.0638053912599210044*tau - 0.568172649215439973)
+            + tau_inv*tau_inv*(tau_inv*(tau_inv*(tau_inv*(0.0280439556415100003*tau_inv
+            - 0.285810952325819989) + 1.22131494671783991) - 2.84816383428879982) 
+            + 4.38395113194500041) + 10.0866559680180004)
+
+def iapws97_d2G0_d2tau_region2(tau, pi):
+    # does not depend on pi but leave as argument for consistency
+    tau_inv = 1.0/tau
+    return (0.127610782519842009*tau + tau_inv*tau_inv*tau_inv*(tau_inv*(tau_inv*(tau_inv*(1.42905476162910006 
+            - 0.168263733849060015*tau_inv) - 4.88525978687135964) + 8.54449150286639991)
+            - 8.76790226389000082) - 0.568172649215439973)
+
+
 
 def iapws97_Gr_region2(tau, pi):
     taut = tau - 0.5
