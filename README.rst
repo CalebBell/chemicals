@@ -70,8 +70,8 @@ The chemicals library also supports integration with
 `Numba <https://numba.pydata.org/>`_, a powerful accelerator that works 
 well with NumPy; `Pint <https://pint.readthedocs.io/en/stable/>`_ Quantity 
 objects to keep track of units of measure; and 
-`NumPy <https://numpy.org/doc/stable/reference/generated/numpy.vectorize.html>`_ 
-vectorized functions. 
+NumPy `vectorized <https://numpy.org/doc/stable/reference/generated/numpy.vectorize.html>`_ 
+functions. 
 
 If you need to know something about a chemical, give chemicals a try.
 
