@@ -25,15 +25,16 @@ SOFTWARE.
 from __future__ import division
 from math import exp, log, sqrt
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
+from fluids.numerics import secant, newton, trunc_log, trunc_exp
 
-__all__ = ['iapws97_dGr_dpi_region5',
+__all__ = [
            'iapws97_boundary_2_3', 'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
            'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
            'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
            'iapws97_boundary_3qu', 'iapws97_boundary_3rx', 'iapws97_boundary_3wx',
            'iapws97_boundary_3ab', 'iapws97_boundary_3op',
            'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
-           'iapws97_rho',
+           'iapws97_rho', 'iapws97_P',
            
            'iapws95_d2A_d2deltar', 'iapws95_dA_ddeltar',
            
@@ -43,11 +44,14 @@ __all__ = ['iapws97_dGr_dpi_region5',
            
            'iapws97_Gr_region2', 'iapws97_dGr_dpi_region2', 'iapws97_d2Gr_d2pi_region2',
            'iapws97_dGr_dtau_region2', 'iapws97_d2Gr_d2tau_region2', 'iapws97_d2Gr_dpidtau_region2',
-           
            'iapws97_G0_region2', 'iapws97_dG0_dtau_region2', 'iapws97_d2G0_d2tau_region2',
            
            'iapws97_A_region3', 'iapws97_dA_ddelta_region3', 'iapws97_d2A_d2delta_region3',
            'iapws97_dA_dtau_region3', 'iapws97_d2A_d2tau_region3', 'iapws97_d2A_ddeltadtau_region3',
+           
+           'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_d2pi_region5', 
+           'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_d2tau_region5', 'iapws97_d2Gr_dpidtau_region5',
+           'iapws97_G0_region5', 'iapws97_dG0_dtau_region5', 'iapws97_d2G0_d2tau_region5',
            ]
 
 __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c', 
@@ -55,7 +59,12 @@ __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97
     'iapws97_region3_i', 'iapws97_region3_j', 'iapws97_region3_k', 'iapws97_region3_l', 'iapws97_region3_m',
     'iapws97_region3_n', 'iapws97_region3_o', 'iapws97_region3_p', 'iapws97_region3_q', 'iapws97_region3_r', 
     'iapws97_region3_s', 'iapws97_region3_t', 'iapws97_region3_u', 'iapws97_region3_v', 'iapws97_region3_w', 
-    'iapws97_region3_x', 'iapws97_region3_y', 'iapws97_region3_z']
+    'iapws97_region3_x', 'iapws97_region3_y', 'iapws97_region3_z',
+    'iapws_97_Trho_err_region1', 'iapws_97_Trho_err_region2', 'iapws_97_Trho_err_region5',
+    
+    'iapws_97_Prho_err_region1', 'iapws_97_Prho_err_region2', 'iapws_97_Prho_err_region5',
+    'iapws_97_Prho_err_region3'
+    ]
 
 
 
@@ -625,38 +634,6 @@ def iapws97_d2Gr_dpidtau_region2(tau, pi):
     return (-0.0007579595006525999962*pi*taut - 0.00006606528334040599997*pi - 0.03151422179468400114*pi*taut2*taut - 0.6131621391080219752*pi*taut5*taut - 0.001920567449814264156*pi*taut34*taut - 0.09199202739273000529*taut + 1.023257428182800066e-7*taut*pi3 - 0.01783486229235799886 + 1.316120018533050084e-6*pi2 - 0.0002904990951471300275*pi2*taut2 - 0.02706106417586639709*pi2*taut5 - 4.270166624078144402*pi2*taut34 - 0.1727437772502959934*taut2 - 3.153892382374680036e-9*pi3 + 5.787044726220840615e-6*pi3*taut2 + 0.000080227267181813501*pi3*pi*taut5*taut - 3.008657961190980272e-10*pi3*pi2*taut2 - 0.2032461342850079844*pi3*pi2*taut13*taut2 - 5018.10580616183961*pi3*pi2*taut34 - 0.3019516723675800263*taut5 - 0.00009718792852307769686*pi6*taut5*taut5 - 6.815697426254326174*pi6*taut13*taut5*taut5*taut + 7.203975270693759891e-10*pi6*pi*taut5*taut2 - 2370.566617862342355*pi6*pi*taut34*taut + 2.317736397844296243e-6*pi6*pi2*taut5*taut5*taut2 + 4.162786084069599818e-18*pi6*pi3*taut2*taut - 1.023474709592900005e-11*pi6*pi3*taut5*taut2*taut2 - 1.402545113131539905e-7*pi6*pi3*taut13 - 3.752966961220103956e-8*pi6*pi6*pi3*taut13*taut13*taut2 + 85.54425503527200192*pi6*pi6*pi3*taut34*taut13*taut2 - 345.3746908909944295*pi17*taut34*taut13*taut5*taut2*taut2 + 3.567433814216839978e-22*pi17*pi2*taut13*taut5*taut + 2.144052181336239759e-10*pi17*pi2*taut34 - 0.004032236899027968197*pi17*pi2*taut34*taut13 - 2.604370909136680202e-23*pi17*pi3*taut13*taut5*taut2 + 0.004410622091729086459*pi17*pi3*pi*taut34*taut13*taut5 - 1.145344221440885637e-12*pi17*pi3*pi2*taut34*taut2*taut2 + 4.560666901131806878e-26*pi17*pi6*taut13*taut5*taut5*taut2 + 5.319812673674687913e-14*pi17*pi6*taut34*taut5 - 0.001313626324797643238*pi17*pi6*taut34*taut13*taut5*taut5)
 
 
-### Fast dG_dpi and dGr_dpi for density calls
-
-def iapws97_dGr_dpi_region5(tau, pi):
-    r'''Calculates dGr_dpi for region 5.
-
-    Parameters
-    ----------
-    tau : float
-        Dimensionless temperature, (1000 K)/T [-]
-    pi : float
-        Dimensionless pressure, P/(1 MPa), [-]
-
-    Returns
-    -------
-    dGr_dpi : float
-        Derivative of dimentionless residual Gibbs energy G/(RT) with respect 
-        to `pi`, [-]
-
-    Notes
-    -----
-    Used in density solution.
-
-    Examples
-    --------
-    >>> iapws97_dGr_dpi_region5(.5, 30.0)
-    0.0004009761854002
-    '''
-    tau3 = tau*tau
-    tau3 *= tau
-    return (pi*tau3*(4.48800748189699983e-6 + tau3*(1.13758364468865005e-7*pi*tau - 8.23265509069419973e-6*tau3))
-            + tau*(tau*(0.000901537616739440007 - 0.00502700776776479966*tau) + 0.00157364048552589993))
-
 ### Region 3 A formulations
 def iapws97_A_region3(tau, delta):
     delta2 = delta*delta
@@ -733,6 +710,88 @@ def iapws97_d2A_ddeltadtau_region3(tau, delta):
     return (-3.408588352968239921*delta*tau + 58.76673785025239738*delta*tau5 - 42.70366415975099983*delta*tau5*tau + 1.734503622682775914*delta*tau14*tau5*tau2 + 6.530372380640161012*delta*tau25 - 2.530863095542799979*tau + 8.339879741676000435*tau*delta2 - 3.558114834299119789*tau*delta3 + 1.131129019981103934*tau*delta5 - 0.1890472113788720099*tau*delta5*delta + 0.0104261316530551186*tau*delta5*delta3 - 24.22789802828400241*delta2*tau2*tau - 0.3943086584350223855*delta2*tau14*tau - 37.12490787323994113*delta2*tau25 + 14.49153131515727999*delta3*tau2*tau + 73.34334809148568013*delta3*tau25 + 0.5385256313166000286*delta4 - 4.937043488843100292*delta4*tau2 - 66.13238065350540751*delta4*tau25 + 25.64059437881915926*delta5*tau25 - 6.914644684008599995*tau5 - 3.08554383331417581*delta5*delta2*tau25 + 0.7560283700668373186*delta5*delta3*tau25 - 0.001655767979503699984*delta5*delta4 - 0.01284823513167908729*delta5*delta5*tau25 + 13.27815659764770118*tau14 - 10.91532008087319028*tau14*tau2)
     
     
+### Region 5
+    
+def iapws97_G0_region5(tau, pi):
+    tau_inv = 1.0/tau
+    return (tau*(6.85408416344340043 - 0.329616265389169993*tau) + tau_inv*(tau_inv*(0.369015349803330006 - 0.0248051489334660015*tau_inv) - 3.1161318213925) + log(pi) - 13.1799836742010008)
+
+def iapws97_dG0_dtau_region5(tau, pi):
+    # does not depend on pi but leave as argument for consistency
+    tau_inv = 1.0/tau
+    return (-0.659232530778339987*tau + tau_inv*tau_inv*(tau_inv*(0.074415446800398008*tau_inv - 0.738030699606660012) + 3.1161318213925) + 6.85408416344340043)
+
+def iapws97_d2G0_d2tau_region5(tau, pi):
+    # does not depend on pi but leave as argument for consistency
+    tau_inv = 1.0/tau
+    return (tau_inv*tau_inv*tau_inv*(tau_inv*(2.21409209881998015 - 0.297661787201592032*tau_inv) - 6.232263642785) - 0.659232530778339987)
+
+def iapws97_Gr_region5(tau, pi):
+    tau3 = tau*tau*tau
+    return (pi*(pi*(3.79194548229549995e-8*pi*tau*tau3*tau3 + tau3*(2.24400374094849992e-6 
+            - 4.11632754534709986e-6*tau3*tau3)) + tau*(tau*(0.000901537616739440007 
+            - 0.00502700776776479966*tau) + 0.00157364048552589993)))
+    
+
+def iapws97_dGr_dpi_region5(tau, pi):
+    r'''Calculates dGr_dpi for region 5.
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (1000 K)/T [-]
+    pi : float
+        Dimensionless pressure, P/(1 MPa), [-]
+
+    Returns
+    -------
+    dGr_dpi : float
+        Derivative of dimentionless residual Gibbs energy G/(RT) with respect 
+        to `pi`, [-]
+
+    Notes
+    -----
+    Used in density solution.
+
+    Examples
+    --------
+    >>> iapws97_dGr_dpi_region5(.5, 30.0)
+    0.0004009761854002
+    '''
+    tau3 = tau*tau
+    tau3 *= tau
+    return (pi*tau3*(4.48800748189699983e-6 + tau3*(1.13758364468865005e-7*pi*tau - 8.23265509069419973e-6*tau3))
+            + tau*(tau*(0.000901537616739440007 - 0.00502700776776479966*tau) + 0.00157364048552589993))
+
+def iapws97_d2Gr_d2pi_region5(tau, pi):
+    tau2 = tau*tau
+    return (tau2*tau*(tau2*tau2*(2.2751672893773001e-7*pi - 8.23265509069419973e-6*tau2)
+                  + 4.48800748189699983e-6))
+
+def iapws97_dGr_dtau_region5(tau, pi):
+    tau2 = tau*tau
+    return pi*(0.001803075233478880013*tau + 0.001573640485525899932
+            + tau2*(-0.01508102330329439897 + pi*(6.732011222845499322e-6 
+            + tau2*tau2*(-0.00003704694790812389877*tau2 
+            + 2.654361837606849767e-7*pi))))
+
+def iapws97_d2Gr_d2tau_region5(tau, pi):
+    tau2 = tau*tau
+# # 10 before
+#    return (0.00180307523347888001*pi + tau*(0.0000134640224456909986*pi2 
+#            - 0.0301620466065887979*pi + tau**4*pi2*(1.59261710256410975e-6*pi*
+#                            - 0.00029637558326499119*tau2)))
+    return pi*(0.001803075233478880013 + tau*(-0.03016204660658879794
+            + pi*(0.00001346402244569099864 + tau2*tau2*(-0.0002963755832649911902*tau2
+            + 1.592617102564109754e-6*pi))))
+
+def iapws97_d2Gr_dpidtau_region5(tau, pi):
+    tau2 = tau*tau
+    return (0.001573640485525899932 + tau*(0.001803075233478880013
+            + tau*(-0.01508102330329439897 + pi*(0.00001346402244569099864
+            + tau2*tau2*(-0.00007409389581624779755*tau2 + 7.963085512820550889e-7*pi)))))
+
+
 ### Region 3 subregion density calls
 
 
@@ -1605,26 +1664,173 @@ def iapws97_rho(T, P):
     R = 461.526
     region = iapws97_identify_region_TP(T, P)
     if region == 1:
-        pi = P/16.53E6
+        pi = P*6.049606775559589e-08 #1/16.53E6
         tau = 1386.0/T
         dG_dpi = iapws97_dG_dpi_region1(tau, pi)
         return P/(R*T*pi*dG_dpi)
     elif region == 2:
-        pi = P/1E6
+        pi = P*1e-6
         tau = 540.0/T
         dG_dpi = 1.0/pi + iapws97_dGr_dpi_region2(tau, pi) 
         return P/(R*T*pi*dG_dpi)
     elif region == 3:
         return iapws97_region3_rho(T, P)
     elif region == 5:
-        pi = P/1E6
-        tau = 1000/T
+        pi = P*1e-6
+        tau = 1000.0/T
         dG_dpi = 1.0/pi + iapws97_dGr_dpi_region5(tau, pi) 
         return P/(R*T*pi*dG_dpi)
     else:
         raise ValueError("Out of bounds")
 
 
+def iapws_97_Trho_err_region1(P, T, rho):
+    R = 461.526
+    pi_region1 = P*6.049606775559589e-08 #1/16.53E6
+    tau_region1 = 1386.0/T
+    dG_dpi_region1 = iapws97_dG_dpi_region1(tau_region1, pi_region1)
+    rhol = P/(R*T*pi_region1*dG_dpi_region1)
+    err = rhol - rho
+    d2G_dpi2_region1 = iapws97_d2G_dpi2_region1(tau_region1, pi_region1)
+    derr = -d2G_dpi2_region1/(R*T*dG_dpi_region1*dG_dpi_region1)
+#    print(P, err, derr)
+    return err, derr
+
+def iapws_97_Trho_err_region2(P, T, rho):
+    R = 461.526
+    pi_region2 = P*1e-6
+    tau_region2 = 540.0/T
+    dG_dpi_region2 = 1/pi_region2 + iapws97_dGr_dpi_region2(tau_region2, pi_region2)
+    rhog = P/(R*T*pi_region2*dG_dpi_region2)
+    err = rhog - rho
+
+    d2G_dpi2_region2 = iapws97_d2Gr_d2pi_region2(tau_region2, pi_region2)
+    d2G_dpi2_region2 -= 1e12/(P*P) # ideal part
+    
+    # checked numerically
+    derr = -d2G_dpi2_region2/(R*T*dG_dpi_region2*dG_dpi_region2)
+#    print(P, T, rho, err, derr)
+    return err, derr
+
+def iapws_97_Trho_err_region5(P, T, rho):
+    R = 461.526
+    pi_region5 = P*1e-6
+    tau_region5 = 1000.0/T
+    dG_dpi_region5 = 1/pi_region5 + iapws97_dGr_dpi_region5(tau_region5, pi_region5)
+    rhog = P/(R*T*pi_region5*dG_dpi_region5)
+    err = rhog - rho
+
+    d2G_dpi2_region5 = iapws97_d2Gr_d2pi_region5(tau_region5, pi_region5)
+    d2G_dpi2_region5 -= 1e12/(P*P) # ideal part
+    derr = -d2G_dpi2_region5/(R*T*dG_dpi_region5*dG_dpi_region5)
+    return err, derr
+
+def iapws97_P(T, rho):
+    R = 461.526
+    if T < 273.15:
+        raise ValueError("T is under minimum value of 273.15 K")
+    elif T <= 1073.15:
+        if T <= 623.15:
+            # region 2 to region 1 only - easy solver under 623K
+            # Compute the density borders at the saturation pressure, and then decide which to pursue
+            Psat = Psat_IAPWS(T)
+            
+            pi_region2 = Psat*1e-6
+            tau_region2 = 540.0/T
+            dG_dpi_region2 = 1.0/pi_region2 + iapws97_dGr_dpi_region2(tau_region2, pi_region2) 
+            rhog_sat = Psat/(R*T*pi_region2*dG_dpi_region2)
+
+            pi_region1 = Psat*6.049606775559589e-08 #1/16.53E6
+            tau_region1 = 1386.0/T
+            dG_dpi_region1 = iapws97_dG_dpi_region1(tau_region1, pi_region1)
+            rhol_sat = Psat/(R*T*pi_region1*dG_dpi_region1)
+            
+            if rhog_sat < rho < rhol_sat:
+                raise ValueError("Specified density is not a stable state at T")
+            elif rho > rhol_sat:
+                return newton(iapws_97_Trho_err_region1, Psat*10.0, fprime=True, bisection=True,
+                              low=Psat, high=100e6, args=(T, rho), xtol=3e-12)                
+            else:
+                return newton(iapws_97_Trho_err_region2, Psat*.1, fprime=True, bisection=True,
+                              low=Psat*1e-20, high=Psat, args=(T, rho), xtol=3e-12)
+        P_region2_border = iapws97_boundary_2_3(T)
+        R = 461.526
+        pi_region2 = P_region2_border*1e-6
+        tau_region2 = 540.0/T
+        dG_dpi_region2 = 1.0/pi_region2 + iapws97_dGr_dpi_region2(tau_region2, pi_region2) 
+        rhog_region2_border = P_region2_border/(R*T*pi_region2*dG_dpi_region2)
+        if rho < rhog_region2_border or P_region2_border > 100e6:
+                return newton(iapws_97_Trho_err_region2, P_region2_border*.1, fprime=True, bisection=True,
+                              low=P_region2_border*1e-20, high=P_region2_border, args=(T, rho), xtol=3e-12)
+        else:
+            # region 3
+            tau = 647.096/T
+            delta = rho/322.0
+            dA_ddelta = iapws97_dA_ddelta_region3(tau, delta)
+            return dA_ddelta*delta*rho*R*T
+                
+    elif T <= 2273.15:
+        return newton(iapws_97_Trho_err_region5, 1e6, fprime=True, bisection=True,
+                      low=1e-10, high=50e6, args=(T, rho), xtol=1e-12)
+
+        P_low, P_high = 1e-5, 50e6
+    else:
+        raise ValueError("T is above maximum value of 2273.15 K")
+
+
+def iapws_97_Prho_err_region1(T, P, rho):
+    R = 461.526
+    pi_region1 = P*6.049606775559589e-08 #1/16.53E6
+    tau_region1 = 1386.0/T
+    dG_dpi_region1 = iapws97_dG_dpi_region1(tau_region1, pi_region1)
+        
+    rhol = P/(R*T*pi_region1*dG_dpi_region1)
+    err = rhol - rho
+    # what it is supposed to be
+    drhol = (-16.53E6/(R*T*T*dG_dpi_region1)
+             + 16.53E6*1386.0*iapws97_d2G_dpidtau_region1(tau_region1, pi_region1)/(R*T*T*T*dG_dpi_region1*dG_dpi_region1))
+    return err, drhol
+
+def iapws_97_Prho_err_region2(T, P, rho):
+    R = 461.526
+    pi_region2 = P*1e-6
+    tau_region2 = 540.0/T
+    dG_dpi_region2 = 1.0/pi_region2 + iapws97_dGr_dpi_region2(tau_region2, pi_region2)
+        
+    rhol = P/(R*T*pi_region2*dG_dpi_region2)
+    err = rhol - rho
+    drhol = (-1e6/(R*T*T*dG_dpi_region2)
+             + 1E6*540.0*iapws97_d2Gr_dpidtau_region2(tau_region2, pi_region2)/(R*T*T*T*dG_dpi_region2*dG_dpi_region2))
+    return err, drhol
+
+def iapws_97_Prho_err_region5(T, P, rho):
+    R = 461.526
+    pi_region5 = P*1e-6
+    tau_region5 = 540.0/T
+    dG_dpi_region5 = 1.0/pi_region5 + iapws97_dGr_dpi_region5(tau_region5, pi_region5)
+        
+    rhol = P/(R*T*pi_region5*dG_dpi_region5)
+    err = rhol - rho
+    drhol = (-1e6/(R*T*T*dG_dpi_region5)
+             + 1E6*540.0*iapws97_d2Gr_dpidtau_region5(tau_region5, pi_region5)/(R*T*T*T*dG_dpi_region5*dG_dpi_region5))
+    return err, drhol
+
+def iapws_97_Prho_err_region3(T, P, rho):
+    R = 461.526
+    Tc = 647.096
+    rhoc = 322.0
+    tau = Tc/T
+    delta = rho/rhoc
+    dA_ddelta = iapws97_dA_ddelta_region3(tau, delta)
+    P_calc = dA_ddelta*delta*rho*R*T
+    err = P_calc - P
+
+    d2A_ddeltadtau = iapws97_d2A_ddeltadtau_region3(tau, delta)
+    
+    derr = R*rho**2*dA_ddelta/rhoc - R*Tc*rho**2*d2A_ddeltadtau/(T*rhoc)
+    return err, derr
+
+### IAPWS95
 
 def iapws95_dA_ddeltar(tau, delta):
     # Uses no constants from this file

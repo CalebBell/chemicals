@@ -26,7 +26,7 @@ from numpy.testing import assert_allclose
 import pytest
 from math import *
 from chemicals.iapws import *
-from fluids.numerics import assert_close, linspace, logspace
+from fluids.numerics import assert_close, linspace, logspace, derivative
 from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G, REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N, REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z
 from chemicals.vapor_pressure import Psat_IAPWS
 
@@ -180,6 +180,16 @@ Jis5 = [1, 2, 3, 3, 9, 7]
 nis5 = [0.15736404855259E-2, 0.90153761673944E-3, -0.50270077677648E-2,
         0.22440037409485E-5, -0.41163275453471E-5, 0.37919454822955E-7]
 
+def iapws97_G0_region5_naive(tau, pi):
+    return  log(pi) + sum( [n0is5[i]*tau**J0is5[i] for i in range(6)] )
+
+def iapws97_dG0_dtau_region5_naive(tau, pi):
+    return sum( [n0is5[i]*J0is5[i]*tau**(J0is5[i]-1) for i in range(6)] )
+
+def iapws97_d2G0_d2tau_region5_naive(tau, pi):
+    return sum( [n0is5[i]*J0is5[i]*(J0is5[i]-1)*tau**(J0is5[i]-2) for i in range(6)] )
+
+
 def iapws97_Gr_region5_naive(tau, pi):
     return sum( [nis5[i]*pi**lis5[i]*tau**Jis5[i] for i in range(6)] )
 
@@ -300,23 +310,24 @@ def test_iapws97_region3_fuzz():
                     
 @pytest.mark.slow
 def test_iapws97_region5_fuzz():
-    funcs_naive = [iapws97_dGr_dpi_region5_naive]
-    funcs_fast = [iapws97_dGr_dpi_region5]
-    atols = [1e-18]
-    rtols = [2e-14]
+    funcs_naive = [iapws97_d2G0_d2tau_region5_naive, iapws97_dG0_dtau_region5_naive, iapws97_G0_region5_naive, iapws97_d2Gr_dpidtau_region5_naive, iapws97_d2Gr_d2tau_region5_naive, iapws97_dGr_dtau_region5_naive, iapws97_d2Gr_d2pi_region5_naive, iapws97_Gr_region5_naive, iapws97_dGr_dpi_region5_naive]
+    funcs_fast = [iapws97_d2G0_d2tau_region5, iapws97_dG0_dtau_region5, iapws97_G0_region5, iapws97_d2Gr_dpidtau_region5, iapws97_d2Gr_d2tau_region5, iapws97_dGr_dtau_region5, iapws97_d2Gr_d2pi_region5, iapws97_Gr_region5, iapws97_dGr_dpi_region5]
+    atols = [0, 0, 0, 0, 0, 0, 5e-21, 4e-17, 1e-18]
+    rtols = [1e-15, 1e-15, 1e-15, 5e-15, 2e-15, 1e-14, 1e-14, 2e-14, 2e-14]
     N = 500
     Ts = linspace(1073.15, 2273.15, N)
     def test_Ps(T, N):
         return logspace(log10(1e-6), log10(50e6), N)
     
     for naive, fast, rtol, atol in zip(funcs_naive, funcs_fast, rtols, atols):
+#        print(naive)
         for T in Ts:
             tau = 1000.0/T
             for P in test_Ps(T, N):
                 pi = P/1E6
                 assert_close(naive(tau, pi),
                              fast(tau, pi), rtol=rtol, atol=atol)
-test_iapws97_region5_fuzz()
+#test_iapws97_region5_fuzz()
 ### Fast tests
 
 def test_iapws97_dG_dpi_region1():
@@ -652,3 +663,119 @@ def test_iapws97_region_1_rho_coolprop():
                 assert_close(rho_CoolProp, rho_implemented, rtol=2e-13)
             except:
                 print([T, P, 1-rho_implemented/rho_CoolProp])
+
+
+def test_iapws97_P():
+    rho = iapws97_rho(273.15, 999)
+    assert_close(iapws97_P(273.15, rho), 999, rtol=1e-10)
+    
+    rho = iapws97_rho(289.47653061224486, 145.6348477501249)
+    assert_close(iapws97_P(289.47653061224486, rho), 145.6348477501249, rtol=1e-10)
+    
+    iapws97_identify_region_TP(1032.9489949748788, 1702.7691722259083)
+    rho = iapws97_rho(1032.9489949748788, 1702.7691722259083)
+    P_calc = iapws97_P(1032.9489949748788, rho)
+    assert_close(P_calc, 1702.7691722259083, rtol=1e-10)
+    
+    rho = iapws97_rho(273.9508008008008, 696.3744730627147)
+    assert_close(iapws97_P(273.9508008008008, rho), 696.3744730627147, rtol=5e-9)
+    
+    
+    rho = iapws97_rho(275.5524024024024, 749.6781874965719)
+    assert_close(iapws97_P(275.5524024024024, rho), 749.6781874965719, rtol=5e-9)
+    
+    rho = iapws97_rho(1500, 20e6)
+    assert_close(iapws97_P(1500, rho), 20e6, rtol=5e-9)
+
+    
+    T_spec = 300
+    rho_spec = .02
+    for i in range(15):
+        P_calc = iapws97_P(T_spec, rho_spec)
+        assert_close(iapws97_rho(T_spec, P_calc), rho_spec, rtol=1e-10)
+        rho_spec *= .25
+        
+
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_iapws97_P_fuzz():
+    N = 40
+    Ts = linspace(273.15, 623.15, N)
+    # Ts = linspace(273.15, 1073.15, N)
+    Ps = logspace(log10(1e-5), log10(100e6), N)
+    for T in Ts:
+        for P in Ps:
+            rho = iapws97_rho(T, P)
+            P_calc = iapws97_P(T, rho)
+            assert_close(P, P_calc, rtol=1e-9)
+            
+    
+    # Region 1 and 2 general - Good, working great!
+    N = 100
+    Ts = linspace(273.15, 1073.15, N)
+    Ps = logspace(log10(1e-8), log10(100e6), N)
+    for T in Ts:
+        for P in Ps:
+            if iapws97_identify_region_TP(T, P) != 3:
+                rho = iapws97_rho(T, P)
+                P_calc = iapws97_P(T, rho)
+                # 5e-9 is best solvers can do
+                assert_close(P, P_calc, rtol=5e-9)
+    
+    # Region 5 - works great
+    N = 100
+    Ts = linspace(1073.15, 2273.15, N)
+    Ps = logspace(log10(1e-8), log10(50e6), N)
+    for T in Ts:
+        for P in Ps:
+            rho = iapws97_rho(T, P)
+            P_calc = iapws97_P(T, rho)
+            assert_close(P, P_calc, rtol=1e-9)
+            
+            
+def test_iapws_97_Trho_err_region():
+    from chemicals.iapws import iapws_97_Trho_err_region1, iapws_97_Trho_err_region2, iapws_97_Trho_err_region5
+    drho_dP_num = derivative(lambda P, *args: iapws_97_Trho_err_region1(P, *args)[0], 1e5, args=(400, 940), dx=1e-1)
+    rho_err, drho_dP_analytical = iapws_97_Trho_err_region1(1e5, T=400.0, rho=940)
+    assert_close(drho_dP_num, drho_dP_analytical)
+    assert_close(drho_dP_analytical, 5.139076806770276e-07)
+    assert_close(rho_err, -2.590879183496895)
+    
+    drho_dP_num = derivative(lambda P, *args: iapws_97_Trho_err_region2(P, *args)[0], 1e5, args=(400, .5), dx=1e-1)
+    rho_err, drho_dP_analytical = iapws_97_Trho_err_region2(1e5, T=400.0, rho=.5)
+    assert_close(drho_dP_num, drho_dP_analytical)
+    assert_close(drho_dP_analytical, 5.5373377906291985e-06,)
+    assert_close(rho_err, 0.04758348314889638)
+    
+    drho_dP_num = derivative(lambda P, *args: iapws_97_Trho_err_region5(P, *args)[0], 1e6, args=(2200, 50), dx=1)
+    rho_err, drho_dP_analytical = iapws_97_Trho_err_region5(1e6, T=2200, rho=50)
+    assert_close(drho_dP_num, drho_dP_analytical)
+    assert_close(drho_dP_analytical, 9.84028484195585e-07)
+    assert_close(rho_err, -49.01554810610934)
+
+
+def test_iapws_97_Prho_err_region():
+    from chemicals.iapws import iapws_97_Prho_err_region3, iapws_97_Prho_err_region2, iapws_97_Prho_err_region5, iapws_97_Prho_err_region1
+    drho_dP_num = derivative(lambda T, *args: iapws_97_Prho_err_region2(T, *args)[0], 400, args=(1e5, 3), dx=1e-5)
+    rho_err, drho_dP_analytical = iapws_97_Prho_err_region2(400, P=1e5, rho=3)
+    assert_close(drho_dP_analytical, -0.0014400334536077983)
+    assert_close(rho_err, -2.4524165168511036)
+    assert_close(drho_dP_num, drho_dP_analytical)
+    
+    drho_dP_num = derivative(lambda T, *args: iapws_97_Prho_err_region5(T, *args)[0], 2000, args=(1e6, 300), dx=1e-2)
+    rho_err, drho_dP_analytical = iapws_97_Prho_err_region5(2000, P=1e6, rho=3)
+    assert_close(drho_dP_num, drho_dP_analytical)
+    assert_close(rho_err, -1.9170616534178333, rtol=1e-10)
+    assert_close(drho_dP_analytical, -0.0005413285807403817, rtol=1e-10)
+    
+    drho_dP_num = derivative(lambda T, *args: iapws_97_Prho_err_region1(T, *args)[0], 300, args=(1e6, 990), dx=1e-4)
+    rho_err, drho_dP_analytical = iapws_97_Prho_err_region1(300, P=1e6, rho=990)
+    assert_close(drho_dP_num, drho_dP_analytical)
+    assert_close(rho_err, 6.960320342238447, rtol=1e-10)
+    assert_close(drho_dP_analytical, -0.2744655492373509, rtol=1e-10)
+    
+    dP_dT_numerical = derivative(lambda T, *args: iapws_97_Prho_err_region3(T, *args)[0], 620, args=(40e6, 400), dx=.01, order=15)
+    P_err, dP_dT_analytical = iapws_97_Prho_err_region3(620, P=40e6, rho=400)
+    assert_close(dP_dT_numerical, dP_dT_analytical)
+    assert_close(dP_dT_analytical, 215319.4089751701)
+    assert_close(P_err, -25505787.520883154)
