@@ -1806,6 +1806,20 @@ def iapws97_P(T, rho):
     quickly with density however, and some discrepancy between solvers is to be
     expected.
     
+    For region 3, there are really two formulations present in IAPWS-97. There
+    is a Helmholtz energy equation (Temperature and density dependent), and 
+    also 26 separate backwards equations for `rho` which depent on `T` and `P`.
+    The Helmholtz energy equation is much more accurate and does not have 
+    discontinuities. The two sets of equations agree closely not not perfectly.
+    By design, :obj:`iapws97_rho` implements the 26 T-P equations and this 
+    implements the Helmholtz energy equation. This means that in region 3 
+    solutions will not be consistent. For consistency requirements, IAPWS-95
+    is recommended.
+    
+    This solver does not have any issues with multiple solutions. The solvers
+    have been checked to achieve a relative solution tolerance of 5e-9 on 
+    100 million points.
+    
     Examples
     --------
     >>> iapws97_P(330.0, iapws97_rho(T=330.0, P=8e5))
