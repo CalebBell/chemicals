@@ -32,7 +32,7 @@ from chemicals.rachford_rice import *
 from chemicals.rachford_rice import Rachford_Rice_solution_numpy
 from chemicals.rachford_rice import Rachford_Rice_valid_solution_naive, Rachford_Rice_solution2
 from chemicals.rachford_rice import Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac
-from fluids.numerics import assert_close, assert_close1d, normalize
+from fluids.numerics import assert_close, assert_close1d, assert_close2d, normalize
 from random import uniform
 import random
 
@@ -96,11 +96,11 @@ def test_RR_numpy():
     Ks = [Wilson_K_value(T_dew, P, Tc=Tcs[i], Pc=Pcs[i], omega=omegas[i]) for i in range(len(zs))]
     
     VF, xs, ys = Rachford_Rice_solution_numpy(zs, Ks)
-    assert_allclose(VF, 1)
+    assert_close(VF, 1)
 
 def test_Rachford_Rice_flash_error():
     err = Rachford_Rice_flash_error(0.5, zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
-    assert_allclose(err, 0.04406445591174976)
+    assert_close(err, 0.04406445591174976)
 
 def test_Rachford_Rice_solution():
     xs_expect = [0.33940869696634357, 0.3650560590371706, 0.2955352439964858]
@@ -110,12 +110,12 @@ def test_Rachford_Rice_solution():
     Ks = [1.685, 0.742, 0.532]
     for args in [(False, False), (True, False), (True, True), (False, True)]:
         V_over_F, xs, ys = Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=args[0], fprime2=args[1])
-        assert_allclose(V_over_F, V_over_F_expect)
+        assert_close(V_over_F, V_over_F_expect)
         assert_allclose(xs, xs_expect)
         assert_allclose(ys, ys_expect)
         
     V_over_F, xs, ys = Rachford_Rice_solution_numpy(zs=zs, Ks=Ks)
-    assert_allclose(V_over_F, V_over_F_expect)
+    assert_close(V_over_F, V_over_F_expect)
     assert_allclose(xs, xs_expect)
     assert_allclose(ys, ys_expect)
     
@@ -133,7 +133,7 @@ def test_Rachford_Rice_solution_LN2_backup():
     ys_expect = [4.3868006610706666e-14, 0.9999999999998495, 2.1306928346491458e-16, 1.0679628749383915e-31, 1.0641617779829182e-13]
     assert_allclose(xs, xs_expect)
     assert_allclose(ys, ys_expect)
-    assert_allclose(V_over_F, 0.0001234423100003866)
+    assert_close(V_over_F, 0.0001234423100003866)
     
     
     # Case where the derivative goes to zero
@@ -144,7 +144,7 @@ def test_Rachford_Rice_solution_LN2_backup():
     ys_expect = [0.2656238021113802, 0.04910234834883537, 0.28439455373097544, 0.0063000230695374705, 0.3945792727392716]
     assert_allclose(xs, xs_expect)
     assert_allclose(ys, ys_expect)
-    assert_allclose(V_over_F, 0.999999999000000)
+    assert_close(V_over_F, 0.999999999000000)
     
     # Case where solver not in range
     zs = [0.4050793625620341, 0.07311645032153137, 0.0739927977508874, 0.0028093939126068498, 0.44500199545294034]
@@ -154,7 +154,7 @@ def test_Rachford_Rice_solution_LN2_backup():
     ys_expect = [2.9693700609116885e-19, 0.9999999999999999, 6.0324551579612055e-22, 1.3154876898578485e-37, 3.4297886669501107e-18]
     assert_allclose(xs, xs_expect)
     assert_allclose(ys, ys_expect)
-    assert_allclose(V_over_F, 0, atol=1e-15)
+    assert_close(V_over_F, 0, atol=1e-15)
     
     # Case where the evaluated point is right on the boundary
     Ks = [1.2566703532018493e-21, 3.35062752053393, 1.0300675710905643e-23, 1.706258568414198e-39, 1.6382855298440747e-20]
@@ -164,7 +164,7 @@ def test_Rachford_Rice_solution_LN2_backup():
     ys_expect = [1.7284711382368154e-22, 1.0, 2.6232565304082093e-24, 1.3952850703269794e-40, 3.728111920707972e-21]
     assert_allclose(xs, xs_expect)
     assert_allclose(ys, ys_expect)
-    assert_allclose(V_over_F, 0, atol=1e-15)
+    assert_close(V_over_F, 0, atol=1e-15)
 
 
 
@@ -172,7 +172,7 @@ def test_flash_inner_loop():
     V_over_F, xs, ys = flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], method='Analytical')
     xs_expect = [0.33940869696634357, 0.3650560590371706, 0.2955352439964858]
     ys_expect = [0.5719036543882889, 0.27087159580558057, 0.15722474980613044]
-    assert_allclose(V_over_F, 0.6907302627738544)
+    assert_close(V_over_F, 0.6907302627738544)
     assert_allclose(xs, xs_expect)
     assert_allclose(ys, ys_expect)
 
@@ -181,15 +181,15 @@ def test_flash_inner_loop():
     xs_expect = [0.07194096138571988, 0.18324869220986345, 0.3098180825880347, 0.4349922638163819]
     ys_expect = [0.30215203782002353, 0.320685211367261, 0.2292653811151457, 0.14789736969756986]
     V_over_F, xs, ys = flash_inner_loop(zs=zs, Ks=Ks, method='Analytical')
-    assert_allclose(V_over_F, 0.12188396426827647)
+    assert_close(V_over_F, 0.12188396426827647)
     assert_allclose(xs, xs_expect)
     assert_allclose(ys, ys_expect)
 
 #     Self created random case, twice, to force the recognition
     V_over_F, xs, ys = flash_inner_loop(zs=[0.6, 0.4], Ks=[1.685, 0.4], method='Analytical')
-    assert_allclose(V_over_F, 0.416058394160584)
+    assert_close(V_over_F, 0.416058394160584)
     V_over_F, xs, ys = flash_inner_loop(zs=[0.6, 0.4], Ks=[1.685, 0.4])
-    assert_allclose(V_over_F, 0.416058394160584)
+    assert_close(V_over_F, 0.416058394160584)
 
     with pytest.raises(Exception):
         flash_inner_loop(zs=[0.6, 0.4], Ks=[1.685, 0.4], method='FAIL')
@@ -198,7 +198,7 @@ def test_flash_inner_loop():
     V_over_F_5b, xs_5b, ys_5b = flash_inner_loop(zs=[0.1, 0.2, 0.3, 0.3, .01], Ks=[4.2, 1.75, 0.74, 0.34, .01])
     assert_allclose(xs_5a, xs_5b)
     assert_allclose(ys_5a, ys_5b)
-    assert_allclose(V_over_F_5a, V_over_F_5b)
+    assert_close(V_over_F_5a, V_over_F_5b)
 
 
     methods = flash_inner_loop_methods(4)
@@ -257,7 +257,7 @@ def test_flash_solution_algorithms():
         V_over_F_expect = 0.2
         xs_expect = [1/3., 2/3.]
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, V_over_F_expect)
+        assert_close(V_over_F, V_over_F_expect)
         assert_allclose(xs, xs_expect)
         
         # Hard to resolve two test; LN2 fails, its objective function does not
@@ -279,7 +279,7 @@ def test_flash_solution_algorithms():
         V_over_F_expect = 0.6907302627738541
         xs_expect = [0.3394086969663436, 0.3650560590371706, 0.29553524399648573]
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, V_over_F_expect)
+        assert_close(V_over_F, V_over_F_expect)
         assert_allclose(xs, xs_expect)
 
         # Said to be in:  J.D. Seader, E.J. Henley, D.K. Roper, Separation Process Principles, third ed., John Wiley & Sons, New York, 2010.
@@ -289,7 +289,7 @@ def test_flash_solution_algorithms():
         xs_expect = [0.07194015, 0.18324807, 0.30981849, 0.43499379]
 
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, V_over_F_expect, rtol=1E-4)
+        assert_close(V_over_F, V_over_F_expect, rtol=1E-4)
         assert_allclose(xs, xs_expect, rtol=1E-4)
 
         # Said to be in:  B.A. Finlayson, Introduction to Chemical Engineering Computing, second ed., John Wiley & Sons, New York, 2012.
@@ -299,7 +299,7 @@ def test_flash_solution_algorithms():
         xs_expect = [0.02881952, 0.19854300, 0.43723872, 0.33539943]
 
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, V_over_F_expect, rtol=1E-5)
+        assert_close(V_over_F, V_over_F_expect, rtol=1E-5)
         assert_allclose(xs, xs_expect, rtol=1E-5)
 
         # Said to be in: J. Vidal, Thermodynamics: Applications in Chemical Engineering and the Petroleum Industry, Technip, Paris, 2003.
@@ -308,7 +308,7 @@ def test_flash_solution_algorithms():
         V_over_F_expect = 0.52360688
         xs_expect = [0.11120375, 0.34091324, 0.38663852, 0.08304114, 0.07802677]
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, V_over_F_expect, rtol=1E-2)
+        assert_close(V_over_F, V_over_F_expect, rtol=1E-2)
         assert_allclose(xs, xs_expect, rtol=1E-2)
 
 
@@ -319,7 +319,7 @@ def test_flash_solution_algorithms():
         xs_expect = [0.01070433, 0.05029118, 0.11693011, 0.27218275, 0.40287788, 0.14701374]
 
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, V_over_F_expect, rtol=1E-6)
+        assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
         assert_allclose(xs, xs_expect, rtol=1E-6)
         
         # Long tests - do not want to test with poly
@@ -333,7 +333,7 @@ def test_flash_solution_algorithms():
         xs_expect = [0.06041132, 0.02035881, 0.00784747, 0.00495988, 0.00145397, 0.00227932, 0.00096884, 0.00139386, 0.03777425, 0.03851756, 0.07880076, 0.08112154, 0.08345504, 0.08694391, 0.09033579, 0.09505925, 0.09754111, 0.10300074, 0.10777648]
 
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, V_over_F_expect, rtol=1E-6)
+        assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
         assert_allclose(xs, xs_expect, rtol=1E-5)
 
         # Random example from MultiComponentFlash.xlsx, https://6507a56d-a-62cb3a1a-s-sites.googlegroups.com/site/simulationsmodelsandworksheets/MultiComponentFlash.xlsx?attachauth=ANoY7coiZq4OX8HjlI75HGTWiegJ9Tqz6cyqmmmH9ib-dhcNL89TIUTmQw3HxrnolKHgYuL66drYGasDgTkf4_RrWlciyRKwJCbSi5YgTG1GfZR_UhlBuaoKQvrW_L8HdboB3PYejRbzVQaCshwzYcOeGCZycdXQdF9scxoiZLpy7wbUA0xx8j9e4nW1D9PjyApC-MjsjqjqL10HFcw1KVr5sD0LZTkZCqFYA1HReqLzOGZE01_b9sfk351BB33mwSgWQlo3DLVe&attredirects=0&d=1
@@ -341,13 +341,13 @@ def test_flash_solution_algorithms():
         zs = [0.0112, 0.8957, 0.0526, 0.0197, 0.0068, 0.0047, 0.0038, 0.0031, 0.0024]
         V_over_F_expect = 0.964872854762834
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, V_over_F_expect, rtol=1E-7)
+        assert_close(V_over_F, V_over_F_expect, rtol=1E-7)
 
         # Random example from Rachford-Rice-Exercise.xls http://www.ipt.ntnu.no/~curtis/courses/PhD-PVT/PVT-HOT-Vienna-May-2016x/e-course/Day2_Part2/Exercises/Rachford-Rice-Exercise.xls
         zs = [0.001601, 0.009103, 0.364815, 0.096731, 0.069522, 0.014405, 0.039312, 0.014405, 0.014104, 0.043219, 0.111308, 0.086659, 0.065183, 0.032209, 0.037425]
         Ks = [1.081310969639700E+002, 6.600350291317650E+000, 3.946099352050670E+001, 4.469649874919970E+000, 9.321795620021620E-001, 3.213910680361160E-001, 2.189276413305250E-001, 7.932561445994600E-002, 5.868520215582420E-002, 2.182440138190620E-002, 1.769601670781200E-003, 2.855879877894100E-005, 2.718731754877420E-007, 2.154768511018220E-009, 2.907309385811110E-013]
         V_over_F, _, _ = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, 0.48908229446749, rtol=1E-5)
+        assert_close(V_over_F, 0.48908229446749, rtol=1E-5)
 
         # Random example from VLE_Pete310.xls http://www.pe.tamu.edu/barrufet/public_html/PETE310/goodies/VLE_Pete310.xls
         # Had to resolve because the goal which was specified by its author was far off from 0
@@ -355,7 +355,7 @@ def test_flash_solution_algorithms():
         zs = [0.0387596899224806, 0.1937984496124030, 0.0775193798449612, 0.1162790697674420, 0.1085271317829460, 0.1550387596899220, 0.3100775193798450]
         V_over_F, _, _ = algo(zs=zs, Ks=Ks)
 
-        assert_allclose(V_over_F, 0.191698639911785)
+        assert_close(V_over_F, 0.191698639911785)
         
         # Example 2 in Gaganis, Vassilis, Dimitris Marinakis, and Nikos Varotsis. “A General Framework of Model Functions for Rapid and Robust Solution of Rachford–Rice Type of Equations.” Fluid Phase Equilibria 322–323 (May 25, 2012): 9–18. https://doi.org/10.1016/j.fluid.2012.03.001.
         # Claims 4 iterations
@@ -365,14 +365,14 @@ def test_flash_solution_algorithms():
         if algo not in (Li_Johns_Ahmadi_solution, flash_inner_loop_LJA):
             # The LJA algo finds a perfect zero in its own method... but for this problem, converges differently
             V_over_F, _, _ = algo(zs=zs, Ks=Ks)
-            assert_allclose(V_over_F, -1.8928931615799782e-05, rtol=5e-4)
+            assert_close(V_over_F, -1.8928931615799782e-05, rtol=5e-4)
 
         # Very very tough problem for all methods due to floating point issues! 
         # Came from a Wilson flash for VF = 1, T = 300K; pressure is around 0.006 Pa
         zs = [9.11975115499676e-05, 9.986813065240533e-05, 0.0010137795304828892, 0.019875879000370657, 0.013528874875432457, 0.021392773691700402, 0.00845450438914824, 0.02500218071904368, 0.016114189201071587, 0.027825798446635016, 0.05583179467176313, 0.0703116540769539, 0.07830577180555454, 0.07236459223729574, 0.0774523322851419, 0.057755091407705975, 0.04030134965162674, 0.03967043780553758, 0.03514481759005302, 0.03175471055284055, 0.025411123554079325, 0.029291866298718154, 0.012084986551713202, 0.01641114551124426, 0.01572454598093482, 0.012145363820829673, 0.01103585282423499, 0.010654818322680342, 0.008777712911254239, 0.008732073853067238, 0.007445155260036595, 0.006402875549212365, 0.0052908087849774296, 0.0048199150683177075, 0.015943943854195963, 0.004452253754752775, 0.01711981267072777, 0.0024032720444511282, 0.032178399403544646, 0.0018219517069058137, 0.003403378548794345, 0.01127516775495176, 0.015133143423489698, 0.029483213283483682]
         Ks = [11266712779.420027, 878492232.6773384, 276137963.8440058, 4326171618.091249, 573047115.7000155, 131436201.37184711, 49144960.82699592, 34263188.970916145, 13026505.192595435, 9843992.470472587, 3181564.1430952367, 1098600.248012159, 398336.89725376305, 147470.4607802813, 67566.76902751227, 23297.414225523942, 10686.776470987174, 4072.207866361747, 1521.3427782410724, 845.019208473066, 341.75877360772205, 194.91347949534864, 87.37639967685602, 43.81742706130358, 20.123099010095398, 11.2277426008874, 5.873713068861075, 2.3291630622640436, 1.3236952322694902, 0.5190977953895624, 0.33652998006213003, 0.1020194939160233, 0.11957263833876645, 0.036296673021294995, 0.022599820560813874, 2170843.2559104185, 756159.852797745, 292204.024675241, 208695.52033667514, 77287.61740255292, 6429786.948979916, 1914236.7164609663, 3164023.516416859, 1042916.2797133088]
         V_over_F, _, _ = algo(zs=zs, Ks=Ks)
-        assert_allclose(V_over_F, 1, atol=0.001)
+        assert_close(V_over_F, 1, atol=0.001)
             
 def test_RR3_analytical_handle_imag_result():
     Ks = [0.9999533721721108, 1.0002950232772678, 0.9998314089519726]
@@ -391,7 +391,7 @@ def test_RR4_analytical_correct_root_selection():
     ys_expect = [0.7917744568491449, 0.011948500343385897, 2.0134713659119683e-06, 0.19627502933610355]
     assert_allclose(xs, xs_expect)
     assert_allclose(ys, ys_expect)
-    assert_allclose(V_over_F, 0.3132247165106723)
+    assert_close(V_over_F, 0.3132247165106723)
 
 
 
@@ -431,7 +431,7 @@ def test_RR_3_component_analytical_killers():
     with pytest.raises(Exception):
         V_over_F, xs, ys = flash_inner_loop(zs, Ks, method='Analytical')
         V_over_F_good, xs_good, ys_good = Rachford_Rice_solution(zs, Ks)
-        assert_allclose(V_over_F, V_over_F_good)
+        assert_close(V_over_F, V_over_F_good)
         
 def test_RR_9_guess_outside_bounds():
     zs = [0.019940159581097128, 0.0029910239371645692, 9.970079790548564e-07, 0.6480551863856566, 0.12961103727713133, 0.08973071811493706, 0.04985039895274282, 0.029910239371645688, 0.029910239371645688]
@@ -443,7 +443,7 @@ def test_RR_9_guess_outside_bounds():
     ys_expect = [7.282617704501734e-08, 6.2121952868264395e-06, 2.0454577676140954e-08, 1.836200281036301e-05, 3.151405278051385e-06, 2.1693978147006393e-07, 9.702224864329157e-09, 2.367512630887783e-10, 0.9999719542371123]
     
     V_over_F, xs, ys = Rachford_Rice_solution_LN2(zs, Ks, guess=guess)
-    assert_allclose(V_over_F, V_over_F_expect, rtol=1e-6)
+    assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
     assert_allclose(xs, xs_expect, rtol=1e-5)
     assert_allclose(ys, ys_expect, rtol=1e-5)
     
@@ -454,7 +454,7 @@ def test_RR_9_guess_outside_bounds():
         # Cannot make work
         if 'polynomial' not in method:
             V_over_F, xs, ys = flash_inner_loop(zs, Ks, method=method)
-            assert_allclose(V_over_F, V_over_F_expect, rtol=1e-6)
+            assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
             assert_allclose(xs, xs_expect, rtol=1e-5)
             assert_allclose(ys, ys_expect, rtol=1e-5)
 
@@ -613,7 +613,7 @@ def test_Rachford_Rice_solutionN_vs_flash_inner_loop():
     ys, xs = comps
     
     beta_y_1d, xs_1d, ys_1d = flash_inner_loop(zs, Ks)
-    assert_allclose(beta_y, beta_y_1d)
+    assert_close(beta_y, beta_y_1d)
     assert_allclose(xs_1d, xs)
     assert_allclose(ys, ys_1d)
     
@@ -744,7 +744,7 @@ def test_Rachford_Rice_polynomial_solution_VFs():
     zs = [0.2, 0.3, 0.4, 0.05, 0.05]
     Ks = [2.5250, 0.7708, 1.0660, 0.2401, 0.3140]
     VF =  Rachford_Rice_solution_polynomial(zs, Ks)[0]
-    assert_allclose(VF, 0.5247206476383832)
+    assert_close(VF, 0.5247206476383832)
 
 
 def test_check_flash_inner():
@@ -754,7 +754,7 @@ def test_check_flash_inner():
     ys_expect = [0.8059104295763668, 0.0, 0.19408957042363328]
     assert_allclose(xs_expect, xs)
     assert_allclose(ys_expect, ys)
-    assert_allclose(VF, VF_expect)
+    assert_close(VF, VF_expect)
     
     
     zs = [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]

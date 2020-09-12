@@ -200,23 +200,26 @@ def test_Tflash():
     T3 = T_flash('71-43-2', method=IEC)
 
     Ts = [227.15, 262.15, 262.15]
-    assert_allclose([T1, T2, T3], Ts)
+    assert_close1d([T1, T2, T3], Ts)
 
     methods = T_flash_methods('110-54-3')
     assert methods == list(T_flash_all_methods)
-    
-    tot1 = pd.Series([T_flash(i) for i in IEC_2010_data.index]).sum()
-    tot2 = pd.Series([T_flash(i) for i in NFPA_2008_data.index]).sum()
-    tot3 = pd.Series([T_flash(i) for i in DIPPR_SERAT_data.index]).sum()
-    assert_allclose([tot1, tot2, tot3], [86127.510323478724, 59397.72151504083, 286056.08653090859])
 
-    tot_default = pd.Series([T_flash(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index, *DIPPR_SERAT_data.index])]).sum()
-    assert_allclose(tot_default, 324881.68653090857)
-    
     assert None == T_flash(CASRN='132451235-2151234-1234123')
 
     with pytest.raises(Exception):
         T_flash(CASRN='8006-61-9', method='BADMETHOD')
+    
+@pytest.mark.slow
+def test_Tflash_all_values():
+    tot1 = pd.Series([T_flash(i) for i in IEC_2010_data.index]).sum()
+    tot2 = pd.Series([T_flash(i) for i in NFPA_2008_data.index]).sum()
+    tot3 = pd.Series([T_flash(i) for i in DIPPR_SERAT_data.index]).sum()
+    assert_close1d([tot1, tot2, tot3], [86127.510323478724, 59397.72151504083, 286056.08653090859])
+
+    tot_default = pd.Series([T_flash(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index, *DIPPR_SERAT_data.index])]).sum()
+    assert_close(tot_default, 324881.68653090857)
+    
 
 
 def test_Tautoignition():
