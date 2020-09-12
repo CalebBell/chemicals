@@ -80,6 +80,8 @@ Pure Component Solid Fit Correlations
 Correlations for Specific Substances
 ------------------------------------
 .. autofunction:: chemicals.volume.iapws97_rho
+.. autofunction:: chemicals.volume.iapws97_P
+
 
 Fit Coefficients
 ----------------
@@ -182,7 +184,7 @@ from chemicals.utils import log, exp, isnan
 from chemicals.utils import Vm_to_rho, mixing_simple
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.iapws import iapws97_rho
+from chemicals.iapws import iapws97_rho, iapws97_P
 
 folder = os_path_join(source_path, 'Density')
 

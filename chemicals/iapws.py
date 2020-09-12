@@ -1682,7 +1682,8 @@ def iapws97_rho(T, P):
     accuracy. 
     
     For many applications, the discontinuities in IF-97 can be problematic and
-    the slower IAPWS-95 must be used. IAPWS-95 also has a wider range of applicability.
+    the slower IAPWS-95 must be used. IAPWS-95 also has a wider range of
+    applicability.
     
     Examples
     --------
@@ -1768,6 +1769,65 @@ def iapws_97_Trho_err_region5(P, T, rho):
     return err, derr
 
 def iapws97_P(T, rho):
+    r'''Calculate the pressure of wate according to the IAPWS-97 
+    standard given a temperature `T` and mass density `rho`.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    rho : float
+        Mass density of water, [kg/m^3]
+
+    Returns
+    -------
+    P : float
+        Pressure, [Pa]
+        
+    Notes
+    -----    
+    The range of validity of this formulation is as follows:
+        
+    For :math:`P \le 100 \text{ MPa}`:
+        
+    .. math::
+        273.15 \text{ K} \le T \le 1073.15 \text{ K}
+
+    For :math:`P \le 50 \text{ MPa}`:
+        
+    .. math::
+        1073.15 \text{ K} \le T \le 2273.15 \text{ K}
+        
+    A ValueError is raised if the temperature or density is out of bounds.
+    
+    Newton's method with analytical derivatives is used here to solve these
+    equations. The solver tolerance is as tight as it can be without causing
+    wasted iterations that do not improve the result at all. Pressure changes
+    quickly with density however, and some discrepancy between solvers is to be
+    expected.
+    
+    Examples
+    --------
+    >>> iapws97_P(330.0, iapws97_rho(T=330.0, P=8e5))
+    8e5
+    >>> iapws97_P(823.0, 40.39293607288123)
+    14e6
+    >>> iapws97_P(T=2000.0, rho=32.11456228328856)
+    3e7
+
+    Region 3 point - does not implement the same equations as 
+    :obj:`iapws97_rho`!
+    
+    >>> iapws97_P(648.6, iapws97_rho(T=648.6, P=22.5e6))
+    22499974.093936257
+    
+    References
+    ----------
+    .. [1] Cooper, JR, and RB Dooley. "Revised Release on the IAPWS Industrial 
+       Formulation 1997 for the Thermodynamic Properties of Water and Steam." 
+       The International Association for the Properties of Water and Steam 1 
+       (2007): 48.
+    '''
     R = 461.526
     if T < 273.15:
         raise ValueError("T is under minimum value of 273.15 K")
@@ -1814,8 +1874,6 @@ def iapws97_P(T, rho):
     elif T <= 2273.15:
         return newton(iapws_97_Trho_err_region5, 1e6, fprime=True, bisection=True,
                       low=1e-10, high=50e6, args=(T, rho), xtol=1e-12)
-
-        P_low, P_high = 1e-5, 50e6
     else:
         raise ValueError("T is above maximum value of 2273.15 K")
 
@@ -2245,7 +2303,7 @@ def iapws95_rho(T, P):
             rho = rho + drho_dT*(T - T_border)
 #            print(rho, 'initial guess', drho_dT, 'drho_dT')
             
-        err, derr = iapws95_rho_err(rho, T, P)
+    err, derr = iapws95_rho_err(rho, T, P)
     rho_old = rho - err/derr
     
     err, derr = iapws95_rho_err(rho_old, T, P)
