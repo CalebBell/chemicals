@@ -1639,7 +1639,7 @@ def iapws97_identify_region_TP(T, P):
     elif 1073.15 <= T <= 2273.15 and P <= 50E6:
         return 5
     else:
-        raise ValueError("For box (1,2,3,4) 273.15 K <= T <= 1073.15 K and P <= 100 MPa;"
+        raise ValueError("For box (1,2,3,4) 273.15 K <= T <= 1073.15 K and P <= 100 MPa; "
                          "for box 5, 1073.15 K <= T <= 2273.15 K and P <= 50 MPa.")
 
 def iapws97_rho(T, P):
@@ -1691,6 +1691,7 @@ def iapws97_rho(T, P):
         pi = P*1e-6
         tau = 1000.0/T
         dG_dpi = 1.0/pi + iapws97_dGr_dpi_region5(tau, pi) 
+#        print(pi, tau, dG_dpi, 'pi, tau, dG_dpi')
         return P/(R*T*pi*dG_dpi)
     else:
         raise ValueError("Out of bounds")
@@ -2194,13 +2195,33 @@ def iapws95_rho_err(rho, T, P_spec):
     return err, derr
 
 def iapws95_rho(T, P):
+    R = 461.51805
     # newton solver overhead is huge.
-    rho = iapws97_rho(T, P)
-    err, derr = iapws95_rho_err(rho, T, P)
+    try:
+        rho = iapws97_rho(T, P)
+    except:
+        if T > 2273.15 and P < 50E6:
+            T_border = 2273.15
+            Pref = 1e6
+            Tref = 1e3
+            pi = P/Pref
+            tau = Tref/T_border
+            # region 5 upwards T extrapolte drho_dT
+            dGr_dpi = iapws97_dGr_dpi_region5(tau, pi) 
+            dG_dpi = 1/pi + dGr_dpi
+            rho = P/(R*T_border*pi*dG_dpi)
+            #print(pi, tau, dG_dpi, 'pi, tau, dG_dpi')
+            d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region5(tau, pi) 
+            drho_dT = -Pref/(R*T_border*T_border*(dGr_dpi + Pref/P)) + Pref*Tref*d2Gr_dpidtau/(R*T_border**3*(dGr_dpi + Pref/P)**2)
+            rho = rho + drho_dT*(T - T_border)
+#            print(rho, 'initial guess', drho_dT, 'drho_dT')
+            
+        err, derr = iapws95_rho_err(rho, T, P)
     rho_old = rho - err/derr
     
     err, derr = iapws95_rho_err(rho_old, T, P)
     rho = rho_old - err/derr
+    
     while abs(rho_old - rho) > abs(1e-11*rho):
         rho_old = rho
         err, derr = iapws95_rho_err(rho, T, P)
