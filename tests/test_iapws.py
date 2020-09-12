@@ -866,3 +866,17 @@ def test_iapws97_T_fuzz():
             rho = iapws97_rho(T, P)
             T_calc = iapws97_T(P, rho)
             assert_close(T, T_calc, rtol=5e-9)
+
+
+def test_rho_iapws95_CoolProp():
+    from CoolProp.CoolProp import PropsSI
+    N = 40
+    Ts = linspace(273.16+1e-10,  1073.15-1e-10, N)
+    Ps = logspace(log10(1e-3), log10(100e6), N)
+    
+    for T in Ts:
+        for P in Ps:
+            rho_implemented = iapws95_rho(T, P)
+            rho_CoolProp = PropsSI('DMASS', 'T', T, 'P', P, 'water')
+            assert_close(rho_implemented, rho_CoolProp, rtol=1e-10)
+            # some points found to fail near Psat curve as expected.

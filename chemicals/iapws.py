@@ -35,6 +35,7 @@ __all__ = [
            'iapws97_boundary_3qu', 'iapws97_boundary_3rx', 'iapws97_boundary_3wx',
            'iapws97_boundary_3ab', 'iapws97_boundary_3op',
            'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
+           'iapws95_rho',
            'iapws97_rho', 'iapws97_P', 'iapws97_T',
            
            'iapws95_d2A_d2deltar', 'iapws95_dA_ddeltar',
@@ -64,7 +65,8 @@ __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97
     'iapws_97_Trho_err_region1', 'iapws_97_Trho_err_region2', 'iapws_97_Trho_err_region5',
     
     'iapws_97_Prho_err_region1', 'iapws_97_Prho_err_region2', 'iapws_97_Prho_err_region5',
-    'iapws_97_Prho_err_region3'
+    'iapws_97_Prho_err_region3',
+    'iapws95_rho_err', 
     ]
 
 
@@ -2175,3 +2177,33 @@ def iapws95_d2A_d2deltar(tau, delta):
             + 0.252868894564308*x11*x15*x19*(56.0*x2 - 1.0) 
             + 20.3559109622041596*x13*x20*x14*(delta*(64.0*x3 - 1.0) + x9) 
             - 0.604316106690436006*x14*x19*x20*(64.0*x2 - 1.0) + 63.0922804755619993*x6*x7)
+            
+            
+            
+def iapws95_rho_err(rho, T, P_spec):
+    R = 461.51805
+    rhoc_inv = (1.0/322.0)
+    tau = 647.096/T
+    delta = rho*rhoc_inv
+    dAddelta_res_val = iapws95_dA_ddeltar(tau, delta)
+    d2Ad2delta_res_val = iapws95_d2A_d2deltar(tau, delta)
+    P_calc = (1.0 + dAddelta_res_val*delta)*rho*R*T
+    err = P_calc - P_spec
+    derr = R*T*(rho*(rho*d2Ad2delta_res_val + 644.0*dAddelta_res_val)
+                + 103684.0)*9.644689633887581e-06 # 1/322**2
+    return err, derr
+
+def iapws95_rho(T, P):
+    # newton solver overhead is huge.
+    rho = iapws97_rho(T, P)
+    err, derr = iapws95_rho_err(rho, T, P)
+    rho_old = rho - err/derr
+    
+    err, derr = iapws95_rho_err(rho_old, T, P)
+    rho = rho_old - err/derr
+    while abs(rho_old - rho) > abs(1e-11*rho):
+        rho_old = rho
+        err, derr = iapws95_rho_err(rho, T, P)
+        rho = rho - err/derr
+    return rho
+
