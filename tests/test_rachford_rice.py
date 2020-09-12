@@ -22,7 +22,6 @@ SOFTWARE.
 """
 
 from math import exp, log
-from numpy.testing import assert_allclose
 import pytest
 import numpy as np
 import pandas as pd
@@ -32,9 +31,9 @@ from chemicals.rachford_rice import *
 from chemicals.rachford_rice import Rachford_Rice_solution_numpy
 from chemicals.rachford_rice import Rachford_Rice_valid_solution_naive, Rachford_Rice_solution2
 from chemicals.rachford_rice import Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac
-from fluids.numerics import assert_close, assert_close1d, assert_close2d, normalize
-from random import uniform
-import random
+from fluids.numerics import isclose, assert_close, assert_close1d, assert_close2d, normalize
+from random import uniform, randint, random
+from chemicals import normalize
 
 
 def RR_solution_mpmath(zs, Ks, dps=200):
@@ -111,13 +110,13 @@ def test_Rachford_Rice_solution():
     for args in [(False, False), (True, False), (True, True), (False, True)]:
         V_over_F, xs, ys = Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=args[0], fprime2=args[1])
         assert_close(V_over_F, V_over_F_expect)
-        assert_allclose(xs, xs_expect)
-        assert_allclose(ys, ys_expect)
+        assert_close1d(xs, xs_expect)
+        assert_close1d(ys, ys_expect)
         
     V_over_F, xs, ys = Rachford_Rice_solution_numpy(zs=zs, Ks=Ks)
     assert_close(V_over_F, V_over_F_expect)
-    assert_allclose(xs, xs_expect)
-    assert_allclose(ys, ys_expect)
+    assert_close1d(xs, xs_expect)
+    assert_close1d(ys, ys_expect)
     
     # TODO support
     zs = [0.1]*10
@@ -131,8 +130,8 @@ def test_Rachford_Rice_solution_LN2_backup():
     V_over_F, xs, ys = Rachford_Rice_solution_LN2(zs=zs, Ks=Ks)
     xs_expect = [0.5000617287749428, 0.1999012339600916, 0.10001234575498856, 1.0001234575498856e-06, 0.20002369138651954]
     ys_expect = [4.3868006610706666e-14, 0.9999999999998495, 2.1306928346491458e-16, 1.0679628749383915e-31, 1.0641617779829182e-13]
-    assert_allclose(xs, xs_expect)
-    assert_allclose(ys, ys_expect)
+    assert_close1d(xs, xs_expect)
+    assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0.0001234423100003866)
     
     
@@ -142,8 +141,8 @@ def test_Rachford_Rice_solution_LN2_backup():
     V_over_F, xs, ys = Rachford_Rice_solution_LN2(zs=zs, Ks=Ks)
     xs_expect = [0.01717590404145029, 7.007973548209148e-06, 0.15724710033808065, 0.8128352581509947, 0.012734729495935555]
     ys_expect = [0.2656238021113802, 0.04910234834883537, 0.28439455373097544, 0.0063000230695374705, 0.3945792727392716]
-    assert_allclose(xs, xs_expect)
-    assert_allclose(ys, ys_expect)
+    assert_close1d(xs, xs_expect)
+    assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0.999999999000000)
     
     # Case where solver not in range
@@ -152,8 +151,8 @@ def test_Rachford_Rice_solution_LN2_backup():
     V_over_F, xs, ys = Rachford_Rice_solution_LN2(zs=zs, Ks=Ks)
     xs_expect = [0.4050793625620341, 0.0731164503215314, 0.0739927977508874, 0.0028093939126068498, 0.44500199545294034]
     ys_expect = [2.9693700609116885e-19, 0.9999999999999999, 6.0324551579612055e-22, 1.3154876898578485e-37, 3.4297886669501107e-18]
-    assert_allclose(xs, xs_expect)
-    assert_allclose(ys, ys_expect)
+    assert_close1d(xs, xs_expect)
+    assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0, atol=1e-15)
     
     # Case where the evaluated point is right on the boundary
@@ -162,8 +161,8 @@ def test_Rachford_Rice_solution_LN2_backup():
     V_over_F, xs, ys = Rachford_Rice_solution_LN2(zs=zs, Ks=Ks)
     xs_expect = [0.13754371891028325, 0.2984515568715462, 0.2546683930289046, 0.08177453852283137, 0.22756179266643456]
     ys_expect = [1.7284711382368154e-22, 1.0, 2.6232565304082093e-24, 1.3952850703269794e-40, 3.728111920707972e-21]
-    assert_allclose(xs, xs_expect)
-    assert_allclose(ys, ys_expect)
+    assert_close1d(xs, xs_expect)
+    assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0, atol=1e-15)
 
 
@@ -173,8 +172,8 @@ def test_flash_inner_loop():
     xs_expect = [0.33940869696634357, 0.3650560590371706, 0.2955352439964858]
     ys_expect = [0.5719036543882889, 0.27087159580558057, 0.15722474980613044]
     assert_close(V_over_F, 0.6907302627738544)
-    assert_allclose(xs, xs_expect)
-    assert_allclose(ys, ys_expect)
+    assert_close1d(xs, xs_expect)
+    assert_close1d(ys, ys_expect)
 
     zs = [0.1, 0.2, 0.3, 0.4]
     Ks = [4.2, 1.75, 0.74, 0.34]
@@ -182,8 +181,8 @@ def test_flash_inner_loop():
     ys_expect = [0.30215203782002353, 0.320685211367261, 0.2292653811151457, 0.14789736969756986]
     V_over_F, xs, ys = flash_inner_loop(zs=zs, Ks=Ks, method='Analytical')
     assert_close(V_over_F, 0.12188396426827647)
-    assert_allclose(xs, xs_expect)
-    assert_allclose(ys, ys_expect)
+    assert_close1d(xs, xs_expect)
+    assert_close1d(ys, ys_expect)
 
 #     Self created random case, twice, to force the recognition
     V_over_F, xs, ys = flash_inner_loop(zs=[0.6, 0.4], Ks=[1.685, 0.4], method='Analytical')
@@ -196,8 +195,8 @@ def test_flash_inner_loop():
 
     V_over_F_5a, xs_5a, ys_5a = flash_inner_loop(zs=[0.1, 0.2, 0.3, 0.3, .01], Ks=[4.2, 1.75, 0.74, 0.34, .01], method='Analytical')
     V_over_F_5b, xs_5b, ys_5b = flash_inner_loop(zs=[0.1, 0.2, 0.3, 0.3, .01], Ks=[4.2, 1.75, 0.74, 0.34, .01])
-    assert_allclose(xs_5a, xs_5b)
-    assert_allclose(ys_5a, ys_5b)
+    assert_close1d(xs_5a, xs_5b)
+    assert_close1d(ys_5a, ys_5b)
     assert_close(V_over_F_5a, V_over_F_5b)
 
 
@@ -216,9 +215,9 @@ def test_flash_inner_loop():
     # Zero composition - technically this is incorrect? But quite useful in saturation calcs
 #    zs, Ks = [0.79, 1e-100, 0.21], [51257.70115063271, 0.01720948221285233, 3939.4410123117154]
 #    V_over_F, xs, ys = flash_inner_loop(zs, Ks, check=True)
-#    assert_allclose(1.0175108346095985, V_over_F)
-#    assert_allclose([1.5147085263221123e-05, 0.0, 5.2389897372063305e-05], xs)
-#    assert_allclose([0.7764047697253411, 0.0, 0.20638691033830794], ys)
+#    assert_close1d(1.0175108346095985, V_over_F)
+#    assert_close1d([1.5147085263221123e-05, 0.0, 5.2389897372063305e-05], xs)
+#    assert_close1d([0.7764047697253411, 0.0, 0.20638691033830794], ys)
 
 
 
@@ -258,7 +257,7 @@ def test_flash_solution_algorithms():
         xs_expect = [1/3., 2/3.]
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect)
-        assert_allclose(xs, xs_expect)
+        assert_close1d(xs, xs_expect)
         
         # Hard to resolve two test; LN2 fails, its objective function does not
         # appear to have any zeroes due to numerical issues.
@@ -269,9 +268,9 @@ def test_flash_solution_algorithms():
 #        xs_expect = [0.20914260341855995, 0.7908573965814395]
 #        ys_expect =  [5.737602142294611e-12, 0.9999999999942625]
 #        V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-#        assert_allclose(V_over_F, V_over_F_expect)
-#        assert_allclose(xs, xs_expect)
-#        assert_allclose(ys, ys_expect)
+#        assert_close1d(V_over_F, V_over_F_expect)
+#        assert_close1d(xs, xs_expect)
+#        assert_close1d(ys, ys_expect)
 
         # Dummpy 3 test
         zs = [0.5, 0.3, 0.2]
@@ -280,7 +279,7 @@ def test_flash_solution_algorithms():
         xs_expect = [0.3394086969663436, 0.3650560590371706, 0.29553524399648573]
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect)
-        assert_allclose(xs, xs_expect)
+        assert_close1d(xs, xs_expect)
 
         # Said to be in:  J.D. Seader, E.J. Henley, D.K. Roper, Separation Process Principles, third ed., John Wiley & Sons, New York, 2010.
         zs = [0.1, 0.2, 0.3, 0.4]
@@ -290,7 +289,7 @@ def test_flash_solution_algorithms():
 
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect, rtol=1E-4)
-        assert_allclose(xs, xs_expect, rtol=1E-4)
+        assert_close1d(xs, xs_expect, rtol=1E-4)
 
         # Said to be in:  B.A. Finlayson, Introduction to Chemical Engineering Computing, second ed., John Wiley & Sons, New York, 2012.
         zs = [0.1, 0.3, 0.4, 0.2]
@@ -300,7 +299,7 @@ def test_flash_solution_algorithms():
 
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect, rtol=1E-5)
-        assert_allclose(xs, xs_expect, rtol=1E-5)
+        assert_close1d(xs, xs_expect, rtol=1E-5)
 
         # Said to be in: J. Vidal, Thermodynamics: Applications in Chemical Engineering and the Petroleum Industry, Technip, Paris, 2003.
         zs = [0.2, 0.3, 0.4, 0.05, 0.05]
@@ -309,7 +308,7 @@ def test_flash_solution_algorithms():
         xs_expect = [0.11120375, 0.34091324, 0.38663852, 0.08304114, 0.07802677]
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect, rtol=1E-2)
-        assert_allclose(xs, xs_expect, rtol=1E-2)
+        assert_close1d(xs, xs_expect, rtol=1E-2)
 
 
         # Said to be in: R. Monroy-Loperena, F.D. Vargas-Villamil, On the determination of the polynomial defining of vapor-liquid split of multicomponent mixtures, Chem.Eng. Sci. 56 (2001) 5865–5868.
@@ -320,7 +319,7 @@ def test_flash_solution_algorithms():
 
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
-        assert_allclose(xs, xs_expect, rtol=1E-6)
+        assert_close1d(xs, xs_expect, rtol=1E-6)
         
         # Long tests - do not want to test with poly
         if algo is flash_inner_loop_poly:
@@ -334,7 +333,7 @@ def test_flash_solution_algorithms():
 
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
-        assert_allclose(xs, xs_expect, rtol=1E-5)
+        assert_close1d(xs, xs_expect, rtol=1E-5)
 
         # Random example from MultiComponentFlash.xlsx, https://6507a56d-a-62cb3a1a-s-sites.googlegroups.com/site/simulationsmodelsandworksheets/MultiComponentFlash.xlsx?attachauth=ANoY7coiZq4OX8HjlI75HGTWiegJ9Tqz6cyqmmmH9ib-dhcNL89TIUTmQw3HxrnolKHgYuL66drYGasDgTkf4_RrWlciyRKwJCbSi5YgTG1GfZR_UhlBuaoKQvrW_L8HdboB3PYejRbzVQaCshwzYcOeGCZycdXQdF9scxoiZLpy7wbUA0xx8j9e4nW1D9PjyApC-MjsjqjqL10HFcw1KVr5sD0LZTkZCqFYA1HReqLzOGZE01_b9sfk351BB33mwSgWQlo3DLVe&attredirects=0&d=1
         Ks = [0.90000, 2.70000, 0.38000, 0.09800, 0.03800, 0.02400, 0.07500, 0.00019, 0.00070]
@@ -389,26 +388,33 @@ def test_RR4_analytical_correct_root_selection():
     V_over_F, xs, ys = flash_inner_loop(zs, Ks, method='Analytical')
     xs_expect = [0.002907312276718056, 0.35857061296097453, 0.3640191709591237, 0.2745029038031836]
     ys_expect = [0.7917744568491449, 0.011948500343385897, 2.0134713659119683e-06, 0.19627502933610355]
-    assert_allclose(xs, xs_expect)
-    assert_allclose(ys, ys_expect)
+    assert_close1d(xs, xs_expect)
+    assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0.3132247165106723)
 
 
 
 @pytest.mark.slow
 def test_fuzz_flash_inner_loop():
-#    np.random.seed(0)
-    for i in range(5000):
-        n = np.random.randint(2,100)
-        Ks = 2*np.random.random(n)
-        zs = np.random.random(n)
-        zs = zs/sum(zs)
-        if any(Ks > 1) and any(Ks < 1):
-            zs, Ks = list(zs), list(Ks)
+    for i in range(200):
+        n = randint(2,100)
+        Ks = [random()*2.0 for i in range(n)]
+        zs = normalize([random() for i in range(n)])
+        K_neg, K_pos = False, False
+        for Ki in Ks:
+            if Ki > 1.0:
+                K_pos = True
+                if K_neg:
+                    break
+            if Ki < 1.0:
+                K_neg = True
+                if K_pos:
+                    break
+        if K_neg and K_pos:
             flash_inner_loop(zs=zs, Ks=Ks)
-
+    
 def test_RR_3_component_analytical_killers():
-    # 3 ms test - need to replace assert_allcloses
+    # 3 ms test - need to replace assert_close1ds
     # Causes a zero division in the current analytical implementation
     # Unfortunately, a slight numerical change in the future may move
     # where the point occurs, and then this test will not cover it
@@ -423,15 +429,14 @@ def test_RR_3_component_analytical_killers():
     for method in methods:
         V_over_F, xs, ys = flash_inner_loop(zs, Ks, method=method)
         assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
-        assert_allclose(xs, xs_expect, rtol=1e-5)
-        assert_allclose(ys, ys_expect, rtol=1e-5)
+        assert_close1d(xs, xs_expect, rtol=1e-5)
+        assert_close1d(ys, ys_expect, rtol=1e-5)
     
     zs = [.8, 0.19, .01]
     Ks = [1.0003745026538315, 0.9983665794975959, 1.0010499948551157]
-    with pytest.raises(Exception):
-        V_over_F, xs, ys = flash_inner_loop(zs, Ks, method='Analytical')
-        V_over_F_good, xs_good, ys_good = Rachford_Rice_solution(zs, Ks)
-        assert_close(V_over_F, V_over_F_good)
+    V_over_F, xs, ys = flash_inner_loop(zs, Ks, method='Analytical')
+    V_over_F_good, xs_good, ys_good = Rachford_Rice_solution(zs, Ks)
+    assert not isclose(V_over_F, V_over_F_good)
         
 def test_RR_9_guess_outside_bounds():
     zs = [0.019940159581097128, 0.0029910239371645692, 9.970079790548564e-07, 0.6480551863856566, 0.12961103727713133, 0.08973071811493706, 0.04985039895274282, 0.029910239371645688, 0.029910239371645688]
@@ -444,8 +449,8 @@ def test_RR_9_guess_outside_bounds():
     
     V_over_F, xs, ys = Rachford_Rice_solution_LN2(zs, Ks, guess=guess)
     assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
-    assert_allclose(xs, xs_expect, rtol=1e-5)
-    assert_allclose(ys, ys_expect, rtol=1e-5)
+    assert_close1d(xs, xs_expect, rtol=1e-5)
+    assert_close1d(ys, ys_expect, rtol=1e-5)
     
     # Check all the methods anyway 
     methods = flash_inner_loop_methods(len(zs))
@@ -455,8 +460,8 @@ def test_RR_9_guess_outside_bounds():
         if 'polynomial' not in method:
             V_over_F, xs, ys = flash_inner_loop(zs, Ks, method=method)
             assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
-            assert_allclose(xs, xs_expect, rtol=1e-5)
-            assert_allclose(ys, ys_expect, rtol=1e-5)
+            assert_close1d(xs, xs_expect, rtol=1e-5)
+            assert_close1d(ys, ys_expect, rtol=1e-5)
 
 
 def validate_RR_convergence(ns, Ks, betas, n=1000):
@@ -491,17 +496,17 @@ def test_Rachford_Rice_solution2():
     
     for func in (Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac):
         f, jac = func(betas, zs, [Ks_y, Ks_z])
-        assert_allclose(f, fs_expect)
-        assert_allclose(jac, jac_expect)
+        assert_close1d(f, fs_expect)
+        assert_close1d(jac, jac_expect)
     
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=.1, beta_z=.6)
     xs_expect = [0.1712804659711611, 0.08150738616425436, 0.1393433949193188, 0.20945175387703213, 0.15668977784027893, 0.22650123851718007, 0.015225982711774586]
     ys_expect = [0.21147483364299702, 0.07313470386530294, 0.31982891387635903, 0.33293382568889657, 0.036586042443791586, 0.004616341311925655, 0.02142533917172731]
     zs_expect = [0.26156812278601893, 0.00200221914149187, 0.20392660665189805, 0.2431536850887592, 0.03786610596908295, 0.03355679851539993, 0.21792646184834918]
-    assert_allclose([ans[0], ans[1]], [0.6868328915094766, 0.06019424397668606])
-    assert_allclose(ans[2], xs_expect)
-    assert_allclose(ans[3], ys_expect)
-    assert_allclose(ans[4], zs_expect)
+    assert_close1d([ans[0], ans[1]], [0.6868328915094766, 0.06019424397668606])
+    assert_close1d(ans[2], xs_expect)
+    assert_close1d(ans[3], ys_expect)
+    assert_close1d(ans[4], zs_expect)
     # Guesses that go out of bounds:
 #    x0 = [.3, .55], [.3, .8]
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.6868328915094766, 0.06019424397668606], n=n_composition_fuzz)
@@ -513,7 +518,7 @@ def test_Rachford_Rice_solution2():
     Ks_y = [26.3059904941, 1.91580344867, 1.42153325608, 3.21966622946, 0.22093634359, 0.01039336513, 19.4239894458]
     Ks_z = [66.7435876079, 1.26478653025, 0.94711004430, 3.94954222664, 0.35954341233, 0.09327536295, 12.0162990083]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=0.7)
-    assert_allclose([ans[0], ans[1]], [0.46945316414811566, 0.47024451567068165])
+    assert_close1d([ans[0], ans[1]], [0.46945316414811566, 0.47024451567068165])
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.46945316414811566, 0.47024451567068165], n=n_composition_fuzz)
 
     # Example 3 in Okuno 2010
@@ -521,7 +526,7 @@ def test_Rachford_Rice_solution2():
     Ks_y = [1.64571122126, 1.91627717926, 0.71408616431, 0.28582415424, 0.04917567928, 0.00326226927, 0.00000570946]
     Ks_z = [1.61947897153, 2.65352105653, 0.68719907526, 0.18483049029, 0.01228448216, 0.00023212526, 0.00000003964]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=0.9)
-    assert_allclose([ans[0], ans[1]], [0.8701633566336909, 2.1803031624194252e-06,], rtol=1e-6)
+    assert_close1d([ans[0], ans[1]], [0.8701633566336909, 2.1803031624194252e-06,], rtol=1e-6)
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.8701633566336909, 2.1803031624194252e-06], n=n_composition_fuzz)
 
     # Example 4 in Okuno 2010 (only of their examples with a test)
@@ -530,7 +535,7 @@ def test_Rachford_Rice_solution2():
     Ks_y = [0.112359551, 13.72549020, 3.389830508]
     Ks_z = [1.011235955, 0.980392157, 0.847457627]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, 0.5, 0.3)
-    assert_allclose([ans[0], ans[1]], [1.2, 14.66])
+    assert_close1d([ans[0], ans[1]], [1.2, 14.66])
     validate_RR_convergence(zs, [Ks_y, Ks_z], [1.2, 14.66], n=n_composition_fuzz)
 
 
@@ -539,7 +544,7 @@ def test_Rachford_Rice_solution2():
     Ks_y = [0.886975564280731, 183.729456216368, 28.8439229979536, 0.762796901964099, 6.805250689498878e-2, 0.345376016039736]
     Ks_z = [1.85133355509695, 0.567851997436811, 0.291644844783998, 0.182989507250403, 8.745408265736165e-2, 0.623957189693138]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=.7, beta_z=.2)
-    assert_allclose([ans[0], ans[1]], [0.7151778078967964, 0.06609909166404299])
+    assert_close1d([ans[0], ans[1]], [0.7151778078967964, 0.06609909166404299])
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.7151778078967964, 0.06609909166404299], n=n_composition_fuzz)
 
     # example 2 Li and Firoozabadi 2012: Initialization of phase fractions in Rachford-Rice equations for robust and efficient three-phase split calculation
@@ -547,7 +552,7 @@ def test_Rachford_Rice_solution2():
     Ks_y = [1.40089114681102, 2.41359153035331, 0.684675481993755, 0.192706323169157, 1.344316808771735e-2, 2.913379631601974e-4, 9.614643893437818e-8]
     Ks_z = [1.42336619958799, 1.56360101270076, 0.805778846552492, 0.437918929556065, 0.136423337258229, 2.241151325196582e-2, 3.114699395928320e-4]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=1e-3)
-    assert_allclose([ans[0], ans[1]], [0.3886026201178722, 1.1532086735243752e-05])
+    assert_close1d([ans[0], ans[1]], [0.3886026201178722, 1.1532086735243752e-05])
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.3886026201178722, 1.1532086735243752e-05], n=n_composition_fuzz)
 
     # example 3 Li and Firoozabadi 2012: Initialization of phase fractions in Rachford-Rice equations for robust and efficient three-phase split calculation
@@ -555,7 +560,7 @@ def test_Rachford_Rice_solution2():
     Ks_y = [0.367489928755904 , 91.9551101941298 , 17.6437660816506 , 0.523968443113866 , 5.444380423358842e-2, 0.192716832533260 ]
     Ks_z = [1.45983188593810, 0.627700554178016, 0.405472131110146, 0.291902855037650, 0.172272959622522, 0.704057279260822]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=.3, beta_z=.01)
-    assert_allclose([ans[0], ans[1]], [0.3753717656603343, 0.04710389352175518])
+    assert_close1d([ans[0], ans[1]], [0.3753717656603343, 0.04710389352175518])
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.3753717656603343, 0.04710389352175518], n=n_composition_fuzz)
 
     # example (Table 2) in Gao 2018 Hybrid Newton-Successive  Substitution Method for Multiphase Rachford-Rice Equations
@@ -571,10 +576,10 @@ def test_Rachford_Rice_solution2():
     # -0.01686263294, -1.1254155641 claimed to be ans 
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=0, beta_z=-1.12)
     
-    assert_allclose([ans[0], ans[1]], [-0.01686263291292747, -1.1254155641065355])
-    assert_allclose(ans[2], xs_expect, atol=1e-12)
-    assert_allclose(ans[3], ys_expect, atol=1e-11)
-    assert_allclose(ans[4], zs_expect, atol=1e-11)
+    assert_close1d([ans[0], ans[1]], [-0.01686263291292747, -1.1254155641065355])
+    assert_close1d(ans[2], xs_expect, atol=1e-12)
+    assert_close1d(ans[3], ys_expect, atol=1e-11)
+    assert_close1d(ans[4], zs_expect, atol=1e-11)
     validate_RR_convergence(zs, [Ks_y, Ks_z], [-0.01686263291292747, -1.1254155641065355], n=n_composition_fuzz)
 
 
@@ -591,8 +596,8 @@ def test_Rachford_Rice_solution2():
     JEMA_zs = [0.893] + [i*(1 - 0.893)/sum(JEMA_zs) for i in JEMA_zs]
     # CO2 frac 0.893 according to fig. 14 label
     beta_y, beta_z, xs, ys, zs = Rachford_Rice_solution2(JEMA_zs, JEMA_Ks_g, JEMA_Ks_l2)
-    assert_allclose(beta_y, -0.37293697094541645)
-    assert_allclose(beta_z, 1.2080206455621543)
+    assert_close(beta_y, -0.37293697094541645)
+    assert_close(beta_z, 1.2080206455621543)
     
     MSO_Ks_g = [1.420340741, 0.2964408254, 0.1805854981, 0.09303281846, 0.03891826286, 0.01263057652, 0.001106068886]
     MSO_Ks_l2 = [1.479781968, 0.06117039468, 0.01625155948, 0.002749741486, 0.0002664184498, 1.309992275E-05, 1.928151262E-08]
@@ -601,7 +606,7 @@ def test_Rachford_Rice_solution2():
     MSO_zs = [0.9483] + [i*(1 - 0.9483)/sum(MSO_zs) for i in MSO_zs]
     
     beta_y, beta_z, xs, ys, zs = Rachford_Rice_solution2(MSO_zs, MSO_Ks_g, MSO_Ks_l2)
-    assert_allclose([beta_y, beta_z], [0.0005228950085238463, 0.857047095608143])
+    assert_close1d([beta_y, beta_z], [0.0005228950085238463, 0.857047095608143])
 
 
 def test_Rachford_Rice_solutionN_vs_flash_inner_loop():
@@ -614,8 +619,8 @@ def test_Rachford_Rice_solutionN_vs_flash_inner_loop():
     
     beta_y_1d, xs_1d, ys_1d = flash_inner_loop(zs, Ks)
     assert_close(beta_y, beta_y_1d)
-    assert_allclose(xs_1d, xs)
-    assert_allclose(ys, ys_1d)
+    assert_close1d(xs_1d, xs)
+    assert_close1d(ys, ys_1d)
     
     
 def test_Rachford_Rice_solutionN():
@@ -647,7 +652,7 @@ def test_Rachford_Rice_solutionN():
         assert_close(beta_i, beta_known, atol=1e-8)
     
     for comp_calc, comp_expect in zip(comps, comps_expect):
-        assert_allclose(comp_calc, comp_expect, atol=1e-9)
+        assert_close1d(comp_calc, comp_expect, atol=1e-9)
 
 @pytest.mark.slow
 @pytest.mark.mpmath
@@ -682,44 +687,44 @@ def test_Rachford_Rice_polynomial():
     zs, Ks = [.4, .6], [2, .5]
     poly = Rachford_Rice_polynomial(zs, Ks)
     coeffs_2 = [1.0, -0.20000000000000007]
-    assert_allclose(coeffs_2, poly)
+    assert_close1d(coeffs_2, poly)
 
     zs = [0.5, 0.3, 0.2]
     Ks = [1.685, 0.742, 0.532]
     coeffs_3 = [1, -3.692652996676083, 2.073518878815094]
     poly = Rachford_Rice_polynomial(zs, Ks)
-    assert_allclose(coeffs_3, poly)
+    assert_close1d(coeffs_3, poly)
     
     zs = [0.2, 0.3, 0.4, 0.1]
     Ks = [2.5250, 0.7708, 1.0660, 0.2401]
     coeffs_4 =  [1, 5.377031669207758, -24.416684496523914, 10.647389883139642]
     poly = Rachford_Rice_polynomial(zs, Ks)
-    assert_allclose(coeffs_4, poly)
+    assert_close1d(coeffs_4, poly)
     
     zs = [0.2, 0.3, 0.4, 0.05, 0.05]
     Ks = [2.5250, 0.7708, 1.0660, 0.2401, 0.3140]
     poly = Rachford_Rice_polynomial(zs, Ks)
     coeffs_5 = [1.0, 3.926393887728915, -32.1738043292604, 45.82179827480925, -15.828236126660224]
-    assert_allclose(coeffs_5, poly)
+    assert_close1d(coeffs_5, poly)
     
     # 6 and higher use generic routine
     zs = [0.05, 0.10, 0.15, 0.30, 0.30, 0.10]
     Ks = [6.0934, 2.3714, 1.3924, 1.1418, 0.6457, 0.5563]
     coeffs_6 = [1.0, 3.9413425113979077, -9.44556472337601, -18.952349132451488, 9.04210538319183, 5.606427780744831]
     poly = Rachford_Rice_polynomial(zs, Ks)
-    assert_allclose(coeffs_6, poly)
+    assert_close1d(coeffs_6, poly)
     
     Ks = [0.9, 2.7, 0.38, 0.098, 0.038, 0.024, 0.075]
     zs = [0.0112, 0.8957, 0.0526, 0.0197, 0.0068, 0.0047, 0.0093]
     poly = Rachford_Rice_polynomial(zs, Ks)
     coeffs_7 = [1.0, -15.564752719919635, 68.96609128282495, -141.05508474225547, 150.04980583027202, -80.97492465198536, 17.57885132690501]
-    assert_allclose(coeffs_7, poly)
+    assert_close1d(coeffs_7, poly)
     
     Ks = [0.90000, 2.70000, 0.38000, 0.09800, 0.03800, 0.02400, 0.07500, 0.00019]
     zs = [0.0112, 0.8957, 0.0526, 0.0197, 0.0068, 0.0047, 0.0038, 0.0055]
     poly = Rachford_Rice_polynomial(zs, Ks)
     coeffs_8 = [1.0, -16.565387656773854, 84.54011830455603, -210.05547256828095, 291.1575729888513, -231.05951648043205, 98.55989361947283, -17.577207793453983]
-    assert_allclose(coeffs_8, poly)
+    assert_close1d(coeffs_8, poly)
 
 
 @pytest.mark.slow
@@ -735,7 +740,7 @@ def test_Rachford_Rice_polynomial_large():
                  -3479139.4994188584, -1635369.1552006816]
     
     poly = Rachford_Rice_polynomial(zs, Ks)
-    assert_allclose(coeffs_19, poly)
+    assert_close1d(coeffs_19, poly)
     
     # doubling 19 runs out of ram. 
     
@@ -752,8 +757,8 @@ def test_check_flash_inner():
     VF_expect = 26.36192330738477
     xs_expect = [0.8298009848088218, 0.0, 0.17019901519117814]
     ys_expect = [0.8059104295763668, 0.0, 0.19408957042363328]
-    assert_allclose(xs_expect, xs)
-    assert_allclose(ys_expect, ys)
+    assert_close1d(xs_expect, xs)
+    assert_close1d(ys_expect, ys)
     assert_close(VF, VF_expect)
     
     
