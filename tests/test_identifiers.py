@@ -29,6 +29,7 @@ from chemicals.elements import periodic_table, nested_formula_parser, serialize_
 import os
 from chemicals.identifiers import ChemicalMetadataDB, folder, pubchem_db
 from chemicals.identifiers import common_mixtures
+from fluids.numerics import assert_close, assert_close1d
 
 # Force the whole db to load
 try:
@@ -40,7 +41,8 @@ def test_dippr_list():
     dippr_set = dippr_compounds()
     # TODO CASs formulas
     assert 12916928773 == sum([CAS_to_int(i) for i in dippr_set])
-    assert all([check_CAS(i) for i in dippr_set])
+    for i in dippr_set:
+        assert check_CAS(i)
 
 
 @pytest.mark.slow
@@ -92,14 +94,17 @@ def test_Matthews_critical_names():
 
 @pytest.mark.slow
 def test_pubchem_dict():
-    assert all([check_CAS(i.CASs) for i in pubchem_db.CAS_index.values()])
+    for i in pubchem_db.CAS_index.values():
+        assert check_CAS(i.CASs)
 
+@pytest.mark.skip
 @pytest.mark.xfail
 def test_database_formulas():
     # Failures are thing slike 3He, C2D4Br2, C14H18N3NaO10[99Tc], [1H]I
     # The fix here is adding an isotope db and making the formula parser handle isotopes as well.
     # This worked until isotopes were added to formulas
-    assert all([i.formula == serialize_formula(i.formula) for i in pubchem_db.CAS_index.values()])
+    for i in pubchem_db.CAS_index.values():
+        assert i.formula == serialize_formula(i.formula) 
 
 def test_organic_user_db():
     db = ChemicalMetadataDB(elements=False,
@@ -117,17 +122,19 @@ def test_organic_user_db():
         assert CAS_from_any('smiles=' + smi) == d.CASs
 
     # Check formula is formatted right
-    assert all([i.formula == serialize_formula(i.formula) for i in db.CAS_index.values()])
+    for i in db.CAS_index.values():
+        assert i.formula == serialize_formula(i.formula)
 
     # Check CAS validity
-    assert all([check_CAS(i.CASs) for i in db.CAS_index.values()])
+    for i in db.CAS_index.values():
+        assert check_CAS(i.CASs)
 
     # MW checker
     for i in db.CAS_index.values():
         formula = serialize_formula(i.formula)
         atoms = nested_formula_parser(formula, check=False)
         mw_calc = molecular_weight(atoms)
-        assert_allclose(mw_calc, i.MW, atol=0.05)
+        assert_close(mw_calc, i.MW, atol=0.05)
 
 
     for CAS, d in db.CAS_index.items():
@@ -170,17 +177,19 @@ def test_inorganic_db():
         assert CAS_from_any('smiles=' + smi) == d.CASs
 
     # Check formula is formatted right
-    assert all([i.formula == serialize_formula(i.formula) for i in db.CAS_index.values()])
+    for i in db.CAS_index.values():
+        assert i.formula == serialize_formula(i.formula)
 
     # Check CAS validity
-    assert all([check_CAS(i.CASs) for i in db.CAS_index.values()])
+    for i in db.CAS_index.values():
+        assert check_CAS(i.CASs)
 
     # MW checker
     for i in db.CAS_index.values():
         formula = serialize_formula(i.formula)
         atoms = nested_formula_parser(formula, check=False)
         mw_calc = molecular_weight(atoms)
-        assert_allclose(mw_calc, i.MW, atol=0.05)
+        assert_close(mw_calc, i.MW, atol=0.05)
     
 
 def test_mixture_from_any():
