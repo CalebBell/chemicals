@@ -258,6 +258,9 @@ def test_Tsat_IAPWS():
     assert_close(Tsat, 584.1494879985282, rtol=1e-13)
     
     assert_close(Tsat_IAPWS(Psat_IAPWS(553.123521)), 553.123521, rtol=1e-13)
+    
+    T_min = 159.77353993926621
+    assert_close(Tsat_IAPWS(Psat_IAPWS(T_min)), T_min, rtol=1e-13)
 
 def test_Psub_Clapeyron():
     Psub = Psub_Clapeyron(250.0, Tt=273.15, Pt=611.0, Hsub_t=51100.0)

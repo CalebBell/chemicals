@@ -28,13 +28,14 @@ from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
 from fluids.numerics import secant, newton, trunc_log, trunc_exp
 
 __all__ = [
-           'iapws97_boundary_2_3', 'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
+           'iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
+           'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
            'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
            'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
            'iapws97_boundary_3qu', 'iapws97_boundary_3rx', 'iapws97_boundary_3wx',
            'iapws97_boundary_3ab', 'iapws97_boundary_3op',
            'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
-           'iapws97_rho', 'iapws97_P',
+           'iapws97_rho', 'iapws97_P', 'iapws97_T',
            
            'iapws95_d2A_d2deltar', 'iapws95_dA_ddeltar',
            
@@ -87,6 +88,14 @@ def iapws97_boundary_2_3(T):
     16529164.2526216
     '''
     return (0.34805185628969E9 - T*(0.11671859879975E7 - 0.10192970039326E4*T))
+
+def iapws97_boundary_2_3_reverse(P):
+    '''
+    >>> iapws97_boundary_2_3_reverse(16529164.2526216)
+    623.15000000000
+    '''
+    return (116.85603437027114637*sqrt(7.1845068690062562659e-8*P - 1.0)
+            + 572.54459862744727161)
 
 def iapws97_boundary_3uv(P):
     '''
@@ -1648,7 +1657,8 @@ def iapws97_rho(T, P):
         
     Notes
     -----
-    Significant discontinuities exist between each region.
+    Significant discontinuities exist between each region. In region 3, there
+    are 26 transition lines!
 
     Examples
     --------
@@ -1806,14 +1816,15 @@ def iapws_97_Prho_err_region2(T, P, rho):
 def iapws_97_Prho_err_region5(T, P, rho):
     R = 461.526
     pi_region5 = P*1e-6
-    tau_region5 = 540.0/T
+    tau_region5 = 1000/T
     dG_dpi_region5 = 1.0/pi_region5 + iapws97_dGr_dpi_region5(tau_region5, pi_region5)
         
     rhol = P/(R*T*pi_region5*dG_dpi_region5)
     err = rhol - rho
     drhol = (-1e6/(R*T*T*dG_dpi_region5)
-             + 1E6*540.0*iapws97_d2Gr_dpidtau_region5(tau_region5, pi_region5)/(R*T*T*T*dG_dpi_region5*dG_dpi_region5))
+             + 1E6*1000*iapws97_d2Gr_dpidtau_region5(tau_region5, pi_region5)/(R*T*T*T*dG_dpi_region5*dG_dpi_region5))
     return err, drhol
+
 
 def iapws_97_Prho_err_region3(T, P, rho):
     R = 461.526
@@ -1829,6 +1840,103 @@ def iapws_97_Prho_err_region3(T, P, rho):
     
     derr = R*rho**2*dA_ddelta/rhoc - R*Tc*rho**2*d2A_ddeltadtau/(T*rhoc)
     return err, derr
+
+def iapws97_T(P, rho):
+    R = 461.526
+    solve_region = 0
+    if P > 100e6:
+        raise ValueError("P is above maximum value of 100 MPa")
+
+    if P < 50E6:
+        # Calculate the 2-5 border using region 5's equations
+        pi_5_border = P*1e-6
+        tau_5_border = 1000.0/1073.15
+        dG_dpi_5_border = 1.0/pi_5_border + iapws97_dGr_dpi_region5(tau_5_border, pi_5_border) 
+        rho_25_border = P/(R*1073.15*pi_5_border*dG_dpi_5_border)
+
+        # get rho minimum at 1073.15
+        if rho <= rho_25_border:
+            rho_5end_border = iapws97_rho(2273.15, P)
+            if rho < rho_5end_border:
+                raise ValueError("Density is lower then region 5 limit")
+            else:
+                solve_region = 5
+    if solve_region == 0:
+        no_region_3 = False
+        if P > 13918839.778885445:
+            T_23 = iapws97_boundary_2_3_reverse(P)
+            if T_23 < 623.15:
+                no_region_3 = True
+        else:
+            no_region_3 = True
+        if no_region_3:
+            if P < 0.005706860511498897: # where the vapor pressure equation dies
+                solve_region = 2 # always gas
+                T_23 = 273.15
+            else:
+                Tsat = Tsat_IAPWS(P)
+                if Tsat < 273.15:
+                    solve_region = 2  # always gas
+                    T_23 = 273.15
+                else:
+                    pi_region1_sat = P*6.049606775559589e-08 #1/16.53E6
+                    tau_region1_sat = 1386.0/Tsat
+                    dG_dpi_region1_sat = iapws97_dG_dpi_region1(tau_region1_sat, pi_region1_sat)
+                    rho1_sat = P/(R*Tsat*pi_region1_sat*dG_dpi_region1_sat)
+
+                    pi_region2_sat = P*1e-6
+                    tau_region2_sat = 540.0/Tsat
+                    dG_dpi_region2_sat = 1.0/pi_region2_sat + iapws97_dGr_dpi_region2(tau_region2_sat, pi_region2_sat) 
+                    rho2_sat = P/(R*Tsat*pi_region2_sat*dG_dpi_region2_sat)
+
+#                     if rho2_sat < rho < rho1_sat:
+#                         raise ValueError("At specified pressure, density is not a stable solution")
+                    if rho > rho2_sat:
+                        solve_region = 1
+                    else:
+                        solve_region = 2
+                        T_23 = Tsat # for initial guess bondary only
+
+        else:
+            rho_23_side3 = iapws97_rho(T_23 * (1 + 1e-12), P)
+            
+            # Calculate the 2-5 border using region 2's equations
+            pi_region2_25_on2 = P*1e-6
+            tau_region2_25_on2 = 540.0/1073.15
+            dG_dpi_region2_25_on2 = 1.0/pi_region2_25_on2 + iapws97_dGr_dpi_region2(tau_region2_25_on2, pi_region2_25_on2) 
+            rho2_25_on2 = P/(R*1073.15*pi_region2_25_on2*dG_dpi_region2_25_on2)
+        
+            if rho2_25_on2 <= rho <= rho_23_side3:
+                solve_region = 2
+    if solve_region == 0:
+        rho_13 = iapws97_rho(623.15-1e-12, P)
+        if rho_23_side3 <= rho <= rho_13:
+            solve_region = 3
+        if solve_region == 0:
+            rho_Tmin_border = iapws97_rho(273.15, P)
+            if rho_13 <= rho <= rho_Tmin_border:
+                solve_region = 1
+            else:
+                # Sometimes liquid water has a higher density at a higher temperature. Weird!
+                solve_region = 1
+    if solve_region == 5:
+        return newton(iapws_97_Prho_err_region5, 1673.15, fprime=True, bisection=True,
+                      low=1073.15, high=2273.15, args=(P, rho), xtol=1e-12)
+    elif solve_region == 2:
+        return newton(iapws_97_Prho_err_region2, 0.5*(T_23 + 1073.15), fprime=True, bisection=True,
+                      low=T_23 , high=1073.15, args=(P, rho), xtol=1e-12)
+    elif solve_region == 3:
+        return newton(iapws_97_Prho_err_region3, 0.5*(T_23 + 623.15), fprime=True, bisection=True,
+                      low=623.15 , high=T_23, args=(P, rho), xtol=1e-12)
+    elif solve_region == 1:
+        try:
+            Tsat = Tsat_IAPWS(P)
+        except:
+            Tsat = 623.15
+        return newton(iapws_97_Prho_err_region1, 0.5*(Tsat + 273.15), fprime=True, bisection=True,
+                      low=273.15 , high=Tsat, args=(P, rho), xtol=1e-12)
+    else:
+        raise ValueError("Could not detect region")
 
 ### IAPWS95
 

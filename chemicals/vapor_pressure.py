@@ -663,6 +663,10 @@ def Psat_IAPWS(T):
     This formulation is quite efficient, and can also be solved backward.
     The range of validity of this equation is 273.15 K < T < 647.096 K, the 
     IAPWS critical point.
+    
+    Extrapolation to lower temperatures is very poor. The function continues to
+    decrease until a pressure of 5.7 mPa is reached at 159.77353993926621 K;
+    under that pressure the vapor pressure increases, which is obviously wrong.
 
     Examples
     --------

@@ -250,7 +250,7 @@ def test_iapws97_region2_fuzz():
     atols = [0, 0, 1e-14, 0, 0, 0.0, 3e-18, 0, 0, ]
     rtols = [1e-14, 1e-14, 5e-15, 2e-14, 2e-14, 2e-15, 1e-14, 2e-15, 2e-15]
     
-    N = 1000
+    N = 100
     P_lim = 1e-6
     Ts = linspace(273.15, 1073.15, N)
     def test_Ps(T, N):
@@ -538,7 +538,7 @@ def test_iapws97_rho():
 @pytest.mark.slow
 def test_iapws97_region_3_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
-    Ts = linspace(623.15+1e-10, 1073.15, 1000)
+    Ts = linspace(623.15+1e-10, 1073.15, 100)
     # Do some points near where more region transitions are, and then up to the limit.
     for P_lim in (25.5e6, 100e6):
         def test_Ps(T, N):
@@ -553,7 +553,7 @@ def test_iapws97_region_3_rho_coolprop():
             return logspace(log10(lower_P), log10(upper_P), N)
     
         for T in Ts:
-            for P in test_Ps(T, 1000):
+            for P in test_Ps(T, 100):
                 assert iapws97_identify_region_TP(T, P) == 3
                 rho_implemented = iapws97_rho(T=T, P=P)
                 rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
@@ -574,7 +574,7 @@ def test_iapws97_region_5_rho_coolprop():
         return logspace(log10(1e-6), log10(50e6), N)
 
     for T in Ts:
-        for P in test_Ps(T, 1000):
+        for P in test_Ps(T, 100):
             assert iapws97_identify_region_TP(T, P) == 5
             rho_implemented = iapws97_rho(T=T, P=P)
             rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
@@ -635,7 +635,7 @@ def test_iapws97_region_2_rho_coolprop():
         return logspace(log10(P_lim), log10(upper_P), N)
 
     for T in Ts:
-        for P in test_Ps(T, 1000):
+        for P in test_Ps(T, 100):
             assert iapws97_identify_region_TP(T, P) == 2
             rho_implemented = iapws97_rho(T=T, P=P)
             rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
@@ -765,8 +765,8 @@ def test_iapws_97_Prho_err_region():
     drho_dP_num = derivative(lambda T, *args: iapws_97_Prho_err_region5(T, *args)[0], 2000, args=(1e6, 300), dx=1e-2)
     rho_err, drho_dP_analytical = iapws_97_Prho_err_region5(2000, P=1e6, rho=3)
     assert_close(drho_dP_num, drho_dP_analytical)
-    assert_close(rho_err, -1.9170616534178333, rtol=1e-10)
-    assert_close(drho_dP_analytical, -0.0005413285807403817, rtol=1e-10)
+    assert_close(rho_err, -1.9170536728150382, rtol=1e-10)
+    assert_close(drho_dP_analytical, -0.0005418228178000102, rtol=1e-10)
     
     drho_dP_num = derivative(lambda T, *args: iapws_97_Prho_err_region1(T, *args)[0], 300, args=(1e6, 990), dx=1e-4)
     rho_err, drho_dP_analytical = iapws_97_Prho_err_region1(300, P=1e6, rho=990)
@@ -779,3 +779,90 @@ def test_iapws_97_Prho_err_region():
     assert_close(dP_dT_numerical, dP_dT_analytical)
     assert_close(dP_dT_analytical, 215319.4089751701)
     assert_close(P_err, -25505787.520883154)
+
+
+def test_iapws97_T():
+    # region 5
+    assert_close(iapws97_T(1e7, iapws97_rho(T=1600, P=1e7)), 1600)
+    
+    # region 2 top
+    assert_close(iapws97_T(60e6, iapws97_rho(T=1000, P=60e6)), 1000)
+    
+    # region 3 top
+    rho = iapws97_rho(T=640, P=60e6)
+    P = iapws97_P(640, rho)
+    assert_close(iapws97_T(P, rho), 640)
+    
+    # region 1
+    rho = iapws97_rho(T=400, P=40e6)
+    assert_close(iapws97_T(40e6, rho), 400)
+    
+    # region 2 bottom
+    rho = iapws97_rho(T=800, P=1e5)
+    iapws97_T(1e5, rho)
+    assert_close(iapws97_T(1e5, rho), 800)
+    
+    # region 1 bottom
+    rho = iapws97_rho(T=300, P=1e5)
+    iapws97_T(1e5, rho)
+    assert_close(iapws97_T(1e5, rho), 300)
+    
+    rho = iapws97_rho(T=273.15, P=1e-08)
+    iapws97_T(1e-08, rho)
+    assert_close(iapws97_T(1e-08, rho), 273.15)
+    
+    
+    rho = iapws97_rho(273.15, 0.0065793322465757635)
+    assert_close(iapws97_T(0.0065793322465757635, rho), 273.15)
+    
+    rho = iapws97_rho(273.15, 673.4150657750918)
+    assert_close(iapws97_T(673.4150657750918, rho), 273.15)
+    
+    iapws97_identify_region_TP(273.15, 22570197.196339723)
+    rho = iapws97_rho(273.15, 22570197.196339723)
+    assert_close(iapws97_T(22570197.196339723, rho), 273.15)
+    
+    iapws97_identify_region_TP(1073.15, 68926121.04349865)
+    rho = iapws97_rho(1073.15, 68926121.04349865)
+    assert_close(iapws97_T(68926121.04349865, rho), 1073.15)
+    
+    rho = iapws97_rho(273.9508008008008, 17030650.2925232)
+    assert_close(iapws97_T(17030650.2925232, rho), 273.9508008008008)
+    
+    # region 5 border requiring calc
+    rho = iapws97_rho(1073.150000000001, 34705199.859195136)
+    assert_close(iapws97_T(34705199.859195136, rho), 1073.150000000001)
+    
+    # region 5 border requiring equation 2 calc
+    rho = iapws97_rho(1073.15, 52396013.53002634)
+    assert_close(iapws97_T(52396013.53002634, rho), 1073.15)
+
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_iapws97_T_fuzz():
+    # region 2 and 1
+    N = 100
+    Ts = linspace(273.15, 1073.15, N)
+    Ps = logspace(log10(1e-8), log10(100e6), N)
+    for T in Ts:
+        for P in Ps:
+            if iapws97_identify_region_TP(T, P) != 3:
+                rho = iapws97_rho(T, P)
+                T_calc = iapws97_T(P, rho)
+                try:
+                    # 5e-9 is best solvers can do
+                    assert_close(T, T_calc, rtol=5e-9)
+                except:
+                    # multiple solutions
+                    rho_recalc = iapws97_rho(T_calc, P)
+                    assert_close(rho, rho_recalc, rtol=5e-9)
+    # region 5
+    N = 100
+    Ts = linspace(1073.15+1e-12, 2273.15, N)
+    Ps = logspace(log10(1e-8), log10(50e6), N)
+    for T in Ts:
+        for P in Ps:
+            assert iapws97_identify_region_TP(T, P) == 5
+            rho = iapws97_rho(T, P)
+            T_calc = iapws97_T(P, rho)
+            assert_close(T, T_calc, rtol=5e-9)
