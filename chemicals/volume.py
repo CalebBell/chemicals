@@ -77,6 +77,10 @@ Pure Component Solid Fit Correlations
 -------------------------------------
 .. autofunction:: chemicals.volume.CRC_inorganic
 
+Correlations for Specific Substances
+------------------------------------
+.. autofunction:: chemicals.volume.iapws97_rho
+
 Fit Coefficients
 ----------------
 All of these coefficients are lazy-loaded, so they must be accessed as an
@@ -178,6 +182,7 @@ from chemicals.utils import log, exp, isnan
 from chemicals.utils import Vm_to_rho, mixing_simple
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import data_source, register_df_source
+from chemicals.iapws import iapws97_rho
 
 folder = os_path_join(source_path, 'Density')
 

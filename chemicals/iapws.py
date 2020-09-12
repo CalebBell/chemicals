@@ -1643,7 +1643,8 @@ def iapws97_identify_region_TP(T, P):
                          "for box 5, 1073.15 K <= T <= 2273.15 K and P <= 50 MPa.")
 
 def iapws97_rho(T, P):
-    r'''Calculate the mass density of water according to the IAPWS-97 standard.
+    r'''Calculate the density of water in kg/m^3 according to the IAPWS-97 
+    standard.
     
     Parameters
     ----------
@@ -1658,20 +1659,48 @@ def iapws97_rho(T, P):
         Mass density of water, [kg/m^3]
         
     Notes
-    -----
-    Significant discontinuities exist between each region. In region 3, there
-    are 26 transition lines!
+    -----    
+    The range of validity of this formulation is as follows:
+        
+    For :math:`P \le 100 \text{ MPa}`:
+        
+    .. math::
+        273.15 \text{ K} \le T \le 1073.15 \text{ K}
 
+    For :math:`P \le 50 \text{ MPa}`:
+        
+    .. math::
+        1073.15 \text{ K} \le T \le 2273.15 \text{ K}
+        
+    A ValueError is raised if the temperature or the pressure is out of bounds.
+
+    IAPWS is implemented in four regions in the `T`-`P` domain:
+    Region 1 (liquid), region 2 (gas and supercritical gas), region 5
+    (high tempreature gas), and region 3 (near-critical).
+    Significant discontinuities exist between the transitions of each regions.
+    In region 3, there are 26 sub-regions and the correlation has the least 
+    accuracy. 
+    
+    For many applications, the discontinuities in IF-97 can be problematic and
+    the slower IAPWS-95 must be used. IAPWS-95 also has a wider range of applicability.
+    
     Examples
     --------
     >>> iapws97_rho(648.6, 22.5e6)
     353.06081088726
     >>> iapws97_rho(330.0, 8e5)
     985.10498080770
-    >>> iapws97_rho(823, 14e6)
+    >>> iapws97_rho(823.0, 14e6)
     40.39293607288123
-    >>> iapws97_rho(2000, 3e7)
+    >>> iapws97_rho(2000.0, 3e7)
     32.11456228328856
+    
+    References
+    ----------
+    .. [1] Cooper, JR, and RB Dooley. "Revised Release on the IAPWS Industrial 
+       Formulation 1997 for the Thermodynamic Properties of Water and Steam." 
+       The International Association for the Properties of Water and Steam 1 
+       (2007): 48.
     '''
     R = 461.526
     region = iapws97_identify_region_TP(T, P)
