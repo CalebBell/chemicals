@@ -866,6 +866,514 @@ def test_iapws97_T_fuzz():
             rho = iapws97_rho(T, P)
             T_calc = iapws97_T(P, rho)
             assert_close(T, T_calc, rtol=5e-9)
+### IAPWS95 checks
+Tc = 647.096
+rhoc = 322.
+R = 461.51805 # kJ/kg water/K
+MW = 18.015268
+
+
+### Ideal part functions
+
+ni0s = [-8.3204464837497, 6.6832105275932, 3.00632, 0.012436, 0.97315,
+        1.2795, 0.96956, 0.24873]
+gammais = [None, None, None, 1.28728967, 3.53734222, 7.74073708,
+           9.24437796, 27.5075105]
+
+
+def dAddelta_idg(tau, delta):
+    '''
+    >>> dAddelta_idg(1.000148377125193, 1.1118012422360248)
+    0.8994413407821229
+    '''
+    tot = 1./delta
+    return tot
+
+
+def ddAdddelta_idg(tau, delta):
+    '''
+    >>> ddAdddelta_idg(1.000148377125193, 1.1118012422360248)
+    -0.8089947255079429
+    '''
+    tot = -1./(delta*delta)
+    return tot
+
+
+def dAdtau_idg(tau, delta):
+    '''
+    >>> dAdtau_idg(1.000148377125193, 1.1118012422360248)
+    9.803439179390017
+    '''
+    tot =ni0s[1] + ni0s[2]/tau
+    for i in range(3, 8):
+        tot += ni0s[i]*gammais[i]*(1.0/(1 - exp(-gammais[i]*tau)) - 1.0)
+    return tot
+
+
+def ddAddtau_idg(tau, delta):
+    '''
+    >>> ddAddtau_idg(1.000148377125193, 1.1118012422360248)
+    -3.433163341430695
+    '''
+    tot = -ni0s[2]/tau**2
+    for i in range(3,8):
+        tot -= ni0s[i]*gammais[i]**2*exp(-gammais[i]*tau)*(1-exp(-gammais[i]*tau))**-2
+    return tot
+
+
+def A_idg(tau, delta):
+    '''
+    >>> A_idg(1.000148377125193, 1.1118012422360248)
+    -1.5631960505251727
+    '''
+    tot = log(delta) + ni0s[0] + ni0s[1]*tau + ni0s[2]*log(tau)
+    for i in range(3,8):
+        tot += ni0s[i]*log(1 - exp(-gammais[i]*tau))
+    return tot
+
+
+### Residual part functions
+cis = [None, None, None, None, None, None, None, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+       2, 2, 2, 3, 3, 3, 3, 4, 6, 6, 6, 6, None, None, None]
+dis = [1, 1, 1, 2, 2, 3, 4, 1, 1, 1, 2, 2, 3, 4, 4, 5, 7, 9, 10, 11, 13,
+       15, 1, 2, 2, 2, 3, 4, 4, 4, 5, 6, 6, 7, 9, 9, 9, 9, 9, 10, 10, 12,
+       3, 4, 4, 5, 14, 3, 6, 6, 6, 3, 3, 3]
+tis = [-0.5, 0.875, 1., 0.5, 0.75, 0.375, 1., 4., 6., 12., 1., 5., 4., 2.,
+       13., 9., 3., 4., 11., 4., 13., 1., 7., 1., 9., 10., 10., 3., 7.,
+       10., 10., 6., 10., 10., 1., 2., 3., 4., 8., 6., 9., 8., 16., 22.,
+       23., 23., 10., 50., 44., 46., 50., 0., 1., 4.]
+nis = [0.12533547935523E-1, 0.78957634722828E1, -0.87803203303561E1,
+       0.31802509345418, -0.26145533859358, -0.78199751687981E-2,
+       0.88089493102134E-2, -0.66856572307965, 0.20433810950965,
+       -0.66212605039687E-4, -0.19232721156002, -0.25709043003438,
+       0.16074868486251, -0.40092828925807E-1, 0.39343422603254E-6,
+       -0.75941377088144E-5, 0.56250979351888E-3, -0.15608652257135E-4,
+       0.11537996422951E-8, 0.36582165144204E-6, -0.13251180074668E-11,
+       -0.62639586912454E-9, -0.10793600908932, 0.17611491008752E-1,
+       0.22132295167546, -0.40247669763528, 0.58083399985759,
+       0.49969146990806E-2, -0.31358700712549E-1, -0.74315929710341,
+       0.47807329915480, 0.20527940895948E-1, -0.13636435110343,
+       0.14180634400617E-1, 0.83326504880713E-2, -0.29052336009585E-1,
+       0.38615085574206E-1, -0.20393486513704E-1, -0.16554050063734E-2,
+       0.19955571979541E-2, 0.15870308324157E-3, -0.16388568342530E-4,
+       0.43613615723811E-1, 0.34994005463765E-1, -0.76788197844621E-1,
+       0.22446277332006E-1, -0.62689710414685E-4, -0.55711118565645E-9,
+       -0.19905718354408, 0.31777497330738, -0.11841182425981,
+       -0.31306260323435E2, 0.31546140237781E2, -0.25213154341695E4,
+       -0.14874640856724, 0.31806110878444]
+alphas = [20., 20., 20.]
+betas = [150., 150., 250., 0.3, 0.3]
+gammas = [1.21, 1.21, 1.25]
+epsilons = [1., 1., 1.]
+ais = [3.5, 3.5]
+bis = [0.85, 0.95]
+Bis = [0.2, 0.2]
+Cis = [28., 32.]
+Dis = [700., 800.]
+Ais = [0.32, 0.32]
+
+for arr in (cis, dis, tis, nis):
+    for i in range(len(arr)):
+        try:
+            arr[i] = float(arr[i])
+        except:
+            pass
+
+
+def calcA_res(tau, delta):
+    '''
+    >>> calcA_res(647.096/647., 358./322.)
+    -1.212026565041463
+    '''
+    phir = 0
+    for i in range(7):
+        phir += nis[i]*delta**dis[i]*tau**tis[i]
+    for i in range(7,51):
+        phir += nis[i]*delta**dis[i]*tau**tis[i]*exp(-delta**cis[i])
+    for i in range(51, 54):
+        phir += nis[i]*delta**dis[i]*tau**tis[i]*exp(
+        -alphas[i-51]*(delta-epsilons[i-51])**2 - betas[i-51]*(tau-gammas[i-51])**2)
+    for i in range(2):
+        theta = (1-tau) + Ais[i]*((delta-1.0)**2)**(1/(2*betas[i+3]))
+        psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+        Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+        phir += nis[i+54]*Delta**bis[i]*delta*psi
+    return phir
+
+
+
+
+def dAddelta_res(tau, delta):
+    '''
+    >>> dAddelta_res(647.096/647., 358./322.)
+    -0.714012024371285
+    '''
+    phir = 0.0
+    for i in range(7):
+        phir += nis[i]*dis[i]*delta**(dis[i]-1.0)*tau**tis[i]
+    for i in range(7,51):
+        phir += nis[i]*exp(-delta**cis[i])*(delta**(dis[i]-1.0)*tau**tis[i])*(dis[i]-cis[i]*delta**cis[i])
+    for i in range(51, 54):
+        phir += nis[i]*delta**dis[i]*tau**tis[i]*exp(
+        -alphas[i-51]*(delta-epsilons[i-51])**2.0 - betas[i-51]*(tau-gammas[i-51])**2.0)*(
+        dis[i]/delta - 2.0*alphas[i-51]*(delta-epsilons[i-51]))
+    for i in range(2):
+        theta = (1.0-tau) + Ais[i]*((delta-1.0)**2.0)**(1.0/(2.0*betas[i+3]))
+        psi = exp(-Cis[i]*(delta-1.0)**2.0 - Dis[i]*(tau-1.0)**2.0)
+        Delta = theta**2.0 + Bis[i]*((delta-1.0)**2.0)**ais[i]
+        _d_psi_d_delta = d_psi_d_delta(i, tau, delta)
+        _d_Delta_bd_delta = d_Delta_bd_delta(i, tau, delta)
+
+        phir += nis[i+54]*(Delta**bis[i]*(psi + delta*_d_psi_d_delta)
+        + _d_Delta_bd_delta*psi*delta)
+    return phir
+
+
+def ddAdddelta_res(tau, delta):
+    '''Works. Don't touch it.
+    >>> ddAdddelta_res(647.096/647., 358./322.)
+    0.47573069564568893
+    '''
+    # need this for rho solver newton
+    phir = 0
+    for i in range(7):
+        phir += nis[i]*dis[i]*(dis[i]-1)*delta**(dis[i]-2)*tau**tis[i]
+    for i in range(7,51):
+        phir += nis[i]*exp(-delta**cis[i])*(delta**(dis[i]-2))*tau**tis[i]*(
+        (dis[i]-cis[i]*delta**cis[i])*(dis[i]-1-cis[i]*delta**cis[i]) - cis[i]**2*delta**cis[i])
+    for i in range(51, 54):
+        phir += nis[i]*tau**tis[i]*exp(-alphas[i-51]*(delta-epsilons[i-51])**2
+        - betas[i-51]*(tau-gammas[i-51])**2)*(
+        - 2*alphas[i-51]*delta**dis[i]
+        + 4*alphas[i-51]**2*delta**dis[i]*(delta-epsilons[i-51])**2
+        - 4*dis[i]*alphas[i-51]*delta**(dis[i]-1)*(delta-epsilons[i-51])
+        + dis[i]*(dis[i]-1)*delta**(dis[i]-2))
+    for i in range(2):
+        theta = (1-tau) + Ais[i]*((delta-1)**2)**(1/(2*betas[i+3]))
+        psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+        Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+        _d_psi_d_delta = d_psi_d_delta(i, tau, delta)
+        _d_Delta_bd_delta = d_Delta_bd_delta(i, tau, delta)
+        _d2_psi_d2_delta = d2_psi_d2_delta(i, tau, delta)
+        _d2_Delta_bd2_delta = d2_Delta_bd2_delta(i, tau, delta)
+
+        phir += nis[i+54]*(Delta**bis[i]*(2*_d_psi_d_delta + delta*_d2_psi_d2_delta)
+        + 2*_d_Delta_bd_delta*(psi + delta*_d_psi_d_delta) + _d2_Delta_bd2_delta*delta*psi)
+    return phir
+
+
+def dAdtau_res(tau, delta):
+    '''
+    >>> dAdtau_res(647.096/647., 358./322.)
+    -3.2172250077516558
+    '''
+    phir = 0
+    for i in range(7):
+        phir += nis[i]*tis[i]*delta**dis[i]*tau**(tis[i]-1)
+    for i in range(7,51):
+        phir += nis[i]*tis[i]*delta**dis[i]*tau**(tis[i]-1)*exp(-delta**cis[i])
+    for i in range(51, 54):
+        phir += nis[i]*delta**dis[i]*tau**tis[i]*exp(
+        -alphas[i-51]*(delta-epsilons[i-51])**2 - betas[i-51]*(tau-gammas[i-51])**2)*(
+        tis[i]/tau -2*betas[i-51]*(tau-gammas[i-51]))
+    for i in range(2):
+        theta = (1-tau) + Ais[i]*((delta-1)**2)**(1/(2*betas[i+3]))
+        psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+        Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+        _d_Delta_bd_tau = d_Delta_bd_tau(i, tau, delta)
+        _d_psi_d_tau = d_psi_d_tau(i, tau, delta)
+
+        phir += nis[i+54]*delta*(_d_Delta_bd_tau*psi + Delta**bis[i]*_d_psi_d_tau)
+    return phir
+
+def dAdtau_res_fast(tau, delta):
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta2*delta2
+    delta8 = delta4*delta4
+    x1 = exp(-delta)
+    x4 = exp(-delta2)
+    x26 = exp(-delta3)
+    x2 = delta*x1
+    x5 = delta*x4
+    x7 = x4*delta8
+    x8 = 300.0*tau
+    x9 = (delta - 1.0)
+    x9 *= x9
+    x10 = -20.0*x9
+    x11 = (0.826446280991736*tau - 1.0)
+    x11 = exp(x10 - 219.615*x11*x11)
+    tau2 = tau*tau
+    tau4 = tau2*tau2
+    taurtinv = 1.0/sqrt(tau)
+    tau_inv = taurtinv*taurtinv
+    tau4inv = sqrt(taurtinv)
+    tau8inv = sqrt(tau4inv)
+    x15 = tau - 1.0
+    x13 = tau*delta2
+    x16 = x15*x15
+    x17 = x9**1.66666666666666674
+    x18 =  (-tau + 0.32*x17 + 1.0)
+    x18 = 0.2*x9*x9*x9*sqrt(x9) + x18*x18
+    x18_05 = x18**-0.05
+    x19 = delta4*delta2
+    x20 = delta3*x4
+    x21 = delta8*delta2*x1
+    x22 = delta4*delta*x4
+    x24 = delta8*delta*x4
+    x27 = delta*x26
+    x50 = (0.8*tau - 1.0)
+    return (delta*(-6.26395869124539993e-10*delta8*delta4*delta2*x1 + 0.159012546727090004*delta*taurtinv
+             - 0.00626677396776150007*tau_inv*taurtinv - tau8inv*(0.196091503945184986*delta*tau8inv
+            + 0.00293249068829928763*taurtinv*delta2 - 6.90879303824744984)
+            - tau*(-tau*(tau*(tau*(tau*(tau*(tau*(-0.000131108546740240002*delta8*delta3*x4
+            + tau*(tau*(-0.000626897104146849956*delta8*delta4*delta*exp(-delta4) + tau*(tau*(-0.000794551260476243984*x1
+            + x13*(tau2*tau*(tau4*tau2*(tau*(tau4*tau4*tau4*tau4*tau4*tau*(tau2*(14.6176487721394821*delta3 - tau4*(5.92059121299049984*delta3
+            + 2.78555592828224976e-8)) - 8.75851607593951975*delta3)*exp(-x19) + 0.516264378636137944*x26*delta2
+            - 1.76612855042628292*x27) + 0.76986812020283002*x27) + 0.697817851580975979*x26) 
+            + 5.11464493842302041e-6*x2 - 1.72265340970684017e-11*x21)) + 1.26917960652461008e-8*x1*delta8*delta)
+            + 0.14180634400617001*x19*x4 - 7.43159297103409955*x20 - 1.36364351103430015*x22 
+            + 4.78073299154799969*delta4*x4 + 5.80833999857589944*delta2*x4 - 4.02476697635280001*x5)
+            - 0.0000683472393793296059*x1*delta4 + 0.00142832774917412992*x24 + 1.9919065650791401*x5)
+            - 0.0132432400509872004*x7) - 0.219510904987843009*x20 - 0.755552063625239967*x4)
+            + 1.22602865705789998*x1 + 0.123167645375688001*x22 + 0.0119733431877246006*x24)
+            - 1.28545215017189984*x2) + 0.642994739450040043*x1*delta2 - 0.000062434609028539994*x1*delta8
+            - 2.67426289231860004*x1 + 1.46328660576816003e-6*x21 - 0.0815739460548159934*x7) 
+            + 0.00168752938055664013*x1*x19 + 0.0149907440972417982*x20 + 0.115845256722618001*x7)
+            + 0.0801856578516139951*delta3*x1 + 0.058104672019170002*x7) + 0.00880894931021340005*delta3
+            + 31.5461402377809996*x11*x13*(tau_inv - x8 + 363.0) + 31.3062603234350014*x11*delta2*(x8 - 363.0)
+            - 2521.31543416949989*tau4*delta2*(-500.0*tau + 4.0*tau_inv + 625.0)*exp(x10 - 390.625*x50*x50)
+            - 0.192327211560020001*x2 + 0.0176114910087519991*x5 + 0.00833265048807130086*x7 
+            + 0.148746408567240002*(1400.0*x15*x18*x18_05*x18_05*x18_05
+            + x18_05*x18_05*x18_05*(-1.7*tau + 0.544*x17
+            + 1.7))*exp(-700.0*x16 - 28.0*x9) - 0.318061108784439994*(1600.0*x15*x18*x18_05 
+            + x18_05*(-1.9*tau + 0.608*x17 + 1.9))
+            *exp(-800.0*x16 - 32.0*x9) - 8.78032033035609949))
+
+def ddAddtau_res(tau, delta):
+    '''
+    >>> ddAddtau_res(647.096/647., 358./322.)
+    -9.960295065592888
+    '''
+    phir = 0
+    for i in range(7):
+        phir += nis[i]*tis[i]*(tis[i]-1)*delta**dis[i]*tau**(tis[i]-2)
+    for i in range(7,51):
+        phir += nis[i]*tis[i]*(tis[i]-1)*delta**dis[i]*tau**(tis[i]-2)*exp(-delta**cis[i])
+    for i in range(51, 54):
+        phir += nis[i]*delta**dis[i]*tau**tis[i]*exp(
+        -alphas[i-51]*(delta-epsilons[i-51])**2 - betas[i-51]*(tau-gammas[i-51])**2)*(
+        (tis[i]/tau -2*betas[i-51]*(tau-gammas[i-51]))**2 - tis[i]/tau**2 -2*betas[i-51])
+    for i in range(2):
+        theta = (1-tau) + Ais[i]*((delta-1)**2)**(1/(2*betas[i+3]))
+        psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+        Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+
+        _d2_Delta_bd2_tau = d2_Delta_bd2_tau(i, tau, delta)
+        _d_Delta_bd_tau = d_Delta_bd_tau(i, tau, delta)
+        _d_psi_d_tau = d_psi_d_tau(i, tau, delta)
+        _d2_psi_d2_tau = d2_psi_d2_tau(i, tau, delta)
+
+        phir += nis[i+54]*delta*(_d2_Delta_bd2_tau*psi
+        + 2*_d_Delta_bd_tau*_d_psi_d_tau + Delta**bis[i]*_d2_psi_d2_tau)
+    return phir
+
+
+def dAddeltatau_res(tau, delta):
+    '''
+    >>> dAddeltatau_res(647.096/647., 358./322.)
+    -1.332147204361434
+    '''
+    phir = 0
+    for i in range(7):
+        phir += nis[i]*dis[i]*tis[i]*delta**(dis[i]-1)*tau**(tis[i]-1)
+    for i in range(7,51):
+        phir += nis[i]*tis[i]*delta**(dis[i]-1)*tau**(tis[i]-1)*exp(-delta**cis[i])*(dis[i] - cis[i]*delta**cis[i])
+    for i in range(51, 54):
+        phir += nis[i]*delta**dis[i]*tau**tis[i]*exp(
+        -alphas[i-51]*(delta-epsilons[i-51])**2 - betas[i-51]*(tau-gammas[i-51])**2)*(
+        dis[i]/delta - 2*alphas[i-51]*(delta-epsilons[i-51]))*(
+        (tis[i]/tau - 2*betas[i-51]*(tau-gammas[i-51])))
+    for i in range(2):
+        theta = (1-tau) + Ais[i]*((delta-1)**2)**(1/(2*betas[i+3]))
+        psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+        Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+
+        _d_psi_d_tau = d_psi_d_tau(i, tau, delta)
+        _d2_psi_d_delta_d_tau = d2_psi_d_delta_d_tau(i, tau, delta)
+        _d_Delta_bd_delta = d_Delta_bd_delta(i, tau, delta)
+        _d_Delta_bd_tau = d_Delta_bd_tau(i, tau, delta)
+        _d_psi_d_delta = d_psi_d_delta(i, tau, delta)
+        _d2_Delta_bd_delta_d_tau = d2_Delta_bd_delta_d_tau(i, tau, delta)
+
+        phir += nis[i+54]*(Delta**bis[i]*(_d_psi_d_tau + delta*_d2_psi_d_delta_d_tau)
+        + delta*_d_Delta_bd_delta*_d_psi_d_tau + _d_Delta_bd_tau*(psi + delta*_d_psi_d_delta)
+        + _d2_Delta_bd_delta_d_tau*psi*delta)
+    return phir
+
+
+### Derivatives of Distance Function
+
+def d_psi_d_delta(i, tau, delta):
+    '''i is either 0 or 1 for 55 or 56.
+    >>> d_psi_d_delta(0, 647.096/647., 358./322.)
+    -4.411951793785948
+    '''
+    psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+    ans = -2*Cis[i]*(delta-1)*psi
+    return ans
+
+def d_Delta_d_delta(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d_Delta_d_delta(1, 647.096/647., 358./322.)
+    3.595414062719538e-06
+    '''
+    theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
+    ans = (delta - 1)*(
+    Ais[i]*theta*2/betas[i+3]*((delta-1.)**2 )**(1./(2*betas[i+3])-1.)
+    + 2*Bis[i]*ais[i]*((delta-1)**2)**(ais[i]-1))
+    return ans
+
+
+def d_Delta_bd_delta(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d_Delta_bd_delta(1, 647.096/647., 358./322.)
+    7.931159558108671e-06
+    '''
+    theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
+    Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+
+    _d_Delta_d_delta = (delta - 1)*(
+    Ais[i]*theta*2/betas[i+3]*((delta-1.)**2 )**(1./(2*betas[i+3])-1.)
+    + 2*Bis[i]*ais[i]*((delta-1)**2)**(ais[i]-1))
+
+    ans = bis[i]*Delta**(bis[i]-1)*_d_Delta_d_delta
+    return ans
+
+
+def d2_psi_d2_delta(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d2_psi_d2_delta(1, 647.096/647., 358./322.)
+    -8.581401910121393
+    '''
+    psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+    ans = (2*Cis[i]*(delta-1)**2 - 1)*2*Cis[i]*psi
+    return ans
+
+
+def d2_Delta_d2_delta(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d2_Delta_d2_delta(1, 647.096/647., 358./322.)
+    0.0002472143243416378
+    '''
+    theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
+
+    _d_Delta_d_delta = (delta - 1)*(
+    Ais[i]*theta*2/betas[i+3]*((delta-1.)**2 )**(1./(2*betas[i+3])-1.)
+    + 2*Bis[i]*ais[i]*((delta-1)**2)**(ais[i]-1))
+
+    first = 1./(delta-1.)*_d_Delta_d_delta
+    second = 4*Bis[i]*ais[i]*(ais[i]-1)*((delta-1)**2)**(ais[i]-2)
+    third = 2*Ais[i]**2*(1./betas[i+3])**2*(((delta-1)**2)**(1./(2*betas[i+3])-1))**2
+    fourth = Ais[i]*theta*4/betas[i+3]*(1./(2*betas[i+3])-1)*((delta-1)**2)**(1./(2*betas[i+3])-2)
+    ans = first + (delta-1.)**2*(second + third + fourth)
+    return ans
+
+
+def d2_Delta_bd2_delta(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d2_Delta_bd2_delta(1, 647.096/647., 358./322.)
+    0.0005157293089972383
+    '''
+    theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
+    Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+
+    _d_Delta_d_delta = (delta - 1)*(
+    Ais[i]*theta*2/betas[i+3]*((delta-1.)**2 )**(1./(2*betas[i+3])-1.)
+    + 2*Bis[i]*ais[i]*((delta-1)**2)**(ais[i]-1))
+
+    first = 1./(delta-1.)*_d_Delta_d_delta
+    second = 4*Bis[i]*ais[i]*(ais[i]-1)*((delta-1)**2)**(ais[i]-2)
+    third = 2*Ais[i]**2*(1./betas[i+3])**2*(((delta-1)**2)**(1./(2*betas[i+3])-1))**2
+    fourth = Ais[i]*theta*4/betas[i+3]*(1./(2*betas[i+3])-1)*((delta-1)**2)**(1./(2*betas[i+3])-2)
+    _d2_Delta_d2_delta = first + (delta-1.)**2*(second + third + fourth)
+
+    ans = bis[i]*(Delta**(bis[i]-1)*_d2_Delta_d2_delta +
+    (bis[i]-1)*Delta**(bis[i]-2)*_d_Delta_d_delta**2)
+    return ans
+
+
+def d_Delta_bd_tau(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d_Delta_bd_tau(1, 647.096/647., 358./322.)
+    -0.0002958235123606516
+    '''
+    theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
+    Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+    ans = -2*theta*bis[i]*Delta**(bis[i]-1)
+    return ans
+
+
+def d_psi_d_tau(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d_psi_d_tau(1, 647.096/647., 358./322.)
+    -0.159135911130251
+    '''
+    psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+    ans = -2*Dis[i]*(tau-1)*psi
+    return ans
+
+
+def d2_psi_d2_tau(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d2_psi_d2_tau(1, 647.096/647., 358./322.)
+    -1072.4719549824797
+    '''
+    psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+    ans = (2*Dis[i]*(tau-1)**2 -1)*2*Dis[i]*psi
+    return ans
+
+
+def d2_Delta_bd2_tau(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d2_Delta_bd2_tau(1, 647.096/647., 358./322.)
+    4.370635612303636
+    '''
+    theta = (1-tau) + Ais[i]*((delta-1)**2)**(1/(2*betas[i+3]))
+    psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+    Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+
+    ans = 2*bis[i]*Delta**(bis[i]-1) + 4*theta**2*bis[i]*(bis[i]-1)*Delta**(bis[i]-2)
+    return ans
+
+
+def d2_psi_d_delta_d_tau(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d2_psi_d_delta_d_tau(1, 647.096/647., 358./322.)
+    1.1386619231183175
+    '''
+    psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
+    ans = 4*Cis[i]*Dis[i]*(delta-1)*(tau-1)*psi
+    return ans
+
+
+def d2_Delta_bd_delta_d_tau(i, tau, delta):
+    ''''i is either 0 or 1 for 55 or 56.
+    >>> d2_Delta_bd_delta_d_tau(1, 647.096/647., 358./322.)
+    -0.027232925382835605
+    '''
+    theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
+    Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
+
+    _d_Delta_d_delta = (delta - 1)*(
+    Ais[i]*theta*2/betas[i+3]*((delta-1.)**2 )**(1./(2*betas[i+3])-1.)
+    + 2*Bis[i]*ais[i]*((delta-1)**2)**(ais[i]-1))
+
+    first = -Ais[i]*bis[i]*2/betas[i+3]*Delta**(bis[i]-1)*(delta-1)*((delta-1)**2)**(1/(2*betas[i+3])-1)
+    second = -2*theta*bis[i]*(bis[i]-1)*Delta**(bis[i]-2)*_d_Delta_d_delta
+    ans = first + second
+    return ans
 
 
 def test_rho_iapws95_CoolProp():
@@ -920,6 +1428,9 @@ def test_iapws95_rho():
     
     assert_close(iapws95_rho(485.9103500701087, 2014934.1250668736), 849.3248042136873)
     assert Psat_IAPWS(485.9103500701087) < 2014934.1250668736
+
+    assert_close(iapws95_rho(472.89458917842654, 1546542.3293244045), 864.9560179779317)
+    assert Psat_IAPWS(472.89458917842654) <1546542.3293244045
 
 
 def test_iapws95_rho_vs_Coolprop():
