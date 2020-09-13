@@ -1393,12 +1393,21 @@ def test_iapws95_d2A_d2deltar_vs_naive():
             assert_close(iapws95_d2A_d2deltar(tau, delta),
                          ddAdddelta_res(tau, delta), rtol=2e-10) # 2e-10 is a pass
 
+def test_iapws95_dA_ddeltar():
+    rhoc_inv = (1.0/322.0)
+    # Has the highest error found so far. No idea where it comes from.
+    T, rho = 221.12845138055224, 1032.1609281563633
+    tau = 647.096/T
+    delta = rho*rhoc_inv
+    assert_close(iapws95_dA_ddeltar(tau, delta),
+                         dAddelta_res(tau, delta), rtol=5e-9)
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_iapws95_dA_ddeltar_vs_naive():
     '''
     '''
-    N = 5000
+    N = 500
     Ts = linspace(200.0,  5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -1406,8 +1415,13 @@ def test_iapws95_dA_ddeltar_vs_naive():
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
+#            try:
+#                assert_close(iapws95_dA_ddeltar(tau, delta),
+#                             dAddelta_res(tau, delta), rtol=1e-11) # 1e-9 is as close as it gets :(
             assert_close(iapws95_dA_ddeltar(tau, delta),
-                         dAddelta_res(tau, delta), rtol=1e-9) # 1e-9 is as close as it gets probably due to missed decimals.
+                         dAddelta_res(tau, delta), rtol=1e-9) # 1e-9 is as close as it gets :(
+#            except:
+#                print([T, rho])
 
 #test_iapws95_dA_ddeltar_vs_naive()
 

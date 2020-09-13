@@ -2097,9 +2097,10 @@ def iapws95_dA_ddeltar(tau, delta):
     # Uses no constants from this file
     # Zeroth attempt Should try to replace each of the tau, delta powers by something else
     # Managed to make the derivative faster, so yeah it could have been better.
-    tau05 = x0 = sqrt(tau)
-    tau_quarter = sqrt(tau05)
-    tau_eighth = sqrt(tau_quarter)
+    _sqrt, _exp = sqrt, exp
+    tau05 = x0 = _sqrt(tau)
+    tau_quarter = _sqrt(tau05)
+    tau_eighth = _sqrt(tau_quarter) # tau checked, is not causing the small discrepancies.
     x1 = tau
     x2 = delta
     delta2 = x3 = x23 = delta*delta
@@ -2111,7 +2112,10 @@ def iapws95_dA_ddeltar(tau, delta):
     delta9 = x22 = delta*delta8
 #    10, 11, 12, 13, 14 also used for delta but not needed
     x6 = delta - 1.0
-    x7 = exp(-delta)
+    x7 = _exp(-delta)
+    x25 = _exp(-x23)
+    x37 = _exp(-x36)
+    x32 = _exp(-x31)
     x8 = x6*x7
     tau2 = x13 = tau*tau
     tau3 = x19 = tau*tau2
@@ -2129,15 +2133,12 @@ def iapws95_dA_ddeltar(tau, delta):
     x14 = x4*x7*(delta - 4.0)
     x21 = x20*x5
     x24 = x23 + x23
-    x25 = exp(-x23)
     x26 = tau*tau6*x25
     x27 = x2*(x23 - 1.0)
     x28 = x25*x27
     x30 = x25*x29
-    x32 = exp(-x31)
     x33 = x4*(x23 - 2.0)
     x35 = x34*(x23 - 3.0)
-    x37 = exp(-x36)
     x38 = x34*(x36 - 1.0)
     x39 = x37*x38
     x40 = tau23*tau23*tau4*x37
@@ -2152,33 +2153,31 @@ def iapws95_dA_ddeltar(tau, delta):
     x50 = delta - 1.0
     x51 = x50*x50
     dn1_2_23 = x51**(2.0/3.0)
+    x65 = x51*dn1_2_23
     x52 = -20.0*x51
     x53 = x31*(-40.0*delta + 40.0 + 3.0/delta)
     c54 = (tau - 1.21)
-    x54 = x53*exp(x52 - 150.0*c54*c54)
-    x55 = -tau
-    x51_2_x51sqrt = x51*x51*sqrt(x51)
-    y50 =(0.32*x51*dn1_2_23 + x55 + 1.0)
+    x54 = x53*_exp(x52 - 150.0*c54*c54)
+    x51_2_x51sqrt = x51*x51*_sqrt(x51)
+    y50 =(0.32*x65 + 1.0 - tau)
     x56 = 0.2*x51*x51_2_x51sqrt + y50*y50
     x57 = 32.0*x51
     x58 = x61 = (tau - 1.0)*(tau - 1.0)
     x59 = 800.0*x58
-    x60 = x51
     x62 = delta*x6
     x63 = 28.0*x51
     x64 = 700.0*x58
-    x65 = x60**1.6666666666666666
-    c100 = (x55 + 0.32*x65 + 1.0)
-    x66 = 0.2*x51_2_x51sqrt*x51 +  c100*c100
-    c51 = exp(-x57 - x59)
-    c52 = exp(-x63 - x64)
+    c100 = (0.32*x65 + 1.0 - tau)
+    x66 = 0.2*x51_2_x51sqrt*x51 + c100*c100
+    c51 = _exp(-x57 - x59)
+    c52 = _exp(-x63 - x64)
     x100 = (tau - 1.25)
     x101 = x66**(-0.05)
     x102 = x56**-0.05
     x67 = x62*(1.4*x51_2_x51sqrt + (-2.13333333333333333*tau + 0.68266666666666666*x65 + 2.13333333333333333)*dn1_2_23)
     return (-3.6582165144204e-7*delta9*delta*x12*(delta - 11.0) + 3.277713668506e-5*delta9*delta2*x42*(x23 - 6)
             + 1.3251180074668e-12*delta9*delta3*x15*x7*(delta - 13.0) 
-            + 0.00012537942082937*delta9*delta4*x29*(x49 + x49 - 7.0)*exp(-x49) 
+            + 0.00012537942082937*delta9*delta4*x29*(x49 + x49 - 7.0)*_exp(-x49) 
             + 6.2639586912454e-10*delta9*delta5*x10*(delta - 15.0) - 0.023459925506394301*tau_quarter*tau_eighth*x3 
             - 0.52291067718716*tau_quarter*tau05*x2 + 7.89576347228280007*tau_quarter*tau05*tau_eighth + 0.25709043003438*tau4*tau*x11*x7
             - 1.1537996422951e-9*tau*tau10*x22*x7*(delta - 10.0) + 6.6212605039687e-5*tau12*x8
@@ -2196,9 +2195,9 @@ def iapws95_dA_ddeltar(tau, delta):
             + 0.10793600908932*x26*(x24 - 1.0) + 0.804953395270559979*x27*x30 - 0.58083399985759*x3*x30*(x24 - 3.0) 
             + 1.67133355696935002e-9*x3*x40*(x36 + x36 - 1.0) + 1.48631859420682*x30*x33 + 0.272728702206860019*x30*x35
             + 0.710470945558860034*x38*x40 - 0.00399111439590819992*x41*x9 + 0.0767881978446210006*x44*x45 
-            - 2521.3154341695*x5*x53*exp(x52 - 250.0*x100*x100) + 0.668565723079650009*x5*x8 
-            - 31.3062603234350014*x54 - 0.14874640856724*x56*x102*x102*x102*(-56.0*x62*exp(-28.0*x60 - 700.0*x61)
-            + c52) + 0.31806110878444*x56*x102*(-64.0*x62*exp(-32.0*x60 - 800.0*x61) 
+            - 2521.3154341695*x5*x53*_exp(x52 - 250.0*x100*x100) + 0.668565723079650009*x5*x8 
+            - 31.3062603234350014*x54 - 0.14874640856724*x56*x102*x102*x102*(-56.0*x62*_exp(-28.0*x51 - 700.0*x61)
+            + c52) + 0.31806110878444*x56*x102*(-64.0*x62*_exp(-32.0*x51 - 800.0*x61) 
             + c51) - 0.126434447282154*x101*x101*x101*x67*c52
             + 0.302158053345218003*x101*x67*c51 - 0.204338109509650007*x8*x9 + 0.0125335479355230001/x0)
 
