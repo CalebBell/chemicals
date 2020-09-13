@@ -880,3 +880,10 @@ def test_rho_iapws95_CoolProp():
             rho_CoolProp = PropsSI('DMASS', 'T', T, 'P', P, 'water')
             assert_close(rho_implemented, rho_CoolProp, rtol=1e-10)
             # some points found to fail near Psat curve as expected.
+
+
+def test_iapws97_rho_extrapolated():
+    region5_highT = iapws97_rho_extrapolated(2300, 20e6)
+    region5_highT_num = (iapws97_region5_rho(2273.15, 20e6) 
+                         + (2300-2273.15)*derivative(iapws97_region5_rho, 2273.15, args=(20e6,), dx=.1, order=3))
+    assert_close(region5_highT, region5_highT_num, rtol=1e-10)
