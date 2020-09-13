@@ -117,9 +117,7 @@ Utility Methods
 """
 
 __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
-           'NFPA_2008_data', 'IEC_2010_data', 
-           'Ontario_exposure_limits_dict', 'NTP_data',
-           'NTP_codes', 'IARC_data', 'IARC_codes', 
+           'NTP_codes', 'IARC_codes', 
            'Skin_all_methods',  'Ceiling_all_methods', 'STEL_all_methods',
            'TWA_all_methods',
            'TWA_methods', 'TWA', 'STEL', 'STEL_methods', 'Ceiling', 'Ceiling_methods',
@@ -130,7 +128,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'LFL', 'UFL_methods', 'UFL_all_methods', 'UFL', 'fire_mixing', 
            'Suzuki_LFL', 'Suzuki_UFL', 
            'Crowl_Louvar_LFL', 'Crowl_Louvar_UFL', 'LFL_ISO_10156_2017',
-           'DIPPR_SERAT_data','NFPA_30_classification')
+           'NFPA_30_classification')
 
 import os
 from fluids.core import F2K

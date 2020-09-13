@@ -30,6 +30,9 @@ from chemicals.identifiers import check_CAS
 from chemicals.safety import *
 from chemicals.utils import normalize
 from fluids.numerics import assert_close, assert_close1d
+from chemicals.safety import (Ontario_exposure_limits_dict, NFPA_2008_data, IEC_2010_data,
+                              DIPPR_SERAT_data, NTP_data, IARC_data, Tflash_sources,
+                              Tautoignition_sources, LFL_sources, UFL_sources)
 
 SUZUKI = 'Suzuki (1994)'
 CROWLLOUVAR = 'Crowl and Louvar (2001)'
