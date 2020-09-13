@@ -1375,6 +1375,9 @@ def d2_Delta_bd_delta_d_tau(i, tau, delta):
     ans = first + second
     return ans
 
+def test_iapws95_d2A_d2deltar():
+    assert_close(iapws95_d2A_d2deltar(3.23548, 2.652088725981779), -681188.0609390885, rtol=1e-11)
+    
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_iapws95_d2A_d2deltar_vs_naive():
@@ -1391,10 +1394,9 @@ def test_iapws95_d2A_d2deltar_vs_naive():
             tau = 647.096/T
             delta = rho*rhoc_inv
             assert_close(iapws95_d2A_d2deltar(tau, delta),
-#                         ddAdddelta_res(tau, delta), rtol=2e-10) # 2e-10 is a pass
-                         ddAdddelta_res(tau, delta), rtol=2e-6) # 2e-10 is a pass
+                         ddAdddelta_res(tau, delta), rtol=2e-10) # 2e-10 is a pass
 
-test_iapws95_d2A_d2deltar_vs_naive()
+#test_iapws95_d2A_d2deltar_vs_naive()
 
 def test_iapws95_dA_ddeltar():
     rhoc_inv = (1.0/322.0)
