@@ -1769,7 +1769,7 @@ def iapws_97_Trho_err_region5(P, T, rho):
     return err, derr
 
 def iapws97_P(T, rho):
-    r'''Calculate the pressure of wate according to the IAPWS-97 
+    r'''Calculate the pressure of water according to the IAPWS-97 
     standard given a temperature `T` and mass density `rho`.
     
     Parameters
@@ -1946,6 +1946,61 @@ def iapws_97_Prho_err_region3(T, P, rho):
     return err, derr
 
 def iapws97_T(P, rho):
+    r'''Calculate the temperature of water according to the IAPWS-97 
+    standard given a pressure `P` and mass density `rho`.
+    
+    Parameters
+    ----------
+    P : float
+        Pressure, [Pa]
+    rho : float
+        Mass density of water, [kg/m^3]
+
+    Returns
+    -------
+    T : float
+        Temperature, [K]
+        
+    Notes
+    -----    
+    The range of validity of this formulation is as follows:
+        
+    For :math:`P \le 100 \text{ MPa}`:
+        
+    .. math::
+        273.15 \text{ K} \le T \le 1073.15 \text{ K}
+
+    For :math:`P \le 50 \text{ MPa}`:
+        
+    .. math::
+        1073.15 \text{ K} \le T \le 2273.15 \text{ K}
+        
+    A ValueError is raised if the pressure or density is out of bounds.
+    
+    Newton's method with analytical derivatives is used here to solve these
+    equations. The solver tolerance is as tight as it can be without causing
+    wasted iterations that do not improve the result at all. 
+    
+    Due to water's unique density curve, there is a temperature region
+    spaning 273.15 K to 280.005 K where there are two solutions. No guarantee
+    is made as to which solution will be returned.
+    
+    Examples
+    --------
+    >>> iapws97_T(8e5, iapws97_rho(T=330.0, P=8e5))
+    330.0
+    >>> iapws97_T(14e6, 40.39293607288123)
+    823.0
+    >>> iapws97_T(P=3e7, rho=32.11456228328856)
+    2000.0
+    
+    References
+    ----------
+    .. [1] Cooper, JR, and RB Dooley. "Revised Release on the IAPWS Industrial 
+       Formulation 1997 for the Thermodynamic Properties of Water and Steam." 
+       The International Association for the Properties of Water and Steam 1 
+       (2007): 48.
+    '''
     R = 461.526
     solve_region = 0
     if P > 100e6:

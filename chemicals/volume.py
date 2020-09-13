@@ -81,7 +81,7 @@ Correlations for Specific Substances
 ------------------------------------
 .. autofunction:: chemicals.volume.iapws97_rho
 .. autofunction:: chemicals.volume.iapws97_P
-
+.. autofunction:: chemicals.volume.iapws97_T
 
 Fit Coefficients
 ----------------
@@ -175,7 +175,9 @@ from __future__ import division
 __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales', 
 'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic', 
 'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture', 
-'ideal_gas', 'Goodman']
+'ideal_gas', 'Goodman',
+'iapws97_rho', 'iapws97_P', 'iapws97_T',
+]
 
 import os
 from fluids.numerics import np, splev, implementation_optimize_tck
@@ -184,7 +186,7 @@ from chemicals.utils import log, exp, isnan
 from chemicals.utils import Vm_to_rho, mixing_simple
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.iapws import iapws97_rho, iapws97_P
+from chemicals.iapws import iapws97_rho, iapws97_P, iapws97_T
 
 folder = os_path_join(source_path, 'Density')
 
