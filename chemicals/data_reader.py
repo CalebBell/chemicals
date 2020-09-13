@@ -34,15 +34,8 @@ __all__ = ['df_sources',
 import os
 from math import isnan
 try:
-    from collections.abc import Iterable
-except:
-    try:
-        from collections import Iterable
-    except:
-        Iterable = list
-try:
     path_join = os.path.join
-except:
+except: # pragma: no cover
     pass
 
 # %% Loading data from local databanks
@@ -82,7 +75,7 @@ def retrieve_from_df_dict(df_dict, index, key, method):
     except KeyError: 
         raise ValueError('Invalid method: %s, allowed methods are %s' %(
                 method, list(df_dict)))
-    except TypeError: 
+    except TypeError: # pragma: no cover
         raise TypeError("Method must be a string, not a %s object" %(type(method).__name__))
     return retrieve_from_df(df, index, key)
 
@@ -95,21 +88,17 @@ def retrieve_from_df(df, index, key):
     if index in df.index:
         if isinstance(key, str):
             return get_value_from_df(df, index, key)
-        elif isinstance(key, Iterable):
+        else: # Assume its an iterable of strings
             return [float(df.at[index, i]) for i in key]
-        else:
-            raise ValueError('key must be a string or an iterable of strings')
 
 def retrieve_any_from_df(df, index, keys):
-    if isinstance(keys, str) or not isinstance(keys, Iterable):    
-        raise ValueError('keys must be an iterable of strings')
     if index not in df.index: return None
     for key in keys:
         value = df.at[index, key]
         if not isnan(value):
             try:
                 return float(value)
-            except:
+            except: # pragma: no cover
                 return value
 
 def get_value_from_df(df, index, key):
@@ -124,8 +113,9 @@ def list_available_methods_from_df_dict(df_dict, index, key):
     return [method for method, df in df_dict.items()
             if (index in df.index) and not pd.isnull(df.at[index, key])]
 
-def list_available_methods_from_df(df, index, keys):
+def list_available_methods_from_df(df, index, keys_by_method):
     if index in df.index:
-        return [key for key in keys if not pd.isnull(df.at[index, key])]
+        return [method for method, key in keys_by_method.items()
+                if not pd.isnull(df.at[index, key])]
     else:
         return []

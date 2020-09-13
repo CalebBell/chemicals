@@ -32,6 +32,7 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 Search Functions
 ----------------
 .. autofunction:: chemicals.identifiers.CAS_from_any
+.. autofunction:: chemicals.identifiers.MW
 .. autofunction:: chemicals.identifiers.search_chemical
 .. autofunction:: chemicals.identifiers.IDs_to_CASs
 
@@ -65,7 +66,7 @@ a certain database or not. The following chemical groups are available.
 
 from __future__ import division
 
-__all__ = ['check_CAS', 'CAS_from_any', 'search_chemical',
+__all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
            'mixture_from_any', 'cryogenics', 'inerts', 'dippr_compounds', 'IDs_to_CASs',
            'get_pubchem_db', 'CAS_to_int', 'sorted_CAS_key', 'int_to_CAS']
 
@@ -445,7 +446,6 @@ class ChemicalMetadataDB(object):
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
 
 
-
 def CAS_from_any(ID, autoload=False, cache=True):
     """Wrapper around `search_chemical` which returns the CAS number of the
     found chemical directly.
@@ -453,7 +453,7 @@ def CAS_from_any(ID, autoload=False, cache=True):
     Parameters
     ----------
     ID : str
-        One of the name formats described above
+        One of the name formats described by `search_chemical`
 
     Returns
     -------
@@ -481,7 +481,45 @@ def CAS_from_any(ID, autoload=False, cache=True):
     >>> CAS_from_any('O') # only elements can be specified by symbol
     '17778-80-2'
     """
-    return search_chemical(ID, autoload=False, cache=True).CASs
+    return search_chemical(ID, autoload=autoload, cache=cache).CASs
+
+def MW(ID, autoload=False, cache=True):
+    """Wrapper around `search_chemical` which returns the molecular weight of the
+    found chemical directly.
+
+    Parameters
+    ----------
+    ID : str
+        One of the name formats described by `search_chemical`
+
+    Returns
+    -------
+    MW : float
+        Molecular weight of chemical, [g/mol]
+
+    Notes
+    -----
+    An exception is raised if the name cannot be identified. The PubChem 
+    database includes a wide variety of other synonyms, but these may not be
+    present for all chemcials. See `search_chemical` for more details.
+
+    Examples
+    --------
+    >>> MW('water')
+    18.01528
+    >>> MW('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
+    46.06844
+    >>> MW('CCCCCCCCCC')
+    142.286
+    >>> MW('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
+    46.06844
+    >>> MW('pubchem=702')
+    46.06844
+    >>> MW('O') # only elements can be specified by symbol
+    15.9994
+    
+    """
+    return search_chemical(ID, autoload=autoload, cache=cache).MW
 
 chemical_search_cache = {}
 chemical_search_cache_max_size = 200

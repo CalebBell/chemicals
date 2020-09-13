@@ -20,7 +20,7 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import pytest
 from chemicals.combustion import *
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.combustion import fuel_air_third_spec_solver
+from chemicals.combustion import fuel_air_third_spec_solver, is_combustible
 
 
 def test_combustion_stoichiometry():
@@ -160,6 +160,18 @@ def test_combustion():
     with pytest.raises(ValueError):
         combustion_data({'H': 5, 'C': 6, 'O': 2, 'N': 1}, Hf=-344900.0, method='BADMETHOD')
         
+    with pytest.raises(ValueError):
+        combustion_data(['H']) # Bad type
+    
+    with pytest.raises(ValueError):
+        combustion_data('C6H12O6', method='Dulong') # too much oxygen
+    
+    with pytest.raises(ValueError):
+        combustion_data('CH3OH', {'H': 4, 'C': 1, 'O': 1})
+    
+    with pytest.raises(ValueError):
+        combustion_data()
+    
         
 def test_air_fuel_ratio_solver():
     Vm_air = 0.024936627188566596
@@ -181,6 +193,9 @@ def test_air_fuel_ratio_solver():
                                         MW_air=MW_air,  MW_fuel=MW_fuel, n_air=air_spec,
                                         n_fuel=fuel_spec, basis=s)
             assert_close1d(ans, ans_expect_full)
+    
+    assert is_combustible('1333-74-0', {'H':2})
+    
 def assert_comb_dict_equal(calc, expect):
     for k, v_expect in expect.items():
         v_calc = calc[k]

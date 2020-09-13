@@ -57,7 +57,6 @@ __all__ = ['RI', 'RI_methods', 'RI_all_methods',
            'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
            'brix_to_RI']
 
-import os
 from fluids.numerics import interp
 from fluids.constants import pi, N_A
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data

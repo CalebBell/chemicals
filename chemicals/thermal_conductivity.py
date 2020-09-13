@@ -39,7 +39,7 @@ Pure Low Pressure Liquid Correlations
 .. autofunction:: chemicals.thermal_conductivity.Nicola_original
 .. autofunction:: chemicals.thermal_conductivity.Nicola
 .. autofunction:: chemicals.thermal_conductivity.Bahadori_liquid
-.. autofunction:: chemicals.thermal_conductivity.Mersmann_Kind_thermal_conductivity_liquid
+.. autofunction:: chemicals.thermal_conductivity.kl_Mersmann_Kind
 
 Pure High Pressure Liquid Correlations
 --------------------------------------
@@ -122,14 +122,13 @@ from __future__ import division
 
 __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad', 
 'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid', 
-'Mersmann_Kind_thermal_conductivity_liquid', 'DIPPR9G', 'DIPPR9I','k_IAPWS',
+'kl_Mersmann_Kind', 'DIPPR9G', 'DIPPR9I','k_IAPWS',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
 'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
 'Wassiljewa_Herning_Zipperer']
 
-import os
-from fluids.numerics import horner, bisplev, implementation_optimize_tck, numpy as np
+from fluids.numerics import bisplev, implementation_optimize_tck, numpy as np
 from fluids.constants import R, R_inv, N_A, k, pi
 from chemicals.utils import log, exp, sqrt, atan, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
@@ -330,10 +329,10 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None):
 
         Gamma = 177.8514
         qd = 2500000000.0#(0.4E-9)**-1
-        nu = 0.630
+        # nu = 0.630
         xi0 = 0.13E-9
-        gamma = 1.239
-#         Gamma0 = 0.06
+        # gamma = 1.239
+        # Gamma0 = 0.06
         TRC = 1.5
 
         zeta_drho_dP = drho_dP*68521.73913043478#22.064E6/322.0
@@ -382,7 +381,7 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None):
 
 ### Purely CSP Methods - Liquids
 
-def Sheffy_Johnson(T, M, Tm):
+def Sheffy_Johnson(T, MW, Tm):
     r'''Calculate the thermal conductivity of a liquid as a function of
     temperature using the Sheffy-Johnson (1961) method. Requires
     Temperature, molecular weight, and melting point.
@@ -394,7 +393,7 @@ def Sheffy_Johnson(T, M, Tm):
     ----------
     T : float
         Temperature of the fluid [K]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
     Tm : float
         Melting point of the fluid [K]
@@ -420,10 +419,10 @@ def Sheffy_Johnson(T, M, Tm):
        Liquids at High Temperatures." Journal of Chemical & Engineering Data
        6, no. 2 (April 1, 1961): 245-49. doi:10.1021/je60010a019
     '''
-    return 1.951*(1.0 - 0.00126*(T - Tm))*Tm**-0.216*M**-0.3
+    return 1.951*(1.0 - 0.00126*(T - Tm))*Tm**-0.216*MW**-0.3
 
 
-def Sato_Riedel(T, M, Tb, Tc):
+def Sato_Riedel(T, MW, Tb, Tc):
     r'''Calculate the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Sato-Riedel [1]_, [2]_, published in
     Reid [3]_. Requires temperature, molecular weight, and boiling and critical
@@ -437,7 +436,7 @@ def Sato_Riedel(T, M, Tb, Tc):
     ----------
     T : float
         Temperature of the fluid [K]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
     Tb : float
         Boiling temperature of the fluid [K]
@@ -467,22 +466,22 @@ def Sato_Riedel(T, M, Tb, Tc):
     '''
     Tr = T/Tc
     Tbr = Tb/Tc
-    return 1.1053*(3. + 20.*(1.0 - Tr)**(2.0/3.0))*M**-0.5/(3.0 + 20.0*(1.0 - Tbr)**(2.0/3.))
+    return 1.1053*(3. + 20.*(1.0 - Tr)**(2.0/3.0))*MW**-0.5/(3.0 + 20.0*(1.0 - Tbr)**(2.0/3.))
 
 
-def Lakshmi_Prasad(T, M):
+def Lakshmi_Prasad(T, MW):
     r'''Estimates thermal conductivity of pure liquids as a function of
     temperature using a reference fluid approach. Low accuracy but quick.
     Developed using several organic fluids.
 
     .. math::
-        \lambda = 0.0655-0.0005T + \frac{1.3855-0.00197T}{M^{0.5}}
+        \lambda = 0.0655-0.0005T + \frac{1.3855-0.00197T}{MW^{0.5}}
 
     Parameters
     ----------
     T : float
         Temperature of the fluid [K]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
 
     Returns
@@ -507,10 +506,10 @@ def Lakshmi_Prasad(T, M):
        Thermal Conductivity of Pure Liquids." The Chemical Engineering Journal
        48, no. 3 (April 1992): 211-14. doi:10.1016/0300-9467(92)80037-B
     '''
-    return 0.0655 - 0.0005*T + (1.3855 - 0.00197*T)*M**-0.5
+    return 0.0655 - 0.0005*T + (1.3855 - 0.00197*T)*MW**-0.5
 
 
-def Gharagheizi_liquid(T, M, Tb, Pc, omega):
+def Gharagheizi_liquid(T, MW, Tb, Pc, omega):
     r'''Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Gharagheizi [1]_. A  convoluted
     method claiming high-accuracy and using only statistically significant
@@ -533,7 +532,7 @@ def Gharagheizi_liquid(T, M, Tb, Pc, omega):
     ----------
     T : float
         Temperature of the fluid [K]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
     Tb : float
         Boiling temperature of the fluid [K]
@@ -567,16 +566,16 @@ def Gharagheizi_liquid(T, M, Tb, Pc, omega):
         AIChE Journal 59, no. 5 (May 1, 2013): 1702-8. doi:10.1002/aic.13938
     '''
     Pc = Pc*1E-5
-    B = 16.0407*M + 2.*Tb - 27.9074
-    A = 3.8588*M**8*(1.0045*B + 6.5152*M - 8.9756)
-    M2 = M*M
+    B = 16.0407*MW + 2.*Tb - 27.9074
+    A = 3.8588*MW**8*(1.0045*B + 6.5152*MW - 8.9756)
+    M2 = MW*MW
     B_inv4 = B**-4.0
     kl = 1E-4*(10.*omega + 2.*Pc - 2.*T + 4. + 1.908*(Tb + 1.009*B*B/(M2))
         + 3.9287*M2*M2*B_inv4 + A*B_inv4*B_inv4)
     return kl
 
 
-def Nicola_original(T, M, Tc, omega, Hfus):
+def Nicola_original(T, MW, Tc, omega, Hfus):
     r'''Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Nicola [1]_. A  simpler but long
     method claiming high-accuracy and using only statistically significant
@@ -594,7 +593,7 @@ def Nicola_original(T, M, Tc, omega, Hfus):
     ----------
     T : float
         Temperature of the fluid [K]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
     Tc : float
         Critical temperature of the fluid [K]
@@ -628,10 +627,10 @@ def Nicola_original(T, M, Tc, omega, Hfus):
     '''
     Tr = T/Tc
     Hfus = Hfus*1000
-    return -0.5694 - 0.1436*Tr + 5.4893E-10*Hfus + 0.0508*omega + M**-0.0622
+    return -0.5694 - 0.1436*Tr + 5.4893E-10*Hfus + 0.0508*omega + MW**-0.0622
 
 
-def Nicola(T, M, Tc, Pc, omega):
+def Nicola(T, MW, Tc, Pc, omega):
     r'''Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of [1]_. A statistically derived
     equation using any correlated terms.
@@ -647,7 +646,7 @@ def Nicola(T, M, Tc, Pc, omega):
     ----------
     T : float
         Temperature of the fluid [K]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
     Tc : float
         Critical temperature of the fluid [K]
@@ -680,10 +679,10 @@ def Nicola(T, M, Tc, Pc, omega):
     '''
     Tr = T/Tc
     Pc = Pc*1E-5
-    return 0.5147*(-0.2537*Tr + 0.0017*Pc + 0.1501*omega + M**-0.2999)
+    return 0.5147*(-0.2537*Tr + 0.0017*Pc + 0.1501*omega + MW**-0.2999)
 
 
-def Bahadori_liquid(T, M):
+def Bahadori_liquid(T, MW):
     r'''Estimates the thermal conductivity of parafin liquid hydrocarbons.
     Fits their data well, and is useful as only MW is required.
     X is the Molecular weight, and Y the temperature.
@@ -707,7 +706,7 @@ def Bahadori_liquid(T, M):
     ----------
     T : float
         Temperature of the fluid [K]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
 
     Returns
@@ -736,7 +735,7 @@ def Bahadori_liquid(T, M):
     B = (1.565612E-2, -1.55833E-4, 5.051114E-7, -4.68030E-10)
     C = (-1.80304E-4, 1.758693E-6, -5.55224E-9, 5.201365E-12)
     D = (5.880443E-7, -5.65898E-9, 1.764384E-11, -1.65944E-14)
-    X, Y = M, T
+    X, Y = MW, T
     
     a = A[0] + X*(B[0] + X*(C[0] + D[0]*X))
     b = A[1] + X*(B[1] + X*(C[1] + D[1]*X))
@@ -745,7 +744,7 @@ def Bahadori_liquid(T, M):
     return a + Y*(b + Y*(c + d*Y))
 
 
-def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, na):
+def kl_Mersmann_Kind(T, MW, Tc, Vc, na):
     r'''Estimates the thermal conductivity of organic liquid substances
     according to the method of [1]_.
 
@@ -760,7 +759,7 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, na):
     ----------
     T : float
         Temperature of the fluid [K]
-    M : float
+    MW : float
         Molecular weight of the fluid [g/mol]
     Tc : float
         Critical temperature of the fluid [K]
@@ -783,7 +782,7 @@ def Mersmann_Kind_thermal_conductivity_liquid(T, MW, Tc, Vc, na):
     --------
     Dodecane at 400 K:
         
-    >>> Mersmann_Kind_thermal_conductivity_liquid(400, 170.33484, 658.0, 
+    >>> kl_Mersmann_Kind(400, 170.33484, 658.0, 
     ... 0.000754, 38)
     0.0895271829899285
 
@@ -1127,7 +1126,7 @@ def Eucken(MW, Cvm, mu):
     temperature using the CSP method of Eucken [1]_.
 
     .. math::
-        \frac{\lambda M}{\eta C_v} = 1 + \frac{9/4}{C_v/R}
+        \frac{\lambda MW}{\eta C_v} = 1 + \frac{9/4}{C_v/R}
 
     Parameters
     ----------
@@ -1170,7 +1169,7 @@ def Eucken_modified(MW, Cvm, mu):
     temperature using the Modified CSP method of Eucken [1]_.
 
     .. math::
-        \frac{\lambda M}{\eta C_v} = 1.32 + \frac{1.77}{C_v/R}
+        \frac{\lambda MW}{\eta C_v} = 1.32 + \frac{1.77}{C_v/R}
 
     Parameters
     ----------
@@ -1286,7 +1285,7 @@ def Chung(T, MW, Tc, omega, Cvm, mu):
     temperature using the CSP method of Chung [1]_.
 
     .. math::
-        \frac{\lambda M}{\eta C_v} = \frac{3.75 \Psi}{C_v/R}
+        \frac{\lambda MW}{\eta C_v} = \frac{3.75 \Psi}{C_v/R}
 
     .. math::
         \Psi = 1 + \alpha \left\{[0.215+0.28288\alpha-1.061\beta+0.26665Z]/
@@ -1481,7 +1480,7 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
 
     .. math::
         k = 7.9505\times 10^{-4} + 3.989\times 10^{-5} T
-        -5.419\times 10^-5 M + 3.989\times 10^{-5} A
+        -5.419\times 10^-5 MW + 3.989\times 10^{-5} A
 
     .. math::
        A = \frac{\left(2\omega + T - \frac{(2\omega + 3.2825)T}{T_b} + 3.2825\right)}{0.1MP_cT}

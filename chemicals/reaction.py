@@ -86,7 +86,6 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
            'balance_stoichiometry', 'stoichiometric_matrix']
            
-import os
 from chemicals.utils import ceil, log10, PY37, source_path, os_path_join, can_load_data
 from chemicals import heat_capacity
 from chemicals.data_reader import (register_df_source,

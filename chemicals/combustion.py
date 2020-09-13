@@ -599,10 +599,10 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         atoms = as_atoms(formula)
     if not stoichiometry:
         try: 
-            stoichiometry = combustion_stoichiometry(atoms, missing_handling)
+            stoichiometry = combustion_stoichiometry(atoms, MW, missing_handling)
         except NameError:
             raise ValueError("must specify either `formula` or `stoichiometry`, none specified")
-    if not MW:
+    if MW is None:
         MW = molecular_weight(atoms)
     if method:
         method = method.capitalize()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
-<Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -210,7 +210,7 @@ def Tc_methods(CASRN):
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Tc_sources, CASRN, 'Tc')
     
-def Tc(CASRN, get_methods=False, method=None):
+def Tc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
     temperature. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -366,7 +366,7 @@ def Pc_methods(CASRN):
     return list_available_methods_from_df_dict(Pc_sources, CASRN, 'Pc')
     
 
-def Pc(CASRN, get_methods=False, method=None):
+def Pc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
     pressure. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -521,7 +521,7 @@ def Vc_methods(CASRN):
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Vc_sources, CASRN, 'Vc')
 
-def Vc(CASRN, get_methods=False, method=None):
+def Vc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
     volume. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not

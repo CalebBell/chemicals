@@ -49,7 +49,7 @@ Pure Low Pressure Gas Correlations
 .. autofunction:: chemicals.viscosity.Yoon_Thodos
 .. autofunction:: chemicals.viscosity.Stiel_Thodos
 .. autofunction:: chemicals.viscosity.Lucas_gas
-.. autofunction:: chemicals.viscosity.Gharagheizi_gas_viscosity
+.. autofunction:: chemicals.viscosity.viscosity_gas_Gharagheizi
 
 Pure High Pressure Gas Correlations
 -----------------------------------
@@ -170,13 +170,12 @@ from __future__ import division
 
 __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
-'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'Gharagheizi_gas_viscosity', 'Herning_Zipperer', 
+'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer', 
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
 'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS']
 
-import os
 from fluids.numerics import secant, interp, numpy as np
-from chemicals.utils import log, exp, log10, sqrt, pi, atan, tan, sin, acos
+from chemicals.utils import log, exp, sqrt, atan, tan, sin, acos
 
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
@@ -616,6 +615,7 @@ def Viswanath_Natarajan_3(T, A, B, C):
 
     Examples
     --------
+    >>> from math import log10
     >>> Viswanath_Natarajan_3(298.15, -2.7173-log10(1000), -1071.18, -129.51)
     0.0006129806445142113
 
@@ -813,7 +813,7 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
 ### Viscosity of Dense Liquids
 
 
-def Lucas(T, P, Tc, Pc, omega, P_sat, mu_l):
+def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
     r'''Adjustes for pressure the viscosity of a liquid using an emperical
     formula developed in [1]_, but as discussed in [2]_ as the original source
     is in German.
@@ -846,7 +846,7 @@ def Lucas(T, P, Tc, Pc, omega, P_sat, mu_l):
         Critical pressure of the fluid [Pa]
     omega : float
         Acentric factor of compound
-    P_sat : float
+    Psat : float
         Saturation pressure of the fluid [Pa]
     mu_l : float
         Viscosity of liquid at 1 atm or saturation, [Pa*s]
@@ -880,7 +880,7 @@ def Lucas(T, P, Tc, Pc, omega, P_sat, mu_l):
     C = Tr*(Tr*(Tr*(Tr*(Tr*(Tr*(15.6719*Tr - 59.8127) + 96.1209) - 84.8291) + 44.1706) - 13.404) + 2.1616) - 0.07921
     D = 0.3257*(1.0039-Tr**2.573)**-0.2906 - 0.2086
     A = 0.9991 - 4.674E-4/(1.0523*Tr**-0.03877 - 1.0513)
-    dPr = (P-P_sat)/Pc
+    dPr = (P-Psat)/Pc
     if dPr < 0.0:
         dPr = 0.0
     return (1. + D*(dPr/2.118)**A)/(1. + C*omega*dPr)*mu_l
@@ -1105,7 +1105,7 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
     return eta*1E-7
 
 
-def Gharagheizi_gas_viscosity(T, Tc, Pc, MW):
+def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
     r'''Calculates the viscosity of a gas using an emperical formula
     developed in [1]_.
 
@@ -1143,7 +1143,7 @@ def Gharagheizi_gas_viscosity(T, Tc, Pc, MW):
 
     Examples
     --------
-    >>> Gharagheizi_gas_viscosity(120., 190.564, 45.99E5, 16.04246)
+    >>> viscosity_gas_Gharagheizi(120., 190.564, 45.99E5, 16.04246)
     5.215761625399613e-06
 
     References
@@ -1632,10 +1632,10 @@ def Twu_1985_internal(T, Tb, SG):
     nu1 = exp(log(nu10 + x0)*square_term1) - x0
     nu2 = exp(log(nu20 + x0)*square_term2) - x0
     
-    T1 = 559.67 # 100 deg F
-    T2 = 669.67 # 210 deg F
+    # T1 = 559.67 # 100 deg F
+    # T2 = 669.67 # 210 deg F
     logT1 = 6.3273473243178415 # log(559.67)
-    logT2 = 6.506785053735233 # log(669.67)
+    # logT2 = 6.506785053735233 # log(669.67)
     
     Z1 = nu1 + 0.7 + exp(-1.47 - nu1*(1.84 + 0.51*nu1))
     Z2 = nu2 + 0.7 + exp(-1.47 - nu2*(1.84 + 0.51*nu2))

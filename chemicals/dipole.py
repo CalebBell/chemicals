@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
-<Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,6 @@ __all__ = ['dipole_moment',
            'dipole_moment_methods',
            'dipole_moment_all_methods']
 
-import os
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -109,7 +108,7 @@ def dipole_moment_methods(CASRN):
     if not _dipole_data_loaded: _load_dipole_data()
     return list_available_methods_from_df_dict(dipole_sources, CASRN, 'Dipole')
 
-def dipole_moment(CASRN, get_methods=False, method=None):
+def dipole_moment(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's dipole moment.
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
@@ -126,9 +125,6 @@ def dipole_moment(CASRN, get_methods=False, method=None):
     -------
     dipole : float
         Dipole moment, [debye]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain dipole moment with the
-        given inputs
 
     Other Parameters
     ----------------

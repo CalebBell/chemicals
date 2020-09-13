@@ -1,13 +1,13 @@
 chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
 =======================================================================================
 
-# TODO: Logo here?
-
 Key Features & Capabilities
 ---------------------------
+
 The chemicals library features an extensive compilation of pure component 
 chemical data that can serve engineers, scientists, technicians, and anyone 
-working with chemicals. The chemicals library facilitates the retrieval of:
+working with chemicals. The chemicals library facilitates the retrieval and 
+calculation of:
 
 - Chemical constants including formula, molecular weight, normal boiling and 
   melting points, triple point, heat of formation, absolute entropy of 
@@ -20,14 +20,27 @@ working with chemicals. The chemicals library facilitates the retrieval of:
   and pressure dependent chemical properties including vapor pressure, 
   heat capacity, molar volume, thermal conductivity, surface tension, dynamic 
   viscosity, heat of vaporization, relative permitivity, etc.
+  
+- Methods to solve thermodynamic phase equilibrium, including flash routines, 
+  vapor-liquid equilibrium constant correlations, and both numerical and 
+  analytical solutions for the Rashford Rice and Li-Johns-Ahmadi equations. 
+  Rashford Rice solutions for systems of 3 or more phases are also available.
 
 Data for over 20,000 chemicals are made available as local databanks in this 
 library. All databanks are loaded on-demand, saving loading time and RAM. For
 example, if only data on the normal boiling point is required, the chemicals 
 library will only load normal boiling point datasets. This on-demand loading 
 feature makes the chemicals library an attractive dependence for software
-modeling chemical processes. In fact, the `Biorefinery Simulation and Techno-Economic Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
+modeling chemical processes. In fact, `The Biorefinery Simulation and Techno-Economic 
+Analysis Modules (BioSTEAM) <https://biosteam.readthedocs.io/en/latest/>`_ 
 is reliant on the chemicals library for the simulation of unit operations.
+
+The chemicals library also supports integration with 
+`Numba <https://numba.pydata.org/>`_, a powerful accelerator that works 
+well with NumPy; `Pint <https://pint.readthedocs.io/en/stable/>`_ Quantity 
+objects to keep track of units of measure; and 
+NumPy `vectorized <https://numpy.org/doc/stable/reference/generated/numpy.vectorize.html>`_ 
+functions. 
 
 If you need to know something about a chemical, give chemicals a try.
 
@@ -96,12 +109,6 @@ If you have an installation of Python with pip, simple install it with:
 
     $ pip install chemicals
     
-Alternatively, if you are using `conda <https://conda.io/en/latest/>`_ as your 
-package management, you can install chemicals in your environment from 
-`conda-forge <https://conda-forge.org/>`_ channel with:
-
-    $ conda install -c conda-forge chemicals
-
 To get the git version, run:
 
     $ git clone git://github.com/CalebBell/chemicals.git
