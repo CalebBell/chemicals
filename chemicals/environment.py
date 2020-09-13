@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
-<Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,6 @@ __all__ = ['GWP', 'ODP', 'logP',
            'GWP_all_methods', 'ODP_all_methods', 'logP_all_methods',
            'GWP_methods', 'ODP_methods', 'logP_methods']
 
-import os
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -63,6 +62,7 @@ from chemicals.data_reader import (register_df_source,
                                    retrieve_any_from_df,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
+                                   list_available_methods_from_df,
                                    list_available_methods_from_df_dict)
 
 ### Register data sources and lazy load them
@@ -151,13 +151,8 @@ def GWP_methods(CASRN):
     GWP
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
-    if CASRN in GWP_data.index:
-        import pandas as pd
-        return [method for method, key in _GWP_keys_by_method.items()
-                if not pd.isnull(GWP_data.at[CASRN, key])]
-    else:
-        return []
-
+    return list_available_methods_from_df(GWP_data, CASRN, _GWP_keys_by_method)
+    
 def GWP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's Global Warming
     Potential, relative to CO2. Lookup is based on CASRNs. Will automatically
@@ -246,12 +241,7 @@ def ODP_methods(CASRN):
     ODP
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
-    if CASRN in ODP_data.index:
-        import pandas as pd
-        return [method for method, key in _ODP_keys_by_method.items()
-                if not pd.isnull(ODP_data.at[CASRN, key])]
-    else:
-        return []
+    return list_available_methods_from_df(ODP_data, CASRN, _ODP_keys_by_method)
 
 def ODP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's Ozone Depletion
