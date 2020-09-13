@@ -887,3 +887,41 @@ def test_iapws97_rho_extrapolated():
     region5_highT_num = (iapws97_region5_rho(2273.15, 20e6) 
                          + (2300-2273.15)*derivative(iapws97_region5_rho, 2273.15, args=(20e6,), dx=.1, order=3))
     assert_close(region5_highT, region5_highT_num, rtol=1e-10)
+    
+    region2_highT = iapws97_rho_extrapolated(1100, 80e6)
+    region2_highT_num = (iapws97_region2_rho(1073.15, 80e6) 
+                         + (1100-1073.15)*derivative(iapws97_region2_rho, 1073.15, args=(80e6,), dx=.1, order=5))
+    
+    assert_close(region2_highT, region2_highT_num, rtol=1e-9)
+    
+    
+    region1_lowT = iapws97_rho_extrapolated(200, 80e6)
+    assert region1_lowT == iapws97_rho(273.15, 80e6)
+    
+def test_iapws95_P():
+    assert_close(iapws95_rho(300.0, iapws95_P(300, 1000)), 1000)
+
+
+def test_iapws95_rho():
+    assert_close(iapws95_rho(273.1600000001, 0.001), 7.932210036861784e-09, rtol=1e-8)
+    
+    assert_close(iapws95_rho(350.0, 1e6), 974.1288271329855, rtol=1e-8)
+    assert_close(iapws95_rho(981.3822764554016, 171493178.34983346), 444.5570512999293)
+    
+    # Point where was starting from negative density initially.
+    assert_close(iapws95_rho(2357., 97719212), 85.77393882818544, rtol=1e-9)
+
+    # Three points CoolProp is finding the vapor root when the liquid one is correct
+    assert_close(iapws95_rho(432.0135947190398, 600559.0434678708), 908.5576752810769)
+    assert Psat_IAPWS(432.0135947190398) < 600559.0434678708
+    
+    assert_close(iapws95_rho(443.36028005610694, 796123.0461361709), 897.2358406215736)
+    assert Psat_IAPWS(443.36028005610694) < 796123.0461361709
+    
+    assert_close(iapws95_rho(485.9103500701087, 2014934.1250668736), 849.3248042136873)
+    assert Psat_IAPWS(485.9103500701087) < 2014934.1250668736
+
+
+def test_iapws95_rho_vs_Coolprop():
+    from CoolProp.CoolProp import PropsSI
+    assert_close(iapws95_rho(2357., 97719212), PropsSI('DMASS', 'T', 2357, 'P', 97719212.0, 'water'), rtol=1e-9)

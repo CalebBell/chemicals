@@ -36,7 +36,9 @@ __all__ = [
            'iapws97_boundary_3ab', 'iapws97_boundary_3op',
            'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
            'iapws97_region1_rho', 'iapws97_region2_rho', 'iapws97_region5_rho',
-           'iapws95_rho', 'iapws97_rho_extrapolated',
+           'iapws95_rho', 'iapws95_P',
+           
+           'iapws97_rho_extrapolated',
            'iapws97_rho', 'iapws97_P', 'iapws97_T',
            
            
@@ -2351,33 +2353,93 @@ def iapws97_rho_extrapolated(T, P):
             T_border = 2273.15
             Pref = 1e6
             Tref = 1e3
-            pi = P/Pref
+            P_inv = 1.0/P
+            pi = P*1e-6
             tau = Tref/T_border
-            # region 5 upwards T extrapolte drho_dT
+            # region 5 upwards T extrapolate drho_dT
             dGr_dpi = iapws97_dGr_dpi_region5(tau, pi) 
-            dG_dpi = 1/pi + dGr_dpi
+            dG_dpi = 1e6*P_inv + dGr_dpi
             rho = P/(R97*T_border*pi*dG_dpi)
-            #print(pi, tau, dG_dpi, 'pi, tau, dG_dpi')
             d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region5(tau, pi) 
-            drho_dT = -Pref/(R97*T_border*T_border*(dGr_dpi + Pref/P)) + Pref*Tref*d2Gr_dpidtau/(R97*T_border**3*(dGr_dpi + Pref/P)**2)
+            x0 = (dGr_dpi + Pref*P_inv)
+            x1 = R97*T_border*T_border
+            drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
             rho = rho + drho_dT*(T - T_border)
+        elif T > 1073.15 and 50e6 <= P <= 100e6:
+            T_border = 1073.15
+            Pref = 1e6
+            Tref = 540.0
+            P_inv = 1.0/P
+            pi = P*1e-6
+            tau = Tref/T_border
+            # region 5 upwards T extrapolate drho_dT
+            dGr_dpi = iapws97_dGr_dpi_region2(tau, pi) 
+            dG_dpi = 1e6*P_inv + dGr_dpi
+            rho = P/(R97*T_border*pi*dG_dpi)
+            d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region2(tau, pi) 
+            x0 = (dGr_dpi + Pref*P_inv)
+            x1 = R97*T_border*T_border
+            drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
+            drho = drho_dT*(T - T_border)
+            if (rho + drho) > .1*rho:
+                # Do not take the extrapolation if density has decreased too much
+                rho = rho + drho
+        elif T < 273.15:
+            # region 1 - fairly incompressible, don't bother extrapolating
+            if P > 100e6: P = 100e6
+            rho = iapws97_region1_rho(273.15, P)
+        else:
+            # Don't bother extrapolating to higher P at this point, the density
+            # change is small there
+            if P > 100e6:
+                P = 100e6
+            if T > 1073.15:
+                T = 1073.15
+            rho = iapws97_rho(T, P)
     return rho
+
+def iapws95_P(T, rho):
+    rhoc_inv = (1.0/322.0)
+    tau = 647.096/T
+    delta = rho*rhoc_inv
+    dAddelta_res_val = iapws95_dA_ddeltar(tau, delta)
+    return (1.0 + dAddelta_res_val*delta)*rho*R95*T
 
 
 def iapws95_rho(T, P):
+    MAX_RHO_STEP = 200.0 # iapws95_rho(250, 1e9) is a good point showing the advantage of this
     rho = iapws97_rho_extrapolated(T, P)
+#    print(rho)
     # newton solver overhead is huge.
 #            print(rho, 'initial guess', drho_dT, 'drho_dT')
             
     err, derr = iapws95_rho_err(rho, T, P)
-    rho_old = rho - err/derr
+    drho = - err/derr
+    if drho < -MAX_RHO_STEP:
+        drho = -MAX_RHO_STEP
+    elif drho > MAX_RHO_STEP:
+        drho = MAX_RHO_STEP
+    rho_old = rho + drho
+#    print(rho_old)
     
     err, derr = iapws95_rho_err(rho_old, T, P)
-    rho = rho_old - err/derr
+    drho = - err/derr
+    if drho < -MAX_RHO_STEP:
+        drho = -MAX_RHO_STEP
+    elif drho > MAX_RHO_STEP:
+        drho = MAX_RHO_STEP
+    rho = rho_old + drho
+#    print(rho)
     
     while abs(rho_old - rho) > abs(1e-11*rho):
         rho_old = rho
         err, derr = iapws95_rho_err(rho, T, P)
-        rho = rho - err/derr
+        drho = - err/derr
+        if drho < -MAX_RHO_STEP:
+            drho = -MAX_RHO_STEP
+        elif drho > MAX_RHO_STEP:
+            drho = MAX_RHO_STEP
+        rho = rho + drho
+#        print(rho, err)
     return rho
 
