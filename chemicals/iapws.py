@@ -60,7 +60,7 @@ __all__ = [
            'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_d2tau_region5', 'iapws97_d2Gr_dpidtau_region5',
            'iapws97_G0_region5', 'iapws97_dG0_dtau_region5', 'iapws97_d2G0_d2tau_region5',
            
-           'iapws95_A0', 'iapws95_dA0dtau', 'iapws95_d2A0_d2tau',
+           'iapws95_A0', 'iapws95_dA0dtau', 'iapws95_d2A0_d2tau', 'iapws95_d3A0_d3tau',
            ]
 
 __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c', 
@@ -2125,6 +2125,26 @@ def iapws95_d2A0_d2tau(tau, delta):
             - 12.1768215703940861*x3/((1.0 - x3)*(1.0 - x3))
             - 0.0206078783406615819*x4/((1.0 - x4)*(1.0 - x4))
             - 3.00632/(tau*tau))
+
+def iapws95_d3A0_d3tau(tau, delta):
+    x0 = exp(-27.5075105*tau)
+    x1 = 1.0 - x0
+    x2 = exp(-9.24437796*tau)
+    x3 = 1.0 - x2
+    x4 = exp(-7.74073708*tau)
+    x5 = 1.0 - x4
+    x6 = exp(-3.53734222*tau)
+    x7 = 1.0 - x6
+    x8 = exp(-1.28728967*tau)
+    x9 = 1.0 - x8
+    return (5177.04609797344619*x0/(x1*x1) + 765.962962903719927*x2/(x3*x3)
+            + 593.454243918743487*x4/(x5*x5) + 43.0735850463617069*x6/(x7*x7)
+            + 0.0265283089085503951*x8/(x9*x9) + 0.0530566178171007902*exp(-2.57457934*tau)/(x9*x9*x9)
+            + 86.1471700927234139*exp(-7.07468444*tau)/(x7*x7*x7)
+            + 1186.90848783748697*exp(-15.48147416*tau)/(x5*x5*x5)
+            + 1531.92592580743985*exp(-18.48875592*tau)/(x3*x3*x3)
+            + 10354.0921959468924*exp(-55.015021*tau)/(x1*x1*x1)
+            + 6.01264000000000021/(tau*tau*tau))
 
 
 

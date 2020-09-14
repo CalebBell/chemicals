@@ -1531,6 +1531,25 @@ def test_ddAddtau_idg_vs_naive():
             errs.append(rerri)
 #    print(rerr/N**2, np.std(errs), np.max(errs))
 #test_ddAddtau_idg_vs_naive()
+            
+            
+def test_iapws95_A0():
+    ans = iapws95_A0(.5345, .575745)
+    assert_close(ans, -7.3790791583143, rtol=1e-14)
+
+def test_iapws95_dA0dtau():
+    ans = iapws95_dA0dtau(.5345, .575745)
+    assert_close(ans, 13.16120203177092, rtol=1e-14)
+    
+def test_iapws95_d2A0_d2tau():
+    ans = iapws95_d2A0_d2tau(.5345, .575745)
+    assert_close(ans, -14.97966801918871, rtol=1e-14)
+    assert_close(ans, derivative(iapws95_dA0dtau, .5345, args=(.575745,), dx=1e-8))
+
+def test_iapws95_d3A0_d3tau():
+    ans = iapws95_d3A0_d3tau(.5345, .575745)
+    assert_close(ans, 67.50267480495313, rtol=1e-14)
+    assert_close(ans, derivative(iapws95_d2A0_d2tau, .5345, args=(.575745,), dx=1e-8))
 
 def test_rho_iapws95_CoolProp():
     from CoolProp.CoolProp import PropsSI
