@@ -2140,12 +2140,13 @@ def iapws95_Ar(tau, delta):
     x51 = 0.8*tau - 1.0
     x35 = 0.2*sqrt(deltam1sqr)*deltam1sqr*deltam1sqr*deltam1sqr + x50*x50
     x35_n05 = x35**-0.05
-    return (delta*(delta*(delta9*(-6.26395869124539993e-10*delta4*tauexpnd - 0.000062689710414685001*delta3*tau10*_exp(-delta4)
-           - 1.32511800746680002e-12*delta2*tau13*expnd - 0.0000163885683425300002*delta*x29*expnd2
+    return (delta*(delta*(delta9*(delta*(delta*(delta*(-6.26395869124539993e-10*delta*tauexpnd - 0.000062689710414685001*tau10*_exp(-delta4))
+           - 1.32511800746680002e-12*tau13*expnd) - 0.0000163885683425300002*x29*expnd2)
            + 3.65821651442040008e-7*tau4expnd)
            
            - 0.26145533859358*tau_quarter*taurt
-           - 0.25709043003437998*tau4*tau*expnd + 0.318025093454180008*taurt
+           + 0.318025093454180008*taurt
+           - 0.25709043003437998*tau4*tauexpnd
            - 0.192327211560020001*tauexpnd
            - 0.00781997516879810034*tau_quarter*tau_eighth*delta
            )
