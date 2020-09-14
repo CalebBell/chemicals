@@ -2108,8 +2108,10 @@ def iapws95_Ar(tau, delta):
     x29 = tau4*tau4
     tau9 = tau6*tau3
     tau10 = tau*tau9
+    tau11 = tau10*tau
     tau13 = tau10*tau3
-    x24 = tau**50
+    x24 = tau10*tau10
+    x24 *= x24*tau10
     delta2 = delta*delta
     delta4 = delta2*delta2
     delta5 = delta*delta4
@@ -2128,7 +2130,7 @@ def iapws95_Ar(tau, delta):
     x14 = delta3*x3
     x20 = delta8*x8
     x22 = tau10*x8
-    x26 = tau**23*x23
+    x26 = tau10*tau13*x23
     x28 = x25*delta5
     x30 = delta9*x8
     x32 = -20.0*x31
@@ -2147,12 +2149,14 @@ def iapws95_Ar(tau, delta):
            - 0.192327211560020001*x4)
            - 0.00781997516879810034*tau_quarter*tau_eighth*delta2
            + 7.89576347228280007*tau**0.875
-           + 0.317774973307380026*tau**46*x28 
-           - 0.199057183544080002*tau**44*x28 
-           + 0.0349940054637650003*tau**22*delta3*x23
-           + 0.0436136157238109987*tau**16*delta2*x23 
-           - 0.0000662126050396869941*tau**12*x3
-           + 1.15379964229510002e-9*tau**11*delta9*x3
+           
+           + 0.317774973307380026*tau11*tau11*tau11*tau11*tau2*x28 
+           - 0.199057183544080002*tau11*tau11*tau11*tau11*x28 
+           + 0.0349940054637650003*tau11*tau11*delta3*x23
+           + 0.0436136157238109987*tau4*tau*tau11*delta2*x23 
+           - 0.0000662126050396869941*tau11*tau*x3
+           + 1.15379964229510002e-9*tau11*delta9*x3
+           
            + x24*(-0.118411824259810006*x28
             - 5.57111185656449973e-10*delta2*x25)
            + 0.00880894931021340005*tau*delta3
