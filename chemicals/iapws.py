@@ -2140,14 +2140,13 @@ def iapws95_Ar(tau, delta):
     x51 = 0.8*tau - 1.0
     x35 = 0.2*sqrt(deltam1sqr)*deltam1sqr*deltam1sqr*deltam1sqr + x50*x50
     x35_n05 = x35**-0.05
-    return (delta*(delta*(delta9*(delta*(delta*(delta*(-6.26395869124539993e-10*delta*tauexpnd - 0.000062689710414685001*tau10*_exp(-delta4))
+    return (delta*(delta*(delta9*(delta*(delta*(delta*(-6.26395869124539993e-10*delta*tauexpnd 
+                                - 0.000062689710414685001*tau10*_exp(-delta4))
            - 1.32511800746680002e-12*tau13*expnd) - 0.0000163885683425300002*x29*expnd2)
            + 3.65821651442040008e-7*tau4expnd)
            
-           - 0.26145533859358*tau_quarter*taurt
-           + 0.318025093454180008*taurt
-           - 0.25709043003437998*tau4*tauexpnd
-           - 0.192327211560020001*tauexpnd
+           + taurt*(-0.26145533859358*tau_quarter + 0.318025093454180008)
+           -tauexpnd*(0.25709043003437998*tau4 + 0.192327211560020001)
            - 0.00781997516879810034*tau_quarter*tau_eighth*delta
            )
            + 7.89576347228280007*tau**0.875
@@ -2164,7 +2163,9 @@ def iapws95_Ar(tau, delta):
            + tau50*(-0.118411824259810006*delta5expnd6
             - 5.57111185656449973e-10*delta2*expnd6)
            + tau*(0.00880894931021340005*delta3
-           + 0.00833265048807130086*delta8expnd2 + 31.5461402377809996*x33 + 0.0176114910087519991*deltaexpnd2
+           + 0.00833265048807130086*delta8expnd2
+           + 0.0176114910087519991*deltaexpnd2
+           + 31.5461402377809996*x33
            - 8.78032033035609949)
            
            +delta3*(-0.0313587007125490022*tau7expnd2
@@ -2177,14 +2178,24 @@ def iapws95_Ar(tau, delta):
            
             - 0.107936009089319995*tau7expnd2
            + 0.000158703083241569997*tau9*delta9expnd2 + 0.221322951675460011*tau9*deltaexpnd2
-           - 0.40247669763527999*tau10*deltaexpnd2 - 0.0400928289258069975*tau2*delta3expnd - 0.029052336009585001*tau2*delta8expnd2
+           - 0.40247669763527999*tau10*deltaexpnd2 - 0.0400928289258069975*tau2*delta3expnd 
+           - 0.029052336009585001*tau2*delta8expnd2
            + 3.93434226032540015e-7*delta3expnd*tau13
-           + 0.000562509793518880044*delta6*tau3*expnd + 0.0141806344006170006*delta6*tau10expnd2 + 0.0386150855742060026*tau3*delta8expnd2
-           - 0.0000156086522571349985*delta8*tau4expnd + 0.580833999857589989*delta2*tau10expnd2
-           - 2521.31543416949989*delta2*tau4*_exp(x32 - 390.625*x51*x51) + 0.160748684862510011*delta2*tau4expnd
-           - 0.00165540500637340006*delta8expnd2*x29 - 0.0203934865137039983*delta8expnd2*tau4 - 0.136364351103430009*tau10expnd2*delta5
-            + 0.0205279408959480013*delta5*tau6*expnd2 + 0.204338109509650007*expnd*tau6
-           + 0.00199555719795409996*delta9expnd2*tau6 - 31.3062603234350014*x33
+           + 0.000562509793518880044*delta6*tau3*expnd
+           + 0.0141806344006170006*delta6*tau10expnd2
+           + 0.0386150855742060026*tau3*delta8expnd2
+           - 0.0000156086522571349985*delta8*tau4expnd 
+           + 0.580833999857589989*delta2*tau10expnd2
+           - 2521.31543416949989*delta2*tau4*_exp(x32 - 390.625*x51*x51)
+           + 0.160748684862510011*delta2*tau4expnd
+           - 0.00165540500637340006*delta8expnd2*x29 
+           - 0.0203934865137039983*delta8expnd2*tau4
+           - 0.136364351103430009*tau10expnd2*delta5
+            + 0.0205279408959480013*delta5*tau6*expnd2 
+            + 0.204338109509650007*expnd*tau6
+           + 0.00199555719795409996*delta9expnd2*tau6
+           
+           - 31.3062603234350014*x33
            - 0.148746408567240002*x35*x35_n05*x35_n05*x35_n05*_exp(-28.0*deltam1sqr - 700.0*taum1sqr)
            + 0.318061108784439994*x35*x35_n05*_exp(-32.0*deltam1sqr - 800.0*taum1sqr)
            - 0.668565723079650009*tau4expnd + 0.0125335479355230001/taurt))
