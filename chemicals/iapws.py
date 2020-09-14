@@ -2105,6 +2105,7 @@ def iapws95_Ar(tau, delta):
     tau3 = tau*tau2
     tau4 = tau*tau3
     tau6 = tau4*tau2
+    tau7 = tau6*tau
     x29 = tau4*tau4
     tau9 = tau6*tau3
     tau10 = tau*tau9
@@ -2160,17 +2161,18 @@ def iapws95_Ar(tau, delta):
            + 0.0349940054637650003*tau11*tau11*delta3*expnd3
            + 0.0436136157238109987*tau4*tau*tau11*delta2*expnd3
            
-           + tau50*(-0.118411824259810006*delta5expnd6
-            - 5.57111185656449973e-10*delta2*expnd6)
+           + tau50*(expnd6*delta2*(-0.118411824259810006*delta3
+            - 5.57111185656449973e-10))
            + tau*(0.00880894931021340005*delta3
            + 0.00833265048807130086*delta8expnd2
            + 0.0176114910087519991*deltaexpnd2
            + 31.5461402377809996*x33
            - 8.78032033035609949)
            
-           +delta3*(-0.0313587007125490022*tau7expnd2
-           + 0.0049969146990805997*tau3*expnd2
-           - 0.743159297103409999*tau10expnd2
+           +delta3*(expnd2*tau3*(tau4*(-0.0313587007125490022
+                                 - 0.743159297103409999*tau3)
+               + 0.0049969146990805997)
+           # tau23expnd3 needs to do in both
            - 0.0767881978446210006*tau23expnd3
             +delta*(0.0224462773320059997*tau23expnd3
            - 7.59413770881439999e-6*tau9*expnd
