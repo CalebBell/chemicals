@@ -2097,10 +2097,10 @@ def iapws95_Ar(tau, delta):
     taurt = _sqrt(tau)
     tau_quarter = _sqrt(taurt)
     tau_eighth = _sqrt(tau_quarter) # tau checked, is not causing the small discrepancies.
-    x31 = (delta - 1.0)
-    x31 *= x31
-    x34 = (tau - 1.0)
-    x34 *= x34
+    deltam1sqr = (delta - 1.0)
+    deltam1sqr *= deltam1sqr
+    taum1sqr = (tau - 1.0)
+    taum1sqr *= taum1sqr
     tau2 = tau*tau
     tau3 = tau*tau2
     tau4 = tau*tau3
@@ -2123,35 +2123,35 @@ def iapws95_Ar(tau, delta):
     expnd2 = _exp(-delta2)
     expnd3 = _exp(-delta3)
     expnd6 = _exp(-delta6)
-    x4 = tau*expnd
-    x6 = expnd*tau4
-    x9 = delta*expnd2
-    x10 = tau6*tau*expnd2
-    x14 = delta3*expnd
-    x20 = delta8*expnd2
-    x22 = tau10*expnd2
-    x26 = tau10*tau13*expnd3
-    x28 = expnd6*delta5
-    x30 = delta9*expnd2
-    x32 = -20.0*x31
+    tauexpnd = tau*expnd
+    tau4expnd = expnd*tau4
+    deltaexpnd2 = delta*expnd2
+    tau7expnd2 = tau6*tau*expnd2
+    delta3expnd = delta3*expnd
+    delta8expnd2 = delta8*expnd2
+    tau10expnd2 = tau10*expnd2
+    tau23expnd3 = tau10*tau13*expnd3
+    delta5expnd6 = expnd6*delta5
+    delta9expnd2 = delta9*expnd2
+    x32 = -20.0*deltam1sqr
     x33 = (0.826446280991736*tau - 1.0)
     x33 = delta2*_exp(x32 - 219.615*x33*x33)
-    x50 = (-tau + 0.32*(x31)**1.66666666666666674 + 1.0)
+    x50 = (-tau + 0.32*(deltam1sqr)**1.66666666666666674 + 1.0)
     x51 = 0.8*tau - 1.0
-    x35 = 0.2*sqrt(x31)*x31*x31*x31 + x50*x50
+    x35 = 0.2*sqrt(deltam1sqr)*deltam1sqr*deltam1sqr*deltam1sqr + x50*x50
     x35_n05 = x35**-0.05
-    return (delta*(delta*(delta9*(-6.26395869124539993e-10*delta4*x4 - 0.000062689710414685001*delta3*tau10*_exp(-delta4)
+    return (delta*(delta*(delta9*(-6.26395869124539993e-10*delta4*tauexpnd - 0.000062689710414685001*delta3*tau10*_exp(-delta4)
            - 1.32511800746680002e-12*delta2*tau13*expnd - 0.0000163885683425300002*delta*x29*expnd2
-           + 3.65821651442040008e-7*x6)
+           + 3.65821651442040008e-7*tau4expnd)
            
            - 0.26145533859358*tau_quarter*taurt
            - 0.25709043003437998*tau4*tau*expnd + 0.318025093454180008*taurt
-           - 0.192327211560020001*x4
+           - 0.192327211560020001*tauexpnd
            - 0.00781997516879810034*tau_quarter*tau_eighth*delta
            )
            + 7.89576347228280007*tau**0.875
            
-           + tau11*(tau11*tau11*tau11*x28*(0.317774973307380026*tau2 
+           + tau11*(tau11*tau11*tau11*delta5expnd6*(0.317774973307380026*tau2
            - 0.199057183544080002)
            + expnd*(1.15379964229510002e-9*delta9
            - 0.0000662126050396869941*tau))
@@ -2160,33 +2160,33 @@ def iapws95_Ar(tau, delta):
            + 0.0349940054637650003*tau11*tau11*delta3*expnd3
            + 0.0436136157238109987*tau4*tau*tau11*delta2*expnd3
            
-           + tau50*(-0.118411824259810006*x28
+           + tau50*(-0.118411824259810006*delta5expnd6
             - 5.57111185656449973e-10*delta2*expnd6)
            + tau*(0.00880894931021340005*delta3
-           + 0.00833265048807130086*x20 + 31.5461402377809996*x33 + 0.0176114910087519991*x9 
+           + 0.00833265048807130086*delta8expnd2 + 31.5461402377809996*x33 + 0.0176114910087519991*deltaexpnd2
            - 8.78032033035609949)
            
-           +delta3*(-0.0313587007125490022*x10
+           +delta3*(-0.0313587007125490022*tau7expnd2
            + 0.0049969146990805997*tau3*expnd2
-           - 0.743159297103409999*x22 
-           - 0.0767881978446210006*x26 
-            +delta*(0.0224462773320059997*x26
+           - 0.743159297103409999*tau10expnd2
+           - 0.0767881978446210006*tau23expnd3
+            +delta*(0.0224462773320059997*tau23expnd3
            - 7.59413770881439999e-6*tau9*expnd
-           + 0.478073299154800013*x22))
+           + 0.478073299154800013*tau10expnd2))
            
-            - 0.107936009089319995*x10
-           + 0.000158703083241569997*tau9*x30 + 0.221322951675460011*tau9*x9
-           - 0.40247669763527999*tau10*x9 - 0.0400928289258069975*tau2*x14 - 0.029052336009585001*tau2*x20
-           + 3.93434226032540015e-7*x14*tau13 
-           + 0.000562509793518880044*delta6*tau3*expnd + 0.0141806344006170006*delta6*x22 + 0.0386150855742060026*tau3*x20
-           - 0.0000156086522571349985*delta8*x6 + 0.580833999857589989*delta2*x22
-           - 2521.31543416949989*delta2*tau4*_exp(x32 - 390.625*x51*x51) + 0.160748684862510011*delta2*x6
-           - 0.00165540500637340006*x20*x29 - 0.0203934865137039983*x20*tau4 - 0.136364351103430009*x22*delta5
+            - 0.107936009089319995*tau7expnd2
+           + 0.000158703083241569997*tau9*delta9expnd2 + 0.221322951675460011*tau9*deltaexpnd2
+           - 0.40247669763527999*tau10*deltaexpnd2 - 0.0400928289258069975*tau2*delta3expnd - 0.029052336009585001*tau2*delta8expnd2
+           + 3.93434226032540015e-7*delta3expnd*tau13
+           + 0.000562509793518880044*delta6*tau3*expnd + 0.0141806344006170006*delta6*tau10expnd2 + 0.0386150855742060026*tau3*delta8expnd2
+           - 0.0000156086522571349985*delta8*tau4expnd + 0.580833999857589989*delta2*tau10expnd2
+           - 2521.31543416949989*delta2*tau4*_exp(x32 - 390.625*x51*x51) + 0.160748684862510011*delta2*tau4expnd
+           - 0.00165540500637340006*delta8expnd2*x29 - 0.0203934865137039983*delta8expnd2*tau4 - 0.136364351103430009*tau10expnd2*delta5
             + 0.0205279408959480013*delta5*tau6*expnd2 + 0.204338109509650007*expnd*tau6
-           + 0.00199555719795409996*x30*tau6 - 31.3062603234350014*x33
-           - 0.148746408567240002*x35*x35_n05*x35_n05*x35_n05*_exp(-28.0*x31 - 700.0*x34) 
-           + 0.318061108784439994*x35*x35_n05*_exp(-32.0*x31 - 800.0*x34) 
-           - 0.668565723079650009*x6 + 0.0125335479355230001/taurt))
+           + 0.00199555719795409996*delta9expnd2*tau6 - 31.3062603234350014*x33
+           - 0.148746408567240002*x35*x35_n05*x35_n05*x35_n05*_exp(-28.0*deltam1sqr - 700.0*taum1sqr)
+           + 0.318061108784439994*x35*x35_n05*_exp(-32.0*deltam1sqr - 800.0*taum1sqr)
+           - 0.668565723079650009*tau4expnd + 0.0125335479355230001/taurt))
 
 
 def iapws95_dA_ddeltar(tau, delta):
