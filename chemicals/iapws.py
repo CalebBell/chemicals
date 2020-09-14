@@ -59,6 +59,8 @@ __all__ = [
            'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_d2pi_region5', 
            'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_d2tau_region5', 'iapws97_d2Gr_dpidtau_region5',
            'iapws97_G0_region5', 'iapws97_dG0_dtau_region5', 'iapws97_d2G0_d2tau_region5',
+           
+           'iapws95_A0', 'iapws95_dA0dtau', 'iapws95_d2A0_d2tau',
            ]
 
 __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c', 
@@ -2092,6 +2094,40 @@ def iapws97_T(P, rho):
         raise ValueError("Could not detect region")
 
 ### IAPWS95
+        
+def iapws95_A0(tau, delta):
+    return (6.68321052759320011*tau + log(delta) + 3.00632*log(tau) 
+            + 0.24873*log(1. - exp(-27.5075105*tau)) 
+            + 0.96956*log(1. - exp(-9.24437796*tau)) 
+            + 1.2795*log(1. - exp(-7.74073708*tau)) 
+            + 0.97315*log(1. - exp(-3.53734222*tau))
+            + 0.012436*log(1. - exp(-1.28728967*tau))
+            - 8.32044648374970031)
+
+def iapws95_dA0dtau(tau, delta):
+    return (-22.4843580635585205 
+            + 0.01600873433612/(1.0 - exp(-1.28728967*tau))
+            + 3.44236458139299994/(1.0 - exp(-3.53734222*tau)) 
+            + 9.90427309386000054/(1.0 - exp(-7.74073708*tau)) 
+            + 8.96297909489759981/(1.0 - exp(-9.24437796*tau)) 
+            + 6.84194308666500017/(1.0 - exp(-27.5075105*tau))
+            + 3.00632/tau)
+
+def iapws95_d2A0_d2tau(tau, delta):
+    x0 = exp(-27.5075105*tau)
+    x1 = exp(-9.24437796*tau)
+    x2 = exp(-7.74073708*tau)
+    x3 = exp(-3.53734222*tau)
+    x4 = exp(-1.28728967*tau)
+    return (-188.204821296839867*x0/((1.0 - x0)*(1.0 - x0))
+            - 82.8571664008121047*x1/((1.0 - x1)*(1.0 - x1))
+            - 76.6663739880884236*x2/((1.0 - x2)*(1.0 - x2))
+            - 12.1768215703940861*x3/((1.0 - x3)*(1.0 - x3))
+            - 0.0206078783406615819*x4/((1.0 - x4)*(1.0 - x4))
+            - 3.00632/(tau*tau))
+
+
+
 def iapws95_Ar(tau, delta):
     _sqrt, _exp = sqrt, exp
     taurt = _sqrt(tau)
@@ -2105,7 +2141,6 @@ def iapws95_Ar(tau, delta):
     tau3 = tau*tau2
     tau4 = tau*tau3
     tau6 = tau4*tau2
-    tau7 = tau6*tau
     x29 = tau4*tau4
     tau9 = tau6*tau3
     tau10 = tau*tau9
@@ -2139,7 +2174,7 @@ def iapws95_Ar(tau, delta):
     x33 = delta2*_exp(x32 - 219.615*x33*x33)
     x50 = (-tau + 0.32*(deltam1sqr)**1.66666666666666674 + 1.0)
     x51 = 0.8*tau - 1.0
-    x35 = 0.2*sqrt(deltam1sqr)*deltam1sqr*deltam1sqr*deltam1sqr + x50*x50
+    x35 = 0.2*_sqrt(deltam1sqr)*deltam1sqr*deltam1sqr*deltam1sqr + x50*x50
     x35_n05 = x35**-0.05
     return (delta*(delta*(delta9*(delta*(delta*(delta*(-6.26395869124539993e-10*delta*tauexpnd 
                                 - 0.000062689710414685001*tau10*_exp(-delta4))
@@ -2179,8 +2214,10 @@ def iapws95_Ar(tau, delta):
            + 0.478073299154800013*tau10expnd2))
            
             - 0.107936009089319995*tau7expnd2
-           + 0.000158703083241569997*tau9*delta9expnd2 + 0.221322951675460011*tau9*deltaexpnd2
-           - 0.40247669763527999*tau10*deltaexpnd2 - 0.0400928289258069975*tau2*delta3expnd 
+           + 0.000158703083241569997*tau9*delta9expnd2 
+           + 0.221322951675460011*tau9*deltaexpnd2
+           - 0.40247669763527999*tau10*deltaexpnd2 
+           - 0.0400928289258069975*tau2*delta3expnd 
            - 0.029052336009585001*tau2*delta8expnd2
            + 3.93434226032540015e-7*delta3expnd*tau13
            + 0.000562509793518880044*delta6*tau3*expnd

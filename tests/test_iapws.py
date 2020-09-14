@@ -1456,8 +1456,81 @@ def test_iapws95_Ar_vs_naive():
             errs.append(rerri)
     print(rerr/N**2, np.std(errs), np.max(errs))
     1/0
-test_iapws95_Ar_vs_naive()
+#test_iapws95_Ar_vs_naive()
 
+
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_iapws95_A0_vs_naive():
+    '''Can't think of a way to optimize this.
+    '''
+    errs = []
+    rerr = 0
+    N = 100
+    Ts = linspace(200.0,  5000.0, N)
+    rhoc_inv = (1.0/322.0)
+    for i, T in enumerate(Ts):
+        rhos = logspace(log10(1e-10), log10(5000), N)
+        for rho in rhos:
+            tau = 647.096/T
+            delta = rho*rhoc_inv
+            val = iapws95_A0(tau, delta)
+            val_naive = iapws95_A0(tau, delta)
+            assert_close(val, val_naive, rtol=5e-15)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+#    print(rerr/N**2, np.std(errs), np.max(errs))
+#test_iapws95_A0_vs_naive()
+    
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_iapws95_iapws95_dA0dtau_vs_naive():
+    '''Can't think of a way to optimize this.
+    '''
+    errs = []
+    rerr = 0
+    N = 100
+    Ts = linspace(200.0,  5000.0, N)
+    rhoc_inv = (1.0/322.0)
+    for i, T in enumerate(Ts):
+        rhos = logspace(log10(1e-10), log10(5000), N)
+        for rho in rhos:
+            tau = 647.096/T
+            delta = rho*rhoc_inv
+            val = iapws95_dA0dtau(tau, delta)
+            val_naive = dAdtau_idg(tau, delta)
+            assert_close(val, val_naive, rtol=5e-15)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+#    print(rerr/N**2, np.std(errs), np.max(errs))
+
+#test_iapws95_iapws95_dA0dtau_vs_naive()
+
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_ddAddtau_idg_vs_naive():
+    '''Can't think of a way to optimize this.
+    '''
+    errs = []
+    rerr = 0
+    N = 100
+    Ts = linspace(200.0,  5000.0, N)
+    rhoc_inv = (1.0/322.0)
+    for i, T in enumerate(Ts):
+        rhos = logspace(log10(1e-10), log10(5000), N)
+        for rho in rhos:
+            tau = 647.096/T
+            delta = rho*rhoc_inv
+            val = iapws95_d2A0_d2tau(tau, delta)
+            val_naive = ddAddtau_idg(tau, delta)
+            assert_close(val, val_naive, rtol=5e-15)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+#    print(rerr/N**2, np.std(errs), np.max(errs))
+#test_ddAddtau_idg_vs_naive()
 
 def test_rho_iapws95_CoolProp():
     from CoolProp.CoolProp import PropsSI
