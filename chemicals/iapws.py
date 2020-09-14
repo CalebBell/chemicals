@@ -2150,12 +2150,15 @@ def iapws95_Ar(tau, delta):
            - 0.00781997516879810034*tau_quarter*tau_eighth*delta2
            + 7.89576347228280007*tau**0.875
            
-           + 0.317774973307380026*tau11*tau11*tau11*tau11*tau2*x28 
-           - 0.199057183544080002*tau11*tau11*tau11*tau11*x28 
+           # Error goes up a lot of tau11 gets factored out.
+           + tau11*(tau11*tau11*tau11*x28*(0.317774973307380026*tau2 
+           - 0.199057183544080002)
+           + x3*(1.15379964229510002e-9*delta9
+           - 0.0000662126050396869941*tau))
+           
+           # These two terms catastrophic cancel somewhat
            + 0.0349940054637650003*tau11*tau11*delta3*x23
            + 0.0436136157238109987*tau4*tau*tau11*delta2*x23 
-           - 0.0000662126050396869941*tau11*tau*x3
-           + 1.15379964229510002e-9*tau11*delta9*x3
            
            + x24*(-0.118411824259810006*x28
             - 5.57111185656449973e-10*delta2*x25)
