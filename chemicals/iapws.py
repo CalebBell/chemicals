@@ -43,7 +43,7 @@ __all__ = [
            
            
            
-           'iapws95_d2A_d2deltar', 'iapws95_dA_ddeltar',
+           'iapws95_Ar', 'iapws95_d2A_d2deltar', 'iapws95_dA_ddeltar',
            
            
            'iapws97_G_region1', 'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
@@ -2092,6 +2092,89 @@ def iapws97_T(P, rho):
         raise ValueError("Could not detect region")
 
 ### IAPWS95
+def iapws95_Ar(tau, delta):
+    _sqrt, _exp = sqrt, exp
+    taurt = _sqrt(tau)
+    tau_quarter = _sqrt(taurt)
+    tau_eighth = _sqrt(tau_quarter) # tau checked, is not causing the small discrepancies.
+    x31 = (delta - 1.0)
+    x31 *= x31
+    x34 = (tau - 1.0)
+    x34 *= x34
+    tau2 = tau*tau
+    tau3 = tau*tau2
+    tau4 = tau*tau3
+    tau6 = tau4*tau2
+    x29 = tau4*tau4
+    tau9 = tau6*tau3
+    tau10 = tau*tau9
+    tau13 = tau10*tau3
+    x24 = tau**50
+    delta2 = delta*delta
+    delta4 = delta2*delta2
+    delta5 = delta*delta4
+    delta6 = delta*delta5
+    delta8 = delta6*delta2
+    delta9 = delta*delta8
+    delta3 = delta*delta2
+    x3 = exp(-delta)
+    x8 = exp(-delta2)
+    x23 = exp(-delta3)
+    x25 = exp(-delta6)
+    x4 = tau*x3
+    x6 = x3*tau4
+    x9 = delta*x8
+    x10 = tau6*tau*x8
+    x14 = delta3*x3
+    x20 = delta8*x8
+    x22 = tau10*x8
+    x26 = tau**23*x23
+    x28 = x25*delta5
+    x30 = delta9*x8
+    x32 = -20.0*x31
+    x33 = (0.826446280991736*tau - 1.0)
+    x33 = delta2*exp(x32 - 219.615*x33*x33)
+    x50 = (-tau + 0.32*(x31)**1.66666666666666674 + 1.0)
+    x51 = 0.8*tau - 1.0
+    x35 = 0.2*sqrt(x31)*x31*x31*x31 + x50*x50
+    x35_n05 = x35**-0.05
+    return (delta*(delta*(delta9*(-6.26395869124539993e-10*delta4*x4 - 0.000062689710414685001*delta3*tau10*exp(-delta4)
+           - 1.32511800746680002e-12*delta2*tau13*x3 - 0.0000163885683425300002*delta*x29*x8
+           + 3.65821651442040008e-7*x6)
+           
+           - 0.26145533859358*tau_quarter*taurt
+           - 0.25709043003437998*tau4*tau*x3 + 0.318025093454180008*taurt
+           - 0.192327211560020001*x4)
+           - 0.00781997516879810034*tau_quarter*tau_eighth*delta2
+           + 7.89576347228280007*tau**0.875
+           + 0.317774973307380026*tau**46*x28 
+           - 0.199057183544080002*tau**44*x28 
+           + 0.0349940054637650003*tau**22*delta3*x23
+           + 0.0436136157238109987*tau**16*delta2*x23 
+           - 0.0000662126050396869941*tau**12*x3
+           + 1.15379964229510002e-9*tau**11*delta9*x3
+           + x24*(-0.118411824259810006*x28
+            - 5.57111185656449973e-10*delta2*x25)
+           + 0.00880894931021340005*tau*delta3
+           + 0.00833265048807130086*tau*x20 + 31.5461402377809996*tau*x33 + 0.0176114910087519991*tau*x9 
+           - 8.78032033035609949*tau - 0.0313587007125490022*delta3*x10 + 0.0049969146990805997*delta3*tau3*x8
+           - 0.743159297103409999*delta3*x22 
+           - 0.0767881978446210006*delta3*x26 
+            + 0.0224462773320059997*delta4*x26
+            - 0.107936009089319995*x10
+           - 7.59413770881439999e-6*tau9*delta4*x3 + 0.000158703083241569997*tau9*x30 + 0.221322951675460011*tau9*x9
+           - 0.40247669763527999*tau10*x9 - 0.0400928289258069975*tau2*x14 - 0.029052336009585001*tau2*x20
+           + 3.93434226032540015e-7*x14*tau13 + 0.478073299154800013*delta4*x22
+           + 0.000562509793518880044*delta6*tau3*x3 + 0.0141806344006170006*delta6*x22 + 0.0386150855742060026*tau3*x20
+           - 0.0000156086522571349985*delta8*x6 + 0.580833999857589989*delta2*x22
+           - 2521.31543416949989*delta2*tau4*exp(x32 - 390.625*x51*x51) + 0.160748684862510011*delta2*x6
+           - 0.00165540500637340006*x20*x29 - 0.0203934865137039983*x20*tau4 - 0.136364351103430009*x22*delta5
+            + 0.0205279408959480013*delta5*tau6*x8 + 0.204338109509650007*x3*tau6
+           + 0.00199555719795409996*x30*tau6 - 31.3062603234350014*x33
+           - 0.148746408567240002*x35*x35_n05*x35_n05*x35_n05*exp(-28.0*x31 - 700.0*x34) 
+           + 0.318061108784439994*x35*x35_n05*exp(-32.0*x31 - 800.0*x34) 
+           - 0.668565723079650009*x6 + 0.0125335479355230001/taurt))
+
 
 def iapws95_dA_ddeltar(tau, delta):
     # Uses no constants from this file
@@ -2174,7 +2257,9 @@ def iapws95_dA_ddeltar(tau, delta):
             + 1.3251180074668e-12*delta9*delta3*tau13*x7*(delta - 13.0)
             + 0.00012537942082937*delta9*delta4*tau10*(delta4 + delta4 - 7.0)*_exp(-delta4)
             + 6.2639586912454e-10*delta9*delta5*x10*(delta - 15.0) - 0.023459925506394301*tau_quarter*tau_eighth*delta2
-            - 0.52291067718716*tau_quarter*taurt*delta + 7.89576347228280007*tau_quarter*taurt*tau_eighth + 0.25709043003438*tau4*tau*x11*x7
+            - 0.52291067718716*tau_quarter*taurt*delta 
+            + 7.89576347228280007*tau**0.875#tau_quarter*taurt*tau_eighth # improves average but increases max.
+            + 0.25709043003438*tau4*tau*x11*x7
             - 1.1537996422951e-9*tau*tau10*delta9*x7*(delta - 10.0) + 6.6212605039687e-5*tau12*x8
             - 0.130840847171432989*tau9*tau7*delta2*x32*(delta3 - 1.0) - 0.0349940054637650003*tau10*tau12*x32*x44
             + 1.19434310126448007*tau23*tau12*tau9*x39 - 1.90664983984428016*tau23*tau23*x39 + 0.636050186908360016*taurt*delta

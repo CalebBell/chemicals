@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 from math import *
@@ -1412,6 +1413,33 @@ def test_iapws95_dA_ddeltar():
 def test_iapws95_dA_ddeltar_vs_naive():
     '''
     '''
+    errs = []
+    rerr = 0
+    N = 500
+    Ts = linspace(200.0, 5000.0, N)
+    rhoc_inv = (1.0/322.0)
+    for i, T in enumerate(Ts):
+        rhos = logspace(log10(1e-10), log10(5000), N)
+        for rho in rhos:
+            tau = 647.096/T
+            delta = rho*rhoc_inv
+            val = iapws95_dA_ddeltar(tau, delta)
+            val_naive = dAddelta_res(tau, delta)
+            assert_close(val, val_naive, rtol=1e-9)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+#    print(rerr/N**2, np.std(errs), np.max(errs))
+
+#test_iapws95_dA_ddeltar_vs_naive()
+            
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_iapws95_Ar_vs_naive():
+    '''
+    '''
+    errs = []
+    rerr = 0
     N = 500
     Ts = linspace(200.0,  5000.0, N)
     rhoc_inv = (1.0/322.0)
@@ -1420,15 +1448,16 @@ def test_iapws95_dA_ddeltar_vs_naive():
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
-#            try:
-#                assert_close(iapws95_dA_ddeltar(tau, delta),
-#                             dAddelta_res(tau, delta), rtol=1e-11) # 1e-9 is as close as it gets :(
-            assert_close(iapws95_dA_ddeltar(tau, delta),
-                         dAddelta_res(tau, delta), rtol=1e-9) # 1e-9 is as close as it gets :(
-#            except:
-#                print([T, rho])
+            val = iapws95_Ar(tau, delta)
+            val_naive = calcA_res(tau, delta)
+            assert_close(val, val_naive, rtol=5e-10)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+    print(rerr/N**2, np.std(errs), np.max(errs))
+    1/0
+test_iapws95_Ar_vs_naive()
 
-#test_iapws95_dA_ddeltar_vs_naive()
 
 def test_rho_iapws95_CoolProp():
     from CoolProp.CoolProp import PropsSI
