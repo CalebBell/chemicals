@@ -2097,6 +2097,8 @@ def iapws97_T(P, rho):
         
 def iapws95_A0(tau, delta):
     # only way to optimize is likely to save transcendentals between calls
+    # It should also be possible to replace these with polynomial fits which
+    # are nearly bit for bit identical, including the derivatives.
     return (6.68321052759320011*tau + log(delta) + 3.00632*log(tau) 
             + 0.24873*log(1. - exp(-27.5075105*tau)) 
             + 0.96956*log(1. - exp(-9.24437796*tau)) 
