@@ -311,23 +311,44 @@ def test_iapws97_region3_fuzz():
                     
 @pytest.mark.slow
 def test_iapws97_region5_fuzz():
-    funcs_naive = [iapws97_d2G0_d2tau_region5_naive, iapws97_dG0_dtau_region5_naive, iapws97_G0_region5_naive, iapws97_d2Gr_dpidtau_region5_naive, iapws97_d2Gr_d2tau_region5_naive, iapws97_dGr_dtau_region5_naive, iapws97_d2Gr_d2pi_region5_naive, iapws97_Gr_region5_naive, iapws97_dGr_dpi_region5_naive]
-    funcs_fast = [iapws97_d2G0_d2tau_region5, iapws97_dG0_dtau_region5, iapws97_G0_region5, iapws97_d2Gr_dpidtau_region5, iapws97_d2Gr_d2tau_region5, iapws97_dGr_dtau_region5, iapws97_d2Gr_d2pi_region5, iapws97_Gr_region5, iapws97_dGr_dpi_region5]
+    funcs_naive = [iapws97_d2G0_d2tau_region5_naive, iapws97_dG0_dtau_region5_naive, 
+                   iapws97_G0_region5_naive, iapws97_d2Gr_dpidtau_region5_naive,
+                   iapws97_d2Gr_d2tau_region5_naive, iapws97_dGr_dtau_region5_naive,
+                   iapws97_d2Gr_d2pi_region5_naive, iapws97_Gr_region5_naive,
+                   iapws97_dGr_dpi_region5_naive]
+    funcs_fast = [iapws97_d2G0_d2tau_region5, iapws97_dG0_dtau_region5,
+                  iapws97_G0_region5, iapws97_d2Gr_dpidtau_region5, 
+                  iapws97_d2Gr_d2tau_region5, iapws97_dGr_dtau_region5, 
+                  iapws97_d2Gr_d2pi_region5, iapws97_Gr_region5,
+                  iapws97_dGr_dpi_region5]
     atols = [0, 0, 0, 0, 0, 0, 5e-21, 4e-17, 1e-18]
     rtols = [1e-15, 1e-15, 1e-15, 5e-15, 2e-15, 1e-14, 1e-14, 2e-14, 2e-14]
+    
+    funcs_naive = [iapws97_Gr_region5_naive]
+    funcs_fast = [iapws97_Gr_region5]
+    atols = [4e-17]
+    rtols = [2e-14]
+    
     N = 500
     Ts = linspace(1073.15, 2273.15, N)
     def test_Ps(T, N):
         return logspace(log10(1e-6), log10(50e6), N)
     
     for naive, fast, rtol, atol in zip(funcs_naive, funcs_fast, rtols, atols):
+        errs = []
+        erri = 0.0
 #        print(naive)
         for T in Ts:
             tau = 1000.0/T
             for P in test_Ps(T, N):
                 pi = P/1E6
-                assert_close(naive(tau, pi),
-                             fast(tau, pi), rtol=rtol, atol=atol)
+                v0 = naive(tau, pi)
+                v1 = fast(tau, pi)
+#                assert_close(v0, v1, rtol=rtol, atol=atol)
+                error = abs(1.0 - v1/v0)
+                erri += error
+                errs.append(error)
+#        print(naive, erri/N**2, np.std(errs), np.max(errs))
 #test_iapws97_region5_fuzz()
 ### Fast tests
 
@@ -1087,71 +1108,6 @@ def dAdtau_res(tau, delta):
 
         phir += nis[i+54]*delta*(_d_Delta_bd_tau*psi + Delta**bis[i]*_d_psi_d_tau)
     return phir
-
-def dAdtau_res_fast(tau, delta):
-    delta2 = delta*delta
-    delta3 = delta*delta2
-    delta4 = delta2*delta2
-    delta8 = delta4*delta4
-    x1 = exp(-delta)
-    x4 = exp(-delta2)
-    x26 = exp(-delta3)
-    x2 = delta*x1
-    x5 = delta*x4
-    x7 = x4*delta8
-    x8 = 300.0*tau
-    x9 = (delta - 1.0)
-    x9 *= x9
-    x10 = -20.0*x9
-    x11 = (0.826446280991736*tau - 1.0)
-    x11 = exp(x10 - 219.615*x11*x11)
-    tau2 = tau*tau
-    tau4 = tau2*tau2
-    taurtinv = 1.0/sqrt(tau)
-    tau_inv = taurtinv*taurtinv
-    tau4inv = sqrt(taurtinv)
-    tau8inv = sqrt(tau4inv)
-    x15 = tau - 1.0
-    x13 = tau*delta2
-    x16 = x15*x15
-    x17 = x9**1.66666666666666674
-    x18 =  (-tau + 0.32*x17 + 1.0)
-    x18 = 0.2*x9*x9*x9*sqrt(x9) + x18*x18
-    x18_05 = x18**-0.05
-    x19 = delta4*delta2
-    x20 = delta3*x4
-    x21 = delta8*delta2*x1
-    x22 = delta4*delta*x4
-    x24 = delta8*delta*x4
-    x27 = delta*x26
-    x50 = (0.8*tau - 1.0)
-    return (delta*(-6.26395869124539993e-10*delta8*delta4*delta2*x1 + 0.159012546727090004*delta*taurtinv
-             - 0.00626677396776150007*tau_inv*taurtinv - tau8inv*(0.196091503945184986*delta*tau8inv
-            + 0.00293249068829928763*taurtinv*delta2 - 6.90879303824744984)
-            - tau*(-tau*(tau*(tau*(tau*(tau*(tau*(-0.000131108546740240002*delta8*delta3*x4
-            + tau*(tau*(-0.000626897104146849956*delta8*delta4*delta*exp(-delta4) + tau*(tau*(-0.000794551260476243984*x1
-            + x13*(tau2*tau*(tau4*tau2*(tau*(tau4*tau4*tau4*tau4*tau4*tau*(tau2*(14.6176487721394821*delta3 - tau4*(5.92059121299049984*delta3
-            + 2.78555592828224976e-8)) - 8.75851607593951975*delta3)*exp(-x19) + 0.516264378636137944*x26*delta2
-            - 1.76612855042628292*x27) + 0.76986812020283002*x27) + 0.697817851580975979*x26) 
-            + 5.11464493842302041e-6*x2 - 1.72265340970684017e-11*x21)) + 1.26917960652461008e-8*x1*delta8*delta)
-            + 0.14180634400617001*x19*x4 - 7.43159297103409955*x20 - 1.36364351103430015*x22 
-            + 4.78073299154799969*delta4*x4 + 5.80833999857589944*delta2*x4 - 4.02476697635280001*x5)
-            - 0.0000683472393793296059*x1*delta4 + 0.00142832774917412992*x24 + 1.9919065650791401*x5)
-            - 0.0132432400509872004*x7) - 0.219510904987843009*x20 - 0.755552063625239967*x4)
-            + 1.22602865705789998*x1 + 0.123167645375688001*x22 + 0.0119733431877246006*x24)
-            - 1.28545215017189984*x2) + 0.642994739450040043*x1*delta2 - 0.000062434609028539994*x1*delta8
-            - 2.67426289231860004*x1 + 1.46328660576816003e-6*x21 - 0.0815739460548159934*x7) 
-            + 0.00168752938055664013*x1*x19 + 0.0149907440972417982*x20 + 0.115845256722618001*x7)
-            + 0.0801856578516139951*delta3*x1 + 0.058104672019170002*x7) + 0.00880894931021340005*delta3
-            + 31.5461402377809996*x11*x13*(tau_inv - x8 + 363.0) + 31.3062603234350014*x11*delta2*(x8 - 363.0)
-            - 2521.31543416949989*tau4*delta2*(-500.0*tau + 4.0*tau_inv + 625.0)*exp(x10 - 390.625*x50*x50)
-            - 0.192327211560020001*x2 + 0.0176114910087519991*x5 + 0.00833265048807130086*x7 
-            + 0.148746408567240002*(1400.0*x15*x18*x18_05*x18_05*x18_05
-            + x18_05*x18_05*x18_05*(-1.7*tau + 0.544*x17
-            + 1.7))*exp(-700.0*x16 - 28.0*x9) - 0.318061108784439994*(1600.0*x15*x18*x18_05 
-            + x18_05*(-1.9*tau + 0.608*x17 + 1.9))
-            *exp(-800.0*x16 - 32.0*x9) - 8.78032033035609949))
-
 def ddAddtau_res(tau, delta):
     '''
     >>> ddAddtau_res(647.096/647., 358./322.)
@@ -1377,7 +1333,7 @@ def d2_Delta_bd_delta_d_tau(i, tau, delta):
     return ans
 
 def test_iapws95_d2A_d2deltar():
-    assert_close(iapws95_d2A_d2deltar(3.23548, 2.652088725981779), -681188.0609390885, rtol=1e-11)
+    assert_close(iapws95_d2Ar_ddelta2(3.23548, 2.652088725981779), -681188.0609390885, rtol=1e-11)
     
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -1394,7 +1350,7 @@ def test_iapws95_d2A_d2deltar_vs_naive():
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
-            assert_close(iapws95_d2A_d2deltar(tau, delta),
+            assert_close(iapws95_d2Ar_ddelta2(tau, delta),
                          ddAdddelta_res(tau, delta), rtol=2e-10) # 2e-10 is a pass
 
 #test_iapws95_d2A_d2deltar_vs_naive()
@@ -1405,8 +1361,8 @@ def test_iapws95_dA_ddeltar():
     T, rho = 221.12845138055224, 1032.1609281563633
     tau = 647.096/T
     delta = rho*rhoc_inv
-    assert_close(iapws95_dA_ddeltar(tau, delta),
-                         dAddelta_res(tau, delta), rtol=5e-9)
+    assert_close(iapws95_dAr_ddelta(tau, delta),
+                 dAddelta_res(tau, delta), rtol=5e-9)
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -1423,7 +1379,7 @@ def test_iapws95_dA_ddeltar_vs_naive():
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
-            val = iapws95_dA_ddeltar(tau, delta)
+            val = iapws95_dAr_ddelta(tau, delta)
             val_naive = dAddelta_res(tau, delta)
             assert_close(val, val_naive, rtol=1e-9)
             rerri = abs(1.0 - val/val_naive)
@@ -1455,9 +1411,84 @@ def test_iapws95_Ar_vs_naive():
             rerr += rerri
             errs.append(rerri)
     print(rerr/N**2, np.std(errs), np.max(errs))
-    1/0
 #test_iapws95_Ar_vs_naive()
 
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_iapws95_dAr_dtau_vs_naive():
+    '''
+    '''
+    errs = []
+    rerr = 0
+    N = 500
+    Ts = linspace(200.0, 5000.0, N)
+    rhoc_inv = (1.0/322.0)
+    for i, T in enumerate(Ts):
+        rhos = logspace(log10(1e-10), log10(5000), N)
+        for rho in rhos:
+            tau = 647.096/T
+            delta = rho*rhoc_inv
+            val = iapws95_dAr_dtau(tau, delta)
+            val_naive = dAdtau_res(tau, delta)
+            assert_close(val, val_naive, rtol=1e-8)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+#    print(rerr/N**2, np.std(errs), np.max(errs))
+#iapws95_dAr_dtau_vs_naive()
+#            
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_iapws95_d2Ar_dtau2_vs_naive():
+    '''
+    '''
+    errs = []
+    rerr = 0
+    N = 500
+    Ts = linspace(200.0, 5000.0, N)
+    rhoc_inv = (1.0/322.0)
+    for i, T in enumerate(Ts):
+        rhos = logspace(log10(1e-10), log10(5000), N)
+        for rho in rhos:
+            tau = 647.096/T
+            delta = rho*rhoc_inv
+            val = iapws95_d2Ar_dtau2(tau, delta)
+            val_naive = ddAddtau_res(tau, delta)
+            assert_close(val, val_naive, rtol=1e-10)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+#    print(rerr/N**2, np.std(errs), np.max(errs))
+#test_iapws95_d2Ar_dtau2_vs_naive()
+
+            
+            
+            
+@pytest.mark.slow
+@pytest.mark.fuzz
+def iapws95_d2Ar_ddeltadtau_vs_naive():
+    '''
+    '''
+    errs = []
+    rerr = 0
+    N = 500
+    Ts = linspace(200.0, 5000.0, N)
+    rhoc_inv = (1.0/322.0)
+    for i, T in enumerate(Ts):
+        rhos = logspace(log10(1e-10), log10(5000), N)
+        for rho in rhos:
+            tau = 647.096/T
+            delta = rho*rhoc_inv
+            val = iapws95_d2Ar_ddeltadtau(tau, delta)
+            val_naive = dAddeltatau_res(tau, delta)
+            assert_close(val.real, val_naive, rtol=1e-8)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+#    print(rerr/N**2, np.std(errs), np.max(errs))
+#iapws95_d2Ar_ddeltadtau_vs_naive()
+  
+            
 
 @pytest.mark.slow
 @pytest.mark.fuzz
