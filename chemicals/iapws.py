@@ -2108,7 +2108,7 @@ def iapws97_T(P, rho):
 
 def rhol_sat_IAPWS(T):
     r'''Calculates saturation liquid mass density of water using the IAPWS
-    explicit equation [1]_.
+    SR1-86(1992) [1]_ [2]_ explicit equation.
 
     .. math::
         \frac{\rho^{sat}_l}{\rho_c} = 1 + b_1\tau^{1/3} + b_2\tau^{2/3}
@@ -2129,6 +2129,10 @@ def rhol_sat_IAPWS(T):
 
     Notes
     -----
+    This equation is fit to experimental data to within its accuracy. It does 
+    not satisfy the equilibrium conditions for the IAPWS-95 or IAPWS-97 
+    formulations.
+    
     The values of the constants are as follows: 
         
     b1 = 1.99274064; 
@@ -2146,11 +2150,13 @@ def rhol_sat_IAPWS(T):
 
     References
     ----------
-    .. [1] Wagner, Wolfgang, and A. Pruss. "International Equations for the
+    .. [1] IAPWS, Secretariat, B Dooley, and EPRI. "Revised Supplementary 
+       Release on Saturation Properties of Ordinary Water Substance", 1992.
+    .. [2] Wagner, Wolfgang, and A. Pruss. "International Equations for the
        Saturation Properties of Ordinary Water Substance. Revised According to 
        the International Temperature Scale of 1990. Addendum to J. Phys. Chem.
-       Ref. Data 16, 893 (1987).” Journal of Physical and Chemical Reference 
-       Data 22, no. 3 (May 1, 1993): 783–87. https://doi.org/10.1063/1.555926.
+       Ref. Data 16, 893 (1987)." Journal of Physical and Chemical Reference 
+       Data 22, no. 3 (May 1, 1993): 783-87. https://doi.org/10.1063/1.555926.
     '''
     tau = 1.0 - T*(1.0/647.096) # 1/647.096
     
@@ -2180,7 +2186,7 @@ def rhol_sat_IAPWS(T):
 
 def rhog_sat_IAPWS(T):
     r'''Calculates saturation vapor mass density of water using the IAPWS
-    explicit equation [1]_.
+    SR1-86(1992) [1]_ [2]_ explicit equation.
 
     .. math::
         \log \left(\frac{\rho^{sat}_g}{\rho_c}\right) = 1 + c_1\tau^{2/6} + c_2\tau^{4/6}
@@ -2201,6 +2207,10 @@ def rhog_sat_IAPWS(T):
 
     Notes
     -----
+    This equation is fit to experimental data to within its accuracy. It does 
+    not satisfy the equilibrium conditions for the IAPWS-95 or IAPWS-97 
+    formulations.
+    
     The values of the constants are as follows: 
         
     c1 = -2.03150240;
@@ -2218,11 +2228,13 @@ def rhog_sat_IAPWS(T):
 
     References
     ----------
-    .. [1] Wagner, Wolfgang, and A. Pruss. "International Equations for the
+    .. [1] IAPWS, Secretariat, B Dooley, and EPRI. "Revised Supplementary 
+       Release on Saturation Properties of Ordinary Water Substance", 1992.
+    .. [2] Wagner, Wolfgang, and A. Pruss. "International Equations for the
        Saturation Properties of Ordinary Water Substance. Revised According to 
        the International Temperature Scale of 1990. Addendum to J. Phys. Chem.
-       Ref. Data 16, 893 (1987).” Journal of Physical and Chemical Reference 
-       Data 22, no. 3 (May 1, 1993): 783–87. https://doi.org/10.1063/1.555926.
+       Ref. Data 16, 893 (1987)." Journal of Physical and Chemical Reference 
+       Data 22, no. 3 (May 1, 1993): 783-87. https://doi.org/10.1063/1.555926.
     '''
     tau = 1.0 - T*(1.0/647.096)
     
