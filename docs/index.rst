@@ -70,6 +70,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.exceptions
    chemicals.flash_basic
    chemicals.heat_capacity
+   chemicals.iapws
    chemicals.identifiers
    chemicals.interface
    chemicals.lennard_jones

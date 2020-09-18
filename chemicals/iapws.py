@@ -29,11 +29,6 @@ from fluids.numerics import secant, newton, trunc_log, trunc_exp, horner
 
 __all__ = [
            'iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
-           'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
-           'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
-           'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
-           'iapws97_boundary_3qu', 'iapws97_boundary_3rx', 'iapws97_boundary_3wx',
-           'iapws97_boundary_3ab', 'iapws97_boundary_3op',
            'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
            'iapws97_region1_rho', 'iapws97_region2_rho', 'iapws97_region5_rho',
            'iapws95_rho', 'iapws95_P',
@@ -45,26 +40,6 @@ __all__ = [
            
            
            
-           'iapws95_Ar', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3', 'iapws95_dAr_ddelta', 'iapws95_dAr_dtau',
-           'iapws95_d2Ar_dtau2',
-           'iapws95_d2Ar_ddeltadtau',
-           
-           
-           'iapws97_G_region1', 'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
-           'iapws97_dG_dtau_region1', 'iapws97_d2G_d2tau_region1', 'iapws97_d2G_dpidtau_region1',
-           
-           'iapws97_Gr_region2', 'iapws97_dGr_dpi_region2', 'iapws97_d2Gr_d2pi_region2',
-           'iapws97_dGr_dtau_region2', 'iapws97_d2Gr_d2tau_region2', 'iapws97_d2Gr_dpidtau_region2',
-           'iapws97_G0_region2', 'iapws97_dG0_dtau_region2', 'iapws97_d2G0_d2tau_region2',
-           
-           'iapws97_A_region3', 'iapws97_dA_ddelta_region3', 'iapws97_d2A_d2delta_region3',
-           'iapws97_dA_dtau_region3', 'iapws97_d2A_d2tau_region3', 'iapws97_d2A_ddeltadtau_region3',
-           
-           'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_d2pi_region5', 
-           'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_d2tau_region5', 'iapws97_d2Gr_dpidtau_region5',
-           'iapws97_G0_region5', 'iapws97_dG0_dtau_region5', 'iapws97_d2G0_d2tau_region5',
-           
-           'iapws95_A0', 'iapws95_dA0dtau', 'iapws95_d2A0_d2tau', 'iapws95_d3A0_d3tau',
            ]
 
 __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c', 
@@ -78,6 +53,34 @@ __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97
     'iapws_97_Prho_err_region1', 'iapws_97_Prho_err_region2', 'iapws_97_Prho_err_region5',
     'iapws_97_Prho_err_region3',
     'iapws95_rho_err', 'iapws95_P_err',
+    
+    
+   'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
+   'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
+   'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
+   'iapws97_boundary_3qu', 'iapws97_boundary_3rx', 'iapws97_boundary_3wx',
+   'iapws97_boundary_3ab', 'iapws97_boundary_3op',
+
+   'iapws95_Ar', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3', 'iapws95_dAr_ddelta', 'iapws95_dAr_dtau',
+   'iapws95_d2Ar_dtau2',
+   'iapws95_d2Ar_ddeltadtau',
+   
+   'iapws97_G_region1', 'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
+   'iapws97_dG_dtau_region1', 'iapws97_d2G_d2tau_region1', 'iapws97_d2G_dpidtau_region1',
+   
+   'iapws97_Gr_region2', 'iapws97_dGr_dpi_region2', 'iapws97_d2Gr_d2pi_region2',
+   'iapws97_dGr_dtau_region2', 'iapws97_d2Gr_d2tau_region2', 'iapws97_d2Gr_dpidtau_region2',
+   'iapws97_G0_region2', 'iapws97_dG0_dtau_region2', 'iapws97_d2G0_d2tau_region2',
+   
+   'iapws97_A_region3', 'iapws97_dA_ddelta_region3', 'iapws97_d2A_d2delta_region3',
+   'iapws97_dA_dtau_region3', 'iapws97_d2A_d2tau_region3', 'iapws97_d2A_ddeltadtau_region3',
+   
+   'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_d2pi_region5', 
+   'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_d2tau_region5', 'iapws97_d2Gr_dpidtau_region5',
+   'iapws97_G0_region5', 'iapws97_dG0_dtau_region5', 'iapws97_d2G0_d2tau_region5',
+   
+   'iapws95_A0', 'iapws95_dA0dtau', 'iapws95_d2A0_d2tau', 'iapws95_d3A0_d3tau',
+
     ]
 
 R95 = 461.51805 # Differs from the other formulation

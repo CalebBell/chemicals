@@ -25,12 +25,17 @@ SOFTWARE.
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
+import chemicals
 from math import *
 from chemicals.iapws import *
 from fluids.numerics import assert_close, linspace, logspace, derivative
 from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G, REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N, REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z
 from chemicals.vapor_pressure import Psat_IAPWS
 from chemicals.iapws import iapws95_P_err
+
+l = chemicals.iapws.__numba_additional_funcs__
+for n in l:
+    globals()[n] = getattr(chemicals.iapws, n)
 
 
 ### IAPWS Naive Functions

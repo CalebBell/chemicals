@@ -77,12 +77,6 @@ Pure Component Solid Fit Correlations
 -------------------------------------
 .. autofunction:: chemicals.volume.CRC_inorganic
 
-Correlations for Specific Substances
-------------------------------------
-.. autofunction:: chemicals.volume.iapws97_rho
-.. autofunction:: chemicals.volume.iapws97_P
-.. autofunction:: chemicals.volume.iapws97_T
-
 Fit Coefficients
 ----------------
 All of these coefficients are lazy-loaded, so they must be accessed as an
