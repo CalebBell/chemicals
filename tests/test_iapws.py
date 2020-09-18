@@ -1730,3 +1730,15 @@ def test_iapws95_rho():
 def test_iapws95_rho_vs_Coolprop():
     from CoolProp.CoolProp import PropsSI
     assert_close(iapws95_rho(2357., 97719212), PropsSI('DMASS', 'T', 2357, 'P', 97719212.0, 'water'), rtol=1e-9)
+
+
+
+def test_rhol_sat_IAPWS():
+    assert_close(rhol_sat_IAPWS(273.16), 999.7891346511478, rtol=1e-13)
+    assert_close(rhol_sat_IAPWS(373.1243), 958.3652337840979, rtol=1e-13)
+    assert_close(rhol_sat_IAPWS(647.096), 322.0, rtol=1e-13)
+
+def test_rhog_sat_IAPWS():
+    assert_close(rhog_sat_IAPWS(373.1243), 0.5975863185878799, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS(273.16), 0.004854262596261411, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS(647.096), 322)

@@ -25,7 +25,7 @@ SOFTWARE.
 from __future__ import division
 from math import exp, log, sqrt, fsum
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
-from fluids.numerics import secant, newton, trunc_log, trunc_exp
+from fluids.numerics import secant, newton, trunc_log, trunc_exp, horner
 
 __all__ = [
            'iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
@@ -39,7 +39,9 @@ __all__ = [
            'iapws95_rho', 'iapws95_P',
            
            'iapws97_rho_extrapolated',
-           'iapws97_rho', 'iapws97_P', 'iapws97_T',
+           'iapws97_rho', 'iapws97_P', 'iapws97_T', 
+           
+           'rhol_sat_IAPWS', 'rhog_sat_IAPWS', 'iapws95_Psat',
            
            
            
@@ -2100,7 +2102,149 @@ def iapws97_T(P, rho):
         raise ValueError("Could not detect region")
 
 ### IAPWS95
+
+def rhol_sat_IAPWS(T):
+    r'''Calculates saturation liquid mass density of water using the IAPWS
+    explicit equation [1]_.
+
+    .. math::
+        \frac{\rho^{sat}_l}{\rho_c} = 1 + b_1\tau^{1/3} + b_2\tau^{2/3}
+        + b_3 \tau^{5/3} + b_4\tau^{16/3} + b_5\tau^{43/3} + b_6\tau^{110/3}
         
+    .. math::
+        \tau = 1 - \frac{T}{T_c}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of water, [K]
+
+    Returns
+    -------
+    rhol_sat : float
+        Saturation liquid mass density of water [kg/m^3]
+
+    Notes
+    -----
+    The values of the constants are as follows: 
+        
+    b1 = 1.99274064; 
+    b2 = 1.09965342; 
+    b3 = -0.510839303; 
+    b4 = -1.75493479; 
+    b5 = -45.5170352; 
+    b6 = -6.74694450e5
+
+
+    Examples
+    --------
+    >>> rhol_sat_IAPWS(300.)
+    996.5089712803
+
+    References
+    ----------
+    .. [1] Wagner, Wolfgang, and A. Pruss. "International Equations for the
+       Saturation Properties of Ordinary Water Substance. Revised According to 
+       the International Temperature Scale of 1990. Addendum to J. Phys. Chem.
+       Ref. Data 16, 893 (1987).” Journal of Physical and Chemical Reference 
+       Data 22, no. 3 (May 1, 1993): 783–87. https://doi.org/10.1063/1.555926.
+    '''
+    tau = 1.0 - T*(1.0/647.096) # 1/647.096
+    
+    tau_cbrt = tau**(1.0/3.0)
+    
+    ratio = 1.0 + 1.99274064*tau_cbrt
+    tau_cbrt4 = tau_cbrt*tau_cbrt # still 2 for first term
+    
+    ratio += 1.09965342*tau_cbrt4 # still b2*tau^(2/3)
+    
+    tau_cbrt4 = tau_cbrt4*tau_cbrt4
+    
+    ratio += -0.510839303*tau_cbrt4*tau_cbrt
+    
+    tau_cbrt8 = tau_cbrt4*tau_cbrt4
+    
+    ratio += -1.75493479*tau_cbrt8*tau_cbrt8
+    
+    tau_cbrt4 = tau_cbrt8*tau_cbrt # repurpse 4 as 9
+    
+    tau_cbrt = tau_cbrt4*tau_cbrt8 # 17 - repurpose variable as tau_cbrt34
+    tau_cbrt *= tau_cbrt # 17+17 = 34
+    
+    ratio += tau_cbrt*(-45.5170352*tau_cbrt4 -6.74694450e5*tau_cbrt*tau_cbrt*tau_cbrt8)
+#    ratio += -6.74694450e5*tau_cbrt*tau_cbrt*tau_cbrt*tau_cbrt8
+    return ratio*322.0
+
+def rhog_sat_IAPWS(T):
+    r'''Calculates saturation vapor mass density of water using the IAPWS
+    explicit equation [1]_.
+
+    .. math::
+        \log \left(\frac{\rho^{sat}_g}{\rho_c}\right) = 1 + c_1\tau^{2/6} + c_2\tau^{4/6}
+        + c_3 \tau^{8/6} + c_4\tau^{18/6} + c_5\tau^{37/6} + c_6\tau^{71/6}
+        
+    .. math::
+        \tau = 1 - \frac{T}{T_c}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of water, [K]
+
+    Returns
+    -------
+    rhog_sat : float
+        Saturation vapor mass density of water [kg/m^3]
+
+    Notes
+    -----
+    The values of the constants are as follows: 
+        
+    c1 = -2.03150240;
+    c2 = -2.68302940;
+    c3 = -5.38626492;
+    c4 = -17.2991605;
+    c5 = -44.7586581;
+    c6 = -63.9201063
+
+
+    Examples
+    --------
+    >>> rhog_sat_IAPWS(300.)
+    0.0255887212886
+
+    References
+    ----------
+    .. [1] Wagner, Wolfgang, and A. Pruss. "International Equations for the
+       Saturation Properties of Ordinary Water Substance. Revised According to 
+       the International Temperature Scale of 1990. Addendum to J. Phys. Chem.
+       Ref. Data 16, 893 (1987).” Journal of Physical and Chemical Reference 
+       Data 22, no. 3 (May 1, 1993): 783–87. https://doi.org/10.1063/1.555926.
+    '''
+    tau = 1.0 - T*(1.0/647.096)
+    
+    tau_6rt = tau**(1.0/6.0)
+    tau_6rt2 = tau_6rt*tau_6rt
+    ratio = -2.03150240*tau_6rt2
+    
+    tau_6rt8 = tau_6rt2*tau_6rt2 # start it off as 4
+    ratio += -2.68302940*tau_6rt8
+    
+    
+    tau_6rt8 *= tau_6rt8
+    ratio += -5.38626492*tau_6rt8
+    
+    tau_6rt16 = tau_6rt8*tau_6rt8
+    tau_6rt18 = tau_6rt16*tau_6rt2 
+    
+    ratio += -17.2991605*tau_6rt18
+    
+    tau_6rt2 = tau_6rt18*tau_6rt18*tau_6rt # 37 - reuse tau_6rt2
+    ratio += tau_6rt2*(-44.7586581 - 63.9201063*tau_6rt16*tau_6rt18) # 71
+    
+    return exp(ratio)*322.0
+
+
 def iapws95_A0(tau, delta):
     # only way to optimize is likely to save transcendentals between calls
     # It should also be possible to replace these with polynomial fits which
@@ -3391,6 +3535,41 @@ def iapws95_d2Ar_ddeltadtau(tau, delta):
             + 0.318061108784439994*x60*(x53/x44*x61*(-0.095*tau 
             + 0.0304*x43 + 0.095) - 2.02666666666666666*x53*x57)
             - 8.78032033035609949)
+
+
+Psat_coeffs_iapws95_235_273 = [-0.0404815673828125, 0.0458526611328125, 0.375885009765625, -0.4257164001464844, -1.6131267547607422, 1.8266944885253906, 4.242580890655518, -4.803114175796509, -7.645859479904175, 8.652797102928162, 10.002255886793137, -11.31277510523796, -9.817383006215096, 11.092894461005926, 7.370591592043638, -8.314844283275306, -4.277057046769187, 4.812127415090799, 1.925885249627754, -2.1572029151720926, -0.6719730040349532, 0.7471348317922093, 0.18054040489369072, -0.19828112466348102, -0.03694033686770126, 0.03975118442394887, 0.005655801688135398, -0.005886636653485766, -0.000631581975426343, 0.0006184879482020733, 5.696264696553044e-05, -4.779557498579834e-05, -1.56374487509936e-05, 5.210719629289429e-05, -0.0001258797167196235, 0.00031015444493132094, -0.0012805056242366497, 0.01149752302139273, -0.13780084439128548, 1.6313925771945534, -11.998047252356896]
+Psat_coeffs_iapws95_273_460 = [8.147908374667168e-07, -1.3258541002869606e-06, -2.960063284263015e-06, 4.862929927185178e-06, 6.120302714407444e-06, -9.979732567444444e-06, -6.454627509810962e-06, 1.1027086657122709e-05, 5.648329533869401e-06, -1.0190725788561394e-05, -1.3649275842908537e-06, 4.478973778532236e-07, 2.4834392547745665e-05, -5.852100520087333e-05, 0.00011126565522801002, -0.00036335083247251987, 0.0013489128931727379, -0.0047478345366922525, 0.018241801868318586, -0.07380538465894615, 0.2868986774488336, -1.015108797564658, 3.4736507508968284, -5.619649447193197]
+Psat_coeffs_iapws95_460_609 = [2.0064180716872215e-07, 2.892629709094763e-07, -8.132046787068248e-07, -1.2402815627865493e-06, 1.2566961231641471e-06, 1.8773480405798182e-06, -1.3796370694763027e-06, -1.8621731214807369e-06, 4.6375271267606877e-07, 1.1436318345658947e-06, 1.6705293433005863e-06, 1.7150333064819279e-06, 1.3039190918107124e-06, 5.15597523786937e-06, 1.185603442621641e-05, 1.694959209075364e-05, 5.210011446887819e-05, 7.716156925408058e-06, 0.0009684942799086382, -0.0037996536704614225, 0.031002148395983753, -0.1716204979856538, 1.2065145338661658, -1.519520204731372]
+Psat_coeffs_iapws95_609_643 = [1.0573770850896835e-05, 1.1763535439968109e-05, -6.56498596072197e-05, -7.157295476645231e-05, 0.0001856974558904767, 0.00019913158030249178, -0.0003122607449768111, -0.00033338970388285816, 0.0003383217645023251, 0.00036499839916359633, -0.00024304199087055167, -0.0002661161202013318, 0.00012133384302615013, 0.00013108684390772396, -4.926522541381928e-05, -5.498319717389677e-05, 3.840095160967394e-06, 9.275973251732239e-06, 4.700250627820424e-06, 1.7356479738772634e-05, 3.5141797559923305e-05, 4.994296202665005e-05, 5.6967466662061206e-05, 5.500573225036831e-05, 7.36448261119127e-05, 0.000486011140590506, -0.0032944327011136323, 0.20513406870743833, -0.24748976782381205]
+Psat_coeffs_iapws95_643_646 = [9.057896477315808e-08, 1.211502649312024e-07, -3.360720484124613e-07, -4.495756513733795e-07, 5.768298478869838e-07, 7.768647307671017e-07, -5.138533794024625e-07, -6.86156649720715e-07, 3.3836656099239804e-07, 4.158511894836181e-07, -1.3213676086643034e-07, -1.300110328283921e-07, 2.7710538380576466e-07, 8.91687420706555e-07, 1.834557936633563e-06, 2.582291823115257e-06, 1.5351452190368736e-06, 8.540061517871983e-07, 1.7006021977569903e-05, 0.02017998616540387, -0.02472793196736738]
+Psat_coeffs_iapws95_near_critical = [-0.007006160914897919, -0.006299436092376709, 0.06787101551890373, 0.06092516239732504, -0.3032621801830828, -0.27187402336858213, 0.8286682133330032, 0.7421519589261152, -1.5481375773670152, -1.3854497998690931, 2.0945177564717596, 1.8733694699149055, -2.1206636809074553, -1.8960203259257469, 1.6377062088922685, 1.4638579778784333, -0.9743636551480677, -0.8708100283029125, 0.44806853431398963, 0.40042604495646117, -0.15886602644877712, -0.14197406009749258, 0.04308180067010703, 0.0385020246406107, -0.008810816846762659, -0.007874311835966985, 0.0013301372745293527, 0.0011886957505600204, -0.00014366835734647143, -0.0001283599871508001, 1.0624248652432722e-05, 9.493371248271015e-06, -4.747152791886172e-07, -4.074279138207085e-07, 7.613360554058896e-08, 1.2227703013014193e-07, 2.2590783514621522e-07, 6.263045703604046e-07, 2.5993277169989305e-06, 0.0022606230644268894, -0.00226439777925055]
+
+def iapws95_Psat(T):
+    # Fit to under 1e-12 precision, with the EOS evaluated with mpmath for max
+    # precision.
+    if 235.0 <= T < 273.15:
+        # Equation solves down to this temperature but not below.
+        coeffs = Psat_coeffs_iapws95_235_273
+        val = horner(coeffs, 0.052424639580602915*(T - 254.074999999999989))
+    elif 273.15 <= T <= 460.1225: # half the points
+        coeffs = Psat_coeffs_iapws95_273_460
+        val = horner(coeffs, 0.0106967602187487444*(T - 366.636250000000018))
+    elif 460.1225 < T <= 609.7005:
+        coeffs = Psat_coeffs_iapws95_460_609
+        val = horner(coeffs, 0.0133709502734359297*(T - 534.911500000000046))
+    elif 609.7005 < T <= 643.35555:
+        coeffs = Psat_coeffs_iapws95_609_643
+        val = horner(coeffs, 0.0594264456597153254*(T - 626.528025000000071))
+    elif 643.35555 < T <= 646.721055:
+        coeffs = Psat_coeffs_iapws95_643_646
+        val = horner(coeffs, 0.594264456597155322*(T - 645.038302499999986))
+    elif T < 647.096:
+        coeffs = Psat_coeffs_iapws95_near_critical
+        val = horner(coeffs, 5.33411567172122325*(T - 646.908527499949969))
+    else:
+        raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
+    return exp(val)*22064000.0
+
 
 def iapws95_rho_err(rho, T, P_spec):
     rhoc_inv = (1.0/322.0)
