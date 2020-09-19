@@ -25,7 +25,7 @@ SOFTWARE.
 from __future__ import division
 from math import exp, log, sqrt, fsum
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
-from fluids.numerics import secant, newton, trunc_log, trunc_exp, horner
+from fluids.numerics import secant, newton, trunc_log, trunc_exp, horner, solve_2_direct, newton_system, damping_maintain_sign
 
 __all__ = [
            'iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
@@ -37,6 +37,7 @@ __all__ = [
            'iapws97_rho', 'iapws97_P', 'iapws97_T', 
            
            'rhol_sat_IAPWS', 'rhog_sat_IAPWS', 'iapws95_Psat', 'rhol_sat_IAPWS95',
+           'iapws95_saturation',
            
            'iapws95_A0', 'iapws95_dA0_dtau', 'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3',
            
@@ -85,11 +86,39 @@ __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97
 R95 = 461.51805 # Differs from the other formulation
 R97 = 461.526
 
+MW = 18.015268
+
 Tc = 647.096
 Tc_inv = 1.0/Tc
 
 rhoc = 322.0
 rhoc_inv = 1.0/rhoc
+
+def use_mpmath_backend():
+    import mpmath as mp
+    globals()['exp'] = mp.exp
+    globals()['log'] = mp.log
+    globals()['sqrt'] = mp.sqrt
+    globals()['R95'] = mp.mpf("461.51805")
+    globals()['R97'] = mp.mpf("461.526")
+    globals()['MW'] = mp.mpf("18.015268")
+    globals()['Tc'] = mp.mpf("647.096")
+    globals()['Tc_inv'] = 1/mp.mpf("647.096")
+    globals()['rhoc'] = mp.mpf("322")
+    globals()['rhoc_inv'] = 1/mp.mpf("322")
+    
+def reset_backend():
+    import math
+    globals()['exp'] = math.exp
+    globals()['log'] = math.log
+    globals()['sqrt'] = math.sqrt
+    globals()['R95'] = 461.51805
+    globals()['R97'] = 461.526
+    globals()['MW'] = 18.015268
+    globals()['Tc'] = 647.096
+    globals()['Tc_inv'] = 1/647.096
+    globals()['rhoc'] = 322.0
+    globals()['rhoc_inv'] = 1/322.0
 
 
 def iapws97_boundary_2_3(T):
@@ -3616,6 +3645,76 @@ def iapws95_d2Ar_ddeltadtau(tau, delta):
             + 0.318061108784439994*x60*(x53/x44*x61*(-0.095*tau 
             + 0.0304*x43 + 0.095) - 2.02666666666666666*x53*x57)
             - 8.78032033035609949)
+
+### Vapor pressure solution
+def _P_G_dG_dV_T_dG_dV_T(T, V):
+    '''For calculating vapor pressure'''
+    _MW_kg = MW/1000
+    R_MW_0_001 = _MW_kg*R95
+    rho = rho_mass = MW/V/1000
+    tau = Tc/T
+    delta = rho_mass/rhoc
+
+    tau = Tc/T
+    delta = rho/rhoc
+    
+    A = iapws95_A0(tau, delta) + iapws95_Ar(tau, delta)
+    dA_dtau = iapws95_dAr_dtau(tau, delta) + iapws95_dA0_dtau(tau, delta)
+    d2A_dtau2 = iapws95_d2Ar_dtau2(tau, delta) + iapws95_d2A0_dtau2(tau, delta)
+    dA_ddelta = iapws95_dAr_ddelta(tau, delta) + 1/delta
+    d2A_ddelta2 =  iapws95_d2Ar_ddelta2(tau, delta) -1/(delta*delta)
+    d2A_ddeltadtau = iapws95_d2Ar_ddeltadtau(tau, delta)
+    
+    P = (dA_ddelta*delta)*rho*R95*T
+
+    S = (tau*dA_dtau - A)*R_MW_0_001
+    H = (tau*dA_dtau + dA_ddelta*delta)*T*R_MW_0_001
+    G = H - T*S
+    
+    dP_dV = (-MW*MW*R95*T*(MW*d2A_ddelta2/10**9 + V*rhoc*dA_ddelta/500000)/(V*V*V*V*rhoc*rhoc))
+    
+    dS_dV_T = ((dA_ddelta - Tc*d2A_ddeltadtau/T)
+                                   *R_MW_0_001*MW/1000/(V*V*rhoc))
+    
+    dS_dP_T = dS_dV_T/dP_dV
+    
+    dH_dV_T = (T*MW*(-MW*d2A_ddelta2/(V*rhoc*10**6) - dA_ddelta/1000
+         -   Tc*d2A_ddeltadtau/T/1000)*R_MW_0_001/(rhoc*V*V))
+    dH_dP_T = dH_dV_T/dP_dV
+    
+    dG_dP_T = -T*dS_dP_T + dH_dP_T
+    
+    dG_dV_T = dG_dP_T*dP_dV
+    
+    return G, P, dG_dV_T, dP_dV
+
+def iapws95_sat_err_and_jac(Vs, T):
+    V_l, V_g = Vs
+    G_l, P_l, dG_dV_l, dP_dV_l =  _P_G_dG_dV_T_dG_dV_T(T, V_l)
+    G_g, P_g, dG_dV_g, dP_dV_g =  _P_G_dG_dV_T_dG_dV_T(T, V_g)
+    err = [0.0]*2
+    err[0] = G_l - G_g
+    err[1] = P_l - P_g
+    
+    jac = [[dG_dV_l, -dG_dV_g],
+           [dP_dV_l, -dP_dV_g]]
+#     print(err, Vs)
+#     print([float(i) for i in err])
+    return err, jac
+
+def iapws95_saturation(T, xtol=1e-16):
+    # rhol_sat_IAPWS95
+    rhog, rhol = rhog_sat_IAPWS(T), rhol_sat_IAPWS(T)
+    Vg = MW/(rhog*1000)
+    Vl = MW/(rhol*1000)
+    (Vg, Vl), iters = newton_system(iapws95_sat_err_and_jac, [Vg, Vl], args=(T,),
+                                    jac=True, xtol=xtol, solve_func=solve_2_direct,
+#                                    damping_func=damping_maintain_sign
+                                    )
+    rhol = MW/(Vl*1000)
+    rhog = MW/(Vg*1000)
+    Psat = iapws95_P(T, rhol)
+    return Psat, rhol, rhog
 
 
 Psat_coeffs_iapws95_235_273 = [-0.0404815673828125, 0.0458526611328125, 0.375885009765625, -0.4257164001464844, -1.6131267547607422, 1.8266944885253906, 4.242580890655518, -4.803114175796509, -7.645859479904175, 8.652797102928162, 10.002255886793137, -11.31277510523796, -9.817383006215096, 11.092894461005926, 7.370591592043638, -8.314844283275306, -4.277057046769187, 4.812127415090799, 1.925885249627754, -2.1572029151720926, -0.6719730040349532, 0.7471348317922093, 0.18054040489369072, -0.19828112466348102, -0.03694033686770126, 0.03975118442394887, 0.005655801688135398, -0.005886636653485766, -0.000631581975426343, 0.0006184879482020733, 5.696264696553044e-05, -4.779557498579834e-05, -1.56374487509936e-05, 5.210719629289429e-05, -0.0001258797167196235, 0.00031015444493132094, -0.0012805056242366497, 0.01149752302139273, -0.13780084439128548, 1.6313925771945534, -11.998047252356896]
