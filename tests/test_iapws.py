@@ -29,7 +29,7 @@ import chemicals
 from math import *
 from chemicals.iapws import *
 from chemicals import iapws
-from fluids.numerics import assert_close, linspace, logspace, derivative
+from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace, derivative
 from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G, REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N, REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z
 from chemicals.vapor_pressure import Psat_IAPWS
 from chemicals.iapws import iapws95_P_err
@@ -1840,6 +1840,18 @@ def test_rhog_sat_IAPWS():
     assert_close(rhog_sat_IAPWS(647.096), 322)
 
 
+def test_iapws95_saturation():
+    from chemicals.iapws import iapws95_sat_err_and_jac
+    
+    err, jac = iapws95_sat_err_and_jac([1.807830655839175e-05, 0.7040053821406961], 300.0)
+    assert_close1d(err, [2.660272002685815e-10, 1.681859203017666e-05], rtol=1e-6)
+    assert_close2d(jac, [[-2219129832.1579313, 3530.261802535087],
+                         [-122750979191014.77, 5014.538087479508]], rtol=1e-7)
+    
+    vals = iapws95_saturation(300.0, xtol=1e-6)
+    assert_close1d(vals, (3536.806752287503, 996.5130274681349, 0.025589673682920273))
+    
+    
 @pytest.mark.slow
 @pytest.mark.mpmath
 def test_iapws95_saturation_fits():
