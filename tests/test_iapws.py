@@ -28,6 +28,7 @@ import pytest
 import chemicals
 from math import *
 from chemicals.iapws import *
+from chemicals import iapws
 from fluids.numerics import assert_close, linspace, logspace, derivative
 from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G, REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N, REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z
 from chemicals.vapor_pressure import Psat_IAPWS
@@ -1837,3 +1838,35 @@ def test_rhog_sat_IAPWS():
     assert_close(rhog_sat_IAPWS(373.1243), 0.5975863185878799, rtol=1e-13)
     assert_close(rhog_sat_IAPWS(273.16), 0.004854262596261411, rtol=1e-13)
     assert_close(rhog_sat_IAPWS(647.096), 322)
+
+
+@pytest.mark.slow
+@pytest.mark.mpmath
+def test_iapws95_saturation_fits():
+    import mpmath as mp
+    mp.mp.dps = 50
+    iapws.use_mpmath_backend()
+    N = 100 # should be able to set arbitrarily high, tested to 1000
+    Ts = linspace(273.15, 647.09, N)
+
+    for T in Ts:
+        rhol = rhol_sat_IAPWS95(T)
+        P_corr = float(iapws95_Psat(T))
+        Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
+            # Everything except > 646.7 is under 2E-13
+        assert_close(P_corr, float(Psat_mp), rtol=7.5e-13)
+        # Almost everything is under 2e-14
+        assert_close(rhol, float(rhol_mp), rtol=2e-13)
+        
+        
+    # Test the low temperature regime with a lower tolerance - fitting issues for 
+    # density
+    Ts = linspace(235, 273.15, N)
+    for T in Ts:
+        rhol = rhol_sat_IAPWS95(T)
+        P_corr = float(iapws95_Psat(T))
+        Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
+        assert_close(P_corr, float(Psat_mp), rtol=7.5e-13)
+        assert_close(rhol, float(rhol_mp), rtol=3e-11)
+
+    iapws.reset_backend()
