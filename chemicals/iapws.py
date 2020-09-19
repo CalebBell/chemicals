@@ -25,7 +25,10 @@ SOFTWARE.
 from __future__ import division
 from math import exp, log, sqrt, fsum
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
-from fluids.numerics import secant, newton, trunc_log, trunc_exp, horner, solve_2_direct, newton_system, damping_maintain_sign
+from fluids.numerics import (secant, newton, trunc_log, trunc_exp, horner,
+                             solve_2_direct, newton_system,
+                             damping_maintain_sign, translate_bound_f_jac)
+
 
 __all__ = [
            'iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
@@ -106,6 +109,10 @@ def use_mpmath_backend():
     globals()['Tc_inv'] = 1/mp.mpf("647.096")
     globals()['rhoc'] = mp.mpf("322")
     globals()['rhoc_inv'] = 1/mp.mpf("322")
+    import fluids.numerics
+    fluids.numerics.exp = mp.exp
+    fluids.numerics.log = mp.log
+    return mp
     
 def reset_backend():
     import math
@@ -119,6 +126,10 @@ def reset_backend():
     globals()['Tc_inv'] = 1/647.096
     globals()['rhoc'] = 322.0
     globals()['rhoc_inv'] = 1/322.0
+    import fluids.numerics
+    fluids.numerics.exp = math.exp
+    fluids.numerics.log = math.log
+    
 
 
 def iapws97_boundary_2_3(T):
@@ -2665,6 +2676,9 @@ def iapws95_dAr_ddelta(tau, delta):
     error was 6.046E-15, with a maximum relative error of 3.39E-10 and a 
     standard deviation of 7.056E-13.
     
+    There was a singularity at `tau` = `delta` = 1, but the limit is correctly
+    returned.
+    
     Examples
     --------
     >>> iapws95_dAr_ddelta(647.096/300.0, 999.0/322)
@@ -2772,8 +2786,28 @@ def iapws95_dAr_ddelta(tau, delta):
             + c51) - 0.126434447282154*x101*x101*x101*x67*c52
             + 0.302158053345218003*x101*x67*c51 - 0.204338109509650007*x8*tau6 + 0.0125335479355230001/taurt)
 
-            
-            
+
+def iapws95_d2Ar_ddelta2_delta_1(tau):
+    # Derived with sympy
+    exp = trunc_exp
+    return (-0.046919851012788602*tau**0.375 + 0.636050186908360016*tau**0.5 
+            - 0.52291067718716*tau**0.75 + 1.56820593144323182*tau**50 
+            - 4.20850366554920272*tau**46 + 2.63624563596086548*tau**44 
+            + 0.196436526075828838*tau**23 - 0.115862176569242416*tau**22 
+            - 0.144400973219474584*tau**16 + 7.23617955691807259e-7*tau**13 
+            + 0.0000243582561405054769*tau**12 + 3.01366009018245322e-8*tau**11 
+            + 0.31651327600812403*tau**10 - 0.322675438839726093*tau**9
+            - 0.0236600953022247575*tau**8 + 0.102487320000099597*tau**7
+            + 0.023417142139243132*tau**6 + 0.0945782837315734979*tau**5 
+            + 1.93563785043781879e-165*tau**4*exp(625.0*tau)*exp(-250.0*tau**2)
+            + 0.0196947947463537576*tau**4 + 0.542141065361544732*tau**3
+            - 0.479881408666422377*tau**2 - 4.49616772203662689e-93*tau*exp(363.0*tau)*exp(-150.0*tau**2) 
+            + 0.267030565833120499*tau
+            + 1.48037819526523354e-303*(0.5*tau**2 - tau + 0.5)**0.849999999999999978
+            *exp(1400*tau)*exp(-700*tau**2) - 1.44239270039235679e-346*(0.5*tau**2 - tau 
+            + 0.5)**0.949999999999999956*exp(1600*tau)*exp(-800*tau**2)
+            + 4.46197842597955621e-93*exp(363.0*tau)*exp(-150.0*tau**2))
+
 
 def iapws95_d2Ar_ddelta2(tau, delta):
     r'''Calculates the second derivative of residual Helmholtz energy of water
@@ -2818,6 +2852,8 @@ def iapws95_d2Ar_ddelta2(tau, delta):
     >>> iapws95_d2Ar_ddelta2(647.096/300.0, 999.0/322)
     1.7862535141735987
     '''
+    if delta == 1.0:
+        return iapws95_d2Ar_ddelta2_delta_1(tau)
     # 4 sqrt; 4 exp; 2 power; 3 div; loads of multiplies and adds.
     delta2 = delta*delta
     delta3 = delta2*delta
@@ -3657,6 +3693,7 @@ def _P_G_dG_dV_T_dG_dV_T(T, V):
 
     tau = Tc/T
     delta = rho/rhoc
+#    print(tau, delta, 'tau, delta')
     
     A = iapws95_A0(tau, delta) + iapws95_Ar(tau, delta)
     dA_dtau = iapws95_dAr_dtau(tau, delta) + iapws95_dA0_dtau(tau, delta)
@@ -3700,18 +3737,87 @@ def iapws95_sat_err_and_jac(Vs, T):
     jac = [[dG_dV_l, -dG_dV_g],
            [dP_dV_l, -dP_dV_g]]
     #print(err, 'err')
-#     print([float(i) for i in err])
+#    print([float(i) for i in err], float(P_g), float(P_l), [float(i) for i in Vs])
     return err, jac
+#from chemicals.utils import Vm_to_rho, rho_to_Vm
+def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
+    r'''Solve the vapor-liquid saturation equations of IAPWS-95 given a
+    specified temperature. With floating point numbers, the achievable 
+    tolerance is somewhat low so `xtol` is exposed as a setting - it can be
+    adjusted somewhat. Density guesses may be provided, otherwise they will
+    be estimated.
 
-def iapws95_saturation(T, xtol=1e-16):
-    # rhol_sat_IAPWS95
-    rhog, rhol = rhog_sat_IAPWS(T), rhol_sat_IAPWS(T)
+    Parameters
+    ----------
+    T : float
+        Temperature at which to solve for saturation condition, [K]
+    xtol : float
+        Tolerance for solver, [-]
+    rhol_guess : float, optional
+        Liquid density of water at saturation (guess), [kg/m^3]
+    rhog_guess : float, optional
+        Vapor density of water at saturation (guess), [kg/m^3]
+
+    Returns
+    -------
+    Psat : float
+        Saturation vapor pressure, 3[Pa]
+    rhol : float
+        Saturation liquid water density, [kg/m^3]
+    rhog : float
+        Saturation vapor water density, [kg/m^3]
+
+    Notes
+    -----
+    This equation can be solved 
+    
+    With `mpmath` multiple precision, the equation can be solved down to 233.6 K
+    and up to 647.095999995 K - within 10 parts in a billion of the critical
+    point exactly.
+    
+    Examples
+    --------
+    >>> 
+    '''
+    
+    '''Reasons for non-convergence:
+        * Floating point numbers in the property equations
+        * Analytical jacobian having a numerical error somewhere due to floats
+        * ZeroDivisionError in iapws95_d2Ar_ddelta2 near-critical
+    '''
+    if rhog_guess is None:
+        rhog = rhog_sat_IAPWS(T)
+    else:
+        rhog = rhog_guess
+    if rhol_guess is None:
+        if T > 647.09:
+            # For unknown reasons, the worse estimates converge better near
+            # the critical point
+            rhol = rhol_sat_IAPWS(T)
+        else:
+            rhol = rhol_sat_IAPWS95(max(T, 235))
+    else:
+        rhol = rhol_guess
     Vg = MW/(rhog*1000)
     Vl = MW/(rhol*1000)
-    (Vg, Vl), iters = newton_system(iapws95_sat_err_and_jac, [Vg, Vl], args=(T,),
-                                    jac=True, xtol=xtol, solve_func=solve_2_direct,
-                                    damping_func=damping_maintain_sign
-                                    )
+    V_crit = MW/(322*1000)
+
+    V_min = MW/(1e-5*1000) # assume a minimum density of 1e-5 kg/m^3 for gas; stops converging at 18 times that
+    V_min = max(V_crit*(1.0+1e-10), Vg*2) # Assume the vapor guess is within 100% of the actual value
+
+    V_max = MW/(2000.0*1000) # use 2000 kg/m^3 as an upper bound
+    
+    # Translate the function variables so that vapor density cannot go above 
+    # 322 kg/m^3 and liquid cannot go under it
+    new_f_j, translate_into, translate_outof = translate_bound_f_jac(iapws95_sat_err_and_jac,
+                                                                     jac=True,
+                                                                     bounds=[(V_crit, V_min), (V_max, V_crit)])
+    guess = translate_into([Vg, Vl])
+    ans, iters = newton_system(new_f_j, guess, args=(T,),
+                                    jac=True, xtol=xtol, solve_func=solve_2_direct)
+    Vg, Vl = translate_outof(ans)
+    
+    # Compute the densities and vapor pressure
     rhol = MW/(Vl*1000)
     rhog = MW/(Vg*1000)
     Psat = iapws95_P(T, rhol)
@@ -3794,7 +3900,7 @@ def rhol_sat_IAPWS95(T):
 #         (1.301907916559972e-11, 1.5329272639853585e-11, 9.685327631780702e-11)
         coeffs = [-342.1649169921875, -286.70733642578125, 3696.8092041015625, 3062.9874267578125, -18628.276138305664, -15248.527671813965, 58141.86198616028, 46974.429047584534, -125898.94741535187, -100287.08330655098, 200761.28558278084, 157482.6384627223, -244240.7832775116, -188416.60116776824, 231738.97573629767, 175548.21367172152, -173839.0422554016, -129094.15901541244, 103905.44825894013, 75496.35919268127, -49644.42389814614, -35215.162472276075, 18947.322668814828, 13087.622056136344, -5751.365423334828, -3856.5318880818013, 1377.1159714494315, 892.9758781142154, -256.84921118732746, -160.2506746801855, 36.651197303384606, 21.84684986680145, -3.9021237365971047, -2.1983816265822327, 0.2992404034464471, 0.15648404704313634, -0.01571472634215354, -0.007373118351861052, 0.0005188793214245813, 0.00019840994932129874, -1.665223554836448e-05, -1.1892982883288106e-05, -1.36274066943054e-05, -2.2384801104155527e-05, -4.5679905172298085e-05, -0.0001857746544898474, 1.0003799295366436]
         val = horner(coeffs, 2020202.04154185997*(T - 647.095999495000001))
-    elif T <= Tc:
+    elif 647.09599999 < T <= Tc:
         # Gotta go to linear interp
         val = 1.0000546416597242 - 5.464165972424162e-05*(T-647.09599999)/(647.096-647.09599999)
     return val*rhoc

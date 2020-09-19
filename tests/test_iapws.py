@@ -44,6 +44,10 @@ def make_me_precise():
     globals()['log'] = mp.log
     globals()['sqrt'] = mp.sqrt
     mp.mp.dps = 50
+    
+    import fluids.numerics
+    fluids.numerics.exp = mp.exp
+    fluids.numerics.log = mp.log
     return mp
 
 def make_me_float():
@@ -51,6 +55,9 @@ def make_me_float():
     globals()['exp'] = math.exp
     globals()['log'] = math.log
     globals()['sqrt'] = math.sqrt
+    import fluids.numerics
+    fluids.numerics.exp = math.exp
+    fluids.numerics.log = math.log
     
 ### IAPWS Naive Functions
 ### Regoin 1
@@ -1367,6 +1374,13 @@ def d2_Delta_bd_delta_d_tau(i, tau, delta):
 
 def test_iapws95_d2A_d2deltar():
     assert_close(iapws95_d2Ar_ddelta2(3.23548, 2.652088725981779), -681188.0609390885, rtol=1e-11)
+
+    # Test equation for delta = 1 exactly, derived with sympy limit(thing, delta, 1)
+    for tau in linspace(.01, .8, 100):
+        assert_close(iapws95_d2Ar_ddelta2(tau,.99999999999), iapws95_d2Ar_ddelta2(tau, 1), rtol=2e-8)
+    for tau in linspace(10, 1.5, 100):
+        assert_close(iapws95_d2Ar_ddelta2(tau,.99999999999), iapws95_d2Ar_ddelta2(tau, 1), rtol=2e-8)
+    
     
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -1848,7 +1862,7 @@ def test_iapws95_saturation():
     assert_close2d(jac, [[-2219129832.1579313, 3530.261802535087],
                          [-122750979191014.77, 5014.538087479508]], rtol=1e-7)
     
-    vals = iapws95_saturation(300.0, xtol=1e-6)
+    vals = iapws95_saturation(300.0, xtol=1e-5)
     assert_close1d(vals, (3536.806752287503, 996.5130274681349, 0.025589673682920273))
     
     
