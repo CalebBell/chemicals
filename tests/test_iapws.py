@@ -1493,6 +1493,9 @@ def test_iapws95_dA_ddeltar():
     delta = rho*rhoc_inv
     assert_close(iapws95_dAr_ddelta(tau, delta),
                  dAddelta_res(tau, delta), rtol=5e-9)
+    
+    assert_close(iapws95_dAr_ddelta(.999999999999999, .999999999999999),
+                 iapws95_dAr_ddelta(1,1), rtol=1e-13)
 
 @pytest.mark.slow
 @pytest.mark.fuzz

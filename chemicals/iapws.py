@@ -26,7 +26,7 @@ from __future__ import division
 from math import exp, log, sqrt, fsum
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
 from fluids.numerics import (secant, newton, trunc_log, trunc_exp, horner,
-                             solve_2_direct, newton_system,
+                             solve_2_direct, newton_system, broyden2,
                              damping_maintain_sign, translate_bound_f_jac)
 
 
@@ -2684,6 +2684,9 @@ def iapws95_dAr_ddelta(tau, delta):
     >>> iapws95_dAr_ddelta(647.096/300.0, 999.0/322)
     -0.3093321202374
     '''
+    if tau == 1.0 and delta == 1.0:
+        # Evaluated with sympy's limit command, otherwise divide by zero
+        return -0.7705590295466400609
     _sqrt, _exp = sqrt, exp
     taurt = _sqrt(tau)
     tau_quarter = _sqrt(taurt)
@@ -3740,12 +3743,20 @@ def iapws95_sat_err_and_jac(Vs, T):
 #    print([float(i) for i in err], float(P_g), float(P_l), [float(i) for i in Vs])
     return err, jac
 #from chemicals.utils import Vm_to_rho, rho_to_Vm
+
+
 def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
     r'''Solve the vapor-liquid saturation equations of IAPWS-95 given a
     specified temperature. With floating point numbers, the achievable 
     tolerance is somewhat low so `xtol` is exposed as a setting - it can be
     adjusted somewhat. Density guesses may be provided, otherwise they will
     be estimated.
+    
+    .. math::
+        G_{liq}(T, \rho_l) = G_{vap}(T, \rho_g)
+    
+    .. math::
+        P_{liq}(T, \rho_l) = P_{vap}(T, \rho_g)
 
     Parameters
     ----------
@@ -3769,21 +3780,21 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
 
     Notes
     -----
-    This equation can be solved 
+    This is not a perfect function.
     
     With `mpmath` multiple precision, the equation can be solved down to 233.6 K
     and up to 647.095999995 K - within 10 parts in a billion of the critical
     point exactly.
     
+    Reasons for non-convergence include floating point issues as delta 
+    becaomes 1, and zero division errors in the matrix inverse.
+    
     Examples
     --------
-    >>> 
-    '''
-    
-    '''Reasons for non-convergence:
-        * Floating point numbers in the property equations
-        * Analytical jacobian having a numerical error somewhere due to floats
-        * ZeroDivisionError in iapws95_d2Ar_ddelta2 near-critical
+    >>> iapws95_saturation(400.0, xtol=1e-6)
+    (245769.34556494374, 937.4860393928042, 1.3694075410068105)
+    >>> iapws95_saturation(647.0955, xtol=1e-7)
+    (22063866.350014206, 325.7094065590604, 318.27733406907214)
     '''
     if rhog_guess is None:
         rhog = rhog_sat_IAPWS(T)
@@ -3800,10 +3811,11 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
         rhol = rhol_guess
     Vg = MW/(rhog*1000)
     Vl = MW/(rhol*1000)
-    V_crit = MW/(322*1000)
+    V_crit_liq = MW/(322.000000000001*1000) # Do not allow it to jump to delta=1
+    V_crit_gas = MW/(321.999999999999*1000)
 
     V_min = MW/(1e-5*1000) # assume a minimum density of 1e-5 kg/m^3 for gas; stops converging at 18 times that
-    V_min = max(V_crit*(1.0+1e-10), Vg*2) # Assume the vapor guess is within 100% of the actual value
+    V_min = max(V_crit_gas*(1.0+1e-10), Vg*2.0) # Assume the vapor guess is within 100% of the actual value
 
     V_max = MW/(2000.0*1000) # use 2000 kg/m^3 as an upper bound
     
@@ -3811,10 +3823,15 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
     # 322 kg/m^3 and liquid cannot go under it
     new_f_j, translate_into, translate_outof = translate_bound_f_jac(iapws95_sat_err_and_jac,
                                                                      jac=True,
-                                                                     bounds=[(V_crit, V_min), (V_max, V_crit)])
+                                                                     bounds=[(V_crit_gas, V_min), (V_max, V_crit_liq)])
     guess = translate_into([Vg, Vl])
-    ans, iters = newton_system(new_f_j, guess, args=(T,),
-                                    jac=True, xtol=xtol, solve_func=solve_2_direct)
+    if T > 647.09599999:
+        # Avoid the jacobian - very badly behaved
+        ans, iters = broyden2(guess, fun=lambda x, T:new_f_j(x, T)[0], jac=new_f_j, xtol=xtol, maxiter=1000, jac_has_fun=True, skip_J=False, args=(T,))
+    else:
+        ans, iters = newton_system(new_f_j, guess, args=(T,),
+                                        jac=True, xtol=xtol, solve_func=solve_2_direct)
+    
     Vg, Vl = translate_outof(ans)
     
     # Compute the densities and vapor pressure
