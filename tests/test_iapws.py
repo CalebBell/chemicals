@@ -1899,3 +1899,27 @@ def test_iapws95_saturation_fits():
         assert_close(rhol, float(rhol_mp), rtol=3e-11)
 
     iapws.reset_backend()
+
+def test_rhog_sat_IAPWS95():
+    assert_close(rhog_sat_IAPWS95(400.0), 1.3694075410068125, rtol=1e-13)
+
+@pytest.mark.slow
+def test_rhog_sat_IAPWS95_vs_saturation():
+    # Specific points
+    Ts = [400.0]
+    for T in Ts:
+        assert_close(iapws95_saturation(T)[2],
+                     rhog_sat_IAPWS95(T), rtol=1e-13)
+
+@pytest.mark.slow
+@pytest.mark.CoolProp
+def test_rhog_sat_IAPWS95_CoolProp():
+    from CoolProp.CoolProp import PropsSI
+    T = 400.0
+    assert_close(rhog_sat_IAPWS95(T), 
+                 PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-13)
+
+
+test_rhog_sat_IAPWS95()
+test_rhog_sat_IAPWS95_vs_saturation()
+test_rhog_sat_IAPWS95_CoolProp()
