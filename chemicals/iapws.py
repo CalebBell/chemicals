@@ -3689,6 +3689,7 @@ def _P_G_dG_dV_T_dG_dV_T(T, V):
     return G, P, dG_dV_T, dP_dV
 
 def iapws95_sat_err_and_jac(Vs, T):
+    #print(Vs, 'Vs')
     V_l, V_g = Vs
     G_l, P_l, dG_dV_l, dP_dV_l =  _P_G_dG_dV_T_dG_dV_T(T, V_l)
     G_g, P_g, dG_dV_g, dP_dV_g =  _P_G_dG_dV_T_dG_dV_T(T, V_g)
@@ -3698,7 +3699,7 @@ def iapws95_sat_err_and_jac(Vs, T):
     
     jac = [[dG_dV_l, -dG_dV_g],
            [dP_dV_l, -dP_dV_g]]
-#     print(err, Vs)
+    #print(err, 'err')
 #     print([float(i) for i in err])
     return err, jac
 
@@ -3709,7 +3710,7 @@ def iapws95_saturation(T, xtol=1e-16):
     Vl = MW/(rhol*1000)
     (Vg, Vl), iters = newton_system(iapws95_sat_err_and_jac, [Vg, Vl], args=(T,),
                                     jac=True, xtol=xtol, solve_func=solve_2_direct,
-#                                    damping_func=damping_maintain_sign
+                                    damping_func=damping_maintain_sign
                                     )
     rhol = MW/(Vl*1000)
     rhog = MW/(Vg*1000)
