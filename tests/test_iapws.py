@@ -37,7 +37,20 @@ l = chemicals.iapws.__numba_additional_funcs__
 for n in l:
     globals()[n] = getattr(chemicals.iapws, n)
 
+def make_me_precise():
+    import mpmath as mp
+    globals()['exp'] = mp.exp
+    globals()['log'] = mp.log
+    globals()['sqrt'] = mp.sqrt
+    mp.mp.dps = 50
+    return mp
 
+def make_me_float():
+    import math
+    globals()['exp'] = math.exp
+    globals()['log'] = math.log
+    globals()['sqrt'] = math.sqrt
+    
 ### IAPWS Naive Functions
 ### Regoin 1
 nis1 = [0.14632971213167, -0.84548187169114, -0.37563603672040E1,
@@ -1356,59 +1369,77 @@ def test_iapws95_d2A_d2deltar():
     
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_iapws95_d2A_d2deltar_vs_naive():
+def test_iapws95_d2A_d2deltar_vs_naive(precise=False, allow_fail=True):
     '''Overall performs very well. 2e-10 was needed in 2000^2 points for like 1 point.
     Smaller number of points work to 1e-12. Having an absolute tolerance of 1e-15
     would also work find.
     '''
-    N = 2000
-    Ts = linspace(200.0,  5000.0, N)
+    if precise:
+        mp = make_me_precise()
+        mpf = mp.mpf
+    else:
+        mpf = lambda x: x
+    errs = []
+    rerr = 0
+    N = 500
+    Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
+        print(i)
         rhos = logspace(log10(1e-10), log10(5000), N)
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
-            assert_close(iapws95_d2Ar_ddelta2(tau, delta),
-                         ddAdddelta_res(tau, delta), rtol=2e-10) # 2e-10 is a pass
+            val = iapws95_d2Ar_ddelta2(tau, delta)
+            val_naive = float(ddAdddelta_res(mpf(tau), mpf(delta)))
+            if allow_fail:
+                assert_close(val, val_naive, rtol=2e-10)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+    print(rerr/N**2, np.std(errs), np.max(errs))
+    make_me_float()
 
 #test_iapws95_d2A_d2deltar_vs_naive()
+#test_iapws95_d2A_d2deltar_vs_naive(precise=True, allow_fail=False)
 
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_iapws95_d3A_d3deltar_vs_naive():
-    '''
-    '''
-    import mpmath as mp
-    mp.mp.dps = 50
-    N = 500
+def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
+    if precise:
+        mp = make_me_precise()
+        mpf = mp.mpf
+    else:
+        mpf = lambda x: x
+    errs = []
+    rerr = 0
+    N = 200
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
-    rerr = 0.0
-    errs = []
     for i, T in enumerate(Ts):
-        print(i)
-#        rhos = logspace(log10(1e-5), log10(5000), N)
-        rhos = logspace(log10(1e-10), log10(5000), N)
+#        print(i)
+#        rhos = logspace(log10(1e-10), log10(1e-4), N)
+        rhos = logspace(log10(1e-4), log10(5000), N)
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
             val = iapws95_d3Ar_ddelta3(tau, delta)
-            val_naive = float(dddA_ddddelta_res(mp.mpf(tau), mp.mpf(delta)))
-            try:
-                assert_close(val, val_naive, rtol=2e-10) # 2e-10 is a pass
-            except:
-                print(tau, delta, T, rho, val, val_naive, abs(1.0 - val/val_naive))
-            if val != 0 and val_naive != 0:
-                rerri = abs(1.0 - val/val_naive)
-            else:
-                rerri = 0
+            val_naive = float(dddA_ddddelta_res(mpf(tau), mpf(delta)))
+            if allow_fail:
+                try:
+                    assert_close(val, val_naive, rtol=1e-5)
+                except:
+                    print([T, rho, abs(1.0 - val/val_naive)])
+            rerri = abs(1.0 - val/val_naive)
+            if rerri > 1e-4:
+                print([T, rho, rerri])
             rerr += rerri
             errs.append(rerri)
     print(rerr/N**2, np.std(errs), np.max(errs))
+    make_me_float()
 
 
-#test_iapws95_d3A_d3deltar_vs_naive()
+#test_iapws95_d3A_d3deltar_vs_naive(precise=True, allow_fail=False)
 
   
 def test_iapws95_d3Ar_ddelta3():
@@ -1416,8 +1447,10 @@ def test_iapws95_d3Ar_ddelta3():
     
     tau, delta, T, rho = 0.5028042728122091, 3.3706405889480084e-09, 1286.9739478957888, 1.0853462696412588e-06
     num = derivative(lambda d: iapws95_d2Ar_ddelta2(tau, d), delta, dx=delta*3e-5, order=15)
-    assert_close(iapws95_d3Ar_ddelta3(tau, delta), num)
+    assert_close(iapws95_d3Ar_ddelta3(tau, delta), num, rtol=1e-3)
 
+@pytest.mark.slow
+@pytest.mark.mpmath
 def test_iapws95_d3Ar_ddelta3_mpmath():
     import mpmath as mp
     mp.mp.dps = 100
@@ -1427,7 +1460,7 @@ def test_iapws95_d3Ar_ddelta3_mpmath():
     
     tau, delta, T, rho = 0.6879013719642095, 4.2599878142989604e-13, 940.6813627254511, 1.3717160762042654e-10
     assert_close(iapws95_d3Ar_ddelta3(tau, delta), 
-                 float(dddA_ddddelta_res(mp.mpf(tau), mp.mpf(delta))))
+                 float(dddA_ddddelta_res(mp.mpf(tau), mp.mpf(delta))), rtol=1e-3)
 #
 #
 #0.5809660021590505 3.308239737943376e-13 1113.8276553106205 1.065253195617767e-10 0.668894347379583 0.6689624104241152 0.00010174419888420161
@@ -1448,9 +1481,14 @@ def test_iapws95_dA_ddeltar():
 
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_iapws95_dA_ddeltar_vs_naive():
+def test_iapws95_dA_ddeltar_vs_naive(precise=False, allow_fail=True):
     '''
     '''
+    if precise:
+        mp = make_me_precise()
+        mpf = mp.mpf
+    else:
+        mpf = lambda x: x
     errs = []
     rerr = 0
     N = 500
@@ -1462,24 +1500,31 @@ def test_iapws95_dA_ddeltar_vs_naive():
             tau = 647.096/T
             delta = rho*rhoc_inv
             val = iapws95_dAr_ddelta(tau, delta)
-            val_naive = dAddelta_res(tau, delta)
-            assert_close(val, val_naive, rtol=1e-9)
+            val_naive = float(dAddelta_res(mpf(tau), mpf(delta)))
+            if allow_fail:
+                assert_close(val, val_naive, rtol=5e-9)
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
-#    print(rerr/N**2, np.std(errs), np.max(errs))
+    print(rerr/N**2, np.std(errs), np.max(errs))
+    make_me_float()
 
 #test_iapws95_dA_ddeltar_vs_naive()
+#test_iapws95_dA_ddeltar_vs_naive(precise=True, allow_fail=False)
+
             
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_iapws95_Ar_vs_naive():
-    '''
-    '''
+def test_iapws95_Ar_vs_naive(precise=False, allow_fail=True):
+    if precise:
+        mp = make_me_precise()
+        mpf = mp.mpf
+    else:
+        mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 500
-    Ts = linspace(200.0,  5000.0, N)
+    N = 300
+    Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
         rhos = logspace(log10(1e-10), log10(5000), N)
@@ -1487,22 +1532,38 @@ def test_iapws95_Ar_vs_naive():
             tau = 647.096/T
             delta = rho*rhoc_inv
             val = iapws95_Ar(tau, delta)
-            val_naive = calcA_res(tau, delta)
-            assert_close(val, val_naive, rtol=5e-10)
+            val_naive = float(calcA_res(mpf(tau), mpf(delta)))
+            if allow_fail:
+                assert_close(val, val_naive, rtol=2e-9)
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
     print(rerr/N**2, np.std(errs), np.max(errs))
+    make_me_float()
 #test_iapws95_Ar_vs_naive()
+#test_iapws95_Ar_vs_naive(precise=True, allow_fail=False)
 
+
+def test_iapws95_Ar():
+    assert_close(iapws95_Ar(647.096/300.0, 999.0/322), -9.57577716026768, rtol=1e-11)
+
+def test_iapws95_dAr_dtau():
+    assert_close(iapws95_dAr_dtau(647.096/300.0, 999.0/322),
+                 -7.704333630957023, rtol=1e-11)
+    
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_iapws95_dAr_dtau_vs_naive():
+def test_iapws95_dAr_dtau_vs_naive(precise=False, allow_fail=True):
     '''
     '''
+    if precise:
+        mp = make_me_precise()
+        mpf = mp.mpf
+    else:
+        mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 500
+    N = 300
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -1511,19 +1572,30 @@ def test_iapws95_dAr_dtau_vs_naive():
             tau = 647.096/T
             delta = rho*rhoc_inv
             val = iapws95_dAr_dtau(tau, delta)
-            val_naive = dAdtau_res(tau, delta)
-            assert_close(val, val_naive, rtol=1e-8)
+            val_naive = float(dAdtau_res(mpf(tau), mpf(delta)))
+            if allow_fail:
+                assert_close(val, val_naive, rtol=1e-8)
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
-#    print(rerr/N**2, np.std(errs), np.max(errs))
-#iapws95_dAr_dtau_vs_naive()
-#            
+    print(rerr/N**2, np.std(errs), np.max(errs))
+    make_me_float()
+#test_iapws95_dAr_dtau_vs_naive()
+
+
+
+
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_iapws95_d2Ar_dtau2_vs_naive():
+def test_iapws95_d2Ar_dtau2_vs_naive(precise=False, allow_fail=True):
     '''
     '''
+    if precise:
+        mp = make_me_precise()
+        mpf = mp.mpf
+    else:
+        mpf = lambda x: x
+
     errs = []
     rerr = 0
     N = 500
@@ -1535,42 +1607,58 @@ def test_iapws95_d2Ar_dtau2_vs_naive():
             tau = 647.096/T
             delta = rho*rhoc_inv
             val = iapws95_d2Ar_dtau2(tau, delta)
-            val_naive = ddAddtau_res(tau, delta)
-            assert_close(val, val_naive, rtol=1e-10)
+            val_naive = float(ddAddtau_res(mpf(tau), mpf(delta)))
+            if allow_fail:
+                assert_close(val, val_naive, rtol=5e-10)
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
-#    print(rerr/N**2, np.std(errs), np.max(errs))
-#test_iapws95_d2Ar_dtau2_vs_naive()
+    print(rerr/N**2, np.std(errs), np.max(errs))
+    make_me_float()
+#test_iapws95_d2Ar_dtau2_vs_naive(precise=True, allow_fail=False)
 
-            
+
+def test_iapws95_d2Ar_dtau2():
+    assert_close(iapws95_d2Ar_dtau2(647.096/300.0, 999.0/322),
+                 -1.2616419775539731, rtol=1e-11)
             
             
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_iapws95_d2Ar_ddeltadtau_vs_naive():
+def test_iapws95_d2Ar_ddeltadtau_vs_naive(precise=False, allow_fail=True):
     '''
     '''
+    if precise:
+        mp = make_me_precise()
+        mpf = mp.mpf
+    else:
+        mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 500
+    N = 300
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
+#        print(i)
         rhos = logspace(log10(1e-10), log10(5000), N)
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
             val = iapws95_d2Ar_ddeltadtau(tau, delta)
-            val_naive = dAddeltatau_res(tau, delta)
+            val_naive = float(dAddeltatau_res(mpf(tau), mpf(delta)))
             assert_close(val.real, val_naive, rtol=1e-8)
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
 #    print(rerr/N**2, np.std(errs), np.max(errs))
+    make_me_float()
+
 #test_iapws95_d2Ar_ddeltadtau_vs_naive()
-  
-            
+#test_iapws95_d2Ar_ddeltadtau_vs_naive(precise=True, allow_fail=False)
+
+def test_iapws95_d2Ar_ddeltadtau():
+    val = iapws95_d2Ar_ddeltadtau(647.096/300.0, 999.0/322)
+    assert_close(val, -0.1984035623854279, rtol=1e-12)
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -1579,7 +1667,7 @@ def test_iapws95_A0_vs_naive():
     '''
     errs = []
     rerr = 0
-    N = 100
+    N = 400
     Ts = linspace(200.0,  5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -1589,7 +1677,7 @@ def test_iapws95_A0_vs_naive():
             delta = rho*rhoc_inv
             val = iapws95_A0(tau, delta)
             val_naive = iapws95_A0(tau, delta)
-            assert_close(val, val_naive, rtol=5e-15)
+            assert_close(val, val_naive, rtol=1e-15)
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
@@ -1598,12 +1686,12 @@ def test_iapws95_A0_vs_naive():
     
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_iapws95_iapws95_dA0dtau_vs_naive():
+def test_iapws95_iapws95_dA0_dtau_vs_naive():
     '''Can't think of a way to optimize this.
     '''
     errs = []
     rerr = 0
-    N = 100
+    N = 300
     Ts = linspace(200.0,  5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -1611,15 +1699,15 @@ def test_iapws95_iapws95_dA0dtau_vs_naive():
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
-            val = iapws95_dA0dtau(tau, delta)
+            val = iapws95_dA0_dtau(tau, delta)
             val_naive = dAdtau_idg(tau, delta)
-            assert_close(val, val_naive, rtol=5e-15)
+            assert_close(val, val_naive, rtol=1e-15)
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
 #    print(rerr/N**2, np.std(errs), np.max(errs))
 
-#test_iapws95_iapws95_dA0dtau_vs_naive()
+test_iapws95_iapws95_dA0_dtau_vs_naive()
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -1636,7 +1724,7 @@ def test_ddAddtau_idg_vs_naive():
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
-            val = iapws95_d2A0_d2tau(tau, delta)
+            val = iapws95_d2A0_dtau2(tau, delta)
             val_naive = ddAddtau_idg(tau, delta)
             assert_close(val, val_naive, rtol=5e-15)
             rerri = abs(1.0 - val/val_naive)
@@ -1650,20 +1738,22 @@ def test_iapws95_A0():
     ans = iapws95_A0(.5345, .575745)
     assert_close(ans, -7.3790791583143, rtol=1e-14)
 
-def test_iapws95_dA0dtau():
-    ans = iapws95_dA0dtau(.5345, .575745)
+def test_iapws95_dA0_dtau():
+    ans = iapws95_dA0_dtau(.5345, .575745)
     assert_close(ans, 13.16120203177092, rtol=1e-14)
     
-def test_iapws95_d2A0_d2tau():
-    ans = iapws95_d2A0_d2tau(.5345, .575745)
+def test_iapws95_d2A0_dtau2():
+    ans = iapws95_d2A0_dtau2(.5345, .575745)
     assert_close(ans, -14.97966801918871, rtol=1e-14)
-    assert_close(ans, derivative(iapws95_dA0dtau, .5345, args=(.575745,), dx=1e-8))
+    assert_close(ans, derivative(iapws95_dA0_dtau, .5345, args=(.575745,), dx=1e-8))
 
-def test_iapws95_d3A0_d3tau():
-    ans = iapws95_d3A0_d3tau(.5345, .575745)
+def test_iapws95_d3A0_dtau3():
+    ans = iapws95_d3A0_dtau3(.5345, .575745)
     assert_close(ans, 67.50267480495313, rtol=1e-14)
-    assert_close(ans, derivative(iapws95_d2A0_d2tau, .5345, args=(.575745,), dx=1e-8))
+    assert_close(ans, derivative(iapws95_d2A0_dtau2, .5345, args=(.575745,), dx=1e-8))
 
+@pytest.mark.slow
+@pytest.mark.CoolProp
 def test_rho_iapws95_CoolProp():
     from CoolProp.CoolProp import PropsSI
     N = 40

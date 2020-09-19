@@ -1026,7 +1026,7 @@ def Vm_to_rho(Vm, MW):
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    return (Vm)**-1*MW/1000.
+    return 1e-3*MW/Vm
 
 
 def rho_to_Vm(rho, MW):
