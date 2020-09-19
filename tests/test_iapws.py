@@ -1901,25 +1901,70 @@ def test_iapws95_saturation_fits():
     iapws.reset_backend()
 
 def test_rhog_sat_IAPWS95():
+    assert_close(rhog_sat_IAPWS95(260.0), 0.0018552889771409127, rtol=1e-13)
     assert_close(rhog_sat_IAPWS95(400.0), 1.3694075410068125, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS95(600.0), 72.84231718283309, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS95(630.0), 132.8395560369342, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS95(645.0), 224.4505402883077, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS95(647.0), 286.5083958147434, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS95(647.08), 303.4596095608764, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS95(647.094), 314.7568132641434, rtol=1e-13)
+    assert_close(rhog_sat_IAPWS95(647.0958), 319.61981063229433, rtol=2e-12)
+    assert_close(rhog_sat_IAPWS95(647.09598), 321.2362413951111, rtol=1e-10)
+    assert_close( rhog_sat_IAPWS95(647.095998), 321.7569904453351, rtol=1e-10)
+    assert_close( rhog_sat_IAPWS95(647.0959998), 321.92296716781414, rtol=1e-10)
+    assert_close(rhog_sat_IAPWS95(647.09599998), 321.9758031526337, rtol=1e-10)
+    
+    
 
 @pytest.mark.slow
 def test_rhog_sat_IAPWS95_vs_saturation():
     # Specific points
-    Ts = [400.0]
+    Ts = [260.0, 400.0, 600.0, 630.0, 645]
     for T in Ts:
         assert_close(iapws95_saturation(T)[2],
                      rhog_sat_IAPWS95(T), rtol=1e-13)
+        
+    # 647 requires mpmath
+    
+    import mpmath as mp
+    mp.mp.dps = 50
+    iapws.use_mpmath_backend()
+    Ts = [647, 647.08, 647.094, 647.0959]
+    for T in Ts:
+        Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
+        assert_close(float(rhog_mp), float(rhog_sat_IAPWS95(T)), rtol=1e-13)
+        
+    Ts = [647.0958, 647.09598, 647.095998, 647.0959998, 647.09599998]
+    # Fit lower accuracy points
+    for T in Ts:
+        Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
+        assert_close(float(rhog_mp), float(rhog_sat_IAPWS95(T)), rtol=1e-10)
+    iapws.reset_backend()
 
 @pytest.mark.slow
 @pytest.mark.CoolProp
 def test_rhog_sat_IAPWS95_CoolProp():
     from CoolProp.CoolProp import PropsSI
-    T = 400.0
-    assert_close(rhog_sat_IAPWS95(T), 
-                 PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-13)
+    Ts = [400.0, 600.0]
+    for T in Ts:
+        assert_close(rhog_sat_IAPWS95(T), 
+                     PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-13)
 
+    Ts = [630.0, 645, 647]
+    for T in Ts:
+        assert_close(rhog_sat_IAPWS95(T), 
+                     PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-9)
+    
+    Ts = [647.08, 647.094,
+#          647.0958
+#    647.09599
+          ]
+    for T in Ts:
+        assert_close(rhog_sat_IAPWS95(T), 
+                     PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-4)
 
-test_rhog_sat_IAPWS95()
-test_rhog_sat_IAPWS95_vs_saturation()
-test_rhog_sat_IAPWS95_CoolProp()
+#
+#test_rhog_sat_IAPWS95()
+#test_rhog_sat_IAPWS95_CoolProp()
+#test_rhog_sat_IAPWS95_vs_saturation()
