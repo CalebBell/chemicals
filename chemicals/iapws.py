@@ -85,6 +85,12 @@ __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97
 R95 = 461.51805 # Differs from the other formulation
 R97 = 461.526
 
+Tc = 647.096
+Tc_inv = 1.0/Tc
+
+rhoc = 322.0
+rhoc_inv = 1.0/rhoc
+
 
 def iapws97_boundary_2_3(T):
     '''Above this pressure we are in region 3.
@@ -119,7 +125,7 @@ def iapws97_boundary_3ef(P):
     '''
     return 3.7278880039999996e-6*P + 564.843879079744056
 #    P = P/1E6
-#    T = 3.727888004*(P-22.064)+647.096
+#    T = 3.727888004*(P-22.064)+Tc
 #    return T
 
 def iapws97_boundary_3cd(P):
@@ -1891,8 +1897,8 @@ def iapws97_P(T, rho):
                               low=P_region2_border*1e-20, high=P_region2_border, args=(T, rho), xtol=3e-12)
         else:
             # region 3
-            tau = 647.096/T
-            delta = rho/322.0
+            tau = Tc/T
+            delta = rho*rhoc_inv
             dA_ddelta = iapws97_dA_ddelta_region3(tau, delta)
             return dA_ddelta*delta*rho*R97*T
                 
@@ -1939,10 +1945,8 @@ def iapws_97_Prho_err_region5(T, P, rho):
 
 
 def iapws_97_Prho_err_region3(T, P, rho):
-    Tc = 647.096
-    rhoc = 322.0
     tau = Tc/T
-    delta = rho/rhoc
+    delta = rho*rhoc_inv
     dA_ddelta = iapws97_dA_ddelta_region3(tau, delta)
     P_calc = dA_ddelta*delta*rho*R97*T
     err = P_calc - P
@@ -2159,7 +2163,7 @@ def rhol_sat_IAPWS(T):
        Ref. Data 16, 893 (1987)." Journal of Physical and Chemical Reference 
        Data 22, no. 3 (May 1, 1993): 783-87. https://doi.org/10.1063/1.555926.
     '''
-    tau = 1.0 - T*(1.0/647.096) # 1/647.096
+    tau = 1.0 - T*Tc_inv
     
     tau_cbrt = tau**(1.0/3.0)
     
@@ -2183,7 +2187,7 @@ def rhol_sat_IAPWS(T):
     
     ratio += tau_cbrt*(-45.5170352*tau_cbrt4 -6.74694450e5*tau_cbrt*tau_cbrt*tau_cbrt8)
 #    ratio += -6.74694450e5*tau_cbrt*tau_cbrt*tau_cbrt*tau_cbrt8
-    return ratio*322.0
+    return ratio*rhoc
 
 def rhog_sat_IAPWS(T):
     r'''Calculates saturation vapor mass density of water using the IAPWS
@@ -2237,7 +2241,7 @@ def rhog_sat_IAPWS(T):
        Ref. Data 16, 893 (1987)." Journal of Physical and Chemical Reference 
        Data 22, no. 3 (May 1, 1993): 783-87. https://doi.org/10.1063/1.555926.
     '''
-    tau = 1.0 - T*(1.0/647.096)
+    tau = 1.0 - T*Tc_inv
     
     tau_6rt = tau**(1.0/6.0)
     tau_6rt2 = tau_6rt*tau_6rt
@@ -2258,7 +2262,7 @@ def rhog_sat_IAPWS(T):
     tau_6rt2 = tau_6rt18*tau_6rt18*tau_6rt # 37 - reuse tau_6rt2
     ratio += tau_6rt2*(-44.7586581 - 63.9201063*tau_6rt16*tau_6rt18) # 71
     
-    return exp(ratio)*322.0
+    return exp(ratio)*rhoc
 
 ### IAPWS 95 fundamental derivatives
 
@@ -3640,7 +3644,7 @@ def iapws95_Psat(T):
     elif 643.35555 < T <= 646.721055:
         coeffs = Psat_coeffs_iapws95_643_646
         val = horner(coeffs, 0.594264456597155322*(T - 645.038302499999986))
-    elif T < 647.096:
+    elif T < Tc:
         coeffs = Psat_coeffs_iapws95_near_critical
         val = horner(coeffs, 5.33411567172122325*(T - 646.908527499949969))
     else:
@@ -3690,14 +3694,13 @@ def rhol_sat_IAPWS95(T):
 #         (1.301907916559972e-11, 1.5329272639853585e-11, 9.685327631780702e-11)
         coeffs = [-342.1649169921875, -286.70733642578125, 3696.8092041015625, 3062.9874267578125, -18628.276138305664, -15248.527671813965, 58141.86198616028, 46974.429047584534, -125898.94741535187, -100287.08330655098, 200761.28558278084, 157482.6384627223, -244240.7832775116, -188416.60116776824, 231738.97573629767, 175548.21367172152, -173839.0422554016, -129094.15901541244, 103905.44825894013, 75496.35919268127, -49644.42389814614, -35215.162472276075, 18947.322668814828, 13087.622056136344, -5751.365423334828, -3856.5318880818013, 1377.1159714494315, 892.9758781142154, -256.84921118732746, -160.2506746801855, 36.651197303384606, 21.84684986680145, -3.9021237365971047, -2.1983816265822327, 0.2992404034464471, 0.15648404704313634, -0.01571472634215354, -0.007373118351861052, 0.0005188793214245813, 0.00019840994932129874, -1.665223554836448e-05, -1.1892982883288106e-05, -1.36274066943054e-05, -2.2384801104155527e-05, -4.5679905172298085e-05, -0.0001857746544898474, 1.0003799295366436]
         val = horner(coeffs, 2020202.04154185997*(T - 647.095999495000001))
-    elif T <= 647.096:
+    elif T <= Tc:
         # Gotta go to linear interp
         val = 1.0000546416597242 - 5.464165972424162e-05*(T-647.09599999)/(647.096-647.09599999)
-    return val*322.0
+    return val*rhoc
 
 def iapws95_rho_err(rho, T, P_spec):
-    rhoc_inv = (1.0/322.0)
-    tau = 647.096/T
+    tau = Tc/T
     delta = rho*rhoc_inv
     dAddelta_res_val = iapws95_dAr_ddelta(tau, delta)
     d2Ad2delta_res_val = iapws95_d2Ar_ddelta2(tau, delta)
@@ -3763,15 +3766,13 @@ def iapws97_rho_extrapolated(T, P):
     return rho
 
 def iapws95_P(T, rho):
-    rhoc_inv = (1.0/322.0)
-    tau = 647.096/T
+    tau = Tc/T
     delta = rho*rhoc_inv
     dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
     return (dAddelta_val*delta)*rho*R95*T
 
 def iapws95_P_err(T, rho, P_spec):
-    rhoc_inv = (1.0/322.0)
-    tau = 647.096/T
+    tau = Tc/T
     delta = rho*rhoc_inv
     dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
     err = (dAddelta_val*delta)*rho*R95*T - P_spec
