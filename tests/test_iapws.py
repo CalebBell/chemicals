@@ -1847,14 +1847,14 @@ def test_iapws95_rho_vs_Coolprop():
 
 
 def test_rhol_sat_IAPWS():
-    assert_close(rhol_sat_IAPWS(273.16), 999.7891346511478, rtol=1e-13)
-    assert_close(rhol_sat_IAPWS(373.1243), 958.3652337840979, rtol=1e-13)
-    assert_close(rhol_sat_IAPWS(647.096), 322.0, rtol=1e-13)
+    assert_close(iapws92_rhol_sat(273.16), 999.7891346511478, rtol=1e-13)
+    assert_close(iapws92_rhol_sat(373.1243), 958.3652337840979, rtol=1e-13)
+    assert_close(iapws92_rhol_sat(647.096), 322.0, rtol=1e-13)
 
 def test_rhog_sat_IAPWS():
-    assert_close(rhog_sat_IAPWS(373.1243), 0.5975863185878799, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS(273.16), 0.004854262596261411, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS(647.096), 322)
+    assert_close(iapws92_rhog_sat(373.1243), 0.5975863185878799, rtol=1e-13)
+    assert_close(iapws92_rhog_sat(273.16), 0.004854262596261411, rtol=1e-13)
+    assert_close(iapws92_rhog_sat(647.096), 322)
 
 
 def test_iapws95_saturation():
@@ -1868,7 +1868,63 @@ def test_iapws95_saturation():
     vals = iapws95_saturation(300.0, xtol=1e-5)
     assert_close1d(vals, (3536.806752287503, 996.5130274681349, 0.025589673682920273))
     
+def test_iapws95_Psat():
+    assert_close(iapws95_Psat(300.0), 3536.806752274638, rtol=1e-12)
+    assert_close(iapws95_Psat(260.0), 222.5574677094123, rtol=1e-12)
+    assert_close(iapws95_Psat(500.0), 2639195.8717618496, rtol=1e-12)
+    assert_close(iapws95_Psat(620.0), 15900579.384968637, rtol=1e-12)
+    assert_close(iapws95_Psat(640.0), 20265209.268028494, rtol=1e-12)
+    assert_close(iapws95_Psat(645.0), 21515208.664142672, rtol=1e-12)
+    assert_close(iapws95_Psat(647.0), 22038405.72692307, rtol=1e-10)
+    assert iapws95_Psat(647.096) == 22064000.0 # Should be dead on
     
+    with pytest.raises(ValueError):
+        iapws95_Psat(150.0)
+
+def test_iapws95_rhol_sat():
+    assert_close(iapws95_rhol_sat(250.0), 991.1730911906317, rtol=1e-13)
+    assert_close(iapws95_rhol_sat(300.0), 996.5130274681278, rtol=1e-13)
+    assert_close(iapws95_rhol_sat(500.0), 831.3134495854619, rtol=1e-13)
+    assert_close(iapws95_rhol_sat(620.0), 586.8776188274974, rtol=1e-13)
+    assert_close(iapws95_rhol_sat(640.0), 481.52614604429033, rtol=1e-13)
+    assert_close(iapws95_rhol_sat(645.0), 425.04824669763036, rtol=1e-13)
+    assert_close(iapws95_rhol_sat(647.0), 357.34089197171636, rtol=1e-13)
+    assert_close(iapws95_rhol_sat(647.08), 340.387972615003, rtol=1e-12)
+    assert_close(iapws95_rhol_sat(647.094), 329.1865391205182, rtol=1e-12)
+    assert_close(iapws95_rhol_sat(647.0955), 325.7094848352297, rtol=1e-11)
+    assert_close(iapws95_rhol_sat(647.09597), 322.9332279314927, rtol=1e-11)
+    assert_close(iapws95_rhol_sat(647.095998), 322.2429814792015, rtol=1e-11)
+    assert_close(iapws95_rhol_sat(647.09599997), 322.02998574491903, rtol=1e-11)
+
+    # Linear interp - may get replaced in future
+    assert_close(iapws95_rhol_sat(647.0959999999), 322.00017602415505, rtol=1e-7)
+    assert 322.0 == iapws95_rhol_sat(647.096)
+    
+    with pytest.raises(ValueError):
+        iapws95_rhol_sat(200.0)
+
+def test_rhog_sat_IAPWS95():
+    assert_close(iapws95_rhog_sat(260.0), 0.0018552889771409127, rtol=1e-13)
+    assert_close(iapws95_rhog_sat(400.0), 1.3694075410068125, rtol=1e-13)
+    assert_close(iapws95_rhog_sat(600.0), 72.84231718283309, rtol=1e-13)
+    assert_close(iapws95_rhog_sat(630.0), 132.8395560369342, rtol=1e-13)
+    assert_close(iapws95_rhog_sat(645.0), 224.4505402883077, rtol=1e-13)
+    assert_close(iapws95_rhog_sat(647.0), 286.5083958147434, rtol=1e-13)
+    assert_close(iapws95_rhog_sat(647.08), 303.4596095608764, rtol=1e-13)
+    assert_close(iapws95_rhog_sat(647.094), 314.7568132641434, rtol=1e-13)
+    assert_close(iapws95_rhog_sat(647.0958), 319.61981063229433, rtol=2e-12)
+    assert_close(iapws95_rhog_sat(647.09598), 321.2362413951111, rtol=1e-10)
+    assert_close(iapws95_rhog_sat(647.095998), 321.7569904453351, rtol=1e-10)
+    assert_close(iapws95_rhog_sat(647.0959998), 321.92296716781414, rtol=1e-10)
+    assert_close(iapws95_rhog_sat(647.09599998), 321.9758031526337, rtol=1e-10)
+    
+    assert 322 == iapws95_rhog_sat(647.0959999999999999)
+    assert 322 == iapws95_rhog_sat(647.0959999999999)
+    assert_close(iapws95_rhog_sat(647.09599999999), 321.9999832063918, rtol=1e-13)
+
+    with pytest.raises(ValueError):
+        iapws95_rhog_sat(200.0)
+
 @pytest.mark.slow
 @pytest.mark.mpmath
 def test_iapws95_saturation_fits():
@@ -1879,7 +1935,7 @@ def test_iapws95_saturation_fits():
     Ts = linspace(273.15, 647.09, N)
 
     for T in Ts:
-        rhol = rhol_sat_IAPWS95(T)
+        rhol = iapws95_rhol_sat(T)
         P_corr = float(iapws95_Psat(T))
         Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
             # Everything except > 646.7 is under 2E-13
@@ -1892,7 +1948,7 @@ def test_iapws95_saturation_fits():
     # density
     Ts = linspace(235, 273.15, N)
     for T in Ts:
-        rhol = rhol_sat_IAPWS95(T)
+        rhol = iapws95_rhol_sat(T)
         P_corr = float(iapws95_Psat(T))
         Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
         assert_close(P_corr, float(Psat_mp), rtol=7.5e-13)
@@ -1900,24 +1956,6 @@ def test_iapws95_saturation_fits():
 
     iapws.reset_backend()
 
-def test_rhog_sat_IAPWS95():
-    assert_close(rhog_sat_IAPWS95(260.0), 0.0018552889771409127, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS95(400.0), 1.3694075410068125, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS95(600.0), 72.84231718283309, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS95(630.0), 132.8395560369342, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS95(645.0), 224.4505402883077, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS95(647.0), 286.5083958147434, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS95(647.08), 303.4596095608764, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS95(647.094), 314.7568132641434, rtol=1e-13)
-    assert_close(rhog_sat_IAPWS95(647.0958), 319.61981063229433, rtol=2e-12)
-    assert_close(rhog_sat_IAPWS95(647.09598), 321.2362413951111, rtol=1e-10)
-    assert_close( rhog_sat_IAPWS95(647.095998), 321.7569904453351, rtol=1e-10)
-    assert_close( rhog_sat_IAPWS95(647.0959998), 321.92296716781414, rtol=1e-10)
-    assert_close(rhog_sat_IAPWS95(647.09599998), 321.9758031526337, rtol=1e-10)
-    
-    assert 322 ==  rhog_sat_IAPWS95(647.0959999999999999)
-    assert 322 == rhog_sat_IAPWS95(647.0959999999999)
-    assert_close(rhog_sat_IAPWS95(647.09599999999), 321.9999832063918, rtol=1e-13)
 
 @pytest.mark.slow
 def test_rhog_sat_IAPWS95_vs_saturation():
@@ -1925,7 +1963,7 @@ def test_rhog_sat_IAPWS95_vs_saturation():
     Ts = [260.0, 400.0, 600.0, 630.0, 645]
     for T in Ts:
         assert_close(iapws95_saturation(T)[2],
-                     rhog_sat_IAPWS95(T), rtol=1e-13)
+                     iapws95_rhog_sat(T), rtol=1e-13)
         
     # 647 requires mpmath
     
@@ -1935,13 +1973,13 @@ def test_rhog_sat_IAPWS95_vs_saturation():
     Ts = [647, 647.08, 647.094, 647.0959]
     for T in Ts:
         Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
-        assert_close(float(rhog_mp), float(rhog_sat_IAPWS95(T)), rtol=1e-13)
+        assert_close(float(rhog_mp), float(iapws95_rhog_sat(T)), rtol=1e-13)
         
     Ts = [647.0958, 647.09598, 647.095998, 647.0959998, 647.09599998]
     # Fit lower accuracy points
     for T in Ts:
         Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
-        assert_close(float(rhog_mp), float(rhog_sat_IAPWS95(T)), rtol=1e-10)
+        assert_close(float(rhog_mp), float(iapws95_rhog_sat(T)), rtol=1e-10)
     iapws.reset_backend()
 
 @pytest.mark.slow
@@ -1950,12 +1988,12 @@ def test_rhog_sat_IAPWS95_CoolProp():
     from CoolProp.CoolProp import PropsSI
     Ts = [400.0, 600.0]
     for T in Ts:
-        assert_close(rhog_sat_IAPWS95(T), 
+        assert_close(iapws95_rhog_sat(T),
                      PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-13)
 
     Ts = [630.0, 645, 647]
     for T in Ts:
-        assert_close(rhog_sat_IAPWS95(T), 
+        assert_close(iapws95_rhog_sat(T),
                      PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-9)
     
     Ts = [647.08, 647.094,
@@ -1963,7 +2001,7 @@ def test_rhog_sat_IAPWS95_CoolProp():
 #    647.09599
           ]
     for T in Ts:
-        assert_close(rhog_sat_IAPWS95(T), 
+        assert_close(iapws95_rhog_sat(T),
                      PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-4)
 
 #

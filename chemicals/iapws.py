@@ -21,6 +21,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+This module contains pieces from the IAPWS-95 and IAPWS-97 implementation.
+The objective of this module is to contain extremely fast functions to
+calculate several basic properties of water. Calculating every property is left
+as an excercise to the reader.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
+.. contents:: :local:
+
+IAPWS-95 Ideal Gas Terms
+------------------------
+.. autofunction:: chemicals.iapws.iapws95_A0
+.. autofunction:: chemicals.iapws.iapws95_dA0_dtau
+.. autofunction:: chemicals.iapws.iapws95_d2A0_dtau2
+.. autofunction:: chemicals.iapws.iapws95_d3A0_dtau3
+
+IAPWS-95 Residual Terms
+-----------------------
+.. autofunction:: chemicals.iapws.iapws95_Ar
+.. autofunction:: chemicals.iapws.iapws95_dAr_ddelta
+.. autofunction:: chemicals.iapws.iapws95_d2Ar_ddelta2
+.. autofunction:: chemicals.iapws.iapws95_d3Ar_ddelta3
+.. autofunction:: chemicals.iapws.iapws95_dAr_dtau
+.. autofunction:: chemicals.iapws.iapws95_d2Ar_dtau2
+.. autofunction:: chemicals.iapws.iapws95_d2Ar_ddeltadtau
+
+IAPWS-95 Saturation Equations
+-----------------------------
+.. autofunction:: chemicals.iapws.iapws95_Psat
+.. autofunction:: chemicals.iapws.iapws95_saturation
+.. autofunction:: chemicals.iapws.iapws95_rhol_sat
+.. autofunction:: chemicals.iapws.iapws95_rhog_sat
+.. autofunction:: chemicals.iapws.iapws92_rhol_sat
+.. autofunction:: chemicals.iapws.iapws92_rhog_sat
+
+  
+    
 """
 from __future__ import division
 from math import exp, log, sqrt, fsum
@@ -37,10 +75,10 @@ __all__ = [
            'iapws95_rho', 'iapws95_P',
            
            'iapws97_rho_extrapolated',
-           'iapws97_rho', 'iapws97_P', 'iapws97_T', 
-           
-           'rhol_sat_IAPWS', 'rhog_sat_IAPWS', 'iapws95_Psat',
-           'rhol_sat_IAPWS95', 'rhog_sat_IAPWS95',
+           'iapws97_rho', 'iapws97_P', 'iapws97_T',
+
+    'iapws92_rhol_sat', 'iapws92_rhog_sat', 'iapws95_Psat',
+    'iapws95_rhol_sat', 'iapws95_rhog_sat',
            'iapws95_saturation',
            
            'iapws95_A0', 'iapws95_dA0_dtau', 'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3',
@@ -2210,7 +2248,7 @@ def iapws97_T(P, rho):
 
 ### IAPWS 95 Initial Guesses
 
-def rhol_sat_IAPWS(T):
+def iapws92_rhol_sat(T):
     r'''Calculates saturation liquid mass density of water using the IAPWS
     SR1-86(1992) [1]_ [2]_ explicit equation.
 
@@ -2246,10 +2284,13 @@ def rhol_sat_IAPWS(T):
     b5 = -45.5170352; 
     b6 = -6.74694450e5
 
+    See Also
+    --------
+    iapws95_rhol_sat
 
     Examples
     --------
-    >>> rhol_sat_IAPWS(300.)
+    >>> iapws92_rhol_sat(300.)
     996.5089712803
 
     References
@@ -2288,7 +2329,7 @@ def rhol_sat_IAPWS(T):
 #    ratio += -6.74694450e5*tau_cbrt*tau_cbrt*tau_cbrt*tau_cbrt8
     return ratio*rhoc
 
-def rhog_sat_IAPWS(T):
+def iapws92_rhog_sat(T):
     r'''Calculates saturation vapor mass density of water using the IAPWS
     SR1-86(1992) [1]_ [2]_ explicit equation.
 
@@ -2324,10 +2365,13 @@ def rhog_sat_IAPWS(T):
     c5 = -44.7586581;
     c6 = -63.9201063
 
+    See Also
+    --------
+    iapws95_rhog_sat
 
     Examples
     --------
-    >>> rhog_sat_IAPWS(300.)
+    >>> iapws92_rhog_sat(300.)
     0.0255887212886
 
     References
@@ -3801,7 +3845,6 @@ def iapws95_sat_err_and_jac(Vs, T):
     #print(err, 'err')
 #    print([float(i) for i in err], float(P_g), float(P_l), [float(i) for i in Vs])
     return err, jac
-#from chemicals.utils import Vm_to_rho, rho_to_Vm
 
 
 def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
@@ -3856,16 +3899,16 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
     (22063866.3500, 325.70940655, 318.277334069)
     '''
     if rhog_guess is None:
-        rhog = rhog_sat_IAPWS(T)
+        rhog = iapws92_rhog_sat(T)
     else:
         rhog = rhog_guess
     if rhol_guess is None:
         if T > 647.09:
             # For unknown reasons, the worse estimates converge better near
             # the critical point
-            rhol = rhol_sat_IAPWS(T)
+            rhol = iapws92_rhol_sat(T)
         else:
-            rhol = rhol_sat_IAPWS95(max(T, 235))
+            rhol = iapws95_rhol_sat(max(T, 235))
     else:
         rhol = rhol_guess
     Vg = MW/(rhog*1000)
@@ -3908,6 +3951,40 @@ Psat_coeffs_iapws95_643_646 = [9.057896477315808e-08, 1.211502649312024e-07, -3.
 Psat_coeffs_iapws95_near_critical = [-0.007006160914897919, -0.006299436092376709, 0.06787101551890373, 0.06092516239732504, -0.3032621801830828, -0.27187402336858213, 0.8286682133330032, 0.7421519589261152, -1.5481375773670152, -1.3854497998690931, 2.0945177564717596, 1.8733694699149055, -2.1206636809074553, -1.8960203259257469, 1.6377062088922685, 1.4638579778784333, -0.9743636551480677, -0.8708100283029125, 0.44806853431398963, 0.40042604495646117, -0.15886602644877712, -0.14197406009749258, 0.04308180067010703, 0.0385020246406107, -0.008810816846762659, -0.007874311835966985, 0.0013301372745293527, 0.0011886957505600204, -0.00014366835734647143, -0.0001283599871508001, 1.0624248652432722e-05, 9.493371248271015e-06, -4.747152791886172e-07, -4.074279138207085e-07, 7.613360554058896e-08, 1.2227703013014193e-07, 2.2590783514621522e-07, 6.263045703604046e-07, 2.5993277169989305e-06, 0.0022606230644268894, -0.00226439777925055]
 
 def iapws95_Psat(T):
+    r'''Compute the saturation pressure of the IAPWS-95 equation using high-
+    fidelity polynomial fits. These have a relative accuracy of under 1e-12,
+    and are generated by solving the saturation equations under the
+    high-precision environment of mpmath. The range of the fit is 235 K to
+    647.096 K, the critical point. 
+    
+    Parameters
+    ----------
+    T : float
+        Temperature at which to calculate the saturation condition, [K]
+
+    Returns
+    -------
+    Psat : float
+        Saturation vapor pressure, [Pa]
+    
+    See Also
+    --------
+    iapws95_saturation
+    
+    Notes
+    -----
+    This method should be used in preference to :obj:`iapws95_saturation`.
+    Although using mpmath generates slightly different results than using
+    plain floating point numbers, the requirement for the saturation curve is
+    to be smooth, and continuous; mpmath makes this easy and the saturation
+    equations were solved extremely high precision, well under a floating
+    point's error.
+    
+    Examples
+    --------
+    >>> iapws95_Psat(400.0)
+    245769.3455
+    '''
     # Fit to under 1e-12 precision, with the EOS evaluated with mpmath for max
     # precision.
     if 235.0 <= T < 273.15:
@@ -3926,14 +4003,46 @@ def iapws95_Psat(T):
     elif 643.35555 < T <= 646.721055:
         coeffs = Psat_coeffs_iapws95_643_646
         val = horner(coeffs, 0.594264456597155322*(T - 645.038302499999986))
-    elif T < Tc:
+    elif 646.721055 < T <= Tc:
         coeffs = Psat_coeffs_iapws95_near_critical
         val = horner(coeffs, 5.33411567172122325*(T - 646.908527499949969))
+        if val > 0.0: val = 0.0
     else:
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
     return exp(val)*22064000.0
 
-def rhol_sat_IAPWS95(T):
+def iapws95_rhol_sat(T):
+    r'''Compute the saturation liquid density of the IAPWS-95 equation using high-
+    fidelity polynomial fits. These have a relative accuracy of under 1e-13,
+    except near the critical point where it rises to 1e-10,
+    and are generated by solving the saturation equations under the
+    high-precision environment of mpmath. The range of the fit is 235 K to
+    647.096 K, the critical point. 
+    
+    Parameters
+    ----------
+    T : float
+        Temperature at which to calculate the saturation condition, [K]
+
+    Returns
+    -------
+    rhol : float
+        Saturation liquid density, [kg/m^3]
+    
+    See Also
+    --------
+    iapws92_rhol_sat
+    
+    Notes
+    -----
+    This method should be used in preference to :obj:`iapws92_rhol_sat`.
+    
+    
+    Examples
+    --------
+    >>> iapws95_rhol_sat(400.0)
+    937.48603939
+    '''
     if 235.0 <= T < 273.15:
         coeffs = [-17.222183227539062, 18.77007293701172, 160.3718719482422, -174.77803325653076, -689.9691653251648, 751.9200625419617, 1818.6332448720932, -1981.8576150536537, -3283.683091402054, 3578.2904051095247, 4302.269122205675, -4688.138357363641, -4227.204455545172, 4606.233353788964, 3174.7852028068155, -3459.378792709904, -1840.9434151535388, 2005.933489420975, 826.9075718919048, -901.0039060153795, -287.0057090885457, 312.71981305931695, 76.35687688595681, -83.19737945724955, -15.353652797617087, 16.729144014339, 2.283299787289934, -2.4879351324522645, -0.2437405315180854, 0.2654055681062317, 0.01792607828713244, -0.019693974261834057, -0.0004738133771589048, 0.0007854872751575925, -0.0006095267475783039, 0.0022049570385940243, -0.005221612771147854, 0.01096251463881881, -0.026019484252807534, 0.036332822379610566, 3.0872453741478227]
         val = horner(coeffs, 0.052424639580602915*(T - 254.074999999999989))
@@ -3979,9 +4088,41 @@ def rhol_sat_IAPWS95(T):
     elif 647.09599999 < T <= Tc:
         # Gotta go to linear interp
         val = 1.0000546416597242 - 5.464165972424162e-05*(T-647.09599999)/(647.096-647.09599999)
+    else:
+        raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
     return val*rhoc
 
-def rhog_sat_IAPWS95(T):
+def iapws95_rhog_sat(T):
+    r'''Compute the saturation vapor density of the IAPWS-95 equation using high-
+    fidelity polynomial fits. These have a relative accuracy of under 1e-13,
+    except near the critical point where it rises to 1e-10,
+    and are generated by solving the saturation equations under the
+    high-precision environment of mpmath. The range of the fit is 235 K to
+    647.096 K, the critical point. 
+    
+    Parameters
+    ----------
+    T : float
+        Temperature at which to calculate the saturation condition, [K]
+
+    Returns
+    -------
+    rhol : float
+        Saturation vapor density, [kg/m^3]
+    
+    See Also
+    --------
+    iapws92_rhog_sat
+    
+    Notes
+    -----
+    This method should be used in preference to :obj:`iapws92_rhog_sat`.
+    
+    Examples
+    --------
+    >>> iapws95_rhog_sat(400.0)
+    1.3694075410
+    '''
     if 235.0 <= T < 273.15:
         # (2.0607069702164786e-14, 1.3923330571480516e-14, 6.141003425167497e-14)
         coeffs = [0.1376953125, -0.16064453125, -1.46826171875, 1.69775390625, 7.30413818359375, -8.376739501953125, -22.501876831054688, 25.625389099121094, 48.05792236328125, -54.43896484375, -75.48343086242676, 85.25402688980103, 90.2677903175354, -101.96795904636383, -83.95101803541183, 95.22411647439003, 61.49870456755161, -70.39149758219719, -35.72743892297149, 41.51342293806374, 16.49678842537105, -19.59625118598342, -6.0450619522016495, 7.399189752410166, 1.7498202509596013, -2.2248343522369396, -0.3973083387245424, 0.5282683086916222, 0.07019889306320692, -0.09777055511221988, -0.009583181835296273, 0.013834803114605165, 0.0010116799821844324, -0.0014553592153561112, -8.832041203277186e-05, 0.0001166358491389019, 2.63497172170446e-06, -1.855304673625824e-05, 4.9769065153526526e-05, -0.00012574357976014028, 0.000309940894730687, -0.0012701900216018913, 0.011378017130855733, -0.13488259814146453, 1.5565491834362626, -12.535071599332248]
@@ -4035,6 +4176,8 @@ def rhog_sat_IAPWS95(T):
     elif 647.09599999 < T <= Tc:
         # Linear fit from boundary points with SymPy
         val = min(-3387140.78569631511 + 5234.37138492019039*T,0.0)
+    else:
+        raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
     return exp(val)*rhoc
 
 
