@@ -1879,6 +1879,11 @@ def test_iapws95_dPsat_dT():
     # Check for functional equivalence
     for T in linspace(235.0, 647.096):
         assert_close(iapws95_Psat(T), iapws95_dPsat_dT(T)[1], rtol=1e-15)
+
+def test_iapws95_Tsat():
+    # Tested with a LOT of points
+    for T in linspace(235.0, 647.096, 100):
+        assert_close(iapws95_Tsat(iapws95_Psat(T)), T, rtol=2e-14)
     
 def test_iapws95_Psat():
     assert_close(iapws95_Psat(300.0), 3536.806752274638, rtol=1e-12)

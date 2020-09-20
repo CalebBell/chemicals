@@ -52,6 +52,8 @@ IAPWS-95 Saturation Equations
 -----------------------------
 .. autofunction:: chemicals.iapws.iapws95_Psat
 .. autofunction:: chemicals.iapws.iapws95_dPsat_dT
+.. autofunction:: chemicals.iapws.iapws95_Tsat
+
 .. autofunction:: chemicals.iapws.iapws95_saturation
 .. autofunction:: chemicals.iapws.iapws95_rhol_sat
 .. autofunction:: chemicals.iapws.iapws95_rhog_sat
@@ -79,8 +81,9 @@ __all__ = [
            'iapws97_rho_extrapolated',
            'iapws97_rho', 'iapws97_P', 'iapws97_T',
 
-    'iapws92_rhol_sat', 'iapws92_rhog_sat', 'iapws95_Psat', 'iapws95_dPsat_dT',
-    'iapws95_rhol_sat', 'iapws95_rhog_sat',
+            'iapws95_Psat', 'iapws95_dPsat_dT', 'iapws95_Tsat',
+            'iapws92_rhol_sat', 'iapws92_rhog_sat', 
+            'iapws95_rhol_sat', 'iapws95_rhog_sat',
            'iapws95_saturation',
            
            'iapws95_A0', 'iapws95_dA0_dtau', 'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3',
@@ -3987,7 +3990,6 @@ def iapws95_dPsat_dT(T):
     Psat : float
         Saturation vapor pressure, [Pa]
     
-    
     Notes
     -----
     `Psat` must be calculated in the calculation of the derivative, so it is
@@ -4091,6 +4093,54 @@ def iapws95_Psat(T):
     else:
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
     return exp(val)*22064000.0
+
+def iapws95_Tsat(P):
+    r'''Compute the saturation temperature of the IAPWS-95 equation.
+    The range of the fit is 235 K to 647.096 K, the critical point. 
+    
+    
+    Parameters
+    ----------
+    Psat : float
+        Saturation vapor pressure specified, [Pa]
+
+    Returns
+    -------
+    T : float
+        Temperature at which the saturation pressure occurs, [K]
+    
+    See Also
+    --------
+    iapws95_Psat
+    Tsat_IAPWS
+    
+    Notes
+    -----
+    This method is quite fast and precise because it starts with great initial
+    guesses and the equation is well-bounded. The precision of this calculation
+    should be the same as :obj:`iapws95_Psat`.
+    
+    Examples
+    --------
+    >>> iapws95_Tsat(iapws95_Psat(400.0))
+    400.0
+    '''
+    if P > 22064000.0:
+        raise ValueError("Pressure higher than critical pressure")
+    elif P < 22.849568234070716: # iapws95_Psat(235)
+        raise ValueError("Pressure lower than correlation")
+    T = Tsat_IAPWS(P)
+    if T < 235.0:
+        T = 235.0
+    dT = 100.0
+    # Very well-behaved solver, no issues found.
+    while abs(dT) > 1e-10:
+        dPsat_dT, Psat = iapws95_dPsat_dT(T)
+        err = Psat - P
+        dT = -err/dPsat_dT
+        T = T + dT
+    return T
+
 
 rhol_coeffs_iapws95_235_273 = [-17.222183227539062, 18.77007293701172, 160.3718719482422, -174.77803325653076, -689.9691653251648, 751.9200625419617, 1818.6332448720932, -1981.8576150536537, -3283.683091402054, 3578.2904051095247, 4302.269122205675, -4688.138357363641, -4227.204455545172, 4606.233353788964, 3174.7852028068155, -3459.378792709904, -1840.9434151535388, 2005.933489420975, 826.9075718919048, -901.0039060153795, -287.0057090885457, 312.71981305931695, 76.35687688595681, -83.19737945724955, -15.353652797617087, 16.729144014339, 2.283299787289934, -2.4879351324522645, -0.2437405315180854, 0.2654055681062317, 0.01792607828713244, -0.019693974261834057, -0.0004738133771589048, 0.0007854872751575925, -0.0006095267475783039, 0.0022049570385940243, -0.005221612771147854, 0.01096251463881881, -0.026019484252807534, 0.036332822379610566, 3.0872453741478227]
 rhol_coeffs_iapws95_273_460 = [1.7102574929594994e-06, -3.5461271181702614e-06, -4.744477337226272e-06, 1.1568277841433883e-05, 1.0390001989435405e-05, -2.5427980290260166e-05, -7.063001248752698e-06, 2.3168839106801897e-05, 1.3829438557877438e-05, -3.149418807879556e-05, 1.2095285001123557e-05, -1.292190836466034e-05, 3.8989083236629085e-05, -6.452956441194146e-05, 9.861656508292072e-05, -0.00016529921067132136, 0.00028210334725997654, -0.0004912796557263732, 0.0008216553207591737, -0.0015053379092586638, 0.002406131617918583, -0.006780978799273418, 0.00908602594184732, -0.06335671046246652, -0.19965126834113162, 2.9904548603014143]
