@@ -1867,6 +1867,18 @@ def test_iapws95_saturation():
     
     vals = iapws95_saturation(300.0, xtol=1e-5)
     assert_close1d(vals, (3536.806752287503, 996.5130274681349, 0.025589673682920273))
+
+def test_iapws95_dPsat_dT():
+    assert_close(derivative(iapws95_Psat, 330.0, dx=330*1e-6), 
+                 iapws95_dPsat_dT(330)[0], rtol=1e-7)
+    
+    dPsat_dT, Psat = iapws95_dPsat_dT(500.0)
+    assert_close(dPsat_dT, 49008.17866580053, rtol=1e-10)
+    assert_close(Psat, 2639195.8717618496, rtol=1e-13)
+    
+    # Check for functional equivalence
+    for T in linspace(235.0, 647.096):
+        assert_close(iapws95_Psat(T), iapws95_dPsat_dT(T)[1], rtol=1e-15)
     
 def test_iapws95_Psat():
     assert_close(iapws95_Psat(300.0), 3536.806752274638, rtol=1e-12)
