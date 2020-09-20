@@ -3994,8 +3994,20 @@ def iapws95_Psat(T):
     >>> iapws95_Psat(400.0)
     245769.3455
     '''
-    # Fit to under 1e-12 precision, with the EOS evaluated with mpmath for max
-    # precision.
+    # Using a loop involves a 10% decrease in PyPy speed but a 50% hit to numba
+    # Maybe in the future we can use this :)
+#    for i in range(Psat_iapws95_coeff_set_count):
+#        if Psat_iapws95_coeff_boundaries[i] <= T <= Psat_iapws95_coeff_boundaries[i+1]:
+#            coeffs = Psat_all_coeffs_iapws95[i]
+#            a, b = Psat_iapws95_coeff_as[i], Psat_iapws95_coeff_bs[i]
+#            val = horner(coeffs,  a*(T - b))
+#            if val > 0.0: val = 0.0
+#            return exp(val)*22064000.0
+#    else:
+#        raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
+
+#    # Fit to under 1e-12 precision, with the EOS evaluated with mpmath for max
+#    # precision.
     if 235.0 <= T < 273.15:
         # Equation solves down to this temperature but not below.
         coeffs = Psat_coeffs_iapws95_235_273
@@ -4191,15 +4203,17 @@ def iapws95_rhog_sat(T):
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
     return exp(val) * iapws95_rhoc
 
+### IAPWS 95 Trho, Prho, TP solvers
 
 def iapws95_rho_err(rho, T, P_spec):
+    RT = R95*T
     tau = iapws95_Tc / T
     delta = rho * iapws95_rhoc_inv
     dAddelta_res_val = iapws95_dAr_ddelta(tau, delta)
     d2Ad2delta_res_val = iapws95_d2Ar_ddelta2(tau, delta)
-    P_calc = (1.0 + dAddelta_res_val*delta)*rho*R95*T
+    P_calc = (1.0 + dAddelta_res_val*delta)*rho*RT
     err = P_calc - P_spec
-    derr = R95*T*(rho*(rho*d2Ad2delta_res_val + 644.0*dAddelta_res_val)
+    derr = RT*(rho*(rho*d2Ad2delta_res_val + 644.0*dAddelta_res_val)
                 + 103684.0)*9.644689633887581e-06 # 1/322**2
     return err, derr
 
@@ -4227,6 +4241,7 @@ def iapws_T(P, rho):
 def iapws95_rho(T, P):
     MAX_RHO_STEP = 200.0 # iapws95_rho(250, 1e9) is a good point showing the advantage of this
     rho = iapws97_rho_extrapolated(T, P)
+    
 #    print(rho)
     # newton solver overhead is huge.
 #            print(rho, 'initial guess', drho_dT, 'drho_dT')

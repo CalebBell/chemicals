@@ -62,7 +62,7 @@ def swap_funcs_and_test(names, substitutions, test):
 
 def mark_as_numba(func):
     func = pytest.mark.numba(func)
-    func = pytest.mark.slow(func)
+#    func = pytest.mark.slow(func)
     func = pytest.mark.skipif(numba is None, reason="Numba is missing")(func)
     return func
     
@@ -382,7 +382,7 @@ def test_volume():
                  SNM0(121, 150.8, 7.49e-05, -0.004, -0.03259620))
 
     
-    kwargs = dict(T=405.45, Tb=239.82, Tc=405.45, Pc=111.7*101325, M=17.03, dipole=None)
+    kwargs = dict(T=405.45, Tb=239.82, Tc=405.45, Pc=111.7*101325, MW=17.03, dipole=None)
     assert_close(chemicals.numba.Campbell_Thodos(**kwargs), 
                  Campbell_Thodos(**kwargs))
 
