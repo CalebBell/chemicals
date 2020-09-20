@@ -128,13 +128,13 @@ __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97
 R95 = 461.51805 # Differs from the other formulation
 R97 = 461.526
 
-MW = 18.015268
+iapws95_MW = 18.015268
 
-Tc = 647.096
-Tc_inv = 1.0/Tc
+iapws95_Tc = 647.096
+iapws95_Tc_inv = 1.0 / iapws95_Tc
 
-rhoc = 322.0
-rhoc_inv = 1.0/rhoc
+iapws95_rhoc = 322.0
+iapws95_rhoc_inv = 1.0 / iapws95_rhoc
 
 def use_mpmath_backend():
     import mpmath as mp
@@ -144,7 +144,7 @@ def use_mpmath_backend():
     globals()['R95'] = mp.mpf("461.51805")
     globals()['R97'] = mp.mpf("461.526")
     globals()['MW'] = mp.mpf("18.015268")
-    globals()['Tc'] = mp.mpf("647.096")
+    globals()['iapws95_Tc'] = mp.mpf("647.096")
     globals()['Tc_inv'] = 1/mp.mpf("647.096")
     globals()['rhoc'] = mp.mpf("322")
     globals()['rhoc_inv'] = 1/mp.mpf("322")
@@ -161,7 +161,7 @@ def reset_backend():
     globals()['R95'] = 461.51805
     globals()['R97'] = 461.526
     globals()['MW'] = 18.015268
-    globals()['Tc'] = 647.096
+    globals()['iapws95_Tc'] = 647.096
     globals()['Tc_inv'] = 1/647.096
     globals()['rhoc'] = 322.0
     globals()['rhoc_inv'] = 1/322.0
@@ -2034,8 +2034,8 @@ def iapws97_P(T, rho):
                               low=P_region2_border*1e-20, high=P_region2_border, args=(T, rho), xtol=3e-12)
         else:
             # region 3
-            tau = Tc/T
-            delta = rho*rhoc_inv
+            tau = iapws95_Tc / T
+            delta = rho * iapws95_rhoc_inv
             dA_ddelta = iapws97_dA_ddelta_region3(tau, delta)
             return dA_ddelta*delta*rho*R97*T
                 
@@ -2082,15 +2082,15 @@ def iapws_97_Prho_err_region5(T, P, rho):
 
 
 def iapws_97_Prho_err_region3(T, P, rho):
-    tau = Tc/T
-    delta = rho*rhoc_inv
+    tau = iapws95_Tc / T
+    delta = rho * iapws95_rhoc_inv
     dA_ddelta = iapws97_dA_ddelta_region3(tau, delta)
     P_calc = dA_ddelta*delta*rho*R97*T
     err = P_calc - P
 
     d2A_ddeltadtau = iapws97_d2A_ddeltadtau_region3(tau, delta)
     
-    derr = R97*rho**2*dA_ddelta/rhoc - R97*Tc*rho**2*d2A_ddeltadtau/(T*rhoc)
+    derr = R97 * rho ** 2 * dA_ddelta / iapws95_rhoc - R97 * iapws95_Tc * rho ** 2 * d2A_ddeltadtau / (T * iapws95_rhoc)
     return err, derr
 
 def iapws97_T(P, rho):
@@ -2303,7 +2303,7 @@ def iapws92_rhol_sat(T):
        Ref. Data 16, 893 (1987)." Journal of Physical and Chemical Reference 
        Data 22, no. 3 (May 1, 1993): 783-87. https://doi.org/10.1063/1.555926.
     '''
-    tau = 1.0 - T*Tc_inv
+    tau = 1.0 - T * iapws95_Tc_inv
     
     tau_cbrt = tau**(1.0/3.0)
     
@@ -2327,7 +2327,7 @@ def iapws92_rhol_sat(T):
     
     ratio += tau_cbrt*(-45.5170352*tau_cbrt4 -6.74694450e5*tau_cbrt*tau_cbrt*tau_cbrt8)
 #    ratio += -6.74694450e5*tau_cbrt*tau_cbrt*tau_cbrt*tau_cbrt8
-    return ratio*rhoc
+    return ratio * iapws95_rhoc
 
 def iapws92_rhog_sat(T):
     r'''Calculates saturation vapor mass density of water using the IAPWS
@@ -2384,7 +2384,7 @@ def iapws92_rhog_sat(T):
        Ref. Data 16, 893 (1987)." Journal of Physical and Chemical Reference 
        Data 22, no. 3 (May 1, 1993): 783-87. https://doi.org/10.1063/1.555926.
     '''
-    tau = 1.0 - T*Tc_inv
+    tau = 1.0 - T * iapws95_Tc_inv
     
     tau_6rt = tau**(1.0/6.0)
     tau_6rt2 = tau_6rt*tau_6rt
@@ -2405,7 +2405,7 @@ def iapws92_rhog_sat(T):
     tau_6rt2 = tau_6rt18*tau_6rt18*tau_6rt # 37 - reuse tau_6rt2
     ratio += tau_6rt2*(-44.7586581 - 63.9201063*tau_6rt16*tau_6rt18) # 71
     
-    return exp(ratio)*rhoc
+    return exp(ratio) * iapws95_rhoc
 
 ### IAPWS 95 fundamental derivatives
 
@@ -3791,14 +3791,14 @@ def iapws95_d2Ar_ddeltadtau(tau, delta):
 ### Vapor pressure solution
 def _P_G_dG_dV_T_dG_dV_T(T, V):
     '''For calculating vapor pressure'''
-    _MW_kg = MW/1000
+    _MW_kg = iapws95_MW / 1000
     R_MW_0_001 = _MW_kg*R95
-    rho = rho_mass = MW/V/1000
-    tau = Tc/T
-    delta = rho_mass/rhoc
+    rho = rho_mass = iapws95_MW / V / 1000
+    tau = iapws95_Tc / T
+    delta = rho_mass / iapws95_rhoc
 
-    tau = Tc/T
-    delta = rho/rhoc
+    tau = iapws95_Tc / T
+    delta = rho / iapws95_rhoc
 #    print(tau, delta, 'tau, delta')
     
     A = iapws95_A0(tau, delta) + iapws95_Ar(tau, delta)
@@ -3814,15 +3814,15 @@ def _P_G_dG_dV_T_dG_dV_T(T, V):
     H = (tau*dA_dtau + dA_ddelta*delta)*T*R_MW_0_001
     G = H - T*S
     
-    dP_dV = (-MW*MW*R95*T*(MW*d2A_ddelta2/10**9 + V*rhoc*dA_ddelta/500000)/(V*V*V*V*rhoc*rhoc))
+    dP_dV = (-iapws95_MW * iapws95_MW * R95 * T * (iapws95_MW * d2A_ddelta2 / 10 ** 9 + V * iapws95_rhoc * dA_ddelta / 500000) / (V * V * V * V * iapws95_rhoc * iapws95_rhoc))
     
-    dS_dV_T = ((dA_ddelta - Tc*d2A_ddeltadtau/T)
-                                   *R_MW_0_001*MW/1000/(V*V*rhoc))
+    dS_dV_T = ((dA_ddelta - iapws95_Tc * d2A_ddeltadtau / T)
+               * R_MW_0_001 * iapws95_MW / 1000 / (V * V * iapws95_rhoc))
     
     dS_dP_T = dS_dV_T/dP_dV
     
-    dH_dV_T = (T*MW*(-MW*d2A_ddelta2/(V*rhoc*10**6) - dA_ddelta/1000
-         -   Tc*d2A_ddeltadtau/T/1000)*R_MW_0_001/(rhoc*V*V))
+    dH_dV_T = (T * iapws95_MW * (-iapws95_MW * d2A_ddelta2 / (V * iapws95_rhoc * 10 ** 6) - dA_ddelta / 1000
+                                 - iapws95_Tc * d2A_ddeltadtau / T / 1000) * R_MW_0_001 / (iapws95_rhoc * V * V))
     dH_dP_T = dH_dV_T/dP_dV
     
     dG_dP_T = -T*dS_dP_T + dH_dP_T
@@ -3911,15 +3911,15 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
             rhol = iapws95_rhol_sat(max(T, 235))
     else:
         rhol = rhol_guess
-    Vg = MW/(rhog*1000)
-    Vl = MW/(rhol*1000)
-    V_crit_liq = MW/(322.000000000001*1000) # Do not allow it to jump to delta=1
-    V_crit_gas = MW/(321.999999999999*1000)
+    Vg = iapws95_MW / (rhog * 1000)
+    Vl = iapws95_MW / (rhol * 1000)
+    V_crit_liq = iapws95_MW / (322.000000000001 * 1000) # Do not allow it to jump to delta=1
+    V_crit_gas = iapws95_MW / (321.999999999999 * 1000)
 
-    V_min = MW/(1e-5*1000) # assume a minimum density of 1e-5 kg/m^3 for gas; stops converging at 18 times that
+    V_min = iapws95_MW / (1e-5 * 1000) # assume a minimum density of 1e-5 kg/m^3 for gas; stops converging at 18 times that
     V_min = max(V_crit_gas*(1.0+1e-10), Vg*2.0) # Assume the vapor guess is within 100% of the actual value
 
-    V_max = MW/(2000.0*1000) # use 2000 kg/m^3 as an upper bound
+    V_max = iapws95_MW / (2000.0 * 1000) # use 2000 kg/m^3 as an upper bound
     
     # Translate the function variables so that vapor density cannot go above 
     # 322 kg/m^3 and liquid cannot go under it
@@ -3937,8 +3937,8 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
     Vg, Vl = translate_outof(ans)
     
     # Compute the densities and vapor pressure
-    rhol = MW/(Vl*1000)
-    rhog = MW/(Vg*1000)
+    rhol = iapws95_MW / (Vl * 1000)
+    rhog = iapws95_MW / (Vg * 1000)
     Psat = iapws95_P(T, rhol)
     return Psat, rhol, rhog
 
@@ -3949,6 +3949,15 @@ Psat_coeffs_iapws95_460_609 = [2.0064180716872215e-07, 2.892629709094763e-07, -8
 Psat_coeffs_iapws95_609_643 = [1.0573770850896835e-05, 1.1763535439968109e-05, -6.56498596072197e-05, -7.157295476645231e-05, 0.0001856974558904767, 0.00019913158030249178, -0.0003122607449768111, -0.00033338970388285816, 0.0003383217645023251, 0.00036499839916359633, -0.00024304199087055167, -0.0002661161202013318, 0.00012133384302615013, 0.00013108684390772396, -4.926522541381928e-05, -5.498319717389677e-05, 3.840095160967394e-06, 9.275973251732239e-06, 4.700250627820424e-06, 1.7356479738772634e-05, 3.5141797559923305e-05, 4.994296202665005e-05, 5.6967466662061206e-05, 5.500573225036831e-05, 7.36448261119127e-05, 0.000486011140590506, -0.0032944327011136323, 0.20513406870743833, -0.24748976782381205]
 Psat_coeffs_iapws95_643_646 = [9.057896477315808e-08, 1.211502649312024e-07, -3.360720484124613e-07, -4.495756513733795e-07, 5.768298478869838e-07, 7.768647307671017e-07, -5.138533794024625e-07, -6.86156649720715e-07, 3.3836656099239804e-07, 4.158511894836181e-07, -1.3213676086643034e-07, -1.300110328283921e-07, 2.7710538380576466e-07, 8.91687420706555e-07, 1.834557936633563e-06, 2.582291823115257e-06, 1.5351452190368736e-06, 8.540061517871983e-07, 1.7006021977569903e-05, 0.02017998616540387, -0.02472793196736738]
 Psat_coeffs_iapws95_near_critical = [-0.007006160914897919, -0.006299436092376709, 0.06787101551890373, 0.06092516239732504, -0.3032621801830828, -0.27187402336858213, 0.8286682133330032, 0.7421519589261152, -1.5481375773670152, -1.3854497998690931, 2.0945177564717596, 1.8733694699149055, -2.1206636809074553, -1.8960203259257469, 1.6377062088922685, 1.4638579778784333, -0.9743636551480677, -0.8708100283029125, 0.44806853431398963, 0.40042604495646117, -0.15886602644877712, -0.14197406009749258, 0.04308180067010703, 0.0385020246406107, -0.008810816846762659, -0.007874311835966985, 0.0013301372745293527, 0.0011886957505600204, -0.00014366835734647143, -0.0001283599871508001, 1.0624248652432722e-05, 9.493371248271015e-06, -4.747152791886172e-07, -4.074279138207085e-07, 7.613360554058896e-08, 1.2227703013014193e-07, 2.2590783514621522e-07, 6.263045703604046e-07, 2.5993277169989305e-06, 0.0022606230644268894, -0.00226439777925055]
+
+# Numba prevents this from being a lookup - the arrays are not the same size 
+Psat_all_coeffs_iapws95 = [Psat_coeffs_iapws95_235_273, Psat_coeffs_iapws95_273_460, Psat_coeffs_iapws95_460_609,
+                           Psat_coeffs_iapws95_609_643, Psat_coeffs_iapws95_643_646, Psat_coeffs_iapws95_near_critical]
+Psat_iapws95_coeff_set_count = len(Psat_all_coeffs_iapws95)
+Psat_iapws95_coeff_boundaries = [235.0, 273.15, 460.1225, 609.7005, 643.35555, 646.721055, iapws95_Tc]
+Psat_iapws95_coeff_as = [0.052424639580602915, 0.0106967602187487444, 0.0133709502734359297, 0.0594264456597153254, 0.594264456597155322, 5.33411567172122325]
+Psat_iapws95_coeff_bs = [254.074999999999989, 366.636250000000018, 534.911500000000046, 626.528025000000071, 645.038302499999986, 646.908527499949969]
+
 
 def iapws95_Psat(T):
     r'''Compute the saturation pressure of the IAPWS-95 equation using high-
@@ -4003,7 +4012,7 @@ def iapws95_Psat(T):
     elif 643.35555 < T <= 646.721055:
         coeffs = Psat_coeffs_iapws95_643_646
         val = horner(coeffs, 0.594264456597155322*(T - 645.038302499999986))
-    elif 646.721055 < T <= Tc:
+    elif 646.721055 < T <= iapws95_Tc:
         coeffs = Psat_coeffs_iapws95_near_critical
         val = horner(coeffs, 5.33411567172122325*(T - 646.908527499949969))
         if val > 0.0: val = 0.0
@@ -4085,12 +4094,12 @@ def iapws95_rhol_sat(T):
 #         (1.301907916559972e-11, 1.5329272639853585e-11, 9.685327631780702e-11)
         coeffs = [-342.1649169921875, -286.70733642578125, 3696.8092041015625, 3062.9874267578125, -18628.276138305664, -15248.527671813965, 58141.86198616028, 46974.429047584534, -125898.94741535187, -100287.08330655098, 200761.28558278084, 157482.6384627223, -244240.7832775116, -188416.60116776824, 231738.97573629767, 175548.21367172152, -173839.0422554016, -129094.15901541244, 103905.44825894013, 75496.35919268127, -49644.42389814614, -35215.162472276075, 18947.322668814828, 13087.622056136344, -5751.365423334828, -3856.5318880818013, 1377.1159714494315, 892.9758781142154, -256.84921118732746, -160.2506746801855, 36.651197303384606, 21.84684986680145, -3.9021237365971047, -2.1983816265822327, 0.2992404034464471, 0.15648404704313634, -0.01571472634215354, -0.007373118351861052, 0.0005188793214245813, 0.00019840994932129874, -1.665223554836448e-05, -1.1892982883288106e-05, -1.36274066943054e-05, -2.2384801104155527e-05, -4.5679905172298085e-05, -0.0001857746544898474, 1.0003799295366436]
         val = horner(coeffs, 2020202.04154185997*(T - 647.095999495000001))
-    elif 647.09599999 < T <= Tc:
+    elif 647.09599999 < T <= iapws95_Tc:
         # Gotta go to linear interp
         val = 1.0000546416597242 - 5.464165972424162e-05*(T-647.09599999)/(647.096-647.09599999)
     else:
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
-    return val*rhoc
+    return val * iapws95_rhoc
 
 def iapws95_rhog_sat(T):
     r'''Compute the saturation vapor density of the IAPWS-95 equation using high-
@@ -4173,17 +4182,17 @@ def iapws95_rhog_sat(T):
 #        (2.4630471386324867e-11, 1.849611580813743e-11, 8.350341664755902e-11)
         coeffs = [0.00012197307423278403, 3.93254984203395e-05, -0.0006863586597720683, -0.00021157731863841178, 0.0016779695676436557, 0.0004919766855269181, -0.0023356411482816086, -0.000646105308648115, 0.00203897414938424, 0.0005266602670174758, -0.0011586472452729257, -0.0002754642919942079, 0.0004306993903883255, 9.281167781887041e-05, -0.00010189150684249311, -1.9063380369572797e-05, 1.512611351263453e-05, 3.227987819904611e-06, 2.394942461261991e-07, 2.148075213501199e-06, 4.4557488727214e-06, 1.0666958153395576e-05, 5.1515776307511835e-05, -0.00012536531858820264]
         val = horner(coeffs, 22222232.6645377725*(T - 647.095999945000017))
-    elif 647.09599999 < T <= Tc:
+    elif 647.09599999 < T <= iapws95_Tc:
         # Linear fit from boundary points with SymPy
         val = min(-3387140.78569631511 + 5234.37138492019039*T,0.0)
     else:
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
-    return exp(val)*rhoc
+    return exp(val) * iapws95_rhoc
 
 
 def iapws95_rho_err(rho, T, P_spec):
-    tau = Tc/T
-    delta = rho*rhoc_inv
+    tau = iapws95_Tc / T
+    delta = rho * iapws95_rhoc_inv
     dAddelta_res_val = iapws95_dAr_ddelta(tau, delta)
     d2Ad2delta_res_val = iapws95_d2Ar_ddelta2(tau, delta)
     P_calc = (1.0 + dAddelta_res_val*delta)*rho*R95*T
@@ -4193,14 +4202,14 @@ def iapws95_rho_err(rho, T, P_spec):
     return err, derr
 
 def iapws95_P(T, rho):
-    tau = Tc/T
-    delta = rho*rhoc_inv
+    tau = iapws95_Tc / T
+    delta = rho * iapws95_rhoc_inv
     dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
     return (dAddelta_val*delta)*rho*R95*T
 
 def iapws95_P_err(T, rho, P_spec):
-    tau = Tc/T
-    delta = rho*rhoc_inv
+    tau = iapws95_Tc / T
+    delta = rho * iapws95_rhoc_inv
     dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
     err = (dAddelta_val*delta)*rho*R95*T - P_spec
     dP_dT = rho*R95*delta*(dAddelta_val - tau*iapws95_d2Ar_ddeltadtau(tau, delta))
