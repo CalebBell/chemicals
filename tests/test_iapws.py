@@ -1915,7 +1915,9 @@ def test_rhog_sat_IAPWS95():
     assert_close( rhog_sat_IAPWS95(647.0959998), 321.92296716781414, rtol=1e-10)
     assert_close(rhog_sat_IAPWS95(647.09599998), 321.9758031526337, rtol=1e-10)
     
-    
+    assert 322 ==  rhog_sat_IAPWS95(647.0959999999999999)
+    assert 322 == rhog_sat_IAPWS95(647.0959999999999)
+    assert_close(rhog_sat_IAPWS95(647.09599999999), 321.9999832063918, rtol=1e-13)
 
 @pytest.mark.slow
 def test_rhog_sat_IAPWS95_vs_saturation():

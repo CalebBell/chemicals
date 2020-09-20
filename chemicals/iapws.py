@@ -141,6 +141,8 @@ def iapws97_boundary_2_3(T):
     '''
     return (0.34805185628969E9 - T*(0.11671859879975E7 - 0.10192970039326E4*T))
 
+### IAPWS 07 Region 3 P boundaries
+
 def iapws97_boundary_2_3_reverse(P):
     '''
     >>> iapws97_boundary_2_3_reverse(16529164.2526216)
@@ -241,7 +243,7 @@ def iapws97_boundary_3rx(P):
 #    T = sum([nis3rx[i]*P**Iis3rx[i] for i in range(4)])
 #    return T
 
-### Log P boundaries
+### IAPWS 07 Region 3 log P boundaries
 def iapws97_boundary_3wx(logP_MPa, logP_MPa_inv):
     '''
     >>> iapws97_boundary_3wx(log(22.3), 1/log(22.3))
@@ -1788,6 +1790,62 @@ def iapws97_rho(T, P):
         return iapws97_region5_rho(T, P)
     else:
         raise ValueError("Out of bounds")
+
+
+def iapws97_rho_extrapolated(T, P):
+    # Intended to extend the range using first derivatives
+    # for use in iapws-95 solver.
+    try:
+        rho = iapws97_rho(T, P)
+    except:
+        if T > 2273.15 and P < 50E6:
+            T_border = 2273.15
+            Pref = 1e6
+            Tref = 1e3
+            P_inv = 1.0/P
+            pi = P*1e-6
+            tau = Tref/T_border
+            # region 5 upwards T extrapolate drho_dT
+            dGr_dpi = iapws97_dGr_dpi_region5(tau, pi) 
+            dG_dpi = 1e6*P_inv + dGr_dpi
+            rho = P/(R97*T_border*pi*dG_dpi)
+            d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region5(tau, pi) 
+            x0 = (dGr_dpi + Pref*P_inv)
+            x1 = R97*T_border*T_border
+            drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
+            rho = rho + drho_dT*(T - T_border)
+        elif T > 1073.15 and 50e6 <= P <= 100e6:
+            T_border = 1073.15
+            Pref = 1e6
+            Tref = 540.0
+            P_inv = 1.0/P
+            pi = P*1e-6
+            tau = Tref/T_border
+            # region 5 upwards T extrapolate drho_dT
+            dGr_dpi = iapws97_dGr_dpi_region2(tau, pi) 
+            dG_dpi = 1e6*P_inv + dGr_dpi
+            rho = P/(R97*T_border*pi*dG_dpi)
+            d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region2(tau, pi) 
+            x0 = (dGr_dpi + Pref*P_inv)
+            x1 = R97*T_border*T_border
+            drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
+            drho = drho_dT*(T - T_border)
+            if (rho + drho) > .1*rho:
+                # Do not take the extrapolation if density has decreased too much
+                rho = rho + drho
+        elif T < 273.15:
+            # region 1 - fairly incompressible, don't bother extrapolating
+            if P > 100e6: P = 100e6
+            rho = iapws97_region1_rho(273.15, P)
+        else:
+            # Don't bother extrapolating to higher P at this point, the density
+            # change is small there
+            if P > 100e6:
+                P = 100e6
+            if T > 1073.15:
+                T = 1073.15
+            rho = iapws97_rho(T, P)
+    return rho
 
 
 def iapws_97_Trho_err_region1(P, T, rho):
@@ -3974,6 +4032,9 @@ def rhog_sat_IAPWS95(T):
 #        (2.4630471386324867e-11, 1.849611580813743e-11, 8.350341664755902e-11)
         coeffs = [0.00012197307423278403, 3.93254984203395e-05, -0.0006863586597720683, -0.00021157731863841178, 0.0016779695676436557, 0.0004919766855269181, -0.0023356411482816086, -0.000646105308648115, 0.00203897414938424, 0.0005266602670174758, -0.0011586472452729257, -0.0002754642919942079, 0.0004306993903883255, 9.281167781887041e-05, -0.00010189150684249311, -1.9063380369572797e-05, 1.512611351263453e-05, 3.227987819904611e-06, 2.394942461261991e-07, 2.148075213501199e-06, 4.4557488727214e-06, 1.0666958153395576e-05, 5.1515776307511835e-05, -0.00012536531858820264]
         val = horner(coeffs, 22222232.6645377725*(T - 647.095999945000017))
+    elif 647.09599999 < T <= Tc:
+        # Linear fit from boundary points with SymPy
+        val = min(-3387140.78569631511 + 5234.37138492019039*T,0.0)
     return exp(val)*rhoc
 
 
@@ -3987,61 +4048,6 @@ def iapws95_rho_err(rho, T, P_spec):
     derr = R95*T*(rho*(rho*d2Ad2delta_res_val + 644.0*dAddelta_res_val)
                 + 103684.0)*9.644689633887581e-06 # 1/322**2
     return err, derr
-
-def iapws97_rho_extrapolated(T, P):
-    # Intended to extend the range using first derivatives
-    # for use in iapws-95 solver.
-    try:
-        rho = iapws97_rho(T, P)
-    except:
-        if T > 2273.15 and P < 50E6:
-            T_border = 2273.15
-            Pref = 1e6
-            Tref = 1e3
-            P_inv = 1.0/P
-            pi = P*1e-6
-            tau = Tref/T_border
-            # region 5 upwards T extrapolate drho_dT
-            dGr_dpi = iapws97_dGr_dpi_region5(tau, pi) 
-            dG_dpi = 1e6*P_inv + dGr_dpi
-            rho = P/(R97*T_border*pi*dG_dpi)
-            d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region5(tau, pi) 
-            x0 = (dGr_dpi + Pref*P_inv)
-            x1 = R97*T_border*T_border
-            drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
-            rho = rho + drho_dT*(T - T_border)
-        elif T > 1073.15 and 50e6 <= P <= 100e6:
-            T_border = 1073.15
-            Pref = 1e6
-            Tref = 540.0
-            P_inv = 1.0/P
-            pi = P*1e-6
-            tau = Tref/T_border
-            # region 5 upwards T extrapolate drho_dT
-            dGr_dpi = iapws97_dGr_dpi_region2(tau, pi) 
-            dG_dpi = 1e6*P_inv + dGr_dpi
-            rho = P/(R97*T_border*pi*dG_dpi)
-            d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region2(tau, pi) 
-            x0 = (dGr_dpi + Pref*P_inv)
-            x1 = R97*T_border*T_border
-            drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
-            drho = drho_dT*(T - T_border)
-            if (rho + drho) > .1*rho:
-                # Do not take the extrapolation if density has decreased too much
-                rho = rho + drho
-        elif T < 273.15:
-            # region 1 - fairly incompressible, don't bother extrapolating
-            if P > 100e6: P = 100e6
-            rho = iapws97_region1_rho(273.15, P)
-        else:
-            # Don't bother extrapolating to higher P at this point, the density
-            # change is small there
-            if P > 100e6:
-                P = 100e6
-            if T > 1073.15:
-                T = 1073.15
-            rho = iapws97_rho(T, P)
-    return rho
 
 def iapws95_P(T, rho):
     tau = Tc/T
