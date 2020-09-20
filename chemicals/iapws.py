@@ -48,13 +48,15 @@ IAPWS-95 Residual Terms
 .. autofunction:: chemicals.iapws.iapws95_d2Ar_dtau2
 .. autofunction:: chemicals.iapws.iapws95_d2Ar_ddeltadtau
 
-IAPWS-95 Saturation Equations
------------------------------
+IAPWS-95 Saturation Pressure/Temperature
+----------------------------------------
 .. autofunction:: chemicals.iapws.iapws95_Psat
 .. autofunction:: chemicals.iapws.iapws95_dPsat_dT
 .. autofunction:: chemicals.iapws.iapws95_Tsat
-
 .. autofunction:: chemicals.iapws.iapws95_saturation
+
+IAPWS Saturation Density
+-----------------------
 .. autofunction:: chemicals.iapws.iapws95_rhol_sat
 .. autofunction:: chemicals.iapws.iapws95_rhog_sat
 .. autofunction:: chemicals.iapws.iapws92_rhol_sat
