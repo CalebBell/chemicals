@@ -62,8 +62,12 @@ IAPWS Saturation Density
 .. autofunction:: chemicals.iapws.iapws92_rhol_sat
 .. autofunction:: chemicals.iapws.iapws92_rhog_sat
 
-  
-    
+IAPWS Constants
+---------------
+.. autodata:: chemicals.iapws.iapws95_Tc
+.. autodata:: chemicals.iapws.iapws95_Pc
+.. autodata:: chemicals.iapws.iapws95_rhoc
+.. autodata:: chemicals.iapws.iapws95_MW
 """
 from __future__ import division
 from math import exp, log, sqrt, fsum
@@ -93,6 +97,8 @@ __all__ = [
            'iapws95_Ar', 'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3', 
            'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2',
            'iapws95_d2Ar_ddeltadtau',
+           
+           'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc',
            ]
 
 __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c', 
@@ -136,6 +142,8 @@ R95 = 461.51805 # Differs from the other formulation
 R97 = 461.526
 
 iapws95_MW = 18.015268
+
+iapws95_Pc = 22064000.0
 
 iapws95_Tc = 647.096
 iapws95_Tc_inv = 1.0 / iapws95_Tc
@@ -4009,7 +4017,7 @@ def iapws95_dPsat_dT(T):
             a, b = Psat_iapws95_coeff_as[i], Psat_iapws95_coeff_bs[i]
             val, der = horner_and_der(coeffs,  a*(T - b))
             if val > 0.0: val = 0.0
-            Psat = exp(val)*22064000.0
+            Psat = exp(val)*iapws95_Pc
             dPsat_dT = Psat*a*der
             return dPsat_dT, Psat        
     else:
@@ -4066,7 +4074,7 @@ def iapws95_Psat(T):
 #            a, b = Psat_iapws95_coeff_as[i], Psat_iapws95_coeff_bs[i]
 #            val = horner(coeffs,  a*(T - b))
 #            if val > 0.0: val = 0.0
-#            return exp(val)*22064000.0
+#            return exp(val)*iapws95_Pc
 #    else:
 #        raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
 
@@ -4094,7 +4102,7 @@ def iapws95_Psat(T):
         if val > 0.0: val = 0.0
     else:
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
-    return exp(val)*22064000.0
+    return exp(val)*iapws95_Pc
 
 def iapws95_Tsat(P):
     r'''Compute the saturation temperature of the IAPWS-95 equation.
@@ -4127,7 +4135,7 @@ def iapws95_Tsat(P):
     >>> iapws95_Tsat(iapws95_Psat(400.0))
     400.0
     '''
-    if P > 22064000.0:
+    if P > iapws95_Pc:
         raise ValueError("Pressure higher than critical pressure")
     elif P < 22.849568234070716: # iapws95_Psat(235)
         raise ValueError("Pressure lower than correlation")
