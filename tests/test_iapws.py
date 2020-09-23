@@ -32,7 +32,7 @@ from chemicals import iapws
 from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace, derivative
 from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G, REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N, REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z
 from chemicals.vapor_pressure import Psat_IAPWS
-from chemicals.iapws import iapws95_P_err
+from chemicals.iapws import iapws95_T_err
 
 l = chemicals.iapws.__numba_additional_funcs__
 for n in l:
@@ -237,6 +237,24 @@ def iapws97_d2Gr_dpidtau_region5_naive(tau, pi):
     return sum( [nis5[i]*lis5[i]*pi**(lis5[i]-1)*Jis5[i]*tau**(Jis5[i]-1) for i in range(6)] )
 
 
+
+def test_iapws97_G_region1():
+    assert_close(iapws97_G_region1(2.0, 10.0), -2.2706245211745117, rtol=1e-12)
+    assert_close(iapws97_G_region1(4.0, .01), -0.23648176259353207, rtol=1e-12)
+
+
+def test_iapws97_d2G_dpi2_region1():
+    assert_close(iapws97_d2G_dpi2_region1(4.8, .8), -0.0009193903700879624, rtol=1e-12)
+
+def test_iapws97_dG_dtau_region1():
+    assert_close(iapws97_dG_dtau_region1(4.8, .8), 0.12200788755868151, rtol=1e-12)
+
+def test_iapws97_d2G_d2tau_region1():
+    assert_close(iapws97_d2G_d2tau_region1(4.8, .8), -0.38995449934370313, rtol=1e-12)
+
+def test_iapws97_d2G_dpidtau_region1():
+    assert_close(iapws97_d2G_dpidtau_region1(4.8, .8), 0.02436120286448202, rtol=1e-12)
+    
 ### Fast equation fuzz tests
 # check that floating points are behaving nicely
 # The only two constants in this world are death and floating point error.
@@ -270,15 +288,45 @@ def test_iapws97_region1_fuzz():
                 assert_close(naive(tau, pi),
                              fast(tau, pi), rtol=rtol, atol=atol)
 
+def test_iapws97_G0_region2():
+    assert_close(iapws97_G0_region2(.7, .2), -8.652623310109474, rtol=1e-12)
+
+def test_iapws97_dG0_dtau_region2():
+    assert_close(iapws97_dG0_dtau_region2(.7, .2), 13.987869557187791, rtol=1e-12)
+
+def test_iapws97_d2G0_d2tau_region2():
+    assert_close(iapws97_d2G0_d2tau_region2(.7, .2), -9.417242299320637, rtol=1e-12)
+
+def test_iapws97_Gr_region2():
+    assert_close(iapws97_Gr_region2(.7, .2), -0.0015296155747292416, rtol=1e-12)
+    
+def test_iapws97_dGr_dtau_region2():
+    assert_close( iapws97_dGr_dtau_region2(.7, .2), -0.00865815941508857, rtol=1e-12)
+
+def test_iapws97_d2Gr_d2tau_region2():
+    assert_close(iapws97_d2Gr_d2tau_region2(.7, .2), -0.0328162552745155, rtol=1e-12)
+
+def test_iapws97_d2Gr_dpidtau_region2():
+    assert_close(iapws97_d2Gr_dpidtau_region2(.7, .2), -0.043342202599839647, rtol=1e-12)
+
+def test_iapws97_dGr_dpi_region2():
+    assert_close(iapws97_dGr_dpi_region2(.7, .2), -0.0076523073842253275, rtol=1e-12)
+
+def test_iapws97_d2Gr_d2pi_region2():
+    assert_close(iapws97_d2Gr_d2pi_region2(.7, .2), -4.239257829323464e-05, rtol=1e-12)
+
 
 @pytest.mark.slow
 def test_iapws97_region2_fuzz():
     funcs_naive = [iapws97_d2G0_d2tau_region2_naive, iapws97_dG0_dtau_region2_naive, iapws97_G0_region2_naive, iapws97_d2Gr_dpidtau_region2_naive, iapws97_d2Gr_d2tau_region2_naive, iapws97_dGr_dtau_region2_naive, iapws97_d2Gr_d2pi_region2_naive, iapws97_Gr_region2_naive, iapws97_dGr_dpi_region2_naive]
-    funcs_fast = [iapws97_d2G0_d2tau_region2, iapws97_dG0_dtau_region2, iapws97_G0_region2, iapws97_d2Gr_dpidtau_region2, iapws97_d2Gr_d2tau_region2, iapws97_dGr_dtau_region2, iapws97_d2Gr_d2pi_region2, iapws97_Gr_region2, iapws97_dGr_dpi_region2]
+    funcs_fast = [iapws97_d2G0_d2tau_region2, iapws97_dG0_dtau_region2, iapws97_G0_region2,
+                  
+                  iapws97_d2Gr_dpidtau_region2, iapws97_d2Gr_d2tau_region2, iapws97_dGr_dtau_region2,
+                  iapws97_d2Gr_d2pi_region2, iapws97_Gr_region2, iapws97_dGr_dpi_region2]
     atols = [0, 0, 1e-14, 0, 0, 0.0, 3e-18, 0, 0, ]
     rtols = [1e-14, 1e-14, 5e-15, 2e-14, 2e-14, 2e-15, 1e-14, 2e-15, 2e-15]
     
-    N = 100
+    N = 200 # tested up to 2000
     P_lim = 1e-6
     Ts = linspace(273.15, 1073.15, N)
     def test_Ps(T, N):
@@ -302,11 +350,31 @@ def test_iapws97_region2_fuzz():
                              fast(tau, pi), rtol=rtol, atol=atol)
 
 #test_iapws97_region2_fuzz()
-                
+
+def test_iapws97_A_region3():
+    assert_close(iapws97_A_region3(1.1, .5), -2.2904854361532445, rtol=1e-13)
+
+def test_iapws97_dA_ddelta_region3():
+    assert_close(iapws97_dA_ddelta_region3(1.1, .5), 0.4629318841671135, rtol=1e-13)
+
+def test_iapws97_d2A_d2delta_region3():
+    assert_close(iapws97_d2A_d2delta_region3(1.1, .5), -2.805028150138424, rtol=1e-13)
+
+def test_iapws97_d2A_ddeltadtau_region3():
+    assert_close(iapws97_d2A_ddeltadtau_region3(1.1, .5), -6.355921133001381, rtol=1e-13)
+
+def test_iapws97_dA_dtau_region3():
+    assert_close(iapws97_dA_dtau_region3(1.1, .5), 6.572433280048887, rtol=1e-13)
+
+def test_iapws97_d2A_d2tau_region3():
+    assert_close(iapws97_d2A_d2tau_region3(1.1, .5), -23.97237328970195, rtol=1e-13)
+
+
 @pytest.mark.slow
 def test_iapws97_region3_fuzz():
     funcs_naive = [iapws97_d2A_ddeltadtau_region3_naive, iapws97_d2A_d2tau_region3_naive, iapws97_dA_dtau_region3_naive, iapws97_d2A_d2delta_region3_naive, iapws97_dA_ddelta_region3_naive, iapws97_A_region3_naive]
-    funcs_fast = [iapws97_d2A_ddeltadtau_region3, iapws97_d2A_d2tau_region3, iapws97_dA_dtau_region3, iapws97_d2A_d2delta_region3, iapws97_dA_ddelta_region3, iapws97_A_region3]
+    funcs_fast = [iapws97_d2A_ddeltadtau_region3, iapws97_d2A_d2tau_region3, iapws97_dA_dtau_region3,
+                  iapws97_d2A_d2delta_region3, iapws97_dA_ddelta_region3, iapws97_A_region3]
     atols = [0, 0, 0, 1e-13, 0.0, 0, ]
     rtols = [3e-12, 1e-11, 5e-13, 1e-12, 2e-12, 5e-14]
     N = 500
@@ -332,10 +400,39 @@ def test_iapws97_region3_fuzz():
                 for P in test_Ps(T, N):
                     rho = iapws97_rho(T, P)
                     delta = rho/322.0
+#                    print(tau, delta)
                     assert_close(naive(tau, delta),
                                  fast(tau, delta), rtol=rtol, atol=atol)
 #test_iapws97_region3_fuzz()
                     
+
+def test_iapws97_G0_region5_naive():
+    assert_close(iapws97_G0_region5(.9, 1.01), -10.309167223118518, rtol=1e-13)
+
+def test_iapws97_dG0_dtau_region5_naive():
+    assert_close(iapws97_dG0_dtau_region5(.9, 1.01), 9.208884308822196, rtol=1e-13)
+
+def test_iapws97_d2G0_d2tau_region5():
+    assert_close(iapws97_d2G0_d2tau_region5(.9, 1.01), -6.337757906177518, rtol=1e-13)
+
+def test_iapws97_Gr_region5():
+    assert_close(iapws97_Gr_region5(.9, 1.01), -0.0015332877816188876, rtol=1e-13)
+
+def test_iapws97_dGr_dpi_region5():
+    assert_close(iapws97_dGr_dpi_region5(.9, 1.01), -0.0015180281714734884, rtol=1e-13)
+    
+def test_iapws97_d2Gr_d2pi_region5():
+    assert_close(iapws97_d2Gr_d2pi_region5(.9, 1.01), 1.9216694490837294e-07, rtol=1e-13)
+
+def test_iapws97_dGr_dtau_region5():
+    assert_close(iapws97_dGr_dtau_region5(.9, 1.01), -0.009119973056785994, rtol=1e-13)
+
+def test_iapws97_d2Gr_d2tau_region5():
+    assert_close(iapws97_d2Gr_d2tau_region5(.9, 1.01), -0.025727469083651373, rtol=1e-13)
+
+def test_iapws97_d2Gr_dpidtau_region5():
+    assert_close(iapws97_d2Gr_dpidtau_region5(.9, 1.01), -0.009039988008632744, rtol=1e-13)
+    
 @pytest.mark.slow
 def test_iapws97_region5_fuzz():
     funcs_naive = [iapws97_d2G0_d2tau_region5_naive, iapws97_dG0_dtau_region5_naive, 
@@ -344,19 +441,21 @@ def test_iapws97_region5_fuzz():
                    iapws97_d2Gr_d2pi_region5_naive, iapws97_Gr_region5_naive,
                    iapws97_dGr_dpi_region5_naive]
     funcs_fast = [iapws97_d2G0_d2tau_region5, iapws97_dG0_dtau_region5,
-                  iapws97_G0_region5, iapws97_d2Gr_dpidtau_region5, 
+                  iapws97_G0_region5, 
+                  
+                  iapws97_d2Gr_dpidtau_region5, 
                   iapws97_d2Gr_d2tau_region5, iapws97_dGr_dtau_region5, 
                   iapws97_d2Gr_d2pi_region5, iapws97_Gr_region5,
                   iapws97_dGr_dpi_region5]
     atols = [0, 0, 0, 0, 0, 0, 5e-21, 4e-17, 1e-18]
-    rtols = [1e-15, 1e-15, 1e-15, 5e-15, 2e-15, 1e-14, 1e-14, 2e-14, 2e-14]
+    rtols = [2e-15, 1e-15, 1e-15, 5e-15, 2e-15, 1e-14, 1e-14, 2e-14, 2e-14]
     
-    funcs_naive = [iapws97_Gr_region5_naive]
-    funcs_fast = [iapws97_Gr_region5]
-    atols = [4e-17]
-    rtols = [2e-14]
+#    funcs_naive = [iapws97_Gr_region5_naive]
+#    funcs_fast = [iapws97_Gr_region5]
+#    atols = [4e-17]
+#    rtols = [2e-14]
     
-    N = 500
+    N = 2000
     Ts = linspace(1073.15, 2273.15, N)
     def test_Ps(T, N):
         return logspace(log10(1e-6), log10(50e6), N)
@@ -369,9 +468,10 @@ def test_iapws97_region5_fuzz():
             tau = 1000.0/T
             for P in test_Ps(T, N):
                 pi = P/1E6
+#                print(tau, pi)
                 v0 = naive(tau, pi)
                 v1 = fast(tau, pi)
-#                assert_close(v0, v1, rtol=rtol, atol=atol)
+                assert_close(v0, v1, rtol=rtol, atol=atol)
                 error = abs(1.0 - v1/v0)
                 erri += error
                 errs.append(error)
@@ -380,6 +480,8 @@ def test_iapws97_region5_fuzz():
 ### Fast tests
 
 def test_iapws97_dG_dpi_region1():
+    assert_close( iapws97_dG_dpi_region1(4.8, .8), 0.12341682293659642, rtol=1e-12)
+
     assert_close(iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6),
                  iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6), rtol=1e-14)
     
@@ -391,6 +493,7 @@ def test_iapws97_dG_dpi_region1():
                  0.09345587583404263, rtol=1e-14)
     assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
                  iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6), rtol=1e-14)
+
 
 
 def test_iapws97_dG_dpi_region2():
@@ -582,6 +685,10 @@ def test_iapws97_rho():
     assert_close(iapws97_rho(T=823, P=14e6), 40.39293607288123)
     assert_close(iapws97_rho(T=2000, P=3e7), 32.11456228328856)
     assert_close(iapws97_rho(648.6, 22.5e6), 353.06081088726)
+    
+    # Vapor pressure boundary
+    assert_close(iapws97_rho(432.0135947190398, 600559.0434678708, True), 3.171654556869339)
+    assert_close(iapws97_rho(432.0135947190398, 600559.0434678708, False), 908.5584542274903)
 
 @pytest.mark.CoolProp
 @pytest.mark.slow
@@ -885,6 +992,12 @@ def test_iapws97_T():
     # region 5 border requiring equation 2 calc
     rho = iapws97_rho(1073.15, 52396013.53002634)
     assert_close(iapws97_T(52396013.53002634, rho), 1073.15)
+
+def test_iapws97_identify_region_TP():
+    assert 1 == iapws97_identify_region_TP(432.0135947190398, 600559.0434678708)
+    assert 2 == iapws97_identify_region_TP(432.0135947190398, 600559.0434678708, use_95_boundary=True)
+
+
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -1805,18 +1918,18 @@ def test_iapws97_rho_extrapolated():
 def test_iapws95_P():
     assert_close(iapws95_rho(300.0, iapws95_P(300, 1000)), 1000)
 
-def test_iapws95_P_err():
-    err, derr = iapws95_P_err(300, 1000, 1e5)
+def test_iapws95_T_err():
+    err, derr = iapws95_T_err(300, 1000, 1e5)
     assert_close(err, 7733001.355973767, rtol=1e-11)
     assert_close(derr, 639359.0465881994, rtol=1e-11)
     
-    assert_close(derivative(lambda T: iapws95_P_err(T, 1000, 1e5)[0], 300, dx=1e-4),
-                 iapws95_P_err(300, 1000, 1e5)[1])
+    assert_close(derivative(lambda T: iapws95_T_err(T, 1000, 1e5)[0], 300, dx=1e-4),
+                 iapws95_T_err(300, 1000, 1e5)[1])
     
 def test_iapws95_rho():
     '''TODO points:
         
-    iapws95_rho(200.0, 1e9)
+    iapws95_rho(200.0, 1e9) - not solving
     '''
     assert_close(iapws95_rho(273.1600000001, 0.001), 7.932210036861784e-09, rtol=1e-8)
     
@@ -1826,25 +1939,34 @@ def test_iapws95_rho():
     # Point where was starting from negative density initially.
     assert_close(iapws95_rho(2357., 97719212), 85.77393882818544, rtol=1e-9)
 
-    # Three points CoolProp is finding the vapor root when the liquid one is correct
-    assert_close(iapws95_rho(432.0135947190398, 600559.0434678708), 908.5576752810769)
-    assert Psat_IAPWS(432.0135947190398) < 600559.0434678708
+
+    # Three points CoolProp is finding the vapor root when the liquid one is NOT correct
+    # initially was making the wrong call there
+    assert_close(iapws95_rho(432.0135947190398, 600559.0434678708), 3.1715230968689263)
     
-    assert_close(iapws95_rho(443.36028005610694, 796123.0461361709), 897.2358406215736)
-    assert Psat_IAPWS(443.36028005610694) < 796123.0461361709
+    assert_close(iapws95_rho(443.36028005610694, 796123.0461361709), 4.141564959829041)
     
-    assert_close(iapws95_rho(485.9103500701087, 2014934.1250668736), 849.3248042136873)
-    assert Psat_IAPWS(485.9103500701087) < 2014934.1250668736
+    assert_close(iapws95_rho(485.9103500701087, 2014934.1250668736), 10.114793546282295)
+    
+    assert_close(iapws95_rho(472.89458917842654, 1546542.3293244045), 7.819904266670308)
+    
+    # Found comparing against coolprop
+    assert_close(iapws95_rho(640, 20265239.648236595), 481.5275168680331, rtol=1e-10)
+    
+    # Slightly different density than CoolProp here
+    assert_close(iapws95_rho(647.08, 22059526.03804436), 295.66686689744756, rtol=1e-10)
+    
 
-    assert_close(iapws95_rho(472.89458917842654, 1546542.3293244045), 864.9560179779317)
-    assert Psat_IAPWS(472.89458917842654) <1546542.3293244045
-
-
+@pytest.mark.slow
+@pytest.mark.CoolProp
 def test_iapws95_rho_vs_Coolprop():
     from CoolProp.CoolProp import PropsSI
-    assert_close(iapws95_rho(2357., 97719212), PropsSI('DMASS', 'T', 2357, 'P', 97719212.0, 'water'), rtol=1e-9)
+    assert_close(iapws95_rho(2357., 97719212), 
+                 PropsSI('DMASS', 'T', 2357, 'P', 97719212.0, 'water'), 
+                 rtol=1e-9)
 
-
+def test_iapws95_T():
+    assert_close(iapws95_T(P=20265239.648236595, rho=481.5275168680331), 640.0)
 
 def test_rhol_sat_IAPWS():
     assert_close(iapws92_rhol_sat(273.16), 999.7891346511478, rtol=1e-13)

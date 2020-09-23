@@ -31,6 +31,12 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 .. contents:: :local:
 
+IAPWS-97 Basic Solvers
+------------------------
+.. autofunction:: chemicals.iapws.iapws97_rho
+.. autofunction:: chemicals.iapws.iapws97_P
+.. autofunction:: chemicals.iapws.iapws97_T
+
 IAPWS-95 Ideal Gas Terms
 ------------------------
 .. autofunction:: chemicals.iapws.iapws95_A0
@@ -56,7 +62,7 @@ IAPWS-95 Saturation Pressure/Temperature
 .. autofunction:: chemicals.iapws.iapws95_saturation
 
 IAPWS Saturation Density
------------------------
+------------------------
 .. autofunction:: chemicals.iapws.iapws95_rhol_sat
 .. autofunction:: chemicals.iapws.iapws95_rhog_sat
 .. autofunction:: chemicals.iapws.iapws92_rhol_sat
@@ -82,7 +88,7 @@ __all__ = [
            'iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
            'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
            'iapws97_region1_rho', 'iapws97_region2_rho', 'iapws97_region5_rho',
-           'iapws95_rho', 'iapws95_P',
+           'iapws95_rho', 'iapws95_P', 'iapws95_T',
            
            'iapws97_rho_extrapolated',
            'iapws97_rho', 'iapws97_P', 'iapws97_T',
@@ -111,7 +117,7 @@ __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97
     
     'iapws_97_Prho_err_region1', 'iapws_97_Prho_err_region2', 'iapws_97_Prho_err_region5',
     'iapws_97_Prho_err_region3',
-    'iapws95_rho_err', 'iapws95_P_err',
+    'iapws95_rho_err', 'iapws95_T_err',
     
     
    'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
@@ -135,6 +141,8 @@ __numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97
    'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_d2tau_region5', 'iapws97_d2Gr_dpidtau_region5',
    'iapws97_G0_region5', 'iapws97_dG0_dtau_region5', 'iapws97_d2G0_d2tau_region5',
    
+   'iapws95_d2Ar_ddelta2_delta_1',
+   
 
     ]
 
@@ -142,13 +150,19 @@ R95 = 461.51805 # Differs from the other formulation
 R97 = 461.526
 
 iapws95_MW = 18.015268
+'''Molecular weight of water in g/mol according to IAPWS-95, also used in IAPWS-97'''
 
 iapws95_Pc = 22064000.0
+'''Critical pressure of water in Pa according to IAPWS-95, also used in IAPWS-97'''
 
 iapws95_Tc = 647.096
+'''Critical temperature of water in K according to IAPWS-95, also used in IAPWS-97'''
+
 iapws95_Tc_inv = 1.0 / iapws95_Tc
 
 iapws95_rhoc = 322.0
+'''Critical density of water in kg/m^3 according to IAPWS-95, also used in IAPWS-97'''
+
 iapws95_rhoc_inv = 1.0 / iapws95_rhoc
 
 def use_mpmath_backend():
@@ -382,7 +396,9 @@ def iapws97_G_region1(tau, pi):
             - 9.353708729245799802e-26*pit2*pit*taut_inv3)))
 
 def iapws97_dG_dpi_region1(tau, pi):
-    r'''Calculates dG_dpi for region 1.
+    r'''Calculates the derivative of dimensionless Gibbs free energy
+    with respect to `pi` for water according to the IAPWS-97 standard dG_dpi 
+    (for region 1).
 
     Parameters
     ----------
@@ -571,7 +587,20 @@ def iapws97_d2G_dpidtau_region1(tau, pi):
     taut_inv9 = taut_inv30*taut_inv3
     taut_inv30 = taut_inv9*taut_inv30
     taut_inv30 *= taut_inv30 # 30 finally
-    return (-0.00009532278781397400275*pit + 0.00002648510719850759971*pit*taut2 - 0.002831059264396019754*pit*taut_inv3*taut_inv + 2.471629874118196128e-14*pit*taut8*taut8 + 0.02184171717541399937 + 1.533692306161854223e-8*pit2*taut2*taut2*taut - 0.0003801557381406480188*pit2*taut_inv3*taut_inv2 + 0.0001585150739097900138*taut2 - 0.01899006821841900047*taut_inv2 - 5.213697831648080174e-6*pit3*taut_inv3 - 0.00004485056381599999715*pit3*taut_inv3*taut_inv3 + 5.736691975169599686e-12*pit3*taut8*taut - 0.00001620679874404679866*pit3*pit*taut_inv9 - 8.3639381907043211e-9*pit7*taut_inv3*taut_inv3*taut_inv - 1.120618553264407982e-7*pit7*taut_inv9*taut_inv3 - 0.004249441109611180011*taut_inv3*taut_inv3*taut_inv2 + 0.002548717211142359929*taut_inv9*taut_inv - 4.187613795897837728e-16*pit7*pit7*pit3*pit3*taut_inv30 + 1.03230334817354737e-17*pit7*pit7*pit7*pit*taut_inv30*taut_inv2 + 2.902203139240009378e-20*pit28*taut_inv30*taut_inv9 - 1.397871848888307079e-20*pit28*pit*taut_inv30*taut_inv9*taut_inv + 2.26028372809409602e-21*pit28*pit2*taut_inv30*taut_inv9*taut_inv2 - 1.227206585277048923e-22*pit28*pit3*taut_inv30*taut_inv9*taut_inv3)
+    return (-0.00009532278781397400275*pit + 0.00002648510719850759971*pit*taut2 
+            - 0.002831059264396019754*pit*taut_inv3*taut_inv + 2.471629874118196128e-14*pit*taut8*taut8 
+            + 0.02184171717541399937 + 1.533692306161854223e-8*pit2*taut2*taut2*taut
+            - 0.0003801557381406480188*pit2*taut_inv3*taut_inv2 + 0.0001585150739097900138*taut2 
+            - 0.01899006821841900047*taut_inv2 - 5.213697831648080174e-6*pit3*taut_inv3 
+            - 0.00004485056381599999715*pit3*taut_inv3*taut_inv3 + 5.736691975169599686e-12*pit3*taut8*taut 
+            - 0.00001620679874404679866*pit3*pit*taut_inv9 - 8.3639381907043211e-9*pit7*taut_inv3*taut_inv3*taut_inv
+            - 1.120618553264407982e-7*pit7*taut_inv9*taut_inv3 - 0.004249441109611180011*taut_inv3*taut_inv3*taut_inv2 
+            + 0.002548717211142359929*taut_inv9*taut_inv - 4.187613795897837728e-16*pit7*pit7*pit3*pit3*taut_inv30 
+            + 1.03230334817354737e-17*pit7*pit7*pit7*pit*taut_inv30*taut_inv2 
+            + 2.902203139240009378e-20*pit28*taut_inv30*taut_inv9 
+            - 1.397871848888307079e-20*pit28*pit*taut_inv30*taut_inv9*taut_inv
+            + 2.26028372809409602e-21*pit28*pit2*taut_inv30*taut_inv9*taut_inv2
+            - 1.227206585277048923e-22*pit28*pit3*taut_inv30*taut_inv9*taut_inv3)
 
 ### Region 2
 
@@ -612,7 +641,30 @@ def iapws97_Gr_region2(tau, pi):
     taut4 = taut2*taut2
     taut10 = taut4*taut4*taut2
     taut25 = taut10*taut10*taut2*taut3
-    return (-0.01783486229235799886*pi*taut - 0.001773174247321299916*pi - 0.04599601369636500264*pi*taut2 - 0.05758125908343200011*pi*taut3 - 0.05032527872793000207*pi*taut4*taut2 - 0.00003303264167020299999*taut*pi2 + 4.387066728443500103e-7*taut*pi3 - 7.884730955936700091e-10*taut*pi4 - 0.000189489875163149999*pi2*taut2 - 0.003939277724335500143*pi2*taut4 - 0.04379729565057299823*pi2*taut4*taut3 - 0.00002667454791408700141*pi2*taut25*taut10*taut + 2.048173769230899887e-8*pi3 - 0.0000322776772385700023*pi3*taut3 - 0.001503392454214799983*pi3*taut4*taut2 - 0.04066825356264899827*pi3*taut25*taut10 + 1.279071785228500082e-8*pi4*taut2 + 4.82253727185070016e-7*pi4*taut3 + 2.292207633766100113e-6*pi4*pi*taut4*taut3 - 1.671476645106100115e-11*pi4*pi2*taut3 - 0.002117147232135499837*pi4*pi2*taut10*taut4*taut2 - 23.89574193410399872*pi4*pi2*taut25*taut10 - 5.905956432427000368e-18*pi4*pi3 - 1.262180889910100042e-6*pi4*pi3*taut10*taut - 0.03894684243573900279*pi4*pi3*taut25 + 1.125621136045899983e-11*pi8*taut4*taut4 - 8.231134089799800435*pi8*taut25*taut10*taut + 1.980971280208800021e-8*pi8*pi*taut10*taut3 + 1.040696521017399955e-19*pi8*pi2*taut4 - 1.023474709592900015e-13*pi8*pi2*taut10 - 1.001817937951099974e-9*pi8*pi2*taut10*taut4 - 8.088290864698499771e-11*pi8*pi8*taut25*taut4 + 0.1069303187940899985*pi8*pi8*taut25*taut25 - 0.3366225057417099875*pi8*pi8*pi2*taut25*taut25*taut4*taut3 + 8.918584535542099871e-25*pi20*taut10*taut10 + 3.062931687623199748e-13*pi20*taut25*taut10 - 4.200246769820800092e-6*pi20*taut25*taut10*taut10*taut3 - 5.905602968563900274e-26*pi20*pi*taut10*taut10*taut + 3.782694761345700151e-6*pi20*pi2*taut25*taut25*taut3 - 1.276860893468100005e-15*pi20*pi3*taut25*taut10*taut4 + 7.308761059506100019e-29*pi20*pi4*taut25*taut + 5.541471535077800115e-17*pi20*pi4*taut25*taut10*taut4*taut - 9.436970724120999844e-7*pi20*pi4*taut25*taut25*taut4*taut4)
+    return (-0.01783486229235799886*pi*taut - 0.001773174247321299916*pi
+            - 0.04599601369636500264*pi*taut2 - 0.05758125908343200011*pi*taut3
+            - 0.05032527872793000207*pi*taut4*taut2 - 0.00003303264167020299999*taut*pi2 
+            + 4.387066728443500103e-7*taut*pi3 - 7.884730955936700091e-10*taut*pi4 
+            - 0.000189489875163149999*pi2*taut2 - 0.003939277724335500143*pi2*taut4 
+            - 0.04379729565057299823*pi2*taut4*taut3 - 0.00002667454791408700141*pi2*taut25*taut10*taut 
+            + 2.048173769230899887e-8*pi3 - 0.0000322776772385700023*pi3*taut3
+            - 0.001503392454214799983*pi3*taut4*taut2 - 0.04066825356264899827*pi3*taut25*taut10
+            + 1.279071785228500082e-8*pi4*taut2 + 4.82253727185070016e-7*pi4*taut3
+            + 2.292207633766100113e-6*pi4*pi*taut4*taut3 - 1.671476645106100115e-11*pi4*pi2*taut3 
+            - 0.002117147232135499837*pi4*pi2*taut10*taut4*taut2 - 23.89574193410399872*pi4*pi2*taut25*taut10 
+            - 5.905956432427000368e-18*pi4*pi3 - 1.262180889910100042e-6*pi4*pi3*taut10*taut 
+            - 0.03894684243573900279*pi4*pi3*taut25 + 1.125621136045899983e-11*pi8*taut4*taut4
+            - 8.231134089799800435*pi8*taut25*taut10*taut + 1.980971280208800021e-8*pi8*pi*taut10*taut3 
+            + 1.040696521017399955e-19*pi8*pi2*taut4 - 1.023474709592900015e-13*pi8*pi2*taut10
+            - 1.001817937951099974e-9*pi8*pi2*taut10*taut4 - 8.088290864698499771e-11*pi8*pi8*taut25*taut4 
+            + 0.1069303187940899985*pi8*pi8*taut25*taut25
+            - 0.3366225057417099875*pi8*pi8*pi2*taut25*taut25*taut4*taut3 
+            + 8.918584535542099871e-25*pi20*taut10*taut10 + 3.062931687623199748e-13*pi20*taut25*taut10 
+            - 4.200246769820800092e-6*pi20*taut25*taut10*taut10*taut3 
+            - 5.905602968563900274e-26*pi20*pi*taut10*taut10*taut + 3.782694761345700151e-6*pi20*pi2*taut25*taut25*taut3
+            - 1.276860893468100005e-15*pi20*pi3*taut25*taut10*taut4 + 7.308761059506100019e-29*pi20*pi4*taut25*taut
+            + 5.541471535077800115e-17*pi20*pi4*taut25*taut10*taut4*taut
+            - 9.436970724120999844e-7*pi20*pi4*taut25*taut25*taut4*taut4)
 
 def iapws97_dGr_dpi_region2(tau, pi):
     r'''Calculates dGr_dpi for region 2.
@@ -699,7 +751,25 @@ def iapws97_d2Gr_d2pi_region2(tau, pi):
     taut4 = taut2*taut2
     taut10 = taut4*taut4*taut2
     taut25 = taut10*taut10*taut4*taut
-    return (2.632240037066100168e-6*pi*taut + 1.228904261538539999e-7*pi - 0.0001936660634314200003*pi*taut3 - 0.00902035472528879903*pi*taut4*taut2 - 0.2440095213758939896*pi*taut25*taut10 - 0.00006606528334040599997*taut - 9.461677147124039696e-9*taut*pi2 + 1.534886142274200165e-7*pi2*taut2 + 5.787044726220840615e-6*pi2*taut3 - 0.0003789797503262999981*taut2 + 0.00004584415267532200057*pi2*pi*taut4*taut3 - 5.014429935318299763e-10*pi4*taut3 - 0.06351441696406499859*pi4*taut10*taut4*taut2 - 716.8722580231200254*pi4*taut25*taut10 - 0.007878555448671000286*taut4 - 2.480501701619340401e-16*pi4*pi - 0.00005301159737622419582*pi4*pi*taut10*taut - 1.635767382301038353*pi4*pi*taut25 + 6.303478361857040293e-10*pi4*pi2*taut4*taut4 - 460.9435090287888102*pi4*pi2*taut25*taut10*taut + 1.426299321750336068e-6*pi4*pi2*pi*taut10*taut3 - 0.08759459130114599645*taut4*taut3 + 9.366268689156599206e-18*pi8*taut4 - 9.211272386336099881e-12*pi8*taut10 - 9.016361441559899391e-8*pi8*taut10*taut4 - 1.941189807527639966e-8*pi8*pi4*pi2*taut25*taut4 + 25.66327651058159987*pi8*pi4*pi2*taut25*taut25 - 103.0064867569632554*pi8*pi8*taut25*taut25*taut4*taut3 + 3.389062123505998002e-22*pi18*taut10*taut10 + 1.16391404129681584e-10*pi18*taut25*taut10 - 0.001596093772531903933*pi18*taut25*taut10*taut10*taut3 - 2.4803532467968384e-23*pi18*pi*taut10*taut10*taut + 0.001747604979741713581*pi18*pi2*taut25*taut25*taut3 - 6.460916120948586575e-13*pi18*pi2*pi*taut25*taut10*taut4 + 4.034436104847367623e-26*pi18*pi4*taut25*taut + 3.058892287362945313e-14*pi18*pi4*taut25*taut10*taut4*taut - 0.0005209207839714791177*pi18*pi4*taut25*taut25*taut4*taut4 - 0.00005334909582817400282*taut25*taut10*taut)
+    return (2.632240037066100168e-6*pi*taut + 1.228904261538539999e-7*pi - 0.0001936660634314200003*pi*taut3
+            - 0.00902035472528879903*pi*taut4*taut2 - 0.2440095213758939896*pi*taut25*taut10 
+            - 0.00006606528334040599997*taut - 9.461677147124039696e-9*taut*pi2 + 1.534886142274200165e-7*pi2*taut2 
+            + 5.787044726220840615e-6*pi2*taut3 - 0.0003789797503262999981*taut2 
+            + 0.00004584415267532200057*pi2*pi*taut4*taut3 - 5.014429935318299763e-10*pi4*taut3 
+            - 0.06351441696406499859*pi4*taut10*taut4*taut2 - 716.8722580231200254*pi4*taut25*taut10
+            - 0.007878555448671000286*taut4 - 2.480501701619340401e-16*pi4*pi 
+            - 0.00005301159737622419582*pi4*pi*taut10*taut - 1.635767382301038353*pi4*pi*taut25 
+            + 6.303478361857040293e-10*pi4*pi2*taut4*taut4 - 460.9435090287888102*pi4*pi2*taut25*taut10*taut
+            + 1.426299321750336068e-6*pi4*pi2*pi*taut10*taut3 - 0.08759459130114599645*taut4*taut3 
+            + 9.366268689156599206e-18*pi8*taut4 - 9.211272386336099881e-12*pi8*taut10
+            - 9.016361441559899391e-8*pi8*taut10*taut4 - 1.941189807527639966e-8*pi8*pi4*pi2*taut25*taut4
+            + 25.66327651058159987*pi8*pi4*pi2*taut25*taut25 - 103.0064867569632554*pi8*pi8*taut25*taut25*taut4*taut3 
+            + 3.389062123505998002e-22*pi18*taut10*taut10 + 1.16391404129681584e-10*pi18*taut25*taut10 
+            - 0.001596093772531903933*pi18*taut25*taut10*taut10*taut3 - 2.4803532467968384e-23*pi18*pi*taut10*taut10*taut
+            + 0.001747604979741713581*pi18*pi2*taut25*taut25*taut3 
+            - 6.460916120948586575e-13*pi18*pi2*pi*taut25*taut10*taut4 + 4.034436104847367623e-26*pi18*pi4*taut25*taut 
+            + 3.058892287362945313e-14*pi18*pi4*taut25*taut10*taut4*taut 
+            - 0.0005209207839714791177*pi18*pi4*taut25*taut25*taut4*taut4 - 0.00005334909582817400282*taut25*taut10*taut)
 
 def iapws97_dGr_dtau_region2(tau, pi):
     taut = tau - 0.5
@@ -1709,9 +1779,9 @@ def iapws97_region3_rho(T, P):
     return rho
 
 
-def iapws97_identify_region_TP(T, P):
+def iapws97_identify_region_TP(T, P, use_95_boundary=False):
     r'''Identify the main region given a temperature and pressure point
-    according to the IAPWS097 standard.
+    according to the IAPWS-97 standard.
     
     Raises a ValueError if the input point is out of bounds.
 
@@ -1721,6 +1791,9 @@ def iapws97_identify_region_TP(T, P):
         Temperature, [K]
     P : float
         Pressure, [Pa]
+    use_95_boundary : bool, optional
+        If True, the SF-95 formulation vapor pressure fit will be used instead
+        of the simpler vapor pressure curve associated with IF-97, [-]
 
     Returns
     -------
@@ -1735,7 +1808,10 @@ def iapws97_identify_region_TP(T, P):
     '''
     under_623 = T <= 623.15
     if under_623:
-        Psat = Psat_IAPWS(T)
+        if use_95_boundary:
+            Psat = iapws95_Psat(T)
+        else:
+            Psat = Psat_IAPWS(T)
     two_to_three = iapws97_boundary_2_3(T)
     if 273.15 <= T <= 623.15 and Psat < P <= 100E6:
         return 1
@@ -1771,7 +1847,7 @@ def iapws97_region5_rho(T, P):
     return P/(R97*T*pi*dG_dpi)
 
 
-def iapws97_rho(T, P):
+def iapws97_rho(T, P, use_95_boundary=False):
     r'''Calculate the density of water in kg/m^3 according to the IAPWS-97 
     standard.
     
@@ -1781,6 +1857,9 @@ def iapws97_rho(T, P):
         Temperature, [K]
     P : float
         Pressure, [Pa]
+    use_95_boundary : bool, optional
+        If True, respect the IAPWS-95 vapor pressure curve instead of the IF-97
+        one, [-]
 
     Returns
     -------
@@ -1832,7 +1911,7 @@ def iapws97_rho(T, P):
        The International Association for the Properties of Water and Steam 1 
        (2007): 48.
     '''
-    region = iapws97_identify_region_TP(T, P)
+    region = iapws97_identify_region_TP(T, P, use_95_boundary)
     if region == 1:
         return iapws97_region1_rho(T, P)
     elif region == 2:
@@ -1845,11 +1924,11 @@ def iapws97_rho(T, P):
         raise ValueError("Out of bounds")
 
 
-def iapws97_rho_extrapolated(T, P):
+def iapws97_rho_extrapolated(T, P, use_95_boundary=False):
     # Intended to extend the range using first derivatives
     # for use in iapws-95 solver.
     try:
-        rho = iapws97_rho(T, P)
+        rho = iapws97_rho(T, P, use_95_boundary)
     except:
         if T > 2273.15 and P < 50E6:
             T_border = 2273.15
@@ -1897,7 +1976,7 @@ def iapws97_rho_extrapolated(T, P):
                 P = 100e6
             if T > 1073.15:
                 T = 1073.15
-            rho = iapws97_rho(T, P)
+            rho = iapws97_rho(T, P, use_95_boundary)
     return rho
 
 
@@ -4326,6 +4405,7 @@ def iapws95_rhog_sat(T):
 ### IAPWS 95 Trho, Prho, TP solvers
 
 def iapws95_rho_err(rho, T, P_spec):
+    # For solving for a rho while P is specified
     RT = R95*T
     tau = iapws95_Tc / T
     delta = rho * iapws95_rhoc_inv
@@ -4337,13 +4417,8 @@ def iapws95_rho_err(rho, T, P_spec):
                 + 103684.0)*9.644689633887581e-06 # 1/322**2
     return err, derr
 
-def iapws95_P(T, rho):
-    tau = iapws95_Tc / T
-    delta = rho * iapws95_rhoc_inv
-    dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
-    return (dAddelta_val*delta)*rho*R95*T
-
-def iapws95_P_err(T, rho, P_spec):
+def iapws95_T_err(T, rho, P_spec):
+    # Use for solving for T
     tau = iapws95_Tc / T
     delta = rho * iapws95_rhoc_inv
     dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
@@ -4351,16 +4426,74 @@ def iapws95_P_err(T, rho, P_spec):
     dP_dT = rho*R95*delta*(dAddelta_val - tau*iapws95_d2Ar_ddeltadtau(tau, delta))
     return err, dP_dT
 
-def iapws_T(P, rho):
+def iapws95_P(T, rho):
+    tau = iapws95_Tc / T
+    delta = rho * iapws95_rhoc_inv
+    dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
+    return (dAddelta_val*delta)*rho*R95*T
+
+
+def iapws95_T(P, rho):
+#    if P < iapws95_Pc:
+#        Tsat = iapws95_Tsat(P)
+#        if 
+    MAX_T_STEP = 100.0
+    
     try:
         T = iapws97_T(P, rho)
     except:
-        pass
+        T = 500.0
+
+    err, derr = iapws95_T_err(T, rho, P)
+    dT = - err/derr
+    if dT < -MAX_T_STEP:
+        dT = -MAX_T_STEP
+    elif dT > MAX_T_STEP:
+        dT = MAX_T_STEP
+    T_old = T + dT
+
+    err, derr = iapws95_T_err(T_old, rho, P)
+    dT = - err/derr
+    if dT < -MAX_T_STEP:
+        dT = -MAX_T_STEP
+    elif dT > MAX_T_STEP:
+        dT = MAX_T_STEP
+    T = T_old + dT
+    iterations = 2
+    while (abs(T_old - T) > abs(1e-9*T)) and iterations < 100:
+        T_old = T
+        err, derr = iapws95_T_err(T, rho, P)
+        dT = - err/derr
+        if dT < -MAX_T_STEP:
+            dT = -MAX_T_STEP
+        elif dT > MAX_T_STEP:
+            dT = MAX_T_STEP
+        T = T_old + dT
+        iterations += 1
+#        print(T, err)
+    if iterations == 100:
+        raise ValueError("Could not converge a temprature solution")
+    return T
+
 
 
 def iapws95_rho(T, P):
     MAX_RHO_STEP = 200.0 # iapws95_rho(250, 1e9) is a good point showing the advantage of this
-    rho = iapws97_rho_extrapolated(T, P)
+    rho = iapws97_rho_extrapolated(T, P, True)
+    
+    if T < iapws95_Tc:
+        # Experimental investication hasn't revealed any places where the solver
+        # skips out of the selected region.
+        Psat = iapws95_Psat(T)
+        if P < Psat: 
+            rho_high = iapws95_rhog_sat(T)
+            if rho > rho_high:
+                rho = rho_high
+        else:
+            rho_low = iapws95_rhol_sat(T)
+            if rho < rho_low:
+                rho = rho_low
+        
     
 #    print(rho)
     # newton solver overhead is huge.
