@@ -88,8 +88,8 @@ def test_none_and_length_check():
 
     assert True == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]]))
     assert True == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]]), length=2)
-    assert False == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]]), length=3)
-    assert False == none_and_length_check(np.array([[1, 1], [1, 1, 10], [1, 30], [10,0]]), length=3)
+    assert False == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]], dtype=object), length=3)
+    assert False == none_and_length_check(np.array([[1, 1], [1, 1, 10], [1, 30], [10,0]], dtype=object), length=3)
 
     
 def test_property_molar_to_mass():

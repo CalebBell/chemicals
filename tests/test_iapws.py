@@ -85,13 +85,13 @@ def iapws97_G_region1_naive(tau, pi):
 def iapws97_dG_dpi_region1_naive(tau, pi):
     return sum([-nis1[i]*lis1[i]*(7.1-pi)**(lis1[i]-1)*(tau-1.222)**Jis1[i] for i in range(34)])
 
-def iapws97_d2G_d2pi_region1_naive(tau, pi):
+def iapws97_d2G_dpi2_region1_naive(tau, pi):
     return sum([nis1[i]*lis1[i]*(lis1[i]-1)*(7.1-pi)**(lis1[i]-2)*(tau-1.222)**Jis1[i] for i in range(34)])
 
 def iapws97_dG_dtau_region1_naive(tau, pi):
     return sum([nis1[i]*Jis1[i]*(7.1-pi)**lis1[i]*(tau-1.222)**(Jis1[i]-1) for i in range(34)])
 
-def iapws97_d2G_d2tau_region1_naive(tau, pi):
+def iapws97_d2G_dtau2_region1_naive(tau, pi):
     return sum([nis1[i]*Jis1[i]*(Jis1[i]-1)*(7.1-pi)**lis1[i]*(tau-1.222)**(Jis1[i]-2) for i in range(34)])
 
 def iapws97_d2G_dpidtau_region1_naive(tau, pi):
@@ -108,7 +108,7 @@ def iapws97_G0_region2_naive(tau, pi):
 def iapws97_dG0_dtau_region2_naive(tau, pi):
     return sum([n0is2[i]*J0is2[i]*tau**(J0is2[i]-1) for i in range(9)])
 
-def iapws97_d2G0_d2tau_region2_naive(tau, pi):
+def iapws97_d2G0_dtau2_region2_naive(tau, pi):
     return sum([n0is2[i]*J0is2[i]*(J0is2[i]-1)*tau**(J0is2[i]-2) for i in range(9)])
 
 n0is2 = [-0.96927686500217E1, 0.10086655968018E2, -0.56087911283020E-2,
@@ -146,13 +146,13 @@ def iapws97_Gr_region2_naive(tau, pi):
 def iapws97_dGr_dpi_region2_naive(tau, pi):
     return sum([nis2[i]*lis2[i]*pi**(lis2[i]-1)*(tau-0.5)**Jis2[i] for i in range(43)])
 
-def iapws97_d2Gr_d2pi_region2_naive(tau, pi):
+def iapws97_d2Gr_dpi2_region2_naive(tau, pi):
     return sum([nis2[i]*lis2[i]*(lis2[i]-1)*pi**(lis2[i]-2)*(tau-0.5)**Jis2[i] for i in range(43)])
 
 def iapws97_dGr_dtau_region2_naive(tau, pi):
     return sum([nis2[i]*pi**lis2[i]*Jis2[i]*(tau-0.5)**(Jis2[i]-1) for i in range(43)])
 
-def iapws97_d2Gr_d2tau_region2_naive(tau, pi):
+def iapws97_d2Gr_dtau2_region2_naive(tau, pi):
     return sum([nis2[i]*pi**lis2[i]*Jis2[i]*(Jis2[i]-1)*(tau-0.5)**(Jis2[i]-2) for i in range(43)])
 
 def iapws97_d2Gr_dpidtau_region2_naive(tau, pi):
@@ -185,13 +185,13 @@ def iapws97_A_region3_naive(tau, delta):
 def iapws97_dA_ddelta_region3_naive(tau, delta):
     return (nis3[0]/delta + sum([nis3[i]*lis3[i]*delta**(lis3[i]-1)*tau**Jis3[i] for i in range(1, 40)]))
 
-def iapws97_d2A_d2delta_region3_naive(tau, delta):
+def iapws97_d2A_ddelta2_region3_naive(tau, delta):
     return (-nis3[0]/delta**2 + sum([nis3[i]*lis3[i]*(lis3[i]-1)*delta**(lis3[i]-2)*tau**Jis3[i] for i in range(1, 40)]))
 
 def iapws97_dA_dtau_region3_naive(tau, delta):
     return (sum([nis3[i]*Jis3[i]*delta**lis3[i]*tau**(Jis3[i]-1) for i in range(1, 40)]))
 
-def iapws97_d2A_d2tau_region3_naive(tau, delta):
+def iapws97_d2A_dtau2_region3_naive(tau, delta):
     return (sum([nis3[i]*Jis3[i]*(Jis3[i]-1)*delta**lis3[i]*tau**(Jis3[i]-2) for i in range(1, 40)]))
 
 def iapws97_d2A_ddeltadtau_region3_naive(tau, delta):
@@ -214,7 +214,7 @@ def iapws97_G0_region5_naive(tau, pi):
 def iapws97_dG0_dtau_region5_naive(tau, pi):
     return sum( [n0is5[i]*J0is5[i]*tau**(J0is5[i]-1) for i in range(6)] )
 
-def iapws97_d2G0_d2tau_region5_naive(tau, pi):
+def iapws97_d2G0_dtau2_region5_naive(tau, pi):
     return sum( [n0is5[i]*J0is5[i]*(J0is5[i]-1)*tau**(J0is5[i]-2) for i in range(6)] )
 
 
@@ -224,13 +224,13 @@ def iapws97_Gr_region5_naive(tau, pi):
 def iapws97_dGr_dpi_region5_naive(tau, pi):
     return sum( [nis5[i]*lis5[i]*pi**(lis5[i]-1)*tau**Jis5[i] for i in range(6)] )
 
-def iapws97_d2Gr_d2pi_region5_naive(tau, pi):
+def iapws97_d2Gr_dpi2_region5_naive(tau, pi):
     return sum( [nis5[i]*lis5[i]*(lis5[i]-1)*pi**(lis5[i]-2)*tau**Jis5[i] for i in range(6)] )
 
 def iapws97_dGr_dtau_region5_naive(tau, pi):
     return sum( [nis5[i]*pi**lis5[i]*Jis5[i]*tau**(Jis5[i]-1) for i in range(6)] )
 
-def iapws97_d2Gr_d2tau_region5_naive(tau, pi):
+def iapws97_d2Gr_dtau2_region5_naive(tau, pi):
     return sum( [nis5[i]*pi**lis5[i]*Jis5[i]*(Jis5[i]-1)*tau**(Jis5[i]-2) for i in range(6)] )
 
 def iapws97_d2Gr_dpidtau_region5_naive(tau, pi):
@@ -249,8 +249,8 @@ def test_iapws97_d2G_dpi2_region1():
 def test_iapws97_dG_dtau_region1():
     assert_close(iapws97_dG_dtau_region1(4.8, .8), 0.12200788755868151, rtol=1e-12)
 
-def test_iapws97_d2G_d2tau_region1():
-    assert_close(iapws97_d2G_d2tau_region1(4.8, .8), -0.38995449934370313, rtol=1e-12)
+def test_iapws97_d2G_dtau2_region1():
+    assert_close(iapws97_d2G_dtau2_region1(4.8, .8), -0.38995449934370313, rtol=1e-12)
 
 def test_iapws97_d2G_dpidtau_region1():
     assert_close(iapws97_d2G_dpidtau_region1(4.8, .8), 0.02436120286448202, rtol=1e-12)
@@ -261,10 +261,10 @@ def test_iapws97_d2G_dpidtau_region1():
     
 @pytest.mark.slow
 def test_iapws97_region1_fuzz():
-    funcs_naive = [iapws97_dG_dpi_region1_naive, iapws97_G_region1_naive, iapws97_d2G_d2pi_region1_naive,
-                   iapws97_dG_dtau_region1_naive, iapws97_d2G_d2tau_region1_naive, iapws97_d2G_dpidtau_region1_naive]
+    funcs_naive = [iapws97_dG_dpi_region1_naive, iapws97_G_region1_naive, iapws97_d2G_dpi2_region1_naive,
+                   iapws97_dG_dtau_region1_naive, iapws97_d2G_dtau2_region1_naive, iapws97_d2G_dpidtau_region1_naive]
     funcs_fast = [iapws97_dG_dpi_region1, iapws97_G_region1, iapws97_d2G_dpi2_region1,
-                  iapws97_dG_dtau_region1, iapws97_d2G_d2tau_region1, iapws97_d2G_dpidtau_region1]
+                  iapws97_dG_dtau_region1, iapws97_d2G_dtau2_region1, iapws97_d2G_dpidtau_region1]
     atols = [0, 1e-14, 0, 3e-15, 0.0, 1e-16]
     rtols = [2e-13, 1e-12, 3e-12, 1e-13, 1e-12, 2e-12]
 
@@ -294,8 +294,8 @@ def test_iapws97_G0_region2():
 def test_iapws97_dG0_dtau_region2():
     assert_close(iapws97_dG0_dtau_region2(.7, .2), 13.987869557187791, rtol=1e-12)
 
-def test_iapws97_d2G0_d2tau_region2():
-    assert_close(iapws97_d2G0_d2tau_region2(.7, .2), -9.417242299320637, rtol=1e-12)
+def test_iapws97_d2G0_dtau2_region2():
+    assert_close(iapws97_d2G0_dtau2_region2(.7, .2), -9.417242299320637, rtol=1e-12)
 
 def test_iapws97_Gr_region2():
     assert_close(iapws97_Gr_region2(.7, .2), -0.0015296155747292416, rtol=1e-12)
@@ -303,8 +303,8 @@ def test_iapws97_Gr_region2():
 def test_iapws97_dGr_dtau_region2():
     assert_close( iapws97_dGr_dtau_region2(.7, .2), -0.00865815941508857, rtol=1e-12)
 
-def test_iapws97_d2Gr_d2tau_region2():
-    assert_close(iapws97_d2Gr_d2tau_region2(.7, .2), -0.0328162552745155, rtol=1e-12)
+def test_iapws97_d2Gr_dtau2_region2():
+    assert_close(iapws97_d2Gr_dtau2_region2(.7, .2), -0.0328162552745155, rtol=1e-12)
 
 def test_iapws97_d2Gr_dpidtau_region2():
     assert_close(iapws97_d2Gr_dpidtau_region2(.7, .2), -0.043342202599839647, rtol=1e-12)
@@ -312,17 +312,17 @@ def test_iapws97_d2Gr_dpidtau_region2():
 def test_iapws97_dGr_dpi_region2():
     assert_close(iapws97_dGr_dpi_region2(.7, .2), -0.0076523073842253275, rtol=1e-12)
 
-def test_iapws97_d2Gr_d2pi_region2():
-    assert_close(iapws97_d2Gr_d2pi_region2(.7, .2), -4.239257829323464e-05, rtol=1e-12)
+def test_iapws97_d2Gr_dpi2_region2():
+    assert_close(iapws97_d2Gr_dpi2_region2(.7, .2), -4.239257829323464e-05, rtol=1e-12)
 
 
 @pytest.mark.slow
 def test_iapws97_region2_fuzz():
-    funcs_naive = [iapws97_d2G0_d2tau_region2_naive, iapws97_dG0_dtau_region2_naive, iapws97_G0_region2_naive, iapws97_d2Gr_dpidtau_region2_naive, iapws97_d2Gr_d2tau_region2_naive, iapws97_dGr_dtau_region2_naive, iapws97_d2Gr_d2pi_region2_naive, iapws97_Gr_region2_naive, iapws97_dGr_dpi_region2_naive]
-    funcs_fast = [iapws97_d2G0_d2tau_region2, iapws97_dG0_dtau_region2, iapws97_G0_region2,
+    funcs_naive = [iapws97_d2G0_dtau2_region2_naive, iapws97_dG0_dtau_region2_naive, iapws97_G0_region2_naive, iapws97_d2Gr_dpidtau_region2_naive, iapws97_d2Gr_dtau2_region2_naive, iapws97_dGr_dtau_region2_naive, iapws97_d2Gr_dpi2_region2_naive, iapws97_Gr_region2_naive, iapws97_dGr_dpi_region2_naive]
+    funcs_fast = [iapws97_d2G0_dtau2_region2, iapws97_dG0_dtau_region2, iapws97_G0_region2,
                   
-                  iapws97_d2Gr_dpidtau_region2, iapws97_d2Gr_d2tau_region2, iapws97_dGr_dtau_region2,
-                  iapws97_d2Gr_d2pi_region2, iapws97_Gr_region2, iapws97_dGr_dpi_region2]
+                  iapws97_d2Gr_dpidtau_region2, iapws97_d2Gr_dtau2_region2, iapws97_dGr_dtau_region2,
+                  iapws97_d2Gr_dpi2_region2, iapws97_Gr_region2, iapws97_dGr_dpi_region2]
     atols = [0, 0, 1e-14, 0, 0, 0.0, 3e-18, 0, 0, ]
     rtols = [1e-14, 1e-14, 5e-15, 2e-14, 2e-14, 2e-15, 1e-14, 2e-15, 2e-15]
     
@@ -357,8 +357,8 @@ def test_iapws97_A_region3():
 def test_iapws97_dA_ddelta_region3():
     assert_close(iapws97_dA_ddelta_region3(1.1, .5), 0.4629318841671135, rtol=1e-13)
 
-def test_iapws97_d2A_d2delta_region3():
-    assert_close(iapws97_d2A_d2delta_region3(1.1, .5), -2.805028150138424, rtol=1e-13)
+def test_iapws97_d2A_ddelta2_region3():
+    assert_close(iapws97_d2A_ddelta2_region3(1.1, .5), -2.805028150138424, rtol=1e-13)
 
 def test_iapws97_d2A_ddeltadtau_region3():
     assert_close(iapws97_d2A_ddeltadtau_region3(1.1, .5), -6.355921133001381, rtol=1e-13)
@@ -366,15 +366,15 @@ def test_iapws97_d2A_ddeltadtau_region3():
 def test_iapws97_dA_dtau_region3():
     assert_close(iapws97_dA_dtau_region3(1.1, .5), 6.572433280048887, rtol=1e-13)
 
-def test_iapws97_d2A_d2tau_region3():
-    assert_close(iapws97_d2A_d2tau_region3(1.1, .5), -23.97237328970195, rtol=1e-13)
+def test_iapws97_d2A_dtau2_region3():
+    assert_close(iapws97_d2A_dtau2_region3(1.1, .5), -23.97237328970195, rtol=1e-13)
 
 
 @pytest.mark.slow
 def test_iapws97_region3_fuzz():
-    funcs_naive = [iapws97_d2A_ddeltadtau_region3_naive, iapws97_d2A_d2tau_region3_naive, iapws97_dA_dtau_region3_naive, iapws97_d2A_d2delta_region3_naive, iapws97_dA_ddelta_region3_naive, iapws97_A_region3_naive]
-    funcs_fast = [iapws97_d2A_ddeltadtau_region3, iapws97_d2A_d2tau_region3, iapws97_dA_dtau_region3,
-                  iapws97_d2A_d2delta_region3, iapws97_dA_ddelta_region3, iapws97_A_region3]
+    funcs_naive = [iapws97_d2A_ddeltadtau_region3_naive, iapws97_d2A_dtau2_region3_naive, iapws97_dA_dtau_region3_naive, iapws97_d2A_ddelta2_region3_naive, iapws97_dA_ddelta_region3_naive, iapws97_A_region3_naive]
+    funcs_fast = [iapws97_d2A_ddeltadtau_region3, iapws97_d2A_dtau2_region3, iapws97_dA_dtau_region3,
+                  iapws97_d2A_ddelta2_region3, iapws97_dA_ddelta_region3, iapws97_A_region3]
     atols = [0, 0, 0, 1e-13, 0.0, 0, ]
     rtols = [3e-12, 1e-11, 5e-13, 1e-12, 2e-12, 5e-14]
     N = 500
@@ -412,8 +412,8 @@ def test_iapws97_G0_region5_naive():
 def test_iapws97_dG0_dtau_region5_naive():
     assert_close(iapws97_dG0_dtau_region5(.9, 1.01), 9.208884308822196, rtol=1e-13)
 
-def test_iapws97_d2G0_d2tau_region5():
-    assert_close(iapws97_d2G0_d2tau_region5(.9, 1.01), -6.337757906177518, rtol=1e-13)
+def test_iapws97_d2G0_dtau2_region5():
+    assert_close(iapws97_d2G0_dtau2_region5(.9, 1.01), -6.337757906177518, rtol=1e-13)
 
 def test_iapws97_Gr_region5():
     assert_close(iapws97_Gr_region5(.9, 1.01), -0.0015332877816188876, rtol=1e-13)
@@ -421,31 +421,31 @@ def test_iapws97_Gr_region5():
 def test_iapws97_dGr_dpi_region5():
     assert_close(iapws97_dGr_dpi_region5(.9, 1.01), -0.0015180281714734884, rtol=1e-13)
     
-def test_iapws97_d2Gr_d2pi_region5():
-    assert_close(iapws97_d2Gr_d2pi_region5(.9, 1.01), 1.9216694490837294e-07, rtol=1e-13)
+def test_iapws97_d2Gr_dpi2_region5():
+    assert_close(iapws97_d2Gr_dpi2_region5(.9, 1.01), 1.9216694490837294e-07, rtol=1e-13)
 
 def test_iapws97_dGr_dtau_region5():
     assert_close(iapws97_dGr_dtau_region5(.9, 1.01), -0.009119973056785994, rtol=1e-13)
 
-def test_iapws97_d2Gr_d2tau_region5():
-    assert_close(iapws97_d2Gr_d2tau_region5(.9, 1.01), -0.025727469083651373, rtol=1e-13)
+def test_iapws97_d2Gr_dtau2_region5():
+    assert_close(iapws97_d2Gr_dtau2_region5(.9, 1.01), -0.025727469083651373, rtol=1e-13)
 
 def test_iapws97_d2Gr_dpidtau_region5():
     assert_close(iapws97_d2Gr_dpidtau_region5(.9, 1.01), -0.009039988008632744, rtol=1e-13)
     
 @pytest.mark.slow
 def test_iapws97_region5_fuzz():
-    funcs_naive = [iapws97_d2G0_d2tau_region5_naive, iapws97_dG0_dtau_region5_naive, 
+    funcs_naive = [iapws97_d2G0_dtau2_region5_naive, iapws97_dG0_dtau_region5_naive, 
                    iapws97_G0_region5_naive, iapws97_d2Gr_dpidtau_region5_naive,
-                   iapws97_d2Gr_d2tau_region5_naive, iapws97_dGr_dtau_region5_naive,
-                   iapws97_d2Gr_d2pi_region5_naive, iapws97_Gr_region5_naive,
+                   iapws97_d2Gr_dtau2_region5_naive, iapws97_dGr_dtau_region5_naive,
+                   iapws97_d2Gr_dpi2_region5_naive, iapws97_Gr_region5_naive,
                    iapws97_dGr_dpi_region5_naive]
-    funcs_fast = [iapws97_d2G0_d2tau_region5, iapws97_dG0_dtau_region5,
+    funcs_fast = [iapws97_d2G0_dtau2_region5, iapws97_dG0_dtau_region5,
                   iapws97_G0_region5, 
                   
                   iapws97_d2Gr_dpidtau_region5, 
-                  iapws97_d2Gr_d2tau_region5, iapws97_dGr_dtau_region5, 
-                  iapws97_d2Gr_d2pi_region5, iapws97_Gr_region5,
+                  iapws97_d2Gr_dtau2_region5, iapws97_dGr_dtau_region5, 
+                  iapws97_d2Gr_dpi2_region5, iapws97_Gr_region5,
                   iapws97_dGr_dpi_region5]
     atols = [0, 0, 0, 0, 0, 0, 5e-21, 4e-17, 1e-18]
     rtols = [2e-15, 1e-15, 1e-15, 5e-15, 2e-15, 1e-14, 1e-14, 2e-14, 2e-14]
