@@ -20,7 +20,7 @@ init:
 install:
   - cmd: activate condaenv
   - cmd: conda install -yq numpy scipy pip pytest pandas matplotlib
-  - cmd: pip install pytest-cov coveralls sympy fluids coveralls sympy fuzzywuzzy pint pytz
+  - cmd: pip install pytest-cov coveralls sympy fluids coveralls sympy fuzzywuzzy pint pytz numba
   - cmd: python setup.py install
   - cmd: rmdir /Q /S chemicals
 

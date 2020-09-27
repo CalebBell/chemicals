@@ -135,4 +135,4 @@ submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
 
 chemicals_dir = utils.source_path
 
-__version__ = '0.1.4'
+__version__ = '0.1.5'

@@ -2,6 +2,6 @@ numpy
 pandas
 numpydoc
 scipy
-fluids>=0.1.68
+fluids>=0.1.86
 IPython
 pint

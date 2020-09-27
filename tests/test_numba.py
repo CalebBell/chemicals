@@ -62,7 +62,6 @@ def swap_funcs_and_test(names, substitutions, test):
 
 def mark_as_numba(func):
     func = pytest.mark.numba(func)
-#    func = pytest.mark.slow(func)
     func = pytest.mark.skipif(numba is None, reason="Numba is missing")(func)
     return func
     
