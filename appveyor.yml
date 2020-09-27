@@ -25,4 +25,4 @@ install:
   - cmd: rmdir /Q /S chemicals
 
 test_script:
-  - cmd: py.test --cov-report html --cov=chemicals -m "not slow and not online"
+  - cmd: py.test --cov-report html --cov=chemicals -m "not slow and not online and not numba"

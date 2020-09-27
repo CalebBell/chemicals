@@ -28,6 +28,6 @@ install:
   - python setup.py -q install
   - rm -rf chemicals
 script:
-  - py.test . -v --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not thermo and not numba"
+  - py.test . -v --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not thermo and not numba and not slow"
 after_success:
   - coveralls
