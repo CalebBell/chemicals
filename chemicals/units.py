@@ -40,9 +40,17 @@ except ImportError: # pragma: no cover
     raise ImportError('The unit handling in fluids requires the installation '
                       'of the package pint, available on pypi or from '
                       'https://github.com/hgrecco/pint')
-from fluids.units import wraps_numpydoc, wrap_numpydoc_obj
+from fluids.units import wraps_numpydoc, wrap_numpydoc_obj, variable_output_wrapper
 
-__funcs = {}
+__pint_wrapped_functions = {}
+
+variable_output_unit_funcs = {
+    # True: arg should be present; False: arg should be None
+    'speed_of_sound': ({(True, True, True, True, True): [u.m/u.s],
+                        (True, True, True, True, False): [u.m*u.kg**0.5/u.s/u.mol**0.5],
+                        }, 5),
+    
+    }
 
 
 for name in dir(chemicals):
@@ -54,6 +62,10 @@ for name in dir(chemicals):
     if name == '__all__':
         continue
     __all__.append(name)
-    __funcs.update({name: obj})
+    __pint_wrapped_functions.update({name: obj})
     
-globals().update(__funcs)
+globals().update(__pint_wrapped_functions)
+
+for name, val in variable_output_unit_funcs.items():
+    globals()[name] = variable_output_wrapper(getattr(chemicals, name),
+            __pint_wrapped_functions[name], val[0], val[1])

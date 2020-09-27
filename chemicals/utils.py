@@ -875,7 +875,7 @@ def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
     Returns
     -------
     w : float
-        Speed of sound for a real gas, [m/s or m*kg^0.5/s/mol^0.5 or MW missing]
+        Speed of sound for a real gas, m/s or m*kg^0.5/s/mol^0.5 if MW missing
         
     Notes
     -----
