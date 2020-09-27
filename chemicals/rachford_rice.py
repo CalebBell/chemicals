@@ -85,18 +85,6 @@ except:
 
 R_inv = 1.0/R
 
-__numba_additional_funcs__ = ['Rachford_Rice_polynomial_3',
-                              'Rachford_Rice_polynomial_4',
-                              'Rachford_Rice_polynomial_5', 'Rachford_Rice_err_fprime',
-                              'Rachford_Rice_err_fprime2', 'Rachford_Rice_err',
-                              'Rachford_Rice_numpy_err', 'Rachford_Rice_err_LN2',
-                              '_Rachford_Rice_polynomial_coeff',
-                              'err_RR_poly', 'err_and_der_RR_poly',
-                              'Rachford_Rice_numpy_err_fprime2',
-                              'LJA_err', 'LJA_fprime2',
-                              '_Rachford_Rice_analytical_3',
-                              'Rachford_Rice_valid_solution_naive', 'RRN_new_betas']
-
  
 def Rachford_Rice_polynomial_3(zs, Cs):
     z0, z1, z2 = zs

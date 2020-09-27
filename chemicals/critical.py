@@ -95,8 +95,6 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
            'Vc_all_methods', 'Zc_all_methods', 
            'critical_surface_all_methods']
 
-__numba_additional_funcs__ = ['_assert_two_critical_properties_provided']
-
 import os
 from fluids.constants import R, R_inv, N_A
 from chemicals.utils import log, PY37, source_path, os_path_join, can_load_data

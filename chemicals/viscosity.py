@@ -180,8 +180,6 @@ from chemicals.utils import log, exp, sqrt, atan, tan, sin, acos
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-__numba_additional_funcs__ = ('_round_whole_even', 'Twu_1985_internal',
-                              'Saybolt_universal_eq')
 
 folder = os_path_join(source_path, 'Viscosity')
 

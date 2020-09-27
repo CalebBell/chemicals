@@ -30,13 +30,14 @@ from math import *
 from chemicals.iapws import *
 from chemicals import iapws
 from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace, derivative
-from chemicals.iapws import REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G, REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N, REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z
 from chemicals.vapor_pressure import Psat_IAPWS
-from chemicals.iapws import iapws95_T_err
-
-l = chemicals.iapws.__numba_additional_funcs__
-for n in l:
-    globals()[n] = getattr(chemicals.iapws, n)
+from chemicals.iapws import (REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G,
+                             REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N,
+                             REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, 
+                             REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z)
+from chemicals.iapws import (iapws_97_Trho_err_region1, iapws_97_Trho_err_region2, iapws_97_Trho_err_region5,
+                             iapws_97_Prho_err_region1, iapws_97_Prho_err_region2, iapws_97_Prho_err_region5,
+                             iapws_97_Prho_err_region3, iapws95_rho_err, iapws95_T_err, iapws95_d2Ar_ddelta2_delta_1)
 
 def make_me_precise():
     import mpmath as mp

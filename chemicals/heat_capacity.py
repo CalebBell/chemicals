@@ -174,10 +174,6 @@ from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
 from fluids.numerics import newton, brenth, secant, polylog2, numpy as np
 
-__numba_additional_funcs__ = [
-    'Lastovka_Shaw_T_for_Hm_err',
-    'Lastovka_Shaw_T_for_Sm_err',
-]
 
 ### Methods introduced in this module
 

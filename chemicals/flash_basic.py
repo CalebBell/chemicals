@@ -58,8 +58,6 @@ from chemicals.rachford_rice import flash_inner_loop
 __all__ = ['K_value','Wilson_K_value', 'PR_water_K_value', 'flash_wilson', 
            'flash_Tb_Tc_Pc', 'flash_ideal']
 
-__numba_additional_funcs__ = ['err_Wilson_TVF', 'err_Wilson_PVF']
-
 
 def K_value(P=None, Psat=None, phi_l=None, phi_g=None, gamma=None, Poynting=1.0):
     r'''Calculates the equilibrium K-value assuming Raoult's law,
