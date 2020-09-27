@@ -170,7 +170,6 @@ __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 
 'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic', 
 'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture', 
 'ideal_gas', 'Goodman',
-#'iapws97_rho', 'iapws97_P', 'iapws97_T',
 ]
 
 import os
@@ -180,7 +179,6 @@ from chemicals.utils import log, exp, isnan
 from chemicals.utils import Vm_to_rho, mixing_simple
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import data_source, register_df_source
-#from chemicals.iapws import iapws97_rho, iapws97_P, iapws97_T
 
 folder = os_path_join(source_path, 'Density')
 
