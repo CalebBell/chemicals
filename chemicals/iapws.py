@@ -5186,8 +5186,49 @@ def iapws95_T_err(T, rho, P_spec):
     return err, dP_dT
 
 def iapws95_P(T, rho):
-    tau = iapws95_Tc / T
-    delta = rho * iapws95_rhoc_inv
+    r'''Calculate the pressure of water according to the IAPWS-95
+    standard given a temperature `T` and mass density `rho`.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    rho : float
+        Mass density of water, [kg/m^3]
+
+    Returns
+    -------
+    P : float
+        Pressure, [Pa]
+        
+    Notes
+    -----    
+    The IAPWS-95 model is explicit with inputs of temperature and density,
+    so this is a direct calculation with no iteration required.
+    
+    Examples
+    --------
+    >>> iapws95_P(330.0, iapws95_rho(T=330.0, P=8e5))
+    8e5
+    >>> iapws95_P(823.0, 40.393893559703734)
+    14e6
+    
+    Not all temperature and density inputs provide a stable solution; for 
+    example anything between the vapor and gas saturation curves. In some but
+    not all of these cases a negative pressure is returned:
+        
+    >>> iapws95_P(T=300, rho=300)
+    -1.526394720e+23
+    
+    References
+    ----------
+    .. [1] Wagner, Wolfgang, and Andreas Pruß. "The IAPWS Formulation 1995 for
+       the Thermodynamic Properties of Ordinary Water Substance for General and
+       Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
+       2 (2002): 387-535.
+    '''
+    tau = iapws95_Tc/T
+    delta = rho*iapws95_rhoc_inv
     dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
     return (dAddelta_val*delta)*rho*R95*T
 
