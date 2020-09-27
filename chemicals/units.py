@@ -49,7 +49,41 @@ variable_output_unit_funcs = {
     'speed_of_sound': ({(True, True, True, True, True): [u.m/u.s],
                         (True, True, True, True, False): [u.m*u.kg**0.5/u.s/u.mol**0.5],
                         }, 5),
+    'Lastovka_Shaw': ({(True, True, True, False): [u.J/u.kg/u.K],
+                      (True, True, False, False): [u.J/u.kg/u.K], # cyclic_aliphatic flag
+                      (True, True, True, True): [u.J/u.mol/u.K],
+                      (True, True, False, True): [u.J/u.mol/u.K], # cyclic_aliphatic flag
+                      }, 4),
+    'Lastovka_Shaw_integral_over_T': ({(True, True, True, False): [u.J/u.kg/u.K],
+                      (True, True, False, False): [u.J/u.kg/u.K], # cyclic_aliphatic flag
+                      (True, True, True, True): [u.J/u.mol/u.K],
+                      (True, True, False, True): [u.J/u.mol/u.K], # cyclic_aliphatic flag
+                      }, 4),
+    'Lastovka_Shaw_integral': ({(True, True, True, False): [u.J/u.kg],
+                      (True, True, False, False): [u.J/u.kg], # cyclic_aliphatic flag
+                      (True, True, True, True): [u.J/u.mol],
+                      (True, True, False, True): [u.J/u.mol], # cyclic_aliphatic flag
+                      }, 4),
     
+    'Dadgostar_Shaw': ({(True, True, False): [u.J/u.kg/u.K],
+                      (True, True, True): [u.J/u.mol/u.K],
+                      }, 3),
+    'Dadgostar_Shaw_integral': ({(True, True, False): [u.J/u.kg],
+                      (True, True, True): [u.J/u.mol],
+                      }, 3),
+    'Dadgostar_Shaw_integral_over_T': ({(True, True, False): [u.J/u.kg/u.K],
+                      (True, True, True): [u.J/u.mol/u.K],
+                      }, 3),
+    
+    'Lastovka_solid': ({(True, True, False): [u.J/u.kg/u.K],
+                      (True, True, True): [u.J/u.mol/u.K],
+                      }, 3),
+    'Lastovka_solid_integral': ({(True, True, False): [u.J/u.kg],
+                      (True, True, True): [u.J/u.mol],
+                      }, 3),
+    'Lastovka_solid_integral_over_T': ({(True, True, False): [u.J/u.kg/u.K],
+                      (True, True, True): [u.J/u.mol/u.K],
+                      }, 3),
     }
 
 

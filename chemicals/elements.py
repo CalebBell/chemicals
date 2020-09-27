@@ -557,7 +557,7 @@ def molecular_weight(atoms):
     Parameters
     ----------
     atoms : dict
-        dictionary of counts of individual atoms, indexed by symbol with
+        Dictionary of counts of individual atoms, indexed by symbol with
         proper capitalization, [-]
 
     Returns
@@ -607,7 +607,7 @@ def mass_fractions(atoms, MW=None):
     Parameters
     ----------
     atoms : dict
-        dictionary of counts of individual atoms, indexed by symbol with
+        Dictionary of counts of individual atoms, indexed by symbol with
         proper capitalization, [-]
     MW : float, optional
         Molecular weight, [g/mol]
@@ -615,7 +615,7 @@ def mass_fractions(atoms, MW=None):
     Returns
     -------
     mfracs : dict
-        dictionary of mass fractions of individual atoms, indexed by symbol
+        Dictionary of mass fractions of individual atoms, indexed by symbol
         with proper capitalization, [-]
 
     Notes

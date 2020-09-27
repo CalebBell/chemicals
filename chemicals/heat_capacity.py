@@ -1001,7 +1001,8 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
     Returns
     -------
     Cpg : float
-        Gas constant-pressure heat capacity, [J/mol/K if MW given; J/kg/K otherwise]
+        Gas constant-pressure heat capacity, J/mol/K if MW given;
+        J/kg/K otherwise
         
     Notes
     -----
@@ -1098,7 +1099,7 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
     Returns
     -------
     H : float
-        Difference in enthalpy from 0 K, [J/mol if MW given; J/kg otherwise]
+        Difference in enthalpy from 0 K, J/mol if MW given; J/kg otherwise
         
     Notes
     -----
@@ -1724,7 +1725,8 @@ def Dadgostar_Shaw(T, similarity_variable, MW=None, terms=None):
     Returns
     -------
     Cpl : float
-        Liquid constant-pressure heat capacity, [J/mol/K if MW given; J/kg/K otherwise]
+        Liquid constant-pressure heat capacity, J/mol/K if MW given; 
+        J/kg/K otherwise
         
     Notes
     -----
@@ -1768,7 +1770,7 @@ def Dadgostar_Shaw_integral(T, similarity_variable, MW=None, terms=None):
     Returns
     -------
     H : float
-        Difference in enthalpy from 0 K, [J/mol if MW given; J/kg otherwise]
+        Difference in enthalpy from 0 K, J/mol if MW given; J/kg otherwise
         
     Notes
     -----
@@ -1817,7 +1819,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None, terms=None):
     Returns
     -------
     S : float
-        Difference in entropy from 0 K, [J/mol/K if MW given; J/kg/K otherwise]
+        Difference in entropy from 0 K, J/mol/K if MW given; J/kg/K otherwise
         
     Notes
     -----
@@ -2167,7 +2169,8 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     Returns
     -------
     Cps : float
-        Solid constant-pressure heat capacity, [J/mol/K if MW given; J/kg/K otherwise]
+        Solid constant-pressure heat capacity, J/mol/K if MW given; J/kg/K
+        otherwise
     
     Notes
     -----
@@ -2242,7 +2245,7 @@ def Lastovka_solid_integral(T, similarity_variable, MW=None):
     Returns
     -------
     H : float
-        Difference in enthalpy from 0 K, [J/mol if MW given; J/kg otherwise]
+        Difference in enthalpy from 0 K, J/mol if MW given; J/kg otherwise
         
     Notes
     -----
@@ -2298,7 +2301,7 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
     Returns
     -------
     S : float
-        Difference in entropy from 0 K, [J/mol/K if MW given; J/kg/K otherwise]
+        Difference in entropy from 0 K, J/mol/K if MW given; J/kg/K otherwise
     
     Notes
     -----

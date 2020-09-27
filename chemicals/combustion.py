@@ -400,7 +400,7 @@ def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
     Hf : float
         Heat of formation [J/mol].
     Hf_chemicals : dict[str, float]
-        Heat of formation of chemicals present in stoichiometry.
+        Heat of formation of chemicals present in stoichiometry, [J/mol]
     
     Returns
     -------
