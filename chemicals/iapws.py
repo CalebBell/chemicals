@@ -85,6 +85,59 @@ IAPWS-97 Region 2
 .. autofunction:: chemicals.iapws.iapws97_d2Gr_dtau2_region2
 .. autofunction:: chemicals.iapws.iapws97_d2Gr_dpidtau_region2
 
+IAPWS-97 Region 3
+-----------------
+.. autofunction:: chemicals.iapws.iapws97_A_region3
+.. autofunction:: chemicals.iapws.iapws97_dA_ddelta_region3
+.. autofunction:: chemicals.iapws.iapws97_d2A_ddelta2_region3
+.. autofunction:: chemicals.iapws.iapws97_dA_dtau_region3
+.. autofunction:: chemicals.iapws.iapws97_d2A_dtau2_region3
+.. autofunction:: chemicals.iapws.iapws97_d2A_ddeltadtau_region3
+
+IAPWS-97 Region 3 PT Backwards Equation Boundaries
+--------------------------------------------------
+.. autofunction:: chemicals.iapws.iapws97_boundary_3uv
+.. autofunction:: chemicals.iapws.iapws97_boundary_3ef
+.. autofunction:: chemicals.iapws.iapws97_boundary_3cd
+.. autofunction:: chemicals.iapws.iapws97_boundary_3gh
+.. autofunction:: chemicals.iapws.iapws97_boundary_3ij
+.. autofunction:: chemicals.iapws.iapws97_boundary_3jk
+.. autofunction:: chemicals.iapws.iapws97_boundary_3mn
+.. autofunction:: chemicals.iapws.iapws97_boundary_3qu
+.. autofunction:: chemicals.iapws.iapws97_boundary_3rx
+.. autofunction:: chemicals.iapws.iapws97_boundary_3wx
+.. autofunction:: chemicals.iapws.iapws97_boundary_3ab
+.. autofunction:: chemicals.iapws.iapws97_boundary_3op
+
+IAPWS-97 Region 3 PT Backwards Equations
+----------------------------------------
+.. autofunction:: chemicals.iapws.iapws97_region3_a
+.. autofunction:: chemicals.iapws.iapws97_region3_b
+.. autofunction:: chemicals.iapws.iapws97_region3_c
+.. autofunction:: chemicals.iapws.iapws97_region3_d
+.. autofunction:: chemicals.iapws.iapws97_region3_e
+.. autofunction:: chemicals.iapws.iapws97_region3_f
+.. autofunction:: chemicals.iapws.iapws97_region3_g
+.. autofunction:: chemicals.iapws.iapws97_region3_h
+.. autofunction:: chemicals.iapws.iapws97_region3_i
+.. autofunction:: chemicals.iapws.iapws97_region3_j
+.. autofunction:: chemicals.iapws.iapws97_region3_k
+.. autofunction:: chemicals.iapws.iapws97_region3_l
+.. autofunction:: chemicals.iapws.iapws97_region3_m
+.. autofunction:: chemicals.iapws.iapws97_region3_n
+.. autofunction:: chemicals.iapws.iapws97_region3_o
+.. autofunction:: chemicals.iapws.iapws97_region3_p
+.. autofunction:: chemicals.iapws.iapws97_region3_q
+.. autofunction:: chemicals.iapws.iapws97_region3_r
+.. autofunction:: chemicals.iapws.iapws97_region3_s
+.. autofunction:: chemicals.iapws.iapws97_region3_t
+.. autofunction:: chemicals.iapws.iapws97_region3_u
+.. autofunction:: chemicals.iapws.iapws97_region3_v
+.. autofunction:: chemicals.iapws.iapws97_region3_w
+.. autofunction:: chemicals.iapws.iapws97_region3_x
+.. autofunction:: chemicals.iapws.iapws97_region3_y
+.. autofunction:: chemicals.iapws.iapws97_region3_z
+
 IAPWS-97 Region 5
 -----------------
 .. autofunction:: chemicals.iapws.iapws97_G0_region5
@@ -124,72 +177,45 @@ from fluids.numerics import (secant, newton, trunc_log, trunc_exp, horner,
                              horner_and_der)
 
 
-__all__ = [
-           'iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
-           'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
-           'iapws97_region1_rho', 'iapws97_region2_rho', 'iapws97_region5_rho',
-           'iapws95_rho', 'iapws95_P', 'iapws95_T',
-           
-           'iapws97_rho_extrapolated',
-           'iapws97_rho', 'iapws97_P', 'iapws97_T',
-
-            'iapws95_Psat', 'iapws95_dPsat_dT', 'iapws95_Tsat',
-            'iapws92_rhol_sat', 'iapws92_rhog_sat', 
-            'iapws95_rhol_sat', 'iapws95_rhog_sat',
-           'iapws95_saturation',
-           
-           'iapws95_A0', 'iapws95_dA0_dtau', 'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3',
-           
-           'iapws95_Ar', 'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3', 
-           'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2',
-           'iapws95_d2Ar_ddeltadtau',
-           
-           'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc',
-           
-           
-            'iapws97_G_region1', 'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
-        'iapws97_dG_dtau_region1', 'iapws97_d2G_dtau2_region1', 'iapws97_d2G_dpidtau_region1',
-
-   'iapws97_Gr_region2', 'iapws97_dGr_dpi_region2', 'iapws97_d2Gr_dpi2_region2',
-   'iapws97_dGr_dtau_region2', 'iapws97_d2Gr_dtau2_region2', 'iapws97_d2Gr_dpidtau_region2',
-   'iapws97_G0_region2', 'iapws97_dG0_dtau_region2', 'iapws97_d2G0_dtau2_region2',
-
-   'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_dpi2_region5',
-   'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_dtau2_region5', 'iapws97_d2Gr_dpidtau_region5',
-   'iapws97_G0_region5', 'iapws97_dG0_dtau_region5', 'iapws97_d2G0_dtau2_region5',
-
-           ]
-
-__numba_additional_funcs__ = ['iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c', 
-    'iapws97_region3_d', 'iapws97_region3_e', 'iapws97_region3_f', 'iapws97_region3_g', 'iapws97_region3_h',
-    'iapws97_region3_i', 'iapws97_region3_j', 'iapws97_region3_k', 'iapws97_region3_l', 'iapws97_region3_m',
-    'iapws97_region3_n', 'iapws97_region3_o', 'iapws97_region3_p', 'iapws97_region3_q', 'iapws97_region3_r', 
-    'iapws97_region3_s', 'iapws97_region3_t', 'iapws97_region3_u', 'iapws97_region3_v', 'iapws97_region3_w', 
-    'iapws97_region3_x', 'iapws97_region3_y', 'iapws97_region3_z',
-    'iapws_97_Trho_err_region1', 'iapws_97_Trho_err_region2', 'iapws_97_Trho_err_region5',
-    
-    'iapws_97_Prho_err_region1', 'iapws_97_Prho_err_region2', 'iapws_97_Prho_err_region5',
-    'iapws_97_Prho_err_region3',
-    'iapws95_rho_err', 'iapws95_T_err',
-    
-    
-   'iapws97_boundary_3uv', 'iapws97_boundary_3ef', 
-   'iapws97_boundary_3ef', 'iapws97_boundary_3cd', 'iapws97_boundary_3gh',
-   'iapws97_boundary_3ij', 'iapws97_boundary_3jk', 'iapws97_boundary_3mn', 
-   'iapws97_boundary_3qu', 'iapws97_boundary_3rx', 'iapws97_boundary_3wx',
-   'iapws97_boundary_3ab', 'iapws97_boundary_3op',
-
-   
-   
-   
-   'iapws97_A_region3', 'iapws97_dA_ddelta_region3', 'iapws97_d2A_ddelta2_region3',
-   'iapws97_dA_dtau_region3', 'iapws97_d2A_dtau2_region3', 'iapws97_d2A_ddeltadtau_region3',
-   
-   
-   'iapws95_d2Ar_ddelta2_delta_1',
-   
-
-    ]
+__all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
+	'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
+	'iapws97_region1_rho', 'iapws97_region2_rho', 'iapws97_region5_rho',
+	'iapws95_rho', 'iapws95_P', 'iapws95_T', 'iapws97_rho_extrapolated',
+	'iapws97_rho', 'iapws97_P', 'iapws97_T', 'iapws95_Psat', 'iapws95_dPsat_dT',
+	'iapws95_Tsat', 'iapws92_rhol_sat', 'iapws92_rhog_sat', 'iapws95_rhol_sat',
+	'iapws95_rhog_sat', 'iapws95_saturation', 'iapws95_A0', 'iapws95_dA0_dtau',
+	'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3', 'iapws95_Ar',
+	'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3',
+	'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2', 'iapws95_d2Ar_ddeltadtau',
+	'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc', 'iapws97_G_region1',
+	'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
+	'iapws97_dG_dtau_region1', 'iapws97_d2G_dtau2_region1',
+	'iapws97_d2G_dpidtau_region1', 'iapws97_Gr_region2',
+	'iapws97_dGr_dpi_region2', 'iapws97_d2Gr_dpi2_region2',
+	'iapws97_dGr_dtau_region2', 'iapws97_d2Gr_dtau2_region2',
+	'iapws97_d2Gr_dpidtau_region2', 'iapws97_G0_region2',
+	'iapws97_dG0_dtau_region2', 'iapws97_d2G0_dtau2_region2',
+	'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_dpi2_region5',
+	'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_dtau2_region5',
+	'iapws97_d2Gr_dpidtau_region5', 'iapws97_G0_region5',
+	'iapws97_dG0_dtau_region5', 'iapws97_d2G0_dtau2_region5', 'iapws97_A_region3',
+	'iapws97_dA_ddelta_region3', 'iapws97_d2A_ddelta2_region3',
+	'iapws97_dA_dtau_region3', 'iapws97_d2A_dtau2_region3',
+	'iapws97_d2A_ddeltadtau_region3', 'iapws97_boundary_3uv',
+	'iapws97_boundary_3ef', 'iapws97_boundary_3ef', 'iapws97_boundary_3cd',
+	'iapws97_boundary_3gh', 'iapws97_boundary_3ij', 'iapws97_boundary_3jk',
+	'iapws97_boundary_3mn', 'iapws97_boundary_3qu', 'iapws97_boundary_3rx',
+	'iapws97_boundary_3wx', 'iapws97_boundary_3ab', 'iapws97_boundary_3op',
+	'iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c',
+	'iapws97_region3_d', 'iapws97_region3_e', 'iapws97_region3_f',
+	'iapws97_region3_g', 'iapws97_region3_h', 'iapws97_region3_i',
+	'iapws97_region3_j', 'iapws97_region3_k', 'iapws97_region3_l',
+	'iapws97_region3_m', 'iapws97_region3_n', 'iapws97_region3_o',
+	'iapws97_region3_p', 'iapws97_region3_q', 'iapws97_region3_r',
+	'iapws97_region3_s', 'iapws97_region3_t', 'iapws97_region3_u',
+	'iapws97_region3_v', 'iapws97_region3_w', 'iapws97_region3_x',
+	'iapws97_region3_y', 'iapws97_region3_z',
+]
 
 R95 = 461.51805 # Differs from the other formulation
 R97 = 461.526
@@ -384,6 +410,56 @@ def iapws97_boundary_3op(logP_MPa, logP_MPa_inv):
             + 969.461372400213008 + logP_MPa_inv*(773.845935768222034 - 1523.13732937084001*logP_MPa_inv))
 #    T = sum([nis3op[i]*logP_MPa**Iis3op[i] for i in range(5)])
 #    return T
+
+
+region3_boundary_doc = '''
+Calculates the transition temperature for a region 3 PT backwards equation 
+transition.
+
+Parameters
+----------
+P : float
+    Pressure [Pa]
+
+Returns
+-------
+T_trans : float
+    Transition temperature [K]
+
+Examples
+--------
+'''
+
+region3_logboundary_doc = '''
+Calculates the transition temperature for a region 3 PT backwards equation 
+transition (for one of "wx", "ab", or "op"; the others do not use a log fit).
+The parameters are provided in the specific units for speed savings only.
+
+Parameters
+----------
+logP_MPa : float
+    Natural logarithm of pressure in units of MPa [log(MPa)]
+logP_MPa_inv : float
+    Inverse of Natural logarithm of pressure in units of MPa [1/log(MPa)]
+
+Returns
+-------
+T_trans : float
+    Transition temperature [K]
+
+Examples
+--------
+'''
+
+
+
+for func in (iapws97_boundary_3uv, iapws97_boundary_3ef, iapws97_boundary_3cd, iapws97_boundary_3gh, 
+             iapws97_boundary_3ij, iapws97_boundary_3jk, iapws97_boundary_3mn, iapws97_boundary_3qu, 
+             iapws97_boundary_3rx):
+    func.__doc__ = region3_boundary_doc + func.__doc__
+    
+for func in (iapws97_boundary_3wx, iapws97_boundary_3ab, iapws97_boundary_3op):
+    func.__doc__ = region3_logboundary_doc + func.__doc__
 
 ### Region 1
     
@@ -1247,6 +1323,33 @@ def iapws97_d2Gr_dpidtau_region2(tau, pi):
 
 ### Region 3 A formulations
 def iapws97_A_region3(tau, delta):
+    r'''Calculates the dimensionless Helmholtz free energy for water 
+    according to the IAPWS-97 standard (for region 3).
+    
+    .. math::
+        \frac{f(\rho, T)}{RT} = \phi(\delta, \tau) = n_1\ln\delta
+        + \sum_{i=2}^{40} n_i \delta^{I_i}\tau^{J_i}
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    A : float
+        Helmholtz free energy A/(RT), [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> iapws97_A_region3(647.096/500.0, 400.0/322.0)
+    -3.0336402168865
+    '''
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -1277,6 +1380,35 @@ def iapws97_A_region3(tau, delta):
             + 1.205336969651700008*tau6*tau6 - 0.008456681281250200827*tau13*tau6*tau4)
     
 def iapws97_dA_ddelta_region3(tau, delta):
+    r'''Calculates the derivative of dimensionless Helmholtz free energy 
+    with respect to `delta` for water 
+    according to the IAPWS-97 standard (for region 3).
+    
+    .. math::
+        \frac{\partial \phi(\delta, \tau)}{\partial \delta} = \frac{n_1}{\delta}
+        + \sum_{i=2}^{40} n_i I_i \delta^{I_i-1}\tau^{J_i}
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    dA_ddelta : float
+        Derivative of dimensionless Helmholtz free energy with respect to 
+        `delta`, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> iapws97_dA_ddelta_region3(647.096/500.0, 400.0/322.0)
+    7.35562435092
+    '''
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -1305,6 +1437,35 @@ def iapws97_dA_ddelta_region3(tau, delta):
             + 0.8852104398431800414*tau13*tau2 - 0.6420776518160700164*tau13*tau3*tau)
     
 def iapws97_d2A_ddelta2_region3(tau, delta):
+    r'''Calculates the second derivative of dimensionless Helmholtz free energy 
+    with respect to `delta` for water 
+    according to the IAPWS-97 standard (for region 3).
+    
+    .. math::
+        \frac{\partial^2 \phi(\delta, \tau)}{\partial \delta^2} = \frac{-n_1}{\delta^2}
+        + \sum_{i=2}^{40} n_i I_i (I_i-1)\delta^{I_i-2}\tau^{J_i}
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    d2A_ddelta2 : float
+        Second derivative of dimensionless Helmholtz free energy with respect to 
+        `delta`, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> iapws97_d2A_ddelta2_region3(647.096/500.0, 400.0/322.0)
+    -2.2858869882497
+    '''
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -1328,6 +1489,35 @@ def iapws97_d2A_ddelta2_region3(tau, delta):
             + 0.07884107375830799735*tau20*tau2 + 0.2511681684861600261*tau20*tau6)
 
 def iapws97_dA_dtau_region3(tau, delta):
+    r'''Calculates the derivative of dimensionless Helmholtz free energy 
+    with respect to `tau` for water 
+    according to the IAPWS-97 standard (for region 3).
+    
+    .. math::
+        \frac{\partial \phi(\delta, \tau)}{\partial \tau} = 
+        + \sum_{i=2}^{40} n_i J_i \delta^{I_i}\tau^{J_i-1}
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    dA_dtau : float
+        Derivative of dimensionless Helmholtz free energy with respect to 
+        `tau`, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> iapws97_dA_dtau_region3(647.096/500.0, 400.0/322.0)
+    -24.9687028688
+    '''
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -1358,6 +1548,35 @@ def iapws97_dA_dtau_region3(tau, delta):
             - 0.1945036694687546086*tau11*tau11)
 
 def iapws97_d2A_dtau2_region3(tau, delta):
+    r'''Calculates the second derivative of dimensionless Helmholtz free energy 
+    with respect to `tau` for water 
+    according to the IAPWS-97 standard (for region 3).
+    
+    .. math::
+        \frac{\partial^2 \phi(\delta, \tau)}{\partial \tau^2} = 
+        + \sum_{i=2}^{40} n_i J_i (J_i-1)\delta^{I_i}\tau^{J_i-2}
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    d2A_dtau2 : float
+        Second derivative of dimensionless Helmholtz free energy with respect  
+        to `tau`, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> iapws97_d2A_dtau2_region3(647.096/500.0, 400.0/322.0)
+    -373.6565823701
+    '''
     delta2 = delta*delta
     delta3 = delta2*delta
     delta6 = delta3*delta3
@@ -1384,6 +1603,35 @@ def iapws97_d2A_dtau2_region3(tau, delta):
 
 
 def iapws97_d2A_ddeltadtau_region3(tau, delta):
+    r'''Calculates the second derivative of dimensionless Helmholtz free energy 
+    with respect to `tau` and `delta` for water 
+    according to the IAPWS-97 standard (for region 3).
+    
+    .. math::
+        \frac{\partial^2 \phi(\delta, \tau)}{\partial \tau \partial \delta} = 
+        + \sum_{i=2}^{40} n_i J_i \delta^{I_i-1}\tau^{J_i-1}
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    d2A_ddeltadtau : float
+        Second derivative of dimensionless Helmholtz free energy with respect  
+        to `tau` and `delta`, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> iapws97_d2A_ddeltadtau_region3(647.096/500.0, 400.0/322.0)
+    145.85190014717
+    '''
     tau2 = tau*tau
     delta2 = tau2*tau2 # abuse - tau4
     tau5 = delta2*tau
@@ -2443,6 +2691,37 @@ def iapws97_region3_z(T, P):
     V = main*main
     V *= V*0.0038
     return 1.0/V
+
+region3_backwards_PT_doc = '''
+Calculate the mass density water in one of the 26 region 3
+backwards regions of the IAPWS-97 standard.
+
+Parameters
+----------
+T : float
+    Temperature, [K]
+P : float
+    Pressure, [Pa]
+
+Returns
+-------
+rho : float
+    Mass density of water in region 3, [kg/m^3]
+    
+Notes
+-----
+Significant discontinuities exist between each region.
+These functions are automatically generated and are not to be edited directly.
+
+'''
+for _ in (iapws97_region3_a, iapws97_region3_b, iapws97_region3_c, iapws97_region3_d,
+          iapws97_region3_e, iapws97_region3_f, iapws97_region3_g, iapws97_region3_h,
+          iapws97_region3_i, iapws97_region3_j, iapws97_region3_k, iapws97_region3_l, 
+          iapws97_region3_m, iapws97_region3_n, iapws97_region3_o, iapws97_region3_p,
+          iapws97_region3_q, iapws97_region3_r, iapws97_region3_s, iapws97_region3_t,
+          iapws97_region3_u, iapws97_region3_v, iapws97_region3_w, iapws97_region3_x,
+          iapws97_region3_y, iapws97_region3_z):
+    _.__doc__ = region3_backwards_PT_doc
 
 def iapws97_region3_rho(T, P):
     r'''Calculate the mass density of water in region 3 of the IAPWS-97 standard.
