@@ -5125,9 +5125,9 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
     Examples
     --------
     >>> iapws95_saturation(400.0, xtol=1e-6)
-    (245769.345564, 937.48603939, 1.36940754100)
+    (245769.345, 937.4860, 1.3694075)
     >>> iapws95_saturation(647.0955, xtol=1e-7)
-    (22063866.3500, 325.70940655, 318.277334069)
+    (22063866.35, 325.70, 318.277)
     '''
     if rhog_guess is None:
         rhog = iapws92_rhog_sat(T)
