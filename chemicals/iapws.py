@@ -31,6 +31,12 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 .. contents:: :local:
 
+IAPWS-95 Basic Solvers
+------------------------
+.. autofunction:: chemicals.iapws.iapws95_rho
+.. autofunction:: chemicals.iapws.iapws95_P
+.. autofunction:: chemicals.iapws.iapws95_T
+
 IAPWS-97 Basic Solvers
 ------------------------
 .. autofunction:: chemicals.iapws.iapws97_rho
@@ -5234,9 +5240,44 @@ def iapws95_P(T, rho):
 
 
 def iapws95_T(P, rho):
-#    if P < iapws95_Pc:
-#        Tsat = iapws95_Tsat(P)
-#        if 
+    r'''Calculate the temperature of water according to the IAPWS-95
+    standard given a density `rho` and pressure `P`.
+    
+    Parameters
+    ----------
+    P : float
+        Pressure, [Pa]
+    rho : float
+        Mass density of water, [kg/m^3]
+        
+    Returns
+    -------
+    T : float
+        Temperature, [K]
+
+    Notes
+    -----    
+    This solution is iterative due to the nature of the equation.
+    The solution procedure begins with IAPWS-97's equations as an 
+    initial guess, extrapolating when out of range. Newton's method 
+    converges extremely, normally after 2 or 3 iterations.
+    
+    Due to water's unique density curve, there is a temperature region
+    spanning 273.15 K to 280.005 K where there are two solutions. No guarantee
+    is made as to which solution will be returned.
+
+    Examples
+    --------
+    >>> iapws95_T(P=1e6, rho=995.0)
+    306.461547194
+
+    References
+    ----------
+    .. [1] Wagner, Wolfgang, and Andreas Pruß. "The IAPWS Formulation 1995 for
+       the Thermodynamic Properties of Ordinary Water Substance for General and
+       Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
+       2 (2002): 387-535.
+    '''
     MAX_T_STEP = 100.0
     
     try:
@@ -5278,6 +5319,51 @@ def iapws95_T(P, rho):
 
 
 def iapws95_rho(T, P):
+    r'''Calculate the density of water according to the IAPWS-95
+    standard given a temperature `T` and pressure `P`.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    P : float
+        Pressure, [Pa]
+        
+    Returns
+    -------
+    rho : float
+        Mass density of water, [kg/m^3]
+
+    Notes
+    -----    
+    This solution is iterative due to the nature of the equation.
+    The solution procedure begins with IAPWS-97's explicit equations as an 
+    initial guess, extrapolating when out of range. If the temperature is under
+    the critical temperature, the saturation density is calculated, and used
+    to ensure the solver begins in the feasible region. Newton's method 
+    converges extremely, normally after 2 or 3 iterations.
+    
+    Temperatures under 273.15 K are not officially supported by [1]_, but a
+    solution is still attempted down to 235 K.
+    
+    Examples
+    --------
+    >>> iapws95_rho(T=300.0, P=1e6)
+    996.96002269499
+    
+    1 GPa and 5000 K are suggested as upper limits of [1]_ although there are
+    no hardcoded limits for temperature and pressure.
+    
+    >>> iapws95_rho(T=5000.0, P=1e9)
+    326.79451662743
+
+    References
+    ----------
+    .. [1] Wagner, Wolfgang, and Andreas Pruß. "The IAPWS Formulation 1995 for
+       the Thermodynamic Properties of Ordinary Water Substance for General and
+       Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
+       2 (2002): 387-535.
+    '''
     MAX_RHO_STEP = 200.0 # iapws95_rho(250, 1e9) is a good point showing the advantage of this
     rho = iapws97_rho_extrapolated(T, P, True)
     
@@ -5297,7 +5383,7 @@ def iapws95_rho(T, P):
     rho_old = 100000.0 #
     # Adding iterations check did not slow anything down.
     iterations = 0
-    while (abs(rho_old - rho) > abs(1e-11*rho)) and iterations < 100:
+    while iterations < 2 or ((abs(rho_old - rho) > abs(1e-11*rho)) and iterations < 100):
         rho_old = rho
         err, derr = iapws95_rho_err(rho, T, P)
         drho = - err/derr
