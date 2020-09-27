@@ -452,15 +452,16 @@ Examples
 '''
 
 
-
-for func in (iapws97_boundary_3uv, iapws97_boundary_3ef, iapws97_boundary_3cd, iapws97_boundary_3gh, 
-             iapws97_boundary_3ij, iapws97_boundary_3jk, iapws97_boundary_3mn, iapws97_boundary_3qu, 
-             iapws97_boundary_3rx):
-    func.__doc__ = region3_boundary_doc + func.__doc__
-    
-for func in (iapws97_boundary_3wx, iapws97_boundary_3ab, iapws97_boundary_3op):
-    func.__doc__ = region3_logboundary_doc + func.__doc__
-
+try:
+    for func in (iapws97_boundary_3uv, iapws97_boundary_3ef, iapws97_boundary_3cd, iapws97_boundary_3gh, 
+                 iapws97_boundary_3ij, iapws97_boundary_3jk, iapws97_boundary_3mn, iapws97_boundary_3qu, 
+                 iapws97_boundary_3rx):
+        func.__doc__ = region3_boundary_doc + func.__doc__
+        
+    for func in (iapws97_boundary_3wx, iapws97_boundary_3ab, iapws97_boundary_3op):
+        func.__doc__ = region3_logboundary_doc + func.__doc__
+except: # except is needed for running Python under -OO flag
+    pass
 ### Region 1
     
 def iapws97_G_region1(tau, pi):
@@ -2714,15 +2715,17 @@ Significant discontinuities exist between each region.
 These functions are automatically generated and are not to be edited directly.
 
 '''
-for _ in (iapws97_region3_a, iapws97_region3_b, iapws97_region3_c, iapws97_region3_d,
-          iapws97_region3_e, iapws97_region3_f, iapws97_region3_g, iapws97_region3_h,
-          iapws97_region3_i, iapws97_region3_j, iapws97_region3_k, iapws97_region3_l, 
-          iapws97_region3_m, iapws97_region3_n, iapws97_region3_o, iapws97_region3_p,
-          iapws97_region3_q, iapws97_region3_r, iapws97_region3_s, iapws97_region3_t,
-          iapws97_region3_u, iapws97_region3_v, iapws97_region3_w, iapws97_region3_x,
-          iapws97_region3_y, iapws97_region3_z):
-    _.__doc__ = region3_backwards_PT_doc
-
+try:
+    for _ in (iapws97_region3_a, iapws97_region3_b, iapws97_region3_c, iapws97_region3_d,
+              iapws97_region3_e, iapws97_region3_f, iapws97_region3_g, iapws97_region3_h,
+              iapws97_region3_i, iapws97_region3_j, iapws97_region3_k, iapws97_region3_l, 
+              iapws97_region3_m, iapws97_region3_n, iapws97_region3_o, iapws97_region3_p,
+              iapws97_region3_q, iapws97_region3_r, iapws97_region3_s, iapws97_region3_t,
+              iapws97_region3_u, iapws97_region3_v, iapws97_region3_w, iapws97_region3_x,
+              iapws97_region3_y, iapws97_region3_z):
+        _.__doc__ = region3_backwards_PT_doc
+except: # except is needed for running Python under -OO flag
+    pass
 def iapws97_region3_rho(T, P):
     r'''Calculate the mass density of water in region 3 of the IAPWS-97 standard.
     No cheking that the original point is in region 3 is performed.
