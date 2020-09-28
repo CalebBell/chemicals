@@ -8,7 +8,7 @@ chemicals
 .. image:: http://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat
    :target: https://chemicals.readthedocs.io/en/latest/
    :alt: Documentation
-.. image:: https://travis-ci.com/CalebBell/chemicals.svg?branch=release?style=flat
+.. image:: https://api.travis-ci.com/CalebBell/chemicals.svg?branch=release
    :target: https://travis-ci.com/github/CalebBell/chemicals
    :alt: Build_status
 .. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
