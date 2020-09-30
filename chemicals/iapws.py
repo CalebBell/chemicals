@@ -156,6 +156,7 @@ IAPWS-95 Ideal Gas Terms
 .. autofunction:: chemicals.iapws.iapws95_dA0_dtau
 .. autofunction:: chemicals.iapws.iapws95_d2A0_dtau2
 .. autofunction:: chemicals.iapws.iapws95_d3A0_dtau3
+.. autofunction:: chemicals.iapws.iapws95_A0_tau_derivatives
 
 IAPWS-95 Residual Terms
 -----------------------
@@ -184,7 +185,8 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
 	'iapws97_rho', 'iapws97_P', 'iapws97_T', 'iapws95_Psat', 'iapws95_dPsat_dT',
 	'iapws95_Tsat', 'iapws92_rhol_sat', 'iapws92_rhog_sat', 'iapws95_rhol_sat',
 	'iapws95_rhog_sat', 'iapws95_saturation', 'iapws95_A0', 'iapws95_dA0_dtau',
-	'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3', 'iapws95_Ar',
+	'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3', 'iapws95_A0_tau_derivatives', 
+    'iapws95_Ar',
 	'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3',
 	'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2', 'iapws95_d2Ar_ddeltadtau',
 	'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc', 'iapws97_G_region1',
@@ -3572,7 +3574,7 @@ def iapws95_A0(tau, delta):
 
 def iapws95_dA0_dtau(tau, delta):
     r'''Calculates the first derivative of ideal gas Helmholtz energy of water
-    with respect to `delta` according to the IAPWS-95 standard.
+    with respect to `tau` according to the IAPWS-95 standard.
     
     .. math::
         \frac{\partial \phi^\circ}{\partial \tau} = n_2 + \frac{n_3}{\tau}
@@ -3611,7 +3613,7 @@ def iapws95_dA0_dtau(tau, delta):
 
 def iapws95_d2A0_dtau2(tau, delta):
     r'''Calculates the second derivative of ideal gas Helmholtz energy of water
-    with respect to `delta` according to the IAPWS-95 standard.
+    with respect to `tau` according to the IAPWS-95 standard.
     
     .. math::
         \frac{\partial^2 \phi^\circ}{\partial \tau^2} = \frac{n_3}{\tau^2}
@@ -3655,7 +3657,7 @@ def iapws95_d2A0_dtau2(tau, delta):
 
 def iapws95_d3A0_dtau3(tau, delta):
     r'''Calculates the third derivative of ideal gas Helmholtz energy of water
-    with respect to `delta` according to the IAPWS-95 standard.
+    with respect to `tau` according to the IAPWS-95 standard.
 
     Parameters
     ----------
@@ -3704,6 +3706,100 @@ def iapws95_d3A0_dtau3(tau, delta):
             + 0.0530566178171007902*x8*(x9))
             + 6.01264/(tau*tau*tau))
 
+
+def iapws95_A0_tau_derivatives(tau, delta):
+    r'''Calculates the ideal gas Helmholtz energy of water
+    and its first three derivatives with respect to `tau` according to the 
+    IAPWS-95 standard. As each of those calls spends most of their time 
+    computing exponentials which are the same for each function, function 
+    offers a time saving.
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    A0 : float
+        Ideal gas dimensionless Helmholtz energy A/(RT) [-]
+    dA0_dtau : float
+        First derivative of ideal gas dimensionless Helmholtz energy A/(RT)
+        with respect to `tau` [-]
+    d2A0_dtau2 : float
+        Second derivative of ideal gas dimensionless Helmholtz energy A/(RT)
+        with respect to `tau` [-]
+    d3A0_dtau3 : float
+        Third derivative of ideal gas dimensionless Helmholtz energy A/(RT)
+        with respect to `tau` [-]
+
+    Notes
+    -----
+    The extra cost of calling this function vs :obj:`iapws95_A0` alone is
+    ~15% with numba, ~40% with PyPy, and 120% with CPython.
+            
+    Examples
+    --------
+    >>> iapws95_A0_tau_derivatives(647.096/300.0, 999.0/322)
+    (9.53707552976, 8.0797055488, -0.65354304775, 0.62225425072)
+    '''
+    _exp, _log = exp, log
+    # 6 divisions, 5 exp, 7 log
+    x0 = _exp(-27.5075105*tau)
+    x1 = 1.0/(1.0 - x0)
+    x2 = _exp(-9.24437796*tau)
+    x3 = 1.0/(1.0 - x2)
+    x4 = _exp(-7.74073708*tau)
+    x5 = 1.0/(1.0 - x4)
+    x6 = _exp(-3.53734222*tau)
+    x7 = 1.0/(1.0 - x6)
+    x8 = _exp(-1.28728967*tau)
+    x9 = 1.0/(1.0 - x8)
+    tau_inv = 1.0/tau
+    A0 = (6.68321052759320011*tau + _log(delta) + 3.00632*_log(tau) 
+            + 0.24873*_log(1. - x0) 
+            + 0.96956*_log(1. - x2) 
+            + 1.2795*_log(1. - x4) 
+            + 0.97315*_log(1. - x6)
+            + 0.012436*_log(1. - x8)
+            - 8.32044648374970031)
+
+    dA0_dtau = (-22.4843580635585205 
+            + 0.01600873433612*x9
+            + 3.44236458139299994*x7
+            + 9.90427309386000054*x5
+            + 8.96297909489759981*x3
+            + 6.84194308666500017*x1
+            + 3.00632*tau_inv)
+    
+    x0 *= x1
+    x2 *= x3
+    x4 *= x5
+    x6 *= x7
+    x8 *= x9
+
+    d2A0_dtau2 = (-188.204821296839867*x0*x1
+            - 82.8571664008121047*x2*x3
+            - 76.6663739880884236*x4*x5
+            - 12.1768215703940861*x6*x7
+            - 0.0206078783406615819*x8*x9
+            - 3.00632*tau_inv*tau_inv)
+    
+    d3A0_dtau3 = (x1*x0*(5177.04609797344619
+            + 10354.0921959468924*x0)
+            + (x3*x2)*(765.962962903719927
+            + 1531.92592580743985*x2)
+            + x5*x4*(593.454243918743487
+            + 1186.90848783748697*x4)
+            + x7*x6*(86.1471700927234139*x6
+            + 43.0735850463617069)
+            + x9*x8*(0.0265283089085503951 
+            + 0.0530566178171007902*x8)
+            + 6.01264*tau_inv*tau_inv*tau_inv)
+
+    return (A0, dA0_dtau, d2A0_dtau2, d3A0_dtau3)
 
 
 def iapws95_Ar(tau, delta):
@@ -4556,6 +4652,13 @@ def iapws95_d3Ar_ddelta3(tau, delta):
     ans += (tau**46*x123*(-x119*x124 + x124*(x115 - x125) + 7.62659935937712063*x125 - 45.7595961562627238*x30))
     ans += (x118*x65*(x119*x126 - 2.84188378223544014*x121 - x122*x126 + 17.0513026934126408*x30))
     return ans
+
+from fluids.numerics import derivative
+def iapws95_d3Ar_ddelta2dtau(tau, delta):
+    return derivative(lambda tau: iapws95_d2Ar_ddelta2(tau, delta), tau, tau*1e-7, order=11)
+
+def iapws95_d3Ar_ddeltadtau2(tau, delta):
+    return derivative(lambda tau: iapws95_d2Ar_ddeltadtau(tau, delta), tau, tau*1e-7, order=11)
 
 def iapws95_dAr_dtau(tau, delta):
     r'''Calculates the first derivative of residual Helmholtz energy of water

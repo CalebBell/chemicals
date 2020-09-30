@@ -2148,3 +2148,15 @@ def test_rhog_sat_IAPWS95_CoolProp():
 #test_rhog_sat_IAPWS95()
 #test_rhog_sat_IAPWS95_CoolProp()
 #test_rhog_sat_IAPWS95_vs_saturation()
+
+
+
+def test_iapws95_A0_tau_derivatives():
+    tau, delta = 647.096/300.0, 999.0/322
+    together = iapws95_A0_tau_derivatives(tau, delta)
+    A0 = iapws95_A0(tau, delta)
+    dA0_dtau = iapws95_dA0_dtau(tau, delta)
+    d2A0_dtau2 = iapws95_d2A0_dtau2(tau, delta)
+    d3A0_dtau3 = iapws95_d3A0_dtau3(tau, delta)
+    assert_close1d(together, (A0, dA0_dtau, d2A0_dtau2, d3A0_dtau3), rtol=1e-15)
+    
