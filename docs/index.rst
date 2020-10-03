@@ -1,6 +1,9 @@
 chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
 =======================================================================================
 
+  .. meta::
+      :google-site-verification: wcmDZ88ikLzq1to6urRDGA6R7oIhzya2sN5hOeV1zZw
+
 Key Features & Capabilities
 ---------------------------
 
