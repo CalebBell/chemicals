@@ -4711,9 +4711,9 @@ def iapws95_d3Ar_ddelta2dtau(tau, delta):
     x38 = x1*tau12
     x39 = x1*delta4
     x42 = x1*tau2
-    x44 = tau**10*x1
-    x47 = tau**21*x31
-    x48 = tau**22*x31
+    x44 = tau*tau9*x1
+    x47 = tau12*tau9*x31
+    x48 = tau9*tau9*tau4*x31
     x49 = tau**43*x34
     x50 = tau**45*x34
     x51 = x3*delta6
@@ -4721,9 +4721,10 @@ def iapws95_d3Ar_ddelta2dtau(tau, delta):
     x54 = x3*tau7
     x55 = tau9*exp(-delta4)
     x57 = delta - 1.0
-    x58 = x57**2
+    x58 = x57*x57
     x59 = -20.0*x58
-    x60 = exp(x59 - 219.615*(0.826446280991736*tau - 1)**2)
+    x60 = (0.826446280991736*tau - 1.0)
+    x60 = exp(x59 - 219.615*x60*x60)
     x61 = delta*x60
     x62 = 189.276841426685991*x61
     x63 = delta3*x60
