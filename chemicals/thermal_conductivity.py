@@ -174,7 +174,7 @@ else:
 
 pi_inv = 1.0/pi # todo move to fluids.constants
 
-def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None):
+def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     r'''Calculate the thermal conductivity of water or steam according to the
     2011 IAPWS [1]_ formulation. Critical enhancement is ignored unless
     parameters for it are provided.
@@ -225,10 +225,15 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None):
     Cv : float, optional
         Constant volume heat capacity of water, [J/kg/K]
     mu : float, optional
-        Viscosity of water, [Pa*S]
+        Viscosity of water, [Pa*s]
     drho_dP : float, optional
         Partial derivative of density with respect to pressure at constant
         temperature, [kg/m^3/Pa]
+    drho_dP_Tr : float, optional
+        Partial derivative of density with respect to pressure at constant
+        temperature (at the reference temperature (970.644 K) and the actual
+        density of water); will be calculated from the industrial formulation
+        fit if omitted, [kg/m^3/Pa]
 
     Returns
     -------
@@ -336,25 +341,28 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None):
         TRC = 1.5
 
         zeta_drho_dP = drho_dP*68521.73913043478#22.064E6/322.0
-        if rhor <= 0.310559006:
-            tot1 = (rhor*(rhor*(rhor*(rhor*(1.97815050331519*rhor + 10.2631854662709) - 2.27492629730878)
-                        + 3.39624167361325) - 5.61149954923348) + 6.53786807199516)
-        elif rhor <= 0.776397516:
-            tot1 = (rhor*(rhor*(rhor*(rhor*(12.1358413791395 - 5.54349664571295*rhor) - 9.82240510197603)
-                        + 8.08379285492595) - 6.30816983387575) + 6.52717759281799)
-        elif rhor <= 1.242236025:
-            tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579) 
-                        + 8.91990208918795) - 3.96415689925446) + 5.35500529896124)
-        elif rhor <= 1.863354037:
-            tot1 = (rhor*(rhor*(rhor*(rhor*(6.1678099993336 - 0.965458722086812*rhor) - 11.0321960061126)
-                        + 8.93237374861479) + 0.464621290821181) + 1.55225959906681)
+        if drho_dP_Tr is None:
+            if rhor <= 0.310559006:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(1.97815050331519*rhor + 10.2631854662709) - 2.27492629730878)
+                            + 3.39624167361325) - 5.61149954923348) + 6.53786807199516)
+            elif rhor <= 0.776397516:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(12.1358413791395 - 5.54349664571295*rhor) - 9.82240510197603)
+                            + 8.08379285492595) - 6.30816983387575) + 6.52717759281799)
+            elif rhor <= 1.242236025:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579) 
+                            + 8.91990208918795) - 3.96415689925446) + 5.35500529896124)
+            elif rhor <= 1.863354037:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(6.1678099993336 - 0.965458722086812*rhor) - 11.0321960061126)
+                            + 8.93237374861479) + 0.464621290821181) + 1.55225959906681)
+            else:
+                tot1 = (rhor*(rhor*(rhor*(rhor*(4.66861294457414 - 0.503243546373828*rhor) - 10.325505114704)
+                            + 9.8895256507892) + 0.595748562571649) + 1.11999926419994)
+            '''Original code:
+            zeta_drho_dP_Tr = 1./sum([Aijs[i][j]*rhor**i for i in range(6)])
+            '''
+            zeta_drho_dP_Tr = 1./tot1
         else:
-            tot1 = (rhor*(rhor*(rhor*(rhor*(4.66861294457414 - 0.503243546373828*rhor) - 10.325505114704)
-                        + 9.8895256507892) + 0.595748562571649) + 1.11999926419994)
-        '''Original code:
-        zeta_drho_dP_Tr = 1./sum([Aijs[i][j]*rhor**i for i in range(6)])
-        '''
-        zeta_drho_dP_Tr = 1./tot1
+            zeta_drho_dP_Tr = drho_dP_Tr*68521.73913043478#22.064E6/322.0
         dchi = rhor*(zeta_drho_dP - zeta_drho_dP_Tr*TRC*Tr_inv)
         if dchi < 0.0:
             xi = 0.0

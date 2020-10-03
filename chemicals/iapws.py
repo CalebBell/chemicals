@@ -156,6 +156,7 @@ IAPWS-95 Ideal Gas Terms
 .. autofunction:: chemicals.iapws.iapws95_dA0_dtau
 .. autofunction:: chemicals.iapws.iapws95_d2A0_dtau2
 .. autofunction:: chemicals.iapws.iapws95_d3A0_dtau3
+.. autofunction:: chemicals.iapws.iapws95_A0_tau_derivatives
 
 IAPWS-95 Residual Terms
 -----------------------
@@ -166,6 +167,8 @@ IAPWS-95 Residual Terms
 .. autofunction:: chemicals.iapws.iapws95_dAr_dtau
 .. autofunction:: chemicals.iapws.iapws95_d2Ar_dtau2
 .. autofunction:: chemicals.iapws.iapws95_d2Ar_ddeltadtau
+.. autofunction:: chemicals.iapws.iapws95_d3Ar_ddeltadtau2
+.. autofunction:: chemicals.iapws.iapws95_d3Ar_ddelta2dtau
 
 """
 from __future__ import division
@@ -184,7 +187,8 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
 	'iapws97_rho', 'iapws97_P', 'iapws97_T', 'iapws95_Psat', 'iapws95_dPsat_dT',
 	'iapws95_Tsat', 'iapws92_rhol_sat', 'iapws92_rhog_sat', 'iapws95_rhol_sat',
 	'iapws95_rhog_sat', 'iapws95_saturation', 'iapws95_A0', 'iapws95_dA0_dtau',
-	'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3', 'iapws95_Ar',
+	'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3', 'iapws95_A0_tau_derivatives', 
+    'iapws95_Ar', 'iapws95_d3Ar_ddeltadtau2', 'iapws95_d3Ar_ddelta2dtau',
 	'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3',
 	'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2', 'iapws95_d2Ar_ddeltadtau',
 	'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc', 'iapws97_G_region1',
@@ -3575,7 +3579,7 @@ def iapws95_A0(tau, delta):
 
 def iapws95_dA0_dtau(tau, delta):
     r'''Calculates the first derivative of ideal gas Helmholtz energy of water
-    with respect to `delta` according to the IAPWS-95 standard.
+    with respect to `tau` according to the IAPWS-95 standard.
     
     .. math::
         \frac{\partial \phi^\circ}{\partial \tau} = n_2 + \frac{n_3}{\tau}
@@ -3614,7 +3618,7 @@ def iapws95_dA0_dtau(tau, delta):
 
 def iapws95_d2A0_dtau2(tau, delta):
     r'''Calculates the second derivative of ideal gas Helmholtz energy of water
-    with respect to `delta` according to the IAPWS-95 standard.
+    with respect to `tau` according to the IAPWS-95 standard.
     
     .. math::
         \frac{\partial^2 \phi^\circ}{\partial \tau^2} = \frac{n_3}{\tau^2}
@@ -3658,7 +3662,7 @@ def iapws95_d2A0_dtau2(tau, delta):
 
 def iapws95_d3A0_dtau3(tau, delta):
     r'''Calculates the third derivative of ideal gas Helmholtz energy of water
-    with respect to `delta` according to the IAPWS-95 standard.
+    with respect to `tau` according to the IAPWS-95 standard.
 
     Parameters
     ----------
@@ -3707,6 +3711,100 @@ def iapws95_d3A0_dtau3(tau, delta):
             + 0.0530566178171007902*x8*(x9))
             + 6.01264/(tau*tau*tau))
 
+
+def iapws95_A0_tau_derivatives(tau, delta):
+    r'''Calculates the ideal gas Helmholtz energy of water
+    and its first three derivatives with respect to `tau` according to the 
+    IAPWS-95 standard. As each of those calls spends most of their time 
+    computing exponentials which are the same for each function, function 
+    offers a time saving.
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    A0 : float
+        Ideal gas dimensionless Helmholtz energy A/(RT) [-]
+    dA0_dtau : float
+        First derivative of ideal gas dimensionless Helmholtz energy A/(RT)
+        with respect to `tau` [-]
+    d2A0_dtau2 : float
+        Second derivative of ideal gas dimensionless Helmholtz energy A/(RT)
+        with respect to `tau` [-]
+    d3A0_dtau3 : float
+        Third derivative of ideal gas dimensionless Helmholtz energy A/(RT)
+        with respect to `tau` [-]
+
+    Notes
+    -----
+    The extra cost of calling this function vs :obj:`iapws95_A0` alone is
+    ~15% with numba, ~40% with PyPy, and 120% with CPython.
+            
+    Examples
+    --------
+    >>> iapws95_A0_tau_derivatives(647.096/300.0, 999.0/322)
+    (9.53707552976, 8.0797055488, -0.65354304775, 0.62225425072)
+    '''
+    _exp, _log = exp, log
+    # 6 divisions, 5 exp, 7 log
+    x0 = _exp(-27.5075105*tau)
+    x1 = 1.0/(1.0 - x0)
+    x2 = _exp(-9.24437796*tau)
+    x3 = 1.0/(1.0 - x2)
+    x4 = _exp(-7.74073708*tau)
+    x5 = 1.0/(1.0 - x4)
+    x6 = _exp(-3.53734222*tau)
+    x7 = 1.0/(1.0 - x6)
+    x8 = _exp(-1.28728967*tau)
+    x9 = 1.0/(1.0 - x8)
+    tau_inv = 1.0/tau
+    A0 = (6.68321052759320011*tau + _log(delta) + 3.00632*_log(tau) 
+            + 0.24873*_log(1. - x0) 
+            + 0.96956*_log(1. - x2) 
+            + 1.2795*_log(1. - x4) 
+            + 0.97315*_log(1. - x6)
+            + 0.012436*_log(1. - x8)
+            - 8.32044648374970031)
+
+    dA0_dtau = (-22.4843580635585205 
+            + 0.01600873433612*x9
+            + 3.44236458139299994*x7
+            + 9.90427309386000054*x5
+            + 8.96297909489759981*x3
+            + 6.84194308666500017*x1
+            + 3.00632*tau_inv)
+    
+    x0 *= x1
+    x2 *= x3
+    x4 *= x5
+    x6 *= x7
+    x8 *= x9
+
+    d2A0_dtau2 = (-188.204821296839867*x0*x1
+            - 82.8571664008121047*x2*x3
+            - 76.6663739880884236*x4*x5
+            - 12.1768215703940861*x6*x7
+            - 0.0206078783406615819*x8*x9
+            - 3.00632*tau_inv*tau_inv)
+    
+    d3A0_dtau3 = (x1*x0*(5177.04609797344619
+            + 10354.0921959468924*x0)
+            + (x3*x2)*(765.962962903719927
+            + 1531.92592580743985*x2)
+            + x5*x4*(593.454243918743487
+            + 1186.90848783748697*x4)
+            + x7*x6*(86.1471700927234139*x6
+            + 43.0735850463617069)
+            + x9*x8*(0.0265283089085503951 
+            + 0.0530566178171007902*x8)
+            + 6.01264*tau_inv*tau_inv*tau_inv)
+
+    return (A0, dA0_dtau, d2A0_dtau2, d3A0_dtau3)
 
 
 def iapws95_Ar(tau, delta):
@@ -4291,6 +4389,245 @@ def iapws95_d3Ar_ddelta3(tau, delta):
 
     Notes
     -----
+    No equation is given for this in IAPWS-95, and the derivative was 
+    symbolically computed with SymPy.
+
+    This is an optimized implementatation.
+    It was generated using SymPy's CSE functionality.
+     
+    Over a linear temperature range of 200 K to 5000 K and a logarithmic 
+    density range of 1E-4
+    kg/m^3 to 5000 kg/m^3, 90000 points were evaluated. The mean 
+    relative error was 5.41E-13, with a maximum relative error of 6.3957e-11 and a 
+    standard deviation of 3.346e-12.
+        
+    90000 points were also evaluated with mpmath. The mean 
+    relative error was 1.41959E-14, with a maximum relative error of 5.8878E-10
+    and a standard deviation of 1.978E-12. 
+    
+    Evaluating 10000 points in the 1e-10 to 1e-4 range, the 
+    mean relative error was 1.2E-16, maximum relative error 1.2e-16, and
+    standard deviation 6.66e-16.
+    
+    Examples
+    --------
+    >>> iapws95_d3Ar_ddelta3(647.096/300.0, 999.0/322)
+    0.3362119057867
+    '''
+    # Gonna have to reduce the number of constants quite a bit for pypy
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta*delta3
+    delta5 = delta*delta4
+    delta6 = delta*delta5
+    delta7 = delta*delta6
+    delta8 = delta*delta7
+    delta9 = delta*delta8
+    delta10 = delta*delta9
+    delta11 = delta*delta10
+    delta12 = delta*delta11
+    delta13 = delta*delta12
+    delta15 = delta2*delta13
+    delta21 = delta15*delta6
+
+    tau2 = tau*tau
+    tau3 = tau*tau2
+    tau4 = tau*tau3
+    tau6 = tau2*tau4
+    tau8 = tau4*tau4
+    tau9 = tau*tau8
+    tau10 = tau*tau9
+    tau40 = tau10*tau10
+    tau40 *= tau40
+
+    x0 = delta*tau
+    x1 = exp(-delta)
+    x2 = tau*x1
+    x3 = 1.15396326936012006*x2
+    x5 = x1*tau4
+    x6 = tau*tau4*x1
+    x7 = 1.54254258020627999*x6
+    x9 = x1*tau6
+    x10 = tau6*tau6*x1
+    x12 = exp(-delta2)
+    x14 = x1*tau2
+    x15 = tau10*tau3*x1
+    x19 = tau6*tau*x12
+    x21 = x12*tau10
+    x23 = exp(-delta3)
+    x24 = tau10*tau6*x23
+    x26 = exp(-delta6)
+    x27 = tau40*tau10*x26
+    x29 = x12*tau3
+    x31 = x12*tau9
+    x32 = tau10*tau10*tau2*x23
+    x33 = tau10*tau10*tau3*x23
+    x34 = 0.000455648262528864003*x1
+    x35 = tau*x12
+    x36 = delta3*tau9
+    x38 = x1*tau3
+    x39 = x1*tau9
+    x42 = tau10*tau*x1
+    x44 = x12*delta8
+    x48 = x12*delta12
+    x49 = x12*tau6
+    x50 = tau40*tau4*x26
+    x51 = tau40*tau6*x26
+    x52 = x12*tau2
+    x53 = x12*tau4
+    x55 = x12*tau8
+    x56 = tau10*exp(-delta4)
+    x58 = delta - 1.0
+    x59 = x58*x58
+    x60 = -20.0*x59
+    x61 = (0.826446280991736*tau - 1.0)
+    x61 = exp(x60 - 219.615*x61*x61)
+    x62 = tau*x61
+    x63 = delta2*x61
+    x64 = (0.8*tau - 1.0)
+    x64 = tau4*exp(x60 - 390.625*x64*x64)
+    x65 = x58*x61
+    x66 = tau*x63
+    x67 = delta2*x64
+    x68 = delta*x58
+    x69 = delta3*x58
+    x70 = x58*x58*x58
+    x71 = delta3*x70
+    x72 = sqrt(x59)*x59*x59*x59
+    x73 = x59**1.66666666666666674
+    x74 = -tau + 0.320000000000000007*x73 + 1.0
+    x75 = 0.2*x72 + x74*x74
+    pow005 = x75**(-0.05)
+    x76 = (tau - 1.0)
+    x76 *= x76
+    x77 = exp(-28.0*x59 - 700.0*x76)
+    x78 = x75*pow005*pow005*pow005*x77
+    x79 = exp(-32.0*x59 - 800.0*x76)
+    x80 = x75*pow005*x79
+    x81 = 3908.33490474319842*x80
+    x82 = delta*x70
+    x83 = x73*x74
+    x84 = 1.19000000000000017*x72 + 1.81333333333333346*x83
+    x85 = pow005*pow005*pow005*x77
+    x86 = x84*x85
+    x87 = 1.33*x72 + 2.02666666666666684*x83
+    x88 = pow005*x79
+    x89 = x87*x88
+    x90 = delta/x58
+    x91 = 61.0677328866124753*x90
+    x92 = 1.0/x59
+    x93 = 0.446239225701720033*x92
+    x94 = x73*x73
+    x95 = 7.13999999999999879*x72 + 4.2311111111111126*x83 + 1.93422222222222251*x94
+    x96 = x85*x95
+    x97 = 0.954183326353319927*x92
+    x98 = 7.98000000000000043*x72 + 4.72888888888889003*x83 + 2.16177777777777802*x94
+    x99 = x88*x98
+    x100 = delta/x70
+    x101 = 0.148746408567240002*x100
+    x102 = 0.318061108784439994*x100
+    x103 = 24.9893966392963236*x90
+    x104 = 0.0700000000000000622*x72 + 0.106666666666666771*x83
+    x105 = pow005/x75
+    x106 = x105*x79*x87
+    x107 = x104*x106
+    x108 = 0.210000000000000048*x72 + 0.320000000000000062*x83
+    x109 = x105*pow005*pow005
+    x110 = x109*x77*x84
+    x111 = x108*x110
+    x112 = x104*x79
+    x113 = x108*x77
+    x114 = sqrt(sqrt(tau))
+    return (0.00401214146653984007*delta9*delta9*delta5*x56 - 0.0511548036983829613*delta9*delta10*x56
+            + 1.20336016101793195e-7*delta9*delta9*x27 - 2.81878141106042993e-8*delta9*delta5*x2
+            + 0.0000662126050396869941*delta*x10 - 0.962227894219367941*delta*x14 
+            + 9.44242142478096036e-6*delta*x15 - 0.752608817101175998*delta*x19 
+            - 8.1763823872351189*delta*x21 + 0.119925952777934386*delta*x29 - delta*x3
+            - 5.31175084021104027*delta*x31 + 0.839856131130360062*delta*x32 
+            - 1.84291674827090413*delta*x33 - 2.22491060444553002*delta*x5
+            + 22540.5074328732007*delta*x65 - delta*x7 - 0.204338109509650007*delta*x9
+            - 0.046919851012788602*sqrt(x114)*x114 - 4.0496681372026524*tau*x44
+            - 0.0666612039045704069*tau*x48 - 0.422675784210048033*x0*x12 
+            - 22713.2209712023177*x0*x65 + 0.211414783445121601*x0 - 0.000198637815119060996*x10 
+            - 0.636122217568879988*x100*x105*x112*x98 + 0.297492817134480003*x100*x109*x113*x95 
+            + x101*x110*(1.26000000000000001*x72 + 0.746666666666666812*x83 + 0.341333333333333433*x94) 
+            - x101*x113*x105*x105*pow005*x84*(1.60999999999999988*x72 + 2.45333333333333359*x83)
+            - x101*x85*(35.6999999999999886*x72 + 5.6414814814814811*x83 + 13.5395555555555589*x94) 
+            - x102*x106*(0.420000000000000373*x72 + 0.248888888888889104*x83 + 0.113777777777777894*x94)
+            + x102*x112*x105/x75*x87*(1.4700000000000002*x72 + 2.24000000000000021*x83) 
+            + x102*x88*(39.9000000000000057*x72 + 6.30518518518518789*x83 + 15.132444444444447*x94)
+            - x103*x111 + x103*x96 + x107*x91 - x107*x97 + 1.44334184132905197*delta2*x14 
+            - 0.0000141636321371714414*delta2*x15 - 2.59046421814367989*delta2*x19 + 0.192327211560020001*delta2*x2 
+            - 2.68063804302186082*delta2*x21 - delta2*tau9*x34 + 1.34677663992036001*delta2*x33 
+            + 1.44673816376259001*delta2*x5 + 0.25709043003437998*delta2*x6 + x111*x93 + 7.9676262603165604*x12*x36 
+            + 14.11943530065831*tau2*x44 + 0.232418688076680008*tau2*x48 - 0.48111394710968397*x14*delta3 
+            + 0.0400928289258069975*x14*delta4 - 5.1679602291205205e-11*x15*delta12 + 1.32511800746680002e-12*x15*delta13 
+            + 4.72121071239048018e-6*x15*delta3 - 3.93434226032540015e-7*x15*delta4 - 2.27390250081302894e-9*x15*delta10
+            + 6.20155227494462486e-10*x15*delta11 - 1.71006072270999421e-6*delta12*x2 - 4.81344064407172886e-7*delta12*x27
+            - 0.308920684593648021*delta12*x29 + 0.0132432400509872004*delta12*x55 + 3.94629397548460203e-7*delta13*x2
+            - 0.00126962466593255998*delta13*x31 - 0.0159644575836327997*delta13*x49 - 0.00255661666143467987*delta13*x55 
+            + 6.26395869124539993e-10*delta15*x2 - 140.673247220654275*delta15*x27 - 236.479934050367035*delta15*x50 
+            + 377.516668289167455*delta15*x51 + 0.000131108546740240002*delta15*x55 + 0.17001449464462573*delta15*x56
+            + 3.01043526840470443*x19*delta3 + 0.863488072714559962*x19*delta4 - 1.88152204275294022*x19*delta5 
+            + 0.250869605700392018*x19*delta7 + 0.647616054535919972*x19 + 40.4904092746456783*x21*delta3 
+            + 25.6054990265034803*x21*delta6 - 40.8530296559261075*x21*delta4 - 11.9150444067814796*x21*delta5
+            - 5.50933111586084046*x21*delta7 - 2.4632454907791681*x21*delta8 + 1.09091480882744007*x21*delta9 
+            - 0.113445075204936005*x21*delta10 + 3.48500399914553993*x21 - 4.97195219251445408*delta3*x24
+            - 14.2094189111772007*delta3*x27 - 0.479703811111737544*delta3*x29 + 0.634013676315071995*delta3*x35 
+            + 2.46335290751376013*delta3*x49 - 0.160748684862510011*delta3*x5 - 23.8868620252896022*delta3*x50
+            + 38.1329967968856067*delta3*x51 - 150270.049552488024*delta3*x65 + 5.88783812271448515*x24*delta6 
+            - 1.17756762454289698*x24*delta9 + 0.261681694342865978*x24 + 2.77441370456912092e-7*delta6*x27
+            + 19.4620031293998252*delta6*x29 + 4.19965584598793562*delta6*x35 + 0.0118127056638964809*delta6*x38 
+            - 0.00786676073759603849*delta6*x5 - 14.6423773488308395*delta6*x52 - 10.2783172029068144*delta6*x53 
+            - 0.834324123212193625*delta6*x55 + 142.09418911177201*x27*delta9 + 25.576954040118963*x27*delta21
+            - 3.34266711393870005e-9*x27 - 18.766931589064118*tau3*x44 + 0.299814881944835965*x29*delta5 
+            - 0.0399753175926447976*x29*delta7 + 4.63381026890472025*x29*delta10 + x3 - 1.77058361340368009*x31*delta5 
+            + 0.114266219933930394*x31*delta7 - 0.0952218499449419969*x31*delta9 + 0.0209488069878872411*x31*delta11 
+            - 6.50888501626029026*x32*delta4 + 5.6690288851299302*x32*delta7 - 0.94483814752165507*x32*delta10
+            + 14.2826047990995058*x33*delta4 - 6.19517254363365666*x33*delta5 - 12.4396880508286038*x33*delta7
+            + 4.24234641574913418*x33*delta8 + 2.07328134180476731*x33*delta10 - 0.606049487964162026*x33*delta11
+            + x34*x36 - 0.140891928070015993*x35*delta5 + 0.99991805856855609*x35*delta10 
+            + 0.118127056638964806*delta4*x38 - 0.000113912065632216001*delta4*x39 - 0.070876233983378889*x38*delta5
+            - 0.000562509793518880044*x38*delta7 + 7.59413770881439999e-6*x39*delta5 + 9.911234445660142*tau4*x44 
+            + 0.163147892109631987*tau4*x48 - 4.43403523352476814*delta5*x49 + 8.30735742452472082e-7*delta7*x42 
+            + 3.16114821778658417*delta7*x49 + 0.00337146888754115935*delta7*x5 - 3.11525903419677031e-7*x42*delta8 
+            + 3.46139892688530034e-8*x42*delta9 - 1.15379964229510002e-9*x42*delta10 - 0.0000592701760150253563*delta8*x5
+            + 0.804526833097472416*x44*tau8 - 1.36155784594004392*delta9*x49 - 0.000105112492718738184*delta9*x5
+            + 238.868620252896022*delta9*x50 - 381.329967968855954*delta9*x51 - 0.0216329102121396027*delta9*x55 
+            + 0.0000120721144975873203*delta10*x5 - 3.48628032115020003*delta10*x52 - 2.44721838164447991*delta10*x53 
+            - 0.198648600764808003*delta10*x55 + 0.263413550129941165*delta11*x49 - 3.65821651442040008e-7*delta11*x5
+            + 0.0141597230479459206*delta11*x55 - 0.136914327545672065*delta11*x56 - 1.04120506006389002*x5
+            + 42.9963516455212797*x50*delta21 - 68.6393942343940893*x51*delta21 - 450810.148657464015*x59*x63 
+            + 454264.419424046355*x59*x66 - 36306942.2520408034*x59*x67 - 1399.40621180059406*x59*x78 + x59*x81 
+            + 2003600.66069984017*x61*x71 - 187.837561940610016*x61 + 151421.473141348804*x62*x69
+            - 2018952.97521798406*x62*x71 + 189.276841426685991*x62 + 11270.2537164366004*x63 + 1815347.11260203994*x64*x68 
+            - 12102314.0840135999*x64*x69 + 161364187.786847979*x64*x71 - 15127.8926050169994*x64 - 11356.6104856011589*x66
+            + 907673.556301020086*x67 - 1399.40621180059384*x68*x78 + x68*x81 - 1399.40621180059406*x68*x86 
+            + 3908.33490474319842*x68*x89 + x7 + 26122.2492869444213*x78*x82 + 24.9893966392963165*x78 
+            - 83377.8113011882378*x80*x82 - 61.0677328866124753*x80 + 24.9893966392963165*x86*x90 + 49.9787932785926472*x86 
+            - x89*x91 - 122.135465773224951*x89 + 0.613014328528949992*x9 - x91*x99 - x93*x96 + x97*x99)
+
+
+def iapws95_d3Ar_ddelta2dtau(tau, delta):
+    r'''Calculates the third derivative of residual Helmholtz energy of water
+    with respect to `delta` twice and `tau` one according to the IAPWS-95 
+    standard.
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    d3Ar_ddeltadtau2 : float
+        Third derivative of residual Helmholtz energy A/(RT) with respect to
+        `delta` twice and `tau` once, [-]
+
+    Notes
+    -----
     This is an optimized implementatation.
     It was generated using SymPy's CSE functionality.
     
@@ -4298,267 +4635,424 @@ def iapws95_d3Ar_ddelta3(tau, delta):
     symbolically computed with SymPy.
     
     Like many higher-order derivatives of functions with exponentials, this one
-    balloons to use many, many terms. Unfortunately, there are large numerical
-    issues present at very low densities, under 0.0001 kg/m^3. No resolution
-    to this issue besides switching to numerical derivatives or using arbitrary
-    precision to compute it is known.
+    balloons to use many, many terms. 
  
     Over a linear temperature range of 200 K to 5000 K and a logarithmic 
-    density range of 1E-4
-    kg/m^3 to 5000 kg/m^3, 90000 points were evaluated with mpmath. The mean 
-    relative error was 9.767e-13, with a maximum relative error of 2.68E-10 and a 
-    standard deviation of 7.38E-12.    
+    density range of 1E-10
+    kg/m^3 to 5000 kg/m^3, 250000 points were evaluated. The mean 
+    relative error was 3.629e-15, with a maximum relative error of 8.38E-11 and a 
+    standard deviation of 2.1214E-13.        
     
-    Evaluating 40000 points in the 1e-10 to 1e-4 range, the 
-    mean relative error was 1.14E-6, maximum relative error 0.000152, and
-    standard deviation 6.59E-6. Caution is recommended in that range.
+    Over the same range, the model was evaluated to a precision of 50 
+    decimal places with `mpmath`, and on 10000 points, the mean relative
+    error was 2.4e-15, with a maximum relative error of 7.62E-12 and a 
+    standard deviation of 7.818E-14.
     
     Examples
     --------
-    >>> iapws95_d3Ar_ddelta3(647.096/300.0, 999.0/322)
-    0.33621190578672067
+    >>> iapws95_d3Ar_ddelta2dtau(647.096/300.0, 999.0/322)
+    0.015646982949077
     '''
-    ans = 0.0
-    # Last two terms - appears to be working fine with mpmath
-    x0 = delta - 1.0
-    x1 = x0**2
-    x2 = (tau - 1.0)**2
-    x3 = x1**3.5
-    x4 = delta - 1.0
-    x5 = x4**2
-    x6 = x5**1.66666666666666674
-    x7 = -tau + 0.320000000000000007*x6 + 1.0
-    x8 = 0.200000000000000011*x3 + x7**2
-    x9 = 56.0*x1
-    x10 = delta*x0
-    x11 = 1/x8
-    x12 = x3/x0
-    x13 = x6/x5
-    x14 = x7*(0.640000000000000013*delta - 0.640000000000000013)
-    x15 = x13*x14
-    x16 = x11*(1.40000000000000013*x12 + 3.33333333333333348*x15)
-    x17 = delta*x16
-    x18 = x3/x1
-    x19 = x5**3.33333333333333348
-    x20 = x4**(-4)
-    x21 = x19*x20
-    x22 = x1*x21
-    x23 = x13*(-0.640000000000000013*tau + 0.20480000000000001*x6 + 0.640000000000000013)
-    x24 = x20*x6
-    x25 = x24*x7
-    x26 = x1*x25
-    x27 = x6/x4**3
-    x28 = 1.28000000000000003*delta - 1.28000000000000003
-    x29 = x28*x7
-    x30 = x27*x29
-    x31 = 0.42000000000000004*x12 + x15
-    x32 = x11*x31**2
-    x33 = 3.33333333333333348*x27
-    x34 = 8.40000000000000036*x18 + 2.27555555555555555*x22 + 3.33333333333333348*x23 + 7.11111111111111072*x26 - x29*x33
-    x35 = x10*x11
-    x36 = x31**3/x8**2
-    x37 = x11*(3.33333333333333348*x13*(-0.320000000000000007*tau + 0.102400000000000005*x6 + 0.320000000000000007) - x14*x33 + 4.20000000000000018*x18 + 1.13777777777777778*x22 + 3.55555555555555536*x26)
-    x38 = 11.1111111111111107*x21
-    x39 = x4**(-5)
-    x40 = x1*x19
-    x41 = (2.0*delta - 2.0)/x4**6
-    x42 = x1*x6*x7
-    x43 = 11.1111111111111107*x14*x24 + 11.1111111111111107*x25*x28 + 3.33333333333333348*x25*(3.83999999999999986*delta - 3.83999999999999986) - x33*(-2.56000000000000005*tau + 0.819200000000000039*x6 + 2.56000000000000005) - x37*(8.40000000000000036*x12 + 20.0*x15) + x38*(0.20480000000000001*delta - 0.20480000000000001) + x38*(0.40960000000000002*delta - 0.40960000000000002) - 13.6533333333333342*x39*x40 - 42.6666666666666643*x39*x42 + 11.3777777777777818*x40*x41 + 11.8518518518518547*x41*x42 + 42.0*x3/x0**3
-    x44 = delta*x11
-    x45 = 64.0*x1
-    ans += (-0.148746408567240002*x8**0.849999999999999978*(9408.0*x1 - 3136.0*x10*(x9 - 3.0) + x11*(21.4199999999999982*x18 + 5.8026666666666662*x22 + 8.5*x23 + 18.1333333333333293*x26 - 8.5*x30 - 4.25000000000000266*x32) - x16*(285.599999999999966*delta - 285.599999999999966) + 142.799999999999983*x17*(x9 - 1.0) - 142.799999999999983*x35*(-1.66666666666666785*x32 + x34) + 0.849999999999999978*x44*(6.38888888888889994*x36 + x37*(7.14000000000000057*x12 + 17.0*x15) + x43) - 168.0)*exp(-28*x1 - 700*x2) + 0.318061108784439994*x8**0.949999999999999956*(12288.0*x1 - 4096.0*x10*(x45 - 3.0) + x11*(23.9399999999999977*x18 + 6.48533333333333228*x22 + 9.5*x23 + 20.2666666666666622*x26 - 9.5*x30 - 1.58333333333333259*x32) - x16*(364.799999999999955*delta - 364.799999999999955) + 182.399999999999977*x17*(x45 - 1.0) - 182.399999999999977*x35*(-0.555555555555555358*x32 + x34) + 0.949999999999999956*x44*(1.94444444444444287*x36 + x37*(7.97999999999999954*x12 + 19.0*x15) + x43) - 192.0)*exp(-32*x1 - 800*x2))
+    # simplest when derivaed from  diff((calcA_res(tau, delta)), delta, delta, tau)
+    tau2 = tau*tau
+    tau3 = tau*tau2
+    tau4 = tau*tau3
+    tau5 = tau*tau4
+    tau6 = tau*tau5
+    tau7 = tau*tau6
+    tau8 = tau*tau7
+    tau9 = tau*tau8
+    tau12 = tau9*tau3
+    tau40 = tau12*tau12*tau12*tau4
+    
+    tau_inv = 1.0/tau
+    taurtinv = sqrt(tau_inv)
+    tau4rtinv = sqrt(taurtinv)
+    tau8rtinv = sqrt(tau4rtinv)
+
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta*delta3
+    delta5 = delta*delta4
+    delta6 = delta*delta5
+    delta7 = delta2*delta5
+    delta8 = delta*delta7
+    delta9 = delta*delta8
+    delta10 = delta*delta9
+    delta11 = delta*delta10
+    delta12 = delta*delta11
+    delta13 = delta*delta12
+    delta14 = delta*delta13
+    delta16 = delta2*delta14
+    x1 = exp(-delta)
+    x3 = exp(-delta2)
+    
+    x2 = delta*x1
+    x4 = delta2*x1
+    x6 = x1*delta13
+    x9 = x1*tau3
+    x11 = x1*tau4
+    x13 = tau9*tau2*x1
+    x15 = tau*x1
+    x17 = delta2*x3
+    x18 = delta4*x3
+    x20 = delta7*x3
+    x22 = delta9*x3
+    x24 = delta11*x3
+    x26 = tau8*x3
+    x28 = tau9*x3
+    x30 = tau6*x3
+    x31 = exp(-delta3)
+    x32 = tau9*tau6*x31
+    x34 = exp(-delta6)
+    x35 = tau9*tau40*x34
+    x37 = x1*tau8
+    x38 = x1*tau12
+    x39 = x1*delta4
+    x42 = x1*tau2
+    x44 = tau*tau9*x1
+    x47 = tau12*tau9*x31
+    x48 = tau9*tau9*tau4*x31
+    x49 = tau3*tau40*x34
+    x50 = tau5*tau40*x34
+    x51 = x3*delta6
+    x53 = tau5*x3
+    x54 = x3*tau7
+    x55 = tau9*exp(-delta4)
+    x57 = delta - 1.0
+    x58 = x57*x57
+    x59 = -20.0*x58
+    x60 = (0.826446280991736*tau - 1.0)
+    x60 = exp(x59 - 219.615*x60*x60)
+    x61 = delta*x60
+    x62 = 189.276841426685991*x61
+    x63 = delta3*x60
+    x64 = 1261.8456095112399*x63
+    x65 = (0.8*tau - 1.0)
+    x65 = exp(x59 - 390.625*x65*x65)
+    x66 = x65*tau3
+    x67 = 300.0*tau - 363.0
+    x68 = delta2*x57
+    x69 = x60*x68
+    x70 = 7571.07365706743985*x69
+    x71 = delta3*x66
+    x72 = tau*x67
+    x73 = x58*x63
+    x74 = 50473.8243804496014*x73
+    x75 = tau4*x65*(500.*tau - 625.0)
+    x76 = delta3*x75
+    x77 = tau - 1.0
+    x78 = delta*x77
+    x79 = x77*x77
+    x80 = exp(-28.0*x58 - 700.0*x79)
+    x81 = sqrt(x58)*x58*x58*x58
+    x82 = x58**1.66666666666666666
+    x83 = -tau + 0.32*x82 + 1.0
+    x84 = 0.2*x81 + x83*x83
+    x85 = x80*x84**0.85
+    x86 = x78*x85
+    x87 = exp(-32.0*x58 - 800.0*x79)
+    x88 = x84**0.949999999999999956*x87
+    x89 = x78*x88
+    x90 = x57*x77
+    x84_inv = 1.0/x84
+    pow005 = x84**(-0.05)
+    x91 = x80*pow005*pow005*pow005
+    x92 = delta*x82
+    x93 = x91*x92
+    x94 = pow005*x87
+    x95 = x92*x94
+    x96 = 1.0/x57
+    x97 = x82*x96
+    x98 = 1.0/x58
+    x99 = x91*(-1.7*tau + 0.544*x82 + 1.7)
+    x100 = delta*x99
+    x101 = x94*(-1.9*tau + 0.608*x82 + 1.9)
+    x102 = delta*x101
+    x103 = x82*x83
+    x104 = 1.81333333333333346*x103 + 1.19*x81
+    x105 = x104*x91
+    x106 = 2.02666666666666684*x103 + 1.33*x81
+    x107 = x106*x94
+    x108 = x77*x96
+    x109 = 0.106666666666666771*x103 + 0.07*x81
+    x110 = x84_inv*pow005*x87
+    x111 = x92*x98
+    x112 = 0.32*x103 + 0.21*x81
+    x113 = x80*x84_inv*pow005*pow005*pow005
+    x114 = x104*x113
+    x115 = x106*x110
+    x116 = -0.3*tau + 0.096*x82 + 0.3
+    x117 = x114*x116
+    x118 = -0.1*tau + 0.032*x82 + 0.1
+    x119 = x115*x118
+    x120 = x58**3.333333333333333333
+    x121 = x98*(4.2311111111111126*x103 + 1.93422222222222251*x120 + 7.13999999999999879*x81)
+    x122 = 208.244971994135994*x78
+    x123 = x98*(4.72888888888889003*x103 + 2.16177777777777802*x120 + 7.98000000000000043*x81)
+    x124 = 508.89777405510398*x78
+    x125 = 0.148746408567240002*delta
+    x126 = 0.318061108784439994*delta
+    x127 = x109*x98
+    x128 = x112*x98
+    return (-0.0100303536663495993*delta10*delta10*x55 - 6.26395869124539993e-10*delta5*delta10*x1 
+            - 0.017594944129795724*delta*taurtinv*tau8rtinv + 16.6595977595308788*delta*x117 
+            - 40.7118219244083193*delta*x119 - 0.000794551260476243984*delta*x13 + 34.8500399914553967*delta*x28 
+            + 4.5333123817514398*delta*x30 + 4.18690710948585565*delta*x32 - 1.67133355696935012e-7*delta*x35 
+            - 60511.5704200679975*delta*x66 + 15127.8926050169994*delta*x75 + 1.18370554438164*delta*x9 
+            + 0.318025093454180008*taurtinv - 0.392183007890369972*tau4rtinv - 4.18353638538023986*tau*x20 
+            + 2.20797753672845998*tau*x22 - 0.232418688076680008*tau*x24 - 0.962227894219367941*tau*x4 
+            - 1.28545215017189984*delta2*x11 - 19.9190656507914028*delta2*x26 + 9.23841744243395979*delta2*x47
+            - 21.1935426051153968*delta2*x48 - 3.85796843670024003*delta2*x9 + 0.105707391722560801*delta2
+            - 2.45205731411579997*x1*tau5 + 1.87918760737362006e-8*x1*delta14 - 0.384654423120040001*x1 
+            + 5.14180860068759937*tau4*x2 + 466.46873726686465*x100*x58 - 8.32979887976543942*x100
+            + 40.7118219244083193*x101*x57 - 1302.77830158106622*x102*x58 + 20.3559109622041596*x102 
+            + x104*x125*x128*x80*x84_inv*x84_inv*pow005*pow005*pow005*(-2.29999999999999982*tau + 0.736*x82
+            + 2.3) + 416.489943988271989*x105*x108 - 23323.4368633432314*x105*x78 
+            - x106*x126*x127*x84_inv*x84_inv*pow005*x87*(-2.1*tau + 0.672*x82
+            + 2.1) - 1017.79554811020796*x107*x108 + 65138.9150790533095*x107*x78
+            + 0.644603847136465014*x109*x110*x111 - 2.57090430034379969*x11 + x110*x118*x123*x126 
+            - 0.26972682086859523*x111*x112*x113 - 0.0475988507415168113*x111*x114 + 0.0339265182703403015*x111*x115 
+            - x113*x116*x121*x125 - x114*x122*x128 + x115*x124*x127 - 0.297492817134480003*x117*x96
+            + 0.636122217568879988*x119*x96 + 3.69502936127063997*tau5*x18 + 1.22602865705789998*tau5*x2 
+            - 3.20235877976788785*tau5*x51 + x121*x122*x91 - x123*x124*x94 + 0.00158910252095248797*x13 
+            + 0.64148526281291196*delta3*x15 + 14.2978998508973945*delta3*x28 - 3.02220825450095987*delta3*x30
+            - 0.00136694478758659201*delta3*x37 - 0.0000409171595073841633*delta3*x38 + 10.3252875727227593*delta3*x48
+            + 0.642994739450040043*delta3*x9 - 0.0801856578516139951*x15*delta4 + 7.9676262603165604*delta4*x26
+            - 16.7476284379434226*delta4*x32 - 177.61773638971502*delta4*x35 - 262.755482278185639*delta4*x49
+            + 438.529463164184449*delta4*x50 - 48.9314458888811927*x17*tau9 - 2.63413085985411577*x17*tau6 
+            + 0.179888929166901579*x17*tau2 - 0.176114910087520005*x17 + 76.7603002421735994*x18*tau9 
+            + 3.95119628978117454*x18*tau6 - 0.269833393750352368*x18*tau2 + 0.0704459640350079963*x18 
+            + 6.28036066422878392*delta7*x32 + 1.83846691266628511e-6*delta7*x35 + 0.00168752938055664013*delta7*x42
+            - 0.00449529185005487913*delta7*x9 + 0.769308846240080002*x2 + 14.8687416460068995*x20*tau9 
+            + 8.34085848402849628*x20*tau2 - 0.95351328367107846*x20*tau7 - 5.87332411594675108*x20*tau3 
+            + 0.599950835141133676*x20 + 0.567225376024680039*delta9*x28 - 2.5383592130492199e-7*delta9*x44 
+            + 4.64637940772524249*delta9*x48 + 0.0000985269176059575924*delta9*x9 - 4.4021197554594842*x22*tau2
+            + 0.503243121937513638*x22*tau7 + 3.09980995008300741*x22*tau3 - 0.316640718546709443*x22 
+            - 2.68733931914267053e-9*delta11*x38 + 1.46328660576816003e-6*delta11*x9 + 0.463381026890472003*x24*tau2 
+            - 0.0529729602039488018*x24*tau7 - 0.326295784219263973*x24*tau3 + 0.0333306019522852034*x24
+            + 0.000683472393793296005*tau8*x39 + 0.128549497425671705*x26*delta8 - 0.0599897654653134618*x26*delta10 
+            + 0.00571331099669651968*x26*delta12 + 3.9838131301582802*x26 + 5.72835940275540079*x28*delta6
+            - 75.9868993714932515*x28*delta5 - 5.45457404413720059*x28*delta8 - 8.04953395270560002*x28 
+            - 0.878043619951372034*tau6*x51 + 0.0352229820175039982*x3 - 0.0236254113277929619*delta6*x42
+            - 18.58551763090097*delta6*x48 + 603.900303725031108*x35*delta10 - 1.00280013418161002e-6*x35*delta13
+            - 213.141283667658001*x35*delta16 + 5.11464493842302041e-6*tau12*x39 + 0.0000613757392610762381*tau12*x4
+            - 1.72265340970684017e-11*tau12*x6 - 0.0000683472393793296059*x37*delta5 + 4.47889886523778457e-10*x38*delta12
+            - 0.192327211560020001*x4 + 0.070876233983378889*delta5*x42 - 23.0960436060849013*delta5*x47 
+            + 52.983856512788492*delta5*x48 + 0.059962976388967193*tau2*x51 + 1.14226164587214911e-6*delta8*x44 
+            + 6.92881308182547073*delta8*x47 - 15.8951569538365494*delta8*x48 + 1.57027146839796594*delta8*x53
+            + 0.00112382296251371978*delta8*x9 + 1.26917960652461008e-8*x44*delta10 + 893.368639745831047*delta10*x49 
+            - 1491.00017475822688*delta10*x50 - 0.502880413884433164*delta10*x53 - 0.0173063281697116815*delta10*x54
+            - 0.0000321923053268995186*delta10*x9 + 0.0478933727508984025*delta12*x53 + 0.00655542733701199986*delta12*x54 
+            - 0.114095272954726712*delta12*x55 - 315.306578733822732*x49*delta16 + 526.235355797021271*x50*delta16 
+            - 0.000524434186960960006*x54*delta14 + 0.0777352409142094136*x55*delta16 - 16.6595977595308788*x57*x99 
+            
+            - 16136418.7786847986*x58*x71 + 4034104.69467119966*x58*x76 + 653056.232173610479*x58*x86 - 2084445.2825297059*x58*x89 
+            - 1.31543132516153401e-7*x6 + 187.837561940610016*x61*x67 - x62*x72 + x62 - 1252.25041293740014*x63*x67 + x64*x72
+            - x64 + 2420462.81680272007*x66*x68 - 7513.50247762440085*x67*x69 + 50090.0165174960057*x67*x73
+            - 605115.704200680018*x68*x75 + x70*x72 - x70 + 403410.469467120012*x71 - x72*x74 + x74 - 100852.617366780003*x76
+            - 23323.4368633432314*x85*x90 - 11661.7184316716157*x86 + 65138.9150790533095*x88*x90 + 32569.4575395266547*x89 
+            + 5.34852578463720008*x9 + 0.539453641737190459*x91*x97 + 0.62936258202672235*x93*x98 - 30.2094039372826693*x93 
+            
+            - 1.28920769427293003*x94*x97 - 1.50407564331841881*x95*x98 + 82.5092924334675217*x95)
 
 
-#    0-7 and 51-54 - works fairly fine. Checked with mpmath 
-    # 1.5623946580944904e-16 6.3872154394719985e-15 2.1053159215966843e-12
-    x0 = delta - 1.0
-    x1 = x0**2
-    x2 = -20.0*x1
-    x3 = exp(x2 - 219.615*(0.826446280991736*tau - 1)**2)
-    x4 = delta**3
-    x5 = delta**2
-    x6 = 6.0*delta - 240.0*x0*x5 + 1600.0*x1*x4 - 40.0*x4
-    x7 = x3*x6
-    x8 = delta*x0
-    x9 = x1*x5
-    x10 = 2.0*delta - 2.0
-    x11 = x10*x4
-    x12 = 1600.0*x11 - 360.0*x5 - 480.0*x8 + 4800.0*x9 + 6.0
-    x13 = tau**4*exp(x2 - 390.625*(0.8*tau - 1)**2)
-    ans += (0.211414783445121601*delta*tau - 0.046919851012788602*tau**0.375 - 630.92280475561995*tau*x10*x7 + 31.5461402377809996*tau*x12*x3 + 50426.3086833900015*x10*x13*x6 - 2521.31543416949989*x12*x13 + x3*(-50090.0165174960057*x11 + 11270.2537164366004*x5 + 15027.0049552487999*x8 - 150270.049552487995*x9 - 187.837561940610016) + x7*(1252.25041293740014*delta - 1252.25041293740014))
 
-    x0 = 1/delta
-    x1 = 1.33713144615930002 - 0.668565723079650009*delta
-    x2 = tau**4
-    x3 = -delta
-    x4 = exp(x3)
-    x5 = x2*x4
-    x6 = tau**6
-    x7 = 0.408676219019300013 - 0.204338109509650007*delta
-    x8 = 0.000132425210079373988 - 0.0000662126050396869941*delta
-    x9 = (x3 + 1.0)*(x3 + 2.0)
-    x10 = tau*x4
-    x11 = 0.160748684862510011*delta
-    x12 = delta - 3.0
-    x13 = x12*(delta - 2.0)
-    x14 = tau**2
-    x15 = 0.0801856578516139951*delta
-    x16 = delta - 4.0
-    x17 = x3 + 4.0
-    x18 = x17*(x3 + 3.0)
-    x19 = delta*x4
-    x20 = tau**13
-    x21 = 7.8686845206508003e-7*delta
-    x22 = x12*x16
-    x23 = delta**2
-    x24 = tau**9
-    x25 = x17*(x3 + 5.0)
-    x26 = delta**4
-    x27 = tau**3
-    x28 = delta - 7.0
-    x29 = x28*(delta - 6.0)
-    x30 = delta**6
-    x31 = delta - 9.0
-    x32 = (x3 + 8.0)*(x3 + 9.0)
-    x33 = delta**7
-    x34 = delta - 10.0
-    x35 = x31*x34
-    x36 = delta - 11.0
-    x37 = x34*x36
-    x38 = (x3 + 12.0)*(x3 + 13.0)
-    x39 = (x3 + 14.0)*(x3 + 15.0)
-    x40 = 2.0*x23
-    x41 = -x40
-    x42 = x41 + 3.0
-    x43 = -x23
-    x44 = exp(x43)
-    x45 = tau**7*x44
-    x46 = 6.0*x23
-    x47 = x43 + 1.0
-    x48 = x47*(x41 + 1.0)
-    x49 = delta*(x46 - x48 - 5.0)
-    x50 = x24*x44
-    x51 = tau**10
-    x52 = x44*x51
-    x53 = delta*x52
-    x54 = 2.32333599943035995*x23
-    x55 = -4.0*x23
-    x56 = x42*x47
-    x57 = x23*(x55 + 9.0)
-    x58 = x43 + 2.0
-    x59 = x42*x58
-    x60 = x40 - (x23 - 2.0)*(x40 - 3.0)
-    x61 = -x23*x60 + x57 + x60
-    x62 = 1.91229319661920005*x23
-    x63 = x41 + 5.0
-    x64 = x58*x63
-    x65 = delta**3
-    x66 = x55 + 13.0
-    x67 = 0.0821117635837920051*x23
-    x68 = x43 + 3.0
-    x69 = x63*x68
-    x70 = x44*x6
-    x71 = 0.545457404413720037*x23
-    x72 = (x23 - 3.0)*(x40 - 5.0)
-    x73 = 0.0567225376024680025*x23
-    x74 = x68*(x41 + 7.0)
-    x75 = x55 + 19.0
-    x76 = 0.0333306019522852034*x23
-    x77 = x41 + 9.0
-    x78 = x77*(x43 + 4.0)
-    x79 = x40 - x78
-    x80 = x30*x44
-    x81 = 0.116209344038340004*x23
-    x82 = (x23 - 4.0)*(x40 - 9.0)
-    x83 = x40 - x82
-    x84 = 0.15446034229682401*x23
-    x85 = 0.0815739460548159934*x23
-    x86 = tau**8
-    x87 = 0.00662162002549360022*x23
-    x88 = x55 + 21.0
-    x89 = 0.00798222879181639984*x23
-    x90 = x77*(x43 + 5.0)
-    x91 = x40 - x90
-    x92 = 0.000634812332966279988*x23
-    x93 = 0.0000655542733701200008*x23
-    x94 = (x23 - 6.0)*(x40 - 11.0)
-    x95 = -x65
-    x96 = exp(x95)
-    x97 = 0.392522541514298995*x65
-    x98 = 3.0*x65
-    x99 = -x98
-    x100 = x99 + 4.0
-    x101 = x95 + 1.0
-    x102 = x101*(x99 + 2.0)
-    x103 = 0.629892098347770046*x65
-    x104 = x99 + 5.0
-    x105 = x100*x101
-    x106 = delta*x96
-    x107 = tau**23
-    x108 = (x65 - 1.0)*(x98 - 4.0)
-    x109 = x100*x104
-    x110 = 8.0*x26
-    x111 = (2.0*x26 - 7.0)*(4.0*x26 - 13.0)
-    x112 = 2.00560026836322003e-8*x30
-    x113 = -12.0*x30
-    x114 = (2.0*x30 - 1.0)*(3.0*x30 - 1.0)
-    x115 = 6.0*x30
-    x116 = -x30
-    x117 = exp(x116)
-    x118 = tau**50*x117
-    x119 = x113 + 17.0
-    x120 = 7.16605860758687996*x30
-    x121 = (x115 - 5.0)*(x30 - 1.0)
-    x122 = x115 - x121
-    x123 = x117*x65
-    x124 = 11.439899039065681*x30
-    x125 = (5.0 - x115)*(x116 + 1.0)
-    x126 = 4.26282567335316021*x30
-    ans += (-x5*(x0*x1 + x0*(1.33713144615930002*delta - 1.33713144615930002) + x1))
-    ans += (x4*x6*(x0*x7 + x0*(0.408676219019300013*delta - 0.408676219019300013) + x7))
-    ans += (-tau**12*x4*(x0*x8 + x0*(0.000132425210079373988*delta - 0.000132425210079373988) + x8))
-    ans += (-x10*(0.576981634680060029*delta - 0.192327211560020001*x9 - 0.769308846240080002))
-    ans += (-tau**5*x4*(0.771271290103139995*delta - 0.25709043003437998*x9 - 1.02836172013751992))
-    ans += (x5*(0.321497369725020021*delta*x12 + x11*(delta - x13) - x11 + 0.160748684862510011*x13))
-    ans += (x14*x19*(-0.0400928289258069975*delta*(delta - x18) - x15*x16 + x15 - 0.0801856578516139951*x18))
-    ans += (x19*x20*(3.93434226032540015e-7*delta*(delta - x22) + x16*x21 - x21 + 7.8686845206508003e-7*x22))
-    ans += (x23*x24*x4*(-0.0000151882754176288*delta*(delta - 5.0) - 7.59413770881439999e-6*delta*(delta - x25) + 0.0000227824131264432008*delta - 0.0000227824131264432008*x25))
-    ans += (x26*x27*x4*(0.00112501958703776009*delta*x28 + 0.000562509793518880044*delta*(delta - x29) - 0.00281254896759440022*delta + 0.00281254896759440022*x29))
-    ans += (x30*x5*(-0.000031217304514269997*delta*x31 - 0.0000156086522571349985*delta*(delta - x32) + 0.00010926056579994499*delta - 0.00010926056579994499*x32))
-    ans += (tau**11*x33*x4*(2.30759928459020003e-9*delta*x34 + 1.15379964229510002e-9*delta*(delta - x35) - 9.23039713836080014e-9*delta + 9.23039713836080014e-9*x35))
-    ans += (delta**8*x5*(7.31643302884080017e-7*delta*x36 + 3.65821651442040008e-7*delta*(delta - x37) - 3.29239486297836013e-6*delta + 3.29239486297836013e-6*x37))
-    ans += (delta**10*x20*x4*(-2.65023601493360004e-12*delta*(delta - 13.0) - 1.32511800746680002e-12*delta*(delta - x38) + 1.45762980821348004e-11*delta - 1.45762980821348004e-11*x38))
-    ans += (delta**12*x10*(-1.25279173824907999e-9*delta*(delta - 15.0) - 6.26395869124539993e-10*delta*(delta - x39) + 8.14314629861901949e-9*delta - 8.14314629861901949e-9*x39))
-    ans += (x45*(-0.431744036357279981*x23*x42 - 1.29523210907183994*x23 + 0.647616054535919972))
-    ans += (0.0704459640350079963*tau*x44*x49)
-    ans += (0.885291806701840045*x49*x50)
-    ans += (1.60990679054111996*x53*(-x46 + x48 + 5.0))
-    ans += (x52*(x54*(x40 - x56) - x54*(x55 + 7.0) - x54 + 1.16166799971517998*x56))
-    ans += (0.0199876587963223988*delta*x27*x44*(x23*(x40 - x59) + x41 - x57 + x59))
-    ans += (0.125434802850196009*delta*x45*x61)
-    ans += (2.97263718841364*x53*x61)
-    ans += (x23*x52*(-5.73687958985760016*x23 + x62*(x40 - x64) - x62*(x55 + 11.0) + 2.86843979492880008*x64))
-    ans += (x65*x70*(-0.328447054335168021*x23 - x66*x67 + x67*(x40 - x69) + 0.16422352716758401*x69))
-    ans += (x52*x65*(2.18182961765488015*x23 + x66*x71 - x71*(x40 - x72) - 1.09091480882744007*x72))
-    ans += (x26*x52*(-0.28361268801234002*x23 + x73*(x40 - x74) - x73*(x55 + 15.0) + 0.14180634400617001*x74))
-    ans += (tau*x80*(-0.233314213665996417*x23 - x75*x76 + x76*x79 + 0.116657106832998209*x78))
-    ans += (x14*x80*(0.813465408268379986*x23 + x75*x81 - x81*x83 - 0.406732704134189993*x82))
-    ans += (x27*x80*(-1.08122239607776804*x23 - x75*x84 + 0.540611198038884022*x78 + x79*x84))
-    ans += (x2*x80*(0.571017622383712009*x23 + x75*x85 - 0.285508811191856005*x82 - x83*x85))
-    ans += (x80*x86*(0.0463513401784551998*x23 + x75*x87 - 0.0231756700892275999*x82 - x83*x87))
-    ans += (x33*x70*(-0.0638578303345311987*x23 - x88*x89 + x89*x91 + 0.0319289151672655994*x90))
-    ans += (x33*x50*(-0.00507849866373023991*x23 - x88*x92 + 0.00253924933186511995*x90 + x91*x92))
-    ans += (delta**9*x44*x86*(0.000655542733701200008*x23 - x93*(x40 - x94) + x93*(x55 + 25.0) - 0.000327771366850600004*x94))
-    ans += (tau**16*x96*(-0.78504508302859799*x100*x65 + 0.130840847171432989*x102 + x97*(-x102 + x98) - x97))
-    ans += (tau**22*x106*(-x103*x104 - x103 + 0.209964032782590015*x105 + 0.314946049173885023*x65*(-x105 + x98)))
-    ans += (x106*x107*(1.38218756120317798*x104*x65 - 0.460729187067726031*x108 - 0.691093780601589103*x65*(-x108 + x98) + 1.38218756120317821*x65))
-    ans += (x107*x23*x96*(0.067338831996018006*x109 + 0.067338831996018006*x65*(-x109 + 9.0*x65) - 1.21209897592832405*x65*(x95 + 2.0) - 0.606049487964162026*x65))
-    ans += (delta**11*x51*(-0.00150455304995244002*x111 + 0.00100303536663496002*x26*(31.0 - x110) - 0.000501517683317480008*x26*(x110 - x111) + 0.0120364243996195202*x26)*exp(-x26))
-    ans += (x118*(x112*(x113 + 11.0) - x112*(-x114 + x115) + x112 - 3.34266711393870005e-9*x114))
-    ans += (tau**44*x123*(x119*x120 - x120*x122 - 4.77737240505792027*x121 + 28.6642344303475198*x30))
-    ans += (tau**46*x123*(-x119*x124 + x124*(x115 - x125) + 7.62659935937712063*x125 - 45.7595961562627238*x30))
-    ans += (x118*x65*(x119*x126 - 2.84188378223544014*x121 - x122*x126 + 17.0513026934126408*x30))
-    return ans
+def iapws95_d3Ar_ddeltadtau2(tau, delta):
+    r'''Calculates the third derivative of residual Helmholtz energy of water
+    with respect to `delta` once and `tau` twice according to the IAPWS-95 
+    standard.
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    d3Ar_ddeltadtau2 : float
+        Third derivative of residual Helmholtz energy A/(RT) with respect to
+        `delta` once and `tau` twice, [-]
+
+    Notes
+    -----
+    This is an optimized implementatation.
+    It was generated using SymPy's CSE functionality.
+    
+    No equation is given for this in IAPWS-95, and the derivative was 
+    symbolically computed with SymPy.
+    
+    Like many higher-order derivatives of functions with exponentials, this one
+    balloons to use many, many terms. 
+ 
+    Over a linear temperature range of 200 K to 5000 K and a logarithmic 
+    density range of 1E-10
+    kg/m^3 to 5000 kg/m^3, 250000 points were evaluated. The mean 
+    relative error was 7.936e-16, with a maximum relative error of 1.965E-11 and a 
+    standard deviation of 4.7938E-14.        
+    
+    Over the same range, the model was evaluated to a precision of 50 
+    decimal places with `mpmath`, and on 90000 points, the mean relative
+    error was 6.08E-16, with a maximum relative error of 3.537E-12 and a 
+    standard deviation of 1.85197E-14.
+    
+    Examples
+    --------
+    >>> iapws95_d3Ar_ddeltadtau2(647.096/300.0, 999.0/322)
+    1.081479970332
+    '''
+    tau_inv = 1.0/tau
+    taurtinv = sqrt(tau_inv)
+    tau4rtinv = sqrt(taurtinv)
+    tau8rtinv = sqrt(tau4rtinv)
+    
+    tau2 = tau*tau
+    tau4 = tau2*tau2
+    tau6 = tau4*tau2
+    tau7 = tau6*tau
+    tau8 = tau4*tau4
+    tau11 = tau8*tau2*tau
+    tau44 = tau11*tau11
+    tau44 *= tau44
+    tau48 = tau44*tau4 # 11*4+4
+
+    delta2 = delta*delta
+    delta3 = delta2*delta
+    delta4 = delta2*delta2
+    delta5 = delta*delta4
+    delta6 = delta4*delta2
+    delta7 = delta*delta6
+    delta8 = delta*delta7
+    delta9 = delta*delta8
+    delta10 = delta*delta9
+    delta11 = delta*delta10
+    delta13 = delta2*delta11
+
+    x1 = exp(-delta)
+    x16 = exp(-delta2)
+    x35 = exp(-delta3)
+    x37 = exp(-delta6)
+
+    x3 = x1*delta3
+    x5 = x1*delta4
+    x7 = x1*tau2
+    x8 = 8.02278867695580011*x7
+    x10 = 6.13014328528949992*x1*tau4
+    x11 = 0.00874006386523868382*tau8*tau2*x1
+    x12 = tau2*tau*x1
+    x14 = tau*x1
+    x18 = x16*delta8
+    x20 = x16*delta10
+    x21 = tau*tau4*x16
+    x23 = x16*tau7
+    x24 = 31.8705050412662416*x23
+    x26 = x16*tau8
+    x27 = tau*x16
+    x31 = tau*tau8*x1
+    x33 = x1*tau11
+    x36 = 31.4018033211439231*tau7*tau7*x35
+    x39 = x37*tau48
+    x40 = tau8*tau8*tau4*x35
+    x41 = tau7*tau7*tau7*x35
+    x42 = x16*tau4
+    x43 = delta5*x37
+    x44 = 2259.69714759239605*tau11*tau11*tau11*tau8*tau
+    x45 = 3946.76516847766015*tau44
+    x47 = x16*tau6
+    x48 = delta11*x37
+    x49 = tau8*exp(-delta4)
+    x50 = 0.82644628099173556*tau
+    x51 = (x50 - 1.0)
+    x51 *= x51
+    x52 = delta - 1.0
+    x53 = x52*x52
+    x54 = -20.0*x53
+    x55 = exp(-219.615*x51 + x54)
+    x56 = x55*(131769.0*x51 - 300.0)
+    x57 = delta3*x52
+    x58 = tau_inv*tau_inv
+    x60 = (-x50 + 0.00275482093663911853*tau_inv + 1.0)
+    x60 = tau*x55*(x58 - 131769.0*x60*x60 + 300.0)
+    x61 = 0.800000000000000044*tau
+    x62 = (0.00640000000000000031*tau_inv - x61 + 1.0)
+    x62 = tau4*(4.0*x58 - 390625.0*x62*x62 + 500.0)*exp(x54 - 390.625*(x61 - 1.0)*(x61 - 1.0))
+    x63 = tau - 1.0
+    x64 = x63*x63
+    x65 = exp(-28.0*x53 - 700.0*x64)
+    x66 = sqrt(x53)*x53*x53*x53
+    x67 = x53**1.66666666666666674
+    x68 = -tau + 0.320000000000000007*x67 + 1.0
+    x69 = x68*x68
+    x70 = 0.2*x66 + x69
+    x71 = 1400.0*x64 - 1.0
+    pow005 = x70**(-0.05)
+    x72 = x70*pow005*pow005*pow005*x71
+    x73 = exp(-32.0*x53 - 800.0*x64)
+    x74 = 1600.0*x64 - 1.0
+    x75 = x70*pow005*x74
+    x76 = -1.69999999999999996*tau + 0.544000000000000039*x67 + 1.69999999999999996
+    x77 = pow005*pow005*pow005
+    x78 = x63*x77
+    x79 = x76*x78
+    x80 = -1.89999999999999991*tau + 0.607999999999999985*x67 + 1.89999999999999991
+    x82 = x63*pow005
+    x83 = x80*x82
+    x70_inv = 1.0/x70
+    x88 = pow005*x70_inv
+    x84 = x88*pow005*pow005
+    x85 = 0.510000000000000009*x69
+    x86 = -1.69999999999999996*x77 + x84*x85
+    x87 = 0.148746408567240002*x65
+    x89 = 0.190000000000000169*x69
+    x90 = -1.89999999999999991*pow005 + x88*x89
+    x91 = 0.318061108784439994*x73
+    x92 = 1.0/x52
+    x93 = x67*x92
+    x94 = x67*x68
+    x95 = x84*(0.210000000000000048*x66 + 0.320000000000000062*x94)
+    x96 = x63*x92
+    x97 = x88*(0.0700000000000000622*x66 + 0.106666666666666771*x94)
+    return (0.0225682957492866001*delta13*delta4*x49 - 2.68733931914267053e-9*delta10*delta2*x33
+            - 0.159012546727090004*delta*taurtinv*tau_inv + 0.0980457519725924931*delta*tau_inv*tau4rtinv
+            - delta*x10 + delta*x11 - 10.2836172013751987*delta*x12 + delta*x24 
+            - 72.4458055743504019*delta*x26 + delta*x8 - delta*x87*(-78400.0*x52*x72 
+            - 156800.0*x52*x79 + 56.0*x52*x86 + 1400.0*x71*x77*x92*(1.19000000000000017*x66
+            + 1.81333333333333346*x94) - 2800.0*x76*x95*x96 + 5077.33333333333394*x78*x93
+            - x92*(-x70_inv*x70_inv*x77*x85*(1.60999999999999988*x66 + 2.45333333333333359*x94)
+            + 1.08800000000000008*x84*x94 + 1.69999999999999996*x95)) + delta*x91*(-102400.0*x52*x75 
+            - 204800.0*x52*x83 + 64.0*x52*x90 + 1600.0*x74*pow005*x92*(1.33000000000000007*x66
+            + 2.02666666666666684*x94) - 3200.0*x80*x96*x97 + 6485.33333333333303*x82*x93 
+            - x92*(-pow005*x70_inv*x70_inv*x89*(1.4700000000000002*x66 + 2.24000000000000021*x94)
+            + 0.405333333333333712*x88*x94 + 1.89999999999999991*x97)) + 0.00940016095164225053*taurtinv*tau_inv*tau_inv
+            + 0.00549842004056116419*taurtinv*tau_inv*tau8rtinv*delta2 - 0.863599129780931229*tau_inv*tau8rtinv
+            + 2.08521462100712407*tau*x18 - 0.463381026890472003*tau*x20 + 5.14180860068759937*delta2*x12
+            + 9.0666247635028796*delta2*x21 + 156.825179961549281*delta2*x26 + delta2*x36 - 4.0947672145749067e-6*delta2*x39
+            - 93.9187809703050078*delta2*x56 - 94.6384207133429953*delta2*x60 + 7563.94630250849968*delta2*x62
+            + 5.78695265505036005*delta2*x7 + 0.000546777915034636847*x1*tau7*delta5 + x10 - x11
+            + 0.0236254113277929619*delta6*x14 - 77.1193941754752785*delta6*x26 - 48.5016915727782916*delta6*x40
+            + 116.564484328134682*delta6*x41 - 0.00337505876111328026*x14*delta7 + 24.545583198617404*delta7*x26
+            - 34.0734489899851098*delta7*x41 - 1.23167645375688006*delta7*x42 + 8.18953442914981341e-6*delta8*x39
+            - 0.00168573444377057989*delta8*x7 - 2.55251419211106034*x18*tau8 - 0.834324123212193625*x18*tau6
+            - 2.20249654348003165*x18*tau2 - 0.522942048172529983*x18 - 1.26917960652460995e-7*delta10*x31
+            + 0.0000482884579903492813*delta10*x7 - 5.26826171970823243*delta3*x21 - delta3*x24 - 195.091541382877153*delta3*x26
+            + 0.119925952777934386*delta3*x27 + 64.6689220970377221*delta3*x40 - 155.4193124375129*delta3*x41
+            + 0.185405360713820799*x20*tau6 + 0.48944367632889596*x20*tau2 + 0.116209344038340004*x20
+            + 2.63413085985411621*x21*delta5 - 4.5333123817514398*x21 - 0.00273388957517318402*tau7*x5
+            + 0.114266219933930394*x23*delta9 - 0.0228532439867860787*x23*delta11 + 60.1319238827615692*x26*delta5
+            + 110.582864645293796*x26*delta4 - 0.059962976388967193*x27*delta5 + 0.000245502957044305007*tau11*x3
+            - 0.0000613757392610762517*tau11*x5 - delta5*x36 + 3.69502936127063997*delta5*x42 - 1.92898421835012002*x3*tau2
+            - 0.32074263140645598*x3 + 1.26917960652460984e-6*delta9*x31 + 0.598667159386230052*delta9*x42
+            + 0.000187303827085619982*delta9*x7 + 1740.65381661920696*delta11*x39 - 0.119733431877245999*delta11*x42
+            - 0.0110131179261801597*delta11*x47 - 4.38985981730447989e-6*delta11*x7 + 2.0671840916482082e-10*x33*delta13
+            + 0.00183551965436336002*delta13*x47 - 0.078989035122503104*delta13*x49 - 1740.65381661920696*tau48*x43
+            + 56.7890816499751736*delta4*x41 - x43*x44 + x43*x45 + x44*x48 - x45*x48 + 0.0801856578516139951*x5
+            + 1252.25041293740014*x56*x57 + 1261.8456095112399*x57*x60 - 100852.617366780003*x57*x62
+            - 208.244971994135994*x65*x72 - 416.489943988271989*x65*x79 + 508.89777405510398*x73*x75 
+            + 1017.79554811020796*x73*x83 - x8 + x86*x87 - x90*x91)
+
+
 
 def iapws95_dAr_dtau(tau, delta):
     r'''Calculates the first derivative of residual Helmholtz energy of water
