@@ -1573,11 +1573,11 @@ def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 300
+    N = 100
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
-        print(i)
+#        print(i)
 #        rhos = logspace(log10(1e-10), log10(1e-4), N)
         rhos = logspace(log10(1e-4), log10(5000), N)
         for rho in rhos:
@@ -1601,7 +1601,7 @@ def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
 
 #test_iapws95_d3A_d3deltar_vs_naive(precise=True, allow_fail=True)
 
-#test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True)
+test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True)
 
 
   
@@ -1696,7 +1696,7 @@ def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
     print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 #test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=True, allow_fail=False)
-test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=False)
+#test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=False)
 
 
 
