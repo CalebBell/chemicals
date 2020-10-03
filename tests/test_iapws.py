@@ -1621,7 +1621,7 @@ def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 500
+    N = 100
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -1639,6 +1639,7 @@ def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
             errs.append(rerri)
     print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
+#test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=True, allow_fail=False)
 test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True)
 
 
