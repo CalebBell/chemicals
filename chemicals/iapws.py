@@ -4657,10 +4657,13 @@ from fluids.numerics import derivative
 def iapws95_d3Ar_ddelta2dtau(tau, delta):
     return derivative(lambda tau: iapws95_d2Ar_ddelta2(tau, delta), tau, tau*1e-7, order=11)
 
-def iapws95_d3Ar_ddeltadtau2_num(tau, delta):
-    return derivative(lambda tau: iapws95_d2Ar_ddeltadtau(tau, delta), tau, tau*1e-7, order=11)
 
 def iapws95_d3Ar_ddeltadtau2(tau, delta):
+    tau_inv = 1.0/tau
+    taurtinv = sqrt(tau_inv)
+    tau4rtinv = sqrt(taurtinv)
+    tau8rtinv = sqrt(tau4rtinv)
+    
     tau2 = tau*tau
     tau4 = tau2*tau2
     tau6 = tau4*tau2
@@ -4670,7 +4673,6 @@ def iapws95_d3Ar_ddeltadtau2(tau, delta):
     tau44 = tau11*tau11
     tau44 *= tau44
     tau48 = tau44*tau4 # 11*4+4
-    tau_inv = 1.0/tau
 
     delta2 = delta*delta
     delta3 = delta2*delta
@@ -4683,7 +4685,12 @@ def iapws95_d3Ar_ddeltadtau2(tau, delta):
     delta10 = delta*delta9
     delta11 = delta*delta10
     delta13 = delta2*delta11
+
     x1 = exp(-delta)
+    x16 = exp(-delta2)
+    x35 = exp(-delta3)
+    x37 = exp(-delta6)
+
     x3 = x1*delta3
     x5 = x1*delta4
     x7 = x1*tau2
@@ -4692,7 +4699,6 @@ def iapws95_d3Ar_ddeltadtau2(tau, delta):
     x11 = 0.00874006386523868382*tau8*tau2*x1
     x12 = tau2*tau*x1
     x14 = tau*x1
-    x16 = exp(-delta2)
     x18 = x16*delta8
     x20 = x16*delta10
     x21 = tau*tau4*x16
@@ -4702,9 +4708,7 @@ def iapws95_d3Ar_ddeltadtau2(tau, delta):
     x27 = tau*x16
     x31 = tau*tau8*x1
     x33 = x1*tau11
-    x35 = exp(-delta3)
     x36 = 31.4018033211439231*tau7*tau7*x35
-    x37 = exp(-delta6)
     x39 = x37*tau48
     x40 = tau8*tau8*tau4*x35
     x41 = tau7*tau7*tau7*x35
@@ -4737,27 +4741,28 @@ def iapws95_d3Ar_ddeltadtau2(tau, delta):
     x67 = x53**1.66666666666666674
     x68 = -tau + 0.320000000000000007*x67 + 1.0
     x69 = x68*x68
-    x70 = 0.200000000000000011*x66 + x69
+    x70 = 0.2*x66 + x69
     x71 = 1400.0*x64 - 1.0
-    x81 = x70**(-0.0500000000000000444)
-    x72 = x70*x81*x81*x81*x71
+    pow005 = x70**(-0.05)
+    x72 = x70*pow005*pow005*pow005*x71
     x73 = exp(-32.0*x53 - 800.0*x64)
     x74 = 1600.0*x64 - 1.0
-    x75 = x70*x81*x74
+    x75 = x70*pow005*x74
     x76 = -1.69999999999999996*tau + 0.544000000000000039*x67 + 1.69999999999999996
-    x77 = x81*x81*x81
+    x77 = pow005*pow005*pow005
     x78 = x63*x77
     x79 = x76*x78
     x80 = -1.89999999999999991*tau + 0.607999999999999985*x67 + 1.89999999999999991
-    x82 = x63*x81
+    x82 = x63*pow005
     x83 = x80*x82
-    x88 = x81/x70
-    x84 = x88*x81*x81
+    x70_inv = 1.0/x70
+    x88 = pow005*x70_inv
+    x84 = x88*pow005*pow005
     x85 = 0.510000000000000009*x69
     x86 = -1.69999999999999996*x77 + x84*x85
     x87 = 0.148746408567240002*x65
     x89 = 0.190000000000000169*x69
-    x90 = -1.89999999999999991*x81 + x88*x89
+    x90 = -1.89999999999999991*pow005 + x88*x89
     x91 = 0.318061108784439994*x73
     x92 = 1.0/x52
     x93 = x67*x92
@@ -4766,18 +4771,18 @@ def iapws95_d3Ar_ddeltadtau2(tau, delta):
     x96 = x63*x92
     x97 = x88*(0.0700000000000000622*x66 + 0.106666666666666771*x94)
     return (0.0225682957492866001*delta13*delta4*x49 - 2.68733931914267053e-9*delta10*delta2*x33
-            - 0.159012546727090004*delta*tau**(-1.5) + 0.0980457519725924931*delta*tau**(-1.25)
+            - 0.159012546727090004*delta*taurtinv*tau_inv + 0.0980457519725924931*delta*tau_inv*tau4rtinv
             - delta*x10 + delta*x11 - 10.2836172013751987*delta*x12 + delta*x24 
             - 72.4458055743504019*delta*x26 + delta*x8 - delta*x87*(-78400.0*x52*x72 
             - 156800.0*x52*x79 + 56.0*x52*x86 + 1400.0*x71*x77*x92*(1.19000000000000017*x66
             + 1.81333333333333346*x94) - 2800.0*x76*x95*x96 + 5077.33333333333394*x78*x93
-            - x92*(-x70**(-2.14999999999999991)*x85*(1.60999999999999988*x66 + 2.45333333333333359*x94)
+            - x92*(-x70_inv*x70_inv*x77*x85*(1.60999999999999988*x66 + 2.45333333333333359*x94)
             + 1.08800000000000008*x84*x94 + 1.69999999999999996*x95)) + delta*x91*(-102400.0*x52*x75 
-            - 204800.0*x52*x83 + 64.0*x52*x90 + 1600.0*x74*x81*x92*(1.33000000000000007*x66 
+            - 204800.0*x52*x83 + 64.0*x52*x90 + 1600.0*x74*pow005*x92*(1.33000000000000007*x66
             + 2.02666666666666684*x94) - 3200.0*x80*x96*x97 + 6485.33333333333303*x82*x93 
-            - x92*(-x70**(-2.04999999999999982)*x89*(1.4700000000000002*x66 + 2.24000000000000021*x94)
-            + 0.405333333333333712*x88*x94 + 1.89999999999999991*x97)) + 0.00940016095164225053*tau**(-2.5) 
-            + 0.00549842004056116419*tau**(-1.625)*delta2 - 0.863599129780931229*tau**(-1.125)
+            - x92*(-pow005*x70_inv*x70_inv*x89*(1.4700000000000002*x66 + 2.24000000000000021*x94)
+            + 0.405333333333333712*x88*x94 + 1.89999999999999991*x97)) + 0.00940016095164225053*taurtinv*tau_inv*tau_inv
+            + 0.00549842004056116419*taurtinv*tau_inv*tau8rtinv*delta2 - 0.863599129780931229*tau_inv*tau8rtinv
             + 2.08521462100712407*tau*x18 - 0.463381026890472003*tau*x20 + 5.14180860068759937*delta2*x12
             + 9.0666247635028796*delta2*x21 + 156.825179961549281*delta2*x26 + delta2*x36 - 4.0947672145749067e-6*delta2*x39
             - 93.9187809703050078*delta2*x56 - 94.6384207133429953*delta2*x60 + 7563.94630250849968*delta2*x62
