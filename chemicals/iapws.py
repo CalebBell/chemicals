@@ -4412,7 +4412,7 @@ def iapws95_d3Ar_ddelta3(tau, delta):
     Examples
     --------
     >>> iapws95_d3Ar_ddelta3(647.096/300.0, 999.0/322)
-    0.3362119057867
+    0.33621190578
     '''
     # Gonna have to reduce the number of constants quite a bit for pypy
     delta2 = delta*delta
