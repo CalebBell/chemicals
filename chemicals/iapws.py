@@ -167,6 +167,7 @@ IAPWS-95 Residual Terms
 .. autofunction:: chemicals.iapws.iapws95_dAr_dtau
 .. autofunction:: chemicals.iapws.iapws95_d2Ar_dtau2
 .. autofunction:: chemicals.iapws.iapws95_d2Ar_ddeltadtau
+.. autofunction:: chemicals.iapws.iapws95_d3Ar_ddeltadtau2
 
 """
 from __future__ import division
@@ -4659,6 +4660,45 @@ def iapws95_d3Ar_ddelta2dtau(tau, delta):
 
 
 def iapws95_d3Ar_ddeltadtau2(tau, delta):
+    r'''Calculates the third derivative of residual Helmholtz energy of water
+    with respect to `delta` once and `tau` twice according to the IAPWS-95 
+    standard.
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    d3Ar_ddeltadtau2 : float
+        Third derivative of residual Helmholtz energy A/(RT) with respect to
+        `delta` once and `tau` twice, [-]
+
+    Notes
+    -----
+    This is an optimized implementatation.
+    It was generated using SymPy's CSE functionality.
+    
+    No equation is given for this in IAPWS-95, and the derivative was 
+    symbolically computed with SymPy.
+    
+    Like many higher-order derivatives of functions with exponentials, this one
+    balloons to use many, many terms. 
+ 
+    Over a linear temperature range of 200 K to 5000 K and a logarithmic 
+    density range of 1E-10
+    kg/m^3 to 5000 kg/m^3, 250000 points were evaluated. The mean 
+    relative error was 7.936e-16, with a maximum relative error of 1.965E-11 and a 
+    standard deviation of 4.7938E-14.        
+    
+    Examples
+    --------
+    >>> iapws95_d3Ar_ddeltadtau2(647.096/300.0, 999.0/322)
+    1.081479970332
+    '''
     tau_inv = 1.0/tau
     taurtinv = sqrt(tau_inv)
     tau4rtinv = sqrt(taurtinv)
