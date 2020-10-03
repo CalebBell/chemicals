@@ -4655,11 +4655,52 @@ def iapws95_d3Ar_ddelta3(tau, delta):
     ans += (x118*x65*(x119*x126 - 2.84188378223544014*x121 - x122*x126 + 17.0513026934126408*x30))
     return ans
 
-from fluids.numerics import derivative
-def iapws95_d3Ar_ddelta2dtau_num(tau, delta):
-    return derivative(lambda tau: iapws95_d2Ar_ddelta2(tau, delta), tau, tau*1e-7, order=11)
 
 def iapws95_d3Ar_ddelta2dtau(tau, delta):
+    r'''Calculates the third derivative of residual Helmholtz energy of water
+    with respect to `delta` twice and `tau` one according to the IAPWS-95 
+    standard.
+
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (647.096 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(322 kg/m^3), [-]
+
+    Returns
+    -------
+    d3Ar_ddeltadtau2 : float
+        Third derivative of residual Helmholtz energy A/(RT) with respect to
+        `delta` twice and `tau` once, [-]
+
+    Notes
+    -----
+    This is an optimized implementatation.
+    It was generated using SymPy's CSE functionality.
+    
+    No equation is given for this in IAPWS-95, and the derivative was 
+    symbolically computed with SymPy.
+    
+    Like many higher-order derivatives of functions with exponentials, this one
+    balloons to use many, many terms. 
+ 
+    Over a linear temperature range of 200 K to 5000 K and a logarithmic 
+    density range of 1E-10
+    kg/m^3 to 5000 kg/m^3, 250000 points were evaluated. The mean 
+    relative error was 3.629e-15, with a maximum relative error of 8.38E-11 and a 
+    standard deviation of 2.1214E-13.        
+    
+    Over the same range, the model was evaluated to a precision of 50 
+    decimal places with `mpmath`, and on 10000 points, the mean relative
+    error was 2.4e-15, with a maximum relative error of 7.62E-12 and a 
+    standard deviation of 7.818E-14.
+    
+    Examples
+    --------
+    >>> iapws95_d3Ar_ddelta2dtau(647.096/300.0, 999.0/322)
+    0.015646982949077
+    '''
     # simplest when derivaed from  diff((calcA_res(tau, delta)), delta, delta, tau)
     tau2 = tau*tau
     tau3 = tau*tau2
