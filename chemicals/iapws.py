@@ -4661,29 +4661,29 @@ def iapws95_d3Ar_ddelta2dtau_num(tau, delta):
 
 def iapws95_d3Ar_ddelta2dtau(tau, delta):
     # simplest when derivaed from  diff((calcA_res(tau, delta)), delta, delta, tau)
-    tau2 = tau**2
-    tau3 = tau**3
-    tau4 = tau**4
-    tau5 = tau**5
-    tau6 = tau**6
-    tau7 = tau**7
-    tau8 = tau**8
-    tau9 = tau**9
-    tau12 = tau**12
+    tau2 = tau*tau
+    tau3 = tau*tau2
+    tau4 = tau*tau3
+    tau5 = tau*tau4
+    tau6 = tau*tau5
+    tau7 = tau*tau6
+    tau8 = tau*tau7
+    tau9 = tau*tau8
+    tau12 = tau9*tau3
 
-    delta2 = delta**2
-    delta3 = delta**3
-    delta4 = delta**4
-    delta5 = delta**5
-    delta7 = delta**7
-    delta8 = delta**8
-    delta9 = delta**9
-    delta11 = delta**11
-    delta10 = delta**10
-    delta12 = delta**12
-    delta13 = delta**13
-    delta14 = delta**14
-    delta16 = delta**16
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta*delta3
+    delta5 = delta*delta4
+    delta7 = delta2*delta5
+    delta8 = delta*delta7
+    delta9 = delta*delta8
+    delta10 = delta*delta9
+    delta11 = delta*delta10
+    delta12 = delta*delta11
+    delta13 = delta*delta12
+    delta14 = delta*delta13
+    delta16 = delta2*delta14
     x1 = exp(-delta)
     x3 = exp(-delta2)
     
