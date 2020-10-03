@@ -4412,28 +4412,28 @@ def iapws95_d3Ar_ddelta3(tau, delta):
     0.3362119057867
     '''
     # Gonna have to reduce the number of constants quite a bit for pypy
-    delta2 = delta**2
-    delta3 = delta**3
-    delta4 = delta**4
-    delta5 = delta**5
-    delta6 = delta**6
-    delta7 = delta**7
-    delta8 = delta**8
-    delta9 = delta**9
-    delta10 = delta**10
-    delta11 = delta**11
-    delta12 = delta**12
-    delta13 = delta**13
-    delta15 = delta**15
-    delta21 = delta**21
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta*delta3
+    delta5 = delta*delta4
+    delta6 = delta*delta5
+    delta7 = delta*delta6
+    delta8 = delta*delta7
+    delta9 = delta*delta8
+    delta10 = delta*delta9
+    delta11 = delta*delta10
+    delta12 = delta*delta11
+    delta13 = delta*delta12
+    delta15 = delta2*delta13
+    delta21 = delta15*delta6
 
-    tau2 = tau**2
-    tau3 = tau**3
-    tau4 = tau**4
-    tau6 = tau**6
-    tau8 = tau**8
-    tau9 = tau**9
-    tau10 = tau**10
+    tau2 = tau*tau
+    tau3 = tau*tau2
+    tau4 = tau*tau3
+    tau6 = tau2*tau4
+    tau8 = tau4*tau4
+    tau9 = tau*tau8
+    tau10 = tau*tau9
 
     x0 = delta*tau
     x1 = exp(-delta)
