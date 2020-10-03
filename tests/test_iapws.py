@@ -1323,6 +1323,18 @@ def dAddeltatau_res(tau, delta):
         + _d2_Delta_bd_delta_d_tau*psi*delta)
     return phir
 
+def iapws95_d3Ar_ddeltadtau2_naive(tau, delta):
+    # Not in publication
+    phir = 0.0
+    for i in range(7):
+        phir += delta**dis[i]*dis[i]*nis[i]*tau**tis[i]*tis[i]*(tis[i] - 1)/(delta*tau**2)
+    for i in range(7,51):
+        phir += delta**dis[i]*nis[i]*tau**tis[i]*tis[i]*(-cis[i]*delta**cis[i]*tis[i] + cis[i]*delta**cis[i] + dis[i]*tis[i] - dis[i])*exp(-delta**cis[i])/(delta*tau**2)
+    for i in range(51, 54):
+        phir += delta**dis[i]*nis[i]*tau**tis[i]*(-8*alphas[i-51]*betas[i-51]**2*(delta - epsilons[i-51])*(gammas[i-51] - tau)**2 + 4*alphas[i-51]*betas[i-51]*(delta - epsilons[i-51]) - 8*alphas[i-51]*betas[i-51]*tis[i]*(delta - epsilons[i-51])*(gammas[i-51] - tau)/tau - 2*alphas[i-51]*tis[i]**2*(delta - epsilons[i-51])/tau**2 + 2*alphas[i-51]*tis[i]*(delta - epsilons[i-51])/tau**2 + 4*betas[i-51]**2*dis[i]*(gammas[i-51] - tau)**2/delta - 2*betas[i-51]*dis[i]/delta + 4*betas[i-51]*dis[i]*tis[i]*(gammas[i-51] - tau)/(delta*tau) + dis[i]*tis[i]**2/(delta*tau**2) - dis[i]*tis[i]/(delta*tau**2))*exp(-alphas[i-51]*(delta - epsilons[i-51])**2 - betas[i-51]*(-gammas[i-51] + tau)**2)
+    for i in range(2):
+        phir += 2*nis[i+54]*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**bis[i]*(2*Ais[i]* Dis[i]*bis[i]*delta*(2*delta - 2.0)*(tau - 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)) + 2*Ais[i]*bis[i]**2*delta*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2) - 2*Ais[i]*bis[i]*delta*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2) - 4*Cis[i]* Dis[i]**2*delta*(delta - 1)*(tau - 1)**2 - 8*Cis[i]* Dis[i]*bis[i]*delta*(delta - 1)*(tau - 1)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) + 2*Cis[i]* Dis[i]*delta*(delta - 1) - 4*Cis[i]*bis[i]**2*delta*(delta - 1)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 - 2*Cis[i]*bis[i]*delta*(delta - 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) + 4*Cis[i]*bis[i]*delta*(delta - 1)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 + 2* Dis[i]**2*bis[i]*delta*(tau - 1)**2*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) + 2* Dis[i]**2*(tau - 1)**2 + 4* Dis[i]*bis[i]**2*delta*(tau - 1)*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 - 4* Dis[i]*bis[i]*delta*(tau - 1)*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 -  Dis[i]*bis[i]*delta*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) + 4* Dis[i]*bis[i]*(tau - 1)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) -  Dis[i] + 2*bis[i]**3*delta*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**3 + bis[i]**2*delta*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 - 6*bis[i]**2*delta*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**3 + 2*bis[i]**2*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 - bis[i]*delta*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 + 4*bis[i]*delta*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**3 + bis[i]/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) - 2*bis[i]*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2)*exp(-Cis[i]*(delta - 1)**2 -  Dis[i]*(tau - 1)**2)
+    return phir
 
 ### Derivatives of Distance Function
 
@@ -1570,6 +1582,7 @@ def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
 
 #test_iapws95_d3A_d3deltar_vs_naive(precise=True, allow_fail=False)
 
+
   
 def test_iapws95_d3Ar_ddelta3():
     assert_close(iapws95_d3Ar_ddelta3(.5, .6), 0.06421246015370234, rtol=1e-9)
@@ -1596,7 +1609,37 @@ def test_iapws95_d3Ar_ddelta3_mpmath():
 #0.5809660021590505 3.5241129527138654e-13 1113.8276553106205 1.1347643707738647e-10 0.6688943474959489 0.6689624104240671 0.00010174402486240464
 #0.5809660021590505 3.7540725845964094e-13 1113.8276553106205 1.208811372240044e-10 0.668894347495896 0.6689624104240159 0.00010174402486495815
 
-
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
+    '''
+    '''
+    if precise:
+        mp = make_me_precise()
+        mpf = mp.mpf
+    else:
+        mpf = lambda x: x
+    errs = []
+    rerr = 0
+    N = 500
+    Ts = linspace(200.0, 5000.0, N)
+    rhoc_inv = (1.0/322.0)
+    for i, T in enumerate(Ts):
+        print(i)
+        rhos = logspace(log10(1e-10), log10(5000), N)
+        for rho in rhos:
+            tau = 647.096/T
+            delta = rho*rhoc_inv
+            val = iapws95_d3Ar_ddeltadtau2(tau, delta)
+            val_naive = float(iapws95_d3Ar_ddeltadtau2_naive(mpf(tau), mpf(delta)))
+            if allow_fail:
+                assert_close(val, val_naive, rtol=2e-10)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+    print(rerr/N**2, np.std(errs), np.max(errs))
+    make_me_float()
+test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True)
 
 
 def test_iapws95_dA_ddeltar():
