@@ -54,7 +54,13 @@ def test_k_IAPWS():
     k = k_IAPWS(T=647.35, rho=222., Cp=101054.488, Cv=4374.66458, mu=31.2204749E-6, drho_dP=177.778595E-6)
     assert_close(k, 0.36687941154060383, rtol=1e-13)
 
-    
+
+    # Feed P: 8600000.0
+    # Case where zero division was occuring
+    kwargs ={'T': 400, 'rho': 941.720097520186, 'Cp': 4233.740244740559, 'Cv': 3622.5838143014544, 'mu': 0.00022080449914642125, 'drho_dP': 4.996396679875349e-07, 'drho_dP_Tr': 2.3158445867118744e-07}
+    assert_close(k_IAPWS(**kwargs), .688018419964361, rtol=1e-11)
+
+
 def test_Perrys2_314_data():
     # In perry's, only 102 is used. No chemicals are missing.
     # Tmaxs all match to 5E-4. Tmins match to 1E-3.

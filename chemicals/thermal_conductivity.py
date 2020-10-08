@@ -373,11 +373,11 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
             xi = 1E4
 
         y = qd*xi
-        y_inv = 1.0/y
         if y < 1.2E-7:
             Z_y = 0.0
         else:
-            Z_y = 2.*pi_inv*y_inv*(((1.0 - kappa_inv)*atan(y) + kappa_inv*y) 
+            y_inv = 1.0 / y
+            Z_y = 2.*pi_inv*y_inv*(((1.0 - kappa_inv)*atan(y) + kappa_inv*y)
                                - (1.0 - exp(-1.0/(y_inv + y*y/(3.0*rhor*rhor)))))
         lambda2 = Gamma*rhor*Cpr*Tr/mur*Z_y
 

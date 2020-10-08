@@ -2110,6 +2110,14 @@ def test_iapws95_rho_vs_Coolprop():
 
 def test_iapws95_T():
     assert_close(iapws95_T(P=20265239.648236595, rho=481.5275168680331), 640.0)
+    
+    # Point where converging to wrong solution
+    assert_close(iapws95_T(P=1000000000, rho=669.0726669889119), 1749.5356805149595, rtol=1e-7)
+
+    # Point where vapor pressure was failing to calculate
+    rho = iapws95_rho(T=1000.0, P=10)
+    assert_close(iapws95_T(P=10.0, rho=rho), 1000, rtol=1e-11)
+
 
 def test_rhol_sat_IAPWS():
     assert_close(iapws92_rhol_sat(273.16), 999.7891346511478, rtol=1e-13)
@@ -2301,4 +2309,9 @@ def test_iapws95_A0_tau_derivatives():
     d2A0_dtau2 = iapws95_d2A0_dtau2(tau, delta)
     d3A0_dtau3 = iapws95_d3A0_dtau3(tau, delta)
     assert_close1d(together, (A0, dA0_dtau, d2A0_dtau2, d3A0_dtau3), rtol=1e-15)
-    
+
+def test_consistency_iapws95_rho_iapws95_P():
+    P = 39.0693
+    rho = iapws95_rho(T=235.0, P=P)
+    P_check = iapws95_P(T=235.0, rho=rho)
+    assert abs(1-P/P_check) < 5e-6

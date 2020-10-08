@@ -5814,6 +5814,8 @@ def iapws95_Psat(T):
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
     return exp(val)*iapws95_Pc
 
+Psat_235 = 22.849568234070716 # iapws95_Psat(235)
+
 def iapws95_Tsat(P):
     r'''Compute the saturation temperature of the IAPWS-95 equation.
     The range of the fit is 235 K to 647.096 K, the critical point. 
@@ -6101,8 +6103,8 @@ def iapws95_P(T, rho):
     '''
     tau = iapws95_Tc/T
     delta = rho*iapws95_rhoc_inv
-    dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
-    return (dAddelta_val*delta)*rho*R95*T
+    dAddelta_res_val = iapws95_dAr_ddelta(tau, delta)
+    return (1.0 + dAddelta_res_val*delta)*rho*(R95*T)
 
 
 def iapws95_T(P, rho):
@@ -6144,29 +6146,23 @@ def iapws95_T(P, rho):
        Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
        2 (2002): 387-535.
     '''
-    MAX_T_STEP = 100.0
-    
     try:
         T = iapws97_T(P, rho)
+        MAX_T_STEP = 100.0
     except:
-        T = 500.0
+        if P > iapws95_Pc:
+            T = 700.0
+            MAX_T_STEP = 500.0
+        else:
+            T = 500.0
+            MAX_T_STEP = 100.0
 
-    err, derr = iapws95_T_err(T, rho, P)
-    dT = - err/derr
-    if dT < -MAX_T_STEP:
-        dT = -MAX_T_STEP
-    elif dT > MAX_T_STEP:
-        dT = MAX_T_STEP
-    T_old = T + dT
+        
+#    if Psat_235 < P < iapws95_Pc:
+#        Tsat = iapws95_Tsat(P)
 
-    err, derr = iapws95_T_err(T_old, rho, P)
-    dT = - err/derr
-    if dT < -MAX_T_STEP:
-        dT = -MAX_T_STEP
-    elif dT > MAX_T_STEP:
-        dT = MAX_T_STEP
-    T = T_old + dT
-    iterations = 2
+    T_old = 10000000.0
+    iterations = 0
     while (abs(T_old - T) > abs(1e-9*T)) and iterations < 100:
         T_old = T
         err, derr = iapws95_T_err(T, rho, P)
@@ -6230,35 +6226,60 @@ def iapws95_rho(T, P):
        Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
        2 (2002): 387-535.
     '''
+    a = 1e-20 # Value where error is always negative
+    b = 5000.0 # value where error is always positive
+
     MAX_RHO_STEP = 200.0 # iapws95_rho(250, 1e9) is a good point showing the advantage of this
     rho = iapws97_rho_extrapolated(T, P, True)
+    #P_inv = 1.0/P
     
     if T < iapws95_Tc:
         # Experimental investication hasn't revealed any places where the solver
         # skips out of the selected region.
         Psat = iapws95_Psat(T)
         if P < Psat: 
-            rho_high = iapws95_rhog_sat(T)
+            b = rho_high = iapws95_rhog_sat(T)
             if rho > rho_high:
                 rho = rho_high
         else:
-            rho_low = iapws95_rhol_sat(T)
+            a = rho_low = iapws95_rhol_sat(T)
             if rho < rho_low:
                 rho = rho_low
     
     rho_old = 100000.0 #
     # Adding iterations check did not slow anything down.
+    '''# Points can be debugged with the following code.
+    import matplotlib.pyplot as plt
+    
+    from chemicals.iapws import iapws95_rho_err
+    rhos = linspace(10, 1500, 10000)
+    T, P = 1749.5356805149597, 1000000000
+    errs = [abs(iapws95_rho_err(rho, T, P)[0]) for rho in rhos]
+    plt.semilogy(rhos, errs)
+    plt.show()
+    '''
     iterations = 0
-    while iterations < 2 or ((abs(rho_old - rho) > abs(1e-11*rho)) and iterations < 100):
+    #  or abs(err*P_inv) > 1e-13
+    # (abs(rho_old - rho) > abs(1e-13*rho)) hand-tuned for maximum precision achievable
+    while iterations < 2 or ((abs(rho_old - rho) > abs(1e-13*rho)) and iterations < 100):
         rho_old = rho
         err, derr = iapws95_rho_err(rho, T, P)
+        if err < 0.0:
+            a = rho
+        else:
+            b = rho
+
         drho = - err/derr
         if drho < -MAX_RHO_STEP:
             drho = -MAX_RHO_STEP
         elif drho > MAX_RHO_STEP:
             drho = MAX_RHO_STEP
         rho = rho + drho
+        if rho > b or rho < a:
+            rho = 0.5*(a + b)
         iterations += 1
 #        print(rho, err)
+    if iterations >= 99:
+        raise ValueError("Could not converge")
     return rho
 
