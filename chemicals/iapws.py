@@ -6262,7 +6262,6 @@ def iapws95_rho(T, P):
     #  or abs(err*P_inv) > 1e-13
     # (abs(rho_old - rho) > abs(1e-13*rho)) hand-tuned for maximum precision achievable
     while iterations < 2 or ((abs(rho_old - rho) > abs(1e-13*rho)) and iterations < 100):
-        rho_old = rho
         err, derr = iapws95_rho_err(rho, T, P)
         if err < 0.0:
             a = rho
@@ -6274,6 +6273,7 @@ def iapws95_rho(T, P):
             drho = -MAX_RHO_STEP
         elif drho > MAX_RHO_STEP:
             drho = MAX_RHO_STEP
+        rho_old = rho
         rho = rho + drho
         if rho > b or rho < a:
             rho = 0.5*(a + b)
@@ -6281,5 +6281,6 @@ def iapws95_rho(T, P):
 #        print(rho, err)
     if iterations >= 99:
         raise ValueError("Could not converge")
+    # Note that the derivatives have not been computed at this spot, so we can't save and return them
     return rho
 
