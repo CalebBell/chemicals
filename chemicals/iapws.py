@@ -63,6 +63,8 @@ IAPWS Constants
 .. autodata:: chemicals.iapws.iapws95_Pc
 .. autodata:: chemicals.iapws.iapws95_rhoc
 .. autodata:: chemicals.iapws.iapws95_MW
+.. autodata:: chemicals.iapws.iapws95_R
+.. autodata:: chemicals.iapws.iapws97_R
 
 IAPWS-97 Region 1
 -----------------
@@ -221,8 +223,12 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
 	'iapws97_region3_y', 'iapws97_region3_z',
 ]
 
-R95 = 461.51805 # Differs from the other formulation
-R97 = 461.526
+iapws95_R = 461.51805
+'''Specific gas constant in J/(kg*K) according to IAPWS-95'''
+
+iapws97_R = 461.526
+'''Specific gas constant in J/(kg*K) according to IAPWS-97'''
+
 
 iapws95_MW = 18.015268
 '''Molecular weight of water in g/mol according to IAPWS-95, also used in IAPWS-97'''
@@ -245,8 +251,8 @@ def use_mpmath_backend():
     globals()['exp'] = mp.exp
     globals()['log'] = mp.log
     globals()['sqrt'] = mp.sqrt
-    globals()['R95'] = mp.mpf("461.51805")
-    globals()['R97'] = mp.mpf("461.526")
+    globals()['iapws95_R'] = mp.mpf("461.51805")
+    globals()['iapws97_R'] = mp.mpf("461.526")
     globals()['MW'] = mp.mpf("18.015268")
     globals()['iapws95_Tc'] = mp.mpf("647.096")
     globals()['Tc_inv'] = 1/mp.mpf("647.096")
@@ -262,8 +268,8 @@ def reset_backend():
     globals()['exp'] = math.exp
     globals()['log'] = math.log
     globals()['sqrt'] = math.sqrt
-    globals()['R95'] = 461.51805
-    globals()['R97'] = 461.526
+    globals()['iapws95_R'] = 461.51805
+    globals()['iapws97_R'] = 461.526
     globals()['MW'] = 18.015268
     globals()['iapws95_Tc'] = 647.096
     globals()['Tc_inv'] = 1/647.096
@@ -2866,19 +2872,19 @@ def iapws97_region1_rho(T, P):
     pi = P*6.049606775559589e-08 #1/16.53E6
     tau = 1386.0/T
     dG_dpi = iapws97_dG_dpi_region1(tau, pi)
-    return P/(R97*T*pi*dG_dpi)
+    return P/(iapws97_R*T*pi*dG_dpi)
 
 def iapws97_region2_rho(T, P):
     pi = P*1e-6
     tau = 540.0/T
     dG_dpi = 1.0/pi + iapws97_dGr_dpi_region2(tau, pi) 
-    return P/(R97*T*pi*dG_dpi)
+    return P/(iapws97_R*T*pi*dG_dpi)
 
 def iapws97_region5_rho(T, P):
     pi = P*1e-6
     tau = 1000.0/T
     dG_dpi = 1.0/pi + iapws97_dGr_dpi_region5(tau, pi) 
-    return P/(R97*T*pi*dG_dpi)
+    return P/(iapws97_R*T*pi*dG_dpi)
 
 
 def iapws97_rho(T, P, use_95_boundary=False):
@@ -2974,10 +2980,10 @@ def iapws97_rho_extrapolated(T, P, use_95_boundary=False):
             # region 5 upwards T extrapolate drho_dT
             dGr_dpi = iapws97_dGr_dpi_region5(tau, pi) 
             dG_dpi = 1e6*P_inv + dGr_dpi
-            rho = P/(R97*T_border*pi*dG_dpi)
+            rho = P/(iapws97_R*T_border*pi*dG_dpi)
             d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region5(tau, pi) 
             x0 = (dGr_dpi + Pref*P_inv)
-            x1 = R97*T_border*T_border
+            x1 = iapws97_R*T_border*T_border
             drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
             rho = rho + drho_dT*(T - T_border)
         elif T > 1073.15 and 50e6 <= P <= 100e6:
@@ -2990,10 +2996,10 @@ def iapws97_rho_extrapolated(T, P, use_95_boundary=False):
             # region 5 upwards T extrapolate drho_dT
             dGr_dpi = iapws97_dGr_dpi_region2(tau, pi) 
             dG_dpi = 1e6*P_inv + dGr_dpi
-            rho = P/(R97*T_border*pi*dG_dpi)
+            rho = P/(iapws97_R*T_border*pi*dG_dpi)
             d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region2(tau, pi) 
             x0 = (dGr_dpi + Pref*P_inv)
-            x1 = R97*T_border*T_border
+            x1 = iapws97_R*T_border*T_border
             drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
             drho = drho_dT*(T - T_border)
             if (rho + drho) > .1*rho:
@@ -3018,10 +3024,10 @@ def iapws_97_Trho_err_region1(P, T, rho):
     pi_region1 = P*6.049606775559589e-08 #1/16.53E6
     tau_region1 = 1386.0/T
     dG_dpi_region1 = iapws97_dG_dpi_region1(tau_region1, pi_region1)
-    rhol = P/(R97*T*pi_region1*dG_dpi_region1)
+    rhol = P/(iapws97_R*T*pi_region1*dG_dpi_region1)
     err = rhol - rho
     d2G_dpi2_region1 = iapws97_d2G_dpi2_region1(tau_region1, pi_region1)
-    derr = -d2G_dpi2_region1/(R97*T*dG_dpi_region1*dG_dpi_region1)
+    derr = -d2G_dpi2_region1/(iapws97_R*T*dG_dpi_region1*dG_dpi_region1)
 #    print(P, err, derr)
     return err, derr
 
@@ -3029,14 +3035,14 @@ def iapws_97_Trho_err_region2(P, T, rho):
     pi_region2 = P*1e-6
     tau_region2 = 540.0/T
     dG_dpi_region2 = 1/pi_region2 + iapws97_dGr_dpi_region2(tau_region2, pi_region2)
-    rhog = P/(R97*T*pi_region2*dG_dpi_region2)
+    rhog = P/(iapws97_R*T*pi_region2*dG_dpi_region2)
     err = rhog - rho
 
     d2G_dpi2_region2 = iapws97_d2Gr_dpi2_region2(tau_region2, pi_region2)
     d2G_dpi2_region2 -= 1e12/(P*P) # ideal part
     
     # checked numerically
-    derr = -d2G_dpi2_region2/(R97*T*dG_dpi_region2*dG_dpi_region2)
+    derr = -d2G_dpi2_region2/(iapws97_R*T*dG_dpi_region2*dG_dpi_region2)
 #    print(P, T, rho, err, derr)
     return err, derr
 
@@ -3044,12 +3050,12 @@ def iapws_97_Trho_err_region5(P, T, rho):
     pi_region5 = P*1e-6
     tau_region5 = 1000.0/T
     dG_dpi_region5 = 1/pi_region5 + iapws97_dGr_dpi_region5(tau_region5, pi_region5)
-    rhog = P/(R97*T*pi_region5*dG_dpi_region5)
+    rhog = P/(iapws97_R*T*pi_region5*dG_dpi_region5)
     err = rhog - rho
 
     d2G_dpi2_region5 = iapws97_d2Gr_dpi2_region5(tau_region5, pi_region5)
     d2G_dpi2_region5 -= 1e12/(P*P) # ideal part
-    derr = -d2G_dpi2_region5/(R97*T*dG_dpi_region5*dG_dpi_region5)
+    derr = -d2G_dpi2_region5/(iapws97_R*T*dG_dpi_region5*dG_dpi_region5)
     return err, derr
 
 def iapws97_P(T, rho):
@@ -3137,12 +3143,12 @@ def iapws97_P(T, rho):
             pi_region2 = Psat*1e-6
             tau_region2 = 540.0/T
             dG_dpi_region2 = 1.0/pi_region2 + iapws97_dGr_dpi_region2(tau_region2, pi_region2) 
-            rhog_sat = Psat/(R97*T*pi_region2*dG_dpi_region2)
+            rhog_sat = Psat/(iapws97_R*T*pi_region2*dG_dpi_region2)
 
             pi_region1 = Psat*6.049606775559589e-08 #1/16.53E6
             tau_region1 = 1386.0/T
             dG_dpi_region1 = iapws97_dG_dpi_region1(tau_region1, pi_region1)
-            rhol_sat = Psat/(R97*T*pi_region1*dG_dpi_region1)
+            rhol_sat = Psat/(iapws97_R*T*pi_region1*dG_dpi_region1)
             
             if rhog_sat < rho < rhol_sat:
                 raise ValueError("Specified density is not a stable state at T")
@@ -3156,7 +3162,7 @@ def iapws97_P(T, rho):
         pi_region2 = P_region2_border*1e-6
         tau_region2 = 540.0/T
         dG_dpi_region2 = 1.0/pi_region2 + iapws97_dGr_dpi_region2(tau_region2, pi_region2) 
-        rhog_region2_border = P_region2_border/(R97*T*pi_region2*dG_dpi_region2)
+        rhog_region2_border = P_region2_border/(iapws97_R*T*pi_region2*dG_dpi_region2)
         if rho < rhog_region2_border or P_region2_border > 100e6:
                 return newton(iapws_97_Trho_err_region2, P_region2_border*.1, fprime=True, bisection=True,
                               low=P_region2_border*1e-20, high=P_region2_border, args=(T, rho), xtol=3e-12)
@@ -3165,7 +3171,7 @@ def iapws97_P(T, rho):
             tau = iapws95_Tc / T
             delta = rho * iapws95_rhoc_inv
             dA_ddelta = iapws97_dA_ddelta_region3(tau, delta)
-            return dA_ddelta*delta*rho*R97*T
+            return dA_ddelta*delta*rho*iapws97_R*T
                 
     elif T <= 2273.15:
         return newton(iapws_97_Trho_err_region5, 1e6, fprime=True, bisection=True,
@@ -3179,11 +3185,11 @@ def iapws_97_Prho_err_region1(T, P, rho):
     tau_region1 = 1386.0/T
     dG_dpi_region1 = iapws97_dG_dpi_region1(tau_region1, pi_region1)
         
-    rhol = P/(R97*T*pi_region1*dG_dpi_region1)
+    rhol = P/(iapws97_R*T*pi_region1*dG_dpi_region1)
     err = rhol - rho
     # what it is supposed to be
-    drhol = (-16.53E6/(R97*T*T*dG_dpi_region1)
-             + 16.53E6*1386.0*iapws97_d2G_dpidtau_region1(tau_region1, pi_region1)/(R97*T*T*T*dG_dpi_region1*dG_dpi_region1))
+    drhol = (-16.53E6/(iapws97_R*T*T*dG_dpi_region1)
+             + 16.53E6*1386.0*iapws97_d2G_dpidtau_region1(tau_region1, pi_region1)/(iapws97_R*T*T*T*dG_dpi_region1*dG_dpi_region1))
     return err, drhol
 
 def iapws_97_Prho_err_region2(T, P, rho):
@@ -3191,10 +3197,10 @@ def iapws_97_Prho_err_region2(T, P, rho):
     tau_region2 = 540.0/T
     dG_dpi_region2 = 1.0/pi_region2 + iapws97_dGr_dpi_region2(tau_region2, pi_region2)
         
-    rhol = P/(R97*T*pi_region2*dG_dpi_region2)
+    rhol = P/(iapws97_R*T*pi_region2*dG_dpi_region2)
     err = rhol - rho
-    drhol = (-1e6/(R97*T*T*dG_dpi_region2)
-             + 1E6*540.0*iapws97_d2Gr_dpidtau_region2(tau_region2, pi_region2)/(R97*T*T*T*dG_dpi_region2*dG_dpi_region2))
+    drhol = (-1e6/(iapws97_R*T*T*dG_dpi_region2)
+             + 1E6*540.0*iapws97_d2Gr_dpidtau_region2(tau_region2, pi_region2)/(iapws97_R*T*T*T*dG_dpi_region2*dG_dpi_region2))
     return err, drhol
 
 def iapws_97_Prho_err_region5(T, P, rho):
@@ -3202,10 +3208,10 @@ def iapws_97_Prho_err_region5(T, P, rho):
     tau_region5 = 1000/T
     dG_dpi_region5 = 1.0/pi_region5 + iapws97_dGr_dpi_region5(tau_region5, pi_region5)
         
-    rhol = P/(R97*T*pi_region5*dG_dpi_region5)
+    rhol = P/(iapws97_R*T*pi_region5*dG_dpi_region5)
     err = rhol - rho
-    drhol = (-1e6/(R97*T*T*dG_dpi_region5)
-             + 1E6*1000*iapws97_d2Gr_dpidtau_region5(tau_region5, pi_region5)/(R97*T*T*T*dG_dpi_region5*dG_dpi_region5))
+    drhol = (-1e6/(iapws97_R*T*T*dG_dpi_region5)
+             + 1E6*1000*iapws97_d2Gr_dpidtau_region5(tau_region5, pi_region5)/(iapws97_R*T*T*T*dG_dpi_region5*dG_dpi_region5))
     return err, drhol
 
 
@@ -3213,12 +3219,12 @@ def iapws_97_Prho_err_region3(T, P, rho):
     tau = iapws95_Tc / T
     delta = rho * iapws95_rhoc_inv
     dA_ddelta = iapws97_dA_ddelta_region3(tau, delta)
-    P_calc = dA_ddelta*delta*rho*R97*T
+    P_calc = dA_ddelta*delta*rho*iapws97_R*T
     err = P_calc - P
 
     d2A_ddeltadtau = iapws97_d2A_ddeltadtau_region3(tau, delta)
     
-    derr = R97 * rho ** 2 * dA_ddelta / iapws95_rhoc - R97 * iapws95_Tc * rho ** 2 * d2A_ddeltadtau / (T * iapws95_rhoc)
+    derr = iapws97_R*rho**2*dA_ddelta/iapws95_rhoc - iapws97_R*iapws95_Tc*rho**2*d2A_ddeltadtau/(T*iapws95_rhoc)
     return err, derr
 
 def iapws97_T(P, rho):
@@ -3286,7 +3292,7 @@ def iapws97_T(P, rho):
         pi_5_border = P*1e-6
         tau_5_border = 1000.0/1073.15
         dG_dpi_5_border = 1.0/pi_5_border + iapws97_dGr_dpi_region5(tau_5_border, pi_5_border) 
-        rho_25_border = P/(R97*1073.15*pi_5_border*dG_dpi_5_border)
+        rho_25_border = P/(iapws97_R*1073.15*pi_5_border*dG_dpi_5_border)
 
         # get rho minimum at 1073.15
         if rho <= rho_25_border:
@@ -3316,12 +3322,12 @@ def iapws97_T(P, rho):
                     pi_region1_sat = P*6.049606775559589e-08 #1/16.53E6
                     tau_region1_sat = 1386.0/Tsat
                     dG_dpi_region1_sat = iapws97_dG_dpi_region1(tau_region1_sat, pi_region1_sat)
-                    rho1_sat = P/(R97*Tsat*pi_region1_sat*dG_dpi_region1_sat)
+                    rho1_sat = P/(iapws97_R*Tsat*pi_region1_sat*dG_dpi_region1_sat)
 
                     pi_region2_sat = P*1e-6
                     tau_region2_sat = 540.0/Tsat
                     dG_dpi_region2_sat = 1.0/pi_region2_sat + iapws97_dGr_dpi_region2(tau_region2_sat, pi_region2_sat) 
-                    rho2_sat = P/(R97*Tsat*pi_region2_sat*dG_dpi_region2_sat)
+                    rho2_sat = P/(iapws97_R*Tsat*pi_region2_sat*dG_dpi_region2_sat)
 
 #                     if rho2_sat < rho < rho1_sat:
 #                         raise ValueError("At specified pressure, density is not a stable solution")
@@ -3338,7 +3344,7 @@ def iapws97_T(P, rho):
             pi_region2_25_on2 = P*1e-6
             tau_region2_25_on2 = 540.0/1073.15
             dG_dpi_region2_25_on2 = 1.0/pi_region2_25_on2 + iapws97_dGr_dpi_region2(tau_region2_25_on2, pi_region2_25_on2) 
-            rho2_25_on2 = P/(R97*1073.15*pi_region2_25_on2*dG_dpi_region2_25_on2)
+            rho2_25_on2 = P/(iapws97_R*1073.15*pi_region2_25_on2*dG_dpi_region2_25_on2)
         
             if rho2_25_on2 <= rho <= rho_23_side3:
                 solve_region = 2
@@ -5517,7 +5523,7 @@ def iapws95_d2Ar_ddeltadtau(tau, delta):
 def _P_G_dG_dV_T_dG_dV_T(T, V):
     '''For calculating vapor pressure'''
     _MW_kg = iapws95_MW / 1000
-    R_MW_0_001 = _MW_kg*R95
+    R_MW_0_001 = _MW_kg*iapws95_R
     rho = rho_mass = iapws95_MW / V / 1000
     tau = iapws95_Tc / T
     delta = rho_mass / iapws95_rhoc
@@ -5533,13 +5539,13 @@ def _P_G_dG_dV_T_dG_dV_T(T, V):
     d2A_ddelta2 =  iapws95_d2Ar_ddelta2(tau, delta) -1/(delta*delta)
     d2A_ddeltadtau = iapws95_d2Ar_ddeltadtau(tau, delta)
     
-    P = (dA_ddelta*delta)*rho*R95*T
+    P = (dA_ddelta*delta)*rho*iapws95_R*T
 
     S = (tau*dA_dtau - A)*R_MW_0_001
     H = (tau*dA_dtau + dA_ddelta*delta)*T*R_MW_0_001
     G = H - T*S
     
-    dP_dV = (-iapws95_MW * iapws95_MW * R95 * T * (iapws95_MW * d2A_ddelta2 / 10 ** 9 + V * iapws95_rhoc * dA_ddelta / 500000) / (V * V * V * V * iapws95_rhoc * iapws95_rhoc))
+    dP_dV = (-iapws95_MW*iapws95_MW*iapws95_R*T*(iapws95_MW*d2A_ddelta2/10**9 + V*iapws95_rhoc*dA_ddelta/500000)/(V*V*V*V*iapws95_rhoc*iapws95_rhoc))
     
     dS_dV_T = ((dA_ddelta - iapws95_Tc * d2A_ddeltadtau / T)
                * R_MW_0_001 * iapws95_MW / 1000 / (V * V * iapws95_rhoc))
@@ -6039,7 +6045,7 @@ def iapws95_rhog_sat(T):
 
 def iapws95_rho_err(rho, T, P_spec):
     # For solving for a rho while P is specified
-    RT = R95*T
+    RT = iapws95_R*T
     tau = iapws95_Tc / T
     delta = rho * iapws95_rhoc_inv
     dAddelta_res_val = iapws95_dAr_ddelta(tau, delta)
@@ -6055,8 +6061,8 @@ def iapws95_T_err(T, rho, P_spec):
     tau = iapws95_Tc / T
     delta = rho * iapws95_rhoc_inv
     dAddelta_val = iapws95_dAr_ddelta(tau, delta) + 1.0/delta
-    err = (dAddelta_val*delta)*rho*R95*T - P_spec
-    dP_dT = rho*R95*delta*(dAddelta_val - tau*iapws95_d2Ar_ddeltadtau(tau, delta))
+    err = (dAddelta_val*delta)*rho*iapws95_R*T - P_spec
+    dP_dT = rho*iapws95_R*delta*(dAddelta_val - tau*iapws95_d2Ar_ddeltadtau(tau, delta))
     return err, dP_dT
 
 def iapws95_P(T, rho):
@@ -6104,7 +6110,7 @@ def iapws95_P(T, rho):
     tau = iapws95_Tc/T
     delta = rho*iapws95_rhoc_inv
     dAddelta_res_val = iapws95_dAr_ddelta(tau, delta)
-    return (1.0 + dAddelta_res_val*delta)*rho*(R95*T)
+    return (1.0 + dAddelta_res_val*delta)*rho*(iapws95_R*T)
 
 
 def iapws95_T(P, rho):
