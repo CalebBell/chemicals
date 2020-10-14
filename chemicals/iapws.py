@@ -21,10 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains pieces from the IAPWS-95 and IAPWS-97 implementation.
+This module the core of the IAPWS-95 and IAPWS-97 standards.
 The objective of this module is to contain extremely fast functions to
-calculate several basic properties of water. Calculating every property is left
-as an exercise to the reader.
+calculate several basic properties of water.
+
+The simplest interfaces are :obj:`iapws95_rho` for density calculation only and
+:obj:`iapws95_properties` for some basic properties.
 
 For reporting bugs, adding feature requests, or submitting pull requests,
 please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
@@ -42,6 +44,10 @@ IAPWS-97 Basic Solvers
 .. autofunction:: chemicals.iapws.iapws97_rho
 .. autofunction:: chemicals.iapws.iapws97_P
 .. autofunction:: chemicals.iapws.iapws97_T
+
+IAPWS-95 Properties
+------------------------
+.. autofunction:: chemicals.iapws.iapws95_properties
 
 IAPWS-95 Saturation Pressure/Temperature
 ----------------------------------------
@@ -193,7 +199,8 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
     'iapws95_Ar', 'iapws95_d3Ar_ddeltadtau2', 'iapws95_d3Ar_ddelta2dtau',
 	'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3',
 	'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2', 'iapws95_d2Ar_ddeltadtau',
-	'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc', 'iapws97_G_region1',
+	'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc', 'iapws95_R',
+    'iapws97_R', 'iapws97_G_region1', 
 	'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
 	'iapws97_dG_dtau_region1', 'iapws97_d2G_dtau2_region1',
 	'iapws97_d2G_dpidtau_region1', 'iapws97_Gr_region2',
@@ -221,6 +228,7 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
 	'iapws97_region3_s', 'iapws97_region3_t', 'iapws97_region3_u',
 	'iapws97_region3_v', 'iapws97_region3_w', 'iapws97_region3_x',
 	'iapws97_region3_y', 'iapws97_region3_z',
+    'iapws95_properties',
 ]
 
 iapws95_R = 461.51805
@@ -6290,3 +6298,177 @@ def iapws95_rho(T, P):
     # Note that the derivatives have not been computed at this spot, so we can't save and return them
     return rho
 
+
+def iapws95_properties(T, P):
+    r'''Calculate some basic properties of water according to the IAPWS-95
+    standard given a temperature `T` and pressure `P`.
+    
+    The properties are density `rho`, internal energy `U`, entropy `S`,
+    enthalpy `H`, isochoric heat capacity `Cv`, isobaric heat capacity `Cp`,
+    speed of sound `w`, 
+    Joule-Thomson coefficient `JT`, isothermal throttling coefficient `delta_T`,
+    isentropic temperature-pressure coefficient `beta_s`, and the derivative of
+    mass density with respect to pressure at constant temperature `drho_dP`.
+    
+    This function is intended as a demonstration of how to use the IAPWS-95
+    equations. For that reason, mass-units are used in all returned variables. 
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    P : float
+        Pressure, [Pa]
+        
+    Returns
+    -------
+    rho : float
+        Mass density of water, [kg/m^3]
+    U : float
+        Internal energy of water, [J/(kg)]
+    S : float
+        Entropy of water, [J/(kg*K)]
+    H : float
+        Enthalpy of water, [J/(kg)]
+    Cv : float
+        Isochoric heat capacity, [J/(kg*K)]
+    Cp : float
+        Isobaric heat capacity, [J/(kg*K)]
+    w : float
+        Speed of sound, [m/s]
+    JT : float
+        Joule-Thomson coefficient, [K/Pa]
+    delta_T : float
+        Isothermal throttling coefficient, [J/(kg*Pa)]
+    beta_s : float
+        Isentropic temperature-pressure coefficient, [K/Pa]
+    drho_dP : float
+        Derivative of mass density with respect to pressure at constant 
+        temperature, [kg/(m^3*Pa)]
+
+    Notes
+    -----
+    Hundreds of useful properties can be obtained from the IAPWS-95 model. It
+    is intended for this function to serve as a useful starting point to those.
+    Calculating every property with every set of units is beyond the scope of
+    `chemicals`. The functions like :obj:`iapws95_dAr_ddelta` can be used
+    directly in your own implementation - where you can calculate only those
+    properties which are necessary, for maximum speed.
+    
+    The formulas are as follows:
+        
+    .. math::
+        \frac{u(\delta, \tau)}{R T}=\tau\left(\phi_{\tau}^{\mathrm{o}}
+        +\phi_{\tau}^{\mathrm{r}}\right)
+
+    .. math::
+        \frac{s(\delta, \tau)}{R}=\tau\left(\phi_{\tau}^{\mathrm{o}}
+        +\phi_{\tau}^{\mathrm{r}}\right)-\phi^{\mathrm{o}}-\phi^{\mathrm{r}}
+
+    .. math::
+        \frac{h(\delta, \tau)}{R T}=1+\tau\left(\phi_{\tau}^{\mathrm{o}}
+        +\phi_{\tau}^{\mathrm{r}}\right)+\delta \phi_{\delta}^{\mathrm{r}}
+    
+    .. math::
+        \frac{c_{v}(\delta, \tau)}{R}=-\tau^{2}\left(\phi_{\tau \tau}^{\mathrm{o}}
+        +\phi_{\tau \tau}^{\mathrm{r}}\right)
+
+    .. math::
+        \frac{c_{p}(\delta, \tau)}{R}=-\tau^{2}\left(\phi_{\tau \tau}^{\mathrm{o}}
+        +\phi_{\tau \tau}^{\mathrm{r}}\right)+\frac{\left(1+\delta 
+        \phi_{\delta}^{\mathrm{r}}-\delta \tau \phi_{\delta \tau}^{\mathrm{r}}
+        \right)^{2}}{1+2 \delta \phi_{\delta}^{\mathrm{r}}+\delta^{2}
+        \phi_{\delta \delta}^{\mathrm{r}}}
+
+    .. math::
+        \frac{w^{2}(\delta, \tau)}{R T}=1+2 \delta \phi_{\delta}^{\mathrm{r}}
+        +\delta^{2} \phi_{\delta \delta}^{\mathrm{r}}-\frac{\left(1+\delta 
+        \phi_{\delta}^{\mathrm{r}}-\delta \tau \phi_{\delta \tau}^{\mathrm{r}}
+        \right)^{2}}{\tau^{2}\left(\phi_{\tau \tau}^{\mathrm{o}}+\phi_{\tau 
+        \tau}^{\mathrm{r}}\right)}
+    
+    .. math::
+        \mu R \rho=\frac{-\left(\delta \phi_{\delta}^{\mathrm{r}}+\delta^{2}
+        \phi_{\delta \delta}^{\mathrm{r}}+\delta \tau \phi_{\delta \tau}^{
+        \mathrm{r}}\right)}{\left(1+\delta \phi_{\delta}^{\mathrm{r}}-\delta
+        \tau \phi_{\delta \tau}^{\mathrm{r}}\right)^{2}-\tau^{2}\left(
+        \phi_{\tau \tau}^{\mathrm{o}}+\phi_{\tau \tau}^{\mathrm{r}}\right)
+        \left(1+2 \delta \phi_{\delta}^{\mathrm{r}}+\delta^{2} \phi_{\delta
+        \delta}^{\mathrm{r}}\right)}
+
+    .. math::
+        \delta_{T} \rho=1-\frac{1+\delta \phi_{\delta}^{\mathrm{r}}-\delta \tau
+        \phi_{\delta \tau}^{\mathrm{r}}}{1+2 \delta \phi_{\delta}^{\mathrm{r}}
+        +\delta^{2} \phi_{\delta \delta}^{\mathrm{r}}}
+
+    .. math::
+        \beta_{S} \rho R=\frac{1+\delta \phi_{\delta}^{\mathrm{r}}-\delta \tau
+        \phi_{\delta \tau}^{\mathrm{r}}}{\left(1+\delta \phi_{\delta}^{
+        \mathrm{r}}-\delta \tau \phi_{\delta \tau}^{\mathrm{r}}\right)^{2}
+        -\tau^{2}\left(\phi_{\tau \tau}^{\mathrm{o}}+\phi_{\tau \tau}^{
+        \mathrm{r}}\right)\left(1+2 \delta \phi_{\delta}^{\mathrm{r}}
+        +\delta^{2} \phi_{\delta \delta}^{\mathrm{r}}\right)}
+    
+    This derivative isn't part of the same table of properties, but it is 
+    needed by the transport calculation routines:
+    
+    .. math::
+        \left(\frac{\partial \rho}{\partial P}\right)_{T} = \frac{1}{
+        R T\left(1+2 \delta \alpha_{\delta}^{\mathrm{r}}+\delta^{2}
+        \alpha_{\delta \delta}^{\mathrm{r}}\right)}
+
+    Examples
+    --------
+    >>> iapws95_properties(T=300.0, P=1e6)
+    (996.96002269, 112478.998245, 392.813902893, 113482.047492, 4127.21730497, 4178.103605593, 1503.035983829, -2.202166728257e-07, 0.000920088074745, 1.985617879134e-08, 4.48108429028e-07)
+    
+    >>> rho, U, S, H, Cv, Cp, w, JT, delta_T, beta_s, drho_dP = iapws95_properties(T=500.0, P=1e5)
+    >>> w
+    548.3138393244
+
+    References
+    ----------
+    .. [1] Wagner, Wolfgang, and Andreas Pruß. "The IAPWS Formulation 1995 for
+       the Thermodynamic Properties of Ordinary Water Substance for General and
+       Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
+       2 (2002): 387-535.
+    '''
+    rho = iapws95_rho(T, P)
+    tau = iapws95_Tc/T
+    delta = rho*iapws95_rhoc_inv
+    A0, dA0_dtau, d2A0_dtau2, d3A0_dtau3 = iapws95_A0_tau_derivatives(tau, delta)
+    
+    Ar = iapws95_Ar(tau, delta)
+    dAr_ddelta = iapws95_dAr_ddelta(tau, delta)
+    d2Ar_ddelta2 = iapws95_d2Ar_ddelta2(tau, delta)
+    dAr_dtau = iapws95_dAr_dtau(tau, delta)
+    d2Ar_dtau2 = iapws95_d2Ar_dtau2(tau, delta)
+    d2Ar_ddeltadtau = iapws95_d2Ar_ddeltadtau(tau, delta)
+    
+    U = iapws95_R*T*tau*(dA0_dtau + dAr_dtau)
+    S = iapws95_R*(tau*(dA0_dtau + dAr_dtau) - A0 - Ar)
+    H = iapws95_R*T*(1.0 + tau*(dA0_dtau + dAr_dtau) + delta*dAr_ddelta)
+    Cv = -iapws95_R*tau*tau*(d2A0_dtau2 + d2Ar_dtau2)
+    
+    
+    Cp = iapws95_R*(-tau*tau*(d2A0_dtau2 + d2Ar_dtau2) + (1.0 + delta*dAr_ddelta 
+                                - delta*tau*d2Ar_ddeltadtau)**2/(1 + 2*delta*dAr_ddelta + delta*delta*d2Ar_ddelta2))
+    w = sqrt(iapws95_R*T*(1 + 2.0*delta*dAr_ddelta + delta*delta*d2Ar_ddelta2 - (1.0 + delta*dAr_ddelta 
+                                - delta*tau*d2Ar_ddeltadtau)**2/(tau*tau*(d2A0_dtau2 + d2Ar_dtau2))))
+    
+    JT = ( -(delta*dAr_ddelta + delta*delta*d2Ar_ddelta2 + delta*tau*d2Ar_ddeltadtau)/
+    ((1.0 + delta*dAr_ddelta - delta*tau*d2Ar_ddeltadtau)**2 - tau*tau*(d2A0_dtau2+d2Ar_dtau2)*
+    (1.0 + 2.0*delta*dAr_ddelta + delta*delta*d2Ar_ddelta2)   ))/(iapws95_R*rho)
+
+    delta_T = (1.0 - (1.0 + delta*dAr_ddelta - delta*tau*d2Ar_ddeltadtau)/
+    (1.0 + 2.0*delta*dAr_ddelta + delta**2*d2Ar_ddelta2))/rho
+
+    
+    denominator1 = (1.0 + delta*dAr_ddelta - delta*tau*d2Ar_ddeltadtau)
+    denominator1 *= denominator1
+    denominator2 = tau*tau*(d2Ar_dtau2+d2A0_dtau2)*(1.0 + 2.0*delta*dAr_ddelta + delta*delta*d2Ar_ddelta2)
+    beta_s = ( 1.0 + delta*dAr_ddelta - delta*tau*d2Ar_ddeltadtau)/(denominator1 - denominator2)/(iapws95_R*rho)
+    
+    drho_dP = 1.0/(iapws95_R*T*(1.0 + 2.0*delta*dAr_ddelta + delta*delta*d2Ar_ddelta2))
+
+    return (rho, U, S, H, Cv, Cp, w, JT, delta_T, beta_s, drho_dP)

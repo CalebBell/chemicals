@@ -379,6 +379,17 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
     
     >>> mu_IAPWS(T=647.35, rho=322., drho_dP=1.213641949033E-2)
     4.2961578738287e-05
+    
+    Full scientific calculation:
+    
+    >>> from chemicals.iapws import iapws95_properties, iapws95_P, iapws95_Tc
+    >>> T, P = 298.15, 1e5
+    >>> rho, _, _, _, _, _, _, _, _, _, drho_dP = iapws95_properties(T, P)
+    >>> P_ref = iapws95_P(1.5*iapws95_Tc, rho)
+    >>> _, _, _, _, _, _, _, _, _, _, drho_dP_Tr = iapws95_properties(1.5*iapws95_Tc, P_ref)
+    >>> mu_IAPWS(T, rho, drho_dP, drho_dP_Tr)
+    0.00089002267377
+    
 
     References
     ----------

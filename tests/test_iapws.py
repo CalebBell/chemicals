@@ -2315,3 +2315,7 @@ def test_consistency_iapws95_rho_iapws95_P():
     rho = iapws95_rho(T=235.0, P=P)
     P_check = iapws95_P(T=235.0, rho=rho)
     assert abs(1-P/P_check) < 5e-6
+
+def test_iapws95_properties():
+    expect = [996.5563403888951, 112553.33413264707, 393.06243381456477, 112653.67968858521, 4130.178615033825, 4180.639522022912, 1501.520415056628, -2.2023653545981183e-07, 0.0009207295643366906, 1.978788044482276e-08, 4.4896388297803826e-07]
+    assert_close1d(iapws95_properties(T=300.0, P=1e5), expect, rtol=1e-13)

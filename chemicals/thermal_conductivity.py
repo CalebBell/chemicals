@@ -270,7 +270,19 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     >>> k_IAPWS(T=620., rho=613.227777440324, Cp=7634.337046792,
     ... Cv=3037.934412104, mu=70.905106751524E-6, drho_dP=5.209378197916E-6)
     0.48148519510200044
+    
+    Full scientific calculation:
 
+    >>> from chemicals.iapws import iapws95_properties, iapws95_P, iapws95_Tc
+    >>> from chemicals.viscosity import mu_IAPWS
+    >>> T, P = 298.15, 1e5
+    >>> rho, _, _, _, Cv, Cp, _, _, _, _, drho_dP = iapws95_properties(T, P)
+    >>> P_ref = iapws95_P(1.5*iapws95_Tc, rho)
+    >>> _, _, _, _, _, _, _, _, _, _, drho_dP_Tr = iapws95_properties(1.5*iapws95_Tc, P_ref)
+    >>> mu = mu_IAPWS(T, rho, drho_dP, drho_dP_Tr)
+    >>> k_IAPWS(T, rho, Cp, Cv, mu, drho_dP, drho_dP_Tr)
+    0.60651532815
+    
     References
     ----------
     .. [1] Huber, M. L., R. A. Perkins, D. G. Friend, J. V. Sengers, M. J.
