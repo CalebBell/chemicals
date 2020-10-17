@@ -178,6 +178,8 @@ def test_lemmon2000_air_d4Ar_dtau4():
 def test_lemmon2000_air_dAr_ddelta():
     assert_close(lemmon2000_air_dAr_ddelta(0.36842, 0.15880050154579475), 0.0428706712678839, rtol=1e-13)
 
+def test_lemmon2000_air_d2Ar_ddelta2():
+    assert_close(lemmon2000_air_d2Ar_ddelta2(0.36842, 0.15880050154579475),  0.15165011962677075, rtol=1e-13)
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -220,6 +222,13 @@ def test_lemmon2000_air_d4Ar_dtau4_vs_naive():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_lemmon2000_air_dAr_ddelta_vs_naive():
-    AARD, std, max_err = func_vs_naive_tester(lemmon2000_air_dAr_ddelta, lemmon2000_air_dAr_ddelta_naive, N=1000)
+    AARD, std, max_err = func_vs_naive_tester(lemmon2000_air_dAr_ddelta, lemmon2000_air_dAr_ddelta_naive, N=100)
+    assert AARD < 1e-13
+    assert max_err < 1e-8
+
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_lemmon2000_air_d2Ar_ddelta2_vs_naive():
+    AARD, std, max_err = func_vs_naive_tester(lemmon2000_air_d2Ar_ddelta2, lemmon2000_air_d2Ar_ddelta2_naive, N=1000)
     assert AARD < 1e-13
     assert max_err < 1e-8
