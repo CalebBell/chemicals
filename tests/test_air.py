@@ -162,6 +162,9 @@ def lemmon2000_air_d4Ar_dddelta3dtau_naive(tau, delta):
 def test_lemmon2000_air_Ar():
     assert_close(lemmon2000_air_Ar(0.36842, 0.15880050154579475), 0.004798812280624336, rtol=1e-13)
     
+def test_lemmon2000_air_dAr_dtau():
+    assert_close(lemmon2000_air_dAr_dtau(0.36842, 0.15880050154579475),  -0.20189573196786642, rtol=1e-13)
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_lemmon2000_air_Ar_vs_naive():
@@ -170,4 +173,12 @@ def test_lemmon2000_air_Ar_vs_naive():
     # If enough points happen, can find some pretty big discrepancie
     assert max_err < 1e-8
 #    print(AARD, std, max_err)
+    
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_lemmon2000_air_dAr_dtau_vs_naive():
+    AARD, std, max_err = func_vs_naive_tester(lemmon2000_air_dAr_dtau, lemmon2000_air_dAr_dtau_naive, N=100)
+    assert AARD < 1e-13
+    assert max_err < 1e-8
+
 
