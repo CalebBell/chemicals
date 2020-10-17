@@ -31,7 +31,8 @@ from fluids.numerics import trunc_exp
 from math import exp, log, sqrt
 __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d2A0_dtau2', 'lemmon2000_air_d3A0_dtau3',
-           'lemmon2000_air_d4A0_dtau4']
+           'lemmon2000_air_d4A0_dtau4',
+           'lemmon2000_air_Ar']
 
 # Get a good, fast variant of lemmon (2004) in here
 
@@ -282,3 +283,73 @@ def lemmon2000_air_d4A0_dtau4(tau, delta):
         - 7.0/(1.0 + x0*(x0 - 2.0)) # 7
         - 1.0/(x0 - 1.0)) # 1
     return d4A0_dtau4
+
+
+
+def lemmon2000_air_Ar(tau, delta):
+    r'''Calculates the residual Helmholtz energy of air according to Lemmon 
+    (2000).
+    
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (126.192 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(11183.9 mol/m^3), [-]
+
+    Returns
+    -------
+    Ar : float
+        Residual dimensionless Helmholtz energy Ar/(RT) [-]
+
+    Notes
+    -----
+            
+    Examples
+    --------
+    >>> lemmon2000_air_Ar(126.192/200.0, 13000/11183.9)
+    -0.2803982072745575
+    >>> lemmon2000_air_Ar(0.36842, 0.15880050154579475)
+    0.00479881228062413
+    '''
+    tau_100 = tau**0.01
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta2*delta2
+    delta5 = delta*delta4
+    delta6 = delta2*delta4
+    taurt2 = sqrt(tau)
+    taurt4 = sqrt(taurt2)
+    tau2 = tau*tau
+    tau3 = tau*tau2
+    tau6 = tau3*tau3
+    tau12 = tau6*tau6
+    tau2_100 = tau_100*tau_100
+    tau4_100 = tau2_100*tau2_100
+    tau5_100 = tau_100*tau4_100
+    tau10_100 = tau5_100*tau5_100
+    tau15_100 = tau5_100*tau10_100
+    tau8_100 = tau4_100*tau4_100
+    tau16_100 = tau8_100*tau8_100
+    tau20_100 = tau4_100*tau16_100
+    tau32_100 = tau16_100*tau16_100
+    tau33_100 = tau_100*tau32_100
+    tau64_100 = tau32_100*tau32_100
+    tau80_100 = tau16_100*tau64_100
+    tau40_100 = tau20_100*tau20_100
+    tau97_100 = tau33_100*tau64_100
+    tau45_100 = tau5_100*tau40_100
+    tau90_100 = tau45_100*tau45_100
+    tau160_100 = tau80_100*tau80_100
+    tau320_100 = tau160_100*tau160_100
+    x0 = delta + delta3
+    x1 = delta6*taurt4
+    return ((tau3*(0.0148287891978000005*delta*taurt2 - 0.00938782884667000057*delta3*tau12)*exp(delta + delta2)
+             - (0.146629609712999986*delta*tau320_100*tau40_100 + 0.031605587982100003*delta3*tau6
+                - 0.000233594806141999996*delta5*tau3*x1)*exp(x0) - (0.101365037911999994*delta*tau160_100 
+            + 0.17381369096999999*delta3*tau80_100 + 0.0472103183731000034*delta5*tau15_100*tau80_100 
+            + 0.0122523554252999996*tau*x1)*exp(delta2 + delta3) + (0.713116392079000017*delta*tau33_100 
+            - 1.61824192067000006*delta*tau4_100*tau97_100 + 0.118160747228999996*delta + 0.0714140178971000017*delta2 
+            + 0.134211176704000013*delta3*tau15_100 - 0.0865421396646000041*delta3 - 0.042053322884200002*delta4*tau20_100 
+            + 0.0349008431981999989*delta4*tau2_100*tau33_100 + 0.0112626704218000001*delta4
+            + 0.000164957183185999979*delta6*tau45_100*tau90_100)*exp(delta2 + x0))*exp(-delta - delta2 - delta3))

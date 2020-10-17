@@ -88,3 +88,5 @@ def test_lemmon2000_air_d4A0_dtau4():
                      lemmon2000_air_d4A0_dtau4(rat, .5))
         
     
+def test_lemmon2000_air_Ar():
+    assert_close(lemmon2000_air_Ar(0.36842, 0.15880050154579475), 0.004798812280624336, rtol=1e-13)
