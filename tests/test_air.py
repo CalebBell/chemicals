@@ -188,7 +188,7 @@ def test_lemmon2000_air_dAr_dtau_vs_naive():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_lemmon2000_air_d2Ar_dtau2_vs_naive():
-    AARD, std, max_err = func_vs_naive_tester(lemmon2000_air_d2Ar_dtau2, lemmon2000_air_d2Ar_dtau2_naive, N=1000)
+    AARD, std, max_err = func_vs_naive_tester(lemmon2000_air_d2Ar_dtau2, lemmon2000_air_d2Ar_dtau2_naive, N=100)
     assert AARD < 1e-13
     assert max_err < 1e-8
 
