@@ -33,7 +33,7 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d2A0_dtau2', 'lemmon2000_air_d3A0_dtau3',
            'lemmon2000_air_d4A0_dtau4',
            'lemmon2000_air_Ar', 'lemmon2000_air_dAr_dtau',
-           'lemmon2000_air_d2Ar_dtau2']
+           'lemmon2000_air_d2Ar_dtau2', 'lemmon2000_air_d3Ar_dtau3']
 
 # Get a good, fast variant of lemmon (2004) in here
 
@@ -305,6 +305,7 @@ def lemmon2000_air_Ar(tau, delta):
 
     Notes
     -----
+    The cost of this function is 1 power, 3 exp, 2 sqrt and many multiplies/adds.
             
     Examples
     --------
@@ -376,7 +377,8 @@ def lemmon2000_air_dAr_dtau(tau, delta):
 
     Notes
     -----
-    The cost of this function is 1 power, 3 exp, 2 sqrt, 2 divisions.
+    The cost of this function is 1 power, 3 exp, 2 sqrt, 2 divisions
+    and the necessary adds/multiplies.
             
     Examples
     --------
@@ -452,6 +454,8 @@ def lemmon2000_air_d2Ar_dtau2(tau, delta):
 
     Notes
     -----
+    The cost of this function is 1 power, 3 exp, 2 sqrt, 2 divisions
+    and the necessary adds/multiplies.
             
     Examples
     --------
@@ -499,3 +503,75 @@ def lemmon2000_air_d2Ar_dtau2(tau, delta):
             - 0.0000779422690553850206*delta5*tau_inv65_100 + 0.00382886107040624965*delta5*tau_invrt2*tau_invrt4*x0 
             + 1.37245314691368003*tau**1.6*x2 + 0.15767003428866691*tau_inv2_100*tau_inv165_100 + 0.0163442433987670138*tau_inv99_100
             - 0.129751905480749996*taurt2*x3 + 0.0973104363955200058*x1))
+
+def lemmon2000_air_d3Ar_dtau3(tau, delta):
+    r'''Calculates the third derivative of residual Helmholtz energy of air 
+    with respect to tau according to Lemmon (2000).
+    
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (132.6312 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
+
+    Returns
+    -------
+    d3Ar_dtau3 : float
+        Third derivative of residual dimensionless Helmholtz energy Ar/(RT)
+        with respect to tau, [-]
+
+    Notes
+    -----
+    The cost of this function is 1 power, 3 exp, 2 sqrt, 4 divisions
+    and the necessary adds/multiplies.
+            
+    Examples
+    --------
+    >>> lemmon2000_air_d3Ar_dtau3(132.6312/200.0, 13000/10447.7)
+    0.27922007457420
+    '''
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta2*delta2
+    delta5 = delta*delta4
+    tau_inv = 1.0/tau
+    taurt2 = sqrt(tau)
+    tau_invrt2 = 1.0/taurt2
+    tau_invrt4 = sqrt(tau_invrt2)
+    tau2 = tau*tau
+    tau3 = tau*tau2
+    tau6 = tau3*tau3
+    tau_inv_100 = tau_inv**0.01
+    tau_inv2_100 = tau_inv_100*tau_inv_100
+    tau_inv4_100 = tau_inv2_100*tau_inv2_100
+    tau_inv8_100 = tau_inv4_100*tau_inv4_100
+    tau_inv16_100 = tau_inv8_100*tau_inv8_100
+    tau_inv32_100 = tau_inv16_100*tau_inv16_100
+    tau_inv33_100 = tau_inv_100*tau_inv32_100
+    tau_inv66_100 = tau_inv33_100*tau_inv33_100
+    tau_inv132_100 = tau_inv66_100*tau_inv66_100
+    tau_inv140_100 = tau_inv8_100*tau_inv132_100
+    tau_inv198_100 = tau_inv66_100*tau_inv132_100
+    tau_inv41_100 = tau_inv8_100*tau_inv33_100
+    tau_inv82_100 = tau_inv41_100*tau_inv41_100
+    tau_inv164_100 = tau_inv82_100*tau_inv82_100
+    tau_inv40_100 = tau_inv8_100*tau_inv32_100
+    tau_inv44_100 = tau_inv4_100*tau_inv40_100
+    tau_inv88_100 = tau_inv44_100*tau_inv44_100
+    tau_inv264_100 = tau_inv132_100*tau_inv132_100
+    tau_inv265_100 = tau_inv_100*tau_inv264_100
+    tau_inv17_100 = tau_inv_100*tau_inv16_100
+    tau_inv281_100 = tau_inv17_100*tau_inv264_100
+    x0 = tau_inv132_100
+    x1 = exp(-delta)
+    x2 = exp(-delta3)
+    x3 = exp(-delta2)
+    return (delta*(-3.79267055785200036*delta2*tau3*x3 - 25.6287727514091017*delta2*tau6*x2*tau6 
+           + 0.0316570613050560015*delta2*tau_inv4_100*tau_inv281_100 - 0.0333722286662399906*delta2*tau_inv88_100*x0*x1
+           - 0.0121113569906496025*delta3*tau_inv140_100*tau_inv140_100 + 0.0131009040155243249*delta3*tau_inv265_100 
+           - 0.00235461462885836479*delta4*tau_inv41_100*x1*tau_inv164_100
+           + 0.00287164580280468724*delta5*tau_inv*tau_invrt2*tau_invrt4*x1 - 0.000050662474886000258*delta5*tau_inv33_100*x0 
+           + 0.00213520252489171874*delta5*x3*delta5/tau_invrt4 - 2.19592503506188796*tau_inv2_100*tau_inv4_100/tau_inv66_100*x3 
+           + 0.0389241745582079926*tau_inv140_100*x1 + 0.263308957262073706*tau_inv2_100*tau_inv265_100 
+           + 0.0161808009647793419*tau_inv_100*tau_inv198_100 + 0.194627858221124994*taurt2*x2))
