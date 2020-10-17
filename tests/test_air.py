@@ -32,6 +32,27 @@ from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspa
 from chemicals.air import TAU_MAX_EXP_87
 
 
+def func_vs_naive_tester(func, func_naive, T_min=1.0, T_max=5000.0, rho_min=1e-5, rho_max=50000.0, N=400, Tc=132.6312, rhoc=10447.7):
+    errs = []
+    rerr = 0
+    Ts = linspace(T_min,  T_max, N)
+    rhoc_inv = 1.0/rhoc
+    for i, T in enumerate(Ts):
+        tau = Tc/T
+        rhos = logspace(log10(rho_min), log10(rho_max), N)
+        for rho in rhos:
+            delta = rho*rhoc_inv
+            val = func(tau, delta)
+            val_naive = func_naive(tau, delta)
+            rerri = abs(1.0 - val/val_naive)
+            rerr += rerri
+            errs.append(rerri)
+    AARD, std, max_err = rerr/N**2, np.std(errs), np.max(errs)
+    return AARD, std, max_err 
+
+
+
+
 def test_lemmon2000_A0():
     assert_close(lemmon2000_air_A0(0.36842, 0.5), -17.026123512818458, rtol=1e-15)
     
@@ -88,10 +109,6 @@ def test_lemmon2000_air_d4A0_dtau4():
                      lemmon2000_air_d4A0_dtau4(rat, .5))
         
     
-def test_lemmon2000_air_Ar():
-    assert_close(lemmon2000_air_Ar(0.36842, 0.15880050154579475), 0.004798812280624336, rtol=1e-13)
-    
-    
 # Naive functions
 def lemmon2000_air_Ar_naive(tau, delta):
     return 0.000233594806141999996*delta**11*tau**3.25*exp(-delta**2) - 0.0122523554252999996*delta**6*tau**1.25*exp(-delta) + 0.000164957183186000006*delta**6*tau**1.35000000000000009 - 0.0472103183731000034*delta**5*tau**0.949999999999999956*exp(-delta) - 0.042053322884200002*delta**4*tau**0.200000000000000011 + 0.0349008431981999989*delta**4*tau**0.349999999999999978 + 0.0112626704218000001*delta**4 + 0.134211176704000013*delta**3*tau**0.149999999999999994 - 0.17381369096999999*delta**3*tau**0.800000000000000044*exp(-delta) - 0.00938782884667000057*delta**3*tau**15*exp(-delta**3) - 0.031605587982100003*delta**3*tau**6*exp(-delta**2) - 0.0865421396646000041*delta**3 + 0.0714140178971000017*delta**2 + 0.713116392079000017*delta*tau**0.330000000000000016 - 1.61824192067000006*delta*tau**1.01000000000000001 - 0.101365037911999994*delta*tau**1.60000000000000009*exp(-delta) + 0.0148287891978000005*delta*tau**3.5*exp(-delta**3) - 0.146629609712999986*delta*tau**3.60000000000000009*exp(-delta**2) + 0.118160747228999996*delta
@@ -141,3 +158,16 @@ def lemmon2000_air_d4Ar_dddeltadtau3_naive(tau, delta):
 
 def lemmon2000_air_d4Ar_dddelta3dtau_naive(tau, delta):
     return -0.00607346495969200012*delta**14*tau**2.25*exp(-delta**2) + 0.109322369274456002*delta**12*tau**2.25*exp(-delta**2) - 0.551166945092048999*delta**10*tau**2.25*exp(-delta**2) + 3.80207068290135108*delta**9*tau**14*exp(-delta**3) + 0.751591288761884857*delta**8*tau**2.25*exp(-delta**2) - 1.40132057919210018*delta**7*tau**2.5*exp(-delta**3) + 0.0153154442816249986*delta**6*tau**0.25*exp(-delta) - 19.0103534145067528*delta**6*tau**14*exp(-delta**3) + 1.51706822314080014*delta**6*tau**5*exp(-delta**2) + 0.0448498024544450036*delta**5*tau**(-0.0500000000000000444)*exp(-delta) - 0.275677997069250003*delta**5*tau**0.25*exp(-delta) - 0.672747036816675026*delta**4*tau**(-0.0500000000000000444)*exp(-delta) + 1.37838998534625001*delta**4*tau**0.25*exp(-delta) - 9.10240933884480086*delta**4*tau**5*exp(-delta**2) + 4.20396173757630098*delta**4*tau**2.5*exp(-delta**3) + 4.22293275973439997*delta**4*tau**2.60000000000000009*exp(-delta**2) + 0.139050952775999992*delta**3*tau**(-0.199999999999999956)*exp(-delta) + 2.6909881472667001*delta**3*tau**(-0.0500000000000000444)*exp(-delta) - 1.83785331379500017*delta**3*tau**0.25*exp(-delta) + 0.0267230636761320028*delta**3*tau**0.350000000000000089 + 16.053187327805702*delta**3*tau**14*exp(-delta**3) - 1.25145857498399993*delta**2*tau**(-0.199999999999999956)*exp(-delta) - 2.6909881472667001*delta**2*tau**(-0.0500000000000000444)*exp(-delta) + 10.2402105062004019*delta**2*tau**5*exp(-delta**2) - 12.6687982792031999*delta**2*tau**2.60000000000000009*exp(-delta**2) - 0.201855949844160026*delta*tau**(-0.800000000000000044) + 0.293167082864879969*delta*tau**(-0.650000000000000022) + 2.50291714996799985*delta*tau**(-0.199999999999999956)*exp(-delta) + 0.162184060659199991*delta*tau**0.600000000000000089*exp(-delta) - 1.24561829261519996*delta*tau**2.5*exp(-delta**3) + 0.120790059033600003*tau**(-0.849999999999999978) - 0.834305716655999952*tau**(-0.199999999999999956)*exp(-delta) - 0.486552181977599973*tau**0.600000000000000089*exp(-delta) - 0.844904596200300118*tau**14*exp(-delta**3) - 1.13780116735560011*tau**5*exp(-delta**2) + 3.16719956980079997*tau**2.60000000000000009*exp(-delta**2)
+
+def test_lemmon2000_air_Ar():
+    assert_close(lemmon2000_air_Ar(0.36842, 0.15880050154579475), 0.004798812280624336, rtol=1e-13)
+    
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_lemmon2000_air_Ar_vs_naive():
+    AARD, std, max_err = func_vs_naive_tester(lemmon2000_air_Ar, lemmon2000_air_Ar_naive, N=100)
+    assert AARD < 1e-13
+    # If enough points happen, can find some pretty big discrepancie
+    assert max_err < 1e-8
+#    print(AARD, std, max_err)
+
