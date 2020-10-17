@@ -377,7 +377,7 @@ def lemmon2000_air_dAr_dtau(tau, delta):
 
     Notes
     -----
-    The cost of this function is 1 power, 3 exp, 2 sqrt, 2 divisions
+    The cost of this function is 1 power, 3 exp, 2 sqrt, 1 divisions
     and the necessary adds/multiplies.
             
     Examples
@@ -390,7 +390,6 @@ def lemmon2000_air_dAr_dtau(tau, delta):
     delta4 = delta2*delta2
     delta5 = delta*delta4
     delta6 = delta2*delta4
-    tau_inv = 1.0/tau
     taurt2 = sqrt(tau)
     taurt4 = sqrt(taurt2)
     tau2 = tau*tau
@@ -419,7 +418,6 @@ def lemmon2000_air_dAr_dtau(tau, delta):
     tau_inv64_100 = tau_inv32_100*tau_inv32_100
     tau_inv65_100 = tau_inv_100*tau_inv64_100
     tau_inv80_100 = tau_inv16_100*tau_inv64_100
-    tau_inv10_100 = tau_inv5_100*tau_inv5_100
     x0 = exp(-delta2)
     x1 = exp(-delta)
     x2 = delta6*taurt4
@@ -489,8 +487,6 @@ def lemmon2000_air_d2Ar_dtau2(tau, delta):
     tau_inv165_100 = tau_inv66_100*tau_inv99_100
     tau_inv20_100 = tau_inv4_100*tau_inv16_100
     tau_inv160_100 = tau_inv80_100*tau_inv80_100
-    tau_inv24_100 = tau_inv8_100*tau_inv16_100
-    tau_inv104_100 = tau_inv24_100*tau_inv80_100
     x0 = exp(-delta)
     x1 = tau_inv40_100*x0
     x2 = exp(-delta2)
@@ -630,8 +626,6 @@ def lemmon2000_air_d4Ar_dtau4(tau, delta):
     tau_inv264_100 = tau_inv8_100*tau_inv256_100
     tau_inv265_100 = tau_inv_100*tau_inv264_100
     tau_inv34_100 = tau_inv2_100*tau_inv32_100
-    tau_inv66_100 = tau_inv32_100*tau_inv34_100
-    tau_inv132_100 = tau_inv66_100*tau_inv66_100
     tau_inv304_100 = tau_inv64_100*tau_inv240_100
     tau_inv320_100 = tau_inv64_100*tau_inv256_100
     tau_inv9_100 = tau_inv_100*tau_inv8_100
