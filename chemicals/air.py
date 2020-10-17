@@ -27,8 +27,8 @@ SOFTWARE.
 
 """
 from __future__ import division
-from fluids.numerics import trunc_exp
 from math import exp, log, sqrt
+
 __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d2A0_dtau2', 'lemmon2000_air_d3A0_dtau3',
            'lemmon2000_air_d4A0_dtau4',
@@ -37,9 +37,9 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d4Ar_dtau4',
            'lemmon2000_air_dAr_ddelta', 'lemmon2000_air_d2Ar_ddelta2',
            'lemmon2000_air_d3Ar_ddelta3', 'lemmon2000_air_d4Ar_ddelta4',
-           'lemmon2000_air_d2Ar_ddeltadtau']
+           'lemmon2000_air_d2Ar_ddeltadtau', 'lemmon2000_air_d3Ar_ddeltadtau2']
 
-# Get a good, fast variant of lemmon (2004) in here
+# Get a good, fast variant of lemmon (2000) in here
 
 # For values of tau above this, log(exp(87.31279*tau) + 2/3) reduces to 87.31279*tau in double precision
 TAU_MAX_EXP_87 = 0.4207493606569795
@@ -1008,7 +1008,7 @@ def lemmon2000_air_d2Ar_ddeltadtau(tau, delta):
     -------
     d2Ar_ddeltadtau : float
         Second derivative of residual dimensionless Helmholtz energy Ar/(RT)
-        with respect to `delta` and `delta`, [-]
+        with respect to `delta` and `tau`, [-]
 
     Notes
     -----
@@ -1082,3 +1082,86 @@ def lemmon2000_air_d2Ar_ddeltadtau(tau, delta):
             - 0.00151836623992300003*delta6*x11*x12 + 0.0153154442816249986*delta6*x9 
             - 1.63442433987669999*tau_100 + 0.235328409386070025*tau_inv2_100*tau_inv65_100 
             - 0.527866594966799996*x1 + 0.0519007621922999984*x10 - x3)
+
+def lemmon2000_air_d3Ar_ddeltadtau2(tau, delta):
+    r'''Calculates the third derivative of residual Helmholtz energy of air 
+    with respect to `delta` and `tau` according to Lemmon (2000).
+    
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (132.6312 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
+
+    Returns
+    -------
+    d3Ar_ddeltadtau2 : float
+        Third derivative of residual dimensionless Helmholtz energy Ar/(RT)
+        with respect to `delta` once and `tau` twice, [-]
+
+    Notes
+    -----
+    The cost of this function is 1 power, 3 exp, 2 sqrt, 3 divisions,
+    and the necessary adds/multiplies.
+            
+    Examples
+    --------
+    >>> lemmon2000_air_d3Ar_ddeltadtau2(132.6312/200.0, 13000/10447.7)
+    -0.19089212184849
+    '''
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta2*delta2
+    delta5 = delta*delta4
+    delta6 = delta2*delta4
+    taurt2 = sqrt(tau)
+    taurt4 = sqrt(taurt2)
+    tau_invrt2 = 1.0/taurt2
+    tau_invrt4 = 1.0/taurt4
+    tau2 = tau*tau
+    tau4 = tau2*tau2
+    tau8 = tau4*tau4
+    tau12 = tau4*tau8
+    tau13 = tau*tau12
+    tau_inv_100 = tau**-0.01
+    tau_inv2_100 = tau_inv_100*tau_inv_100
+    tau_inv4_100 = tau_inv2_100*tau_inv2_100
+    tau_inv8_100 = tau_inv4_100*tau_inv4_100
+    tau_inv16_100 = tau_inv8_100*tau_inv8_100
+    tau_inv32_100 = tau_inv16_100*tau_inv16_100
+    tau_inv40_100 = tau_inv8_100*tau_inv32_100
+    tau_inv33_100 = tau_inv_100*tau_inv32_100
+    tau_inv65_100 = tau_inv32_100*tau_inv33_100
+    tau_inv66_100 = tau_inv33_100*tau_inv33_100
+    tau_inv99_100 = tau_inv33_100*tau_inv66_100
+    tau_inv105_100 = tau_inv40_100*tau_inv65_100
+    tau_inv80_100 = tau_inv40_100*tau_inv40_100
+    tau_inv120_100 = tau_inv40_100*tau_inv80_100
+    tau_inv165_100 = tau_inv66_100*tau_inv99_100
+    tau_inv20_100 = tau_inv4_100*tau_inv16_100
+    tau_inv160_100 = tau_inv80_100*tau_inv80_100
+    tau_inv24_100 = tau_inv8_100*tau_inv16_100
+    tau_inv104_100 = tau_inv24_100*tau_inv80_100
+    x0 = exp(-delta)
+    x1 = 0.0973104363955200058*tau_inv40_100*x0
+    x2 = exp(-delta3)
+    x3 = 5.9143321734021006*tau13*x2
+    x4 = exp(-delta2)
+    x5 = tau4*x4
+    x6 = tau_inv120_100*x0
+    x7 = tau_inv105_100*x0
+    x8 = tau*taurt2*x2
+    x9 = x4/tau_inv160_100
+    x10 = tau_invrt2*tau_invrt4*x0
+    x11 = tau*taurt4*x4
+    return (delta*x1 - 0.0513357750892800002*delta2*tau_inv80_100*tau_inv105_100 - delta2*x3
+            - 2.84450291838900027*delta2*x5 + 0.083430571665599973*delta2*x6 + 2.74490629382736007*delta2*x9
+            - 0.0317597673103620012*delta3*tau_inv165_100 + 0.0269141266458880063*delta3*tau_inv20_100*tau_inv160_100 
+            - 0.0278101905551999921*delta3*x6 - 0.389255716442249988*delta3*x8 
+            + 0.0187897822190471221*delta4*x11*delta6 + 1.89633527892600018*delta4*x5 +
+            0.0112124506136112596*delta4*x7 + 0.000467653614332310178*delta5*tau_inv65_100
+            - 0.0229731664224375014*delta5*x10 + delta5*x3 - 0.00224249012272225226*delta5*x7 
+            + 0.00382886107040624965*delta6*x10 - 0.00341632403982675007*delta6*x11*delta6 
+            - 0.15767003428866691*tau_inv2_100*tau_inv165_100 - 0.0163442433987670138*tau_inv99_100 
+            - x1 + 0.129751905480749996*x8 - 1.37245314691368003*x9)
