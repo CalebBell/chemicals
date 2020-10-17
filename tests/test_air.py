@@ -77,3 +77,15 @@ def test_lemmon2000_air_d3A0_dtau3():
         assert_close(derivative(lambda tau: lemmon2000_air_d2A0_dtau2(tau, .5), rat, dx=rat*1e-5),
                      lemmon2000_air_d3A0_dtau3(rat, .5))
     
+def test_lemmon2000_air_d4A0_dtau4():
+    assert_close(lemmon2000_air_d4A0_dtau4(126.192/200.0, 13000/11183.9), -94.8155327278803, rtol=1e-13)
+    
+    assert_close(derivative(lambda tau: lemmon2000_air_d3A0_dtau3(tau, .5), 0.36842, dx=4e-7),
+                 lemmon2000_air_d4A0_dtau4(0.36842, .5))
+
+    # 1000.0, 100.0, 10.0, 5.0, 3.0,2.5, 2.0,
+    for rat in (  1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda tau: lemmon2000_air_d3A0_dtau3(tau, .5), rat, dx=rat*1e-5),
+                     lemmon2000_air_d4A0_dtau4(rat, .5))
+        
+    

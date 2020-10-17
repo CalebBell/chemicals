@@ -30,7 +30,8 @@ from __future__ import division
 from fluids.numerics import trunc_exp
 from math import exp, log, sqrt
 __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
-           'lemmon2000_air_d2A0_dtau2', 'lemmon2000_air_d3A0_dtau3']
+           'lemmon2000_air_d2A0_dtau2', 'lemmon2000_air_d3A0_dtau3',
+           'lemmon2000_air_d4A0_dtau4']
 
 # Get a good, fast variant of lemmon (2004) in here
 
@@ -203,7 +204,7 @@ def lemmon2000_air_d3A0_dtau3(tau, delta):
     19.869037005427806
     '''
     tau_inv = 1.0/tau
-    d3A0_dtau3 = (tau_inv*(0.0000732612824999999982*sqrt(tau_inv) + tau_inv*(-tau_inv*(tau_inv*(
+    d3A0_dtau3 = (tau_inv*(0.0000732612825*sqrt(tau_inv) + tau_inv*(-tau_inv*(tau_inv*(
             3.6343164e-6*tau_inv - 0.0005046594456) - 0.000953164296) + 4.981776064)*tau_inv))
     d3A0_dtau3_base = d3A0_dtau3
     
@@ -227,3 +228,50 @@ def lemmon2000_air_d3A0_dtau3(tau, delta):
                         + 3077.32334244827462/(-2.0*x0 
                         + x3 + 1.0)  + 1025.77444748275821/(x0 - 1.0))
     return d3A0_dtau3
+
+def lemmon2000_air_d4A0_dtau4(tau, delta):
+    r'''Calculates the fourth temperature derivative of ideal gas Helmholtz
+    energy of air according to Lemmon (2000).
+    
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (126.192 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(11183.9 mol/m^3), [-]
+
+    Returns
+    -------
+    d4A0_dtau4 : float
+        Fourth derivative of `A0/RT` Ideal gas dimensionless Helmholtz energy
+         with respect to `tau` [-]
+
+    Notes
+    -----
+            
+    Examples
+    --------
+    >>> lemmon2000_air_d4A0_dtau4(126.192/200.0, 13000/11183.9)
+    -94.8155327278803
+    '''
+    tau_inv = 1.0/tau
+    tau_inv2 = tau_inv*tau_inv
+    x0 = exp(16.90741*tau)
+    x1 = exp(25.36365*tau)
+    x2 = exp(87.31279*tau)
+    x3 = exp(33.81482*tau)
+    x4 = exp(50.7273*tau)
+    x5 = exp(174.62558*tau)
+    x6 = exp(50.72223*tau)
+    x7 = exp(76.09095*tau)
+    x8 = exp(261.93837*tau)
+    x9 = exp(349.25116*tau)
+    d4A0_dtau4 = (-tau_inv2*(0.00010989192375*sqrt(tau_inv) - tau_inv2*(tau_inv*(
+            tau_inv*(0.0000218058983999999983*tau_inv - 0.002523297228)
+            - 0.003812657184) - 14.945328192)))
+    
+    d4A0_dtau4 += (-11503834.4949299842*x2/(x2 + 2.0/3.0)
+    + 80526841.4645098895*x5/((4.0/3.0)*x2 + x5 + (4.0/9.0)) 
+    - 138046013.939159811*x8/((4.0/3.0)*x2 + 2.0*x5 + x8 + 0.296296296296296668)
+    + 69023006.9695799053*x9/(1.18518518518518667*x2 + (8.0/3.0)*(x5 +x8) + x9 + 0.197530864197531214) - 1964918.95144730341/(6.0*x4 - 4.0*x7 - 4.0*exp(25.36365*tau) + exp(101.4546*tau) + 1.0) - 104059.134906686755/(-4.0*x0 + 6.0*x3 - 4.0*x6 + exp(67.62964*tau) + 1.0) - 3929837.90289460681/(x7 + 3.0*exp(25.36365*tau) - 3.0*exp(50.7273*tau) - 1.0) - 208118.26981337351/(3.0*x0 - 3.0*x3 + x6 - 1.0) - 2292405.44335518777/(-2.0*x1 + x4 + 1.0) - 121402.324057801219/(-2.0*x0 + x3 + 1.0) - 327486.491907883901/(x1 - 1.0) - 17343.1891511144604/(x0 - 1.0))
+    return d4A0_dtau4
