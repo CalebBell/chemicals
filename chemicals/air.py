@@ -37,7 +37,8 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d4Ar_dtau4',
            'lemmon2000_air_dAr_ddelta', 'lemmon2000_air_d2Ar_ddelta2',
            'lemmon2000_air_d3Ar_ddelta3', 'lemmon2000_air_d4Ar_ddelta4',
-           'lemmon2000_air_d2Ar_ddeltadtau', 'lemmon2000_air_d3Ar_ddeltadtau2']
+           'lemmon2000_air_d2Ar_ddeltadtau', 'lemmon2000_air_d3Ar_ddeltadtau2',
+           'lemmon2000_air_d3Ar_ddelta2dtau']
 
 # Get a good, fast variant of lemmon (2000) in here
 
@@ -1085,7 +1086,7 @@ def lemmon2000_air_d2Ar_ddeltadtau(tau, delta):
 
 def lemmon2000_air_d3Ar_ddeltadtau2(tau, delta):
     r'''Calculates the third derivative of residual Helmholtz energy of air 
-    with respect to `delta` and `tau` according to Lemmon (2000).
+    with respect to `delta` once and `tau` twice according to Lemmon (2000).
     
     Parameters
     ----------
@@ -1165,3 +1166,85 @@ def lemmon2000_air_d3Ar_ddeltadtau2(tau, delta):
             + 0.00382886107040624965*delta6*x10 - 0.00341632403982675007*delta6*x11*delta6 
             - 0.15767003428866691*tau_inv2_100*tau_inv165_100 - 0.0163442433987670138*tau_inv99_100 
             - x1 + 0.129751905480749996*x8 - 1.37245314691368003*x9)
+
+def lemmon2000_air_d3Ar_ddelta2dtau(tau, delta):
+    r'''Calculates the third derivative of residual Helmholtz energy of air 
+    with respect to `delta` twice and `tau` once according to Lemmon (2000).
+    
+    Parameters
+    ----------
+    tau : float
+        Dimensionless temperature, (132.6312 K)/T [-]
+    delta : float
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
+
+    Returns
+    -------
+    d3Ar_ddelta2dtau : float
+        Third derivative of residual dimensionless Helmholtz energy Ar/(RT)
+        with respect to `delta` twice and `once` twice, [-]
+
+    Notes
+    -----
+    The cost of this function is 1 power, 3 exp, 2 sqrt, 3 divisions,
+    and the necessary adds/multiplies.
+            
+    Examples
+    --------
+    >>> lemmon2000_air_d3Ar_ddelta2dtau(132.6312/200.0, 13000/10447.7)
+    0.01441788198940
+    '''
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta2*delta2
+    delta5 = delta*delta4
+    delta6 = delta2*delta4
+    delta7 = delta*delta6
+    taurt2 = sqrt(tau)
+    taurt4 = sqrt(taurt2)
+    tau2 = tau*tau
+    tau4 = tau2*tau2
+    tau5 = tau*tau4
+    tau10 = tau5*tau5
+    tau14 = tau4*tau10
+    tau_20 = tau**0.05
+    tau2_20 = tau_20*tau_20
+    tau4_20 = tau2_20*tau2_20
+    tau6_20 = tau2_20*tau4_20
+    tau12_20 = tau6_20*tau6_20
+    tau24_20 = tau12_20*tau12_20
+    tau48_20 = tau24_20*tau24_20
+    tau52_20 = tau4_20*tau48_20
+    tau_inv_20 = 1.0/tau_20
+    tau_inv2_20 = tau_inv_20*tau_inv_20
+    tau_inv4_20 = tau_inv2_20*tau_inv2_20
+    tau_inv8_20 = tau_inv4_20*tau_inv4_20
+    tau_inv12_20 = tau_inv4_20*tau_inv8_20
+    tau_inv16_20 = tau_inv8_20*tau_inv8_20
+    x0 = exp(-delta)
+    x1 = tau12_20*x0
+    x2 = exp(-delta3)
+    x3 = tau14*x2
+    x4 = exp(-delta2)
+    x5 = tau5*x4
+    x6 = tau52_20*x4
+    x7 = tau_inv4_20*x0
+    x8 = 0.834305716655999952*x7
+    x9 = tau_inv_20*x0
+    x10 = taurt4*x0
+    x11 = tau2*taurt2*x2
+    x12 = tau2*taurt4*x4
+    x13 = delta4*x12
+    x14 = delta7
+    return (0.120790059033600003*delta*tau_inv_20*tau_inv16_20 - 0.162184060659199991*delta*x1
+            - 0.844904596200300118*delta*x3 - 1.13780116735560011*delta*x5 + 3.16719956980079997*delta*x6
+            - delta*x8 - 0.100927974922080013*delta2*tau_inv16_20
+            + 0.146583541432439984*delta2*tau_inv_20*tau_inv12_20 - 0.622809146307599981*delta2*x11
+            + delta2*x8 + 2.65486939049640025*delta3*x5 - 2.11146637986719998*delta3*x6
+            - 0.139050952775999992*delta3*x7 - 0.89699604908889996*delta3*x9
+            + 0.00668076591903300071*delta4*tau_20*tau6_20 - 0.459463328448750041*delta4*x10 
+            + 3.37961838480120047*delta4*x3 + 0.44849802454444998*delta4*x9 + 0.183785331379500011*delta5*x10
+            + 0.467106859730700041*delta5*x11 - 0.758534111570400071*delta5*x5 - 0.0448498024544450036*delta5*x9
+            - 0.0153154442816249986*delta6*x10 + 0.00303673247984600006*delta6*x12*x14 
+            - 1.26735689430045029*delta7*x3 + 0.324368121318399982*x1 - 0.0349224235182290024*x13*x14 
+            + 0.0835101431957649964*x13*delta5)
