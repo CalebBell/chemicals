@@ -54,6 +54,7 @@ from . import rachford_rice
 from . import flash_basic
 from . import safety
 from . import iapws
+from . import air
 
 from .utils import *
 from .critical import *
@@ -85,13 +86,14 @@ from .rachford_rice import *
 from .flash_basic import *
 from .safety import *
 from .iapws import *
+from .air import *
 __all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr', 
            'temperature', 'miscdata', 'environment', 'refractivity', 'solubility', 
            'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial', 
            'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity', 
            'interface', 'permittivity', 'thermal_conductivity', 'combustion',
            'volume', 'rachford_rice', 'flash_basic', 'identifiers', 'safety',
-           'iapws']
+           'iapws', 'air']
 
 __all__.extend(exceptions.__all__)
 __all__.extend(critical.__all__)
@@ -123,6 +125,7 @@ __all__.extend(flash_basic.__all__)
 __all__.extend(identifiers.__all__)
 __all__.extend(safety.__all__)
 __all__.extend(iapws.__all__)
+__all__.extend(air.__all__)
 
 
 submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata, 
@@ -130,7 +133,7 @@ submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
               vapor_pressure, virial, phase_change, triple, acentric, viscosity,
               interface, permittivity, thermal_conductivity, combustion,
               heat_capacity, reaction, volume, rachford_rice, flash_basic, identifiers, safety,
-              iapws]
+              iapws, air]
 
 
 chemicals_dir = utils.source_path
