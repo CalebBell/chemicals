@@ -51,9 +51,9 @@ def lemmon2000_air_A0(tau, delta):
     Parameters
     ----------
     tau : float
-        Dimensionless temperature, (126.192 K)/T [-]
+        Dimensionless temperature, (132.6312 K)/T [-]
     delta : float
-        Dimensionless density, rho/(11183.9 mol/m^3), [-]
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
 
     Returns
     -------
@@ -65,8 +65,8 @@ def lemmon2000_air_A0(tau, delta):
             
     Examples
     --------
-    >>> lemmon2000_air_A0(126.192/200.0, 13000/11183.9)
-    -14.843572915952736
+    >>> lemmon2000_air_A0(132.6312/200.0, 13000/10447.7)
+    -14.65173785639
     '''
     tau_inv = 1.0/tau
     
@@ -91,9 +91,9 @@ def lemmon2000_air_dA0_dtau(tau, delta):
     Parameters
     ----------
     tau : float
-        Dimensionless temperature, (126.192 K)/T [-]
+        Dimensionless temperature, (132.6312 K)/T [-]
     delta : float
-        Dimensionless density, rho/(11183.9 mol/m^3), [-]
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
 
     Returns
     -------
@@ -106,8 +106,8 @@ def lemmon2000_air_dA0_dtau(tau, delta):
             
     Examples
     --------
-    >>> lemmon2000_air_dA0_dtau(126.192/200.0, 13000/11183.9)
-    3.940861816141846
+    >>> lemmon2000_air_dA0_dtau(132.6312/200.0, 13000/10447.7)
+    3.749095669249
     '''
     tau_inv = 1.0/tau
     dA0_dtau = (-0.00029304513*sqrt(tau) + tau_inv*(-tau_inv*(tau_inv*(1.8171582e-7*tau_inv 
@@ -139,7 +139,7 @@ def lemmon2000_air_d2A0_dtau2(tau, delta):
     tau : float
         Dimensionless temperature, (126.192 K)/T [-]
     delta : float
-        Dimensionless density, rho/(11183.9 mol/m^3), [-]
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
 
     Returns
     -------
@@ -152,8 +152,8 @@ def lemmon2000_air_d2A0_dtau2(tau, delta):
             
     Examples
     --------
-    >>> lemmon2000_air_d2A0_dtau2(126.192/200.0, 13000/11183.9)
-    -6.260482844274295
+    >>> lemmon2000_air_d2A0_dtau2(132.6312/200.0, 13000/10447.7)
+    -5.66675499015
     '''
     tau_inv = 1.0/tau
     d2A0_dtau2 = (-0.000146522565*sqrt(tau_inv) + tau_inv*(tau_inv*(tau_inv*(
@@ -188,7 +188,7 @@ def lemmon2000_air_d3A0_dtau3(tau, delta):
     tau : float
         Dimensionless temperature, (126.192 K)/T [-]
     delta : float
-        Dimensionless density, rho/(11183.9 mol/m^3), [-]
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
 
     Returns
     -------
@@ -201,8 +201,8 @@ def lemmon2000_air_d3A0_dtau3(tau, delta):
             
     Examples
     --------
-    >>> lemmon2000_air_d3A0_dtau3(126.192/200.0, 13000/11183.9)
-    19.869037005427806
+    >>> lemmon2000_air_d3A0_dtau3(132.6312/200.0, 13000/10447.7)
+    17.10538866838
     '''
     tau_inv = 1.0/tau
     d3A0_dtau3 = (tau_inv*(0.0000732612825*sqrt(tau_inv) + tau_inv*(-tau_inv*(tau_inv*(
@@ -237,9 +237,9 @@ def lemmon2000_air_d4A0_dtau4(tau, delta):
     Parameters
     ----------
     tau : float
-        Dimensionless temperature, (126.192 K)/T [-]
+        Dimensionless temperature, (132.6312 K)/T [-]
     delta : float
-        Dimensionless density, rho/(11183.9 mol/m^3), [-]
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
 
     Returns
     -------
@@ -252,8 +252,8 @@ def lemmon2000_air_d4A0_dtau4(tau, delta):
             
     Examples
     --------
-    >>> lemmon2000_air_d4A0_dtau4(126.192/200.0, 13000/11183.9)
-    -94.8155327278803
+    >>> lemmon2000_air_d4A0_dtau4(126.192/200.0, 13000/10447.7)
+    -94.815532727
     '''
     tau_inv = 1.0/tau
     tau_inv2 = tau_inv*tau_inv
@@ -293,9 +293,9 @@ def lemmon2000_air_Ar(tau, delta):
     Parameters
     ----------
     tau : float
-        Dimensionless temperature, (126.192 K)/T [-]
+        Dimensionless temperature, (132.6312 K)/T [-]
     delta : float
-        Dimensionless density, rho/(11183.9 mol/m^3), [-]
+        Dimensionless density, rho/(10447.7 mol/m^3), [-]
 
     Returns
     -------
@@ -307,10 +307,10 @@ def lemmon2000_air_Ar(tau, delta):
             
     Examples
     --------
-    >>> lemmon2000_air_Ar(126.192/200.0, 13000/11183.9)
-    -0.2803982072745575
+    >>> lemmon2000_air_Ar(132.6312/200.0, 13000/10447.7)
+    -0.34683017661
     >>> lemmon2000_air_Ar(0.36842, 0.15880050154579475)
-    0.00479881228062413
+    0.0047988122806
     '''
     tau_100 = tau**0.01
     delta2 = delta*delta
