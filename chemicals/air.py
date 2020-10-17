@@ -462,7 +462,7 @@ def lemmon2000_air_d2Ar_dtau2(tau, delta):
     Examples
     --------
     >>> lemmon2000_air_d2Ar_dtau2(132.6312/200.0, 13000/10447.7)
-    -0.7632109061747537
+    -0.7632109061747
     '''
     delta2 = delta*delta
     delta3 = delta*delta2
@@ -682,7 +682,7 @@ def lemmon2000_air_dAr_ddelta(tau, delta):
     Examples
     --------
     >>> lemmon2000_air_dAr_ddelta(132.6312/200.0, 13000/10447.7)
-    -1.8112257495223263
+    -0.1367917666005
     '''
     delta2 = delta*delta
     delta3 = delta*delta2
