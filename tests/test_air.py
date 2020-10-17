@@ -165,36 +165,80 @@ def test_lemmon2000_air_Ar():
 def test_lemmon2000_air_dAr_dtau():
     assert_close(lemmon2000_air_dAr_dtau(0.36842, 0.15880050154579475),  -0.20189573196786642, rtol=1e-13)
 
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda tau: lemmon2000_air_Ar(tau, .5), rat, dx=rat*1e-5),
+                     lemmon2000_air_dAr_dtau(rat, .5))
+
 def test_lemmon2000_air_d2Ar_dtau2():
     assert_close(lemmon2000_air_d2Ar_dtau2(132.6312/200.0, 13000/10447.7), -0.7632109061747537, rtol=1e-14)
+
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda tau: lemmon2000_air_dAr_dtau(tau, .5), rat, dx=rat*1e-5),
+                     lemmon2000_air_d2Ar_dtau2(rat, .5))
 
 def test_lemmon2000_air_d3Ar_dtau3():
     assert_close(lemmon2000_air_d3Ar_dtau3(132.6312/200.0, 13000/10447.7), 0.27922007457420017, rtol=1e-13)
 
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda tau: lemmon2000_air_d2Ar_dtau2(tau, .5), rat, dx=rat*1e-5),
+                     lemmon2000_air_d3Ar_dtau3(rat, .5))
+
 def test_lemmon2000_air_d4Ar_dtau4():
     assert_close(lemmon2000_air_d4Ar_dtau4(132.6312/200.0, 13000/10447.7), -8.197368061417675, rtol=1e-14)
+
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda tau: lemmon2000_air_d3Ar_dtau3(tau, .5), rat, dx=rat*1e-5),
+                     lemmon2000_air_d4Ar_dtau4(rat, .5))
 
 
 def test_lemmon2000_air_dAr_ddelta():
     assert_close(lemmon2000_air_dAr_ddelta(0.36842, 0.15880050154579475), 0.0428706712678839, rtol=1e-13)
 
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda delta: lemmon2000_air_Ar(.5, delta), rat, dx=rat*1e-5),
+                     lemmon2000_air_dAr_ddelta(.5, rat))
+
 def test_lemmon2000_air_d2Ar_ddelta2():
     assert_close(lemmon2000_air_d2Ar_ddelta2(0.36842, 0.15880050154579475),  0.15165011962677075, rtol=1e-13)
+
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda delta: lemmon2000_air_dAr_ddelta(.5, delta), rat, dx=rat*1e-5),
+                     lemmon2000_air_d2Ar_ddelta2(.5, rat))
 
 def test_lemmon2000_air_d3Ar_ddelta3():
     assert_close(lemmon2000_air_d3Ar_ddelta3(0.36842, 0.15880050154579475), -0.09682239073996685, rtol=1e-13)
 
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda delta: lemmon2000_air_d2Ar_ddelta2(.5, delta), rat, dx=rat*1e-5),
+                     lemmon2000_air_d3Ar_ddelta3(.5, rat))
+
 def test_lemmon2000_air_d4Ar_ddelta4():
     assert_close(lemmon2000_air_d4Ar_ddelta4(0.36842, 0.15880050154579475),  1.0647113576834495, rtol=1e-13)
+
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda delta: lemmon2000_air_d3Ar_ddelta3(.5, delta), rat, dx=rat*1e-5),
+                     lemmon2000_air_d4Ar_ddelta4(.5, rat))
 
 def test_lemmon2000_air_d2Ar_ddeltadtau():
     assert_close(lemmon2000_air_d2Ar_ddeltadtau(0.36842, 0.15880050154579475), -1.261887383081615, rtol=1e-13)
 
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda tau: lemmon2000_air_dAr_ddelta(tau, .5), rat, dx=rat*1e-5),
+                     lemmon2000_air_d2Ar_ddeltadtau(rat, .5))
+
 def test_lemmon2000_air_d3Ar_ddeltadtau2():
     assert_close(lemmon2000_air_d3Ar_ddeltadtau2(132.6312/200.0, 13000/10447.7), -0.19089212184849963, rtol=1e-13)
 
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda tau: lemmon2000_air_d2Ar_ddeltadtau(tau, .5), rat, dx=rat*1e-5),
+                     lemmon2000_air_d3Ar_ddeltadtau2(rat, .5))
+
 def test_lemmon2000_air_d3Ar_ddelta2dtau():
     assert_close(lemmon2000_air_d3Ar_ddelta2dtau(132.6312/200.0, 13000/10447.7), 0.014417881989408202, rtol=1e-13)
+
+    for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
+        assert_close(derivative(lambda tau: lemmon2000_air_d2Ar_ddelta2(tau, .5), rat, dx=rat*1e-5),
+                     lemmon2000_air_d3Ar_ddelta2dtau(rat, .5))
 
 @pytest.mark.slow
 @pytest.mark.fuzz
