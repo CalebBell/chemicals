@@ -39,7 +39,9 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d3Ar_ddelta3', 'lemmon2000_air_d4Ar_ddelta4',
            'lemmon2000_air_d2Ar_ddeltadtau', 'lemmon2000_air_d3Ar_ddeltadtau2',
            'lemmon2000_air_d3Ar_ddelta2dtau', 'lemmon2000_air_d4Ar_ddelta2dtau2',
-           'lemmon2000_air_d4Ar_ddeltadtau3', 'lemmon2000_air_d4Ar_ddelta3dtau']
+           'lemmon2000_air_d4Ar_ddeltadtau3', 'lemmon2000_air_d4Ar_ddelta3dtau',
+           'lemmon2000_air_rho_dew', 'lemmon2000_air_rho_bubble', 
+           'lemmon2000_air_P_dew', 'lemmon2000_air_P_bubble']
 
 # Get a good, fast variant of lemmon (2000) in here
 
@@ -1496,3 +1498,178 @@ def lemmon2000_air_d4Ar_ddelta3dtau(tau, delta):
             - 0.486552181977599973*x1 - 1.24561829261519996*x12 - 1.40132057919210018*x12*delta6 
             - 0.551166945092048999*x14*x15 - 0.00607346495969200012*x15*delta12 - 0.844904596200300118*x3
             - 1.13780116735560011*x5 + 3.16719956980079997*x6 - 0.834305716655999952*x7)
+
+
+def lemmon2000_air_rho_dew(T):
+    r'''Calculates the dew molar density of standard dry air according to Lemmon 
+    (2000).
+    
+    .. math::
+        \ln \left(\frac{\rho_{dew}}{\rho_j}  \right) = N_1\theta^{0.41}
+        + N_2\theta + N_3\theta^{2.8} + N_4\theta^{6.5}
+        
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    rho_dew : float
+        Dew point molar density, [mol/m^3]
+
+    Notes
+    -----
+    The stated range of this ancillary equation is 59.75 <= T <= 132.6312.
+
+    Examples
+    --------
+    >>> lemmon2000_air_rho_dew(100.0)
+    785.7863223794999
+    '''
+    if T < 59.75 or T > 132.6312:
+        raise ValueError("Outside limits")
+    Tj = 132.6312
+    Pj = 3.78502E6
+    rhoj = 10447.7
+    theta = 1.0 - T/Tj
+    
+    N1 = -2.0466
+    N2 = -4.7520
+    N3 = -13.259
+    N4 = -47.652
+    
+    tot = N1*theta**0.41 + N2*theta + N3*theta**2.8 + N4*theta**6.5
+    return exp(tot)*rhoj
+
+def lemmon2000_air_rho_bubble(T):
+    r'''Calculates the bubble molar density of standard dry air according to Lemmon 
+    (2000).
+    
+    .. math::
+         \left(\frac{\rho_{bubble}}{rho_j} -1 \right) = N_1\theta^{0.65}
+        + N_2\theta^{0.85} + N_3\theta^{0.95} + N_4\theta^{1.1}
+        + N_5\ln\frac{T}{T_j}
+        
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    rho_bubble : float
+        bubble point molar density, [mol/m^3]
+
+    Notes
+    -----
+    The stated range of this ancillary equation is 59.75 <= T <= 132.6312.
+
+    Examples
+    --------
+    >>> lemmon2000_air_rho_bubble(100.0)
+    26530.979020427476
+    '''
+    if T < 59.75 or T > 132.6312:
+        raise ValueError("Outside limits")
+    Tj = 132.6312
+    Pj = 3.78502E6
+    rhoj = 10447.7
+    
+    N1 = 44.3413
+    N2 = -240.073
+    N3 = 285.139
+    N4 = -88.3366
+    N5 = -0.892181
+
+    theta = 1.0 - T/Tj
+    
+    tot = N1*theta**0.65 + N2*theta**0.85 + N3*theta**0.95 + N4*theta**1.1 + N5*log(T/Tj)
+    tot += 1
+    tot *= rhoj
+    return tot
+
+def lemmon2000_air_P_dew(T):
+    r'''Calculates the dew pressure of standard dry air according to Lemmon 
+    (2000).
+    
+    .. math::
+        \ln \left(\frac{P_{dew}}{P_j}  \right) = \left(\frac{T_j}{T}  \right) 
+        \sum_{i}^8 N_i \theta^{i/2}
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    P_dew : float
+        Dew pressure, [Pa]
+
+    Notes
+    -----
+    The stated range of this ancillary equation is 59.75 <= T <= 132.6312.
+
+    Examples
+    --------
+    >>> lemmon2000_air_P_dew(100.0)
+    567424.1338937
+    '''
+    if T < 59.75 or T > 132.6312:
+        raise ValueError("Outside limits")
+    Tj = 132.6312
+    Pj = 3.78502E6
+    thetart = sqrt(1.0 - T/Tj)
+    thetart3 = thetart*thetart*thetart
+    tot = thetart*(thetart*(thetart3*(0.7567212 - 3.514322*thetart3) - 5.539635) - 0.1567266)
+#     Ns = [0.0, -0.1567266, -5.539635, 0, 0, 0.7567212, 0, 0, -3.514322]
+#     tot = 0.0
+#     for i in range(1, 9):
+#         tot += Ns[i]*theta**(i*0.5)
+    tot *= Tj/T
+    return exp(tot)*Pj
+
+def lemmon2000_air_P_bubble(T):
+    r'''Calculates the bubble pressure of standard dry air according to Lemmon 
+    (2000).
+    
+    .. math::
+        \ln \left(\frac{P_{bubble}}{P_j}  \right) = \left(\frac{T_j}{T}  \right) 
+        \sum_{i}^8 N_i \theta^{i/2}
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    P_bubble : float
+        Bubble pressure, [Pa]
+
+    Notes
+    -----
+    The stated range of this ancillary equation is 59.75 <= T <= 132.6312.
+
+    Examples
+    --------
+    >>> lemmon2000_air_P_bubble(100.0)
+    663128.589440
+    '''
+    if T < 59.75 or T > 132.6312:
+        raise ValueError("Outside limits")
+    Tj = 132.6312
+    Pj = 3.78502E6
+    
+#     theta = 1.0 - T/Tj
+#     Ns = [0.0, 0.2260724, -7.080499, 5.700283, -12.44017, 17.81926, -10.81364, 0.0, 0.0]
+#     tot = 0.0
+#     for i in range(1, 9):
+#         tot += Ns[i]*theta**(i*0.5)
+
+    thetart = sqrt(1.0 - T/Tj)
+    tot = thetart*(thetart*(thetart*(thetart*(thetart*(17.81926 - 10.81364*thetart) 
+                - 12.44017) + 5.700283) - 7.080499) + 0.2260724)
+    tot *= Tj/T
+    return exp(tot)*Pj

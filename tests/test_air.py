@@ -371,3 +371,16 @@ def test_lemmon2000_air_d4Ar_ddelta3dtau_vs_naive():
     assert AARD < 1e-13
     assert max_err < 1e-8
 
+
+def test_lemmon2000_air_rho_dew():
+    assert_close(lemmon2000_air_rho_dew(120), 2989.303928859551, rtol=1e-13)
+    
+def test_lemmon2000_air_rho_bubble():
+    assert_close(lemmon2000_air_rho_bubble(120), 21589.77853554958, rtol=1e-13)
+    
+    
+def test_lemmon2000_air_P_dew():
+    assert_close(lemmon2000_air_P_dew(100), 567424.1338937179, rtol=1e-14)
+    
+def test_lemmon2000_air_P_bubble():
+    assert_close(lemmon2000_air_P_bubble(100), 663128.5894402424, rtol=1e-14)
