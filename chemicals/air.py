@@ -46,7 +46,7 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_rho_reducing',
            
            'lemmon2000_air_MW', 'lemmon2000_air_P_max', 'lemmon2000_air_T_max',
-           'lemmon2000_rho'
+           'lemmon2000_rho', 'lemmon2000_P'
            ]
 
 # Get a good, fast variant of lemmon (2000) in here
@@ -1692,6 +1692,12 @@ def lemmon2000_air_P_bubble(T):
     return exp(tot)*Pj
 
 
+def lemmon2000_P(T, rho):
+    tau = lemmon2000_air_T_reducing/T
+    delta = rho*lemmon2000_air_rho_reducing_inv
+    dAddelta_res_val = lemmon2000_air_dAr_ddelta(tau, delta)
+    return (1.0 + dAddelta_res_val*delta)*rho*(lemmon2000_air_R*T)
+
 def lemmon2000_rho_err(rho, T, P_spec):
     # For solving for a rho (molar) while P is specified
     RT = lemmon2000_air_R*T
@@ -1706,6 +1712,7 @@ def lemmon2000_rho_err(rho, T, P_spec):
     derr = RT*(rho*(rho*d2Ad2delta_res_val + 2.0*lemmon2000_air_rho_reducing*dAddelta_res_val)
                 + lemmon2000_air_rho_reducing*lemmon2000_air_rho_reducing)/(lemmon2000_air_rho_reducing*lemmon2000_air_rho_reducing)
     return err, derr
+
 
 def lemmon2000_rho(T, P):
     a = 1e-20 # Value where error is always negative
