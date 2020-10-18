@@ -67,6 +67,7 @@ Gas Mixing Rules
 Correlations for Specific Substances
 ------------------------------------
 .. autofunction:: chemicals.viscosity.mu_IAPWS
+.. autofunction:: chemicals.viscosity.mu_air_lemmon
 
 Petroleum Correlations
 ----------------------
@@ -172,7 +173,7 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer', 
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
-'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS']
+'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon']
 
 from fluids.numerics import secant, interp, numpy as np
 from chemicals.utils import log, exp, sqrt, atan, tan, sin, acos
@@ -501,6 +502,124 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
         mu2 = 1.0
     mu = mu0*mu1*mu2*1e-6
     return mu
+
+
+def mu_air_lemmon(T, rho):
+    r'''Calculates and returns the viscosity of air according to Lemmon 
+    and Jacobsen (2003) [1]_.
+    
+    Viscosity is calculated as a function of two terms; 
+    the first is the dilute-gas limit; the second is the contribution due to
+    finite density.
+
+    .. math::
+        \mu = \mu^0(T) + \mu^r(T, \rho)
+        
+    .. math::
+        \mu^0(T) = \frac{0.9266958\sqrt{MT}}{\sigma^2 \Omega(T^*)}
+        
+    .. math::
+        \Omega(T^*) = \exp\left( \sum_{i=0}^4 b_i [\ln(T^*)]^i \right)
+        
+    .. math::
+        \mu^r = \sum_{i=1}^n N_i \tau^{t_i} \delta^{d_i} \exp\left( 
+        -\gamma_i \delta^{l_i}\right)
+
+    Parameters
+    ----------
+    T : float
+        Temperature of air [K]
+    rho : float
+        Molar density of air [mol/m^3]
+
+    Returns
+    -------
+    mu : float
+        Viscosity of air, [Pa*s]
+
+    Notes
+    -----
+    
+    The coefficients are:
+        
+    Ni = [10.72, 1.122, 0.002019, -8.876, -0.02916]
+    
+    ti = [0.2, 0.05, 2.4, 0.6, 3.6]
+    
+    di = [1, 4, 9, 1, 8]
+    
+    gammai = Ii = [0, 0, 0, 1, 1]
+    
+    bi = [.431, -0.4623, 0.08406, 0.005341, -0.00331]
+
+    The reducing parameters are :math:`T_c = 132.6312` K and 
+    :math:`\rho_c = 10447.7` mol/m^3. Additional parameters used are
+    :math:`\sigma = 0.36` nm,
+    :math:`M = 28.9586` g/mol and :math:`\frac{e}{k} = 103.3` K.
+    
+    This is an implementation optimized for speed, spending its time
+    in the calclulation of 1 log; 2 exp; 1 power; and 2 divisions.
+
+    Examples
+    --------
+    Viscosity at 300 K and 1 bar:
+        
+    >>> mu_air_lemmon(300.0, 40.10292351061862)
+    1.85371518556e-05
+    
+    Calculate the density in-place:
+        
+    >>> from chemicals.air import lemmon2000_rho
+    >>> mu_air_lemmon(300.0, lemmon2000_rho(300.0, 1e5))
+    1.85371518556e-05
+
+    References
+    ----------
+    .. [1] Lemmon, E. W., and R. T. Jacobsen. "Viscosity and Thermal 
+       Conductivity Equations for Nitrogen, Oxygen, Argon, and Air."
+       International Journal of Thermophysics 25, no. 1 (January 1, 2004): 
+       21-69. https://doi.org/10.1023/B:IJOT.0000022327.04529.f3.
+    '''
+    # Cost: 1 log; 2 exp; 1 power; 2 divisions
+#     sigma = 0.360 # nm
+#     M = 28.9586 # g/mol
+#     rhoc = 10447.7 # mol/m^3, maxcondentherm actually
+    Tc = 132.6312 # K, maxcondentherm actually
+    tau = Tc/T
+    delta = rho*9.571484632981421e-05 # 9.57...E-5 = 1/10447.7 
+
+    delta2 = delta*delta
+    delta4 = delta2*delta2
+    delta8 = delta4*delta4
+    tau_20 = tau**0.05
+    tau2_20 = tau_20*tau_20
+    tau4_20 = tau2_20*tau2_20
+    tau8_20 = tau4_20*tau4_20
+
+    tau12_20 = tau4_20*tau8_20
+    tau24_20 = tau12_20*tau12_20
+    tau48_20 = tau24_20*tau24_20
+    x0 = exp(-delta)
+    etar = (delta*(-8.876e-6*tau12_20*x0 + 0.002019e-6*tau48_20*delta8
+                  + 10.72e-6*tau4_20) + 1.122e-6*delta4*tau_20
+            - 0.02916e-6*delta8*tau24_20*x0*tau48_20)
+
+#     e_k = 103.3 # K
+#     Ts = T/e_k
+    Ts = T*0.00968054211035818 # 1/e_k
+    lnTs = log(Ts)
+#     tot = 0.0
+#     for i in range(5):
+#         tot += CIs[i]*lnTs**i
+    Omega = exp(lnTs*(lnTs*(lnTs*(0.005341 - 0.00331*lnTs) + 0.08406) - 0.4623) + 0.431)
+    
+    # 0.0266958*sqrt(28.9586)/(0.360*0.360)*sqrt(132.6312) = 12.76...
+    eta0 = 12.765845058845755e-6/(Omega*tau8_20*tau2_20)
+#     eta0 = 0.0266958*sqrt(T*M)/(sigma*sigma*Omega)
+#     etar = 0.0
+#     for i in range(5):
+#         etar += Ni[i]*tau**ti[i]*delta**di[i]*exp(-gammai[i]*delta**Ii[i])
+    return (eta0 + etar)
 
 
 def Viswanath_Natarajan_2(T, A, B):

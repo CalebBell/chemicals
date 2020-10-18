@@ -493,3 +493,7 @@ def test_Twu_1985():
     
     mu = Twu_1985(T=R2K(609.67), Tb=R2K(1210.17), rho=0.8964*999.0170824078306)
     assert_close(mu, 0.008235004218042592, rtol=1e-13)
+
+
+def test_mu_air_lemmon():
+    assert_close(mu_air_lemmon(300.0, 40.10292351061862), 1.853715185567247e-05, rtol=1e-13)
