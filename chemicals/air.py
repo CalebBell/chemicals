@@ -41,12 +41,29 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d3Ar_ddelta2dtau', 'lemmon2000_air_d4Ar_ddelta2dtau2',
            'lemmon2000_air_d4Ar_ddeltadtau3', 'lemmon2000_air_d4Ar_ddelta3dtau',
            'lemmon2000_air_rho_dew', 'lemmon2000_air_rho_bubble', 
-           'lemmon2000_air_P_dew', 'lemmon2000_air_P_bubble']
+           'lemmon2000_air_P_dew', 'lemmon2000_air_P_bubble',
+           'lemmon2000_air_R', 'lemmon2000_air_T_reducing', 'lemmon2000_air_P_reducing',
+           'lemmon2000_air_rho_reducing',
+           
+           'lemmon2000_air_MW', 'lemmon2000_air_P_max', 'lemmon2000_air_T_max',
+           'lemmon2000_rho'
+           ]
 
 # Get a good, fast variant of lemmon (2000) in here
 
 # For values of tau above this, log(exp(87.31279*tau) + 2/3) reduces to 87.31279*tau in double precision
 TAU_MAX_EXP_87 = 0.4207493606569795
+
+lemmon2000_air_R = 8.314510
+
+lemmon2000_air_T_reducing = 132.6312
+lemmon2000_air_P_reducing = 3.78502E6
+lemmon2000_air_rho_reducing = 10447.7
+lemmon2000_air_rho_reducing_inv = 1.0/lemmon2000_air_rho_reducing
+
+lemmon2000_air_MW = 28.9586
+lemmon2000_air_P_max = 2000E6
+lemmon2000_air_T_max = 2000.
 
 def lemmon2000_air_A0(tau, delta):
     r'''Calculates the ideal gas Helmholtz energy of air according to Lemmon 
@@ -1673,3 +1690,46 @@ def lemmon2000_air_P_bubble(T):
                 - 12.44017) + 5.700283) - 7.080499) + 0.2260724)
     tot *= Tj/T
     return exp(tot)*Pj
+
+
+def lemmon2000_rho_err(rho, T, P_spec):
+    # For solving for a rho (molar) while P is specified
+    RT = lemmon2000_air_R*T
+    tau = lemmon2000_air_T_reducing / T
+    delta = rho * lemmon2000_air_rho_reducing_inv
+
+    dAddelta_res_val = lemmon2000_air_dAr_ddelta(tau, delta)
+    d2Ad2delta_res_val = lemmon2000_air_d2Ar_ddelta2(tau, delta)
+    P_calc = (1.0 + dAddelta_res_val*delta)*rho*RT
+    
+    err = P_calc - P_spec
+    derr = RT*(rho*(rho*d2Ad2delta_res_val + 2.0*lemmon2000_air_rho_reducing*dAddelta_res_val)
+                + lemmon2000_air_rho_reducing*lemmon2000_air_rho_reducing)/(lemmon2000_air_rho_reducing*lemmon2000_air_rho_reducing)
+    return err, derr
+
+def lemmon2000_rho(T, P):
+    a = 1e-20 # Value where error is always negative
+    b = 500000.0 # value where error is always positive
+
+    rho = P/(lemmon2000_air_R*T) # ideal gas guess
+    
+    rho_old = 100000.0 #
+    iterations = 0
+    while iterations < 2 or ((abs(rho_old - rho) > abs(1e-13*rho)) and iterations < 100):
+        err, derr = lemmon2000_rho_err(rho, T, P)
+        if err < 0.0:
+            a = rho
+        else:
+            b = rho
+
+        drho = - err/derr
+
+        rho_old = rho
+        rho = rho + drho
+        if rho > b or rho < a:
+            rho = 0.5*(a + b)
+        iterations += 1
+    if iterations >= 99:
+        raise ValueError("Could not converge")
+    # Note that the derivatives have not been computed at this spot, so we can't save and return them
+    return rho

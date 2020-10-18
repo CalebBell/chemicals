@@ -384,3 +384,7 @@ def test_lemmon2000_air_P_dew():
     
 def test_lemmon2000_air_P_bubble():
     assert_close(lemmon2000_air_P_bubble(100), 663128.5894402424, rtol=1e-14)
+    
+    
+def test_lemmon2000_rho():
+    assert_close(lemmon2000_rho(300.0, 1e5), 40.10292351061862, rtol=1e-13)
