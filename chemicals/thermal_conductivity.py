@@ -76,6 +76,7 @@ Gas Mixing Rules
 Correlations for Specific Substances
 ------------------------------------
 .. autofunction:: chemicals.thermal_conductivity.k_IAPWS
+.. autofunction:: chemicals.thermal_conductivity.k_air_lemmon
 
 
 Fit Coefficients
@@ -126,7 +127,7 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
 'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
-'Wassiljewa_Herning_Zipperer']
+'Wassiljewa_Herning_Zipperer', 'k_air_lemmon']
 
 from fluids.numerics import bisplev, implementation_optimize_tck, numpy as np
 from fluids.constants import R, R_inv, N_A, k, pi
@@ -398,6 +399,176 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
 
     k = (lambda0*lambda1 + lambda2)*1e-3
     return k
+
+def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=None):
+    r'''Calculate the thermal conductivity of air using the Lemmon and Jacobsen
+    (2004) [1]_ formulation. The critical enhancement term is ignored unless
+    all the rquired parameters for it are provided.
+
+    .. math::
+        \lambda = \lambda^0(T) + \lambda^r(\tau, \delta) + \lambda^c(\tau, \delta)
+        
+    .. math::
+        \lambda^0 = N_1\left[\frac{\eta^0(T)}{1 \mu \text{Pa}\cdot \text{s}} 
+        \right] + N_2\tau^{t_2} + N_3\tau^{t_3}
+
+    .. math::
+        \lambda^r = \sum_{i=4}^n N_i \tau^{t_i} \delta^{d_i} \exp(-\gamma_i
+        \delta^{l_i})
+
+    .. math::
+        \lambda^c = \rho C_p \frac{kR_0 T}{6\pi\xi\cdot \eta(T, \rho)}\left(
+        \tilde \Omega -\tilde \Omega_0\right)
+
+    .. math::
+        \tilde \Omega = \frac{2}{\pi}\left[
+        \left(\frac{C_p - C_v}{C_p}\right)\tan^{-1} (\xi/q_D) + \frac{C_v}
+        {C_p}(\xi/q_D) \right]
+
+    .. math::
+        \tilde \Omega_0 = \frac{2}{\pi}\left\{1 - \exp\left[\frac{-1}{q_D/\xi
+        + 1/3(\xi/q_D)^2(\rho_c/\rho)^2} \right] \right\}
+
+    .. math::
+        \xi = \xi_0 \left[\frac{\tilde \chi(T, \rho) - \tilde \chi(T_{ref}, 
+        \rho)\frac{T_{ref}}{T}}{\Gamma}  \right]^{\nu/\gamma}
+
+    .. math::
+        \tilde \chi(T, \rho) = \frac{P_c \rho}{\rho_c^2} \left(\frac{\partial 
+        \rho}{\partial P} \right)_{T}
+        
+    Parameters
+    ----------
+    T : float
+        Temperature air [K]
+    rho : float
+        Molar density of air [mol/m^3]
+    Cp : float, optional
+        Molar constant pressure heat capacity of air, [J/mol/K]
+    Cv : float, optional
+        Molar constant volume heat capacity of air, [J/mol/K]
+    mu : float, optional
+        Viscosity of air, [Pa*s]
+    drho_dP : float, optional
+        Partial derivative of density with respect to pressure at constant
+        temperature, [mol/m^3/Pa]
+    drho_dP_Tr : float, optional
+        Partial derivative of density with respect to pressure at constant
+        temperature (at the reference temperature (265.262 K) and the actual
+        density of air), [mol/m^3/Pa]
+
+    Returns
+    -------
+    k : float
+        Thermal condiuctivity of air, [W/m/K]
+
+    Notes
+    -----
+    The constnts are as follows:
+
+    Ni = [1.308, 1.405, -1.036, 8.743, 14.76, -16.62, 3.793, -6.142, -0.3778]
+    
+    ti = [None, -1.1, -0.3, 0.1, 0.0, 0.5, 2.7, 0.3, 1.3]
+     
+    di = [None, None, None, 1, 2, 3, 7, 7, 11]
+     
+    li  = [None, None, None, 0, 0, 2, 2, 2, 2]
+     
+    gammai = [None, None, None, 0, 0, 1, 1, 1, 1]
+
+    R0 = 1.01; Pc = 3.78502E6 Pa; xi0 = 0.11E-9 nm; qd = 0.31E-9 nm; 
+    Tc = 132.6312 K (actually the maxcondentherm); T_ref = 265.262 (2Tc
+    rounded differently); rhoc = 10447.7 mol/m^3 (actually the maxcondentherm);
+    k = 1.380658E-23 J/K; nu = 0.63 and gamma = 1.2415, sigma = 0.36,
+    MW = 28.9586 g/mol.
+
+
+    Examples
+    --------
+    Basic calculation at 300 K and approximately 1 bar:
+    
+    >>> k_air_lemmon(300, 40.0)
+    0.0263839695044
+    
+    Calculation near critical point:
+    
+    >>> k_air_lemmon(132.64, 10400, 2137.078854678728, 35.24316159996235, 0.07417878614315769, 0.00035919027241528256, 1.7762253265868595e-05)
+    0.07562307234760
+    
+    References
+    ----------
+    .. [1] Lemmon, E. W., and R. T. Jacobsen. "Viscosity and Thermal 
+       Conductivity Equations for Nitrogen, Oxygen, Argon, and Air."
+       International Journal of Thermophysics 25, no. 1 (January 1, 2004): 
+       21-69. https://doi.org/10.1023/B:IJOT.0000022327.04529.f3.
+    '''
+    R0 = 1.01
+    Pc = 3.78502E6
+    xi0 = 0.11E-9
+    qd = 0.31E-9 
+#     Gamma = 0.055
+    Tc = 132.6312 # K, maxcondentherm actually
+    T_ref = 265.262 # Tc*2 but rounded differently
+    rhoc = 10447.7 
+    rhoc2 = rhoc*rhoc
+    
+    qd_inv = 3225806451.612903 # 10.31E-9 
+    gamma_inv = 18.181818181818183 # 1/.055
+
+    tau = Tc/T
+    tau_10 = tau**0.1
+    tau2_10 = tau_10*tau_10
+    tau3_10 = tau_10*tau2_10
+    tau6_10 = tau3_10*tau3_10
+    tau12_10 = tau6_10*tau6_10
+    tau24_10 = tau12_10*tau12_10
+    
+    delta = rho*9.571484632981421e-05 # 9.57...E-5 = 1/10447.7 
+
+    Ts = T*0.00968054211035818 # 1/e_k
+    lnTs = log(Ts)
+    Omega_inv = exp(-0.431 -lnTs*(lnTs*(lnTs*(0.005341 - 0.00331*lnTs) + 0.08406) - 0.4623))
+        
+    #12.7658... = 0.0266958*sqrt(28.9586)/(0.360*0.360)*sqrt(132.6312)
+    eta0 = 12.765845058845755*Omega_inv/(tau2_10*tau3_10)
+    
+    k0 = 1.308*eta0 + 1.405/(tau*tau_10) - 1.036/tau3_10
+
+#     kr = 0.0
+#     for i in range(3, 9):
+#         kr += Ni[i]*tau**ti[i]*delta**di[i]*exp(-gammai[i]*delta**li[i])
+
+    delta2 = delta*delta
+    delta3 = delta*delta2
+    delta4 = delta*delta3
+    delta7 = delta3*delta4
+    x0 = exp(-delta2)
+    x1 = delta7*tau3_10*x0
+    kr = (8.743*delta*tau_10 + 14.76*delta2 - 16.62*delta3*tau3_10*tau2_10*x0 
+          - 0.3778*delta4*tau_10*x0*tau12_10*delta7 - 6.142*x1 + 3.793*x1*tau24_10)
+
+    if Cp is not None and Cv is not None and mu is not None and drho_dP is not None and drho_dP_Tr is not None:
+        x2 = Pc*rho/rhoc2
+        xi_bar = x2*drho_dP
+        xi_bar_ref = x2*drho_dP_Tr
+    
+        xi = xi0*((xi_bar - xi_bar_ref*T_ref/T)*gamma_inv)**0.5074506645187273# .50745... = (0.63/1.2415)
+        if xi < 0.0:
+            kc = 0.0
+        else:
+            xi_qd = xi*qd_inv
+            
+            term0 = qd/xi + (1.0/3.0)*xi_qd*xi_qd*(rhoc*rhoc/(rho*rho))
+            Omega_bar0 = 2.0*pi_inv*(1.0 - exp(-1.0/term0))
+            
+            Omega_bar = 2.0*pi_inv*((Cp - Cv)/Cp*atan(xi_qd) + Cv/Cp*xi_qd)
+            k = 1.380658E-23 # J/K
+            
+            # Mu should still be in Pa*s
+            kc = rho*Cp*k*R0*T/(6.0*pi*xi*mu)*(Omega_bar - Omega_bar0)
+            kc *= 1e3 # Convert to mW/m/K, same as others
+        return (k0 + kr + kc)*1e-3
+    return (k0 + kr)*1e-3
 
 ### Purely CSP Methods - Liquids
 
