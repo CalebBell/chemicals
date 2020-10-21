@@ -519,15 +519,15 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
     tau_10 = tau**0.1
     tau2_10 = tau_10*tau_10
     tau3_10 = tau_10*tau2_10
-    tau6_10 = tau3_10*tau3_10
-    tau12_10 = tau6_10*tau6_10
+    tau12_10 = tau3_10*tau3_10
+    tau12_10 *= tau12_10
     tau24_10 = tau12_10*tau12_10
     
     delta = rho*9.571484632981421e-05 # 9.57...E-5 = 1/10447.7 
 
     Ts = T*0.00968054211035818 # 1/e_k
     lnTs = log(Ts)
-    Omega_inv = exp(-0.431 -lnTs*(lnTs*(lnTs*(0.005341 - 0.00331*lnTs) + 0.08406) - 0.4623))
+    Omega_inv = exp(-0.431 - lnTs*(lnTs*(lnTs*(0.005341 - 0.00331*lnTs) + 0.08406) - 0.4623))
         
     #12.7658... = 0.0266958*sqrt(28.9586)/(0.360*0.360)*sqrt(132.6312)
     eta0 = 12.765845058845755*Omega_inv/(tau2_10*tau3_10)
@@ -541,11 +541,9 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
     delta2 = delta*delta
     delta3 = delta*delta2
     delta4 = delta*delta3
-    delta7 = delta3*delta4
     x0 = exp(-delta2)
-    x1 = delta7*tau3_10*x0
-    kr = (8.743*delta*tau_10 + 14.76*delta2 - 16.62*delta3*tau3_10*tau2_10*x0 
-          - 0.3778*delta4*tau_10*x0*tau12_10*delta7 - 6.142*x1 + 3.793*x1*tau24_10)
+    kr = (8.743*delta*tau_10 + 14.76*delta2 - x0*(16.62*delta3*tau3_10*tau2_10 
+          + delta3*delta4*(0.3778*delta4*tau_10*tau12_10 + tau3_10*(6.142 - 3.793*tau24_10))))
 
     if Cp is not None and Cv is not None and mu is not None and drho_dP is not None and drho_dP_Tr is not None:
         x2 = Pc*rho/rhoc2
