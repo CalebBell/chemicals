@@ -48,8 +48,8 @@ __all__ = ['solubility_parameter',
            'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture']
            
 import os
-from fluids.constants import R, atm
-from chemicals.utils import log, exp
+from fluids.constants import R, atm, R_inv
+from chemicals.utils import log, exp, sqrt
 
 
 
@@ -98,7 +98,7 @@ def solubility_parameter(T, Hvapm, Vml):
        Cohesion Parameters, Second Edition. CRC Press, 1991.
     '''
     # Prevent taking the root of a negative number
-    return None if (Hvapm < R*T or Vml < 0.0) else ((Hvapm - R*T)/Vml)**0.5
+    return None if (Hvapm < R*T or Vml < 0.0) else sqrt((Hvapm - R*T)/Vml)
 
 def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     r'''Returns the maximum solubility of a solute in a solvent.
@@ -140,7 +140,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     From [1]_, matching example
 
     >>> solubility_eutectic(T=260., Tm=278.68, Hm=9952., Cpl=0, Cps=0, gamma=3.0176)
-    0.2434007130748926
+    0.2434007130748
 
     References
     ----------
@@ -148,7 +148,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
        Weinheim, Germany: Wiley-VCH, 2012.
     '''
     dCp = Cpl-Cps
-    x = exp(- Hm/R/T*(1-T/Tm) + dCp*(Tm-T)/R/T - dCp/R*log(Tm/T))/gamma
+    x = exp(- R_inv*((Hm*(1.0 - T/Tm) - dCp*(Tm-T))/T + dCp*log(Tm/T)))/gamma
     return x
 
 
@@ -190,7 +190,7 @@ def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
     From [1]_, matching example.
 
     >>> Tm_depression_eutectic(353.35, 19110, .02)
-    1.0864598583150953
+    1.0864598583150
 
     References
     ----------
@@ -198,10 +198,10 @@ def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
        Weinheim, Germany: Wiley-VCH, 2012.
     '''
     if x is not None:
-        dTm = R*Tm**2*x/Hm
+        dTm = R*Tm*Tm*x/Hm
     elif M is not None and MW is not None:
         MW = MW/1000. #g/mol to kg/mol
-        dTm = R*Tm**2*MW*M/Hm
+        dTm = R*Tm*Tm*MW*M/Hm
     else:
         raise ValueError('Either molality or mole fraction of the solute must be specified; MW of the solvent is required also if molality is provided')
     return dTm
@@ -412,7 +412,8 @@ def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
     '''
-    return exp(A + B/T + C*log(T) + D*T + E/T**2 + F*T**2)
+    T_inv = 1.0/T
+    return exp(A + T_inv*(B + E*T_inv)  + C*log(T) + T*(D + F*T))
 
 
 def Henry_pressure_mixture(Hs, weights=None, zs=None):

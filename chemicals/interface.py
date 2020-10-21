@@ -241,7 +241,7 @@ def sigma_IAPWS(T):
     .. [1] IAPWS. 2014. Revised Release on Surface Tension of Ordinary Water
        Substance
     '''
-    tau = 1. - T/647.096
+    tau = 1. - T*(1.0/647.096)
     return 0.2358*tau**1.256*(1.0 - 0.625*tau)
 
 ### Regressed coefficient-based functions
@@ -303,7 +303,7 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
        and Modeling 53, no. 12 (2013): 3418-30. doi:10.1021/ci4005699.
     '''
     Tr = T/Tc
-    one_minus_Tr = 1 - Tr
+    one_minus_Tr = 1.0 - Tr
     sigma = sigma0*(one_minus_Tr)**n0 + sigma1*(one_minus_Tr)**n1 + sigma2*(one_minus_Tr)**n2
     return sigma
 
@@ -357,9 +357,7 @@ def Somayajulu(T, Tc, A, B, C):
        Thermophysics 9, no. 4 (July 1988): 559-66. doi:10.1007/BF00503154.
     '''
     X = (Tc-T)/Tc
-    X_125 = X**1.25
-    sigma = X_125*(A + X*(B + C*X))*1e-3
-    return sigma
+    return X*sqrt(sqrt(X))*(A + X*(B + C*X))*1e-3
 
 
 def Jasper(T, a, b):
@@ -461,10 +459,11 @@ def Brock_Bird(T, Tb, Tc, Pc):
        Principle of Corresponding States." AIChE Journal 1, no. 2
        (June 1, 1955): 174-77. doi:10.1002/aic.690010208
     '''
-    Tbr = Tb/Tc
-    Tr = T/Tc
+    Tc_inv = 1.0/Tc
+    Tbr = Tb*Tc_inv
+    Tr = T*Tc_inv
     Pc = Pc*1e-5  # Convert to bar
-    Q = 0.1196*(1.0 + Tbr*log(Pc/1.01325)/(1.0 - Tbr)) - 0.279
+    Q = 0.1196*(1.0 + Tbr*log(Pc*(1.0/1.01325))/(1.0 - Tbr)) - 0.279
     sigma = (Pc)**(2.0/3.0)*Tc**(1.0/3.0)*Q*(1.0 - Tr)**(11.0/9.0)
     sigma = sigma*1e-3  # convert to N/m
     return sigma
@@ -520,10 +519,9 @@ def Pitzer_sigma(T, Tc, Pc, omega):
     '''
     Tr = T/Tc
     Pc = Pc*1e-5  # Convert to bar
-    sigma = Pc**(2.0/3.0)*Tc**(1.0/3.0)*(1.86+1.18*omega)/19.05 * (
-        (3.75+0.91*omega)/(0.291-0.08*omega))**(2.0/3.0)*(1.0-Tr)**(11.0/9.0)
-    sigma = sigma*1e-3  # N/m, please
-    return sigma
+    sigma = Pc**(2.0/3.0)*Tc**(1.0/3.0)*(1.86 + 1.18*omega)*(1.0/19.05)*(
+        (3.75 + 0.91*omega)/(0.291 - 0.08*omega))**(2.0/3.0)*(1.0 - Tr)**(11.0/9.0)
+    return sigma*1e-3  # N/m, please
 
 
 def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
@@ -576,7 +574,7 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
         k, x, y, z, m = 0.158, 0.50, -1.5, 1.85, 11.0/9.0
     Tr = T/Tc
     Tbr = Tb/Tc
-    Pc = Pc/1E5  # Convert to bar
+    Pc = Pc*1E-5  # Convert to bar
     sigma = k*Pc**x*Tb**y*Tc**z*((1.0 - Tr)/(1.0 - Tbr))**m
     sigma = sigma*1e-3  # N/m
     return sigma
@@ -709,8 +707,8 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
     m = (1.210 + 0.5385*omega - 14.61*StielPolar - 32.07*StielPolar2
         - 1.656*omega2 + 22.03*StielPolar*omega)
     Tr = T/Tc
-    Pc = Pc/101325.
-    sigma = Pc**(2.0/3.)*Tc**(1.0/3.0)*Q*((1.0 - Tr)*2.5)**m
+    Pc = Pc*(1.0/101325.0)
+    sigma = Pc**(2.0/3.)*Tc**(1.0/3.0)*Q*(2.5*(1.0 - Tr))**m
     sigma = sigma*1e-3  # convert to N/m
     return sigma
 
@@ -764,7 +762,7 @@ def Miqueu(T, Tc, Vc, omega):
     '''
     Vc = Vc*1E6
     t = 1. - T/Tc
-    sigma = k*Tc*(N_A/Vc)**(2.0/3.0)*(4.35 + 4.14*omega)*t**1.26*(1.0 + 0.19*t**0.5 - 0.25*t)*10000.0
+    sigma = k*Tc*(N_A/Vc)**(2.0/3.0)*(4.35 + 4.14*omega)*t**1.26*(1.0 + 0.19*sqrt(t) - 0.25*t)*10000.0
     return sigma
 
     
@@ -834,7 +832,7 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
        2015): 1908-15. doi:10.1080/10916466.2015.1110593.
     '''
     MW = MW*1e-3 # Use kg/mol for consistency with the other units
-    sphericity = 1. - 0.0047*MW + 6.8E-6*MW*MW
+    sphericity = 1. - MW*(0.0047 - 6.8E-6*MW)
     return sphericity*MW**(1.0/3.0)/(6.*N_A**(1.0/3.0))*rhol**(2.0/3.)*(Hvap_Tb + Cpl*(Tb-T))
 
 
@@ -1203,8 +1201,8 @@ def Meybodi_Daryasafar_Karimi(rho_water, rho_oil, T, Tc):
     A7 = -4.1388901263E0
     A8 = 3.0084299030E0
     A9 = -3.8203072876E-3
-    A10 = 3.5000000000E0
+#    A10 = 3.5000000000E0
     drho = abs(rho_water - rho_oil)*1e-3 # Correlation in units of g/mL
     sigma = ((A1 + drho*(A2 + drho*(A3 + A4*drho)))
-             /(A5 + A6*T**A7/Tc + A8*T**A9))**A10
-    return sigma*1e-3 # mN/m to N/m
+             /(A5 + A6*T**A7/Tc + A8*T**A9))
+    return sigma*sigma*sigma*sqrt(sigma)*1e-3 # mN/m to N/m

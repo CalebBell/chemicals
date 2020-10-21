@@ -541,8 +541,7 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
     delta2 = delta*delta
     delta3 = delta*delta2
     delta4 = delta*delta3
-    x0 = exp(-delta2)
-    kr = (8.743*delta*tau_10 + 14.76*delta2 - x0*(16.62*delta3*tau3_10*tau2_10 
+    kr = (8.743*delta*tau_10 + 14.76*delta2 -  exp(-delta2)*(16.62*delta3*tau3_10*tau2_10 
           + delta3*delta4*(0.3778*delta4*tau_10*tau12_10 + tau3_10*(6.142 - 3.793*tau24_10))))
 
     if Cp is not None and Cv is not None and mu is not None and drho_dP is not None and drho_dP_Tr is not None:
@@ -754,13 +753,14 @@ def Gharagheizi_liquid(T, MW, Tb, Pc, omega):
         Conductivity of Liquid Chemical Compounds at Atmospheric Pressure."
         AIChE Journal 59, no. 5 (May 1, 2013): 1702-8. doi:10.1002/aic.13938
     '''
+    M2 = MW*MW
+    M4 = M2*M2
     Pc = Pc*1E-5
     B = 16.0407*MW + 2.*Tb - 27.9074
-    A = 3.8588*MW**8*(1.0045*B + 6.5152*MW - 8.9756)
-    M2 = MW*MW
-    B_inv4 = B**-4.0
-    kl = 1E-4*(10.*omega + 2.*Pc - 2.*T + 4. + 1.908*(Tb + 1.009*B*B/(M2))
-        + 3.9287*M2*M2*B_inv4 + A*B_inv4*B_inv4)
+    A = 3.8588*M4*M4*(1.0045*B + 6.5152*MW - 8.9756)
+    B_inv4 = 1.0/(B*B*B*B)
+    kl = 1E-4*(10.*omega + 2.*(Pc - T) + 4. + 1.908*(Tb + 1.009*B*B/(M2))
+        + 3.9287*M4*B_inv4 + A*B_inv4*B_inv4)
     return kl
 
 
@@ -815,7 +815,7 @@ def Nicola_original(T, MW, Tc, omega, Hfus):
         (April 1, 2014): 135-40. doi:10.1007/s10973-013-3422-7
     '''
     Tr = T/Tc
-    Hfus = Hfus*1000
+    Hfus = Hfus*1000.0
     return -0.5694 - 0.1436*Tr + 5.4893E-10*Hfus + 0.0508*omega + MW**-0.0622
 
 
@@ -866,9 +866,7 @@ def Nicola(T, MW, Tc, Pc, omega):
        International Journal of Refrigeration. 2014.
        doi:10.1016/j.ijrefrig.2014.06.003
     '''
-    Tr = T/Tc
-    Pc = Pc*1E-5
-    return 0.5147*(-0.2537*Tr + 0.0017*Pc + 0.1501*omega + MW**-0.2999)
+    return 0.5147*(-0.2537*T/Tc + 0.0017E-5*Pc + 0.1501*omega + MW**-0.2999)
 
 
 def Bahadori_liquid(T, MW):
@@ -982,10 +980,11 @@ def kl_Mersmann_Kind(T, MW, Tc, Vc, na):
        Pressure." Industrial & Engineering Chemistry Research, January 31, 
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     '''
-    lambda_star = 2/3.*(na + 40.*(1. - T/Tc)**0.5)
+    lambda_star = (2/3.)*(na + 40.*sqrt(1. - T/Tc))
     Vc = Vc*1000.0 # m^3/mol to m^3/kmol
     N_A2 = N_A*1000.0 # Their avogadro's constant is per kmol
-    kl = lambda_star*(k*Tc)**1.5*N_A2**(7.0/6.)*Vc**(-2.0/3.)/Tc*MW**-0.5
+    kTc = k*Tc
+    kl = lambda_star*kTc*sqrt(kTc/MW)*N_A2**(7.0/6.)*Vc**(-2.0/3.)/Tc
     return kl
 
 
@@ -1043,7 +1042,10 @@ def DIPPR9G(T, P, Tc, Pc, kl):
     '''
     Tr = T/Tc
     Pr = P/Pc
-    return kl*(0.98 + 0.0079*Pr*Tr**1.4 + 0.63*Tr**1.2*(Pr/(30. + Pr)))
+    Tr_2_10 = Tr**(0.2)
+    Tr_12_10 = Tr_2_10*Tr_2_10*Tr_2_10
+    Tr_12_10 *= Tr_12_10
+    return kl*(0.98 + Tr_12_10*(0.0079*Pr*Tr_2_10 + 0.63*(Pr/(30. + Pr))))
 
 
 Trs_Missenard = [0.8, 0.7, 0.6, 0.5]
