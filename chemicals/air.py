@@ -28,6 +28,7 @@ SOFTWARE.
 """
 from __future__ import division
 from math import exp, log, sqrt
+from fluids.numerics import horner_and_der3
 
 __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d2A0_dtau2', 'lemmon2000_air_d3A0_dtau3',
@@ -46,7 +47,10 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_rho_reducing',
            
            'lemmon2000_air_MW', 'lemmon2000_air_P_max', 'lemmon2000_air_T_max',
-           'lemmon2000_rho', 'lemmon2000_P'
+           'lemmon2000_rho', 'lemmon2000_P',
+           
+           'TEOS10_BAW_derivatives', 'TEOS10_CAWW_derivatives',
+           'TEOS10_CAAW_derivatives',
            ]
 
 # Get a good, fast variant of lemmon (2000) in here
@@ -1740,3 +1744,59 @@ def lemmon2000_rho(T, P):
         raise ValueError("Could not converge")
     # Note that the derivatives have not been computed at this spot, so we can't save and return them
     return rho
+
+
+
+### Virial
+    
+TEOS10_CAAW_coeffs = [0.482737E-9, 1.05678E-7, -6.56394E-5,  0.294442E-1, -3.19317][::-1]
+
+def TEOS10_CAAW_derivatives(T):
+    T_inv = 1.0/T
+    d0, d1, d2, d3 = horner_and_der3(TEOS10_CAAW_coeffs, T_inv)
+    T_inv2 = T_inv*T_inv
+    return (d0, 
+            -d1*T_inv2, 
+            T_inv2*T_inv*(d1 + d1 + d2*T_inv), 
+            -(6.0*(d1 + d2*T_inv) + d3*T_inv2)*T_inv2*T_inv2)
+
+def TEOS10_CAWW_derivatives(T):
+    T_inv = 1.0/T
+    expt = exp(T_inv*(T_inv*(33406000.0*T_inv - 383383.0) + 3478.02))
+    d0 = -2.190323971261093e-11*expt
+    T_inv2 = T_inv*T_inv
+    
+    d1 = T_inv2*(T_inv*(0.00219509887751844195*T_inv*expt - 0.0000167946595014798305*expt)
+                 + 7.61799057852550599e-8*expt)
+    
+    d2 = T_inv*T_inv2*(T_inv*(T_inv*(T_inv*(T_inv*(-219988.419307143195*T_inv*expt
+            + 3366.25437183861095*expt) - 28.1467694832850697*expt) + 0.108043927768599987*expt) 
+                - 0.0002145712574147933*expt) - 1.5235981157051012e-7*expt)
+    
+    d3 = T_inv2*T_inv2*(T_inv*(T_inv*(T_inv*(T_inv*(T_inv*(T_inv*(T_inv*(
+            22046799406123.2734*T_inv*expt - 506038920955.382813*expt) + 6167066465.87169647*expt) 
+            - 42357924.8786190823*expt) + 178679.559190398955*expt) - 356.155073924973806*expt) 
+            + 0.0892391625921256371*expt) + 0.00138819550149763883*expt) + 4.57079434711530359e-7*expt)
+    
+    return (d0, d1, d2, d3)
+
+def TEOS10_BAW_derivatives(T):
+    T_inv = 1.0/T
+    T_inv3_1000 = T_inv**0.003
+    T_inv6_1000 = T_inv3_1000*T_inv3_1000
+    T_inv12_1000 = T_inv6_1000*T_inv6_1000
+    T_inv24_1000 = T_inv12_1000*T_inv12_1000
+    T_inv27_1000 = T_inv3_1000*T_inv24_1000
+    T_inv54_1000 = T_inv27_1000*T_inv27_1000
+    T_inv78_1000 = T_inv24_1000*T_inv54_1000
+    T_inv156_1000 = T_inv78_1000*T_inv78_1000
+    T_inv183_1000 = T_inv27_1000*T_inv156_1000
+    T_inv48_1000 = T_inv24_1000*T_inv24_1000
+    T_inv237_1000 = T_inv54_1000*T_inv183_1000
+    T_inv2 = T_inv*T_inv
+    T_inv3 = T_inv2*T_inv
+    d0 = -410.555342440099992*T_inv183_1000*T_inv3 - 0.0297917594240699017*T_inv48_1000*T_inv + 0.000198275966635743002*T_inv237_1000
+    d1 = 1306.79765498684*T_inv183_1000*T_inv3*T_inv + 0.0312217638764253*T_inv48_1000*T_inv2 - 4.69914040926711e-5*T_inv237_1000*T_inv
+    d2 = -5466.33459080994*T_inv183_1000*T_inv3*T_inv2 - 0.0639421724189189*T_inv48_1000*T_inv3 + 5.81283668626341e-5*T_inv237_1000*T_inv2
+    d3 = 28332.0121841679*T_inv183_1000*T_inv3*T_inv3+ 0.194895741532865*T_inv48_1000*T_inv2*T_inv2 - 0.000130033156671713*T_inv237_1000*T_inv3
+    return d0, d1, d2

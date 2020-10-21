@@ -392,3 +392,21 @@ def test_lemmon2000_rho():
     
 def test_lemmon2000_P():
     assert_close(lemmon2000_P(300.0, 40.10292351061862), 1e5, rtol=1e-14)
+    
+    
+def test_TEOS10_CAAW_derivatives():
+    assert_close1d(TEOS10_CAAW_derivatives(200.0)[:3], (1.05493575e-09, -1.525350000000001e-12, -1.13436375e-13), rtol=1e-13)
+    assert_close(derivative(lambda T: TEOS10_CAAW_derivatives(T)[-2], 200.0, dx=200*1e-7), TEOS10_CAAW_derivatives(200)[-1], rtol=1e-8)
+    assert_close1d(TEOS10_CAAW_derivatives(300.0), (8.019777407407409e-10, -1.9610345679012353e-12, 1.700556378600824e-14, -1.0129827160493834e-16), rtol=1e-13)
+
+def test_TEOS10_CAWW_derivatives():
+    assert_close(TEOS10_CAWW_derivatives(200.0)[0], -0.349872634E-5, rtol=1e-9)
+    assert_close(TEOS10_CAWW_derivatives(200.0)[1], 0.188025052E-6, rtol=2e-9)
+    assert_close(TEOS10_CAWW_derivatives(200.0)[2], -0.124996856E-7, rtol=2e-9)
+    assert_close(derivative(lambda T: TEOS10_CAWW_derivatives(T)[-2], 200.0, dx=200*1e-7), TEOS10_CAWW_derivatives(200)[-1], rtol=1e-8)
+
+def test_TEOS10_BAW_derivatives():
+    assert_close(TEOS10_BAW_derivatives(200)[0], -0.784874278E-4)
+    assert_close(TEOS10_BAW_derivatives(200)[1], 0.848076624E-6)
+    assert_close(TEOS10_BAW_derivatives(200)[2], -0.122622146E-7)
+    assert_close(derivative(lambda T: TEOS10_BAW_derivatives(T)[-2], 200.0, dx=200*1e-7), TEOS10_BAW_derivatives(200)[-1], rtol=1e-8)
