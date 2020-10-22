@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module the core of the IAPWS-95 and IAPWS-97 standards.
+This module contains the core of the IAPWS-95 and IAPWS-97 standards.
 The objective of this module is to contain extremely fast functions to
 calculate several basic properties of water.
 

@@ -60,6 +60,7 @@ __all__ = ['RI', 'RI_methods', 'RI_all_methods',
 from fluids.numerics import interp
 from fluids.constants import pi, N_A
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from chemicals.utils import sqrt
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -353,8 +354,8 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
        Substance as a Function of Wavelength, Temperature and Pressure.
     '''
     delta = rho*1e-3
-    theta = T/273.15
-    Lambda = wavelength/0.589
+    theta = T*(1.0/273.15)
+    Lambda = wavelength*(1.0/0.589)
 
     LambdaIR = 5.432937
     LambdaUV = 0.229202
@@ -364,7 +365,7 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
     A = delta*(0.244257733 + 0.0097463448*delta + -0.00373235*theta + 0.0002686785*Lambda2*theta + 
     0.0015892057/Lambda2 + 0.0024593426/(Lambda2 - LambdaUV*LambdaUV) + 
     0.90070492/(Lambda2 - LambdaIR*LambdaIR) - 0.0166626219*delta*delta)
-    n = ((2*A + 1.)/(1. - A))**0.5
+    n = sqrt((2.0*A + 1.)/(1. - A))
     return n
 
 ICUMSA_1974_brix = list([float(i) for i in range(96)])

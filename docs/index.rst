@@ -64,6 +64,7 @@ If you need to know something about a chemical, give chemicals a try.
    :caption: API
    
    chemicals.acentric
+   chemicals.air
    chemicals.combustion
    chemicals.critical
    chemicals.dipole

@@ -22,8 +22,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
+This module contains various thermodynamic functions for air and humid air.
+
+For reporting bugs, adding feature requests, or submitting pull requests,
+please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
+
 .. contents:: :local:
 
+Dry Air Basic Solvers
+------------------------
+.. autofunction:: chemicals.air.lemmon2000_rho
+.. autofunction:: chemicals.air.lemmon2000_P
+
+Dry Air Bubble/Dew Points
+-------------------------
+.. autofunction:: chemicals.air.lemmon2000_air_P_dew
+.. autofunction:: chemicals.air.lemmon2000_air_P_bubble
+.. autofunction:: chemicals.air.lemmon2000_air_rho_dew
+.. autofunction:: chemicals.air.lemmon2000_air_rho_bubble
+   
+Dry Air Constants
+-----------------
+.. autodata:: chemicals.air.lemmon2000_air_T_reducing
+.. autodata:: chemicals.air.lemmon2000_air_rho_reducing
+.. autodata:: chemicals.air.lemmon2000_air_P_reducing
+.. autodata:: chemicals.air.lemmon2000_air_MW
+.. autodata:: chemicals.air.lemmon2000_air_R
+.. autodata:: chemicals.air.lemmon2000_air_T_max
+.. autodata:: chemicals.air.lemmon2000_air_P_max
+
+Dry Air Ideal Gas Terms
+-----------------------
+.. autofunction:: chemicals.air.lemmon2000_air_A0
+.. autofunction:: chemicals.air.lemmon2000_air_dA0_dtau
+.. autofunction:: chemicals.air.lemmon2000_air_d2A0_dtau2
+.. autofunction:: chemicals.air.lemmon2000_air_d3A0_dtau3
+.. autofunction:: chemicals.air.lemmon2000_air_d4A0_dtau4
+
+Dry Air Residual Terms
+----------------------
+.. autofunction:: chemicals.air.lemmon2000_air_Ar
+.. autofunction:: chemicals.air.lemmon2000_air_dAr_dtau
+.. autofunction:: chemicals.air.lemmon2000_air_d2Ar_dtau2
+.. autofunction:: chemicals.air.lemmon2000_air_d3Ar_dtau3
+.. autofunction:: chemicals.air.lemmon2000_air_d4Ar_dtau4
+.. autofunction:: chemicals.air.lemmon2000_air_dAr_ddelta
+.. autofunction:: chemicals.air.lemmon2000_air_d2Ar_ddelta2
+.. autofunction:: chemicals.air.lemmon2000_air_d3Ar_ddelta3
+.. autofunction:: chemicals.air.lemmon2000_air_d4Ar_ddelta4
+.. autofunction:: chemicals.air.lemmon2000_air_d2Ar_ddeltadtau
+.. autofunction:: chemicals.air.lemmon2000_air_d3Ar_ddeltadtau2
+.. autofunction:: chemicals.air.lemmon2000_air_d3Ar_ddelta2dtau
+.. autofunction:: chemicals.air.lemmon2000_air_d4Ar_ddelta2dtau2
+.. autofunction:: chemicals.air.lemmon2000_air_d4Ar_ddeltadtau3
+.. autofunction:: chemicals.air.lemmon2000_air_d4Ar_ddelta3dtau
+
+Humid Air Virial Terms
+----------------------
+.. autofunction:: chemicals.air.TEOS10_BAW_derivatives
+.. autofunction:: chemicals.air.TEOS10_CAAW_derivatives
+.. autofunction:: chemicals.air.TEOS10_CAWW_derivatives
 
 """
 from __future__ import division
@@ -59,15 +117,26 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
 TAU_MAX_EXP_87 = 0.4207493606569795
 
 lemmon2000_air_R = 8.314510
+'''Molar gas constant in J/(mol*K) used in the the Lemmon (2000) EOS for dry air'''
 
 lemmon2000_air_T_reducing = 132.6312
+'''Reducing temperature in K for the Lemmon (2000) EOS for dry air'''
 lemmon2000_air_P_reducing = 3.78502E6
+'''Reducing pressure in Pa for the Lemmon (2000) EOS for dry air'''
+
 lemmon2000_air_rho_reducing = 10447.7
+'''Reducing molar density in mol/m^3 for the Lemmon (2000) EOS for dry air'''
+
 lemmon2000_air_rho_reducing_inv = 1.0/lemmon2000_air_rho_reducing
 
 lemmon2000_air_MW = 28.9586
+'''Molecular weight of air in g/mol for the Lemmon (2000) EOS for dry air'''
+
 lemmon2000_air_P_max = 2000E6
+'''Maximum pressure in Pa valid for the Lemmon (2000) EOS for dry air'''
+
 lemmon2000_air_T_max = 2000.
+'''Maximum temperature in K valid for the Lemmon (2000) EOS for dry air'''
 
 def lemmon2000_air_A0(tau, delta):
     r'''Calculates the ideal gas Helmholtz energy of air according to Lemmon 
@@ -92,6 +161,12 @@ def lemmon2000_air_A0(tau, delta):
 
     Notes
     -----
+    
+    The coefficients are as follows:
+        
+    Ns = [0.605719400E-7, -0.210274769E-4, -0.158860716E-3, -13.841928076, 
+    17.275266575, -0.195363420E-3, 2.490888032, 0.791309509, 0.212236768, 
+    -0.197938904, 25.36365, 16.90741, 37.31279]
             
     Examples
     --------
@@ -128,8 +203,8 @@ def lemmon2000_air_dA0_dtau(tau, delta):
     Returns
     -------
     dA0_dtau : float
-        First derivative of `A0/RT` Ideal gas dimensionless Helmholtz energy
-         with respect to `tau` [-]
+        First derivative of `A0/(RT)` Ideal gas dimensionless Helmholtz energy
+        with respect to `tau` [-]
 
     Notes
     -----
@@ -174,8 +249,8 @@ def lemmon2000_air_d2A0_dtau2(tau, delta):
     Returns
     -------
     d2A0_dtau2 : float
-        Second derivative of `A0/RT` Ideal gas dimensionless Helmholtz energy
-         with respect to `tau` [-]
+        Second derivative of `A0/(RT)` Ideal gas dimensionless Helmholtz energy
+        with respect to `tau` [-]
 
     Notes
     -----
@@ -223,8 +298,8 @@ def lemmon2000_air_d3A0_dtau3(tau, delta):
     Returns
     -------
     d3A0_dtau3 : float
-        Third derivative of `A0/RT` Ideal gas dimensionless Helmholtz energy
-         with respect to `tau` [-]
+        Third derivative of `A0/(RT)` Ideal gas dimensionless Helmholtz energy
+        with respect to `tau` [-]
 
     Notes
     -----
@@ -273,8 +348,8 @@ def lemmon2000_air_d4A0_dtau4(tau, delta):
     Returns
     -------
     d4A0_dtau4 : float
-        Fourth derivative of `A0/RT` Ideal gas dimensionless Helmholtz energy
-         with respect to `tau` [-]
+        Fourth derivative of `A0/(RT)` Ideal gas dimensionless Helmholtz energy
+        with respect to `tau` [-]
 
     Notes
     -----
@@ -1541,7 +1616,7 @@ def lemmon2000_air_rho_dew(T):
 
     Notes
     -----
-    The stated range of this ancillary equation is 59.75 <= T <= 132.6312.
+    The stated range of this ancillary equation is 59.75 K <= T <= 132.6312 K.
 
     Examples
     --------
@@ -1584,7 +1659,7 @@ def lemmon2000_air_rho_bubble(T):
 
     Notes
     -----
-    The stated range of this ancillary equation is 59.75 <= T <= 132.6312.
+    The stated range of this ancillary equation is 59.75 K <= T <= 132.6312 K.
 
     Examples
     --------
@@ -1630,7 +1705,7 @@ def lemmon2000_air_P_dew(T):
 
     Notes
     -----
-    The stated range of this ancillary equation is 59.75 <= T <= 132.6312.
+    The stated range of this ancillary equation is 59.75 K <= T <= 132.6312 K.
 
     Examples
     --------
@@ -1671,7 +1746,7 @@ def lemmon2000_air_P_bubble(T):
 
     Notes
     -----
-    The stated range of this ancillary equation is 59.75 <= T <= 132.6312.
+    The stated range of this ancillary equation is 59.75 K <= T <= 132.6312 K.
 
     Examples
     --------
@@ -1697,6 +1772,41 @@ def lemmon2000_air_P_bubble(T):
 
 
 def lemmon2000_P(T, rho):
+    r'''Calculate the pressure of air according to the (2000)
+    given a temperature `T` and molar density `rho`.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    rho : float
+        Molar density of water, [mol/m^3]
+
+    Returns
+    -------
+    P : float
+        Pressure, [Pa]
+        
+    Notes
+    -----    
+    Helmholtz equations of state are explicit with inputs of temperature and 
+    density, so this is a direct calculation with no iteration required.
+    
+    Examples
+    --------
+    >>> lemmon2000_P(330.0, lemmon2000_rho(T=330.0, P=8e5))
+    8e5
+    >>> lemmon2000_P(823.0, 40)
+    273973.0024911
+    
+    References
+    ----------
+    .. [1] Lemmon, Eric W., Richard T. Jacobsen, Steven G. Penoncello, and 
+       Daniel G. Friend. "Thermodynamic Properties of Air and Mixtures of 
+       Nitrogen, Argon, and Oxygen From 60 to 2000 K at Pressures to 2000 MPa."
+       Journal of Physical and Chemical Reference Data 29, no. 3 (May 1, 2000):
+       331-85. https://doi.org/10.1063/1.1285884.
+    '''
     tau = lemmon2000_air_T_reducing/T
     delta = rho*lemmon2000_air_rho_reducing_inv
     dAddelta_res_val = lemmon2000_air_dAr_ddelta(tau, delta)
@@ -1719,6 +1829,45 @@ def lemmon2000_rho_err(rho, T, P_spec):
 
 
 def lemmon2000_rho(T, P):
+    r'''Calculate the density of water according to the Lemmon (2000) [1]_
+    given a temperature `T` and pressure `P`.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    P : float
+        Pressure, [Pa]
+        
+    Returns
+    -------
+    rho : float
+        Molar density of water, [mol/m^3]
+
+    Notes
+    -----    
+    This solution is iterative due to the nature of the equation.
+    This solver has been tested only for gas solutions.
+    
+    Examples
+    --------
+    >>> lemmon2000_rho(T=300.0, P=1e6)
+    402.046613509
+    
+    2 GPa and 2000 K are suggested as upper limits of [1]_ although there are
+    no hardcoded limits for temperature and pressure.
+    
+    >>> lemmon2000_rho(T=2000.0, P=2e9)
+    32892.9327834
+
+    References
+    ----------
+    .. [1] Lemmon, Eric W., Richard T. Jacobsen, Steven G. Penoncello, and 
+       Daniel G. Friend. "Thermodynamic Properties of Air and Mixtures of 
+       Nitrogen, Argon, and Oxygen From 60 to 2000 K at Pressures to 2000 MPa."
+       Journal of Physical and Chemical Reference Data 29, no. 3 (May 1, 2000):
+       331-85. https://doi.org/10.1063/1.1285884.
+    '''
     a = 1e-20 # Value where error is always negative
     b = 500000.0 # value where error is always positive
 
@@ -1752,6 +1901,52 @@ def lemmon2000_rho(T, P):
 TEOS10_CAAW_coeffs = [0.482737E-9, 1.05678E-7, -6.56394E-5,  0.294442E-1, -3.19317][::-1]
 
 def TEOS10_CAAW_derivatives(T):
+    r'''Calculates the third molar virial cross coefficient between
+    air and air-water according to [1]_.
+    
+    .. math::
+        C_{aaw}(T) = \frac{1}{(\bar \rho^*)^2}\sum_{i=1}^5 c_i(\theta)^{1-i}
+        
+    Where :math:`\theta = T/T^*` and :math:`T^* = 100` K and :math:`\bar \rho = 10^6`
+    mol/m^3.
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    Caaw : float
+        Air air-water second molar virial cross coefficient [m^6/mol^2]
+    dCaaw_dT : float
+        First temperature derivative of air air-water third molar virial cross
+        coefficient [m^6/(mol^2*K)]
+    d2Caaw_dT2 : float
+        Second temperature derivative of air air-water third molar virial cross
+        coefficient [m^6/(mol^2*K^2)]
+    d3Caaw_dT3 : float
+        Third temperature derivative of air air-water third molar virial cross
+        coefficient [m^6/(mol^2*K^3)]
+
+    Notes
+    -----
+    The coefficients are as follows:
+        
+    cis =  [0.482737E-9, 1.05678E-7, -6.56394E-5,  0.294442E-1, -3.19317]
+            
+    Examples
+    --------
+    >>> TEOS10_CAAW_derivatives(300.0)
+    (8.019777407407409e-10, -1.9610345679012353e-12, 1.700556378600824e-14, -1.0129827160493832e-16)
+
+    References
+    ----------
+    .. [1] Herrmann, Sebastian, Hans-Joachim Kretzschmar, and Donald P. Gatley. 
+       "Thermodynamic Properties of Real Moist Air, Dry Air, Steam, Water, and
+       Ice (RP-1485)." HVAC&R Research 15, no. 5 (September 1, 2009): 961-986.
+       https://doi.org/10.1080/10789669.2009.10390874.
+    '''
     T_inv = 1.0/T
     d0, d1, d2, d3 = horner_and_der3(TEOS10_CAAW_coeffs, T_inv)
     T_inv2 = T_inv*T_inv
@@ -1761,6 +1956,53 @@ def TEOS10_CAAW_derivatives(T):
             -(6.0*(d1 + d2*T_inv) + d3*T_inv2)*T_inv2*T_inv2)
 
 def TEOS10_CAWW_derivatives(T):
+    r'''Calculates the third molar virial cross coefficient between
+    air and water-water according to [1]_.
+    
+    .. math::
+        C_{aww}(T) = \frac{1}{(\bar \rho^*)^2}\exp\left[\sum_{i=1}^4
+        d_i(\theta)^{1-i}\right]
+        
+    Where :math:`\theta = T/T^*` and :math:`T^* = 100` K and :math:`\bar \rho = 10^6`
+    mol/m^3.
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    Caww : float
+        Air water-water second molar virial cross coefficient [m^6/mol^2]
+    dCaww_dT : float
+        First temperature derivative of air water-water third molar virial cross
+        coefficient [m^6/(mol^2*K)]
+    d2Caww_dT2 : float
+        Second temperature derivative of air water-water third molar virial cross
+        coefficient [m^6/(mol^2*K^2)]
+    d3Caww_dT3 : float
+        Third temperature derivative of air water-water third molar virial cross
+        coefficient [m^6/(mol^2*K^3)]
+
+    Notes
+    -----
+    The coefficients are as follows:
+        
+    dis = [-0.10728876E2, 0.347802E2, -0.383383E2, 0.334060E2]
+            
+    Examples
+    --------
+    >>> TEOS10_CAWW_derivatives(300.0)
+    (-1.1555278368039349e-07, 2.6136327775413448e-09, -7.513345818045024e-11, 2.601834967770415e-12)
+    
+    References
+    ----------
+    .. [1] Herrmann, Sebastian, Hans-Joachim Kretzschmar, and Donald P. Gatley. 
+       "Thermodynamic Properties of Real Moist Air, Dry Air, Steam, Water, and
+       Ice (RP-1485)." HVAC&R Research 15, no. 5 (September 1, 2009): 961-986.
+       https://doi.org/10.1080/10789669.2009.10390874.
+    '''
     T_inv = 1.0/T
     expt = exp(T_inv*(T_inv*(33406000.0*T_inv - 383383.0) + 3478.02))
     d0 = -2.190323971261093e-11*expt
@@ -1781,15 +2023,65 @@ def TEOS10_CAWW_derivatives(T):
     return (d0, d1, d2, d3)
 
 def TEOS10_BAW_derivatives(T):
+    r'''Calculates the second molar virial cross coefficient between
+    air and water according to [1]_.
+    
+    .. math::
+        B_{aw}(T) = \frac{1}{\bar \rho^*}\sum_{i=1}^3 c_i(\theta)^{d_i}
+        
+    Where :math:`\theta = T/T^*` and :math:`T^* = 100` K and :math:`\bar \rho = 10^6`
+    mol/m^3.
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    Baw : float
+        Air-water second molar virial cross coefficient [m^3/mol]
+    dBaw_dT : float
+        First temperature derivative of air-water second molar virial cross
+        coefficient [m^3/(mol*K)]
+    d2Baw_dT2 : float
+        Second temperature derivative of air-water second molar virial cross
+        coefficient [m^3/(mol*K^2)]
+    d3Baw_dT3 : float
+        Third temperature derivative of air-water second molar virial cross
+        coefficient [m^3/(mol*K^3)]
+
+    Notes
+    -----
+    
+    The coefficients are as follows:
+        
+    cis = [0.665687E2, -0.238834E3, -0.176755E3]
+    
+    dis = [-0.237, -1.048, -3.183]
+
+            
+    Examples
+    --------
+    >>> TEOS10_BAW_derivatives(300.0)
+    (-2.956727474282386e-05, 2.8009736043809844e-07, -2.425992413058737e-09,  3.0736974302787557e-11)
+
+    References
+    ----------
+    .. [1] Herrmann, Sebastian, Hans-Joachim Kretzschmar, and Donald P. Gatley. 
+       "Thermodynamic Properties of Real Moist Air, Dry Air, Steam, Water, and
+       Ice (RP-1485)." HVAC&R Research 15, no. 5 (September 1, 2009): 961-986.
+       https://doi.org/10.1080/10789669.2009.10390874.
+    '''
     T_inv = 1.0/T
     T_inv3_1000 = T_inv**0.003
-    T_inv6_1000 = T_inv3_1000*T_inv3_1000
-    T_inv12_1000 = T_inv6_1000*T_inv6_1000
+    T_inv12_1000 = T_inv3_1000*T_inv3_1000
+    T_inv12_1000 *= T_inv12_1000
     T_inv24_1000 = T_inv12_1000*T_inv12_1000
     T_inv27_1000 = T_inv3_1000*T_inv24_1000
     T_inv54_1000 = T_inv27_1000*T_inv27_1000
-    T_inv78_1000 = T_inv24_1000*T_inv54_1000
-    T_inv156_1000 = T_inv78_1000*T_inv78_1000
+    T_inv156_1000 = T_inv24_1000*T_inv54_1000
+    T_inv156_1000 *= T_inv156_1000
     T_inv183_1000 = T_inv27_1000*T_inv156_1000
     T_inv48_1000 = T_inv24_1000*T_inv24_1000
     T_inv237_1000 = T_inv54_1000*T_inv183_1000
@@ -1799,4 +2091,4 @@ def TEOS10_BAW_derivatives(T):
     d1 = 1306.79765498684*T_inv183_1000*T_inv3*T_inv + 0.0312217638764253*T_inv48_1000*T_inv2 - 4.69914040926711e-5*T_inv237_1000*T_inv
     d2 = -5466.33459080994*T_inv183_1000*T_inv3*T_inv2 - 0.0639421724189189*T_inv48_1000*T_inv3 + 5.81283668626341e-5*T_inv237_1000*T_inv2
     d3 = 28332.0121841679*T_inv183_1000*T_inv3*T_inv3+ 0.194895741532865*T_inv48_1000*T_inv2*T_inv2 - 0.000130033156671713*T_inv237_1000*T_inv3
-    return d0, d1, d2
+    return d0, d1, d2, d3

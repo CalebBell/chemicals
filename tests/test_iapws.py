@@ -1601,7 +1601,7 @@ def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
 
 #test_iapws95_d3A_d3deltar_vs_naive(precise=True, allow_fail=True)
 
-test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True)
+#test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True)
 
 
   
@@ -1980,8 +1980,6 @@ def test_iapws95_iapws95_dA0_dtau_vs_naive():
             rerr += rerri
             errs.append(rerri)
 #    print(rerr/N**2, np.std(errs), np.max(errs))
-
-test_iapws95_iapws95_dA0_dtau_vs_naive()
 
 @pytest.mark.slow
 @pytest.mark.fuzz
