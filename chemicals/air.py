@@ -83,10 +83,16 @@ Humid Air Virial Terms
 .. autofunction:: chemicals.air.TEOS10_CAAW_derivatives
 .. autofunction:: chemicals.air.TEOS10_CAWW_derivatives
 
+Henry's Law for Air in Water
+----------------------------
+.. autofunction:: chemicals.air.iapws04_Henry_air
+.. autofunction:: chemicals.air.iapws04_dHenry_air_dT
+
 """
 from __future__ import division
 from math import exp, log, sqrt
 from fluids.numerics import horner_and_der3
+from chemicals.iapws import iapws92_Psat, iapws92_dPsat_dT, iapws95_Tc, iapws95_Tc_inv
 
 __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d2A0_dtau2', 'lemmon2000_air_d3A0_dtau3',
@@ -109,6 +115,7 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            
            'TEOS10_BAW_derivatives', 'TEOS10_CAWW_derivatives',
            'TEOS10_CAAW_derivatives',
+           'iapws04_Henry_air', 'iapws04_dHenry_air_dT',
            ]
 
 # Get a good, fast variant of lemmon (2000) in here
@@ -2092,3 +2099,127 @@ def TEOS10_BAW_derivatives(T):
     d2 = -5466.33459080994*T_inv183_1000*T_inv3*T_inv2 - 0.0639421724189189*T_inv48_1000*T_inv3 + 5.81283668626341e-5*T_inv237_1000*T_inv2
     d3 = 28332.0121841679*T_inv183_1000*T_inv3*T_inv3+ 0.194895741532865*T_inv48_1000*T_inv2*T_inv2 - 0.000130033156671713*T_inv237_1000*T_inv3
     return d0, d1, d2, d3
+
+
+### Henry
+def iapws04_Henry_air(T):
+    # result has units of 1/Pa
+    Tr = T*iapws95_Tc_inv
+    Tr_inv = 1.0/Tr
+    tau = 1.0 - Tr
+    Psat = iapws92_Psat(T)
+    tau_355_1000 = tau**0.355
+    exp_041_term = Tr**-0.41*exp(tau)
+    kH_N2 = exp(Tr_inv*(9.67578 - 4.72162*tau_355_1000) - 11.70585*exp_041_term)
+    kH_O2 = exp(Tr_inv*(9.44833 - 4.43822*tau_355_1000) - 11.42005*exp_041_term)
+    kH_Ar = exp(Tr_inv*(8.40954 - 4.29587*tau_355_1000) - 10.52779*exp_041_term)
+    # NOT the mole fractions of Lemmon (2000)!
+    return (0.7812*kH_N2 + 0.2095*kH_O2 + 0.0093*kH_Ar)/(1.01325*Psat)
+
+def iapws04_dHenry_air_dT(T):
+    dPsat_dT, Psat = iapws92_dPsat_dT(T)
+    x1 = 1.0/Psat
+    Tr = T*iapws95_Tc_inv
+    tau = 1.0 - Tr
+    x5 = Tr**(-0.41)*exp(tau)
+    x6 = 11.70585*x5
+    x7 = tau**0.355
+    x8 = 4.72162*x7
+    T_inv = 1.0/T
+    x10 = iapws95_Tc*T_inv
+    x11 = 0.7812*exp(x10*(9.67578 - x8) - x6)
+    x12 = 11.42005*x5
+    x13 = 4.43822*x7
+    x14 = 0.2095*exp(x10*(9.44833 - x13) - x12)
+    x15 = 10.52779*x5
+    x16 = 4.29587*x7
+    x17 = 0.0093*exp(x10*(8.40954 - x16) - x15)
+    x18 = x1*(x11 + x14 + x17)
+    x19 = x7/tau*T_inv
+    x20 = iapws95_Tc*T_inv*T_inv
+    x21 = x5*T_inv
+    H = 0.9869232667160128*x18
+    dH_dT = (0.9869232667160128*x1*(x11*(1.6761751*x19 + iapws95_Tc_inv*x6 + x20*(x8 - 9.67578)
+    + 4.7993985*x21) + x14*(x12*iapws95_Tc_inv + 1.5755681*x19 + x20*(x13 - 9.44833) + 4.6822205*x21)
+        + x17*(x15*iapws95_Tc_inv + 1.52503385*x19 + x20*(x16 - 8.40954) + 4.3163939*x21) - x18*dPsat_dT))
+    return dH_dT, H
+
+def ashrae1485_sat_err(xsat_w, T, P, Psat_w, Vsat_w, kappa_w, H, Baa, Bww, Baw, 
+                       Caaa, Cwww, Caaw, Caww):
+    r'''Calculates the error in the saturation mole fraction of water according
+    to [1]_.
+    
+    .. math::
+        
+
+    Parameters
+    ----------
+    xsat_w : float
+        Guessed saturation mole fraction of water at `T` and `P`, [-]
+    T : float
+        Temperature, [K]
+    P : float
+        Pressure, [Pa]
+    Psat_w : float
+        Vapor pressure of water calculated with :obj:`Psat_IAPWS`, [Pa]
+    Vsat_w : float
+        Molar volume of water at the saturation pressure, [m^3/mol]
+    kappa_w : float
+        Isothermal coefficient of compressibility of water at `T` and `P` 
+        according to IAPWS-95 [1/Pa]
+    H : float
+        Henry's constant of air in water at `T`, [1/Pa]
+    Baa : float
+        Air-air second molar virial cross coefficient [m^3/mol]
+    Bww : float
+        Water-water second molar virial cross coefficient [m^3/mol]
+    Baw : float
+        Air-water second molar virial cross coefficient [m^3/mol]
+    Caaa : float
+        Air air-air second molar virial cross coefficient [m^6/mol^2]
+    Cwww : float
+        Water water-water second molar virial cross coefficient [m^6/mol^2]
+    Caaw : float
+        Air air-water second molar virial cross coefficient [m^6/mol^2]
+    Caww : float
+        Air water-water second molar virial cross coefficient [m^6/mol^2]
+
+    Returns
+    -------
+    err : float
+        Water enhancement error; should be zero when converged, [-]
+
+    Notes
+    -----
+            
+    Examples
+    --------
+    
+    References
+    ----------
+    .. [1] Herrmann, Sebastian, Hans-Joachim Kretzschmar, and Donald P. Gatley. 
+       "Thermodynamic Properties of Real Moist Air, Dry Air, Steam, Water, and
+       Ice (RP-1485)." HVAC&R Research 15, no. 5 (September 1, 2009): 961-986.
+       https://doi.org/10.1080/10789669.2009.10390874.
+    '''
+    R = 8.314472# table 3.1
+    RT_inv = 1.0/(R*T)
+
+    term0 = ((1.0 + kappa_w*Psat_w)*(P - Psat_w) - 0.5*kappa_w*(P*P - Psat_w*Psat_w))*Vsat_w
+    term1 = log(1.0 - H*(1.0 - xsat_w)*P)
+
+    term2 = RT_inv*((1.0 - xsat_w)**2*P*Baa - 2.0*(1.0 - xsat_w)**2*P*Baw
+            - (P - Psat_w - P*(1.0 - xsat_w)**2)*Bww)
+
+    t0 = (1.0 - xsat_w)**3*P*P*Caaa + 1.5*(1.0 - xsat_w)**2*(1.0 - 2.0*(1.0-xsat_w))*P**2*Caaw
+
+    t1 = -3.0*xsat_w*(1.0 - xsat_w)**2*P*P*Caww - 0.5*((3.0 - 2.0*xsat_w)*xsat_w*xsat_w*P*P - Psat_w*Psat_w)*Cwww
+
+    t2 =-xsat_w*(-2.0 + 3*xsat_w)*(1.0 - xsat_w)**2*P*P*Baa*Bww - 2.0*(-1.0 + 3.0*xsat_w)*(1.0 - xsat_w)**3*P*P*Baa*Baw
+
+    t3 = 6.0*xsat_w*xsat_w*(1.0 - xsat_w)**2*P*P*Baw*Bww - 1.5*(1.0 - xsat_w)**4*P*P*Baa*Baa
+
+    t4 = -2.0*xsat_w*(-2.0 + 3.0*xsat_w)*(1.0 - xsat_w)**2*P*P*Baw*Baw - 0.5*(Psat_w*Psat_w - (4.0 - 3.0*xsat_w)*xsat_w**3*P*P)*Bww*Bww
+
+    lnf = RT_inv*(term0) + term1 + term2 + RT_inv*RT_inv*(t0 + t1 + t2 + t3 + t4)
+    return exp(lnf)*Psat_w/P - xsat_w

@@ -49,10 +49,12 @@ IAPWS-95 Properties
 ------------------------
 .. autofunction:: chemicals.iapws.iapws95_properties
 
-IAPWS-95 Saturation Pressure/Temperature
+IAPWS Saturation Pressure/Temperature
 ----------------------------------------
 .. autofunction:: chemicals.iapws.iapws95_Psat
 .. autofunction:: chemicals.iapws.iapws95_dPsat_dT
+.. autofunction:: chemicals.iapws.iapws92_Psat
+.. autofunction:: chemicals.iapws.iapws92_dPsat_dT
 .. autofunction:: chemicals.iapws.iapws95_Tsat
 .. autofunction:: chemicals.iapws.iapws95_saturation
 
@@ -60,6 +62,7 @@ IAPWS Saturation Density
 ------------------------
 .. autofunction:: chemicals.iapws.iapws95_rhol_sat
 .. autofunction:: chemicals.iapws.iapws95_rhog_sat
+.. autofunction:: chemicals.iapws.iapws95_drhol_sat_dT
 .. autofunction:: chemicals.iapws.iapws92_rhol_sat
 .. autofunction:: chemicals.iapws.iapws92_rhog_sat
 
@@ -189,18 +192,18 @@ from fluids.numerics import (secant, newton, trunc_log, trunc_exp, horner,
 
 
 __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
-	'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
-	'iapws97_region1_rho', 'iapws97_region2_rho', 'iapws97_region5_rho',
-	'iapws95_rho', 'iapws95_P', 'iapws95_T', 'iapws97_rho_extrapolated',
-	'iapws97_rho', 'iapws97_P', 'iapws97_T', 'iapws95_Psat', 'iapws95_dPsat_dT',
-	'iapws95_Tsat', 'iapws92_rhol_sat', 'iapws92_rhog_sat', 'iapws95_rhol_sat',
+           'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
+           'iapws97_region1_rho', 'iapws97_region2_rho', 'iapws97_region5_rho',
+           'iapws95_rho', 'iapws95_P', 'iapws95_T', 'iapws97_rho_extrapolated',
+           'iapws97_rho', 'iapws97_P', 'iapws97_T', 'iapws95_Psat', 'iapws95_dPsat_dT',
+           'iapws95_Tsat', 'iapws92_rhol_sat', 'iapws92_rhog_sat', 'iapws95_rhol_sat',
 	'iapws95_rhog_sat', 'iapws95_saturation', 'iapws95_A0', 'iapws95_dA0_dtau',
 	'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3', 'iapws95_A0_tau_derivatives', 
     'iapws95_Ar', 'iapws95_d3Ar_ddeltadtau2', 'iapws95_d3Ar_ddelta2dtau',
 	'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3',
 	'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2', 'iapws95_d2Ar_ddeltadtau',
 	'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc', 'iapws95_R',
-    'iapws97_R', 'iapws97_G_region1', 
+    'iapws97_R', 'iapws97_G_region1', 'iapws95_drhol_sat_dT',
 	'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
 	'iapws97_dG_dtau_region1', 'iapws97_d2G_dtau2_region1',
 	'iapws97_d2G_dpidtau_region1', 'iapws97_Gr_region2',
@@ -210,26 +213,27 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
 	'iapws97_dG0_dtau_region2', 'iapws97_d2G0_dtau2_region2',
 	'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_dpi2_region5',
 	'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_dtau2_region5',
-	'iapws97_d2Gr_dpidtau_region5', 'iapws97_G0_region5',
-	'iapws97_dG0_dtau_region5', 'iapws97_d2G0_dtau2_region5', 'iapws97_A_region3',
-	'iapws97_dA_ddelta_region3', 'iapws97_d2A_ddelta2_region3',
-	'iapws97_dA_dtau_region3', 'iapws97_d2A_dtau2_region3',
-	'iapws97_d2A_ddeltadtau_region3', 'iapws97_boundary_3uv',
-	'iapws97_boundary_3ef', 'iapws97_boundary_3ef', 'iapws97_boundary_3cd',
-	'iapws97_boundary_3gh', 'iapws97_boundary_3ij', 'iapws97_boundary_3jk',
-	'iapws97_boundary_3mn', 'iapws97_boundary_3qu', 'iapws97_boundary_3rx',
-	'iapws97_boundary_3wx', 'iapws97_boundary_3ab', 'iapws97_boundary_3op',
-	'iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c',
-	'iapws97_region3_d', 'iapws97_region3_e', 'iapws97_region3_f',
-	'iapws97_region3_g', 'iapws97_region3_h', 'iapws97_region3_i',
-	'iapws97_region3_j', 'iapws97_region3_k', 'iapws97_region3_l',
-	'iapws97_region3_m', 'iapws97_region3_n', 'iapws97_region3_o',
-	'iapws97_region3_p', 'iapws97_region3_q', 'iapws97_region3_r',
-	'iapws97_region3_s', 'iapws97_region3_t', 'iapws97_region3_u',
-	'iapws97_region3_v', 'iapws97_region3_w', 'iapws97_region3_x',
-	'iapws97_region3_y', 'iapws97_region3_z',
-    'iapws95_properties',
-]
+           'iapws97_d2Gr_dpidtau_region5', 'iapws97_G0_region5',
+           'iapws97_dG0_dtau_region5', 'iapws97_d2G0_dtau2_region5', 'iapws97_A_region3',
+           'iapws97_dA_ddelta_region3', 'iapws97_d2A_ddelta2_region3',
+           'iapws97_dA_dtau_region3', 'iapws97_d2A_dtau2_region3',
+           'iapws97_d2A_ddeltadtau_region3', 'iapws97_boundary_3uv',
+           'iapws97_boundary_3ef', 'iapws97_boundary_3ef', 'iapws97_boundary_3cd',
+           'iapws97_boundary_3gh', 'iapws97_boundary_3ij', 'iapws97_boundary_3jk',
+           'iapws97_boundary_3mn', 'iapws97_boundary_3qu', 'iapws97_boundary_3rx',
+           'iapws97_boundary_3wx', 'iapws97_boundary_3ab', 'iapws97_boundary_3op',
+           'iapws97_region3_a', 'iapws97_region3_b', 'iapws97_region3_c',
+           'iapws97_region3_d', 'iapws97_region3_e', 'iapws97_region3_f',
+           'iapws97_region3_g', 'iapws97_region3_h', 'iapws97_region3_i',
+           'iapws97_region3_j', 'iapws97_region3_k', 'iapws97_region3_l',
+           'iapws97_region3_m', 'iapws97_region3_n', 'iapws97_region3_o',
+           'iapws97_region3_p', 'iapws97_region3_q', 'iapws97_region3_r',
+           'iapws97_region3_s', 'iapws97_region3_t', 'iapws97_region3_u',
+           'iapws97_region3_v', 'iapws97_region3_w', 'iapws97_region3_x',
+           'iapws97_region3_y', 'iapws97_region3_z',
+           'iapws95_properties',
+           'iapws92_Psat', 'iapws92_dPsat_dT',
+           ]
 
 iapws95_R = 461.51805
 '''Specific gas constant in J/(kg*K) according to IAPWS-95'''
@@ -5682,6 +5686,94 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
     return Psat, rhol, rhog
 
 
+def iapws92_Psat(T):
+    r'''Compute the saturation pressure of the IAPWS-92 equation.
+    
+    .. math::
+        P_{sat} = P_c \exp\left(\frac{T_c}{T}[a_1\tau + a_2\tau^{1.5} + a_3\tau^3 + a_4\tau^{3.5}
+        a_5\tau^4 + a_6\tau^{7.5}]\right)
+        
+    Parameters
+    ----------
+    T : float
+        Temperature at which to calculate the saturation condition and
+        its temperature derivative, [K]
+
+    Returns
+    -------
+    Psat : float
+        Saturation vapor pressure, [Pa]
+    
+    Notes
+    -----
+    The coefficients are [-7.85951783, 1.84408259, -11.7866497, 22.6807411, 
+    -15.9618719, 1.80122502]
+    
+    Examples
+    --------
+    >>> iapws92_Psat(400.0)
+    245765.2635418
+    '''
+    Tr = T*iapws95_Tc_inv
+    tau = 1.0 - Tr
+    taurt2 = sqrt(tau)
+    tau2 = tau*tau
+    tau3 = tau*tau2
+    tau4 = tau2*tau2
+    return iapws95_Pc*exp((1.84408259*tau*taurt2 - 7.85951783*tau + 22.6807411*tau3*taurt2
+                      + 1.80122502*tau3*taurt2*tau4 - 11.7866497*tau3 - 15.9618719*tau4)/Tr)
+
+def iapws92_dPsat_dT(T):
+    r'''Compute the temperature derivative of saturation pressure of the 
+    IAPWS-92 equation.
+    
+    .. math::
+        P_{sat} = P_c \exp\left(\frac{T_c}{T}[a_1\tau + a_2\tau^{1.5} + a_3\tau^3 + a_4\tau^{3.5}
+        a_5\tau^4 + a_6\tau^{7.5}]\right)
+        
+    Parameters
+    ----------
+    T : float
+        Temperature at which to calculate the saturation condition and
+        its temperature derivative, [K]
+
+    Returns
+    -------
+    dPsat_dT : float
+        First temperature derivative of saturation vapor pressure, [Pa/K]
+    Psat : float
+        Saturation vapor pressure, [Pa]
+    
+    Notes
+    -----
+    The coefficients are [-7.85951783, 1.84408259, -11.7866497, 22.6807411, 
+    -15.9618719, 1.80122502]
+    
+    Examples
+    --------
+    >>> iapws92_dPsat_dT(400.0)
+    (7483.47094105, 245765.263541)
+    '''
+    Tr = T*iapws95_Tc_inv
+    T_inv = 1.0/T
+    Tr_inv = iapws95_Tc*T_inv
+    tau = 1.0 - Tr
+    taurt2 = sqrt(tau)
+    tau2 = tau*tau
+    tau4 = tau2*tau2
+    Psat = iapws95_Pc*exp(tau*(taurt2*(1.84408259  + (1.80122502*tau4 + 22.6807411)*tau2)
+                      - tau2*(11.7866497 + 15.9618719*tau) - 7.85951783)*Tr_inv)
+    dPsat_dT = ((Tr*tau*(-13.50918765*tau4 - 79.38259385)
+         + tau2*(-1.80122502*tau4 - 22.6807411)
+         - 1.84408259)*T_inv*Tr_inv*taurt2*tau
+    
+        + iapws95_Tc_inv*Tr_inv*(35.60803943*Tr_inv
+                + Tr*(-2.766123885*Tr_inv*taurt2 + Tr*(151.2682746 - 47.8856157*Tr)
+                - 131.1311805)))
+    dPsat_dT *= Psat
+    return dPsat_dT, Psat
+
+
 Psat_coeffs_iapws95_235_273 = [-0.0404815673828125, 0.0458526611328125, 0.375885009765625, -0.4257164001464844, -1.6131267547607422, 1.8266944885253906, 4.242580890655518, -4.803114175796509, -7.645859479904175, 8.652797102928162, 10.002255886793137, -11.31277510523796, -9.817383006215096, 11.092894461005926, 7.370591592043638, -8.314844283275306, -4.277057046769187, 4.812127415090799, 1.925885249627754, -2.1572029151720926, -0.6719730040349532, 0.7471348317922093, 0.18054040489369072, -0.19828112466348102, -0.03694033686770126, 0.03975118442394887, 0.005655801688135398, -0.005886636653485766, -0.000631581975426343, 0.0006184879482020733, 5.696264696553044e-05, -4.779557498579834e-05, -1.56374487509936e-05, 5.210719629289429e-05, -0.0001258797167196235, 0.00031015444493132094, -0.0012805056242366497, 0.01149752302139273, -0.13780084439128548, 1.6313925771945534, -11.998047252356896]
 Psat_coeffs_iapws95_273_460 = [8.147908374667168e-07, -1.3258541002869606e-06, -2.960063284263015e-06, 4.862929927185178e-06, 6.120302714407444e-06, -9.979732567444444e-06, -6.454627509810962e-06, 1.1027086657122709e-05, 5.648329533869401e-06, -1.0190725788561394e-05, -1.3649275842908537e-06, 4.478973778532236e-07, 2.4834392547745665e-05, -5.852100520087333e-05, 0.00011126565522801002, -0.00036335083247251987, 0.0013489128931727379, -0.0047478345366922525, 0.018241801868318586, -0.07380538465894615, 0.2868986774488336, -1.015108797564658, 3.4736507508968284, -5.619649447193197]
 Psat_coeffs_iapws95_460_609 = [2.0064180716872215e-07, 2.892629709094763e-07, -8.132046787068248e-07, -1.2402815627865493e-06, 1.2566961231641471e-06, 1.8773480405798182e-06, -1.3796370694763027e-06, -1.8621731214807369e-06, 4.6375271267606877e-07, 1.1436318345658947e-06, 1.6705293433005863e-06, 1.7150333064819279e-06, 1.3039190918107124e-06, 5.15597523786937e-06, 1.185603442621641e-05, 1.694959209075364e-05, 5.210011446887819e-05, 7.716156925408058e-06, 0.0009684942799086382, -0.0037996536704614225, 0.031002148395983753, -0.1716204979856538, 1.2065145338661658, -1.519520204731372]
@@ -5891,6 +5983,21 @@ rhol_coeffs_iapws95_647_64709599 = [-0.001290641725063324, -0.000377871096134185
 rhol_coeffs_iapws95_647_647095999 = [-4.733548848889768e-06, -7.60948023525998e-06, 1.7879367078421637e-05, 3.080385795328766e-05, -3.0345471259352053e-05, -5.6281653996848036e-05, 2.7725049449145445e-05, 5.695053056342658e-05, -1.5959582896130087e-05, -3.672514257857529e-05, 3.8304293354940455e-06, 1.2481707166500655e-05, -3.0915939763787037e-06, -6.661048546519055e-06, -4.9108654751606196e-06, -7.2591069035787825e-06, -1.2581070591322074e-05, -2.1996436737614644e-05, -4.2936997922793374e-05, -0.00010488089397681088, -0.0005081514985303057, 1.0012486252556012]
 rhol_coeffs_iapws95_647_64709599999 = [-342.1649169921875, -286.70733642578125, 3696.8092041015625, 3062.9874267578125, -18628.276138305664, -15248.527671813965, 58141.86198616028, 46974.429047584534, -125898.94741535187, -100287.08330655098, 200761.28558278084, 157482.6384627223, -244240.7832775116, -188416.60116776824, 231738.97573629767, 175548.21367172152, -173839.0422554016, -129094.15901541244, 103905.44825894013, 75496.35919268127, -49644.42389814614, -35215.162472276075, 18947.322668814828, 13087.622056136344, -5751.365423334828, -3856.5318880818013, 1377.1159714494315, 892.9758781142154, -256.84921118732746, -160.2506746801855, 36.651197303384606, 21.84684986680145, -3.9021237365971047, -2.1983816265822327, 0.2992404034464471, 0.15648404704313634, -0.01571472634215354, -0.007373118351861052, 0.0005188793214245813, 0.00019840994932129874, -1.665223554836448e-05, -1.1892982883288106e-05, -1.36274066943054e-05, -2.2384801104155527e-05, -4.5679905172298085e-05, -0.0001857746544898474, 1.0003799295366436]
 
+rhol_all_coeffs_iapws95 = [rhol_coeffs_iapws95_235_273, rhol_coeffs_iapws95_273_460, 
+                           rhol_coeffs_iapws95_460_609, rhol_coeffs_iapws95_609_643, 
+                           rhol_coeffs_iapws95_643_646, rhol_coeffs_iapws95_646_647, 
+                           rhol_coeffs_iapws95_647_64709, rhol_coeffs_iapws95_647_647095,
+                           rhol_coeffs_iapws95_647_6470959, rhol_coeffs_iapws95_647_64709599,
+                           rhol_coeffs_iapws95_647_647095999,
+                           rhol_coeffs_iapws95_647_64709599999]
+
+rhol_iapws95_coeff_set_count = len(rhol_all_coeffs_iapws95)
+rhol_iapws95_coeff_boundaries = [235.0, 273.15, 460.1225, 609.7005, 643.35555, 646.721055, 647.07, 647.09, 647.095, 647.0959, 647.09599, 647.095999, 647.09599999]
+
+rhol_iapws95_coeff_as = [0.052424639580602915, 0.0106967602187487444, 0.0133709502734359297, 0.0594264456597153254, 0.594264456597155322, 5.73156228058745576, 100.0, 400.0, 2222.22222221862921, 22222.2222221862903, 222222.222783279401, 2020202.04154185997]
+
+rhol_iapws95_coeff_bs = [254.074999999999989, 366.636250000000018, 534.911500000000046, 626.528025000000071, 645.038302499999986, 646.895527500000071, 647.080000000000041, 647.092499999999973, 647.095450000000028, 647.095945000000029, 647.095994499999961, 647.095999495000001]
+
 def iapws95_rhol_sat(T):
     r'''Compute the saturation liquid density of the IAPWS-95 equation using high-
     fidelity polynomial fits. These have a relative accuracy of under 1e-13,
@@ -5960,6 +6067,46 @@ def iapws95_rhol_sat(T):
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
     return val * iapws95_rhoc
 
+
+def iapws95_drhol_sat_dT(T):
+    r'''Compute the first temperature derivative of saturation liquid density 
+    of the IAPWS-95 equation using high-fidelity polynomial fits. The actual
+    saturated liquid density is returned as well.
+    
+    The range of the fit is 235 K to 647.096 K, the critical point. 
+    
+    Parameters
+    ----------
+    T : float
+        Temperature at which to calculate the saturation condition
+        and its derivative, [K]
+
+    Returns
+    -------
+    drhol_dT : float
+        First temperature derivative of saturation liquid density, [kg/(m^3*K)]
+    rhol : float
+        Saturation liquid density, [kg/m^3]
+    
+    Examples
+    --------
+    >>> iapws95_drhol_sat_dT(400.0)
+    (-0.835194603380, 937.486039392)
+    '''
+    if rhol_iapws95_coeff_boundaries[-1] < T <= iapws95_Tc:
+        return (-5464.1616377970422036*iapws95_rhoc,
+                (1.0000546416597242 - 5.464165972424162e-05*(T-647.09599999)/(647.096-647.09599999))*iapws95_rhoc)
+    for i in range(rhol_iapws95_coeff_set_count):
+        if rhol_iapws95_coeff_boundaries[i] <= T <= rhol_iapws95_coeff_boundaries[i+1]:
+            coeffs = rhol_all_coeffs_iapws95[i]
+            a, b = rhol_iapws95_coeff_as[i], rhol_iapws95_coeff_bs[i]
+            val, der = horner_and_der(coeffs,  a*(T - b))
+            rhol = iapws95_rhoc*val
+            drhol_dT = iapws95_rhoc*a*der
+            return drhol_dT, rhol        
+    raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
+    
+
 rhog_coeffs_iapws95_235_273 = [0.1376953125, -0.16064453125, -1.46826171875, 1.69775390625, 7.30413818359375, -8.376739501953125, -22.501876831054688, 25.625389099121094, 48.05792236328125, -54.43896484375, -75.48343086242676, 85.25402688980103, 90.2677903175354, -101.96795904636383, -83.95101803541183, 95.22411647439003, 61.49870456755161, -70.39149758219719, -35.72743892297149, 41.51342293806374, 16.49678842537105, -19.59625118598342, -6.0450619522016495, 7.399189752410166, 1.7498202509596013, -2.2248343522369396, -0.3973083387245424, 0.5282683086916222, 0.07019889306320692, -0.09777055511221988, -0.009583181835296273, 0.013834803114605165, 0.0010116799821844324, -0.0014553592153561112, -8.832041203277186e-05, 0.0001166358491389019, 2.63497172170446e-06, -1.855304673625824e-05, 4.9769065153526526e-05, -0.00012574357976014028, 0.000309940894730687, -0.0012701900216018913, 0.011378017130855733, -0.13488259814146453, 1.5565491834362626, -12.535071599332248]
 rhog_coeffs_iapws95_273_460 = [1.7136335372924805e-07, -3.762543201446533e-07, -8.121132850646973e-07, 1.8654391169548035e-06, 2.1441373974084854e-06, -4.7711655497550964e-06, -3.3307005651295185e-06, 7.087073754519224e-06, 4.624249413609505e-06, -8.835311746224761e-06, -4.7929461288731545e-06, 1.0012711754825432e-05, 6.726278115820605e-06, -1.6951385987340473e-05, -9.048057336258353e-06, 2.6337079361837823e-05, 4.6732045689168444e-05, -0.00012556672749042264, 6.779015188840276e-05, -0.0002350752717177329, 0.0014799389422037734, -0.004694000666042086, 0.01756919958847014, -0.07219342538345153, 0.2914447799309543, -0.9555489491588713, 3.249393719828254, -6.510294967224288]
 rhog_coeffs_iapws95_460_609 = [1.2516975402832031e-06, 1.475214958190918e-06, -6.6943466663360596e-06, -7.795169949531555e-06, 1.6705133020877838e-05, 2.0584091544151306e-05, -2.2356165573000908e-05, -3.1747971661388874e-05, 1.7298210877925158e-05, 3.512369585223496e-05, -7.913477020338178e-07, -2.318583574378863e-05, -3.4064614737872034e-06, 2.451385444146581e-05, 2.2935704691917636e-05, 8.854244697431568e-06, 2.8566514629346784e-05, 6.899303605223395e-05, 9.508152072612575e-05, 0.00014820537592186156, 0.0002821634795964201, 0.0005001793425947199, 0.0008733352662275706, 0.0016571537903367073, 0.003102883759193986, 0.007114612495199513, 0.008911656572993865, 0.05774574971527424, -0.08122819733346776, 1.2692652844232588, -2.57864220544887]
@@ -5973,6 +6120,16 @@ rhog_coeffs_iapws95_647_64709599 = [-8.106724635581486e-06, -2.8820204533985816e
 rhog_coeffs_iapws95_647_647095999 = [-6.350732803639403e-06, 3.169606685560211e-06, 4.043474250181589e-05, -1.1164001431751558e-05, -0.00010510194278801066, 1.7335470121615515e-05, 0.00015198191861953703, -1.3636971201158588e-05, -0.0001346982971606181, 6.242079475360374e-06, 7.785105900667832e-05, -3.2741184249895916e-08, -2.767780142779591e-05, 1.2714908340129283e-06, 9.144014199798448e-06, 3.451458830057083e-06, 3.9403172298118835e-06, 7.697128420847176e-06, 1.267204183537352e-05, 2.1967496184305084e-05, 4.2934223307938634e-05, 0.00010487735229099445, 0.0005090347179200651, -0.0012496837143941386]
 rhog_coeffs_iapws95_647_6470959999 = [-5.212060354864434e-06, -1.2219827251414017e-05, 2.8798432351706538e-05, 6.585986411966616e-05, -6.636928452752322e-05, -0.00014977469883592498, 8.476677627999862e-05, 0.00018944485286720436, -6.546990376135597e-05, -0.00014559560201167498, 3.2082676010722344e-05, 7.080311448931509e-05, -9.104274236474037e-06, -2.0487195780491234e-05, 2.7732548831052584e-06, 5.378368545767148e-06, 2.284769716569908e-06, 3.625228977934317e-06, 6.971486769632724e-06, 1.3625029664792398e-05, 3.3242598524321547e-05, 0.00016192478118363886, -0.00039652161031166215]
 rhog_coeffs_iapws95_647_64709599999 = [0.00012197307423278403, 3.93254984203395e-05, -0.0006863586597720683, -0.00021157731863841178, 0.0016779695676436557, 0.0004919766855269181, -0.0023356411482816086, -0.000646105308648115, 0.00203897414938424, 0.0005266602670174758, -0.0011586472452729257, -0.0002754642919942079, 0.0004306993903883255, 9.281167781887041e-05, -0.00010189150684249311, -1.9063380369572797e-05, 1.512611351263453e-05, 3.227987819904611e-06, 2.394942461261991e-07, 2.148075213501199e-06, 4.4557488727214e-06, 1.0666958153395576e-05, 5.1515776307511835e-05, -0.00012536531858820264]
+
+rhog_all_coeffs_iapws95 = [rhog_coeffs_iapws95_235_273, rhog_coeffs_iapws95_273_460, 
+                           rhog_coeffs_iapws95_460_609, rhog_coeffs_iapws95_609_643, 
+                           rhog_coeffs_iapws95_643_646, rhog_coeffs_iapws95_646_647, 
+                           rhog_coeffs_iapws95_647_64709, rhog_coeffs_iapws95_647_647095,
+                           rhog_coeffs_iapws95_647_6470959, rhog_coeffs_iapws95_647_64709599,
+                           rhog_coeffs_iapws95_647_647095999, rhog_coeffs_iapws95_647_6470959999,
+                           rhog_coeffs_iapws95_647_64709599999]
+
+rhog_iapws95_coeff_boundaries = [235.0, 273.15, 460.1225, 609.7005, 643.35555, 646.721055, 647.07, 647.09, 647.095, 647.0959, 647.09599, 647.095999, 647.0959999, 647.09599999, iapws95_Tc]
 
 def iapws95_rhog_sat(T):
     r'''Compute the saturation vapor density of the IAPWS-95 equation using high-

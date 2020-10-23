@@ -2191,6 +2191,19 @@ def test_iapws95_rhol_sat():
     with pytest.raises(ValueError):
         iapws95_rhol_sat(200.0)
 
+def test_iapws95_rhol_sat_dT():
+    for T in linspace(235.0, 647.096, 100):
+        assert_close(iapws95_drhol_sat_dT(T)[1], iapws95_rhol_sat(T), rtol=1e-13)
+
+    assert_close1d(iapws95_drhol_sat_dT(277), (0.002398816135429972, 999.9249513005213), rtol=1e-13)
+    assert_close1d(iapws95_drhol_sat_dT(647.09599999999), (-1759460.0473706475, 322.00001760241554), rtol=1e-13)
+    
+    # Numerical dereivatives do fail near T = 277 K
+    for T in linspace(235.0+10e-4, 647.095-10e-4, 10):
+        assert_close(iapws95_drhol_sat_dT(T)[0],
+                     derivative(iapws95_rhol_sat, T, dx=T*4e-7, order=7), rtol=1e-4)
+
+
 def test_rhog_sat_IAPWS95():
     assert_close(iapws95_rhog_sat(260.0), 0.0018552889771409127, rtol=1e-13)
     assert_close(iapws95_rhog_sat(400.0), 1.3694075410068125, rtol=1e-13)
@@ -2317,3 +2330,11 @@ def test_consistency_iapws95_rho_iapws95_P():
 def test_iapws95_properties():
     expect = [996.5563403888951, 112553.33413264707, 393.06243381456477, 112653.67968858521, 4130.178615033825, 4180.639522022912, 1501.520415056628, -2.2023653545981183e-07, 0.0009207295643366906, 1.978788044482276e-08, 4.4896388297803826e-07]
     assert_close1d(iapws95_properties(T=300.0, P=1e5), expect, rtol=1e-13)
+    
+    
+def test_iapws92_Psat():
+    assert_close(iapws92_Psat(400.0), 245765.263541822, rtol=1e-13)
+
+def test_iapws92_dPsat_dT():
+    assert_close(iapws92_dPsat_dT(400.0)[0], 7483.4709410560408287, rtol=1e-12)
+    assert_close(iapws92_dPsat_dT(400.0)[1], 245765.263541822, rtol=1e-12)

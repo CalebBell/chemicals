@@ -410,3 +410,10 @@ def test_TEOS10_BAW_derivatives():
     assert_close(TEOS10_BAW_derivatives(200)[1], 0.848076624E-6)
     assert_close(TEOS10_BAW_derivatives(200)[2], -0.122622146E-7)
     assert_close(derivative(lambda T: TEOS10_BAW_derivatives(T)[-2], 200.0, dx=200*1e-7), TEOS10_BAW_derivatives(200)[-1], rtol=1e-8)
+    
+def test_iapws04_Henry_air():
+    assert_close(iapws04_Henry_air(300.0), 1.3616423498770563e-10, rtol=1e-13)
+
+def test_iapws04_dHenry_air_dT():
+    assert_close(iapws04_dHenry_air_dT(300.0)[0], -1.8759741871455597e-12, rtol=1e-8)
+    assert_close(iapws04_dHenry_air_dT(300.0)[1], 1.3616423498770563e-10, rtol=1e-12)
