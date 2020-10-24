@@ -184,7 +184,7 @@ IAPWS-95 Residual Terms
 
 """
 from __future__ import division
-from math import exp, log, sqrt, fsum
+from math import exp, log, sqrt
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
 from fluids.numerics import (secant, newton, trunc_log, trunc_exp, horner,
                              solve_2_direct, newton_system, broyden2,

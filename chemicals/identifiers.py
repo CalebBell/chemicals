@@ -76,6 +76,7 @@ from chemicals.utils import PY37, source_path, os_path_join, can_load_data, to_n
 from chemicals.elements import (periodic_table, homonuclear_elemental_gases,
                              charge_from_formula, serialize_formula)
 
+
 folder = os_path_join(source_path, 'Identifiers')
 
 def check_CAS(CASRN):
@@ -288,12 +289,12 @@ class ChemicalMetadataDB(object):
     loaded_main_db = False
     def __init__(self, 
                  elements=True,
-                 main_db=os.path.join(folder, 'chemical identifiers pubchem large.tsv'),
-                 user_dbs=[os.path.join(folder, 'chemical identifiers pubchem small.tsv'),
-                           os.path.join(folder, 'chemical identifiers example user db.tsv'),
-                           os.path.join(folder, 'Cation db.tsv'),
-                           os.path.join(folder, 'Anion db.tsv'),
-                           os.path.join(folder, 'Inorganic db.tsv')]):       
+                 main_db=os_path_join(folder, 'chemical identifiers pubchem large.tsv'),
+                 user_dbs=[os_path_join(folder, 'chemical identifiers pubchem small.tsv'),
+                           os_path_join(folder, 'chemical identifiers example user db.tsv'),
+                           os_path_join(folder, 'Cation db.tsv'),
+                           os_path_join(folder, 'Anion db.tsv'),
+                           os_path_join(folder, 'Inorganic db.tsv')]):       
         '''Construct the database from its parameters, loading all of the files in
         `user_dbs`, the periodic table, and defering loading of `main_db`
         as it is very large until a search doesn't find a chemical in the smaller

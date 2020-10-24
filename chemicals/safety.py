@@ -132,7 +132,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
 
 import os
 from fluids.core import F2K
-from chemicals.utils import R, none_and_length_check, normalize, PY37
+from chemicals.utils import source_path, R, none_and_length_check, normalize, PY37, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -243,7 +243,7 @@ IARC_codes = {1: 'Carcinogenic to humans (1)',
               3: 'Not classifiable as to its carcinogenicity to humans (3)',
               4: 'Probably not carcinogenic to humans (4)'}
 
-folder = os.path.join(os.path.dirname(__file__), 'Safety')
+folder = os_path_join(source_path, 'Safety')
 register_df_source(folder, 'NFPA 497 2008.tsv')
 register_df_source(folder, 'IS IEC 60079-20-1 2010.tsv')
 register_df_source(folder, 'DIPPR T_flash Serat.csv')
@@ -265,7 +265,7 @@ def _load_safety_data():
     global Tautoignition_sources, LFL_sources, UFL_sources, _safety_data_loaded
     import json
     from io import open
-    file = os.path.join(folder, 'Ontario Exposure Limits.json')
+    file = os_path_join(folder, 'Ontario Exposure Limits.json')
     with open(file, 'r') as stream: 
         Ontario_exposure_limits_dict = json.load(stream)
     NFPA_2008_data = data_source('NFPA 497 2008.tsv')
@@ -290,7 +290,8 @@ if PY37:
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else: # pragma: no cover
-    _load_safety_data()
+    if can_load_data:
+        _load_safety_data()
 
 # # Used to read Ontario Expore Limits data from original file (DO NOT DELETE!)
 # Ontario_exposure_limits_dict = {}
