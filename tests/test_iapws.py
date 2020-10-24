@@ -2310,6 +2310,9 @@ def test_rhog_sat_IAPWS95_CoolProp():
 #test_rhog_sat_IAPWS95_CoolProp()
 #test_rhog_sat_IAPWS95_vs_saturation()
 
+def test_iapws95_d4Ar_ddelta2dtau2():
+    assert_close(iapws95_d4Ar_ddelta2dtau2(647.096/300.0, 999.0/322), -2.6564229154801002)
+    assert_close(iapws95_d4Ar_ddelta2dtau2(.7, 1.2), 1.28154351717541)
 
 
 def test_iapws95_A0_tau_derivatives():
