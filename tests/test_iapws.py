@@ -260,6 +260,7 @@ def test_iapws97_d2G_dpidtau_region1():
 # check that floating points are behaving nicely
 # The only two constants in this world are death and floating point error.
     
+@pytest.mark.fuzz
 @pytest.mark.slow
 def test_iapws97_region1_fuzz():
     funcs_naive = [iapws97_dG_dpi_region1_naive, iapws97_G_region1_naive, iapws97_d2G_dpi2_region1_naive,
@@ -318,6 +319,7 @@ def test_iapws97_d2Gr_dpi2_region2():
 
 
 @pytest.mark.slow
+@pytest.mark.fuzz
 def test_iapws97_region2_fuzz():
     funcs_naive = [iapws97_d2G0_dtau2_region2_naive, iapws97_dG0_dtau_region2_naive, iapws97_G0_region2_naive, iapws97_d2Gr_dpidtau_region2_naive, iapws97_d2Gr_dtau2_region2_naive, iapws97_dGr_dtau_region2_naive, iapws97_d2Gr_dpi2_region2_naive, iapws97_Gr_region2_naive, iapws97_dGr_dpi_region2_naive]
     funcs_fast = [iapws97_d2G0_dtau2_region2, iapws97_dG0_dtau_region2, iapws97_G0_region2,
@@ -372,6 +374,7 @@ def test_iapws97_d2A_dtau2_region3():
 
 
 @pytest.mark.slow
+@pytest.mark.fuzz
 def test_iapws97_region3_fuzz():
     funcs_naive = [iapws97_d2A_ddeltadtau_region3_naive, iapws97_d2A_dtau2_region3_naive, iapws97_dA_dtau_region3_naive, iapws97_d2A_ddelta2_region3_naive, iapws97_dA_ddelta_region3_naive, iapws97_A_region3_naive]
     funcs_fast = [iapws97_d2A_ddeltadtau_region3, iapws97_d2A_dtau2_region3, iapws97_dA_dtau_region3,
@@ -435,6 +438,7 @@ def test_iapws97_d2Gr_dpidtau_region5():
     assert_close(iapws97_d2Gr_dpidtau_region5(.9, 1.01), -0.009039988008632744, rtol=1e-13)
     
 @pytest.mark.slow
+@pytest.mark.fuzz
 def test_iapws97_region5_fuzz():
     funcs_naive = [iapws97_d2G0_dtau2_region5_naive, iapws97_dG0_dtau_region5_naive, 
                    iapws97_G0_region5_naive, iapws97_d2Gr_dpidtau_region5_naive,
@@ -693,6 +697,7 @@ def test_iapws97_rho():
 
 @pytest.mark.CoolProp
 @pytest.mark.slow
+@pytest.mark.fuzz
 def test_iapws97_region_3_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     Ts = linspace(623.15+1e-10, 1073.15, 100)
@@ -723,6 +728,7 @@ def test_iapws97_region_3_rho_coolprop():
     
 @pytest.mark.CoolProp
 @pytest.mark.slow
+@pytest.mark.fuzz
 def test_iapws97_region_5_rho_coolprop():
     # Working great!
     from CoolProp.CoolProp import PropsSI
@@ -775,6 +781,7 @@ def iapws97_dGr_dpi_region2_fastest(tau, pi):
 
 @pytest.mark.CoolProp
 @pytest.mark.slow
+@pytest.mark.fuzz
 def test_iapws97_region_2_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     P_lim = 1e-6
@@ -804,6 +811,7 @@ def test_iapws97_region_2_rho_coolprop():
 
 @pytest.mark.CoolProp
 @pytest.mark.slow
+@pytest.mark.fuzz
 def test_iapws97_region_1_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     Ts = linspace(273.15+1e-10,  623.15-1e-10, 500)
@@ -2026,6 +2034,7 @@ def test_iapws95_d3A0_dtau3():
 
 @pytest.mark.slow
 @pytest.mark.CoolProp
+@pytest.mark.fuzz
 def test_rho_iapws95_CoolProp():
     from CoolProp.CoolProp import PropsSI
     N = 40
@@ -2228,6 +2237,7 @@ def test_rhog_sat_IAPWS95():
 
 @pytest.mark.slow
 @pytest.mark.mpmath
+@pytest.mark.fuzz
 def test_iapws95_saturation_fits():
     import mpmath as mp
     mp.mp.dps = 50
@@ -2258,7 +2268,6 @@ def test_iapws95_saturation_fits():
     iapws.reset_backend()
 
 
-@pytest.mark.slow
 def test_rhog_sat_IAPWS95_vs_saturation():
     # Specific points
     Ts = [260.0, 400.0, 600.0, 630.0, 645]
@@ -2267,7 +2276,10 @@ def test_rhog_sat_IAPWS95_vs_saturation():
                      iapws95_rhog_sat(T), rtol=1e-13)
         
     # 647 requires mpmath
-    
+@pytest.mark.slow
+@pytest.mark.fuzz
+def test_rhog_sat_IAPWS95_vs_saturation2():    
+    Ts = [260.0, 400.0, 600.0, 630.0, 645]
     import mpmath as mp
     mp.mp.dps = 50
     iapws.use_mpmath_backend()
