@@ -260,6 +260,8 @@ iapws95_rhoc = 322.0
 
 iapws95_rhoc_inv = 1.0 / iapws95_rhoc
 
+iapws95_R_rhoc_inv2 = iapws95_R*iapws95_rhoc_inv*iapws95_rhoc_inv
+
 def use_mpmath_backend():
     import mpmath as mp
     globals()['exp'] = mp.exp
@@ -4032,8 +4034,8 @@ def iapws95_dAr_ddelta(tau, delta):
 
     Notes
     -----
-    This is an optimized implementatation taking 11 exp calls, 4 sqrts, 
-    and 3 powers. It was generated using SymPy's CSE functionality, with 
+    This is an optimized implementatation taking 8 exp calls, 4 sqrts, 
+    and 2 powers. It was generated using SymPy's CSE functionality, with 
     select polynomial optimizations by hand as well. It is over
     10x faster than a naive implementation.
     
@@ -4068,7 +4070,7 @@ def iapws95_dAr_ddelta(tau, delta):
     taurt = _sqrt(tau)
     tau4rt = _sqrt(taurt)
     tau8rt = _sqrt(tau4rt) # tau checked, is not causing the small discrepancies.
-    tau875 = tau**0.875
+    tau875 = tau**0.875#tau8rt*tau4rt*taurt#tau**0.875
     c54 = (tau - 1.21)
     taum1sqr = (tau - 1.0)
     taum1sqr *= taum1sqr
@@ -4126,18 +4128,22 @@ def iapws95_dAr_ddelta(tau, delta):
     x48 = delta8*x47
     x50 = delta - 1.0
     x51 = x50*x50
-    dm1rt23 = x51**(2.0/3.0)
+    dm1rt23 = x51**(1.0/3.0) # numba will make this a cbrt, PyPy does not care, CPython slows a by a multiply and assign
+    dm1rt23 *= dm1rt23
     x65 = x51*dm1rt23
     x52 = -20.0*x51
-    x53 = delta3*(-40.0*delta + 40.0 + 3.0/delta)
+    x53 = (-40.0*delta4 + 40.0*delta3 + 3.0*delta2)
     x51_2_x51sqrt = x51*x51*_sqrt(x51)
     y50 = 0.32*x65 + 1.0 - tau
     x56 = 0.2*x51*x51_2_x51sqrt + y50*y50
     x57 = 32.0*x51
     x62 = delta*x6
     x63 = 28.0*x51
-    exp800 = _exp(-x57 - x59)
-    exp700 = _exp(-x63 - x64)
+    exp100 = _exp(0.125*(-x57 - x59))
+    exp200 = exp100*exp100
+    exp400 = exp200*exp200
+    exp800 = exp400*exp400
+    exp700 = exp400*exp200*exp100
     pow005 = x56**(-0.05)
     exp250 = _exp(x52 - 250.0*x100*x100)
     exp150 = _exp(x52 - 150.0*c54*c54)
@@ -4280,8 +4286,11 @@ def iapws95_d2Ar_ddelta2(tau, delta):
     y5 = -20.0*y3
     y6 = (0.826446280991736*tau - 1.0)
     exp150 = _exp(y5 - 219.615*y6*y6)
-    exp700 = _exp(-700.0*taum1sqr - 28.0*y3)
-    exp800 = _exp(-800.0*taum1sqr - 32.0*y3)
+    exp100 = _exp(-100.0*taum1sqr - 4.0*y3)
+    exp200 = exp100*exp100
+    exp400 = exp200*exp200
+    exp700 = exp400*exp200*exp100
+    exp800 = exp400*exp400
     exp250 = _exp(y5 - 390.625*y63*y63)
     y6 = y4*exp150
     y7 = delta*tau
@@ -6353,7 +6362,7 @@ def iapws95_rhol_sat(T):
         val = 1.0000546416597242 - 5.464165972424162e-05*(T-647.09599999)/(647.096-647.09599999)
     else:
         raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
-    return val * iapws95_rhoc
+    return val*iapws95_rhoc
 
 
 def iapws95_drhol_sat_dT(T):
@@ -6496,17 +6505,16 @@ def iapws95_rhog_sat(T):
 
 ### IAPWS 95 Trho, Prho, TP solvers
 
-def iapws95_rho_err(rho, T, P_spec):
+def iapws95_rho_err(rho, T, tau, P_spec):
     # For solving for a rho while P is specified
-    RT = iapws95_R*T
-    tau = iapws95_Tc / T
-    delta = rho * iapws95_rhoc_inv
+    # tau added as a paramter to save a division
+    delta = rho*iapws95_rhoc_inv
     dAddelta_res_val = iapws95_dAr_ddelta(tau, delta)
     d2Ad2delta_res_val = iapws95_d2Ar_ddelta2(tau, delta)
-    P_calc = (1.0 + dAddelta_res_val*delta)*rho*RT
+    P_calc = (1.0 + dAddelta_res_val*delta)*rho*iapws95_R*T
     err = P_calc - P_spec
-    derr = RT*(rho*(rho*d2Ad2delta_res_val + 644.0*dAddelta_res_val)
-                + 103684.0)*9.644689633887581e-06 # 1/322**2
+    derr = T*(rho*(rho*d2Ad2delta_res_val + 644.0*dAddelta_res_val)
+                + 103684.0)*iapws95_R_rhoc_inv2
     return err, derr
 
 def iapws95_T_err(T, rho, P_spec):
@@ -6691,6 +6699,7 @@ def iapws95_rho(T, P):
     MAX_RHO_STEP = 200.0 # iapws95_rho(250, 1e9) is a good point showing the advantage of this
     rho = iapws97_rho_extrapolated(T, P, True)
     #P_inv = 1.0/P
+    tau = iapws95_Tc / T
     
     if T < iapws95_Tc:
         # Experimental investication hasn't revealed any places where the solver
@@ -6721,7 +6730,7 @@ def iapws95_rho(T, P):
     #  or abs(err*P_inv) > 1e-13
     # (abs(rho_old - rho) > abs(1e-13*rho)) hand-tuned for maximum precision achievable
     while iterations < 2 or ((abs(rho_old - rho) > abs(1e-13*rho)) and iterations < 100):
-        err, derr = iapws95_rho_err(rho, T, P)
+        err, derr = iapws95_rho_err(rho, T, tau, P)
         if err < 0.0:
             a = rho
         else:

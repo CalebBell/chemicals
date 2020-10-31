@@ -2273,7 +2273,7 @@ def test_rhog_sat_IAPWS95_vs_saturation():
     Ts = [260.0, 400.0, 600.0, 630.0, 645]
     for T in Ts:
         assert_close(iapws95_saturation(T)[2],
-                     iapws95_rhog_sat(T), rtol=1e-13)
+                     iapws95_rhog_sat(T), rtol=1e-12)
         
     # 647 requires mpmath
 @pytest.mark.slow
