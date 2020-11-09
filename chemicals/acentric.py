@@ -114,12 +114,12 @@ def omega(CASRN, method=None):
     -----
     A total of three sources are available for this function. They are:
 
-        * 'PSRK', a compillation of experimental and estimated data published 
-          in the Appendix of [15]_, the fourth revision of the PSRK model.
+        * 'PSRK', a compillation of experimental and estimated data published
+          in the Appendix of [2]_, the fourth revision of the PSRK model.
         * 'PD', an older compillation of
-          data published in (Passut & Danner, 1973) [16]_.
+          data published in (Passut & Danner, 1973) [3]_.
         * 'YAWS', a large compillation of data from a
-          variety of sources; no data points are sourced in the work of [17]_.
+          variety of sources; no data points are sourced in the work of [4]_.
 
     See Also
     --------
@@ -145,9 +145,9 @@ def omega(CASRN, method=None):
        Publishing, 2014.
     '''
     if method:
-        return retrieve_from_df_dict(critical.omega_sources, CASRN, 'omega', method) 
+        return retrieve_from_df_dict(critical.omega_sources, CASRN, 'omega', method)
     else:
-        return retrieve_any_from_df_dict(critical.omega_sources, CASRN, 'omega') 
+        return retrieve_any_from_df_dict(critical.omega_sources, CASRN, 'omega')
 
 def omega_definition(Psat, Pc):
     r'''Returns the acentric factor of a fluid according to its fundamental
@@ -209,7 +209,7 @@ def LK_omega(Tb, Tc, Pc):
 
     Notes
     -----
-    The units of the above equation are atmosphere and Kelvin; values are 
+    The units of the above equation are atmosphere and Kelvin; values are
     converted internally.
 
     Examples
@@ -265,7 +265,7 @@ def Stiel_polar_factor(Psat, Pc, omega):
     Examples
     --------
     Calculating the factor for water:
-    
+
     >>> Stiel_polar_factor(Psat=169745, Pc=22048321.0, omega=0.344)
     0.02322146744772713
 

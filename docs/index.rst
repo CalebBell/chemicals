@@ -51,13 +51,6 @@ If you need to know something about a chemical, give chemicals a try.
    :maxdepth: 1
    :numbered:
    :caption: Tutorial
-   
-   Overview
-   Installation
-   tutorial/Getting_started
-   tutorial/Numba support
-   tutorial/Numpy array support
-   tutorial/Pint Quantities support
 
 .. toctree::
    :maxdepth: 2

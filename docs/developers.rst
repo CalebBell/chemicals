@@ -1,7 +1,7 @@
 Developer's Guide and Roadmap
 =============================
 
-The `chemicals` project has the following core ideas as its goals:
+The chemicals project has the following core ideas as its goals:
 
 * Efficient
     * Functions do only the work required.
@@ -21,9 +21,7 @@ This is a hobby project primarily by Caleb Bell. Contributors are welcome! Chemi
 
 Scope and Future Features
 -------------------------
-The library has a focus on pure-component properties. Lot sof data files are included and there is ample room for more files. However, it is not feasible to add data on an individual chemical alone - a compilation of data which includes that chemicals must be found instead.
-
-
+The library has a focus on pure-component properties. Lots of data files are included and there is ample room for more files. However, it is not feasible to add data on an individual chemical alone - a compilation of data which includes that chemicals must be found instead.
 
 
 The following properties have been looked at a little but may have too much data fit on PyPi. If you are interested in implementing one of them it may take multiple data packages uploaded to PyPi alongside `chemicals`:
@@ -43,19 +41,27 @@ Running Tests
 -------------
 From the root directory of the project you downloaded with `git clone https://github.com/CalebBell/chemicals.git`, run the following command:
 
-python3 -m pytest .
+.. code-block:: bash
+
+   python3 -m pytest .
 
 This will run all of the tests. Additionally pytest can be used to run the doctests:
 
-python3 -m pytest --doctest-modules .
+.. code-block:: bash
+
+   python3 -m pytest --doctest-modules .
 
 The test suite can take some time to run; tests are marked with various markers to allow a fast subset of tests to run.
 
-python3 -m pytest -m "not slow" .
+.. code-block:: bash
+
+   python3 -m pytest -m "not slow" .
 
 This should only take a few seconds, and show red output if a test is broken. To keep the main test suite fast, pytest allows a flag which shows how long each test takes.
 
-python3 -m pytest -m "not slow" --durations=100
+.. code-block:: bash
+
+   python3 -m pytest -m "not slow" --durations=100
 
 If a test you added appears in this list, consider splitting it into a fast portion and a slow portion.
 
@@ -64,7 +70,7 @@ Docstrings
 The docstrings follow Pep8, most of the numpydoc standard,
 More information about numpydoc can be found `here <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 
-In addition to being documentation, the docstrings in `chemicals` serve the following purposes:
+In addition to being documentation, the docstrings in chemicals serve the following purposes:
 
 * Contain LaTeX math formulas for implemented formulas. This makes it easy for the reader and authors to follow code. This is especially important when the code can be optimized by hand significantly, and end up not looking like the math formulas.
 * Contain doctests for every public method. These examples often make debugging really easy since they can just be copy-pasted into Jupyter or an IDE/debugger.
@@ -75,7 +81,9 @@ In addition to being documentation, the docstrings in `chemicals` serve the foll
 No automated style tool is ran on the docstrings at present, but the following command
 was used once to format the docstrings with the tool `docformatter <https://github.com/myint/docformatter>`_
 
-python3 -m docformatter --wrap-summaries=80 --wrap-descriptions=80 --in-place --recursive .
+.. code-block:: bash
+
+   python3 -m docformatter --wrap-summaries=80 --wrap-descriptions=80 --in-place --recursive .
 
 This does not quite match numpydoc's recommended 75 character limit.
 
@@ -121,7 +129,9 @@ Documentation
 -------------
 Sphinx is used with readthedocs. Readthedocs is configured to build whatever is on the release branch. From the root of the `chemicals` project, the documentation can be built with the following command, which will output html files into a "_build" folder:
 
-sphinx-build -b html docs _build
+.. code-block:: bash
+
+   sphinx-build -b html docs _build
 
 Sample Notebooks
 ----------------
@@ -129,7 +139,9 @@ The `nbval <https://pypi.org/project/nbval/>`_ pytest plugin can be used to chec
 
 On UNIX/Mac OS/WSL, the notebook results can be regenerated with the following shell command, from the directory with the notebooks:
 
-for i in *.ipynb ; do python3 -m jupyter nbconvert --to notebook --inplace --execute "$i" ; done
+.. code-block:: bash
+
+   for i in *.ipynb ; do python3 -m jupyter nbconvert --to notebook --inplace --execute "$i" ; done
 
 Continuous Integration
 ----------------------
@@ -145,4 +157,4 @@ Adding new data and methods is well worth the price of increasing RAM, but it is
 
 Additional Material
 -------------------
-More information about the interfaces with PyPy and Numba can be found `here <https://fluids.readthedocs.io/developers.html>`_.
+More information about the interfaces with PyPy and Numba can be found `on the fluids site <https://fluids.readthedocs.io/developers.html>`_.
