@@ -87,10 +87,10 @@ from .flash_basic import *
 from .safety import *
 from .iapws import *
 from .air import *
-__all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr', 
-           'temperature', 'miscdata', 'environment', 'refractivity', 'solubility', 
-           'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial', 
-           'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity', 
+__all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr',
+           'temperature', 'miscdata', 'environment', 'refractivity', 'solubility',
+           'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial',
+           'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity',
            'interface', 'permittivity', 'thermal_conductivity', 'combustion',
            'volume', 'rachford_rice', 'flash_basic', 'identifiers', 'safety',
            'iapws', 'air']
@@ -128,8 +128,8 @@ __all__.extend(iapws.__all__)
 __all__.extend(air.__all__)
 
 
-submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata, 
-              environment, refractivity, solubility, lennard_jones, 
+submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
+              environment, refractivity, solubility, lennard_jones,
               vapor_pressure, virial, phase_change, triple, acentric, viscosity,
               interface, permittivity, thermal_conductivity, combustion,
               heat_capacity, reaction, volume, rachford_rice, flash_basic, identifiers, safety,
@@ -139,3 +139,29 @@ submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
 chemicals_dir = utils.source_path
 
 __version__ = '0.1.5'
+
+def complete_lazy_loading():
+    critical._load_critical_data()
+    dipole._load_dipole_data()
+    environment._load_GWP_ODP_data()
+    environment._load_logP_data()
+    heat_capacity._load_Cp_data()
+    interface.load_interface_dfs()
+    lennard_jones._load_LJ_data()
+    miscdata._load_VDI_saturation_dict()
+    miscdata._load_CRC_data()
+    permittivity._load_permittivity_data()
+    phase_change._load_phase_change_constants()
+    phase_change._load_phase_change_correlations()
+    reaction._load_reaction_data()
+    refractivity._load_RI_data()
+    safety._load_safety_data()
+    thermal_conductivity._load_k_data()
+    triple._load_triple_data()
+    vapor_pressure.load_vapor_pressure_dfs()
+    viscosity._load_mu_data()
+    volume._load_rho_data()
+    try:
+        identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
+    except:
+        pass
