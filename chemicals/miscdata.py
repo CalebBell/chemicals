@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains several tables which are common to different lookup 
+This module contains several tables which are common to different lookup
 functions.
 
 For reporting bugs, adding feature requests, or submitting pull requests,
@@ -61,18 +61,18 @@ def _load_VDI_saturation_dict():
     """
     import json
     global VDI_saturation_dict, _VDI_dict_loaded
-    
+
     with open(os.path.join(folder, 'VDI Saturation Compounds Data.json')) as f:
         VDI_saturation_dict = json.loads(f.read())
     _VDI_dict_loaded = True
-    
+
 _CRC_data_loaded = False
 def _load_CRC_data():
     global CRC_inorganic_data, CRC_organic_data, _CRC_data_loaded
     CRC_inorganic_data = data_source('Physical Constants of Inorganic Compounds.csv')
     CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
     _CRC_data_loaded = True
-    
+
 if PY37:
     def __getattr__(name):
         if name in ('CRC_inorganic_data', 'CRC_organic_data'):
@@ -170,7 +170,7 @@ def lookup_VDI_tabular_data(CASRN, prop):
     if not _VDI_dict_loaded: _load_VDI_saturation_dict()
     try:
         d = VDI_saturation_dict[CASRN]
-    except KeyError: 
+    except KeyError:
         raise LookupError('CASRN not in VDI tabulation')
     try:
         props, Ts = d[prop], d['T']

@@ -28,7 +28,7 @@ For reporting bugs, adding feature requests, or submitting pull requests,
 please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
 
 .. contents:: :local:
-    
+
 Lookup Functions
 ----------------
 .. autofunction:: chemicals.refractivity.RI
@@ -53,7 +53,7 @@ Utility functions
 """
 
 __all__ = ['RI', 'RI_methods', 'RI_all_methods',
-           'polarizability_from_RI', 'molar_refractivity_from_RI', 
+           'polarizability_from_RI', 'molar_refractivity_from_RI',
            'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
            'brix_to_RI']
 
@@ -71,7 +71,7 @@ from chemicals.data_reader import (register_df_source,
 # Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Misc')
-register_df_source(folder, 'CRC Handbook Organic RI.csv', 
+register_df_source(folder, 'CRC Handbook Organic RI.csv',
                    csv_kwargs={'dtype': {'RI': float, 'RIT': float}})
 
 CRC = 'CRC'
@@ -160,14 +160,14 @@ def RI(CASRN, method=None):
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
-    
+
     '''
     if not _RI_data_loaded: _load_RI_data()
     key = ('RI', 'RIT')
     if method:
-        value = retrieve_from_df_dict(RI_sources, CASRN, key, method) 
+        value = retrieve_from_df_dict(RI_sources, CASRN, key, method)
     else:
-        value = retrieve_any_from_df_dict(RI_sources, CASRN, key) 
+        value = retrieve_any_from_df_dict(RI_sources, CASRN, key)
     if value is None:
         value = (None, None)
     else:
@@ -315,7 +315,7 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
         \Lambda = \lambda/0.589 \mu m
 
     .. math::
-        \Lambda_{IR} = 5.432937 
+        \Lambda_{IR} = 5.432937
 
     .. math::
         \Lambda_{UV} = 0.229202
@@ -359,29 +359,29 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
 
     LambdaIR = 5.432937
     LambdaUV = 0.229202
-    
+
     Lambda2 = Lambda*Lambda
 
-    A = delta*(0.244257733 + 0.0097463448*delta + -0.00373235*theta + 0.0002686785*Lambda2*theta + 
-    0.0015892057/Lambda2 + 0.0024593426/(Lambda2 - LambdaUV*LambdaUV) + 
+    A = delta*(0.244257733 + 0.0097463448*delta + -0.00373235*theta + 0.0002686785*Lambda2*theta +
+    0.0015892057/Lambda2 + 0.0024593426/(Lambda2 - LambdaUV*LambdaUV) +
     0.90070492/(Lambda2 - LambdaIR*LambdaIR) - 0.0166626219*delta*delta)
     n = sqrt((2.0*A + 1.)/(1. - A))
     return n
 
 ICUMSA_1974_brix = list([float(i) for i in range(96)])
-ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175, 
-                   1.34325, 1.34477, 1.34629, 1.34782, 1.34937, 1.35093, 1.35250, 
-                   1.35408, 1.35568, 1.35729, 1.35891, 1.36054, 1.36218, 1.36384, 
-                   1.36551, 1.36720, 1.36889, 1.37060, 1.37233, 1.37406, 1.37582, 
-                   1.37758, 1.37936, 1.38115, 1.38296, 1.38478, 1.38661, 1.38846, 
-                   1.39032, 1.39220, 1.39409, 1.39600, 1.39792, 1.39986, 1.40181, 
-                   1.40378, 1.40576, 1.40776, 1.40978, 1.41181, 1.41385, 1.41592, 
-                   1.41799, 1.42009, 1.42220, 1.42432, 1.42647, 1.42863, 1.43080, 
-                   1.43299, 1.43520, 1.43743, 1.43967, 1.44193, 1.44420, 1.44650, 
-                   1.44881, 1.45113, 1.45348, 1.45584, 1.45822, 1.46061, 1.46303, 
-                   1.46546, 1.46790, 1.47037, 1.47285, 1.47535, 1.47787, 1.48040, 
+ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175,
+                   1.34325, 1.34477, 1.34629, 1.34782, 1.34937, 1.35093, 1.35250,
+                   1.35408, 1.35568, 1.35729, 1.35891, 1.36054, 1.36218, 1.36384,
+                   1.36551, 1.36720, 1.36889, 1.37060, 1.37233, 1.37406, 1.37582,
+                   1.37758, 1.37936, 1.38115, 1.38296, 1.38478, 1.38661, 1.38846,
+                   1.39032, 1.39220, 1.39409, 1.39600, 1.39792, 1.39986, 1.40181,
+                   1.40378, 1.40576, 1.40776, 1.40978, 1.41181, 1.41385, 1.41592,
+                   1.41799, 1.42009, 1.42220, 1.42432, 1.42647, 1.42863, 1.43080,
+                   1.43299, 1.43520, 1.43743, 1.43967, 1.44193, 1.44420, 1.44650,
+                   1.44881, 1.45113, 1.45348, 1.45584, 1.45822, 1.46061, 1.46303,
+                   1.46546, 1.46790, 1.47037, 1.47285, 1.47535, 1.47787, 1.48040,
                    1.48295, 1.48552, 1.48811, 1.49071, 1.49333, 1.49597, 1.49862,
-                   1.50129, 1.50398, 1.5067, 1.5094, 1.5122, 1.5149, 1.5177, 
+                   1.50129, 1.50398, 1.5067, 1.5094, 1.5122, 1.5149, 1.5177,
                    1.5205, 1.5234, 1.5262, 1.5291, 1.5320]
 
 def brix_to_RI(brix):
@@ -403,9 +403,9 @@ def brix_to_RI(brix):
     The scale is officially defined from 0 to 85; but the data source contains
     values up to 95. Linear extrapolation outside of the bounds is performed;
     and a table of 96 values are linearly interpolated.
-    
+
     The ICUMSA (International Committee of Uniform Method of Sugar Analysis)
-    published a document setting out the reference values in 1974; but an 
+    published a document setting out the reference values in 1974; but an
     original data source has not been found and reviewed.
 
     Examples
@@ -420,7 +420,7 @@ def brix_to_RI(brix):
     References
     ----------
     .. [1] "Refractometer　Data Book-Refractive Index and Brix | ATAGO CO.,
-       LTD." Accessed June 13, 2020. 
+       LTD." Accessed June 13, 2020.
        https://www.atago.net/en/databook-refractometer_relationship.php.
     """
     return interp(brix, ICUMSA_1974_brix, ICUMSA_1974_RIs, extrapolate=True)
@@ -441,12 +441,12 @@ def RI_to_brix(RI):
     Notes
     -----
     The scale is officially defined from 0 to 85; but the data source contains
-    values up to 95. 
-    
+    values up to 95.
+
     Linear extrapolation to values under 0 or above 95 is performed.
-    
+
     The ICUMSA (International Committee of Uniform Method of Sugar Analysis)
-    published a document setting out the reference values in 1974; but an 
+    published a document setting out the reference values in 1974; but an
     original data source has not been found and reviewed.
 
     Examples
@@ -457,12 +457,12 @@ def RI_to_brix(RI):
     0.0
     >>> RI_to_brix(1.532)
     95.0
-    
+
 
     References
     ----------
     .. [1] "Refractometer　Data Book-Refractive Index and Brix | ATAGO CO.,
-       LTD." Accessed June 13, 2020. 
+       LTD." Accessed June 13, 2020.
        https://www.atago.net/en/databook-refractometer_relationship.php.
     """
     return interp(RI, ICUMSA_1974_RIs, ICUMSA_1974_brix, extrapolate=True)

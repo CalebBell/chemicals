@@ -607,7 +607,7 @@ def isobaric_expansion(V, dV_dT):
 
 
 def isothermal_compressibility(V, dV_dP):
-    r'''Calculate the isothermal coefficient of a compressibility, given its
+    r'''Calculate the isothermal coefficient of compressibility, given its
     molar volume at a certain `T` and `P`, and its derivative of molar volume
     with respect to `P`.
 
@@ -624,7 +624,7 @@ def isothermal_compressibility(V, dV_dP):
     Returns
     -------
     kappa : float
-        Isothermal coefficient of a compressibility, [1/Pa]
+        Isothermal coefficient of compressibility, [1/Pa]
 
     Notes
     -----

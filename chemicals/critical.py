@@ -21,9 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains lookup functions for critical temperature, 
+This module contains lookup functions for critical temperature,
 critical pressure, critical volume, and critical compressibility factors.
-It also includes a few relationships between the critical properties, and a 
+It also includes a few relationships between the critical properties, and a
 variety of critical mixture property estimation routines.
 
 For reporting bugs, adding feature requests, or submitting pull requests,
@@ -81,18 +81,18 @@ Critical Volume of Mixtures
 """
 
 __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
-           'Mersmann_Kind_predictor', 
-           'third_property', 
-           'critical_surface', 
-           'Ihmels', 'Meissner', 'Grigoras', 'Hekayati_Raeissi', 'Li', 
+           'Mersmann_Kind_predictor',
+           'third_property',
+           'critical_surface',
+           'Ihmels', 'Meissner', 'Grigoras', 'Hekayati_Raeissi', 'Li',
            'Chueh_Prausnitz_Tc', 'Grieves_Thodos',
-           'modified_Wilson_Tc', 'Chueh_Prausnitz_Vc', 
+           'modified_Wilson_Tc', 'Chueh_Prausnitz_Vc',
            'modified_Wilson_Vc',
-           'Tc_methods', 'Pc_methods', 
-           'Vc_methods', 'Zc_methods', 
+           'Tc_methods', 'Pc_methods',
+           'Vc_methods', 'Zc_methods',
            'critical_surface_methods',
-           'Tc_all_methods', 'Pc_all_methods', 
-           'Vc_all_methods', 'Zc_all_methods', 
+           'Tc_all_methods', 'Pc_all_methods',
+           'Vc_all_methods', 'Zc_all_methods',
            'critical_surface_all_methods']
 
 import os
@@ -154,11 +154,11 @@ def _load_critical_data():
         PD: critical_data_PassutDanner,
         YAWS: critical_data_Yaws
     }
-    
+
     # Create copies just incase new dfs need to be added later
     Pc_sources = Tc_sources.copy()
     Vc_sources = Tc_sources.copy()
-    
+
     # The Passut Danner tsv file doesn't have Vc, so its not included
     del Vc_sources['PD']
     Zc_sources = Vc_sources.copy()
@@ -171,7 +171,7 @@ def _load_critical_data():
 
 if PY37:
     def __getattr__(name):
-        if name in ('critical_data_IUPAC', 'critical_data_Matthews', 
+        if name in ('critical_data_IUPAC', 'critical_data_Matthews',
                     'critical_data_CRC', 'critical_data_PSRKR4',
                     'critical_data_Yaws', 'critical_data_PassutDanner',
                     'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
@@ -207,14 +207,14 @@ def Tc_methods(CASRN):
     """
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Tc_sources, CASRN, 'Tc')
-    
+
 def Tc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
     temperature. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
+    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
     inorganic chemicals. Function has data for approximately 1000 chemicals.
 
     Parameters
@@ -230,8 +230,8 @@ def Tc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
-        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held  
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
+        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held
         in the list `Tc_all_methods`.
 
     Notes
@@ -333,13 +333,13 @@ def Tc(CASRN, method=None):
     .. [17] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
-    
+
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
-        return retrieve_from_df_dict(Tc_sources, CASRN, 'Tc', method) 
+        return retrieve_from_df_dict(Tc_sources, CASRN, 'Tc', method)
     else:
-        return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc') 
+        return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
 
 Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
 '''Tuple of method name keys. See the `Pc` for the actual references'''
@@ -362,7 +362,7 @@ def Pc_methods(CASRN):
     Pc
     """
     return list_available_methods_from_df_dict(Pc_sources, CASRN, 'Pc')
-    
+
 
 def Pc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
@@ -370,7 +370,7 @@ def Pc(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
+    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
     inorganic chemicals. Function has data for approximately 7500 chemicals.
 
     Examples
@@ -391,8 +391,8 @@ def Pc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
-        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held  
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
+        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held
         in the list `Pc_all_methods`.
 
     Notes
@@ -492,9 +492,9 @@ def Pc(CASRN, method=None):
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
-        return retrieve_from_df_dict(Pc_sources, CASRN, 'Pc', method) 
+        return retrieve_from_df_dict(Pc_sources, CASRN, 'Pc', method)
     else:
-        return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc') 
+        return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
 
 Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
 '''Tuple of method name keys. See the `Vc` for the actual references'''
@@ -525,7 +525,7 @@ def Vc(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
+    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
     inorganic chemicals. Function has data for approximately 7500 chemicals.
 
     Examples
@@ -546,10 +546,10 @@ def Vc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
-        'CRC', 'PSRK', and 'YAWS'. All valid values are also held  
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
+        'CRC', 'PSRK', and 'YAWS'. All valid values are also held
         in the list `Vc_all_methods`.
-        
+
     Notes
     -----
     A total of six sources are available for this function. They are:
@@ -643,7 +643,7 @@ def Vc(CASRN, method=None):
     if method:
         return retrieve_from_df_dict(Vc_sources, CASRN, 'Vc', method)
     else:
-        return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc') 
+        return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc')
 
 Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
 '''Tuple of method name keys. See the `Zc` for the actual references'''
@@ -674,7 +674,7 @@ def Zc(CASRN, method=None):
     data source to use if no method is provided; returns None if the data is
     not available.
 
-    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for 
+    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
     inorganic chemicals. Function has data for approximately 7500 chemicals.
 
     Examples
@@ -695,8 +695,8 @@ def Zc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 
-        'CRC', 'PSRK', and 'YAWS'. All valid values are also held  
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
+        'CRC', 'PSRK', and 'YAWS'. All valid values are also held
         in `Zc_all_methods`.
 
     Notes
@@ -792,9 +792,9 @@ def Zc(CASRN, method=None):
     if method:
         return retrieve_from_df_dict(Zc_sources, CASRN, 'Zc', method)
     else:
-        return retrieve_any_from_df_dict(Zc_sources, CASRN, 'Zc') 
+        return retrieve_any_from_df_dict(Zc_sources, CASRN, 'Zc')
 
-rcovs_Mersmann_Kind = {'C': 0.77, 'Cl': 0.99, 'I': 1.33, 'H': 0.37, 'F': 0.71, 
+rcovs_Mersmann_Kind = {'C': 0.77, 'Cl': 0.99, 'I': 1.33, 'H': 0.37, 'F': 0.71,
                        'S': 1.04, 'O': 0.6, 'N': 0.71, 'Si': 1.17, 'Br': 1.14}
 
 rcovs_regressed =  {
@@ -837,7 +837,7 @@ rcovs_regressed =  {
     u'Cs': 3.433699060142929,
     u'Zr': 0.9346554283483623}
 
-def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5, 
+def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
                             covalent_radii=rcovs_Mersmann_Kind):
     r'''Predicts the critical molar volume of a chemical based only on its
     atomic composition according to [1]_ and [2]_. This is a crude approach,
@@ -846,19 +846,19 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
     fraction as well as the atomic contributions can be adjusted; this method
     is general and atomic contributions can be regressed to predict other
     properties with this routine.
-    
+
     .. math::
         \frac{\left(\frac{V_c}{n_a N_A}\right)^{1/3}}{d_a}
         = \frac{3.645}{\left(\frac{r_a}{r_H}\right)^{1/2}}
 
         r_a = d_a/2
-        
+
         d_a = 2 \frac{\sum_i (n_i r_i)}{n_a}
-        
+
     In the above equations, :math:`n_i` is the number of atoms of species i in
-    the molecule, :math:`r_i` is the covalent atomic radius of the atom, and 
+    the molecule, :math:`r_i` is the covalent atomic radius of the atom, and
     :math:`n_a` is the total number of atoms in the molecule.
-    
+
     Parameters
     ----------
     atoms : dict
@@ -874,45 +874,45 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
     -------
     Vc : float
         Predicted critical volume of the chemical, [m^3/mol]
-    
+
     Notes
-    -----    
-    Using the :obj:`chemicals.elements.periodic_table` covalent radii (from RDKit), 
+    -----
+    Using the :obj:`chemicals.elements.periodic_table` covalent radii (from RDKit),
     the coefficient and power should be 4.261206523632586 and 0.5597281770786228
     respectively for best results.
-    
+
     Examples
     --------
     Prediction of critical volume of decane:
-        
+
     >>> Mersmann_Kind_predictor({'C': 10, 'H': 22})
     0.0005851858957767497
-    
+
     This is compared against the experimental value, 0.000624 (a 6.2% relative
     error)
-    
+
     Using custom fitted coefficients we can do a bit better:
-        
+
     >>> from chemicals.critical import rcovs_regressed
-    >>> Mersmann_Kind_predictor({'C': 10, 'H': 22}, coeff=4.261206523632586, 
+    >>> Mersmann_Kind_predictor({'C': 10, 'H': 22}, coeff=4.261206523632586,
     ... power=0.5597281770786228, covalent_radii=rcovs_regressed)
     0.0005956870915974391
-    
-    The relative error is only 4.5% now. This is compared to an experimental 
+
+    The relative error is only 4.5% now. This is compared to an experimental
     uncertainty of 5.6%.
-    
+
     Evaluating 1321 critical volumes in the database, the average relative
     error is 5.0%; standard deviation 6.8%; and worst value of 79% relative
     error for phosphorus.
-    
+
     References
     ----------
     .. [1] Mersmann, Alfons, and Matthias Kind. "Correlation for the Prediction
        of Critical Molar Volume." Industrial & Engineering Chemistry Research,
        October 16, 2017. https://doi.org/10.1021/acs.iecr.7b03171.
-    .. [2] Mersmann, Alfons, and Matthias Kind. "Prediction of Mechanical and 
-       Thermal Properties of Pure Liquids, of Critical Data, and of Vapor 
-       Pressure." Industrial & Engineering Chemistry Research, January 31, 
+    .. [2] Mersmann, Alfons, and Matthias Kind. "Prediction of Mechanical and
+       Thermal Properties of Pure Liquids, of Critical Data, and of Vapor
+       Pressure." Industrial & Engineering Chemistry Research, January 31,
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     '''
     H_RADIUS_COV = covalent_radii['H']
@@ -1135,7 +1135,7 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
 def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
     r'''Estimation model for missing critical constants of a fluid
     according to [1]_. Based on the molecular weight and saturation
-    molar volume of a fluid, and requires one of `Tc` or `Pc`. 
+    molar volume of a fluid, and requires one of `Tc` or `Pc`.
     Optionally, `Vc` can be provided to increase the accuracy of
     the prediction of `Tc` or `Pc` a little.
 
@@ -1144,7 +1144,7 @@ def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
     MW : float
         Molecular weight of fluid, [g/mol]
     V_sat : float, optional
-        Molar volume of liquid at the saturation pressure of the fluid 
+        Molar volume of liquid at the saturation pressure of the fluid
         at 298.15 K. Used if `Vc` is not provided. [m^3/mol]
     Tc : float, optional
         Critical temperature of fluid (optional) [K]
@@ -1175,7 +1175,7 @@ def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
 
     References
     ----------
-    .. [1] Hekayati, Javad, and Sona Raeissi. "Estimation of the Critical 
+    .. [1] Hekayati, Javad, and Sona Raeissi. "Estimation of the Critical
        Properties of Compounds Using Volume-Based Thermodynamics." AIChE Journal
        n/a, no. n/a (n.d.): e17004. https://doi.org/10.1002/aic.17004.
     '''
@@ -1189,20 +1189,20 @@ def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
         V_sat *= 1e3
     Tc_calc = Pc_calc = 0.0
     Vc_estimated = False
-    
-    
+
+
     if Vc is None:
         if V_sat is None:
             raise ValueError("V_sat is required when Vc is not provided")
         Vc_estimated = True
         # Direct estimation of Vc from V and MW
         # 3.2 Equations 30-33
-        a3 = -2.636518E+00  
-        b3 = 1.048744E-02  
-        c3 = 1.222756E+00  
-        d3 = 6.924349E-09  
-        e3 = -1.102846E-05  
-        f3 = 1.871249E-03  
+        a3 = -2.636518E+00
+        b3 = 1.048744E-02
+        c3 = 1.222756E+00
+        d3 = 6.924349E-09
+        e3 = -1.102846E-05
+        f3 = 1.871249E-03
 
         chi1 = a3
         chi2 = b3*MW + c3
@@ -1211,12 +1211,12 @@ def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
 
     if Vc_estimated:
         # equqtions 21-24; slightly less accurate than Equations 25-28
-        a1 = -1.434646E+02 
-        b1 = 1.781802E-01 
-        c1 = 4.196576E+01 
-        d1 = -3.443955E-05 
-        e1 = 9.812262E-03 
-        f1 = 1.106396E-01 
+        a1 = -1.434646E+02
+        b1 = 1.781802E-01
+        c1 = 4.196576E+01
+        d1 = -3.443955E-05
+        e1 = 9.812262E-03
+        f1 = 1.106396E-01
         psi1 = a1
         psi2 = b1*MW + c1
         psi3 = d1*MW*MW + e1*MW + f1
@@ -1275,8 +1275,8 @@ def critical_surface_methods(Tc=None, Pc=None, Vc=None):
     --------
     critical_surface
     """
-    if ((Tc is not None and Pc is not None) 
-         or (Tc is not None and Vc is not None) 
+    if ((Tc is not None and Pc is not None)
+         or (Tc is not None and Vc is not None)
          or (Pc is not None and Vc is not None)):
         return list(critical_surface_all_methods)
     else:
@@ -1311,11 +1311,11 @@ def critical_surface(Tc=None, Pc=None, Vc=None,
 
     >>> critical_surface(Tc=599.4, Pc=1.19E6, method='IHMELS')
     0.0010927333333333334
-    
+
     See Also
     --------
     critical_surface_methods_methods
-    
+
     '''
     if not method or method == IHMELS:
         return Ihmels(Tc=Tc, Pc=Pc, Vc=Vc)
@@ -1353,12 +1353,12 @@ def third_property(CASRN=None, T=False, P=False, V=False):
     Examples
     --------
     Decamethyltetrasiloxane [141-62-8]
-    
+
     >>> third_property('141-62-8', V=True)
     0.0010920041152263375
 
     Succinic acid [110-15-6]
-    
+
     >>> third_property('110-15-6', P=True)
     6095016.233766234
     '''
@@ -1707,7 +1707,7 @@ def Chueh_Prausnitz_Vc(zs, Vcs, nus):
         zi_Vc_23s[i] = v
         denominator_inv += v
     denominator_inv = 1.0/denominator_inv
-    
+
     Vcm = 0.0
     for i in range(N):
         Vcm += zi_Vc_23s[i]*Vcs[i]

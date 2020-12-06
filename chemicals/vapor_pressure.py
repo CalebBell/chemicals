@@ -76,7 +76,7 @@ attribute of this module.
 
 .. data:: Psat_data_WagnerPoling
 
-    Coefficients for the Wagner 2.5, 5 model equation documented in 
+    Coefficients for the Wagner 2.5, 5 model equation documented in
     :obj:`Wagner` in [2]_, with data for 104 chemicals.
 
 .. data:: Psat_data_AntoinePoling
@@ -87,18 +87,18 @@ attribute of this module.
 
 .. data:: Psat_data_AntoineExtended
 
-    Data for 97 chemicals in [2]_ for the TRC extended Antoine model 
+    Data for 97 chemicals in [2]_ for the TRC extended Antoine model
     :obj:`TRC_Antoine_extended`.
-    
+
 .. data:: Psat_data_Perrys2_8
 
-    A collection of 341 coefficient sets for :obj:`thermo.dippr.EQ101` from 
-    the DIPPR database published openly in [4]_. 
+    A collection of 341 coefficient sets for :obj:`thermo.dippr.EQ101` from
+    the DIPPR database published openly in [4]_.
 
 .. data:: Psat_data_VDI_PPDS_3
 
-    Coefficients for the Wagner equation :obj:`Wagner`, published 
-    openly in [3]_. 
+    Coefficients for the Wagner equation :obj:`Wagner`, published
+    openly in [3]_.
 
 .. [1] McGarry, Jack. "Correlation and Prediction of the Vapor Pressures of
     Pure Liquids over Large Pressure Ranges." Industrial & Engineering
@@ -133,10 +133,10 @@ The structure of each dataframe is shown below:
 
 from __future__ import division
 
-__all__ = ['Antoine', 'Wagner_original', 'Wagner', 'TRC_Antoine_extended', 
-           'boiling_critical_relation', 'Lee_Kesler', 'Ambrose_Walton', 
+__all__ = ['Antoine', 'Wagner_original', 'Wagner', 'TRC_Antoine_extended',
+           'boiling_critical_relation', 'Lee_Kesler', 'Ambrose_Walton',
            'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Tsat_IAPWS',
-           'Psub_Clapeyron', 
+           'Psub_Clapeyron',
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
            'DIPPR101_ABC_coeffs_from_point']
 
@@ -160,7 +160,7 @@ register_df_source(folder, 'Wagner Original McGarry.tsv', csv_kwargs={
                  'Pc': float, 'Tc': float, 'Tmin': float}})
 
 register_df_source(folder, 'Wagner Collection Poling.tsv', csv_kwargs={
-        'dtype': {'A': float, 'B': float, 'C': float, 'D': float, 'Pc': float, 
+        'dtype': {'A': float, 'B': float, 'C': float, 'D': float, 'Pc': float,
                   'Tc': float, 'Pc': float, 'Tmin': float, 'Tmax': float}})
 
 register_df_source(folder, 'Antoine Extended Collection Poling.tsv', csv_kwargs={
@@ -181,7 +181,7 @@ def load_vapor_pressure_dfs():
     # 57463 bytes for df; 13720 bytes for numpy
     Psat_data_WagnerMcGarry = data_source('Wagner Original McGarry.tsv')
     Psat_values_WagnerMcGarry = np.array(Psat_data_WagnerMcGarry.values[:, 1:], dtype=float)
-    
+
     # 58216 bytes for df; 13000 bytes for numpy
     Psat_data_AntoinePoling = data_source('Antoine Collection Poling.tsv')
     Psat_values_AntoinePoling = np.array(Psat_data_AntoinePoling.values[:, 1:], dtype=float)
@@ -201,9 +201,9 @@ def load_vapor_pressure_dfs():
     # 52742 bytes for df; 15400 bytes for numpy
     Psat_data_VDI_PPDS_3 = data_source('VDI PPDS Boiling temperatures at different pressures.tsv')
     Psat_values_VDI_PPDS_3 = np.array(Psat_data_VDI_PPDS_3.values[:, 1:], dtype=float)
-    
+
     _vapor_pressure_dfs_loaded = True
-    
+
 if PY37:
     def __getattr__(name):
         if name in ('Psat_data_WagnerMcGarry', 'Psat_values_WagnerMcGarry', 'Psat_data_AntoinePoling',
@@ -217,12 +217,12 @@ else:
     if can_load_data:
         load_vapor_pressure_dfs()
 
-    
-    
-    
+
+
+
 def Antoine(T, A, B, C, base=10.0):
     r'''Calculates vapor pressure of a chemical using the Antoine equation.
-    Parameters `A`, `B`, and `C` are chemical-dependent. Parameters can be 
+    Parameters `A`, `B`, and `C` are chemical-dependent. Parameters can be
     found in numerous sources; however units of the coefficients used vary.
     Originally proposed by Antoine (1888) [2]_.
 
@@ -246,49 +246,56 @@ def Antoine(T, A, B, C, base=10.0):
     -------
     Psat : float
         Vapor pressure calculated with coefficients [Pa]
-    
+
     Notes
     -----
-    Assumes coefficients are for calculating vapor pressure in Pascal. 
+    Assumes coefficients are for calculating vapor pressure in Pascal.
     Coefficients should be consistent with input temperatures in Kelvin;
     however, if both the given temperature and units are specific to degrees
     Celcius, the result will still be correct.
-    
+
     **Converting units in input coefficients:**
-    
-        * **ln to log10**: Divide A and B by ln(10)=2.302585 to change  
+
+        * **ln to log10**: Divide A and B by ln(10)=2.302585 to change
           parameters for a ln equation to a log10 equation.
-        * **log10 to ln**: Multiply A and B by ln(10)=2.302585 to change 
+        * **log10 to ln**: Multiply A and B by ln(10)=2.302585 to change
           parameters for a log equation to a ln equation.
         * **mmHg to Pa**: Add log10(101325/760)= 2.1249 to A.
         * **kPa to Pa**: Add log_{base}(1000)= 6.908 to A for log(base)
+        * **bar to Pa**: Add log_{base}(100000)= 11.5129254 to A for log(base)
         * **°C to K**: Subtract 273.15 from C only!
 
     Examples
     --------
     Methane, coefficients from [1]_, at 100 K:
-    
+
     >>> Antoine(100.0, 8.7687, 395.744, -6.469)
     34478.367349639906
-    
+
     Tetrafluoromethane, coefficients from [1]_, at 180 K
-    
+
     >>> Antoine(180, A=8.95894, B=510.595, C=-15.95)
     702271.0518579542
-    
+
     Oxygen at 94.91 K, with coefficients from [3]_ in units of °C, mmHg, log10,
     showing the conversion of coefficients A (mmHg to Pa) and C (°C to K)
-    
+
     >>> Antoine(94.91, 6.83706+2.1249, 339.2095, 268.70-273.15)
     162978.88655572367
+
+    n-hexane with Antoine coefficients from the NIST webbook in units of K and
+    bar, calculating the vapor pressure in Pa at 200 K:
+
+    >>> Antoine(T=200, A=3.45604+5, B=1044.038, C=-53.893)
+    20.4329803671
 
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    .. [2] Antoine, C. 1888. Tensions des Vapeurs: Nouvelle Relation Entre les 
+    .. [2] Antoine, C. 1888. Tensions des Vapeurs: Nouvelle Relation Entre les
        Tensions et les Tempé. Compt.Rend. 107:681-684.
-    .. [3] Yaws, Carl L. The Yaws Handbook of Vapor Pressure: Antoine 
+    .. [3] Yaws, Carl L. The Yaws Handbook of Vapor Pressure: Antoine
        Coefficients. 1 edition. Houston, Tex: Gulf Publishing Company, 2007.
     '''
     return base**(A - B/(T + C))
@@ -322,12 +329,12 @@ def Antoine_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2, base=10.0):
 
     Notes
     -----
-    Coefficients are for calculating vapor pressure in Pascal. This is 
-    primarily useful for interconverting vapor pressure models, not fitting 
+    Coefficients are for calculating vapor pressure in Pascal. This is
+    primarily useful for interconverting vapor pressure models, not fitting
     experimental data.
-    
+
     Derived with SymPy as follows:
-        
+
     >>> from sympy import * # doctest: +SKIP
     >>> base, A, B, C, T = symbols('base, A, B, C, T') # doctest: +SKIP
     >>> v = base**(A - B/(T + C)) # doctest: +SKIP
@@ -338,15 +345,15 @@ def Antoine_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2, base=10.0):
     Examples
     --------
     Recalculate some coefficients from a calcualted value and its derivative:
-        
-    
+
+
     >>> T = 178.01
     >>> A, B, C = (24.0989474955895, 4346.793091137991, -18.96968471040141)
     >>> Psat = Antoine(T, A, B, C, base=exp(1))
     >>> dPsat_dT, d2Psat_dT2 = (0.006781441203850251, 0.0010801244983894853) # precomputed
     >>> Antoine_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2, base=exp(1))
     (24.098947495155453, 4346.793090994682, -18.969684713118813)
-    
+
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
@@ -382,12 +389,12 @@ def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
 
     Notes
     -----
-    Coefficients are for calculating vapor pressure in Pascal. This is 
-    primarily useful for interconverting vapor pressure models, not fitting 
+    Coefficients are for calculating vapor pressure in Pascal. This is
+    primarily useful for interconverting vapor pressure models, not fitting
     experimental data.
-    
+
     Derived with SymPy as follows:
-        
+
     >>> from sympy import * # doctest: +SKIP
     >>> base, A, B, T = symbols('base, A, B, T') # doctest: +SKIP
     >>> v = base**(A - B/T) # doctest: +SKIP
@@ -398,7 +405,7 @@ def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
     Examples
     --------
     Recalculate some coefficients from a calcualted value and its derivative:
-        
+
     >>> T = 178.01
     >>> A, B = (27.358925161569008, 5445.569591293226)
     >>> Psat = Antoine(T, A, B, C=0, base=exp(1))
@@ -442,12 +449,12 @@ def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
 
     Notes
     -----
-    Coefficients are for calculating vapor pressure in Pascal. This is 
-    primarily useful for interconverting vapor pressure models, not fitting 
+    Coefficients are for calculating vapor pressure in Pascal. This is
+    primarily useful for interconverting vapor pressure models, not fitting
     experimental data.
-    
+
     Derived with SymPy as follows:
-        
+
     >>> from sympy import * # doctest: +SKIP
     >>> base, A, B, C, T = symbols('base, A, B, C, T') # doctest: +SKIP
     >>> v = exp(A - B/T + C*log(T)) # doctest: +SKIP
@@ -458,12 +465,12 @@ def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
     Examples
     --------
     Calculate the coefficients:
-    
+
     >>> T = 178.01
     >>> Psat, dPsat_dT, d2Psat_dT2 = (0.03946094565666715, 0.006781441203850251, 0.0010801244983894853)
     >>> DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2)
     (72.47169926642722, -6744.620564969687, -7.2976291987890844)
-    
+
     '''
     A = (T*dPsat_dT*Psat + T*(T*dPsat_dT**2 - Psat*(T*d2Psat_dT2 + 2*dPsat_dT))*log(T) + T*(T*dPsat_dT**2 - Psat*(T*d2Psat_dT2 + 2*dPsat_dT)) + Psat**2*log(Psat))/Psat**2
     B = T**2*(-T*dPsat_dT**2 + T*d2Psat_dT2*Psat + dPsat_dT*Psat)/Psat**2
@@ -472,13 +479,13 @@ def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
 
 def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
     r'''Calculates vapor pressure of a chemical using the TRC Extended Antoine
-    equation. Parameters are chemical dependent, and said to be from the 
+    equation. Parameters are chemical dependent, and said to be from the
     Thermodynamics Research Center (TRC) at Texas A&M. Coefficients for various
     chemicals can be found in [1]_.
 
     .. math::
         \log_{10} P^{sat} = A - \frac{B}{T + C} + 0.43429x^n + Ex^8 + Fx^{12}
-        
+
     .. math::
         x = \max \left(\frac{T-t_o-273.15}{T_c}, 0 \right)
 
@@ -494,18 +501,18 @@ def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
     -------
     Psat : float
         Vapor pressure calculated with coefficients [Pa]
-    
+
     Notes
     -----
-    Assumes coefficients are for calculating vapor pressure in Pascal. 
+    Assumes coefficients are for calculating vapor pressure in Pascal.
     Coefficients should be consistent with input temperatures in Kelvin;
 
     Examples
     --------
     Tetrafluoromethane, coefficients from [1]_, at 180 K:
-    
-    >>> TRC_Antoine_extended(180.0, 227.51, -120., 8.95894, 510.595, -15.95, 
-    ... 2.41377, -93.74, 7425.9) 
+
+    >>> TRC_Antoine_extended(180.0, 227.51, -120., 8.95894, 510.595, -15.95,
+    ... 2.41377, -93.74, 7425.9)
     706317.0898414153
 
     References
@@ -529,7 +536,7 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
     .. math::
         \ln P^{sat}= \ln P_c + \frac{a\tau + b \tau^{1.5} + c\tau^3 + d\tau^6}
         {T_r}
-        
+
     .. math::
         \tau = 1 - \frac{T}{T_c}
 
@@ -557,7 +564,7 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
     --------
     Methane, coefficients from [2]_, at 100 K.
 
-    >>> Wagner_original(100.0, 190.53, 4596420., a=-6.00435, b=1.1885, 
+    >>> Wagner_original(100.0, 190.53, 4596420., a=-6.00435, b=1.1885,
     ... c=-0.834082, d=-1.22833)
     34520.44601450499
 
@@ -635,16 +642,16 @@ def Psat_IAPWS(T):
 
     .. math::
         P^{sat} = 10^6 \left[ \frac{2C}{-B + \sqrt{B^2 - 4AC}}  \right]^4
-        
+
     .. math::
         A = \nu^2 + n_1 \nu + n_2
-        
+
     .. math::
         B = n_3 \nu^2 + n_4\nu + n_5
-        
+
     .. math::
         C = n_6\nu^2 + n_7\nu + n_8
-        
+
     .. math::
         \nu = T + \frac{n_9}{T - n_{10}}
 
@@ -661,9 +668,9 @@ def Psat_IAPWS(T):
     Notes
     -----
     This formulation is quite efficient, and can also be solved backward.
-    The range of validity of this equation is 273.15 K < T < 647.096 K, the 
+    The range of validity of this equation is 273.15 K < T < 647.096 K, the
     IAPWS critical point.
-    
+
     Extrapolation to lower temperatures is very poor. The function continues to
     decrease until a pressure of 5.7 mPa is reached at 159.77353993926621 K;
     under that pressure the vapor pressure increases, which is obviously wrong.
@@ -691,7 +698,7 @@ def Psat_IAPWS(T):
 
 
 def dPsat_IAPWS_dT(T):
-    r'''Calculates the first temperature dervative of vapor pressure of water 
+    r'''Calculates the first temperature dervative of vapor pressure of water
     using the IAPWS explicit equation. This was derived with SymPy, using the
     CSE method.
 
@@ -737,36 +744,36 @@ def dPsat_IAPWS_dT(T):
     x11 = 1.0/(x11*x11)
     x12 = x1*(1.12864813714895499e-6*x11 + 2.0)
     x20 = x10_inv*x10_inv*x10_inv*x10_inv
-    return (-3946.77829948379076*x3*x3*x3*(2.68752888216023447e-8*x11 - 0.000147268477556755493*x12 
+    return (-3946.77829948379076*x3*x3*x3*(2.68752888216023447e-8*x11 - 0.000147268477556755493*x12
                 + 0.0476238571384899889 + x3*(-8.39415340011308276e-9*x11 + 0.0000211273704791915782*x12
-                - 0.0148747038582233565 + 2.0*(x7*(4.19707670005654138e-9*x11 
-            - 0.0000105636852395957891*x12 + 0.00743735192911167825) + x8*(2.60482114645230015e-16*x11 
-            - 1.42736343074136086e-12*x12 + 4.6158250046507185e-10) + (0.00263438245944447809*x11 
-            + 4.0*x12 + 4668.20858110680001)*(4.6158250046507185e-10*T - 1.10113079121562103e-10*x0 
+                - 0.0148747038582233565 + 2.0*(x7*(4.19707670005654138e-9*x11
+            - 0.0000105636852395957891*x12 + 0.00743735192911167825) + x8*(2.60482114645230015e-16*x11
+            - 1.42736343074136086e-12*x12 + 4.6158250046507185e-10) + (0.00263438245944447809*x11
+            + 4.0*x12 + 4668.20858110680001)*(4.6158250046507185e-10*T - 1.10113079121562103e-10*x0
             - 1.42736343074136086e-12*x2 - 3.8769014372169964e-8))/x9)*x10_inv)*x20)
 
 def Tsat_IAPWS(P):
     r'''Calculates the saturation temperature of water using the IAPWS explicit
     equation.
-    
+
     .. math::
         T_s = \frac{n_{10} + D - \left[(n_{10}+D)^2 - 4(n_9 + n_{10}D) \right]^{0.5}}{2}
 
     .. math:
         D = \frac{2G}{-F - (F^2 - 4EG)^{0.5}}
-    
+
     .. math::
         E = \beta^2 + n_3 \beta + n_6
-    
+
     .. math::
         F = n_1 \beta^2 + n_4\beta + n_7
-    
+
     .. math::
         G = n_2\beta^2 + n_5\beta + n_8
-    
+
     .. math::
         \beta = \left(P_{sat} \right)^{0.25}
-        
+
 
     Parameters
     ----------
@@ -780,10 +787,10 @@ def Tsat_IAPWS(P):
 
     Notes
     -----
-    The range of validity of this equation is 273.15 K < T < 647.096 K, the 
+    The range of validity of this equation is 273.15 K < T < 647.096 K, the
     IAPWS critical point.
-    
-    The coefficients `n1` to `n10` are (0.11670521452767E4, -0.72421316703206E6, 
+
+    The coefficients `n1` to `n10` are (0.11670521452767E4, -0.72421316703206E6,
     -0.17073846940092E2, 0.12020824702470E5, -0.32325550322333E7, 0.14915108613530E2,
     -0.48232657361591E4, 0.40511340542057E6, -0.23855557567849, 0.65017534844798E3)
 
@@ -897,7 +904,7 @@ def Lee_Kesler(T, Tc, Pc, omega):
     Notes
     -----
     This equation appears in [1]_ in expanded form.
-    The reduced pressure form of the equation ensures predicted vapor pressure 
+    The reduced pressure form of the equation ensures predicted vapor pressure
     cannot surpass the critical pressure.
 
     Examples
@@ -1081,22 +1088,22 @@ def Edalat(T, Tc, Pc, omega):
     .. math::
         \ln(P^{sat}/P_c) = \frac{a\tau + b\tau^{1.5} + c\tau^3 + d\tau^6}
         {1-\tau}
-        
+
     .. math::
         a = -6.1559 - 4.0855\omega
-        
+
     .. math::
         b = 1.5737 - 1.0540\omega - 4.4365\times 10^{-3} d
-        
+
     .. math::
         c = -0.8747 - 7.8874\omega
-        
+
     .. math::
         d = \frac{1}{-0.4893 - 0.9912\omega + 3.1551\omega^2}
-        
+
     .. math::
         \tau = 1 - \frac{T}{T_c}
-        
+
     Parameters
     ----------
     T : float
@@ -1116,7 +1123,7 @@ def Edalat(T, Tc, Pc, omega):
     Notes
     -----
     [1]_ found an average error of 6.06% on 94 compounds and 1106 data points.
-    
+
     Examples
     --------
     >>> Edalat(347.2, 617.1, 36E5, 0.299)
@@ -1124,8 +1131,8 @@ def Edalat(T, Tc, Pc, omega):
 
     References
     ----------
-    .. [1] Edalat, M., R. B. Bozar-Jomehri, and G. A. Mansoori. "Generalized 
-       Equation Predicts Vapor Pressure of Hydrocarbons." Oil and Gas Journal; 
+    .. [1] Edalat, M., R. B. Bozar-Jomehri, and G. A. Mansoori. "Generalized
+       Equation Predicts Vapor Pressure of Hydrocarbons." Oil and Gas Journal;
        91:5 (February 1, 1993).
     '''
     tau = 1. - T/Tc
@@ -1153,7 +1160,7 @@ def Psub_Clapeyron(T, Tt, Pt, Hsub_t):
     .. math::
         \ln \frac{P}{P_{tp}} = -\frac{\Delta H_{sub}}{R}
         \left(\frac{1}{T}-\frac{1}{T_{tp}} \right)
-        
+
     Parameters
     ----------
     T : float
@@ -1174,24 +1181,24 @@ def Psub_Clapeyron(T, Tt, Pt, Hsub_t):
     -----
     Does not seem to capture the decrease in sublimation pressure quickly
     enough.
-    
+
     Examples
     --------
     >>> Psub_Clapeyron(250, Tt=273.15, Pt=611.0, Hsub_t=51100.0)
     76.06457150831804
     >>> Psub_Clapeyron(300, Tt=273.15, Pt=611.0, Hsub_t=51100.0)
     4577.282832876156
-    
+
     References
     ----------
-    .. [1] Goodman, B. T., W. V. Wilding, J. L. Oscarson, and R. L. Rowley. 
-       "Use of the DIPPR Database for the Development of QSPR Correlations: 
-       Solid Vapor Pressure and Heat of Sublimation of Organic Compounds." 
-       International Journal of Thermophysics 25, no. 2 (March 1, 2004): 
+    .. [1] Goodman, B. T., W. V. Wilding, J. L. Oscarson, and R. L. Rowley.
+       "Use of the DIPPR Database for the Development of QSPR Correlations:
+       Solid Vapor Pressure and Heat of Sublimation of Organic Compounds."
+       International Journal of Thermophysics 25, no. 2 (March 1, 2004):
        337-50. https://doi.org/10.1023/B:IJOT.0000028471.77933.80.
-    .. [2] Feistel, Rainer, and Wolfgang Wagner. "Sublimation Pressure and 
+    .. [2] Feistel, Rainer, and Wolfgang Wagner. "Sublimation Pressure and
        Sublimation Enthalpy of H2O Ice Ih between 0 and 273.16K." Geochimica et
-       Cosmochimica Acta 71, no. 1 (January 1, 2007): 36-45. 
+       Cosmochimica Acta 71, no. 1 (January 1, 2007): 36-45.
        https://doi.org/10.1016/j.gca.2006.08.034.
     '''
     return Pt*exp(Hsub_t*(T - Tt)/(R*T*Tt))

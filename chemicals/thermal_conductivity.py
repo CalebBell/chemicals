@@ -121,11 +121,11 @@ attribute of this module.
 
 from __future__ import division
 
-__all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad', 
-'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid', 
+__all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
+'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid',
 'kl_Mersmann_Kind', 'DIPPR9G', 'DIPPR9I','k_IAPWS',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
-'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 
+'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas',
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
 'Wassiljewa_Herning_Zipperer', 'k_air_lemmon']
 
@@ -151,20 +151,20 @@ def _load_k_data():
 
     k_data_Perrys_8E_2_314 = data_source('Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv')
     k_values_Perrys_8E_2_314 = np.array(k_data_Perrys_8E_2_314.values[:, 1:], dtype=float)
-    
+
     k_data_Perrys_8E_2_315 = data_source('Table 2-315 Thermal Conductivity of Inorganic and Organic Liquids.tsv')
     k_values_Perrys_8E_2_315 = np.array(k_data_Perrys_8E_2_315.values[:, 1:], dtype=float)
-    
+
     k_data_VDI_PPDS_9 = data_source('VDI PPDS Thermal conductivity of saturated liquids.tsv')
     k_values_VDI_PPDS_9 = np.array(k_data_VDI_PPDS_9.values[:, 1:], dtype=float)
-    
+
     k_data_VDI_PPDS_10 = data_source('VDI PPDS Thermal conductivity of gases.tsv')
     k_values_VDI_PPDS_10 = np.array(k_data_VDI_PPDS_10.values[:, 1:], dtype=float)
 
 if PY37:
     def __getattr__(name):
         if name in ('k_data_Perrys_8E_2_314', 'k_values_Perrys_8E_2_314', 'k_data_Perrys_8E_2_315',
-                    'k_values_Perrys_8E_2_315', 'k_data_VDI_PPDS_9', 'k_values_VDI_PPDS_9', 'k_data_VDI_PPDS_10', 
+                    'k_values_Perrys_8E_2_315', 'k_data_VDI_PPDS_9', 'k_values_VDI_PPDS_9', 'k_data_VDI_PPDS_10',
                     'k_values_VDI_PPDS_10'):
             _load_k_data()
             return globals()[name]
@@ -244,22 +244,22 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     Notes
     -----
     Gamma = 177.8514;
-    
+
     qd = 0.4E-9;
-    
+
     nu = 0.630;
-    
+
     gamma = 1.239;
-    
+
     zeta0 = 0.13E-9;
-    
+
     Gamma0 = 0.06;
-    
+
     TRC = 1.5
-    
+
     The formulation uses the industrial variant of the critical enhancement.
     It matches to 5E-6 relative tolerance at the check temperature, and should
-    match even closer outside it.  
+    match even closer outside it.
 
     Examples
     --------
@@ -271,7 +271,7 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     >>> k_IAPWS(T=620., rho=613.227777440324, Cp=7634.337046792,
     ... Cv=3037.934412104, mu=70.905106751524E-6, drho_dP=5.209378197916E-6)
     0.48148519510200044
-    
+
     Full scientific calculation:
 
     >>> from chemicals.iapws import iapws95_properties, iapws95_P, iapws95_Tc
@@ -283,7 +283,7 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     >>> mu = mu_IAPWS(T, rho, drho_dP, drho_dP_Tr)
     >>> k_IAPWS(T, rho, Cp, Cv, mu, drho_dP, drho_dP_Tr)
     0.60651532815
-    
+
     References
     ----------
     .. [1] Huber, M. L., R. A. Perkins, D. G. Friend, J. V. Sengers, M. J.
@@ -294,8 +294,8 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     '''
     rhor = rho*0.003105590062111801#1/322.0
     Tr = T*0.0015453657571674064 # 1/647.096
-    Tr_inv = 1.0/Tr 
-    
+    Tr_inv = 1.0/Tr
+
 #     Lijs = [[1.60397357, -0.646013523, 0.111443906, 0.102997357, -0.0504123634, 0.00609859258],
 #             [2.33771842, -2.78843778, 1.53616167, -0.463045512, 0.0832827019, -0.00719201245],
 #             [2.19650529, -4.54580785, 3.55777244, -1.40944978, 0.275418278, -0.0205938816],
@@ -315,7 +315,7 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
         lambda0 += L/Tr**i
     lambda0 = Tr**0.5/lambda0
     '''
-    lambda0 = sqrt(Tr)/(Tr_inv*(Tr_inv*(Tr_inv*(0.0004096266*Tr_inv - 0.003454586) 
+    lambda0 = sqrt(Tr)/(Tr_inv*(Tr_inv*(Tr_inv*(0.0004096266*Tr_inv - 0.003454586)
                         + 0.006770357) + 0.01323095) + 0.002443221)
 
     '''Unoptimized (but editable) code; the below is generated with sympy
@@ -330,8 +330,8 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     x1 = (Tr_inv - 1.0)
     x12 = x1*x1
     tot1 = (x0*(x0*(x0*(x0*(x0*(x1*(x1*(0.012913842*x12 - 0.0205938816) - 0.00719201245) + 0.00609859258)
-                            + x1*(x1*(0.275418278 - 0.19268305*x12) + 0.0832827019) - 0.0504123634) 
-                        + x1*(x1*(x1*(1.1168348*x1 + 0.0716373224) - 1.40944978) - 0.463045512) + 0.102997357) 
+                            + x1*(x1*(0.275418278 - 0.19268305*x12) + 0.0832827019) - 0.0504123634)
+                        + x1*(x1*(x1*(1.1168348*x1 + 0.0716373224) - 1.40944978) - 0.463045512) + 0.102997357)
                     + x1*(x1*(x1*(-3.18369245*x1 - 0.621178141) + 3.55777244) + 1.53616167) + 0.111443906)
                 + x1*(x1*(x1*(4.57586331*x1 + 1.60812989) - 4.54580785) - 2.78843778) - 0.646013523)
             + x1*(x1*(x1*(-2.720337*x1 - 1.21051378) + 2.19650529) + 2.33771842) + 1.60397357)
@@ -362,7 +362,7 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
                 tot1 = (rhor*(rhor*(rhor*(rhor*(12.1358413791395 - 5.54349664571295*rhor) - 9.82240510197603)
                             + 8.08379285492595) - 6.30816983387575) + 6.52717759281799)
             elif rhor <= 1.242236025:
-                tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579) 
+                tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579)
                             + 8.91990208918795) - 3.96415689925446) + 5.35500529896124)
             elif rhor <= 1.863354037:
                 tot1 = (rhor*(rhor*(rhor*(rhor*(6.1678099993336 - 0.965458722086812*rhor) - 11.0321960061126)
@@ -407,9 +407,9 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
 
     .. math::
         \lambda = \lambda^0(T) + \lambda^r(\tau, \delta) + \lambda^c(\tau, \delta)
-        
+
     .. math::
-        \lambda^0 = N_1\left[\frac{\eta^0(T)}{1 \mu \text{Pa}\cdot \text{s}} 
+        \lambda^0 = N_1\left[\frac{\eta^0(T)}{1 \mu \text{Pa}\cdot \text{s}}
         \right] + N_2\tau^{t_2} + N_3\tau^{t_3}
 
     .. math::
@@ -430,13 +430,13 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
         + 1/3(\xi/q_D)^2(\rho_c/\rho)^2} \right] \right\}
 
     .. math::
-        \xi = \xi_0 \left[\frac{\tilde \chi(T, \rho) - \tilde \chi(T_{ref}, 
+        \xi = \xi_0 \left[\frac{\tilde \chi(T, \rho) - \tilde \chi(T_{ref},
         \rho)\frac{T_{ref}}{T}}{\Gamma}  \right]^{\nu/\gamma}
 
     .. math::
-        \tilde \chi(T, \rho) = \frac{P_c \rho}{\rho_c^2} \left(\frac{\partial 
+        \tilde \chi(T, \rho) = \frac{P_c \rho}{\rho_c^2} \left(\frac{\partial
         \rho}{\partial P} \right)_{T}
-        
+
     Parameters
     ----------
     T : float
@@ -467,16 +467,16 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
     The constnts are as follows:
 
     Ni = [1.308, 1.405, -1.036, 8.743, 14.76, -16.62, 3.793, -6.142, -0.3778]
-    
+
     ti = [None, -1.1, -0.3, 0.1, 0.0, 0.5, 2.7, 0.3, 1.3]
-     
+
     di = [None, None, None, 1, 2, 3, 7, 7, 11]
-     
+
     li  = [None, None, None, 0, 0, 2, 2, 2, 2]
-     
+
     gammai = [None, None, None, 0, 0, 1, 1, 1, 1]
 
-    R0 = 1.01; Pc = 3.78502E6 Pa; xi0 = 0.11E-9 nm; qd = 0.31E-9 nm; 
+    R0 = 1.01; Pc = 3.78502E6 Pa; xi0 = 0.11E-9 nm; qd = 0.31E-9 nm;
     Tc = 132.6312 K (actually the maxcondentherm); T_ref = 265.262 (2Tc
     rounded differently); rhoc = 10447.7 mol/m^3 (actually the maxcondentherm);
     k = 1.380658E-23 J/K; nu = 0.63 and gamma = 1.2415, sigma = 0.36,
@@ -486,33 +486,33 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
     Examples
     --------
     Basic calculation at 300 K and approximately 1 bar:
-    
+
     >>> k_air_lemmon(300, 40.0)
     0.0263839695044
-    
+
     Calculation near critical point:
-    
+
     >>> k_air_lemmon(132.64, 10400, 2137.078854678728, 35.24316159996235, 0.07417878614315769, 0.00035919027241528256, 1.7762253265868595e-05)
     0.07562307234760
-    
+
     References
     ----------
-    .. [1] Lemmon, E. W., and R. T. Jacobsen. "Viscosity and Thermal 
+    .. [1] Lemmon, E. W., and R. T. Jacobsen. "Viscosity and Thermal
        Conductivity Equations for Nitrogen, Oxygen, Argon, and Air."
-       International Journal of Thermophysics 25, no. 1 (January 1, 2004): 
+       International Journal of Thermophysics 25, no. 1 (January 1, 2004):
        21-69. https://doi.org/10.1023/B:IJOT.0000022327.04529.f3.
     '''
     R0 = 1.01
     Pc = 3.78502E6
     xi0 = 0.11E-9
-    qd = 0.31E-9 
+    qd = 0.31E-9
 #     Gamma = 0.055
     Tc = 132.6312 # K, maxcondentherm actually
     T_ref = 265.262 # Tc*2 but rounded differently
-    rhoc = 10447.7 
+    rhoc = 10447.7
     rhoc2 = rhoc*rhoc
-    
-    qd_inv = 3225806451.612903 # 10.31E-9 
+
+    qd_inv = 3225806451.612903 # 10.31E-9
     gamma_inv = 18.181818181818183 # 1/.055
 
     tau = Tc/T
@@ -522,16 +522,16 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
     tau12_10 = tau3_10*tau3_10
     tau12_10 *= tau12_10
     tau24_10 = tau12_10*tau12_10
-    
-    delta = rho*9.571484632981421e-05 # 9.57...E-5 = 1/10447.7 
+
+    delta = rho*9.571484632981421e-05 # 9.57...E-5 = 1/10447.7
 
     Ts = T*0.00968054211035818 # 1/e_k
     lnTs = log(Ts)
     Omega_inv = exp(-0.431 - lnTs*(lnTs*(lnTs*(0.005341 - 0.00331*lnTs) + 0.08406) - 0.4623))
-        
+
     #12.7658... = 0.0266958*sqrt(28.9586)/(0.360*0.360)*sqrt(132.6312)
     eta0 = 12.765845058845755*Omega_inv/(tau2_10*tau3_10)
-    
+
     k0 = 1.308*eta0 + 1.405/(tau*tau_10) - 1.036/tau3_10
 
 #     kr = 0.0
@@ -541,26 +541,26 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
     delta2 = delta*delta
     delta3 = delta*delta2
     delta4 = delta*delta3
-    kr = (8.743*delta*tau_10 + 14.76*delta2 -  exp(-delta2)*(16.62*delta3*tau3_10*tau2_10 
+    kr = (8.743*delta*tau_10 + 14.76*delta2 -  exp(-delta2)*(16.62*delta3*tau3_10*tau2_10
           + delta3*delta4*(0.3778*delta4*tau_10*tau12_10 + tau3_10*(6.142 - 3.793*tau24_10))))
 
     if Cp is not None and Cv is not None and mu is not None and drho_dP is not None and drho_dP_Tr is not None:
         x2 = Pc*rho/rhoc2
         xi_bar = x2*drho_dP
         xi_bar_ref = x2*drho_dP_Tr
-    
+
         xi = xi0*((xi_bar - xi_bar_ref*T_ref/T)*gamma_inv)**0.5074506645187273# .50745... = (0.63/1.2415)
         if xi < 0.0:
             kc = 0.0
         else:
             xi_qd = xi*qd_inv
-            
+
             term0 = qd/xi + (1.0/3.0)*xi_qd*xi_qd*(rhoc*rhoc/(rho*rho))
             Omega_bar0 = 2.0*pi_inv*(1.0 - exp(-1.0/term0))
-            
+
             Omega_bar = 2.0*pi_inv*((Cp - Cv)/Cp*atan(xi_qd) + Cv/Cp*xi_qd)
             k = 1.380658E-23 # J/K
-            
+
             # Mu should still be in Pa*s
             kc = rho*Cp*k*R0*T/(6.0*pi*xi*mu)*(Omega_bar - Omega_bar0)
             kc *= 1e3 # Convert to mW/m/K, same as others
@@ -923,7 +923,7 @@ def Bahadori_liquid(T, MW):
     C = (-1.80304E-4, 1.758693E-6, -5.55224E-9, 5.201365E-12)
     D = (5.880443E-7, -5.65898E-9, 1.764384E-11, -1.65944E-14)
     X, Y = MW, T
-    
+
     a = A[0] + X*(B[0] + X*(C[0] + D[0]*X))
     b = A[1] + X*(B[1] + X*(C[1] + D[1]*X))
     c = A[2] + X*(B[2] + X*(C[2] + D[2]*X))
@@ -941,7 +941,7 @@ def kl_Mersmann_Kind(T, MW, Tc, Vc, na):
 
     .. math::
         \lambda^* = \frac{2}{3}\left(n_a + 40\sqrt{1-T_r}\right)
-        
+
     Parameters
     ----------
     T : float
@@ -964,20 +964,20 @@ def kl_Mersmann_Kind(T, MW, Tc, Vc, na):
     -----
     In the equation, all quantities must be in SI units but N_A is in a kmol
     basis and Vc is in units of (m^3/kmol); this is converted internally.
-    
+
     Examples
     --------
     Dodecane at 400 K:
-        
-    >>> kl_Mersmann_Kind(400, 170.33484, 658.0, 
+
+    >>> kl_Mersmann_Kind(400, 170.33484, 658.0,
     ... 0.000754, 38)
     0.0895271829899285
 
     References
     ----------
-    .. [1] Mersmann, Alfons, and Matthias Kind. "Prediction of Mechanical and 
-       Thermal Properties of Pure Liquids, of Critical Data, and of Vapor 
-       Pressure." Industrial & Engineering Chemistry Research, January 31, 
+    .. [1] Mersmann, Alfons, and Matthias Kind. "Prediction of Mechanical and
+       Thermal Properties of Pure Liquids, of Critical Data, and of Vapor
+       Pressure." Industrial & Engineering Chemistry Research, January 31,
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     '''
     lambda_star = (2/3.)*(na + 40.*sqrt(1. - T/Tc))
@@ -1055,14 +1055,14 @@ Qs_Missenard = [[0.036, 0.038, 0.038, 0.038, 0.038, 0.038],
                 [0.015, 0.020, 0.022, 0.024, 0.025, 0.025],
                 [0.012, 0.0165, 0.017, 0.019, 0.020, 0.020]]
 # tck obtained with interp1d's regrid_smth
-Missenard_tck = implementation_optimize_tck([[1.0, 1.0, 5.0, 10.0, 50.0, 100.0, 200.0, 200.0], 
-                                             [0.5, 0.5, 0.6, 0.7, 0.8, 0.8], 
+Missenard_tck = implementation_optimize_tck([[1.0, 1.0, 5.0, 10.0, 50.0, 100.0, 200.0, 200.0],
+                                             [0.5, 0.5, 0.6, 0.7, 0.8, 0.8],
                                              [0.012, 0.015, 0.018, 0.036, 0.0165, 0.02,
                                               0.025, 0.038, 0.017, 0.022, 0.027, 0.038,
-                                              0.019, 0.024, 0.031, 0.038, 0.02, 0.025, 
+                                              0.019, 0.024, 0.031, 0.038, 0.02, 0.025,
                                               0.032, 0.038, 0.02, 0.025, 0.032, 0.038],
                                               1,1])
-            
+
 def Missenard(T, P, Tc, Pc, kl):
     r'''Adjustes for pressure the thermal conductivity of a liquid using an
     emperical formula based on [1]_, but as given in [2]_.
@@ -1122,11 +1122,11 @@ def DIPPR9H(ws, ks):
 
     .. math::
         \lambda_m = \left( \sum_i w_i \lambda_i^{-2}\right)^{-1/2}
-        
+
     This is also called the Vredeveld (1973) equation. A review in [3]_ finds
     this the best model on average. However, they did caution that in some
     cases a linear mole-fraction mixing rule performs better. This equation
-    according to Poling [1]_ should not be used if some components have 
+    according to Poling [1]_ should not be used if some components have
     thermal conductivities more than twice other components. They also say this
     should not be used with water.
 
@@ -1152,9 +1152,9 @@ def DIPPR9H(ws, ks):
 
     Average deviations of 3%. for 118 nonaqueous systems with 817 data points.
     Max deviation 20%. According to DIPPR.
-    
+
     In some sources, this equation is given with the molecular weights included:
-    
+
     .. math::
         \lambda_m^{-2} = \frac{\sum_i z_i {MW}_i \lambda_i^{-2}}
         {\sum_i z_i {MW}_i}
@@ -1171,7 +1171,7 @@ def DIPPR9H(ws, ks):
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     .. [3] Focke, Walter W. "Correlating Thermal-Conductivity Data for Ternary
-       Liquid Mixtures." International Journal of Thermophysics 29, no. 4 
+       Liquid Mixtures." International Journal of Thermophysics 29, no. 4
        (August 1, 2008): 1342-60. https://doi.org/10.1007/s10765-008-0465-2.
     '''
     kl = 0.0
@@ -1183,16 +1183,16 @@ def DIPPR9I(zs, Vms, ks):
     r'''Calculates thermal conductivity of a liquid mixture according to
     mixing rules in [1]_. This is recommended in [2]_ for aqueous and
     nonaqueous systems.
-    
+
     .. math::
         k_{mix} = \sum_{i}\sum_j \phi_i\phi_j k_{i,j}
-    
+
     .. math::
         k_{i,j} = \frac{2}{\frac{1}{k_i} + \frac{1}{k_j}}
-    
+
     .. math::
         \phi_i = \frac{z_i V_{m,i}}{\sum_j^n z_j V_{m,j}}
-        
+
     Parameters
     ----------
     zs : list[float]
@@ -1211,11 +1211,11 @@ def DIPPR9I(zs, Vms, ks):
     -----
     This equation is entirely dimensionless; all dimensions cancel.
     The example is from [2]_; all results agree.
-    
+
     [2]_ found average deviations of 4-6% for 118 nonaqueous systems
-    and 15 aqueous systems at atmospheric pressure, with a maximum deviation of 
+    and 15 aqueous systems at atmospheric pressure, with a maximum deviation of
     33%.
-    
+
     The computational complexity here is N^2, with a division present in the
     inner loop.
 
@@ -1244,13 +1244,13 @@ def DIPPR9I(zs, Vms, ks):
     tot = 1.0/tot
     for i in range(N):
         phis[i] *= tot
-        
+
     # Compute the diagonal and store ks_inv
     for i in range(N):
         k_inv = 1.0/ks[i]
         k += phis[i]*phis[i]*ks[i]
         ks_inv[i] = k_inv
-    
+
     # Main loop
     main_k_sum = 0.0
     for i in range(N):
@@ -1258,7 +1258,7 @@ def DIPPR9I(zs, Vms, ks):
         for j in range(i):
             tot += phis[j]/(ks_inv[i] + ks_inv[j])
         main_k_sum += tot*phis[i]
-            
+
     # factored out 4 - 2 from inner loop, two from symmetry
     k += 4.0*main_k_sum
     return k
@@ -1636,16 +1636,16 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     f = Tc/190.4*theta
     h = Vc/9.92E-5*psi
     T0 = T/f
-    
+
     T0_third = T0**(1.0/3.0)
     T0_moving = 1.0/T0
-    tot = (2907741.307*T0_moving + T0_third*(-3312874.033*T0_moving 
+    tot = (2907741.307*T0_moving + T0_third*(-3312874.033*T0_moving
             + T0_third*(1608101.838*T0_moving + T0_third*(-433190.4871*T0_moving
-            + T0_third*(70624.8133*T0_moving + T0_third*(-7116.62075*T0_moving 
-         + T0_third*(432.51744*T0_moving + T0_third*(0.2037119479*T0_moving*T0_third 
+            + T0_third*(70624.8133*T0_moving + T0_third*(-7116.62075*T0_moving
+         + T0_third*(432.51744*T0_moving + T0_third*(0.2037119479*T0_moving*T0_third
         - 14.4591121*T0_moving))))))))
-    
-#    Cs = [2.907741307E6, -3.312874033E6, 1.608101838E6, -4.331904871E5, 
+
+#    Cs = [2.907741307E6, -3.312874033E6, 1.608101838E6, -4.331904871E5,
 #          7.062481330E4, -7.116620750E3, 4.325174400E2, -1.445911210E1, 2.037119479E-1]
 #    tot = 0.0
 #    for i in range(9):
@@ -1722,7 +1722,7 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
     B = (T + (2.*omega + 2.*T - 2.*T*(2.*omega + 3.2825)*Tb_inv + 3.2825)
          /(2.0*omega + T - T*(2.0*omega + 3.2825)*Tb_inv + 3.2825)
          - T*(2.0*omega + 3.2825)*Tb_inv)
-    
+
     x0 = (3.9752*omega + 0.1*Pc + 1.9876*B + 6.5243)
     A = (2.0*omega + T - T*(2.0*omega + 3.2825)*Tb_inv + 3.2825)/(0.1*MW*Pc*T) * x0*x0
     return 7.9505E-4 + 3.989E-5*T - 5.419E-5*MW + 3.989E-5*A
@@ -1991,14 +1991,14 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     h = Vc/9.92E-5*psi
     T0 = T/f
     rho0 = 16.04/(Vm*1E6)*h  # Vm must be in cm^3/mol here.
-    
+
     T0_third = T0**(1.0/3.0)
     T0_moving = 1.0/T0
     tot = 0.0
     for i in range(9):
         tot += Cs[i]*T0_moving
-        T0_moving *= T0_third    
-    
+        T0_moving *= T0_third
+
     eta0 = 1E-7*tot
     k1 = 1944*eta0
     b1 = -0.25276920E0
@@ -2040,7 +2040,7 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     tot = 0.0
     for i in range(9):
         tot += Cs[i]*T0_moving
-        T0_moving *= T0_third    
+        T0_moving *= T0_third
 
     eta0 = 1E-7*tot
     H = (16.04*f/MW)**0.5*h**(-2.0/3.)
@@ -2123,7 +2123,7 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     Association factor is assumed 0. Relates to the polarity of the gas.
 
     Coefficients as follows:
-        
+
     ais = [2.4166E+0, -5.0924E-1, 6.6107E+0, 1.4543E+1, 7.9274E-1, -5.8634E+0, 9.1089E+1]
 
     bis = [7.4824E-1, -1.5094E+0, 5.6207E+0, -8.9139E+0, 8.2019E-1, 1.2801E+1, 1.2811E+2]
@@ -2151,7 +2151,7 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
     Tr = T/Tc
     mur = 131.3*dipole*(Vc*1E6*Tc)**-0.5
     mur4 = mur*mur
-    mur4 *= mur4 
+    mur4 *= mur4
 
     # From Chung Method
     alpha = Cvm*R_inv - 1.5
@@ -2177,7 +2177,7 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
 
 
 ### Thermal conductivity of gas mixtures
-    
+
 
 def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     r'''Calculates thermal conductivity of a gas mixture according to
@@ -2194,7 +2194,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
 
     .. math::
         S_{ij} = S_{ji} = (S_i S_j)^{0.5}
-        
+
     .. math::
         S_i = 1.5 T_b
 
@@ -2251,7 +2251,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     Ss_invT = [0.0]*N
     TSrootSsinv = [0.0]*N
     bigis_inv = [0.0]*N
-    
+
     for i in range(N):
         Si = 1.5*Tbs[i]
         S_roots[i] = sqrt(Si)
@@ -2263,7 +2263,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
         rt25MW = sqrt(rt05MW)
         bigis[i] = sqrt(T_Si*mus[i]/(rt05MW*rt25MW))# correct and clever - compute MW^0.375
         bigis_inv[i] = 1.0/bigis[i]
-        
+
     k = 0.0
     for i in range(N):
         den = 0.0
@@ -2279,7 +2279,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
         k += ys[i]*ks[i]/den
     k *= 4.0 # constant
     return k
-    
+
     # Original, unoptimized implementation
 #    cmps = range(len(ys))
 #    Ss = [1.5*Tb for Tb in Tbs]
@@ -2288,7 +2288,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
 #    Aij = [[0.25*(1. + (mus[i]/mus[j]*(MWs[j]/MWs[i])**0.75
 #            *(T+Ss[i])/(T+Ss[j]))**0.5 )**2 *(T+Sij[i][j])/(T+Ss[i])
 #            for j in cmps] for i in cmps]
-#            
+#
 #    return sum([ys[i]*ks[i]/sum(ys[j]*Aij[i][j] for j in cmps) for i in cmps])
 
 
@@ -2329,7 +2329,7 @@ def Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots=None):
     --------
     >>> Wassiljewa_Herning_Zipperer(zs=[.1, .4, .5], ks=[1.002E-5, 1.15E-5, 2e-5], MWs=[40.0, 50.0, 60.0])
     1.5861181979916883e-05
-    
+
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.

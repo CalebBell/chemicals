@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains lookup functions and estimation methods for the 
+This module contains lookup functions and estimation methods for the
 parameters molecular diameter `sigma` and the Stockmayer parameter `epsilon`.
 These are used for diffusivity calculations. It also contains several
 methods for computing the collision integral, another parameter used in the
@@ -83,7 +83,7 @@ __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
            'sigma_Bird_Stewart_Lightfoot_melting',
            'sigma_Stiel_Thodos', 'sigma_Tee_Gotoh_Steward_1',
            'sigma_Tee_Gotoh_Steward_2',
-           'sigma_Silva_Liu_Macedo', 'epsilon_Flynn', 
+           'sigma_Silva_Liu_Macedo', 'epsilon_Flynn',
            'epsilon_Bird_Stewart_Lightfoot_critical',
            'epsilon_Bird_Stewart_Lightfoot_boiling',
            'epsilon_Bird_Stewart_Lightfoot_melting', 'epsilon_Stiel_Thodos',
@@ -139,7 +139,7 @@ Stockmayer_all_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
 '''Tuple of method name keys. See the `Stockmayer` for the actual references'''
 
 def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
-    """Return all methods available to obtain the Stockmayer parameter for the 
+    """Return all methods available to obtain the Stockmayer parameter for the
     desired chemical.
 
     Parameters
@@ -281,7 +281,7 @@ molecular_diameter_all_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
 
 def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
                                omega=None, Vm=None, Vb=None):
-    """Return all methods available to obtain the molecular diameter for the 
+    """Return all methods available to obtain the molecular diameter for the
     desired chemical.
 
     Parameters
@@ -762,8 +762,8 @@ def sigma_Silva_Liu_Macedo(Tc, Pc):
 
     Notes
     -----
-    Pc is originally in bar. An excellent paper. None is  
-    returned if the polynomial returns a negative number, as in the case of 
+    Pc is originally in bar. An excellent paper. None is
+    returned if the polynomial returns a negative number, as in the case of
     1029.13 K and 3.83 bar.
 
     Examples

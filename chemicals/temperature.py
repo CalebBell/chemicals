@@ -22,14 +22,14 @@ SOFTWARE.
 
 This module contains functionality for converting between the temperature scales
 ITS-90, ITS-76, ITS-68, ITS-48, and ITS-27. These historical temperature scales
-can deviate quite a bit from modern temperature measurements! It is important 
+can deviate quite a bit from modern temperature measurements! It is important
 to convert old measurements of temperature to their modern equivalent.
 
 For reporting bugs, adding feature requests, or submitting pull requests,
 please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
 
 .. contents:: :local:
-    
+
 Conversion functions
 --------------------
 .. autofunction:: chemicals.temperature.T_converter
@@ -39,7 +39,7 @@ Conversion functions
 
 from __future__ import division
 
-__all__ = ['T_converter', 'T_scales', 'ITS90_68_difference', 'Ts_68', 
+__all__ = ['T_converter', 'T_scales', 'ITS90_68_difference', 'Ts_68',
 'diffs_68', 'Ts_48', 'diffs_48', 'Ts_76', 'diffs_76', 'Ts_27', 'diffs_27']
 from fluids.core import C2K
 
@@ -108,14 +108,14 @@ Ts_48 = [93.15, 103.15, 113.15, 123.15, 133.15, 143.15, 153.15, 163.15, 173.15,
          723.15, 733.15, 743.15, 753.15, 763.15, 773.15, 783.15, 793.15, 803.15,
          813.15, 823.15, 833.15, 843.15, 853.15, 863.15, 873.15, 883.15, 893.15,
          903.15, 913.15, 923.15, 933.15, 943.15, 953.15, 963.15, 973.15, 983.15,
-         993.15, 1003.15, 1013.15, 1023.15, 1033.15, 1043.15, 1053.15, 1063.15, 
+         993.15, 1003.15, 1013.15, 1023.15, 1033.15, 1043.15, 1053.15, 1063.15,
          1073.15, 1083.15, 1093.15, 1103.15, 1113.15, 1123.15, 1133.15, 1143.15,
          1153.15, 1163.15, 1173.15, 1183.15, 1193.15, 1203.15, 1213.15, 1223.15,
          1233.15, 1243.15, 1253.15, 1263.15, 1273.15, 1283.15, 1293.15, 1303.15,
          1313.15, 1323.15, 1333.15, 1343.15, 1373.15, 1473.15, 1573.15, 1673.15,
-         1773.15, 1873.15, 1973.15, 2073.15, 2173.15, 2273.15, 2373.15, 2473.15, 
-         2573.15, 2673.15, 2773.15, 2873.15, 2973.15, 3073.15, 3173.15, 3273.15, 
-         3373.15, 3473.15, 3573.15, 3673.15, 3773.15, 3873.15, 3973.15, 4073.15, 
+         1773.15, 1873.15, 1973.15, 2073.15, 2173.15, 2273.15, 2373.15, 2473.15,
+         2573.15, 2673.15, 2773.15, 2873.15, 2973.15, 3073.15, 3173.15, 3273.15,
+         3373.15, 3473.15, 3573.15, 3673.15, 3773.15, 3873.15, 3973.15, 4073.15,
          4173.15, 4273.15]
 
 diffs_48 = [0.02, 0.017, 0.007, 0, 0.001, 0.008, 0.017, 0.026, 0.035,
@@ -142,14 +142,14 @@ diffs_76 = [-0.0001, -0.0002, -0.0003, -0.0004, -0.0005, -0.0006,
              -0.0007, -0.0008, -0.001, -0.0011, -0.0013, -0.0014,
              -0.0016, -0.0018, -0.002, -0.0022, -0.0025, -0.0027,
              -0.003, -0.0032, -0.0035, -0.0038, -0.0041]
-Ts_27 = [903.15, 913.15, 923.15, 933.15, 943.15, 953.15, 963.15, 973.15, 983.15, 
-         993.15, 1003.15, 1013.15, 1023.15, 1033.15, 1043.15, 1053.15, 1063.15, 
+Ts_27 = [903.15, 913.15, 923.15, 933.15, 943.15, 953.15, 963.15, 973.15, 983.15,
+         993.15, 1003.15, 1013.15, 1023.15, 1033.15, 1043.15, 1053.15, 1063.15,
          1073.15, 1083.15, 1093.15, 1103.15, 1113.15, 1123.15, 1133.15, 1143.15,
          1153.15, 1163.15, 1173.15, 1183.15, 1193.15, 1203.15, 1213.15, 1223.15,
          1233.15, 1243.15, 1253.15, 1263.15, 1273.15, 1283.15, 1293.15, 1303.15,
          1313.15, 1323.15, 1333.15, 1373.15, 1473.15, 1573.15, 1673.15, 1773.15,
          1873.15, 1973.15, 2073.15, 2173.15, 2273.15, 2373.15, 2473.15, 2573.15,
-         2673.15, 2773.15, 2873.15, 2973.15, 3073.15, 3173.15, 3273.15, 3373.15, 
+         2673.15, 2773.15, 2873.15, 2973.15, 3073.15, 3173.15, 3273.15, 3373.15,
          3473.15, 3573.15, 3673.15, 3773.15, 3873.15, 3973.15, 4073.15, 4173.15,
          4273.15]
 diffs_27 = [0.08, 0.19, 0.3, 0.42, 0.52, 0.63, 0.73, 0.83, 0.93, 1.02,
@@ -175,12 +175,12 @@ def build_splines():
     Ts_90_from_48 = np.array(Ts_48) + diffs_48
     Ts_90_from_76 = np.array(Ts_76) + diffs_76
     Ts_90_from_27 = np.array(Ts_27) + diffs_27
-    
+
     T68_to_T90 = UnivariateSpline(Ts_68, Ts_90_from_68, s=0)
     T48_to_T90 = UnivariateSpline(Ts_48, Ts_90_from_48, s=0)
     T76_to_T90 = UnivariateSpline(Ts_76, Ts_90_from_76, s=0)
     T27_to_T90 = UnivariateSpline(Ts_27, Ts_90_from_27, s=0)
-    
+
     T90_to_T68 = UnivariateSpline(Ts_90_from_68, Ts_68, s=0)
     T90_to_T48 = UnivariateSpline(Ts_90_from_48, Ts_48, s=0)
     T90_to_T76 = UnivariateSpline(Ts_90_from_76, Ts_76, s=0)
@@ -235,27 +235,27 @@ def ITS90_68_difference(T):
     For temperatures under 13.8 K, no conversion is performed.
 
     The first set of coefficients is:
-    
+
     -0.005903, 0.008174, -0.061924, -0.193388, 1.490793, 1.252347, -9.835868,
     1.411912, 25.277595, -19.183815, -18.437089, 27.000895, -8.716324.
 
     The second set of coefficients is:
-    
+
     0, -0.148759, -0.267408, 1.08076, 1.269056, -4.089591, -1.871251,
     7.438081, -3.536296.
 
     The third set of coefficients is:
-        
+
     7.8687209E1, -4.7135991E-1, 1.0954715E-3, -1.2357884E-6, 6.7736583E-10,
     -1.4458081E-13.
-    
+
     These last coefficients use the temperature in degrees Celcius. A slightly
     older model used the following coefficients but a different equation over
     the same range:
-        
+
     -0.00317, -0.97737, 1.2559, 2.03295, -5.91887, -3.23561, 7.23364,
     5.04151.
-    
+
     The model for these coefficients was:
 
     .. math::

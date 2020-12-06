@@ -614,7 +614,7 @@ def SMK(T, Tc, omega):
     L1 = (A11*tau_13 + A21*tau_56 + A31*tau_other +
            tau*(B11 + tau*(B21 + B31*tau)))
 
-    domega = 4.016064257028112*(omega - omegaR1) # 4.016... = 1.0/(omegaR2 - omegaR1
+    domega = 4.016064257028112*(omega - omegaR1) # 4.016... = 1.0/(omegaR2 - omegaR1)
 #    domega = (omega - omegaR1)/(omegaR2 - omegaR1)
     return R*Tc*(L0 + domega*L1)
 

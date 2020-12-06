@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 This module contains various surface tension estimation routines, dataframes
-of fit coefficients, fitting model equations, mixing rules, and 
+of fit coefficients, fitting model equations, mixing rules, and
 water-hydrocarbon interfacial tension estimation routines.
 
 For reporting bugs, adding feature requests, or submitting pull requests,
@@ -83,7 +83,7 @@ attribute of this module.
 
 .. data:: sigma_data_Somayajulu2
 
-    Data from [2]_ with :obj:`Somayajulu` coefficients. These should be 
+    Data from [2]_ with :obj:`Somayajulu` coefficients. These should be
     preferred over the original coefficients.
 
 .. data:: sigma_data_VDI_PPDS_11
@@ -110,7 +110,7 @@ attribute of this module.
    Berlin; New York:: Springer, 2010.
 
 The structure of each dataframe is shown below:
-    
+
 
 .. ipython::
 
@@ -131,10 +131,10 @@ The structure of each dataframe is shown below:
 from __future__ import division
 
 __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
-           'Brock_Bird', 'Pitzer_sigma', 'Sastri_Rao', 'Zuo_Stenby', 
+           'Brock_Bird', 'Pitzer_sigma', 'Sastri_Rao', 'Zuo_Stenby',
            'sigma_IAPWS',
            'Mersmann_Kind_sigma', 'API10A32',
-           'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem', 
+           'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem',
            'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 'Weinaug_Katz',
            'Meybodi_Daryasafar_Karimi']
 
@@ -166,7 +166,7 @@ def load_interface_dfs():
 
     sigma_data_Jasper_Lange = data_source('Jasper-Lange.tsv')
     sigma_values_Jasper_Lange = np.array(sigma_data_Jasper_Lange.values[:, 1:], dtype=float)
-    
+
     sigma_data_Somayajulu = data_source('Somayajulu.tsv')
     sigma_values_Somayajulu = np.array(sigma_data_Somayajulu.values[:, 1:], dtype=float)
 
@@ -178,9 +178,9 @@ def load_interface_dfs():
 
 if PY37:
     def __getattr__(name):
-        if name in ('sigma_data_Mulero_Cachadina', 'sigma_values_Mulero_Cachadina', 
+        if name in ('sigma_data_Mulero_Cachadina', 'sigma_values_Mulero_Cachadina',
                     'sigma_data_Jasper_Lange', 'sigma_values_Jasper_Lange',
-                    'sigma_data_Somayajulu', 'sigma_values_Somayajulu', 'sigma_data_Somayajulu2', 
+                    'sigma_data_Somayajulu', 'sigma_values_Somayajulu', 'sigma_data_Somayajulu2',
                     'sigma_values_Somayajulu2', 'sigma_data_VDI_PPDS_11', 'sigma_values_VDI_PPDS_11'
                     ):
             load_interface_dfs()
@@ -314,7 +314,7 @@ def Somayajulu(T, Tc, A, B, C):
 
     .. math::
         \sigma=aX^{5/4}+bX^{9/4}+cX^{13/4}
-        
+
     .. math::
         X=(T_c-T)/T_c
 
@@ -640,7 +640,7 @@ def Zuo_Stenby(T, Tc, Pc, omega):
 
     ST_1 = 40.520*(1.0 - Tr)**1.287  # Methane
     ST_2 = 52.095*(1.0 - Tr)**1.21548  # n-octane
-    
+
     ST_r_1 = log(1.0 + 0.013537770442486932*ST_1) # Constant from 1/(Tc_1**(1.0/3.0)*Pc_1**(2.0/3.0))
 #    ST_r_1 = log(1.0 + ST_1/(Tc_1**(1.0/3.0)*Pc_1**(2.0/3.0)))
     ST_r_2 = log(1.0 + 0.014154874587259097*ST_2) # Constant from /(Tc_2**(1.0/3.0)*Pc_2**(2.0/3.0))
@@ -765,7 +765,7 @@ def Miqueu(T, Tc, Vc, omega):
     sigma = k*Tc*(N_A/Vc)**(2.0/3.0)*(4.35 + 4.14*omega)*t**1.26*(1.0 + 0.19*sqrt(t) - 0.25*t)*10000.0
     return sigma
 
-    
+
 def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
     r'''Calculates vapor-liquid surface tension using the correlation derived by
     [1]_ based on critical property CSP methods.
@@ -776,7 +776,7 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
 
     .. math::
         \phi = 1 - 0.0047MW + 6.8\times 10^{-6} MW^2
-            
+
     Parameters
     ----------
     T : float
@@ -801,25 +801,25 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
     -----
     Internal units of molecuar weight are kg/mol. This model is dimensionally
     consistent.
-    
-    This model does not use the critical temperature. After it predicts a 
-    surface tension of 0 at a sufficiently high temperature, it returns 
+
+    This model does not use the critical temperature. After it predicts a
+    surface tension of 0 at a sufficiently high temperature, it returns
     negative results. The temperature at which this occurs (the "predicted"
     critical temperature) can be calculated as follows:
-        
+
     .. math::
         \sigma = 0 \to T_{c,predicted} \text{ at } T_b + \frac{H_{vap}}{Cp_l}
-    
-    Because of its dependence on density, it has the potential to model the 
+
+    Because of its dependence on density, it has the potential to model the
     effect of pressure on surface tension.
-    
-    Claims AAD of 4.3%. Developed for normal alkanes. Total of 472 data points. 
+
+    Claims AAD of 4.3%. Developed for normal alkanes. Total of 472 data points.
     Behaves worse for higher alkanes. Behaves very poorly overall.
-    
+
     Examples
     --------
     Methane at 90 K
-    
+
     >>> Aleem(T=90, MW=16.04246, Tb=111.6, rhol=458.7, Hvap_Tb=510870.,
     ... Cpl=2465.)
     0.01669970230131523
@@ -827,8 +827,8 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
     References
     ----------
     .. [1] Aleem, W., N. Mellon, S. Sufian, M. I. A. Mutalib, and D. Subbarao.
-       "A Model for the Estimation of Surface Tension of Pure Hydrocarbon 
-       Liquids." Petroleum Science and Technology 33, no. 23-24 (December 17, 
+       "A Model for the Estimation of Surface Tension of Pure Hydrocarbon
+       Liquids." Petroleum Science and Technology 33, no. 23-24 (December 17,
        2015): 1908-15. doi:10.1080/10916466.2015.1110593.
     '''
     MW = MW*1e-3 # Use kg/mol for consistency with the other units
@@ -842,11 +842,11 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
 
     .. math::
         \sigma^* = \frac{\sigma n_{ass}^{1/3}} {(kT_c)^{1/3} T_{rm}P_c^{2/3}}
-        
+
     .. math::
         \sigma^* = \left(\frac{T_b - T_m}{T_m}\right)^{1/3}
         \left[6.25(1-T_r) + 31.3(1-T_r)^{4/3}\right]
-        
+
     Parameters
     ----------
     T : float
@@ -872,19 +872,19 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
     -----
     In the equation, all quantities must be in SI units. `k` is the boltzman
     constant.
-    
+
     Examples
     --------
     MTBE at STP (the actual value is 0.0181):
-        
+
     >>> Mersmann_Kind_sigma(298.15, 164.15, 328.25, 497.1, 3430000.0)
     0.016744311449290426
 
     References
     ----------
-    .. [1] Mersmann, Alfons, and Matthias Kind. "Prediction of Mechanical and 
-       Thermal Properties of Pure Liquids, of Critical Data, and of Vapor 
-       Pressure." Industrial & Engineering Chemistry Research, January 31, 
+    .. [1] Mersmann, Alfons, and Matthias Kind. "Prediction of Mechanical and
+       Thermal Properties of Pure Liquids, of Critical Data, and of Vapor
+       Pressure." Industrial & Engineering Chemistry Research, January 31,
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     '''
     Tr = T/Tc
@@ -894,13 +894,13 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
 
 
 def API10A32(T, Tc, K_W):
-    r'''Calculates the interfacial tension between 
+    r'''Calculates the interfacial tension between
     a liquid petroleum fraction and air, using the oil's pseudocritical
     temperature and Watson K Characterization factor.
 
     .. math::
         \sigma = \frac{673.7\left[\frac{\left(T_c - T\right)}{T_c}\right]^{1.232}}{K_W}
-    
+
     Parameters
     ----------
     T : float
@@ -921,14 +921,14 @@ def API10A32(T, Tc, K_W):
     [1]_ cautions that this should not be applied to coal liquids,
     and that it will give higher errors at pressures above 500 psi.
     [1]_ claims this has an average error of 10.7%.
-    
-    This function converges to zero at `Tc`; do not use it above that 
+
+    This function converges to zero at `Tc`; do not use it above that
     temperature!
 
     Examples
-    --------    
+    --------
     Sample problem in Comments on Procedure 10A3.2.1 of [1]_;
-    
+
     >>> from fluids.core import F2K, R2K
     >>> API10A32(T=F2K(60), Tc=R2K(1334), K_W=12.4)
     29.577333312096968
@@ -1013,7 +1013,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
         for j in range(i):
             tot += Vms[i]*Vms[j]
     return tot
-        
+
 
 def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
     r'''Calculates surface tension of a liquid mixture according to
@@ -1060,9 +1060,9 @@ def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
     Raises a ValueError if temperature is greater than the mixture's critical
     temperature or if the given temperature is negative, or if the mixture's
     boiling temperature is higher than its critical temperature.
-    
-    [1]_ claims a 4.63 percent average absolute error on 21 binary and 4 
-    ternary non-aqueous systems. [1]_ also considered Van der Waals mixing 
+
+    [1]_ claims a 4.63 percent average absolute error on 21 binary and 4
+    ternary non-aqueous systems. [1]_ also considered Van der Waals mixing
     rules for `Tc`, but found it provided a higher error of 5.58%
 
     Examples
@@ -1125,16 +1125,16 @@ def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
     --------
     >>> Weinaug_Katz([5.1e-5, 7.2e-5], Vml=0.000125, Vmg=0.02011, xs=[.4, .6], ys=[.6, .4])
     0.06547479150776776
-    
+
     Neglect the vapor phase density by setting `Vmg` to a high value:
-        
+
     >>> Weinaug_Katz([5.1e-5, 7.2e-5], Vml=0.000125, Vmg=1e100, xs=[.4, .6], ys=[.6, .4])
     0.06701752894095361
-    
+
     References
     ----------
-    .. [1] Weinaug, Charles F., and Donald L. Katz. "Surface Tensions of 
-       Methane-Propane Mixtures." Industrial & Engineering Chemistry 35, 
+    .. [1] Weinaug, Charles F., and Donald L. Katz. "Surface Tensions of
+       Methane-Propane Mixtures." Industrial & Engineering Chemistry 35,
        no. 2 (February 1, 1943): 239-246. https://doi.org/10.1021/ie50398a028.
     .. [2] Pedersen, Karen Schou, Aage Fredenslund, and Per Thomassen.
        Properties of Oils and Natural Gases. Vol. 5. Gulf Pub Co, 1989.
@@ -1154,12 +1154,12 @@ def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
 def Meybodi_Daryasafar_Karimi(rho_water, rho_oil, T, Tc):
     r'''Calculates the interfacial tension between water and a hydrocabon
     liquid according to the correlation of [1]_.
-    
+
     .. math::
-        \gamma_{hw} = \left(\frac{A_1 + A_2 \Delta \rho + A_3\Delta\rho^2 
+        \gamma_{hw} = \left(\frac{A_1 + A_2 \Delta \rho + A_3\Delta\rho^2
         + A_4\Delta\rho^3} {A_5 + A_6\frac{T^{A_7}}{T_{c,h}} + A_8T^{A_9}}
         \right)^{A_{10}}
-        
+
     Parameters
     ----------
     rho_water : float
@@ -1179,17 +1179,17 @@ def Meybodi_Daryasafar_Karimi(rho_water, rho_oil, T, Tc):
     Notes
     -----
     Internal units of the equation are g/mL and mN/m.
-    
+
     Examples
     --------
     >>> Meybodi_Daryasafar_Karimi(980, 760, 580, 914)
     0.02893598143089256
-    
+
     References
     ----------
-    .. [1] Kalantari Meybodi, Mahdi, Amin Daryasafar, and Masoud Karimi. 
-       "Determination of Hydrocarbon-Water Interfacial Tension Using a New 
-       Empirical Correlation."  Fluid Phase Equilibria 415 (May 15, 2016): 
+    .. [1] Kalantari Meybodi, Mahdi, Amin Daryasafar, and Masoud Karimi.
+       "Determination of Hydrocarbon-Water Interfacial Tension Using a New
+       Empirical Correlation."  Fluid Phase Equilibria 415 (May 15, 2016):
        42-50. doi:10.1016/j.fluid.2016.01.037.
     '''
     A1 = -1.3687340042E-1
