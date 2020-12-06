@@ -53,7 +53,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'numpydoc',
     'IPython.sphinxext.ipython_console_highlighting',
-    'IPython.sphinxext.ipython_directive'
+    'IPython.sphinxext.ipython_directive',
+    'sphinx.ext.intersphinx',
 ]
 
 #     'sphinx.ext.napoleon'
