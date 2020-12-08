@@ -352,16 +352,21 @@ def Antoine_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2, base=10.0):
     >>> Psat = Antoine(T, A, B, C, base=exp(1))
     >>> dPsat_dT, d2Psat_dT2 = (0.006781441203850251, 0.0010801244983894853) # precomputed
     >>> Antoine_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2, base=exp(1))
-    (24.098947495155453, 4346.793090994682, -18.969684713118813)
+    (24.098947495155, 4346.793090994, -18.969684713118)
 
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    A = log(Psat*exp(2*dPsat_dT**2/(dPsat_dT**2 - d2Psat_dT2*Psat)))/log(base)
-    B = 4*dPsat_dT**3*Psat/((dPsat_dT**4 - 2*dPsat_dT**2*d2Psat_dT2*Psat + d2Psat_dT2**2*Psat**2)*log(base))
-    C = (-T*dPsat_dT**2 + T*d2Psat_dT2*Psat + 2*dPsat_dT*Psat)/(dPsat_dT**2 - d2Psat_dT2*Psat)
+    x0 = 1.0/log(base)
+    x1 = Psat*d2Psat_dT2
+    dPsat_dT_2 = dPsat_dT*dPsat_dT
+    x3 = 1.0/(x1 - dPsat_dT_2)
+    x4 = dPsat_dT_2 + dPsat_dT_2
+    A = x0*log(Psat*exp(-x3*x4))
+    B = 4.0*Psat*dPsat_dT*dPsat_dT_2*x0/(Psat*Psat*d2Psat_dT2*d2Psat_dT2 + dPsat_dT_2*dPsat_dT_2 - x1*x4)
+    C = -x3*(2.0*Psat*dPsat_dT + T*x1 - T*dPsat_dT_2)
     return (A, B, C)
 
 def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
