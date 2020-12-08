@@ -423,8 +423,10 @@ def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-    A = log(Psat*exp(T*dPsat_dT/Psat))/log(base)
-    B = T**2*dPsat_dT/(Psat*log(base))
+    log_base_inv = 1.0/log(base)
+    Psat_inv = 1.0/Psat
+    A = log(Psat*exp(T*dPsat_dT*Psat_inv))*log_base_inv
+    B = T*T*dPsat_dT*log_base_inv*Psat_inv
     return (A, B)
 
 def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
@@ -474,12 +476,17 @@ def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
     >>> T = 178.01
     >>> Psat, dPsat_dT, d2Psat_dT2 = (0.03946094565666715, 0.006781441203850251, 0.0010801244983894853)
     >>> DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2)
-    (72.47169926642722, -6744.620564969687, -7.2976291987890844)
-
+    (72.47169926642, -6744.620564969, -7.2976291987890)
     '''
-    A = (T*dPsat_dT*Psat + T*(T*dPsat_dT**2 - Psat*(T*d2Psat_dT2 + 2*dPsat_dT))*log(T) + T*(T*dPsat_dT**2 - Psat*(T*d2Psat_dT2 + 2*dPsat_dT)) + Psat**2*log(Psat))/Psat**2
-    B = T**2*(-T*dPsat_dT**2 + T*d2Psat_dT2*Psat + dPsat_dT*Psat)/Psat**2
-    C = -T*(T*dPsat_dT**2 - Psat*(T*d2Psat_dT2 + 2*dPsat_dT))/Psat**2
+    x0 = Psat*Psat
+    x1 = 1.0/x0
+    x2 = Psat*dPsat_dT
+    x3 = -T*dPsat_dT*dPsat_dT
+    x4 = T*d2Psat_dT2
+    x5 = T*(Psat*(2.0*dPsat_dT + x4) + x3)
+    A = x1*(T*x2 + x0*log(Psat) - x5*log(T) - x5)
+    B = T*T*x1*(Psat*x4 + x2 + x3)
+    C = x1*x5
     return (A, B, C)
 
 def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
