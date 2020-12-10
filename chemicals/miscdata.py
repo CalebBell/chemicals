@@ -162,6 +162,8 @@ def lookup_VDI_tabular_data(CASRN, prop):
     --------
     >>> lookup_VDI_tabular_data('67-56-1', 'Mu (g)')
     ([337.63, 360.0, 385.0, 410.0, 435.0, 460.0, 500.0], [1.11e-05, 1.18e-05, 1.27e-05, 1.36e-05, 1.46e-05, 1.59e-05, 2.04e-05])
+    >>> lookup_VDI_tabular_data('7782-41-4', 'sigma')
+    ([53.49, 64.0, 74.0, 85.04, 92.0, 102.0, 112.0, 122.0, 132.0, 144.41], [0.0227, 0.02, 0.0166, 0.0136, 0.0117, 0.0092, 0.0068, 0.0045, 0.0024, 0.0])
 
     References
     ----------
@@ -180,6 +182,9 @@ def lookup_VDI_tabular_data(CASRN, prop):
     props = [p for p in props if p]
     # Not all data series converege to correct values
     if prop == 'sigma':
-        Ts.append(d['Tc'])
-        props.append(0)
+        if Ts[-1] < d['Tc']:
+            Ts.append(d['Tc'])
+            props.append(0.0)
+        elif Ts[-1] == d['Tc']:
+            props[-1] = 0.0
     return Ts, props
