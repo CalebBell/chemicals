@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 This module contains four estimation methods for second `B` virial coefficients,
-two utility covnersions for when only `B` is considered, and two methods to 
+two utility covnersions for when only `B` is considered, and two methods to
 calculate `Z` from higher order virial expansions.
 
 For reporting bugs, adding feature requests, or submitting pull requests,
@@ -47,7 +47,7 @@ Second Virial Correlations
 from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
-           'BVirial_Tsonopoulos_extended', 'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form', 
+           'BVirial_Tsonopoulos_extended', 'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
            'Z_from_virial_pressure_form']
 
 from fluids.numerics import numpy as np
@@ -157,17 +157,17 @@ def Z_from_virial_density_form(T, P, *args):
 
     Notes
     -----
-    For use with B or with B and C or with B and C and D, optimized equations 
+    For use with B or with B and C or with B and C and D, optimized equations
     are used to obtain the compressibility factor directly.
-    If more coefficients are provided, uses numpy's roots function to solve 
-    this equation. This takes substantially longer as the solution is 
+    If more coefficients are provided, uses numpy's roots function to solve
+    this equation. This takes substantially longer as the solution is
     numerical.
-    
+
     If no virial coefficients are given, returns 1, as per the ideal gas law.
-    
+
     The units of each virial coefficient are as follows, where for B, n=1, and
     C, n=2, and so on.
-    
+
     .. math::
         \left(\frac{\text{m}^3}{\text{mol}}\right)^n
 
@@ -178,10 +178,10 @@ def Z_from_virial_density_form(T, P, *args):
 
     References
     ----------
-    .. [1] Prausnitz, John M., Rudiger N. Lichtenthaler, and Edmundo Gomes de 
-       Azevedo. Molecular Thermodynamics of Fluid-Phase Equilibria. 3rd 
+    .. [1] Prausnitz, John M., Rudiger N. Lichtenthaler, and Edmundo Gomes de
+       Azevedo. Molecular Thermodynamics of Fluid-Phase Equilibria. 3rd
        edition. Upper Saddle River, N.J: Prentice Hall, 1998.
-    .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering. 
+    .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering.
        Butterworth-Heinemann, 1985.
     '''
     l = len(args)
@@ -193,10 +193,10 @@ def Z_from_virial_density_form(T, P, *args):
         # A small imaginary part is ignored
         return (P*(-(3*B*R*T/P + R**2*T**2/P**2)/(3*(-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)) - (-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)/3 + R*T/(3*P))/(R*T)).real
     if l == 3:
-        # Huge mess. Ideally sympy could optimize a function for quick python 
+        # Huge mess. Ideally sympy could optimize a function for quick python
         # execution. Derived with kate's text highlighting
         B, C, D = args[0], args[1], args[2]
-        P2 = P**2 
+        P2 = P**2
         RT = R*T
         BRT = B*RT
         T2 = T**2
@@ -204,7 +204,7 @@ def Z_from_virial_density_form(T, P, *args):
         RT23 = 3*R2*T2
         mCRT = -C*RT
         P2256 = 256*P2
-        
+
         RT23P2256 = RT23/(P2256)
         big1 = (D*RT/P - (-BRT/P - RT23/(8*P2))**2/12 - RT*(mCRT/(4*P) - RT*(BRT/(16*P) + RT23P2256)/P)/P)
         big3 = (-BRT/P - RT23/(8*P2))
@@ -213,7 +213,7 @@ def Z_from_virial_density_form(T, P, *args):
         big2 = 2*big1/(3*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3))
         big7 = 2*BRT/(3*P) - big2 + 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(4*P2)
         return (P*(((csqrt(big7)/2 + csqrt(4*BRT/(3*P) - (-2*C*RT/P - 2*RT*(BRT/(2*P) + R2*T2/(8*P2))/P)/csqrt(big7) + big2 - 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(2*P2))/2 + RT/(4*P))))/R/T).real
-    
+
     size = l + 2
 #    arr = np.ones(size, dtype=np.complex128) # numba: uncomment
     arr = [1.0]*size # numba: delete
@@ -228,7 +228,7 @@ def Z_from_virial_density_form(T, P, *args):
 
 
 def Z_from_virial_pressure_form(P, *args):
-    r'''Calculates the compressibility factor of a gas given its pressure, and 
+    r'''Calculates the compressibility factor of a gas given its pressure, and
     pressure-form virial coefficients. Any number of coefficients is supported.
 
     .. math::
@@ -248,18 +248,18 @@ def Z_from_virial_pressure_form(P, *args):
 
     Notes
     -----
-    Note that although this function does not require a temperature input, it  
+    Note that although this function does not require a temperature input, it
     is still dependent on it because the coefficients themselves normally are
     regressed in terms of temperature.
-    
+
     The use of this form is less common than the density form. Its coefficients
     are normally indicated with the "'" suffix.
-    
+
     If no virial coefficients are given, returns 1, as per the ideal gas law.
-    
+
     The units of each virial coefficient are as follows, where for B, n=1, and
     C, n=2, and so on.
-    
+
     .. math::
         \left(\frac{1}{\text{Pa}}\right)^n
 
@@ -267,13 +267,13 @@ def Z_from_virial_pressure_form(P, *args):
     --------
     >>> Z_from_virial_pressure_form(102919.99946855308, 4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19)
     1.00283753944
-    
+
     References
     ----------
-    .. [1] Prausnitz, John M., Rudiger N. Lichtenthaler, and Edmundo Gomes de 
-       Azevedo. Molecular Thermodynamics of Fluid-Phase Equilibria. 3rd 
+    .. [1] Prausnitz, John M., Rudiger N. Lichtenthaler, and Edmundo Gomes de
+       Azevedo. Molecular Thermodynamics of Fluid-Phase Equilibria. 3rd
        edition. Upper Saddle River, N.J: Prentice Hall, 1998.
-    .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering. 
+    .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering.
        Butterworth-Heinemann, 1985.
     '''
     tot = 0.0
@@ -311,10 +311,10 @@ def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
     omega : float
         Acentric factor for fluid, [-]
     order : int, optional
-        Order of the calculation. 0 for the calculation of B itself; for 1/2/3, 
-        the first/second/third derivative of B with respect to temperature; and  
-        for -1/-2, the first/second indefinite integral of B with respect to 
-        temperature. No other integrals or derivatives are implemented, and an 
+        Order of the calculation. 0 for the calculation of B itself; for 1/2/3,
+        the first/second/third derivative of B with respect to temperature; and
+        for -1/-2, the first/second indefinite integral of B with respect to
+        temperature. No other integrals or derivatives are implemented, and an
         exception will be raised if any other order is given.
 
     Returns
@@ -329,7 +329,7 @@ def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
     -2, -1, 1, 2, and 3, all obtained with SymPy.
 
     For first temperature derivative of B:
-    
+
     .. math::
         \frac{d B^{(0)}}{dT} = \frac{33 Tc}{100 T^{2}} + \frac{277 Tc^{2}}{1000 T^{3}} + \frac{363 Tc^{3}}{10000 T^{4}}
 
@@ -337,7 +337,7 @@ def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
         \frac{d B^{(1)}}{dT} = - \frac{23 Tc}{50 T^{2}} + \frac{Tc^{2}}{T^{3}} + \frac{291 Tc^{3}}{1000 T^{4}} + \frac{73 Tc^{8}}{1250 T^{9}}
 
     For the second temperature derivative of B:
-    
+
     .. math::
         \frac{d^2 B^{(0)}}{dT^2} = - \frac{3 Tc}{5000 T^{3}} \left(1100 + \frac{1385 Tc}{T} + \frac{242 Tc^{2}}{T^{2}}\right)
 
@@ -345,26 +345,26 @@ def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
         \frac{d^2 B^{(1)}}{dT^2} = \frac{Tc}{T^{3}} \left(\frac{23}{25} - \frac{3 Tc}{T} - \frac{291 Tc^{2}}{250 T^{2}} - \frac{657 Tc^{7}}{1250 T^{7}}\right)
 
     For the third temperature derivative of B:
-    
+
     .. math::
         \frac{d^3 B^{(0)}}{dT^3} = \frac{3 Tc}{500 T^{4}} \left(330 + \frac{554 Tc}{T} + \frac{121 Tc^{2}}{T^{2}}\right)
 
     .. math::
         \frac{d^3 B^{(1)}}{dT^3} = \frac{3 Tc}{T^{4}} \left(- \frac{23}{25} + \frac{4 Tc}{T} + \frac{97 Tc^{2}}{50 T^{2}} + \frac{219 Tc^{7}}{125 T^{7}}\right)
-    
+
     For the first indefinite integral of B:
-    
+
     .. math::
         \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \log{\left (T \right )} + \frac{1}{20000 T^{2}} \left(2770 T Tc^{2} + 121 Tc^{3}\right)
-        
+
     .. math::
         \int{B^{(1)}} dT = \frac{73 T}{1000} + \frac{23 Tc}{50} \log{\left (T \right )} + \frac{1}{70000 T^{7}} \left(35000 T^{6} Tc^{2} + 3395 T^{5} Tc^{3} + 73 Tc^{8}\right)
-    
+
     For the second indefinite integral of B:
 
     .. math::
         \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \log{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \log{\left (T \right )} - \frac{121 Tc^{3}}{20000 T}
-    
+
     .. math::
         \int\int B^{(1)} dT dT = \frac{73 T^{2}}{2000} + \frac{23 T}{50} Tc \log{\left (T \right )} - \frac{23 T}{50} Tc + \frac{Tc^{2}}{2} \log{\left (T \right )} - \frac{1}{420000 T^{6}} \left(20370 T^{5} Tc^{3} + 73 Tc^{8}\right)
 
@@ -401,7 +401,7 @@ def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
     elif order == -2:
         B0 = 289*T**2/4000 - 33*T*Tc*log(T)/100 + 33*T*Tc/100 + 277*Tc**2*log(T)/2000 - 121*Tc**3/(20000*T)
         B1 = 73*T**2/2000 + 23*T*Tc*log(T)/50 - 23*T*Tc/50 + Tc**2*log(T)/2 - (20370*T**5*Tc**3 + 73*Tc**8)/(420000*T**6)
-    else: 
+    else:
         raise ValueError('Only orders -2, -1, 0, 1, 2 and 3 are supported.')
     Br = B0 + omega*B1
     return Br*R*Tc/Pc
@@ -431,10 +431,10 @@ def BVirial_Abbott(T, Tc, Pc, omega, order=0):
     omega : float
         Acentric factor for fluid, [-]
     order : int, optional
-        Order of the calculation. 0 for the calculation of B itself; for 1/2/3, 
-        the first/second/third derivative of B with respect to temperature; and  
-        for -1/-2, the first/second indefinite integral of B with respect to 
-        temperature. No other integrals or derivatives are implemented, and an 
+        Order of the calculation. 0 for the calculation of B itself; for 1/2/3,
+        the first/second/third derivative of B with respect to temperature; and
+        for -1/-2, the first/second indefinite integral of B with respect to
+        temperature. No other integrals or derivatives are implemented, and an
         exception will be raised if any other order is given.
 
     Returns
@@ -449,7 +449,7 @@ def BVirial_Abbott(T, Tc, Pc, omega, order=0):
     -2, -1, 1, 2, and 3, all obtained with SymPy.
 
     For first temperature derivative of B:
-    
+
     .. math::
         \frac{d B^{(0)}}{dT} = \frac{0.6752}{T \left(\frac{T}{Tc}\right)^{1.6}}
 
@@ -457,7 +457,7 @@ def BVirial_Abbott(T, Tc, Pc, omega, order=0):
         \frac{d B^{(1)}}{dT} = \frac{0.7224}{T \left(\frac{T}{Tc}\right)^{4.2}}
 
     For the second temperature derivative of B:
-    
+
     .. math::
         \frac{d^2 B^{(0)}}{dT^2} = - \frac{1.75552}{T^{2} \left(\frac{T}{Tc}\right)^{1.6}}
 
@@ -465,29 +465,29 @@ def BVirial_Abbott(T, Tc, Pc, omega, order=0):
         \frac{d^2 B^{(1)}}{dT^2} = - \frac{3.75648}{T^{2} \left(\frac{T}{Tc}\right)^{4.2}}
 
     For the third temperature derivative of B:
-    
+
     .. math::
         \frac{d^3 B^{(0)}}{dT^3} = \frac{6.319872}{T^{3} \left(\frac{T}{Tc}\right)^{1.6}}
 
     .. math::
         \frac{d^3 B^{(1)}}{dT^3} = \frac{23.290176}{T^{3} \left(\frac{T}{Tc}\right)^{4.2}}
-    
+
     For the first indefinite integral of B:
-    
+
     .. math::
         \int{B^{(0)}} dT = 0.083 T + \frac{\frac{211}{300} Tc}{\left(\frac{T}{Tc}\right)^{0.6}}
-        
+
     .. math::
         \int{B^{(1)}} dT = 0.139 T + \frac{0.05375 Tc}{\left(\frac{T}{Tc}\right)^{3.2}}
-    
+
     For the second indefinite integral of B:
 
     .. math::
         \int\int B^{(0)} dT dT = 0.0415 T^{2} + \frac{211}{120} Tc^{2} \left(\frac{T}{Tc}\right)^{0.4}
-    
+
     .. math::
         \int\int B^{(1)} dT dT = 0.0695 T^{2} - \frac{\frac{43}{1760} Tc^{2}}{\left(\frac{T}{Tc}\right)^{2.2}}
-    
+
     Examples
     --------
     Example is from [1]_, p. 93, and matches the result exactly, for isobutane.
@@ -519,7 +519,7 @@ def BVirial_Abbott(T, Tc, Pc, omega, order=0):
     elif order == -2:
         B0 = 0.0415*T**2 + 211/120.*Tc**2*Tr**0.4
         B1 = 0.0695*T**2 - 43/1760.*Tc**2*Tr**(-2.2)
-    else: 
+    else:
         raise ValueError('Only orders -2, -1, 0, 1, 2 and 3 are supported.')
     Br = B0 + omega*B1
     return Br*R*Tc/Pc
@@ -548,10 +548,10 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
     omega : float
         Acentric factor for fluid, [-]
     order : int, optional
-        Order of the calculation. 0 for the calculation of B itself; for 1/2/3, 
-        the first/second/third derivative of B with respect to temperature; and  
-        for -1/-2, the first/second indefinite integral of B with respect to 
-        temperature. No other integrals or derivatives are implemented, and an 
+        Order of the calculation. 0 for the calculation of B itself; for 1/2/3,
+        the first/second/third derivative of B with respect to temperature; and
+        for -1/-2, the first/second indefinite integral of B with respect to
+        temperature. No other integrals or derivatives are implemented, and an
         exception will be raised if any other order is given.
 
     Returns
@@ -569,7 +569,7 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
     -2, -1, 1, 2, and 3, all obtained with SymPy.
 
     For first temperature derivative of B:
-    
+
     .. math::
         \frac{d B^{(0)}}{dT} = \frac{33 Tc}{100 T^{2}} + \frac{277 Tc^{2}}{1000 T^{3}} + \frac{363 Tc^{3}}{10000 T^{4}} + \frac{607 Tc^{8}}{125000 T^{9}}
 
@@ -577,7 +577,7 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
         \frac{d B^{(1)}}{dT} = - \frac{331 Tc^{2}}{500 T^{3}} + \frac{1269 Tc^{3}}{1000 T^{4}} + \frac{8 Tc^{8}}{125 T^{9}}
 
     For the second temperature derivative of B:
-    
+
     .. math::
         \frac{d^2 B^{(0)}}{dT^2} = - \frac{3 Tc}{125000 T^{3}} \left(27500 + \frac{34625 Tc}{T} + \frac{6050 Tc^{2}}{T^{2}} + \frac{1821 Tc^{7}}{T^{7}}\right)
 
@@ -585,26 +585,26 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
         \frac{d^2 B^{(1)}}{dT^2} = \frac{3 Tc^{2}}{500 T^{4}} \left(331 - \frac{846 Tc}{T} - \frac{96 Tc^{6}}{T^{6}}\right)
 
     For the third temperature derivative of B:
-    
+
     .. math::
         \frac{d^3 B^{(0)}}{dT^3} = \frac{3 Tc}{12500 T^{4}} \left(8250 + \frac{13850 Tc}{T} + \frac{3025 Tc^{2}}{T^{2}} + \frac{1821 Tc^{7}}{T^{7}}\right)
 
     .. math::
         \frac{d^3 B^{(1)}}{dT^3} = \frac{3 Tc^{2}}{250 T^{5}} \left(-662 + \frac{2115 Tc}{T} + \frac{480 Tc^{6}}{T^{6}}\right)
-    
+
     For the first indefinite integral of B:
-    
+
     .. math::
         \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \log{\left (T \right )} + \frac{1}{7000000 T^{7}} \left(969500 T^{6} Tc^{2} + 42350 T^{5} Tc^{3} + 607 Tc^{8}\right)
-        
+
     .. math::
         \int{B^{(1)}} dT = \frac{637 T}{10000} - \frac{1}{70000 T^{7}} \left(23170 T^{6} Tc^{2} - 14805 T^{5} Tc^{3} - 80 Tc^{8}\right)
-        
+
     For the second indefinite integral of B:
 
     .. math::
         \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \log{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \log{\left (T \right )} - \frac{1}{42000000 T^{6}} \left(254100 T^{5} Tc^{3} + 607 Tc^{8}\right)
-    
+
     .. math::
         \int\int B^{(1)} dT dT = \frac{637 T^{2}}{20000} - \frac{331 Tc^{2}}{1000} \log{\left (T \right )} - \frac{1}{210000 T^{6}} \left(44415 T^{5} Tc^{3} + 40 Tc^{8}\right)
 
@@ -640,13 +640,13 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
     elif order == -2:
         B0 = 289*T**2/4000. - 33*T*Tc*log(T)/100. + 33*T*Tc/100. + 277*Tc**2*log(T)/2000. - (254100*T**5*Tc**3 + 607*Tc**8)/(42000000.*T**6)
         B1 = 637*T**2/20000. - 331*Tc**2*log(T)/1000. - (44415*T**5*Tc**3 + 40*Tc**8)/(210000.*T**6)
-    else: 
+    else:
         raise ValueError('Only orders -2, -1, 0, 1, 2 and 3 are supported.')
     Br = (B0+omega*B1)
     return Br*R*Tc/Pc
 
 
-def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='', 
+def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
                                  dipole=0, order=0):
     r'''Calculates the second virial coefficient using the
     comprehensive model in [1]_. See the notes for the calculation of `a` and
@@ -654,13 +654,13 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
 
     .. math::
         \frac{BP_c}{RT_c} = B^{(0)} + \omega B^{(1)} + a B^{(2)} + b B^{(3)}
-    
+
     .. math::
         B^{(0)}=0.1445-0.33/T_r-0.1385/T_r^2-0.0121/T_r^3
 
     .. math::
         B^{(1)} = 0.0637+0.331/T_r^2-0.423/T_r^3 -0.423/T_r^3 - 0.008/T_r^8
-        
+
     .. math::
         B^{(2)} = 1/T_r^6
 
@@ -688,10 +688,10 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
     dipole : float
         dipole moment, optional, [Debye]
     order : int, optional
-        Order of the calculation. 0 for the calculation of B itself; for 1/2/3, 
-        the first/second/third derivative of B with respect to temperature; and  
-        for -1/-2, the first/second indefinite integral of B with respect to 
-        temperature. No other integrals or derivatives are implemented, and an 
+        Order of the calculation. 0 for the calculation of B itself; for 1/2/3,
+        the first/second/third derivative of B with respect to temperature; and
+        for -1/-2, the first/second indefinite integral of B with respect to
+        temperature. No other integrals or derivatives are implemented, and an
         exception will be raised if any other order is given.
 
     Returns
@@ -709,64 +709,64 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
     To calculate `a` or `b`, the following rules are used:
 
     For 'simple' or 'normal' fluids:
-    
+
     .. math::
         a = 0
-        
+
     .. math::
         b = 0
 
     For 'ketone', 'aldehyde', 'alkyl nitrile', 'ether', 'carboxylic acid',
     or 'ester' types of chemicals:
-    
+
     .. math::
         a = -2.14\times 10^{-4} \mu_r - 4.308 \times 10^{-21} (\mu_r)^8
-        
+
     .. math::
         b = 0
-    
-    For 'alkyl halide', 'mercaptan', 'sulfide', or 'disulfide' types of 
+
+    For 'alkyl halide', 'mercaptan', 'sulfide', or 'disulfide' types of
     chemicals:
 
     .. math::
         a = -2.188\times 10^{-4} (\mu_r)^4 - 7.831 \times 10^{-21} (\mu_r)^8
-        
+
     .. math::
         b = 0
 
     For 'alkanol' types of chemicals (except methanol):
-    
+
     .. math::
         a = 0.0878
-    
+
     .. math::
         b = 0.00908 + 0.0006957 \mu_r
-        
+
     For methanol:
-    
+
     .. math::
         a = 0.0878
-        
+
     .. math::
         b = 0.0525
-    
+
     For water:
-    
+
     .. math::
         a = -0.0109
-        
+
     .. math::
         b = 0
-    
+
     If required, the form of dipole moment used in the calculation of some
     types of `a` and `b` values is as follows:
-    
+
     .. math::
         \mu_r = 100000\frac{\mu^2(Pc/101325.0)}{Tc^2}
 
 
     For first temperature derivative of B:
-    
+
     .. math::
         \frac{d B^{(0)}}{dT} = \frac{33 Tc}{100 T^{2}} + \frac{277 Tc^{2}}{1000 T^{3}} + \frac{363 Tc^{3}}{10000 T^{4}} + \frac{607 Tc^{8}}{125000 T^{9}}
 
@@ -780,7 +780,7 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
         \frac{d B^{(3)}}{dT} = \frac{8 Tc^{8}}{T^{9}}
 
     For the second temperature derivative of B:
-    
+
     .. math::
         \frac{d^2 B^{(0)}}{dT^2} = - \frac{3 Tc}{125000 T^{3}} \left(27500 + \frac{34625 Tc}{T} + \frac{6050 Tc^{2}}{T^{2}} + \frac{1821 Tc^{7}}{T^{7}}\right)
 
@@ -794,7 +794,7 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
         \frac{d^2 B^{(3)}}{dT^2} = - \frac{72 Tc^{8}}{T^{10}}
 
     For the third temperature derivative of B:
-    
+
     .. math::
         \frac{d^3 B^{(0)}}{dT^3} = \frac{3 Tc}{12500 T^{4}} \left(8250 + \frac{13850 Tc}{T} + \frac{3025 Tc^{2}}{T^{2}} + \frac{1821 Tc^{7}}{T^{7}}\right)
 
@@ -808,10 +808,10 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
         \frac{d^3 B^{(3)}}{dT^3} = \frac{720 Tc^{8}}{T^{11}}
 
     For the first indefinite integral of B:
-    
+
     .. math::
         \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \log{\left (T \right )} + \frac{1}{7000000 T^{7}} \left(969500 T^{6} Tc^{2} + 42350 T^{5} Tc^{3} + 607 Tc^{8}\right)
-        
+
     .. math::
         \int{B^{(1)}} dT = \frac{637 T}{10000} - \frac{1}{70000 T^{7}} \left(23170 T^{6} Tc^{2} - 14805 T^{5} Tc^{3} - 80 Tc^{8}\right)
 
@@ -825,16 +825,16 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
 
     .. math::
         \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \log{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \log{\left (T \right )} - \frac{1}{42000000 T^{6}} \left(254100 T^{5} Tc^{3} + 607 Tc^{8}\right)
-    
+
     .. math::
         \int\int B^{(1)} dT dT = \frac{637 T^{2}}{20000} - \frac{331 Tc^{2}}{1000} \log{\left (T \right )} - \frac{1}{210000 T^{6}} \left(44415 T^{5} Tc^{3} + 40 Tc^{8}\right)
 
     .. math::
         \int\int B^{(2)} dT dT = \frac{Tc^{6}}{20 T^{4}}
-        
+
     .. math::
         \int\int B^{(3)} dT dT = - \frac{Tc^{8}}{42 T^{6}}
-        
+
     Examples
     --------
     Example from Perry's Handbook, 8E, p2-499. Matches to a decimal place.
@@ -885,7 +885,7 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
         B1 = 637*T**2/20000. - 331*Tc**2*log(T)/1000. - (44415*T**5*Tc**3 + 40*Tc**8)/(210000.*T**6)
         B2 = Tc**6/(20*T**4)
         B3 = -Tc**8/(42*T**6)
-    else: 
+    else:
         raise ValueError('Only orders -2, -1, 0, 1, 2 and 3 are supported.')
     if a == 0 and b == 0 and species_type != '':
         if species_type == 'simple' or species_type == 'normal':

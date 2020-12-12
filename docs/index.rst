@@ -51,19 +51,13 @@ If you need to know something about a chemical, give chemicals a try.
    :maxdepth: 1
    :numbered:
    :caption: Tutorial
-   
-   Overview
-   Installation
-   tutorial/Getting_started
-   tutorial/Numba support
-   tutorial/Numpy array support
-   tutorial/Pint Quantities support
 
 .. toctree::
    :maxdepth: 2
    :caption: API
    
    chemicals.acentric
+   chemicals.air
    chemicals.combustion
    chemicals.critical
    chemicals.dipole
@@ -102,6 +96,12 @@ If you need to know something about a chemical, give chemicals a try.
    :caption: Developer's guide
    
    developers
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+   
+   water_steam_properties_python
 
 Installation
 ------------

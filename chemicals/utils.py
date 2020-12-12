@@ -31,41 +31,41 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 """
 
-__all__ = ['isobaric_expansion', 'isothermal_compressibility', 
+__all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Cp_minus_Cv', 'speed_of_sound', 'Joule_Thomson',
 'phase_identification_parameter', 'phase_identification_parameter_phase',
-'isentropic_exponent', 'Vm_to_rho', 'rho_to_Vm', 
-'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs', 
-'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros', 
- 'mixing_simple', 
-'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar', 
+'isentropic_exponent', 'Vm_to_rho', 'rho_to_Vm',
+'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs',
+'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros',
+ 'mixing_simple',
+'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar',
 'SG_to_API', 'API_to_SG', 'SG',   'Watson_K',
 'dxs_to_dns', 'dns_to_dn_partials', 'dxs_to_dn_partials', 'd2ns_to_dn2_partials',
 'd2xs_to_dxdn_partials', 'dxs_to_dxsn1', 'd2xs_to_d2xsn1',
  'vapor_mass_quality', 'mix_component_flows',
-'mix_multiple_component_flows', 'mix_component_partial_flows', 
+'mix_multiple_component_flows', 'mix_component_partial_flows',
 'solve_flow_composition_mix',
 'v_to_v_molar', 'v_molar_to_v']
 
 import os
 import sys
 from cmath import sqrt as csqrt
-from fluids.numerics import (brenth, newton, linspace, polyint, 
+from fluids.numerics import (brenth, newton, linspace, polyint,
                              polyint_over_x, derivative, polyder,
                              horner, horner_and_der2, assert_close,
                              quadratic_from_f_ders, numpy as np)
 from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
-                  cos, cosh, degrees, e,  exp, fabs, 
-                  factorial, floor, fmod, frexp, isinf, 
-                  isnan, ldexp, log, log10, modf, pi, pow, 
+                  cos, cosh, degrees, e,  exp, fabs,
+                  factorial, floor, fmod, frexp, isinf,
+                  isnan, ldexp, log, log10, modf, pi, pow,
                   radians, sin, sinh, sqrt, tan, tanh, trunc) # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
 
-__all__.extend(['acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 
-'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'e', 'exp', 
-'fabs', 'factorial', 'floor', 'fmod', 'frexp', 
-'isinf', 'isnan', 'ldexp',  'log', 'log10', 'modf', 
+__all__.extend(['acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
+'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'e', 'exp',
+'fabs', 'factorial', 'floor', 'fmod', 'frexp',
+'isinf', 'isnan', 'ldexp',  'log', 'log10', 'modf',
 'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc'])
-__all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma', 
+__all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma',
 # Obtained from SciPy 0.19 (2014 CODATA)
 # Included here so calculations are consistent across SciPy versions
 from fluids.constants import g, R, k, N_A, calorie, epsilon_0
@@ -79,14 +79,14 @@ try:
     source_path = os.path.dirname(__file__) # micropython
 except:
     source_path = ''
-    
+
 if os.name == 'nt':
     def os_path_join(*args):
         return '\\'.join(args)
 else:
     def os_path_join(*args):
         return '/'.join(args)
-    
+
 can_load_data = True
 try:
     if sys.implementation.name == 'micropython':
@@ -126,9 +126,9 @@ def to_num(values):
     return values
 
 def hash_any_primitive(v):
-    '''Method to hash a primitive - with basic support for lists and 
-    dictionaries.     
-    
+    '''Method to hash a primitive - with basic support for lists and
+    dictionaries.
+
     Parameters
     ----------
     v : object
@@ -143,19 +143,19 @@ def hash_any_primitive(v):
     -----
     Handles up to 3d lists. Assumes all lists are the same dimension.
     Handles dictionaries by iterating over each value and key.
-    
+
     Will fail explosively on circular references.
-    
+
     The values returned by this function should not be counted on to be the
     same in the future.
-    
+
     Values change on startup due to hash randomization on python 3.3+.
-    
+
     Examples
     --------
-    
+
     hash_any_primitive([1,2,3,4,5])
-    
+
     hash_any_primitive({'a': [1,2,3], 'b': []})
     '''
     if isinstance(v, list):
@@ -184,7 +184,7 @@ def Parachor(MW, rhol, rhog, sigma):
 
     .. math::
         P = \frac{\sigma^{0.25} MW}{\rho_L - \rho_V}
-    
+
     Parameters
     ----------
     MW : float
@@ -203,26 +203,26 @@ def Parachor(MW, rhol, rhog, sigma):
 
     Notes
     -----
-    To convert the output of this function to units of [mN^0.25*m^2.75/kmol], 
+    To convert the output of this function to units of [mN^0.25*m^2.75/kmol],
     multiply by 5623.4132519.
-    
-    Values in group contribution tables for Parachor are often listed as 
+
+    Values in group contribution tables for Parachor are often listed as
     dimensionless, in which they are multiplied by 5623413 and the appropriate
     units to make them dimensionless.
-    
+
     Examples
     --------
-    Calculating Parachor from a known surface tension for methyl isobutyl 
+    Calculating Parachor from a known surface tension for methyl isobutyl
     ketone at 293.15 K
-    
+
     >>> Parachor(100.15888, 800.8088185536124, 4.97865317223119, 0.02672166960656005)
     5.088443542210164e-05
-    
+
     Converting to the `dimensionless` form:
-    
+
     >>> 5623413*5.088443542210164e-05
     286.14419565030687
-    
+
     Compared to 274.9 according to a group contribution method described in
     [3]_.
 
@@ -245,7 +245,7 @@ def property_molar_to_mass(A_molar, MW):
 
     .. math::
         A_{\text{mass}} = \frac{1000 A_{\text{molar}}}{\text{MW}}
-        
+
     Parameters
     ----------
     A_molar : float
@@ -257,10 +257,10 @@ def property_molar_to_mass(A_molar, MW):
     -------
     A_mass : float
         Quantity in molar units [thing/kg]
-        
+
     Notes
     -----
-    For legacy reasons, if the value `A_molar` is None, None is also returned 
+    For legacy reasons, if the value `A_molar` is None, None is also returned
     and no exception is returned.
 
     Examples
@@ -279,7 +279,7 @@ def property_mass_to_molar(A_mass, MW):
 
     .. math::
         A_{\text{molar}} = \frac{A_{\text{mass}} \text{MW}}{1000}
-        
+
     Parameters
     ----------
     A_mass : float
@@ -291,10 +291,10 @@ def property_mass_to_molar(A_mass, MW):
     -------
     A_molar : float
         Quantity in molar units [thing/mol]
-        
+
     Notes
     -----
-    For legacy reasons, if the value `A_mass` is None, None is also returned 
+    For legacy reasons, if the value `A_mass` is None, None is also returned
     and no exception is returned.
 
     Examples
@@ -314,11 +314,11 @@ def v_to_v_molar(v, MW):
     compatible with thermodynamic calculations on a molar basis.
 
     .. math::
-        v\left(\frac{\text{m}\sqrt{\text{kg}} }{s \sqrt{\text{mol}}} \right) 
+        v\left(\frac{\text{m}\sqrt{\text{kg}} }{s \sqrt{\text{mol}}} \right)
         = v \text{(m/s)}
         \sqrt{\text{MW (g/mol)}}\cdot
         \left(\frac{1000 \text{g}}{1 \text{kg}}\right)^{-0.5}
-        
+
     Parameters
     ----------
     v : float
@@ -337,9 +337,9 @@ def v_to_v_molar(v, MW):
     67.10998435404377
     '''
     return v*MW**0.5*root_1000_inv
-    
+
 def v_molar_to_v(v_molar, MW):
-    r'''Convert a velocity from units of the molar velocity form to standard 
+    r'''Convert a velocity from units of the molar velocity form to standard
     m/s units.
 
     .. math::
@@ -347,7 +347,7 @@ def v_molar_to_v(v_molar, MW):
         {s \sqrt{\text{mol}}} \right)
         {\text{MW (g/mol)}}^{-0.5}\cdot
         \left(\frac{1000 \text{g}}{1 \text{kg}}\right)^{0.5}
-        
+
     Parameters
     ----------
     v_molar : float
@@ -372,11 +372,11 @@ def vapor_mass_quality(VF, MWl, MWg):
     this is the most common definition, where 1 means a pure vapor and 0 means
     a pure liquid. The vapor quality on a mass basis is related to the mole
     basis vapor fraction according to the following relationship:
-    
+
     .. math::
         x = \frac{\frac{V}{F}\cdot  \text{MW}_g}
         {(1-\frac{V}{F})\text{MW}_l + \frac{V}{F}\text{MW}_g}
-        
+
     Parameters
     ----------
     VF : float
@@ -441,7 +441,7 @@ def SG_to_API(SG):
     References
     ----------
     .. [1] API Technical Data Book: General Properties & Characterization.
-    American Petroleum Institute, 7E, 2005.
+       American Petroleum Institute, 7E, 2005.
     '''
     return 141.5/SG - 131.5
 
@@ -482,11 +482,11 @@ def API_to_SG(API):
 
 def SG(rho, rho_ref=999.0170824078306):
     r'''Calculates the specific gravity of a substance with respect to another
-    substance; by default, this is water at 15.555 °C (60 °F). For gases, 
-    normally the reference density is 1.2 kg/m^3, that of dry air. However, in 
+    substance; by default, this is water at 15.555 °C (60 °F). For gases,
+    normally the reference density is 1.2 kg/m^3, that of dry air. However, in
     general specific gravity should always be specified with respect to the
     temperature and pressure of its reference fluid. This can vary widely.
-    
+
     .. math::
         SG = \frac{\rho}{\rho_{ref}}
 
@@ -500,7 +500,7 @@ def SG(rho, rho_ref=999.0170824078306):
     Returns
     -------
     SG : float
-        Specific gravity of the substance with respect to the reference 
+        Specific gravity of the substance with respect to the reference
         density, [-]
 
     Notes
@@ -508,7 +508,7 @@ def SG(rho, rho_ref=999.0170824078306):
     Another common reference point is water at 4°C (rho_ref=999.9748691393087).
     Specific gravity is often used by consumers instead of density.
     The reference for solids is normally the same as for liquids - water.
-    
+
     Examples
     --------
     >>> SG(860)
@@ -524,7 +524,7 @@ def Watson_K(Tb, SG):
 
     .. math::
         K_W = \frac{T_b^{1/3}}{\text{SG at}~60^\circ\text{F}}
-    
+
     Parameters
     ----------
     SG : float
@@ -541,17 +541,17 @@ def Watson_K(Tb, SG):
     -----
     There are different ways to compute the average boiling point,
     so two different definitions are often used - K_UOP using volume
-    average boiling point (VABP) using distillation points of 10%, 30%, 
+    average boiling point (VABP) using distillation points of 10%, 30%,
     50%, 70%, and 90%; and K_Watson using mean average boiling point (MeABP).
 
     Examples
     --------
     >>> Watson_K(400, .8)
     11.20351186639291
-    
+
     Sample problem in Comments on Procedure 2B5.1 of [1]_;
     a fluids has a MEAB of 580 F and a SG of 34.5.
-    
+
     >>> from fluids.core import F2K
     >>> Watson_K(F2K(580), API_to_SG(34.5))
     11.884570347084471
@@ -565,7 +565,7 @@ def Watson_K(Tb, SG):
 
 
 def isobaric_expansion(V, dV_dT):
-    r'''Calculate the isobaric coefficient of a thermal expansion, given its 
+    r'''Calculate the isobaric coefficient of a thermal expansion, given its
     molar volume at a certain `T` and `P`, and its derivative of molar volume
     with respect to `T`.
 
@@ -583,18 +583,18 @@ def isobaric_expansion(V, dV_dT):
     -------
     beta : float
         Isobaric coefficient of a thermal expansion, [1/K]
-        
+
     Notes
     -----
     For an ideal gas, this expression simplified to:
-    
+
     .. math::
         \beta = \frac{1}{T}
 
     Examples
     --------
     Calculated for hexane from the PR EOS at 299 K and 1 MPa (liquid):
-    
+
     >>> isobaric_expansion(0.000130229900873546, 1.58875261849113e-7)
     0.0012199599384121608
 
@@ -607,7 +607,7 @@ def isobaric_expansion(V, dV_dT):
 
 
 def isothermal_compressibility(V, dV_dP):
-    r'''Calculate the isothermal coefficient of a compressibility, given its 
+    r'''Calculate the isothermal coefficient of compressibility, given its
     molar volume at a certain `T` and `P`, and its derivative of molar volume
     with respect to `P`.
 
@@ -624,32 +624,32 @@ def isothermal_compressibility(V, dV_dP):
     Returns
     -------
     kappa : float
-        Isothermal coefficient of a compressibility, [1/Pa]
-        
+        Isothermal coefficient of compressibility, [1/Pa]
+
     Notes
     -----
     For an ideal gas, this expression simplified to:
-    
+
     .. math::
         \kappa = \frac{1}{P}
-        
-        
+
+
     The isothermal bulk modulus is the inverse of this quantity:
-        
+
     .. math::
         K = -V\left(\frac{\partial P}{\partial V} \right)_T
-        
+
     The ideal gas isothermal bulk modulus is simply the gas's pressure.
 
     Examples
     --------
     Calculated for hexane from the PR EOS at 299 K and 1 MPa (liquid):
-    
+
     >>> isothermal_compressibility(0.000130229900873546, -2.72902118209903e-13)
     2.095541165119158e-09
-    
+
     Calculate the bulk modulus of propane from the PR EOS at 294 K as a gas:
-    
+
     >>> 1/isothermal_compressibility(0.0024576770482135617, -3.5943321700795866e-09)
     683764.5859979445
 
@@ -664,13 +664,13 @@ def isothermal_compressibility(V, dV_dP):
 def phase_identification_parameter(V, dP_dT, dP_dV, d2P_dV2, d2P_dVdT):
     r'''Calculate the Phase Identification Parameter developed in [1]_ for
     the accurate and efficient determination of whether a fluid is a liquid or
-    a gas based on the results of an equation of state. For supercritical 
-    conditions, this provides a good method for choosing which property 
+    a gas based on the results of an equation of state. For supercritical
+    conditions, this provides a good method for choosing which property
     correlations to use.
-    
+
     .. math::
         \Pi = V \left[\frac{\frac{\partial^2 P}{\partial V \partial T}}
-        {\frac{\partial P }{\partial T}}- \frac{\frac{\partial^2 P}{\partial 
+        {\frac{\partial P }{\partial T}}- \frac{\frac{\partial^2 P}{\partial
         V^2}}{\frac{\partial P}{\partial V}} \right]
 
     Parameters
@@ -690,32 +690,32 @@ def phase_identification_parameter(V, dP_dT, dP_dV, d2P_dV2, d2P_dVdT):
     -------
     PIP : float
         Phase Identification Parameter, [-]
-        
+
     Notes
     -----
-    Heuristics were used by process simulators before the invent of this 
-    parameter. 
-    
+    Heuristics were used by process simulators before the invent of this
+    parameter.
+
     The criteria for liquid is Pi > 1; for vapor, Pi <= 1.
-    
-    There is also a solid phase mechanism available. For solids, the Solid  
-    Phase Identification Parameter is greater than 1, like liquids; however,  
+
+    There is also a solid phase mechanism available. For solids, the Solid
+    Phase Identification Parameter is greater than 1, like liquids; however,
     unlike liquids, d2P_dVdT is always >0; it is < 0 for liquids and gases.
 
     Examples
     --------
     Calculated for hexane from the PR EOS at 299 K and 1 MPa (liquid):
-    
-    >>> phase_identification_parameter(0.000130229900874, 582169.397484, 
+
+    >>> phase_identification_parameter(0.000130229900874, 582169.397484,
     ... -3.66431747236e+12, 4.48067893805e+17, -20518995218.2)
     11.33428990564796
 
     References
     ----------
     .. [1] Venkatarathnam, G., and L. R. Oellrich. "Identification of the Phase
-       of a Fluid Using Partial Derivatives of Pressure, Volume, and 
-       Temperature without Reference to Saturation Properties: Applications in 
-       Phase Equilibria Calculations." Fluid Phase Equilibria 301, no. 2 
+       of a Fluid Using Partial Derivatives of Pressure, Volume, and
+       Temperature without Reference to Saturation Properties: Applications in
+       Phase Equilibria Calculations." Fluid Phase Equilibria 301, no. 2
        (February 25, 2011): 225-33. doi:10.1016/j.fluid.2010.12.001.
     .. [2] Jayanti, Pranava Chaitanya, and G. Venkatarathnam. "Identification
        of the Phase of a Substance from the Derivatives of Pressure, Volume and
@@ -727,13 +727,13 @@ def phase_identification_parameter(V, dP_dT, dP_dV, d2P_dV2, d2P_dVdT):
 
 
 def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=None, d2P_dV2=None):
-    r'''Uses the Phase Identification Parameter concept developed in [1]_ and 
-    [2]_ to determine if a chemical is a solid, liquid, or vapor given the 
+    r'''Uses the Phase Identification Parameter concept developed in [1]_ and
+    [2]_ to determine if a chemical is a solid, liquid, or vapor given the
     appropriate thermodynamic conditions.
 
     The criteria for liquid is PIP > 1; for vapor, PIP <= 1.
 
-    For solids, PIP(solid) is defined to be d2P_dVdT. If it is larger than 0, 
+    For solids, PIP(solid) is defined to be d2P_dVdT. If it is larger than 0,
     the species is a solid. It is less than 0 for all liquids and gases.
 
     Parameters
@@ -753,28 +753,28 @@ def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=Non
     -------
     phase : str
         Either 's', 'l' or 'g'
-    
+
     Notes
     -----
     The criteria for being a solid phase is checked first, which only
     requires d2P_dVdT. All other inputs are optional for this reason.
-    However, an exception will be raised if the other inputs become 
+    However, an exception will be raised if the other inputs become
     needed to determine if a species is a liquid or a gas.
-        
+
     Examples
     --------
     Calculated for hexane from the PR EOS at 299 K and 1 MPa (liquid):
-    
-    >>> phase_identification_parameter_phase(-20518995218.2, 0.000130229900874, 
+
+    >>> phase_identification_parameter_phase(-20518995218.2, 0.000130229900874,
     ... 582169.397484, -3.66431747236e+12, 4.48067893805e+17)
     'l'
 
     References
     ----------
     .. [1] Venkatarathnam, G., and L. R. Oellrich. "Identification of the Phase
-       of a Fluid Using Partial Derivatives of Pressure, Volume, and 
-       Temperature without Reference to Saturation Properties: Applications in 
-       Phase Equilibria Calculations." Fluid Phase Equilibria 301, no. 2 
+       of a Fluid Using Partial Derivatives of Pressure, Volume, and
+       Temperature without Reference to Saturation Properties: Applications in
+       Phase Equilibria Calculations." Fluid Phase Equilibria 301, no. 2
        (February 25, 2011): 225-33. doi:10.1016/j.fluid.2010.12.001.
     .. [2] Jayanti, Pranava Chaitanya, and G. Venkatarathnam. "Identification
        of the Phase of a Substance from the Derivatives of Pressure, Volume and
@@ -785,7 +785,7 @@ def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=Non
     if d2P_dVdT > 0:
         return 's'
     else:
-        PIP = phase_identification_parameter(V=V, dP_dT=dP_dT, dP_dV=dP_dV, 
+        PIP = phase_identification_parameter(V=V, dP_dT=dP_dT, dP_dV=dP_dV,
                                              d2P_dV2=d2P_dV2, d2P_dVdT=d2P_dVdT)
         return 'l' if PIP > 1 else 'g'
 
@@ -813,15 +813,15 @@ def Cp_minus_Cv(T, dP_dT, dP_dV):
     -------
     Cp_minus_Cv : float
         Cp - Cv for a real gas, [J/mol/K]
-        
+
     Notes
     -----
     Equivalent expressions are:
-    
+
     .. math::
         C_p - C_v= -T\left(\frac{\partial V}{\partial T}\right)_P^2/\left(
         \frac{\partial V}{\partial P}\right)_T
-        
+
         C_p - C_v = T\left(\frac{\partial P}{\partial T}\right)
         \left(\frac{\partial V}{\partial T}\right)
 
@@ -831,7 +831,7 @@ def Cp_minus_Cv(T, dP_dT, dP_dV):
     Examples
     --------
     Calculated for hexane from the PR EOS at 299 K and 1 MPa (liquid):
-    
+
     >>> Cp_minus_Cv(299, 582232.475794113, -3665180614672.253)
     27.654681381642394
 
@@ -839,26 +839,26 @@ def Cp_minus_Cv(T, dP_dT, dP_dV):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering. 
+    .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering.
        Butterworth-Heinemann, 1985.
     .. [3] Gmehling, Jurgen, Barbel Kolbe, Michael Kleiber, and Jurgen Rarey.
-       Chemical Thermodynamics for Process Simulation. 1st edition. Weinheim: 
+       Chemical Thermodynamics for Process Simulation. 1st edition. Weinheim:
        Wiley-VCH, 2012.
     '''
     return -T*dP_dT*dP_dT/dP_dV
-    
-    
+
+
 def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
-    r'''Calculate a real fluid's speed of sound. The required derivatives should 
+    r'''Calculate a real fluid's speed of sound. The required derivatives should
     be calculated with an equation of state, and `Cp` and `Cv` are both the
     real fluid versions. Expression is given in [1]_ and [2]_; a unit conversion
-    is further performed to obtain a result in m/s. If MW is not provided the 
+    is further performed to obtain a result in m/s. If MW is not provided the
     result is returned in units of m*kg^0.5/s/mol^0.5.
 
     .. math::
         w = \left[-V^2 \left(\frac{\partial P}{\partial V}\right)_T \frac{C_p}
         {C_v}\right]^{1/2}
-        
+
     Parameters
     ----------
     V : float
@@ -876,36 +876,36 @@ def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
     -------
     w : float
         Speed of sound for a real gas, m/s or m*kg^0.5/s/mol^0.5 if MW missing
-        
+
     Notes
     -----
     An alternate expression based on molar density is as follows:
-    
+
     .. math::
        w = \left[\left(\frac{\partial P}{\partial \rho}\right)_T \frac{C_p}
        {C_v}\right]^{1/2}
 
     The form with the unit conversion performed inside it is as follows:
-    
+
     .. math::
         w = \left[-V^2 \frac{1000}{MW}\left(\frac{\partial P}{\partial V}
         \right)_T \frac{C_p}{C_v}\right]^{1/2}
-    
+
     Examples
     --------
     Example from [2]_:
-    
+
     >>> speed_of_sound(V=0.00229754, dP_dV=-3.5459e+08, Cp=153.235, Cv=132.435, MW=67.152)
     179.5868138460819
 
     References
     ----------
     .. [1] Gmehling, Jurgen, Barbel Kolbe, Michael Kleiber, and Jurgen Rarey.
-       Chemical Thermodynamics for Process Simulation. 1st edition. Weinheim: 
+       Chemical Thermodynamics for Process Simulation. 1st edition. Weinheim:
        Wiley-VCH, 2012.
-    .. [2] Pratt, R. M. "Thermodynamic Properties Involving Derivatives: Using 
+    .. [2] Pratt, R. M. "Thermodynamic Properties Involving Derivatives: Using
        the Peng-Robinson Equation of State." Chemical Engineering Education 35,
-       no. 2 (March 1, 2001): 112-115. 
+       no. 2 (March 1, 2001): 112-115.
     '''
     if MW is None:
         return (-V*V*dP_dV*Cp/Cv)**0.5
@@ -914,16 +914,16 @@ def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
 
 
 def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
-    r'''Calculate a real fluid's Joule Thomson coefficient. The required 
+    r'''Calculate a real fluid's Joule Thomson coefficient. The required
     derivative should be calculated with an equation of state, and `Cp` is the
-    real fluid versions. This can either be calculated with `dV_dT` directly, 
+    real fluid versions. This can either be calculated with `dV_dT` directly,
     or with `beta` if it is already known.
 
     .. math::
         \mu_{JT} = \left(\frac{\partial T}{\partial P}\right)_H = \frac{1}{C_p}
         \left[T \left(\frac{\partial V}{\partial T}\right)_P - V\right]
         = \frac{V}{C_p}\left(\beta T-1\right)
-        
+
     Parameters
     ----------
     T : float
@@ -941,21 +941,21 @@ def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
     -------
     mu_JT : float
         Joule-Thomson coefficient [K/Pa]
-            
+
     Examples
     --------
     Example from [2]_:
-    
+
     >>> Joule_Thomson(T=390, V=0.00229754, Cp=153.235, dV_dT=1.226396e-05)
     1.621956080529905e-05
 
     References
     ----------
-    .. [1] Walas, Stanley M. Phase Equilibria in Chemical Engineering. 
+    .. [1] Walas, Stanley M. Phase Equilibria in Chemical Engineering.
        Butterworth-Heinemann, 1985.
-    .. [2] Pratt, R. M. "Thermodynamic Properties Involving Derivatives: Using 
+    .. [2] Pratt, R. M. "Thermodynamic Properties Involving Derivatives: Using
        the Peng-Robinson Equation of State." Chemical Engineering Education 35,
-       no. 2 (March 1, 2001): 112-115. 
+       no. 2 (March 1, 2001): 112-115.
     '''
     if dV_dT is not None:
         return (T*dV_dT - V)/Cp
@@ -1277,7 +1277,7 @@ def Vfs_to_zs(Vfs, Vms):
 
 
 def dxs_to_dns(dxs, xs):
-    r'''Convert the mole fraction derivatives of a quantity (calculated so 
+    r'''Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to mole number derivatives (where the mole fractions
     do sum to one). Requires the derivatives and the mole fractions of the
     mixture.
@@ -1306,7 +1306,7 @@ def dxs_to_dns(dxs, xs):
     -----
     Does not check that the sums add to one. Does not check that inputs are of
     the same length.
-    
+
     This applies to a specific phase only, not to a mixture of multiple phases.
 
     Examples
@@ -1321,16 +1321,16 @@ def dxs_to_dns(dxs, xs):
 
 
 def dns_to_dn_partials(dns, F):
-    r'''Convert the mole number derivatives of a quantity (calculated so 
+    r'''Convert the mole number derivatives of a quantity (calculated so
     they do sum to 1) to partial molar quantites.
-    
+
     .. math::
-        
-        \left(\frac{\partial n F}{\partial n_i}\right)_{n_{k \ne i}} = F_i + 
-        n \left(\frac{\partial F}{\partial n_i}\right)_{n_{k\ne i}} 
+
+        \left(\frac{\partial n F}{\partial n_i}\right)_{n_{k \ne i}} = F_i +
+        n \left(\frac{\partial F}{\partial n_i}\right)_{n_{k\ne i}}
 
     In the formula, the `n` is 1.
-    
+
     Parameters
     ----------
     dns : list[float]
@@ -1338,7 +1338,7 @@ def dns_to_dn_partials(dns, F):
         1), [prop/mol]
     F : float
         Property evaluated at constant composition, [prop]
-    
+
     Returns
     -------
     partial_properties : list[float]
@@ -1349,9 +1349,9 @@ def dns_to_dn_partials(dns, F):
     -----
     Does not check that the sums add to one. Does not check that inputs are of
     the same length.
-    
+
     This applies to a specific phase only, not to a mixture of multiple phases.
-    
+
     This is especially useful for fugacity calculations.
 
     Examples
@@ -1363,7 +1363,7 @@ def dns_to_dn_partials(dns, F):
 
 
 def dxs_to_dn_partials(dxs, xs, F):
-    r'''Convert the mole fraction derivatives of a quantity (calculated so 
+    r'''Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to partial molar quantites. Requires the derivatives
     and the mole fractions of the mixture.
 
@@ -1387,9 +1387,9 @@ def dxs_to_dn_partials(dxs, xs, F):
     -----
     Does not check that the sums add to one. Does not check that inputs are of
     the same length.
-    
+
     This applies to a specific phase only, not to a mixture of multiple phases.
-    
+
     See Also
     --------
     dxs_to_dns
@@ -1408,23 +1408,23 @@ def dxs_to_dn_partials(dxs, xs, F):
 
 
 def d2ns_to_dn2_partials(d2ns, dns):
-    r'''Convert second-order mole number derivatives of a quantity 
+    r'''Convert second-order mole number derivatives of a quantity
      to the following second-order partial derivative:
-                
+
     .. math::
             \frac{\partial^2 n F}{\partial n_j \partial n_i}
             = \frac{\partial^2 F}{\partial n_i \partial n_j}
             + \frac{\partial F}{\partial n_i}
             + \frac{\partial F}{\partial n_j}
-    
-    
-    Requires the second order mole number derivatives and the first order 
+
+
+    Requires the second order mole number derivatives and the first order
     mole number derivatives of the mixture only.
 
     Parameters
     ----------
     d2ns : list[float]
-        Second order derivatives of a quantity with respect to mole number 
+        Second order derivatives of a quantity with respect to mole number
         (summing to 1), [prop/mol^2]
     dns : list[float]
         Derivatives of a quantity with respect to mole number (summing to
@@ -1440,21 +1440,21 @@ def d2ns_to_dn2_partials(d2ns, dns):
     -----
     Does not check that the sums add to one. Does not check that inputs are of
     the same length.
-    
-    This was originally implemented to allow for the calculation of 
+
+    This was originally implemented to allow for the calculation of
     first mole number derivatices of log fugacity coefficients; the two
-    arguments are the second and first mole number derivatives of the overall 
+    arguments are the second and first mole number derivatives of the overall
     mixture log fugacity coefficient.
 
-    
+
     Derived with the following SymPy code.
-    
+
     >>> from sympy import *
     >>> n1, n2 = symbols('n1, n2')
     >>> f, g, h = symbols('f, g, h', cls=Function)
     >>> diff(h(n1, n2)*f(n1,  n2), n1, n2)
     f(n1, n2)*Derivative(h(n1, n2), n1, n2) + h(n1, n2)*Derivative(f(n1, n2), n1, n2) + Derivative(f(n1, n2), n1)*Derivative(h(n1, n2), n2) + Derivative(f(n1, n2), n2)*Derivative(h(n1, n2), n1)
-        
+
     See Also
     --------
     dxs_to_dns
@@ -1480,15 +1480,15 @@ def d2ns_to_dn2_partials(d2ns, dns):
 
 
 def d2xs_to_dxdn_partials(d2xs, xs):
-    r'''Convert second-order mole fraction derivatives of a quantity 
+    r'''Convert second-order mole fraction derivatives of a quantity
     (calculated so they do not sum to 1) to the following second-order
     partial derivative:
-        
+
     .. math::
             \frac{\partial^2 n F}{\partial x_j \partial n_i}
             = \frac{\partial^2 F}{\partial x_i x_j}
             - \sum_k x_k \frac{\partial^2 F}{\partial x_k \partial x_j}
-    
+
     Requires the second derivatives and the mole fractions of the mixture only.
 
     Parameters
@@ -1509,7 +1509,7 @@ def d2xs_to_dxdn_partials(d2xs, xs):
     -----
     Does not check that the sums add to one. Does not check that inputs are of
     the same length.
-        
+
     See Also
     --------
     dxs_to_dns
@@ -1522,7 +1522,7 @@ def d2xs_to_dxdn_partials(d2xs, xs):
     >>> d2xs_to_dxdn_partials(d2xs, [0.7, 0.2, 0.1])
     [[-0.02510000000000001, -0.18369999999999997, 0.005199999999999982], [-0.0971, 0.41030000000000005, 0.18719999999999992], [0.3699, 0.4653, -0.41080000000000005]]
     '''
-    N = len(xs)    
+    N = len(xs)
 
     double_sums = [0.0]*N
     for j in range(N):
@@ -1530,7 +1530,7 @@ def d2xs_to_dxdn_partials(d2xs, xs):
         for k in range(N):
             tot += xs[k]*d2xs[j][k]
         double_sums[j] = tot
-    
+
     # Oddly, the below saw found to be successful for NRTL but not PR
     # Mysterious, interesting sum which is surprisingly efficient to calculate
 #    d2xsi = d2xs[1]
@@ -1538,22 +1538,22 @@ def d2xs_to_dxdn_partials(d2xs, xs):
 #    for k in cmps:
 #        symmetric_sum += xs[k]*d2xsi[k]
 #    print(symmetric_sum)
-    
+
     return [[d2xs[i][j] - double_sums[j] for j in range(N)]
              for i in range(N)]
 
 
 
 def dxs_to_dxsn1(dxs):
-    r'''Convert the mole fraction derivatives of a quantity (calculated so 
+    r'''Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to derivatives such that they do sum to 1 by changing
     the composition of the last component in the negative of the component
     which is changed. Requires the derivatives of the mixture only. The size of
     the returned array is one less than the input.
-    
+
     .. math::
-        \left(\frac{\partial F}{\partial x_i}\right)_{\sum_{x_i}^N =1} = 
-        \left(\frac{\partial F}{\partial x_i} 
+        \left(\frac{\partial F}{\partial x_i}\right)_{\sum_{x_i}^N =1} =
+        \left(\frac{\partial F}{\partial x_i}
         - \frac{\partial F}{\partial x_N}\right)_{\sum_{x_i}^N \ne 1}
 
     Parameters
@@ -1567,7 +1567,7 @@ def dxs_to_dxsn1(dxs):
     dxsm1 : list[float]
         Derivatives of a quantity with respect to mole fraction (summing to
         1 by altering the last component's composition), [prop]
-        
+
     Notes
     -----
 
@@ -1581,17 +1581,17 @@ def dxs_to_dxsn1(dxs):
 
 
 def d2xs_to_d2xsn1(d2xs):
-    r'''Convert the second mole fraction derivatives of a quantity (calculated  
-    so they do not sum to 1) to derivatives such that they do sum to 1 
+    r'''Convert the second mole fraction derivatives of a quantity (calculated
+    so they do not sum to 1) to derivatives such that they do sum to 1
     Requires the second derivatives of the mixture only. The size of
     the returned array is one less than the input in both dimensions
-    
+
     .. math::
-        \left(\frac{\partial^2 F}{\partial x_i \partial x_j }\right)_{\sum_{x_i}^N =1} = 
-        \left(\frac{\partial^2 F}{\partial x_i\partial x_j} 
-        -\frac{\partial^2 F}{\partial x_i\partial x_N} 
-        -\frac{\partial^2 F}{\partial x_j\partial x_N} 
-        +\frac{\partial^2 F}{\partial x_N\partial x_N} 
+        \left(\frac{\partial^2 F}{\partial x_i \partial x_j }\right)_{\sum_{x_i}^N =1} =
+        \left(\frac{\partial^2 F}{\partial x_i\partial x_j}
+        -\frac{\partial^2 F}{\partial x_i\partial x_N}
+        -\frac{\partial^2 F}{\partial x_j\partial x_N}
+        +\frac{\partial^2 F}{\partial x_N\partial x_N}
         \right)_{\sum_{x_i}^N \ne 1}
 
     Parameters
@@ -1603,9 +1603,9 @@ def d2xs_to_d2xsn1(d2xs):
     Returns
     -------
     d2xsm1 : list[float]
-        Second derivatives of a quantity with respect to mole fraction (summing 
+        Second derivatives of a quantity with respect to mole fraction (summing
         to 1 by altering the last component's composition), [prop]
-        
+
     Notes
     -----
 
@@ -1700,11 +1700,11 @@ def normalize(values):
             return []
 
 def remove_zeros(values, tol=1e-6):
-    r'''Simple function which removes zero values from an array, and replaces 
+    r'''Simple function which removes zero values from an array, and replaces
     them with a user-specified value, normally a very small number. Helpful
     for the case where a function can work with values very close to zero but
     not quite zero. The resulting array is normalized so the sum is still one.
-    
+
     Parameters
     ----------
     values : array-like
@@ -1757,7 +1757,7 @@ def mixing_simple(fracs, props):
 
     Notes
     -----
-    Returns None if there is an error, normally if one of the properties is 
+    Returns None if there is an error, normally if one of the properties is
     missing or if they are not the same length as the fractions.
 
     Examples
@@ -1819,7 +1819,7 @@ def mixing_power(fracs, props, r):
 
     .. math::
         \text{prop}_{mix}^r = \sum_i z_i \left(\text{prop}_i \right)^{r}
-        
+
     Parameters
     ----------
     fracs : list[float]
@@ -1837,15 +1837,15 @@ def mixing_power(fracs, props, r):
     Notes
     -----
     This equation is entirely dimensionless; all dimensions cancel.
-    
-    
+
+
     The following recommendations in [1] exist for different properties:
-        
+
     **Surface tension**: r = 1 Recommended by an author in [1]_; but often
     non-linear behavior is shown and r= -1 to r=-3 is recommended.  r = -1
     is most often used.
-    
-    **Liquid thermal conductivity**: r = -2 in [1]_; this is known also as 
+
+    **Liquid thermal conductivity**: r = -2 in [1]_; this is known also as
     procedure DIPPR9B.
 
     Examples
@@ -1894,7 +1894,7 @@ def mixing_power(fracs, props, r):
             x = props[i]*props[i]
             prop += fracs[i]*(x*x)
         return sqrt(sqrt(prop))
-    
+
     for i in range(len(fracs)):
         prop += fracs[i]*(props[i]**r)
     return prop**(1.0/r)
@@ -1902,9 +1902,9 @@ def mixing_power(fracs, props, r):
 
 def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
     r'''Mix two flows of potentially different chemicals of given overall flow
-    rates and flow fractions to determine the outlet components, flow rates, 
+    rates and flow fractions to determine the outlet components, flow rates,
     and compositions. The flows do not need to be of the same length.
-    
+
     Parameters
     ----------
     IDs1 : list[str]
@@ -1926,14 +1926,14 @@ def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
         List of identifiers of the chemical species in the combined flow, [-]
     moles : list[float]
         Flow rates of all chemical species in the combined flow, [mol/s]
-    
+
     Notes
     -----
     Mass or volume flows and fractions can be used instead of molar ones.
-    
+
     If the two flows have the same components, the output list will be in the
     same order as the one given; otherwise they are sorted alphabetically.
-    
+
     Examples
     --------
     >>> mix_component_flows(['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1'], 1, 1, [0.5, 0.5], [0.5, 0.5])
@@ -1959,9 +1959,9 @@ def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
 def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
     r'''Mix two flows of potentially different chemicals; with the feature that
     the mole flows of either or both streams may be unknown.
-    
+
     The flows do not need to be of the same length.
-    
+
     Parameters
     ----------
     IDs1 : list[str]
@@ -1979,14 +1979,14 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
         List of identifiers of the chemical species in the combined flow, [-]
     moles : list[float]
         Flow rates of all chemical species in the combined flow, [mol/s]
-    
+
     Notes
     -----
     Mass or volume flows and fractions can be used instead of molar ones.
-    
+
     If the two flows have the same components, the output list will be in the
     same order as the one given; otherwise they are sorted alphabetically.
-    
+
     Examples
     --------
     >>> mix_component_partial_flows(['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1'], [0.5, 0.5], [0.5, 0.5])
@@ -2002,14 +2002,14 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
         cmps = IDs1
     else:
         cmps = sorted(list(set((IDs1 + IDs2))))
-        
+
     ns = []
     for ID in cmps:
         ns.append(0.0)
         if ID in IDs1 and ns1 is not None:
             ind = IDs1.index(ID)
             ns[-1] += ns1[ind]
-            
+
         if ID in IDs2 and ns2 is not None:
             ind = IDs2.index(ID)
             ns[-1] += ns2[ind]
@@ -2017,10 +2017,10 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
 
 
 def mix_multiple_component_flows(IDs, flows, fractions):
-    r'''Mix multiple flows of potentially different chemicals of given overall 
-    flow rates and flow fractions to determine the outlet components, flow 
+    r'''Mix multiple flows of potentially different chemicals of given overall
+    flow rates and flow fractions to determine the outlet components, flow
     rates,  and compositions. The flows do not need to be of the same length.
-    
+
     Parameters
     ----------
     IDs : list[list[str]]
@@ -2036,14 +2036,14 @@ def mix_multiple_component_flows(IDs, flows, fractions):
         List of identifiers of the chemical species in the combined flow, [-]
     moles : list[float]
         Flow rates of all chemical species in the combined flow, [mol/s]
-    
+
     Notes
     -----
     Mass or volume flows and fractions can be used instead of molar ones.
-    
+
     If the every flow have the same components, the output list will be in the
     same order as the one given; otherwise they are sorted alphabetically.
-    
+
     Examples
     --------
     >>> mix_multiple_component_flows([['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1']],
@@ -2067,7 +2067,7 @@ def mix_multiple_component_flows(IDs, flows, fractions):
                 cmps, component_flows = mix_component_flows(cmps, IDs[counter], flow, flows[counter], fracs, fractions[counter])
                 flow = sum(component_flows)
                 fracs = [i/flow for i in component_flows]
-                counter +=1 
+                counter +=1
     return cmps, component_flows
 
 
@@ -2075,12 +2075,12 @@ def mix_multiple_component_flows(IDs, flows, fractions):
 
 def solve_flow_composition_mix(Fs, zs, ws, MWs):
     r'''Solve a stream composition problem where some specs are mole flow rates;
-    some are mass fractions; and some are mole fractions. This algorithm 
+    some are mass fractions; and some are mole fractions. This algorithm
     requires at least one mole flow rate; and for every other component, a
-    single spec in mole or mass or a flow rate. It is permissible for no 
-    components to have mole fractions; or no components to have weight 
+    single spec in mole or mass or a flow rate. It is permissible for no
+    components to have mole fractions; or no components to have weight
     fractions; or both.
-    
+
     Parameters
     ----------
     Fs : list[float]
@@ -2100,17 +2100,17 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
         Mole fractions, [-]
     ws : list[float]
         Mass fractions, [-]
-    
+
     Notes
     -----
     A fast path is used if no weight fractions are provided; the calculation is
-    much simpler for that case.    
-    
+    much simpler for that case.
+
     This algorithm was derived using SymPy, and framed in a form which allows
     for explicit solving.
     This is capable of solving large-scale problems i.e. with 1000 components a
     solve time is 1 ms; with 10000 it is 10 ms.
-    
+
     Examples
     --------
     >>> Fs = [3600, None, None, None, None]
@@ -2126,19 +2126,19 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
     [0.5154077420893426, 0.19012206531421305, 0.26447019259644433, 0.01, 0.02]
     '''
     # Fs needs to have at least one flow in it
-    # Either F, z, or w needs to be specified for every flow. 
+    # Either F, z, or w needs to be specified for every flow.
     # MW needs to be specified for every component.
     zs = list(zs)
     ws = list(ws)
     Fs = list(Fs)
-    
+
     N = len(MWs)
     F_knowns = [F for F in Fs if F is not None]
     MWs_known = [MWs[i] for i in range(N) if Fs[i] is not None]
     F_known = sum(F_knowns)
     F_known_inv = 1.0/F_known
     MW_known = sum([F*MW*F_known_inv for F, MW in zip(F_knowns, MWs_known)])
-    
+
     if not any([i is not None for i in ws]):
         # Only flow rates or mole fractions!
         zs_spec = sum([zi for zi in zs if zi is not None])
@@ -2146,7 +2146,7 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
         for i in range(len(Fs)):
             if Fs[i] is None:
                 Fs[i] = zs[i]*F_act
-        
+
         Ft_inv = 1.0/sum(Fs)
         zs = [F*Ft_inv for F in Fs]
         ws = zs_to_ws(zs, MWs)
@@ -2157,8 +2157,8 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
     MW_z_sum = sum([MWs[i]*zs[i] for i in range(N) if zs[i] is not None])
     zs_sum = sum([zs[i] for i in range(N) if zs[i] is not None])
     weight_term = sum([-ws[i]/(MWs[i]*den_bracketed) for i in range(N) if ws[i] is not None])
-    
-    
+
+
     Ft = -F_known*(MW_known*weight_term + 1.0)/(MW_z_sum*weight_term + zs_sum - 1.0)
     Ft_inv = 1.0/Ft
     # Once the problem had been reduced by putting all variables outside the
@@ -2171,16 +2171,16 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
 #        return err
 #    Ft = newton(to_solve, F_known)
     # For each flow, in-place replace with mole flows calculated
-    
+
     num_bracketed = MW_z_sum*Ft + F_known*MW_known
-    
+
     for i in range(N):
         if zs[i] is not None:
             Fs[i] = Ft*zs[i]
         if ws[i] is not None:
             Fs[i] = -ws[i]*num_bracketed/(MWs[i]*den_bracketed)
-    
+
     zs = [F*Ft_inv for F in Fs]
     ws = zs_to_ws(zs, MWs)
-    
+
     return Fs, zs, ws

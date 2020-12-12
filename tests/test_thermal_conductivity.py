@@ -54,7 +54,30 @@ def test_k_IAPWS():
     k = k_IAPWS(T=647.35, rho=222., Cp=101054.488, Cv=4374.66458, mu=31.2204749E-6, drho_dP=177.778595E-6)
     assert_close(k, 0.36687941154060383, rtol=1e-13)
 
+
+    # Feed P: 8600000.0
+    # Case where zero division was occuring
+    kwargs ={'T': 400, 'rho': 941.720097520186, 'Cp': 4233.740244740559, 'Cv': 3622.5838143014544, 'mu': 0.00022080449914642125, 'drho_dP': 4.996396679875349e-07, 'drho_dP_Tr': 2.3158445867118744e-07}
+    assert_close(k_IAPWS(**kwargs), .688018419964361, rtol=1e-11)
+
+
+def test_k_air_lemmon():
+    assert_close(0.009359024866082538, k_air_lemmon(100.0, 0.0), rtol=1e-13)
+    # residual contribution check
+    assert_close(0.06767561978576218, k_air_lemmon(1000.0, 10.0), rtol=1e-13)
     
+    
+    assert round(k_air_lemmon(100.0, 0.0), 8) == 0.00935902
+    assert round(k_air_lemmon(300.0, 0.0), 8) == 0.0263529
+    assert 0.119221 == round(k_air_lemmon(100.0, 28000, 55.2692672373821, 28.34619888255363, 0.0001121942174621181, 3.74860727627286e-05, 0.00010792259486711741), 6)
+    assert .0353185 == round(k_air_lemmon(200.0, 10000, 51.93438934270359, 23.26466926251931, 0.0007391806641309079, 0.000370795564745618, 2.1139164365616433e-05), 7)
+    assert 0.0326062 == round(k_air_lemmon(300.0, 5000), 7) # Does not need critical
+    k_near_crit = k_air_lemmon(132.64, 10400, 2137.078854678728, 35.24316159996235, 0.07417878614315769, 0.00035919027241528256, 1.7762253265868595e-05)
+    assert 0.0756231 == round(k_near_crit, 7)
+    assert_close(k_near_crit, 0.07562307234760142, rtol=1e-13)
+
+
+
 def test_Perrys2_314_data():
     # In perry's, only 102 is used. No chemicals are missing.
     # Tmaxs all match to 5E-4. Tmins match to 1E-3.

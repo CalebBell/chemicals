@@ -13,6 +13,7 @@ prof
 *Pyreverse*
 monkeytype.sqlite3
 *.spyproject*
+chemicals.build
 
 # Docs #
 ########

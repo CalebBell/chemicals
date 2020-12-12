@@ -50,7 +50,7 @@ Equations
 
 from __future__ import division
 
-__all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107', 
+__all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
            'EQ114', 'EQ115', 'EQ116', 'EQ127']
 
 from chemicals.utils import log, exp, sinh, cosh, atan, atanh, sqrt, tanh
@@ -85,8 +85,8 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
         is returned; and for -1j, the indefinite integral of the property
-        divided by temperature with respect to temperature is returned. No 
-        other integrals or derivatives are implemented, and an exception will 
+        divided by temperature with respect to temperature is returned. No
+        other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
     Returns
@@ -98,20 +98,20 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     Notes
     -----
     The derivative with respect to T, integral with respect to T, and integral
-    over T with respect to T are computed as follows. All derivatives and 
+    over T with respect to T are computed as follows. All derivatives and
     integrals are easily computed with SymPy.
-    
+
     .. math::
-        \frac{d Y}{dT} = B + 2 C T + 3 D T^{2} + 4 E T^{3} + 5 F T^{4} 
+        \frac{d Y}{dT} = B + 2 C T + 3 D T^{2} + 4 E T^{3} + 5 F T^{4}
         + 6 G T^{5}
-        
+
     .. math::
-        \int Y dT = A T + \frac{B T^{2}}{2} + \frac{C T^{3}}{3} + \frac{D 
+        \int Y dT = A T + \frac{B T^{2}}{2} + \frac{C T^{3}}{3} + \frac{D
         T^{4}}{4} + \frac{E T^{5}}{5} + \frac{F T^{6}}{6} + \frac{G T^{7}}{7}
-        
+
     .. math::
         \int \frac{Y}{T} dT = A \log{\left (T \right )} + B T + \frac{C T^{2}}
-        {2} + \frac{D T^{3}}{3} + \frac{E T^{4}}{4} + \frac{F T^{5}}{5} 
+        {2} + \frac{D T^{3}}{3} + \frac{E T^{4}}{4} + \frac{F T^{5}}{5}
         + \frac{G T^{6}}{6}
 
     Examples
@@ -200,8 +200,8 @@ def EQ102(T, A, B, C, D, order=0):
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
         is returned; and for -1j, the indefinite integral of the property
-        divided by temperature with respect to temperature is returned. No 
-        other integrals or derivatives are implemented, and an exception will 
+        divided by temperature with respect to temperature is returned. No
+        other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
     Returns
@@ -215,28 +215,28 @@ def EQ102(T, A, B, C, D, order=0):
     The derivative with respect to T, integral with respect to T, and integral
     over T with respect to T are computed as follows. The first derivative is
     easily computed; the two integrals required Rubi to perform the integration.
-    
+
     .. math::
-        \frac{d Y}{dT} = \frac{A B T^{B}}{T \left(\frac{C}{T} + \frac{D}{T^{2}} 
+        \frac{d Y}{dT} = \frac{A B T^{B}}{T \left(\frac{C}{T} + \frac{D}{T^{2}}
         + 1\right)} + \frac{A T^{B} \left(\frac{C}{T^{2}} + \frac{2 D}{T^{3}}
         \right)}{\left(\frac{C}{T} + \frac{D}{T^{2}} + 1\right)^{2}}
-        
+
     .. math::
         \int Y dT = - \frac{2 A T^{B + 3} \operatorname{hyp2f1}{\left (1,B + 3,
-        B + 4,- \frac{2 T}{C - \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 3\right) 
-        \left(C + \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}} + \frac{2 A 
-        T^{B + 3} \operatorname{hyp2f1}{\left (1,B + 3,B + 4,- \frac{2 T}{C 
-        + \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 3\right) \left(C 
+        B + 4,- \frac{2 T}{C - \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 3\right)
+        \left(C + \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}} + \frac{2 A
+        T^{B + 3} \operatorname{hyp2f1}{\left (1,B + 3,B + 4,- \frac{2 T}{C
+        + \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 3\right) \left(C
         - \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}}
-        
+
     .. math::
         \int \frac{Y}{T} dT = - \frac{2 A T^{B + 2} \operatorname{hyp2f1}{\left
-        (1,B + 2,B + 3,- \frac{2 T}{C + \sqrt{C^{2} - 4 D}} \right )}}{\left(B 
+        (1,B + 2,B + 3,- \frac{2 T}{C + \sqrt{C^{2} - 4 D}} \right )}}{\left(B
         + 2\right) \left(C + \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}}
         + \frac{2 A T^{B + 2} \operatorname{hyp2f1}{\left (1,B + 2,B + 3,
-        - \frac{2 T}{C - \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 2\right) 
+        - \frac{2 T}{C - \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 2\right)
         \left(C - \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}}
-        
+
     Examples
     --------
     Water vapor viscosity; DIPPR coefficients normally listed in Pa*s.
@@ -252,12 +252,12 @@ def EQ102(T, A, B, C, D, order=0):
     if order == 0:
         return A*T**B/(1. + C/T + D/(T*T))
     elif order == 1:
-        return (A*B*T**B/(T*(C/T + D/T**2 + 1)) 
+        return (A*B*T**B/(T*(C/T + D/T**2 + 1))
                 + A*T**B*(C/T**2 + 2*D/T**3)/(C/T + D/T**2 + 1)**2)
     elif order == -1:
         # numba-scipy does not support complex numbers so this does not work in numba
         # imaginary part is 0
-        return float((2*A*T**(3+B)*hyp2f1(1.0, 3.0+B, 4.0+B, (-2*T/(C - csqrt(C*C 
+        return float((2*A*T**(3+B)*hyp2f1(1.0, 3.0+B, 4.0+B, (-2*T/(C - csqrt(C*C
                 - 4*D))))/((3+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D))
                 -2*A*T**(3+B)*hyp2f1(1.0, 3.0+B, 4+B, (-2*T/(C + csqrt(C*C - 4*D))))/(
                 (3+B)*(C + csqrt(C*C-4*D))*csqrt(C*C-4*D))).real)
@@ -268,7 +268,7 @@ def EQ102(T, A, B, C, D, order=0):
                 C*C-4*D))*csqrt(C*C-4*D))).real)
     else:
         raise ValueError(order_not_found_msg)
-        
+
 
 def EQ104(T, A, B, C, D, E, order=0):
     r'''DIPPR Equation #104. Often used in calculating second virial
@@ -289,8 +289,8 @@ def EQ104(T, A, B, C, D, E, order=0):
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
         is returned; and for -1j, the indefinite integral of the property
-        divided by temperature with respect to temperature is returned. No 
-        other integrals or derivatives are implemented, and an exception will 
+        divided by temperature with respect to temperature is returned. No
+        other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
     Returns
@@ -304,17 +304,17 @@ def EQ104(T, A, B, C, D, E, order=0):
     The derivative with respect to T, integral with respect to T, and integral
     over T with respect to T are computed as follows. All expressions can be
     obtained with SymPy readily.
-    
+
     .. math::
-        \frac{d Y}{dT} = - \frac{B}{T^{2}} - \frac{3 C}{T^{4}} 
+        \frac{d Y}{dT} = - \frac{B}{T^{2}} - \frac{3 C}{T^{4}}
         - \frac{8 D}{T^{9}} - \frac{9 E}{T^{10}}
-        
+
     .. math::
-        \int Y dT = A T + B \log{\left (T \right )} - \frac{1}{56 T^{8}} 
+        \int Y dT = A T + B \log{\left (T \right )} - \frac{1}{56 T^{8}}
         \left(28 C T^{6} + 8 D T + 7 E\right)
-        
+
     .. math::
-        \int \frac{Y}{T} dT = A \log{\left (T \right )} - \frac{1}{72 T^{9}} 
+        \int \frac{Y}{T} dT = A \log{\left (T \right )} - \frac{1}{72 T^{9}}
         \left(72 B T^{8} + 24 C T^{6} + 9 D T + 8 E\right)
 
     Examples
@@ -363,7 +363,7 @@ def EQ105(T, A, B, C, D):
     -------
     Y : float
         Property [constant-specific]
-        
+
     Notes
     -----
     This expression can be integrated in terms of the incomplete gamma function
@@ -450,8 +450,8 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
         is returned; and for -1j, the indefinite integral of the property
-        divided by temperature with respect to temperature is returned. No 
-        other integrals or derivatives are implemented, and an exception will 
+        divided by temperature with respect to temperature is returned. No
+        other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
     Returns
@@ -463,26 +463,26 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
     Notes
     -----
     The derivative with respect to T, integral with respect to T, and integral
-    over T with respect to T are computed as follows. The derivative is 
+    over T with respect to T are computed as follows. The derivative is
     obtained via SymPy; the integrals from Wolfram Alpha.
-    
+
     .. math::
         \frac{d Y}{dT} = \frac{2 B C^{3} \cosh{\left (\frac{C}{T} \right )}}
         {T^{4} \sinh^{3}{\left (\frac{C}{T} \right )}} - \frac{2 B C^{2}}{T^{3}
         \sinh^{2}{\left (\frac{C}{T} \right )}} + \frac{2 D E^{3} \sinh{\left
-        (\frac{E}{T} \right )}}{T^{4} \cosh^{3}{\left (\frac{E}{T} \right )}} 
+        (\frac{E}{T} \right )}}{T^{4} \cosh^{3}{\left (\frac{E}{T} \right )}}
         - \frac{2 D E^{2}}{T^{3} \cosh^{2}{\left (\frac{E}{T} \right )}}
-        
+
     .. math::
         \int Y dT = A T + \frac{B C}{\tanh{\left (\frac{C}{T} \right )}}
         - D E \tanh{\left (\frac{E}{T} \right )}
-        
+
     .. math::
         \int \frac{Y}{T} dT = A \log{\left (T \right )} + \frac{B C}{T \tanh{
         \left (\frac{C}{T} \right )}} - B \log{\left (\sinh{\left (\frac{C}{T}
         \right )} \right )} - \frac{D E}{T} \tanh{\left (\frac{E}{T} \right )}
         + D \log{\left (\cosh{\left (\frac{E}{T} \right )} \right )}
-        
+
     Examples
     --------
     Water ideal gas molar heat capacity; DIPPR coefficients normally in
@@ -503,14 +503,14 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
     if order == 0:
         return A + B*((C/T)/sinh(C/T))**2 + D*((E/T)/cosh(E/T))**2
     elif order == 1:
-        return (2*B*C**3*cosh(C/T)/(T**4*sinh(C/T)**3) 
-                - 2*B*C**2/(T**3*sinh(C/T)**2) 
+        return (2*B*C**3*cosh(C/T)/(T**4*sinh(C/T)**3)
+                - 2*B*C**2/(T**3*sinh(C/T)**2)
                 + 2*D*E**3*sinh(E/T)/(T**4*cosh(E/T)**3)
                 - 2*D*E**2/(T**3*cosh(E/T)**2))
     elif order == -1:
         return A*T + B*C/tanh(C/T) - D*E*tanh(E/T)
     elif order == -1j:
-        return (A*log(T) + B*C/tanh(C/T)/T - B*log(sinh(C/T)) 
+        return (A*log(T) + B*C/tanh(C/T)/T - B*log(sinh(C/T))
                 - D*E*tanh(E/T)/T + D*log(cosh(E/T)))
     else:
         raise ValueError(order_not_found_msg)
@@ -540,8 +540,8 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
         is returned; and for -1j, the indefinite integral of the property
-        divided by temperature with respect to temperature is returned. No 
-        other integrals or derivatives are implemented, and an exception will 
+        divided by temperature with respect to temperature is returned. No
+        other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
     Returns
@@ -555,37 +555,37 @@ def EQ114(T, Tc, A, B, C, D, order=0):
     The derivative with respect to T, integral with respect to T, and integral
     over T with respect to T are computed as follows. All expressions can be
     obtained with SymPy readily.
-    
+
     .. math::
-        \frac{d Y}{dT} = \frac{A^{2}}{T_{c} \left(- \frac{T}{T_{c}} 
+        \frac{d Y}{dT} = \frac{A^{2}}{T_{c} \left(- \frac{T}{T_{c}}
         + 1\right)^{2}} + \frac{2 A}{T_{c}} C + \frac{2 A}{T_{c}} D \left(
         - \frac{T}{T_{c}} + 1\right) + \frac{C^{2}}{T_{c}} \left(
         - \frac{T}{T_{c}} + 1\right)^{2} + \frac{2 C}{T_{c}} D \left(
         - \frac{T}{T_{c}} + 1\right)^{3} + \frac{D^{2}}{T_{c}} \left(
         - \frac{T}{T_{c}} + 1\right)^{4}
-        
+
     .. math::
         \int Y dT = - A^{2} T_{c} \log{\left (T - T_{c} \right )} + \frac{D^{2}
         T^{6}}{30 T_{c}^{5}} - \frac{T^{5}}{10 T_{c}^{4}} \left(C D + 2 D^{2}
         \right) + \frac{T^{4}}{12 T_{c}^{3}} \left(C^{2} + 6 C D + 6 D^{2}
-        \right) - \frac{T^{3}}{3 T_{c}^{2}} \left(A D + C^{2} + 3 C D 
-        + 2 D^{2}\right) + \frac{T^{2}}{2 T_{c}} \left(2 A C + 2 A D + C^{2} 
-        + 2 C D + D^{2}\right) + T \left(- 2 A C - A D + B - \frac{C^{2}}{3} 
+        \right) - \frac{T^{3}}{3 T_{c}^{2}} \left(A D + C^{2} + 3 C D
+        + 2 D^{2}\right) + \frac{T^{2}}{2 T_{c}} \left(2 A C + 2 A D + C^{2}
+        + 2 C D + D^{2}\right) + T \left(- 2 A C - A D + B - \frac{C^{2}}{3}
         - \frac{C D}{2} - \frac{D^{2}}{5}\right)
-        
+
     .. math::
         \int \frac{Y}{T} dT = - A^{2} \log{\left (T + \frac{- 60 A^{2} T_{c}
         + 60 A C T_{c} + 30 A D T_{c} - 30 B T_{c} + 10 C^{2} T_{c}
-        + 15 C D T_{c} + 6 D^{2} T_{c}}{60 A^{2} - 60 A C - 30 A D + 30 B 
+        + 15 C D T_{c} + 6 D^{2} T_{c}}{60 A^{2} - 60 A C - 30 A D + 30 B
         - 10 C^{2} - 15 C D - 6 D^{2}} \right )} + \frac{D^{2} T^{5}}
         {25 T_{c}^{5}} - \frac{T^{4}}{8 T_{c}^{4}} \left(C D + 2 D^{2}
         \right) + \frac{T^{3}}{9 T_{c}^{3}} \left(C^{2} + 6 C D + 6 D^{2}
         \right) - \frac{T^{2}}{2 T_{c}^{2}} \left(A D + C^{2} + 3 C D
-        + 2 D^{2}\right) + \frac{T}{T_{c}} \left(2 A C + 2 A D + C^{2} 
-        + 2 C D + D^{2}\right) + \frac{1}{30} \left(30 A^{2} - 60 A C 
-        - 30 A D + 30 B - 10 C^{2} - 15 C D - 6 D^{2}\right) \log{\left 
+        + 2 D^{2}\right) + \frac{T}{T_{c}} \left(2 A C + 2 A D + C^{2}
+        + 2 C D + D^{2}\right) + \frac{1}{30} \left(30 A^{2} - 60 A C
+        - 30 A D + 30 B - 10 C^{2} - 15 C D - 6 D^{2}\right) \log{\left
         (T + \frac{1}{60 A^{2} - 60 A C - 30 A D + 30 B - 10 C^{2} - 15 C D
-        - 6 D^{2}} \left(- 30 A^{2} T_{c} + 60 A C T_{c} + 30 A D T_{c} 
+        - 6 D^{2}} \left(- 30 A^{2} T_{c} + 60 A C T_{c} + 30 A D T_{c}
         - 30 B T_{c} + 10 C^{2} T_{c} + 15 C D T_{c} + 6 D^{2} T_{c}
         + T_{c} \left(30 A^{2} - 60 A C - 30 A D + 30 B - 10 C^{2} - 15 C D
         - 6 D^{2}\right)\right) \right )}
@@ -607,30 +607,30 @@ def EQ114(T, Tc, A, B, C, D, order=0):
     '''
     if order == 0:
         t = 1.-T/Tc
-        return (A**2./t + B - 2.*A*C*t - A*D*t**2. - C**2.*t**3./3. 
+        return (A**2./t + B - 2.*A*C*t - A*D*t**2. - C**2.*t**3./3.
                 - C*D*t**4./2. - D**2*t**5./5.)
     elif order == 1:
-        return (A**2/(Tc*(-T/Tc + 1)**2) + 2*A*C/Tc + 2*A*D*(-T/Tc + 1)/Tc 
-                + C**2*(-T/Tc + 1)**2/Tc + 2*C*D*(-T/Tc + 1)**3/Tc 
+        return (A**2/(Tc*(-T/Tc + 1)**2) + 2*A*C/Tc + 2*A*D*(-T/Tc + 1)/Tc
+                + C**2*(-T/Tc + 1)**2/Tc + 2*C*D*(-T/Tc + 1)**3/Tc
                 + D**2*(-T/Tc + 1)**4/Tc)
     elif order == -1:
-        return (-A**2*Tc*clog(T - Tc).real + D**2*T**6/(30*Tc**5) 
-                - T**5*(C*D + 2*D**2)/(10*Tc**4) 
-                + T**4*(C**2 + 6*C*D + 6*D**2)/(12*Tc**3) - T**3*(A*D + C**2 
-                + 3*C*D + 2*D**2)/(3*Tc**2) + T**2*(2*A*C + 2*A*D + C**2 + 2*C*D 
+        return (-A**2*Tc*clog(T - Tc).real + D**2*T**6/(30*Tc**5)
+                - T**5*(C*D + 2*D**2)/(10*Tc**4)
+                + T**4*(C**2 + 6*C*D + 6*D**2)/(12*Tc**3) - T**3*(A*D + C**2
+                + 3*C*D + 2*D**2)/(3*Tc**2) + T**2*(2*A*C + 2*A*D + C**2 + 2*C*D
                 + D**2)/(2*Tc) + T*(-2*A*C - A*D + B - C**2/3 - C*D/2 - D**2/5))
     elif order == -1j:
-        return (-A**2*clog(T + (-60*A**2*Tc + 60*A*C*Tc + 30*A*D*Tc - 30*B*Tc 
-                + 10*C**2*Tc + 15*C*D*Tc + 6*D**2*Tc)/(60*A**2 - 60*A*C 
-                - 30*A*D + 30*B - 10*C**2 - 15*C*D - 6*D**2)).real 
-                + D**2*T**5/(25*Tc**5) - T**4*(C*D + 2*D**2)/(8*Tc**4) 
+        return (-A**2*clog(T + (-60*A**2*Tc + 60*A*C*Tc + 30*A*D*Tc - 30*B*Tc
+                + 10*C**2*Tc + 15*C*D*Tc + 6*D**2*Tc)/(60*A**2 - 60*A*C
+                - 30*A*D + 30*B - 10*C**2 - 15*C*D - 6*D**2)).real
+                + D**2*T**5/(25*Tc**5) - T**4*(C*D + 2*D**2)/(8*Tc**4)
                 + T**3*(C**2 + 6*C*D + 6*D**2)/(9*Tc**3) - T**2*(A*D + C**2
                 + 3*C*D + 2*D**2)/(2*Tc**2) + T*(2*A*C + 2*A*D + C**2 + 2*C*D
                 + D**2)/Tc + (30*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2
-                - 15*C*D - 6*D**2)*clog(T + (-30*A**2*Tc + 60*A*C*Tc 
-                + 30*A*D*Tc - 30*B*Tc + 10*C**2*Tc + 15*C*D*Tc + 6*D**2*Tc 
-                + Tc*(30*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2 - 15*C*D 
-                - 6*D**2))/(60*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2 
+                - 15*C*D - 6*D**2)*clog(T + (-30*A**2*Tc + 60*A*C*Tc
+                + 30*A*D*Tc - 30*B*Tc + 10*C**2*Tc + 15*C*D*Tc + 6*D**2*Tc
+                + Tc*(30*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2 - 15*C*D
+                - 6*D**2))/(60*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2
                 - 15*C*D - 6*D**2)).real/30)
     else:
         raise ValueError(order_not_found_msg)
@@ -692,8 +692,8 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
         is returned; and for -1j, the indefinite integral of the property
-        divided by temperature with respect to temperature is returned. No 
-        other integrals or derivatives are implemented, and an exception will 
+        divided by temperature with respect to temperature is returned. No
+        other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
     Returns
@@ -704,23 +704,23 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
 
     Notes
     -----
-    The derivative with respect to T and integral with respect to T are 
+    The derivative with respect to T and integral with respect to T are
     computed as follows. The integral divided by T with respect to T has an
-    extremely complicated (but still elementary) integral which can be read 
-    from the source. It was computed with Rubi; the other expressions can 
+    extremely complicated (but still elementary) integral which can be read
+    from the source. It was computed with Rubi; the other expressions can
     readily be obtained with SymPy.
 
     .. math::
         \frac{d Y}{dT} = - \frac{7 B}{20 T_c \left(- \frac{T}{T_c} + 1\right)^{
-        \frac{13}{20}}} - \frac{2 C}{3 T_c \sqrt[3]{- \frac{T}{T_c} + 1}} 
+        \frac{13}{20}}} - \frac{2 C}{3 T_c \sqrt[3]{- \frac{T}{T_c} + 1}}
         - \frac{D}{T_c} - \frac{4 E}{3 T_c} \sqrt[3]{- \frac{T}{T_c} + 1}
 
     .. math::
         \int Y dT = A T - \frac{20 B}{27} T_c \left(- \frac{T}{T_c} + 1\right)^{
         \frac{27}{20}} - \frac{3 C}{5} T_c \left(- \frac{T}{T_c} + 1\right)^{
-        \frac{5}{3}} + D \left(- \frac{T^{2}}{2 T_c} + T\right) - \frac{3 E}{7} 
+        \frac{5}{3}} + D \left(- \frac{T^{2}}{2 T_c} + T\right) - \frac{3 E}{7}
         T_c \left(- \frac{T}{T_c} + 1\right)^{\frac{7}{3}}
-                
+
     Examples
     --------
     Water liquid molar density; DIPPR coefficients normally in kmol/m^3.
@@ -737,11 +737,11 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         tau = 1-T/Tc
         return A + B*tau**0.35 + C*tau**(2/3.) + D*tau + E*tau**(4/3.)
     elif order == 1:
-        return (-7*B/(20*Tc*(-T/Tc + 1)**(13/20)) 
-                - 2*C/(3*Tc*(-T/Tc + 1)**(1/3)) 
+        return (-7*B/(20*Tc*(-T/Tc + 1)**(13/20))
+                - 2*C/(3*Tc*(-T/Tc + 1)**(1/3))
                 - D/Tc - 4*E*(-T/Tc + 1)**(1/3)/(3*Tc))
     elif order == -1:
-        return (A*T - 20*B*Tc*(-T/Tc + 1)**(27/20)/27 
+        return (A*T - 20*B*Tc*(-T/Tc + 1)**(27/20)/27
                 - 3*C*Tc*(-T/Tc + 1)**(5/3)/5 + D*(-T**2/(2*Tc) + T)
                 - 3*E*Tc*(-T/Tc + 1)**(7/3)/7)
     elif order == -1j:
@@ -822,8 +822,8 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
         is returned; and for -1j, the indefinite integral of the property
-        divided by temperature with respect to temperature is returned. No 
-        other integrals or derivatives are implemented, and an exception will 
+        divided by temperature with respect to temperature is returned. No
+        other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
     Returns
@@ -837,36 +837,36 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
     The derivative with respect to T, integral with respect to T, and integral
     over T with respect to T are computed as follows. All expressions can be
     obtained with SymPy readily.
-    
+
     .. math::
         \frac{d Y}{dT} = - \frac{B C^{3} e^{\frac{C}{T}}}{T^{4}
-        \left(e^{\frac{C}{T}} - 1\right)^{2}} + \frac{2 B C^{3} 
-        e^{\frac{2 C}{T}}}{T^{4} \left(e^{\frac{C}{T}} - 1\right)^{3}} 
-        - \frac{2 B C^{2} e^{\frac{C}{T}}}{T^{3} \left(e^{\frac{C}{T}} 
-        - 1\right)^{2}} - \frac{D E^{3} e^{\frac{E}{T}}}{T^{4} 
-        \left(e^{\frac{E}{T}} - 1\right)^{2}} + \frac{2 D E^{3} 
+        \left(e^{\frac{C}{T}} - 1\right)^{2}} + \frac{2 B C^{3}
+        e^{\frac{2 C}{T}}}{T^{4} \left(e^{\frac{C}{T}} - 1\right)^{3}}
+        - \frac{2 B C^{2} e^{\frac{C}{T}}}{T^{3} \left(e^{\frac{C}{T}}
+        - 1\right)^{2}} - \frac{D E^{3} e^{\frac{E}{T}}}{T^{4}
+        \left(e^{\frac{E}{T}} - 1\right)^{2}} + \frac{2 D E^{3}
         e^{\frac{2 E}{T}}}{T^{4} \left(e^{\frac{E}{T}} - 1\right)^{3}}
-        - \frac{2 D E^{2} e^{\frac{E}{T}}}{T^{3} \left(e^{\frac{E}{T}} 
+        - \frac{2 D E^{2} e^{\frac{E}{T}}}{T^{3} \left(e^{\frac{E}{T}}
         - 1\right)^{2}} - \frac{F G^{3} e^{\frac{G}{T}}}{T^{4}
         \left(e^{\frac{G}{T}} - 1\right)^{2}} + \frac{2 F G^{3}
         e^{\frac{2 G}{T}}}{T^{4} \left(e^{\frac{G}{T}} - 1\right)^{3}}
-        - \frac{2 F G^{2} e^{\frac{G}{T}}}{T^{3} \left(e^{\frac{G}{T}} 
+        - \frac{2 F G^{2} e^{\frac{G}{T}}}{T^{3} \left(e^{\frac{G}{T}}
         - 1\right)^{2}}
-        
+
     .. math::
-        \int Y dT = A T + \frac{B C^{2}}{C e^{\frac{C}{T}} - C} 
-        + \frac{D E^{2}}{E e^{\frac{E}{T}} - E} 
+        \int Y dT = A T + \frac{B C^{2}}{C e^{\frac{C}{T}} - C}
+        + \frac{D E^{2}}{E e^{\frac{E}{T}} - E}
         + \frac{F G^{2}}{G e^{\frac{G}{T}} - G}
-        
+
     .. math::
         \int \frac{Y}{T} dT = A \log{\left (T \right )} + B C^{2} \left(
-        \frac{1}{C T e^{\frac{C}{T}} - C T} + \frac{1}{C T} - \frac{1}{C^{2}} 
+        \frac{1}{C T e^{\frac{C}{T}} - C T} + \frac{1}{C T} - \frac{1}{C^{2}}
         \log{\left (e^{\frac{C}{T}} - 1 \right )}\right) + D E^{2} \left(
-        \frac{1}{E T e^{\frac{E}{T}} - E T} + \frac{1}{E T} - \frac{1}{E^{2}} 
+        \frac{1}{E T e^{\frac{E}{T}} - E T} + \frac{1}{E T} - \frac{1}{E^{2}}
         \log{\left (e^{\frac{E}{T}} - 1 \right )}\right) + F G^{2} \left(
-        \frac{1}{G T e^{\frac{G}{T}} - G T} + \frac{1}{G T} - \frac{1}{G^{2}} 
+        \frac{1}{G T e^{\frac{G}{T}} - G T} + \frac{1}{G T} - \frac{1}{G^{2}}
         \log{\left (e^{\frac{G}{T}} - 1 \right )}\right)
-            
+
     Examples
     --------
     Ideal gas heat capacity of methanol; DIPPR coefficients normally in
@@ -881,27 +881,27 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
        DIPPR/AIChE
     '''
     if order == 0:
-        return (A+B*((C/T)**2*exp(C/T)/(exp(C/T) - 1)**2) + 
-            D*((E/T)**2*exp(E/T)/(exp(E/T)-1)**2) + 
+        return (A+B*((C/T)**2*exp(C/T)/(exp(C/T) - 1)**2) +
+            D*((E/T)**2*exp(E/T)/(exp(E/T)-1)**2) +
             F*((G/T)**2*exp(G/T)/(exp(G/T)-1)**2))
     elif order == 1:
-        return (-B*C**3*exp(C/T)/(T**4*(exp(C/T) - 1)**2) 
-                + 2*B*C**3*exp(2*C/T)/(T**4*(exp(C/T) - 1)**3) 
-                - 2*B*C**2*exp(C/T)/(T**3*(exp(C/T) - 1)**2) 
-                - D*E**3*exp(E/T)/(T**4*(exp(E/T) - 1)**2) 
-                + 2*D*E**3*exp(2*E/T)/(T**4*(exp(E/T) - 1)**3) 
-                - 2*D*E**2*exp(E/T)/(T**3*(exp(E/T) - 1)**2) 
+        return (-B*C**3*exp(C/T)/(T**4*(exp(C/T) - 1)**2)
+                + 2*B*C**3*exp(2*C/T)/(T**4*(exp(C/T) - 1)**3)
+                - 2*B*C**2*exp(C/T)/(T**3*(exp(C/T) - 1)**2)
+                - D*E**3*exp(E/T)/(T**4*(exp(E/T) - 1)**2)
+                + 2*D*E**3*exp(2*E/T)/(T**4*(exp(E/T) - 1)**3)
+                - 2*D*E**2*exp(E/T)/(T**3*(exp(E/T) - 1)**2)
                 - F*G**3*exp(G/T)/(T**4*(exp(G/T) - 1)**2)
-                + 2*F*G**3*exp(2*G/T)/(T**4*(exp(G/T) - 1)**3) 
+                + 2*F*G**3*exp(2*G/T)/(T**4*(exp(G/T) - 1)**3)
                 - 2*F*G**2*exp(G/T)/(T**3*(exp(G/T) - 1)**2))
     elif order == -1:
         return (A*T + B*C**2/(C*exp(C/T) - C) + D*E**2/(E*exp(E/T) - E)
                 + F*G**2/(G*exp(G/T) - G))
     elif order == -1j:
         return (A*log(T) + B*C**2*(1/(C*T*exp(C/T) - C*T) + 1/(C*T)
-                - log(exp(C/T) - 1)/C**2) + D*E**2*(1/(E*T*exp(E/T) - E*T) 
+                - log(exp(C/T) - 1)/C**2) + D*E**2*(1/(E*T*exp(E/T) - E*T)
                 + 1/(E*T) - log(exp(E/T) - 1)/E**2)
-                + F*G**2*(1/(G*T*exp(G/T) - G*T) + 1/(G*T) - log(exp(G/T) 
+                + F*G**2*(1/(G*T*exp(G/T) - G*T) + 1/(G*T) - log(exp(G/T)
                 - 1)/G**2))
     else:
         raise ValueError(order_not_found_msg)

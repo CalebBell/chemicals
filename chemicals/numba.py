@@ -42,7 +42,7 @@ normal_fluids = fluids
 
 orig_file = __file__
 def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
-    cache_blacklist = set( ['Rachford_Rice_solution', 'Rachford_Rice_solution_LN2', 'Rachford_Rice_solution_polynomial', 
+    cache_blacklist = set( ['Rachford_Rice_solution', 'Rachford_Rice_solution_LN2', 'Rachford_Rice_solution_polynomial',
               'Rachford_Rice_solution_numpy', 'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
               'Rachford_Rice_solutionN', 'Rachford_Rice_solution2', 'flash_wilson',
               'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm'])
@@ -57,7 +57,7 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
         conv_fun = numba.vectorize
     else:
         conv_fun = numba.jit
-    
+
     to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
              'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
@@ -65,11 +65,11 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
              'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
              'viscosity.Wilke_large', 'viscosity.Wilke_prefactored',
              'interface.Winterfeld_Scriven_Davis',
-             
+
              'rachford_rice.Rachford_Rice_solution',
              'rachford_rice.Rachford_Rice_solution_LN2',
              'rachford_rice.Rachford_Rice_solution_numpy',
-             'rachford_rice.Rachford_Rice_polynomial', 
+             'rachford_rice.Rachford_Rice_polynomial',
              'rachford_rice.Rachford_Rice_polynomial_3',
              'rachford_rice.Rachford_Rice_polynomial_4',
              'rachford_rice.Rachford_Rice_polynomial_5',

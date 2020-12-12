@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 This module contains the ideal flash solver; two flash initialization routines;
-a vapor-liquid equilibrium constant correlation; a liquid-water equilibrium  
+a vapor-liquid equilibrium constant correlation; a liquid-water equilibrium
 constant correlation, and a definition function to show the commonly used calculation
 frameworks.
 
@@ -30,7 +30,7 @@ For reporting bugs, adding feature requests, or submitting pull requests,
 please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
 
 .. contents:: :local:
-    
+
 Ideal Flash Function
 --------------------
 .. autofunction:: chemicals.flash_basic.flash_ideal
@@ -55,7 +55,7 @@ from fluids.numerics import newton, brenth, oscillation_checker, secant, NotBoun
 
 from chemicals.rachford_rice import flash_inner_loop
 
-__all__ = ['K_value','Wilson_K_value', 'PR_water_K_value', 'flash_wilson', 
+__all__ = ['K_value','Wilson_K_value', 'PR_water_K_value', 'flash_wilson',
            'flash_Tb_Tc_Pc', 'flash_ideal']
 
 
@@ -570,14 +570,14 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
     solver. It is used in the PVF solvers. This typically allows pressures
     up to 2 MPa to be converged to. Failures may still occur for other
     conditions.
-    
+
     This model is based on [1]_, which aims to estimate dew and bubble points
     using the same K value formulation as used here. While this implementation
     uses a numerical solver to provide an exact bubble/dew point estimate,
-    [1]_ suggests a sequential substitution and flowchart based solver with 
+    [1]_ suggests a sequential substitution and flowchart based solver with
     loose tolerances. That model was also implemented, but found to be slower
     and less reliable than this implementation.
-    
+
 
     Examples
     --------
@@ -590,10 +590,10 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
 
     References
     ----------
-    .. [1] Kandula, Vamshi Krishna, John C. Telotte, and F. Carl Knopf. "It’s 
-       Not as Easy as It Looks: Revisiting Peng—Robinson Equation of State 
+    .. [1] Kandula, Vamshi Krishna, John C. Telotte, and F. Carl Knopf. "It’s
+       Not as Easy as It Looks: Revisiting Peng—Robinson Equation of State
        Convergence Issues for Dew Point, Bubble Point and Flash Calculations."
-       International Journal of Mechanical Engineering Education 41, no. 3 
+       International Journal of Mechanical Engineering Education 41, no. 3
        (July 1, 2013): 188-202. https://doi.org/10.7227/IJMEE.41.3.2.
     '''
     T_MAX = 50000
@@ -708,26 +708,26 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
 def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
     r'''PVT flash model using ideal, composition-independent equation.
     Solves the various cases of composition-independent models.
-    
+
     Capable of solving with two of `T`, `P`, and `VF` for the other one;
     that results in three solve modes, but for `VF=1` and `VF=0`, there are
     additional solvers; for a total of seven solvers implemented.
-    
+
     The function takes a list of callables that take `T` in Kelvin as an argument,
     and return vapor pressure. The callables can include the effect of
     non-ideal pure component fugacity coefficients. For the (`T`, `P`) and
     (`P`, `VF`) cases, the Poynting correction factor can be easily included as
-    well but not the (`T`, `VF`) case as the callable only takes `T` as an 
-    argument. Normally the Poynting correction factor is used with activity 
-    coefficient models with composition dependence.            
+    well but not the (`T`, `VF`) case as the callable only takes `T` as an
+    argument. Normally the Poynting correction factor is used with activity
+    coefficient models with composition dependence.
 
-    Both `flash_wilson` and `flash_Tb_Tc_Pc` are specialized cases of this 
+    Both `flash_wilson` and `flash_Tb_Tc_Pc` are specialized cases of this
     function and have the same functionality but with the model built right in.
-    
+
     Even when using more complicated models, this is useful for obtaining initial
 
     This model uses `flash_inner_loop` to solve the Rachford-Rice problem.
-    
+
     Parameters
     ----------
     zs : list[float]
@@ -738,7 +738,7 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
     Tcs : list[float], optional
         Critical temperatures of all species; uses as upper bounds and only
         for the case that `T` is not specified; if they are needed and not
-        given, it is assumed a method `solve_prop` exists in each of `funcs` 
+        given, it is assumed a method `solve_prop` exists in each of `funcs`
         which will accept `P` in Pa and return temperature in `K`, [K]
     T : float, optional
         Temperature, [K]
@@ -774,7 +774,7 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
     --------
     Basic case with four compounds, usingthe Antoine equation as a model and
     solving for vapor pressure:
-    
+
     >>> from chemicals import Antoine, Ambrose_Walton
     >>> Tcs = [369.83, 425.12, 469.7, 507.6]
     >>> Antoine_As = [8.92828, 8.93266, 8.97786, 9.00139]
@@ -789,10 +789,10 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
     >>> T, P, VF, xs, ys = flash_ideal(T=330.55, P=1e6, zs=zs, funcs=Psat_funcs, Tcs=Tcs)
     >>> round(VF, 10)
     1.00817e-05
-    
+
     Similar case, using the Ambrose-Walton corresponding states method to estimate
     vapor pressures:
-        
+
     >>> Tcs = [369.83, 425.12, 469.7, 507.6]
     >>> Pcs = [4248000.0, 3796000.0, 3370000.0, 3025000.0]
     >>> omegas = [0.152, 0.193, 0.251, 0.2975]
@@ -804,7 +804,7 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
     >>> _, P, VF, xs, ys = flash_ideal(T=329.151, VF=0, zs=zs, funcs=Psat_funcs, Tcs=Tcs)
     >>> round(P, 3)
     1000013.343
-    
+
     Case with fugacities in the liquid phase, vapor phase, activity coefficients
     in the liquid phase, and Poynting correction factors.
 
@@ -827,7 +827,7 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
     >>> VF, xs, ys
     (0.510863971792927, [0.5573493403937615, 0.4426506596062385], [0.4450898279593881, 0.5549101720406119])
 
-    Note that while this works for PT composition independent flashes - an 
+    Note that while this works for PT composition independent flashes - an
     outer iterating loop is needed for composition dependence!
     '''
     T_MAX = 50000.0
@@ -911,7 +911,7 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
                 T_dew = brenth(to_solve, T_low_guess, T_MAX, fa=err_low, fb=err_high)
             else:
                 T_dew = secant(to_solve, min(min(Tcs)*0.9, T_guess), xtol=1e-12, maxiter=50, bisection=True, high=min(Tcs))
-        
+
         xs = [P]*N
         for i in range(N):
             xs[i] *= zs[i]/funcs[i](T_dew)
@@ -950,7 +950,7 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
             else:
                 Tc_min = min(Tcs)
                 T_bubble = secant(to_solve, min(Tc_min*0.9, T_guess), maxiter=50, bisection=True, high=Tc_min, xtol=1e-12)
-        
+
         P_inv = 1.0/P
         ys = [0.0]*N
         for i in range(N):

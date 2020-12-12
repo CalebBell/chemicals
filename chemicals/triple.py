@@ -21,9 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 This module contains lookup functions for a chemical's triple temperature and
-pressure. The triple temperature is the unique co-existence point between a 
+pressure. The triple temperature is the unique co-existence point between a
 pure chemicals's solid, gas, and liquid state.
- 
+
 For reporting bugs, adding feature requests, or submitting pull requests,
 please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
 
@@ -43,7 +43,7 @@ Triple Pressure
 
 """
 
-__all__ = ['Tt_all_methods', 'Tt_methods', 'Tt', 
+__all__ = ['Tt_all_methods', 'Tt_methods', 'Tt',
            'Pt_all_methods', 'Pt_methods', 'Pt']
 
 import os
@@ -146,7 +146,7 @@ def Tt(CASRN, get_methods=False, method=None):
 
     >>> Tt('7664-41-7')
     195.48
-    
+
     See Also
     --------
     Tt
@@ -162,11 +162,11 @@ def Tt(CASRN, get_methods=False, method=None):
         if method == MELTING:
             return Tm(CASRN)
         else:
-            return retrieve_from_df_dict(Tt_sources, CASRN, 'Tt68', method) 
+            return retrieve_from_df_dict(Tt_sources, CASRN, 'Tt68', method)
     else:
-        Tt = retrieve_any_from_df_dict(Tt_sources, CASRN, 'Tt68') 
+        Tt = retrieve_any_from_df_dict(Tt_sources, CASRN, 'Tt68')
         if Tt: return Tt
-        return Tm(CASRN)    
+        return Tm(CASRN)
 
 Pt_all_methods = (STAVELEY,)
 '''Tuple of method name keys. See the `Pt` for the actual references'''
@@ -197,9 +197,9 @@ def Pt(CASRN, get_methods=False, method=None):
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
-    Returns data from [1]_ only. 
-    
-    This function doe snot implement it but it is also possible to calculate 
+    Returns data from [1]_ only.
+
+    This function doe snot implement it but it is also possible to calculate
     the vapor pressure at the triple temperature from a vapor pressure
     correlation, if data is available; note most Antoine-type correlations do
     not extrapolate well to this low of a pressure.
@@ -222,7 +222,7 @@ def Pt(CASRN, get_methods=False, method=None):
     method : string, optional
         A string for the method name to use, as defined in the variable,
         `Pt_all_methods`.
-        
+
     Notes
     -----
 
@@ -245,7 +245,7 @@ def Pt(CASRN, get_methods=False, method=None):
     '''
     if not _triple_data_loaded: _load_triple_data()
     if method:
-        return retrieve_from_df_dict(Pt_sources, CASRN, 'Pt', method) 
+        return retrieve_from_df_dict(Pt_sources, CASRN, 'Pt', method)
     else:
-        return retrieve_any_from_df_dict(Pt_sources, CASRN, 'Pt') 
+        return retrieve_any_from_df_dict(Pt_sources, CASRN, 'Pt')
 

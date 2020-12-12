@@ -21,8 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains lookup functions for three important environmental 
-properties - Global Warming Potential, Ozone Depletion Potential, and 
+This module contains lookup functions for three important environmental
+properties - Global Warming Potential, Ozone Depletion Potential, and
 octanol-water partition coefficient.
 
 
@@ -51,7 +51,7 @@ Octanol-Water Partition Coefficient
 
 """
 
-__all__ = ['GWP', 'ODP', 'logP', 
+__all__ = ['GWP', 'ODP', 'logP',
            'GWP_all_methods', 'ODP_all_methods', 'logP_all_methods',
            'GWP_methods', 'ODP_methods', 'logP_methods']
 
@@ -97,7 +97,7 @@ def _load_GWP_ODP_data():
         'ODP2 string': 'ODP2',
         'ODP1 string': 'ODP1',
     }
-    
+
 _logP_data_loaded = False
 def _load_logP_data():
     global _logP_data_loaded, logP_data_CRC, logP_data_Syrres, logP_sources
@@ -152,7 +152,7 @@ def GWP_methods(CASRN):
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     return list_available_methods_from_df(GWP_data, CASRN, _GWP_keys_by_method)
-    
+
 def GWP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's Global Warming
     Potential, relative to CO2. Lookup is based on CASRNs. Will automatically
@@ -175,7 +175,7 @@ def GWP(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are IPCC (2007) 100yr',
-        'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'. 
+        'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'.
         All valid values are also held in the variable `GWP_all_methods`.
 
     Notes
@@ -202,6 +202,9 @@ def GWP(CASRN, method=None):
        Changes in Atmospheric Constituents and in Radiative Forcing." 2007.
        https://www.ipcc.ch/publications_and_data/ar4/wg1/en/ch2s2-10-2.html.
     '''
+    # TODO update with 5th edition values
+    # Official table is at https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
+    # page 73
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
         key = _GWP_keys_by_method[method]
@@ -267,7 +270,7 @@ def ODP(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'ODP2 Max', 'ODP2 Min', 
+        The method name to use. Accepted methods are 'ODP2 Max', 'ODP2 Min',
         'ODP2 string', 'ODP2 logarithmic average', and methods for older values
         are 'ODP1 Max', 'ODP1 Min', 'ODP1 string', and 'ODP1 logarithmic average'.
         All valid values are also held in the list ODP_methods.
@@ -354,11 +357,11 @@ def logP(CASRN, method=None):
     -------
     logP : float
         Octanol-water partition coefficient, [-]
-        
+
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'SYRRES', or 'CRC', 
+        The method name to use. Accepted methods are 'SYRRES', or 'CRC',
         All valid values are also held in the list logP_methods.
 
     Notes
@@ -382,6 +385,6 @@ def logP(CASRN, method=None):
     '''
     if not _logP_data_loaded: _load_logP_data()
     if method:
-        return retrieve_from_df_dict(logP_sources, CASRN, 'logP', method) 
+        return retrieve_from_df_dict(logP_sources, CASRN, 'logP', method)
     else:
-        return retrieve_any_from_df_dict(logP_sources, CASRN, 'logP') 
+        return retrieve_any_from_df_dict(logP_sources, CASRN, 'logP')

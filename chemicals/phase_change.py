@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains lookup functions for melting and boiling point, heat of 
+This module contains lookup functions for melting and boiling point, heat of
 fusion, various enthalpy of vaporization estimation routines, and dataframes
 of fit coefficients.
 
@@ -50,29 +50,28 @@ standard value, at 1 atm and the normal melting point.
 .. autofunction:: chemicals.phase_change.Hfus_methods
 .. autodata:: chemicals.phase_change.Hfus_all_methods
 
-Heat of Vaporization at Tb Correlations 
+Heat of Vaporization at Tb Correlations
 ---------------------------------------
 .. autofunction:: chemicals.phase_change.Riedel
 .. autofunction:: chemicals.phase_change.Chen
 .. autofunction:: chemicals.phase_change.Liu
 .. autofunction:: chemicals.phase_change.Vetere
 
-Heat of Vaporization at T Correlations 
+Heat of Vaporization at T Correlations
 --------------------------------------
 .. autofunction:: chemicals.phase_change.Pitzer
 .. autofunction:: chemicals.phase_change.SMK
 .. autofunction:: chemicals.phase_change.MK
 .. autofunction:: chemicals.phase_change.Velasco
-.. autofunction:: chemicals.phase_change.Pitzer
 .. autofunction:: chemicals.phase_change.Clapeyron
 .. autofunction:: chemicals.phase_change.Watson
 
-Heat of Vaporization at T Model Equations 
+Heat of Vaporization at T Model Equations
 -----------------------------------------
 .. autofunction:: chemicals.phase_change.Alibakhshi
 .. autofunction:: chemicals.phase_change.PPDS12
 
-Heat of Sublimation 
+Heat of Sublimation
 -------------------
 No specific correlation is provided. This value is fairly strongly temperature
 dependent; the dependency comes almost entirely from the vaporization
@@ -87,13 +86,13 @@ attribute of this module.
 .. data:: phase_change_data_Perrys2_150
 
     A collection of 344 coefficient sets from the DIPPR database published
-    openly in [1]_. Provides temperature limits for all its fluids. 
+    openly in [1]_. Provides temperature limits for all its fluids.
     See :obj:`chemicals.dippr.EQ106` for the model equation.
 
 .. data:: phase_change_data_VDI_PPDS_4
 
-    Coefficients for a equation form developed by the PPDS, published 
-    openly in [2]_. Extrapolates poorly at low temperatures. See :obj:`PPDS12` 
+    Coefficients for a equation form developed by the PPDS, published
+    openly in [2]_. Extrapolates poorly at low temperatures. See :obj:`PPDS12`
     for the model equation.
 
 .. data:: phase_change_data_Alibakhshi_Cs
@@ -113,7 +112,7 @@ attribute of this module.
     https://doi.org/10.1016/j.fluid.2016.10.013.
 
 The structure of each dataframe is shown below:
-    
+
 
 .. ipython::
 
@@ -127,8 +126,8 @@ The structure of each dataframe is shown below:
 
 """
 
-__all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm', 
-           'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen', 
+__all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm',
+           'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen',
            'Liu', 'Vetere', 'Alibakhshi','PPDS12', 'Watson', 'Hfus', 'Hfus_methods']
 
 import os
@@ -188,7 +187,7 @@ def _load_phase_change_constants():
     Hfus_sources = {
         CRC: Hfus_data_CRC,
     }
-    
+
 
 _phase_change_corrs_loaded = False
 def _load_phase_change_correlations():
@@ -199,14 +198,14 @@ def _load_phase_change_correlations():
     # 66554 for pandas; 19264 bytes for numpy
     phase_change_data_Perrys2_150 = data_source('Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
     phase_change_values_Perrys2_150 = np.array(phase_change_data_Perrys2_150.values[:, 1:], dtype=float)
-    
+
     # 52187 bytes for pandas, 13056 bytes for numpy
     phase_change_data_VDI_PPDS_4 = data_source('VDI PPDS Enthalpies of vaporization.tsv')
     phase_change_values_VDI_PPDS_4 = np.array(phase_change_data_VDI_PPDS_4.values[:, 2:], dtype=float)
-    
+
     phase_change_data_Alibakhshi_Cs = data_source('Alibakhshi one-coefficient enthalpy of vaporization.tsv')
     _phase_change_corrs_loaded = True
-    
+
 if PY37:
     def __getattr__(name):
         if name in ('Tb_data_Yaws', 'Tm_ON_data', 'Hvap_data_Gharagheizi',
@@ -215,9 +214,9 @@ if PY37:
             _load_phase_change_constants()
             return globals()[name]
         elif name in ('phase_change_data_Perrys2_150',
-                      'phase_change_values_Perrys2_150', 
-                      'phase_change_data_VDI_PPDS_4', 
-                      'phase_change_values_VDI_PPDS_4', 
+                      'phase_change_values_Perrys2_150',
+                      'phase_change_data_VDI_PPDS_4',
+                      'phase_change_values_VDI_PPDS_4',
                       'phase_change_data_Alibakhshi_Cs'):
             _load_phase_change_correlations()
             return globals()[name]
@@ -310,9 +309,9 @@ def Tb(CASRN, method=None):
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
-        return retrieve_from_df_dict(Tb_sources, CASRN, 'Tb', method) 
+        return retrieve_from_df_dict(Tb_sources, CASRN, 'Tb', method)
     else:
-        return retrieve_any_from_df_dict(Tb_sources, CASRN, 'Tb') 
+        return retrieve_any_from_df_dict(Tb_sources, CASRN, 'Tb')
 
 ### Melting Point
 
@@ -371,7 +370,7 @@ def Tm(CASRN, method=None):
     A total of three sources are available for this function. They are:
 
         * 'OPEN_NTBKM, a compillation of data on organics
-          as published in [1]_ as Open Notebook Melting Points; Averaged 
+          as published in [1]_ as Open Notebook Melting Points; Averaged
           (median) values were used when
           multiple points were available. For more information on this
           invaluable and excellent collection, see
@@ -400,9 +399,9 @@ def Tm(CASRN, method=None):
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
     elif method:
-        return retrieve_from_df_dict(Tm_sources, CASRN, 'Tm', method) 
+        return retrieve_from_df_dict(Tm_sources, CASRN, 'Tm', method)
     else:
-        return retrieve_any_from_df_dict(Tm_sources, CASRN, 'Tm') 
+        return retrieve_any_from_df_dict(Tm_sources, CASRN, 'Tm')
 
 ### Enthalpy of Vaporization at T
 
@@ -612,10 +611,10 @@ def SMK(T, Tc, omega):
     L0 = (A10*tau_13 + A20*tau_56 + A30*tau_other +
           tau*(B10 + tau*(B20 + B30*tau)))
 
-    L1 = (A11*tau_13 + A21*tau_56 + A31*tau_other + 
+    L1 = (A11*tau_13 + A21*tau_56 + A31*tau_other +
            tau*(B11 + tau*(B21 + B31*tau)))
 
-    domega = 4.016064257028112*(omega - omegaR1) # 4.016... = 1.0/(omegaR2 - omegaR1
+    domega = 4.016064257028112*(omega - omegaR1) # 4.016... = 1.0/(omegaR2 - omegaR1)
 #    domega = (omega - omegaR1)/(omegaR2 - omegaR1)
     return R*Tc*(L0 + domega*L1)
 
@@ -687,7 +686,7 @@ def MK(T, Tc, omega):
     tau_other = tau**1.2083
     tau2 = tau*tau
     tau3 = tau2*tau
-    
+
     H0 = (bs0[0]*tau_third + bs1[0]*tau_83 + bs2[0]*tau_other +
     bs3[0]*tau + bs4[0]*tau2 + bs5[0]*tau3)
 
@@ -973,9 +972,9 @@ def Vetere(Tb, Tc, Pc, F=1):
 ### Enthalpy of Vaporization adjusted for T
 
 def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
-    r'''Calculates enthalpy of vaporization of a chemical at a temperature 
+    r'''Calculates enthalpy of vaporization of a chemical at a temperature
     using the known heat of vaporization at another temperature according to
-    the Watson [1]_ [2]_ correlation. This is an application of the 
+    the Watson [1]_ [2]_ correlation. This is an application of the
     corresponding-states principle, with an emperical temperature dependence.
 
     .. math::
@@ -993,7 +992,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     Tc : float
         Critical temperature of fluid [K]
     exponent : float, optional
-        A fit exponent can optionally be used instead of the Watson 0.38 
+        A fit exponent can optionally be used instead of the Watson 0.38
         exponent, [-]
 
     Returns
@@ -1008,18 +1007,18 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     --------
     Predict the enthalpy of vaporization of water at 320 K from a point at
     300 K:
-        
+
     >>> Watson(T=320, Hvap_ref=43908, T_ref=300.0, Tc=647.14)
     42928.990094915454
-    
+
     The error is 0.38% compared to the correct value of 43048 J/mol.
 
     References
     ----------
-    .. [1] Watson, KM. "Thermodynamics of the Liquid State." Industrial & 
+    .. [1] Watson, KM. "Thermodynamics of the Liquid State." Industrial &
        Engineering Chemistry 35, no. 4 (1943): 398–406.
     .. [2] Martin, Joseph J., and John B. Edwards. "Correlation of Latent Heats
-       of Vaporization.” AIChE Journal 11, no. 2 (1965): 331-33. 
+       of Vaporization.” AIChE Journal 11, no. 2 (1965): 331-33.
        https://doi.org/10.1002/aic.690110226.
     '''
     Tr = T/Tc
@@ -1028,9 +1027,9 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     return H2
 
 ### Enthalpy of Vaporization model equations
-    
+
 def Alibakhshi(T, Tc, C):
-    r'''Calculates enthalpy of vaporization of a chemical at a temperature 
+    r'''Calculates enthalpy of vaporization of a chemical at a temperature
     using a theoretically-derived single-coefficient fit equation developed in
     [1]_. This model falls apart at ~0.8 Tc.
 
@@ -1054,17 +1053,17 @@ def Alibakhshi(T, Tc, C):
 
     Notes
     -----
-    The authors of [1]_ evaluated their model on 1890 compounds for a 
+    The authors of [1]_ evaluated their model on 1890 compounds for a
     temperature range of 50 K under `Tb` to 100 K below `Tc`, and obtained an
     average absolute relative error of 4.5%.
 
     Examples
     --------
     Predict the enthalpy of vaporization of water at 320 K:
-        
+
     >>> Alibakhshi(T=320.0, Tc=647.14, C=-16.7171)
     41961.30490225752
-    
+
     The error is 2.5% compared to the correct value of 43048 J/mol.
 
     References
@@ -1077,13 +1076,13 @@ def Alibakhshi(T, Tc, C):
     return (4.5*pi*N_A)**(1/3.)*4.2E-7*(Tc-6.) - R/2.*T*log(T) + C*T
 
 def PPDS12(T, Tc, A, B, C, D, E):
-    r'''Calculate the enthalpy of vaporization of a fluid using the 5-term 
+    r'''Calculate the enthalpy of vaporization of a fluid using the 5-term
     power fit developed by the PPDS and named PPDS equation 12.
-    
+
     .. math::
-       H_{vap} = RT_c \left(A\tau^{1/3} + B\tau^{2/3} + C\tau + D\tau^2 
+       H_{vap} = RT_c \left(A\tau^{1/3} + B\tau^{2/3} + C\tau + D\tau^2
        + E\tau^6\right)
-    
+
     .. math::
         \tau = 1 - \frac{T}{T_c}
 
@@ -1111,14 +1110,14 @@ def PPDS12(T, Tc, A, B, C, D, E):
 
     Notes
     -----
-    Coefficients can be found in [1]_, but no other source for these 
+    Coefficients can be found in [1]_, but no other source for these
     coefficients has been found.
 
     Examples
     --------
     >>> PPDS12(300.0, 591.75, 4.60584, 13.97224, -10.592315, 2.120205, 4.277128)
     37948.76862035925
-    
+
     References
     ----------
     .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
@@ -1156,13 +1155,13 @@ def Hfus_methods(CASRN):
     if not _phase_change_const_loaded: _load_phase_change_constants()
     return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
 
-def Hfus(CASRN, method=None): 
+def Hfus(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's heat of fusion.
     Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
 
-    The Preferred source is 'CRC'. Function has data for approximately 1100 
+    The Preferred source is 'CRC'. Function has data for approximately 1100
     chemicals.
 
     Parameters
@@ -1185,8 +1184,9 @@ def Hfus(CASRN, method=None):
     -----
     A total of one method is available for this function. They are:
 
-        * 'CRC', a compillation of data on organics and inorganics as published 
-        in [1]_.
+    * 'CRC', a compillation of data on organics and inorganics as published
+      in [1]_.
+
 
     Examples
     --------
@@ -1204,8 +1204,8 @@ def Hfus(CASRN, method=None):
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
-        return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method) 
+        return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method)
     else:
-        return retrieve_any_from_df_dict(Hfus_sources, CASRN, 'Hfus') 
+        return retrieve_any_from_df_dict(Hfus_sources, CASRN, 'Hfus')
 
 

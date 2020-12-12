@@ -35,7 +35,7 @@ try:
     import pint
     from pint import _DEFAULT_REGISTRY as u
     from pint import DimensionalityError
-    
+
 except ImportError: # pragma: no cover
     raise ImportError('The unit handling in fluids requires the installation '
                       'of the package pint, available on pypi or from '
@@ -64,7 +64,7 @@ variable_output_unit_funcs = {
                       (True, True, True, True): [u.J/u.mol],
                       (True, True, False, True): [u.J/u.mol], # cyclic_aliphatic flag
                       }, 4),
-    
+
     'Dadgostar_Shaw': ({(True, True, False): [u.J/u.kg/u.K],
                       (True, True, True): [u.J/u.mol/u.K],
                       }, 3),
@@ -74,7 +74,7 @@ variable_output_unit_funcs = {
     'Dadgostar_Shaw_integral_over_T': ({(True, True, False): [u.J/u.kg/u.K],
                       (True, True, True): [u.J/u.mol/u.K],
                       }, 3),
-    
+
     'Lastovka_solid': ({(True, True, False): [u.J/u.kg/u.K],
                       (True, True, True): [u.J/u.mol/u.K],
                       }, 3),
@@ -97,7 +97,7 @@ for name in dir(chemicals):
         continue
     __all__.append(name)
     __pint_wrapped_functions.update({name: obj})
-    
+
 globals().update(__pint_wrapped_functions)
 
 for name, val in variable_output_unit_funcs.items():
