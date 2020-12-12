@@ -2103,6 +2103,37 @@ def TEOS10_BAW_derivatives(T):
 
 ### Henry
 def iapws04_Henry_air(T):
+    r'''Calculate the Henry's law constant of air in water according to the
+    IAPWS-04 standard.
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    H : float
+        Henry's law constant, [1/Pa]
+
+    Notes
+    -----
+    The mole fractions of air in this model are 0.7812 N2, 0.2095 O2  and
+    0.0093 Ar.
+
+    Examples
+    --------
+    >>> iapws04_Henry_air(320.0)
+    1.0991553689889531e-10
+
+    References
+    ----------
+    .. [1] Fernández-Prini, Roberto, Jorge L. Alvarez, and Allan H. Harvey.
+       "Henry's Constants and Vapor-Liquid Distribution Constants for Gaseous
+       Solutes in H2O and D2O at High Temperatures." Journal of Physical and
+       Chemical Reference Data 32, no. 2 (June 2003): 903-16.
+       https://doi.org/10.1063/1.1564818.
+    '''
     # result has units of 1/Pa
     Tr = T*iapws95_Tc_inv
     Tr_inv = 1.0/Tr
@@ -2117,6 +2148,40 @@ def iapws04_Henry_air(T):
     return (0.7812*kH_N2 + 0.2095*kH_O2 + 0.0093*kH_Ar)/(1.01325*Psat)
 
 def iapws04_dHenry_air_dT(T):
+    r'''Calculate the temperature derivative of Henry's law constant of air in
+    water according to the IAPWS-04 standard. As the actual Henry's law
+    constant must be calculated as well, it is also returned.
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+
+    Returns
+    -------
+    dH_dT : float
+        First temperature derivative of Henry's law constant, [1/(Pa*K)]
+    H : float
+        Henry's law constant, [1/Pa]
+
+    Notes
+    -----
+    The mole fractions of air in this model are 0.7812 N2, 0.2095 O2  and
+    0.0093 Ar.
+
+    Examples
+    --------
+    >>> iapws04_dHenry_air_dT(320.0)
+    (-8.680064421141611e-13, 1.0991553689889561e-10)
+
+    References
+    ----------
+    .. [1] Fernández-Prini, Roberto, Jorge L. Alvarez, and Allan H. Harvey.
+       "Henry's Constants and Vapor-Liquid Distribution Constants for Gaseous
+       Solutes in H2O and D2O at High Temperatures." Journal of Physical and
+       Chemical Reference Data 32, no. 2 (June 2003): 903-16.
+       https://doi.org/10.1063/1.1564818.
+    '''
     dPsat_dT, Psat = iapws92_dPsat_dT(T)
     x1 = 1.0/Psat
     Tr = T*iapws95_Tc_inv
@@ -2144,82 +2209,3 @@ def iapws04_dHenry_air_dT(T):
         + x17*(x15*iapws95_Tc_inv + 1.52503385*x19 + x20*(x16 - 8.40954) + 4.3163939*x21) - x18*dPsat_dT))
     return dH_dT, H
 
-def ashrae1485_sat_err(xsat_w, T, P, Psat_w, Vsat_w, kappa_w, H, Baa, Bww, Baw,
-                       Caaa, Cwww, Caaw, Caww):
-    r'''Calculates the error in the saturation mole fraction of water according
-    to [1]_.
-
-    .. math::
-
-
-    Parameters
-    ----------
-    xsat_w : float
-        Guessed saturation mole fraction of water at `T` and `P`, [-]
-    T : float
-        Temperature, [K]
-    P : float
-        Pressure, [Pa]
-    Psat_w : float
-        Vapor pressure of water calculated with :obj:`Psat_IAPWS`, [Pa]
-    Vsat_w : float
-        Molar volume of water at the saturation pressure, [m^3/mol]
-    kappa_w : float
-        Isothermal coefficient of compressibility of water at `T` and `P`
-        according to IAPWS-95 [1/Pa]
-    H : float
-        Henry's constant of air in water at `T`, [1/Pa]
-    Baa : float
-        Air-air second molar virial cross coefficient [m^3/mol]
-    Bww : float
-        Water-water second molar virial cross coefficient [m^3/mol]
-    Baw : float
-        Air-water second molar virial cross coefficient [m^3/mol]
-    Caaa : float
-        Air air-air second molar virial cross coefficient [m^6/mol^2]
-    Cwww : float
-        Water water-water second molar virial cross coefficient [m^6/mol^2]
-    Caaw : float
-        Air air-water second molar virial cross coefficient [m^6/mol^2]
-    Caww : float
-        Air water-water second molar virial cross coefficient [m^6/mol^2]
-
-    Returns
-    -------
-    err : float
-        Water enhancement error; should be zero when converged, [-]
-
-    Notes
-    -----
-
-    Examples
-    --------
-
-    References
-    ----------
-    .. [1] Herrmann, Sebastian, Hans-Joachim Kretzschmar, and Donald P. Gatley.
-       "Thermodynamic Properties of Real Moist Air, Dry Air, Steam, Water, and
-       Ice (RP-1485)." HVAC&R Research 15, no. 5 (September 1, 2009): 961-986.
-       https://doi.org/10.1080/10789669.2009.10390874.
-    '''
-    R = 8.314472# table 3.1
-    RT_inv = 1.0/(R*T)
-
-    term0 = ((1.0 + kappa_w*Psat_w)*(P - Psat_w) - 0.5*kappa_w*(P*P - Psat_w*Psat_w))*Vsat_w
-    term1 = log(1.0 - H*(1.0 - xsat_w)*P)
-
-    term2 = RT_inv*((1.0 - xsat_w)**2*P*Baa - 2.0*(1.0 - xsat_w)**2*P*Baw
-            - (P - Psat_w - P*(1.0 - xsat_w)**2)*Bww)
-
-    t0 = (1.0 - xsat_w)**3*P*P*Caaa + 1.5*(1.0 - xsat_w)**2*(1.0 - 2.0*(1.0-xsat_w))*P**2*Caaw
-
-    t1 = -3.0*xsat_w*(1.0 - xsat_w)**2*P*P*Caww - 0.5*((3.0 - 2.0*xsat_w)*xsat_w*xsat_w*P*P - Psat_w*Psat_w)*Cwww
-
-    t2 =-xsat_w*(-2.0 + 3*xsat_w)*(1.0 - xsat_w)**2*P*P*Baa*Bww - 2.0*(-1.0 + 3.0*xsat_w)*(1.0 - xsat_w)**3*P*P*Baa*Baw
-
-    t3 = 6.0*xsat_w*xsat_w*(1.0 - xsat_w)**2*P*P*Baw*Bww - 1.5*(1.0 - xsat_w)**4*P*P*Baa*Baa
-
-    t4 = -2.0*xsat_w*(-2.0 + 3.0*xsat_w)*(1.0 - xsat_w)**2*P*P*Baw*Baw - 0.5*(Psat_w*Psat_w - (4.0 - 3.0*xsat_w)*xsat_w**3*P*P)*Bww*Bww
-
-    lnf = RT_inv*(term0) + term1 + term2 + RT_inv*RT_inv*(t0 + t1 + t2 + t3 + t4)
-    return exp(lnf)*Psat_w/P - xsat_w
