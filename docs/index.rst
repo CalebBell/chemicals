@@ -96,12 +96,13 @@ If you need to know something about a chemical, give chemicals a try.
    :caption: Developer's guide
    
    developers
+   water_steam_properties_python
 
 .. toctree::
    :maxdepth: 1
    :caption: Tutorials
    
-   water_steam_properties_python
+   
 
 Installation
 ------------
