@@ -37,7 +37,7 @@ from chemicals import normalize
 
 
 def RR_solution_mpmath(zs, Ks, dps=200):
-    # extremely important to validate high decimal precision with mpmath 
+    # extremely important to validate high decimal precision with mpmath
     # numerical issues make this an open research problem with respect to maintaining speed
     from mpmath import mp, mpf, findroot
 
@@ -61,7 +61,7 @@ def RR_solution_mpmath(zs, Ks, dps=200):
     V_over_F = findroot(objf, .5, tol=1e-100)
     xs = [0]*N
     ys = [0]*N
-    
+
     for i in range(N):
         xs[i] = float(zs[i]/(1 + V_over_F*Ks_minus_1[i]))
         ys[i] = float(xs[i]*Ks[i])
@@ -74,9 +74,9 @@ def assert_same_RR_results(zs, Ks, f0, f1, rtol=1e-9):
     V_over_F1, xs1, ys1 = f0(zs, Ks)
     V_over_F2, xs2, ys2 = f1(zs, Ks)
     assert_close(V_over_F1, V_over_F2, rtol=rtol)
-    assert_close1d(xs1, xs2, rtol=rtol)    
-    assert_close1d(ys1, ys2, rtol=rtol)    
-    
+    assert_close1d(xs1, xs2, rtol=rtol)
+    assert_close1d(ys1, ys2, rtol=rtol)
+
     zs_recalc1 = [xs1[i]*(1.0 - V_over_F1) + ys1[i]*V_over_F1 for i in range(N)]
     zs_recalc2 = [xs2[i]*(1.0 - V_over_F2) + ys2[i]*V_over_F2 for i in range(N)]
     assert_close1d(zs, zs_recalc1, rtol=rtol)
@@ -93,9 +93,20 @@ def test_RR_numpy():
     P = 1e3
     T_dew = 98.49898995287606
     Ks = [Wilson_K_value(T_dew, P, Tc=Tcs[i], Pc=Pcs[i], omega=omegas[i]) for i in range(len(zs))]
-    
+
     VF, xs, ys = Rachford_Rice_solution_numpy(zs, Ks)
     assert_close(VF, 1)
+
+
+    # Check it raises the correct exception if bad K values are given
+    with pytest.raises(PhaseCountReducedError):
+        zs = [0.0, 0.0885053990596404, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.721469918219507, 0.01742948033685831,
+              0.1725952023839942]
+        Ks = [192.3625321718047, 105.20070698573475, 76.30532397111489, 37.090890262982, 21.38862102676539, 18.093547012968767,
+              10.319129068837443, 9.001962137200403, 4.565198737490148, 340.69153314749224, 269.09234343328467,
+              21.858385052861507]
+        ans = Rachford_Rice_solution_numpy(zs, Ks, guess=0.5)
+
 
 def test_Rachford_Rice_flash_error():
     err = Rachford_Rice_flash_error(0.5, zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
@@ -112,12 +123,12 @@ def test_Rachford_Rice_solution():
         assert_close(V_over_F, V_over_F_expect)
         assert_close1d(xs, xs_expect)
         assert_close1d(ys, ys_expect)
-        
+
     V_over_F, xs, ys = Rachford_Rice_solution_numpy(zs=zs, Ks=Ks)
     assert_close(V_over_F, V_over_F_expect)
     assert_close1d(xs, xs_expect)
     assert_close1d(ys, ys_expect)
-    
+
     # TODO support
     zs = [0.1]*10
     Ks = [8392.392499558426, 12360.984782058651, 13065.127660554343, 13336.292668013915, 14828.275288641305, 15830.9627719128, 17261.101575196506, 18943.481861916727, 21232.279762917482, 23663.61696650799]
@@ -133,8 +144,8 @@ def test_Rachford_Rice_solution_LN2_backup():
     assert_close1d(xs, xs_expect)
     assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0.0001234423100003866)
-    
-    
+
+
     # Case where the derivative goes to zero
     Ks = [15.464909530837806, 7006.64008090944, 1.8085837711444488, 0.007750676421035811, 30.98450366497431]
     zs = [0.26562380186293233, 0.04910234829974003, 0.284394553603828, 0.006300023876072552, 0.3945792723574272]
@@ -144,7 +155,7 @@ def test_Rachford_Rice_solution_LN2_backup():
     assert_close1d(xs, xs_expect)
     assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0.999999999000000)
-    
+
     # Case where solver not in range
     zs = [0.4050793625620341, 0.07311645032153137, 0.0739927977508874, 0.0028093939126068498, 0.44500199545294034]
     Ks = [7.330341496863982e-19, 13.676812750105826, 8.152759918973137e-21, 4.6824608110480365e-35, 7.707355701762951e-18]
@@ -154,7 +165,7 @@ def test_Rachford_Rice_solution_LN2_backup():
     assert_close1d(xs, xs_expect)
     assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0, atol=1e-15)
-    
+
     # Case where the evaluated point is right on the boundary
     Ks = [1.2566703532018493e-21, 3.35062752053393, 1.0300675710905643e-23, 1.706258568414198e-39, 1.6382855298440747e-20]
     zs = [0.13754371891028325, 0.2984515568715462, 0.2546683930289046, 0.08177453852283137, 0.22756179266643456]
@@ -202,11 +213,11 @@ def test_flash_inner_loop():
 
     methods = flash_inner_loop_methods(4)
     assert methods == ['Analytical', 'Leibovici and Nichita 2', 'Rachford-Rice (Secant)',
-                            'Rachford-Rice (Newton-Raphson)', 
+                            'Rachford-Rice (Newton-Raphson)',
                             'Rachford-Rice (Halley)', 'Rachford-Rice (NumPy)',
                             'Li-Johns-Ahmadi',
                              'Rachford-Rice (polynomial)']
-    
+
     # case with a guess
     flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], guess=.7)
 
@@ -227,13 +238,13 @@ def test_flash_solution_algorithms():
 #    z1, z2, K1, K2, VF = symbols('z1, z2, K1, K2, VF')
 #    expr = z1*(K1 - 1)/(1 + VF*(K1-1)) + z2*(K2 - 1)/(1 + VF*(K2-1))
 #    solve(expr, VF)
-    
+
 #    from sympy import *
 #    z1, z2, z3, K1, K2, K3, VF = symbols('z1, z2, z3, K1, K2, K3, VF')
 #    expr = z1*(K1 - 1)/(1 + VF*(K1-1)) + z2*(K2 - 1)/(1 + VF*(K2-1)) + z3*(K3 - 1)/(1 + VF*(K3-1))
 #    ans = solve(expr, VF)
 
-    
+
     flash_inner_loop_secant = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (Secant)')
     flash_inner_loop_NR = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (Newton-Raphson)')
     flash_inner_loop_halley = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (Halley)')
@@ -241,16 +252,16 @@ def test_flash_solution_algorithms():
     flash_inner_loop_LJA = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Li-Johns-Ahmadi')
     flash_inner_loop_poly = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (polynomial)')
     flash_inner_loop_LN2 = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Leibovici and Nichita 2')
-    
+
 
     algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
-                  flash_inner_loop, flash_inner_loop_secant, 
-                  flash_inner_loop_NR, flash_inner_loop_halley, 
+                  flash_inner_loop, flash_inner_loop_secant,
+                  flash_inner_loop_NR, flash_inner_loop_halley,
                   flash_inner_loop_numpy, flash_inner_loop_LJA,
                   flash_inner_loop_poly, flash_inner_loop_LN2]
     for algo in algorithms:
-        
-        
+
+
         # dummpy 2 test
         zs, Ks = [.4, .6], [2, .5]
         V_over_F_expect = 0.2
@@ -258,7 +269,7 @@ def test_flash_solution_algorithms():
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect)
         assert_close1d(xs, xs_expect)
-        
+
         # Hard to resolve two test; LN2 fails, its objective function does not
         # appear to have any zeroes due to numerical issues.
         # How to handle?
@@ -320,7 +331,7 @@ def test_flash_solution_algorithms():
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
         assert_close1d(xs, xs_expect, rtol=1E-6)
-        
+
         # Long tests - do not want to test with poly
         if algo is flash_inner_loop_poly:
             continue
@@ -355,24 +366,24 @@ def test_flash_solution_algorithms():
         V_over_F, _, _ = algo(zs=zs, Ks=Ks)
 
         assert_close(V_over_F, 0.191698639911785)
-        
+
         # Example 2 in Gaganis, Vassilis, Dimitris Marinakis, and Nikos Varotsis. “A General Framework of Model Functions for Rapid and Robust Solution of Rachford–Rice Type of Equations.” Fluid Phase Equilibria 322–323 (May 25, 2012): 9–18. https://doi.org/10.1016/j.fluid.2012.03.001.
         # Claims 4 iterations
         # Some methods fail
         Ks = [2.9086E1, 8.7438E0, 1.9317E0, 7.9137E-1, 3.2918E-1, 1.5721E-1, 1.7684E-2, 1.4677E-5]
-        zs = [2.8688E-5, 7.0701E-2, 1.3198E-1, 1.3039E-1, 2.7631E-2, 3.5986E-2, 4.5207E-1, 1.5122E-1]   
+        zs = [2.8688E-5, 7.0701E-2, 1.3198E-1, 1.3039E-1, 2.7631E-2, 3.5986E-2, 4.5207E-1, 1.5122E-1]
         if algo not in (Li_Johns_Ahmadi_solution, flash_inner_loop_LJA):
             # The LJA algo finds a perfect zero in its own method... but for this problem, converges differently
             V_over_F, _, _ = algo(zs=zs, Ks=Ks)
             assert_close(V_over_F, -1.8928931615799782e-05, rtol=5e-4)
 
-        # Very very tough problem for all methods due to floating point issues! 
+        # Very very tough problem for all methods due to floating point issues!
         # Came from a Wilson flash for VF = 1, T = 300K; pressure is around 0.006 Pa
         zs = [9.11975115499676e-05, 9.986813065240533e-05, 0.0010137795304828892, 0.019875879000370657, 0.013528874875432457, 0.021392773691700402, 0.00845450438914824, 0.02500218071904368, 0.016114189201071587, 0.027825798446635016, 0.05583179467176313, 0.0703116540769539, 0.07830577180555454, 0.07236459223729574, 0.0774523322851419, 0.057755091407705975, 0.04030134965162674, 0.03967043780553758, 0.03514481759005302, 0.03175471055284055, 0.025411123554079325, 0.029291866298718154, 0.012084986551713202, 0.01641114551124426, 0.01572454598093482, 0.012145363820829673, 0.01103585282423499, 0.010654818322680342, 0.008777712911254239, 0.008732073853067238, 0.007445155260036595, 0.006402875549212365, 0.0052908087849774296, 0.0048199150683177075, 0.015943943854195963, 0.004452253754752775, 0.01711981267072777, 0.0024032720444511282, 0.032178399403544646, 0.0018219517069058137, 0.003403378548794345, 0.01127516775495176, 0.015133143423489698, 0.029483213283483682]
         Ks = [11266712779.420027, 878492232.6773384, 276137963.8440058, 4326171618.091249, 573047115.7000155, 131436201.37184711, 49144960.82699592, 34263188.970916145, 13026505.192595435, 9843992.470472587, 3181564.1430952367, 1098600.248012159, 398336.89725376305, 147470.4607802813, 67566.76902751227, 23297.414225523942, 10686.776470987174, 4072.207866361747, 1521.3427782410724, 845.019208473066, 341.75877360772205, 194.91347949534864, 87.37639967685602, 43.81742706130358, 20.123099010095398, 11.2277426008874, 5.873713068861075, 2.3291630622640436, 1.3236952322694902, 0.5190977953895624, 0.33652998006213003, 0.1020194939160233, 0.11957263833876645, 0.036296673021294995, 0.022599820560813874, 2170843.2559104185, 756159.852797745, 292204.024675241, 208695.52033667514, 77287.61740255292, 6429786.948979916, 1914236.7164609663, 3164023.516416859, 1042916.2797133088]
         V_over_F, _, _ = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, 1, atol=0.001)
-            
+
 def test_RR3_analytical_handle_imag_result():
     Ks = [0.9999533721721108, 1.0002950232772678, 0.9998314089519726]
     zs = [0.8486684394734213, 0.14038238201968353, 0.010949178506895217]
@@ -412,7 +423,7 @@ def test_fuzz_flash_inner_loop():
                     break
         if K_neg and K_pos:
             flash_inner_loop(zs=zs, Ks=Ks)
-    
+
 def test_RR_3_component_analytical_killers():
     # 3 ms test - need to replace assert_close1ds
     # Causes a zero division in the current analytical implementation
@@ -424,35 +435,35 @@ def test_RR_3_component_analytical_killers():
     V_over_F_expect = -132.57775072987795
     xs_expect = [0.32364856217161636, 0.6641943926907056, 0.01215704513767788]
     ys_expect = [0.3236485568923745, 0.6641943990933973, 0.012157044014228065]
-    
+
     methods = flash_inner_loop_methods(3)
     for method in methods:
         V_over_F, xs, ys = flash_inner_loop(zs, Ks, method=method)
         assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
         assert_close1d(xs, xs_expect, rtol=1e-5)
         assert_close1d(ys, ys_expect, rtol=1e-5)
-    
+
     zs = [.8, 0.19, .01]
     Ks = [1.0003745026538315, 0.9983665794975959, 1.0010499948551157]
     V_over_F, xs, ys = flash_inner_loop(zs, Ks, method='Analytical')
     V_over_F_good, xs_good, ys_good = Rachford_Rice_solution(zs, Ks)
     assert not isclose(V_over_F, V_over_F_good)
-        
+
 def test_RR_9_guess_outside_bounds():
     zs = [0.019940159581097128, 0.0029910239371645692, 9.970079790548564e-07, 0.6480551863856566, 0.12961103727713133, 0.08973071811493706, 0.04985039895274282, 0.029910239371645688, 0.029910239371645688]
     Ks = [3.5485897145055816e-06, 0.002018123183156661, 0.019945350603929494, 2.7529940298098384e-05, 2.3624326321851173e-05, 2.3490645243135485e-06, 1.891034975611742e-07, 7.690760330909594e-09, 634.2139456449565]
     guess = 0.028368024647511682
-    
+
     V_over_F_expect = 0.028379070106453616
     xs_expect = [0.020522568936985175, 0.0030782042140309754, 1.025531116615776e-06, 0.6669830232661768, 0.13339661987044737, 0.09235156345203366, 0.05130642737684176, 0.030783856589219376, 0.0015767107631482343]
     ys_expect = [7.282617704501734e-08, 6.2121952868264395e-06, 2.0454577676140954e-08, 1.836200281036301e-05, 3.151405278051385e-06, 2.1693978147006393e-07, 9.702224864329157e-09, 2.367512630887783e-10, 0.9999719542371123]
-    
+
     V_over_F, xs, ys = Rachford_Rice_solution_LN2(zs, Ks, guess=guess)
     assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
     assert_close1d(xs, xs_expect, rtol=1e-5)
     assert_close1d(ys, ys_expect, rtol=1e-5)
-    
-    # Check all the methods anyway 
+
+    # Check all the methods anyway
     methods = flash_inner_loop_methods(len(zs))
     for method in methods:
         # 9 coeff root finding is numerically terrible - has a false root, and doesn't quite bracket
@@ -466,7 +477,7 @@ def test_RR_9_guess_outside_bounds():
 
 def validate_RR_convergence(ns, Ks, betas, n=1000):
     # TODO better support for n phases
-    
+
     for _ in range(n):
         beta_guess = []
         for _ in range(len(betas)):
@@ -482,7 +493,7 @@ def validate_RR_convergence(ns, Ks, betas, n=1000):
 
 
 def test_Rachford_Rice_solution2():
-    
+
     n_composition_fuzz = 0
     # Example 1 in Okuno 2010
     zs = [0.204322076984, 0.070970999150, 0.267194323384, 0.296291964579, 0.067046080882, 0.062489248292, 0.031685306730]
@@ -493,12 +504,12 @@ def test_Rachford_Rice_solution2():
     # Obtained with numdiffftools's Jacobian function
     fs_expect = [0.22327453005006953, -0.10530391302991113]
     jac_expect = [[-0.7622803760231517, -0.539733935411029], [-0.539733935411029, -0.86848106463838]]
-    
+
     for func in (Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac):
         f, jac = func(betas, zs, [Ks_y, Ks_z])
         assert_close1d(f, fs_expect)
         assert_close1d(jac, jac_expect)
-    
+
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=.1, beta_z=.6)
     xs_expect = [0.1712804659711611, 0.08150738616425436, 0.1393433949193188, 0.20945175387703213, 0.15668977784027893, 0.22650123851718007, 0.015225982711774586]
     ys_expect = [0.21147483364299702, 0.07313470386530294, 0.31982891387635903, 0.33293382568889657, 0.036586042443791586, 0.004616341311925655, 0.02142533917172731]
@@ -510,8 +521,8 @@ def test_Rachford_Rice_solution2():
     # Guesses that go out of bounds:
 #    x0 = [.3, .55], [.3, .8]
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.6868328915094766, 0.06019424397668606], n=n_composition_fuzz)
-    
-    
+
+
 
     # Example 2 in Okuno 2010
     zs = [0.132266176697, 0.205357472415, 0.170087543100, 0.186151796211, 0.111333894738, 0.034955417168, 0.159847699672]
@@ -567,15 +578,15 @@ def test_Rachford_Rice_solution2():
     zs = [0.0315583329803, 0.4071270076623, 0.4751941671726, 0.0545811711566, 0.0115700446895, 0.0189113955704, 0.0000455484805, 0.0006404014374, 0.0003675973687, 0.0000037504895, 0.0000002428846, 0.0000001594408, 0.0000000228589, 0.0000000202543, 0.0000001375537]
     Ks_y = [1.8528741428663, 0.2314055308386, 0.5041709444335, 0.0635482083897, 0.4078908506272, 0.5066231481075, 27.1901689643580, 0.0765095693423, 0.1284992832837, 1.4795557872248, 12.7769884293417, 13.7666844672269, 52.4995561949013, 33.9539240672109, 5.1979194333821]
     Ks_z = [1.8115659762243, 0.6954909860157, 0.0001084501767, 0.0012603511720, 0.0013474694481, 0.0000038929319, 0.0035219133166, 0.0000171923836, 0.0000021965300, 0.0001633840436, 0.0016090228536, 0.0007523046170, 0.0000798682401, 0.0000023516037, 0.0000127574489]
-    
+
     xs_expect = [0.4366767940810, 0.3003165208873, 0.2227137374279, 0.0255077448600, 0.0054220598442, 0.0088630653086, 0.0000271151486, 0.0002991176091, 0.0001717657315, 0.0000017714844, 0.0000001261729, 0.0000000835080, 0.0000000181866, 0.0000000129031, 0.0000000669487]
     ys_expect = [0.8091071405424, 0.0694949039355, 0.1122857953373, 0.0016209714859, 0.0022116086020, 0.0044902340485, 0.0007372654706, 0.0000228853595, 0.0000220717734, 0.0000026210100, 0.0000016121100, 0.0000011496277, 0.0000009547879, 0.0000004381100, 0.0000003479939]
     zs_expect = [0.7910688227638, 0.2088674332287, 0.0000241533442, 0.0000321487161, 0.0000073060600, 0.0000000345033, 0.0000000954972, 0.0000000051425, 0.0000000003773, 0.0000000002894, 0.0000000002030, 0.0000000000628, 0.0000000000015, 0.0000000000000, 0.0000000000009]
     # Two other solutions -(0.8, 0.26) or (0.2, 0.9) will converge, both have negative compositions
-    
-    # -0.01686263294, -1.1254155641 claimed to be ans 
+
+    # -0.01686263294, -1.1254155641 claimed to be ans
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=0, beta_z=-1.12)
-    
+
     assert_close1d([ans[0], ans[1]], [-0.01686263291292747, -1.1254155641065355])
     assert_close1d(ans[2], xs_expect, atol=1e-12)
     assert_close1d(ans[3], ys_expect, atol=1e-11)
@@ -584,13 +595,13 @@ def test_Rachford_Rice_solution2():
 
 
     # Ks from tables 8 and 9 from Pan, Huanquan, Michael Connolly, and Hamdi
-    # Tchelepi. “Multiphase Equilibrium Calculation Framework for Compositional 
+    # Tchelepi. “Multiphase Equilibrium Calculation Framework for Compositional
     # Simulation of CO2 Injection in Low-Temperature Reservoirs.” Industrial &
     # Engineering Chemistry Research, January 4, 2019. https://doi.org/10.1021/acs.iecr.8b05229.
     # Compositions in supporting information
     JEMA_Ks_g = [1.546336826, 2.379576919, 0.8818093562, 0.3597420492, 0.0440420288, 0.0008924834994, 1.302131664E-06]
     JEMA_Ks_l2 = [1.544580305, 2.336017325, 0.8869147335, 0.3712005301, 0.0476811452, 0.001059266958, 1.76617359E-06]
-    
+
     # CO2 first component in all lists
     JEMA_zs = [0.0693, 0.1742, 0.1944, 0.3138, 0.1549, 0.0742]
     JEMA_zs = [0.893] + [i*(1 - 0.893)/sum(JEMA_zs) for i in JEMA_zs]
@@ -598,13 +609,13 @@ def test_Rachford_Rice_solution2():
     beta_y, beta_z, xs, ys, zs = Rachford_Rice_solution2(JEMA_zs, JEMA_Ks_g, JEMA_Ks_l2)
     assert_close(beta_y, -0.37293697094541645)
     assert_close(beta_z, 1.2080206455621543)
-    
+
     MSO_Ks_g = [1.420340741, 0.2964408254, 0.1805854981, 0.09303281846, 0.03891826286, 0.01263057652, 0.001106068886]
     MSO_Ks_l2 = [1.479781968, 0.06117039468, 0.01625155948, 0.002749741486, 0.0002664184498, 1.309992275E-05, 1.928151262E-08]
     MSO_zs =  [0.2354, 0.3295, 0.1713, 0.1099, 0.0574, 0.0965]
-    
+
     MSO_zs = [0.9483] + [i*(1 - 0.9483)/sum(MSO_zs) for i in MSO_zs]
-    
+
     beta_y, beta_z, xs, ys, zs = Rachford_Rice_solution2(MSO_zs, MSO_Ks_g, MSO_Ks_l2)
     assert_close1d([beta_y, beta_z], [0.0005228950085238463, 0.857047095608143])
 
@@ -616,16 +627,16 @@ def test_Rachford_Rice_solutionN_vs_flash_inner_loop():
     betas, comps = Rachford_Rice_solutionN(zs, Ks=[Ks], betas=[.5])
     beta_y, beta_x = betas
     ys, xs = comps
-    
+
     beta_y_1d, xs_1d, ys_1d = flash_inner_loop(zs, Ks)
     assert_close(beta_y, beta_y_1d)
     assert_close1d(xs_1d, xs)
     assert_close1d(ys, ys_1d)
-    
-    
+
+
 def test_Rachford_Rice_solutionN():
     # 5 phase example!
-    # Example 2 in Gao, Ran, Xiaolong Yin, and Zhiping Li. "Hybrid Newton-Successive 
+    # Example 2 in Gao, Ran, Xiaolong Yin, and Zhiping Li. "Hybrid Newton-Successive
     # Substitution Method for Multiphase Rachford-Rice Equations." Entropy 20,
     #  no. 6 (June 2018): 452. https://doi.org/10.3390/e20060452.
     zs = [0.3817399509140, 0.0764336433731, 0.1391487737570, 0.0643992218952, 0.1486026004951, 0.0417212486653, 0.1227693500767, 0.0213087870239, 0.0016270350309, 0.0021307432306, 0.0000917810305, 0.0000229831930, 0.0000034782551, 0.0000001126367, 0.0000002344634, 0.0000000038064, 0.0000000173126, 0.0000000281366, 0.0000000042589, 0.0000000024453]
@@ -634,23 +645,23 @@ def test_Rachford_Rice_solutionN():
     Ks2 = [2.1341148433378, 1.9043018392943, 0.0144945209799, 0.0442168936781, 0.0787337170042, 0.0560494950996, 0.0770042412753, 0.0025050231128, 0.1031743167040, 0.0022130957042, 0.1928690729187, 0.0588393075672, 0.3556852336181, 1.7486777932718, 1.8885719459373, 97.7361071036055, 6.0072238022229, 4.0574761982724, 35.1553173521778, 31.9676317062480]
     Ks3 = [0.7101073236142, 6.0440859895389, 0.4369041160293, 0.9918488866995, 0.7768884555186, 0.2134611795537, 0.0239948965688, 0.0218059421417, 0.1708086119388, 0.0932727495955, 1.0014414881636, 4.0996590670858, 0.1045382819199, 29.0578470200348, 13.7002699311125, 6.6483533942909, 18.7742085574180, 5.2779281096742, 9.0540032759730, 2.5158440811075]
     betas = [.2, .2, .2, .2]
-    
+
     comps_expect = [[0.9161781565910, 0.0657332011406, 0.0160032740856, 0.0003986252704, 0.0003254638212, 0.0004794773913, 0.0007745137206, 0.0000815232125, 0.0000215548051, 0.0000018460956, 0.0000010836688, 0.0000007760273, 0.0000000655938, 0.0000003322911, 0.0000000712038, 0.0000000196710, 0.0000000149415, 0.0000000002201, 0.0000000000028, 0.0000000002460],
                     [0.0703377430444, 0.1627432269869, 0.3941941327593, 0.1369058721276, 0.1167269703543, 0.0893335859206, 0.0192373761213, 0.0007031494410, 0.0011587406941, 0.0055236243798, 0.0024299319085, 0.0006570806789, 0.0000372997780, 0.0000097940117, 0.0000002580951, 0.0000006859566, 0.0000001517188, 0.0000002002775, 0.0000001709606, 0.0000000047849],
                     [0.8219077915568, 0.1498297868279, 0.0020066794190, 0.0028308978284, 0.0115654002029, 0.0023177344403, 0.0092945598936, 0.0000524356412, 0.0001655101790, 0.0000046777816, 0.0000192022086, 0.0000014956648, 0.0000012665513, 0.0000002971170, 0.0000004678207, 0.0000012519326, 0.0000001185027, 0.0000001200651, 0.0000002135856, 0.0000000927811],
                     [0.2734823498098, 0.4755465214053, 0.0604867521264, 0.0635011332973, 0.1141191632121, 0.0088269542238, 0.0028962301245, 0.0004564463108, 0.0002740077651, 0.0001971489765, 0.0000997043646, 0.0001042112156, 0.0000003722479, 0.0000049372049, 0.0000033937126, 0.0000000851609, 0.0000003703530, 0.0000001561795, 0.0000000550075, 0.0000000073018],
                     [0.3851281921976, 0.0786796419224, 0.1384439969943, 0.0640229919586, 0.1468925975170, 0.0413515667922, 0.1207019216039, 0.0209321985655, 0.0016041800354, 0.0021136824783, 0.0000995608488, 0.0000254194834, 0.0000035608768, 0.0000001699095, 0.0000002477114, 0.0000000128093, 0.0000000197267, 0.0000000295911, 0.0000000060755, 0.0000000029023]]
-    
+
     beta_solution = [-0.00538660799, -0.00373696250, -0.00496311432, -0.00415370309]
     beta_solution.append(1.0 - sum(beta_solution))
     Ks = [Ks0, Ks1, Ks2, Ks3]
-    
+
     # Angry solution - spends lots of time in the damping, goes down to 0.001 even
     # Would be a great candidate for a line search
     betas, comps = Rachford_Rice_solutionN(zs, Ks, betas)
     for beta_i, beta_known in zip(betas, beta_solution):
         assert_close(beta_i, beta_known, atol=1e-8)
-    
+
     for comp_calc, comp_expect in zip(comps, comps_expect):
         assert_close1d(comp_calc, comp_expect, atol=1e-9)
 
@@ -658,24 +669,24 @@ def test_Rachford_Rice_solutionN():
 @pytest.mark.mpmath
 def test_Rachford_Rice_solution_trace():
     # Most of these end up being solved by Halley's method with no transformation
-    # after failing at LN2. 
-    
+    # after failing at LN2.
+
     zs = [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
     Ks = [8755306854.943026, 7.393334548416551e-16, 6.87130044872998e-79]
     assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
-    
+
     zs = [0.2333333333333333, 0.1, 0.3333333333333333, 0.3333333333333333]
     Ks = [8755306854.943026, 1.1, 7.393334548416551e-16, 6.87130044872998e-79]
     assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
-    
+
     zs = [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
     Ks = [1e3, 1e4, 1e-17]
     assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
-    
+
     zs = [.25, .25, .25, .25]
     Ks = [100, .1, 1e-16, 1e-50]
     assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
-    
+
     zs = [0.4, 0.6]
     Ks = [1e3, 1e-17]
     assert_same_RR_results(zs, Ks, RR_solution_mpmath, flash_inner_loop, rtol=1e-13)
@@ -694,32 +705,32 @@ def test_Rachford_Rice_polynomial():
     coeffs_3 = [1, -3.692652996676083, 2.073518878815094]
     poly = Rachford_Rice_polynomial(zs, Ks)
     assert_close1d(coeffs_3, poly)
-    
+
     zs = [0.2, 0.3, 0.4, 0.1]
     Ks = [2.5250, 0.7708, 1.0660, 0.2401]
     coeffs_4 =  [1, 5.377031669207758, -24.416684496523914, 10.647389883139642]
     poly = Rachford_Rice_polynomial(zs, Ks)
     assert_close1d(coeffs_4, poly)
-    
+
     zs = [0.2, 0.3, 0.4, 0.05, 0.05]
     Ks = [2.5250, 0.7708, 1.0660, 0.2401, 0.3140]
     poly = Rachford_Rice_polynomial(zs, Ks)
     coeffs_5 = [1.0, 3.926393887728915, -32.1738043292604, 45.82179827480925, -15.828236126660224]
     assert_close1d(coeffs_5, poly)
-    
+
     # 6 and higher use generic routine
     zs = [0.05, 0.10, 0.15, 0.30, 0.30, 0.10]
     Ks = [6.0934, 2.3714, 1.3924, 1.1418, 0.6457, 0.5563]
     coeffs_6 = [1.0, 3.9413425113979077, -9.44556472337601, -18.952349132451488, 9.04210538319183, 5.606427780744831]
     poly = Rachford_Rice_polynomial(zs, Ks)
     assert_close1d(coeffs_6, poly)
-    
+
     Ks = [0.9, 2.7, 0.38, 0.098, 0.038, 0.024, 0.075]
     zs = [0.0112, 0.8957, 0.0526, 0.0197, 0.0068, 0.0047, 0.0093]
     poly = Rachford_Rice_polynomial(zs, Ks)
     coeffs_7 = [1.0, -15.564752719919635, 68.96609128282495, -141.05508474225547, 150.04980583027202, -80.97492465198536, 17.57885132690501]
     assert_close1d(coeffs_7, poly)
-    
+
     Ks = [0.90000, 2.70000, 0.38000, 0.09800, 0.03800, 0.02400, 0.07500, 0.00019]
     zs = [0.0112, 0.8957, 0.0526, 0.0197, 0.0068, 0.0047, 0.0038, 0.0055]
     poly = Rachford_Rice_polynomial(zs, Ks)
@@ -733,18 +744,18 @@ def test_Rachford_Rice_polynomial_large():
     # 19 takes ~1 sec
     zs = [0.3727, 0.0772, 0.0275, 0.0071, 0.0017, 0.0028, 0.0011, 0.0015, 0.0333, 0.0320, 0.0608, 0.0571, 0.0538, 0.0509, 0.0483, 0.0460, 0.0439, 0.0420, 0.0403]
     Ks = [7.11, 4.30, 3.96, 1.51, 1.20, 1.27, 1.16, 1.09, 0.86, 0.80, 0.73, 0.65, 0.58, 0.51, 0.45, 0.39, 0.35, 0.30, 0.26]
-    coeffs_19 = [1.0, -0.8578819552817947, -157.7870481947649, 547.7859890170784, 6926.565858999385, 
-                 -39052.793041087636, -71123.61208697906, 890809.1105085013, -1246174.7361619857, 
+    coeffs_19 = [1.0, -0.8578819552817947, -157.7870481947649, 547.7859890170784, 6926.565858999385,
+                 -39052.793041087636, -71123.61208697906, 890809.1105085013, -1246174.7361619857,
                  -5633651.629883111, 21025868.75287835, -15469951.107862322, -41001954.18122998,
                  97340936.26910116, -72754773.28565726, 4301672.656674517, 17784298.9111024,
                  -3479139.4994188584, -1635369.1552006816]
-    
+
     poly = Rachford_Rice_polynomial(zs, Ks)
     assert_close1d(coeffs_19, poly)
-    
-    # doubling 19 runs out of ram. 
-    
-    
+
+    # doubling 19 runs out of ram.
+
+
 def test_Rachford_Rice_polynomial_solution_VFs():
     zs = [0.2, 0.3, 0.4, 0.05, 0.05]
     Ks = [2.5250, 0.7708, 1.0660, 0.2401, 0.3140]
@@ -760,8 +771,8 @@ def test_check_flash_inner():
     assert_close1d(xs_expect, xs)
     assert_close1d(ys_expect, ys)
     assert_close(VF, VF_expect)
-    
-    
+
+
     zs = [0.3333333333333333, 0.3333333333333333, 0.3333333333333333]
     Ks = [9.340698220307541e-10, 0.7685310477822435, 3.399419742763956e-17]
     guess = 4.440892098500627e-16

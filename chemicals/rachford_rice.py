@@ -828,6 +828,8 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
 #            Kmin = Ks[i] # numba: uncomment
     Kmin = Ks.min() # numba: delete
     Kmax = Ks.max() # numba: delete
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
     z_of_Kmax = zs[Ks == Kmax][0] # numba: delete
 
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.-Kmin))/((1.-Kmin)*(Kmax-1.))
@@ -858,7 +860,7 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
 
     try:
         V_over_F = halley(Rachford_Rice_numpy_err_fprime2, x0, high=V_over_F_max*one_epsilon_smaller,
-                          low=V_over_F_min*one_epsilon_larger, xtol=1e-12, args=(zs_k_minus_1, K_minus_1),
+                          low=V_over_F_min*one_epsilon_larger, xtol=1e-13, args=(zs_k_minus_1, K_minus_1),
                           bisection=True)
 #        V_over_F = secant(Rachford_Rice_numpy_err, x0, high=V_over_F_max*one_epsilon_smaller,
 #                          low=V_over_F_min*one_epsilon_larger, ytol=1e-5, xtol=1.48e-8, args=(zs_k_minus_1, K_minus_1))
