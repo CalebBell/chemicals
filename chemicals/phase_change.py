@@ -65,6 +65,7 @@ Heat of Vaporization at T Correlations
 .. autofunction:: chemicals.phase_change.Velasco
 .. autofunction:: chemicals.phase_change.Clapeyron
 .. autofunction:: chemicals.phase_change.Watson
+.. autofunction:: chemicals.phase_change.Watson_n
 
 Heat of Vaporization at T Model Equations
 -----------------------------------------
@@ -128,7 +129,8 @@ The structure of each dataframe is shown below:
 
 __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm',
            'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen',
-           'Liu', 'Vetere', 'Alibakhshi','PPDS12', 'Watson', 'Hfus', 'Hfus_methods']
+           'Liu', 'Vetere', 'Alibakhshi','PPDS12', 'Watson', 'Watson_n',
+           'Hfus', 'Hfus_methods']
 
 import os
 from fluids.numerics import numpy as np
@@ -398,10 +400,11 @@ def Tm(CASRN, method=None):
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
-    elif method:
+    if method:
         return retrieve_from_df_dict(Tm_sources, CASRN, 'Tm', method)
     else:
         return retrieve_any_from_df_dict(Tm_sources, CASRN, 'Tm')
+
 
 ### Enthalpy of Vaporization at T
 
@@ -978,7 +981,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     corresponding-states principle, with an emperical temperature dependence.
 
     .. math::
-        \frac{\Delta H_{vap}^{T2}}{\Delta H_{vap}^{T1}}  = \left(
+        \frac{\Delta H_{vap}^{T1}}{\Delta H_{vap}^{T2}}  = \left(
         \frac{1-T_{r,1}}{1-T_{r,2}} \right)^{0.38}
 
     Parameters
@@ -1013,6 +1016,8 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
 
     The error is 0.38% compared to the correct value of 43048 J/mol.
 
+    If the provided temperature is above the critical point, zero is returned.
+
     References
     ----------
     .. [1] Watson, KM. "Thermodynamics of the Liquid State." Industrial &
@@ -1022,9 +1027,50 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
        https://doi.org/10.1002/aic.690110226.
     '''
     Tr = T/Tc
+    if Tr > 1.0:
+        return 0.0
     Trefr = T_ref/Tc
     H2 = Hvap_ref*((1.0 - Tr)/(1.0 - Trefr))**exponent
     return H2
+
+def Watson_n(T1, T2, Hvap1, Hvap2, Tc):
+    r'''Calculates the Watson heat of vaporizaton extrapolation exponent
+    given two known heats of vaporization.
+
+    .. math::
+        n = \left[ \frac{\log{\left(\frac{Hvap_{1}}{Hvap_{2}} \right)}}
+        {\log{\left(\frac{T_{1} - T_{c}}{T_{2} - T_{c}} \right)}}\right]
+
+    Parameters
+    ----------
+    T1 : float
+        Temperature of first heat of vaporization point, [K]
+    T2 : float
+        Temperature of second heat of vaporization point, [K]
+    Hvap1 : float
+        Enthalpy of vaporization at the first known temperature point, [J/mol]
+    Hvap2 : float
+        Enthalpy of vaporization at the second known temperature point, [J/mol]
+    Tc : float
+        Critical temperature of fluid [K]
+
+    Returns
+    -------
+    exponent : float
+        A fit exponent that can be used instead of the Watson 0.38 exponent,
+        [-]
+
+    Notes
+    -----
+    This can be useful for extrapolating when a correlation does not reach
+    the critical point.
+
+    Examples
+    --------
+    >>> Watson_n(T1=320, T2=300, Hvap1=42928.990094915454, Hvap2=43908, Tc=647.14)
+    0.380000000000
+    '''
+    return log(Hvap1/Hvap2)/log((T1 - Tc)/(T2 - Tc))
 
 ### Enthalpy of Vaporization model equations
 

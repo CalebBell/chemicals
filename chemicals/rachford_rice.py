@@ -828,7 +828,7 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
 #            Kmin = Ks[i] # numba: uncomment
     Kmin = Ks.min() # numba: delete
     Kmax = Ks.max() # numba: delete
-    if Kmin > 1.0 or Kmax < 1.0:
+    if Kmin > 1.0 or Kmax < 1.0:  # numba: delete
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
     z_of_Kmax = zs[Ks == Kmax][0] # numba: delete
 

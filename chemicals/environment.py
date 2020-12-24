@@ -76,7 +76,7 @@ register_df_source(folder, 'Syrres logP data.csv.gz',
 
 _GWP_ODP_data_loaded = False
 def _load_GWP_ODP_data():
-    global _GWP_ODP_data_loaded, GWP_data, ODP_data, _GWP_keys_by_method
+    global _GWP_ODP_data_loaded, GWP_data, ODP_data
     global _GWP_keys_by_method, _ODP_keys_by_method
     GWP_data = data_source('Official Global Warming Potentials.tsv')
     ODP_data = data_source('Ozone Depletion Potentials.tsv')

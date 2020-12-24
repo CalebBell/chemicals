@@ -77,6 +77,7 @@ Petroleum Correlations
 Fit Correlations
 ----------------
 .. autofunction:: chemicals.viscosity.PPDS9
+.. autofunction:: chemicals.viscosity.dPPDS9_dT
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2_exponential
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_3
@@ -169,13 +170,13 @@ The structure of each dataframe is shown below:
 
 from __future__ import division
 
-__all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9',
+__all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9', 'dPPDS9_dT',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer',
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
 'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon']
 
-from fluids.numerics import secant, interp, numpy as np
+from fluids.numerics import secant, interp, numpy as np, trunc_exp
 from chemicals.utils import log, exp, sqrt, atan, tan, sin, acos
 
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
@@ -782,6 +783,9 @@ def PPDS9(T, A, B, C, D, E):
     -----
     No other source for these coefficients has been found.
 
+    There can be a singularity in this equation when `T` approaches `C` or
+    `D`; it may be helpful to take as a limit to this equation `D` + 5 K.
+
     Examples
     --------
     >>> PPDS9(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
@@ -793,14 +797,105 @@ def PPDS9(T, A, B, C, D, E):
        Berlin; New York:: Springer, 2010.
     '''
     term = (C - T)/(T-D)
-    if term < 0:
+    if term < 0.0:
         term1 = -((T - C)/(T-D))**(1/3.)
     else:
         term1 = term**(1/3.)
     term2 = term*term1
-    mu = E*exp(A*term1 + B*term2)
+    mu = E*trunc_exp(A*term1 + B*term2)
     return mu
 
+def dPPDS9_dT(T, A, B, C, D, E):
+    r'''Calculate the temperature derivative of  viscosity of a liquid using
+    the 5-term exponential power fit developed by the PPDS and named PPDS
+    equation 9.
+
+    Normally, the temperature derivative is:
+
+    .. math::
+        \frac{\partial \mu}{\partial T} = E \left(\frac{A \sqrt[3]{\frac{C - T}
+        {- D + T}} \left(- D + T\right) \left(- \frac{C - T}{3 \left(- D
+        + T\right)^{2}} - \frac{1}{3 \left(- D + T\right)}\right)}{C - T}
+        - \frac{B \sqrt[3]{\frac{C - T}{- D + T}} \left(C - T\right)}{\left(
+        - D + T\right)^{2}} + B \sqrt[3]{\frac{C - T}{- D + T}} \left(- \frac{
+        C - T}{3 \left(- D + T\right)^{2}} - \frac{1}{3 \left(- D + T\right)}
+        \right) - \frac{B \sqrt[3]{\frac{C - T}{- D + T}}}{- D + T}\right)
+        e^{A \sqrt[3]{\frac{C - T}{- D + T}} + \frac{B \sqrt[3]{\frac{C - T}
+        {- D + T}} \left(C - T\right)}{- D + T}}
+
+    For the low-temperature region:
+
+    .. math::
+        \frac{\partial \mu}{\partial T} = E \left(- \frac{A \sqrt[3]{\frac{
+        - C + T}{- D + T}} \left(- D + T\right) \left(- \frac{- C + T}{3
+        \left(- D + T\right)^{2}} + \frac{1}{3 \left(- D + T\right)}\right)
+        }{- C + T} + \frac{B \sqrt[3]{\frac{- C + T}{- D + T}} \left(C
+        - T\right)}{\left(- D + T\right)^{2}} + \frac{B \sqrt[3]{\frac{
+        - C + T}{- D + T}}}{- D + T} - \frac{B \sqrt[3]{\frac{- C + T}{
+        - D + T}} \left(C - T\right) \left(- \frac{- C + T}{3 \left(- D
+        + T\right)^{2}} + \frac{1}{3 \left(- D + T\right)}\right)}{- C
+        + T}\right) e^{- A \sqrt[3]{\frac{- C + T}{- D + T}} - \frac{B
+        \sqrt[3]{\frac{- C + T}{- D + T}} \left(C - T\right)}{- D + T}}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [-]
+    C : float
+        Coefficient, [K]
+    D : float
+        Coefficient, [K]
+    E : float
+        Coefficient, [Pa*s]
+
+    Returns
+    -------
+    dmu_dT : float
+        First temperature derivative of liquid viscosity, [Pa*s]
+    mu : float
+        Liquid viscosity, [Pa*s]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> dPPDS9_dT(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    (-3.186540635882627e-06, 0.00035091137378230684)
+
+    References
+    ----------
+    .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+       Berlin; New York:: Springer, 2010.
+    '''
+    term = (C - T)/(T-D)
+    if term < 0.0:
+        x0 = 1.0/(-D + T)
+        x1 = x0*(-C + T)
+        x2 = -T
+        x3 = C + x2
+        x4 = B*x3
+        mu = E*trunc_exp(-x1**(1.0/3.0)*(A + x0*x4))
+        x6 = D + x2
+        x7 = 1.0/x6
+        x8 = x0*(x1 - 1.0)/3.0
+        dmu_dT = -mu*(x3*x7)**(1.0/3.0)*(-A*x6*x8/x3 + B*x7 + B*x8 - x4*x7*x7)
+    else:
+        x0 = -T
+        x1 = C + x0
+        x2 = D + x0
+        x3 = 1.0/x2
+        x4 = x1*x3
+        x5 = (-x4)**(1.0/3.0)
+        mu = E*trunc_exp(x5*(A - B*x4))
+        x7 = 1.0/(-D + T)
+        x8 = x7*(x1*x7 + 1.0)*(1.0/3.0)
+        dmu_dT = -x5*mu*(-A*x2*x8/x1 + B*x1*x3*x3 - B*x3 + B*x8)
+    return (dmu_dT, mu)
 
 
 def Letsou_Stiel(T, MW, Tc, Pc, omega):
