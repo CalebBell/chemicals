@@ -154,9 +154,9 @@ def test_PPDS9():
 
     # Check can go super low T without overflow
     coeffs = [1.20479, 0.6058, 216.325, 2.278, 8.756e-05]
-    assert PPDS9(3, *coeffs) > 1e100
-    assert PPDS9(2, *coeffs) > 1e100
-    assert PPDS9(1, *coeffs) > 1e100
+    assert PPDS9(3, *coeffs) > 1e10
+    assert PPDS9(2, *coeffs) > 1e10
+    assert PPDS9(1, *coeffs) > 1e10
 
     dPPDS9_dT(2, *coeffs)
     dPPDS9_dT(1, *coeffs)

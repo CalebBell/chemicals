@@ -25,6 +25,7 @@ from math import exp, log
 import pytest
 import numpy as np
 import pandas as pd
+import sys
 from chemicals.exceptions import PhaseCountReducedError
 from fluids.constants import calorie, R
 from chemicals.rachford_rice import *
@@ -35,6 +36,7 @@ from fluids.numerics import isclose, assert_close, assert_close1d, assert_close2
 from random import uniform, randint, random
 from chemicals import normalize
 
+is_pypy = 'PyPy' in sys.version
 
 def RR_solution_mpmath(zs, Ks, dps=200):
     # extremely important to validate high decimal precision with mpmath
@@ -211,13 +213,6 @@ def test_flash_inner_loop():
     assert_close(V_over_F_5a, V_over_F_5b)
 
 
-    methods = flash_inner_loop_methods(4)
-    assert methods == ['Analytical', 'Leibovici and Nichita 2', 'Rachford-Rice (Secant)',
-                            'Rachford-Rice (Newton-Raphson)',
-                            'Rachford-Rice (Halley)', 'Rachford-Rice (NumPy)',
-                            'Li-Johns-Ahmadi',
-                             'Rachford-Rice (polynomial)']
-
     # case with a guess
     flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], guess=.7)
 
@@ -230,6 +225,13 @@ def test_flash_inner_loop():
 #    assert_close1d([1.5147085263221123e-05, 0.0, 5.2389897372063305e-05], xs)
 #    assert_close1d([0.7764047697253411, 0.0, 0.20638691033830794], ys)
 
+@pytest.mark.skipif(is_pypy, reason="PyPy is slowed down by numpy")
+def test_flash_inner_loop_methods():
+    methods = flash_inner_loop_methods(4)
+    assert methods == ['Analytical', 'Leibovici and Nichita 2', 'Rachford-Rice (Secant)',
+                       'Rachford-Rice (Newton-Raphson)', 'Rachford-Rice (Halley)',
+                       'Rachford-Rice (NumPy)', 'Li-Johns-Ahmadi',
+                       'Rachford-Rice (polynomial)']
 
 
 def test_flash_solution_algorithms():

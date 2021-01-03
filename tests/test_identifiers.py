@@ -75,10 +75,10 @@ def test_Matthews_critical_names():
 # TODO uncomment when electrochem is back
 #@pytest.mark.slow
 #def test_Laliberte_metadata_identifiers():
-#    from thermo.electrochem import _Laliberte_Density_ParametersDict, _Laliberte_Viscosity_ParametersDict, _Laliberte_Heat_Capacity_ParametersDict
-#    lalib = _Laliberte_Density_ParametersDict.copy()
-#    lalib.update(_Laliberte_Viscosity_ParametersDict)
-#    lalib.update(_Laliberte_Heat_Capacity_ParametersDict)
+#    from thermo.electrochem import rho_dict_Laliberte, mu_dict_Laliberte, Cp_dict_Laliberte
+#    lalib = rho_dict_Laliberte.copy()
+#    lalib.update(mu_dict_Laliberte)
+#    lalib.update(Cp_dict_Laliberte)
 #    
 #    for CAS, d in lalib.items():
 #        c = None
