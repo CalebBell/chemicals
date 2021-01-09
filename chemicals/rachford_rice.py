@@ -66,6 +66,7 @@ from __future__ import division
 __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution', 'Rachford_Rice_polynomial',
            'Rachford_Rice_solution_polynomial', 'Rachford_Rice_solution_LN2',
+           'Rachford_Rice_solution_LN2_noalloc', 'Rachford_Rice_solution_secant_noalloc',
            'Rachford_Rice_solution2', 'Rachford_Rice_solutionN',
            'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
@@ -631,6 +632,46 @@ def Rachford_Rice_err(V_over_F, zs_k_minus_1, K_minus_1):
     return err
 
 
+def Rachford_Rice_solution_secant_noalloc(zs, Ks, xs, ys, zs_k_minus_1, K_minus_1, guess=None):
+    N = len(Ks)
+    Kmin = min(Ks) # numba: delete
+    Kmax = max(Ks)# numba: delete
+    z_of_Kmax = zs[Ks.index(Kmax)]# numba: delete
+
+#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if Ks[i] > Kmax: # numba: uncomment
+#            z_of_Kmax = zs[i] # numba: uncomment
+#            Kmax = Ks[i] # numba: uncomment
+#        if Ks[i] < Kmin: # numba: uncomment
+#            Kmin = Ks[i] # numba: uncomment
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
+    V_over_F_max = 1./(1.-Kmin)
+
+    V_over_F_min2 = V_over_F_min
+    V_over_F_max2 = V_over_F_max
+    if guess is not None and guess > V_over_F_min and guess < V_over_F_max:
+        x0 = guess
+    else:
+        x0 = (V_over_F_min2 + V_over_F_max2)*0.5
+
+    for i in range(N):
+        Kim1 = Ks[i] - 1.0
+        K_minus_1[i] = Kim1
+        zs_k_minus_1[i] = zs[i]*Kim1
+
+    low, high = V_over_F_min*one_epsilon_larger, V_over_F_max*one_epsilon_smaller
+    V_over_F = secant(Rachford_Rice_err, x0, ytol=1e-5, xtol=1.48e-11, high=high,
+                      low=low, bisection=True, require_xtol=True,
+                      args=(zs_k_minus_1, K_minus_1))
+
+    for i in range(N):
+        xs[i] = zs[i]/(1. + V_over_F*K_minus_1[i])
+        ys[i] = xs[i]*Ks[i]
+    return V_over_F, xs, ys
 
 def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
     r'''Solves the objective function of the Rachford-Rice flash equation [1]_.
@@ -899,6 +940,68 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
 
     return F0, -dF0, ddF0
 
+def Rachford_Rice_solution_LN2_noalloc(zs, Ks, xs, ys, cis_ys, guess=None):
+    Kmin = min(Ks) # numba: delete
+    Kmax = max(Ks) # numba: delete
+    z_of_Kmax = zs[Ks.index(Kmax)] # numba: delete
+#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
+#    for i in range(len(zs)): # numba: uncomment
+#        if Ks[i] > Kmax: # numba: uncomment
+#            z_of_Kmax = zs[i] # numba: uncomment
+#            Kmax = Ks[i] # numba: uncomment
+#        if Ks[i] < Kmin: # numba: uncomment
+#            Kmin = Ks[i] # numba: uncomment
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+
+    one_m_Kmin = 1.0 - Kmin
+    N = len(zs)
+
+    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - one_m_Kmin)/((one_m_Kmin)*(Kmax - 1.))
+    V_over_F_max = 1./one_m_Kmin
+
+    guess = 0.5*(V_over_F_min + V_over_F_max) if guess is None else guess
+    for i in range(N):
+        cis_ys[i] = 1.0/(1.0 - Ks[i])
+
+    x0 = V_over_F_max - V_over_F_min
+
+    # Suggests guess V_over_F_min, not using
+    try:
+        guess = -log((V_over_F_max-guess)/(guess-V_over_F_min))
+    except:
+        # Case where guess was less than V_over_F_min - nasty
+        guess = 0.5*(V_over_F_min + V_over_F_max)
+        guess = -log((V_over_F_max-guess)/(guess-V_over_F_min))
+
+    # Should always converge - no poles
+
+    #V_over_F = halley(Rachford_Rice_err_LN2, guess, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N))
+
+    iterations = 0
+    while iterations < 100:
+        fval, fder, fder2 = Rachford_Rice_err_LN2(guess, zs, cis_ys, x0, V_over_F_min, N)
+        fder_inv = 1.0/fder
+        # Compute the next point
+        step = fval*fder_inv
+        guess_new = guess - step/(1.0 - 0.5*step*fder2*fder_inv)
+
+        if abs(guess_new - guess) < abs(1e-10*guess_new):
+            V_over_F = guess_new
+            break
+
+        guess = guess_new
+        iterations += 1
+
+    V_over_F = (V_over_F_min + (V_over_F_max - V_over_F_min)/(1.0 + exp(-V_over_F)))
+
+    for i in range(N):
+        xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
+        xs[i] = xi
+        ys[i] = Ks[i]*xi
+    return V_over_F, xs, ys
+
 def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     r'''Solves the a objective function for the Rachford-Rice flash equation
     according to the Leibovici and Nichita (2010) transformation (method 2).
@@ -1035,10 +1138,10 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
 #        raise ValueError("Could not solve") # numba: uncomment
 #        return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks)
         return flash_inner_loop(zs=zs, Ks=Ks, check=True, method=FLASH_INNER_HALLEY)
-        try: # numba: delete
-            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, zs, cis_ys, x0, V_over_F_min, N)[0], V_over_F_min, V_over_F_max)  # numba: delete
-        except NotBoundedError:  # numba: delete
-            return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True)  # numba: delete
+#        try: # numba: delete
+#            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, zs, cis_ys, x0, V_over_F_min, N)[0], V_over_F_min, V_over_F_max)  # numba: delete
+#        except NotBoundedError:  # numba: delete
+#            return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True)  # numba: delete
             # err_low = 1e100
             # try:
             #     err_low = Rachford_Rice_flash_error(V_over_F_min, zs, Ks)
