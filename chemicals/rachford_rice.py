@@ -608,11 +608,26 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
 
 def Rachford_Rice_err_fprime(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
     err0, err1 = 0.0, 0.0
-    for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
-        VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
-        err0 += num0*VF_kim1_1_inv
-        err1 += num1*VF_kim1_1_inv*VF_kim1_1_inv
+    # for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
+    #     VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
+    #     err0 += num0*VF_kim1_1_inv
+    #     err1 += num1*VF_kim1_1_inv*VF_kim1_1_inv
 #            print(err0, V_over_F)
+
+    N = len(zs_k_minus_1)
+    i = 0
+    while i < N:
+        VF_kim1_1_inv = 1.0/(1. + V_over_F*K_minus_1[i])
+        err0 += zs_k_minus_1[i]*VF_kim1_1_inv
+        err1 += zs_k_minus_1_2[i]*VF_kim1_1_inv*VF_kim1_1_inv
+        i += 1
+
+    # for i in range(len(K_minus_1)):
+    #     err0 += zs_k_minus_1[i]/(1. + V_over_F*K_minus_1[i])
+    #
+    # for i in range(len(K_minus_1)):
+    #     x = (1. + V_over_F*K_minus_1[i])
+    #     err1 += zs_k_minus_1_2[i]/(x*x)
     return err0, err1
 
 def Rachford_Rice_err_fprime2(V_over_F, zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1):
