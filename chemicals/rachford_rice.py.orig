@@ -608,12 +608,13 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
 
 def Rachford_Rice_err_fprime(V_over_F, zs_k_minus_1, K_minus_1):
     err0, err1 = 0.0, 0.0
-    for num0, Kim1 in zip(zs_k_minus_1, K_minus_1):
-        x = num0/(1. + V_over_F*Kim1)
-        err0 += x
-        err1 += x*x
+<<<<<<< HEAD
+    # for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
+    #     VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
+    #     err0 += num0*VF_kim1_1_inv
+    #     err1 += num1*VF_kim1_1_inv*VF_kim1_1_inv
 #            print(err0, V_over_F)
-    return err0, -2.0*err1
+
     N = len(zs_k_minus_1)
     i = 0
     while i < N:
@@ -622,6 +623,21 @@ def Rachford_Rice_err_fprime(V_over_F, zs_k_minus_1, K_minus_1):
         err1 += zs_k_minus_1_2[i]*VF_kim1_1_inv*VF_kim1_1_inv
         i += 1
 
+    # for i in range(len(K_minus_1)):
+    #     err0 += zs_k_minus_1[i]/(1. + V_over_F*K_minus_1[i])
+    #
+    # for i in range(len(K_minus_1)):
+    #     x = (1. + V_over_F*K_minus_1[i])
+    #     err1 += zs_k_minus_1_2[i]/(x*x)
+    return err0, err1
+=======
+    for num0, Kim1 in zip(zs_k_minus_1, K_minus_1):
+        x = num0/(1. + V_over_F*Kim1)
+        err0 += x
+        err1 += x*x
+#            print(err0, V_over_F)
+    return err0, -2.0*err1
+>>>>>>> master
 
 def Rachford_Rice_err_fprime2(V_over_F, zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1):
     err0, err1, err2 = 0.0, 0.0, 0.0
@@ -847,7 +863,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
         K_minus_1[i] = Kim1
         zs_k_minus_1[i] = zs[i]*Kim1
 
-    if fprime or fprime2:
+    if fprime2:
         zs_k_minus_1_2 = [0.0]*N
         for i in range(N):
             zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
@@ -864,7 +880,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
                               high=high, low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1))
         elif fprime:
             V_over_F = newton(Rachford_Rice_err_fprime, x0, ytol=1e-12, fprime=True, high=high,
-                              low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1))
+                              low=low, bisection=True, args=(zs_k_minus_1, K_minus_1))
         else:
 #            print(V_over_F_max, V_over_F_min)
             V_over_F = secant(Rachford_Rice_err, x0, ytol=1e-5, xtol=1.48e-8, high=high,
@@ -989,6 +1005,7 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
         ddF0 += x7*(t51 + x5x1x6 + x5x1x6)
 
     return F0, -dF0, ddF0
+
 def Rachford_Rice_solution_LN2_noalloc(zs, Ks, xs, ys, cis_ys, guess=None):
     Kmin = min(Ks) # numba: delete
     Kmax = max(Ks) # numba: delete
