@@ -67,6 +67,7 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution', 'Rachford_Rice_polynomial',
            'Rachford_Rice_solution_polynomial', 'Rachford_Rice_solution_LN2',
            'Rachford_Rice_solution_LN2_noalloc', 'Rachford_Rice_solution_secant_noalloc',
+           'Rachford_Rice_solution_newton_noalloc',
            'Rachford_Rice_solution2', 'Rachford_Rice_solutionN',
            'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
@@ -667,6 +668,47 @@ def Rachford_Rice_solution_secant_noalloc(zs, Ks, xs, ys, zs_k_minus_1, K_minus_
     V_over_F = secant(Rachford_Rice_err, x0, ytol=1e-5, xtol=1.48e-11, high=high,
                       low=low, bisection=True, require_xtol=True,
                       args=(zs_k_minus_1, K_minus_1))
+
+    for i in range(N):
+        xs[i] = zs[i]/(1. + V_over_F*K_minus_1[i])
+        ys[i] = xs[i]*Ks[i]
+    return V_over_F, xs, ys
+
+def Rachford_Rice_solution_newton_noalloc(zs, Ks, xs, ys, K_minus_1, zs_k_minus_1, zs_k_minus_1_2, guess=None):
+    N = len(Ks)
+    Kmin = min(Ks) # numba: delete
+    Kmax = max(Ks)# numba: delete
+    z_of_Kmax = zs[Ks.index(Kmax)]# numba: delete
+
+#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if Ks[i] > Kmax: # numba: uncomment
+#            z_of_Kmax = zs[i] # numba: uncomment
+#            Kmax = Ks[i] # numba: uncomment
+#        if Ks[i] < Kmin: # numba: uncomment
+#            Kmin = Ks[i] # numba: uncomment
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
+    V_over_F_max = 1./(1.-Kmin)
+
+    V_over_F_min2 = V_over_F_min
+    V_over_F_max2 = V_over_F_max
+    if guess is not None and guess > V_over_F_min and guess < V_over_F_max:
+        x0 = guess
+    else:
+        x0 = (V_over_F_min2 + V_over_F_max2)*0.5
+
+    for i in range(N):
+        Kim1 = Ks[i] - 1.0
+        K_minus_1[i] = Kim1
+        zs_k_minus_1[i] = zs[i]*Kim1
+        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
+
+    low, high = V_over_F_min*one_epsilon_larger, V_over_F_max*one_epsilon_smaller
+    V_over_F = newton(Rachford_Rice_err_fprime, x0, xtol=1e-12, fprime=True, high=high,
+                      low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1))
 
     for i in range(N):
         xs[i] = zs[i]/(1. + V_over_F*K_minus_1[i])
