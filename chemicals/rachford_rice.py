@@ -604,14 +604,14 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
         err += zs[i]*(Ks[i] - 1.0)/(1.0 + V_over_F*(Ks[i] - 1.0))
     return err
 
-def Rachford_Rice_err_fprime(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
+def Rachford_Rice_err_fprime(V_over_F, zs_k_minus_1, K_minus_1):
     err0, err1 = 0.0, 0.0
-    for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
-        VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
-        err0 += num0*VF_kim1_1_inv
-        err1 += num1*VF_kim1_1_inv*VF_kim1_1_inv
+    for num0, Kim1 in zip(zs_k_minus_1, K_minus_1):
+        x = num0/(1. + V_over_F*Kim1)
+        err0 += x
+        err1 += x*x
 #            print(err0, V_over_F)
-    return err0, err1
+    return err0, -2.0*err1
 
 def Rachford_Rice_err_fprime2(V_over_F, zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1):
     err0, err1, err2 = 0.0, 0.0, 0.0
@@ -756,7 +756,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
         K_minus_1[i] = Kim1
         zs_k_minus_1[i] = zs[i]*Kim1
 
-    if fprime or fprime2:
+    if fprime2:
         zs_k_minus_1_2 = [0.0]*N
         for i in range(N):
             zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
@@ -773,7 +773,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
                               high=high, low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1))
         elif fprime:
             V_over_F = newton(Rachford_Rice_err_fprime, x0, ytol=1e-12, fprime=True, high=high,
-                              low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1))
+                              low=low, bisection=True, args=(zs_k_minus_1, K_minus_1))
         else:
 #            print(V_over_F_max, V_over_F_min)
             V_over_F = secant(Rachford_Rice_err, x0, ytol=1e-5, xtol=1.48e-8, high=high,
@@ -802,10 +802,10 @@ def Rachford_Rice_numpy_err_fprime2(V_over_F, zs_k_minus_1, K_minus_1):
     x0 = 1.0/(K_minus_1*V_over_F + 1.0)
 
     err = zs_k_minus_1*x0
-    fprime = -err*K_minus_1*x0
-    fprime2 = -2.0*fprime*K_minus_1*x0
+    fprime = err*K_minus_1*x0
+    fprime2 = fprime*K_minus_1*x0
 #    print(float(err.sum()), float(fprime.sum()), float(fprime2.sum()), V_over_F)
-    return float(err.sum()), float(fprime.sum()), float(fprime2.sum())
+    return float(err.sum()), -float(fprime.sum()), 2.0*float(fprime2.sum())
 #    return err.sum(), fprime.sum(), fprime2.sum()
 
 
