@@ -68,6 +68,7 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
 
              'rachford_rice.Rachford_Rice_solution',
              'rachford_rice.Rachford_Rice_solution_LN2',
+             'rachford_rice.Rachford_Rice_solution_LN2_noalloc',
              'rachford_rice.Rachford_Rice_solution_numpy',
              'rachford_rice.Rachford_Rice_polynomial',
              'rachford_rice.Rachford_Rice_polynomial_3',
