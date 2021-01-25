@@ -203,8 +203,8 @@ register_df_source(folder, 'Table 2-312 Vapor Viscosity of Inorganic and Organic
     'dtype':{'C1': float, 'C2': float, 'C3': float, 'C4': float, 'Tmin': float, 'Tmax': float}})
 
 
-register_df_source(folder, 'VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv')
-register_df_source(folder, 'VDI PPDS Dynamic viscosity of gases polynomials.tsv')
+register_df_source(folder, 'VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv', csv_kwargs={'float_precision': 'legacy'})
+register_df_source(folder, 'VDI PPDS Dynamic viscosity of gases polynomials.tsv', csv_kwargs={'float_precision': 'legacy'})
 
 
 
