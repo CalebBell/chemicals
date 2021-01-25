@@ -140,8 +140,8 @@ folder = os_path_join(source_path, 'Thermal Conductivity')
 
 register_df_source(folder, 'Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv')
 register_df_source(folder, 'Table 2-315 Thermal Conductivity of Inorganic and Organic Liquids.tsv')
-register_df_source(folder, 'VDI PPDS Thermal conductivity of saturated liquids.tsv')
-register_df_source(folder, 'VDI PPDS Thermal conductivity of gases.tsv')
+register_df_source(folder, 'VDI PPDS Thermal conductivity of saturated liquids.tsv', csv_kwargs={'float_precision': 'legacy'})
+register_df_source(folder, 'VDI PPDS Thermal conductivity of gases.tsv', csv_kwargs={'float_precision': 'legacy'})
 
 _k_data_loaded = False
 def _load_k_data():

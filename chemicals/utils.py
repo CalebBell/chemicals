@@ -174,7 +174,7 @@ def hash_any_primitive(v):
         v = temp_hash
     elif isinstance(v, set):
         # Should only contain hashable items
-        v = tuple(v)
+        v = frozenset(v)
     elif isinstance(v, tuple):
         v = tuple(hash_any_primitive(i) for i in v)
     return hash(v)

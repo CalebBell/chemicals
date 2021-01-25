@@ -989,7 +989,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     >>> LFL(CASRN='71-43-2')
     0.012
     >>> LFL(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
-    0.044000000000000004
+    0.044
 
     Notes
     -----
@@ -1198,7 +1198,7 @@ def LFL_ISO_10156_2017(zs, LFLs, CASs):
     >>> LFLs = [.04, .044, None, None, None]
     >>> CASs = ['1333-74-0', '74-82-8', '124-38-9', '7727-37-9', '7782-44-7']
     >>> LFL_ISO_10156_2017(zs, LFLs, CASs)
-    0.14273722742907632
+    0.1427372274
 
     References
     ----------
