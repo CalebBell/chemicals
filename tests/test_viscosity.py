@@ -117,12 +117,13 @@ def test_VDI_PPDS_7_data():
 def test_VDI_PPDS_8_data():
     # Coefficients for water are incorrect - obtained an average deviation of 150%!
     assert all([check_CAS(i) for i in mu_data_VDI_PPDS_8.index])
+    assert mu_data_VDI_PPDS_8.index.is_unique
+    assert mu_data_VDI_PPDS_8.shape == (274, 6)
+
     tots_calc = [mu_data_VDI_PPDS_8[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [0.00032879559999999999, 9.5561339999999995e-06, 2.8377710000000001e-09, 2.8713399999999998e-12, 2.8409200000000004e-15]
     assert_close1d(tots_calc, tots)
 
-    assert mu_data_VDI_PPDS_8.index.is_unique
-    assert mu_data_VDI_PPDS_8.shape == (274, 6)
 
 def test_ViswanathNatarajan():
     mu = Viswanath_Natarajan_2(348.15, -5.9719-log(100), 1007.0)

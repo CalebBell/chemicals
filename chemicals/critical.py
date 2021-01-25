@@ -680,7 +680,7 @@ def Zc(CASRN, method=None):
     Examples
     --------
     >>> Zc(CASRN='64-17-5')
-    0.24100000000000002
+    0.241
 
     Parameters
     ----------
