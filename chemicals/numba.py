@@ -45,7 +45,7 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
     cache_blacklist = set( ['Rachford_Rice_solution', 'Rachford_Rice_solution_LN2', 'Rachford_Rice_solution_polynomial',
               'Rachford_Rice_solution_numpy', 'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
               'Rachford_Rice_solutionN', 'Rachford_Rice_solution2', 'flash_wilson',
-              'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm'])
+              'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'iapws97_T', 'iapws95_T'])
 
     blacklist = set(['to_num'])
 
