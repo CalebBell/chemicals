@@ -81,7 +81,7 @@ jobs:
         pip install numba
     - name: Test with pytest
       run: |
-        pytest . -v --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not sympy and not numba"
+        pytest . -v --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not sympy and not numba and not CoolProp and not fuzz"
         coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
