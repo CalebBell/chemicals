@@ -74,7 +74,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'chemicals'
-copyright = u'2016-2020, Caleb Bell and contributors'
+import datetime
+copyright = u'2016 - %s, Caleb Bell and contributors' %datetime.datetime.now().year
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
