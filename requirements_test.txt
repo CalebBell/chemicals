@@ -9,3 +9,9 @@ pytest-cov
 coveralls
 matplotlib
 pint
+IPython
+sphinx
+mpmath
+fuzzywuzzy
+pytz
+wheel
