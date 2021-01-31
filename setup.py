@@ -26,7 +26,7 @@ from distutils.core import setup
 
 
 classifiers=[
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
     'Intended Audience :: Education',
     'Intended Audience :: Manufacturing',
@@ -43,7 +43,10 @@ classifiers=[
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: Implementation :: CPython',
+    'Programming Language :: Python :: Implementation :: PyPy',
     'Topic :: Education',
     'Topic :: Scientific/Engineering :: Atmospheric Science',
     'Topic :: Scientific/Engineering :: Chemistry',
@@ -55,10 +58,10 @@ setup(
   name = 'chemicals',
   packages = ['chemicals'],
   license='MIT',
-  version = '0.1.5',
+  version = '1.0.0',
   description = 'Chemical properties component of Chemical Engineering Design Library (ChEDL)',
   author = 'Caleb Bell',
-  install_requires=['fluids>=0.1.86', 'scipy', 'pandas'],
+  install_requires=['fluids>=1.0.0', 'scipy', 'numpy', 'pandas'],
   extras_require = {
       'Coverage documentation':  ['wsgiref>=0.1.2', 'coverage>=4.0.3']
   },
@@ -66,17 +69,17 @@ setup(
   platforms=["Windows", "Linux", "Mac OS", "Unix"],
   author_email = 'Caleb.Andrew.Bell@gmail.com',
   url = 'https://github.com/CalebBell/chemicals',
-  download_url = 'https://github.com/CalebBell/chemicals/tarball/0.1.5',
-  keywords = ['chemical engineering', 'chemistry', 'mechanical engineering', 
+  download_url = 'https://github.com/CalebBell/chemicals/tarball/1.0.0',
+  keywords = ['chemical engineering', 'chemistry', 'mechanical engineering',
   'thermodynamics', 'databases', 'cheminformatics', 'engineering','viscosity',
-  'density', 'heat capacity', 'thermal conductivity', 'surface tension', 
-  'combustion', 'environmental engineering', 'solubility', 'vapor pressure', 
+  'density', 'heat capacity', 'thermal conductivity', 'surface tension',
+  'combustion', 'environmental engineering', 'solubility', 'vapor pressure',
   'equation of state', 'molecule'],
   classifiers = classifiers,
-  package_data={'chemicals': ['Critical Properties/*', 'Density/*', 
+  package_data={'chemicals': ['Critical Properties/*', 'Density/*',
   'Electrolytes/*', 'Environment/*', 'Heat Capacity/*', 'Identifiers/*',
-  'Law/*', 'Misc/*', 'Phase Change/*', 'Reactions/*', 'Safety/*', 
-  'Solubility/*', 'Interface/*', 'Triple Properties/*', 
-  'Thermal Conductivity/*', 
+  'Law/*', 'Misc/*', 'Phase Change/*', 'Reactions/*', 'Safety/*',
+  'Solubility/*', 'Interface/*', 'Triple Properties/*',
+  'Thermal Conductivity/*',
   'Vapor Pressure/*', 'Viscosity/*']}
 )

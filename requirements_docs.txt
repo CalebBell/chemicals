@@ -1,7 +1,13 @@
 numpy
-pandas
-numpydoc
 scipy
+numpydoc
+pint
+nbsphinx
 fluids>=1.0.0
 IPython
-pint
+ipython
+numba
+pandas
+sphinxcontrib-katex
+sphinx-sitemap
+sphinx==3.2.1
