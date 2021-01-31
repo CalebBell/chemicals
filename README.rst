@@ -1,5 +1,5 @@
 =========
-chemicals
+Chemicals
 =========
 
 .. image:: http://img.shields.io/pypi/v/chemicals.svg?style=flat
@@ -8,8 +8,8 @@ chemicals
 .. image:: http://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat
    :target: https://chemicals.readthedocs.io/en/latest/
    :alt: Documentation
-.. image:: https://api.travis-ci.com/CalebBell/chemicals.svg?branch=release
-   :target: https://travis-ci.com/github/CalebBell/chemicals
+.. image:: https://github.com/CalebBell/chemicals/workflows/Build/badge.svg
+   :target: https://github.com/CalebBell/chemicals/actions
    :alt: Build_status
 .. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
    :target: https://github.com/CalebBell/chemicals/blob/master/LICENSE.txt
@@ -255,5 +255,5 @@ Citation
 
 To cite chemicals in publications use:
 
-    Caleb Bell and Contributors (2016-2020). chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
+    Caleb Bell and Contributors (2016-2021). chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
     https://github.com/CalebBell/chemicals.

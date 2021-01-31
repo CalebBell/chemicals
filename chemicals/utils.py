@@ -95,6 +95,7 @@ try:
 except:
     pass
 
+
 def to_num(values):
     r'''Legacy function to turn a list of strings into either floats
     (if numeric), stripped strings (if not) or None if the string is empty.
@@ -125,6 +126,12 @@ def to_num(values):
             else:
                 values[i] = values[i].strip()
     return values
+
+
+try:
+    ndarray = np.ndarray
+except:
+    pass
 
 def hash_any_primitive(v):
     '''Method to hash a primitive - with basic support for lists and
@@ -177,6 +184,8 @@ def hash_any_primitive(v):
         v = frozenset(v)
     elif isinstance(v, tuple):
         v = tuple(hash_any_primitive(i) for i in v)
+    elif isinstance(v, ndarray):
+        v = hash(v.data.tobytes())
     return hash(v)
 
 def Parachor(MW, rhol, rhog, sigma):
