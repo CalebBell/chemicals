@@ -43,12 +43,24 @@ if not IS_PYPY:
     API10A32_numba = chemicals.numba.API10A32
     Meybodi_Daryasafar_Karimi_numba = chemicals.numba.Meybodi_Daryasafar_Karimi
     Weinaug_Katz_numba = chemicals.numba.Weinaug_Katz
+    Winterfeld_Scriven_Davis_numba = chemicals.numba.Winterfeld_Scriven_Davis
+    Diguilio_Teja_numba = chemicals.numba.Diguilio_Teja
 
 
-Weinaug_Katz_ns = (2, 5, 10, 20, 50, 100)
+Diguilio_Teja_ns = Winterfeld_Scriven_Davis_ns = Weinaug_Katz_ns = (2, 5, 10, 20, 50, 100)
 class TimeInterfaceSuite(BaseTimeSuite):
     def __init__(self):
         super().__init__()
+        
+        for N in Diguilio_Teja_ns:
+            Diguilio_Teja_kwargs = dict(T=298.15, xs=normalize([0.1606, 0.8394]*N), sigmas_Tb=[0.01424, 0.02530]*N, Tbs=[309.21, 312.95]*N, Tcs=[469.7, 508.0]*N)
+            N *= 2
+            setattr(self, 'DT%d' %N, Diguilio_Teja_kwargs)
+            Diguilio_Teja_kwargs = Diguilio_Teja_kwargs.copy()
+            for s in ('sigmas_Tb', 'xs', 'Tbs', 'Tcs'):
+                Diguilio_Teja_kwargs[s] = np.array(Diguilio_Teja_kwargs[s])
+            setattr(self, 'DTnp%d' %N, Diguilio_Teja_kwargs)
+
         
         for N in Weinaug_Katz_ns:
             Weinaug_Katz_kwargs = dict(parachors=[5.1e-5, 7.2e-5]*N, Vml=0.000125, Vmg=0.02011, xs=normalize([.4, .6]*N), ys=normalize([.6, .4]*N))
@@ -58,7 +70,15 @@ class TimeInterfaceSuite(BaseTimeSuite):
             for s in ('parachors', 'xs', 'ys'):
                 Weinaug_Katz_kwargs[s] = np.array(Weinaug_Katz_kwargs[s])
             setattr(self, 'WKnp%d' %N, Weinaug_Katz_kwargs)
-
+            
+        for N in Winterfeld_Scriven_Davis_ns:
+            Winterfeld_Scriven_Davis_kwargs = dict(xs=normalize([0.1606, 0.8394]*N), sigmas=[0.01547, 0.02877]*N, rhoms=[8610., 15530.]*N)
+            N *= 2
+            setattr(self, 'WS%d' %N, Winterfeld_Scriven_Davis_kwargs)
+            Winterfeld_Scriven_Davis_kwargs = Winterfeld_Scriven_Davis_kwargs.copy()
+            for s in ('sigmas', 'xs', 'rhoms'):
+                Winterfeld_Scriven_Davis_kwargs[s] = np.array(Winterfeld_Scriven_Davis_kwargs[s])
+            setattr(self, 'WSnp%d' %N, Winterfeld_Scriven_Davis_kwargs)
 
 
     def time_sigma_IAPWS(self):
@@ -140,11 +160,37 @@ for n in Weinaug_Katz_ns:
     def fnp(self, N=n, string=string):
         kwargs = getattr(self, string)
         Weinaug_Katz_numba(**kwargs)
-        
     setattr(TimeInterfaceSuite, 'time_Weinaug_Katz_%d_numba' %(n,), fnp)
 
+for n in Winterfeld_Scriven_Davis_ns:
+    n *= 2
+    string = 'WS%d' %(n,)
+    def f(self, N=n, string=string):
+        kwargs = getattr(self, string)
+        Winterfeld_Scriven_Davis(**kwargs)
+    setattr(TimeInterfaceSuite, 'time_Winterfeld_Scriven_Davis_%d' %(n,), f)
+    
+    string = 'WSnp%d' %(n,)
+    def fnp(self, N=n, string=string):
+        kwargs = getattr(self, string)
+        Winterfeld_Scriven_Davis_numba(**kwargs)
+    setattr(TimeInterfaceSuite, 'time_Winterfeld_Scriven_Davis_%d_numba' %(n,), fnp)
 
-            #setattr(self, 'WKnp%d' %N, Weinaug_Katz_kwargs)
+for n in Diguilio_Teja_ns:
+    n *= 2
+    string = 'DT%d' %(n,)
+    def f(self, N=n, string=string):
+        kwargs = getattr(self, string)
+        Diguilio_Teja(**kwargs)
+    setattr(TimeInterfaceSuite, 'time_Diguilio_Teja_%d' %(n,), f)
+    
+    string = 'DTnp%d' %(n,)
+    def fnp(self, N=n, string=string):
+        kwargs = getattr(self, string)
+        Diguilio_Teja_numba(**kwargs)
+    setattr(TimeInterfaceSuite, 'time_Diguilio_Teja_%d_numba' %(n,), fnp)
+
+
 
 suites = [TimeInterfaceSuite,
           ]
