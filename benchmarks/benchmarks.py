@@ -1,6 +1,7 @@
 from fluids.numerics import IS_PYPY
 from fluids.constants import *
 #IS_PYPY = True
+from fluids.numerics import normalize
 
 if not IS_PYPY:
     import fluids.numba
@@ -41,8 +42,25 @@ if not IS_PYPY:
     Mersmann_Kind_sigma_numba = chemicals.numba.Mersmann_Kind_sigma
     API10A32_numba = chemicals.numba.API10A32
     Meybodi_Daryasafar_Karimi_numba = chemicals.numba.Meybodi_Daryasafar_Karimi
+    Weinaug_Katz_numba = chemicals.numba.Weinaug_Katz
 
+
+Weinaug_Katz_ns = (2, 5, 10, 20, 50, 100)
 class TimeInterfaceSuite(BaseTimeSuite):
+    def __init__(self):
+        super().__init__()
+        
+        for N in Weinaug_Katz_ns:
+            Weinaug_Katz_kwargs = dict(parachors=[5.1e-5, 7.2e-5]*N, Vml=0.000125, Vmg=0.02011, xs=normalize([.4, .6]*N), ys=normalize([.6, .4]*N))
+            N *= 2
+            setattr(self, 'WK%d' %N, Weinaug_Katz_kwargs)
+            Weinaug_Katz_kwargs = Weinaug_Katz_kwargs.copy()
+            for s in ('parachors', 'xs', 'ys'):
+                Weinaug_Katz_kwargs[s] = np.array(Weinaug_Katz_kwargs[s])
+            setattr(self, 'WKnp%d' %N, Weinaug_Katz_kwargs)
+
+
+
     def time_sigma_IAPWS(self):
         sigma_IAPWS(450.)
     def time_sigma_IAPWS_numba(self):
@@ -109,6 +127,24 @@ class TimeInterfaceSuite(BaseTimeSuite):
         Meybodi_Daryasafar_Karimi(980, 760, 580, 914)
     def time_Meybodi_Daryasafar_Karimi_numba(self):
         Meybodi_Daryasafar_Karimi_numba(980, 760, 580, 914)
+
+for n in Weinaug_Katz_ns:
+    n *= 2
+    string = 'WK%d' %(n,)
+    def f(self, N=n, string=string):
+        kwargs = getattr(self, string)
+        Weinaug_Katz(**kwargs)
+    setattr(TimeInterfaceSuite, 'time_Weinaug_Katz_%d' %(n,), f)
+    
+    string = 'WKnp%d' %(n,)
+    def fnp(self, N=n, string=string):
+        kwargs = getattr(self, string)
+        Weinaug_Katz_numba(**kwargs)
+        
+    setattr(TimeInterfaceSuite, 'time_Weinaug_Katz_%d_numba' %(n,), fnp)
+
+
+            #setattr(self, 'WKnp%d' %N, Weinaug_Katz_kwargs)
 
 suites = [TimeInterfaceSuite,
           ]
