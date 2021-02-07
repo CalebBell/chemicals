@@ -25,7 +25,6 @@ class BaseTimeSuite(object):
                     c = getattr(self, k)
                     c()
 
-
 from chemicals.interface import * 
 
 if not IS_PYPY:
@@ -191,6 +190,19 @@ for n in Diguilio_Teja_ns:
     setattr(TimeInterfaceSuite, 'time_Diguilio_Teja_%d_numba' %(n,), fnp)
 
 
+from chemicals.dippr import *
+if IS_PYPY:
+    EQ100_numba = chemicals.numba.EQ100
+    EQ101_numba = chemicals.numba.EQ101
+    EQ102_numba = chemicals.numba.EQ102
+    EQ104_numba = chemicals.numba.EQ104
+    EQ105_numba = chemicals.numba.EQ105
+    EQ106_numba = chemicals.numba.EQ106
+    EQ107_numba = chemicals.numba.EQ107
+    EQ114_numba = chemicals.numba.EQ114
+    EQ115_numba = chemicals.numba.EQ115
+    EQ116_numba = chemicals.numba.EQ116
+    EQ127_numba = chemicals.numba.EQ127
 
 suites = [TimeInterfaceSuite,
           ]
