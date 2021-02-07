@@ -28,6 +28,18 @@ class BaseTimeSuite(object):
 from chemicals.viscosity import *
 if not IS_PYPY:
     mu_IAPWS_numba = chemicals.numba.mu_IAPWS
+    mu_air_lemmon_numba = chemicals.numba.mu_air_lemmon
+    PPDS9_numba = chemicals.numba.PPDS9
+    dPPDS9_dT_numba = chemicals.numba.dPPDS9_dT
+    Letsou_Stiel_numba = chemicals.numba.Letsou_Stiel
+    Przedziecki_Sridhar_numba = chemicals.numba.Przedziecki_Sridhar
+    Lucas_numba = chemicals.numba.Lucas
+    Yoon_Thodos_numba = chemicals.numba.Yoon_Thodos
+    Stiel_Thodos_numba = chemicals.numba.Stiel_Thodos
+    Lucas_gas_numba = chemicals.numba.Lucas_gas
+    viscosity_gas_Gharagheizi_numba = chemicals.numba.viscosity_gas_Gharagheizi
+    Twu_1985_numba = chemicals.numba.Twu_1985
+    viscosity_index_numba = chemicals.numba.viscosity_index
     
 class TimeViscositySuite(BaseTimeSuite):
     def time_mu_IAPWS(self):
@@ -38,8 +50,70 @@ class TimeViscositySuite(BaseTimeSuite):
         mu_IAPWS(T=647.35, rho=222, drho_dP=175.456980972231e-6, drho_dP_Tr=3.119177410324e-6)
     def time_mu_IAPWS_full_numba(self):
         mu_IAPWS_numba(T=647.35, rho=222, drho_dP=175.456980972231e-6, drho_dP_Tr=3.119177410324e-6)
-
-
+        
+    def time_mu_air_lemmon(self):
+        mu_air_lemmon(298.15, 40.)
+    def time_mu_air_lemmon_numba(self):
+        mu_air_lemmon_numba(298.15, 40.)
+        
+    def time_PPDS9(self):
+        PPDS9(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    def time_PPDS9_numba(self):
+        PPDS9_numba(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    def time_dPPDS9_dT(self):
+        dPPDS9_dT(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    def time_dPPDS9_dT_numba(self):
+        dPPDS9_dT_numba(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+        
+    def time_Letsou_Stiel(self):
+        Letsou_Stiel(400., 46.07, 516.25, 6.383E6, 0.6371)
+    def time_Letsou_Stiel_numba(self):
+        Letsou_Stiel_numba(400., 46.07, 516.25, 6.383E6, 0.6371)
+        
+    def time_Przedziecki_Sridhar(self):
+        Przedziecki_Sridhar(383., 178., 591.8, 41E5, 316E-6, 95E-6, .263, 92.14)
+    def time_Przedziecki_Sridhar_numba(self):
+        Przedziecki_Sridhar_numba(383., 178., 591.8, 41E5, 316E-6, 95E-6, .263, 92.14)
+        
+    def time_Lucas(self):
+        Lucas(300., 500E5, 572.2, 34.7E5, 0.236, 0, 0.00068) 
+    def time_Lucas_numba(self):
+        Lucas_numba(300., 500E5, 572.2, 34.7E5, 0.236, 0, 0.00068) 
+        
+    def time_Yoon_Thodos(self):
+        Yoon_Thodos(300., 556.35, 4.5596E6, 153.8)
+    def time_Yoon_Thodos_numba(self):
+        Yoon_Thodos_numba(300., 556.35, 4.5596E6, 153.8)
+        
+    def time_Stiel_Thodos(self):
+        Stiel_Thodos(300., 556.35, 4.5596E6, 153.8) 
+    def time_Stiel_Thodos_numba(self):
+        Stiel_Thodos_numba(300., 556.35, 4.5596E6, 153.8)
+        
+    def time_Lucas_gas(self):
+        Lucas_gas(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=1.7)
+    def time_Lucas_gas_numba(self):
+        Lucas_gas_numba(T=550., Tc=512.6, Pc=80.9E5, Zc=0.224, MW=32.042, dipole=1.7)
+        
+    def time_viscosity_gas_Gharagheizi(self):
+        viscosity_gas_Gharagheizi(120., 190.564, 45.99E5, 16.04246)
+    def time_viscosity_gas_Gharagheizi_numba(self):
+        viscosity_gas_Gharagheizi_numba(120., 190.564, 45.99E5, 16.04246)
+        
+    def time_Twu_1985(self):
+        Twu_1985(T=338.7055, Tb=672.3166, rho=895.5189)
+    def time_Twu_1985_numba(self):
+        Twu_1985_numba(T=338.7055, Tb=672.3166, rho=895.5189)
+        
+    def time_viscosity_index(self):
+        viscosity_index(73.3E-6, 8.86E-6, rounding=True)
+    def time_viscosity_index_numba(self):
+        viscosity_index_numba(73.3E-6, 8.86E-6, rounding=True)
+        
+    def time_viscosity_converter_1(self):
+        viscosity_converter(8.79, 'engler', 'parlin cup #7')
+    def time_viscosity_converter_2(self):
+        viscosity_converter(700, 'Saybolt Universal Seconds', 'kinematic viscosity')
 
 from chemicals.permittivity import *
 if not IS_PYPY:
