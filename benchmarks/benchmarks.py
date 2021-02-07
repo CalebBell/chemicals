@@ -25,6 +25,39 @@ class BaseTimeSuite(object):
                     c = getattr(self, k)
                     c()
 
+from chemicals.viscosity import *
+if not IS_PYPY:
+    mu_IAPWS_numba = chemicals.numba.mu_IAPWS
+    
+class TimeViscositySuite(BaseTimeSuite):
+    def time_mu_IAPWS(self):
+        mu_IAPWS(298.15, 998.)
+    def time_mu_IAPWS_numba(self):
+        mu_IAPWS_numba(298.15, 998.)
+    def time_mu_IAPWS_full(self):
+        mu_IAPWS(T=647.35, rho=222, drho_dP=175.456980972231e-6, drho_dP_Tr=3.119177410324e-6)
+    def time_mu_IAPWS_full_numba(self):
+        mu_IAPWS_numba(T=647.35, rho=222, drho_dP=175.456980972231e-6, drho_dP_Tr=3.119177410324e-6)
+
+
+
+from chemicals.permittivity import *
+if not IS_PYPY:
+    permittivity_IAPWS_numba = chemicals.numba.permittivity_IAPWS
+    
+class TimePermittivitySuite(BaseTimeSuite):
+    def time_permittivity_IAPWS(self):
+        permittivity_IAPWS(650., 40.31090)
+    def time_permittivity_IAPWS_numba(self):
+        permittivity_IAPWS_numba(650., 40.31090)
+        
+        
+        
+        
+
+
+
+
 from chemicals.interface import * 
 
 if not IS_PYPY:
@@ -204,7 +237,7 @@ if IS_PYPY:
     EQ116_numba = chemicals.numba.EQ116
     EQ127_numba = chemicals.numba.EQ127
 
-suites = [TimeInterfaceSuite,
+suites = [TimeInterfaceSuite, TimePermittivitySuite, TimeViscositySuite,
           ]
 
 

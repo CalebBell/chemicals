@@ -63,7 +63,6 @@ order_not_found_msg = ('Only the actual property calculation, first temperature 
                        'temperature integral over temperature are supported '
                        'with order=  0, 1, -1, or -1j respectively')
 
-
 def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     r'''DIPPR Equation # 100. Used in calculating the molar heat capacities
     of liquids and solids, liquid thermal conductivity, and solid density.
@@ -905,3 +904,18 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
                 - 1)/G**2))
     else:
         raise ValueError(order_not_found_msg)
+
+
+dippr_eq_supported_orders = {
+EQ100: (0, 1, -1, -1j),
+#EQ101: (),
+EQ102: (0, 1, -1, -1j),
+EQ104: (0, 1, -1, -1j),
+#EQ105:
+#EQ106:
+EQ107: (0, 1, -1, -1j),
+EQ114: (0, 1, -1, -1j),
+#EQ115:
+EQ115: (0, 1, -1, -1j),
+EQ127: (0, 1, -1, -1j),
+}

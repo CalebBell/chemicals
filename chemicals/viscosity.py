@@ -429,7 +429,7 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
             - 1.08374) + 0.0850895) + 0.520094)
     mu1 = exp(rhor*tot)
 
-    if drho_dP:
+    if drho_dP is not None:
         xmu = 0.068
         qc = 526315789.4736842#(1.9E-9)**-1
         qD = 909090909.0909091#(1.1E-9)**-1
@@ -458,10 +458,10 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
             else:
                 tot1 = (rhor*(rhor*(rhor*(rhor*(4.66861294457414 - 0.503243546373828*rhor) - 10.325505114704)
                             + 9.8895256507892) + 0.595748562571649) + 1.11999926419994)
-            drho_dP_Tr = 1./tot1
+            drho_dP_Tr2 = 1./tot1
         else:
-            drho_dP_Tr *= 68521.73913043478 #22.064E6/322.0
-        dchi = rhor*(zeta_drho_dP - drho_dP_Tr*TRC*Tr_inv)
+            drho_dP_Tr2 = drho_dP_Tr*68521.73913043478 #22.064E6/322.0
+        dchi = rhor*(zeta_drho_dP - drho_dP_Tr2*TRC*Tr_inv)
         if dchi < 0.0:
             # By definition
             return mu0*mu1*1e-6
