@@ -14,6 +14,7 @@ prof
 monkeytype.sqlite3
 *.spyproject*
 chemicals.build
+.asv
 
 # Docs #
 ########
