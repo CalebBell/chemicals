@@ -5,7 +5,7 @@ ver_tup = platform.python_version_tuple()[0:2]
 
 def pytest_ignore_collect(path):
     path = str(path)
-    if 'manual_runner' in path or 'make_test_stubs' in path or 'plot' in path or 'prerelease' in path:
+    if 'benchmark' in path or 'manual_runner' in path or 'make_test_stubs' in path or 'plot' in path or 'prerelease' in path:
         return True
     if 'dev' in path:
         return True 
