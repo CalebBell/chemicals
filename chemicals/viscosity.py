@@ -1295,10 +1295,11 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
     Tc_inv = 1.0/Tc
     Tr = T*Tc_inv
     MW_inv = 1.0/MW
-    xi = 0.176*(Tc*MW_inv*MW_inv*MW_inv/(Pc/1E5)**4)**(1.0/6.0)  # bar arrording to example in Poling
+    Pc_bar = Pc*1e-5
+    xi = 0.176*(Tc*MW_inv*MW_inv*MW_inv/(Pc_bar*Pc_bar*Pc_bar*Pc_bar))**(1.0/6.0)  # bar arrording to example in Poling
     if dipole is None:
         dipole = 0.0
-    dipoler = 52.46*dipole*dipole*(Pc*1E-5)*Tc_inv*Tc_inv  # bar arrording to example in Poling
+    dipoler = 52.46*dipole*dipole*Pc_bar*Tc_inv*Tc_inv  # bar arrording to example in Poling
     if dipoler < 0.022:
         Fp = 1.0
     elif 0.022 <= dipoler < 0.075:
@@ -1319,7 +1320,8 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
                 value = 1.0
             else:
                 value = -1.0
-            FQ = 1.22*Q**0.15*(1.0 + 0.00385*((Tr-12.0)**2)**(MW_inv)*value)
+            x0 = (Tr-12.0)
+            FQ = 1.22*Q**0.15*(1.0 + 0.00385*(x0*x0)**(MW_inv)*value)
     eta = (0.807*Tr**0.618 - 0.357*exp(-0.449*Tr) + 0.340*exp(-4.058*Tr) + 0.018)*Fp*FQ/xi
     return eta*1E-7
 
