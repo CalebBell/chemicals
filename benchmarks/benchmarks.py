@@ -126,12 +126,112 @@ class TimePermittivitySuite(BaseTimeSuite):
         permittivity_IAPWS_numba(650., 40.31090)
         
         
+from chemicals.thermal_conductivity import *
+if not IS_PYPY:
+    k_IAPWS_numba = chemicals.numba.k_IAPWS
+    k_air_lemmon_numba = chemicals.numba.k_air_lemmon
+    Sheffy_Johnson_numba = chemicals.numba.Sheffy_Johnson
+    Sato_Riedel_numba = chemicals.numba.Sato_Riedel
+    Gharagheizi_liquid_numba = chemicals.numba.Gharagheizi_liquid
+    Nicola_original_numba = chemicals.numba.Nicola_original
+    Lakshmi_Prasad_numba = chemicals.Lakshmi_Prasad
+    Nicola_numba = chemicals.numba.Nicola
+    Bahadori_liquid_numba = chemicals.numba.Bahadori_liquid
+    kl_Mersmann_Kind_numba = chemicals.numba.kl_Mersmann_Kind
+    DIPPR9G_numba = chemicals.numba.DIPPR9G
+    Missenard_numba = chemicals.numba.Missenard
+    Eucken_numba = chemicals.numba.Eucken
+    Eucken_modified_numba = chemicals.numba.Eucken_modified
+    DIPPR9B_numba = chemicals.numba.DIPPR9B
+    Chung_numba = chemicals.numba.Chung
+
+
+
+class TimeThermalConductivitySuite(BaseTimeSuite):
+    def time_k_IAPWS(self):
+        k_IAPWS(647.35, 750.)
+    def time_k_IAPWS_numba(self):
+        k_IAPWS_numba(647.35, 750.)
+    def time_k_IAPWS_full(self):
+        k_IAPWS(T=620., rho=613.227777440324, Cp=7634.337046792, Cv=3037.934412104, mu=70.905106751524E-6, drho_dP=5.209378197916E-6)
+    def time_k_IAPWS_full_numba(self):
+        k_IAPWS_numba(T=620., rho=613.227777440324, Cp=7634.337046792, Cv=3037.934412104, mu=70.905106751524E-6, drho_dP=5.209378197916E-6)
+    
+    def time_k_air_lemmon(self):
+        k_air_lemmon(300.0, 40.0)
+    def time_k_air_lemmon_numba(self):
+        k_air_lemmon_numba(300.0, 40.0)
+    def time_k_air_lemmon_full(self):
+        k_air_lemmon(132.64, 10400, 2137.078854678728, 35.24316159996235, 0.07417878614315769, 0.00035919027241528256, 1.7762253265868595e-05)
+    def time_k_air_lemmon_full_numba(self):
+        k_air_lemmon_numba(132.64, 10400, 2137.078854678728, 35.24316159996235, 0.07417878614315769, 0.00035919027241528256, 1.7762253265868595e-05)
+
+    def time_Sheffy_Johnson(self):
+        Sheffy_Johnson(300, 47, 280)
+    def time_Sheffy_Johnson_numba(self):
+        Sheffy_Johnson_numba(300, 47, 280)
+        
+    def time_Sato_Riedel(self):
+        Sato_Riedel(300, 47, 390, 520)
+    def time_Sato_Riedel_numba(self):
+        Sato_Riedel_numba(300, 47, 390, 520)
+    
+    def time_Lakshmi_Prasad(self):
+        Lakshmi_Prasad(273.15, 100)
+    def time_Lakshmi_Prasad_numba(self):
+        Lakshmi_Prasad_numba(273.15, 100)
+        
+    def time_Gharagheizi_liquid(self):
+        Gharagheizi_liquid(300, 40, 350, 1E6, 0.27)
+    def time_Gharagheizi_liquid_numba(self):
+        Gharagheizi_liquid_numba(300, 40, 350, 1E6, 0.27)
+        
+    def time_Nicola_original(self):
+        Nicola_original(300, 142.3, 611.7, 0.49, 201853)
+    def time_Nicola_original_numba(self):
+        Nicola_original_numba(300, 142.3, 611.7, 0.49, 201853)
+        
+    def time_Nicola(self):
+        Nicola(300, 142.3, 611.7, 0.49, 201853)
+    def time_Nicola_numba(self):
+        Nicola_numba(300, 142.3, 611.7, 0.49, 201853)
+        
+    def time_Bahadori_liquid(self):
+        Bahadori_liquid(273.15, 170)
+    def time_Bahadori_liquid_numba(self):
+        Bahadori_liquid_numba(273.15, 170)
+    
+    def time_kl_Mersmann_Kind(self):
+        kl_Mersmann_Kind(400, 170.33484, 658.0, 0.000754, 38)
+    def time_kl_Mersmann_Kind_numba(self):
+        kl_Mersmann_Kind_numba(400, 170.33484, 658.0, 0.000754, 38)
+        
+    def time_DIPPR9G(self):
+        DIPPR9G(515.05, 3.92E7, 579.15, 3.212E6, 7.085E-2)
+    def time_DIPPR9G_numba(self):
+        DIPPR9G_numba(515.05, 3.92E7, 579.15, 3.212E6, 7.085E-2)
+
+    def time_Missenard(self):
+        Missenard(304., 6330E5, 591.8, 41E5, 0.129)
+    def time_Missenard_numba(self):
+        Missenard_numba(304., 6330E5, 591.8, 41E5, 0.129)
+
+    def time_Eucken(self):
+        Eucken(MW=72.151, Cvm=135.9, mu=8.77E-6)
+    def time_Eucken_numba(self):
+        Eucken_numba(MW=72.151, Cvm=135.9, mu=8.77E-6)
+
+    def time_Eucken_modified(self):
+        Eucken_modified(MW=72.151, Cvm=135.9, mu=8.77E-6)
+    def time_Eucken_modified_numba(self):
+        Eucken_modified_numba(MW=72.151, Cvm=135.9, mu=8.77E-6)
+        
+    def time_DIPPR9B(self):
+        DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='linear')
+    def time_DIPPR9B_numba(self):
+        DIPPR9B_numba(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='linear')
         
         
-
-
-
-
 from chemicals.interface import * 
 
 if not IS_PYPY:

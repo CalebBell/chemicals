@@ -2568,14 +2568,14 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         scale_min, scale_max, nu_min, nu_max = viscosity_converter_limits[scale]
 
         if visc < scale_min*(1.-1E-7) or visc > scale_max*(1.+1E-7):
-            raise Exception('Viscosity conversion is outside the limits of the '
+            raise ValueError('Viscosity conversion is outside the limits of the '
                             '%s scale; given value is %s, but the range of the '
                             'scale is from %s to %s. Set `extrapolate` to True '
                             'to perform the conversion anyway.' %(scale, visc, scale_min, scale_max))
 
     def range_check_linear(val, c, tmin, scale):
         if val < tmin:
-            raise Exception('Viscosity conversion is outside the limits of the '
+            raise ValueError('Viscosity conversion is outside the limits of the '
                             '%s scale; given value is %s, but the minimum time '
                             'for this scale is %s s. Set `extrapolate` to True '
                             'to perform the conversion anyway.' %(scale, val, tmin))
@@ -2602,7 +2602,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         val = c*val # convert from seconds to centistokes
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
-        raise Exception('Scale "%s" not recognized - allowable values are any of %s.' %(old_scale, keys))
+        raise ValueError('Scale "%s" not recognized - allowable values are any of %s.' %(old_scale, keys))
 
     # Convert to desired scale
     if new_scale == 'kinematic viscosity':
@@ -2620,7 +2620,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
             range_check_linear(val, c, tmin, new_scale)
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
-        raise Exception('Scale "%s" not recognized - allowable values are any of %s.' %(new_scale, keys))
+        raise ValueError('Scale "%s" not recognized - allowable values are any of %s.' %(new_scale, keys))
     return float(val)
 
 
