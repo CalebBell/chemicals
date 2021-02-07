@@ -946,7 +946,7 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     Examples
     --------
     >>> Letsou_Stiel(400., 46.07, 516.25, 6.383E6, 0.6371)
-    0.00020361508753081502
+    0.0002036150875308
 
     References
     ----------
@@ -957,7 +957,7 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     Tr = T/Tc
     xi0 = (1.5174 - Tr*(2.135 - 0.75*Tr))*1E-5
     xi1 = (4.2552 - Tr*(7.674 - 3.4*Tr))*1E-5
-    xi = 2173.424*Tc**(1.0/6.)*MW**-0.5*Pc**(-2.0/3.)
+    xi = 2173.424*Tc**(1.0/6.)/sqrt(MW)*Pc**(-2.0/3.)
     return (xi0 + omega*xi1)/xi
 
 
@@ -1102,7 +1102,7 @@ def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
     dPr = (P-Psat)/Pc
     if dPr < 0.0:
         dPr = 0.0
-    return (1. + D*(dPr/2.118)**A)/(1. + C*omega*dPr)*mu_l
+    return (1. + D*(dPr*(1.0/2.118))**A)/(1. + C*omega*dPr)*mu_l
 
 ### Viscosity of liquid mixtures
 ### Viscosity of Gases - low pressure
@@ -1147,7 +1147,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
     Examples
     --------
     >>> Yoon_Thodos(300., 556.35, 4.5596E6, 153.8)
-    1.0194885727776817e-05
+    1.019488572777e-05
 
     References
     ----------
@@ -1156,7 +1156,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
        doi:10.1002/aic.690160225.
     '''
     Tr = T/Tc
-    xi = 2173.4241*Tc**(1/6.)*MW**-0.5*Pc**(-2.0/3.)
+    xi = 2173.4241*Tc**(1/6.)/sqrt(MW)*Pc**(-2.0/3.)
     a = 46.1
     b = 0.618
     c = 20.4
@@ -1209,7 +1209,7 @@ def Stiel_Thodos(T, Tc, Pc, MW):
     Examples
     --------
     >>> Stiel_Thodos(300., 556.35, 4.5596E6, 153.8) #CCl4
-    1.0408926223608723e-05
+    1.040892622360e-05
 
     References
     ----------
@@ -1217,11 +1217,11 @@ def Stiel_Thodos(T, Tc, Pc, MW):
        Gases at Normal Pressures." AIChE Journal 7, no. 4 (1961): 611-15.
        doi:10.1002/aic.690070416.
     '''
-    Pc = Pc/101325.
+    Pc = Pc*(1.0/101325.)
     Tr = T/Tc
-    xi = Tc**(1/6.)/(MW**0.5*Pc**(2/3.))
+    xi = Tc**(1/6.)/(sqrt(MW)*Pc**(2/3.))
     if Tr > 1.5:
-        mu_g = 17.78E-5*(4.58*Tr-1.67)**.625/xi
+        mu_g = 17.78E-5*(4.58*Tr-1.67)**0.625/xi
     else:
         mu_g = 34E-5*Tr**0.94/xi
     return mu_g*1e-3
