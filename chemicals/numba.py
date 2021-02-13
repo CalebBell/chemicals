@@ -47,7 +47,7 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
               'Rachford_Rice_solutionN', 'Rachford_Rice_solution2', 'flash_wilson',
               'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'iapws97_T', 'iapws95_T'])
 
-    blacklist = set(['to_num'])
+    blacklist = set(['to_num', 'hash_any_primitive'])
 
     __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
     new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,

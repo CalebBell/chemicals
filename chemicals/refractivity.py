@@ -60,7 +60,7 @@ __all__ = ['RI', 'RI_methods', 'RI_all_methods',
 from fluids.numerics import interp
 from fluids.constants import pi, N_A
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
-from chemicals.utils import sqrt
+from chemicals.utils import sqrt, isnan
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -136,8 +136,9 @@ def RI(CASRN, method=None):
     -------
     RI : float
         Refractive Index on the Na D line, [-]
-    T : float
-        Temperature at which refractive index reading was made
+    T : float or None
+        Temperature at which refractive index reading was made; None if not
+        available, [K]
 
     Other Parameters
     ----------------
@@ -155,6 +156,8 @@ def RI(CASRN, method=None):
     --------
     >>> RI(CASRN='64-17-5')
     (1.3611, 293.15)
+    >>> RI("60-35-5")
+    (1.4278, None)
 
     References
     ----------
@@ -171,7 +174,10 @@ def RI(CASRN, method=None):
     if value is None:
         value = (None, None)
     else:
-        value = tuple(value)
+        if isnan(value[1]):
+            value = (value[0], None)
+        else:
+            value = tuple(value)
     return value
 
 def polarizability_from_RI(RI, Vm):

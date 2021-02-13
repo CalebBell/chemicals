@@ -175,10 +175,10 @@ def hash_any_primitive(v):
         else:
             v = tuple(hash_any_primitive(i) for i in v)
     elif isinstance(v, dict):
-        temp_hash = 0
+        temp_hash = set()
         for key, value in v.items():
-            temp_hash = hash((temp_hash, key, hash_any_primitive(value)))
-        v = temp_hash
+            temp_hash.add(hash((key, hash_any_primitive(value))))
+        v = hash(frozenset(temp_hash))
     elif isinstance(v, set):
         # Should only contain hashable items
         v = frozenset(v)

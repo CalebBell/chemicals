@@ -1433,7 +1433,7 @@ def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
     if MW_roots is None:
         MW_roots = [0.0]*N
         for i in range(N):
-            MW_roots[i] = MWs[i]**0.5
+            MW_roots[i] = sqrt(MWs[i])
     denominator = k = 0.0
     for i in range(N):
         v = zs[i]*MW_roots[i]
