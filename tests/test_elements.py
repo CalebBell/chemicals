@@ -136,7 +136,7 @@ def test_misc_elements():
     assert periodic_table.Br.CAS_standard == '7726-95-6' # Br2
     assert periodic_table.Br.CAS == '10097-32-2' # monatomic
 
-    assert periodic_table.I.CAS == '20461-54-5'
+    assert periodic_table.I.CAS == '14362-44-8' # An earlier bug had 20461-54-5 which is the ionic form, not the monatomic form
     assert periodic_table.I.CAS_standard == '7553-56-2'
 
     assert (periodic_table.O.CAS, periodic_table.O.CAS_standard) == ('17778-80-2', '7782-44-7')
