@@ -22,6 +22,7 @@ SOFTWARE.
 """
 
 import pandas as pd
+from math import isnan
 from numpy.testing import assert_allclose
 import pytest
 from chemicals.identifiers import *
@@ -56,6 +57,11 @@ def test_dippr_2016_matched_meta():
             # CELLOBIOSE (not the latest CAS, now is 528-50-7)
             # TRIPROPYLENE GLYCOL MONOETHYL ETHER (cannot find structure)
             continue
+        try:
+            if isnan(CAS):
+                continue
+        except:
+            pass
         assert CAS_from_any(CAS) == CAS
 
     # TODO names?

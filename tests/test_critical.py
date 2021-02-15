@@ -201,7 +201,7 @@ def test_Tc_all_values():
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_close(Tcs_default_sum, 6053723.896122222)
+    assert_close(Tcs_default_sum, 6055023.896122223)
 
 def test_Tc():
     Tc_val = Tc(CASRN='64-17-5')
