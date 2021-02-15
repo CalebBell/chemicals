@@ -2240,7 +2240,7 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     else:
 
     .. math::
-        N = \frac{\log(H) - \log(\nu_{40})}{\log (\nu_{100})}
+        N = \frac{\ln(H) - \ln(\nu_{40})}{\ln (\nu_{100})}
 
     .. math::
         VI = \frac{10^N-1}{0.00715} + 100

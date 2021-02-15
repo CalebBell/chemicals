@@ -355,18 +355,18 @@ def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
     For the first indefinite integral of B:
 
     .. math::
-        \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \log{\left (T \right )} + \frac{1}{20000 T^{2}} \left(2770 T Tc^{2} + 121 Tc^{3}\right)
+        \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \ln{\left (T \right )} + \frac{1}{20000 T^{2}} \left(2770 T Tc^{2} + 121 Tc^{3}\right)
 
     .. math::
-        \int{B^{(1)}} dT = \frac{73 T}{1000} + \frac{23 Tc}{50} \log{\left (T \right )} + \frac{1}{70000 T^{7}} \left(35000 T^{6} Tc^{2} + 3395 T^{5} Tc^{3} + 73 Tc^{8}\right)
+        \int{B^{(1)}} dT = \frac{73 T}{1000} + \frac{23 Tc}{50} \ln{\left (T \right )} + \frac{1}{70000 T^{7}} \left(35000 T^{6} Tc^{2} + 3395 T^{5} Tc^{3} + 73 Tc^{8}\right)
 
     For the second indefinite integral of B:
 
     .. math::
-        \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \log{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \log{\left (T \right )} - \frac{121 Tc^{3}}{20000 T}
+        \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \ln{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \ln{\left (T \right )} - \frac{121 Tc^{3}}{20000 T}
 
     .. math::
-        \int\int B^{(1)} dT dT = \frac{73 T^{2}}{2000} + \frac{23 T}{50} Tc \log{\left (T \right )} - \frac{23 T}{50} Tc + \frac{Tc^{2}}{2} \log{\left (T \right )} - \frac{1}{420000 T^{6}} \left(20370 T^{5} Tc^{3} + 73 Tc^{8}\right)
+        \int\int B^{(1)} dT dT = \frac{73 T^{2}}{2000} + \frac{23 T}{50} Tc \ln{\left (T \right )} - \frac{23 T}{50} Tc + \frac{Tc^{2}}{2} \ln{\left (T \right )} - \frac{1}{420000 T^{6}} \left(20370 T^{5} Tc^{3} + 73 Tc^{8}\right)
 
     Examples
     --------
@@ -595,7 +595,7 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
     For the first indefinite integral of B:
 
     .. math::
-        \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \log{\left (T \right )} + \frac{1}{7000000 T^{7}} \left(969500 T^{6} Tc^{2} + 42350 T^{5} Tc^{3} + 607 Tc^{8}\right)
+        \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \ln{\left (T \right )} + \frac{1}{7000000 T^{7}} \left(969500 T^{6} Tc^{2} + 42350 T^{5} Tc^{3} + 607 Tc^{8}\right)
 
     .. math::
         \int{B^{(1)}} dT = \frac{637 T}{10000} - \frac{1}{70000 T^{7}} \left(23170 T^{6} Tc^{2} - 14805 T^{5} Tc^{3} - 80 Tc^{8}\right)
@@ -603,10 +603,10 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
     For the second indefinite integral of B:
 
     .. math::
-        \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \log{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \log{\left (T \right )} - \frac{1}{42000000 T^{6}} \left(254100 T^{5} Tc^{3} + 607 Tc^{8}\right)
+        \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \ln{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \ln{\left (T \right )} - \frac{1}{42000000 T^{6}} \left(254100 T^{5} Tc^{3} + 607 Tc^{8}\right)
 
     .. math::
-        \int\int B^{(1)} dT dT = \frac{637 T^{2}}{20000} - \frac{331 Tc^{2}}{1000} \log{\left (T \right )} - \frac{1}{210000 T^{6}} \left(44415 T^{5} Tc^{3} + 40 Tc^{8}\right)
+        \int\int B^{(1)} dT dT = \frac{637 T^{2}}{20000} - \frac{331 Tc^{2}}{1000} \ln{\left (T \right )} - \frac{1}{210000 T^{6}} \left(44415 T^{5} Tc^{3} + 40 Tc^{8}\right)
 
     Examples
     --------
@@ -810,7 +810,7 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
     For the first indefinite integral of B:
 
     .. math::
-        \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \log{\left (T \right )} + \frac{1}{7000000 T^{7}} \left(969500 T^{6} Tc^{2} + 42350 T^{5} Tc^{3} + 607 Tc^{8}\right)
+        \int{B^{(0)}} dT = \frac{289 T}{2000} - \frac{33 Tc}{100} \ln{\left (T \right )} + \frac{1}{7000000 T^{7}} \left(969500 T^{6} Tc^{2} + 42350 T^{5} Tc^{3} + 607 Tc^{8}\right)
 
     .. math::
         \int{B^{(1)}} dT = \frac{637 T}{10000} - \frac{1}{70000 T^{7}} \left(23170 T^{6} Tc^{2} - 14805 T^{5} Tc^{3} - 80 Tc^{8}\right)
@@ -824,10 +824,10 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
     For the second indefinite integral of B:
 
     .. math::
-        \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \log{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \log{\left (T \right )} - \frac{1}{42000000 T^{6}} \left(254100 T^{5} Tc^{3} + 607 Tc^{8}\right)
+        \int\int B^{(0)} dT dT = \frac{289 T^{2}}{4000} - \frac{33 T}{100} Tc \ln{\left (T \right )} + \frac{33 T}{100} Tc + \frac{277 Tc^{2}}{2000} \ln{\left (T \right )} - \frac{1}{42000000 T^{6}} \left(254100 T^{5} Tc^{3} + 607 Tc^{8}\right)
 
     .. math::
-        \int\int B^{(1)} dT dT = \frac{637 T^{2}}{20000} - \frac{331 Tc^{2}}{1000} \log{\left (T \right )} - \frac{1}{210000 T^{6}} \left(44415 T^{5} Tc^{3} + 40 Tc^{8}\right)
+        \int\int B^{(1)} dT dT = \frac{637 T^{2}}{20000} - \frac{331 Tc^{2}}{1000} \ln{\left (T \right )} - \frac{1}{210000 T^{6}} \left(44415 T^{5} Tc^{3} + 40 Tc^{8}\right)
 
     .. math::
         \int\int B^{(2)} dT dT = \frac{Tc^{6}}{20 T^{4}}

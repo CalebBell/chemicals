@@ -377,7 +377,7 @@ def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
     error.
 
     .. math::
-        H_{12} = \exp\left(A_{12} + \frac{B_{12}}{T} + C_{12}\log(T) + D_{12}T
+        H_{12} = \exp\left(A_{12} + \frac{B_{12}}{T} + C_{12}\ln(T) + D_{12}T
          + \frac{E_{12}}{T^2} \right)
 
     Parameters

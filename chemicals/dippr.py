@@ -109,7 +109,7 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
         T^{4}}{4} + \frac{E T^{5}}{5} + \frac{F T^{6}}{6} + \frac{G T^{7}}{7}
 
     .. math::
-        \int \frac{Y}{T} dT = A \log{\left (T \right )} + B T + \frac{C T^{2}}
+        \int \frac{Y}{T} dT = A \ln{\left (T \right )} + B T + \frac{C T^{2}}
         {2} + \frac{D T^{3}}{3} + \frac{E T^{4}}{4} + \frac{F T^{5}}{5}
         + \frac{G T^{6}}{6}
 
@@ -309,11 +309,11 @@ def EQ104(T, A, B, C, D, E, order=0):
         - \frac{8 D}{T^{9}} - \frac{9 E}{T^{10}}
 
     .. math::
-        \int Y dT = A T + B \log{\left (T \right )} - \frac{1}{56 T^{8}}
+        \int Y dT = A T + B \ln{\left (T \right )} - \frac{1}{56 T^{8}}
         \left(28 C T^{6} + 8 D T + 7 E\right)
 
     .. math::
-        \int \frac{Y}{T} dT = A \log{\left (T \right )} - \frac{1}{72 T^{9}}
+        \int \frac{Y}{T} dT = A \ln{\left (T \right )} - \frac{1}{72 T^{9}}
         \left(72 B T^{8} + 24 C T^{6} + 9 D T + 8 E\right)
 
     Examples
@@ -477,10 +477,10 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
         - D E \tanh{\left (\frac{E}{T} \right )}
 
     .. math::
-        \int \frac{Y}{T} dT = A \log{\left (T \right )} + \frac{B C}{T \tanh{
-        \left (\frac{C}{T} \right )}} - B \log{\left (\sinh{\left (\frac{C}{T}
+        \int \frac{Y}{T} dT = A \ln{\left (T \right )} + \frac{B C}{T \tanh{
+        \left (\frac{C}{T} \right )}} - B \ln{\left (\sinh{\left (\frac{C}{T}
         \right )} \right )} - \frac{D E}{T} \tanh{\left (\frac{E}{T} \right )}
-        + D \log{\left (\cosh{\left (\frac{E}{T} \right )} \right )}
+        + D \ln{\left (\cosh{\left (\frac{E}{T} \right )} \right )}
 
     Examples
     --------
@@ -564,7 +564,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         - \frac{T}{T_{c}} + 1\right)^{4}
 
     .. math::
-        \int Y dT = - A^{2} T_{c} \log{\left (T - T_{c} \right )} + \frac{D^{2}
+        \int Y dT = - A^{2} T_{c} \ln{\left (T - T_{c} \right )} + \frac{D^{2}
         T^{6}}{30 T_{c}^{5}} - \frac{T^{5}}{10 T_{c}^{4}} \left(C D + 2 D^{2}
         \right) + \frac{T^{4}}{12 T_{c}^{3}} \left(C^{2} + 6 C D + 6 D^{2}
         \right) - \frac{T^{3}}{3 T_{c}^{2}} \left(A D + C^{2} + 3 C D
@@ -573,7 +573,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         - \frac{C D}{2} - \frac{D^{2}}{5}\right)
 
     .. math::
-        \int \frac{Y}{T} dT = - A^{2} \log{\left (T + \frac{- 60 A^{2} T_{c}
+        \int \frac{Y}{T} dT = - A^{2} \ln{\left (T + \frac{- 60 A^{2} T_{c}
         + 60 A C T_{c} + 30 A D T_{c} - 30 B T_{c} + 10 C^{2} T_{c}
         + 15 C D T_{c} + 6 D^{2} T_{c}}{60 A^{2} - 60 A C - 30 A D + 30 B
         - 10 C^{2} - 15 C D - 6 D^{2}} \right )} + \frac{D^{2} T^{5}}
@@ -582,7 +582,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         \right) - \frac{T^{2}}{2 T_{c}^{2}} \left(A D + C^{2} + 3 C D
         + 2 D^{2}\right) + \frac{T}{T_{c}} \left(2 A C + 2 A D + C^{2}
         + 2 C D + D^{2}\right) + \frac{1}{30} \left(30 A^{2} - 60 A C
-        - 30 A D + 30 B - 10 C^{2} - 15 C D - 6 D^{2}\right) \log{\left
+        - 30 A D + 30 B - 10 C^{2} - 15 C D - 6 D^{2}\right) \ln{\left
         (T + \frac{1}{60 A^{2} - 60 A C - 30 A D + 30 B - 10 C^{2} - 15 C D
         - 6 D^{2}} \left(- 30 A^{2} T_{c} + 60 A C T_{c} + 30 A D T_{c}
         - 30 B T_{c} + 10 C^{2} T_{c} + 15 C D T_{c} + 6 D^{2} T_{c}
@@ -641,7 +641,7 @@ def EQ115(T, A, B, C=0, D=0, E=0):
     Only parameters A and B are required.
 
     .. math::
-        Y = \exp\left(A + \frac{B}{T} + C\log T + D T^2 + \frac{E}{T^2}\right)
+        Y = \exp\left(A + \frac{B}{T} + C\ln T + D T^2 + \frac{E}{T^2}\right)
 
     Parameters
     ----------
@@ -858,13 +858,13 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
         + \frac{F G^{2}}{G e^{\frac{G}{T}} - G}
 
     .. math::
-        \int \frac{Y}{T} dT = A \log{\left (T \right )} + B C^{2} \left(
+        \int \frac{Y}{T} dT = A \ln{\left (T \right )} + B C^{2} \left(
         \frac{1}{C T e^{\frac{C}{T}} - C T} + \frac{1}{C T} - \frac{1}{C^{2}}
-        \log{\left (e^{\frac{C}{T}} - 1 \right )}\right) + D E^{2} \left(
+        \ln{\left (e^{\frac{C}{T}} - 1 \right )}\right) + D E^{2} \left(
         \frac{1}{E T e^{\frac{E}{T}} - E T} + \frac{1}{E T} - \frac{1}{E^{2}}
-        \log{\left (e^{\frac{E}{T}} - 1 \right )}\right) + F G^{2} \left(
+        \ln{\left (e^{\frac{E}{T}} - 1 \right )}\right) + F G^{2} \left(
         \frac{1}{G T e^{\frac{G}{T}} - G T} + \frac{1}{G T} - \frac{1}{G^{2}}
-        \log{\left (e^{\frac{G}{T}} - 1 \right )}\right)
+        \ln{\left (e^{\frac{G}{T}} - 1 \right )}\right)
 
     Examples
     --------

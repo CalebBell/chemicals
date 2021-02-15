@@ -1038,8 +1038,8 @@ def Watson_n(T1, T2, Hvap1, Hvap2, Tc):
     given two known heats of vaporization.
 
     .. math::
-        n = \left[ \frac{\log{\left(\frac{Hvap_{1}}{Hvap_{2}} \right)}}
-        {\log{\left(\frac{T_{1} - T_{c}}{T_{2} - T_{c}} \right)}}\right]
+        n = \left[ \frac{\ln{\left(\frac{Hvap_{1}}{Hvap_{2}} \right)}}
+        {\ln{\left(\frac{T_{1} - T_{c}}{T_{2} - T_{c}} \right)}}\right]
 
     Parameters
     ----------
@@ -1081,7 +1081,7 @@ def Alibakhshi(T, Tc, C):
 
     .. math::
         \Delta H_{vap} = \left(4.5\pi N_A\right)^{1/3.}4.2\times 10^{-7}
-        (T_c - 6) - 0.5RT\log(T) + CT
+        (T_c - 6) - 0.5RT\ln(T) + CT
 
     Parameters
     ----------

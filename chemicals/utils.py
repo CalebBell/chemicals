@@ -1790,7 +1790,7 @@ def mixing_logarithmic(fracs, props):
     logarithmic properties.
 
     .. math::
-        y = \sum_i \text{frac}_i \cdot \log(\text{prop}_i)
+        y = \sum_i \text{frac}_i \cdot \ln(\text{prop}_i)
 
     Parameters
     ----------

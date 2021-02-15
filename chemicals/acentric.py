@@ -241,7 +241,7 @@ def Stiel_polar_factor(Psat, Pc, omega):
     the critical pressure `Pc`, and the acentric factor `omega`.
 
     .. math::
-        x = \log P_r|_{T_r=0.6} + 1.70 \omega + 1.552
+        x = \log_{10} P_r|_{T_r=0.6} + 1.70 \omega + 1.552
 
     Parameters
     ----------

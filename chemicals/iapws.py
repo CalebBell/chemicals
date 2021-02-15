@@ -3484,7 +3484,7 @@ def iapws92_rhog_sat(T):
     SR1-86(1992) [1]_ [2]_ explicit equation.
 
     .. math::
-        \log \left(\frac{\rho^{sat}_g}{\rho_c}\right) = 1 + c_1\tau^{2/6} + c_2\tau^{4/6}
+        \ln \left(\frac{\rho^{sat}_g}{\rho_c}\right) = 1 + c_1\tau^{2/6} + c_2\tau^{4/6}
         + c_3 \tau^{8/6} + c_4\tau^{18/6} + c_5\tau^{37/6} + c_6\tau^{71/6}
 
     .. math::

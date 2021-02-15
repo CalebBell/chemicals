@@ -366,8 +366,11 @@ def logP(CASRN, method=None):
 
     Notes
     -----
+    Although matimatically this could be expressed with a logarithm in any
+    base, reported values are published using a  base 10 logarithm.
+
     .. math::
-        \log P_{ oct/wat} = \log\left(\frac{\left[{solute}
+        \log_{10} P_{ oct/wat} = \log_{10}\left(\frac{\left[{solute}
         \right]_{ octanol}^{un-ionized}}{\left[{solute}
         \right]_{ water}^{ un-ionized}}\right)
 
