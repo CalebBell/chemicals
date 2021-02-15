@@ -73,7 +73,7 @@ __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
 import os
 from io import open
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data, to_num
-from chemicals.elements import (periodic_table, homonuclear_elemental_gases,
+from chemicals.elements import (periodic_table, homonuclear_elements,
                              charge_from_formula, serialize_formula)
 
 
@@ -335,7 +335,7 @@ class ChemicalMetadataDB(object):
 
 
             if ele.InChI_key in self.InChI_key_index:
-                if ele.number not in homonuclear_elemental_gases:
+                if ele.number not in homonuclear_elements:
                     obj_old = self.InChI_key_index[ele.InChI_key]
                     for name in obj_old.synonyms:
                         self.name_index[name] = obj
@@ -345,7 +345,7 @@ class ChemicalMetadataDB(object):
             self.pubchem_index[ele.PubChem] = obj
             self.smiles_index[ele.smiles] = obj
             self.InChI_index[ele.InChI] = obj
-            if ele.number in homonuclear_elemental_gases:
+            if ele.number in homonuclear_elements:
                 for name in synonyms:
                     self.name_index['monatomic ' + name] = obj
             else:

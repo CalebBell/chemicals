@@ -79,7 +79,7 @@ def test_Matthews_critical_names():
 #    lalib = rho_dict_Laliberte.copy()
 #    lalib.update(mu_dict_Laliberte)
 #    lalib.update(Cp_dict_Laliberte)
-#    
+#
 #    for CAS, d in lalib.items():
 #        c = None
 #        formula = d['Formula']
@@ -104,7 +104,7 @@ def test_database_formulas():
     # The fix here is adding an isotope db and making the formula parser handle isotopes as well.
     # This worked until isotopes were added to formulas
     for i in pubchem_db.CAS_index.values():
-        assert i.formula == serialize_formula(i.formula) 
+        assert i.formula == serialize_formula(i.formula)
 
 def test_organic_user_db():
     db = ChemicalMetadataDB(elements=False,
@@ -139,7 +139,7 @@ def test_organic_user_db():
 
     for CAS, d in db.CAS_index.items():
         assert CAS_from_any('InChI=1S/' + d.InChI) == int_to_CAS(CAS)
-        
+
     for CAS, d in db.CAS_index.items():
         assert CAS_from_any('InChIKey=' + d.InChI_key) == int_to_CAS(CAS)
 
@@ -169,7 +169,7 @@ def test_inorganic_db():
             # Formulas which are not unique by design
             continue
         assert CAS_from_any(formula) == d.CASs
-    
+
     # Check smiles are unique / can lookup by smiles
     for smi, d in db.smiles_index.items():
         if not smi:
@@ -190,21 +190,21 @@ def test_inorganic_db():
         atoms = nested_formula_parser(formula, check=False)
         mw_calc = molecular_weight(atoms)
         assert_close(mw_calc, i.MW, atol=0.05)
-    
+
 
 def test_mixture_from_any():
     with pytest.raises(Exception):
         mixture_from_any(['water', 'methanol'])
     with pytest.raises(Exception):
         mixture_from_any('NOTAMIXTURE')
-        
+
     for name in ['Air', 'air', u'Air', ['air']]:
         assert mixture_from_any(name) == common_mixtures['Air']
 
     names = ['R-401A ', ' R-401A ', 'R401A ', 'r401a', 'r-401A', 'refrigerant-401A', 'refrigerant 401A']
     for name in names:
         assert mixture_from_any(name) == common_mixtures['R401A']
-        
+
     assert mixture_from_any('R512A') == common_mixtures['R512A']
     assert mixture_from_any([u'air']) == common_mixtures['Air']
 
@@ -213,22 +213,22 @@ def test_IDs_to_CASs():
     assert IDs_to_CASs('R512A') == expect
     assert IDs_to_CASs(['R512A']) == expect
     assert IDs_to_CASs(['norflurane', '1,1-difluoroethane']) == expect
-    
+
     assert IDs_to_CASs(['norflurane']) == ['811-97-2']
     assert IDs_to_CASs('norflurane') == ['811-97-2']
-    
+
 def test_search_chemical():
-    hit0 = search_chemical('water') 
-    hit1 = search_chemical('water') 
+    hit0 = search_chemical('water')
+    hit1 = search_chemical('water')
     assert hit0 is hit1
-    
+
     with pytest.raises(ValueError):
         # Not that smart/weird
         search_chemical('(oxidane)')
-        
+
     assert search_chemical('water').charge == 0
-    
-    
+
+
 def test_CAS_from_any():
     assert CAS_from_any('7732-18-5 ') == '7732-18-5'
     assert CAS_from_any('   7732  -18-5 ') == '7732-18-5'
@@ -247,11 +247,11 @@ def test_CAS_from_any():
     assert CAS_from_any(' inchikey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N') == '64-17-5'
 
     assert CAS_from_any('InChI=1S/C6H15N/c1-5-6(2)7(3)4/h6H,5H2,1-4H3') == '921-04-0'
-    
+
     assert CAS_from_any('pubchem=702') == '64-17-5'
-    
+
     assert CAS_from_any('oxidane') == '7732-18-5'
-    
+
     assert CAS_from_any('CCCCCCCCCC') == '124-18-5'
     assert CAS_from_any('SMILES=CCCCCCCCCC') == '124-18-5'
 
@@ -259,16 +259,16 @@ def test_CAS_from_any():
     assert CAS_from_any('O') == '17778-80-2'
 
     assert CAS_from_any('InChiKey=QVGXLLKOCUKJST-UHFFFAOYSA-N') == '17778-80-2'
-    # Just because it's an element does not mean the CAS number refers to the 
+    # Just because it's an element does not mean the CAS number refers to the
     # monatomic form unfortunately - this is the CAS for Monooxygen
-    
+
     assert CAS_from_any('1') == '12385-13-6'
-    
+
 
     assert CAS_from_any('HC2O4-') == '920-52-5'
-    
+
     assert CAS_from_any('water (H2O)') == '7732-18-5'
-    
+
     # Test charge interpretation
     assert CAS_from_any('Ca+2') == '14127-61-8'
     assert CAS_from_any('Ca++') == '14127-61-8'
@@ -289,12 +289,12 @@ def test_CAS_from_any():
     # unknown CAS
     with pytest.raises(Exception):
         CAS_from_any('1411769-41-9')
-        
+
     with pytest.raises(Exception):
         # This was parsed as Cerium for a little while
         CAS_from_any('Cellulose')
-        
-        
+
+
 def test_periodic_table_variants():
     """Do a lookup in the periodic table and compare vs CAS_from_any."""
     ids = [periodic_table._CAS_to_elements, periodic_table._name_to_elements, periodic_table._symbol_to_elements]
@@ -306,7 +306,7 @@ def test_periodic_table_variants():
             except:
                 failed_CASs.append(periodic_table[i].name)
     assert 0 == len(set(failed_CASs))
-    
+
     # Check only the 5 known diatomics have a diff case
     failed_CASs = []
     for thing in ids:
@@ -315,33 +315,65 @@ def test_periodic_table_variants():
                 assert CAS_from_any(i) == periodic_table[i].CAS
             except:
                 failed_CASs.append(periodic_table[i].name)
-    assert set(['Chlorine', 'Fluorine', 'Hydrogen', 'Nitrogen', 'Oxygen']) == set(failed_CASs)     
-    
-    
+    assert set(['Chlorine', 'Fluorine', 'Hydrogen', 'Nitrogen', 'Oxygen', 'Bromine', 'Iodine']) == set(failed_CASs)
+
+
+
     for CAS, d in periodic_table._CAS_to_elements.items():
         assert CAS_from_any(d.smiles) == CAS
-        
+
     for CAS, d in periodic_table._CAS_to_elements.items():
         assert CAS_from_any('SMILES=' + d.smiles) == CAS
-        
+
     for CAS, d in periodic_table._CAS_to_elements.items():
         assert CAS_from_any('InChI=1S/' + d.InChI) == CAS
-        
+
     for CAS, d in periodic_table._CAS_to_elements.items():
         assert CAS_from_any('InChIKey=' + d.InChI_key) == CAS
-        
-        
+
+
     fail = 0
     for CAS, d in periodic_table._CAS_to_elements.items():
-        
+
         if d.PubChem != None:
             assert CAS_from_any('PubChem=' + str(d.PubChem)) == CAS
         else:
             fail += 1
     assert fail == 9
     # 111 - 118 aren't in pubchem
-    
-    
+
+    # Direct checks on specific elements
+    assert search_chemical('bromine').formula == 'Br2'
+    assert search_chemical('iodine').formula == 'I2'
+
+    assert search_chemical('Oxygen').formula == 'O2'
+    assert search_chemical('nitrogen').formula == 'N2'
+    assert search_chemical('fluorine').formula == 'F2'
+    assert search_chemical('hydrogen').formula == 'H2'
+    assert search_chemical('chlorine').formula == 'Cl2'
+
+
+    assert search_chemical('monatomic bromine').formula == 'Br'
+    assert search_chemical('monatomic iodine').formula == 'I'
+
+    assert search_chemical('monatomic Oxygen').formula == 'O'
+    assert search_chemical('monatomic nitrogen').formula == 'N'
+    assert search_chemical('monatomic fluorine').formula == 'F'
+    assert search_chemical('monatomic hydrogen').formula == 'H'
+    assert search_chemical('monatomic chlorine').formula == 'Cl'
+
+    # Check they can be looked up by their specific CAS number also
+    assert search_chemical(search_chemical('monatomic bromine').CASs).formula == 'Br'
+    assert search_chemical(search_chemical('monatomic iodine').CASs).formula == 'I'
+
+    assert search_chemical(search_chemical('monatomic Oxygen').CASs).formula == 'O'
+    assert search_chemical(search_chemical('monatomic nitrogen').CASs).formula == 'N'
+    assert search_chemical(search_chemical('monatomic fluorine').CASs).formula == 'F'
+    assert search_chemical(search_chemical('monatomic hydrogen').CASs).formula == 'H'
+    assert search_chemical(search_chemical('monatomic chlorine').CASs).formula == 'Cl'
+
+
+
 def test_fake_CAS_numbers():
     """File generated with :
 
@@ -355,7 +387,7 @@ def test_fake_CAS_numbers():
     f.close()
     """
     # TODO
-    
+
 
 @pytest.mark.slow
 def test_db_vs_ChemSep():
@@ -369,7 +401,7 @@ def test_db_vs_ChemSep():
     EVEN THAT HAS BEEN REDUCED By 80% by using cElementTree instead of
     ElementTree.
     """
-    
+
     import xml.etree.cElementTree as ET
     folder = os.path.join(os.path.dirname(__file__), 'Data')
 
@@ -389,12 +421,12 @@ def test_db_vs_ChemSep():
                 smiles = i.attrib['value']
             elif formula is None and tag == 'StructureFormula':
                 formula = i.attrib['value']
-        
+
 #        CAS = [i.attrib['value'] if  ][0]
 #        name = [i.attrib['value'] for i in child if i.tag ][0]
 #        smiles = [i.attrib['value'] for i in child if i.tag == ]
 #        formula = [i.attrib['value'] for i in child if i.tag == 'StructureFormula'][0]
-        
+
         try:
             if '-' in formula:
                 formula = None
@@ -406,9 +438,9 @@ def test_db_vs_ChemSep():
             smiles = smiles[0]
         else:
             smiles = None
-        
-        data[CAS] = {'name': name, 'smiles': smiles, 'formula': formula}        
-    
+
+        data[CAS] = {'name': name, 'smiles': smiles, 'formula': formula}
+
     for CAS, d in data.items():
         hit = pubchem_db.search_CAS(CAS)
         assert hit.CASs == CAS
@@ -433,11 +465,11 @@ def test_db_vs_ChemSep():
 ##
 
     # In an ideal world we could also validate against their smiles
-    # but that's proving difficult due to things like 1-hexene - 
+    # but that's proving difficult due to things like 1-hexene -
     # is it 'CCCCC=C' or 'C=CCCCC'?
-#test_db_vs_ChemSep() 
-    
-    
+#test_db_vs_ChemSep()
+
+
 
 
 def test_CAS2int():
@@ -458,8 +490,8 @@ def test_sorted_CAS_key():
     assert res == expect
     res = sorted_CAS_key(['108-88-3', '98-00-0', '7732-18-5', '64-17-5'])
     assert res == expect
-    
+
     invalid_CAS_expect = ('641', '98-00-0', '108-88-3', '7732-8-5')
     invalid_CAS_test = sorted_CAS_key(['7732-8-5', '641', '108-88-3', '98-00-0'])
     assert invalid_CAS_expect == invalid_CAS_test
-    
+
