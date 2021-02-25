@@ -6,7 +6,7 @@ Chemicals
    :target: https://pypi.python.org/pypi/chemicals
    :alt: Version_status
 .. image:: http://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat
-   :target: https://chemicals.readthedocs.io/en/latest/
+   :target: https://chemicals.readthedocs.io/
    :alt: Documentation
 .. image:: https://github.com/CalebBell/chemicals/workflows/Build/badge.svg
    :target: https://github.com/CalebBell/chemicals/actions

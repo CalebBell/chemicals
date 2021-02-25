@@ -2007,7 +2007,7 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
     Examples
     --------
     >>> Zabransky_cubic(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
-    75.31465144297991
+    75.31465144297
 
     References
     ----------
@@ -2015,7 +2015,7 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
-    T = T/100.
+    T = T*1e-2
     return R*(((a4*T + a3)*T + a2)*T + a1)
 
 def Zabransky_cubic_integral(T, a1, a2, a3, a4):
@@ -2047,7 +2047,7 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     Examples
     --------
     >>> Zabransky_cubic_integral(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
-    31051.690370364562
+    31051.690370364
 
     References
     ----------
@@ -2055,7 +2055,7 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
-    T = T/100.
+    T = T*1e-2
     return 100.0*R*T*(T*(T*(T*a4*0.25 + a3*(1.0/3.)) + a2*0.5) + a1)
 
 def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
@@ -2089,7 +2089,7 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     --------
     >>> Zabransky_cubic_integral_over_T(298.15, 20.9634, -10.1344, 2.8253,
     ... -0.256738)
-    24.732465342840914
+    24.732465342840
 
     References
     ----------
@@ -2140,7 +2140,7 @@ def Perry_151(T, a, b, c, d):
        Eighth Edition. McGraw-Hill Professional, 2007.
 
     """
-    T2 = T**2
+    T2 = T*T
     return (a + b*T + c/T2 + d*T2) * 4.184
 
 def Lastovka_solid(T, similarity_variable, MW=None):
