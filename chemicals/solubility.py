@@ -48,7 +48,7 @@ __all__ = ['solubility_parameter',
            'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture']
            
 import os
-from fluids.constants import R, atm
+from fluids.constants import R, atm, R_inv
 from chemicals.utils import log, exp
 
 
@@ -121,7 +121,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
         Heat of melting at the melting temperature of the solute [J/mol]
     Cpl : float, optional
         Molar heat capacity of the solute as a liquid [J/mol/K]
-    Cpls: float, optional
+    Cps: float, optional
         Molar heat capacity of the solute as a solid [J/mol/K]
     gamma : float, optional
         Activity coefficient of the solute as a liquid [-]
@@ -140,7 +140,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     From [1]_, matching example
 
     >>> solubility_eutectic(T=260., Tm=278.68, Hm=9952., Cpl=0, Cps=0, gamma=3.0176)
-    0.2434007130748926
+    0.243400713
 
     References
     ----------
@@ -148,7 +148,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
        Weinheim, Germany: Wiley-VCH, 2012.
     '''
     dCp = Cpl-Cps
-    x = exp(- Hm/R/T*(1-T/Tm) + dCp*(Tm-T)/R/T - dCp/R*log(Tm/T))/gamma
+    x = exp(- R_inv*((Hm*(1.0 - T/Tm) - dCp*(Tm-T))/T + dCp*log(Tm/T)))/gamma
     return x
 
 
