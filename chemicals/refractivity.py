@@ -59,6 +59,7 @@ __all__ = ['RI', 'RI_methods', 'RI_all_methods',
 
 from fluids.numerics import interp
 from fluids.constants import pi, N_A
+from chemicals.numba import unsafe
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -98,6 +99,7 @@ else:
 RI_all_methods = (CRC,)
 '''Tuple of method name keys. See the `RI` for the actual references'''
 
+@unsafe
 def RI_methods(CASRN):
     """Return all methods available to obtain the RI for the desired chemical.
 
@@ -119,6 +121,7 @@ def RI_methods(CASRN):
     if not _RI_data_loaded: _load_RI_data()
     return list_available_methods_from_df_dict(RI_sources, CASRN, 'RI')
 
+@unsafe
 def RI(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's refractive
     index. Lookup is based on CASRNs. Will automatically select a data source
@@ -172,6 +175,7 @@ def RI(CASRN, method=None):
     else:
         value = tuple(value)
     return value
+
 
 def polarizability_from_RI(RI, Vm):
     r'''Returns the polarizability of a fluid given its molar volume and

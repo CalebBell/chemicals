@@ -86,6 +86,7 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
            'balance_stoichiometry', 'stoichiometric_matrix']
            
+from chemicals.numba import unsafe
 from chemicals.utils import ceil, log10, PY37, source_path, os_path_join, can_load_data
 from chemicals import heat_capacity
 from chemicals.data_reader import (register_df_source,
@@ -166,6 +167,7 @@ else:
 Hfs_all_methods = (CRC,)
 '''Tuple of method name keys. See the `Hfs` for the actual references'''
 
+@unsafe
 def Hfs_methods(CASRN):
     """Return all methods available to obtain the Hfs for the desired chemical.
 
@@ -187,6 +189,7 @@ def Hfs_methods(CASRN):
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
+@unsafe
 def Hfs(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's solid/crystaline 
     standard phase heat of formation. The lookup is based on CASRNs. Will 
@@ -241,6 +244,7 @@ def Hfs(CASRN, method=None):
 Hfl_all_methods = (ATCT_L, CRC)
 '''Tuple of method name keys. See the `Hfl` for the actual references'''
 
+@unsafe
 def Hfl_methods(CASRN):
     """Return all methods available to obtain the Hfl for the desired chemical.
 
@@ -262,6 +266,7 @@ def Hfl_methods(CASRN):
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
+@unsafe
 def Hfl(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's liquid standard
     phase heat of formation. The lookup is based on CASRNs. Will automatically
@@ -319,6 +324,7 @@ def Hfl(CASRN, method=None):
 Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS)
 '''Tuple of method name keys. See the `Hfg` for the actual references'''
 
+@unsafe
 def Hfg_methods(CASRN):
     """Return all methods available to obtain the Hfg for the desired chemical.
 
@@ -340,6 +346,7 @@ def Hfg_methods(CASRN):
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(Hfg_sources, CASRN, 'Hfg')
 
+@unsafe
 def Hfg(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's gas heat of
     formation. Lookup is based on CASRNs. Will automatically select a data
@@ -415,6 +422,7 @@ def Hfg(CASRN, method=None):
 S0s_all_methods = (CRC,)
 '''Tuple of method name keys. See the `S0s` for the actual references'''
 
+@unsafe
 def S0s_methods(CASRN):
     """Return all methods available to obtain the S0s for the desired chemical.
 
@@ -436,6 +444,7 @@ def S0s_methods(CASRN):
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0s_sources, CASRN, 'S0s')
 
+@unsafe
 def S0s(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
@@ -484,6 +493,7 @@ def S0s(CASRN, method=None):
 S0l_all_methods = (CRC,)
 '''Tuple of method name keys. See the `S0l` for the actual references'''
 
+@unsafe
 def S0l_methods(CASRN):
     """Return all methods available to obtain the S0l for the desired chemical.
 
@@ -505,6 +515,7 @@ def S0l_methods(CASRN):
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0l_sources, CASRN, 'S0l')
 
+@unsafe
 def S0l(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
@@ -559,6 +570,7 @@ def S0l(CASRN, method=None):
 S0g_all_methods = (CRC, YAWS)
 '''Tuple of method name keys. See the `S0g` for the actual references'''
 
+@unsafe
 def S0g_methods(CASRN):
     """Return all methods available to obtain the S0g for the desired chemical.
 
@@ -812,6 +824,7 @@ def entropy_formation(Hf, Gf, T_ref=298.15):
 
 # %% Stoichiometry functions
 
+@unsafe
 def stoichiometric_matrix(atomss, reactants):
     r'''This function calculates a stoichiometric matrix of reactants and 
     stoichiometric matrix, as required by a solver to compute the reation

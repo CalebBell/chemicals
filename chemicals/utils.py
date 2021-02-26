@@ -47,6 +47,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'solve_flow_composition_mix',
 'v_to_v_molar', 'v_molar_to_v']
 
+from chemicals.numba import unsafe
 import os
 import sys
 from cmath import sqrt as csqrt
@@ -94,6 +95,7 @@ try:
 except:
     pass
 
+@unsafe
 def to_num(values):
     r'''Legacy function to turn a list of strings into either floats
     (if numeric), stripped strings (if not) or None if the string is empty.

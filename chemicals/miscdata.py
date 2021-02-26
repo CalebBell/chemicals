@@ -38,6 +38,7 @@ Temperature Dependent data
 __all__ = ['lookup_VDI_tabular_data']
 
 import os
+from chemicals.numba import unsafe
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
@@ -127,6 +128,7 @@ else:
 #        newdict["Volume (g)"].append(rho_to_Vm(rhog, _MW))
 #        VDI_saturation_dict[CASRN] = newdict
 
+@unsafe
 def lookup_VDI_tabular_data(CASRN, prop):
     r'''This function retrieves the tabular data available for a given chemical
     and a given property. Lookup is based on CASRNs. Length of data returned

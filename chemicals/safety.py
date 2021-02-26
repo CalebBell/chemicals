@@ -134,6 +134,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
 
 import os
 from fluids.core import F2K
+from chemicals.numba import unsafe
 from chemicals.utils import R, none_and_length_check, normalize, PY37
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -398,6 +399,7 @@ Ceiling_all_methods = (ONTARIO,)
 Skin_all_methods = (ONTARIO,)
 '''Tuple of method name keys. See the :obj:`Skin` for the actual references'''
 
+@unsafe
 def TWA_methods(CASRN):
     """Return all methods available to obtain the Time-Weighted Average exposure
     limits (TWA) for the desired chemical.
@@ -427,6 +429,7 @@ def TWA_methods(CASRN):
         if (data["TWA (ppm)"] or data["TWA (mg/m^3)"]): return [ONTARIO]
     return []
     
+@unsafe
 def TWA(CASRN, method=None):
     """Return the Time-Weighted Average exposure
     limits (TWA) for the desired chemical if it is available.
@@ -470,6 +473,7 @@ def TWA(CASRN, method=None):
         raise ValueError('Invalid method: %s, allowed methods are %s' %(
                          method, TWA_all_methods))
 
+@unsafe
 def STEL_methods(CASRN):
     """Return all methods available to obtain STEL for the desired chemical.
 
@@ -493,6 +497,7 @@ def STEL_methods(CASRN):
         if (data["STEL (ppm)"] or data["STEL (mg/m^3)"]): return [ONTARIO]
     return []
 
+@unsafe
 def STEL(CASRN, method=None):
     """This function handles the retrieval of Short-term Exposure Limit (STEL)
     on worker exposure to dangerous chemicals.
@@ -538,6 +543,7 @@ def STEL(CASRN, method=None):
         raise ValueError('Invalid method: %s, allowed methods are %s' %(
                          method, TWA_all_methods))
 
+@unsafe
 def Ceiling_methods(CASRN):
     """Return all methods available to obtain Ceiling limits for the desired
     chemical.
@@ -562,6 +568,7 @@ def Ceiling_methods(CASRN):
         if (data["Ceiling (ppm)"] or data["Ceiling (mg/m^3)"]): return [ONTARIO]
     return []
 
+@unsafe
 def Ceiling(CASRN, method=None):
     """This function handles the retrieval of Ceiling limits on worker exposure
     to dangerous chemicals.
@@ -599,6 +606,7 @@ def Ceiling(CASRN, method=None):
         raise ValueError('Invalid method: %s, allowed methods are %s' %(
                          method, list(Ontario_exposure_limits_dict)))
 
+@unsafe
 def Skin_methods(CASRN):
     """Return all methods available to obtain whether or not a chemical can be
     absorbed through the skin.
@@ -620,6 +628,7 @@ def Skin_methods(CASRN):
     """
     return [ONTARIO] if CASRN in Ontario_exposure_limits_dict else []
 
+@unsafe
 def Skin(CASRN, method=None):
     """This function handles the retrieval of whether or not a chemical can be
     absorbed through the skin, relevant to chemical safety calculations.
@@ -661,6 +670,7 @@ COMBINED = 'Combined'
 Carcinogen_all_methods = (IARC, NTP)
 '''Tuple of method name keys. See the :obj:`Carcinogen` for the actual references'''
 
+@unsafe
 def Carcinogen_methods(CASRN):
     """Return all methods available to obtain Carcinogen listings for the
     desired chemical.
@@ -681,6 +691,7 @@ def Carcinogen_methods(CASRN):
     """
     return list(Carcinogen_all_methods)
 
+@unsafe
 def Carcinogen(CASRN, method=None):
     r'''Looks up if a chemical is listed as a carcinogen or not according to
     either a specifc method or with all methods.
@@ -756,6 +767,7 @@ def Carcinogen(CASRN, method=None):
 T_flash_all_methods = (IEC, NFPA, SERAT)
 '''Tuple of method name keys. See the :obj:`T_flash` for the actual references'''
 
+@unsafe
 def T_flash_methods(CASRN):
     """Return all methods available to obtain T_flash for the desired chemical.
 
@@ -776,6 +788,7 @@ def T_flash_methods(CASRN):
     if not _safety_data_loaded: _load_safety_data()
     return list_available_methods_from_df_dict(Tflash_sources, CASRN, 'T_flash')
 
+@unsafe
 def T_flash(CASRN, method=None):
     r'''
     This function handles the retrieval or calculation of a chemical's
@@ -843,6 +856,7 @@ def T_flash(CASRN, method=None):
 T_autoignition_all_methods = (IEC, NFPA)
 '''Tuple of method name keys. See the :obj:`T_autoignition` for the actual references'''
 
+@unsafe
 def T_autoignition_methods(CASRN):
     """Return all methods available to obtain T_autoignition for the desired
     chemical.
@@ -864,6 +878,7 @@ def T_autoignition_methods(CASRN):
     if not _safety_data_loaded: _load_safety_data()
     return list_available_methods_from_df_dict(Tautoignition_sources, CASRN, 'T_autoignition')
 
+@unsafe
 def T_autoignition(CASRN, method=None):
     r'''
     This function handles the retrieval or calculation of a chemical's
@@ -922,6 +937,7 @@ def T_autoignition(CASRN, method=None):
 LFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
 '''Tuple of method name keys. See the :obj:`LFL` for the actual references'''
 
+@unsafe
 def LFL_methods(Hc=None, atoms=None, CASRN=''):
     """Return all methods available to obtain LFL for the desired chemical.
 
@@ -958,6 +974,7 @@ def LFL_methods(Hc=None, atoms=None, CASRN=''):
         methods.append(CROWLLOUVAR)
     return methods
 
+@unsafe
 def LFL(Hc=None, atoms=None, CASRN='', method=None):
     r'''This function handles the retrieval or calculation of a chemical's
     Lower Flammability Limit. Lookup is based on CASRNs. Will automatically 
@@ -1026,6 +1043,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
 UFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
 '''Tuple of method name keys. See the :obj:`UFL` for the actual references'''
 
+@unsafe
 def UFL_methods(Hc=None, atoms=None, CASRN=''):
     """Return all methods available to obtain UFL for the desired chemical.
 
@@ -1062,6 +1080,7 @@ def UFL_methods(Hc=None, atoms=None, CASRN=''):
         methods.append(CROWLLOUVAR)
     return methods
 
+@unsafe
 def UFL(Hc=None, atoms=None, CASRN='', method=None):
     r'''This function handles the retrieval or calculation of a chemical's
     Upper Flammability Limit. Lookup is based on CASRNs. Two predictive methods
@@ -1146,6 +1165,7 @@ ISO_10156_2017_Kks = {
     '354-33-6': 3.5, # C2HF5
 }
 
+@unsafe
 def LFL_ISO_10156_2017(zs, LFLs, CASs):
     r'''Calculate the lower flammability limit of a mixture of combustible gases
     and inert gases according to ISO 10156 (2017) [1]_. 
@@ -1391,7 +1411,7 @@ def Suzuki_UFL(Hc):
     UFL = 6.3*Hc + 0.567*Hc*Hc + 23.5
     return UFL/100.
 
-
+@unsafe
 def Crowl_Louvar_LFL(atoms):
     r'''Calculates lower flammability limit, using the Crowl-Louvar [1]_
     correlation. Uses molecular formula only.
@@ -1442,7 +1462,7 @@ def Crowl_Louvar_LFL(atoms):
         nO = atoms['O']
     return 0.55/(4.76*nC + 1.19*nH - 2.38*nO + 1.)
 
-
+@unsafe
 def Crowl_Louvar_UFL(atoms):
     r'''Calculates upper flammability limit, using the Crowl-Louvar [1]_
     correlation. Uses molecular formula only.

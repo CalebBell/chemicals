@@ -54,7 +54,7 @@ Octanol-Water Partition Coefficient
 __all__ = ['GWP', 'ODP', 'logP', 
            'GWP_all_methods', 'ODP_all_methods', 'logP_all_methods',
            'GWP_methods', 'ODP_methods', 'logP_methods']
-
+from chemicals.numba import unsafe
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -133,6 +133,7 @@ GWP_all_methods = (IPCC100, IPCC100SAR, IPCC20, IPCC500)
 
 ### Environmental data functions
 
+@unsafe
 def GWP_methods(CASRN):
     """Return all methods available to obtain GWP for the desired chemical.
 
@@ -153,6 +154,7 @@ def GWP_methods(CASRN):
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     return list_available_methods_from_df(GWP_data, CASRN, _GWP_keys_by_method)
     
+@unsafe
 def GWP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's Global Warming
     Potential, relative to CO2. Lookup is based on CASRNs. Will automatically
@@ -223,6 +225,7 @@ ODP_all_methods = (ODP2MAX, ODP1MAX, ODP2LOG, ODP1LOG,
                    ODP2MIN, ODP1MIN, ODP2STR, ODP1STR)
 '''Tuple of method name keys. See the `ODP` for the actual references'''
 
+@unsafe
 def ODP_methods(CASRN):
     """Return all methods available to obtain ODP for the desired chemical.
 
@@ -243,6 +246,7 @@ def ODP_methods(CASRN):
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     return list_available_methods_from_df(ODP_data, CASRN, _ODP_keys_by_method)
 
+@unsafe
 def ODP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's Ozone Depletion
     Potential, relative to CFC-11 (trichlorofluoromethane). Lookup is based on
@@ -319,6 +323,7 @@ CRC = 'CRC'
 logP_all_methods = (SYRRES, CRC)
 '''Tuple of method name keys. See the `logP` for the actual references'''
 
+@unsafe
 def logP_methods(CASRN):
     """Return all methods available to obtain logP for the desired chemical.
 
@@ -339,6 +344,7 @@ def logP_methods(CASRN):
     if not _logP_data_loaded: _load_logP_data()
     return list_available_methods_from_df_dict(logP_sources, CASRN, 'logP')
 
+@unsafe
 def logP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's octanol-water
     partition coefficient. Lookup is based on CASRNs. Will automatically
