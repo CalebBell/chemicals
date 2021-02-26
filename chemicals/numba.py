@@ -45,7 +45,7 @@ def __getattr__(name):
     
         __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
         new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,
-                                                        blacklist=numba_blacklisted,
+                                                        blacklist=set(numba_blacklisted),
                                                         cache_blacklist=cache_blacklist)
         
         to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
