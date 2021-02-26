@@ -72,7 +72,7 @@ __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
 
 import os
 from io import open
-from chemicals.numba import unsafe
+from chemicals import mark_jit_unsafe
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data, to_num
 from chemicals.elements import (periodic_table, homonuclear_elements,
                              charge_from_formula, serialize_formula)
@@ -80,7 +80,7 @@ from chemicals.elements import (periodic_table, homonuclear_elements,
 
 folder = os_path_join(source_path, 'Identifiers')
 
-@unsafe
+@mark_jit_unsafe
 def check_CAS(CASRN):
     """Checks if a CAS number is valid. Returns False if the parser cannot parse
     the given string.
@@ -126,7 +126,7 @@ def check_CAS(CASRN):
     except:
         return False
 
-@unsafe
+@mark_jit_unsafe
 def CAS_to_int(i):
     r'''Converts CAS number of a compounds from a string to an int. This is
     helpful when storing large amounts of CAS numbers, as their strings take up
@@ -155,7 +155,7 @@ def CAS_to_int(i):
     '''
     return int(i.replace('-', ''))
 
-@unsafe
+@mark_jit_unsafe
 def int_to_CAS(i):
     r'''Converts CAS number of a compounds from an int to an string. This is
     helpful when dealing with int CAS numbers.
@@ -183,7 +183,7 @@ def int_to_CAS(i):
     i = str(i)
     return i[:-3]+'-'+i[-3:-1]+'-'+i[-1]
 
-@unsafe
+@mark_jit_unsafe
 def sorted_CAS_key(CASs):
     r'''Takes a list of CAS numbers as strings, and returns a tuple of the same
     CAS numbers, sorted from smallest to largest. This is very convenient for
@@ -451,7 +451,7 @@ class ChemicalMetadataDB(object):
         '''
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
 
-@unsafe
+@mark_jit_unsafe
 def CAS_from_any(ID, autoload=False, cache=True):
     """Wrapper around `search_chemical` which returns the CAS number of the
     found chemical directly.
@@ -489,7 +489,7 @@ def CAS_from_any(ID, autoload=False, cache=True):
     """
     return search_chemical(ID, autoload=autoload, cache=cache).CASs
 
-@unsafe
+@mark_jit_unsafe
 def MW(ID, autoload=False, cache=True):
     """Wrapper around `search_chemical` which returns the molecular weight of the
     found chemical directly.
@@ -531,7 +531,7 @@ def MW(ID, autoload=False, cache=True):
 chemical_search_cache = {}
 chemical_search_cache_max_size = 200
 
-@unsafe
+@mark_jit_unsafe
 def search_chemical(ID, autoload=False, cache=True):
     """Looks up metadata about a chemical by searching and testing for the input
     string being any of the following types of chemical identifiers:
@@ -724,7 +724,7 @@ def _search_chemical(ID, autoload):
 # Obtained via the command:
 # list(pd.read_excel('http://www.aiche.org/sites/default/files/docs/pages/sponsor_compound_list-2014.xlsx')['Unnamed: 2'])[2:]
 # This is consistently faster than creating a list and then making the set.
-@unsafe
+@mark_jit_unsafe
 def dippr_compounds():
     """Loads and returns a set of compounds known in the DIPPR database. This
     can be useful for knowing if a chemical is of industrial relevance.
@@ -780,7 +780,7 @@ class CommonMixtureMetadata(object):
         self.synonyms = synonyms
 
 
-@unsafe
+@mark_jit_unsafe
 def mixture_from_any(ID):
     """Search by string for a mixture in the included common mixture database.
     The database primarily contains refrigerant blends. The variable
@@ -823,7 +823,7 @@ def mixture_from_any(ID):
             pass
     raise ValueError('Mixture name not recognized')
 
-@unsafe
+@mark_jit_unsafe
 def IDs_to_CASs(IDs):
     """Find the CAS numbers for multiple chemicals names at once. Also supports
     having a string input which is a common mixture name in the database.
@@ -878,7 +878,7 @@ inerts = {"7440-37-1": "Argon", "124-38-9": "Carbon Dioxide", "7440-59-7":
 
 
 _pubchem_db_loaded = False
-@unsafe
+@mark_jit_unsafe
 def get_pubchem_db():
     """Helper function to delay the creation of the pubchem_db object.
 
@@ -895,7 +895,7 @@ def get_pubchem_db():
 mixture_composition_loaded = False
 global common_mixtures_by_synonym, common_mixtures
 
-@unsafe
+@mark_jit_unsafe
 def load_mixture_composition():
     global mixture_composition_loaded, common_mixtures_by_synonym, common_mixtures
     common_mixtures = {}

@@ -54,7 +54,7 @@ Basic Combustion Spec Solvers
 """
 
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
-from chemicals.utils import property_molar_to_mass, property_mass_to_molar
+from chemicals.utils import property_molar_to_mass, property_mass_to_molar, mark_jit_unsafe
 from fluids.numerics import normalize
 
 __all__ = ('combustion_stoichiometry',
@@ -145,6 +145,7 @@ unreactive_CASs = {
 O2_CAS = '7782-44-7'
 H2O_CAS = '7732-18-5'
 
+@mark_jit_unsafe
 def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
     r"""Return a dictionary of stoichiometric coefficients of chemical
     combustion, given a dictionary of a molecule's constituent atoms and their
@@ -280,7 +281,7 @@ def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
         raise ValueError("Allowed values for `missing_handling` are 'elemental' and 'ash'.")
     return products
 
-
+@mark_jit_unsafe
 def combustion_products_mixture(atoms_list, zs, reactivities=None, CASs=None,
                                 missing_handling='elemental',
                                 combustion_stoichiometries=None):
@@ -373,7 +374,7 @@ def combustion_products_to_list(products, CASs):
     return zs
 
 
-
+@mark_jit_unsafe
 def is_combustible(CAS, atoms, reactive=True):
     if not reactive:
         return False
@@ -386,6 +387,7 @@ def is_combustible(CAS, atoms, reactive=True):
     else:
         return False
 
+@mark_jit_unsafe
 def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
     r"""
     Return the higher heating value [HHV; in J/mol] based on the
@@ -430,6 +432,7 @@ def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
     Hfs = Hf_chemicals or Hf_combustion_chemicals
     return sum([Hfs[i] * j for i, j in stoichiometry.items()]) - Hf
 
+@mark_jit_unsafe
 def HHV_modified_Dulong(mass_fractions):
     r"""
     Return higher heating value [HHV; in J/g] based on the modified
@@ -518,6 +521,7 @@ def LHV_from_HHV(HHV, N_H2O):
     """
     return HHV + 44011.496 * N_H2O
 
+@mark_jit_unsafe
 def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
                     method=None, missing_handling='ash'):
     r"""
@@ -619,7 +623,6 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         raise ValueError("method must be either 'Stoichiometric' or 'Dulong', "
                          "not %s" %(method))
     return CombustionData(stoichiometry, HHV, Hf, MW)
-
 
 class CombustionData(object):
     r"""
@@ -757,7 +760,7 @@ def air_fuel_ratio_solver(ratio, Vm_air, Vm_fuel, MW_air, MW_fuel,
     mass_ratio, volume_ratio = MW_air/MW_fuel*mole_ratio, Vm_air/Vm_fuel*mole_ratio
     return n_air, n_fuel, mole_ratio, mass_ratio, volume_ratio
 
-
+@mark_jit_unsafe
 def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
                          n_air=None, n_out=None,
                          O2_excess=None, frac_out_O2=None,
@@ -1092,7 +1095,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
 
     return results
 
-
+@mark_jit_unsafe
 def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                            n_fuel=None, n_air=None, n_out=None,
                            O2_excess=None, frac_out_O2=None,
@@ -1242,7 +1245,7 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
 
         return ans
 
-
+@mark_jit_unsafe
 def combustion_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                            n_fuel=None, n_air=None, n_out=None,
                            O2_excess=None, frac_out_O2=None,

@@ -45,9 +45,8 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows',
 'solve_flow_composition_mix',
-'v_to_v_molar', 'v_molar_to_v']
+'v_to_v_molar', 'v_molar_to_v', 'mark_jit_unsafe']
 
-from chemicals.numba import unsafe
 import os
 import sys
 from cmath import sqrt as csqrt
@@ -96,7 +95,12 @@ try:
 except:
     pass
 
-@unsafe
+numba_blacklisted = []
+def mark_jit_unsafe(f):
+    numba_blacklisted.append(f.__name__)
+    return f
+
+@mark_jit_unsafe
 def to_num(values):
     r'''Legacy function to turn a list of strings into either floats
     (if numeric), stripped strings (if not) or None if the string is empty.
@@ -134,7 +138,7 @@ try:
 except:
     pass
 
-@unsafe
+@mark_jit_unsafe
 def hash_any_primitive(v):
     '''Method to hash a primitive - with basic support for lists and
     dictionaries.

@@ -135,9 +135,7 @@ __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm',
 import os
 from fluids.numerics import numpy as np
 from fluids.constants import R, N_A, pi
-from chemicals.numba import unsafe
-from chemicals.utils import log
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from chemicals.utils import log, PY37, source_path, os_path_join, can_load_data, mark_jit_unsafe
 from chemicals import miscdata
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -236,7 +234,7 @@ else:
 Tb_all_methods = (CRC_INORG, CRC_ORG, YAWS)
 '''Tuple of method name keys. See the `Tb` for the actual references'''
 
-@unsafe
+@mark_jit_unsafe
 def Tb_methods(CASRN):
     """Return all methods available to obtain the Tb for the desired chemical.
 
@@ -257,7 +255,7 @@ def Tb_methods(CASRN):
     if not _phase_change_const_loaded: _load_phase_change_constants()
     return list_available_methods_from_df_dict(Tb_sources, CASRN, 'Tb')
 
-@unsafe
+@mark_jit_unsafe
 def Tb(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's boiling
     point. Lookup is based on CASRNs. Will automatically select a data
@@ -323,7 +321,7 @@ def Tb(CASRN, method=None):
 Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
 '''Tuple of method name keys. See the `Tm` for the actual references'''
 
-@unsafe
+@mark_jit_unsafe
 def Tm_methods(CASRN):
     """Return all methods available to obtain the Tm for the desired chemical.
 
@@ -344,7 +342,7 @@ def Tm_methods(CASRN):
     if not _phase_change_const_loaded: _load_phase_change_constants()
     return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Tm')
 
-@unsafe
+@mark_jit_unsafe
 def Tm(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's melting
     point. Lookup is based on CASRNs. Will automatically select a data
@@ -1186,7 +1184,7 @@ def PPDS12(T, Tc, A, B, C, D, E):
 Hfus_all_methods = (CRC,)
 '''Tuple of method name keys. See the `Hfus` for the actual references'''
 
-@unsafe
+@mark_jit_unsafe
 def Hfus_methods(CASRN):
     """Return all methods available to obtain the Hfus for the desired chemical.
 
@@ -1207,7 +1205,7 @@ def Hfus_methods(CASRN):
     if not _phase_change_const_loaded: _load_phase_change_constants()
     return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
 
-@unsafe
+@mark_jit_unsafe
 def Hfus(CASRN, method=None): 
     r'''This function handles the retrieval of a chemical's heat of fusion.
     Lookup is based on CASRNs. Will automatically select a data

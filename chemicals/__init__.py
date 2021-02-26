@@ -23,8 +23,8 @@ SOFTWARE.
 """
 
 import os
-
 from . import utils
+from .utils import mark_jit_unsafe
 from . import critical
 from . import elements
 from . import reaction

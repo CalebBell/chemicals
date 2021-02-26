@@ -47,7 +47,7 @@ __all__ = ['Tt_all_methods', 'Tt_methods', 'Tt',
            'Pt_all_methods', 'Pt_methods', 'Pt']
 
 import os
-from chemicals.numba import unsafe
+from chemicals import mark_jit_unsafe
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.phase_change import Tm
 from chemicals.data_reader import (register_df_source,
@@ -87,7 +87,7 @@ else:
 Tt_all_methods = (STAVELEY, MELTING)
 '''Tuple of method name keys. See the `Tt` for the actual references'''
 
-@unsafe
+@mark_jit_unsafe
 def Tt_methods(CASRN):
     """Return all methods available to obtain the Tt for the desired chemical.
 
@@ -111,7 +111,7 @@ def Tt_methods(CASRN):
     if Tm(CASRN): methods.append(MELTING)
     return methods
 
-@unsafe
+@mark_jit_unsafe
 def Tt(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's triple temperature.
     Lookup is based on CASRNs. Will automatically select a data source to use
@@ -174,7 +174,7 @@ def Tt(CASRN, get_methods=False, method=None):
 Pt_all_methods = (STAVELEY,)
 '''Tuple of method name keys. See the `Pt` for the actual references'''
 
-@unsafe
+@mark_jit_unsafe
 def Pt_methods(CASRN):
     """Return all methods available to obtain the Pt for the desired chemical.
 
@@ -196,7 +196,7 @@ def Pt_methods(CASRN):
     if not _triple_data_loaded: _load_triple_data()
     return list_available_methods_from_df_dict(Pt_sources, CASRN, 'Pt')
 
-@unsafe
+@mark_jit_unsafe
 def Pt(CASRN, get_methods=False, method=None):
     r'''This function handles the retrieval of a chemical's triple pressure.
     Lookup is based on CASRNs. Will automatically select a data source to use

@@ -17,18 +17,13 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-busy = False
-numba_blacklisted = []
-__all__ = []
-def unsafe(f):
-    numba_blacklisted.append(f.__name__)
-    return f
+from chemicals.utils import PY37, numba_blacklisted
 
-def __getattr__(name):
-    if name == '__path__' or busy:
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+busy = False
+__all__ = []
+
+def transform():
     gdct = globals()
-    gdct['busy'] = True
     import chemicals
     import fluids
     import fluids.numba
@@ -96,7 +91,18 @@ def __getattr__(name):
     gdct.update(replaced)
     gdct['__name__'] = 'chemicals.numba'
     gdct['__file__'] = orig_file
-    del gdct['__getattr__'], gdct['busy']
-    try: return gdct[name]
-    except KeyError:
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+    del gdct['transform']
+
+if PY37:
+    def __getattr__(name):
+        if name == '__path__' or busy:
+            raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        gdct = globals()
+        gdct['busy'] = True
+        transform()
+        del gdct['__getattr__'], gdct['busy']
+        try: return gdct[name]
+        except KeyError:
+            raise AttributeError("module %s has no attribute %s" %(__name__, name))
+else:
+    transform()
