@@ -46,7 +46,7 @@ CAS Number Utilities
 Database Objects
 ----------------
 There is an object used to represent a chemical's metadata, an object used to
-represent a common mixture's composition, and an object used to hold the 
+represent a common mixture's composition, and an object used to hold the
 mixture metadata.
 
 .. autoclass:: chemicals.identifiers.ChemicalMetadata
@@ -56,7 +56,7 @@ mixture metadata.
 
 Chemical Groups
 ---------------
-It is convenient to tag some chemicals with labels like "refrigerant", or in 
+It is convenient to tag some chemicals with labels like "refrigerant", or in
 a certain database or not. The following chemical groups are available.
 
 .. autodata:: chemicals.identifiers.cryogenics
@@ -74,8 +74,9 @@ import os
 from io import open
 from chemicals.numba import unsafe
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data, to_num
-from chemicals.elements import (periodic_table, homonuclear_elemental_gases,
+from chemicals.elements import (periodic_table, homonuclear_elements,
                              charge_from_formula, serialize_formula)
+
 
 folder = os_path_join(source_path, 'Identifiers')
 
@@ -101,9 +102,9 @@ def check_CAS(CASRN):
     false positives.
 
     Function also does not support additional separators, apart from '-'.
-    
+
     CAS numbers up to the series 1 XXX XXX-XX-X are now being issued.
-    
+
     A long can hold CAS numbers up to 2 147 483-64-7
 
     Examples
@@ -115,7 +116,7 @@ def check_CAS(CASRN):
     """
     try:
         check = CASRN[-1] # Don't store the int - it is not necessary and is slower
-        
+
         productsum = 0
         i = 1
         for num in CASRN.replace('-', '')[:-1][::-1]:
@@ -212,7 +213,7 @@ def sorted_CAS_key(CASs):
     return tuple(CAS for _, CAS in sorted(zip(int_CASs, CASs)))
 
 class ChemicalMetadata(object):
-    """Class for storing metadata on chemicals. 
+    """Class for storing metadata on chemicals.
 
     Attributes
     ----------
@@ -225,7 +226,7 @@ class ChemicalMetadata(object):
         :obj:`chemicals.elements.serialize_formula` generates, [-]
     MW : float
         Molecular weight of the compound as calculated with the standard
-        atomic abundances; consistent with the element weights in 
+        atomic abundances; consistent with the element weights in
         :obj:`chemicals.elements.periodic_table`, [g/mol]
     smiles : str
         SMILES identification string, [-]
@@ -248,7 +249,7 @@ class ChemicalMetadata(object):
     def __repr__(self):
         return ('<ChemicalMetadata, name=%s, formula=%s, smiles=%s, MW=%g>'
                 %(self.common_name, self.formula, self.smiles, self.MW))
-        
+
     @property
     def charge(self):
         """Charge of the species as an integer.
@@ -261,13 +262,13 @@ class ChemicalMetadata(object):
         except AttributeError:
             self._charge = charge_from_formula(self.formula)
             return self._charge
-        
+
     @property
     def CASs(self):
         """CAs number of the compound as a string.
         """
         return int_to_CAS(self.CAS)
-    
+
     def __init__(self, pubchemid, CAS, formula, MW, smiles, InChI, InChI_key,
                  iupac_name, common_name, synonyms):
         self.pubchemid = pubchemid
@@ -276,29 +277,29 @@ class ChemicalMetadata(object):
         self.MW = MW
         self.smiles = smiles
         self.InChI = InChI
-        
+
         self.InChI_key = InChI_key
         self.iupac_name = iupac_name
         self.common_name = common_name
         self.synonyms = synonyms
-        
+
 
 class ChemicalMetadataDB(object):
     '''Object which holds the main database of chemical metadata.
-    
-    .. warning:: To allow the `chemicals` to grow and improve, the details of 
+
+    .. warning:: To allow the `chemicals` to grow and improve, the details of
        this class may change in the future without notice!
 
     '''
     loaded_main_db = False
-    def __init__(self, 
+    def __init__(self,
                  elements=True,
-                 main_db=os.path.join(folder, 'chemical identifiers pubchem large.tsv'),
-                 user_dbs=[os.path.join(folder, 'chemical identifiers pubchem small.tsv'),
-                           os.path.join(folder, 'chemical identifiers example user db.tsv'),
-                           os.path.join(folder, 'Cation db.tsv'),
-                           os.path.join(folder, 'Anion db.tsv'),
-                           os.path.join(folder, 'Inorganic db.tsv')]):       
+                 main_db=os_path_join(folder, 'chemical identifiers pubchem large.tsv'),
+                 user_dbs=[os_path_join(folder, 'chemical identifiers pubchem small.tsv'),
+                           os_path_join(folder, 'chemical identifiers example user db.tsv'),
+                           os_path_join(folder, 'Cation db.tsv'),
+                           os_path_join(folder, 'Anion db.tsv'),
+                           os_path_join(folder, 'Inorganic db.tsv')]):
         '''Construct the database from its parameters, loading all of the files in
         `user_dbs`, the periodic table, and defering loading of `main_db`
         as it is very large until a search doesn't find a chemical in the smaller
@@ -319,42 +320,42 @@ class ChemicalMetadataDB(object):
         for db in self.user_dbs:
             self.load(db)
         self.load_elements()
-        
+
     def load_elements(self):
         '''Load elements into the indexes.
         '''
         if not self.elements:
             return None
         for ele in periodic_table:
-            
+
             CAS = int(ele.CAS.replace('-', '')) # Store as int for easier lookup
             synonyms = [ele.name.lower()]
-            
-            obj = ChemicalMetadata(pubchemid=ele.PubChem, CAS=CAS, 
+
+            obj = ChemicalMetadata(pubchemid=ele.PubChem, CAS=CAS,
                                    formula=ele.symbol, MW=ele.MW, smiles=ele.smiles,
                                    InChI=ele.InChI, InChI_key=ele.InChI_key,
-                                   iupac_name=ele.name.lower(), 
-                                   common_name=ele.name.lower(), 
+                                   iupac_name=ele.name.lower(),
+                                   common_name=ele.name.lower(),
                                    synonyms=synonyms)
-            
-            
+
+
             if ele.InChI_key in self.InChI_key_index:
-                if ele.number not in homonuclear_elemental_gases:
+                if ele.number not in homonuclear_elements:
                     obj_old = self.InChI_key_index[ele.InChI_key]
                     for name in obj_old.synonyms:
-                        self.name_index[name] = obj    
-            
+                        self.name_index[name] = obj
+
             self.InChI_key_index[ele.InChI_key] = obj
             self.CAS_index[CAS] = obj
             self.pubchem_index[ele.PubChem] = obj
             self.smiles_index[ele.smiles] = obj
             self.InChI_index[ele.InChI] = obj
-            if ele.number in homonuclear_elemental_gases:
+            if ele.number in homonuclear_elements:
                 for name in synonyms:
-                    self.name_index['monatomic ' + name] = obj    
+                    self.name_index['monatomic ' + name] = obj
             else:
                 for name in synonyms:
-                    self.name_index[name] = obj    
+                    self.name_index[name] = obj
             self.formula_index[obj.formula] = obj
 
 
@@ -367,14 +368,14 @@ class ChemicalMetadataDB(object):
             values = line.rstrip('\n').split('\t')
             (pubchemid, CAS, formula, MW, smiles, InChI, InChI_key, iupac_name, common_name) = values[0:9]
             CAS = int(CAS.replace('-', '')) # Store as int for easier lookup
-            
+
             synonyms = values[7:]
             pubchemid = int(pubchemid)
 
             obj = ChemicalMetadata(pubchemid, CAS, formula, float(MW), smiles,
-                                    InChI, InChI_key, iupac_name, common_name, 
+                                    InChI, InChI_key, iupac_name, common_name,
                                     synonyms)
-            
+
             # Lookup indexes
             self.CAS_index[CAS] = obj
             self.pubchem_index[pubchemid] = obj
@@ -384,15 +385,15 @@ class ChemicalMetadataDB(object):
             for name in synonyms:
                 self.name_index[name] = obj
             self.formula_index[obj.formula] = obj
-                    
+
         f.close()
-        
+
     @property
     def finished_loading(self):
         '''Whether or not the database has loaded the main database.
         '''
         return not (not self.loaded_main_db and self.main_db is not None)
-        
+
     def autoload_main_db(self):
         '''Load the main database when needed.
         '''
@@ -402,7 +403,7 @@ class ChemicalMetadataDB(object):
         self.load_elements()
         self.loaded_main_db = True
         return True
-        
+
     def _search_autoload(self, identifier, index, autoload=True):
         if index:
             if identifier in index:
@@ -412,12 +413,12 @@ class ChemicalMetadataDB(object):
                     self.autoload_main_db()
                     return self._search_autoload(identifier, index, autoload)
         return False
-    
+
     def search_pubchem(self, pubchem, autoload=True):
         '''Search for a chemical by its pubchem number. Accepts strings or ints.
         '''
         return self._search_autoload(int(pubchem), self.pubchem_index, autoload=autoload)
-        
+
     def search_CAS(self, CAS, autoload=True):
         '''Search for a chemical by its CAS number. Accepts strings or ints.
         '''
@@ -444,7 +445,7 @@ class ChemicalMetadataDB(object):
         '''Search for a chemical by its name.
         '''
         return self._search_autoload(name, self.name_index, autoload=autoload)
-    
+
     def search_formula(self, formula, autoload=True):
         '''Search for a chemical by its serialized formula.
         '''
@@ -467,7 +468,7 @@ def CAS_from_any(ID, autoload=False, cache=True):
 
     Notes
     -----
-    An exception is raised if the name cannot be identified. The PubChem 
+    An exception is raised if the name cannot be identified. The PubChem
     database includes a wide variety of other synonyms, but these may not be
     present for all chemcials. See `search_chemical` for more details.
 
@@ -505,7 +506,7 @@ def MW(ID, autoload=False, cache=True):
 
     Notes
     -----
-    An exception is raised if the name cannot be identified. The PubChem 
+    An exception is raised if the name cannot be identified. The PubChem
     database includes a wide variety of other synonyms, but these may not be
     present for all chemcials. See `search_chemical` for more details.
 
@@ -523,7 +524,7 @@ def MW(ID, autoload=False, cache=True):
     46.06844
     >>> MW('O') # only elements can be specified by symbol
     15.9994
-    
+
     """
     return search_chemical(ID, autoload=autoload, cache=cache).MW
 
@@ -540,13 +541,13 @@ def search_chemical(ID, autoload=False, cache=True):
     * InChI key, prefixed by 'InChIKey='
     * PubChem CID, prefixed by 'PubChem='
     * SMILES (prefix with 'SMILES=' to ensure smiles parsing; ex.
-      'C' will return Carbon as it is an element whereas the SMILES 
+      'C' will return Carbon as it is an element whereas the SMILES
       interpretation for 'C' is methane)
-    * CAS number (obsolete numbers may point to the current number)    
+    * CAS number (obsolete numbers may point to the current number)
 
-    If the input is an ID representing an element, the following additional 
-    inputs may be specified as 
-    
+    If the input is an ID representing an element, the following additional
+    inputs may be specified as
+
     * Atomic symbol (ex 'Na')
     * Atomic number (as a string)
 
@@ -563,7 +564,7 @@ def search_chemical(ID, autoload=False, cache=True):
 
     Notes
     -----
-    An exception is raised if the name cannot be identified. The PubChem 
+    An exception is raised if the name cannot be identified. The PubChem
     database includes a wide variety of other synonyms, but these may not be
     present for all chemcials.
 
@@ -617,13 +618,13 @@ def _search_chemical(ID, autoload):
         CAS_alternate_loopup = pubchem_db.search_name(ID, autoload)
         if CAS_alternate_loopup:
             return CAS_alternate_loopup
-            
+
         if not autoload:
             return search_chemical(ID, autoload=True)
         raise ValueError('A valid CAS number (%s) was recognized, but is not in the database' %(ID))
-        
-        
-    
+
+
+
     ID_len = len(ID)
     if ID_len > 9:
         inchi_search = False
@@ -654,7 +655,7 @@ def _search_chemical(ID, autoload):
             pubchem_lookup = pubchem_db.search_pubchem(ID[8:], autoload)
             if pubchem_lookup:
                 return pubchem_lookup
-                
+
             else:
                 if not autoload:
                     return search_chemical(ID, autoload=True)
@@ -675,29 +676,29 @@ def _search_chemical(ID, autoload):
     smiles_lookup = pubchem_db.search_smiles(ID, autoload)
     if smiles_lookup:
         return smiles_lookup
-    
+
     try:
         formula_query = pubchem_db.search_formula(serialize_formula(ID), autoload)
         if formula_query and type(formula_query) == ChemicalMetadata:
             return formula_query
     except:
         pass
-    
+
     # Try a direct lookup with the name - the fastest
     name_lookup = pubchem_db.search_name(ID, autoload)
     if name_lookup:
         return name_lookup
-    
+
 #     Permutate through various name options
     ID_no_space = ID.replace(' ', '')
     ID_no_space_dash = ID_no_space.replace('-', '')
-    
+
     for name in [ID, ID_no_space, ID_no_space_dash]:
         for name2 in [name, name.lower()]:
             name_lookup = pubchem_db.search_name(name2, autoload)
             if name_lookup:
                 return name_lookup
-    
+
     if ID[-1] == ')' and '(' in ID:#
         # Try to match in the form 'water (H2O)'
         first_identifier, second_identifier = ID[0:-1].split('(', 1)
@@ -709,10 +710,10 @@ def _search_chemical(ID, autoload):
             return CAS
         except:
             pass
-        
+
     if not autoload:
         return _search_chemical(ID, autoload=True)
-            
+
     raise ValueError('Chemical name (%s) not recognized' %(ID))
 
 
@@ -739,7 +740,7 @@ def dippr_compounds():
     return dippr_compounds
 
 class CommonMixtureMetadata(object):
-    """Class for storing metadata on predefined chemical mixtures. 
+    """Class for storing metadata on predefined chemical mixtures.
 
     Attributes
     ----------
@@ -827,7 +828,7 @@ def IDs_to_CASs(IDs):
     """Find the CAS numbers for multiple chemicals names at once. Also supports
     having a string input which is a common mixture name in the database.
     An error will be raised if any of the chemicals cannot be found.
-    
+
 
     Parameters
     ----------
@@ -919,7 +920,7 @@ def load_mixture_composition():
             obj = CommonMixtureMetadata(name=name, CASs=CASs, N=N, source=source,
                                         names=names, ws=ws, zs=zs, synonyms=synonyms)
             common_mixtures[name] = obj
-            
+
             for syn in synonyms:
                 common_mixtures_by_synonym[syn] = obj
     mixture_composition_loaded = True

@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains several tables which are common to different lookup 
+This module contains several tables which are common to different lookup
 functions.
 
 For reporting bugs, adding feature requests, or submitting pull requests,
@@ -62,18 +62,18 @@ def _load_VDI_saturation_dict():
     """
     import json
     global VDI_saturation_dict, _VDI_dict_loaded
-    
+
     with open(os.path.join(folder, 'VDI Saturation Compounds Data.json')) as f:
         VDI_saturation_dict = json.loads(f.read())
     _VDI_dict_loaded = True
-    
+
 _CRC_data_loaded = False
 def _load_CRC_data():
     global CRC_inorganic_data, CRC_organic_data, _CRC_data_loaded
     CRC_inorganic_data = data_source('Physical Constants of Inorganic Compounds.csv')
     CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
     _CRC_data_loaded = True
-    
+
 if PY37:
     def __getattr__(name):
         if name in ('CRC_inorganic_data', 'CRC_organic_data'):
@@ -164,6 +164,8 @@ def lookup_VDI_tabular_data(CASRN, prop):
     --------
     >>> lookup_VDI_tabular_data('67-56-1', 'Mu (g)')
     ([337.63, 360.0, 385.0, 410.0, 435.0, 460.0, 500.0], [1.11e-05, 1.18e-05, 1.27e-05, 1.36e-05, 1.46e-05, 1.59e-05, 2.04e-05])
+    >>> lookup_VDI_tabular_data('7782-41-4', 'sigma')
+    ([53.49, 64.0, 74.0, 85.04, 92.0, 102.0, 112.0, 122.0, 132.0, 144.41], [0.0227, 0.02, 0.0166, 0.0136, 0.0117, 0.0092, 0.0068, 0.0045, 0.0024, 0.0])
 
     References
     ----------
@@ -172,7 +174,7 @@ def lookup_VDI_tabular_data(CASRN, prop):
     if not _VDI_dict_loaded: _load_VDI_saturation_dict()
     try:
         d = VDI_saturation_dict[CASRN]
-    except KeyError: 
+    except KeyError:
         raise LookupError('CASRN not in VDI tabulation')
     try:
         props, Ts = d[prop], d['T']
@@ -182,6 +184,9 @@ def lookup_VDI_tabular_data(CASRN, prop):
     props = [p for p in props if p]
     # Not all data series converege to correct values
     if prop == 'sigma':
-        Ts.append(d['Tc'])
-        props.append(0)
+        if Ts[-1] < d['Tc']:
+            Ts.append(d['Tc'])
+            props.append(0.0)
+        elif Ts[-1] == d['Tc']:
+            props[-1] = 0.0
     return Ts, props

@@ -20,9 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-__all__ = ['df_sources', 
-           'data_source', 
-           'register_df_source', 
+__all__ = ['df_sources',
+           'data_source',
+           'register_df_source',
            'load_df',
            'retrieve_any_from_df_dict',
            'retrieve_from_df_dict',
@@ -70,9 +70,9 @@ def data_source(key):
 # %% Retrieving data from files
 
 def retrieve_from_df_dict(df_dict, index, key, method):
-    try: 
+    try:
         df = df_dict[method]
-    except KeyError: 
+    except KeyError:
         raise ValueError('Invalid method: %s, allowed methods are %s' %(
                 method, list(df_dict)))
     except TypeError: # pragma: no cover
@@ -108,7 +108,7 @@ def get_value_from_df(df, index, key):
     except TypeError:
         # Not a number
         return value
-            
+
 def list_available_methods_from_df_dict(df_dict, index, key):
     return [method for method, df in df_dict.items()
             if (index in df.index) and not pd.isnull(df.at[index, key])]

@@ -57,6 +57,9 @@ def test_Tt():
     with pytest.raises(Exception):
         Tt('74-82-8', method='BADMETHOD')
 
+
+@pytest.mark.slow
+def test_Tt_fuzz():
     Tt_sum = sum([Tt(i) for i in triple_data_Staveley.index])
     assert_close(Tt_sum, 31251.845000000001)
     Tt_sum2 = pd.Series([Tt(i, method='MELTING') for i in triple_data_Staveley.index]).sum()
@@ -74,5 +77,7 @@ def test_Pt():
     with pytest.raises(Exception):
         Pt('74-82-8', method='BADMETHOD')
 
+@pytest.mark.slow
+def test_Pt_fuzz():
     Pt_sum = sum([Pt(i) for i in triple_data_Staveley.index if pd.notnull(triple_data_Staveley.at[i, 'Pt'])])
     assert_close(Pt_sum, 1886624.8374376972)

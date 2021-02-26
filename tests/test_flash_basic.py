@@ -23,7 +23,6 @@ SOFTWARE.
 """
 
 from math import exp, log
-from numpy.testing import assert_allclose
 import pytest
 import numpy as np
 import pandas as pd
@@ -38,39 +37,39 @@ import random
 
 def test_K_value():
     K = K_value(101325, 3000.)
-    assert_allclose(K, 0.029607698001480384)
+    assert_close(K, 0.029607698001480384)
 
     K = K_value(P=101325, Psat=3000, gamma=0.9)
-    assert_allclose(K, 0.026646928201332347)
+    assert_close(K, 0.026646928201332347)
 
     K = K_value(P=101325, Psat=3000, gamma=0.9, Poynting=1.1)
-    assert_allclose(K, 0.029311621021465586)
+    assert_close(K, 0.029311621021465586)
 
     K = K_value(phi_l=1.6356, phi_g=0.88427)
-    assert_allclose(K, 1.8496613025433408)
+    assert_close(K, 1.8496613025433408)
 
     K = K_value(P=1E6, Psat=1938800, phi_l=1.4356, phi_g=0.88427, gamma=0.92)
-    assert_allclose(K, 2.8958055544121137)
+    assert_close(K, 2.8958055544121137)
 
     K = K_value(P=1E6, Psat=1938800, phi_l=1.4356, phi_g=0.88427, gamma=0.92, Poynting=0.999)
-    assert_allclose(K, 2.8929097488577016)
+    assert_close(K, 2.8929097488577016)
 
     with pytest.raises(Exception):
-        K_value(101325)
+        K_value(101325.0)
 
     with pytest.raises(Exception):
-        K_value(101325, gamma=0.9)
+        K_value(101325.0, gamma=0.9)
 
     with pytest.raises(Exception):
         K_value(P=1E6, Psat=1938800, phi_l=0.88427, gamma=0.92)
 
 def test_Wilson_K_value():
     K = Wilson_K_value(270.0, 7600000.0, 305.4, 4880000.0, 0.098)
-    assert_allclose(K, 0.2963932297479371)
+    assert_close(K, 0.2963932297479371)
 
 def test_PR_water_K_value():
     K = PR_water_K_value(300, 1e5, 568.7, 2490000.0)
-    assert_allclose(K, 76131.19143239626)
+    assert_close(K, 76131.19143239626)
 
 
 
@@ -111,9 +110,9 @@ def test_flash_wilson_7_pts():
 
     for (VF, xs, ys, T, P), kw in zip(pts_expect, kwargs):
         ans = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, **kw)
-        assert_allclose([ans[0], ans[1], ans[2]], [T, P, VF], atol=1e-9)
-        assert_allclose(ans[3], xs)
-        assert_allclose(ans[4], ys)
+        assert_close1d([ans[0], ans[1], ans[2]], [T, P, VF], atol=1e-9)
+        assert_close1d(ans[3], xs)
+        assert_close1d(ans[4], ys)
 
     with pytest.raises(Exception):
         flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=300)
@@ -136,20 +135,20 @@ def test_flash_wilson_7_pts_44_components():
     a = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=300, P=1e5)
     
     b = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=300, VF=0)
-    assert_allclose(b[2], 0, atol=1e-5)
+    assert_close(b[2], 0, atol=1e-5)
     c = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=300, VF=1)
-    assert_allclose(c[2], 1, atol=1e-5)
+    assert_close(c[2], 1, atol=1e-5)
     d = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=300, VF=.1)
-    assert_allclose(d[2], .1, atol=1e-5)
+    assert_close(d[2], .1, atol=1e-5)
     
     e = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, P=1e4, VF=1)
     # Tough problem - didn't converge with newton needed bisecting
-    assert_allclose(e[2], 1, atol=1e-4)
+    assert_close(e[2], 1, atol=1e-4)
     
     f = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, P=1e4, VF=0)
-    assert_allclose(f[2], 0, atol=1e-5)
+    assert_close(f[2], 0, atol=1e-5)
     g = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, P=1e4, VF=.1)
-    assert_allclose(g[2], .1, atol=1e-5)
+    assert_close(g[2], .1, atol=1e-5)
     
 @pytest.mark.slow
 def test_flash_wilson_PVFs():
@@ -166,8 +165,8 @@ def test_flash_wilson_PVFs():
         for P in Ps:
             T, _, _, xs, ys = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, VF=VF, P=P)
             _, _, _, xs_TP, ys_TP = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=T, P=P)
-            assert_allclose(xs, xs_TP, rtol=5e-5)
-            assert_allclose(ys, ys_TP, rtol=5e-5)
+            assert_close1d(xs, xs_TP, rtol=5e-5)
+            assert_close1d(ys, ys_TP, rtol=5e-5)
 
 def test_flash_wilson_PVFs_issues():
     zs = [.5, .2, .1, .000001, .199999]
@@ -180,17 +179,17 @@ def test_flash_wilson_PVFs_issues():
     VF = 0.0
     T, _, _, xs, ys = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, VF=VF, P=P)
     _, _, VF_calc, xs_TP, ys_TP = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=T, P=P)
-    assert_allclose(xs, xs_TP)
-    assert_allclose(ys, ys_TP)
-    assert_allclose(VF_calc, VF, atol=1e-15)
+    assert_close1d(xs, xs_TP)
+    assert_close1d(ys, ys_TP)
+    assert_close(VF_calc, VF, atol=1e-15)
     
     # point where initial guess was lower than T_low
     VF, P, zs = (1.0, 1000000000.0, [0.019533438038283966, 0.8640664164566196, 0.05411762997156959, 0.04013739663879973, 0.022145118894727096])
     T, _, _, xs, ys = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, VF=VF, P=P)
     _, _, VF_calc, xs_TP, ys_TP = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=T, P=P)
-    assert_allclose(xs, xs_TP)
-    assert_allclose(ys, ys_TP)
-    assert_allclose(VF_calc, VF, atol=1e-15)
+    assert_close1d(xs, xs_TP)
+    assert_close1d(ys, ys_TP)
+    assert_close(VF_calc, VF, atol=1e-15)
 
         
 def test_flash_wilson_singularity():
@@ -203,13 +202,13 @@ def test_flash_wilson_singularity():
     zs, Tcs, Pcs, omegas = [0.01, 0.99], [190.564, 33.2], [4599000.0, 1296960.0], [0.008, -0.22]
     T, P = 33.0, 1e6
     _, _, VF, xs, ys = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, P=P, T=T)
-    assert_allclose(VF, 0.952185734369369)
+    assert_close(VF, 0.952185734369369)
     _, _, _, xs_P, ys_P = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, P=P, VF=VF)
-    assert_allclose(xs_P, xs)
-    assert_allclose(ys_P, ys)
+    assert_close1d(xs_P, xs)
+    assert_close1d(ys_P, ys)
     _, _, _, xs_T, ys_T = flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=T, VF=VF)
-    assert_allclose(xs_T, xs)
-    assert_allclose(ys_T, ys)
+    assert_close1d(xs_T, xs)
+    assert_close1d(ys_T, ys)
 
 
 def test_flash_Tb_Tc_Pc():
@@ -236,9 +235,9 @@ def test_flash_Tb_Tc_Pc():
     
     for (T, P, VF, xs, ys), kw in zip(pts_expect, kwargs):
         ans = flash_Tb_Tc_Pc(zs=zs, Tcs=Tcs, Pcs=Pcs, Tbs=Tbs, **kw)
-        assert_allclose([ans[0], ans[1], ans[2]], [T, P, VF], atol=1e-9)
-        assert_allclose(ans[3], xs)
-        assert_allclose(ans[4], ys)
+        assert_close1d([ans[0], ans[1], ans[2]], [T, P, VF], atol=1e-9)
+        assert_close1d(ans[3], xs)
+        assert_close1d(ans[4], ys)
 
     with pytest.raises(Exception):
         flash_Tb_Tc_Pc(zs=zs, Tcs=Tcs, Pcs=Pcs, Tbs=Tbs, T=300)
@@ -258,10 +257,10 @@ def test_flash_Tb_Tc_Pc_cases():
     T_calc, P_calc, VF_calc, xs, ys = flash_Tb_Tc_Pc(zs=[0.7058334393128614, 0.2941665606871387],
                                                      Tcs=[305.32, 469.7], Pcs=[4872000.0, 3370000.0],
                                                      Tbs=[184.55, 309.21], P=6.5e6, VF=0)
-    assert_allclose(T_calc, 313.8105619996756)
-    assert_allclose(VF_calc, 0, atol=1e-12)
-    assert_allclose(xs, [0.7058334393128627, 0.29416656068713737])
-    assert_allclose(ys, [0.9999999137511981, 8.624880199749853e-08])
+    assert_close(T_calc, 313.8105619996756)
+    assert_close(VF_calc, 0, atol=1e-12)
+    assert_close1d(xs, [0.7058334393128627, 0.29416656068713737])
+    assert_close1d(ys, [0.9999999137511981, 8.624880199749853e-08])
 
 
 

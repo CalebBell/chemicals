@@ -27,9 +27,9 @@ from fluids.numerics import assert_close, assert_close1d
 from chemicals.critical import *
 from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_Matthews,
-                                critical_data_CRC, 
-                                critical_data_PSRKR4, 
-                                critical_data_Yaws, 
+                                critical_data_CRC,
+                                critical_data_PSRKR4,
+                                critical_data_Yaws,
                                 critical_data_PassutDanner)
 
 def test_data_IUPAC():
@@ -70,7 +70,8 @@ def test_data_Matthews():
 
     assert critical_data_Matthews.shape == (120, 6)
     assert critical_data_Matthews.index.is_unique
-    
+
+
 def test_data_CRC():
     Tc_sum = critical_data_CRC['Tc'].sum()
     assert_close(Tc_sum, 514092.75)
@@ -188,7 +189,7 @@ def test_relationships():
         critical_surface()
     with pytest.raises(Exception):
         critical_surface(Tc=599.4, Pc=1.19E6, method='FAIL')
-        
+
     assert [] == critical_surface_methods(Tc=100)
 
 @pytest.mark.slow
@@ -200,13 +201,13 @@ def test_Tc_all_values():
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_close(Tcs_default_sum, 6053723.896122222)
+    assert_close(Tcs_default_sum, 6055023.896122223)
 
 def test_Tc():
     Tc_val = Tc(CASRN='64-17-5')
     assert_close(514.0, Tc_val)
     assert type(Tc_val) is float
-    
+
     assert_close(516.2, Tc(CASRN='64-17-5', method='PSRK'))
     assert Tc(CASRN='64-17-5', method='MATTHEWS') is None
 
@@ -219,9 +220,12 @@ def test_Tc():
 
     # Error handling
     assert Tc(CASRN='BADCAS') is None
-    
+
     with pytest.raises(Exception):
         Tc(CASRN='98-01-1', method='BADMETHOD')
+
+    # https://github.com/CalebBell/thermo/issues/65
+    assert Tc(CASRN='7784-42-1', method='MATTHEWS') == 373
 
 def test_Pc():
 
@@ -307,10 +311,10 @@ def test_Zc_all_values():
 
 def test_Mersmann_Kind_predictor():
     test_atoms = {'C': 10, 'H': 22}
-    
+
     Vc_pred = Mersmann_Kind_predictor(test_atoms)
     assert_close(Vc_pred, 0.0005851859052024729)
-    
+
     with pytest.raises(Exception):
         Mersmann_Kind_predictor( {'C': 10, 'H': 22, 'NOTANATOM': 100})
 
@@ -406,7 +410,7 @@ def test_third_property():
         third_property('141-62-8')
     with pytest.raises(Exception):
         third_property('1410-62-8', V=True)
-        
+
     assert_close(third_property('110-15-6', V=True), 0.00039809186906019007)
     assert_close(third_property('110-15-6', P=True), 6095016.233766234)
     assert_close(third_property('110-15-6', T=True), 658.410835214447)
@@ -418,21 +422,21 @@ def test_Hekayati_Raeissi():
     assert_close1d(ans, (599.7951343525503, 4108000.0, 0.0003149083374202421), rtol=1e-10)
     ans = Hekayati_Raeissi(MW=92.13842, V_sat=0.00010685961260743776, Tc=599.7951343525503)
     assert_close1d(ans, (599.7951343525503, 4108000.0, 0.0003149083374202421), rtol=1e-10)
-    
+
     ans = Hekayati_Raeissi(MW=92.13842, V_sat=0.00010685961260743776, Pc=4108000.0, Vc=0.000316)
     assert_close1d(ans, (600.331367806081, 4108000.0, 0.000316), rtol=1e-10)
     ans = Hekayati_Raeissi(MW=92.13842, V_sat=0.00010685961260743776, Tc=600.331367806081, Vc=0.000316)
     assert_close1d(ans, (600.331367806081, 4108000.0, 0.000316), rtol=1e-10)
-    
+
     ans = Hekayati_Raeissi(MW=92.13842, Pc=4108000.0, Vc=0.000316)
     assert_close1d(ans, (600.331367806081, 4108000.0, 0.000316), rtol=1e-10)
     ans = Hekayati_Raeissi(MW=92.13842, Tc=600.331367806081, Vc=0.000316)
     assert_close1d(ans, (600.331367806081, 4108000.0, 0.000316), rtol=1e-10)
-    
+
     # All inputs provided test
     ans = Hekayati_Raeissi(MW=92.13842, Tc=600., Vc=0.000316, Pc=1e7)
     assert_close1d(ans, (600.0, 10000000.0, 0.000316), rtol=1e-7)
-    
+
     with pytest.raises(ValueError):
         Hekayati_Raeissi(MW=92.13842, Pc=4108000.0)
 

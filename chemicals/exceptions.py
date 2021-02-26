@@ -35,8 +35,8 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 """
 
 __all__ = ['TrivialSolutionError',
-           'PhaseCountReducedError', 
-           'PhaseExistenceImpossible', 
+           'PhaseCountReducedError',
+           'PhaseExistenceImpossible',
            'UnderspecifiedError',
            'OverspeficiedError']
 

@@ -1,15 +1,15 @@
 =========
-chemicals
+Chemicals
 =========
 
 .. image:: http://img.shields.io/pypi/v/chemicals.svg?style=flat
    :target: https://pypi.python.org/pypi/chemicals
    :alt: Version_status
 .. image:: http://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat
-   :target: https://chemicals.readthedocs.io/en/latest/
+   :target: https://chemicals.readthedocs.io/
    :alt: Documentation
-.. image:: https://travis-ci.com/CalebBell/chemicals.svg?branch=release?style=flat
-   :target: https://travis-ci.com/github/CalebBell/chemicals
+.. image:: https://github.com/CalebBell/chemicals/workflows/Build/badge.svg
+   :target: https://github.com/CalebBell/chemicals/actions
    :alt: Build_status
 .. image:: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
    :target: https://github.com/CalebBell/chemicals/blob/master/LICENSE.txt
@@ -24,7 +24,7 @@ chemicals
    :alt: Join the chat at https://gitter.im/CalebBell/chemicals
    :target: https://gitter.im/CalebBell/chemicals
 .. image:: http://img.shields.io/appveyor/ci/calebbell/chemicals.svg
-   :target: https://ci.appveyor.com/project/calebbell/chemicals/branch/master
+   :target: https://ci.appveyor.com/project/calebbell/chemicals/branch/release
    :alt: Build_status
 .. image:: https://zenodo.org/badge/264697738.svg
    :alt: Zenodo
@@ -84,7 +84,12 @@ https://pypi.python.org/pypi/chemicals/
 If you have an installation of Python with pip, simple install it with:
 
     $ pip install chemicals
-    
+
+If you are using `conda <https://docs.conda.io/en/latest/>`_, you can install
+chemicals from conda-forge channel:
+
+    $ conda install -c conda-forge chemicals
+   
 To get the git version, run:
 
     $ git clone git://github.com/CalebBell/chemicals.git
@@ -250,5 +255,5 @@ Citation
 
 To cite chemicals in publications use:
 
-    Caleb Bell and Contributors (2016-2020). chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
+    Caleb Bell and Contributors (2016-2021). chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
     https://github.com/CalebBell/chemicals.

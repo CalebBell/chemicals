@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
 
@@ -40,9 +40,9 @@ Pure High Pressure Liquid Correlations
 
 Liquid Mixing Rules
 -------------------
-No specific correlations are implemented but 
+No specific correlations are implemented but
 :obj:`chemicals.utils.mixing_logarithmic` with weight fractions is the
- recommended form.
+recommended form.
 
 Pure Low Pressure Gas Correlations
 ----------------------------------
@@ -53,7 +53,7 @@ Pure Low Pressure Gas Correlations
 
 Pure High Pressure Gas Correlations
 -----------------------------------
-No correlations are implemented yet. 
+No correlations are implemented yet.
 
 Gas Mixing Rules
 ----------------
@@ -67,6 +67,7 @@ Gas Mixing Rules
 Correlations for Specific Substances
 ------------------------------------
 .. autofunction:: chemicals.viscosity.mu_IAPWS
+.. autofunction:: chemicals.viscosity.mu_air_lemmon
 
 Petroleum Correlations
 ----------------------
@@ -76,6 +77,7 @@ Petroleum Correlations
 Fit Correlations
 ----------------
 .. autofunction:: chemicals.viscosity.PPDS9
+.. autofunction:: chemicals.viscosity.dPPDS9_dT
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2_exponential
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_3
@@ -85,7 +87,7 @@ Conversion functions
 --------------------
 .. autofunction:: chemicals.viscosity.viscosity_converter
 .. autofunction:: chemicals.viscosity.viscosity_index
- 
+
 Fit Coefficients
 ----------------
 All of these coefficients are lazy-loaded, so they must be accessed as an
@@ -93,12 +95,12 @@ attribute of this module.
 
 .. data:: mu_data_Dutt_Prasad
 
-    Coefficient sfor :obj:`chemicals.viscosity.Viswanath_Natarajan_3` from [1]_ 
+    Coefficient sfor :obj:`chemicals.viscosity.Viswanath_Natarajan_3` from [1]_
     for 100 fluids.
 
 .. data:: mu_data_VN3
 
-    Coefficients for :obj:`chemicals.viscosity.Viswanath_Natarajan_3` from [1]_ 
+    Coefficients for :obj:`chemicals.viscosity.Viswanath_Natarajan_3` from [1]_
     with data for 432 fluids.
 
 .. data:: mu_data_VN2
@@ -114,27 +116,27 @@ attribute of this module.
 .. data:: mu_data_Perrys_8E_2_313
 
     A collection of 337 coefficient sets for :obj:`chemicals.dippr.EQ101` from the
-    DIPPR database published openly in [3]_. 
+    DIPPR database published openly in [3]_.
 
 .. data:: mu_data_Perrys_8E_2_312
 
-    A collection of 345 coefficient sets for :obj:`chemicals.dippr.EQ102` from the 
-    DIPPR database published openly in [3]_. 
+    A collection of 345 coefficient sets for :obj:`chemicals.dippr.EQ102` from the
+    DIPPR database published openly in [3]_.
 
 .. data:: mu_data_VDI_PPDS_7
 
     Coefficients for the model equation :obj:`PPDS9`, published openly in [2]_.
     Provides no temperature limits, but has been designed
-    for extrapolation. Extrapolated to low temperatures it provides a 
+    for extrapolation. Extrapolated to low temperatures it provides a
     smooth exponential increase. However, for some chemicals such as
     glycerol, extrapolated to higher temperatures viscosity is predicted
     to increase above a certain point.
 
 .. data:: mu_data_VDI_PPDS_8
 
-    Coefficients for a tempereture polynomial (T in Kelvin) developed by the 
+    Coefficients for a tempereture polynomial (T in Kelvin) developed by the
     PPDS, published openly in [2]_. :math:`\mu = A + BT + CT^2 + DT^3 + ET^4`.
-    
+
 .. [1] Viswanath, Dabir S., and G. Natarajan. Databook On The Viscosity Of
    Liquids. New York: Taylor & Francis, 1989
 .. [2] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
@@ -168,20 +170,18 @@ The structure of each dataframe is shown below:
 
 from __future__ import division
 
-__all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9',
+__all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9', 'dPPDS9_dT',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
-'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer', 
+'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer',
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
-'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS']
+'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon']
 
-from fluids.numerics import secant, interp, numpy as np
+from fluids.numerics import secant, interp, numpy as np, trunc_exp
 from chemicals.utils import log, exp, sqrt, atan, tan, sin, acos
 
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
 
-__numba_additional_funcs__ = ('_round_whole_even', 'Twu_1985_internal',
-                              'Saybolt_universal_eq')
 
 folder = os_path_join(source_path, 'Viscosity')
 
@@ -201,10 +201,10 @@ register_df_source(folder, 'Table 2-313 Viscosity of Inorganic and Organic Liqui
 
 register_df_source(folder, 'Table 2-312 Vapor Viscosity of Inorganic and Organic Substances.tsv', csv_kwargs={
     'dtype':{'C1': float, 'C2': float, 'C3': float, 'C4': float, 'Tmin': float, 'Tmax': float}})
-    
 
-register_df_source(folder, 'VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv')
-register_df_source(folder, 'VDI PPDS Dynamic viscosity of gases polynomials.tsv')
+
+register_df_source(folder, 'VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv', csv_kwargs={'float_precision': 'legacy'})
+register_df_source(folder, 'VDI PPDS Dynamic viscosity of gases polynomials.tsv', csv_kwargs={'float_precision': 'legacy'})
 
 
 
@@ -221,7 +221,7 @@ def _load_mu_data():
 
     mu_data_VN3 = data_source('Viswanath Natarajan Dynamic 3 term.tsv')
     mu_values_VN3 = np.array(mu_data_VN3.values[:, 2:], dtype=float)
-    
+
     mu_data_VN2 = data_source('Viswanath Natarajan Dynamic 2 term.tsv')
     mu_values_VN2 = np.array(mu_data_VN2.values[:, 2:], dtype=float)
 
@@ -230,24 +230,24 @@ def _load_mu_data():
 
     mu_data_Perrys_8E_2_313 = data_source('Table 2-313 Viscosity of Inorganic and Organic Liquids.tsv')
     mu_values_Perrys_8E_2_313 = np.array(mu_data_Perrys_8E_2_313.values[:, 1:], dtype=float)
-    
+
     mu_data_Perrys_8E_2_312 = data_source('Table 2-312 Vapor Viscosity of Inorganic and Organic Substances.tsv')
     mu_values_Perrys_8E_2_312 = np.array(mu_data_Perrys_8E_2_312.values[:, 1:], dtype=float)
 
     mu_data_VDI_PPDS_7 = data_source('VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv')
     mu_values_PPDS_7 = np.array(mu_data_VDI_PPDS_7.values[:, 2:], dtype=float)
-    
+
     mu_data_VDI_PPDS_8 = data_source('VDI PPDS Dynamic viscosity of gases polynomials.tsv')
     mu_values_PPDS_8 = np.array(mu_data_VDI_PPDS_8.values[:, 1:], dtype=float)
-    
+
     _mu_data_loaded = True
 
 if PY37:
     def __getattr__(name):
         if name in ('mu_data_Dutt_Prasad', 'mu_values_Dutt_Prasad', 'mu_data_VN3',
-                    'mu_values_VN3', 'mu_data_VN2', 'mu_values_VN2', 'mu_data_VN2E', 
+                    'mu_values_VN3', 'mu_data_VN2', 'mu_values_VN2', 'mu_data_VN2E',
                     'mu_values_VN2E', 'mu_data_Perrys_8E_2_313', 'mu_values_Perrys_8E_2_313',
-                    'mu_data_Perrys_8E_2_312', 'mu_values_Perrys_8E_2_312', 'mu_data_VDI_PPDS_7', 
+                    'mu_data_Perrys_8E_2_312', 'mu_values_Perrys_8E_2_312', 'mu_data_VDI_PPDS_7',
                     'mu_values_PPDS_7', 'mu_data_VDI_PPDS_8', 'mu_values_PPDS_8'):
             _load_mu_data()
             return globals()[name]
@@ -261,10 +261,10 @@ else:
 def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
     r'''Calculates and returns the viscosity of water according to the IAPWS
     (2008) release.
-    
-    Viscosity is calculated as a function of three terms; 
+
+    Viscosity is calculated as a function of three terms;
     the first is the dilute-gas limit; the second is the contribution due to
-    finite density; and the third and most complex is a critical enhancement 
+    finite density; and the third and most complex is a critical enhancement
     term.
 
     .. math::
@@ -340,7 +340,7 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
     Notes
     -----
     There are three ways to use this formulation.
-    
+
     1) Compute the Industrial formulation value which does not include the
        critical enhacement, by leaving `drho_dP` and `drho_dP_Tr` None.
     2) Compute the Scientific formulation value by accurately computing and
@@ -351,22 +351,22 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
        for that term in the thermal conductivity IAPWS equation which is used.
 
     xmu = 0.068
-    
+
     qc = (1.9E-9)**-1
-    
+
     qd = (1.1E-9)**-1
-    
+
     nu = 0.630
-    
+
     gamma = 1.239
-    
+
     xi0 = 0.13E-9
-    
+
     Gamma0 = 0.06
-    
+
     TRC = 1.5
-    
-    This forulation is highly optimized, spending most of its time in the 
+
+    This forulation is highly optimized, spending most of its time in the
     logarithm, power, and square root.
 
     Examples
@@ -378,9 +378,20 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
     6.415460784836147e-05
 
     Point 4 of formulation, compared with MPEI and IAPWS, matches.
-    
+
     >>> mu_IAPWS(T=647.35, rho=322., drho_dP=1.213641949033E-2)
     4.2961578738287e-05
+
+    Full scientific calculation:
+
+    >>> from chemicals.iapws import iapws95_properties, iapws95_P, iapws95_Tc
+    >>> T, P = 298.15, 1e5
+    >>> rho, _, _, _, _, _, _, _, _, _, drho_dP = iapws95_properties(T, P)
+    >>> P_ref = iapws95_P(1.5*iapws95_Tc, rho)
+    >>> _, _, _, _, _, _, _, _, _, _, drho_dP_Tr = iapws95_properties(1.5*iapws95_Tc, P_ref)
+    >>> mu_IAPWS(T, rho, drho_dP, drho_dP_Tr)
+    0.00089002267377
+
 
     References
     ----------
@@ -395,34 +406,30 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
     rhor = rho*0.003105590062111801 #1/322.
     x0 = rhor - 1.
     x1 = Tr_inv - 1.
-    '''
-    His = [1.67752, 2.20462, 0.6366564, -0.241605]
-    mu0 = 0
-    for i in range(4):
-        mu0 += His[i]/Tr**i
-    '''
+#    His = [1.67752, 2.20462, 0.6366564, -0.241605]
+#    mu0 = 0
+#    for i in range(4):
+#        mu0 += His[i]/Tr**i
     mu0 = 100.0*sqrt(Tr)/(Tr_inv*(Tr_inv*(0.6366564 - 0.241605*Tr_inv) + 2.20462) + 1.67752)
 
-    '''
-    i_coefs = [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6]
-    j_coef = [0, 1, 2, 3, 0, 1, 2, 3, 5, 0, 1, 2, 3, 4, 0, 1, 0, 3, 4, 3, 5]
-    Hijs = [0.520094, .0850895, -1.08374, -0.289555, 0.222531, 0.999115,
-          1.88797, 1.26613, 0.120573, -0.281378, -0.906851, -0.772479,
-          -0.489837, -0.257040, 0.161913, 0.257399, -0.0325372, 0.0698452,
-          0.00872102, -0.00435673, -0.000593264]
-    tot = 0
-    for i in range(21):
-        tot += Hijs[i]*(rhor - 1.)**i_coefs[i]*(Tr_inv - 1.)**j_coef[i]
-    '''
+#    i_coefs = [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 4, 4, 5, 6, 6]
+#    j_coef = [0, 1, 2, 3, 0, 1, 2, 3, 5, 0, 1, 2, 3, 4, 0, 1, 0, 3, 4, 3, 5]
+#    Hijs = [0.520094, .0850895, -1.08374, -0.289555, 0.222531, 0.999115,
+#          1.88797, 1.26613, 0.120573, -0.281378, -0.906851, -0.772479,
+#          -0.489837, -0.257040, 0.161913, 0.257399, -0.0325372, 0.0698452,
+#          0.00872102, -0.00435673, -0.000593264]
+#    tot = 0
+#    for i in range(21):
+#        tot += Hijs[i]*(rhor - 1.)**i_coefs[i]*(Tr_inv - 1.)**j_coef[i]
     x02 = x0*x0
-    tot = (x0*(x0*(x0*(0.161913 - 0.0325372*x0) - 0.281378) + 0.222531) 
-           + x1*(x0*(x0*(0.257399*x0 - 0.906851) + 0.999115) + x1*(x0*(1.88797 - 0.772479*x0) 
-            + x1*(x0*(x0*(x02*(0.0698452 - 0.00435673*x02) - 0.489837) + 1.26613) 
-            + x1*(x02*(0.00872102*x0*x02 - 0.25704) + x0*x1*(0.120573 - 0.000593264*x02*x02*x0)) - 0.289555) 
+    tot = (x0*(x0*(x0*(0.161913 - 0.0325372*x0) - 0.281378) + 0.222531)
+           + x1*(x0*(x0*(0.257399*x0 - 0.906851) + 0.999115) + x1*(x0*(1.88797 - 0.772479*x0)
+            + x1*(x0*(x0*(x02*(0.0698452 - 0.00435673*x02) - 0.489837) + 1.26613)
+            + x1*(x02*(0.00872102*x0*x02 - 0.25704) + x0*x1*(0.120573 - 0.000593264*x02*x02*x0)) - 0.289555)
             - 1.08374) + 0.0850895) + 0.520094)
     mu1 = exp(rhor*tot)
 
-    if drho_dP:
+    if drho_dP is not None:
         xmu = 0.068
         qc = 526315789.4736842#(1.9E-9)**-1
         qD = 909090909.0909091#(1.1E-9)**-1
@@ -432,7 +439,7 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
 #        Gamma0 = 0.06
         TRC = 1.5
 
-        # Not a perfect match because of 
+        # Not a perfect match because of
         zeta_drho_dP = drho_dP*68521.73913043478 #22.064E6/322.0
         if drho_dP_Tr is None:
             # Brach needed to allow scientific points to work
@@ -443,7 +450,7 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
                 tot1 = (rhor*(rhor*(rhor*(rhor*(12.1358413791395 - 5.54349664571295*rhor) - 9.82240510197603)
                             + 8.08379285492595) - 6.30816983387575) + 6.52717759281799)
             elif rhor <= 1.242236025:
-                tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579) 
+                tot1 = (rhor*(rhor*(rhor*(rhor*(9.19494865194302 - 2.16866274479712*rhor) - 12.033872950579)
                             + 8.91990208918795) - 3.96415689925446) + 5.35500529896124)
             elif rhor <= 1.863354037:
                 tot1 = (rhor*(rhor*(rhor*(rhor*(6.1678099993336 - 0.965458722086812*rhor) - 11.0321960061126)
@@ -451,14 +458,14 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
             else:
                 tot1 = (rhor*(rhor*(rhor*(rhor*(4.66861294457414 - 0.503243546373828*rhor) - 10.325505114704)
                             + 9.8895256507892) + 0.595748562571649) + 1.11999926419994)
-            drho_dP_Tr = 1./tot1
+            drho_dP_Tr2 = 1./tot1
         else:
-            drho_dP_Tr *= 68521.73913043478 #22.064E6/322.0
-        dchi = rhor*(zeta_drho_dP - drho_dP_Tr*TRC*Tr_inv)
+            drho_dP_Tr2 = drho_dP_Tr*68521.73913043478 #22.064E6/322.0
+        dchi = rhor*(zeta_drho_dP - drho_dP_Tr2*TRC*Tr_inv)
         if dchi < 0.0:
             # By definition
             return mu0*mu1*1e-6
-        
+
         # 16.666 = 1/Gamma0
         xi = xi0*(dchi*16.666666666666668)**0.5084745762711864 #(nu/gamma)
         qD2 = qD*qD
@@ -494,6 +501,124 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
     return mu
 
 
+def mu_air_lemmon(T, rho):
+    r'''Calculates and returns the viscosity of air according to Lemmon
+    and Jacobsen (2003) [1]_.
+
+    Viscosity is calculated as a function of two terms;
+    the first is the dilute-gas limit; the second is the contribution due to
+    finite density.
+
+    .. math::
+        \mu = \mu^0(T) + \mu^r(T, \rho)
+
+    .. math::
+        \mu^0(T) = \frac{0.9266958\sqrt{MT}}{\sigma^2 \Omega(T^*)}
+
+    .. math::
+        \Omega(T^*) = \exp\left( \sum_{i=0}^4 b_i [\ln(T^*)]^i \right)
+
+    .. math::
+        \mu^r = \sum_{i=1}^n N_i \tau^{t_i} \delta^{d_i} \exp\left(
+        -\gamma_i \delta^{l_i}\right)
+
+    Parameters
+    ----------
+    T : float
+        Temperature of air [K]
+    rho : float
+        Molar density of air [mol/m^3]
+
+    Returns
+    -------
+    mu : float
+        Viscosity of air, [Pa*s]
+
+    Notes
+    -----
+
+    The coefficients are:
+
+    Ni = [10.72, 1.122, 0.002019, -8.876, -0.02916]
+
+    ti = [0.2, 0.05, 2.4, 0.6, 3.6]
+
+    di = [1, 4, 9, 1, 8]
+
+    gammai = Ii = [0, 0, 0, 1, 1]
+
+    bi = [.431, -0.4623, 0.08406, 0.005341, -0.00331]
+
+    The reducing parameters are :math:`T_c = 132.6312` K and
+    :math:`\rho_c = 10447.7` mol/m^3. Additional parameters used are
+    :math:`\sigma = 0.36` nm,
+    :math:`M = 28.9586` g/mol and :math:`\frac{e}{k} = 103.3` K.
+
+    This is an implementation optimized for speed, spending its time
+    in the calclulation of 1 log; 2 exp; 1 power; and 2 divisions.
+
+    Examples
+    --------
+    Viscosity at 300 K and 1 bar:
+
+    >>> mu_air_lemmon(300.0, 40.10292351061862)
+    1.85371518556e-05
+
+    Calculate the density in-place:
+
+    >>> from chemicals.air import lemmon2000_rho
+    >>> mu_air_lemmon(300.0, lemmon2000_rho(300.0, 1e5))
+    1.85371518556e-05
+
+    References
+    ----------
+    .. [1] Lemmon, E. W., and R. T. Jacobsen. "Viscosity and Thermal
+       Conductivity Equations for Nitrogen, Oxygen, Argon, and Air."
+       International Journal of Thermophysics 25, no. 1 (January 1, 2004):
+       21-69. https://doi.org/10.1023/B:IJOT.0000022327.04529.f3.
+    '''
+    # Cost: 1 log; 2 exp; 1 power; 2 divisions
+#     sigma = 0.360 # nm
+#     M = 28.9586 # g/mol
+#     rhoc = 10447.7 # mol/m^3, maxcondentherm actually
+    Tc = 132.6312 # K, maxcondentherm actually
+    tau = Tc/T
+    delta = rho*9.571484632981421e-05 # 9.57...E-5 = 1/10447.7
+
+    delta2 = delta*delta
+    delta4 = delta2*delta2
+    delta8 = delta4*delta4
+    tau_20 = tau**0.05
+    tau2_20 = tau_20*tau_20
+    tau4_20 = tau2_20*tau2_20
+    tau8_20 = tau4_20*tau4_20
+
+    tau12_20 = tau4_20*tau8_20
+    tau24_20 = tau12_20*tau12_20
+    tau48_20 = tau24_20*tau24_20
+    x0 = exp(-delta)
+    etar = (delta*(-8.876e-6*tau12_20*x0 + 0.002019e-6*tau48_20*delta8
+                  + 10.72e-6*tau4_20) + 1.122e-6*delta4*tau_20
+            - 0.02916e-6*delta8*tau24_20*x0*tau48_20)
+
+#     e_k = 103.3 # K
+#     Ts = T/e_k
+    Ts = T*0.00968054211035818 # 1/e_k
+    lnTs = log(Ts)
+#     tot = 0.0
+#     for i in range(5):
+#         tot += CIs[i]*lnTs**i
+    Omega = exp(lnTs*(lnTs*(lnTs*(0.005341 - 0.00331*lnTs) + 0.08406) - 0.4623) + 0.431)
+
+    # 0.0266958*sqrt(28.9586)/(0.360*0.360)*sqrt(132.6312) = 12.76...
+    eta0 = 12.765845058845755e-6/(Omega*tau8_20*tau2_20)
+#     eta0 = 0.0266958*sqrt(T*M)/(sigma*sigma*Omega)
+#     etar = 0.0
+#     for i in range(5):
+#         etar += Ni[i]*tau**ti[i]*delta**di[i]*exp(-gammai[i]*delta**Ii[i])
+    return (eta0 + etar)
+
+
 def Viswanath_Natarajan_2(T, A, B):
     r'''Calculate the viscosity of a liquid using the 2-term form
     representation developed in [1]_. Requires input coefficients. The `A`
@@ -502,7 +627,7 @@ def Viswanath_Natarajan_2(T, A, B):
 
     .. math::
         \mu = \exp\left(A + \frac{B}{T}\right)
-        
+
     Parameters
     ----------
     T : float
@@ -524,10 +649,10 @@ def Viswanath_Natarajan_2(T, A, B):
     Examples
     --------
     DDBST has 0.0004580 as a value at this temperature for 1-Butanol.
-    
+
     >>> Viswanath_Natarajan_2(348.15, -5.9719-log(100), 1007.0)
     0.000459836869568295
-    
+
     References
     ----------
     .. [1] Viswanath, Dabir S., and G. Natarajan. Databook On The Viscosity Of
@@ -539,7 +664,7 @@ def Viswanath_Natarajan_2(T, A, B):
 def Viswanath_Natarajan_2_exponential(T, C, D):
     r'''Calculate the viscosity of a liquid using the 2-term exponential form
     representation developed in [1]_. Requires input coefficients. The `A`
-    coefficient is assumed to yield coefficients in Pa*s, as all 
+    coefficient is assumed to yield coefficients in Pa*s, as all
     coefficients found so far have been.
 
     .. math::
@@ -569,13 +694,13 @@ def Viswanath_Natarajan_2_exponential(T, C, D):
     >>> mus = [2.2173, 2.1530, 1.741, 1.0091] # in cP
     >>> Viswanath_Natarajan_2_exponential(288.15, 4900800, -3.8075)
     0.002114798866203873
-    
+
     Calculation of the AARD of the fit (1% is the value stated in [1]_.:
-        
+
     >>> mu_calc = [Viswanath_Natarajan_2_exponential(T, 4900800, -3.8075) for T in Ts]
     >>> np.mean([abs((mu - mu_i*1000)/mu) for mu, mu_i in zip(mus, mu_calc)])
     0.010467928813061298
-    
+
     References
     ----------
     .. [1] Viswanath, Dabir S., and G. Natarajan. Databook On The Viscosity Of
@@ -587,9 +712,9 @@ def Viswanath_Natarajan_2_exponential(T, C, D):
 def Viswanath_Natarajan_3(T, A, B, C):
     r'''Calculate the viscosity of a liquid using the 3-term Antoine form
     representation developed in [1]_. Requires input coefficients. If the
-    coefficients do not yield viscosity in Pa*s, but rather cP, remove 
+    coefficients do not yield viscosity in Pa*s, but rather cP, remove
     log10(1000) from `A`.
-    
+
     .. math::
         \log_{10} \mu = A + B/(T + C)
 
@@ -629,9 +754,9 @@ def Viswanath_Natarajan_3(T, A, B, C):
 def PPDS9(T, A, B, C, D, E):
     r'''Calculate the viscosity of a liquid using the 5-term exponential power
     fit developed by the PPDS and named PPDS equation 9.
-    
+
     .. math::
-       \mu = E \exp\left[A \left(\frac{C-T}{T-D}\right)^{1/3}  
+       \mu = E \exp\left[A \left(\frac{C-T}{T-D}\right)^{1/3}
         + B \left(\frac{C-T}{T-D}\right)^{4/3}  \right]
 
     Parameters
@@ -658,25 +783,119 @@ def PPDS9(T, A, B, C, D, E):
     -----
     No other source for these coefficients has been found.
 
+    There can be a singularity in this equation when `T` approaches `C` or
+    `D`; it may be helpful to take as a limit to this equation `D` + 5 K.
+
     Examples
     --------
     >>> PPDS9(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
     0.00035091137378230684
-    
+
     References
     ----------
     .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
        Berlin; New York:: Springer, 2010.
     '''
     term = (C - T)/(T-D)
-    if term < 0:
+    if term < 0.0:
         term1 = -((T - C)/(T-D))**(1/3.)
     else:
         term1 = term**(1/3.)
     term2 = term*term1
-    mu = E*exp(A*term1 + B*term2)
+    mu = E*trunc_exp(A*term1 + B*term2)
     return mu
 
+def dPPDS9_dT(T, A, B, C, D, E):
+    r'''Calculate the temperature derivative of  viscosity of a liquid using
+    the 5-term exponential power fit developed by the PPDS and named PPDS
+    equation 9.
+
+    Normally, the temperature derivative is:
+
+    .. math::
+        \frac{\partial \mu}{\partial T} = E \left(\frac{A \sqrt[3]{\frac{C - T}
+        {- D + T}} \left(- D + T\right) \left(- \frac{C - T}{3 \left(- D
+        + T\right)^{2}} - \frac{1}{3 \left(- D + T\right)}\right)}{C - T}
+        - \frac{B \sqrt[3]{\frac{C - T}{- D + T}} \left(C - T\right)}{\left(
+        - D + T\right)^{2}} + B \sqrt[3]{\frac{C - T}{- D + T}} \left(- \frac{
+        C - T}{3 \left(- D + T\right)^{2}} - \frac{1}{3 \left(- D + T\right)}
+        \right) - \frac{B \sqrt[3]{\frac{C - T}{- D + T}}}{- D + T}\right)
+        e^{A \sqrt[3]{\frac{C - T}{- D + T}} + \frac{B \sqrt[3]{\frac{C - T}
+        {- D + T}} \left(C - T\right)}{- D + T}}
+
+    For the low-temperature region:
+
+    .. math::
+        \frac{\partial \mu}{\partial T} = E \left(- \frac{A \sqrt[3]{\frac{
+        - C + T}{- D + T}} \left(- D + T\right) \left(- \frac{- C + T}{3
+        \left(- D + T\right)^{2}} + \frac{1}{3 \left(- D + T\right)}\right)
+        }{- C + T} + \frac{B \sqrt[3]{\frac{- C + T}{- D + T}} \left(C
+        - T\right)}{\left(- D + T\right)^{2}} + \frac{B \sqrt[3]{\frac{
+        - C + T}{- D + T}}}{- D + T} - \frac{B \sqrt[3]{\frac{- C + T}{
+        - D + T}} \left(C - T\right) \left(- \frac{- C + T}{3 \left(- D
+        + T\right)^{2}} + \frac{1}{3 \left(- D + T\right)}\right)}{- C
+        + T}\right) e^{- A \sqrt[3]{\frac{- C + T}{- D + T}} - \frac{B
+        \sqrt[3]{\frac{- C + T}{- D + T}} \left(C - T\right)}{- D + T}}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [-]
+    C : float
+        Coefficient, [K]
+    D : float
+        Coefficient, [K]
+    E : float
+        Coefficient, [Pa*s]
+
+    Returns
+    -------
+    dmu_dT : float
+        First temperature derivative of liquid viscosity, [Pa*s]
+    mu : float
+        Liquid viscosity, [Pa*s]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> dPPDS9_dT(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    (-3.186540635882627e-06, 0.00035091137378230684)
+
+    References
+    ----------
+    .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
+       Berlin; New York:: Springer, 2010.
+    '''
+    term = (C - T)/(T-D)
+    if term < 0.0:
+        x0 = 1.0/(-D + T)
+        x1 = x0*(-C + T)
+        x2 = -T
+        x3 = C + x2
+        x4 = B*x3
+        mu = E*trunc_exp(-x1**(1.0/3.0)*(A + x0*x4))
+        x6 = D + x2
+        x7 = 1.0/x6
+        x8 = x0*(x1 - 1.0)/3.0
+        dmu_dT = -mu*(x3*x7)**(1.0/3.0)*(-A*x6*x8/x3 + B*x7 + B*x8 - x4*x7*x7)
+    else:
+        x0 = -T
+        x1 = C + x0
+        x2 = D + x0
+        x3 = 1.0/x2
+        x4 = x1*x3
+        x5 = (-x4)**(1.0/3.0)
+        mu = E*trunc_exp(x5*(A - B*x4))
+        x7 = 1.0/(-D + T)
+        x8 = x7*(x1*x7 + 1.0)*(1.0/3.0)
+        dmu_dT = -x5*mu*(-A*x2*x8/x1 + B*x1*x3*x3 - B*x3 + B*x8)
+    return (dmu_dT, mu)
 
 
 def Letsou_Stiel(T, MW, Tc, Pc, omega):
@@ -727,7 +946,7 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     Examples
     --------
     >>> Letsou_Stiel(400., 46.07, 516.25, 6.383E6, 0.6371)
-    0.00020361508753081502
+    0.0002036150875308
 
     References
     ----------
@@ -738,7 +957,7 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     Tr = T/Tc
     xi0 = (1.5174 - Tr*(2.135 - 0.75*Tr))*1E-5
     xi1 = (4.2552 - Tr*(7.674 - 3.4*Tr))*1E-5
-    xi = 2173.424*Tc**(1.0/6.)*MW**-0.5*Pc**(-2.0/3.)
+    xi = 2173.424*Tc**(1.0/6.)/sqrt(MW)*Pc**(-2.0/3.)
     return (xi0 + omega*xi1)/xi
 
 
@@ -800,7 +1019,7 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
     Vm, Vc = Vm*1E6, Vc*1E6  # m^3/mol to mL/mol
     Tc_inv = 1.0/Tc
     Tr = T*Tc_inv
-    
+
     Tr2 = Tr*Tr
     Gamma = 0.29607 - 0.09045*Tr - 0.04842*Tr2
     VrT = 0.33593 - 0.33953*Tr + 1.51941*Tr2 - 2.02512*Tr*Tr2 + 1.11422*Tr2*Tr2
@@ -883,7 +1102,7 @@ def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
     dPr = (P-Psat)/Pc
     if dPr < 0.0:
         dPr = 0.0
-    return (1. + D*(dPr/2.118)**A)/(1. + C*omega*dPr)*mu_l
+    return (1. + D*(dPr*(1.0/2.118))**A)/(1. + C*omega*dPr)*mu_l
 
 ### Viscosity of liquid mixtures
 ### Viscosity of Gases - low pressure
@@ -928,7 +1147,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
     Examples
     --------
     >>> Yoon_Thodos(300., 556.35, 4.5596E6, 153.8)
-    1.0194885727776817e-05
+    1.019488572777e-05
 
     References
     ----------
@@ -937,7 +1156,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
        doi:10.1002/aic.690160225.
     '''
     Tr = T/Tc
-    xi = 2173.4241*Tc**(1/6.)*MW**-0.5*Pc**(-2.0/3.)
+    xi = 2173.4241*Tc**(1/6.)/sqrt(MW)*Pc**(-2.0/3.)
     a = 46.1
     b = 0.618
     c = 20.4
@@ -952,12 +1171,12 @@ def Stiel_Thodos(T, Tc, Pc, MW):
     developed in [1]_.
 
     if :math:`T_r > 1.5`:
-        
+
     .. math::
         \mu_g = 17.78\times 10^{-5} (4.58T_r - 1.67)^{0.625}/\xi
-    
+
     else:
-    
+
     .. math::
         \mu_g = 34\times 10^{-5} T_r^{0.94}/\xi
 
@@ -990,7 +1209,7 @@ def Stiel_Thodos(T, Tc, Pc, MW):
     Examples
     --------
     >>> Stiel_Thodos(300., 556.35, 4.5596E6, 153.8) #CCl4
-    1.0408926223608723e-05
+    1.040892622360e-05
 
     References
     ----------
@@ -998,11 +1217,11 @@ def Stiel_Thodos(T, Tc, Pc, MW):
        Gases at Normal Pressures." AIChE Journal 7, no. 4 (1961): 611-15.
        doi:10.1002/aic.690070416.
     '''
-    Pc = Pc/101325.
+    Pc = Pc*(1.0/101325.)
     Tr = T/Tc
-    xi = Tc**(1/6.)/(MW**0.5*Pc**(2/3.))
+    xi = Tc**(1/6.)/(sqrt(MW)*Pc**(2/3.))
     if Tr > 1.5:
-        mu_g = 17.78E-5*(4.58*Tr-1.67)**.625/xi
+        mu_g = 17.78E-5*(4.58*Tr-1.67)**0.625/xi
     else:
         mu_g = 34E-5*Tr**0.94/xi
     return mu_g*1e-3
@@ -1076,10 +1295,11 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
     Tc_inv = 1.0/Tc
     Tr = T*Tc_inv
     MW_inv = 1.0/MW
-    xi = 0.176*(Tc*MW_inv*MW_inv*MW_inv/(Pc/1E5)**4)**(1.0/6.0)  # bar arrording to example in Poling
+    Pc_bar = Pc*1e-5
+    xi = 0.176*(Tc*MW_inv*MW_inv*MW_inv/(Pc_bar*Pc_bar*Pc_bar*Pc_bar))**(1.0/6.0)  # bar arrording to example in Poling
     if dipole is None:
         dipole = 0.0
-    dipoler = 52.46*dipole*dipole*(Pc*1E-5)*Tc_inv*Tc_inv  # bar arrording to example in Poling
+    dipoler = 52.46*dipole*dipole*Pc_bar*Tc_inv*Tc_inv  # bar arrording to example in Poling
     if dipoler < 0.022:
         Fp = 1.0
     elif 0.022 <= dipoler < 0.075:
@@ -1100,7 +1320,8 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
                 value = 1.0
             else:
                 value = -1.0
-            FQ = 1.22*Q**0.15*(1.0 + 0.00385*((Tr-12.0)**2)**(MW_inv)*value)
+            x0 = (Tr-12.0)
+            FQ = 1.22*Q**0.15*(1.0 + 0.00385*(x0*x0)**(MW_inv)*value)
     eta = (0.807*Tr**0.618 - 0.357*exp(-0.449*Tr) + 0.340*exp(-4.058*Tr) + 0.018)*Fp*FQ/xi
     return eta*1E-7
 
@@ -1137,8 +1358,8 @@ def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
     7% average relative deviation. Deviation should never be above 30%.
     Developed with the DIPPR database. It is believed theoretically predicted values
     are included in the correlation.
-    
-    Under 0.2Tc, this correlation has been modified to provide values at the 
+
+    Under 0.2Tc, this correlation has been modified to provide values at the
     limit.
 
     Examples
@@ -1158,7 +1379,7 @@ def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
     if Tr < 0.2:
         Tr = 0.2
         T = 0.2*Tc
-    
+
     mu_g = 1E-5*Pc*Tr + (0.091 - 0.477/MW)*T + MW*(1E-5*Pc - 8.0*MW*MW/(T*T))*(10.7639/Tc - 4.1929/T)
     mu_g = 1e-7*mu_g
     return mu_g
@@ -1194,7 +1415,7 @@ def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
     -----
     This equation is entirely dimensionless; all dimensions cancel.
     The original source has not been reviewed.
-    
+
     Adding the square roots can speed up the calculation.
 
     Examples
@@ -1212,7 +1433,7 @@ def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
     if MW_roots is None:
         MW_roots = [0.0]*N
         for i in range(N):
-            MW_roots[i] = MWs[i]**0.5
+            MW_roots[i] = sqrt(MWs[i])
     denominator = k = 0.0
     for i in range(N):
         v = zs[i]*MW_roots[i]
@@ -1264,14 +1485,14 @@ def Wilke(ys, mus, MWs):
     References
     ----------
     .. [1] Wilke, C. R. "A Viscosity Equation for Gas Mixtures." The Journal of
-       Chemical Physics 18, no. 4 (April 1, 1950): 517-19. 
+       Chemical Physics 18, no. 4 (April 1, 1950): 517-19.
        https://doi.org/10.1063/1.1747673.
     '''
     cmps = range(len(ys))
     phis = [[(1.0 + (mus[i]/mus[j])**0.5*(MWs[j]/MWs[i])**0.25)**2.0/(8.0*(1.0 + MWs[i]/MWs[j]))**0.5
                     for j in cmps] for i in cmps]
-    # Some publications show the denominator sum should not consider i ==j and have only the 
-    # mole fraction  but this reduces to that as phi[i][i] == 1    
+    # Some publications show the denominator sum should not consider i ==j and have only the
+    # mole fraction  but this reduces to that as phi[i][i] == 1
     return sum([ys[i]*mus[i]/sum([ys[j]*phis[i][j] for j in cmps]) for i in cmps])
 
 
@@ -1279,17 +1500,17 @@ def Wilke_prefactors(MWs):
     r'''The :obj:`Wilke` gas viscosity method can be sped up by precomputing several
     matrices. The memory used is proportional to N^2, so it can be significant,
     but is still a substantial performance increase even when they are so large
-    they cannot fit into cached memory. These matrices are functions of 
+    they cannot fit into cached memory. These matrices are functions of
     molecular weights only. These are used by the :obj:`Wilke_prefactored` function.
 
     .. math::
         t0_{i,j} = \frac{ \sqrt{\frac{MW_{j}}{MW_{i}}}}{
-        \sqrt{\frac{8 MW_{i}}{MW_{j}} + 8}} 
-        
+        \sqrt{\frac{8 MW_{i}}{MW_{j}} + 8}}
+
     .. math::
         t1_{i,j} = \frac{2 \sqrt[4]{\frac{MW_{j}}{MW_{i}}}
-        }{\sqrt{\frac{8 MW_{i}}{MW_{j}} + 8}} 
-        
+        }{\sqrt{\frac{8 MW_{i}}{MW_{j}} + 8}}
+
     .. math::
         t2_{i,j} = \frac{1}{\sqrt{\frac{8 MW_{i}}{MW_{j}} + 8}}
 
@@ -1306,17 +1527,17 @@ def Wilke_prefactors(MWs):
         Second terms, [-]
     t2s : list[list[float]]
         Third terms, [-]
-        
+
     Notes
     -----
     These terms are derived as follows using SymPy. The viscosity terms are not
     known before hand so they are not included in the factors, but otherwise
     these parameters simplify the computation of the :math:`\phi_{ij}` term
     to the following:
-        
+
     .. math::
         \phi_{ij} = \frac{\mu_i}{\mu_j}t0_{i,j} + \sqrt{\frac{\mu_i}{\mu_j}}t1_{i,j} + t2_{i,j}
-    
+
     >>> from sympy import * # doctest: +SKIP
     >>> MWi, MWj, mui, muj = symbols('MW_i, MW_j, mu_i, mu_j') # doctest: +SKIP
     >>> f = (1 + sqrt(mui/muj)*(MWj/MWi)**Rational(1,4))**2 # doctest: +SKIP
@@ -1335,10 +1556,10 @@ def Wilke_prefactors(MWs):
     MWs_inv = [1.0/MWi for MWi in MWs]
     phi_fact_invs = [[1.0/(8.0*(1.0 + MWs[i]*MWs_inv[j]))**0.5
                     for j in cmps] for i in cmps]
-    
+
     t0s = [[(MWs[j]*MWs_inv[i])**0.5*phi_fact_invs[i][j]
                     for j in cmps] for i in cmps]
-    
+
     t1s = [[2.0*(MWs[j]*MWs_inv[i])**0.25*phi_fact_invs[i][j]
                     for j in cmps] for i in cmps]
     return t0s, t1s, phi_fact_invs
@@ -1353,7 +1574,7 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
     .. math::
         \phi_{ij} = \frac{\mu_i}{\mu_j}t0_{i,j} + \sqrt{\frac{\mu_i}{\mu_j}}
         t1_{i,j} + t2_{i,j}
-        
+
     Parameters
     ----------
     ys : float
@@ -1390,7 +1611,7 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
     References
     ----------
     .. [1] Wilke, C. R. "A Viscosity Equation for Gas Mixtures." The Journal of
-       Chemical Physics 18, no. 4 (April 1, 1950): 517-19. 
+       Chemical Physics 18, no. 4 (April 1, 1950): 517-19.
        https://doi.org/10.1063/1.1747673.
     '''
     N = len(ys)
@@ -1404,7 +1625,7 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
         mu_roots[i] = muirtinv*mus[i]
         # 1/mus
         mus_inv[i] = muirtinv*muirtinv
-        
+
     mu = 0.0
     for i in range(N): # numba's p range does not help here
         tot = 0.0
@@ -1417,10 +1638,10 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
 def Wilke_large(ys, mus, MWs):
     r'''Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
-    
+
     This function is a slightly faster version of :obj:`Wilke`. It achieves its
-    extra speed by avoiding some checks, some powers, and by allocating less 
-    memory during the computation. For very large component vectors, this 
+    extra speed by avoiding some checks, some powers, and by allocating less
+    memory during the computation. For very large component vectors, this
     function should be called instead.
 
     Parameters
@@ -1451,19 +1672,19 @@ def Wilke_large(ys, mus, MWs):
     References
     ----------
     .. [1] Wilke, C. R. "A Viscosity Equation for Gas Mixtures." The Journal of
-       Chemical Physics 18, no. 4 (April 1, 1950): 517-19. 
+       Chemical Physics 18, no. 4 (April 1, 1950): 517-19.
        https://doi.org/10.1063/1.1747673.
     '''
     # For the cases where memory is sparse or not desired to be consumed
     N = len(MWs)
-    
+
 #   Compute the MW and assorted power vectors
     MW_invs = [0.0]*N
     MW_inv_mus = [0.0]*N
     mu_roots = [0.0]*N
     mus_inv_MW_roots = [0.0]*N
     mu_root_invs_MW_25s = [0.0]*N
-    
+
     for i in range(N):
         MW_root = sqrt(MWs[i])
         MW_root_inv = 1.0/MW_root
@@ -1476,9 +1697,9 @@ def Wilke_large(ys, mus, MWs):
         MW_inv_mus[i] = mus[i]*MW_root_inv
         mus_inv_MW_roots[i] = mu_root_inv*x0
         mu_root_invs_MW_25s[i] = x0*MW_25_inv
-    
+
     mu = 0.0
-    for i in range(N): 
+    for i in range(N):
         # numba's p range does help here but only when large, when small it hinders
         tot = 0.0
         MWi = MWs[i]
@@ -1573,7 +1794,7 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
     Tstrs = [i**0.5 for i in Tsts]
     Aij = [[0.0]*N for j in cmps]
     phiij =[[0.0]*N for j in cmps]
-    
+
     for i in cmps:
         for j in cmps:
             Sij = (1.0 +Tstrs[i]*Tstrs[j] + (MDs[i]*MDs[j])/4.)/(
@@ -1583,10 +1804,10 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
                 Sij = 1.0
             Mij = MWs[i]/MWs[j]
             Mij45 = Mij**0.45
-            
+
             mij = (4./((1.0 + 1.0/Mij)*(1.0 + Mij)))**0.25
 
-            Aij[i][j] = mij*Mij**-0.5*(1.0 + (Mij - Mij45)/(2.0*(1.0 + Mij) 
+            Aij[i][j] = mij*Mij**-0.5*(1.0 + (Mij - Mij45)/(2.0*(1.0 + Mij)
                 + (1.0 + Mij45)*mij**-0.5/(1.0 + mij)))
 
             phiij[i][j] = (mus[i]/mus[j])**0.5*Sij*Aij[i][j]
@@ -1594,52 +1815,52 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
     return sum([ys[i]*mus[i]/sum([ys[j]*phiij[i][j] for j in cmps]) for i in cmps])
 
 ### Petroleum liquids
-    
+
 def Twu_1985_internal(T, Tb, SG):
     Tb2 = Tb*Tb
     Tb10 = Tb2*Tb2
     Tb10 *= Tb10*Tb2 # compute Tb^-10
     Tb_inv = 1.0/Tb
     Tb_sqrt_inv = 1.0/sqrt(Tb)
-    
+
     # equation 15
     Tc0 = Tb/(0.533272 + 0.191017e-3*Tb + 0.779681e-7*Tb2 - 0.284376e-10*Tb2*Tb
              + 0.959468e28/(Tb10*Tb2*Tb))
     alpha = 1.0 - Tb/Tc0
     alpha3 = alpha*alpha*alpha
-    
+
     SG0 = 0.843593  -0.128624*alpha - 3.36159*alpha3
     alpha6 = alpha3*alpha3
     SG0 -= 13749.5*alpha6*alpha6
     dSG = SG - SG0
     nu20 = (exp(4.73227 - 27.0975*alpha + alpha*(49.4491*alpha
              - 50.4706*alpha3)) - 1.5)
-    
-    
+
+
     nu10 = exp(0.801621 + 1.37179*log(nu20))
-    
+
     x = abs(1.99873 - 56.7394*Tb_sqrt_inv)
     f1 = 1.33932*x*dSG - 21.1141*dSG*dSG*Tb_sqrt_inv
     f2 = x*dSG - 21.1141*dSG*dSG*Tb_sqrt_inv
-    
+
     square_term2 = (1.0 + f2 + f2)/(1.0 - f2 - f2)
-    square_term2 *= square_term2 
+    square_term2 *= square_term2
 
     square_term1 = (1.0 + f1 + f1)/(1.0 - f1 - f1)
     square_term1 *= square_term1
-    
+
     x0 = 450.0*Tb_inv
     nu1 = exp(log(nu10 + x0)*square_term1) - x0
     nu2 = exp(log(nu20 + x0)*square_term2) - x0
-    
+
     # T1 = 559.67 # 100 deg F
     # T2 = 669.67 # 210 deg F
     logT1 = 6.3273473243178415 # log(559.67)
     # logT2 = 6.506785053735233 # log(669.67)
-    
+
     Z1 = nu1 + 0.7 + exp(-1.47 - nu1*(1.84 + 0.51*nu1))
     Z2 = nu2 + 0.7 + exp(-1.47 - nu2*(1.84 + 0.51*nu2))
-    
+
     loglogZ1 = log(log(Z1))
     try:
         B = (loglogZ1 - log(log(Z2)))*-5.572963964974682 #/(logT1 - logT2)
@@ -1649,16 +1870,16 @@ def Twu_1985_internal(T, Tb, SG):
         Z = exp(exp(loglogZ1 + B*(log(T) - logT1)))
     except:
         Z = 1.0
-    
+
     # cSt
     x0 = Z - 0.7
     nu = x0 - exp(-0.7487 + x0*(x0*(0.6119 - 0.3193*x0) - 3.295))
     return nu
 
 def Twu_1985(T, Tb, rho):
-    r'''Calculate the viscosity of a petroleum liquid using the 
+    r'''Calculate the viscosity of a petroleum liquid using the
     Twu (1985) correlation
-    developed in [1]_. Based on a fit to n-alkanes that used as a 
+    developed in [1]_. Based on a fit to n-alkanes that used as a
     reference. Requires the boiling point and density of
     the system.
 
@@ -1679,16 +1900,16 @@ def Twu_1985(T, Tb, rho):
     Notes
     -----
     The formulas are as follows:
-    
+
     .. math::
         T_{c}^{\circ}=T_{b}\left(0.533272+0.191017 \times 10^{-3} T_{b}
         +0.779681 \times 10^{-7} T_{b}^{2}
-        -0.284376 \times 10^{-10} T_{b}^{3}+0.959468 
+        -0.284376 \times 10^{-10} T_{b}^{3}+0.959468
         \times 10^{28}/T_{b}^{13}\right)^{-1}
-        
+
     .. math::
         \alpha=1-T_{b} / T_{c}^{\circ}
-        
+
     .. math::
         \ln \left(\nu_2^{\circ}+1.5\right)=4.73227-27.0975 \alpha
         +49.4491 \alpha^{2}-50.4706 \alpha^{4}
@@ -1730,19 +1951,19 @@ def Twu_1985(T, Tb, rho):
 
     .. math::
         \nu=(Z-0.7)-\exp \left(-0.7487-3.295Z-0.7)+0.6119Z-0.7)^{2}-0.3193Z-0.7)^{3}\right)
-        
-        
+
+
     Examples
     --------
     Sample point from article:
-    
+
     >>> Twu_1985(T=338.7055, Tb=672.3166, rho=895.5189)
     0.008235009644854494
-    
+
     References
     ----------
-    .. [1] Twu, Chorng H. "Internally Consistent Correlation for Predicting 
-       Liquid Viscosities of Petroleum Fractions." Industrial & Engineering 
+    .. [1] Twu, Chorng H. "Internally Consistent Correlation for Predicting
+       Liquid Viscosities of Petroleum Fractions." Industrial & Engineering
        Chemistry Process Design and Development 24, no. 4 (October 1, 1985):
        1287-93. https://doi.org/10.1021/i200031a064.
     '''
@@ -1756,27 +1977,27 @@ def Twu_1985(T, Tb, rho):
 
 
 ### Viscosity for Liquids or Gases
-            
+
 def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
-    r'''Calculates the viscosity of a gas or a liquid using the method of 
+    r'''Calculates the viscosity of a gas or a liquid using the method of
     Lorentz, Bray, and Clarke [1]_. This method is not quite the same as the
     original, but rather the form commonly presented and used today. The
     original had a different formula for pressure correction for gases which
-    was tabular and not presented entirely in [1]_. However using that 
+    was tabular and not presented entirely in [1]_. However using that
     distinction introduces a discontinuity between the liquid and gas viscosity,
     so it is not normally used.
 
     .. math::
         \mu [\text{centipoise}] = \mu_{\text{P low, Stiel-hThodos}} [\text{centipoise}]
         + \frac{\text{poly}^4 - 0.0001}{\xi}
-        
+
     .. math::
-        \text{poly} = (0.1023 + 0.023364 \rho_r + 0.058533\rho_r^2 
+        \text{poly} = (0.1023 + 0.023364 \rho_r + 0.058533\rho_r^2
             - 0.040758\rho_r^3 + 0.0093724\rho_r^4)
 
     .. math::
         \xi = T_c^{1/6} MW^{-1/2} (P_c\text{[atm]})^{-2/3}
-        
+
     Parameters
     ----------
     T : float
@@ -1807,27 +2028,27 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
     -----
     An example from [2]_ was implemented and checked for validation. Somewhat
     different rounding is used in [2]_.
-    
+
     The mixing of the pure component Stiel-Thodos viscosities happens with the
     Herning-Zipperer mixing rule:
-    
+
     .. math::
         \mu = \frac{\sum x_i \mu_i \sqrt{MW_i}}{\sum x_i \sqrt{MW_i}}
 
     Examples
     --------
     >>> Lorentz_Bray_Clarke(T=300.0, P=1e6, Vm=0.0023025, zs=[.4, .3, .3],
-    ... MWs=[16.04246, 30.06904, 44.09562], Tcs=[190.564, 305.32, 369.83], 
+    ... MWs=[16.04246, 30.06904, 44.09562], Tcs=[190.564, 305.32, 369.83],
     ... Pcs=[4599000.0, 4872000.0, 4248000.0], Vcs=[9.86e-05, 0.0001455, 0.0002])
     9.925488160761484e-06
 
     References
     ----------
-    .. [1] Lohrenz, John, Bruce G. Bray, and Charles R. Clark. "Calculating 
-       Viscosities of Reservoir Fluids From Their Compositions." Journal of 
+    .. [1] Lohrenz, John, Bruce G. Bray, and Charles R. Clark. "Calculating
+       Viscosities of Reservoir Fluids From Their Compositions." Journal of
        Petroleum Technology 16, no. 10 (October 1, 1964): 1,171-1,176.
        https://doi.org/10.2118/915-PA.
-    .. [2] Whitson, Curtis H., and Michael R. Brulé. Phase Behavior. Henry L. 
+    .. [2] Whitson, Curtis H., and Michael R. Brulé. Phase Behavior. Henry L.
        Doherty Memorial Fund of AIME, Society of Petroleum Engineers, 2000.
     '''
     Tc, Pc, Vc, MW = 0.0, 0.0, 0.0, 0.0
@@ -1842,25 +2063,25 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
     xi = Tc**(1.0/6.0)*MW**-0.5*Pc**(-2.0/3.0)
     rhoc = 1.0/Vc # Molar pseudocritical density
     rhom = 1.0/Vm
-    
-    rhor = rhom/rhoc    
+
+    rhor = rhom/rhoc
     # mu star is computed here
     mus_low_gas = [0.0]*N
     for i in range(N):
         mus_low_gas[i] = Stiel_Thodos(T, Tcs[i], Pcs[i], MWs[i])
     mu_low_gas = Herning_Zipperer(zs, mus_low_gas, MWs)
-    
+
     # Polynomial - in horner form, validated
     poly = rhor*(rhor*(rhor*(0.0093724*rhor - 0.040758) + 0.058533) + 0.023364) + 0.1023
-    
+
     mu_low_gas *= 1e3 # Convert low-pressure viscosity to cP
-    
+
     poly2 = poly*poly
     mu = (mu_low_gas*xi + poly2*poly2 - 0.0001)/xi
     return mu*1e-3 # Convert back from cP to Pa
 
-            
-            
+
+
 ### Misc functions
 
 
@@ -2019,7 +2240,7 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     else:
 
     .. math::
-        N = \frac{\log(H) - \log(\nu_{40})}{\log (\nu_{100})}
+        N = \frac{\ln(H) - \ln(\nu_{40})}{\ln (\nu_{100})}
 
     .. math::
         VI = \frac{10^N-1}{0.00715} + 100
@@ -2043,8 +2264,8 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     VI is undefined for nu_100 under 2 mm^2/s. None is returned if this is the
     case. Internal units are mm^2/s. Higher values of viscosity index suggest
     a lesser decrease in kinematic viscosity as temperature increases.
-    
-    Note that viscosity is a pressure-dependent property, and that the 
+
+    Note that viscosity is a pressure-dependent property, and that the
     viscosity index is defined for a fluid at whatever pressure it is at.
     The viscosity index is thus also a function of pressure.
 
@@ -2196,7 +2417,7 @@ def _create_viscosity_converters():
         values, nus = np.log(values), np.log(nus)
         viscosity_converters_to_nu[key] = UnivariateSpline(values, nus, k=3, s=0)
         viscosity_converters_from_nu[key] = UnivariateSpline(nus, values, k=3, s=0)
-    
+
     # Barbey gets special treatment because of its reversed values
     viscosity_converter_limits['barbey'] = (Barbey_degrees[-1], Barbey_degrees[0], Barbey_nu[0], Barbey_nu[-1])
     barbey_values, barbey_nus = np.log(list(reversed(Barbey_degrees))), np.log(list(reversed(Barbey_nu)))
@@ -2205,7 +2426,7 @@ def _create_viscosity_converters():
 
     _created_viscosity_converters = True
 
-# originally from  Euverard, M. R., "The Efflux Type Viscosity Cup," National 
+# originally from  Euverard, M. R., "The Efflux Type Viscosity Cup," National
 # Paint, Varnish, and Lacquer Association, 9 April 1948.
 # actually found in the Paint Testing Manual
 # stored are (coefficient, and minimum time (seconds))
@@ -2214,51 +2435,51 @@ def _create_viscosity_converters():
 # Note: Engler can also be reported in units of time? Would be good to have a reference.
 
 viscosity_scales_linear = {
-    'american can': (3.5, 35), 
-    'astm 0.07': (1.4, 60), 
-    'astm 0.10': (4.8, 25), 
-    'astm 0.15': (21, 9), 
-    'astm 0.20': (61, 5), 
-    'astm 0.25': (140, 4), 
-    'a&w b': (18.5, 10), 
-    'a&w crucible': (11.7, 12), 
-    'caspers tin plate': (3.6, 39), 
-    'continental can': (3.3, 12), 
-    'crown cork and seal': (3.3, 12), 
-    'engler': (7.3, 18), 
-    'ford cup #3': (2.4, 34), 
-    'ford cup #4': (3.7, 23), 
-    'murphy varnish': (3.1, 24), 
-    'parlin cup #7': (1.3, 60), 
-    'parlin cup #10': (4.8, 21), 
-    'parlin cup #15': (21.5, 10), 
-    'parlin cup #20': (60, 5), 
-    'parlin cup #25': (140, 15), 
-    'parlin cup #30': (260, 10), 
-    'pratt lambert a': (0.61, 70), 
-    'pratt lambert b': (1.22, 60), 
-    'pratt lambert c': (2.43, 40), 
-    'pratt lambert d': (4.87, 25), 
-    'pratt lambert e': (9.75, 15), 
-    'pratt lambert f': (19.5, 9), 
-    'pratt lambert g': (38, 7), 
-    'pratt lambert h': (76, 5), 
-    'pratt lambert i': (152, 4), 
-    'redwood standard': (0.23, 320), 
-    'saybolt furol': (2.1, 17), 
-    'saybolt universal': (0.21, 70), 
-    'scott': (1.6, 20), 
-    'westinghouse': (3.4, 30), 
-    'zahn cup #1': (0.75, 50), 
-    'zahn cup #2': (3.1, 30), 
-    'zahn cup #3': (9.8, 25), 
-    'zahn cup #4': (12.5, 14), 
+    'american can': (3.5, 35),
+    'astm 0.07': (1.4, 60),
+    'astm 0.10': (4.8, 25),
+    'astm 0.15': (21, 9),
+    'astm 0.20': (61, 5),
+    'astm 0.25': (140, 4),
+    'a&w b': (18.5, 10),
+    'a&w crucible': (11.7, 12),
+    'caspers tin plate': (3.6, 39),
+    'continental can': (3.3, 12),
+    'crown cork and seal': (3.3, 12),
+    'engler': (7.3, 18),
+    'ford cup #3': (2.4, 34),
+    'ford cup #4': (3.7, 23),
+    'murphy varnish': (3.1, 24),
+    'parlin cup #7': (1.3, 60),
+    'parlin cup #10': (4.8, 21),
+    'parlin cup #15': (21.5, 10),
+    'parlin cup #20': (60, 5),
+    'parlin cup #25': (140, 15),
+    'parlin cup #30': (260, 10),
+    'pratt lambert a': (0.61, 70),
+    'pratt lambert b': (1.22, 60),
+    'pratt lambert c': (2.43, 40),
+    'pratt lambert d': (4.87, 25),
+    'pratt lambert e': (9.75, 15),
+    'pratt lambert f': (19.5, 9),
+    'pratt lambert g': (38, 7),
+    'pratt lambert h': (76, 5),
+    'pratt lambert i': (152, 4),
+    'redwood standard': (0.23, 320),
+    'saybolt furol': (2.1, 17),
+    'saybolt universal': (0.21, 70),
+    'scott': (1.6, 20),
+    'westinghouse': (3.4, 30),
+    'zahn cup #1': (0.75, 50),
+    'zahn cup #2': (3.1, 30),
+    'zahn cup #3': (9.8, 25),
+    'zahn cup #4': (12.5, 14),
     'zahn cup #5': (23.6, 12)
 }
 
-    
+
 def Saybolt_universal_eq(nu):
-    return (4.6324*nu + (1E5 + 3264.*nu)/(nu*(nu*(1.646*nu + 23.97) 
+    return (4.6324*nu + (1E5 + 3264.*nu)/(nu*(nu*(1.646*nu + 23.97)
                                           + 262.7) + 3930.2))
 
 
@@ -2270,7 +2491,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
     Parameters
     ----------
     val : float
-        Viscosity value in the specified scale; [m^2/s] if 
+        Viscosity value in the specified scale; [m^2/s] if
         'kinematic viscosity'; [degrees] if Engler or Barbey; [s] for the other
         scales.
     old_scale : str
@@ -2281,43 +2502,43 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         If True, a conversion will be performed even if outside the limits of
         either scale; if False, and either value is outside a limit, an
         exception will be raised.
-        
+
     Returns
     -------
     result : float
-        Viscosity value in the specified scale; [m^2/s] if 
+        Viscosity value in the specified scale; [m^2/s] if
         'kinematic viscosity'; [degrees] if Engler or Barbey; [s] for the other
         scales
 
     Notes
     -----
     The valid scales for this function are any of the following:
-        
-    ['a&w b', 'a&w crucible', 'american can', 'astm 0.07', 'astm 0.10', 
-    'astm 0.15', 'astm 0.20', 'astm 0.25', 'barbey', 'caspers tin plate', 
-    'continental can', 'crown cork and seal', 'demmier #1', 'demmier #10', 
-    'engler', 'ford cup #3', 'ford cup #4', 'kinematic viscosity', 
-    'mac michael', 'murphy varnish', 'parlin cup #10', 'parlin cup #15', 
-    'parlin cup #20', 'parlin cup #25', 'parlin cup #30', 'parlin cup #7', 
-    'pratt lambert a', 'pratt lambert b', 'pratt lambert c', 'pratt lambert d', 
+
+    ['a&w b', 'a&w crucible', 'american can', 'astm 0.07', 'astm 0.10',
+    'astm 0.15', 'astm 0.20', 'astm 0.25', 'barbey', 'caspers tin plate',
+    'continental can', 'crown cork and seal', 'demmier #1', 'demmier #10',
+    'engler', 'ford cup #3', 'ford cup #4', 'kinematic viscosity',
+    'mac michael', 'murphy varnish', 'parlin cup #10', 'parlin cup #15',
+    'parlin cup #20', 'parlin cup #25', 'parlin cup #30', 'parlin cup #7',
+    'pratt lambert a', 'pratt lambert b', 'pratt lambert c', 'pratt lambert d',
     'pratt lambert e', 'pratt lambert f', 'pratt lambert g', 'pratt lambert h',
-    'pratt lambert i', 'redwood admiralty', 'redwood standard', 
-    'saybolt furol', 'saybolt universal', 'scott', 'stormer 100g load', 
+    'pratt lambert i', 'redwood admiralty', 'redwood standard',
+    'saybolt furol', 'saybolt universal', 'scott', 'stormer 100g load',
     'westinghouse', 'zahn cup #1', 'zahn cup #2', 'zahn cup #3', 'zahn cup #4',
     'zahn cup #5']
-    
+
     Some of those scales are converted linearly; the rest use tabulated data
     and splines.
 
     Because the conversion is performed by spline functions, a re-conversion
     of a value will not yield exactly the original value. However, it is quite
     close.
-    
+
     The method 'Saybolt universal' has a special formula implemented for its
     conversion, from [4]_. It is designed for maximum backwards compatibility
-    with prior experimental data. It is solved by newton's method when 
+    with prior experimental data. It is solved by newton's method when
     kinematic viscosity is desired as an output.
-    
+
     .. math::
         SUS_{eq} = 4.6324\nu_t + \frac{[1.0 + 0.03264\nu_t]}
         {[(3930.2 + 262.7\nu_t + 23.97\nu_t^2 + 1.646\nu_t^3)\times10^{-5})]}
@@ -2331,32 +2552,32 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
 
     References
     ----------
-    .. [1] Hydraulic Institute. Hydraulic Institute Engineering Data Book. 
+    .. [1] Hydraulic Institute. Hydraulic Institute Engineering Data Book.
        Cleveland, Ohio: Hydraulic Institute, 1990.
-    .. [2] Gardner/Sward. Paint Testing Manual. Physical and Chemical 
-       Examination of Paints, Varnishes, Lacquers, and Colors. 13th Edition. 
+    .. [2] Gardner/Sward. Paint Testing Manual. Physical and Chemical
+       Examination of Paints, Varnishes, Lacquers, and Colors. 13th Edition.
        ASTM, 1972.
-    .. [3] Euverard, M. R., The Efflux Type Viscosity Cup. National Paint, 
+    .. [3] Euverard, M. R., The Efflux Type Viscosity Cup. National Paint,
        Varnish, and Lacquer Association, 1948.
     .. [4] API Technical Data Book: General Properties & Characterization.
        American Petroleum Institute, 7E, 2005.
-    .. [5] ASTM. Standard Practice for Conversion of Kinematic Viscosity to 
+    .. [5] ASTM. Standard Practice for Conversion of Kinematic Viscosity to
        Saybolt Universal Viscosity or to Saybolt Furol Viscosity. D 2161 - 93.
     '''
     if not _created_viscosity_converters:
         _create_viscosity_converters()
     def range_check(visc, scale):
         scale_min, scale_max, nu_min, nu_max = viscosity_converter_limits[scale]
-        
+
         if visc < scale_min*(1.-1E-7) or visc > scale_max*(1.+1E-7):
-            raise Exception('Viscosity conversion is outside the limits of the '
+            raise ValueError('Viscosity conversion is outside the limits of the '
                             '%s scale; given value is %s, but the range of the '
                             'scale is from %s to %s. Set `extrapolate` to True '
                             'to perform the conversion anyway.' %(scale, visc, scale_min, scale_max))
 
     def range_check_linear(val, c, tmin, scale):
         if val < tmin:
-            raise Exception('Viscosity conversion is outside the limits of the '
+            raise ValueError('Viscosity conversion is outside the limits of the '
                             '%s scale; given value is %s, but the minimum time '
                             'for this scale is %s s. Set `extrapolate` to True '
                             'to perform the conversion anyway.' %(scale, val, tmin))
@@ -2383,7 +2604,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         val = c*val # convert from seconds to centistokes
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
-        raise Exception('Scale "%s" not recognized - allowable values are any of %s.' %(old_scale, keys))
+        raise ValueError('Scale "%s" not recognized - allowable values are any of %s.' %(old_scale, keys))
 
     # Convert to desired scale
     if new_scale == 'kinematic viscosity':
@@ -2401,7 +2622,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
             range_check_linear(val, c, tmin, new_scale)
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
-        raise Exception('Scale "%s" not recognized - allowable values are any of %s.' %(new_scale, keys))
+        raise ValueError('Scale "%s" not recognized - allowable values are any of %s.' %(new_scale, keys))
     return float(val)
 
 

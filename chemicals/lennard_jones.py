@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This module contains lookup functions and estimation methods for the 
+This module contains lookup functions and estimation methods for the
 parameters molecular diameter `sigma` and the Stockmayer parameter `epsilon`.
 These are used for diffusivity calculations. It also contains several
 methods for computing the collision integral, another parameter used in the
@@ -83,7 +83,7 @@ __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
            'sigma_Bird_Stewart_Lightfoot_melting',
            'sigma_Stiel_Thodos', 'sigma_Tee_Gotoh_Steward_1',
            'sigma_Tee_Gotoh_Steward_2',
-           'sigma_Silva_Liu_Macedo', 'epsilon_Flynn', 
+           'sigma_Silva_Liu_Macedo', 'epsilon_Flynn',
            'epsilon_Bird_Stewart_Lightfoot_critical',
            'epsilon_Bird_Stewart_Lightfoot_boiling',
            'epsilon_Bird_Stewart_Lightfoot_melting', 'epsilon_Stiel_Thodos',
@@ -141,7 +141,7 @@ Stockmayer_all_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
 
 @unsafe
 def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
-    """Return all methods available to obtain the Stockmayer parameter for the 
+    """Return all methods available to obtain the Stockmayer parameter for the
     desired chemical.
 
     Parameters
@@ -285,7 +285,7 @@ molecular_diameter_all_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
 @unsafe
 def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
                                omega=None, Vm=None, Vb=None):
-    """Return all methods available to obtain the molecular diameter for the 
+    """Return all methods available to obtain the molecular diameter for the
     desired chemical.
 
     Parameters
@@ -767,8 +767,8 @@ def sigma_Silva_Liu_Macedo(Tc, Pc):
 
     Notes
     -----
-    Pc is originally in bar. An excellent paper. None is  
-    returned if the polynomial returns a negative number, as in the case of 
+    Pc is originally in bar. An excellent paper. None is
+    returned if the polynomial returns a negative number, as in the case of
     1029.13 K and 3.83 bar.
 
     Examples
@@ -1133,11 +1133,11 @@ def collision_integral_Neufeld_Janzen_Aziz(T_star, l=1, s=1):
         A, B, C, D, E, F, R, S, W, P = 1.12007, 0.14578, 0.53347, 1.11986, 2.28803, 3.27567, 0.0007427, 21.048, -0.28759, 6.69149
     else:
         raise ValueError('Input values of l and s are not supported')
-    omega = A / T_star ** B + C / exp(D * T_star) + E / exp(F * T_star)
+    omega = A/T_star**B + C*exp(-D*T_star) + E*exp(-F*T_star)
     if (l == 1 and (s == 1 or s == 2)) or (s == 3 and l == 3):
-        omega += G/exp(H * T_star)
+        omega += G*exp(-H*T_star)
     if not (l == 1  and (s == 1 or s == 2)):
-        omega += R * T_star ** B * sin(S * T_star ** W - P)
+        omega += R*T_star**B*sin(S*T_star**W - P)
     return omega
 
 As_collision = {(1, 1): -1.10367290,

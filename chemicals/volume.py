@@ -84,7 +84,7 @@ attribute of this module.
 
 .. data:: rho_data_COSTALD
 
-    Coefficients for the :obj:`COSTALD` method from [3]_; 192 fluids have 
+    Coefficients for the :obj:`COSTALD` method from [3]_; 192 fluids have
     coefficients published.
 
 .. data:: rho_data_SNM0
@@ -92,13 +92,13 @@ attribute of this module.
     Coefficients for the :obj:`SNM0` method for 73 fluids from [2]_.
 
 .. data:: rho_data_Perry_8E_105_l
-    
+
     Coefficients for :obj:`chemicals.dippr.EQ105` from [1]_ for 344 fluds. Note
     this is in terms of molar density; to obtain molar volume, invert the result!
 
 .. data:: rho_data_VDI_PPDS_2
 
-    Coefficients in [5]_ developed by the PPDS using :obj:`chemicals.dippr.EQ116` 
+    Coefficients in [5]_ developed by the PPDS using :obj:`chemicals.dippr.EQ116`
     but in terms of mass density [kg/m^3]; Valid up to the critical temperature,
     and extrapolates to very low temperatures well.
 
@@ -120,12 +120,12 @@ attribute of this module.
 
 .. data:: rho_data_CRC_virial
 
-    Coefficients for a tempereture polynomial (T in Kelvin) for the second `B` 
-    virial coefficient published in [4]_. The form of the equation is 
+    Coefficients for a tempereture polynomial (T in Kelvin) for the second `B`
+    virial coefficient published in [4]_. The form of the equation is
     :math:`B = (a_1 + t(a_2 + t(a_3 + t(a_4 + a_5 t)))) \times 10^{-6}` with
     :math:`t = \frac{298.15}{T} - 1` and then `B` will be in units of m^3/mol.
-            
-    
+
+
 .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
     8E. McGraw-Hill Professional, 2007.
 .. [2] Mchaweh, A., A. Alsaygh, Kh. Nasrifar, and M. Moshfeghian.
@@ -141,7 +141,7 @@ attribute of this module.
     Berlin; New York:: Springer, 2010.
 
 The structure of each dataframe is shown below:
-    
+
 .. ipython::
 
     In [1]: import chemicals
@@ -166,10 +166,11 @@ The structure of each dataframe is shown below:
 
 from __future__ import division
 
-__all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales', 
-'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic', 
-'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture', 
-'ideal_gas', 'Goodman']
+__all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
+'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic',
+'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture',
+'ideal_gas', 'Goodman',
+]
 
 import os
 from fluids.numerics import np, splev, implementation_optimize_tck
@@ -208,10 +209,10 @@ def _load_rho_data():
     rho_data_SNM0 = data_source('Mchaweh SN0 deltas.tsv')
     rho_data_Perry_8E_105_l = data_source('Perry Parameters 105.tsv')
     rho_values_Perry_8E_105_l = np.array(rho_data_Perry_8E_105_l.values[:, 1:], dtype=float)
-    
+
     rho_data_VDI_PPDS_2 = data_source('VDI PPDS Density of Saturated Liquids.tsv')
     rho_values_VDI_PPDS_2 = np.array(rho_data_VDI_PPDS_2.values[:, 1:], dtype=float)
-    
+
     rho_data_CRC_inorg_l = data_source('CRC Inorganics densties of molten compounds and salts.tsv')
     rho_values_CRC_inorg_l = np.array(rho_data_CRC_inorg_l.values[:, 1:], dtype=float)
 
@@ -224,10 +225,10 @@ def _load_rho_data():
 if PY37:
     def __getattr__(name):
         if name in ('rho_data_COSTALD', 'rho_data_SNM0', 'rho_data_Perry_8E_105_l',
-                    'rho_values_Perry_8E_105_l', 'rho_data_VDI_PPDS_2', 
-                    'rho_values_VDI_PPDS_2', 'rho_data_CRC_inorg_l', 
+                    'rho_values_Perry_8E_105_l', 'rho_data_VDI_PPDS_2',
+                    'rho_values_VDI_PPDS_2', 'rho_data_CRC_inorg_l',
                     'rho_values_CRC_inorg_l', 'rho_data_CRC_inorg_l_const',
-                    'rho_data_CRC_inorg_s_const', 'rho_data_CRC_virial', 
+                    'rho_data_CRC_inorg_s_const', 'rho_data_CRC_virial',
                     'rho_values_CRC_virial'):
             _load_rho_data()
             return globals()[name]
@@ -261,23 +262,23 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     Examples
     --------
     Calculate density of nitrogen in kg/m3 at 300 K:
-    
+
     >>> volume_VDI_PPDS(300, 126.19, 313, 470.922, 493.251, -560.469, 389.611)
     313.0
-    
+
     Calculate molar volume of nitrogen in m3/mol at 300 K:
-    
+
     >>> volume_VDI_PPDS(300, 126.19, 313, 470.922, 493.251, -560.469, 389.611, 28.01)
     8.9488817891e-05
 
     References
     ----------
-    .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition. 
+    .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
            Berlin; New York:: Springer, 2010.
     '''
     tau = 1. - T/Tc if T < Tc else 0.
     rho = rhoc + a*tau**0.35 + b*tau**(2/3.) + c*tau + d*tau**(4/3.)
-    return rho if MW is None else 0.001 * MW / rho 
+    return rho if MW is None else 0.001 * MW / rho
 
 ### Critical-properties based
 
@@ -508,7 +509,7 @@ Bhirud_normal_lnU1_tck = implementation_optimize_tck([[0.98, 0.98, 0.98, 0.98, 0
                                                       [-0.4626000000000001, -0.4624223420145324, -0.4543553159709354, -0.4416003593769303, -0.4284319856698448, -0.41267169794369013, -0.39288122255539465, -0.3678034118347314, -0.3379051301056794, -0.30257606774255136, -0.2767190885302606, -0.2629, 0.0, 0.0, 0.0, 0.0],
                                                      3])
 
-        
+
 def Bhirud_normal(T, Tc, Pc, omega):
     r'''Calculates saturation liquid density using the Bhirud [1]_ CSP method.
     Uses Critical temperature and pressure and acentric factor.
@@ -883,7 +884,7 @@ def CRC_inorganic(T, rho0, k, Tm, MW=None):
         Chemistry and Physics, 95E. [Boca Raton, FL]: CRC press, 2014.
     '''
     rho = rho0 - k*(T-Tm)
-    return rho if MW is None else 0.001 * MW / rho 
+    return rho if MW is None else 0.001 * MW / rho
 
 
 def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
@@ -1061,7 +1062,7 @@ def Rackett_mixture(T, xs, MWs, Tcs, Pcs, Zrs):
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     '''
     bigsum, Tc, Zr, MW = 0.0, 0.0, 0.0, 0.0
-    
+
     # Fastest for numba and PyPy and CPython
     for i in range(len(xs)):
         x0 = Tcs[i]*xs[i]
@@ -1147,7 +1148,7 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
     vec = [0.0]*N
     for i in range(N):
         vec[i] = (Tcs[i]*Vcs[i])**0.5*xs[i]*Vm_inv_root
-    
+
     Tcm = 0.0
     for i in range(N):
         for j in range(i):
@@ -1220,7 +1221,7 @@ def Goodman(T, Tt, Vml):
     Examples
     --------
     Decane at 200 K:
-        
+
     >>> Goodman(200, 243.225, 0.00023585)
     0.0002053665090860923
 

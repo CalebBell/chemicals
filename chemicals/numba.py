@@ -19,6 +19,7 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 busy = False
 numba_blacklisted = []
+__all__ = []
 def unsafe(f):
     numba_blacklisted.append(f.__name__)
     return f
@@ -32,16 +33,15 @@ def __getattr__(name):
     import fluids
     import fluids.numba
     normal = chemicals
-    __all__ = []
     __funcs = {}
     replaced = fluids.numba.numerics_dict.copy()
     normal_fluids = fluids
     orig_file = __file__
     def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec):
-        cache_blacklist = set(['Rachford_Rice_solution', 'Rachford_Rice_solution_LN2', 'Rachford_Rice_solution_polynomial', 
+        cache_blacklist = set( ['Rachford_Rice_solution', 'Rachford_Rice_solution_LN2', 'Rachford_Rice_solution_polynomial',
                   'Rachford_Rice_solution_numpy', 'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
                   'Rachford_Rice_solutionN', 'Rachford_Rice_solution2', 'flash_wilson',
-                  'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm'])
+                  'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'iapws97_T', 'iapws95_T'])
     
         __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
         new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,
@@ -49,39 +49,39 @@ def __getattr__(name):
                                                         cache_blacklist=cache_blacklist)
         
         to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
-                 'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
-                 'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
-                 'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
-                 'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
-                 'viscosity.Wilke_large', 'viscosity.Wilke_prefactored',
-                 'interface.Winterfeld_Scriven_Davis',
-                 
-                 'rachford_rice.Rachford_Rice_solution',
-                 'rachford_rice.Rachford_Rice_solution_LN2',
-                 'rachford_rice.Rachford_Rice_solution_numpy',
-                 'rachford_rice.Rachford_Rice_polynomial', 
-                 'rachford_rice.Rachford_Rice_polynomial_3',
-                 'rachford_rice.Rachford_Rice_polynomial_4',
-                 'rachford_rice.Rachford_Rice_polynomial_5',
-                 'rachford_rice.Rachford_Rice_solution_polynomial',
-                 'rachford_rice.Rachford_Rice_numpy_err_fprime2',
-                 'rachford_rice.Li_Johns_Ahmadi_solution',
-                 'rachford_rice._Rachford_Rice_analytical_3',
-                 'rachford_rice.flash_inner_loop',
-                 'rachford_rice.Rachford_Rice_solution2',
-                 'rachford_rice.Rachford_Rice_solutionN',
-                 'rachford_rice.RRN_new_betas',
-                 'rachford_rice.Rachford_Rice_flashN_f_jac',
-                 'rachford_rice.Rachford_Rice_flash2_f_jac',
-                 'rachford_rice.Rachford_Rice_valid_solution_naive',
-                 'flash_basic.flash_wilson',
-                 'solubility.Henry_pressure_mixture',
-                 'critical.Chueh_Prausnitz_Tc',
-                 'critical.Chueh_Prausnitz_Vc',
-                 'thermal_conductivity.Lindsay_Bromley',
-                 'thermal_conductivity.DIPPR9I',
-                 'virial.Z_from_virial_density_form',
-                 ]
+             'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
+             'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
+             'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
+             'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
+             'viscosity.Wilke_large', 'viscosity.Wilke_prefactored',
+             'interface.Winterfeld_Scriven_Davis',
+
+             'rachford_rice.Rachford_Rice_solution',
+             'rachford_rice.Rachford_Rice_solution_LN2',
+             'rachford_rice.Rachford_Rice_solution_numpy',
+             'rachford_rice.Rachford_Rice_polynomial',
+             'rachford_rice.Rachford_Rice_polynomial_3',
+             'rachford_rice.Rachford_Rice_polynomial_4',
+             'rachford_rice.Rachford_Rice_polynomial_5',
+             'rachford_rice.Rachford_Rice_solution_polynomial',
+             'rachford_rice.Rachford_Rice_numpy_err_fprime2',
+             'rachford_rice.Li_Johns_Ahmadi_solution',
+             'rachford_rice._Rachford_Rice_analytical_3',
+             'rachford_rice.flash_inner_loop',
+             'rachford_rice.Rachford_Rice_solution2',
+             'rachford_rice.Rachford_Rice_solutionN',
+             'rachford_rice.RRN_new_betas',
+             'rachford_rice.Rachford_Rice_flashN_f_jac',
+             'rachford_rice.Rachford_Rice_flash2_f_jac',
+             'rachford_rice.Rachford_Rice_valid_solution_naive',
+             'flash_basic.flash_wilson',
+             'solubility.Henry_pressure_mixture',
+             'critical.Chueh_Prausnitz_Tc',
+             'critical.Chueh_Prausnitz_Vc',
+             'thermal_conductivity.Lindsay_Bromley',
+             'thermal_conductivity.DIPPR9I',
+             'virial.Z_from_virial_density_form',
+             ]
         normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist)
     
         for mod in new_mods:
@@ -96,7 +96,7 @@ def __getattr__(name):
     gdct.update(replaced)
     gdct['__name__'] = 'chemicals.numba'
     gdct['__file__'] = orig_file
-    del gdct['__getattr__'], gdct['unsafe'], gdct['numba_blacklisted'], gdct['busy']
+    del gdct['__getattr__'], gdct['busy']
     try: return gdct[name]
     except KeyError:
         raise AttributeError("module %s has no attribute %s" %(__name__, name))

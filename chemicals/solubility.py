@@ -28,7 +28,7 @@ For reporting bugs, adding feature requests, or submitting pull requests,
 please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_.
 
 .. contents:: :local:
-    
+
 Henry's Law
 ------------
 .. autofunction:: chemicals.solubility.Henry_pressure
@@ -43,15 +43,13 @@ Utility functions
 
 """
 
-__all__ = ['solubility_parameter', 
+__all__ = ['solubility_parameter',
            'solubility_eutectic', 'Tm_depression_eutectic',
            'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture']
-           
+
 import os
 from fluids.constants import R, atm, R_inv
-from chemicals.utils import log, exp
-
-
+from chemicals.utils import log, exp, sqrt
 
 def solubility_parameter(T, Hvapm, Vml):
     r'''This function handles the calculation of a chemical's solubility
@@ -74,7 +72,7 @@ def solubility_parameter(T, Hvapm, Vml):
     -------
     delta : float
         Solubility parameter, [Pa^0.5]
-        
+
     Notes
     -----
     Undefined past the critical point. For convenience, if Hvap is not defined,
@@ -98,7 +96,7 @@ def solubility_parameter(T, Hvapm, Vml):
        Cohesion Parameters, Second Edition. CRC Press, 1991.
     '''
     # Prevent taking the root of a negative number
-    return None if (Hvapm < R*T or Vml < 0.0) else ((Hvapm - R*T)/Vml)**0.5
+    return None if (Hvapm < R*T or Vml < 0.0) else sqrt((Hvapm - R*T)/Vml)
 
 def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     r'''Returns the maximum solubility of a solute in a solvent.
@@ -190,7 +188,7 @@ def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
     From [1]_, matching example.
 
     >>> Tm_depression_eutectic(353.35, 19110, .02)
-    1.0864598583150953
+    1.0864598583150
 
     References
     ----------
@@ -198,10 +196,10 @@ def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
        Weinheim, Germany: Wiley-VCH, 2012.
     '''
     if x is not None:
-        dTm = R*Tm**2*x/Hm
+        dTm = R*Tm*Tm*x/Hm
     elif M is not None and MW is not None:
         MW = MW/1000. #g/mol to kg/mol
-        dTm = R*Tm**2*MW*M/Hm
+        dTm = R*Tm*Tm*MW*M/Hm
     else:
         raise ValueError('Either molality or mole fraction of the solute must be specified; MW of the solvent is required also if molality is provided')
     return dTm
@@ -221,7 +219,7 @@ HENRY_SCALES_KHPC = ('KHpc', 'm^3*atm/mol')
 HENRY_SCALES_KHCC = ('KHcc',)
 HENRY_SCALES_SI = ('SI',)
 
-HENRY_SCALES_LIST = (HENRY_SCALES_HCP + HENRY_SCALES_HCP_MOLALITY 
+HENRY_SCALES_LIST = (HENRY_SCALES_HCP + HENRY_SCALES_HCP_MOLALITY
                      + HENRY_SCALES_HCC + HENRY_SCALES_HBP_SI + HENRY_SCALES_HBP
                      + HENRY_SCALES_HXP + HENRY_SCALES_BUNSEN + HENRY_SCALES_KHPX
                      + HENRY_SCALES_KHPC_SI + HENRY_SCALES_KHPC + HENRY_SCALES_KHCC
@@ -229,19 +227,19 @@ HENRY_SCALES_LIST = (HENRY_SCALES_HCP + HENRY_SCALES_HCP_MOLALITY
 
 
 def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
-    r'''Converts Henry's law constant for a gas with respect to a solvent from 
-    one scale to another. 
-    
+    r'''Converts Henry's law constant for a gas with respect to a solvent from
+    one scale to another.
+
     There are many scales, but it is recommemed to operate in the scale of
     `SI` - which returns a value with units `Pa`, and directly gets used in
     place of vapor pressure inside a flash calculation. This removes the
     complexity of Henry's law, avoiding possible simplication in favor of use
     with other thermodynamic models.
-    
+
     Only some scales require the molecular weight and the molar density of the
     solvent. Values for water, the most common solute, are 55344.59 mol/m^3 at
     STP and 18.01528 g/mol.
-        
+
     Parameters
     ----------
     val : float
@@ -250,7 +248,7 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
         String representing the scale that `val` is in originally.
     new_scale : str
         String representing the scale that `val` should be converted to.
-        
+
     Returns
     -------
     result : float
@@ -259,18 +257,18 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
     Notes
     -----
     The valid scales for this function are any of the following:
-        
-    ('Hcp', 'mol/(m^3*Pa)', 'M/atm', 'Hcc', 'mol/(kg*Pa)', 'Hbp', 
+
+    ('Hcp', 'mol/(m^3*Pa)', 'M/atm', 'Hcc', 'mol/(kg*Pa)', 'Hbp',
     'mol/(kg*atm)', 'Hxp', '1/atm', 'alpha', 'bunsen coefficient', 'KHpx',
     'atm', 'm^3*Pa/mol', 'KHpc', 'm^3*atm/mol', 'KHcc', 'SI')
-    
+
     Examples
     --------
-    >>> Henry_converter(1.2e-5, old_scale='Hcp', new_scale='SI', rhom=55344.59, 
+    >>> Henry_converter(1.2e-5, old_scale='Hcp', new_scale='SI', rhom=55344.59,
     ... MW=18.01528)
     4612049166.666666
-    
-    >>> Henry_converter(0.0297475, old_scale='Hcc', new_scale='KHcc', 
+
+    >>> Henry_converter(0.0297475, old_scale='Hcc', new_scale='KHcc',
     ... rhom=55344.59, MW=18.01528)
     33.61627027481301
 
@@ -282,10 +280,10 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
     # Convert val to units of 1/atm
     if old_scale in HENRY_SCALES_HCP:
         factor = atm/rhom
-        Hxp = val*factor # multiplication of 1.83089 
+        Hxp = val*factor # multiplication of 1.83089
     elif old_scale in HENRY_SCALES_HCP_MOLALITY: # Hcp in Molarity
         factor = 1000.0/rhom
-        Hxp = val*factor # multiplication of 0.0180695 
+        Hxp = val*factor # multiplication of 0.0180695
     elif old_scale in HENRY_SCALES_HCC:
         # Aqueous concentration divided by gas concentration
         factor = (atm/(R*298.15*rhom))
@@ -293,11 +291,11 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
     elif old_scale in HENRY_SCALES_HBP_SI: # Hbp in SI
         rho = 1e-3*rhom*MW  # Vm_to_rho(1.0/rhom, MW)
         factor = rho*atm/rhom
-        Hxp = val*factor# Multiplication of 1825.40 
+        Hxp = val*factor# Multiplication of 1825.40
     elif old_scale in HENRY_SCALES_HBP:
         rho = 1e-3*rhom*MW  # Vm_to_rho(1.0/rhom, MW)
         factor = rho/rhom
-        Hxp = val*factor # multiplication of 0.0180153 
+        Hxp = val*factor # multiplication of 0.0180153
     elif old_scale in HENRY_SCALES_HXP:
         Hxp = val
     elif old_scale in HENRY_SCALES_BUNSEN:
@@ -308,19 +306,19 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
         Hxp = 1.0/val
     elif old_scale in HENRY_SCALES_KHPC_SI:
         factor = atm/rhom
-        Hxp = factor/val # multiplication of 0.546182 
+        Hxp = factor/val # multiplication of 0.546182
     elif old_scale in HENRY_SCALES_KHPC:
         factor = 1.0/rhom
-        Hxp = factor/val # multiplication of 55341.9 
+        Hxp = factor/val # multiplication of 55341.9
     elif old_scale in HENRY_SCALES_KHCC:
-        factor = atm/(R*298.15*rhom) # gas concentration divided by Aqueous concentration 
-        Hxp = factor/val # Multiplication of 1353.96 
+        factor = atm/(R*298.15*rhom) # gas concentration divided by Aqueous concentration
+        Hxp = factor/val # Multiplication of 1353.96
     elif old_scale in HENRY_SCALES_SI:
         Hxp = atm/val
     else:
         raise ValueError("Not recognized input scale")
 #        raise ValueError("Not recognized input scale: %s" %old_scale)
-    
+
     # Convert from the constant `Hxp` to the desired unit
     if new_scale in HENRY_SCALES_HCP:
         factor = atm/rhom
@@ -362,13 +360,13 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
 #        raise ValueError("Not recognized input scale: %s" %new_scale)
 
     return conv_val
-        
+
 
 def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
     r'''Calculates Henry's law constant as a function of temperature according
     to the SI units of `Pa` and using a common temperature dependence as used
     in many process simulation applications.
-    
+
     Only the `A` parameter is required - which has no temperature dependence
     when used by itself.
     As the model is exponential, a sufficiently high temperature may cause an
@@ -377,7 +375,7 @@ def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
     error.
 
     .. math::
-        H_{12} = \exp\left(A_{12} + \frac{B_{12}}{T} + C_{12}\log(T) + D_{12}T
+        H_{12} = \exp\left(A_{12} + \frac{B_{12}}{T} + C_{12}\ln(T) + D_{12}T
          + \frac{E_{12}}{T^2} \right)
 
     Parameters
@@ -396,7 +394,7 @@ def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
     -----
     Add 11.51292 to the `A` constant if it is said to provide units of `bar`,
     so that it provides units of `Pa` instead.
-    
+
     The `F` parameter is not often included in models. It is rare to fit
     all parameters.
 
@@ -412,15 +410,16 @@ def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
     '''
-    return exp(A + B/T + C*log(T) + D*T + E/T**2 + F*T**2)
+    T_inv = 1.0/T
+    return exp(A + T_inv*(B + E*T_inv)  + C*log(T) + T*(D + F*T))
 
 
 def Henry_pressure_mixture(Hs, weights=None, zs=None):
     r'''Mixing rule for Henry's law components. Applies a logarithmic average
     to all solvent components and mole fractions. Optionally, weight factors
     can be provided instead of using mole fractions - only specify one of them.
-    
-    A common weight factor is using volume fractions of powers of them, or 
+
+    A common weight factor is using volume fractions of powers of them, or
     using critical volumes.
 
     Parameters

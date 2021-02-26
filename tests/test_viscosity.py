@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
 
@@ -27,7 +27,7 @@ import pytest
 from math import log, log10
 import numpy as np
 import pandas as pd
-from fluids.numerics import assert_close, assert_close1d
+from fluids.numerics import assert_close, assert_close1d, derivative
 from fluids.constants import psi, atm, foot, lb
 from fluids.core import R2K, F2K
 from chemicals.utils import normalize, mixing_simple
@@ -85,22 +85,22 @@ def test_Perrys2_313_data():
     tots_calc = [mu_data_Perrys_8E_2_313[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'C5', u'Tmin', u'Tmax']]
     tots = [9166.6971369999992, 615425.94497999991, 1125.5317557875198, 9.054869390623603e+34, 402.21244000000002, 72467.140000000014, 136954.85999999999]
     assert_close1d(tots_calc, tots)
-    
+
     assert mu_data_Perrys_8E_2_313.index.is_unique
     assert mu_data_Perrys_8E_2_313.shape == (337, 8)
 
-    
+
 def test_Perrys2_312_data():
-    # Argon, Difluoromethane, 1-Hexyne, Methylsilane, Nitrogen trifluoride, 
-    # Vinyl chloride all do not match on Tmax at 1E-3 - their models predict 
+    # Argon, Difluoromethane, 1-Hexyne, Methylsilane, Nitrogen trifluoride,
+    # Vinyl chloride all do not match on Tmax at 1E-3 - their models predict
     # ~1E-5 Pa*S, but listed values are ~1E-10 to 1E-12. Unsure of the cause.
     # All coumpounds match at 1E-3 for Tmin.
-    
+
     assert all([check_CAS(i) for i in mu_data_Perrys_8E_2_312.index])
     tots_calc = [mu_data_Perrys_8E_2_312[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
     tots = [0.00019683902626010103, 250.10520100000002, 65862.829200000007, 191286, 74802.639999999999, 355064.37]
     assert_close1d(tots_calc, tots)
-    
+
     assert mu_data_Perrys_8E_2_312.index.is_unique
     assert mu_data_Perrys_8E_2_312.shape == (345, 7)
 
@@ -110,19 +110,20 @@ def test_VDI_PPDS_7_data():
     tots_calc = [mu_data_VDI_PPDS_7[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [507.14607000000001, 1680.7624099999998, 165461.14259999999, 46770.887000000002, 0.057384780000000003]
     assert_close1d(tots_calc, tots)
-    
+
     assert mu_data_VDI_PPDS_7.index.is_unique
     assert mu_data_VDI_PPDS_7.shape == (271, 7)
 
 def test_VDI_PPDS_8_data():
     # Coefficients for water are incorrect - obtained an average deviation of 150%!
     assert all([check_CAS(i) for i in mu_data_VDI_PPDS_8.index])
+    assert mu_data_VDI_PPDS_8.index.is_unique
+    assert mu_data_VDI_PPDS_8.shape == (274, 6)
+
     tots_calc = [mu_data_VDI_PPDS_8[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [0.00032879559999999999, 9.5561339999999995e-06, 2.8377710000000001e-09, 2.8713399999999998e-12, 2.8409200000000004e-15]
     assert_close1d(tots_calc, tots)
-    
-    assert mu_data_VDI_PPDS_8.index.is_unique
-    assert mu_data_VDI_PPDS_8.shape == (274, 6)
+
 
 def test_ViswanathNatarajan():
     mu = Viswanath_Natarajan_2(348.15, -5.9719-log(100), 1007.0)
@@ -137,6 +138,30 @@ def test_ViswanathNatarajan():
 def test_PPDS9():
     mu = PPDS9(400.0, 1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
     assert_close(mu, 0.00035091137378230684, rtol=1e-13)
+
+    coeffs = (1.74793, 1.33728, 482.347, 41.78, 9.963e-05)
+    # normal region
+    mu_expect = PPDS9(400.0, *coeffs)
+    dmu, mu = dPPDS9_dT(400.0, *coeffs)
+    assert_close(mu, mu_expect, rtol=1e-13)
+    assert_close(dmu, -3.186540635882627e-06, rtol=1e-10)
+    assert_close(derivative(PPDS9, 400.0, args=coeffs, dx=1e-4), dmu, rtol=1e-9)
+
+    mu_expect = PPDS9(5.0, *coeffs)
+    dmu, mu = dPPDS9_dT(5.0, *coeffs)
+    assert_close(mu, mu_expect, rtol=1e-13)
+    assert_close(dmu, 1126796480623.1184, rtol=1e-10)
+    assert_close(derivative(PPDS9, 5.0, args=coeffs, dx=1e-5), dmu, rtol=1e-9)
+
+    # Check can go super low T without overflow
+    coeffs = [1.20479, 0.6058, 216.325, 2.278, 8.756e-05]
+    assert PPDS9(3, *coeffs) > 1e10
+    assert PPDS9(2, *coeffs) > 1e10
+    assert PPDS9(1, *coeffs) > 1e10
+
+    dPPDS9_dT(2, *coeffs)
+    dPPDS9_dT(1, *coeffs)
+    dPPDS9_dT(3, *coeffs)
 
 def test_Letsou_Stiel():
     # Checked 2017-03-05
@@ -209,18 +234,18 @@ def test_Wilke():
 
 #    with pytest.raises(Exception):
 #        Wilke([0.05], [1.34E-5, 9.5029E-6], [64.06, 46.07])
-        
+
     mu = Wilke_large([0.05, 0.95], [1.34E-5, 9.5029E-6], [64.06, 46.07])
     assert_close(mu, 9.701614885866193e-06, rtol=1e-10)
-    
+
     mu = Wilke_prefactored([0.05, 0.95], [1.34E-5, 9.5029E-6], *Wilke_prefactors([64.06, 46.07]))
     assert_close(mu, 9.701614885866193e-06, rtol=1e-10)
-    
+
     # Large composition test
     zs = [0.10456352460469782, 0.10472506156674823, 0.10347781516834291, 1.4089716440797791e-05, 0.10488254481011455, 0.10078888107401028, 0.09902003237540975, 0.09045109410107957, 0.08642540418108867, 0.1043609364553231, 0.10129061594674436]
     mus = [1.1601665408586192e-05, 9.408370570946896e-06, 8.19709294177777e-06, 1.4314548719058091e-05, 1.5057441002481923e-05, 7.5434795308593725e-06, 7.447082353139856e-06, 7.0365592301967965e-06, 6.720364621681796e-06, 1.2157004301638695e-05, 1.3006463728382868e-05]
     MWs = [16.04246, 30.06904, 44.09562, 2.01588, 44.0095, 58.1222, 58.1222, 72.14878, 72.14878, 34.08088, 64.0638]
-    
+
     # Make a large set of data, but don't actually use it anywhere; for easy of bencharmking
     zs_new = []
     mus_new = []
@@ -238,7 +263,7 @@ def test_Wilke():
     assert_close(Wilke_large(zs, mus, MWs), mu_expect, rtol=1e-10)
     prefactors = Wilke_prefactors(MWs)
     assert_close(Wilke_prefactored(zs, mus, *prefactors), mu_expect, rtol=1e-10)
-    
+
     # Test that the prefactors really work - use a different composition
     zs_diff = normalize([.1, .2,.3, .4, .5, .6, .7, .8, .9, .10, .2])
     mu_expect = 8.238656569251283e-06
@@ -306,10 +331,10 @@ def test_Lorentz_Bray_Clarke():
     Pcs = [4599000.0, 4872000.0, 4248000.0]
     Vcs = [9.86e-05, 0.0001455, 0.0002]
     Vm = 0.002302491921416089
-    
+
     mu = Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs)
-    assert_close(mu, 9.925488946486405e-06, rtol=1e-6)    
-    
+    assert_close(mu, 9.925488946486405e-06, rtol=1e-6)
+
     #  2,000 psig and 160°F.
     zs = [0.875, 0.083, 0.021, 0.006, 0.008, 0.003, 0.002, 0.001, 0.001]
     MWs = [16.04, 30.07, 44.09, 58.12, 58.12, 72.15, 72.15, 86.17, 114.00]
@@ -318,44 +343,44 @@ def test_Lorentz_Bray_Clarke():
     Vcs = [1.590*foot**3/lb, 2.370*foot**3/lb, 3.250*foot**3/lb, 4.208*foot**3/lb, 4.080*foot**3/lb, 4.899*foot**3/lb, 4.870*foot**3/lb, 5.929*foot**3/lb, 7.882*foot**3/lb]
     P = atm + 2000*psi
     T = F2K(160.0)
-    
+
     MW = mixing_simple(zs, MWs)
     rho_mass = 6.74*lb/foot**3
-    rhom = rho_mass/MW 
+    rhom = rho_mass/MW
     Vm = 1.0/rhom
-    
+
     mu = Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs)
     assert_close(mu, 1.636032602394696e-05)
 
 def test_viscosity_converter():
     # Barbey - todo viscosity_converter(95, 'barbey', 'parlin cup #7')
-    
+
     visc = viscosity_converter(8.79, 'engler', 'parlin cup #7')
     assert type(visc) is float
     assert_close(visc, 52.5)
-    
+
     # seconds/degrees string inputs and capitals
     visc = viscosity_converter(8.79, 'degrees engler', 'seconds parlin cup #7')
     assert type(visc) is float
     assert_close(visc, 52.5)
-    
+
     visc = viscosity_converter(8.79, '    degrees engler', 'seconds parlin cup #7    ')
     assert type(visc) is float
     assert_close(visc, 52.5)
-    
+
     visc = viscosity_converter(8.79, 'Engler', 'PARLIN cup #7')
     assert type(visc) is float
     assert_close(visc, 52.5)
-    
-    
+
+
     visc = viscosity_converter(8.78, 'engler', 'parlin cup #7')
     assert type(visc) is float
     assert_close(visc, 52.45389001785669)
-    
+
     visc = viscosity_converter(5.91, 'engler', 'parlin cup #7', True)
     assert type(visc) is float
     assert_close(visc, 39.96017612902695)
-    
+
     with pytest.raises(Exception):
         # limit is 5.92, but even that fails due to float conversion
         viscosity_converter(5.91, 'engler', 'parlin cup #7', extrapolate=False)
@@ -364,26 +389,26 @@ def test_viscosity_converter():
     with pytest.raises(Exception):
         # too little
         viscosity_converter(5.91999, 'engler', 'parlin cup #7')
-        
+
     with pytest.raises(Exception):
         viscosity_converter(8.79, 'NOTAREALSCALE', 'kinematic viscosity')
     with pytest.raises(Exception):
         viscosity_converter(8.79, 'kinematic viscosity', 'NOTAREALSCALE')
-        
+
     nu = viscosity_converter(8.79, 'engler', 'kinematic viscosity')
     assert type(nu) is float
     assert_close(nu, 6.5E-5)
-    
+
     with pytest.raises(Exception):
         viscosity_converter(8.79, 'pratt lambert e', 'kinematic viscosity')
-        
+
     t = viscosity_converter(0.0002925, 'kinematic viscosity', 'pratt lambert g')
     assert type(nu) is float
     assert_close(t, 7.697368421052632)
     nu = viscosity_converter(7.697368421052632, 'pratt lambert g', 'kinematic viscosity', )
     assert type(nu) is float
     assert_close(nu, .0002925)
-    
+
     with pytest.raises(Exception):
         viscosity_converter(0.00002925, 'kinematic viscosity', 'pratt lambert g')
     viscosity_converter(0.00002925, 'kinematic viscosity', 'pratt lambert g', True)
@@ -392,15 +417,15 @@ def test_viscosity_converter():
     with pytest.raises(Exception):
         viscosity_converter(6, 'pratt lambert g', 'kinematic viscosity')
     viscosity_converter(6, 'pratt lambert g', 'kinematic viscosity', True)
-    
+
     nu = viscosity_converter(700, 'Saybolt Universal Seconds', 'kinematic viscosity')
     assert type(nu) is float
     assert_close(nu, 0.00015108914751515542)
-    
+
     t = viscosity_converter(0.00015108914751515542, 'kinematic viscosity', 'Saybolt Universal Seconds')
     assert type(t) is float
     assert_close(t, 700)
-    
+
     # Barbey custom tests
     nu = viscosity_converter(483, 'barbey', 'kinematic viscosity')*1E6
     assert type(nu) is float
@@ -440,49 +465,49 @@ def test_mu_IAPWS():
     for i in range(len(Ts_mu20)):
         mu = mu_IAPWS(T=Ts_mu20[i], rho=rhos_mu20[i])
         assert_close(mus20_listed[i], mu, rtol=4e-8)
-        
+
     assert_close(mu_IAPWS(T=647.35, rho=122.0, drho_dP=17.109308489109e-6), 2.55206768504972e-05, rtol=1e-13)
     mu = mu_IAPWS(T=647.35, rho=122.0, drho_dP=17.109308489109e-6, drho_dP_Tr=2.936891667997e-6)
     assert_close(mu, 2.552067683647617e-05, rtol=1e-13)
-    
+
     mu = mu_IAPWS(T=647.35, rho=222, drho_dP=175.456980972231e-6)
     assert_close(mu, 3.133759043936869e-05, rtol=1e-13)
     mu = mu_IAPWS(T=647.35, rho=222, drho_dP=175.456980972231e-6, drho_dP_Tr=3.119177410324e-6)
     assert_close(mu, 3.1337589197275484e-05, rtol=1e-13)
-    
+
     mu = mu_IAPWS(T=647.35, rho=272, drho_dP=1508.2800389184448e-6)
     assert_close(mu, 3.6228143762668687e-05, rtol=1e-13)
     mu = mu_IAPWS(T=647.35, rho=272, drho_dP=1508.2800389184448e-6, drho_dP_Tr=2.999611040849e-6)
     assert_close(mu, 3.622814313612717e-05, rtol=1e-13)
-    
-    
+
+
     mu = mu_IAPWS(T=647.35, rho=322, drho_dP=1.213641949033e-2, drho_dP_Tr=2.751438963343e-6)
     assert_close(mu, 4.296157881023829e-05, rtol=1e-13)
     mu = mu_IAPWS(T=647.35, rho=322, drho_dP=1.213641949033e-2)
     assert_close(mu, 4.2961578738287014e-05, rtol=1e-13)
-    
-    
+
+
     mu = mu_IAPWS(T=647.35, rho=372, drho_dP=1245.917204367233E-6, drho_dP_Tr=2.415440238773e-6)
     assert_close(mu, 4.568820447470762e-05, rtol=1e-13)
     mu = mu_IAPWS(T=647.35, rho=372, drho_dP=1245.917204367233E-6)
     assert_close(mu, 4.5688204316365544e-05, rtol=1e-13)
-    
+
     mu = mu_IAPWS(T=647.35, rho=422, drho_dP=130.393537965256e-6, drho_dP_Tr=2.046542440571e-6)
     assert_close(mu, 4.943625601494998e-05, rtol=1e-13)
     mu = mu_IAPWS(T=647.35, rho=422, drho_dP=130.393537965256e-6)
     assert_close(mu, 4.943625789265867e-05, rtol=1e-13)
-    
+
     mu = mu_IAPWS(T=647.35, rho=20, drho_dP=4.074182233978e-6)
     assert_close(mu, 2.3253942194448227e-05, rtol=1e-13) # rhor <= 0.310559006
     mu = mu_IAPWS(T=647.35, rho=20, drho_dP=4.074182233978e-6, drho_dP_Tr=2.352881641109e-6)
     assert_close(mu, 2.3253942194448267e-05, rtol=1e-13)
-    
-    
+
+
     mu = mu_IAPWS(T=647.35, rho=600, drho_dP=4.28639862246e-6, drho_dP_Tr=9.903267886625e-7)
     assert_close(mu, 7.001987553170616e-05, rtol=1e-13)
     mu = mu_IAPWS(T=647.35, rho=600, drho_dP=4.28639862246e-6)
     assert_close(mu, 7.001987566162558e-05, rtol=1e-13)
-    
+
     # Test case with zero
     assert_close(mu_IAPWS(347.0, 975.5266664069043, 4.439512743107522e-07), 0.00038316609714314585, rtol=1e-13)
 
@@ -490,6 +515,18 @@ def test_Twu_1985():
     from chemicals.viscosity import Twu_1985_internal
     mu = Twu_1985_internal(T=609.67, Tb=1210.17, SG=0.8964)
     assert_close(mu, 9.195790397643691, rtol=1e-13)
-    
+
     mu = Twu_1985(T=R2K(609.67), Tb=R2K(1210.17), rho=0.8964*999.0170824078306)
     assert_close(mu, 0.008235004218042592, rtol=1e-13)
+
+
+def test_mu_air_lemmon():
+    assert_close(mu_air_lemmon(300.0, 40.10292351061862), 1.853715185567247e-05, rtol=1e-13)
+
+    # Values in a check table 5 of [1]_.
+    assert round(mu_air_lemmon(100.0, 0.0), 11) == 7.09559e-6
+    assert round(mu_air_lemmon(300.0, 0.0), 10) == 18.5230e-6
+    assert round(mu_air_lemmon(100.0, 28e3), 9) == 107.923e-6
+    assert round(mu_air_lemmon(200.0, 10e3), 10) == 21.1392e-6
+    assert round(mu_air_lemmon(300.0, 5e3), 10) == 21.3241e-6
+    assert round(mu_air_lemmon(132.64, 10.4e3), 10) == 17.7623e-6

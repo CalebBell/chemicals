@@ -1,4 +1,4 @@
 numpy
 scipy
 pandas
-fluids>=0.1.68
+fluids>=1.0.0

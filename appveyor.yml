@@ -20,9 +20,9 @@ init:
 install:
   - cmd: activate condaenv
   - cmd: conda install -yq numpy scipy pip pytest pandas matplotlib
-  - cmd: pip install pytest-cov coveralls sympy fluids coveralls sympy fuzzywuzzy pint pytz
+  - cmd: pip install pytest-cov coveralls sympy fluids coveralls sympy fuzzywuzzy pint pytz numba IPython
   - cmd: python setup.py install
   - cmd: rmdir /Q /S chemicals
 
 test_script:
-  - cmd: py.test --cov-report html --cov=chemicals -m "not slow and not online"
+  - cmd: py.test --cov-report html --cov=chemicals -m "not slow and not online and not numba"

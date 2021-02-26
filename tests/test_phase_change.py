@@ -29,7 +29,7 @@ from chemicals.phase_change import (Hvap_data_CRC, Hfus_data_CRC,
                                     Hvap_data_Gharagheizi, Hsub_data_Gharagheizi,
                                     Tb_data_Yaws, Tm_ON_data,
                                     phase_change_data_Perrys2_150,
-                                    phase_change_data_Alibakhshi_Cs, 
+                                    phase_change_data_Alibakhshi_Cs,
                                     phase_change_data_VDI_PPDS_4)
 from chemicals.miscdata import CRC_inorganic_data, CRC_organic_data
 from chemicals.identifiers import check_CAS
@@ -38,6 +38,10 @@ from chemicals.identifiers import check_CAS
 def test_Watson():
     Hvap = Watson(T=320, Hvap_ref=43908, T_ref=300.0, Tc=647.14)
     assert_close(Hvap, 42928.990094915454, rtol=1e-12)
+
+    # Supercritical
+    Hvap = Watson(T=480, **{'Hvap_ref': 862.4034055086013, 'T_ref': 469.6530300000001, 'Tc': 469.7, 'exponent': 0.48746055545202976})
+    assert Hvap == 0.0
 
 
 def test_Clapeyron():
@@ -48,17 +52,17 @@ def test_Clapeyron():
     Hvap = Clapeyron(264.0, 466.0, 5.55E6, 0.98, 5E4)
     assert_close(Hvap, 23370.947571814384)
 
-    
+
 def test_Pitzer():
     Hvap = Pitzer(452, 645.6, 0.35017)
     assert_close(Hvap, 36696.749078320056)
 
-    
+
 def test_SMK():
     Hvap = SMK(553.15, 751.35, 0.302)
     assert_close(Hvap, 39866.18999046232)
 
-    
+
 def test_MK():
     # Problem in article for SMK function.
     Hv1 = MK(553.15, 751.35, 0.302)
@@ -67,7 +71,7 @@ def test_MK():
     assert_close(Hv1, 38728.00667307733, rtol=1e-12)
     assert_close(Hv2, 25940.988533726406, rtol=1e-12)
 
-    
+
 def test_Velasco():
     Hv1 = Velasco(553.15, 751.35, 0.302)
     Hv2 = Velasco(333.2, 476.0, 0.5559)
@@ -83,17 +87,17 @@ def test_Riedel():
     assert_close(Hv1, 26828.59040728512, rtol=1e-12)
     assert_close(Hv2, 35089.80179000598, rtol=1e-12)
 
-    
+
 def test_Chen():
     Hv1 = Chen(294.0, 466.0, 5.55E6)
     assert_close(Hv1, 26705.902558030946)
 
-    
+
 def test_Liu():
     Hv1 = Liu(294.0, 466.0, 5.55E6)
     assert_close(Hv1, 26378.575260517395)
 
-    
+
 def test_Vetere():
     Hv1 = Vetere(294.0, 466.0, 5.55E6)
     assert_close(Hv1, 26363.43895706672)
@@ -130,7 +134,7 @@ def test_Hfus():
     assert_close(Hfus('462-06-6'), 11310.0, rtol=1e-12)
     assert_close(Hfus(CASRN='75-07-0'), 2310.0)
     assert Hfus(CASRN='75000-07-0') is None
-    
+
     assert Hfus_methods('7732-18-5') == ['CRC']
 
 def test_Gharagheizi_Hvap_data():
@@ -168,24 +172,24 @@ def test_Tm_ON_data():
 
     assert Tm_ON_data.shape == (11549, 1)
     assert Tm_ON_data.index.is_unique
-    
+
 @pytest.mark.slow
 def test_Tm_ON_data_CAS_valid():
     assert all([check_CAS(i) for i in Tm_ON_data.index])
 
-    
+
 def test_Perrys2_150_data():
     # rtol=2E-4 for Tmin; only helium-4 needs a higher tolerance
     # Everything hits 0 at Tmax except Difluoromethane, methane, and water;
     # those needed their Tmax adjusted to their real Tc.
     # C1 is divided by 1000, to give units of J/mol instead of J/kmol
     # Terephthalic acid removed, was a constant value only.
-    
+
     assert all([check_CAS(i) for i in phase_change_data_Perrys2_150.index])
     tots_calc = [phase_change_data_Perrys2_150[i].abs().sum() for i in [u'Tc', u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
     tots = [189407.42499999999, 18617223.739999998, 174.34494000000001, 112.51209900000001, 63.894040000000004, 70810.849999999991, 189407.005]
     assert_close1d(tots_calc, tots)
-    
+
     assert phase_change_data_Perrys2_150.index.is_unique
     assert phase_change_data_Perrys2_150.shape == (344, 8)
 
@@ -196,7 +200,7 @@ def test_Alibakhshi_Cs_data():
     tots_calc = [phase_change_data_Alibakhshi_Cs[i].abs().sum() for i in [u'C']]
     tots = [28154.361500000003]
     assert_close1d(tots_calc, tots)
-    
+
     assert phase_change_data_Alibakhshi_Cs.index.is_unique
     assert phase_change_data_Alibakhshi_Cs.shape == (1890, 2)
 
@@ -207,7 +211,7 @@ def test_VDI_PPDS_4_data():
     tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc', u'MW']]
     tots = [1974.2929800000002, 2653.9399000000003, 2022.530649, 943.25633100000005, 3124.9258610000002, 150142.28, 27786.919999999998]
     assert_close1d(tots_calc, tots)
-    
+
     assert phase_change_data_VDI_PPDS_4.index.is_unique
     assert phase_change_data_VDI_PPDS_4.shape == (272, 8)
 
@@ -267,7 +271,7 @@ def test_Tm_all_values():
 
     s = set(); s.update(s1); s.update(s2); s.update(s3)
     assert len(s) == 14723
-    
+
 def test_Tm():
     # Open notebook, CRC organic, CRC inorg
     Tms_calc = Tm('996-50-9'), Tm('999-78-0'), Tm('993-50-0')
@@ -294,8 +298,7 @@ def test_Tm():
 def test_Alibakhshi():
     Hvap = Alibakhshi(T=320.0, Tc=647.14, C=-16.7171)
     assert_close(Hvap, 41961.30490225752, rtol=1e-13)
-    
+
 def test_PPDS12():
     Hvap = PPDS12(300.0, 591.75, 4.60584, 13.97224, -10.592315, 2.120205, 4.277128)
     assert_close(Hvap, 37948.76862035927, rtol=1e-13)
-    

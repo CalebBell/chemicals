@@ -30,6 +30,9 @@ from chemicals.identifiers import check_CAS
 from chemicals.safety import *
 from chemicals.utils import normalize
 from fluids.numerics import assert_close, assert_close1d
+from chemicals.safety import (Ontario_exposure_limits_dict, NFPA_2008_data, IEC_2010_data,
+                              DIPPR_SERAT_data, NTP_data, IARC_data, Tflash_sources,
+                              Tautoignition_sources, LFL_sources, UFL_sources)
 
 SUZUKI = 'Suzuki (1994)'
 CROWLLOUVAR = 'Crowl and Louvar (2001)'
@@ -50,31 +53,31 @@ def test_OntarioExposureLimits():
     from chemicals.safety import _OntarioExposureLimits
     pts = [_OntarioExposureLimits[i]["TWA (ppm)"] for i in _OntarioExposureLimits.keys()]
     tot = pd.DataFrame(pts)[0].sum()
-    assert_allclose(tot, 41047.08621213534)
+    assert_close(tot, 41047.08621213534)
 
     pts = [_OntarioExposureLimits[i]["TWA (mg/m^3)"] for i in _OntarioExposureLimits.keys()]
     tot = pd.DataFrame(pts)[0].sum()
-    assert_allclose(tot, 108342.92212201601)
+    assert_close(tot, 108342.92212201601)
 
     pts = [_OntarioExposureLimits[i]["STEL (ppm)"] for i in _OntarioExposureLimits.keys()]
     tot = pd.DataFrame(pts)[0].sum()
-    assert_allclose(tot, 44849.91366780729)
+    assert_close(tot, 44849.91366780729)
 
     pts = [_OntarioExposureLimits[i]["STEL (mg/m^3)"] for i in _OntarioExposureLimits.keys()]
     tot = pd.DataFrame(pts)[0].sum()
-    assert_allclose(tot, 95303.402815878886)
+    assert_close(tot, 95303.402815878886)
 
     pts = [_OntarioExposureLimits[i]["Ceiling (ppm)"] for i in _OntarioExposureLimits.keys()]
     tot = pd.DataFrame(pts)[0].sum()
-    assert_allclose(tot, 1140.6482916385789)
+    assert_close(tot, 1140.6482916385789)
 
     pts = [_OntarioExposureLimits[i]["Ceiling (mg/m^3)"] for i in _OntarioExposureLimits.keys()]
     tot = pd.DataFrame(pts)[0].sum()
-    assert_allclose(tot, 6093.2716177993389)
+    assert_close(tot, 6093.2716177993389)
 
     pts = [_OntarioExposureLimits[i]["Skin"] for i in _OntarioExposureLimits.keys()]
     tot = pd.DataFrame(pts)[0].sum()
-    assert_allclose(tot, 236)
+    assert_close(tot, 236)
 
 
 def test_IARC_data():
@@ -131,13 +134,13 @@ def test_safety_predictions():
     # Methylamine, 4.9% LFL in article
     LFL2 = Suzuki_LFL(-1085100)
 
-    assert_allclose([LFL1, LFL2], [0.014276107095811811, 0.043977077259217984])
+    assert_close1d([LFL1, LFL2], [0.014276107095811811, 0.043977077259217984])
 
     # Pentane, literature 7.8% UFL
     UFL1 = Suzuki_UFL(-3536600)
     # Methylamine, literature 20.6% UFL
     UFL2 = Suzuki_UFL(-1085100)
-    assert_allclose([UFL1, UFL2], [0.0831119493052, 0.17331479619669998])
+    assert_close1d([UFL1, UFL2], [0.0831119493052, 0.17331479619669998])
 
 def test_safety_atom_predictions():
     # Pentane, 1.5 % LFL in literature
@@ -149,7 +152,7 @@ def test_safety_atom_predictions():
     # Formaldehyde
     LFL4 = Crowl_Louvar_LFL({'H': 2, 'C': 1, 'O': 1})
 
-    assert_allclose([LFL1, LFL2, LFL3, LFL4], [0.014073694984646879,
+    assert_close1d([LFL1, LFL2, LFL3, LFL4], [0.014073694984646879,
                     0.011899610558199915, 0.011899610558199915,
                     0.09548611111111112])
 
@@ -163,7 +166,7 @@ def test_safety_atom_predictions():
     UFL3 = Crowl_Louvar_UFL({'H': 14, 'C': 6, 'Na': 100})
     UFL4 = Crowl_Louvar_UFL({'H': 2, 'C': 1, 'O': 1})
 
-    assert_allclose([UFL1, UFL2, UFL3, UFL4], [0.08955987717502559, 0.07572479446127219, 0.07572479446127219, 0.607638888888889])
+    assert_close1d([UFL1, UFL2, UFL3, UFL4], [0.08955987717502559, 0.07572479446127219, 0.07572479446127219, 0.607638888888889])
 
     assert Crowl_Louvar_UFL({'H': 14, 'C': 0}) == None
 
@@ -172,7 +175,7 @@ def test_safety_atom_predictions():
 def test_NFPA_497_2008():
     tots_calc = [NFPA_2008_data[i].sum() for i in ['T_flash', 'T_autoignition', 'LFL', 'UFL']]
     tots = [52112.200000000019, 127523.69999999998, 4.2690000000000001, 29.948999999999998]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
 
     assert NFPA_2008_data.index.is_unique
     assert NFPA_2008_data.shape == (231, 5)
@@ -181,13 +184,13 @@ def test_NFPA_497_2008():
 def test_IEC_2010():
     tots_calc = [IEC_2010_data[i].sum() for i in ['T_flash', 'T_autoignition', 'LFL', 'UFL']]
     tots = [83054.500000000015, 199499.94999999998, 6.4436999999999998, 40.034999999999997]
-    assert_allclose(tots_calc, tots)
+    assert_close1d(tots_calc, tots)
 
     assert IEC_2010_data.index.is_unique
     assert IEC_2010_data.shape == (327, 5)
 
 def test_DIPPR_SERAT():
-    assert_allclose(DIPPR_SERAT_data['T_flash'].sum(), 285171.13471004181)
+    assert_close(DIPPR_SERAT_data['T_flash'].sum(), 285171.13471004181)
 
     assert DIPPR_SERAT_data.index.is_unique
     assert DIPPR_SERAT_data.shape == (870, 2)
@@ -200,23 +203,26 @@ def test_Tflash():
     T3 = T_flash('71-43-2', method=IEC)
 
     Ts = [227.15, 262.15, 262.15]
-    assert_allclose([T1, T2, T3], Ts)
+    assert_close1d([T1, T2, T3], Ts)
 
     methods = T_flash_methods('110-54-3')
     assert methods == list(T_flash_all_methods)
-    
-    tot1 = pd.Series([T_flash(i) for i in IEC_2010_data.index]).sum()
-    tot2 = pd.Series([T_flash(i) for i in NFPA_2008_data.index]).sum()
-    tot3 = pd.Series([T_flash(i) for i in DIPPR_SERAT_data.index]).sum()
-    assert_allclose([tot1, tot2, tot3], [86127.510323478724, 59397.72151504083, 286056.08653090859])
 
-    tot_default = pd.Series([T_flash(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index, *DIPPR_SERAT_data.index])]).sum()
-    assert_allclose(tot_default, 324881.68653090857)
-    
     assert None == T_flash(CASRN='132451235-2151234-1234123')
 
     with pytest.raises(Exception):
         T_flash(CASRN='8006-61-9', method='BADMETHOD')
+    
+@pytest.mark.slow
+def test_Tflash_all_values():
+    tot1 = pd.Series([T_flash(i) for i in IEC_2010_data.index]).sum()
+    tot2 = pd.Series([T_flash(i) for i in NFPA_2008_data.index]).sum()
+    tot3 = pd.Series([T_flash(i) for i in DIPPR_SERAT_data.index]).sum()
+    assert_close1d([tot1, tot2, tot3], [86127.510323478724, 59397.72151504083, 286056.08653090859])
+
+    tot_default = pd.Series([T_flash(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index, *DIPPR_SERAT_data.index])]).sum()
+    assert_close(tot_default, 324881.68653090857)
+    
 
 
 def test_Tautoignition():
@@ -225,13 +231,13 @@ def test_Tautoignition():
     T3 = T_autoignition('71-43-2', method=IEC)
 
     Ts = [553.15, 771.15, 771.15]
-    assert_allclose([T1, T2, T3], Ts)
+    assert_close1d([T1, T2, T3], Ts)
 
     methods = T_autoignition_methods('8006-61-9')
     assert methods == list(T_autoignition_all_methods)
 
     tot_default = pd.Series([T_autoignition(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index])]).sum()
-    assert_allclose(tot_default, 229841.29999999993)
+    assert_close(tot_default, 229841.29999999993)
 
     assert None == T_autoignition(CASRN='132451235-2151234-1234123')
 
@@ -247,13 +253,13 @@ def test_LFL():
     LFL5 = LFL(Hc=-764464.0)
     LFL6 = LFL(atoms={'H': 4, 'C': 1, 'O': 1})
     LFLs = [0.014, 0.012, 0.012, 0.012, 0.05870183749384112, 0.06756756756756757]
-    assert_allclose([LFL1, LFL2, LFL3, LFL4, LFL5, LFL6], LFLs)
+    assert_close1d([LFL1, LFL2, LFL3, LFL4, LFL5, LFL6], LFLs)
 
     methods = LFL_methods(CASRN='71-43-2', Hc=-764464, atoms={'H': 4, 'C': 1, 'O': 1})
     assert methods == list(LFL_all_methods)
 
     tot_default = pd.Series([LFL(CASRN=i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index])]).sum()
-    assert_allclose(tot_default, 7.0637000000000008)
+    assert_close(tot_default, 7.0637000000000008)
 
     assert None == LFL(CASRN='132451235-2151234-1234123')
 
@@ -297,13 +303,13 @@ def test_UFL():
     UFL5 = UFL(Hc=-764464.0)
     UFL6 = UFL(atoms={'H': 4, 'C': 1, 'O': 1})
     UFLs = [0.076, 0.078, 0.086, 0.086, 0.1901523455253683, 0.4299754299754299]
-    assert_allclose([UFL1, UFL2, UFL3, UFL4, UFL5, UFL6], UFLs)
+    assert_close1d([UFL1, UFL2, UFL3, UFL4, UFL5, UFL6], UFLs)
 
     methods = UFL_methods(CASRN='71-43-2', Hc=-764464, atoms={'H': 4, 'C': 1, 'O': 1})
     assert methods == list(UFL_all_methods)
 
     tot_default = pd.Series([UFL(CASRN=i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index])]).sum()
-    assert_allclose(tot_default, 46.364000000000004)
+    assert_close(tot_default, 46.364000000000004)
 
     assert None == UFL(CASRN='132451235-2151234-1234123')
 

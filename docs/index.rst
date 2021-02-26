@@ -1,6 +1,9 @@
 chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
 =======================================================================================
 
+  .. meta::
+      :google-site-verification: wcmDZ88ikLzq1to6urRDGA6R7oIhzya2sN5hOeV1zZw
+
 Key Features & Capabilities
 ---------------------------
 
@@ -48,19 +51,13 @@ If you need to know something about a chemical, give chemicals a try.
    :maxdepth: 1
    :numbered:
    :caption: Tutorial
-   
-   Overview
-   Installation
-   tutorial/Getting_started
-   tutorial/Numba support
-   tutorial/Numpy array support
-   tutorial/Pint Quantities support
 
 .. toctree::
    :maxdepth: 2
    :caption: API
    
    chemicals.acentric
+   chemicals.air
    chemicals.combustion
    chemicals.critical
    chemicals.dipole
@@ -70,6 +67,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.exceptions
    chemicals.flash_basic
    chemicals.heat_capacity
+   chemicals.iapws
    chemicals.identifiers
    chemicals.interface
    chemicals.lennard_jones
@@ -98,6 +96,13 @@ If you need to know something about a chemical, give chemicals a try.
    :caption: Developer's guide
    
    developers
+   water_steam_properties_python
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+   
+   
 
 Installation
 ------------
@@ -109,6 +114,11 @@ If you have an installation of Python with pip, simple install it with:
 
     $ pip install chemicals
     
+If you are using `conda <https://docs.conda.io/en/latest/>`_, you can install
+chemicals from conda-forge channel:
+
+    $ conda install -c conda-forge chemicals
+
 To get the git version, run:
 
     $ git clone git://github.com/CalebBell/chemicals.git
@@ -144,7 +154,7 @@ Citation
 
 To cite chemicals in publications use::
 
-    Caleb Bell and Contributors (2016-2020). chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
+    Caleb Bell and Contributors (2016-2021). chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
     https://github.com/CalebBell/chemicals.
     
 Indices and tables

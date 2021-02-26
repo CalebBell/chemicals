@@ -63,7 +63,7 @@ def test_lookup_VDI_tabular_data():
     dat = lookup_VDI_tabular_data('67-56-1', 'Mu (g)')
     sTs, sprops = sum(dat[0]), sum(dat[1])
     assert_close1d([sTs, sprops], [2887.63, 0.0001001])
-    
+
     # Check multiple props
     P_sum = sum(lookup_VDI_tabular_data('67-56-1', 'P')[1])
     assert_close(P_sum, 13332648.3)
@@ -83,6 +83,6 @@ def test_lookup_VDI_tabular_data():
         for CASRN in sorted(VDI_saturation_dict.keys()):
             sums[prop]+= sum(lookup_VDI_tabular_data(CASRN, prop)[1])
 
-    sums_calc = {'Volume (g)': 4480967.380663272, 'Mu (g)': 0.01092262, 'K (g)': 13.3338, 'P': 830362576.5100002, 'Pr (l)': 2561.917999999999, 'Cp (l)': 109652.14080415797, 'K (l)': 62.80901, 'T': 210960.66, 'Volume (l)': 0.06622819718826786, 'Beta': 3.66542, 'Pr (g)': 2561.917999999999, 'Hvap': 11146818.439615589, 'Mu (l)': 0.14801666, 'Cp (g)': 215899.05447308993, 'sigma': 9.08229, 'Density (l)': 510315.80999999994, 'Density (g)': 33258.34707901}
+    sums_calc = {'Volume (g)': 4480967.380663272, 'Mu (g)': 0.01092262, 'K (g)': 13.3338, 'P': 830362576.5100002, 'Pr (l)': 2561.917999999999, 'Cp (l)': 109652.14080415797, 'K (l)': 62.80901, 'T': 210960.66, 'Volume (l)': 0.06622819718826786, 'Beta': 3.66542, 'Pr (g)': 2561.917999999999, 'Hvap': 11146818.439615589, 'Mu (l)': 0.14801666, 'Cp (g)': 215899.05447308993, 'sigma': 9.08092, 'Density (l)': 510315.80999999994, 'Density (g)': 33258.34707901}
     for k, v in sums.items():
         assert_close(sums_calc[k], sums[k], rtol=1e-12)

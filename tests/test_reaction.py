@@ -61,11 +61,13 @@ def test_Hfg_API_TDB_data():
 
     assert None == Hfg('98-00-1')
 
-    tot = sum([abs(Hfg(i, method='API_TDB_G')) for i in Hfg_API_TDB_data.index])
-    assert_close(tot, 101711260.0)
-
     with pytest.raises(Exception):
         Hf('98-00-0', method='BADMETHOD')
+
+@pytest.mark.slow
+def test_Hfg_API_TDB_data_fuzz():
+    tot = sum([abs(Hfg(i, method='API_TDB_G')) for i in Hfg_API_TDB_data.index])
+    assert_close(tot, 101711260.0)
 
 
 def test_Hfl():

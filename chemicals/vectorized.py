@@ -23,9 +23,9 @@ SOFTWARE.
 Basic module which wraps all chemicals functions with numpy's np.vectorize
 function.
 
-All other object - dicts, classes, etc - are not wrapped. Supports star 
+All other object - dicts, classes, etc - are not wrapped. Supports star
 imports; so the same objects exported when importing from the main library
-will be imported from here. 
+will be imported from here.
 
 >>> from chemicals.vectorized import *
 >>> Antoine(np.linspace(100, 200, 5), A=8.95894, B=510.595, C=-15.95)
@@ -41,7 +41,7 @@ array([591.75, 647.14])
 Note that because this needs to import chemicals itself, chemicals.vectorized
 needs to be imported separately; the following will cause an error as
 the chemicals.vectorized module has not yet been imported:
-    
+
 >>> import chemicals
 >>> chemicals.vectorized # doctest: +SKIP
 
@@ -81,4 +81,4 @@ globals().update(__funcs)
 
 
 
-        
+

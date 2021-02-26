@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
 
@@ -117,12 +117,12 @@ def omega(CASRN, method=None):
     -----
     A total of three sources are available for this function. They are:
 
-        * 'PSRK', a compillation of experimental and estimated data published 
-          in the Appendix of [15]_, the fourth revision of the PSRK model.
+        * 'PSRK', a compillation of experimental and estimated data published
+          in the Appendix of [2]_, the fourth revision of the PSRK model.
         * 'PD', an older compillation of
-          data published in (Passut & Danner, 1973) [16]_.
+          data published in (Passut & Danner, 1973) [3]_.
         * 'YAWS', a large compillation of data from a
-          variety of sources; no data points are sourced in the work of [17]_.
+          variety of sources; no data points are sourced in the work of [4]_.
 
     See Also
     --------
@@ -148,9 +148,9 @@ def omega(CASRN, method=None):
        Publishing, 2014.
     '''
     if method:
-        return retrieve_from_df_dict(critical.omega_sources, CASRN, 'omega', method) 
+        return retrieve_from_df_dict(critical.omega_sources, CASRN, 'omega', method)
     else:
-        return retrieve_any_from_df_dict(critical.omega_sources, CASRN, 'omega') 
+        return retrieve_any_from_df_dict(critical.omega_sources, CASRN, 'omega')
 
 def omega_definition(Psat, Pc):
     r'''Returns the acentric factor of a fluid according to its fundamental
@@ -212,7 +212,7 @@ def LK_omega(Tb, Tc, Pc):
 
     Notes
     -----
-    The units of the above equation are atmosphere and Kelvin; values are 
+    The units of the above equation are atmosphere and Kelvin; values are
     converted internally.
 
     Examples
@@ -244,7 +244,7 @@ def Stiel_polar_factor(Psat, Pc, omega):
     the critical pressure `Pc`, and the acentric factor `omega`.
 
     .. math::
-        x = \log P_r|_{T_r=0.6} + 1.70 \omega + 1.552
+        x = \log_{10} P_r|_{T_r=0.6} + 1.70 \omega + 1.552
 
     Parameters
     ----------
@@ -268,7 +268,7 @@ def Stiel_polar_factor(Psat, Pc, omega):
     Examples
     --------
     Calculating the factor for water:
-    
+
     >>> Stiel_polar_factor(Psat=169745, Pc=22048321.0, omega=0.344)
     0.02322146744772713
 
