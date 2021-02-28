@@ -96,8 +96,11 @@ except:
     pass
 
 numba_blacklisted = []
-def mark_jit_unsafe(f):
-    numba_blacklisted.append(f.__name__)
+numba_cache_blacklisted = []
+
+def mark_jit_unsafe(f=None, cache=False):
+    if not f: return lambda f: mark_jit_unsafe(f, cache)
+    (numba_cache_blacklisted if cache else numba_blacklisted).append(f.__name__)
     return f
 
 @mark_jit_unsafe

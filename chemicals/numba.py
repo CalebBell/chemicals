@@ -17,7 +17,7 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from chemicals.utils import PY37, numba_blacklisted
+from chemicals.utils import PY37, numba_blacklisted, numba_cache_blacklisted
 
 busy = False
 __all__ = []
@@ -33,11 +33,14 @@ def transform():
     normal_fluids = fluids
     orig_file = __file__
     def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec):
-        cache_blacklist = set( ['Rachford_Rice_solution', 'Rachford_Rice_solution_LN2', 'Rachford_Rice_solution_polynomial',
-                  'Rachford_Rice_solution_numpy', 'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
-                  'Rachford_Rice_solutionN', 'Rachford_Rice_solution2', 'flash_wilson',
-                  'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'iapws97_T', 'iapws95_T'])
-    
+        numba_cache_blacklisted.extend([
+            'Rachford_Rice_solution', 'Rachford_Rice_solution_LN2',
+            'Rachford_Rice_solution_polynomial','Rachford_Rice_solution_numpy', 
+            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
+            'Rachford_Rice_solutionN', 'Rachford_Rice_solution2', 'flash_wilson',
+            'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'iapws97_T', 
+            'iapws95_T'])
+        cache_blacklist = set(numba_cache_blacklisted)
         __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
         new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,
                                                         blacklist=set(numba_blacklisted),
