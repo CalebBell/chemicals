@@ -46,10 +46,10 @@ def test_solid_models():
     # graph. 1684 was the best the pixels could give.
     Cp = Lastovka_solid(300, 0.2139)
     assert_close(Cp, 1682.063629222013)
-    
+
     dH = Lastovka_solid_integral(300, 0.2139)
     assert_close(dH, 283246.1242170376)
-    
+
     dS = Lastovka_solid_integral_over_T(300, 0.2139)
     assert_close(dS, 1947.5537561495557)
 
@@ -73,7 +73,7 @@ def test_Zabransky_quasi_polynomial():
     H2 = Zabransky_quasi_polynomial_integral(300, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     H1 = Zabransky_quasi_polynomial_integral(200, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     assert_close(H2 - H1, 14662.031376528757)
-    
+
     S2 = Zabransky_quasi_polynomial_integral_over_T(300, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     S1 = Zabransky_quasi_polynomial_integral_over_T(200, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     assert_close(S2-S1, 59.16999297436473) # result from quadrature, not the integral
@@ -82,13 +82,13 @@ def test_Zabransky_quasi_polynomial():
 def test_Zabransky_cubic():
     Cp = Zabransky_cubic(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
     assert_close(Cp, 75.31465144297991)
-    
+
     H0 = Zabransky_cubic_integral(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
     assert_close(H0, 31051.690370364562)
-    
+
     S0 = Zabransky_cubic_integral_over_T(298.15, 20.9634, -10.1344, 2.8253,  -0.256738)
     assert_close(S0, 24.732465342840854)
-    
+
 
 def test_Lastovka_Shaw():
     # C64H52S2 (M = 885.2 alpha = 0.1333 mol/g
@@ -120,17 +120,17 @@ def test_Lastovka_Shaw_T_for_Hm():
     sv, MW, Hm = 0.05, 12.0, 3727593.7203149837
     T = Lastovka_Shaw_T_for_Hm(Hm=Hm, MW=MW, similarity_variable=sv)
     assert_close(T, 153731.155415042)
-    
+
     T = Lastovka_Shaw_T_for_Hm(Hm=55000, MW=80.0, similarity_variable=0.23)
     assert_close(T, 600.0943429567604)
-    
+
     T = Lastovka_Shaw_T_for_Hm(Hm=55000, MW=80.0, similarity_variable=0.23, factor=2)
     assert_close(T, 469.688546084446)
 
 def test_Lastovka_Shaw_T_for_Sm():
     T = Lastovka_Shaw_T_for_Sm(Sm=112.80, MW=72.151, similarity_variable=0.2356)
     assert_close(T, 603.4298291570275)
-    
+
     T = Lastovka_Shaw_T_for_Sm(Sm=112.80, MW=72.151, similarity_variable=0.2356, factor=2)
     assert_close(T, 446.62661557878624)
 
@@ -139,12 +139,12 @@ def test_Lastovka_Shaw_T_for_Sm():
 def test_Lastovka_Shaw_T_for_Hm_fuzz():
     T_ref = 298.15
     factor = 1.0
-    
+
     # Originally tested with 50 points in everything
     similarity_variables = linspace(.05, .5, 8)
     MWs = linspace(12, 1200, 8)
     Hms = [-i for i in logspace(log10(1e4), log10(1), 15)] + logspace(log10(1), log10(1e7), 15)
-    
+
     for sv in similarity_variables:
         for MW in MWs:
             for Hm in Hms:
@@ -163,11 +163,11 @@ def test_Lastovka_Shaw_T_for_Hm_fuzz():
 #def test_Lastovka_Shaw_T_for_Sm_fuzz():
 #    T_ref = 298.15
 #    factor = 1.0
-#    
+#
 #    similarity_variables = linspace(.05, .5, 8)
 #    MWs = linspace(12, 1200, 8)
 #    Sms = logspace(log10(3000), log10(300), 15)
-#    
+#
 #    for sv in similarity_variables:
 #        for MW in MWs:
 #            for Sm in Sms:
@@ -211,7 +211,7 @@ def test_TRC_gas_data():
 def test_TRC_gas():
     Cps = [TRCCp(T, 4.0, 7.65E5, 720., 3.565, -0.052, -1.55E6, 52., 201.) for T in [150, 300]]
     assert_close1d(Cps, [35.58433189527471, 42.06527108097466])
-    
+
     # Test a zero division error
     Cp_zero = TRCCp(298, 4.0, 32753000, 892, 76.209, -0.254, -58870000, 98, 298)
     Cp_almost_zero = TRCCp(298*(1+1e-13), 4.0, 32753000, 892, 76.209, -0.254, -58870000, 98, 298)
@@ -229,18 +229,18 @@ def test_TRCCp_integral_over_T():
     coeffs = [4.0, 124000, 245, 50.538999999999994, -49.468999999999994, 220440000, 560, 78]
     dS = TRCCp_integral_over_T(300, *coeffs) - TRCCp_integral_over_T(200, *coeffs)
     assert_close(dS, 23.4427894111345)
-    
+
 def test_Zabransky_dicts():
-    from chemicals.heat_capacity import (zabransky_dict_sat_s, 
-                                         zabransky_dict_sat_p, 
-                                         zabransky_dict_const_s, 
-                                         zabransky_dict_const_p, 
-                                         zabransky_dict_iso_s, 
+    from chemicals.heat_capacity import (zabransky_dict_sat_s,
+                                         zabransky_dict_sat_p,
+                                         zabransky_dict_const_s,
+                                         zabransky_dict_const_p,
+                                         zabransky_dict_iso_s,
                                          zabransky_dict_iso_p)
     quasi_dicts = [zabransky_dict_sat_p, zabransky_dict_const_p, zabransky_dict_iso_p]
     spline_dicts = [zabransky_dict_sat_s, zabransky_dict_const_s, zabransky_dict_iso_s]
-    
-    sums = [[4811.400000000001, 7889.5, 11323.099999999999], 
+
+    sums = [[4811.400000000001, 7889.5, 11323.099999999999],
             [6724.9, 11083.200000000004, 17140.75],
             [37003.999999999985, 72467.1, 91646.64999999997]]
     coeff_sums = [[1509.3503910000002, 170.63668272100003, 553.71843, 3602.9634764, 2731.1423000000004, 2505.7230399999994],
@@ -255,10 +255,10 @@ def test_Zabransky_dicts():
         assert_close1d(tot_calc, sums[i])
         coeff_calc = sum_(np.abs([getattr_(k, 'coeffs') for k in quasi_dicts[i].values()]))
         assert_close1d(coeff_calc, coeff_sums[i])
-    
+
     sums = [[108141.20000000004, 153049.59999999992, 16980025.79560638],
             [15739.999999999998, 22191.1, 60581.66851630001],
-            [224963.9000000004, 293247.29999999993, 146377687.7182099]] 
+            [224963.9000000004, 293247.29999999993, 146377687.7182099]]
     get_Tmin_sum = lambda z_splines: sum_([i.Tmin for i in z_splines])
     get_Tmax_sum = lambda z_splines: sum_([i.Tmax for i in z_splines])
     get_coeffs_sum = lambda z_splines: sum_([sum_([abs_(j) for j in i.coeffs]) for i in z_splines])
@@ -283,9 +283,9 @@ def test_ZABRANSKY_SPLINE():
     assert_close(d.calculate(400), 76.53795418514787)
     assert_close(d.force_calculate(250), 77.1082743553618)
 #    assert_close1d(d.Ts, [273.6, 380.0, 590.0, 635.0, 644.6])
-    
+
     # Test enthalpy integrals
-    
+
     assert_close(d.force_calculate_integral(200, 270), 5505.7344456789615)
     assert_close(d.force_calculate_integral(200, 280), 6264.127552384685)
     assert_close(d.force_calculate_integral(200, 380), 13817.514452840238)
@@ -296,7 +296,7 @@ def test_ZABRANSKY_SPLINE():
     assert_close(d.force_calculate_integral(200, 635+1E-9), 39698.85970642518)
     assert_close(d.force_calculate_integral(200, 644.6), 76304.80397369813)
     assert_close(d.force_calculate_integral(200, 645), 78093.69002487611)
-    
+
     # Same test cases, flipped around
     assert_close(d.force_calculate_integral(270, 200), -5505.7344456789615)
     assert_close(d.force_calculate_integral(280, 200), -6264.127552384685)
@@ -320,7 +320,7 @@ def test_ZABRANSKY_SPLINE():
     assert_close(d.force_calculate_integral_over_T(200, 635+1E-9), 99.5436500025113)
     assert_close(d.force_calculate_integral_over_T(200, 644.6), 156.74432313471482)
     assert_close(d.force_calculate_integral_over_T(200, 645), 159.51864708803043)
-    
+
     # Same test cases, flipped around
     assert_close(d.force_calculate_integral_over_T(270, 200), -23.65404552882864)
     assert_close(d.force_calculate_integral_over_T(280, 200), -26.412181131648946)
@@ -332,8 +332,8 @@ def test_ZABRANSKY_SPLINE():
     assert_close(d.force_calculate_integral_over_T(635+1E-9, 200), -99.5436500025113)
     assert_close(d.force_calculate_integral_over_T(644.6, 200), -156.74432313471482)
     assert_close(d.force_calculate_integral_over_T(645, 200), -159.51864708803043)
-    
-    
+
+
     # Test a chemical with only one set of coefficients
     d = zabransky_dict_iso_s['2016-57-1']
     assert_close(d.calculate(310), 375.543177681642)

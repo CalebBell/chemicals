@@ -67,21 +67,21 @@ def test_CSP():
 
     sigma_calc = Miqueu(300., 340.1, 0.000199, 0.1687)
     assert_close(sigma_calc, 0.003474100774091376)
-    
+
     sigma_calc = Mersmann_Kind_sigma(298.15, 164.15, 328.25, 497.1, 3430000.0)
     assert_close(0.016744311449290426, sigma_calc)
 
-    
+
 def test_Aleem():
     st = Aleem(T=90, MW=16.04246, Tb=111.6, rhol=458.7, Hvap_Tb=510870., Cpl=2465.)
     assert_close(st, 0.01669970221165325)
 
     # Test the "critical" point (where the correlation predicts sigma=0)
-    st_at_Tc = Aleem(T=318.8494929006085, MW=16.04246, Tb=111.6, rhol=458.7, 
+    st_at_Tc = Aleem(T=318.8494929006085, MW=16.04246, Tb=111.6, rhol=458.7,
                      Hvap_Tb=510870.,  Cpl=2465.)
     assert_close(st_at_Tc, 0, atol=1E-12)
-    
-    
+
+
 def test_REFPROP():
     sigma = REFPROP_sigma(298.15, 647.096, -0.1306, 2.471, 0.2151, 1.233)
     assert_close(sigma, 0.07205503890847453)
@@ -132,7 +132,7 @@ def test_VDI_PPDS_11_data():
     """I believe there are no errors here."""
     for i in sigma_data_VDI_PPDS_11.index:
         assert check_CAS(i)
-    
+
     assert sigma_data_VDI_PPDS_11.index.is_unique
     assert sigma_data_VDI_PPDS_11.shape == (272, 8)
 
@@ -146,7 +146,7 @@ def test_Weinaug_Katz():
     # sample test case
     sigma = Weinaug_Katz([5.1e-5, 7.2e-5], Vml=0.000125, Vmg=0.02011, xs=[.4, .6], ys=[.6, .4])
     assert_close(sigma, 0.06547479150776776)
-    
+
     # pure component check it checks out
     Vml = rho_to_Vm(800.8088185536124, 100.15888)
     Vmg = rho_to_Vm(4.97865317223119, 100.15888)
@@ -191,6 +191,5 @@ def test_Meybodi_Daryasafar_Karimi():
 def test_API10A32():
     from fluids.core import F2K, R2K
     assert_close(API10A32(T=F2K(60), Tc=R2K(1334), K_W=12.4), 29.577333312096968, rtol=1e-13)
-    
-    
-    
+
+

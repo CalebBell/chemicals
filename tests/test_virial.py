@@ -41,20 +41,20 @@ def test_B_from_Z():
 def test_Z_from_virial_density_form():
     Z_calc = Z_from_virial_density_form(300.0, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
     assert_close(Z_calc, 1.2843494052609186)
-    
+
     Z_calc = Z_from_virial_density_form(300, 102031.881198762, 1e-4, 1e-5, 1e-6)
     assert_close(Z_calc, 1.0736323841544937)
 
     Z_calc = Z_from_virial_density_form(300, 96775.8831504971, 1e-4, 1e-5)
     assert_close(Z_calc, 1.018326089216066)
-    
+
     Z_calc = Z_from_virial_density_form(300, 95396.3561037084, 1e-4)
     assert_close(Z_calc,  1.003809998713499)
-    
+
     assert_close(1, Z_from_virial_density_form(300, 95396.3561037084))
-    
+
     '''B-only solution, derived as follows:
-    
+
     >>> B, C, D, E = symbols('B, C, D, E')
     >>> P, V, Z, R, T = symbols('P, V, Z, R, T', positive=True, real=True, nonzero=True)
     >>> rho = 1/V
@@ -62,8 +62,8 @@ def test_Z_from_virial_density_form():
     >>> slns = solve(to_slv, V)
     >>> simplify(slns[1]*P/R/T)
     1/2 + sqrt(4*B*P + R*T)/(2*sqrt(R)*sqrt(T))
-    
-    To check this, simply disable the if statement and allow the numerical 
+
+    To check this, simply disable the if statement and allow the numerical
     algorithm to run.
     '''
 
@@ -71,13 +71,13 @@ def test_Z_from_virial_density_form():
 def test_Z_from_virial_pressure_form():
     Z_calc = Z_from_virial_pressure_form(102919.99946855308, 4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19)
     assert_close(Z_calc, 1.00283753944)
-    
+
     Z_calc = Z_from_virial_pressure_form(102847.17619188508, 4.032286555169439e-09, 1.6197059494442215e-13)
     assert_close(Z_calc, 1.00212796)
 
     Z_calc = Z_from_virial_pressure_form(102671.27455742132, 4.032286555169439e-09)
     assert_close(Z_calc, 1.000414)
-    
+
     Z_calc = Z_calc = Z_from_virial_pressure_form(102671.27455742132)
     assert_close(Z_calc, 1)
 
@@ -106,13 +106,13 @@ def test_BVirial_Pitzer_Curl_calculus():
     Tr = T/Tc
     B0 = Rational(1445,10000) - Rational(33,100)/Tr - Rational(1385,10000)/Tr**2 - Rational(121,10000)/Tr**3
     B1 = Rational(73,1000) + Rational(46,100)/Tr - Rational(1,2)/Tr**2 - Rational(97,1000)/Tr**3 - Rational(73,10000)/Tr**8
-        
+
     # Note: scipy.misc.derivative was attempted, but found to given too
-    # incorrect of derivatives for higher orders, so there is no reasons to 
-    # implement it. Plus, no uses have yet been found for the higher 
-    # derivatives/integrals. For integrals, there is no way to get the 
+    # incorrect of derivatives for higher orders, so there is no reasons to
+    # implement it. Plus, no uses have yet been found for the higher
+    # derivatives/integrals. For integrals, there is no way to get the
     # indefinite integral.
-    
+
     # Test points in vector form for order 1, 2, and 3
     # Use lambdify for fast evaluation
     pts = 3 # points total = pts^4
@@ -129,11 +129,11 @@ def test_BVirial_Pitzer_Curl_calculus():
         Br = B0c + omega*B1c
         BVirial = (Br*R*Tc/Pc).subs(R, _R)
         f = lambdify((T, Tc, Pc, omega), BVirial, "numpy")
-        
+
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         Bcalc2 = BVirial_Pitzer_Curl(_Ts, _Tcs, _Pcs, _omegas, order)
         assert_close1d(Bcalcs, Bcalc2)
-        
+
 
     # Check integrals using SymPy:
     for order in range(-2, 0):
@@ -145,7 +145,7 @@ def test_BVirial_Pitzer_Curl_calculus():
         Br = B0c + omega*B1c
         BVirial = (Br*R*Tc/Pc).subs(R, _R)
         f = lambdify((T, Tc, Pc, omega), BVirial, "numpy")
-        
+
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         Bcalc2 = [BVirial_Pitzer_Curl(T2, Tc2, Pc2, omega2, order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
         assert_close1d(Bcalcs, Bcalc2)
@@ -153,7 +153,7 @@ def test_BVirial_Pitzer_Curl_calculus():
 def test_BVirial_Abbott_calculus():
     B = BVirial_Abbott(510., 425.2, 38E5, 0.193)
     assert_close(B, -0.00020570185009564064)
-    
+
     with pytest.raises(Exception):
         BVirial_Abbott(510., 425.2, 38E5, 0.193, order=-3)
 
@@ -168,7 +168,7 @@ def test_BVirial_Abbott_calculus():
 
     B = BVirial_Abbott(510., 425.2, 38E5, 0.193)
     assert_close(B, -0.00020570185009564064)
-    
+
     with pytest.raises(Exception):
         BVirial_Abbott(510., 425.2, 38E5, 0.193, order=-3)
 
@@ -194,7 +194,7 @@ def test_BVirial_Abbott_calculus():
         Br = B0c + omega*B1c
         BVirial = (Br*R*Tc/Pc).subs(R, _R)
         f = lambdify((T, Tc, Pc, omega), BVirial, "numpy")
-        
+
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         Bcalc2 = BVirial_Abbott(_Ts, _Tcs, _Pcs, _omegas, order)
         assert_close1d(Bcalcs, Bcalc2)
@@ -210,9 +210,9 @@ def test_BVirial_Abbott_calculus():
         Br = B0c + omega*B1c
         BVirial = (Br*R*Tc/Pc).subs(R, _R)
         f = lambdify((T, Tc, Pc, omega), BVirial, "numpy")
-        
+
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
-        
+
         Bcalc2 = [BVirial_Abbott(T2, Tc2, Pc2, omega2, order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
         assert_close1d(Bcalcs, Bcalc2)
 
@@ -255,7 +255,7 @@ def test_BVirial_Tsonopoulos_calculus():
         Br = B0c + omega*B1c
         BVirial = (Br*R*Tc/Pc).subs(R, _R)
         f = lambdify((T, Tc, Pc, omega), BVirial, "numpy")
-        
+
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         Bcalc2 = BVirial_Tsonopoulos(_Ts, _Tcs, _Pcs, _omegas, order)
         assert_close1d(Bcalcs, Bcalc2)
@@ -270,9 +270,9 @@ def test_BVirial_Tsonopoulos_calculus():
         Br = B0c + omega*B1c
         BVirial = (Br*R*Tc/Pc).subs(R, _R)
         f = lambdify((T, Tc, Pc, omega), BVirial, "numpy")
-        
+
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
-        
+
         Bcalc2 = [BVirial_Tsonopoulos(T2, Tc2, Pc2, omega2, order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
         assert_close1d(Bcalcs, Bcalc2)
 
@@ -327,11 +327,11 @@ def test_BVirial_Tsonopoulos_extended_calculus():
         B1c = diff(B1, T, order)
         B2c = diff(B2, T, order)
         B3c = diff(B3, T, order)
-        
+
         Br = B0c + omega*B1c + a*B2c + b*B3c
         BVirial = (Br*R*Tc/Pc).subs(R, _R)
         f = lambdify((T, Tc, Pc, omega), BVirial, "numpy")
-        
+
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
         Bcalc2 = BVirial_Tsonopoulos_extended(_Ts, _Tcs, _Pcs, _omegas, order=order, a=a, b=b)
         assert_close1d(Bcalcs, Bcalc2)
@@ -352,9 +352,9 @@ def test_BVirial_Tsonopoulos_extended_calculus():
 
         BVirial = (Br*R*Tc/Pc).subs(R, _R)
         f = lambdify((T, Tc, Pc, omega), BVirial, "numpy")
-        
+
         Bcalcs = f(_Ts, _Tcs, _Pcs, _omegas)
-        
-        
+
+
         Bcalc2 = [BVirial_Tsonopoulos_extended(T2, Tc2, Pc2, omega2, a=a, b=b, order=order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
         assert_close1d(Bcalcs, Bcalc2)

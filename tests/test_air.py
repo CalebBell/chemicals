@@ -48,47 +48,47 @@ def func_vs_naive_tester(func, func_naive, T_min=1.0, T_max=5000.0, rho_min=1e-5
             rerr += rerri
             errs.append(rerri)
     AARD, std, max_err = rerr/N**2, np.std(errs), np.max(errs)
-    return AARD, std, max_err 
+    return AARD, std, max_err
 
 
 
 
 def test_lemmon2000_A0():
     assert_close(lemmon2000_air_A0(0.36842, 0.5), -17.026123512818458, rtol=1e-15)
-    
+
     # if statement test
-    assert_close(lemmon2000_air_A0(TAU_MAX_EXP_87*(1-1e-15), .5), 
+    assert_close(lemmon2000_air_A0(TAU_MAX_EXP_87*(1-1e-15), .5),
                  lemmon2000_air_A0(TAU_MAX_EXP_87*(1+1e-15), .5), rtol=1e-15)
-    
+
     # Value computed with SymPy
     assert_close(lemmon2000_air_A0(300, .5), -3.54214522586700104, rtol=5e-15)
-    
-    
+
+
     # Check points that may fail
     lemmon2000_air_A0(1e20, 1e20)
     lemmon2000_air_A0(1e-10, 1e-10)
-    
-    
-    
+
+
+
 def test_lemmon2000_air_dA0_dtau():
     assert_close(derivative(lambda tau: lemmon2000_air_A0(tau, 13000/11183.9), 126.192/200.0, dx=1e-7),
                  lemmon2000_air_dA0_dtau(126.192/200.0, 13000/11183.9), rtol=1e-9)
-    
+
     assert_close(lemmon2000_air_dA0_dtau(0.36842, 0.5), 6.764336610288353, rtol=1e-14)
-    
+
     for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
         assert_close(derivative(lambda tau: lemmon2000_air_A0(tau, .5), rat, dx=rat*1e-5),
                      lemmon2000_air_dA0_dtau(rat, .5))
-    
-    
+
+
 def test_lemmon2000_air_d2A0_dtau2():
     assert_close(lemmon2000_air_d2A0_dtau2(126.192/200.0, 13000/11183.9), -6.260482844274295, rtol=1e-13)
 
     for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
         assert_close(derivative(lambda tau: lemmon2000_air_dA0_dtau(tau, .5), rat, dx=rat*1e-5),
                      lemmon2000_air_d2A0_dtau2(rat, .5))
-    
-    
+
+
 def test_lemmon2000_air_d3A0_dtau3():
     assert_close(lemmon2000_air_d3A0_dtau3(0.36842, .5), 102.9144884392338, rtol=2e-12)
     assert_close(derivative(lambda tau: lemmon2000_air_d2A0_dtau2(tau, .5), 0.36842, dx=1e-7),
@@ -97,18 +97,18 @@ def test_lemmon2000_air_d3A0_dtau3():
     for rat in (1000.0, 100.0, 10.0, 5.0, 3.0, 2.5, 2.0, 1.5, 1.0, .5, .2, .1, .01, .001):
         assert_close(derivative(lambda tau: lemmon2000_air_d2A0_dtau2(tau, .5), rat, dx=rat*1e-5),
                      lemmon2000_air_d3A0_dtau3(rat, .5))
-    
+
 def test_lemmon2000_air_d4A0_dtau4():
     assert_close(lemmon2000_air_d4A0_dtau4(126.192/200.0, 13000/11183.9), -94.8155327278803, rtol=1e-13)
-    
+
     assert_close(derivative(lambda tau: lemmon2000_air_d3A0_dtau3(tau, .5), 0.36842, dx=4e-7),
                  lemmon2000_air_d4A0_dtau4(0.36842, .5))
 
     for rat in (1000.0, 100.0, 10.0, 5.0, 3.0,2.5, 2.0,  1.5, 1.0, .5, .2, .1, .01, .001):
         assert_close(derivative(lambda tau: lemmon2000_air_d3A0_dtau3(tau, .5), rat, dx=rat*1e-5),
                      lemmon2000_air_d4A0_dtau4(rat, .5))
-        
-    
+
+
 # Naive functions
 def lemmon2000_air_Ar_naive(tau, delta):
     return 0.000233594806141999996*delta**11*tau**3.25*exp(-delta**2) - 0.0122523554252999996*delta**6*tau**1.25*exp(-delta) + 0.000164957183186000006*delta**6*tau**1.35000000000000009 - 0.0472103183731000034*delta**5*tau**0.949999999999999956*exp(-delta) - 0.042053322884200002*delta**4*tau**0.200000000000000011 + 0.0349008431981999989*delta**4*tau**0.349999999999999978 + 0.0112626704218000001*delta**4 + 0.134211176704000013*delta**3*tau**0.149999999999999994 - 0.17381369096999999*delta**3*tau**0.800000000000000044*exp(-delta) - 0.00938782884667000057*delta**3*tau**15*exp(-delta**3) - 0.031605587982100003*delta**3*tau**6*exp(-delta**2) - 0.0865421396646000041*delta**3 + 0.0714140178971000017*delta**2 + 0.713116392079000017*delta*tau**0.330000000000000016 - 1.61824192067000006*delta*tau**1.01000000000000001 - 0.101365037911999994*delta*tau**1.60000000000000009*exp(-delta) + 0.0148287891978000005*delta*tau**3.5*exp(-delta**3) - 0.146629609712999986*delta*tau**3.60000000000000009*exp(-delta**2) + 0.118160747228999996*delta
@@ -119,7 +119,7 @@ def lemmon2000_air_dAr_dtau_naive(tau, delta):
 
 def lemmon2000_air_d2Ar_dtau2_naive(tau, delta):
     return delta*(0.00170816201991337503*delta**10*tau**1.25*exp(-delta**2) - 0.00382886107040624965*delta**5*tau**(-0.75)*exp(-delta) + 0.0000779422690553850206*delta**5*tau**(-0.649999999999999911) + 0.00224249012272225226*delta**4*tau**(-1.05000000000000004)*exp(-delta) + 0.00672853166147200157*delta**3*tau**(-1.80000000000000004) - 0.00793994182759050031*delta**3*tau**(-1.64999999999999991) - 0.0171119250297600001*delta**2*tau**(-1.85000000000000009) + 0.0278101905551999921*delta**2*tau**(-1.19999999999999996)*exp(-delta) - 1.9714440578007002*delta**2*tau**13*exp(-delta**3) - 0.948167639463000089*delta**2*tau**4*exp(-delta**2) - 0.15767003428866691*tau**(-1.66999999999999993) - 0.0163442433987670138*tau**(-0.989999999999999991) - 0.0973104363955200058*tau**(-0.399999999999999911)*exp(-delta) + 0.129751905480749996*tau**1.5*exp(-delta**3) - 1.37245314691368003*tau**1.60000000000000009*exp(-delta**2))
-    
+
 def lemmon2000_air_d3Ar_dtau3_naive(tau, delta):
     return delta*(0.00213520252489171874*delta**10*tau**0.25*exp(-delta**2) + 0.00287164580280468724*delta**5*tau**(-1.75)*exp(-delta) - 0.000050662474886000258*delta**5*tau**(-1.64999999999999991) - 0.00235461462885836479*delta**4*tau**(-2.04999999999999982)*exp(-delta) - 0.0121113569906496025*delta**3*tau**(-2.79999999999999982) + 0.0131009040155243249*delta**3*tau**(-2.64999999999999991) + 0.0316570613050560015*delta**2*tau**(-2.85000000000000009) - 0.0333722286662399906*delta**2*tau**(-2.20000000000000018)*exp(-delta) - 25.6287727514091017*delta**2*tau**12*exp(-delta**3) - 3.79267055785200036*delta**2*tau**3*exp(-delta**2) + 0.263308957262073706*tau**(-2.66999999999999993) + 0.0161808009647793419*tau**(-1.98999999999999999) + 0.0389241745582079926*tau**(-1.39999999999999991)*exp(-delta) + 0.194627858221124994*tau**0.5*exp(-delta**3) - 2.19592503506188796*tau**0.600000000000000089*exp(-delta**2))
 
@@ -161,7 +161,7 @@ def lemmon2000_air_d4Ar_ddelta3dtau_naive(tau, delta):
 
 def test_lemmon2000_air_Ar():
     assert_close(lemmon2000_air_Ar(0.36842, 0.15880050154579475), 0.004798812280624336, rtol=1e-13)
-    
+
 def test_lemmon2000_air_dAr_dtau():
     assert_close(lemmon2000_air_dAr_dtau(0.36842, 0.15880050154579475),  -0.20189573196786642, rtol=1e-13)
 
@@ -374,26 +374,26 @@ def test_lemmon2000_air_d4Ar_ddelta3dtau_vs_naive():
 
 def test_lemmon2000_air_rho_dew():
     assert_close(lemmon2000_air_rho_dew(120), 2989.303928859551, rtol=1e-13)
-    
+
 def test_lemmon2000_air_rho_bubble():
     assert_close(lemmon2000_air_rho_bubble(120), 21589.77853554958, rtol=1e-13)
-    
-    
+
+
 def test_lemmon2000_air_P_dew():
     assert_close(lemmon2000_air_P_dew(100), 567424.1338937179, rtol=1e-14)
-    
+
 def test_lemmon2000_air_P_bubble():
     assert_close(lemmon2000_air_P_bubble(100), 663128.5894402424, rtol=1e-14)
-    
-    
+
+
 def test_lemmon2000_rho():
     assert_close(lemmon2000_rho(300.0, 1e5), 40.10292351061862, rtol=1e-13)
-    
-    
+
+
 def test_lemmon2000_P():
     assert_close(lemmon2000_P(300.0, 40.10292351061862), 1e5, rtol=1e-14)
-    
-    
+
+
 def test_TEOS10_CAAW_derivatives():
     assert_close1d(TEOS10_CAAW_derivatives(200.0)[:3], (1.05493575e-09, -1.525350000000001e-12, -1.13436375e-13), rtol=1e-13)
     assert_close(derivative(lambda T: TEOS10_CAAW_derivatives(T)[-2], 200.0, dx=200*1e-7), TEOS10_CAAW_derivatives(200)[-1], rtol=1e-8)
@@ -410,7 +410,7 @@ def test_TEOS10_BAW_derivatives():
     assert_close(TEOS10_BAW_derivatives(200)[1], 0.848076624E-6)
     assert_close(TEOS10_BAW_derivatives(200)[2], -0.122622146E-7)
     assert_close(derivative(lambda T: TEOS10_BAW_derivatives(T)[-2], 200.0, dx=200*1e-7), TEOS10_BAW_derivatives(200)[-1], rtol=1e-8)
-    
+
 def test_iapws04_Henry_air():
     assert_close(iapws04_Henry_air(300.0), 1.3616423498770563e-10, rtol=1e-13)
 

@@ -56,6 +56,6 @@ def test_dipole():
     methods = dipole_moment_methods(CASRN='78-78-4')
     methods_fixed = ['CCCBDB', 'MULLER', 'POLING']
     assert methods == methods_fixed
-    
+
     with pytest.raises(Exception):
         dipole_moment(CASRN='78-78-4', method='FAIL')

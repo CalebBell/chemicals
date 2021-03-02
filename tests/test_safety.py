@@ -111,18 +111,18 @@ def test_Carcinogen():
 
     with pytest.raises(Exception):
         Carcinogen('71-43-2', method='BADMETHOD')
-        
+
     # New item 2020
     assert Carcinogen('100-00-5')[IARC] == IARC_codes[12]
-    
+
     # Trichloroethylene added to 14th ed of NTP as known carcinogen.
     expected = {NTP: NTP_codes[1], IARC: IARC_codes[1]}
     assert Carcinogen('79-01-6') == expected
-    
+
     # Cobalt, added in 14th ed of NTP
     expected = {NTP: NTP_codes[2], IARC: IARC_codes[11]}
     assert Carcinogen('7440-48-4') == expected
-    
+
 def test_Skin():
     assert Skin('108-94-1')
     assert not Skin('1395-21-7')
@@ -212,7 +212,7 @@ def test_Tflash():
 
     with pytest.raises(Exception):
         T_flash(CASRN='8006-61-9', method='BADMETHOD')
-    
+
 @pytest.mark.slow
 def test_Tflash_all_values():
     tot1 = pd.Series([T_flash(i) for i in IEC_2010_data.index]).sum()
@@ -222,7 +222,7 @@ def test_Tflash_all_values():
 
     tot_default = pd.Series([T_flash(i) for i in set([*IEC_2010_data.index, *NFPA_2008_data.index, *DIPPR_SERAT_data.index])]).sum()
     assert_close(tot_default, 324881.68653090857)
-    
+
 
 
 def test_Tautoignition():
@@ -273,28 +273,28 @@ def test_LFL_ISO_10156_2017():
     CASs = ['74-82-8', '74-84-0']
     res = LFL_ISO_10156_2017(zs, LFLs, CASs)
     assert_close(res, 0.037714285714285714, rtol=1e-13)
-    
+
     # Example 2
     zs = [.48, .5+.79*.02, .02*.21]
     LFLs = [0.04, None, None]
     CASs = ['1333-74-0', '7727-37-9', '7782-44-7']
     res = LFL_ISO_10156_2017(zs, LFLs, CASs)
     assert_close(res, 0.08333333333333333, rtol=1e-13)
-    
+
     # Example 3
     zs = [.4, .6]
     LFLs = [.044, None]
     CASs = ['74-82-8', '124-38-9']
     res = LFL_ISO_10156_2017(zs, LFLs, CASs)
     assert_close(res, 0.11379707112970712, rtol=1e-13)
-    
+
     # Example 4
     zs = [.15, .15, .3, .35+.05*.79, .05*.21]
     LFLs = [.04, .044, None, None, None]
     CASs = ['1333-74-0', '74-82-8', '124-38-9', '7727-37-9', '7782-44-7']
     res = LFL_ISO_10156_2017(zs, LFLs, CASs)
     assert_close(res, 0.14273722742907632, rtol=1e-13)
-    
+
 def test_UFL():
     UFL1 = UFL(CASRN='8006-61-9')
     UFL2 = UFL(CASRN='71-43-2', method=NFPA)
@@ -327,7 +327,7 @@ def test_unit_conv_TLV():
 def test_fire_mixing():
     LFL = fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.012, .053, .031])
     assert_close(LFL, 0.02751172136637642, rtol=1e-13)
-    
+
     UFL = fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.075, .15, .32])
     assert_close(UFL, 0.12927551844869378, rtol=1e-13)
 
@@ -335,41 +335,41 @@ def test_fire_mixing():
 def test_NFPA_30_classification():
     assert NFPA_30_classification(253.15, 283.55) == 'IA' # ethylene oxide
     assert NFPA_30_classification(253.15, Psat_100F=268062) == 'IA' # ethylene oxide
-    
+
     assert NFPA_30_classification(227.15, 249.05) == 'IA' # methyl chloride
     assert NFPA_30_classification(227.15, Psat_100F=812201) == 'IA' # methyl chloride
-    
+
     assert NFPA_30_classification(233.15, 309.21) == 'IA' # pentane
     assert NFPA_30_classification(233.15, Psat_100F=107351) == 'IA' # pentane
     assert NFPA_30_classification(233.15, Psat_100F=101325) == 'IA' # pentane fake point to trigger border
     assert NFPA_30_classification(233.15, Psat_100F=101324.99999) == 'IB' # pentane fake point to trigger border
     assert NFPA_30_classification(233.15, Tb=310.92777777777) == 'IA' # pentane fake point under border
     assert NFPA_30_classification(233.15, Tb=310.92777777777777) == 'IB' # pentane fake point above border
-    
+
     assert NFPA_30_classification(253.15, 329.23) == 'IB' # acetone
     assert NFPA_30_classification(253.15, Psat_100F=51979) == 'IB' # acetone
-    
+
     assert NFPA_30_classification(262.15, 353.23) == 'IB' # benzene
     assert NFPA_30_classification(262.15, Psat_100F=22215) == 'IB' # benzene
-    
+
     assert NFPA_30_classification(308.15, 390.75) == 'IC' # butyl alcohol
     assert NFPA_30_classification(308.15, Psat_100F=2158) == 'IC' # butyl alcohol
     assert NFPA_30_classification(308.15) == 'IC' # butyl alcohol
-    
+
     assert NFPA_30_classification(F2K(100)) == 'II' # made up
     assert NFPA_30_classification(F2K(140)*(1-1e-13)) == 'II' # made up
     assert NFPA_30_classification(F2K(120), Tb=1e100) == 'II' # made up
     assert NFPA_30_classification(F2K(120), Tb=-1e100) == 'II' # made up
     assert NFPA_30_classification(F2K(120), Psat_100F=-1e100) == 'II' # made up
     assert NFPA_30_classification(F2K(120), Psat_100F=1e100) == 'II' # made up
-    
+
     assert NFPA_30_classification(F2K(140)) == 'IIIA' # made up
     assert NFPA_30_classification(F2K(200)*(1-1e-13)) == 'IIIA' # made up
     assert NFPA_30_classification(F2K(170), Tb=1e100) == 'IIIA' # made up
     assert NFPA_30_classification(F2K(170), Tb=-1e100) == 'IIIA' # made up
     assert NFPA_30_classification(F2K(170), Psat_100F=-1e100) == 'IIIA' # made up
     assert NFPA_30_classification(F2K(170), Psat_100F=1e100) == 'IIIA' # made up
-    
+
     assert NFPA_30_classification(F2K(200)) == 'IIIB' # made up
     assert NFPA_30_classification(F2K(200)*(1+1e-13)) == 'IIIB' # made up
     assert NFPA_30_classification(F2K(300), Tb=1e100) == 'IIIB' # made up

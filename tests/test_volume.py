@@ -28,7 +28,7 @@ import pytest
 import pandas as pd
 from chemicals.volume import *
 from chemicals.volume import (rho_data_COSTALD, rho_data_SNM0, rho_data_Perry_8E_105_l, rho_data_CRC_inorg_l,
-                              rho_data_VDI_PPDS_2, rho_data_CRC_inorg_l_const, rho_data_CRC_inorg_s_const, 
+                              rho_data_VDI_PPDS_2, rho_data_CRC_inorg_l_const, rho_data_CRC_inorg_s_const,
                               rho_data_CRC_virial)
 from chemicals.utils import Vm_to_rho
 from chemicals.identifiers import check_CAS
@@ -162,7 +162,7 @@ def test_VDI_PPDS_2_data():
     tots_calc = [rho_data_VDI_PPDS_2[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'rhoc', u'MW']]
     tots = [208878.27130000002, 117504.59450000001, 202008.99950000001, 85280.333600000013, 150142.28, 97269, 27786.919999999998]
     assert_allclose(tots_calc, tots)
-    
+
     assert rho_data_VDI_PPDS_2.index.is_unique
     assert rho_data_VDI_PPDS_2.shape == (272, 8)
 

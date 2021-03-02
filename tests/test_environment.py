@@ -48,10 +48,10 @@ def test_GWP():
 
     # No value
     assert GWP('7732-18-5', method=None) is None
-    
+
     assert GWP_methods('14882353275-98-3') == []
-    
-    
+
+
     assert type(GWP(CASRN='74-82-8')) is float
 
 @pytest.mark.slow
@@ -117,7 +117,7 @@ def test_ODP():
         ODP(CASRN='148875-98-3', method='BADMETHOD')
 
     assert ODP(CASRN='14882353275-98-3') == None
-    
+
     assert ODP_methods('14882353275-98-3') == []
 
 @pytest.mark.slow
