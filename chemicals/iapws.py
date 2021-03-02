@@ -185,6 +185,7 @@ IAPWS-95 Residual Terms
 """
 from __future__ import division
 from math import exp, log, sqrt
+from chemicals.utils import mark_numba_uncacheable
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
 from fluids.numerics import (secant, newton, trunc_log, trunc_exp, horner,
                              solve_2_direct, newton_system, broyden2,
@@ -3243,6 +3244,7 @@ def iapws_97_Prho_err_region3(T, P, rho):
     derr = iapws97_R*rho**2*dA_ddelta/iapws95_rhoc - iapws97_R*iapws95_Tc*rho**2*d2A_ddeltadtau/(T*iapws95_rhoc)
     return err, derr
 
+@mark_numba_uncacheable
 def iapws97_T(P, rho):
     r'''Calculate the temperature of water according to the IAPWS-97
     standard given a pressure `P` and mass density `rho`.
@@ -6574,6 +6576,7 @@ def iapws95_P(T, rho):
     return (1.0 + dAddelta_res_val*delta)*rho*(iapws95_R*T)
 
 
+@mark_numba_uncacheable
 def iapws95_T(P, rho):
     r'''Calculate the temperature of water according to the IAPWS-95
     standard given a density `rho` and pressure `P`.

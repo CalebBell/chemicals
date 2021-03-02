@@ -45,7 +45,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows',
 'solve_flow_composition_mix',
-'v_to_v_molar', 'v_molar_to_v', 'mark_jit_unsafe']
+'v_to_v_molar', 'v_molar_to_v']
 
 import os
 import sys
@@ -95,15 +95,18 @@ try:
 except:
     pass
 
-numba_blacklisted = []
+numba_blacklisted = ['mark_numba_incompatible', 'mark_numba_uncacheable']
 numba_cache_blacklisted = []
 
-def mark_jit_unsafe(f=None, cache=False):
-    if not f: return lambda f: mark_jit_unsafe(f, cache)
-    (numba_cache_blacklisted if cache else numba_blacklisted).append(f.__name__)
+def mark_numba_incompatible(f):
+    numba_blacklisted.append(f.__name__)
     return f
 
-@mark_jit_unsafe
+def mark_numba_uncacheable(f):
+    numba_cache_blacklisted.append(f.__name__)
+    return f
+
+@mark_numba_incompatible
 def to_num(values):
     r'''Legacy function to turn a list of strings into either floats
     (if numeric), stripped strings (if not) or None if the string is empty.
@@ -141,7 +144,7 @@ try:
 except:
     pass
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def hash_any_primitive(v):
     '''Method to hash a primitive - with basic support for lists and
     dictionaries.

@@ -94,7 +94,7 @@ __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
 
 import os
 from fluids.constants import k
-from chemicals import mark_jit_unsafe
+from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import exp, log, sin
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
@@ -139,7 +139,7 @@ Stockmayer_all_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
                           TEEGOTOSTEWARD1, BSLB, BSLM)
 '''Tuple of method name keys. See the `Stockmayer` for the actual references'''
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
     """Return all methods available to obtain the Stockmayer parameter for the
     desired chemical.
@@ -180,7 +180,7 @@ def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=Non
     if Tm: methods.append(BSLM)
     return methods
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
                method=None):
     r'''This function handles the retrieval or calculation a chemical's
@@ -282,7 +282,7 @@ molecular_diameter_all_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
                                   BSLC1, BSLB, BSLM)
 '''Tuple of method name keys. See the `molecular_diameter` for the actual references'''
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
                                omega=None, Vm=None, Vb=None):
     """Return all methods available to obtain the molecular diameter for the
@@ -331,7 +331,7 @@ def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
     if Vm: methods.append(BSLM)
     return methods
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
           Vm=None, Vb=None, method=None):
     r'''This function handles the retrieval or calculation a chemical's

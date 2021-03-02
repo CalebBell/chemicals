@@ -33,19 +33,12 @@ def transform():
     normal_fluids = fluids
     orig_file = __file__
     def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec):
-        numba_cache_blacklisted.extend([
-            'Rachford_Rice_solution', 'Rachford_Rice_solution_LN2',
-            'Rachford_Rice_solution_polynomial','Rachford_Rice_solution_numpy', 
-            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
-            'Rachford_Rice_solutionN', 'Rachford_Rice_solution2', 'flash_wilson',
-            'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'iapws97_T', 
-            'iapws95_T'])
         cache_blacklist = set(numba_cache_blacklisted)
         __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
         new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,
                                                         blacklist=set(numba_blacklisted),
                                                         cache_blacklist=cache_blacklist)
-        
+
         to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
              'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
@@ -81,14 +74,14 @@ def transform():
              'virial.Z_from_virial_density_form',
              ]
         normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist)
-    
+
         for mod in new_mods:
             mod.__dict__.update(__funcs)
             try:
                 __all__.extend(mod.__all__)
             except AttributeError:
                 pass
-    
+
     transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False)
     gdct.update(__funcs)
     gdct.update(replaced)

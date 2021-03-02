@@ -53,6 +53,7 @@ from math import exp, log
 
 from fluids.numerics import newton, brenth, oscillation_checker, secant, NotBoundedError
 
+from chemicals.utils import mark_numba_uncacheable
 from chemicals.rachford_rice import flash_inner_loop
 
 __all__ = ['K_value','Wilson_K_value', 'PR_water_K_value', 'flash_wilson',
@@ -330,6 +331,7 @@ def err_Wilson_PVF(T_guess, N, P_inv, VF, Tcs, Pcs, Ks, zs, xs, x50s):
         derr += xs[i]*(1.0 - x2*x3)*dKi_dT
     return err, derr
 
+@mark_numba_uncacheable
 def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
     r'''PVT flash model using Wilson's equation - useful for obtaining initial
     guesses for more rigorous models, or it can be used as its own model.

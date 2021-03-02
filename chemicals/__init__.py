@@ -24,7 +24,7 @@ SOFTWARE.
 
 import os
 from . import utils
-from .utils import mark_jit_unsafe
+from .utils import mark_numba_incompatible
 from . import critical
 from . import elements
 from . import reaction

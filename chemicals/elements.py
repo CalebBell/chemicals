@@ -67,7 +67,7 @@ __all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions',
            'serialize_formula', 'mixture_atomic_composition_ordered',
            'periodic_table']
 import re
-from chemicals import mark_jit_unsafe
+from chemicals.utils import mark_numba_incompatible
 
 CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7440-42-8', '7440-44-0', '7727-37-9', '7782-44-7', '7782-41-4', '7440-01-9', '7440-23-5', '7439-95-4', '7429-90-5', '7440-21-3', '7723-14-0', '7704-34-9', '7782-50-5', '7440-37-1', '7440-09-7', '7440-70-2', '7440-20-2', '7440-32-6', '7440-62-2', '7440-47-3', '7439-96-5', '7439-89-6', '7440-48-4', '7440-02-0', '7440-50-8', '7440-66-6', '7440-55-3', '7440-56-4', '7440-38-2', '7782-49-2', '7726-95-6', '7439-90-9', '7440-17-7', '7440-24-6', '7440-65-5', '7440-67-7', '7440-03-1', '7439-98-7', '7440-26-8', '7440-18-8', '7440-16-6', '7440-05-3', '7440-22-4', '7440-43-9', '7440-74-6', '7440-31-5', '7440-36-0', '13494-80-9', '7553-56-2', '7440-63-3', '7440-46-2', '7440-39-3', '7439-91-0', '7440-45-1', '7440-10-0', '7440-00-8', '7440-12-2', '7440-19-9', '7440-53-1', '7440-54-2', '7440-27-9', '7429-91-6', '7440-60-0', '7440-52-0', '7440-30-4', '7440-64-4', '7439-94-3', '7440-58-6', '7440-25-7', '7440-33-7', '7440-15-5', '7440-04-2', '7439-88-5', '7440-06-4', '7440-57-5', '7439-97-6', '7440-28-0', '7439-92-1', '7440-69-9', '7440-08-6', '7440-68-8', '10043-92-2', '7440-73-5', '7440-14-4', '7440-34-8', '7440-29-1', '7440-13-3', '7440-61-1', '7439-99-8', '7440-07-5', '7440-35-9', '7440-51-9', '7440-40-6', '7440-71-3', '7429-92-7', '7440-72-4', '7440-11-1', '10028-14-5', '22537-19-5', '53850-36-5', '53850-35-4', '54038-81-2', '54037-14-8', '54037-57-9', '54038-01-6', '54083-77-1', '54386-24-2', '54084-26-3', '54084-70-7', '54085-16-4', '54085-64-2', '54100-71-9', '54101-14-3', '54144-19-3']
 '''Standard CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118.'''
@@ -554,7 +554,7 @@ True
 '''
 del openbabel_element_data
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def molecular_weight(atoms):
     r'''Calculates molecular weight of a molecule given a dictionary of its
     atoms and their counts, in the format {symbol: count}.
@@ -603,7 +603,7 @@ def molecular_weight(atoms):
             raise ValueError('Molecule includes unknown atoms')
     return MW
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def mass_fractions(atoms, MW=None):
     r'''Calculates the mass fractions of each element in a compound,
     given a dictionary of its atoms and their counts, in the format
@@ -654,7 +654,7 @@ def mass_fractions(atoms, MW=None):
             raise ValueError('Molecule includes unknown atoms')
     return mfracs
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def atom_fractions(atoms):
     r'''Calculates the atomic fractions of each element in a compound,
     given a dictionary of its atoms and their counts, in the format
@@ -695,7 +695,7 @@ def atom_fractions(atoms):
         afracs[i] = atoms[i]/count
     return afracs
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def mixture_atomic_composition(atomss, zs):
     r'''Simple function to calculate the atomic average composition of a
     mixture, using the mole fractions of each species and their own atomic
@@ -730,7 +730,7 @@ def mixture_atomic_composition(atomss, zs):
                 ans[key] = val*zs_i
     return ans
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def mixture_atomic_composition_ordered(atomss, zs):
     r'''Simple function to calculate the atomic average composition of a
     mixture, using the mole fractions of each species and their own atomic
@@ -769,7 +769,7 @@ def mixture_atomic_composition_ordered(atomss, zs):
         eles.append(k)
     return nums, eles
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def atom_matrix(atomss, atom_IDs=None):
     r'''Simple function to create a matrix of elements in each compound, where
     each row has the same elements.
@@ -817,7 +817,7 @@ def atom_matrix(atomss, atom_IDs=None):
 
     return element_matrix
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def similarity_variable(atoms, MW=None):
     r'''Calculates the similarity variable of an compound, as defined in [1]_.
     Currently only applied for certain heat capacity estimation routines.
@@ -859,7 +859,7 @@ def similarity_variable(atoms, MW=None):
         MW = molecular_weight(atoms)
     return sum(atoms.values())/MW
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def atoms_to_Hill(atoms):
     r'''Determine the Hill formula of a compound, given a dictionary of its
     atoms and their counts, in the format {symbol: count}.
@@ -920,7 +920,7 @@ def atoms_to_Hill(atoms):
 _simple_formula_parser_re_str = r'([A-Z][a-z]{0,2})([\d\.\d]+)?'
 _simple_formula_parser_re = None # Delay creation to simple_formula_parser to speedup start
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def simple_formula_parser(formula):
     r'''Basic formula parser, primarily for obtaining element counts from
     formulas as formated in PubChem. Handles formulas with integer or decimal
@@ -976,7 +976,7 @@ bracketed_charge_re_str = r'\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$'
 formula_token_matcher_rational = bracketed_charge_re = None
 letter_set = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def nested_formula_parser(formula, check=True):
     r'''Improved formula parser which handles braces and their multipliers,
     as well as rational element counts.
@@ -1064,7 +1064,7 @@ def nested_formula_parser(formula, check=True):
                 ans[ele] = count
     return ans
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def charge_from_formula(formula):
     r'''Basic formula parser to determine the charge from a formula - given
     that the charge is already specified as one element of the formula.
@@ -1120,7 +1120,7 @@ def charge_from_formula(formula):
     else:
         return multiplier*count
 
-@mark_jit_unsafe
+@mark_numba_incompatible
 def serialize_formula(formula):
     r'''Basic formula serializer to construct a consistently-formatted formula.
     This is necessary for handling user-supplied formulas, which are not always
