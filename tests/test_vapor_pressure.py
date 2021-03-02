@@ -59,11 +59,11 @@ def test_Antoine():
     # Methane, coefficients from [1]_, at 100 K:
     Psat = Antoine(100.0, 8.7687, 395.744, -6.469)
     assert_allclose(Psat, 34478.367349639906)
-    
+
     # Tetrafluoromethane, coefficients from [1]_, at 180 K
     Psat = Antoine(180, A=8.95894, B=510.595, C=-15.95)
     assert_allclose(Psat, 702271.0518579542)
-    
+
     # Oxygen at 94.91 K, with coefficients from [3]_ in units of °C, mmHg, log10,
     # showing the conversion of coefficients A (mmHg to Pa) and C (°C to K)
     Psat = Antoine(94.91, 6.83706+2.1249, 339.2095, 268.70-273.15)
@@ -73,7 +73,7 @@ def test_Antoine_fit_extrapolate():
     T = 178.01
     A, B, C =  (24.0989474955895, 4346.793091137991, -18.96968471040141)
     Psat, dPsat_dT, d2Psat_dT2 = (0.03946094565666715, 0.006781441203850251, 0.0010801244983894853)
-    
+
     assert_close(Psat, Antoine(T, A, B, C, base=e), rtol=1e-10)
     dPsat_dT_num = derivative(lambda T: Antoine(T, A, B, C, base=e), T, dx=T*1e-9)
     assert_close(dPsat_dT_num, dPsat_dT, rtol=1e-7)
@@ -104,16 +104,16 @@ def test_test_Antoine_AB():
 def test_Antoine_AB_fit_extrapolate():
     T = 178.01
     Psat, dPsat_dT, d2Psat_dT2 = (0.03946094565666715, 0.006781441203850251, 0.0010801244983894853)
-    
+
     A, B = (27.358925161569008, 5445.569591293226)
     C = 0.0
     assert_close(Psat, Antoine(T, A, B, C, base=e), rtol=1e-10)
     dPsat_dT_num = derivative(lambda T: Antoine(T, A, B, C, base=e), T, dx=T*1e-9)
     assert_close(dPsat_dT_num, dPsat_dT, rtol=1e-7)
     # d2Psat_dT2_num = derivative(lambda T: Antoine(T, A, B, C, base=e), T, dx=T*1e-7, n=2, order=13)
-    
+
     d2Psat_dT2_analytical = B*(B/T - 2)*exp(A - B/T)/T**3
-    
+
     # Second derivative does not match, but is similar - small jump
     assert_close(d2Psat_dT2, d2Psat_dT2_analytical, rtol=1e-2)
 
@@ -139,7 +139,7 @@ def test_WagnerMcGarry():
 
 def test_AntoinePoling():
     sums_calc =  [Psat_data_AntoinePoling[i].abs().sum() for i in ['A', 'B', 'C', 'Tmin', 'Tmax']]
-    sums = [2959.75131, 398207.29786, 18732.24601, 86349.09, 120340.66]
+    sums = [2959.75131, 398207.29786, 18532.246009999995, 86349.09, 120340.66]
     assert_allclose(sums_calc, sums)
 
     assert Psat_data_AntoinePoling.index.is_unique
@@ -165,7 +165,7 @@ def test_AntoineExtended():
     assert Psat_data_AntoineExtended.index.is_unique
     assert Psat_data_AntoineExtended.shape == (97, 11)
     assert all([check_CAS(i) for i in Psat_data_AntoineExtended.index])
-    
+
 def test_VDI_PPDS_3_data():
     """I believe there are no errors here.
 
@@ -176,7 +176,7 @@ def test_VDI_PPDS_3_data():
     tots_calc = [Psat_data_VDI_PPDS_3[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'Pc', u'Tm']]
     tots = [2171.4607300000002, 694.38631999999996, 931.3604499999999, 919.88944000000004, 150225.16000000003, 1265565000, 56957.849999999991]
     assert_allclose(tots_calc, tots)
-    
+
     assert Psat_data_VDI_PPDS_3.index.is_unique
     assert Psat_data_VDI_PPDS_3.shape == (275, 8)
 
@@ -208,7 +208,7 @@ def test_Ambrose_Walton():
     Psat = Ambrose_Walton(347.25, 617.15, 36.09E5, 0.304)
     assert_allclose(Psat, 13278.878504306222)
 
-    
+
 def test_Edalat():
     # No check data, but gives the same results as the other CSP relationships
     Psat = Edalat(347.2, 617.1, 36E5, 0.299)
@@ -241,7 +241,7 @@ def test_Psat_IAPWS():
     assert_close(Psat, 2638897.7562732217, rtol=1e-12)
     Psat = Psat_IAPWS(600.)
     assert_close(Psat, 12344314.578376647, rtol=1e-12)
-    
+
     # Points obtained with CoolProp
     assert_close(dPsat_IAPWS_dT(300.0), 207.88388134164325327, rtol=5e-15)
     assert_close(dPsat_IAPWS_dT(500.0), 49008.859762957346618, rtol=5e-15)
@@ -256,9 +256,9 @@ def test_Tsat_IAPWS():
     assert_close(Tsat, 453.0356323914666, rtol=1e-13)
     Tsat = Tsat_IAPWS(1E7)
     assert_close(Tsat, 584.1494879985282, rtol=1e-13)
-    
+
     assert_close(Tsat_IAPWS(Psat_IAPWS(553.123521)), 553.123521, rtol=1e-13)
-    
+
     T_min = 159.77353993926621
     assert_close(Tsat_IAPWS(Psat_IAPWS(T_min)), T_min, rtol=1e-13)
 

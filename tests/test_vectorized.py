@@ -34,4 +34,4 @@ def test_Tc_multi():
     Tcs_vec = chemicals.vectorized.Tc(['108-88-3', '7732-18-5'])
     assert_close1d(Tcs_simple, Tcs_vec)
 
-    
+

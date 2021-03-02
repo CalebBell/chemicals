@@ -52,9 +52,9 @@ def test_Henry_converter():
     test_values = [1.2E-05, 0.0012159, 0.0297475, 1.20361E-08, 0.00121956,
                    2.19707E-05, 0.0272532, 45515.2, 83333.3, 0.822436, 33.6163,
                    4611823929.1419935]
-    test_scales = [HENRY_SCALES_HCP, HENRY_SCALES_HCP_MOLALITY, HENRY_SCALES_HCC, 
-                   HENRY_SCALES_HBP_SI, HENRY_SCALES_HBP, HENRY_SCALES_HXP, 
-                   HENRY_SCALES_BUNSEN, HENRY_SCALES_KHPX, HENRY_SCALES_KHPC_SI, 
+    test_scales = [HENRY_SCALES_HCP, HENRY_SCALES_HCP_MOLALITY, HENRY_SCALES_HCC,
+                   HENRY_SCALES_HBP_SI, HENRY_SCALES_HBP, HENRY_SCALES_HXP,
+                   HENRY_SCALES_BUNSEN, HENRY_SCALES_KHPX, HENRY_SCALES_KHPC_SI,
                    HENRY_SCALES_KHPC, HENRY_SCALES_KHCC, HENRY_SCALES_SI]
     for v, scales in zip(test_values, test_scales):
         for scale in scales:
@@ -68,7 +68,7 @@ def test_Henry_converter():
 def test_Henry_pressure():
     H = Henry_pressure(300.0, A=15.0, B=300.0, C=.04, D=1e-3, E=1e2, F=1e-5)
     assert_close(H, 37105004.47898146)
-    
+
 def test_Henry_pressure_mixture():
     H = Henry_pressure_mixture([1072330.36341, 744479.751106, None], zs=[.48, .48, .04])
     assert_close(H, 893492.1611602883)

@@ -65,8 +65,8 @@ def test_k_air_lemmon():
     assert_close(0.009359024866082538, k_air_lemmon(100.0, 0.0), rtol=1e-13)
     # residual contribution check
     assert_close(0.06767561978576218, k_air_lemmon(1000.0, 10.0), rtol=1e-13)
-    
-    
+
+
     assert round(k_air_lemmon(100.0, 0.0), 8) == 0.00935902
     assert round(k_air_lemmon(300.0, 0.0), 8) == 0.0263529
     assert 0.119221 == round(k_air_lemmon(100.0, 28000, 55.2692672373821, 28.34619888255363, 0.0001121942174621181, 3.74860727627286e-05, 0.00010792259486711741), 6)
@@ -85,7 +85,7 @@ def test_Perrys2_314_data():
     tots_calc = [k_data_Perrys_8E_2_314[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
     tots = [48935634.823768869, 297.41545078799999, 421906466448.71423, 232863514627157.62, 125020.26000000001, 347743.42000000004]
     assert_close(tots_calc, tots)
-    
+
     assert k_data_Perrys_8E_2_314.index.is_unique
     assert k_data_Perrys_8E_2_314.shape == (345, 7)
 
@@ -99,7 +99,7 @@ def test_Perrys2_315_data():
     tots_calc = [k_data_Perrys_8E_2_315[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'C5', u'Tmin', u'Tmax']]
     tots = [82.001667499999996, 0.19894598900000002, 0.0065330144999999999, 0.00046928630199999995, 1.0268010799999999e-07, 70996.369999999995, 138833.41]
     assert_close1d(tots_calc, tots)
-    
+
     assert k_data_Perrys_8E_2_315.index.is_unique
     assert k_data_Perrys_8E_2_315.shape == (340, 8)
 
@@ -120,7 +120,7 @@ def test_VDI_PPDS_10_data():
     tots_calc = [k_data_VDI_PPDS_10[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [2.2974640014599998, 0.015556001460000001, 1.9897655000000001e-05, 6.7747269999999993e-09, 2.3260109999999999e-12]
     assert_close1d(tots_calc, tots)
-    
+
     assert k_data_VDI_PPDS_10.index.is_unique
     assert k_data_VDI_PPDS_10.shape == (275, 6)
 
@@ -138,7 +138,7 @@ def test_VDI_PPDS_9_data():
     tots_calc = [k_data_VDI_PPDS_9[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
     tots = [63.458699999999993, 0.14461469999999998, 0.00042270770000000005, 1.7062660000000002e-06, 3.2715370000000003e-09]
     assert_close1d(tots_calc, tots)
-    
+
     assert k_data_VDI_PPDS_9.index.is_unique
     assert k_data_VDI_PPDS_9.shape == (271, 6)
 
@@ -165,7 +165,7 @@ def test_CSP_liq():
 
     kl = Bahadori_liquid(273.15, 170)
     assert_close(kl, 0.14274278108272603)
-    
+
     kl = kl_Mersmann_Kind(400, 170.33484, 658.0, 0.000754, 38)
     assert_close(kl, 0.0895271829899285)
 
@@ -261,16 +261,16 @@ def test_Wassiljewa_Herning_Zipperer():
     MWs = [40, 50, 60]
     zs = [.1, .4, .5]
     kgs = [.01, .015, .025]
-    
+
     k = Wassiljewa_Herning_Zipperer(zs, kgs, MWs)
     assert_close(k, 0.01984976897415608, rtol=1e-13)
-    
+
     MWs = [40.0, 50.0, 60.0]
     zs = [.1, .4, .5]
     ks = [1.002E-5, 1.15E-5, 2e-5]
     k = Wassiljewa_Herning_Zipperer(zs, ks, MWs)
     assert_close(k, 1.5861181979916883e-05, rtol=1e-13)
-    
+
     MW_roots = [i**0.5 for i in MWs]
     k = Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots)
     assert_close(k, 1.5861181979916883e-05, rtol=1e-13)

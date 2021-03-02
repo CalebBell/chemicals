@@ -38,7 +38,7 @@ def test_data():
 
 def test_conversion():
     # TODO actually test data points instead of covering everything in a slow test
-    
+
     T2 = T_converter(500, 'ITS-68', 'ITS-48')
     assert_close(T2, 499.9470092992346)
 
@@ -58,7 +58,7 @@ def test_conversion():
                 assert_close(T_converter(T, scale2, scale1), Ti, rtol=1e-6)
 
     low_scales = ('ITS-90', 'ITS-68', 'ITS-76')
-    
+
     for Ti in (15, 17, 19, 21, 23, 25):
         for scale1 in low_scales:
             for scale2 in low_scales:

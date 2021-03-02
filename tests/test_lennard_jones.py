@@ -109,7 +109,7 @@ def test_molecular_diameter_all_values():
     # Use the default method for each chemical in this file
     MDs_sum = sum([molecular_diameter(CASRN=i) for i in LJ_data_Magalhaes.index])
     assert_close(MDs_sum, 1995.8174799999997)
-    
+
 def test_molecular_diameter_function():
 
     assert_close(4.23738, molecular_diameter(CASRN='64-17-5'))
@@ -187,7 +187,7 @@ def test_collision_integral():
 
     with pytest.raises(Exception):
         collision_integral_Kim_Monroe(0.3, l=8, s=22)
-        
+
     all_keys = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (3, 3), (3, 4), (3, 5), (4, 4)]
     for i in range(len(all_keys)):
         collision_integral_Neufeld_Janzen_Aziz(2.125, l=all_keys[i][0], s=all_keys[i][1])

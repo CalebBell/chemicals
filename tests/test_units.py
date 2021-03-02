@@ -40,17 +40,17 @@ def test_misc_units():
 
 def test_speed_of_sound():
     v = speed_of_sound(V=0.00229754*u.m**3/u.mol, dP_dV=-3.5459e+08*u("Pa*mol/m^3"), Cp=153.235*u("J/mol/K"), Cv=132.435*u("J/mol/K"), MW=67.152*u("g/mol"))
-    
+
     assert_pint_allclose(v, 179.5868138460819, {'[length]': 1, '[time]': -1})
-    
+
     v = speed_of_sound(V=0.00229754*u.m**3/u.mol, dP_dV=-3.5459e+08*u("Pa*mol/m^3"), Cp=153.235*u("J/mol/K"), Cv=132.435*u("J/mol/K"))
-    
+
     assert_pint_allclose(v, 46.537593457316525, {'[length]': 1, '[mass]': 0.5, '[substance]': -0.5, '[time]': -1})
 
 
 def test_heat_capacity_variable_units():
     S = Lastovka_solid_integral_over_T(300*u.K, 0.2139*u.mol/u.g)
     assert_pint_allclose(S, 1947.5537561495564, {'[length]': 2, '[temperature]': -1, '[time]': -2})
-    
+
     S = Lastovka_solid_integral_over_T(300*u.K, 0.2139*u.mol/u.g, MW=48*u.g/u.mol)
     assert_pint_allclose(S, 93.4825802951787, {'[length]': 2, '[mass]': 1, '[substance]': -1, '[temperature]': -1, '[time]': -2})

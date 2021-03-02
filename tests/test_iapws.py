@@ -33,7 +33,7 @@ from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspa
 from chemicals.vapor_pressure import Psat_IAPWS
 from chemicals.iapws import (REGION_3A, REGION_3B, REGION_3C, REGION_3D, REGION_3E, REGION_3F, REGION_3G,
                              REGION_3H, REGION_3I, REGION_3J, REGION_3K, REGION_3L, REGION_3M, REGION_3N,
-                             REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U, 
+                             REGION_3O, REGION_3P, REGION_3Q, REGION_3R, REGION_3S, REGION_3T, REGION_3U,
                              REGION_3V, REGION_3W, REGION_3X, REGION_3Y, REGION_3Z)
 from chemicals.iapws import (iapws_97_Trho_err_region1, iapws_97_Trho_err_region2, iapws_97_Trho_err_region5,
                              iapws_97_Prho_err_region1, iapws_97_Prho_err_region2, iapws_97_Prho_err_region5,
@@ -45,7 +45,7 @@ def make_me_precise():
     globals()['log'] = mp.log
     globals()['sqrt'] = mp.sqrt
     mp.mp.dps = 50
-    
+
     import fluids.numerics
     fluids.numerics.exp = mp.exp
     fluids.numerics.log = mp.log
@@ -59,7 +59,7 @@ def make_me_float():
     import fluids.numerics
     fluids.numerics.exp = math.exp
     fluids.numerics.log = math.log
-    
+
 ### IAPWS Naive Functions
 ### Regoin 1
 nis1 = [0.14632971213167, -0.84548187169114, -0.37563603672040E1,
@@ -255,11 +255,11 @@ def test_iapws97_d2G_dtau2_region1():
 
 def test_iapws97_d2G_dpidtau_region1():
     assert_close(iapws97_d2G_dpidtau_region1(4.8, .8), 0.02436120286448202, rtol=1e-12)
-    
+
 ### Fast equation fuzz tests
 # check that floating points are behaving nicely
 # The only two constants in this world are death and floating point error.
-    
+
 @pytest.mark.fuzz
 @pytest.mark.slow
 def test_iapws97_region1_fuzz():
@@ -275,13 +275,13 @@ def test_iapws97_region1_fuzz():
 #    funcs_fast = [iapws97_d2G_dpidtau_region1]
 #    atols = [1e-16]
 #    rtols = [2e-12]
-    
+
     N = 500
     Ts = linspace(273.15, 623.15, N)
     def test_Ps(T, N):
         Psat = Psat_IAPWS(T)
         return logspace(log10(Psat), log10(100e6), N)
-    
+
     for naive, fast, rtol, atol in zip(funcs_naive, funcs_fast, rtols, atols):
         for T in Ts:
             tau = 1386.0/T
@@ -301,7 +301,7 @@ def test_iapws97_d2G0_dtau2_region2():
 
 def test_iapws97_Gr_region2():
     assert_close(iapws97_Gr_region2(.7, .2), -0.0015296155747292416, rtol=1e-12)
-    
+
 def test_iapws97_dGr_dtau_region2():
     assert_close( iapws97_dGr_dtau_region2(.7, .2), -0.00865815941508857, rtol=1e-12)
 
@@ -323,12 +323,12 @@ def test_iapws97_d2Gr_dpi2_region2():
 def test_iapws97_region2_fuzz():
     funcs_naive = [iapws97_d2G0_dtau2_region2_naive, iapws97_dG0_dtau_region2_naive, iapws97_G0_region2_naive, iapws97_d2Gr_dpidtau_region2_naive, iapws97_d2Gr_dtau2_region2_naive, iapws97_dGr_dtau_region2_naive, iapws97_d2Gr_dpi2_region2_naive, iapws97_Gr_region2_naive, iapws97_dGr_dpi_region2_naive]
     funcs_fast = [iapws97_d2G0_dtau2_region2, iapws97_dG0_dtau_region2, iapws97_G0_region2,
-                  
+
                   iapws97_d2Gr_dpidtau_region2, iapws97_d2Gr_dtau2_region2, iapws97_dGr_dtau_region2,
                   iapws97_d2Gr_dpi2_region2, iapws97_Gr_region2, iapws97_dGr_dpi_region2]
     atols = [0, 0, 1e-14, 0, 0, 0.0, 3e-18, 0, 0, ]
     rtols = [1e-14, 1e-14, 5e-15, 2e-14, 2e-14, 2e-15, 1e-14, 2e-15, 2e-15]
-    
+
     N = 200 # tested up to 2000
     P_lim = 1e-6
     Ts = linspace(273.15, 1073.15, N)
@@ -336,7 +336,7 @@ def test_iapws97_region2_fuzz():
         upper_P = iapws97_boundary_2_3(T)
         if T <= 623.15:
             upper_P = min(Psat_IAPWS(T), upper_P)
-        
+
         if upper_P < P_lim or upper_P > 100e6:
             # No valid points in region 2
             return []
@@ -383,7 +383,7 @@ def test_iapws97_region3_fuzz():
     rtols = [3e-12, 1e-11, 5e-13, 1e-12, 2e-12, 5e-14]
     N = 500
     Ts = linspace(623.15, 1073.15, N)
-    
+
     for naive, fast, rtol, atol in zip(funcs_naive, funcs_fast, rtols, atols):
 #        print(fast)
         # Do some points near where more region transitions are, and then up to the limit.
@@ -398,7 +398,7 @@ def test_iapws97_region3_fuzz():
                 upper_P = iapws97_boundary_2_3(T)*10.0
                 upper_P = min(upper_P, P_lim)
                 return logspace(log10(lower_P), log10(upper_P), N)
-        
+
             for T in Ts:
                 tau = 647.096/T
                 for P in test_Ps(T, N):
@@ -408,7 +408,7 @@ def test_iapws97_region3_fuzz():
                     assert_close(naive(tau, delta),
                                  fast(tau, delta), rtol=rtol, atol=atol)
 #test_iapws97_region3_fuzz()
-                    
+
 
 def test_iapws97_G0_region5_naive():
     assert_close(iapws97_G0_region5(.9, 1.01), -10.309167223118518, rtol=1e-13)
@@ -424,7 +424,7 @@ def test_iapws97_Gr_region5():
 
 def test_iapws97_dGr_dpi_region5():
     assert_close(iapws97_dGr_dpi_region5(.9, 1.01), -0.0015180281714734884, rtol=1e-13)
-    
+
 def test_iapws97_d2Gr_dpi2_region5():
     assert_close(iapws97_d2Gr_dpi2_region5(.9, 1.01), 1.9216694490837294e-07, rtol=1e-13)
 
@@ -436,35 +436,35 @@ def test_iapws97_d2Gr_dtau2_region5():
 
 def test_iapws97_d2Gr_dpidtau_region5():
     assert_close(iapws97_d2Gr_dpidtau_region5(.9, 1.01), -0.009039988008632744, rtol=1e-13)
-    
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_iapws97_region5_fuzz():
-    funcs_naive = [iapws97_d2G0_dtau2_region5_naive, iapws97_dG0_dtau_region5_naive, 
+    funcs_naive = [iapws97_d2G0_dtau2_region5_naive, iapws97_dG0_dtau_region5_naive,
                    iapws97_G0_region5_naive, iapws97_d2Gr_dpidtau_region5_naive,
                    iapws97_d2Gr_dtau2_region5_naive, iapws97_dGr_dtau_region5_naive,
                    iapws97_d2Gr_dpi2_region5_naive, iapws97_Gr_region5_naive,
                    iapws97_dGr_dpi_region5_naive]
     funcs_fast = [iapws97_d2G0_dtau2_region5, iapws97_dG0_dtau_region5,
-                  iapws97_G0_region5, 
-                  
-                  iapws97_d2Gr_dpidtau_region5, 
-                  iapws97_d2Gr_dtau2_region5, iapws97_dGr_dtau_region5, 
+                  iapws97_G0_region5,
+
+                  iapws97_d2Gr_dpidtau_region5,
+                  iapws97_d2Gr_dtau2_region5, iapws97_dGr_dtau_region5,
                   iapws97_d2Gr_dpi2_region5, iapws97_Gr_region5,
                   iapws97_dGr_dpi_region5]
     atols = [0, 0, 0, 0, 0, 0, 5e-21, 4e-17, 1e-18]
     rtols = [2e-15, 1e-15, 1e-15, 5e-15, 2e-15, 1e-14, 1e-14, 2e-14, 2e-14]
-    
+
 #    funcs_naive = [iapws97_Gr_region5_naive]
 #    funcs_fast = [iapws97_Gr_region5]
 #    atols = [4e-17]
 #    rtols = [2e-14]
-    
+
     N = 2000
     Ts = linspace(1073.15, 2273.15, N)
     def test_Ps(T, N):
         return logspace(log10(1e-6), log10(50e6), N)
-    
+
     for naive, fast, rtol, atol in zip(funcs_naive, funcs_fast, rtols, atols):
         errs = []
         erri = 0.0
@@ -489,10 +489,10 @@ def test_iapws97_dG_dpi_region1():
 
     assert_close(iapws97_dG_dpi_region1_naive(1386/277.15, 101325/16.53E6),
                  iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6), rtol=1e-14)
-    
+
     assert_close(iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6),
                  0.12923271825448354, rtol=1e-14)
-    
+
     # Point that had bad error with horner's method
     assert_close(iapws97_dG_dpi_region1(1386 / 600.15, 10001325 / 16.53E6),
                  0.09345587583404263, rtol=1e-14)
@@ -503,8 +503,8 @@ def test_iapws97_dG_dpi_region1():
 
 def test_iapws97_dG_dpi_region2():
     assert_close(iapws97_dGr_dpi_region2(.656, 16), -0.006292631931275252, rtol=1e-14)
-    
-    
+
+
     # Point that had bad error with horner's method
     assert_close(iapws97_dGr_dpi_region2(0.788009171330091, 26.87134177929712), -0.018525334158583723, rtol=1e-14)
 
@@ -513,38 +513,38 @@ def test_iapws97_dG_dpi_region5():
 
 def test_iapws_boundary_equations():
     assert_close(iapws97_boundary_2_3(0.623150000E3), 16529164.252621626, rtol=1e-13)
-    
+
     assert_close(iapws97_boundary_3uv(22.3E6), 647.7996121480069, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3ef(40E6), 713.959399239744, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3cd(25E6), 649.3659208321279, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3gh(25E6), 656.6980572261236, rtol=2e-14)
-    
+
     assert_close(iapws97_boundary_3ij(25E6), 660.7865756716819, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3jk(25E6), 668.1915358826951, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3mn(22.8E6), 649.6054132953997, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3qu(22E6), 645.6355027340121, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3rx(22E6), 648.2622753670172, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3wx(log(22.3), 1 / log(22.3)), 648.204947950734, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3ab(log(40), 1 / log(40)), 693.0341408296053, rtol=1e-14)
-    
+
     assert_close(iapws97_boundary_3op(log(22.8), 1 / log(22.8)), 650.010694314133, rtol=1e-14)
-    
+
 def test_iapws97_region_3_misc():
     assert iapws97_region_3(630, 50e6) == REGION_3A
     assert iapws97_region_3(709.5013, 50e6) == REGION_3B
     assert iapws97_region_3(709.5012, 50e6) == REGION_3A
-    
+
     assert iapws97_region_3(700.0, 30e6) == REGION_3F
-    
+
     # CoolProp differs but http://twt.mpei.ac.ru/MCS/Worksheets/iapws/IAPWS-IF97-Region3-VPT.xmcd confirms it is C here.
     # A test with IAPWS95 shows CoolProp matches the correct answer better
     # We are right next to a transition point / huge discontinuity here.
@@ -557,127 +557,127 @@ def test_iapws97_region_full_table():
     assert_close(1/iapws97_region3_rho(T=630, P=50e6), 0.001470853100110911, rtol=1e-13)
     assert iapws97_region_3(670, 80e6) == REGION_3A
     assert_close(1/iapws97_region3_rho(T=670, P=80e6), 0.0015038313585404727, rtol=1e-13)
-    
+
     assert iapws97_region_3(710.0, 50e6) == REGION_3B
     assert_close(1/iapws97_region3_rho(T=710, P=50e6), 0.0022047285870574838, rtol=1e-13)
     assert iapws97_region_3(750.0, 80e6) == REGION_3B
     assert_close(1/iapws97_region3_rho(T=750, P=80e6), 0.0019736929401211155, rtol=1e-13)
-    
+
     assert iapws97_region_3(630.0, 20e6) == REGION_3C
     assert_close(1/iapws97_region3_rho(T=630, P=20e6), 0.0017616964055295276, rtol=1e-13)
     assert iapws97_region_3(650.0, 30e6) == REGION_3C
     assert_close(1/iapws97_region3_rho(T=650, P=30e6), 0.0018195606165288332, rtol=1e-13)
-    
+
     assert iapws97_region_3(656.0, 26e6) == REGION_3D
     assert_close(1/iapws97_region3_rho(T=656, P=26e6), 0.002245587720029806, rtol=1e-13)
     assert iapws97_region_3(670.0, 30e6) == REGION_3D
     assert_close(1/iapws97_region3_rho(T=670, P=30e6), 0.002506897701629579, rtol=1e-13)
-    
+
     assert iapws97_region_3(661.0, 26e6) == REGION_3E
     assert_close(1/iapws97_region3_rho(T=661, P=26e6), 0.0029702259620031472, rtol=1e-13)
     assert iapws97_region_3(675.0, 30e6) == REGION_3E
     assert_close(1/iapws97_region3_rho(T=675, P=30e6), 0.0030046270863580073, rtol=1e-13)
-    
+
     assert iapws97_region_3(671.0, 26e6) == REGION_3F
     assert_close(1/iapws97_region3_rho(T=671, P=26e6), 0.00501902940104471, rtol=1e-13)
     assert iapws97_region_3(690.0, 30e6) == REGION_3F
     assert_close(1/iapws97_region3_rho(T=690, P=30e6), 0.004656470141685632, rtol=1e-13)
-    
+
     assert iapws97_region_3(649.0, 23.6e6) == REGION_3G
     assert_close(1/iapws97_region3_rho(T=649, P=23.6e6), 0.0021631983783137196, rtol=1e-13)
     assert iapws97_region_3(650.0, 24e6) == REGION_3G
     assert_close(1/iapws97_region3_rho(T=650, P=24e6), 0.0021660441609564836, rtol=1e-13)
-    
+
     assert iapws97_region_3(652.0, 23.6e6) == REGION_3H
     assert_close(1/iapws97_region3_rho(T=652, P=23.6e6), 0.002651081406573861, rtol=1e-13)
     assert iapws97_region_3(654.0, 24e6) == REGION_3H
     assert_close(1/iapws97_region3_rho(T=654, P=24e6), 0.0029678023349397832, rtol=1e-13)
-    
+
     assert iapws97_region_3(653.0, 23.6e6) == REGION_3I
     assert_close(1/iapws97_region3_rho(T=653, P=23.6e6), 0.003273916815935874, rtol=1e-13)
     assert iapws97_region_3(655.0, 24e6) == REGION_3I
     assert_close(1/iapws97_region3_rho(T=655, P=24e6), 0.0035503298636594843, rtol=1e-13)
-    
+
     assert iapws97_region_3(655.0, 23.5e6) == REGION_3J
     assert_close(1/iapws97_region3_rho(T=655, P=23.5e6), 0.004545001141649382, rtol=1e-13)
     assert iapws97_region_3(660.0, 24e6) == REGION_3J
     assert_close(1/iapws97_region3_rho(T=660, P=24e6), 0.005100267703573203, rtol=1e-13)
-    
+
     assert iapws97_region_3(660.0, 23e6) == REGION_3K
     assert_close(1/iapws97_region3_rho(T=660, P=23e6), 0.006109525996886692, rtol=1e-13)
     assert iapws97_region_3(670.0, 24e6) == REGION_3K
     assert_close(1/iapws97_region3_rho(T=670, P=24e6), 0.0064273256447015745, rtol=1e-13)
-    
+
     assert iapws97_region_3(646.0, 22.6e6) == REGION_3L
     assert_close(1/iapws97_region3_rho(T=646, P=22.6e6), 0.0021178608506781027, rtol=1e-13)
     assert iapws97_region_3(646.0, 23e6) == REGION_3L
     assert_close(1/iapws97_region3_rho(T=646, P=23e6), 0.002062374674146725, rtol=1e-13)
-    
+
     assert iapws97_region_3(648.6, 22.6e6) == REGION_3M
     assert_close(1/iapws97_region3_rho(T=648.6, P=22.6e6), 0.002533063780421483, rtol=1e-13)
     assert iapws97_region_3(649.3, 22.8e6) == REGION_3M
     assert_close(1/iapws97_region3_rho(T=649.3, P=22.8e6), 0.0025729717809150347, rtol=1e-13)
-    
+
     assert iapws97_region_3(649, 22.6e6) == REGION_3N
     assert_close(1/iapws97_region3_rho(T=649, P=22.6e6), 0.0029234327109982578, rtol=1e-13)
     assert iapws97_region_3(649.7, 22.8e6) == REGION_3N
     assert_close(1/iapws97_region3_rho(T=649.7, P=22.8e6), 0.0029133114940412745, rtol=1e-13)
-    
+
     assert iapws97_region_3(649.1, 22.6e6) == REGION_3O
     assert_close(1/iapws97_region3_rho(T=649.1, P=22.6e6), 0.003131208996006528, rtol=1e-13)
     assert iapws97_region_3(649.9, 22.8e6) == REGION_3O
     assert_close(1/iapws97_region3_rho(T=649.9, P=22.8e6), 0.003221160277936286, rtol=1e-13)
-    
+
     assert iapws97_region_3(649.4, 22.6e6) == REGION_3P
     assert_close(1/iapws97_region3_rho(T=649.4, P=22.6e6), 0.0037155961864873133, rtol=1e-13)
     assert iapws97_region_3(650.2, 22.8e6) == REGION_3P
     assert_close(1/iapws97_region3_rho(T=650.2, P=22.8e6), 0.0036647547896187177, rtol=1e-13)
-    
+
     assert iapws97_region_3(640, 21.1E6) == REGION_3Q
     assert_close(1/iapws97_region3_rho(T=640, P=21.1E6), 0.001970999271891958, rtol=1e-13)
     assert iapws97_region_3(643, 21.8E6) == REGION_3Q
     assert_close(1/iapws97_region3_rho(T=643, P=21.8E6), 0.002043919160913867, rtol=1e-13)
-    
+
     assert iapws97_region_3(644, 21.1E6) == REGION_3R
     assert_close(1/iapws97_region3_rho(T=644, P=21.1E6), 0.00525100992110033, rtol=1e-13)
     assert iapws97_region_3(648, 21.8E6) == REGION_3R
     assert_close(1/iapws97_region3_rho(T=648, P=21.8E6), 0.00525684474078012, rtol=1e-13)
-    
+
     assert iapws97_region_3(635.0, 19.1e6) == REGION_3S
     assert_close(1/iapws97_region3_rho(T=635, P=19.1e6), 0.0019328290790263667, rtol=1e-13)
     assert iapws97_region_3(638.0, 20e6) == REGION_3S
     assert_close(1/iapws97_region3_rho(T=638, P=20e6), 0.0019853872274726695, rtol=1e-13)
-    
+
     assert iapws97_region_3(626, 17e6) == REGION_3T
     assert_close(1/iapws97_region3_rho(T=626, P=17e6), 0.008483262001139871, rtol=1e-13)
     assert iapws97_region_3(640, 20e6) == REGION_3T
     assert_close(1/iapws97_region3_rho(T=640, P=20e6), 0.006227528101006945, rtol=1e-13)
-    
+
     assert iapws97_region_3(644.6, 21.5e6) == REGION_3U
     assert_close(1/iapws97_region3_rho(T=644.6, P=21.5e6), 0.002268366646629464, rtol=1e-13)
     assert iapws97_region_3(646.1, 22e6) == REGION_3U
     assert_close(1/iapws97_region3_rho(T=646.1, P=22e6), 0.0022963505532551556, rtol=1e-13)
-    
+
     assert iapws97_region_3(648.6, 22.5e6) == REGION_3V
     assert_close(1/iapws97_region3_rho(T=648.6, P=22.5e6), 0.002832373260251989, rtol=1e-13)
     assert iapws97_region_3(647.9, 22.3e6) == REGION_3V
     assert_close(1/iapws97_region3_rho(T=647.9, P=22.3e6), 0.0028114244045568644, rtol=1e-13)
-    
+
     assert iapws97_region_3(647.5, 22.15e6) == REGION_3W
     assert_close(1/iapws97_region3_rho(T=647.5, P=22.15e6), 0.003694032280598682, rtol=1e-13)
     assert iapws97_region_3(648.1, 22.3e6) == REGION_3W
     assert_close(1/iapws97_region3_rho(T=648.1, P=22.3e6), 0.0036222263053987108, rtol=1e-13)
-    
+
     assert iapws97_region_3(648, 22.11e6) == REGION_3X
     assert_close(1/iapws97_region3_rho(T=648, P=22.11e6), 0.004528072648832488, rtol=1e-13)
     assert iapws97_region_3(649, 22.3e6) == REGION_3X
     assert_close(1/iapws97_region3_rho(T=649, P=22.3e6), 0.004556905798876878, rtol=1e-13)
-    
+
     assert iapws97_region_3(646.84, 22e6) == REGION_3Y
     assert_close(1/iapws97_region3_rho(T=646.84, P=22e6), 0.0026983547189247956, rtol=3e-13)
     assert iapws97_region_3(647.05, 22.064e6) == REGION_3Y
     assert_close(1/iapws97_region3_rho(T=647.05, P=22.064e6), 0.0027176556481596707, rtol=3e-12)
-    
+
     assert iapws97_region_3(646.89, 22e6) == REGION_3Z
     assert_close(1/iapws97_region3_rho(T=646.89, P=22e6), 0.003798732962152225, rtol=2e-12)
     assert iapws97_region_3(647.15, 22.064e6) == REGION_3Z
@@ -685,12 +685,12 @@ def test_iapws97_region_full_table():
 
 
 
-def test_iapws97_rho(): 
+def test_iapws97_rho():
     assert_close(iapws97_rho(T=330, P=8e5), 985.1049808079207)
     assert_close(iapws97_rho(T=823, P=14e6), 40.39293607288123)
     assert_close(iapws97_rho(T=2000, P=3e7), 32.11456228328856)
     assert_close(iapws97_rho(648.6, 22.5e6), 353.06081088726)
-    
+
     # Vapor pressure boundary
     assert_close(iapws97_rho(432.0135947190398, 600559.0434678708, True), 3.171654556869339)
     assert_close(iapws97_rho(432.0135947190398, 600559.0434678708, False), 908.5584542274903)
@@ -713,7 +713,7 @@ def test_iapws97_region_3_rho_coolprop():
             upper_P = iapws97_boundary_2_3(T)*10.0
             upper_P = min(upper_P, P_lim)
             return logspace(log10(lower_P), log10(upper_P), N)
-    
+
         for T in Ts:
             for P in test_Ps(T, 100):
                 assert iapws97_identify_region_TP(T, P) == 3
@@ -724,8 +724,8 @@ def test_iapws97_region_3_rho_coolprop():
     #            except:
     #                print([T, P, 1-rho_CoolProp/rho_implemented])
 #test_iapws97_region_3_rho_coolprop()
-    
-    
+
+
 @pytest.mark.CoolProp
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -759,23 +759,23 @@ def iapws97_dGr_dpi_region2_fastest(tau, pi):
     taut21 = taut13*taut8
     taut29 = taut21*taut8
     # 53 from 13*13*!3*!3*3
-    # 57 from 
+    # 57 from
     return (pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi*(pi2*pi2*pi2*(pi2*(pi2
         *(pi*(pi*(pi*(pi*taut13*taut13*(taut13*taut*(1.32995316841867198e-15 - 0.0000226487297378903988*taut13*taut4*taut)
         + 1.75410265428146418e-27) - 2.93678005497663003e-14*taut29*taut8*taut2) + 0.0000832192847496054092*taut*taut21*taut29*taut3)
     - 1.24017662339841913e-24*taut21) + taut8*taut8*taut4*(taut13*taut2*(6.1258633752463995e-12
-    - 0.0000840049353964159951*taut13) + 1.78371690710842005e-23)) - 6.05920510335077989*taut21*taut21*taut13*taut2) 
+    - 0.0000840049353964159951*taut13) + 1.78371690710842005e-23)) - 6.05920510335077989*taut21*taut21*taut13*taut2)
     + taut29*(1.71088510070543998*taut21 - 1.29412653835175996e-9)) + taut4*(taut6
     *(-1.00181793795109993e-8*taut4 - 1.02347470959289996e-12) + 1.04069652101739995e-18))
     + 1.78287415218792009e-7*taut13) + taut4*taut4*(9.00496908836719986e-11 - 65.8490727183984035*taut13*taut13*taut2))
     + taut6*taut4*taut*(-0.27262789705017304*taut6*taut6*taut2 - 8.83526622937069987e-6) - 4.13416950269890026e-17)
     + taut3*(taut13*(-143.374451604623999*taut13*taut6 - 0.012702883392812999) - 1.00288598706366e-10))
     + 0.0000114610381688305001*taut6*taut) + taut*(taut*(1.92901490874028006e-6*taut + 5.11628714091400033e-8)
-    - 3.15389238237468004e-9)) + taut*(taut2*(taut3*(-0.122004760687946995*taut21*taut8 
+    - 3.15389238237468004e-9)) + taut*(taut2*(taut3*(-0.122004760687946995*taut21*taut8
     - 0.00451017736264439952) - 0.0000968330317157100001) + 1.31612001853305008e-6) + 6.14452130769269999e-8)
-    + taut*(taut*(taut2*(taut3*(-0.0000533490958281740028*taut21*taut8 - 0.0875945913011459965) 
-    - 0.00787855544867100029) - 0.000378979750326299998) - 0.000066065283340406)) 
-    + taut*(taut*(taut*(-0.0503252787279300021*taut3 - 0.0575812590834320001) - 0.0459960136963650026) 
+    + taut*(taut*(taut2*(taut3*(-0.0000533490958281740028*taut21*taut8 - 0.0875945913011459965)
+    - 0.00787855544867100029) - 0.000378979750326299998) - 0.000066065283340406))
+    + taut*(taut*(taut*(-0.0503252787279300021*taut3 - 0.0575812590834320001) - 0.0459960136963650026)
     - 0.0178348622923579989) - 0.00177317424732129992)
 
 
@@ -790,8 +790,8 @@ def test_iapws97_region_2_rho_coolprop():
         upper_P = iapws97_boundary_2_3(T)*(1.0-1e-10)
         if T <= 623.15:
             upper_P = min(Psat_IAPWS(T)*(1.0-1e-10), upper_P)
-        
-        
+
+
         if upper_P < P_lim or upper_P > 100e6:
             # No valid points in region 2
             return []
@@ -833,33 +833,33 @@ def test_iapws97_region_1_rho_coolprop():
 def test_iapws97_P():
     rho = iapws97_rho(273.15, 999)
     assert_close(iapws97_P(273.15, rho), 999, rtol=1e-10)
-    
+
     rho = iapws97_rho(289.47653061224486, 145.6348477501249)
     assert_close(iapws97_P(289.47653061224486, rho), 145.6348477501249, rtol=1e-10)
-    
+
     iapws97_identify_region_TP(1032.9489949748788, 1702.7691722259083)
     rho = iapws97_rho(1032.9489949748788, 1702.7691722259083)
     P_calc = iapws97_P(1032.9489949748788, rho)
     assert_close(P_calc, 1702.7691722259083, rtol=1e-10)
-    
+
     rho = iapws97_rho(273.9508008008008, 696.3744730627147)
     assert_close(iapws97_P(273.9508008008008, rho), 696.3744730627147, rtol=5e-9)
-    
-    
+
+
     rho = iapws97_rho(275.5524024024024, 749.6781874965719)
     assert_close(iapws97_P(275.5524024024024, rho), 749.6781874965719, rtol=5e-9)
-    
+
     rho = iapws97_rho(1500, 20e6)
     assert_close(iapws97_P(1500, rho), 20e6, rtol=5e-9)
 
-    
+
     T_spec = 300
     rho_spec = .02
     for i in range(15):
         P_calc = iapws97_P(T_spec, rho_spec)
         assert_close(iapws97_rho(T_spec, P_calc), rho_spec, rtol=1e-10)
         rho_spec *= .25
-        
+
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -873,8 +873,8 @@ def test_iapws97_P_fuzz():
             rho = iapws97_rho(T, P)
             P_calc = iapws97_P(T, rho)
             assert_close(P, P_calc, rtol=1e-9)
-            
-    
+
+
     # Region 1 and 2 general - Good, working great!
     N = 100
     Ts = linspace(273.15, 1073.15, N)
@@ -886,7 +886,7 @@ def test_iapws97_P_fuzz():
                 P_calc = iapws97_P(T, rho)
                 # 5e-9 is best solvers can do
                 assert_close(P, P_calc, rtol=5e-9)
-    
+
     # Region 5 - works great
     N = 100
     Ts = linspace(1073.15, 2273.15, N)
@@ -896,8 +896,8 @@ def test_iapws97_P_fuzz():
             rho = iapws97_rho(T, P)
             P_calc = iapws97_P(T, rho)
             assert_close(P, P_calc, rtol=1e-9)
-            
-            
+
+
 def test_iapws_97_Trho_err_region():
     from chemicals.iapws import iapws_97_Trho_err_region1, iapws_97_Trho_err_region2, iapws_97_Trho_err_region5
     drho_dP_num = derivative(lambda P, *args: iapws_97_Trho_err_region1(P, *args)[0], 1e5, args=(400, 940), dx=1e-1)
@@ -905,13 +905,13 @@ def test_iapws_97_Trho_err_region():
     assert_close(drho_dP_num, drho_dP_analytical)
     assert_close(drho_dP_analytical, 5.139076806770276e-07)
     assert_close(rho_err, -2.590879183496895)
-    
+
     drho_dP_num = derivative(lambda P, *args: iapws_97_Trho_err_region2(P, *args)[0], 1e5, args=(400, .5), dx=1e-1)
     rho_err, drho_dP_analytical = iapws_97_Trho_err_region2(1e5, T=400.0, rho=.5)
     assert_close(drho_dP_num, drho_dP_analytical)
     assert_close(drho_dP_analytical, 5.5373377906291985e-06,)
     assert_close(rho_err, 0.04758348314889638)
-    
+
     drho_dP_num = derivative(lambda P, *args: iapws_97_Trho_err_region5(P, *args)[0], 1e6, args=(2200, 50), dx=1)
     rho_err, drho_dP_analytical = iapws_97_Trho_err_region5(1e6, T=2200, rho=50)
     assert_close(drho_dP_num, drho_dP_analytical)
@@ -926,19 +926,19 @@ def test_iapws_97_Prho_err_region():
     assert_close(drho_dP_analytical, -0.0014400334536077983)
     assert_close(rho_err, -2.4524165168511036)
     assert_close(drho_dP_num, drho_dP_analytical)
-    
+
     drho_dP_num = derivative(lambda T, *args: iapws_97_Prho_err_region5(T, *args)[0], 2000, args=(1e6, 300), dx=1e-2)
     rho_err, drho_dP_analytical = iapws_97_Prho_err_region5(2000, P=1e6, rho=3)
     assert_close(drho_dP_num, drho_dP_analytical)
     assert_close(rho_err, -1.9170536728150382, rtol=1e-10)
     assert_close(drho_dP_analytical, -0.0005418228178000102, rtol=1e-10)
-    
+
     drho_dP_num = derivative(lambda T, *args: iapws_97_Prho_err_region1(T, *args)[0], 300, args=(1e6, 990), dx=1e-4)
     rho_err, drho_dP_analytical = iapws_97_Prho_err_region1(300, P=1e6, rho=990)
     assert_close(drho_dP_num, drho_dP_analytical)
     assert_close(rho_err, 6.960320342238447, rtol=1e-10)
     assert_close(drho_dP_analytical, -0.2744655492373509, rtol=1e-10)
-    
+
     dP_dT_numerical = derivative(lambda T, *args: iapws_97_Prho_err_region3(T, *args)[0], 620, args=(40e6, 400), dx=.01, order=15)
     P_err, dP_dT_analytical = iapws_97_Prho_err_region3(620, P=40e6, rho=400)
     assert_close(dP_dT_numerical, dP_dT_analytical)
@@ -949,55 +949,55 @@ def test_iapws_97_Prho_err_region():
 def test_iapws97_T():
     # region 5
     assert_close(iapws97_T(1e7, iapws97_rho(T=1600, P=1e7)), 1600)
-    
+
     # region 2 top
     assert_close(iapws97_T(60e6, iapws97_rho(T=1000, P=60e6)), 1000)
-    
+
     # region 3 top
     rho = iapws97_rho(T=640, P=60e6)
     P = iapws97_P(640, rho)
     assert_close(iapws97_T(P, rho), 640)
-    
+
     # region 1
     rho = iapws97_rho(T=400, P=40e6)
     assert_close(iapws97_T(40e6, rho), 400)
-    
+
     # region 2 bottom
     rho = iapws97_rho(T=800, P=1e5)
     iapws97_T(1e5, rho)
     assert_close(iapws97_T(1e5, rho), 800)
-    
+
     # region 1 bottom
     rho = iapws97_rho(T=300, P=1e5)
     iapws97_T(1e5, rho)
     assert_close(iapws97_T(1e5, rho), 300)
-    
+
     rho = iapws97_rho(T=273.15, P=1e-08)
     iapws97_T(1e-08, rho)
     assert_close(iapws97_T(1e-08, rho), 273.15)
-    
-    
+
+
     rho = iapws97_rho(273.15, 0.0065793322465757635)
     assert_close(iapws97_T(0.0065793322465757635, rho), 273.15)
-    
+
     rho = iapws97_rho(273.15, 673.4150657750918)
     assert_close(iapws97_T(673.4150657750918, rho), 273.15)
-    
+
     iapws97_identify_region_TP(273.15, 22570197.196339723)
     rho = iapws97_rho(273.15, 22570197.196339723)
     assert_close(iapws97_T(22570197.196339723, rho), 273.15)
-    
+
     iapws97_identify_region_TP(1073.15, 68926121.04349865)
     rho = iapws97_rho(1073.15, 68926121.04349865)
     assert_close(iapws97_T(68926121.04349865, rho), 1073.15)
-    
+
     rho = iapws97_rho(273.9508008008008, 17030650.2925232)
     assert_close(iapws97_T(17030650.2925232, rho), 273.9508008008008)
-    
+
     # region 5 border requiring calc
     rho = iapws97_rho(1073.150000000001, 34705199.859195136)
     assert_close(iapws97_T(34705199.859195136, rho), 1073.150000000001)
-    
+
     # region 5 border requiring equation 2 calc
     rho = iapws97_rho(1073.15, 52396013.53002634)
     assert_close(iapws97_T(52396013.53002634, rho), 1073.15)
@@ -1243,7 +1243,7 @@ def dddA_ddddelta_res(tau, delta):
     for i in range(7,51):
         phir += delta**dis[i]*nis[i]*tau**tis[i]*(-3*cis[i]*delta**cis[i]*dis[i]*(dis[i] - 1) + 3*cis[i]*delta**cis[i]*dis[i]*(cis[i]*delta**cis[i] - cis[i] + 1) - cis[i]*delta**cis[i]*(cis[i]**2*delta**(2*cis[i]) - 3*cis[i]**2*delta**cis[i] + cis[i]**2 + 3*cis[i]*delta**cis[i] - 3*cis[i] + 2) + dis[i]*(dis[i]**2 - 3*dis[i] + 2))*exp(-delta**cis[i])/delta**3
 #        phir += (-cis[i]*delta**cis[i]*delta**(dis[i] - 2)*nis[i]*tau**tis[i]*(-cis[i]**2*delta**cis[i] + (-cis[i]*delta**cis[i] + dis[i])*(-cis[i]*delta**cis[i] + dis[i] - 1))*exp(-delta**cis[i])/delta + delta**(dis[i] - 2)*nis[i]*tau**tis[i]*(-cis[i]**3*delta**cis[i]/delta - cis[i]**2*delta**cis[i]*(-cis[i]*delta**cis[i] + dis[i])/delta - cis[i]**2*delta**cis[i]*(-cis[i]*delta**cis[i] + dis[i] - 1)/delta)*exp(-delta**cis[i]) + delta**(dis[i] - 2)*nis[i]*tau**tis[i]*(dis[i] - 2)*(-cis[i]**2*delta**cis[i] + (-cis[i]*delta**cis[i] + dis[i])*(-cis[i]*delta**cis[i] + dis[i] - 1))*exp(-delta**cis[i])/delta)
-    for i in range(51, 54):        
+    for i in range(51, 54):
         phir += (delta**dis[i]*nis[i]*tau**tis[i]*(-4*alphas[i-51]**2*(delta - epsilons[i-51])*(2*alphas[i-51]*(delta - epsilons[i-51])**2 - 3) + 6*alphas[i-51]*dis[i]*(2*alphas[i-51]*(delta - epsilons[i-51])**2 - 1)/delta - 6*alphas[i-51]*dis[i]*(delta - epsilons[i-51])*(dis[i] - 1)/delta**2 + dis[i]*(dis[i]**2 - 3*dis[i] + 2)/delta**3)*exp(-alphas[i-51]*(delta - epsilons[i-51])**2 - betas[i-51]*(-gammas[i-51] + tau)**2))
 #        phir += (-alphas[i-51]*nis[i]*tau**tis[i]*(2*delta - 2*epsilons[i-51])*(4*alphas[i-51]**2*delta**dis[i]*(delta - epsilons[i-51])**2 - 2*alphas[i-51]*delta**dis[i] - 4*alphas[i-51]*delta**(dis[i] - 1)*dis[i]*(delta - epsilons[i-51]) + delta**(dis[i] - 2)*dis[i]*(dis[i] - 1))*exp(-alphas[i-51]*(delta - epsilons[i-51])**2 - betas[i-51]*(-gammas[i-51] + tau)**2) + nis[i]*tau**tis[i]*(4*alphas[i-51]**2*delta**dis[i]*(2*delta - 2*epsilons[i-51]) + 4*alphas[i-51]**2*delta**dis[i]*dis[i]*(delta - epsilons[i-51])**2/delta - 4*alphas[i-51]*delta**(dis[i] - 1)*dis[i] - 2*alphas[i-51]*delta**dis[i]*dis[i]/delta - 4*alphas[i-51]*delta**(dis[i] - 1)*dis[i]*(delta - epsilons[i-51])*(dis[i] - 1)/delta + delta**(dis[i] - 2)*dis[i]*(dis[i] - 2)*(dis[i] - 1)/delta)*exp(-alphas[i-51]*(delta - epsilons[i-51])**2 - betas[i-51]*(-gammas[i-51] + tau)**2))
     for i in range(2):
@@ -1354,13 +1354,13 @@ def iapws95_d3Ar_ddelta2dtau_naive(tau, delta):
     phir = 0
     for i in range(7):
         phir += delta**dis[i]*dis[i]*nis[i]*tau**tis[i]*tis[i]*(dis[i] - 1)/(delta**2*tau)
-    for i in range(7,51):        
+    for i in range(7,51):
         phir += delta**dis[i]*nis[i]*tau**tis[i]*tis[i]*(-2*cis[i]*delta**cis[i]*dis[i] + cis[i]*delta**cis[i]*(cis[i]*delta**cis[i] - cis[i] + 1) + dis[i]*(dis[i] - 1))*exp(-delta**cis[i])/(delta**2*tau)
-    for i in range(51, 54):        
+    for i in range(51, 54):
         phir += delta**dis[i]*nis[i]*tau**tis[i]*(4*alphas[i-51]*betas[i-51]*(gammas[i-51] - tau)*(2*alphas[i-51]*(delta - epsilons[i-51])**2 - 1) - 8*alphas[i-51]*betas[i-51]*dis[i]*(delta - epsilons[i-51])*(gammas[i-51] - tau)/delta + 2*alphas[i-51]*tis[i]*(2*alphas[i-51]*(delta - epsilons[i-51])**2 - 1)/tau - 4*alphas[i-51]*dis[i]*tis[i]*(delta - epsilons[i-51])/(delta*tau) + 2*betas[i-51]*dis[i]*(dis[i] - 1)*(gammas[i-51] - tau)/delta**2 + dis[i]*tis[i]*(dis[i] - 1)/(delta**2*tau))*exp(-alphas[i-51]*(delta - epsilons[i-51])**2 - betas[i-51]*(-gammas[i-51] + tau)**2)
     for i in range(2):
         phir += 2*nis[i+54]*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**bis[i]*(2*Ais[i]*Cis[i]*bis[i]*delta*(delta - 1)*(2*delta - 2.0)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)) - Ais[i]*bis[i]*(2*delta - 2.0)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)) + 4*Cis[i]*Dis[i]*bis[i]*delta*(delta - 1)*(tau - 1)*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) - 2*Cis[i]*Dis[i]*delta*(tau - 1)*(2*Cis[i]*(delta - 1)**2 - 1) + 4*Cis[i]*Dis[i]*(delta - 1)*(tau - 1) + 4*Cis[i]*bis[i]**2*delta*(delta - 1)*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 - 4*Cis[i]*bis[i]*delta*(delta - 1)*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 - 2*Cis[i]*bis[i]*delta*(2*Cis[i]*(delta - 1)**2 - 1)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) + 4*Cis[i]*bis[i]*(delta - 1)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) - Dis[i]*bis[i]*delta*(tau - 1)*(2*Ais[i]**2*(delta - 1)**2*((delta - 1.0)**2)**(1/betas[i+3])/(betas[i+3]**2*(delta - 1.0)**4) + 2*Ais[i]*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) - 2*Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**3) + 2*Ais[i]*(delta - 1)**2*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]**2*(delta - 1.0)**4) + 4*Bis[i]*ais[i]**2*((delta - 1)**2)**ais[i]/(delta - 1)**2 - 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1)**2 + bis[i]*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) - (Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) - 2*Dis[i]*bis[i]*(tau - 1)*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) - bis[i]**2*delta*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*(2*Ais[i]**2*(delta - 1)**2*((delta - 1.0)**2)**(1/betas[i+3])/(betas[i+3]**2*(delta - 1.0)**4) + 2*Ais[i]*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) - 2*Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**3) + 2*Ais[i]*(delta - 1)**2*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]**2*(delta - 1.0)**4) + 4*Bis[i]*ais[i]**2*((delta - 1)**2)**ais[i]/(delta - 1)**2 - 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1)**2 + bis[i]*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) - (Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 - 2*bis[i]**2*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 - bis[i]*delta*(Ais[i]*bis[i]*(2*delta - 2.0)*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)) - Ais[i]*(2*delta - 2.0)*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2*(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)) + Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) - Ais[i]*(2*delta - 2.0)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**3) + Ais[i]*(delta - 1)**2*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]**2*(delta - 1.0)**4) - bis[i]*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))**2*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 + (Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))**2*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) + bis[i]*delta*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*(2*Ais[i]**2*(delta - 1)**2*((delta - 1.0)**2)**(1/betas[i+3])/(betas[i+3]**2*(delta - 1.0)**4) + 2*Ais[i]*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) - 2*Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**3) + 2*Ais[i]*(delta - 1)**2*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]**2*(delta - 1.0)**4) + 4*Bis[i]*ais[i]**2*((delta - 1)**2)**ais[i]/(delta - 1)**2 - 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1)**2 + bis[i]*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2) - (Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))**2/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2))/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2 + 2*bis[i]*(Ais[i]*(2*delta - 2.0)*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)*((delta - 1.0)**2)**(1/(2*betas[i+3]))/(betas[i+3]*(delta - 1.0)**2) + 2*Bis[i]*ais[i]*((delta - 1)**2)**ais[i]/(delta - 1))*(Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)/(Bis[i]*((delta - 1)**2)**ais[i] + (Ais[i]*((delta - 1.0)**2)**(1/(2*betas[i+3])) - tau + 1)**2)**2)*exp(-Cis[i]*(delta - 1)**2 - Dis[i]*(tau - 1)**2)
-        
+
     return phir
 
 ### Derivatives of Distance Function
@@ -1533,8 +1533,8 @@ def test_iapws95_d2A_d2deltar():
         assert_close(iapws95_d2Ar_ddelta2(tau,.99999999999), iapws95_d2Ar_ddelta2(tau, 1), rtol=2e-8)
     for tau in linspace(10, 1.5, 100):
         assert_close(iapws95_d2Ar_ddelta2(tau,.99999999999), iapws95_d2Ar_ddelta2(tau, 1), rtol=2e-8)
-    
-    
+
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_iapws95_d2A_d2deltar_vs_naive(precise=False, allow_fail=True):
@@ -1612,38 +1612,38 @@ def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
 #test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True)
 
 
-  
+
 def test_iapws95_d3Ar_ddelta3():
     # Extremely flat function. Requires huge steps to get results.
-    
+
     tau, delta = .7, 2.2
     assert_close(derivative(lambda delta: iapws95_d2Ar_ddelta2(tau, delta), delta, dx=delta*1e-4, order=7),
                  iapws95_d3Ar_ddelta3(tau, delta), rtol=1e-11)
-    
+
     tau, delta = 1e-3, 2.2
     assert_close(derivative(lambda delta: iapws95_d2Ar_ddelta2(tau, delta), delta, dx=delta*1e-4, order=7),
                  iapws95_d3Ar_ddelta3(tau, delta), rtol=1e-11)
-    
+
     tau, delta = 1e-8, 2.2
     assert_close(derivative(lambda delta: iapws95_d2Ar_ddelta2(tau, delta), delta, dx=delta*1e-4, order=7),
                  iapws95_d3Ar_ddelta3(tau, delta), rtol=1e-11)
-    
+
     tau, delta = 15.5, 2.2
     assert_close(derivative(lambda delta: iapws95_d2Ar_ddelta2(tau, delta), delta, dx=delta*1e-4, order=7),
                  iapws95_d3Ar_ddelta3(tau, delta), rtol=1e-11)
-    
+
     tau, delta = 15.5, 11.2
     assert_close(derivative(lambda delta: iapws95_d2Ar_ddelta2(tau, delta), delta, dx=delta*1e-4, order=7),
                  iapws95_d3Ar_ddelta3(tau, delta), rtol=1e-11)
-    
+
     tau, delta = 2.5, 1.2
     assert_close(derivative(lambda delta: iapws95_d2Ar_ddelta2(tau, delta), delta, dx=delta*1e-4, order=7),
                  iapws95_d3Ar_ddelta3(tau, delta), rtol=1e-11)
-    
+
     tau, delta = 1e-4, 1e-3
     assert_close(derivative(lambda delta: iapws95_d2Ar_ddelta2(tau, delta), delta, dx=delta*1e-2, order=7),
                  iapws95_d3Ar_ddelta3(tau, delta), rtol=1e-10)
-    
+
     tau, delta = 0.32916247703300405, 1.7314054528190082
     assert_close(derivative(lambda delta: iapws95_d2Ar_ddelta2(tau, delta), delta, dx=delta*5e-4, order=7),
                  iapws95_d3Ar_ddelta3(tau, delta), rtol=1e-8)
@@ -1654,18 +1654,18 @@ def test_iapws95_d3Ar_ddelta3():
     tau, delta, T, rho = 0.5028042728122091, 3.3706405889480084e-09, 1286.9739478957888, 1.0853462696412588e-06
     num = derivative(lambda d: iapws95_d2Ar_ddelta2(tau, d), delta, dx=delta*.3, order=7)
     assert_close(iapws95_d3Ar_ddelta3(tau, delta), num, rtol=1e-7)
-    
+
 @pytest.mark.slow
 @pytest.mark.mpmath
 def test_iapws95_d3Ar_ddelta3_mpmath():
     import mpmath as mp
     mp.mp.dps = 100
     tau, delta, T, rho = 0.5028042728122091, 3.3706405889480084e-09, 1286.9739478957888, 1.0853462696412588e-06
-    assert_close(iapws95_d3Ar_ddelta3(tau, delta), 
+    assert_close(iapws95_d3Ar_ddelta3(tau, delta),
                  float(dddA_ddddelta_res(mp.mpf(tau), mp.mpf(delta))))
-    
+
     tau, delta, T, rho = 0.6879013719642095, 4.2599878142989604e-13, 940.6813627254511, 1.3717160762042654e-10
-    assert_close(iapws95_d3Ar_ddelta3(tau, delta), 
+    assert_close(iapws95_d3Ar_ddelta3(tau, delta),
                  float(dddA_ddddelta_res(mp.mpf(tau), mp.mpf(delta))), rtol=1e-3)
 #
 #
@@ -1751,7 +1751,7 @@ def test_iapws95_dA_ddeltar():
     delta = rho*rhoc_inv
     assert_close(iapws95_dAr_ddelta(tau, delta),
                  dAddelta_res(tau, delta), rtol=5e-9)
-    
+
     assert_close(iapws95_dAr_ddelta(.999999999999999, .999999999999999),
                  iapws95_dAr_ddelta(1,1), rtol=1e-13)
 
@@ -1788,7 +1788,7 @@ def test_iapws95_dA_ddeltar_vs_naive(precise=False, allow_fail=True):
 #test_iapws95_dA_ddeltar_vs_naive()
 #test_iapws95_dA_ddeltar_vs_naive(precise=True, allow_fail=False)
 
-            
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_iapws95_Ar_vs_naive(precise=False, allow_fail=True):
@@ -1822,17 +1822,17 @@ def test_iapws95_Ar_vs_naive(precise=False, allow_fail=True):
 
 def test_iapws95_Ar():
     assert_close(iapws95_Ar(647.096/300.0, 999.0/322), -9.57577716026768, rtol=1e-11)
-    
+
     # Point was being issue in third delta derivative
     assert_close(iapws95_Ar(0.827680930232558, 4.443026216725733e-07), -3.726849328574788e-7, rtol=1e-13)
-    
-    
-    
+
+
+
 
 def test_iapws95_dAr_dtau():
     assert_close(iapws95_dAr_dtau(647.096/300.0, 999.0/322),
                  -7.704333630957023, rtol=1e-11)
-    
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_iapws95_dAr_dtau_vs_naive(precise=False, allow_fail=True):
@@ -1903,8 +1903,8 @@ def test_iapws95_d2Ar_dtau2_vs_naive(precise=False, allow_fail=True):
 def test_iapws95_d2Ar_dtau2():
     assert_close(iapws95_d2Ar_dtau2(647.096/300.0, 999.0/322),
                  -1.2616419775539731, rtol=1e-11)
-            
-            
+
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_iapws95_d2Ar_ddeltadtau_vs_naive(precise=False, allow_fail=True):
@@ -1965,7 +1965,7 @@ def test_iapws95_A0_vs_naive():
             errs.append(rerri)
 #    print(rerr/N**2, np.std(errs), np.max(errs))
 #test_iapws95_A0_vs_naive()
-    
+
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_iapws95_iapws95_dA0_dtau_vs_naive():
@@ -2012,8 +2012,8 @@ def test_ddAddtau_idg_vs_naive():
             errs.append(rerri)
 #    print(rerr/N**2, np.std(errs), np.max(errs))
 #test_ddAddtau_idg_vs_naive()
-            
-            
+
+
 def test_iapws95_A0():
     ans = iapws95_A0(.5345, .575745)
     assert_close(ans, -7.3790791583143, rtol=1e-14)
@@ -2021,7 +2021,7 @@ def test_iapws95_A0():
 def test_iapws95_dA0_dtau():
     ans = iapws95_dA0_dtau(.5345, .575745)
     assert_close(ans, 13.16120203177092, rtol=1e-14)
-    
+
 def test_iapws95_d2A0_dtau2():
     ans = iapws95_d2A0_dtau2(.5345, .575745)
     assert_close(ans, -14.97966801918871, rtol=1e-14)
@@ -2040,7 +2040,7 @@ def test_rho_iapws95_CoolProp():
     N = 40
     Ts = linspace(273.16+1e-10,  1073.15-1e-10, N)
     Ps = logspace(log10(1e-3), log10(100e6), N)
-    
+
     for T in Ts:
         for P in Ps:
             rho_implemented = iapws95_rho(T, P)
@@ -2051,20 +2051,20 @@ def test_rho_iapws95_CoolProp():
 
 def test_iapws97_rho_extrapolated():
     region5_highT = iapws97_rho_extrapolated(2300, 20e6)
-    region5_highT_num = (iapws97_region5_rho(2273.15, 20e6) 
+    region5_highT_num = (iapws97_region5_rho(2273.15, 20e6)
                          + (2300-2273.15)*derivative(iapws97_region5_rho, 2273.15, args=(20e6,), dx=.1, order=3))
     assert_close(region5_highT, region5_highT_num, rtol=1e-10)
-    
+
     region2_highT = iapws97_rho_extrapolated(1100, 80e6)
-    region2_highT_num = (iapws97_region2_rho(1073.15, 80e6) 
+    region2_highT_num = (iapws97_region2_rho(1073.15, 80e6)
                          + (1100-1073.15)*derivative(iapws97_region2_rho, 1073.15, args=(80e6,), dx=.1, order=5))
-    
+
     assert_close(region2_highT, region2_highT_num, rtol=1e-9)
-    
-    
+
+
     region1_lowT = iapws97_rho_extrapolated(200, 80e6)
     assert region1_lowT == iapws97_rho(273.15, 80e6)
-    
+
 def test_iapws95_P():
     assert_close(iapws95_rho(300.0, iapws95_P(300, 1000)), 1000)
 
@@ -2072,20 +2072,20 @@ def test_iapws95_T_err():
     err, derr = iapws95_T_err(300, 1000, 1e5)
     assert_close(err, 7733001.355973767, rtol=1e-11)
     assert_close(derr, 639359.0465881994, rtol=1e-11)
-    
+
     assert_close(derivative(lambda T: iapws95_T_err(T, 1000, 1e5)[0], 300, dx=1e-4),
                  iapws95_T_err(300, 1000, 1e5)[1])
-    
+
 def test_iapws95_rho():
     '''TODO points:
-        
+
     iapws95_rho(200.0, 1e9) - not solving
     '''
     assert_close(iapws95_rho(273.1600000001, 0.001), 7.932210036861784e-09, rtol=1e-8)
-    
+
     assert_close(iapws95_rho(350.0, 1e6), 974.1288271329855, rtol=1e-8)
     assert_close(iapws95_rho(981.3822764554016, 171493178.34983346), 444.5570512999293)
-    
+
     # Point where was starting from negative density initially.
     assert_close(iapws95_rho(2357., 97719212), 85.77393882818544, rtol=1e-9)
 
@@ -2093,31 +2093,31 @@ def test_iapws95_rho():
     # Three points CoolProp is finding the vapor root when the liquid one is NOT correct
     # initially was making the wrong call there
     assert_close(iapws95_rho(432.0135947190398, 600559.0434678708), 3.1715230968689263)
-    
+
     assert_close(iapws95_rho(443.36028005610694, 796123.0461361709), 4.141564959829041)
-    
+
     assert_close(iapws95_rho(485.9103500701087, 2014934.1250668736), 10.114793546282295)
-    
+
     assert_close(iapws95_rho(472.89458917842654, 1546542.3293244045), 7.819904266670308)
-    
+
     # Found comparing against coolprop
     assert_close(iapws95_rho(640, 20265239.648236595), 481.5275168680331, rtol=1e-10)
-    
+
     # Slightly different density than CoolProp here
     assert_close(iapws95_rho(647.08, 22059526.03804436), 295.66686689744756, rtol=1e-10)
-    
+
 
 @pytest.mark.slow
 @pytest.mark.CoolProp
 def test_iapws95_rho_vs_Coolprop():
     from CoolProp.CoolProp import PropsSI
-    assert_close(iapws95_rho(2357., 97719212), 
-                 PropsSI('DMASS', 'T', 2357, 'P', 97719212.0, 'water'), 
+    assert_close(iapws95_rho(2357., 97719212),
+                 PropsSI('DMASS', 'T', 2357, 'P', 97719212.0, 'water'),
                  rtol=1e-9)
 
 def test_iapws95_T():
     assert_close(iapws95_T(P=20265239.648236595, rho=481.5275168680331), 640.0)
-    
+
     # Point where converging to wrong solution
     assert_close(iapws95_T(P=1000000000, rho=669.0726669889119), 1749.5356805149595, rtol=1e-7)
 
@@ -2139,23 +2139,23 @@ def test_rhog_sat_IAPWS():
 
 def test_iapws95_saturation():
     from chemicals.iapws import iapws95_sat_err_and_jac
-    
+
     err, jac = iapws95_sat_err_and_jac([1.807830655839175e-05, 0.7040053821406961], 300.0)
     assert_close1d(err, [2.660272002685815e-10, 1.681859203017666e-05], rtol=1e-6)
     assert_close2d(jac, [[-2219129832.1579313, 3530.261802535087],
                          [-122750979191014.77, 5014.538087479508]], rtol=1e-7)
-    
+
     vals = iapws95_saturation(300.0, xtol=1e-5)
     assert_close1d(vals, (3536.806752287503, 996.5130274681349, 0.025589673682920273))
 
 def test_iapws95_dPsat_dT():
-    assert_close(derivative(iapws95_Psat, 330.0, dx=330*1e-6), 
+    assert_close(derivative(iapws95_Psat, 330.0, dx=330*1e-6),
                  iapws95_dPsat_dT(330)[0], rtol=1e-7)
-    
+
     dPsat_dT, Psat = iapws95_dPsat_dT(500.0)
     assert_close(dPsat_dT, 49008.17866580053, rtol=1e-10)
     assert_close(Psat, 2639195.8717618496, rtol=1e-13)
-    
+
     # Check for functional equivalence
     for T in linspace(235.0, 647.096):
         assert_close(iapws95_Psat(T), iapws95_dPsat_dT(T)[1], rtol=1e-15)
@@ -2164,7 +2164,7 @@ def test_iapws95_Tsat():
     # Tested with a LOT of points
     for T in linspace(235.0, 647.096, 100):
         assert_close(iapws95_Tsat(iapws95_Psat(T)), T, rtol=2e-14)
-    
+
 def test_iapws95_Psat():
     assert_close(iapws95_Psat(300.0), 3536.806752274638, rtol=1e-12)
     assert_close(iapws95_Psat(260.0), 222.5574677094123, rtol=1e-12)
@@ -2174,7 +2174,7 @@ def test_iapws95_Psat():
     assert_close(iapws95_Psat(645.0), 21515208.664142672, rtol=1e-12)
     assert_close(iapws95_Psat(647.0), 22038405.72692307, rtol=1e-10)
     assert iapws95_Psat(647.096) == 22064000.0 # Should be dead on
-    
+
     with pytest.raises(ValueError):
         iapws95_Psat(150.0)
 
@@ -2196,7 +2196,7 @@ def test_iapws95_rhol_sat():
     # Linear interp - may get replaced in future
     assert_close(iapws95_rhol_sat(647.0959999999), 322.00017602415505, rtol=1e-7)
     assert 322.0 == iapws95_rhol_sat(647.096)
-    
+
     with pytest.raises(ValueError):
         iapws95_rhol_sat(200.0)
 
@@ -2206,7 +2206,7 @@ def test_iapws95_rhol_sat_dT():
 
     assert_close1d(iapws95_drhol_sat_dT(277), (0.002398816135429972, 999.9249513005213), rtol=1e-13)
     assert_close1d(iapws95_drhol_sat_dT(647.09599999999), (-1759460.0473706475, 322.00001760241554), rtol=1e-13)
-    
+
     # Numerical dereivatives do fail near T = 277 K
     for T in linspace(235.0+10e-4, 647.095-10e-4, 10):
         assert_close(iapws95_drhol_sat_dT(T)[0],
@@ -2227,7 +2227,7 @@ def test_rhog_sat_IAPWS95():
     assert_close(iapws95_rhog_sat(647.095998), 321.7569904453351, rtol=1e-10)
     assert_close(iapws95_rhog_sat(647.0959998), 321.92296716781414, rtol=1e-10)
     assert_close(iapws95_rhog_sat(647.09599998), 321.9758031526337, rtol=1e-10)
-    
+
     assert 322 == iapws95_rhog_sat(647.0959999999999999)
     assert 322 == iapws95_rhog_sat(647.0959999999999)
     assert_close(iapws95_rhog_sat(647.09599999999), 321.9999832063918, rtol=1e-13)
@@ -2253,9 +2253,9 @@ def test_iapws95_saturation_fits():
         assert_close(P_corr, float(Psat_mp), rtol=7.5e-13)
         # Almost everything is under 2e-14
         assert_close(rhol, float(rhol_mp), rtol=2e-13)
-        
-        
-    # Test the low temperature regime with a lower tolerance - fitting issues for 
+
+
+    # Test the low temperature regime with a lower tolerance - fitting issues for
     # density
     Ts = linspace(235, 273.15, N)
     for T in Ts:
@@ -2274,11 +2274,11 @@ def test_rhog_sat_IAPWS95_vs_saturation():
     for T in Ts:
         assert_close(iapws95_saturation(T)[2],
                      iapws95_rhog_sat(T), rtol=1e-12)
-        
+
     # 647 requires mpmath
 @pytest.mark.slow
 @pytest.mark.fuzz
-def test_rhog_sat_IAPWS95_vs_saturation2():    
+def test_rhog_sat_IAPWS95_vs_saturation2():
     Ts = [260.0, 400.0, 600.0, 630.0, 645]
     import mpmath as mp
     mp.mp.dps = 50
@@ -2287,7 +2287,7 @@ def test_rhog_sat_IAPWS95_vs_saturation2():
     for T in Ts:
         Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
         assert_close(float(rhog_mp), float(iapws95_rhog_sat(T)), rtol=1e-13)
-        
+
     Ts = [647.0958, 647.09598, 647.095998, 647.0959998, 647.09599998]
     # Fit lower accuracy points
     for T in Ts:
@@ -2308,7 +2308,7 @@ def test_rhog_sat_IAPWS95_CoolProp():
     for T in Ts:
         assert_close(iapws95_rhog_sat(T),
                      PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-9)
-    
+
     Ts = [647.08, 647.094,
 #          647.0958
 #    647.09599
@@ -2345,8 +2345,8 @@ def test_consistency_iapws95_rho_iapws95_P():
 def test_iapws95_properties():
     expect = [996.5563403888951, 112553.33413264707, 393.06243381456477, 112653.67968858521, 4130.178615033825, 4180.639522022912, 1501.520415056628, -2.2023653545981183e-07, 0.0009207295643366906, 1.978788044482276e-08, 4.4896388297803826e-07]
     assert_close1d(iapws95_properties(T=300.0, P=1e5), expect, rtol=1e-13)
-    
-    
+
+
 def test_iapws92_Psat():
     assert_close(iapws92_Psat(400.0), 245765.263541822, rtol=1e-13)
 
