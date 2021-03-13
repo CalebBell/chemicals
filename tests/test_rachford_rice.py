@@ -272,6 +272,16 @@ def test_flash_solution_algorithms():
         assert_close(V_over_F, V_over_F_expect)
         assert_close1d(xs, xs_expect)
 
+
+        # Raise error on bad binary:
+        zs, Ks = [0.4, 0.6], [2.269925647634519e-19, 2.248989467272186e-18]
+        with pytest.raises(PhaseCountReducedError):
+            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+
+        zs, Ks = [0.4, 0.6], [2.269925647634519e2, 2.248989467272186e8]
+        with pytest.raises(PhaseCountReducedError):
+            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+
         # Hard to resolve two test; LN2 fails, its objective function does not
         # appear to have any zeroes due to numerical issues.
         # How to handle?
@@ -293,6 +303,15 @@ def test_flash_solution_algorithms():
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect)
         assert_close1d(xs, xs_expect)
+
+        # Raise error on bad ternary:
+        zs, Ks = [0.4, 0.5, 0.1], [2.269925647634519e-19, 2.248989467272186e-18, 1e-2]
+        with pytest.raises(PhaseCountReducedError):
+            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+
+        zs, Ks = [0.4, 0.5, 0.1], [2.269925647634519e2, 2.248989467272186e8, 1e3]
+        with pytest.raises(PhaseCountReducedError):
+            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
 
         # Said to be in:  J.D. Seader, E.J. Henley, D.K. Roper, Separation Process Principles, third ed., John Wiley & Sons, New York, 2010.
         zs = [0.1, 0.2, 0.3, 0.4]

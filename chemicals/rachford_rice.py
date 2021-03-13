@@ -475,6 +475,9 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
 #            Kmax = Ks[i] # numba: uncomment
 #        if Ks[i] < Kmin: # numba: uncomment
 #            Kmin = Ks[i] # numba: uncomment
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax - 1.))
     V_over_F_max = 1./(1.-Kmin)
@@ -1152,6 +1155,10 @@ def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
     # Smallest K value
     kn = Ks_sorted[-1]
 
+    if kn > 1.0 or k1 < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+
     x_max = (1. - kn)/(k1 - kn)
     x_min = x_max*z1
 
@@ -1487,6 +1494,9 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         if l == 2:
             z1, z2 = zs
             K1, K2 = Ks
+            if (K1 < 1.0 and K2 < 1.0) or (K1 > 1.0 and K2 > 1.0):
+                raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#                raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
             z1z2 = z1 + z2
             K1z1 = K1*z1
             K2z2 = K2*z2
