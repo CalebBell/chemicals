@@ -34,6 +34,8 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 Fit Correlations
 ----------------
 .. autofunction:: chemicals.vapor_pressure.Antoine
+.. autofunction:: chemicals.vapor_pressure.dAntoine_dT
+.. autofunction:: chemicals.vapor_pressure.d2Antoine_dT2
 .. autofunction:: chemicals.vapor_pressure.Wagner
 .. autofunction:: chemicals.vapor_pressure.Wagner_original
 .. autofunction:: chemicals.vapor_pressure.TRC_Antoine_extended
@@ -133,7 +135,8 @@ The structure of each dataframe is shown below:
 
 from __future__ import division
 
-__all__ = ['Antoine', 'Wagner_original', 'Wagner', 'TRC_Antoine_extended',
+__all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
+           'Wagner_original', 'Wagner', 'TRC_Antoine_extended',
            'boiling_critical_relation', 'Lee_Kesler', 'Ambrose_Walton',
            'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Tsat_IAPWS',
            'Psub_Clapeyron',
@@ -265,6 +268,13 @@ def Antoine(T, A, B, C, base=10.0):
         * **bar to Pa**: Add log_{base}(100000)= 11.5129254 to A for log(base)
         * **°C to K**: Subtract 273.15 from C only!
 
+
+    Note that if `C` is negative and `T` is less than `C`, the predicted vapor
+    pressure would be high and positive at those temperatures under `C`; and
+    a singularity would occur at `T` == `C`. This implementation is corrected
+    to return zero for the case of `T + C < 0.0`, which matches the intention
+    of the Antoine equation.
+
     Examples
     --------
     Methane, coefficients from [1]_, at 100 K:
@@ -298,8 +308,104 @@ def Antoine(T, A, B, C, base=10.0):
     .. [3] Yaws, Carl L. The Yaws Handbook of Vapor Pressure: Antoine
        Coefficients. 1 edition. Houston, Tex: Gulf Publishing Company, 2007.
     '''
-    return base**(A - B/(T + C))
+    T_C = T + C
+    if T_C <= 0.0:
+        return 0.0
+    else:
+        return base**(A - B/(T_C))
 
+def dAntoine_dT(T, A, B, C, base=10.0):
+    r'''Calculates the first temperature derivative of vapor pressure of a
+    chemical using the Antoine equation.
+    Parameters `A`, `B`, and `C` are chemical-dependent.
+
+    .. math::
+        \frac{\partial  P^{\text{sat}} }{\partial T} =
+        \frac{B \text{base}^{A - \frac{B}{C + T}} \log{\left(\text{base} \right)}}
+        {\left(C + T\right)^{2}}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    A : float
+        Antoine `A` parameter, [-]
+    B : float
+        Antoine `B` parameter, [K]
+    C : float
+        Antoine `C` parameter, [K]
+    base : float, optional
+        Optional base of logarithm; 10 by default
+
+    Returns
+    -------
+    dPsat_dT : float
+        First temperature derivative of vapor pressure calculated with
+        coefficients [Pa/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Methane at 100 K:
+
+    >>> dAntoine_dT(100.0, 8.7687, 395.744, -6.469)
+    3591.4147747481
+    '''
+    T_C = T + C
+    if T_C <= 0.0:
+        return 0.0
+    den = 1.0/(T_C)
+    return B*base**(A - B*den)*log(base)*den*den
+
+def d2Antoine_dT2(T, A, B, C, base=10.0):
+    r'''Calculates the second temperature derivative of vapor pressure of a
+    chemical using the Antoine equation.
+    Parameters `A`, `B`, and `C` are chemical-dependent.
+
+    .. math::
+        \frac{\partial^2  P^{\text{sat}} }{\partial T^2} =
+        \frac{B \text{base}^{A - \frac{B}{C + T}} \left(\frac{B \log{\left(
+        \text{base} \right)}}{C + T} - 2\right) \log{\left(\text{base}
+        \right)}}{\left(C + T\right)^{3}}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    A : float
+        Antoine `A` parameter, [-]
+    B : float
+        Antoine `B` parameter, [K]
+    C : float
+        Antoine `C` parameter, [K]
+    base : float, optional
+        Optional base of logarithm; 10 by default
+
+    Returns
+    -------
+    d2Psat_dT2 : float
+        Second temperature derivative of vapor pressure calculated with
+        coefficients [Pa/K^2]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Methane at 100 K:
+
+    >>> d2Antoine_dT2(100.0, 8.7687, 395.744, -6.469)
+    297.30093799054
+    '''
+    T_C = T + C
+    if T_C <= 0.0:
+        return 0.0
+    den = 1.0/(T_C)
+    log_base = log(base)
+    x0 = B*den*log_base
+    return x0*base**(A - B*den)*(x0 - 2.0)*den*den
 
 def Antoine_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2, base=10.0):
     r'''Calculates the antoine coefficients `A`, `B`, and `C` from a known
@@ -592,7 +698,11 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
     Tr = T/Tc
     tau = 1.0 - Tr
     tau2 = tau*tau
-    tau_Tr = tau/Tr
+    try:
+        tau_Tr = tau/Tr
+    except:
+        # T = 0; Tr = 0
+        return 0.0
     return Pc*exp(((d*tau2*tau + c)*tau2 + a + b*sqrt(tau))*tau_Tr)
 
 

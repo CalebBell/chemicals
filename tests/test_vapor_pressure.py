@@ -39,6 +39,10 @@ def test_Wagner_original():
     assert_allclose(Psat, 34520.44601450496)
 
 
+    for T in (0.0, 1e-100, 1e-15, 1e-7, 1.0):
+        assert 0 == Wagner_original(T, 190.53, 4596420., a=-6.00435, b=1.1885, c=-0.834082, d=-1.22833)
+
+
 def test_Wagner():
     # Methane, coefficients from [2]_, at 100 K.
     Psat = Wagner(100., 190.551, 4599200, -6.02242, 1.26652, -0.5707, -1.366)
@@ -68,6 +72,34 @@ def test_Antoine():
     # showing the conversion of coefficients A (mmHg to Pa) and C (°C to K)
     Psat = Antoine(94.91, 6.83706+2.1249, 339.2095, 268.70-273.15)
     assert_allclose(Psat, 162978.88655572367)
+
+    # Extremely low temperature checks
+    Psat = Antoine(T=60, A=3.45604+5, B=1044.038, C=-53.893)
+    assert Psat < 1e-100
+    assert Psat > 0.0
+
+    assert Antoine(T=53, A=3.45604+5, B=1044.038, C=-53.893) == 0.0
+    assert Antoine(T=53.893, A=3.45604+5, B=1044.038, C=-53.893) == 0.0
+    assert Antoine(T=50, A=3.45604+5, B=1044.038, C=-53.893) == 0.0
+
+    dPsat_dT = dAntoine_dT(100.0, 8.7687, 395.744, -6.469)
+    assert_close(dPsat_dT, 3591.4147747481156, rtol=1e-13)
+    assert_close(dPsat_dT,
+                 derivative(Antoine, 100.0, dx=100*1e-7, args=(8.7687, 395.744, -6.469)),
+                 rtol=1e-9)
+
+    # Extremely low temperature derivative check
+    assert dAntoine_dT(5, 8.7687, 395.744, -6.469) == 0.0
+
+
+    d2Psat_dT = d2Antoine_dT2(100, 8.7687, 395.744, -6.469)
+    d2Psat_dT_num = derivative(dAntoine_dT,  100.0,dx=.01, args=(8.7687, 395.744, -6.469))
+    assert_close(d2Psat_dT, 297.30093799054947, rtol=1e-13)
+    assert_close(d2Psat_dT, d2Psat_dT_num, rtol=1e-7)
+
+    # Low T values
+    for T in (0, 1e-10, 1e-100, 10, 53, 53.893, 54):
+        assert 0 == d2Antoine_dT2(T=T, A=3.45604+5, B=1044.038, C=-53.893)
 
 def test_Antoine_fit_extrapolate():
     T = 178.01
