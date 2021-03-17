@@ -63,6 +63,9 @@ order_not_found_msg = ('Only the actual property calculation, first temperature 
                        'temperature integral over temperature are supported '
                        'with order=  0, 1, -1, or -1j respectively')
 
+order_not_found_pos_only_msg = ('Only the actual property calculation, and'
+                                'temperature derivative(s) are supported')
+
 def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     r'''DIPPR Equation # 100. Used in calculating the molar heat capacities
     of liquids and solids, liquid thermal conductivity, and solid density.
@@ -128,16 +131,16 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     if order == 0:
         return A + T*(B + T*(C + T*(D + T*(E + T*(F + G*T)))))
     elif order == 1:
-        return B + T*(2*C + T*(3*D + T*(4*E + T*(5*F + 6*G*T))))
+        return B + T*(2.0*C + T*(3.0*D + T*(4.0*E + T*(5.0*F + 6.0*G*T))))
     elif order == -1:
-        return T*(A + T*(B/2 + T*(C/3 + T*(D/4 + T*(E/5 + T*(F/6 + G*T/7))))))
+        return T*(A + T*(B*0.5 + T*(C*(1.0/3.0) + T*(D*0.25 + T*(E*0.2 + T*(F*(1.0/6) + G*T*(1.0/7.0)))))))
     elif order == -1j:
-        return A*log(T) + T*(B + T*(C/2 + T*(D/3 + T*(E/4 + T*(F/5 + G*T/6)))))
+        return A*log(T) + T*(B + T*(C*0.5 + T*(D*(1.0/3) + T*(E*0.25 + T*(F*0.2 + G*T*(1.0/6))))))
     else:
         raise ValueError(order_not_found_msg)
 
 
-def EQ101(T, A, B, C, D, E):
+def EQ101(T, A, B, C, D, E, order=0):
     r'''DIPPR Equation # 101. Used in calculating vapor pressure, sublimation
     pressure, and liquid viscosity.
     All 5 parameters are required. E is often an integer. As the model is
@@ -154,6 +157,11 @@ def EQ101(T, A, B, C, D, E):
         Temperature, [K]
     A-E : float
         Parameter for the equation; chemical and property specific [-]
+    order : int, optional
+        Order of the calculation. 0 for the calculation of the result itself;
+        for `n`, the `nth` derivative of the property is returned. No
+        other integrals or derivatives are implemented, and an exception will
+        be raised if any other order is given.
 
     Returns
     -------
@@ -163,6 +171,23 @@ def EQ101(T, A, B, C, D, E):
     Notes
     -----
     This function is not integrable for either dT or Y/T dT.
+
+    .. math::
+        \frac{d Y}{dT} = \left(- \frac{B}{T^{2}} + \frac{C}{T}
+        + \frac{D E T^{E}}{T}\right) e^{A + \frac{B}{T}
+        + C \log{\left(T \right)} + D T^{E}}
+
+    .. math::
+        \frac{d^2 Y}{dT^2} = \frac{\left(\frac{2 B}{T} - C + D E^{2} T^{E}
+        - D E T^{E} + \left(- \frac{B}{T} + C + D E T^{E}\right)^{2}\right)
+        e^{A + \frac{B}{T} + C \log{\left(T \right)} + D T^{E}}}{T^{2}}
+
+    .. math::
+        \frac{d^3 Y}{dT^3} = \frac{\left(- \frac{6 B}{T} + 2 C + D E^{3} T^{E}
+        - 3 D E^{2} T^{E} + 2 D E T^{E} + \left(- \frac{B}{T} + C
+        + D E T^{E}\right)^{3} + 3 \left(- \frac{B}{T} + C + D E T^{E}\right)
+        \left(\frac{2 B}{T} - C + D E^{2} T^{E} - D E T^{E}\right)\right)
+        e^{A + \frac{B}{T} + C \log{\left(T \right)} + D T^{E}}}{T^{3}}
 
     Examples
     --------
@@ -176,8 +201,25 @@ def EQ101(T, A, B, C, D, E):
     .. [1] Design Institute for Physical Properties, 1996. DIPPR Project 801
        DIPPR/AIChE
     '''
-    return trunc_exp(A + B/T + C*log(T) + D*T**E)
-
+    T_inv = 1.0/T
+    T_E = T**E
+    expr = trunc_exp(A + B*T_inv + C*log(T) + D*T_E)
+    if order == 0:
+        return expr
+    elif order == 1:
+        return T_inv*expr*(-B*T_inv + C + D*E*T_E)
+    elif order == 2:
+        x0 = (-B*T_inv + C + D*E*T_E)
+        return expr*(2.0*B*T_inv - C + D*E*T_E*(E - 1.0) + x0*x0)*T_inv*T_inv
+    elif order == 3:
+        E2 = E*E
+        E3 = E2*E
+        x0 = (-B*T_inv + C + D*E*T_E)
+        return expr*(-6.0*B*T_inv + 2.0*C + D*E3*T_E - 3*D*E2*T_E + 2.0*D*E*T_E
+                     + x0*x0*x0
+                     + 3.0*(-B*T_inv + C + D*E*T_E)*(2.0*B*T_inv - C + D*E2*T_E - D*E*T_E))*T_inv*T_inv*T_inv
+    else:
+        raise ValueError(order_not_found_pos_only_msg)
 
 def EQ102(T, A, B, C, D, order=0):
     r'''DIPPR Equation # 102. Used in calculating vapor viscosity, vapor
@@ -908,7 +950,7 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
 
 dippr_eq_supported_orders = {
 EQ100: (0, 1, -1, -1j),
-#EQ101: (),
+EQ101: (0, 1, 2, 3),
 EQ102: (0, 1, -1, -1j),
 EQ104: (0, 1, -1, -1j),
 #EQ105:

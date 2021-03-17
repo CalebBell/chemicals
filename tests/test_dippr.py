@@ -64,6 +64,24 @@ def test_Eqs():
     assert_close(a, 37.02960772416336)
 
 
+
+
+def test_EQ101_more():
+    assert_close(EQ101(300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=1), 208.00259945348506, rtol=1e-13)
+    assert_close(derivative(lambda T: EQ101(T, 73.649, -7258.2, -7.3037, 4.1653E-6, 2), 300, dx=1e-4),
+                 EQ101(300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=1), rtol=1e-9)
+
+    assert_close(EQ101(300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=2), 10.64524169930617, rtol=1e-13)
+    assert_close(derivative(lambda T: EQ101(T, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=1), 300, dx=1e-4),
+                 EQ101(300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=2), rtol=1e-9)
+
+    assert_close(EQ101(300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=3), 0.4566096458105825, rtol=1e-13)
+    assert_close(derivative(lambda T: EQ101(T, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=2), 300, dx=1e-4),
+                 EQ101(300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=3), rtol=1e-9)
+
+    with pytest.raises(ValueError):
+        EQ101(300, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=1000)
+
 def test_EQ127_more():
     # T derivative
     coeffs = (3.3258E4, 3.6199E4, 1.2057E3, 1.5373E7, 3.2122E3, -1.5318E7, 3.2122E3)

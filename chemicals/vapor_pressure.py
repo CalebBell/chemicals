@@ -34,11 +34,21 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 Fit Correlations
 ----------------
 .. autofunction:: chemicals.vapor_pressure.Antoine
-.. autofunction:: chemicals.vapor_pressure.dAntoine_dT
-.. autofunction:: chemicals.vapor_pressure.d2Antoine_dT2
 .. autofunction:: chemicals.vapor_pressure.Wagner
 .. autofunction:: chemicals.vapor_pressure.Wagner_original
 .. autofunction:: chemicals.vapor_pressure.TRC_Antoine_extended
+
+Fit Correlation Derivatives
+---------------------------
+.. autofunction:: chemicals.vapor_pressure.dAntoine_dT
+.. autofunction:: chemicals.vapor_pressure.d2Antoine_dT2
+.. autofunction:: chemicals.vapor_pressure.dWagner_dT
+.. autofunction:: chemicals.vapor_pressure.d2Wagner_dT2
+.. autofunction:: chemicals.vapor_pressure.dWagner_original_dT
+.. autofunction:: chemicals.vapor_pressure.d2Wagner_original_dT2
+.. autofunction:: chemicals.vapor_pressure.dTRC_Antoine_extended_dT
+.. autofunction:: chemicals.vapor_pressure.d2TRC_Antoine_extended_dT2
+
 
 Vapor Pressure Estimation Correlations
 --------------------------------------
@@ -136,7 +146,10 @@ The structure of each dataframe is shown below:
 from __future__ import division
 
 __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
-           'Wagner_original', 'Wagner', 'TRC_Antoine_extended',
+           'Wagner_original',  'dWagner_original_dT', 'd2Wagner_original_dT2',
+           'Wagner', 'dWagner_dT', 'd2Wagner_dT2',
+           'TRC_Antoine_extended', 'dTRC_Antoine_extended_dT',
+           'd2TRC_Antoine_extended_dT2',
            'boiling_critical_relation', 'Lee_Kesler', 'Ambrose_Walton',
            'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Tsat_IAPWS',
            'Psub_Clapeyron',
@@ -611,9 +624,22 @@ def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
     ----------
     T : float
         Temperature of fluid, [K]
-    A, B, C, n, E, F : floats
-        Regressed coefficients for the Antoine Extended (TRC) equation,
-        specific for each chemical, [-]
+    Tc : float
+        Critical temperature of fluid, [K]
+    to : float
+        Fit temperature-transition parameter, [K]
+    A : float
+        Antoine `A` parameter, [-]
+    B : float
+        Antoine `B` parameter, [K]
+    C : float
+        Antoine `C` parameter, [K]
+    n : float
+        Fit parameter, [-]
+    E : float
+        Fit parameter, [-]
+    F : float
+        Fit parameter, [-]
 
     Returns
     -------
@@ -629,8 +655,8 @@ def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
     --------
     Tetrafluoromethane, coefficients from [1]_, at 180 K:
 
-    >>> TRC_Antoine_extended(180.0, 227.51, -120., 8.95894, 510.595, -15.95,
-    ... 2.41377, -93.74, 7425.9)
+    >>> TRC_Antoine_extended(T=180.0, Tc=227.51, to=-120., A=8.95894,
+    ... B=510.595, C=-15.95, n=2.41377, E=-93.74, F=7425.9)
     706317.0898414153
 
     References
@@ -643,6 +669,165 @@ def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
         x = 0.0
     x4 = x*x*x*x
     return 10.**(A - B/(T+C) + 0.43429*x**n + x4*x4*(E + F*x4))
+
+def dTRC_Antoine_extended_dT(T, Tc, to, A, B, C, n, E, F):
+    r'''Calculates the first temperature derivative of vapor pressure of a
+    chemical using the TRC Extended Antoine equation.
+
+    .. math::
+        \frac{\partial  P^{\text{sat}} }{\partial T} =
+        10^{A - \frac{B}{C + T} + \frac{E \left(T - T_{ref} - to\right)^{8}}
+        {T_{c}^{8}} + \frac{F \left(T - T_{ref} - to\right)^{12}}{T_{c}^{12}}
+        + f \left(\frac{T - T_{ref} - to}{T_{c}}\right)^{n}}
+        \left(\frac{B}{\left(C + T\right)^{2}} + \frac{8 E \left(T - T_{ref}
+        - to\right)^{7}}{T_{c}^{8}} + \frac{12 F \left(T - T_{ref} - to
+        \right)^{11}}{T_{c}^{12}} + \frac{f n \left(\frac{T - T_{ref} - to}
+        {T_{c}}\right)^{n}}{T - T_{ref} - to}\right) \log{\left(10 \right)}
+
+    .. math::
+        x = \max \left(\frac{T-t_o-273.15}{T_c}, 0 \right)
+
+    .. math::
+        T_{ref} = 273.15 \text{ K}
+
+    .. math::
+        f = 0.43429
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    Tc : float
+        Critical temperature of fluid, [K]
+    to : float
+        Fit temperature-transition parameter, [K]
+    A : float
+        Antoine `A` parameter, [-]
+    B : float
+        Antoine `B` parameter, [K]
+    C : float
+        Antoine `C` parameter, [K]
+    n : float
+        Fit parameter, [-]
+    E : float
+        Fit parameter, [-]
+    F : float
+        Fit parameter, [-]
+
+    Returns
+    -------
+    dPsat_dT : float
+        First temperature derivative of vapor pressure calculated with
+        coefficients [Pa/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Tetrafluoromethane at 180 K:
+
+    >>> dTRC_Antoine_extended_dT(T=180.0, Tc=227.51, to=-120., A=8.95894,
+    ... B=510.595, C=-15.95, n=2.41377, E=-93.74, F=7425.9)
+    31219.6061263
+    '''
+    T_ref = 273.15
+    f = 0.43429
+    ln10 = 2.302585092994046
+    x = (T - to - 273.15)/Tc
+    if x < 0.0:
+        return dAntoine_dT(T, A, B, C, base=10.0)
+    x0 = C + T
+    x1 = -T + T_ref + to
+    x2 = E/Tc**8
+    x3 = F/Tc**12
+    x4 = f*(-x1/Tc)**n
+    return (-10**(A - B/x0 + x1**12*x3 + x1**8*x2 + x4)*(-B/x0**2 + n*x4/x1 + 12.0*x1**11*x3 + 8.0*x1**7*x2)*ln10)
+
+def d2TRC_Antoine_extended_dT2(T, Tc, to, A, B, C, n, E, F):
+    r'''Calculates the second temperature derivative of vapor pressure of a
+    chemical using the TRC Extended Antoine equation.
+
+    .. math::
+        \frac{\partial^2  P^{\text{sat}} }{\partial T^2} =
+        10^{A - \frac{B}{C + T} + \frac{E \left(- T + T_{ref} + to\right)^{8}}
+        {T_{c}^{8}} + \frac{F \left(- T + T_{ref} + to\right)^{12}}{T_{c}^{12}}
+        + f \left(- \frac{- T + T_{ref} + to}{T_{c}}\right)^{n}} \left(
+        - \frac{2 B}{\left(C + T\right)^{3}} + \frac{56 E \left(- T + T_{ref}
+        + to\right)^{6}}{T_{c}^{8}} + \frac{132 F \left(- T + T_{ref}
+        + to\right)^{10}}{T_{c}^{12}} + \frac{f n^{2} \left(- \frac{- T
+        + T_{ref} + to}{T_{c}}\right)^{n}}{\left(- T + T_{ref} + to\right)^{2}}
+        - \frac{f n \left(- \frac{- T + T_{ref} + to}{T_{c}}\right)^{n}}
+        {\left(- T + T_{ref} + to\right)^{2}} + \left(- \frac{B}{\left(C
+        + T\right)^{2}} + \frac{8 E \left(- T + T_{ref} + to\right)^{7}}
+        {T_{c}^{8}} + \frac{12 F \left(- T + T_{ref} + to\right)^{11}}
+        {T_{c}^{12}} + \frac{f n \left(- \frac{- T + T_{ref} + to}
+        {T_{c}}\right)^{n}}{- T + T_{ref} + to}\right)^{2}
+        \log{\left(10 \right)}\right) \log{\left(10 \right)}
+
+    .. math::
+        x = \max \left(\frac{T-t_o-273.15}{T_c}, 0 \right)
+
+    .. math::
+        T_{ref} = 273.15 \text{ K}
+
+    .. math::
+        f = 0.43429
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    Tc : float
+        Critical temperature of fluid, [K]
+    to : float
+        Fit temperature-transition parameter, [K]
+    A : float
+        Antoine `A` parameter, [-]
+    B : float
+        Antoine `B` parameter, [K]
+    C : float
+        Antoine `C` parameter, [K]
+    n : float
+        Fit parameter, [-]
+    E : float
+        Fit parameter, [-]
+    F : float
+        Fit parameter, [-]
+
+    Returns
+    -------
+    d2Psat_dT2 : float
+        Second temperature derivative of vapor pressure calculated with
+        coefficients [Pa/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Tetrafluoromethane at 180 K:
+
+    >>> d2TRC_Antoine_extended_dT2(T=180.0, Tc=227.51, to=-120., A=8.95894,
+    ... B=510.595, C=-15.95, n=2.41377, E=-93.74, F=7425.9)
+    1022.550368944
+    '''
+    T_ref = 273.15
+    f = 0.43429
+    x = (T - to - 273.15)/Tc
+    if x < 0.0:
+        return d2Antoine_dT2(T, A, B, C, base=10.0)
+    x0 = 2.302585092994046
+    x1 = C + T
+    x2 = -T + T_ref + to
+    x3 = E/Tc**8
+    x4 = F/Tc**12
+    x5 = f*(-x2/Tc)**n
+    x6 = x2**(-2)
+    x7 = n*x5
+    return (10**(A - B/x1 + x2**12*x4 + x2**8*x3 + x5)*x0*(-2.0*B/x1**3 + n**2*x5*x6
+            + x0*(-B/x1**2 + 12.0*x2**11*x4 + 8.0*x2**7*x3 + x7/x2)**2
+            + 132.0*x2**10*x4 + 56.0*x2**6*x3 - x6*x7))
 
 
 def Wagner_original(T, Tc, Pc, a, b, c, d):
@@ -705,6 +890,149 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
         return 0.0
     return Pc*exp(((d*tau2*tau + c)*tau2 + a + b*sqrt(tau))*tau_Tr)
 
+def dWagner_original_dT(T, Tc, Pc, a, b, c, d):
+    r'''Calculates first temperature derivative of vapor pressure using the
+    Wagner equation (3, 6 form).
+
+    Requires critical temperature and pressure as well as four coefficients
+    specific to each chemical.
+
+    .. math::
+        \frac{\partial  P^{\text{sat}} }{\partial T} =
+        P_{c} \left(\frac{T_{c} \left(- \frac{a}{T_{c}} - \frac{1.5 b
+        \tau^{0.5}}{T_{c}} - \frac{3 c \tau^{2}}{T_{c}} - \frac{6 d \tau^{5}}
+        {T_{c}}\right)}{T} - \frac{T_{c} \left(a \tau + b \tau^{1.5}
+        + c \tau^{3} + d \tau^{6}\right)}{T^{2}}\right) e^{\frac{T_{c} \left(a
+        \tau + b \tau^{1.5} + c \tau^{3} + d \tau^{6}\right)}{T}}
+
+    .. math::
+        \tau = 1 - \frac{T}{T_c}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    Tc : float
+        Critical temperature, [K]
+    Pc : float
+        Critical pressure, [Pa]
+    a, b, c, d : floats
+        Parameters for wagner equation. Specific to each chemical. [-]
+
+    Returns
+    -------
+    dPsat_dT : float
+        First temperature derivative of vapor pressure at T [Pa/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Methane at 100 K.
+
+    >>> dWagner_original_dT(100.0, 190.53, 4596420., a=-6.00435, b=1.1885,
+    ... c=-0.834082, d=-1.22833)
+    3593.70783283
+    '''
+    Tr = T/Tc
+    tau = 1.0 - Tr
+    tau2 = tau*tau
+    tau3 = tau2*tau
+    try:
+        T_inv = 1.0/T
+        Tr_inv = Tc*T_inv
+    except:
+        # T = 0; Tr = 0
+        return 0.0
+    tau_rt = sqrt(tau)
+    y0 = a*tau + b*tau*tau_rt + tau3*(c + d*tau3)
+    exp_term = exp(Tr_inv*y0)
+    if exp_term == 0.0:
+        # Avoid underflowing to nan
+        return 0.0
+    dPsat_dT = Pc*(T_inv*((-a - 1.5*b*tau_rt - tau2*(3.0*c + 6.0*d*tau3))
+                   - Tc*y0*T_inv)
+                    *exp_term)
+    return dPsat_dT
+
+def d2Wagner_original_dT2(T, Tc, Pc, a, b, c, d):
+    r'''Calculates second temperature derivative of vapor pressure using the
+    Wagner equation (3, 6 form).
+
+    Requires critical temperature and pressure as well as four coefficients
+    specific to each chemical.
+
+    .. math::
+        \frac{\partial^2  P^{\text{sat}} }{\partial T^2} =
+        \frac{P_{c} \left(\frac{\frac{0.75 b}{\tau^{0.5}} + 6 c \tau + 30 d
+        \tau^{4}}{T_{c}} + \frac{2 \left(a + 1.5 b \tau^{0.5} + 3 c \tau^{2}
+        + 6 d \tau^{5}\right)}{T} + \frac{36 \left(\frac{a}{6} + 0.25 b
+        \tau^{0.5} + \frac{c \tau^{2}}{2} + d \tau^{5} - \frac{T_{c} \left(
+        - a \tau - b \tau^{1.5} - c \tau^{3} - d \tau^{6}\right)}{6 T}
+        \right)^{2}}{T} - \frac{2 T_{c} \left(- a \tau - b \tau^{1.5}
+        - c \tau^{3} - d \tau^{6}\right)}{T^{2}}\right) e^{- \frac{T_{c}
+        \left(- a \tau - b \tau^{1.5} - c \tau^{3} - d \tau^{6}\right)}{T}}}{T}
+
+    .. math::
+        \tau = 1 - \frac{T}{T_c}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    Tc : float
+        Critical temperature, [K]
+    Pc : float
+        Critical pressure, [Pa]
+    a, b, c, d : floats
+        Parameters for wagner equation. Specific to each chemical. [-]
+
+    Returns
+    -------
+    d2Psat_dT2 : float
+        Second temperature derivative of vapor pressure at T [Pa/K^2]
+
+    Notes
+    -----
+    This second derivative is infinity at T == Tc.
+
+    Examples
+    --------
+    Methane at 100 K.
+
+    >>> d2Wagner_original_dT2(100.0, 190.53, 4596420., a=-6.00435, b=1.1885,
+    ... c=-0.834082, d=-1.22833)
+    296.87593368224
+    '''
+    Tr = T/Tc
+    tau = 1.0 - Tr
+    tau2 = tau*tau
+    tau3 = tau2*tau
+    try:
+        T_inv = 1.0/T
+#        Tr_inv = Tc*T_inv
+    except:
+        # T = 0; Tr = 0
+        return 0.0
+#    y0 = a*tau + b*tau*tau_rt + tau3*(c + d*tau3)
+#
+#    tau_rt = sqrt(tau)
+    tau_rt = sqrt(tau)
+    x1 = Tc*tau*(a + b*tau_rt + tau2*(c + d*tau3))
+    x2 = T_inv*x1
+    exp_term = exp(x2)
+    if exp_term == 0.0:
+        # Avoid underflowing to nan
+        return 0.0
+    x4 = b*tau_rt
+    x5 = c*tau2
+    x6 = d*tau2*tau3
+    x7 = (a*(1.0/6.0) + x2*(1.0/6.0) + 0.25*x4 + 0.5*x5 + x6)
+    return (Pc*T_inv*T_inv*(2.0*(a + 1.5*x4 + 3.0*x5 + 6.0*x6) + 36.0*x7*x7
+                   + (0.75*b/tau_rt + 6.0*c*tau + 30.0*d*tau2*tau2)*Tr
+                   + 2.0*x1*T_inv)*exp_term)
+
 
 def Wagner(T, Tc, Pc, a, b, c, d):
     r'''Calculates vapor pressure using the Wagner equation (2.5, 5 form).
@@ -758,6 +1086,139 @@ def Wagner(T, Tc, Pc, a, b, c, d):
     tau = 1.0 - T/Tc
     return Pc*exp((a*tau + b*tau**1.5 + c*tau**2.5 + d*tau**5)/Tr)
 
+def dWagner_dT(T, Tc, Pc, a, b, c, d):
+    r'''Calculates the first temperature derivative of vapor pressure using the
+    Wagner equation (2.5, 5 form).
+
+    Requires critical temperature and pressure as well as four coefficients
+    specific to each chemical.
+
+    .. math::
+        \frac{\partial  P^{\text{sat}} }{\partial T} =
+        P_{c} \left(\frac{T_{c} \left(- \frac{a}{T_{c}} - \frac{1.5 b
+        \tau^{0.5}}{T_{c}} - \frac{2.5 c \tau^{1.5}}{T_{c}} - \frac{5 d
+        \tau^{4}}{T_{c}}\right)}{T} - \frac{T_{c} \left(a \tau + b \tau^{1.5}
+        + c \tau^{2.5} + d \tau^{5}\right)}{T^{2}}\right) e^{\frac{T_{c}
+        \left(a \tau + b \tau^{1.5} + c \tau^{2.5} + d \tau^{5}\right)}{T}}
+
+    .. math::
+        \tau = 1 - \frac{T}{T_c}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    Tc : float
+        Critical temperature, [K]
+    Pc : float
+        Critical pressure, [Pa]
+    a, b, c, d : floats
+        Parameters for wagner equation. Specific to each chemical. [-]
+
+    Returns
+    -------
+    dPsat_dT : float
+        First temperature derivative of vapor pressure at T [Pa/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Methane at 100 K.
+
+    >>> dWagner_dT(100., 190.551, 4599200, -6.02242, 1.26652, -0.5707, -1.366)
+    3587.2910498076
+
+    '''
+    Tr = T/Tc
+    tau = 1.0 - T/Tc
+    tau2 = tau*tau
+    try:
+        x0 = 1.0/T
+    except:
+        # T = 0
+        return 0.0
+    tau_rt = sqrt(tau)
+    x1 = tau*tau_rt
+    x2 = Tc*x0*(a*tau + b*x1 + tau2*(c*tau_rt + d*tau2*tau))
+    exp_term = exp(x2)
+    if exp_term == 0.0:
+        # Avoid nan issues
+        return 0.0
+    return -Pc*x0*(a + 1.5*b*tau_rt + 2.5*c*x1 + 5.0*d*tau2*tau2 + x2)*exp_term
+
+def d2Wagner_dT2(T, Tc, Pc, a, b, c, d):
+    r'''Calculates the second temperature derivative of vapor pressure using the
+    Wagner equation (2.5, 5 form).
+
+    Requires critical temperature and pressure as well as four coefficients
+    specific to each chemical.
+
+    .. math::
+        \frac{\partial^2  P^{\text{sat}} }{\partial T^2} =
+        \frac{P_{c} \left(\frac{\frac{0.75 b}{\tau^{0.5}} + 3.75 c \tau^{0.5}
+        + 20 d \tau^{3}}{T_{c}} + \frac{2 \left(a + 1.5 b \tau^{0.5}
+        + 2.5 c \tau^{1.5} + 5 d \tau^{4}\right)}{T} + \frac{25 \left(
+        \frac{a}{5} + 0.3 b \tau^{0.5} + 0.5 c \tau^{1.5} + d \tau^{4}
+        - \frac{T_{c} \left(- a \tau - b \tau^{1.5} - c \tau^{2.5}
+        - d \tau^{5}\right)}{5 T}\right)^{2}}{T} - \frac{2 T_{c} \left(- a
+        \tau - b \tau^{1.5} - c \tau^{2.5} - d \tau^{5}\right)}{T^{2}}\right)
+        e^{- \frac{T_{c} \left(- a \tau - b \tau^{1.5} - c \tau^{2.5}
+        - d \tau^{5}\right)}{T}}}{T}
+
+    .. math::
+        \tau = 1 - \frac{T}{T_c}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    Tc : float
+        Critical temperature, [K]
+    Pc : float
+        Critical pressure, [Pa]
+    a, b, c, d : floats
+        Parameters for wagner equation. Specific to each chemical. [-]
+
+    Returns
+    -------
+    d2Psat_dT2 : float
+        Second temperature derivative of vapor pressure at T [Pa/K^2]
+
+    Notes
+    -----
+    This second derivative is infinity at T == Tc.
+
+    Examples
+    --------
+    Methane at 100 K.
+
+    >>> d2Wagner_dT2(100., 190.551, 4599200, -6.02242, 1.26652, -0.5707, -1.366)
+    296.7091513877
+    '''
+    Tr = T/Tc
+    tau = 1.0 - T/Tc
+    tau_rt = sqrt(tau)
+    tau2 = tau*tau
+    try:
+        T_inv = 1.0/T
+    except:
+        # T = 0
+        return 0.0
+    x1 = tau*tau_rt
+    x2 = Tc*(a*tau + b*x1 + tau*(c*x1 + d*tau2*tau2))
+    x3 = T_inv*x2
+    x5 = b*tau_rt
+    x6 = c*x1
+    x7 = d*tau2*tau2
+    exp_term = exp(x3)
+    if exp_term == 0.0:
+        # Avoid nan issues
+        return 0.0
+    return (Pc*T_inv*(2.0*T_inv*(a + 1.5*x5 + 2.5*x6 + 5.0*x7) + 25.0*T_inv*(a*(1.0/5.0) + x3*(1.0/5.0)
+            + 0.3*x5 + 0.5*x6 + x7)**2 + (0.75*b/tau_rt + 3.75*c*tau_rt
+            + 20.0*d*tau*tau2)/Tc + 2.0*x2*T_inv*T_inv)*exp_term)
 
 def Psat_IAPWS(T):
     r'''Calculates vapor pressure of water using the IAPWS explicit equation.
@@ -988,7 +1449,7 @@ def boiling_critical_relation(T, Tb, Tc, Pc):
     Tbr = Tb/Tc
     Tr = T/Tc
     h = Tbr*log(Pc/101325.)/(1 - Tbr)
-    return exp(h*(1-1/Tr))*Pc
+    return exp(h*(1.0 - 1.0/Tr))*Pc
 
 
 def Lee_Kesler(T, Tc, Pc, omega):
