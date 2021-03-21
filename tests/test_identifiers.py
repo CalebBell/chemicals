@@ -23,7 +23,6 @@ SOFTWARE.
 
 import pandas as pd
 from math import isnan
-from numpy.testing import assert_allclose
 import pytest
 from chemicals.identifiers import *
 from chemicals.elements import periodic_table, nested_formula_parser, serialize_formula, molecular_weight

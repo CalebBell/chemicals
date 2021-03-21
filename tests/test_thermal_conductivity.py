@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from numpy.testing import assert_allclose
 import pytest
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.thermal_conductivity import *
@@ -196,7 +195,7 @@ def test_CSP_gas():
     assert kg1 == DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92) # No argument
     kg2 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='monoatomic')
     kg3 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='nonlinear')
-    assert_allclose([kg1, kg2, kg3], [0.01813208676438415, 0.023736881470903245, 0.018625352738307743])
+    assert_close1d([kg1, kg2, kg3], [0.01813208676438415, 0.023736881470903245, 0.018625352738307743])
 
     with pytest.raises(ValueError):
         DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='FAIL')
@@ -221,30 +220,30 @@ def test_CSP_gas():
 def test_CSP_gas_dense():
     kgs = [Stiel_Thodos_dense(T=378.15, MW=44.013, Tc=309.6, Pc=72.4E5, Vc=97.4E-6, Zc=0.274, Vm=i, kg=2.34E-2) for i in [144E-6, 24E-6, 240E-6]]
     kgs_exp = [0.041245574404863684, 0.9158718777539487, 0.03258313269922979]
-    assert_allclose(kgs, kgs_exp)
+    assert_close1d(kgs, kgs_exp)
 
 
     kgs = [Eli_Hanley_dense(T=T, MW=42.081, Tc=364.9, Vc=1.81E-4, Zc=0.274, omega=0.144, Cvm=82.70, Vm=1.721E-4) for T in [473., 900]]
     kgs_exp = [0.06038475936515042, 0.08987438807653142]
-    assert_allclose(kgs, kgs_exp)
+    assert_close1d(kgs, kgs_exp)
 
     kg = Eli_Hanley_dense(700, MW=42.081, Tc=364.9, Vc=1.81E-4, Zc=0.274, omega=0.144, Cvm=82.70, Vm=3.721E-4)
-    assert_allclose(kg, 0.06953791121177173)
+    assert_close(kg, 0.06953791121177173)
 
     kg = Chung_dense(T=473., MW=42.081, Tc=364.9, Vc=184.6E-6, omega=0.142, Cvm=82.67, Vm=172.1E-6, mu=134E-7, dipole=0.4)
-    assert_allclose(kg, 0.06160569232570781)
+    assert_close(kg, 0.06160569232570781)
 
 
 def test_DIPPR9H():
     k = DIPPR9H([0.258, 0.742], [0.1692, 0.1528])
-    assert_allclose(k, 0.15657104706719646)
+    assert_close(k, 0.15657104706719646)
 
 #    with pytest.raises(Exception):
 #        DIPPR9H([0.258, 0.742], [0.1692])
 
 def test_Filippov():
     kl = Filippov([0.258, 0.742], [0.1692, 0.1528])
-    assert_allclose(kl, 0.15929167628799998)
+    assert_close(kl, 0.15929167628799998)
 
     with pytest.raises(ValueError):
         Filippov([0.258], [0.1692, 0.1528])
@@ -252,7 +251,7 @@ def test_Filippov():
 
 def test_Lindsay_Bromley():
     kg = Lindsay_Bromley(323.15, [0.23, 0.77], [1.939E-2, 1.231E-2], [1.002E-5, 1.015E-5], [248.31, 248.93], [46.07, 50.49])
-    assert_allclose(kg, 0.01390264417969313)
+    assert_close(kg, 0.01390264417969313)
 
 #    with pytest.raises(Exception):
 #        Lindsay_Bromley(323.15, [0.23], [1.939E-2, 1.231E-2], [1.002E-5, 1.015E-5], [248.31, 248.93], [46.07, 50.49])

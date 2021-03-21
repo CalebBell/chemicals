@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from numpy.testing import assert_allclose
 import pytest
 import pandas as pd
 import numpy as np
@@ -319,10 +318,10 @@ def test_UFL():
 
 def test_unit_conv_TLV():
     mgm3 = ppmv_to_mgm3(1, 40)
-    assert_allclose(mgm3, 1.6349617809430446)
+    assert_close(mgm3, 1.6349617809430446)
 
     ppmv = mgm3_to_ppmv(1.635, 40)
-    assert_allclose(ppmv, 1.0000233761164334)
+    assert_close(ppmv, 1.0000233761164334)
 
 def test_fire_mixing():
     LFL = fire_mixing(ys=normalize([0.0024, 0.0061, 0.0015]), FLs=[.012, .053, .031])

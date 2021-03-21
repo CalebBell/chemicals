@@ -21,9 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from numpy.testing import assert_allclose
 import pytest
-from fluids.numerics import assert_close
+from fluids.numerics import assert_close, assert_close1d, assert_close2d
 
 from chemicals.elements import *
 from chemicals.elements import periodic_table
@@ -31,11 +30,11 @@ from chemicals.elements import periodic_table
 def test_molecular_weight():
     MW_calc = molecular_weight({'H': 12, 'C': 20, 'O': 5})
     MW = 332.30628
-    assert_allclose(MW_calc, MW)
+    assert_close(MW_calc, MW)
 
     MW_calc = molecular_weight({'C': 32, 'Cu': 1, 'H': 12, 'Na': 4, 'S': 4, 'O': 12, 'N': 8})
     MW = 984.24916
-    assert_allclose(MW_calc, MW)
+    assert_close(MW_calc, MW)
 
     with pytest.raises(Exception):
         molecular_weight({'H': 12, 'C': 20, 'FAIL': 5})
@@ -47,11 +46,11 @@ def test_molecular_weight():
 def test_mass_fractions():
     mfs_calc = mass_fractions({'H': 12, 'C': 20, 'O': 5})
     mfs = {'H': 0.03639798802478244, 'C': 0.7228692758981262, 'O': 0.24073273607709128}
-    assert_allclose(sorted(mfs.values()), sorted(mfs_calc.values()))
+    assert_close1d(sorted(mfs.values()), sorted(mfs_calc.values()))
 
     mfs_calc = mass_fractions({'C': 32, 'Cu': 1, 'H': 12, 'Na': 4, 'S': 4, 'O': 12, 'N': 8})
     mfs = {'C': 0.39049299264832493, 'H': 0.012288839545466314, 'O': 0.19506524140696244, 'N': 0.11384678245496294, 'S': 0.13031253183899086, 'Na': 0.09343069187887344, 'Cu': 0.06456292022641909}
-    assert_allclose(sorted(mfs.values()), sorted(mfs_calc.values()))
+    assert_close1d(sorted(mfs.values()), sorted(mfs_calc.values()))
 
     # Fail two tests, one without MW, and one with MW
     with pytest.raises(Exception):
@@ -63,20 +62,20 @@ def test_mass_fractions():
 def test_atom_fractions():
     fractions_calc = atom_fractions({'H': 12, 'C': 20, 'O': 5})
     fractions = {'H': 0.32432432432432434, 'C': 0.5405405405405406, 'O': 0.13513513513513514}
-    assert_allclose(sorted(fractions_calc.values()), sorted(fractions.values()))
+    assert_close1d(sorted(fractions_calc.values()), sorted(fractions.values()))
 
 
 def test_similarity_variable():
     sim1 = similarity_variable({'H': 32, 'C': 15})
     sim2 = similarity_variable({'H': 32, 'C': 15}, 212.41458)
-    assert_allclose([sim1, sim2], [0.2212654140784498]*2)
+    assert_close1d([sim1, sim2], [0.2212654140784498]*2)
 
 
 def test_elements_data():
     tots_calc = [sum([getattr(i, att) for i in periodic_table if not getattr(i, att) is None]) for att in
     ['number', 'MW', 'period', 'group', 'AReneg', 'rcov', 'rvdw', 'maxbonds', 'elneg', 'ionization', 'elaffinity', 'electrons', 'protons']]
     tots_exp = [7021, 17285.2137652, 620, 895, 109.91, 144.3100000000001, 179.4300000000001, 94, 163.27000000000007, 816.4238999999999, 67.50297235000001, 7021, 7021]
-    assert_allclose(tots_calc, tots_exp)
+    assert_close1d(tots_calc, tots_exp)
 
 def test_misc_elements():
     assert periodic_table['H'].InChI == 'H' # 'InChI=1S/
@@ -221,7 +220,7 @@ def test_serialize_formula():
 def test_mixture_atomic_composition_ordered():
     ns, names = mixture_atomic_composition_ordered([{'O': 2}, {'N': 1, 'O': 2}, {'C': 1, 'H': 4}], [0.95, 0.025, .025])
     assert names == ['H', 'C', 'N', 'O']
-    assert_allclose(ns, [0.1, 0.025, 0.025, 1.95], rtol=1e-12)
+    assert_close1d(ns, [0.1, 0.025, 0.025, 1.95], rtol=1e-12)
 
 
 def test_atom_matrix():
@@ -241,7 +240,7 @@ def test_atom_matrix():
      [0.0, 1, 0.0, 2]]
     default = atom_matrix(atomss)
 
-    assert_allclose(default, default_expect, rtol=1e-12)
+    assert_close2d(default, default_expect, rtol=1e-12)
 
     OCH = atom_matrix(atomss, ['O', 'C', 'H'])
-    assert_allclose(OCH, OCH_expect, rtol=1e-12)
+    assert_close2d(OCH, OCH_expect, rtol=1e-12)

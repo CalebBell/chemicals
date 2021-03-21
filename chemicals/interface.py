@@ -1012,6 +1012,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
         # Symmetric - can be slightly optimized
         for j in range(i):
             tot += Vms[i]*Vms[j]
+
     return tot
 
 

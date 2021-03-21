@@ -28,7 +28,6 @@ from math import *
 from random import random
 from fluids.constants import *
 from fluids.numerics import assert_close, assert_close1d, assert_close2d
-from numpy.testing import assert_allclose
 import pytest
 try:
     import numba
