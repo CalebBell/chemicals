@@ -168,7 +168,7 @@ __all__ = ['heat_capacity_gas_methods',
            ]
 import os
 from io import open
-from chemicals.utils import R, log, exp, to_num, PY37, property_mass_to_molar, source_path, os_path_join, can_load_data
+from chemicals.utils import R, log, exp, to_num, PY37, property_mass_to_molar, source_path, os_path_join, can_load_data, mark_numba_uncacheable
 from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
 from fluids.numerics import newton, brenth, secant, polylog2, numpy as np
@@ -1214,6 +1214,7 @@ def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm, cyclic_ali
     err = (dH - Hm)
     return err
 
+@mark_numba_uncacheable
 def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
                            factor=1.0, cyclic_aliphatic=None, term_A=None):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
@@ -1286,6 +1287,7 @@ def Lastovka_Shaw_T_for_Sm_err(T, MW, similarity_variable, S_ref, Sm, cyclic_ali
     err = (dS - Sm)
     return err
 
+@mark_numba_uncacheable
 def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
                            factor=1.0, cyclic_aliphatic=None, term_A=None):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for

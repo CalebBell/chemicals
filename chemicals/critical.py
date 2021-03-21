@@ -96,6 +96,7 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
            'critical_surface_all_methods']
 
 import os
+from chemicals.utils import mark_numba_incompatible
 from fluids.constants import R, R_inv, N_A
 from chemicals.utils import log, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
@@ -188,6 +189,7 @@ else: # pragma: no cover
 Tc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
 '''Tuple of method name keys. See the `Tc` for the actual references'''
 
+@mark_numba_incompatible
 def Tc_methods(CASRN):
     """Return all methods available to obtain Tc for the desired chemical.
 
@@ -208,6 +210,7 @@ def Tc_methods(CASRN):
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Tc_sources, CASRN, 'Tc')
 
+@mark_numba_incompatible
 def Tc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
     temperature. Lookup is based on CASRNs. Will automatically select a data
@@ -344,6 +347,7 @@ def Tc(CASRN, method=None):
 Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
 '''Tuple of method name keys. See the `Pc` for the actual references'''
 
+@mark_numba_incompatible
 def Pc_methods(CASRN):
     """Return all methods available to obtain Pc for the desired chemical.
 
@@ -363,7 +367,7 @@ def Pc_methods(CASRN):
     """
     return list_available_methods_from_df_dict(Pc_sources, CASRN, 'Pc')
 
-
+@mark_numba_incompatible
 def Pc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
     pressure. Lookup is based on CASRNs. Will automatically select a data
@@ -499,6 +503,7 @@ def Pc(CASRN, method=None):
 Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
 '''Tuple of method name keys. See the `Vc` for the actual references'''
 
+@mark_numba_incompatible
 def Vc_methods(CASRN):
     """Return all methods available to obtain Vc for the desired chemical.
 
@@ -519,6 +524,7 @@ def Vc_methods(CASRN):
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Vc_sources, CASRN, 'Vc')
 
+@mark_numba_incompatible
 def Vc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
     volume. Lookup is based on CASRNs. Will automatically select a data
@@ -648,6 +654,7 @@ def Vc(CASRN, method=None):
 Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
 '''Tuple of method name keys. See the `Zc` for the actual references'''
 
+@mark_numba_incompatible
 def Zc_methods(CASRN):
     """Return all methods available to obtain Zc for the desired chemical.
 
@@ -668,6 +675,7 @@ def Zc_methods(CASRN):
     if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Zc_sources, CASRN, 'Zc')
 
+@mark_numba_incompatible
 def Zc(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's critical
     compressibility. Lookup is based on CASRNs. Will automatically select a
@@ -837,6 +845,7 @@ rcovs_regressed =  {
     u'Cs': 3.433699060142929,
     u'Zr': 0.9346554283483623}
 
+@mark_numba_incompatible
 def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
                             covalent_radii=rcovs_Mersmann_Kind):
     r'''Predicts the critical molar volume of a chemical based only on its

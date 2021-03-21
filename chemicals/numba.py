@@ -17,48 +17,29 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+from chemicals.utils import PY37, numba_blacklisted, numba_cache_blacklisted
 
-from __future__ import division
-import sys
-import importlib.util
-import types
-import numpy as np
-import numba
-import chemicals
-import fluids
-import fluids.numba
-import re
-normal = chemicals
-import inspect
-
+busy = False
 __all__ = []
 
-__funcs = {}
+def transform():
+    gdct = globals()
+    import chemicals
+    import fluids
+    import fluids.numba
+    normal = chemicals
+    __funcs = {}
+    replaced = fluids.numba.numerics_dict.copy()
+    normal_fluids = fluids
+    orig_file = __file__
+    def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec):
+        cache_blacklist = set(numba_cache_blacklisted)
+        __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
+        new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,
+                                                        blacklist=set(numba_blacklisted),
+                                                        cache_blacklist=cache_blacklist)
 
-numerics = fluids.numba.numerics
-replaced = fluids.numba.numerics_dict.copy()
-
-normal_fluids = fluids
-
-orig_file = __file__
-def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
-    cache_blacklist = set( ['Rachford_Rice_solution', 'Rachford_Rice_solution_LN2', 'Rachford_Rice_solution_polynomial',
-              'Rachford_Rice_solution_numpy', 'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
-              'Rachford_Rice_solutionN', 'Rachford_Rice_solution2', 'flash_wilson',
-              'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'iapws97_T', 'iapws95_T'])
-
-    blacklist = set(['to_num', 'hash_any_primitive'])
-
-    __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
-    new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,
-                                                    blacklist=blacklist,
-                                                    cache_blacklist=cache_blacklist)
-    if vec:
-        conv_fun = numba.vectorize
-    else:
-        conv_fun = numba.jit
-
-    to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
+        to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
              'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
              'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
              'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
@@ -92,21 +73,32 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False):
              'thermal_conductivity.DIPPR9I',
              'virial.Z_from_virial_density_form',
              ]
-    normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist)
+        normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist)
 
-    for mod in new_mods:
-        mod.__dict__.update(__funcs)
-        try:
-            __all__.extend(mod.__all__)
-        except AttributeError:
-            pass
+        for mod in new_mods:
+            mod.__dict__.update(__funcs)
+            try:
+                __all__.extend(mod.__all__)
+            except AttributeError:
+                pass
 
-transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False)
+    transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False)
+    gdct.update(__funcs)
+    gdct.update(replaced)
+    gdct['__name__'] = 'chemicals.numba'
+    gdct['__file__'] = orig_file
+    del gdct['transform']
 
-
-
-globals().update(__funcs)
-globals().update(replaced)
-
-__name__ = 'chemicals.numba'
-__file__ = orig_file
+if PY37:
+    def __getattr__(name):
+        if name == '__path__' or busy:
+            raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        gdct = globals()
+        gdct['busy'] = True
+        transform()
+        del gdct['__getattr__'], gdct['busy']
+        try: return gdct[name]
+        except KeyError:
+            raise AttributeError("module %s has no attribute %s" %(__name__, name))
+else:
+    transform()

@@ -75,7 +75,7 @@ from fluids.constants import R
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
 from chemicals.utils import exp, log
-from chemicals.utils import normalize
+from chemicals.utils import normalize, mark_numba_uncacheable
 from chemicals.exceptions import PhaseCountReducedError
 try:
     from itertools import combinations
@@ -388,6 +388,7 @@ def err_RR_poly(VF, poly):
 def err_and_der_RR_poly(VF, poly):
     return horner_and_der(poly, VF)
 
+@mark_numba_uncacheable
 def Rachford_Rice_solution_polynomial(zs, Ks):
     r'''Solves the Rachford-Rice equation by transforming it into a polynomial,
     and then either analytically calculating the roots, or, using the known
@@ -635,6 +636,7 @@ def Rachford_Rice_err(V_over_F, zs_k_minus_1, K_minus_1):
 
 
 
+@mark_numba_uncacheable
 def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
     r'''Solves the objective function of the Rachford-Rice flash equation [1]_.
     Uses the method proposed in [2]_ to obtain an initial guess.
@@ -814,6 +816,7 @@ def Rachford_Rice_numpy_err_fprime2(V_over_F, zs_k_minus_1, K_minus_1):
 
 
 
+@mark_numba_uncacheable
 def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
     """Undocumented version of Rachford_Rice_solution which works with numpy
     instead.
@@ -902,6 +905,7 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
 
     return F0, -dF0, ddF0
 
+@mark_numba_uncacheable
 def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     r'''Solves the a objective function for the Rachford-Rice flash equation
     according to the Leibovici and Nichita (2010) transformation (method 2).
@@ -1087,6 +1091,7 @@ def LJA_fprime2(v, t1, terms_2, terms_3, N2):
         fprime2 += 2.0*terms_3[i]*(x3 - 1.0)*x2*x2
     return err, fprime, fprime2
 
+@mark_numba_uncacheable
 def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
     r'''Solves the objective function of the Li-Johns-Ahmadi flash equation.
     Uses the method proposed in [1]_ to obtain an initial guess.
@@ -1371,6 +1376,7 @@ def flash_inner_loop_methods(N):
     return methods
 
 
+@mark_numba_uncacheable
 def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
     r'''This function handles the solution of the inner loop of a flash
     calculation, solving for liquid and gas mole fractions and vapor fraction
@@ -1646,6 +1652,7 @@ def Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=False):
     return True
 
 
+@mark_numba_uncacheable
 def Rachford_Rice_solutionN(ns, Ks, betas):
     r'''Solves the (phases -1) objectives functions of the Rachford-Rice flash
     equation for an N-phase system. Initial guesses are required for all phase
@@ -1790,6 +1797,7 @@ def RRN_new_betas(betas, d_betas, damping, ns, Ks, *args):
     return betas_test
 
 
+@mark_numba_uncacheable
 def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
     r'''Solves the two objective functions of the Rachford-Rice flash equation
     for a three-phase system. Initial guesses are required for both phase

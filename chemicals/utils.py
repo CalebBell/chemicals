@@ -95,7 +95,18 @@ try:
 except:
     pass
 
+numba_blacklisted = ['mark_numba_incompatible', 'mark_numba_uncacheable']
+numba_cache_blacklisted = []
 
+def mark_numba_incompatible(f):
+    numba_blacklisted.append(f.__name__)
+    return f
+
+def mark_numba_uncacheable(f):
+    numba_cache_blacklisted.append(f.__name__)
+    return f
+
+@mark_numba_incompatible
 def to_num(values):
     r'''Legacy function to turn a list of strings into either floats
     (if numeric), stripped strings (if not) or None if the string is empty.
@@ -133,6 +144,7 @@ try:
 except:
     pass
 
+@mark_numba_incompatible
 def hash_any_primitive(v):
     '''Method to hash a primitive - with basic support for lists and
     dictionaries.

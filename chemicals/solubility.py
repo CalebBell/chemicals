@@ -51,8 +51,6 @@ import os
 from fluids.constants import R, atm, R_inv
 from chemicals.utils import log, exp, sqrt
 
-
-
 def solubility_parameter(T, Hvapm, Vml):
     r'''This function handles the calculation of a chemical's solubility
     parameter. Calculation is a function of temperature, but is not always
@@ -121,7 +119,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
         Heat of melting at the melting temperature of the solute [J/mol]
     Cpl : float, optional
         Molar heat capacity of the solute as a liquid [J/mol/K]
-    Cpls: float, optional
+    Cps: float, optional
         Molar heat capacity of the solute as a solid [J/mol/K]
     gamma : float, optional
         Activity coefficient of the solute as a liquid [-]
@@ -140,7 +138,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     From [1]_, matching example
 
     >>> solubility_eutectic(T=260., Tm=278.68, Hm=9952., Cpl=0, Cps=0, gamma=3.0176)
-    0.2434007130748
+    0.243400713
 
     References
     ----------
