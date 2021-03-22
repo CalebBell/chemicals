@@ -705,9 +705,9 @@ def _search_chemical(ID, autoload):
         try:
             CAS1 = search_chemical(first_identifier, autoload)
             CAS2 = search_chemical(second_identifier, autoload)
-            assert CAS1 == CAS2
-            CAS = CAS1
-            return CAS
+            if CAS1 == CAS2:
+                CAS = CAS1
+                return CAS
         except:
             pass
 
