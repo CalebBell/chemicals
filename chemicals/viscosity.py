@@ -1634,6 +1634,42 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
             tot += ys[j]*phiij
         mu += ys[i]*mus[i]/tot
     return mu
+    ''' # Alternate variant which may be able to be faster in parallel
+    N = len(ys)
+    mu_root_invs = [0.0]*N
+    mu_roots = [0.0]*N
+    mus_inv = [0.0]*N
+    tots = [0.0]*N
+    for i in range(N):
+        # 1/sqrt(mus)
+        mu_root_invs[i] = muirtinv = 1.0/sqrt(mus[i])
+        # sqrt(mus)
+        mu_roots[i] = muirtinv*mus[i]
+        # 1/mus
+        mus_inv[i] = muirtinv*muirtinv*ys[i]
+        mu_root_invs[i] *= ys[i]
+
+    mu = 0.0
+    for i in range(N):
+        tot = 0.0
+        # Not a symmetric matrix unfortunately
+        for j in range(N):
+            tot += ys[j]*t2s[i][j]
+        tots[i] += tot
+    for i in range(N):
+        tot1 = 0.0
+        for j in range(N):
+            tot1 += mus_inv[j]*t0s[i][j]
+        tots[i] += tot1*mus[i]
+    for i in range(N):
+        tot2 = 0.0
+        for j in range(N):
+            tot2 += mu_root_invs[j]*t1s[i][j]
+        tots[i] += tot2*mu_roots[i]
+    for i in range(N):
+        mu += ys[i]*mus[i]/tots[i]
+    return mu
+    '''
 
 def Wilke_large(ys, mus, MWs):
     r'''Calculates viscosity of a gas mixture according to
