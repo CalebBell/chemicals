@@ -1471,10 +1471,10 @@ def d2ns_to_dn2_partials(d2ns, dns):
 
     Derived with the following SymPy code.
 
-    >>> from sympy import *
-    >>> n1, n2 = symbols('n1, n2')
-    >>> f, g, h = symbols('f, g, h', cls=Function)
-    >>> diff(h(n1, n2)*f(n1,  n2), n1, n2)
+    >>> from sympy import * # doctest: +SKIP
+    >>> n1, n2 = symbols('n1, n2') # doctest: +SKIP
+    >>> f, g, h = symbols('f, g, h', cls=Function) # doctest: +SKIP
+    >>> diff(h(n1, n2)*f(n1,  n2), n1, n2) # doctest: +SKIP
     f(n1, n2)*Derivative(h(n1, n2), n1, n2) + h(n1, n2)*Derivative(f(n1, n2), n1, n2) + Derivative(f(n1, n2), n1)*Derivative(h(n1, n2), n2) + Derivative(f(n1, n2), n2)*Derivative(h(n1, n2), n1)
 
     See Also
