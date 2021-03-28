@@ -385,13 +385,13 @@ def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
         raise ValueError(order_not_found_msg)
 
 
-def EQ105(T, A, B, C, D):
+def EQ105(T, A, B, C, D, order=0):
     r'''DIPPR Equation #105. Often used in calculating liquid molar density.
     All 4 parameters are required. C is sometimes the fluid's critical
     temperature.
 
     .. math::
-        Y = \frac{A}{B^{1 + (1-\frac{T}{C})^D}}
+        Y = \frac{A}{B^{1 + \left(1-\frac{T}{C}\right)^D}}
 
     Parameters
     ----------
@@ -399,6 +399,13 @@ def EQ105(T, A, B, C, D):
         Temperature, [K]
     A-D : float
         Parameter for the equation; chemical and property specific [-]
+    order : int, optional
+        Order of the calculation. 0 for the calculation of the result itself;
+        for 1, the first derivative of the property is returned, for
+        -1, the indefinite integral of the property with respect to temperature
+        is returned; No
+        other integrals or derivatives are implemented, and an exception will
+        be raised if any other order is given.
 
     Returns
     -------
@@ -408,7 +415,27 @@ def EQ105(T, A, B, C, D):
     Notes
     -----
     This expression can be integrated in terms of the incomplete gamma function
-    for dT, but for Y/T dT no integral could be found.
+    for dT, however nans are the only output from that function.
+    For Y/T dT no integral could be found.
+
+    .. math::
+        \frac{d Y}{dT} = \frac{A B^{- \left(1 - \frac{T}{C}\right)^{D} - 1} D
+        \left(1 - \frac{T}{C}\right)^{D} \log{\left(B \right)}}{C \left(1
+        - \frac{T}{C}\right)}
+
+    .. math::
+        \frac{d^2 Y}{dT^2} = \frac{A B^{- \left(1 - \frac{T}{C}\right)^{D} - 1}
+        D \left(1 - \frac{T}{C}\right)^{D} \left(D \left(1 - \frac{T}{C}
+        \right)^{D} \log{\left(B \right)} - D + 1\right) \log{\left(B \right)}}
+        {C^{2} \left(1 - \frac{T}{C}\right)^{2}}
+
+    .. math::
+        \frac{d^3 Y}{dT^3} = \frac{A B^{- \left(1 - \frac{T}{C}\right)^{D} - 1}
+        D \left(1 - \frac{T}{C}\right)^{D} \left(D^{2} \left(1 - \frac{T}{C}
+        \right)^{2 D} \log{\left(B \right)}^{2} - 3 D^{2} \left(1 - \frac{T}{C}
+        \right)^{D} \log{\left(B \right)} + D^{2} + 3 D \left(1 - \frac{T}{C}
+        \right)^{D} \log{\left(B \right)} - 3 D + 2\right) \log{\left(B
+        \right)}}{C^{3} \left(1 - \frac{T}{C}\right)^{3}}
 
     Examples
     --------
@@ -422,7 +449,31 @@ def EQ105(T, A, B, C, D):
     .. [1] Design Institute for Physical Properties, 1996. DIPPR Project 801
        DIPPR/AIChE
     '''
-    return A*B**(-(1. + (1. - T/C)**D))
+    if order == 0:
+        return A*B**(-(1. + (1. - T/C)**D))
+    elif order == 1:
+        x0 = 1.0/C
+        x1 = 1.0 - T*x0
+        x2 = x1**D
+        return A*B**(-x2 - 1.0)*D*x0*x2*log(B)/x1
+    elif order == 2:
+        x0 = 1.0 - T/C
+        x1 = x0**D
+        x2 = D*x1*log(B)
+        den = 1.0/(C*x0)
+        return A*B**(-x1 - 1.0)*x2*(1.0 - D + x2)*den*den
+    elif order == 3:
+        x0 = 1.0 - T/C
+        x1 = x0**D
+        x2 = 3.0*D
+        x3 = D*D
+        x4 = log(B)
+        x5 = x1*x4
+        den = 1.0/(C*x0)
+        return A*B**(-x1 - 1.0)*D*x5*(x0**(2.0*D)*x3*x4*x4 + x2*x5 - x2 - 3.0*x3*x5 + x3 + 2.0)*den*den*den
+    else:
+        raise ValueError(order_not_found_msg)
+
 
 
 def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0):
@@ -953,7 +1004,7 @@ EQ100: (0, 1, -1, -1j),
 EQ101: (0, 1, 2, 3),
 EQ102: (0, 1, -1, -1j),
 EQ104: (0, 1, -1, -1j),
-#EQ105:
+EQ105: (0, 1, 2, 3),
 #EQ106:
 EQ107: (0, 1, -1, -1j),
 EQ114: (0, 1, -1, -1j),
