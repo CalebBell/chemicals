@@ -905,6 +905,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
     .. math::
         Y = A + B\tau^{0.35} + C\tau^{2/3} + D\tau + E\tau^{4/3}
 
+    .. math::
         \tau = 1 - \frac{T}{T_c}
 
     Parameters
