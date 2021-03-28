@@ -401,9 +401,7 @@ def EQ105(T, A, B, C, D, order=0):
         Parameter for the equation; chemical and property specific [-]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
-        for 1, the first derivative of the property is returned, for
-        -1, the indefinite integral of the property with respect to temperature
-        is returned; No
+        for 1, 2, and 3, that derivative of the property is returned; No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
@@ -476,7 +474,7 @@ def EQ105(T, A, B, C, D, order=0):
 
 
 
-def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0):
+def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
     r'''DIPPR Equation #106. Often used in calculating liquid surface tension,
     and heat of vaporization.
     Only parameters A and B parameters are required; many fits include no
@@ -495,6 +493,11 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0):
         Critical temperature, [K]
     A-D : float
         Parameter for the equation; chemical and property specific [-]
+    order : int, optional
+        Order of the calculation. 0 for the calculation of the result itself;
+        for 1, 2, and 3, that derivative of the property is returned; No
+        other integrals or derivatives are implemented, and an exception will
+        be raised if any other order is given.
 
     Returns
     -------
@@ -505,6 +508,50 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0):
     -----
     The integral could not be found, but the integral over T actually could,
     again in terms of hypergeometric functions.
+
+    .. math::
+        \frac{d Y}{dT} = A \left(- \frac{T}{T_{c}} + 1\right)^{B + \frac{C T}
+        {T_{c}} + \frac{D T^{2}}{T_{c}^{2}} + \frac{e T^{3}}{T_{c}^{3}}} \left(
+        \left(\frac{C}{T_{c}} + \frac{2 D T}{T_{c}^{2}} + \frac{3 e T^{2}}
+        {T_{c}^{3}}\right) \log{\left(- \frac{T}{T_{c}} + 1 \right)} - \frac{B
+        + \frac{C T}{T_{c}} + \frac{D T^{2}}{T_{c}^{2}} + \frac{e T^{3}}
+        {T_{c}^{3}}}{T_{c} \left(- \frac{T}{T_{c}} + 1\right)}\right)
+
+    .. math::
+        \frac{d^2 Y}{dT^2} = \frac{A \left(- \frac{T}{T_{c}} + 1\right)^{B
+        + \frac{C T}{T_{c}} + \frac{D T^{2}}{T_{c}^{2}} + \frac{e T^{3}}
+        {T_{c}^{3}}} \left(2 \left(D + \frac{3 e T}{T_{c}}\right) \log{\left(
+        - \frac{T}{T_{c}} + 1 \right)} + \left(\left(C + \frac{2 D T}{T_{c}}
+        + \frac{3 e T^{2}}{T_{c}^{2}}\right) \log{\left(- \frac{T}{T_{c}}
+        + 1 \right)} + \frac{B + \frac{C T}{T_{c}} + \frac{D T^{2}}{T_{c}^{2}}
+        + \frac{e T^{3}}{T_{c}^{3}}}{\frac{T}{T_{c}} - 1}\right)^{2}
+        + \frac{2 \left(C + \frac{2 D T}{T_{c}} + \frac{3 e T^{2}}{T_{c}^{2}}
+        \right)}{\frac{T}{T_{c}} - 1} - \frac{B + \frac{C T}{T_{c}} + \frac{D
+        T^{2}}{T_{c}^{2}} + \frac{e T^{3}}{T_{c}^{3}}}{\left(\frac{T}{T_{c}}
+        - 1\right)^{2}}\right)}{T_{c}^{2}}
+
+    .. math::
+        \frac{d^3 Y}{dT^3} = \frac{A \left(- \frac{T}{T_{c}} + 1\right)^{B
+        + \frac{C T}{T_{c}} + \frac{D T^{2}}{T_{c}^{2}} + \frac{e T^{3}}
+        {T_{c}^{3}}} \left(\frac{6 \left(D + \frac{3 e T}{T_{c}}\right)}
+        {\frac{T}{T_{c}} - 1} + \left(\left(C + \frac{2 D T}{T_{c}}
+        + \frac{3 e T^{2}}{T_{c}^{2}}\right) \log{\left(- \frac{T}{T_{c}}
+        + 1 \right)} + \frac{B + \frac{C T}{T_{c}} + \frac{D T^{2}}{T_{c}^{2}}
+        + \frac{e T^{3}}{T_{c}^{3}}}{\frac{T}{T_{c}} - 1}\right)^{3}
+        + 3 \left(\left(C + \frac{2 D T}{T_{c}} + \frac{3 e T^{2}}{T_{c}^{2}}
+        \right) \log{\left(- \frac{T}{T_{c}} + 1 \right)} + \frac{B
+        + \frac{C T}{T_{c}} + \frac{D T^{2}}{T_{c}^{2}} + \frac{e T^{3}}
+        {T_{c}^{3}}}{\frac{T}{T_{c}} - 1}\right) \left(2 \left(D + \frac{3 e T}
+        {T_{c}}\right) \log{\left(- \frac{T}{T_{c}} + 1 \right)} + \frac{2
+        \left(C + \frac{2 D T}{T_{c}} + \frac{3 e T^{2}}{T_{c}^{2}}\right)}
+        {\frac{T}{T_{c}} - 1} - \frac{B + \frac{C T}{T_{c}} + \frac{D T^{2}}
+        {T_{c}^{2}} + \frac{e T^{3}}{T_{c}^{3}}}{\left(\frac{T}{T_{c}}
+        - 1\right)^{2}}\right) + 6 e \log{\left(- \frac{T}{T_{c}} + 1 \right)}
+        - \frac{3 \left(C + \frac{2 D T}{T_{c}} + \frac{3 e T^{2}}{T_{c}^{2}}
+        \right)}{\left(\frac{T}{T_{c}} - 1\right)^{2}} + \frac{2 \left(B
+        + \frac{C T}{T_{c}} + \frac{D T^{2}}{T_{c}^{2}} + \frac{e T^{3}}
+        {T_{c}^{3}}\right)}{\left(\frac{T}{T_{c}} - 1\right)^{3}}\right)}
+        {T_{c}^{3}}
 
     Examples
     --------
@@ -518,8 +565,46 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0):
     .. [1] Design Institute for Physical Properties, 1996. DIPPR Project 801
        DIPPR/AIChE
     '''
-    Tr = T/Tc
-    return A*(1. - Tr)**(B + Tr*(C + Tr*(D + E*Tr)))
+    if order == 0:
+        Tr = T/Tc
+        return A*(1. - Tr)**(B + Tr*(C + Tr*(D + E*Tr)))
+    elif order == 1:
+        x0 = 1.0/Tc
+        x1 = T*x0
+        x2 = 1.0 - x1
+        x3 = E*x1
+        x4 = C + x1*(D + x3)
+        x5 = B + x1*x4
+        return A*x0*x2**x5*(x5/(x1 - 1.0) + (x1*(D + 2.0*x3) + x4)*log(x2))
+    elif order == 2:
+        x0 = T/Tc
+        x1 = 1.0 - x0
+        x2 = E*x0
+        x3 = C + x0*(D + x2)
+        x4 = B + x0*x3
+        x5 = log(x1)
+        x6 = x0 - 1.0
+        x7 = 1.0/x6
+        x8 = x0*(D + 2.0*x2) + x3
+        return (A*x1**x4*(-x4/x6**2 + 2*x5*(D + 3.0*x2) + 2.0*x7*x8
+                          + (x4*x7 + x5*x8)**2)/Tc**2)
+    elif order == 3:
+        x0 = T/Tc
+        x1 = 1.0 - x0
+        x2 = E*x0
+        x3 = C + x0*(D + x2)
+        x4 = B + x0*x3
+        x5 = log(x1)
+        x6 = D + 3.0*x2
+        x7 = x0 - 1.0
+        x8 = 1/x7
+        x9 = x7**(-2)
+        x10 = x0*(D + 2.0*x2) + x3
+        x11 = x10*x5 + x4*x8
+        return (A*x1**x4*(-3*x10*x9 + x11**3 + 3*x11*(2*x10*x8 - x4*x9 + 2*x5*x6)
+                          + 2*x4/x7**3 + 6*E*x5 + 6*x6*x8)/Tc**3)
+    else:
+        raise ValueError(order_not_found_msg)
 
 
 def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):

@@ -76,6 +76,22 @@ def test_EQ105_more():
     d3 = EQ105(300, 0.70824, 0.26411, 507.6, 0.27537, order=3)
     assert_close(derivative(lambda T: EQ105(T, 0.70824, 0.26411, 507.6, 0.27537, order=2), 300, dx=1e-3), d3)
 
+def test_EQ106_more():
+    d1_analytical = EQ106(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1)
+    d1_numerical = derivative(lambda T: EQ106(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=0), 300.0, dx=1e-4)
+    assert_close(d1_analytical, -0.00019544758472630726, rtol=1e-13)
+    assert_close(d1_analytical, d1_numerical, rtol=1e-8)
+
+    d2_analytical = EQ106(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=2)
+    d2_numerical = derivative(lambda T: EQ106(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1), 300.0, dx=1e-4)
+    assert_close(d2_analytical, 2.113551968259993e-07, rtol=1e-13)
+    assert_close(d2_analytical, d2_numerical, rtol=1e-8)
+
+    d3_analytical = EQ106(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=3)
+    d3_numerical = derivative(lambda T: EQ106(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=2), 300.0, dx=1e-4)
+    assert_close(d3_analytical, -5.524739890945817e-09, rtol=1e-13)
+    assert_close(d3_analytical, d3_numerical, rtol=1e-8)
+
 
 def test_EQ101_more():
     assert_close(EQ101(300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=1), 208.00259945348506, rtol=1e-13)
