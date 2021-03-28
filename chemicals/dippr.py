@@ -483,6 +483,7 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
     .. math::
         Y = A(1-T_r)^{B + C T_r + D T_r^2 + E T_r^3}
 
+    .. math::
         Tr = \frac{T}{Tc}
 
     Parameters
@@ -506,6 +507,8 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
 
     Notes
     -----
+    This form is used by Yaws with only the parameters `A` and `B`.
+
     The integral could not be found, but the integral over T actually could,
     again in terms of hypergeometric functions.
 
