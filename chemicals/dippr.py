@@ -813,7 +813,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         raise ValueError(order_not_found_msg)
 
 
-def EQ115(T, A, B, C=0, D=0, E=0):
+def EQ115(T, A, B, C=0, D=0, E=0, order=0):
     r'''DIPPR Equation #115. No major uses; has been used as an alternate
     liquid viscosity expression, and as a model for vapor pressure.
     Only parameters A and B are required.
@@ -827,6 +827,11 @@ def EQ115(T, A, B, C=0, D=0, E=0):
         Temperature, [K]
     A-E : float
         Parameter for the equation; chemical and property specific [-]
+    order : int, optional
+        Order of the calculation. 0 for the calculation of the result itself;
+        for 1, 2, and 3, that derivative of the property is returned; No
+        other integrals or derivatives are implemented, and an exception will
+        be raised if any other order is given.
 
     Returns
     -------
@@ -838,12 +843,57 @@ def EQ115(T, A, B, C=0, D=0, E=0):
     No coefficients found for this expression.
     This function is not integrable for either dT or Y/T dT.
 
+    .. math::
+        \frac{d Y}{dT} = \left(- \frac{B}{T^{2}} + \frac{C}{T} + 2 D T
+        - \frac{2 E}{T^{3}}\right) e^{A + \frac{B}{T} + C \log{\left(T \right)}
+        + D T^{2} + \frac{E}{T^{2}}}
+
+    .. math::
+        \frac{d^2 Y}{dT^2} = \left(\frac{2 B}{T^{3}} - \frac{C}{T^{2}} + 2 D
+        + \frac{6 E}{T^{4}} + \left(\frac{B}{T^{2}} - \frac{C}{T} - 2 D T
+        + \frac{2 E}{T^{3}}\right)^{2}\right) e^{A + \frac{B}{T}
+        + C \log{\left(T \right)} + D T^{2} + \frac{E}{T^{2}}}
+
+    .. math::
+        \frac{d^3 Y}{dT^3} =- \left(3 \left(\frac{2 B}{T^{3}} - \frac{C}{T^{2}}
+        + 2 D + \frac{6 E}{T^{4}}\right) \left(\frac{B}{T^{2}} - \frac{C}{T}
+        - 2 D T + \frac{2 E}{T^{3}}\right) + \left(\frac{B}{T^{2}}
+        - \frac{C}{T} - 2 D T + \frac{2 E}{T^{3}}\right)^{3} + \frac{2 \left(
+        \frac{3 B}{T} - C + \frac{12 E}{T^{2}}\right)}{T^{3}}\right)
+        e^{A + \frac{B}{T} + C \log{\left(T \right)} + D T^{2} + \frac{E}{T^{2}}}
+
     References
     ----------
     .. [1] Design Institute for Physical Properties, 1996. DIPPR Project 801
        DIPPR/AIChE
     '''
-    return exp(A+B/T+C*log(T)+D*T**2 + E/T**2)
+    if order == 0:
+        return exp(A+B/T+C*log(T)+D*T**2 + E/T**2)
+    elif order == 1:
+        x0 = T**2
+        x1 = 1/x0
+        x2 = 1/T
+        return (-(B*x1 - C*x2 - 2*D*T + 2*E/T**3)*exp(A + B*x2 + C*log(T) + D*x0 + E*x1))
+    elif order == 2:
+        x0 = 1/T
+        x1 = T**2
+        x2 = 1/x1
+        x3 = 2*D
+        x4 = 2/T**3
+        return (B*x4 - C*x2 + 6*E/T**4 + x3 + (B*x2 - C*x0 + E*x4 - T*x3)**2)*exp(A + B*x0 + C*log(T) + D*x1 + E*x2)
+    elif order == 3:
+        x0 = 1/T
+        x1 = B*x0
+        x2 = T**2
+        x3 = 1/x2
+        x4 = E*x3
+        x5 = 2/T**3
+        x6 = 2*D
+        x7 = B*x3 - C*x0 + E*x5 - T*x6
+        return (-(x5*(-C + 3*x1 + 12*x4) + x7**3 + 3*x7*(B*x5 - C*x3 + 6*E/T**4
+                  + x6))*exp(A + C*log(T) + D*x2 + x1 + x4))
+    else:
+        raise ValueError(order_not_found_msg)
 
 
 def EQ116(T, Tc, A, B, C, D, E, order=0):
@@ -1090,10 +1140,10 @@ EQ101: (0, 1, 2, 3),
 EQ102: (0, 1, -1, -1j),
 EQ104: (0, 1, -1, -1j),
 EQ105: (0, 1, 2, 3),
-#EQ106:
+EQ106: (0, 1, 2, 3),
 EQ107: (0, 1, -1, -1j),
 EQ114: (0, 1, -1, -1j),
-#EQ115:
-EQ115: (0, 1, -1, -1j),
+EQ115: (0, 1, 2, 3),
+EQ116: (0, 1, -1, -1j),
 EQ127: (0, 1, -1, -1j),
 }

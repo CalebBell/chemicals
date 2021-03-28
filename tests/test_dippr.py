@@ -136,6 +136,23 @@ def test_EQ127_more():
     with pytest.raises(Exception):
         EQ127(20., *coeffs, order=1E100)
 
+def test_EQ115_more():
+    args = (0.01, 0.002, 0.0003, 0.00004, 10.0)
+    d1_analytical = EQ115(300.0, *args, order=1)
+    d1_numerical = derivative(lambda T: EQ115(T, *args, order=0), 300.0, dx=1e-2)
+    assert_close(d1_analytical, 0.8888181148504066, rtol=1e-13)
+    assert_close(d1_analytical, d1_numerical)
+
+    d2_analytical = EQ115(300.0, *args, order=2)
+    d2_numerical = derivative(lambda T: EQ115(T, *args, order=1), 300.0, dx=1e-2)
+    assert_close(d2_analytical, 0.024294699592116293, rtol=1e-13)
+    assert_close(d2_analytical, d2_numerical)
+
+    d3_analytical = EQ115(300.0, *args, order=3)
+    d3_numerical = derivative(lambda T: EQ115(T, *args, order=2), 300.0, dx=1e-2)
+    assert_close(d3_analytical, 0.0007252940633608988, rtol=1e-13)
+    assert_close(d3_analytical, d3_numerical)
+
 
 def test_EQ116_more():
     # T derivative
