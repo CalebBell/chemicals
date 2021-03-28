@@ -702,6 +702,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         Y = \frac{A^2}{\tau} + B - 2AC\tau - AD\tau^2 - \frac{1}{3}C^2\tau^3
         - \frac{1}{2}CD\tau^4 - \frac{1}{5}D^2\tau^5
 
+    .. math::
         \tau = 1 - \frac{T}{Tc}
 
     Parameters
