@@ -133,14 +133,14 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     elif order == 1:
         return B + T*(2.0*C + T*(3.0*D + T*(4.0*E + T*(5.0*F + 6.0*G*T))))
     elif order == -1:
-        return T*(A + T*(B*0.5 + T*(C*(1.0/3.0) + T*(D*0.25 + T*(E*0.2 + T*(F*(1.0/6) + G*T*(1.0/7.0)))))))
+        return T*(A + T*(B*0.5 + T*(C*(1.0/3.0) + T*(D*0.25 + T*(E*0.2 + T*(F*(1.0/6.0) + G*T*(1.0/7.0)))))))
     elif order == -1j:
-        return A*log(T) + T*(B + T*(C*0.5 + T*(D*(1.0/3) + T*(E*0.25 + T*(F*0.2 + G*T*(1.0/6))))))
+        return A*log(T) + T*(B + T*(C*0.5 + T*(D*(1.0/3.0) + T*(E*0.25 + T*(F*0.2 + G*T*(1.0/6.0))))))
     else:
         raise ValueError(order_not_found_msg)
 
 
-def EQ101(T, A, B, C, D, E, order=0):
+def EQ101(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     r'''DIPPR Equation # 101. Used in calculating vapor pressure, sublimation
     pressure, and liquid viscosity.
     All 5 parameters are required. E is often an integer. As the model is
@@ -311,7 +311,7 @@ def EQ102(T, A, B, C, D, order=0):
         raise ValueError(order_not_found_msg)
 
 
-def EQ104(T, A, B, C, D, E, order=0):
+def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     r'''DIPPR Equation #104. Often used in calculating second virial
     coefficients of gases. All 5 parameters are required.
     C, D, and E are normally large values.
