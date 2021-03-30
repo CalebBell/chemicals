@@ -38,17 +38,14 @@ Inputs do not need to be numpy arrays; they can be any iterable:
 >>> chemicals.vectorized.Tc(['108-88-3', '7732-18-5'])
 array([591.75, 647.14])
 
-Note that because this needs to import chemicals itself, chemicals.vectorized
-needs to be imported separately; the following will cause an error as
-the chemicals.vectorized module has not yet been imported:
+.. warning::
+    This module does not replace the functions in the `chemicals` module; it
+    copies all the functions into the `chemicals.vectorized` module and makes
+    them vectorized there.
 
->>> import chemicals
->>> chemicals.vectorized # doctest: +SKIP
-
-The correct syntax is as follows:
-
->>> import chemicals.vectorized # Necessary
->>> from chemicals.vectorized import * # May be used without first importing chemicals
+    For example by importing `chemicals.vectorized`,
+    `chemicals.Antoine` won't become vectorized,
+    but `chemicals.vectorized.Antoine` will become available and is vectorized.
 
 .. warning:: `np.vectorize` does not use NumPy to accelerate any computations;
    it is a convenience wrapper. If you are working on a problem large enough for
@@ -60,8 +57,7 @@ The correct syntax is as follows:
 """
 
 from __future__ import division
-import types
-import numpy as np
+from fluids.numerics import numpy as np, FakePackage
 import chemicals
 
 __all__ = []
@@ -69,6 +65,7 @@ __all__ = []
 
 __funcs = {}
 
+import types
 for name in dir(chemicals):
     obj = getattr(chemicals, name)
     if isinstance(obj, types.FunctionType):

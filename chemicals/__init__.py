@@ -24,7 +24,7 @@ SOFTWARE.
 
 import os
 from . import utils
-from .utils import mark_numba_incompatible
+from .utils import mark_numba_incompatible, PY37
 from . import critical
 from . import elements
 from . import reaction
@@ -165,3 +165,23 @@ def complete_lazy_loading():
         identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
     except:
         pass
+
+global vectorized, numba, units, numba_vectorized
+if PY37:
+    def __getattr__(name):
+        global vectorized, numba, units, numba_vectorized
+        if name == 'vectorized':
+            import chemicals.vectorized as vectorized
+            return vectorized
+        if name == 'numba':
+            import chemicals.numba as numba
+            return numba
+        if name == 'units':
+            import chemicals.units as units
+            return units
+        if name == 'numba_vectorized':
+            import chemicals.numba_vectorized as numba_vectorized
+            return numba_vectorized
+        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+else:
+    from . import vectorized

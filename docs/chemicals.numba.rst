@@ -8,8 +8,8 @@ Numba is rapidly evolving, and hopefully in the future it will support more of
 the functionality of fluids.
 
 Using the numba-accelerated version of `chemicals` is easy; simply call functions
-and classes from the fluids.numba namespace. The chemicals.numba module must be
-imported separately; it is not loaded automatically as part of fluids.
+and classes from the chemicals.numba namespace. The chemicals.numba module must be
+imported separately on Python < 3.7; it is not loaded automatically as part of chemicals.
 
 >>> import chemicals
 >>> import chemicals.numba
@@ -36,7 +36,7 @@ Today, the list of things known not to work is as follows:
 - In :py:mod:`chemicals.reaction`, :py:func:`~.stoichiometric_matrix` (dictionaries), :py:func:`~.balance_stoichiometry` (scipy functions, fractional numbers).
 - In :py:mod:`chemicals.safety`, :py:func:`~.LFL_ISO_10156_2017` (dictionaries)
 
-- The assorted functions :py:func:`~.collision_integral_Kim_Monroe` :py:func:`~.Henry_pressure_mixture`   :py:func:`~.T_converter`  :py:func:`~.Wilke`  :py:func:`~.Wilke_prefactors` :py:func:`~.Brokaw` :py:func:`~.viscosity_converter` :py:func:`~.CAS_to_int`  :py:func:`~.int_to_CAS`   :py:func:`~.hash_any_primitive`   :py:func:`~.sorted_CAS_key`  may or may not be able to be ported but have not yet been.
+- The assorted functions :py:func:`~.collision_integral_Kim_Monroe`, :py:func:`~.Henry_pressure_mixture`, :py:func:`~.T_converter`,  :py:func:`~.Wilke`,  :py:func:`~.Wilke_prefactors`, :py:func:`~.Brokaw` :py:func:`~.viscosity_converter`, :py:func:`~.CAS_to_int`, :py:func:`~.int_to_CAS`, :py:func:`~.sorted_CAS_key`  may or may not be able to be ported but have not yet been.
 
 
 All of the regular Numba-compiled functions are built with the `nogil` flag,

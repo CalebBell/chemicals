@@ -309,6 +309,12 @@ katex_js_path = \
 katex_autorender_path = \
     'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js'
     
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'numpy': ('http://docs.scipy.org/doc/numpy', None),
+                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
+                       'matplotlib': ('http://matplotlib.sourceforge.net', None),
+                       'fluids': ('https://fluids.readthedocs.io/', None)}
+
 from sphinx.ext.autodoc import between
 import chemicals
 try:

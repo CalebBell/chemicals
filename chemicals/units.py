@@ -88,6 +88,8 @@ variable_output_unit_funcs = {
 
 
 for name in dir(chemicals):
+    if name == '__getattr__' or name == '__test__':
+        continue
     obj = getattr(chemicals, name)
     if isinstance(obj, types.FunctionType):
         obj = wraps_numpydoc(u)(obj)
