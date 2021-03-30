@@ -2,7 +2,7 @@ numpy
 scipy
 pandas
 sympy
-fluids>=1.0.0
+fluids>=1.0.2
 pytest
 pytest-cov
 coveralls
