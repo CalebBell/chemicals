@@ -65,15 +65,18 @@ __all__ = []
 
 __funcs = {}
 
-import types
-for name in dir(chemicals):
-    obj = getattr(chemicals, name)
-    if isinstance(obj, types.FunctionType):
-        obj = np.vectorize(obj)
-    elif isinstance(obj, str):
-        continue
-    __all__.append(name)
-    __funcs.update({name: obj})
+if isinstance(np, FakePackage):
+    pass
+else:
+    import types
+    for name in dir(chemicals):
+        obj = getattr(chemicals, name)
+        if isinstance(obj, types.FunctionType):
+            obj = np.vectorize(obj)
+        elif isinstance(obj, str):
+            continue
+        __all__.append(name)
+        __funcs.update({name: obj})
 globals().update(__funcs)
 
 
