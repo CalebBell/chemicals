@@ -270,11 +270,11 @@ def use_mpmath_backend():
     globals()['sqrt'] = mp.sqrt
     globals()['iapws95_R'] = mp.mpf("461.51805")
     globals()['iapws97_R'] = mp.mpf("461.526")
-    globals()['MW'] = mp.mpf("18.015268")
+    globals()['iapws95_MW'] = mp.mpf("18.015268")
     globals()['iapws95_Tc'] = mp.mpf("647.096")
     globals()['Tc_inv'] = 1/mp.mpf("647.096")
     globals()['rhoc'] = mp.mpf("322")
-    globals()['rhoc_inv'] = 1/mp.mpf("322")
+    globals()['iapws95_rhoc_inv'] = 1/mp.mpf("322")
     import fluids.numerics
     fluids.numerics.exp = mp.exp
     fluids.numerics.log = mp.log
@@ -290,11 +290,11 @@ def reset_backend():
     globals()['sqrt'] = math.sqrt
     globals()['iapws95_R'] = 461.51805
     globals()['iapws97_R'] = 461.526
-    globals()['MW'] = 18.015268
+    globals()['iapws95_MW'] = 18.015268
     globals()['iapws95_Tc'] = 647.096
     globals()['Tc_inv'] = 1/647.096
     globals()['rhoc'] = 322.0
-    globals()['rhoc_inv'] = 1/322.0
+    globals()['iapws95_rhoc_inv'] = 1/322.0
     import fluids.numerics
     import fluids.numerics.special
     fluids.numerics.exp = math.exp
