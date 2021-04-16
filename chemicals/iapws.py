@@ -278,6 +278,9 @@ def use_mpmath_backend():
     import fluids.numerics
     fluids.numerics.exp = mp.exp
     fluids.numerics.log = mp.log
+    fluids.numerics.trunc_exp = mp.exp
+    fluids.numerics.trunc_log = mp.log
+    
     return mp
 
 def reset_backend():
@@ -293,8 +296,11 @@ def reset_backend():
     globals()['rhoc'] = 322.0
     globals()['rhoc_inv'] = 1/322.0
     import fluids.numerics
+    import fluids.numerics.special
     fluids.numerics.exp = math.exp
     fluids.numerics.log = math.log
+    fluids.numerics.trunc_exp = fluids.numerics.special.trunc_exp
+    fluids.numerics.trunc_log = fluids.numerics.special.trunc_log
 
 
 

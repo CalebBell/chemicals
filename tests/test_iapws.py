@@ -38,6 +38,12 @@ from chemicals.iapws import (iapws_97_Trho_err_region1, iapws_97_Trho_err_region
                              iapws_97_Prho_err_region1, iapws_97_Prho_err_region2, iapws_97_Prho_err_region5,
                              iapws_97_Prho_err_region3, iapws95_rho_err, iapws95_T_err, iapws95_d2Ar_ddelta2_delta_1)
 
+try:
+    import CoolProp
+    has_CoolProp = True
+except:  # pragma: no cover
+    has_CoolProp = False
+
 def make_me_precise():
     import mpmath as mp
     globals()['exp'] = mp.exp
@@ -697,6 +703,7 @@ def test_iapws97_rho():
 @pytest.mark.CoolProp
 @pytest.mark.slow
 @pytest.mark.fuzz
+@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_3_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     Ts = linspace(623.15+1e-10, 1073.15, 100)
@@ -728,6 +735,7 @@ def test_iapws97_region_3_rho_coolprop():
 @pytest.mark.CoolProp
 @pytest.mark.slow
 @pytest.mark.fuzz
+@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_5_rho_coolprop():
     # Working great!
     from CoolProp.CoolProp import PropsSI
@@ -781,6 +789,7 @@ def iapws97_dGr_dpi_region2_fastest(tau, pi):
 @pytest.mark.CoolProp
 @pytest.mark.slow
 @pytest.mark.fuzz
+@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_2_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     P_lim = 1e-6
@@ -811,6 +820,7 @@ def test_iapws97_region_2_rho_coolprop():
 @pytest.mark.CoolProp
 @pytest.mark.slow
 @pytest.mark.fuzz
+@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_1_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     Ts = linspace(273.15+1e-10,  623.15-1e-10, 500)
@@ -2034,6 +2044,7 @@ def test_iapws95_d3A0_dtau3():
 @pytest.mark.slow
 @pytest.mark.CoolProp
 @pytest.mark.fuzz
+@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_rho_iapws95_CoolProp():
     from CoolProp.CoolProp import PropsSI
     N = 40
@@ -2108,6 +2119,7 @@ def test_iapws95_rho():
 
 @pytest.mark.slow
 @pytest.mark.CoolProp
+@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws95_rho_vs_Coolprop():
     from CoolProp.CoolProp import PropsSI
     assert_close(iapws95_rho(2357., 97719212),
@@ -2296,6 +2308,7 @@ def test_rhog_sat_IAPWS95_vs_saturation2():
 
 @pytest.mark.slow
 @pytest.mark.CoolProp
+@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_rhog_sat_IAPWS95_CoolProp():
     from CoolProp.CoolProp import PropsSI
     Ts = [400.0, 600.0]
