@@ -2246,6 +2246,20 @@ def test_rhog_sat_IAPWS95():
     with pytest.raises(ValueError):
         iapws95_rhog_sat(200.0)
 
+@pytest.mark.mpmath
+def test_iapws95_saturation_fits_concise():
+    # About 100 ms, important not to disable - very painful to debug
+    # and depends on a ton of functionality
+    import mpmath as mp
+    mp.mp.dps = 50
+    iapws.use_mpmath_backend()
+    T = 500.0
+    P_corr = float(iapws95_Psat(T))
+    Psat_mp, rhol_mp, rhog_mp = iapws95_saturation(mp.mpf(T), xtol=1e-20)
+        # Everything except > 646.7 is under 2E-13
+    assert_close(P_corr, float(Psat_mp), rtol=7.5e-13)
+    iapws.reset_backend()
+
 @pytest.mark.slow
 @pytest.mark.mpmath
 @pytest.mark.fuzz
