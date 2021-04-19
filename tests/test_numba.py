@@ -457,6 +457,18 @@ def test_rachford_rice():
     assert_close(VF, VF_new)
     assert_close1d(xs, xs_new)
     assert_close1d(ys, ys_new)
+    
+    zs = [0.1, 0.2, 0.3, 0.4]
+    Ks = [1.0161456228504933, 1.001260709063004, 0.9882448742560694, 1.0237689436500155]
+    chemicals.numba.rachford_rice.flash_inner_loop(np.array(zs), np.array(Ks), guess=0.8556936118217484)
+
+    zs = np.array([0.1, 0.2, 0.3, 0.4])
+    Ks = np.array([1.0161456228504933, 1.001260709063004, 0.9882448742560694, 1.0237689436500155])
+    VF_new, xs_new, ys_new = chemicals.numba.flash_inner_loop(zs=zs, Ks=Ks,  guess=0.8556936118217484)
+    VF, xs, ys = flash_inner_loop(zs=zs.tolist(), Ks=Ks.tolist(), guess=0.8556936118217484)
+    assert_close(VF, VF_new)
+    assert_close1d(xs, xs_new)
+    assert_close1d(ys, ys_new)
 
 @mark_as_numba
 def test_Rachford_Rice_solutionN():

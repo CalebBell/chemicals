@@ -1023,13 +1023,13 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     x0 = V_over_F_max - V_over_F_min
 
     # Suggests guess V_over_F_min, not using
-    try:
-        guess = -log((V_over_F_max-guess)/(guess-V_over_F_min))
-    except:
+    log_transform = (V_over_F_max-guess)/(guess-V_over_F_min)
+    if log_transform > 0.0:
+        guess = -log(log_transform)
+    else:
         # Case where guess was less than V_over_F_min - nasty
         guess = 0.5*(V_over_F_min + V_over_F_max)
         guess = -log((V_over_F_max-guess)/(guess-V_over_F_min))
-
     # Should always converge - no poles
     try:
 #        V_over_F = halley(Rachford_Rice_err_LN2, guess, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: uncomment
