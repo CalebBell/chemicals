@@ -247,13 +247,13 @@ def test_flash_solution_algorithms():
 #    ans = solve(expr, VF)
 
 
-    flash_inner_loop_secant = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (Secant)')
-    flash_inner_loop_NR = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (Newton-Raphson)')
-    flash_inner_loop_halley = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (Halley)')
-    flash_inner_loop_numpy = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (NumPy)')
-    flash_inner_loop_LJA = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Li-Johns-Ahmadi')
-    flash_inner_loop_poly = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Rachford-Rice (polynomial)')
-    flash_inner_loop_LN2 = lambda zs, Ks: flash_inner_loop(zs=zs, Ks=Ks, method='Leibovici and Nichita 2')
+    flash_inner_loop_secant = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Secant)')
+    flash_inner_loop_NR = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Newton-Raphson)')
+    flash_inner_loop_halley = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Halley)')
+    flash_inner_loop_numpy = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (NumPy)')
+    flash_inner_loop_LJA = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Li-Johns-Ahmadi')
+    flash_inner_loop_poly = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (polynomial)')
+    flash_inner_loop_LN2 = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Nichita 2')
 
 
     algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
@@ -332,6 +332,12 @@ def test_flash_solution_algorithms():
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
         assert_close(V_over_F, V_over_F_expect, rtol=1E-5)
         assert_close1d(xs, xs_expect, rtol=1E-5)
+        
+        # Case with an initial guess out of range
+        zs = [0.1, 0.2, 0.3, 0.4]
+        Ks = [1.0161456228504933, 1.001260709063004, 0.9882448742560694, 1.0237689436500155]
+        V_over_F, xs, ys = algo(zs=zs, Ks=Ks, guess=0.8556936118217484)
+        assert_close(V_over_F, 37.338470768192806)
 
         # Said to be in: J. Vidal, Thermodynamics: Applications in Chemical Engineering and the Petroleum Industry, Technip, Paris, 2003.
         zs = [0.2, 0.3, 0.4, 0.05, 0.05]
