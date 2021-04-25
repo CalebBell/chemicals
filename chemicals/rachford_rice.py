@@ -868,8 +868,6 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
         V_over_F = halley(Rachford_Rice_numpy_err_fprime2, x0, high=V_over_F_max*one_epsilon_smaller,
                           low=V_over_F_min*one_epsilon_larger, xtol=1e-13, args=(zs_k_minus_1, K_minus_1),
                           bisection=True)
-#        V_over_F = secant(Rachford_Rice_numpy_err, x0, high=V_over_F_max*one_epsilon_smaller,
-#                          low=V_over_F_min*one_epsilon_larger, ytol=1e-5, xtol=1.48e-8, args=(zs_k_minus_1, K_minus_1))
     except:
         V_over_F = brenth(Rachford_Rice_numpy_err, V_over_F_max*one_epsilon_smaller, V_over_F_min*one_epsilon_larger,
                           args=(zs_k_minus_1, K_minus_1))
@@ -1478,7 +1476,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
                     else:
                         zs2[i-running_zeros] = zs[i]
                         Ks2[i-running_zeros] = Ks[i]
-                V_over_F, xs, ys = Rachford_Rice_solution(zs2, Ks2, guess)
+                V_over_F, xs, ys = Rachford_Rice_solution(zs2, Ks2, fprime=False, fprime2=False, guess=guess)
 
                 # Reset the values into a main array
                 xs2 = [0.0]*l
@@ -1495,7 +1493,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
     if method2 == FLASH_INNER_LN2:
         return Rachford_Rice_solution_LN2(zs, Ks, guess)
     elif method2 == FLASH_INNER_SECANT:
-        return Rachford_Rice_solution(zs, Ks)
+        return Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=guess)
     elif method2 == FLASH_INNER_ANALYTICAL:
         if l == 2:
             z1, z2 = zs
@@ -1511,7 +1509,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
             if den != 0.0:
                 V_over_F = t1/den
             else:
-                return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess)
+                return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess, fprime=False, fprime2=False)
         elif l == 3:
             fail = False
             try:
@@ -1521,7 +1519,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
             if not fail and sln[0].imag != 0.0:
                 fail = True
             if fail:
-                return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess)
+                return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess, fprime=False, fprime2=False)
             return sln
         elif l == 4:
             return Rachford_Rice_solution_polynomial(zs, Ks)
@@ -1549,7 +1547,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         try:
             return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks, guess=guess)
         except:
-            return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess)
+            return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess, fprime=False, fprime2=False)
     elif method2 == FLASH_INNER_NR:
         return Rachford_Rice_solution(zs=zs, Ks=Ks, guess=guess, fprime=True)
     elif method2 == FLASH_INNER_HALLEY:
@@ -1557,7 +1555,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
                                       fprime2=True)
 
     elif method2 == FLASH_INNER_LJA:
-        return Li_Johns_Ahmadi_solution(zs=zs, Ks=Ks)
+        return Li_Johns_Ahmadi_solution(zs=zs, Ks=Ks, guess=guess)
     elif method2 == FLASH_INNER_POLY:
         return Rachford_Rice_solution_polynomial(zs=zs, Ks=Ks)
     else:
