@@ -33,6 +33,7 @@ Dry Air Basic Solvers
 ------------------------
 .. autofunction:: chemicals.air.lemmon2000_rho
 .. autofunction:: chemicals.air.lemmon2000_P
+.. autofunction:: chemicals.air.lemmon2000_T
 
 Dry Air Bubble/Dew Points
 -------------------------
@@ -111,7 +112,7 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_rho_reducing',
 
            'lemmon2000_air_MW', 'lemmon2000_air_P_max', 'lemmon2000_air_T_max',
-           'lemmon2000_rho', 'lemmon2000_P',
+           'lemmon2000_rho', 'lemmon2000_P', 'lemmon2000_T',
 
            'TEOS10_BAW_derivatives', 'TEOS10_CAWW_derivatives',
            'TEOS10_CAAW_derivatives',
@@ -124,7 +125,9 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
 TAU_MAX_EXP_87 = 0.4207493606569795
 
 lemmon2000_air_R = 8.314510
-'''Molar gas constant in J/(mol*K) used in the the Lemmon (2000) EOS for dry air'''
+'''Molar gas constant in Jlemmon2000_air_R/(mol*K) used in the the Lemmon (2000) EOS for dry air'''
+lemmon2000_air_R2 = lemmon2000_air_R*lemmon2000_air_R
+lemmon2000_air_R_inv = 1.0/lemmon2000_air_R
 
 lemmon2000_air_T_reducing = 132.6312
 '''Reducing temperature in K for the Lemmon (2000) EOS for dry air'''
@@ -1787,7 +1790,7 @@ def lemmon2000_P(T, rho):
     T : float
         Temperature, [K]
     rho : float
-        Molar density of water, [mol/m^3]
+        Molar density of air, [mol/m^3]
 
     Returns
     -------
@@ -1836,7 +1839,7 @@ def lemmon2000_rho_err(rho, T, P_spec):
 
 
 def lemmon2000_rho(T, P):
-    r'''Calculate the density of water according to the Lemmon (2000) [1]_
+    r'''Calculate the density of air according to the Lemmon (2000) [1]_
     given a temperature `T` and pressure `P`.
 
     Parameters
@@ -1849,7 +1852,7 @@ def lemmon2000_rho(T, P):
     Returns
     -------
     rho : float
-        Molar density of water, [mol/m^3]
+        Molar density of air, [mol/m^3]
 
     Notes
     -----
@@ -1901,6 +1904,85 @@ def lemmon2000_rho(T, P):
     # Note that the derivatives have not been computed at this spot, so we can't save and return them
     return rho
 
+def lemmon2000_T_err(T, rho, P_spec):
+    # Use for solving for T
+    tau = lemmon2000_air_T_reducing / T
+    delta = rho * lemmon2000_air_rho_reducing_inv
+    dAddelta_val = lemmon2000_air_dAr_ddelta(tau, delta) + 1.0/delta
+    err = (dAddelta_val*delta)*rho*lemmon2000_air_R*T - P_spec
+    dP_dT = rho*lemmon2000_air_R*delta*(dAddelta_val - tau*lemmon2000_air_d2Ar_ddeltadtau(tau, delta))
+    return err, dP_dT
+
+def lemmon2000_T(P, rho):
+    r'''Calculate the temperature of air according to the Lemmon (2000) [1]_
+    given a pressure `P` and molar density `rho` .
+
+    Parameters
+    ----------
+    P : float
+        Pressure, [Pa]
+    rho : float
+        Molar density of air, [mol/m^3]
+
+    Returns
+    -------
+    T : float
+        Temperature, [K]
+
+    Notes
+    -----
+    This solution is iterative due to the nature of the equation.
+    This solver has been tested only for gas solutions.
+
+    Examples
+    --------
+    >>> lemmon2000_T(P=1e5, rho=20.0)
+    601.1393854499
+
+    References
+    ----------
+    .. [1] Lemmon, Eric W., Richard T. Jacobsen, Steven G. Penoncello, and
+       Daniel G. Friend. "Thermodynamic Properties of Air and Mixtures of
+       Nitrogen, Argon, and Oxygen From 60 to 2000 K at Pressures to 2000 MPa."
+       Journal of Physical and Chemical Reference Data 29, no. 3 (May 1, 2000):
+       331-85. https://doi.org/10.1063/1.1285884.
+    '''
+    # Estimate the initial temperature by fitting a second virial coefficient
+    # to a quadratic. Choose 1 atm as the pressure instead of using the theoretical
+    # virial coefficient as that pressure range is more common
+    B2, B1, B0 = -4.269819117654342e-11, 1.174790062327561e-07, -4.6404598566915656e-05
+    
+    V = 1.0/rho
+    x0 = B1*P
+    x1 = P*P
+    x2 = 4.0*B2*x1
+    try:
+        T = -(lemmon2000_air_R + x0 - sqrt(-B0*x2 + B1*B1*x1 + lemmon2000_air_R2 
+                            + 2.0*lemmon2000_air_R*x0 + V*x2))/(2.0*B2*P)
+    except:
+        # For T ~= 2000 K, 100 MPa; and 10 MPa and 130 K there are small regions
+        # the fit has a sqrt under zero
+        # Fail back to the idea-gas solution for those regions
+        T = P*V*lemmon2000_air_R_inv
+    if T < lemmon2000_air_T_reducing:
+        T = lemmon2000_air_T_reducing
+    MAX_T_STEP = 100.0
+
+    T_old = 10000000.0
+    iterations = 0
+    while (abs(T_old - T) > abs(1e-13*T)) and iterations < 100:
+        T_old = T
+        err, derr = lemmon2000_T_err(T, rho, P)
+        dT = - err/derr
+        if dT < -MAX_T_STEP:
+            dT = -MAX_T_STEP
+        # elif dT > MAX_T_STEP: # Not being used by solver
+        #     dT = MAX_T_STEP
+        T = T_old + dT
+        iterations += 1
+    if iterations == 100:
+        raise ValueError("Could not converge a temprature solution")
+    return T
 
 
 ### Virial

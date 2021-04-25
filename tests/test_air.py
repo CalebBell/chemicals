@@ -393,6 +393,62 @@ def test_lemmon2000_rho():
 def test_lemmon2000_P():
     assert_close(lemmon2000_P(300.0, 40.10292351061862), 1e5, rtol=1e-14)
 
+def test_lemmon2000_T():
+    
+    '''B coefficients can be derived as follows:
+    # Equation form
+    from sympy import *
+    P, V, R, T, B0, B1, B2, B3 = symbols('P, V, R, T, B0, B1, B2, B3')
+    
+    B = B0 + B1*T + B2*T*T #+ B3*T*T*T
+    Eq0 = Eq(P*V/(R*T), 1 + B*P/(R*T))
+    print(cse(solve(Eq0, T)[0], optimizations='basic'))
+    
+    # Plot
+    from fluids.numerics import horner
+    import chemicals
+    R = chemicals.air.lemmon2000_air_R
+    Ts = linspace(DryAirLemmon.T_MIN_FIXED, DryAirLemmon.T_MAX_FIXED, 1000)
+    # Ts = linspace(500, DryAirLemmon.T_MAX_FIXED, 1000)
+    for P in [101325.0]:
+        Bs = [DryAirLemmon(T=T, P=P).B_virial() for T in Ts]
+        Bs = []
+        for T in Ts:
+            o = DryAirLemmon(T=T, P=P)
+            Z = P*o.V()/(R*T)
+            B = R*T*(Z - 1.0)/P
+            Bs.append(B)
+    
+        coeffs = np.polyfit(Ts, Bs, 2).tolist()
+        Bs_calc = [horner(coeffs, T) for T in Ts]
+        import matplotlib.pyplot as plt
+    
+        plt.plot(Ts, Bs, 'g', label='B good P=%s' %(P))
+        plt.plot(Ts, Bs_calc, 'r', label='B fit P=%s' %(P))
+    plt.legend()
+    plt.show()
+    print(coeffs)
+    
+
+    '''
+    
+    # Catch a case the B estimator goes into the liquid region
+    T = 143.93790965391196
+    rho = lemmon2000_rho(T, 9011018.251664797)
+    assert_close(lemmon2000_T(9011018.251664797, rho), T, rtol=1e-11)
+    
+    # Case where ideal-gas estimation necessary
+    T = 2000.0
+    rho = lemmon2000_rho(T, 1e8)
+    assert_close(lemmon2000_T(1e8, rho), T, rtol=1e-11)
+
+    # Case where bounding step necessary
+    T = 135.0
+    rho = lemmon2000_rho(T, 1e9)
+    assert_close(lemmon2000_T(1e9, rho), T, rtol=1e-11)
+
+
+
 
 def test_TEOS10_CAAW_derivatives():
     assert_close1d(TEOS10_CAAW_derivatives(200.0)[:3], (1.05493575e-09, -1.525350000000001e-12, -1.13436375e-13), rtol=1e-13)

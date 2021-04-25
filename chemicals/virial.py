@@ -61,7 +61,7 @@ def B_to_Z(B, T, P):
     second virial coefficient.
 
     .. math::
-        Z = 1 + \frac{BP}{RT}
+        Z = \frac{PV}{RT} = 1 + \frac{BP}{RT}
 
     Parameters
     ----------
