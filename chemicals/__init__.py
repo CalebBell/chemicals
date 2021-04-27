@@ -138,7 +138,7 @@ submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
 
 chemicals_dir = utils.source_path
 
-__version__ = '1.0.5'
+__version__ = '1.0.6'
 
 def complete_lazy_loading():
     critical._load_critical_data()
