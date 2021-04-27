@@ -2115,6 +2115,9 @@ def test_iapws95_rho():
 
     # Slightly different density than CoolProp here
     assert_close(iapws95_rho(647.08, 22059526.03804436), 295.66686689744756, rtol=1e-10)
+    
+    # Odd case with slight discontinuities, the boundary checking becomes an issue
+    assert_close(iapws95_rho(T=250.4989495844, P=10595.601792776019), 991.5868159629832, rtol=1e-9)
 
 
 @pytest.mark.slow

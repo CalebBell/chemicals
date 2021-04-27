@@ -6651,7 +6651,7 @@ def iapws95_T(P, rho):
         iterations += 1
 #        print(T, err)
     if iterations == 100:
-        raise ValueError("Could not converge a temprature solution")
+        raise ValueError("Could not converge a temperature solution")
     return T
 
 
@@ -6741,8 +6741,12 @@ def iapws95_rho(T, P):
     while iterations < 2 or ((abs(rho_old - rho) > abs(1e-13*rho)) and iterations < 100):
         err, derr = iapws95_rho_err(rho, T, tau, P)
         if err < 0.0:
+            if iterations > 20 and a == rho:
+                return rho
             a = rho
         else:
+            if iterations > 20 and b == rho:
+                return rho
             b = rho
 
         drho = - err/derr
