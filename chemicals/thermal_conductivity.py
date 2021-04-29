@@ -548,22 +548,26 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
         x2 = Pc*rho/rhoc2
         xi_bar = x2*drho_dP
         xi_bar_ref = x2*drho_dP_Tr
-
-        xi = xi0*((xi_bar - xi_bar_ref*T_ref/T)*gamma_inv)**0.5074506645187273# .50745... = (0.63/1.2415)
-        if xi < 0.0:
+        
+        dchi = (xi_bar - xi_bar_ref*T_ref/T)
+        if dchi < 0.0:
             kc = 0.0
         else:
-            xi_qd = xi*qd_inv
-
-            term0 = qd/xi + (1.0/3.0)*xi_qd*xi_qd*(rhoc*rhoc/(rho*rho))
-            Omega_bar0 = 2.0*pi_inv*(1.0 - exp(-1.0/term0))
-
-            Omega_bar = 2.0*pi_inv*((Cp - Cv)/Cp*atan(xi_qd) + Cv/Cp*xi_qd)
-            k = 1.380658E-23 # J/K
-
-            # Mu should still be in Pa*s
-            kc = rho*Cp*k*R0*T/(6.0*pi*xi*mu)*(Omega_bar - Omega_bar0)
-            kc *= 1e3 # Convert to mW/m/K, same as others
+            xi = xi0*(dchi*gamma_inv)**0.5074506645187273# .50745... = (0.63/1.2415)
+            if xi < 0.0:
+                kc = 0.0
+            else:
+                xi_qd = xi*qd_inv
+    
+                term0 = qd/xi + (1.0/3.0)*xi_qd*xi_qd*(rhoc*rhoc/(rho*rho))
+                Omega_bar0 = 2.0*pi_inv*(1.0 - exp(-1.0/term0))
+    
+                Omega_bar = 2.0*pi_inv*((Cp - Cv)/Cp*atan(xi_qd) + Cv/Cp*xi_qd)
+                k = 1.380658E-23 # J/K
+    
+                # Mu should still be in Pa*s
+                kc = rho*Cp*k*R0*T/(6.0*pi*xi*mu)*(Omega_bar - Omega_bar0)
+                kc *= 1e3 # Convert to mW/m/K, same as others
         return (k0 + kr + kc)*1e-3
     return (k0 + kr)*1e-3
 

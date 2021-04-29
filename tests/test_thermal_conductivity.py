@@ -74,6 +74,12 @@ def test_k_air_lemmon():
     k_near_crit = k_air_lemmon(132.64, 10400, 2137.078854678728, 35.24316159996235, 0.07417878614315769, 0.00035919027241528256, 1.7762253265868595e-05)
     assert 0.0756231 == round(k_near_crit, 7)
     assert_close(k_near_crit, 0.07562307234760142, rtol=1e-13)
+    
+    # Random point found that was causing issues
+    kwargs_problematic = {'T': 300, 'rho': 5000.0, 'Cp': 34.650910964354516,
+                      'Cv': 21.576284320940534, 'drho_dP': 0.00038766674876690075, 
+                      'drho_dP_Tr': 0.0004713577861638539, 'mu': 2.1324097850144885e-05}
+    assert_close(k_air_lemmon(**kwargs_problematic), 0.0326062305718951, rtol=1e-13)
 
 
 
