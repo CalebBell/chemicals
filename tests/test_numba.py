@@ -469,6 +469,13 @@ def test_rachford_rice():
     assert_close(VF, VF_new)
     assert_close1d(xs, xs_new)
     assert_close1d(ys, ys_new)
+    from .test_rachford_rice import test_flash_solution_algorithms
+    test_flash_solution_algorithms(chemicals.numba.flash_inner_loop, array=True)
+    test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_LN2, array=True)
+    test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution, array=True)
+    # test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_numpy, array=True) # Does not currently pass
+# test_rachford_rice()
+
 
 @mark_as_numba
 def test_Rachford_Rice_solutionN():
@@ -554,7 +561,7 @@ def test_lazy_loading():
 
 @mark_as_numba
 def test_safety_functions():
-    import test_safety
+    from . import test_safety
     swap_funcs_and_test(['NFPA_30_classification'],
                         [chemicals.numba.NFPA_30_classification],
                         test_safety.test_NFPA_30_classification)

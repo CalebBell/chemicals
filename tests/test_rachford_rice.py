@@ -234,7 +234,23 @@ def test_flash_inner_loop_methods():
                        'Rachford-Rice (polynomial)']
 
 
-def test_flash_solution_algorithms():
+flash_inner_loop_secant = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Secant)')
+flash_inner_loop_NR = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Newton-Raphson)')
+flash_inner_loop_halley = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Halley)')
+flash_inner_loop_numpy = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (NumPy)')
+flash_inner_loop_LJA = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Li-Johns-Ahmadi')
+flash_inner_loop_poly = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (polynomial)')
+flash_inner_loop_LN2 = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Nichita 2')
+
+algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
+              flash_inner_loop, flash_inner_loop_secant,
+              flash_inner_loop_NR, flash_inner_loop_halley,
+              flash_inner_loop_numpy, flash_inner_loop_LJA,
+              flash_inner_loop_poly, flash_inner_loop_LN2]
+
+@pytest.mark.parametrize("algorithm", algorithms)
+@pytest.mark.parametrize("array", [False])
+def test_flash_solution_algorithms(algorithm, array):
     # Derive the analytical solution with:
 #    from sympy import *
 #    z1, z2, K1, K2, VF = symbols('z1, z2, K1, K2, VF')
@@ -245,47 +261,33 @@ def test_flash_solution_algorithms():
 #    z1, z2, z3, K1, K2, K3, VF = symbols('z1, z2, z3, K1, K2, K3, VF')
 #    expr = z1*(K1 - 1)/(1 + VF*(K1-1)) + z2*(K2 - 1)/(1 + VF*(K2-1)) + z3*(K3 - 1)/(1 + VF*(K3-1))
 #    ans = solve(expr, VF)
+    if array: 
+        algo = lambda zs, Ks, guess=None: algorithm(np.array(zs), np.array(Ks), guess=guess)
+    else:
+        algo = algorithm
+
+    # dummy 2 test
+    zs, Ks = [.4, .6], [2, .5]
+    V_over_F_expect = 0.2
+    xs_expect = [1/3., 2/3.]
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, V_over_F_expect)
+    assert_close1d(xs, xs_expect)
 
 
-    flash_inner_loop_secant = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Secant)')
-    flash_inner_loop_NR = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Newton-Raphson)')
-    flash_inner_loop_halley = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Halley)')
-    flash_inner_loop_numpy = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (NumPy)')
-    flash_inner_loop_LJA = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Li-Johns-Ahmadi')
-    flash_inner_loop_poly = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (polynomial)')
-    flash_inner_loop_LN2 = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Nichita 2')
-
-
-    algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
-                  flash_inner_loop, flash_inner_loop_secant,
-                  flash_inner_loop_NR, flash_inner_loop_halley,
-                  flash_inner_loop_numpy, flash_inner_loop_LJA,
-                  flash_inner_loop_poly, flash_inner_loop_LN2]
-    for algo in algorithms:
-
-
-        # dummpy 2 test
-        zs, Ks = [.4, .6], [2, .5]
-        V_over_F_expect = 0.2
-        xs_expect = [1/3., 2/3.]
+    # Raise error on bad binary:
+    zs, Ks = [0.4, 0.6], [2.269925647634519e-19, 2.248989467272186e-18]
+    with pytest.raises(PhaseCountReducedError):
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, V_over_F_expect)
-        assert_close1d(xs, xs_expect)
 
+    zs, Ks = [0.4, 0.6], [2.269925647634519e2, 2.248989467272186e8]
+    with pytest.raises(PhaseCountReducedError):
+        V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
 
-        # Raise error on bad binary:
-        zs, Ks = [0.4, 0.6], [2.269925647634519e-19, 2.248989467272186e-18]
-        with pytest.raises(PhaseCountReducedError):
-            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-
-        zs, Ks = [0.4, 0.6], [2.269925647634519e2, 2.248989467272186e8]
-        with pytest.raises(PhaseCountReducedError):
-            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-
-        # Hard to resolve two test; LN2 fails, its objective function does not
-        # appear to have any zeroes due to numerical issues.
-        # How to handle?
-        # This is exactly on the bound of the objective function
+    # Hard to resolve two test; LN2 fails, its objective function does not
+    # appear to have any zeroes due to numerical issues.
+    # How to handle?
+    # This is exactly on the bound of the objective function
 #        zs, Ks = [.01, .99],  [2.7433923306443067e-11, 1.26445046138136]
 #        V_over_F_expect = 0.952185734369369
 #        xs_expect = [0.20914260341855995, 0.7908573965814395]
@@ -295,121 +297,121 @@ def test_flash_solution_algorithms():
 #        assert_close1d(xs, xs_expect)
 #        assert_close1d(ys, ys_expect)
 
-        # Dummpy 3 test
-        zs = [0.5, 0.3, 0.2]
-        Ks = [1.685, 0.742, 0.532]
-        V_over_F_expect = 0.6907302627738541
-        xs_expect = [0.3394086969663436, 0.3650560590371706, 0.29553524399648573]
+    # Dummpy 3 test
+    zs = [0.5, 0.3, 0.2]
+    Ks = [1.685, 0.742, 0.532]
+    V_over_F_expect = 0.6907302627738541
+    xs_expect = [0.3394086969663436, 0.3650560590371706, 0.29553524399648573]
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, V_over_F_expect)
+    assert_close1d(xs, xs_expect)
+
+    # Raise error on bad ternary:
+    zs, Ks = [0.4, 0.5, 0.1], [2.269925647634519e-19, 2.248989467272186e-18, 1e-2]
+    with pytest.raises(PhaseCountReducedError):
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, V_over_F_expect)
-        assert_close1d(xs, xs_expect)
 
-        # Raise error on bad ternary:
-        zs, Ks = [0.4, 0.5, 0.1], [2.269925647634519e-19, 2.248989467272186e-18, 1e-2]
-        with pytest.raises(PhaseCountReducedError):
-            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-
-        zs, Ks = [0.4, 0.5, 0.1], [2.269925647634519e2, 2.248989467272186e8, 1e3]
-        with pytest.raises(PhaseCountReducedError):
-            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-
-        # Said to be in:  J.D. Seader, E.J. Henley, D.K. Roper, Separation Process Principles, third ed., John Wiley & Sons, New York, 2010.
-        zs = [0.1, 0.2, 0.3, 0.4]
-        Ks = [4.2, 1.75, 0.74, 0.34]
-        V_over_F_expect = 0.12188885
-        xs_expect = [0.07194015, 0.18324807, 0.30981849, 0.43499379]
-
+    zs, Ks = [0.4, 0.5, 0.1], [2.269925647634519e2, 2.248989467272186e8, 1e3]
+    with pytest.raises(PhaseCountReducedError):
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, V_over_F_expect, rtol=1E-4)
-        assert_close1d(xs, xs_expect, rtol=1E-4)
 
-        # Said to be in:  B.A. Finlayson, Introduction to Chemical Engineering Computing, second ed., John Wiley & Sons, New York, 2012.
-        zs = [0.1, 0.3, 0.4, 0.2]
-        Ks = [6.8, 2.2, 0.8, 0.052]
-        V_over_F_expect = 0.42583973
-        xs_expect = [0.02881952, 0.19854300, 0.43723872, 0.33539943]
+    # Said to be in:  J.D. Seader, E.J. Henley, D.K. Roper, Separation Process Principles, third ed., John Wiley & Sons, New York, 2010.
+    zs = [0.1, 0.2, 0.3, 0.4]
+    Ks = [4.2, 1.75, 0.74, 0.34]
+    V_over_F_expect = 0.12188885
+    xs_expect = [0.07194015, 0.18324807, 0.30981849, 0.43499379]
 
-        V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, V_over_F_expect, rtol=1E-5)
-        assert_close1d(xs, xs_expect, rtol=1E-5)
-        
-        # Case with an initial guess out of range
-        zs = [0.1, 0.2, 0.3, 0.4]
-        Ks = [1.0161456228504933, 1.001260709063004, 0.9882448742560694, 1.0237689436500155]
-        V_over_F, xs, ys = algo(zs=zs, Ks=Ks, guess=0.8556936118217484)
-        assert_close(V_over_F, 37.338470768192806)
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, V_over_F_expect, rtol=1E-4)
+    assert_close1d(xs, xs_expect, rtol=1E-4)
 
-        # Said to be in: J. Vidal, Thermodynamics: Applications in Chemical Engineering and the Petroleum Industry, Technip, Paris, 2003.
-        zs = [0.2, 0.3, 0.4, 0.05, 0.05]
-        Ks = [2.5250, 0.7708, 1.0660, 0.2401, 0.3140]
-        V_over_F_expect = 0.52360688
-        xs_expect = [0.11120375, 0.34091324, 0.38663852, 0.08304114, 0.07802677]
-        V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, V_over_F_expect, rtol=1E-2)
-        assert_close1d(xs, xs_expect, rtol=1E-2)
+    # Said to be in:  B.A. Finlayson, Introduction to Chemical Engineering Computing, second ed., John Wiley & Sons, New York, 2012.
+    zs = [0.1, 0.3, 0.4, 0.2]
+    Ks = [6.8, 2.2, 0.8, 0.052]
+    V_over_F_expect = 0.42583973
+    xs_expect = [0.02881952, 0.19854300, 0.43723872, 0.33539943]
+
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, V_over_F_expect, rtol=1E-5)
+    assert_close1d(xs, xs_expect, rtol=1E-5)
+    
+    # Case with an initial guess out of range
+    zs = [0.1, 0.2, 0.3, 0.4]
+    Ks = [1.0161456228504933, 1.001260709063004, 0.9882448742560694, 1.0237689436500155]
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks, guess=0.8556936118217484)
+    assert_close(V_over_F, 37.338470768192806)
+
+    # Said to be in: J. Vidal, Thermodynamics: Applications in Chemical Engineering and the Petroleum Industry, Technip, Paris, 2003.
+    zs = [0.2, 0.3, 0.4, 0.05, 0.05]
+    Ks = [2.5250, 0.7708, 1.0660, 0.2401, 0.3140]
+    V_over_F_expect = 0.52360688
+    xs_expect = [0.11120375, 0.34091324, 0.38663852, 0.08304114, 0.07802677]
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, V_over_F_expect, rtol=1E-2)
+    assert_close1d(xs, xs_expect, rtol=1E-2)
 
 
-        # Said to be in: R. Monroy-Loperena, F.D. Vargas-Villamil, On the determination of the polynomial defining of vapor-liquid split of multicomponent mixtures, Chem.Eng. Sci. 56 (2001) 5865–5868.
-        zs = [0.05, 0.10, 0.15, 0.30, 0.30, 0.10]
-        Ks = [6.0934, 2.3714, 1.3924, 1.1418, 0.6457, 0.5563]
-        V_over_F_expect = 0.72073810
-        xs_expect = [0.01070433, 0.05029118, 0.11693011, 0.27218275, 0.40287788, 0.14701374]
+    # Said to be in: R. Monroy-Loperena, F.D. Vargas-Villamil, On the determination of the polynomial defining of vapor-liquid split of multicomponent mixtures, Chem.Eng. Sci. 56 (2001) 5865–5868.
+    zs = [0.05, 0.10, 0.15, 0.30, 0.30, 0.10]
+    Ks = [6.0934, 2.3714, 1.3924, 1.1418, 0.6457, 0.5563]
+    V_over_F_expect = 0.72073810
+    xs_expect = [0.01070433, 0.05029118, 0.11693011, 0.27218275, 0.40287788, 0.14701374]
 
-        V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
-        assert_close1d(xs, xs_expect, rtol=1E-6)
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
+    assert_close1d(xs, xs_expect, rtol=1E-6)
 
-        # Long tests - do not want to test with poly
-        if algo is flash_inner_loop_poly:
-            continue
+    # Long tests - do not want to test with poly
+    if algo is flash_inner_loop_poly:
+        return
 
-        # Said to be in: R. Monroy-Loperena, F.D. Vargas-Villamil, On the determination of the polynomial defining of vapor-liquid split of multicomponent mixtures, Chem.Eng. Sci. 56 (2001) 5865–5868.
-        zs = [0.3727, 0.0772, 0.0275, 0.0071, 0.0017, 0.0028, 0.0011, 0.0015, 0.0333, 0.0320, 0.0608, 0.0571, 0.0538, 0.0509, 0.0483, 0.0460, 0.0439, 0.0420, 0.0403]
-        Ks = [7.11, 4.30, 3.96, 1.51, 1.20, 1.27, 1.16, 1.09, 0.86, 0.80, 0.73, 0.65, 0.58, 0.51, 0.45, 0.39, 0.35, 0.30, 0.26]
-        V_over_F_expect = 0.84605135
-        xs_expect = [0.06041132, 0.02035881, 0.00784747, 0.00495988, 0.00145397, 0.00227932, 0.00096884, 0.00139386, 0.03777425, 0.03851756, 0.07880076, 0.08112154, 0.08345504, 0.08694391, 0.09033579, 0.09505925, 0.09754111, 0.10300074, 0.10777648]
+    # Said to be in: R. Monroy-Loperena, F.D. Vargas-Villamil, On the determination of the polynomial defining of vapor-liquid split of multicomponent mixtures, Chem.Eng. Sci. 56 (2001) 5865–5868.
+    zs = [0.3727, 0.0772, 0.0275, 0.0071, 0.0017, 0.0028, 0.0011, 0.0015, 0.0333, 0.0320, 0.0608, 0.0571, 0.0538, 0.0509, 0.0483, 0.0460, 0.0439, 0.0420, 0.0403]
+    Ks = [7.11, 4.30, 3.96, 1.51, 1.20, 1.27, 1.16, 1.09, 0.86, 0.80, 0.73, 0.65, 0.58, 0.51, 0.45, 0.39, 0.35, 0.30, 0.26]
+    V_over_F_expect = 0.84605135
+    xs_expect = [0.06041132, 0.02035881, 0.00784747, 0.00495988, 0.00145397, 0.00227932, 0.00096884, 0.00139386, 0.03777425, 0.03851756, 0.07880076, 0.08112154, 0.08345504, 0.08694391, 0.09033579, 0.09505925, 0.09754111, 0.10300074, 0.10777648]
 
-        V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
-        assert_close1d(xs, xs_expect, rtol=1E-5)
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, V_over_F_expect, rtol=1E-6)
+    assert_close1d(xs, xs_expect, rtol=1E-5)
 
-        # Random example from MultiComponentFlash.xlsx, https://6507a56d-a-62cb3a1a-s-sites.googlegroups.com/site/simulationsmodelsandworksheets/MultiComponentFlash.xlsx?attachauth=ANoY7coiZq4OX8HjlI75HGTWiegJ9Tqz6cyqmmmH9ib-dhcNL89TIUTmQw3HxrnolKHgYuL66drYGasDgTkf4_RrWlciyRKwJCbSi5YgTG1GfZR_UhlBuaoKQvrW_L8HdboB3PYejRbzVQaCshwzYcOeGCZycdXQdF9scxoiZLpy7wbUA0xx8j9e4nW1D9PjyApC-MjsjqjqL10HFcw1KVr5sD0LZTkZCqFYA1HReqLzOGZE01_b9sfk351BB33mwSgWQlo3DLVe&attredirects=0&d=1
-        Ks = [0.90000, 2.70000, 0.38000, 0.09800, 0.03800, 0.02400, 0.07500, 0.00019, 0.00070]
-        zs = [0.0112, 0.8957, 0.0526, 0.0197, 0.0068, 0.0047, 0.0038, 0.0031, 0.0024]
-        V_over_F_expect = 0.964872854762834
-        V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, V_over_F_expect, rtol=1E-7)
+    # Random example from MultiComponentFlash.xlsx, https://6507a56d-a-62cb3a1a-s-sites.googlegroups.com/site/simulationsmodelsandworksheets/MultiComponentFlash.xlsx?attachauth=ANoY7coiZq4OX8HjlI75HGTWiegJ9Tqz6cyqmmmH9ib-dhcNL89TIUTmQw3HxrnolKHgYuL66drYGasDgTkf4_RrWlciyRKwJCbSi5YgTG1GfZR_UhlBuaoKQvrW_L8HdboB3PYejRbzVQaCshwzYcOeGCZycdXQdF9scxoiZLpy7wbUA0xx8j9e4nW1D9PjyApC-MjsjqjqL10HFcw1KVr5sD0LZTkZCqFYA1HReqLzOGZE01_b9sfk351BB33mwSgWQlo3DLVe&attredirects=0&d=1
+    Ks = [0.90000, 2.70000, 0.38000, 0.09800, 0.03800, 0.02400, 0.07500, 0.00019, 0.00070]
+    zs = [0.0112, 0.8957, 0.0526, 0.0197, 0.0068, 0.0047, 0.0038, 0.0031, 0.0024]
+    V_over_F_expect = 0.964872854762834
+    V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, V_over_F_expect, rtol=1E-7)
 
-        # Random example from Rachford-Rice-Exercise.xls http://www.ipt.ntnu.no/~curtis/courses/PhD-PVT/PVT-HOT-Vienna-May-2016x/e-course/Day2_Part2/Exercises/Rachford-Rice-Exercise.xls
-        zs = [0.001601, 0.009103, 0.364815, 0.096731, 0.069522, 0.014405, 0.039312, 0.014405, 0.014104, 0.043219, 0.111308, 0.086659, 0.065183, 0.032209, 0.037425]
-        Ks = [1.081310969639700E+002, 6.600350291317650E+000, 3.946099352050670E+001, 4.469649874919970E+000, 9.321795620021620E-001, 3.213910680361160E-001, 2.189276413305250E-001, 7.932561445994600E-002, 5.868520215582420E-002, 2.182440138190620E-002, 1.769601670781200E-003, 2.855879877894100E-005, 2.718731754877420E-007, 2.154768511018220E-009, 2.907309385811110E-013]
+    # Random example from Rachford-Rice-Exercise.xls http://www.ipt.ntnu.no/~curtis/courses/PhD-PVT/PVT-HOT-Vienna-May-2016x/e-course/Day2_Part2/Exercises/Rachford-Rice-Exercise.xls
+    zs = [0.001601, 0.009103, 0.364815, 0.096731, 0.069522, 0.014405, 0.039312, 0.014405, 0.014104, 0.043219, 0.111308, 0.086659, 0.065183, 0.032209, 0.037425]
+    Ks = [1.081310969639700E+002, 6.600350291317650E+000, 3.946099352050670E+001, 4.469649874919970E+000, 9.321795620021620E-001, 3.213910680361160E-001, 2.189276413305250E-001, 7.932561445994600E-002, 5.868520215582420E-002, 2.182440138190620E-002, 1.769601670781200E-003, 2.855879877894100E-005, 2.718731754877420E-007, 2.154768511018220E-009, 2.907309385811110E-013]
+    V_over_F, _, _ = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, 0.48908229446749, rtol=1E-5)
+
+    # Random example from VLE_Pete310.xls http://www.pe.tamu.edu/barrufet/public_html/PETE310/goodies/VLE_Pete310.xls
+    # Had to resolve because the goal which was specified by its author was far off from 0
+    Ks = [3.578587993622110000, 10.348850231319200000, 2.033984472604390000, 0.225176162885930000, 0.096215673714140800, 0.070685757228660000, 0.001509595637954720, ]
+    zs = [0.0387596899224806, 0.1937984496124030, 0.0775193798449612, 0.1162790697674420, 0.1085271317829460, 0.1550387596899220, 0.3100775193798450]
+    V_over_F, _, _ = algo(zs=zs, Ks=Ks)
+
+    assert_close(V_over_F, 0.191698639911785)
+
+    # Example 2 in Gaganis, Vassilis, Dimitris Marinakis, and Nikos Varotsis. “A General Framework of Model Functions for Rapid and Robust Solution of Rachford–Rice Type of Equations.” Fluid Phase Equilibria 322–323 (May 25, 2012): 9–18. https://doi.org/10.1016/j.fluid.2012.03.001.
+    # Claims 4 iterations
+    # Some methods fail
+    Ks = [2.9086E1, 8.7438E0, 1.9317E0, 7.9137E-1, 3.2918E-1, 1.5721E-1, 1.7684E-2, 1.4677E-5]
+    zs = [2.8688E-5, 7.0701E-2, 1.3198E-1, 1.3039E-1, 2.7631E-2, 3.5986E-2, 4.5207E-1, 1.5122E-1]
+    if algo not in (Li_Johns_Ahmadi_solution, flash_inner_loop_LJA):
+        # The LJA algo finds a perfect zero in its own method... but for this problem, converges differently
         V_over_F, _, _ = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, 0.48908229446749, rtol=1E-5)
+        assert_close(V_over_F, -1.8928931615799782e-05, rtol=5e-4)
 
-        # Random example from VLE_Pete310.xls http://www.pe.tamu.edu/barrufet/public_html/PETE310/goodies/VLE_Pete310.xls
-        # Had to resolve because the goal which was specified by its author was far off from 0
-        Ks = [3.578587993622110000, 10.348850231319200000, 2.033984472604390000, 0.225176162885930000, 0.096215673714140800, 0.070685757228660000, 0.001509595637954720, ]
-        zs = [0.0387596899224806, 0.1937984496124030, 0.0775193798449612, 0.1162790697674420, 0.1085271317829460, 0.1550387596899220, 0.3100775193798450]
-        V_over_F, _, _ = algo(zs=zs, Ks=Ks)
-
-        assert_close(V_over_F, 0.191698639911785)
-
-        # Example 2 in Gaganis, Vassilis, Dimitris Marinakis, and Nikos Varotsis. “A General Framework of Model Functions for Rapid and Robust Solution of Rachford–Rice Type of Equations.” Fluid Phase Equilibria 322–323 (May 25, 2012): 9–18. https://doi.org/10.1016/j.fluid.2012.03.001.
-        # Claims 4 iterations
-        # Some methods fail
-        Ks = [2.9086E1, 8.7438E0, 1.9317E0, 7.9137E-1, 3.2918E-1, 1.5721E-1, 1.7684E-2, 1.4677E-5]
-        zs = [2.8688E-5, 7.0701E-2, 1.3198E-1, 1.3039E-1, 2.7631E-2, 3.5986E-2, 4.5207E-1, 1.5122E-1]
-        if algo not in (Li_Johns_Ahmadi_solution, flash_inner_loop_LJA):
-            # The LJA algo finds a perfect zero in its own method... but for this problem, converges differently
-            V_over_F, _, _ = algo(zs=zs, Ks=Ks)
-            assert_close(V_over_F, -1.8928931615799782e-05, rtol=5e-4)
-
-        # Very very tough problem for all methods due to floating point issues!
-        # Came from a Wilson flash for VF = 1, T = 300K; pressure is around 0.006 Pa
-        zs = [9.11975115499676e-05, 9.986813065240533e-05, 0.0010137795304828892, 0.019875879000370657, 0.013528874875432457, 0.021392773691700402, 0.00845450438914824, 0.02500218071904368, 0.016114189201071587, 0.027825798446635016, 0.05583179467176313, 0.0703116540769539, 0.07830577180555454, 0.07236459223729574, 0.0774523322851419, 0.057755091407705975, 0.04030134965162674, 0.03967043780553758, 0.03514481759005302, 0.03175471055284055, 0.025411123554079325, 0.029291866298718154, 0.012084986551713202, 0.01641114551124426, 0.01572454598093482, 0.012145363820829673, 0.01103585282423499, 0.010654818322680342, 0.008777712911254239, 0.008732073853067238, 0.007445155260036595, 0.006402875549212365, 0.0052908087849774296, 0.0048199150683177075, 0.015943943854195963, 0.004452253754752775, 0.01711981267072777, 0.0024032720444511282, 0.032178399403544646, 0.0018219517069058137, 0.003403378548794345, 0.01127516775495176, 0.015133143423489698, 0.029483213283483682]
-        Ks = [11266712779.420027, 878492232.6773384, 276137963.8440058, 4326171618.091249, 573047115.7000155, 131436201.37184711, 49144960.82699592, 34263188.970916145, 13026505.192595435, 9843992.470472587, 3181564.1430952367, 1098600.248012159, 398336.89725376305, 147470.4607802813, 67566.76902751227, 23297.414225523942, 10686.776470987174, 4072.207866361747, 1521.3427782410724, 845.019208473066, 341.75877360772205, 194.91347949534864, 87.37639967685602, 43.81742706130358, 20.123099010095398, 11.2277426008874, 5.873713068861075, 2.3291630622640436, 1.3236952322694902, 0.5190977953895624, 0.33652998006213003, 0.1020194939160233, 0.11957263833876645, 0.036296673021294995, 0.022599820560813874, 2170843.2559104185, 756159.852797745, 292204.024675241, 208695.52033667514, 77287.61740255292, 6429786.948979916, 1914236.7164609663, 3164023.516416859, 1042916.2797133088]
-        V_over_F, _, _ = algo(zs=zs, Ks=Ks)
-        assert_close(V_over_F, 1, atol=0.001)
+    # Very very tough problem for all methods due to floating point issues!
+    # Came from a Wilson flash for VF = 1, T = 300K; pressure is around 0.006 Pa
+    zs = [9.11975115499676e-05, 9.986813065240533e-05, 0.0010137795304828892, 0.019875879000370657, 0.013528874875432457, 0.021392773691700402, 0.00845450438914824, 0.02500218071904368, 0.016114189201071587, 0.027825798446635016, 0.05583179467176313, 0.0703116540769539, 0.07830577180555454, 0.07236459223729574, 0.0774523322851419, 0.057755091407705975, 0.04030134965162674, 0.03967043780553758, 0.03514481759005302, 0.03175471055284055, 0.025411123554079325, 0.029291866298718154, 0.012084986551713202, 0.01641114551124426, 0.01572454598093482, 0.012145363820829673, 0.01103585282423499, 0.010654818322680342, 0.008777712911254239, 0.008732073853067238, 0.007445155260036595, 0.006402875549212365, 0.0052908087849774296, 0.0048199150683177075, 0.015943943854195963, 0.004452253754752775, 0.01711981267072777, 0.0024032720444511282, 0.032178399403544646, 0.0018219517069058137, 0.003403378548794345, 0.01127516775495176, 0.015133143423489698, 0.029483213283483682]
+    Ks = [11266712779.420027, 878492232.6773384, 276137963.8440058, 4326171618.091249, 573047115.7000155, 131436201.37184711, 49144960.82699592, 34263188.970916145, 13026505.192595435, 9843992.470472587, 3181564.1430952367, 1098600.248012159, 398336.89725376305, 147470.4607802813, 67566.76902751227, 23297.414225523942, 10686.776470987174, 4072.207866361747, 1521.3427782410724, 845.019208473066, 341.75877360772205, 194.91347949534864, 87.37639967685602, 43.81742706130358, 20.123099010095398, 11.2277426008874, 5.873713068861075, 2.3291630622640436, 1.3236952322694902, 0.5190977953895624, 0.33652998006213003, 0.1020194939160233, 0.11957263833876645, 0.036296673021294995, 0.022599820560813874, 2170843.2559104185, 756159.852797745, 292204.024675241, 208695.52033667514, 77287.61740255292, 6429786.948979916, 1914236.7164609663, 3164023.516416859, 1042916.2797133088]
+    V_over_F, _, _ = algo(zs=zs, Ks=Ks)
+    assert_close(V_over_F, 1, atol=0.001)
 
 def test_RR3_analytical_handle_imag_result():
     Ks = [0.9999533721721108, 1.0002950232772678, 0.9998314089519726]
