@@ -80,12 +80,12 @@ jobs:
         python -m pip install wheel
         pip install -r requirements_test.txt
     - name: Add numba
-      if: ${{ matrix.python-version == '3.6' || matrix.python-version == '3.7' || matrix.python-version == '3.8' || matrix.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.7' || matrix.python-version == '3.8' || matrix.python-version == '3.9' }}
       run: |
         pip install numba
     - name: Test with pytest
       run: |
-        pytest . -v --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not sympy and not numba and not CoolProp and not fuzz"
+        pytest . -v --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not sympy and not CoolProp and not fuzz"
         coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
