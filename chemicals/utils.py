@@ -56,13 +56,13 @@ from fluids.numerics import (brenth, newton, linspace, polyint,
                              quadratic_from_f_ders, numpy as np)
 from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
                   cos, cosh, degrees, e,  exp, fabs,
-                  factorial, floor, fmod, frexp, isinf,
+                  floor, fmod, frexp, isinf,
                   isnan, ldexp, log, log10, modf, pi, pow,
                   radians, sin, sinh, sqrt, tan, tanh, trunc) # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
 
 __all__.extend(['acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
 'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'e', 'exp',
-'fabs', 'factorial', 'floor', 'fmod', 'frexp',
+'fabs', 'floor', 'fmod', 'frexp',
 'isinf', 'isnan', 'ldexp',  'log', 'log10', 'modf',
 'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc'])
 __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma',
