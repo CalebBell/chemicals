@@ -570,7 +570,14 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
     '''
     if order == 0:
         Tr = T/Tc
-        return A*(1. - Tr)**(B + Tr*(C + Tr*(D + E*Tr)))
+        tau = (1.0 - Tr)
+        power = (B + Tr*(C + Tr*(D + E*Tr)))
+        try:
+            return A*tau**power
+        except:
+            # TODO: after more testing with regression, maybe return a more
+            # precise value or allow A to impact the result
+            return 1e300
     elif order == 1:
         x0 = 1.0/Tc
         x1 = T*x0

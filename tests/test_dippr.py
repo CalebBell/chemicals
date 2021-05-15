@@ -91,6 +91,11 @@ def test_EQ106_more():
     d3_numerical = derivative(lambda T: EQ106(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=2), 300.0, dx=1e-4)
     assert_close(d3_analytical, -5.524739890945817e-09, rtol=1e-13)
     assert_close(d3_analytical, d3_numerical, rtol=1e-8)
+    
+    # check that this regression set of points does not produce an error
+    overflow_kwargs = {'T': 304.747, 'Tc': 405.4, 'A': 56.743647419038744, 'B': -75.36242555958763,
+                   'C': -141.1028969227863, 'D': -254.76349199392695, 'E': -442.5916844036474, 'order': 0}
+    EQ106(**overflow_kwargs)
 
 
 def test_EQ101_more():
