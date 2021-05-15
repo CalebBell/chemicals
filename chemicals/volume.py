@@ -93,7 +93,7 @@ attribute of this module.
 
 .. data:: rho_data_Perry_8E_105_l
 
-    Coefficients for :obj:`chemicals.dippr.EQ105` from [1]_ for 344 fluds. Note
+    Coefficients for :obj:`chemicals.dippr.EQ105` from [1]_ for 344 fluids. Note
     this is in terms of molar density; to obtain molar volume, invert the result!
 
 .. data:: rho_data_VDI_PPDS_2

@@ -1072,7 +1072,7 @@ def Wagner(T, Tc, Pc, a, b, c, d):
     Methane, coefficients from [2]_, at 100 K.
 
     >>> Wagner(100., 190.551, 4599200, -6.02242, 1.26652, -0.5707, -1.366)
-    34415.00476263708
+    34415.004762637
 
     References
     ----------
@@ -1083,8 +1083,11 @@ def Wagner(T, Tc, Pc, a, b, c, d):
        New York: McGraw-Hill Professional, 2000.
     '''
     Tr = T/Tc
-    tau = 1.0 - T/Tc
-    return Pc*exp((a*tau + b*tau**1.5 + c*tau**2.5 + d*tau**5)/Tr)
+    tau = 1.0 - Tr
+    tau_rt = sqrt(tau)
+    tau15 = tau*tau_rt
+    tau25 = tau*tau15
+    return Pc*exp((a + b*tau_rt + tau15*(c + d*tau25))*tau/Tr)
 
 def dWagner_dT(T, Tc, Pc, a, b, c, d):
     r'''Calculates the first temperature derivative of vapor pressure using the
