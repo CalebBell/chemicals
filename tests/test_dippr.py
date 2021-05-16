@@ -75,6 +75,12 @@ def test_EQ105_more():
 
     d3 = EQ105(300, 0.70824, 0.26411, 507.6, 0.27537, order=3)
     assert_close(derivative(lambda T: EQ105(T, 0.70824, 0.26411, 507.6, 0.27537, order=2), 300, dx=1e-3), d3)
+    
+    
+    # avoid complex numbers
+    kwargs = {'T': 195.0, 'A': 7247.0, 'B': 0.418, 'C': 5.2, 'D': 0.24, 'order': 0}
+    assert_close(EQ105(**kwargs), 17337.32057416268)
+
 
 def test_EQ106_more():
     d1_analytical = EQ106(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1)

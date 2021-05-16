@@ -56,7 +56,7 @@ __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
 from chemicals.utils import log, exp, sinh, cosh, atan, atanh, sqrt, tanh
 from cmath import log as clog
 from cmath import sqrt as csqrt
-from fluids.numerics import hyp2f1, trunc_exp
+from fluids.numerics import hyp2f1, trunc_exp, trunc_log
 
 order_not_found_msg = ('Only the actual property calculation, first temperature '
                        'derivative, first temperature integral, and first '
@@ -203,7 +203,7 @@ def EQ101(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     '''
     T_inv = 1.0/T
     T_E = T**E
-    expr = trunc_exp(A + B*T_inv + C*log(T) + D*T_E)
+    expr = trunc_exp(A + B*T_inv + C*trunc_log(T) + D*T_E)
     if order == 0:
         return expr
     elif order == 1:
@@ -448,7 +448,12 @@ def EQ105(T, A, B, C, D, order=0):
        DIPPR/AIChE
     '''
     if order == 0:
-        return A*B**(-(1. + (1. - T/C)**D))
+        problematic = (1. - T/C)
+        if D < 1.0 and problematic < 0.0:
+            # Handle the case of a negative D exponent with a (1. - T/C) under 0 which would yield a complex number
+            problematic = 0.0
+        ans = A*B**(-(1. + problematic**D))
+        return ans
     elif order == 1:
         x0 = 1.0/C
         x1 = 1.0 - T*x0
