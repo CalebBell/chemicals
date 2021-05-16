@@ -163,6 +163,11 @@ def test_EQ115_more():
     d3_numerical = derivative(lambda T: EQ115(T, *args, order=2), 300.0, dx=1e-2)
     assert_close(d3_analytical, 0.0007252940633608988, rtol=1e-13)
     assert_close(d3_analytical, d3_numerical)
+    
+    # Check case avoid overflow
+    kwargs = {'T': 400.05, 'A': 1.0, 'B': 1.0, 'C': 1.0, 'D': 1.0, 'E': 1.0, 'order': 0}
+    EQ115(**kwargs)
+
 
 
 def test_EQ116_more():

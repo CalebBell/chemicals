@@ -884,7 +884,7 @@ def EQ115(T, A, B, C=0, D=0, E=0, order=0):
        DIPPR/AIChE
     '''
     if order == 0:
-        return exp(A+B/T+C*log(T)+D*T**2 + E/T**2)
+        return trunc_exp(A+B/T+C*log(T)+D*T**2 + E/T**2)
     elif order == 1:
         x0 = T**2
         x1 = 1/x0
