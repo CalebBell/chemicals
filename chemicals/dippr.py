@@ -298,9 +298,12 @@ def EQ102(T, A, B, C, D, order=0):
     elif order == -1:
         # numba-scipy does not support complex numbers so this does not work in numba
         # imaginary part is 0
-        return float((2*A*T**(3+B)*hyp2f1(1.0, 3.0+B, 4.0+B, (-2*T/(C - csqrt(C*C
-                - 4*D))))/((3+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D))
-                -2*A*T**(3+B)*hyp2f1(1.0, 3.0+B, 4+B, (-2*T/(C + csqrt(C*C - 4*D))))/(
+        arg3_hyp = (-2*T/(C - csqrt(C*C - 4*D)))
+        arg3_hyp2 = (-2*T/(C + csqrt(C*C - 4*D)))
+        hyp2f1_term1 = hyp2f1(1.0, 3.0+B, 4.0+B, arg3_hyp)
+        hyp2f1_term2 = hyp2f1(1.0, 3.0+B, 4.0+B, arg3_hyp2)
+        return float((2*A*T**(3+B)*hyp2f1_term1/((3+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D))
+                -2*A*T**(3+B)*hyp2f1_term2/(
                 (3+B)*(C + csqrt(C*C-4*D))*csqrt(C*C-4*D))).real)
     elif order == -1j:
         return float((2*A*T**(2+B)*hyp2f1(1.0, 2.0+B, 3.0+B, -2*T/(C - csqrt(C*C - 4*D)))/(
