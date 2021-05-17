@@ -299,13 +299,13 @@ def EQ102(T, A, B, C, D, order=0):
         # numba-scipy does not support complex numbers so this does not work in numba
         # imaginary part is 0
         x0 = csqrt(C*C - 4.0*D)
-        arg3_hyp = (-2*T/(C - x0))
+        arg3_hyp = (-2.0*T/(C - x0))
         #arg3_hyp2 = (-2*T/(C + csqrt(C*C - 4*D)))
         hyp2f1_term1 = hyp2f1(1.0, 3.0+B, 4.0+B, arg3_hyp)
         hyp2f1_term2 = hyp2f1_term1.real - hyp2f1_term1.imag*1.0j #hyp2f1(1.0, 3.0+B, 4.0+B, arg3_hyp2)
-        return float((2*A*T**(3+B)*hyp2f1_term1/((3+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D))
+        return float((2*A*T**(3+B)*hyp2f1_term1/((3+B)*(C - x0)*x0)
                 -2*A*T**(3+B)*hyp2f1_term2/(
-                (3+B)*(C + csqrt(C*C-4*D))*csqrt(C*C-4*D))).real)
+                (3+B)*(C + x0)*x0)).real)
     elif order == -1j:
         return float((2*A*T**(2+B)*hyp2f1(1.0, 2.0+B, 3.0+B, -2*T/(C - csqrt(C*C - 4*D)))/(
                 (2+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D)) -2*A*T**(2+B)*hyp2f1(
