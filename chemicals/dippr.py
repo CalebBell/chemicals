@@ -301,7 +301,7 @@ def EQ102(T, A, B, C, D, order=0):
         arg3_hyp = (-2*T/(C - csqrt(C*C - 4*D)))
         arg3_hyp2 = (-2*T/(C + csqrt(C*C - 4*D)))
         hyp2f1_term1 = hyp2f1(1.0, 3.0+B, 4.0+B, arg3_hyp)
-        hyp2f1_term2 = hyp2f1(1.0, 3.0+B, 4.0+B, arg3_hyp2)
+        hyp2f1_term2 = hyp2f1_term1.real - hyp2f1_term1.imag*1.0j #hyp2f1(1.0, 3.0+B, 4.0+B, arg3_hyp2)
         return float((2*A*T**(3+B)*hyp2f1_term1/((3+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D))
                 -2*A*T**(3+B)*hyp2f1_term2/(
                 (3+B)*(C + csqrt(C*C-4*D))*csqrt(C*C-4*D))).real)
