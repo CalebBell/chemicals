@@ -56,7 +56,7 @@ __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
 from chemicals.utils import log, exp, sinh, cosh, atan, atanh, sqrt, tanh
 from cmath import log as clog
 from cmath import sqrt as csqrt
-from fluids.numerics import hyp2f1, trunc_exp, trunc_log
+from fluids.numerics import hyp2f1, trunc_exp, trunc_log, numpy as np
 
 order_not_found_msg = ('Only the actual property calculation, first temperature '
                        'derivative, first temperature integral, and first '
@@ -298,6 +298,7 @@ def EQ102(T, A, B, C, D, order=0):
     elif order == -1:
         # numba-scipy does not support complex numbers so this does not work in numba
         # imaginary part is 0
+        # Hours spend trying to make hyp2f1 use real inputs only: 2
         c0 = 3.0 + B
         x0 = csqrt(C*C - 4.0*D)
         arg3_hyp = (-2.0*T/(C - x0))
@@ -317,6 +318,25 @@ def EQ102(T, A, B, C, D, order=0):
     else:
         raise ValueError(order_not_found_msg)
 
+def EQ102_fitting_jacobian(Ts, params):
+    A, B, C, D = params
+    x0 = Ts**B
+    x1 = 1.0/Ts
+    x2 = x1*x1
+    x3 = C*x1 + D*x2 + 1.0
+    x4 = x0/x3
+    x5 = A*x4/x3
+    lnTs = np.log(Ts)
+    
+    N = len(Ts)
+    param_count = 4
+    out = np.zeros((N, param_count))
+    for i in range(N):
+        out[i][0] = x4[i]
+        out[i][1] = A*x4[i]*lnTs[i]
+        out[i][2] = -x1[i]*x5[i]
+        out[i][3] = -x2[i]*x5[i]
+    return out
 
 def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     r'''DIPPR Equation #104. Often used in calculating second virial
