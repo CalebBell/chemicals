@@ -320,22 +320,30 @@ def EQ102(T, A, B, C, D, order=0):
 
 def EQ102_fitting_jacobian(Ts, params):
     A, B, C, D = params
-    x0 = Ts**B
-    x1 = 1.0/Ts
-    x2 = x1*x1
-    x3 = C*x1 + D*x2 + 1.0
-    x4 = x0/x3
-    x5 = A*x4/x3
-    lnTs = np.log(Ts)
+    # x0 = Ts**B
+    # x1 = 1.0/Ts
+    # x2 = x1*x1
+    # x3 = C*x1 + D*x2 + 1.0
+    # x4 = x0/x3
+    # x5 = A*x4/x3
+    # lnTs = np.log(Ts)
     
     N = len(Ts)
     param_count = 4
-    out = np.zeros((N, param_count))
+    # out = np.zeros((N, param_count)) # numba: uncomment
+    out = [[0.0]*4 for _ in range(N)] # numba: delete
     for i in range(N):
-        out[i][0] = x4[i]
-        out[i][1] = A*x4[i]*lnTs[i]
-        out[i][2] = -x1[i]*x5[i]
-        out[i][3] = -x2[i]*x5[i]
+        x0 = Ts[i]**B
+        x1 = 1.0/Ts[i]
+        x2 = x1*x1
+        x3 = C*x1 + D*x2 + 1.0
+        x4 = x0/x3
+        x5 = A*x4/x3
+        lnT = log(Ts[i])
+        out[i][0] = x4
+        out[i][1] = A*x4*lnT
+        out[i][2] = -x1*x5
+        out[i][3] = -x2*x5
     return out
 
 def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):

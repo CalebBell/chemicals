@@ -73,9 +73,16 @@ in the geochemical or astronomical domain is normally neglected.
 
 .. autofunction:: chemicals.volume.Goodman
 
+Pure Component Liquid Fit Correlations
+-------------------------------------
+.. autofunction:: chemicals.volume.Rackett_fit
+
 Pure Component Solid Fit Correlations
 -------------------------------------
 .. autofunction:: chemicals.volume.CRC_inorganic
+
+
+
 
 Fit Coefficients
 ----------------
@@ -169,7 +176,7 @@ from __future__ import division
 __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
 'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic',
 'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture',
-'ideal_gas', 'Goodman',
+'ideal_gas', 'Goodman', 'Rackett_fit',
 ]
 
 import os
@@ -399,6 +406,63 @@ def Rackett(T, Tc, Pc, Zc):
     '''
     return R*Tc/Pc*Zc**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
+def Rackett_fit(T, Tc, rhoc, b, n):
+    r'''Calculates saturation liquid volume, using the Rackett equation form 
+    and a known or estimated critical temperature and density as well
+    as fit parameters `b` and `n`.
+
+    The molar volume of a liquid is given by:
+
+    .. math::
+        \rho_{sat} = \rho_c b^{-\left(1 - \frac{T}{T_c}\right)^n}
+    
+    Note that units of this equation in some sources are kg/m^3 and some are
+    in mol/^3. 
+    
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    rhoc : float
+        Critical density of fluid, often a fit parameter only [kg/m^3]
+    b : float
+        Fit parameter, [-]
+    n : float
+        Fit parameter, [-]
+
+    Returns
+    -------
+    Vs : float
+        Saturation liquid volume, [m^3/mol]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Input sample from NIST (naphthalene) (m^3/kg):
+        
+    >>> Rackett_fit(T=400.0, Tc=748.402, rhoc=314.629, b=0.257033, n=0.280338)
+    0.00106174320755
+    
+    Parameters in Yaws form (note the 1000 multiplier on `rhoc`, called `A`
+    in Yaws) (m^3/kg):
+        
+    >>> Rackett_fit(T=298.15, Tc=425.18, rhoc=0.2283*1000, b=0.2724, n=0.2863)
+    0.00174520519958
+
+    References
+    ----------
+    .. [1] Frenkel, Michael, Robert D. Chirico, Vladimir Diky, Xinjian Yan,
+       Qian Dong, and Chris Muzny. "ThermoData Engine (TDE): Software 
+       Implementation of the Dynamic Data Evaluation Concept." Journal of 
+       Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38. 
+       https://doi.org/10.1021/ci050067b.
+    '''
+    rho = rhoc*b**(-(1.0 - T/Tc)**n)
+    return 1.0/rho
 
 def Yamada_Gunn(T, Tc, Pc, omega):
     r'''Calculates saturation liquid volume, using Yamada and Gunn CSP method
