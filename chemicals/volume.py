@@ -74,7 +74,7 @@ in the geochemical or astronomical domain is normally neglected.
 .. autofunction:: chemicals.volume.Goodman
 
 Pure Component Liquid Fit Correlations
--------------------------------------
+--------------------------------------
 .. autofunction:: chemicals.volume.Rackett_fit
 
 Pure Component Solid Fit Correlations
@@ -406,18 +406,23 @@ def Rackett(T, Tc, Pc, Zc):
     '''
     return R*Tc/Pc*Zc**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
-def Rackett_fit(T, Tc, rhoc, b, n):
+def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
     r'''Calculates saturation liquid volume, using the Rackett equation form 
     and a known or estimated critical temperature and density as well
     as fit parameters `b` and `n`.
 
-    The molar volume of a liquid is given by:
+    The density of a liquid is given by:
 
     .. math::
         \rho_{sat} = \rho_c b^{-\left(1 - \frac{T}{T_c}\right)^n}
     
-    Note that units of this equation in some sources are kg/m^3 and some are
-    in mol/^3. 
+    The density is then converted to a specific volume by taking its inverse.
+    
+    Note that the units of this equation in some sources are kg/m^3, g/mL in others,
+    and m^3/mol in others. If the units for the coefficients are in molar units,
+    do NOT provide `MW` or an incorrect value will be returned. If the units
+    are mass units and `MW` is not provided, the output will have the same
+    units as `rhoc`.
     
     Parameters
     ----------
@@ -431,11 +436,13 @@ def Rackett_fit(T, Tc, rhoc, b, n):
         Fit parameter, [-]
     n : float
         Fit parameter, [-]
-
+    MW : float, optional
+        Molecular weight, [g/mol]
+        
     Returns
     -------
     Vs : float
-        Saturation liquid volume, [m^3/mol]
+        Saturation liquid volume, [m^3/mol if MW given; m^3/kg otherwise]
 
     Notes
     -----
@@ -447,11 +454,16 @@ def Rackett_fit(T, Tc, rhoc, b, n):
     >>> Rackett_fit(T=400.0, Tc=748.402, rhoc=314.629, b=0.257033, n=0.280338)
     0.00106174320755
     
-    Parameters in Yaws form (note the 1000 multiplier on `rhoc`, called `A`
+    Parameters in Yaws form (butane) (note the 1000 multiplier on `rhoc`, called `A`
     in Yaws) (m^3/kg):
         
     >>> Rackett_fit(T=298.15, Tc=425.18, rhoc=0.2283*1000, b=0.2724, n=0.2863)
     0.00174520519958
+    
+    Same Yaws point, with MW provided:
+        
+    >>> Rackett_fit(T=298.15, Tc=425.18, rhoc=0.2283*1000, b=0.2724, n=0.2863, MW=58.123)
+    0.00010143656181
 
     References
     ----------
@@ -460,9 +472,14 @@ def Rackett_fit(T, Tc, rhoc, b, n):
        Implementation of the Dynamic Data Evaluation Concept." Journal of 
        Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38. 
        https://doi.org/10.1021/ci050067b.
+    .. [2] Yaws, Carl L. "Liquid Density of the Elements: A Comprehensive 
+       Tabulation for All the Important Elements from Ag to Zr." Chemical 
+       Engineering 114, no. 12 (2007): 44-47.
     '''
-    rho = rhoc*b**(-(1.0 - T/Tc)**n)
-    return 1.0/rho
+    rho_calc = rhoc*b**(-(1.0 - T/Tc)**n)
+    if MW is not None:
+        return 1e-3*MW/rho_calc
+    return 1.0/rho_calc
 
 def Yamada_Gunn(T, Tc, Pc, omega):
     r'''Calculates saturation liquid volume, using Yamada and Gunn CSP method
