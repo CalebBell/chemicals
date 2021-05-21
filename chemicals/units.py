@@ -84,7 +84,10 @@ variable_output_unit_funcs = {
     'Lastovka_solid_integral_over_T': ({(True, True, False): [u.J/u.kg/u.K],
                       (True, True, True): [u.J/u.mol/u.K],
                       }, 3),
-    }
+    'Rackett_fit': ({(True, True, True, True, True, True): [u.m**3/u.mol],
+                  (True, True, True, True, True, False): [u.m**3/u.kg],
+                  }, 6),
+}
 
 
 for name in dir(chemicals):

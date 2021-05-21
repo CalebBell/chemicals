@@ -54,3 +54,12 @@ def test_heat_capacity_variable_units():
 
     S = Lastovka_solid_integral_over_T(300*u.K, 0.2139*u.mol/u.g, MW=48*u.g/u.mol)
     assert_pint_allclose(S, 93.4825802951787, {'[length]': 2, '[mass]': 1, '[substance]': -1, '[temperature]': -1, '[time]': -2})
+
+def test_Rackett_fit_variable_units():
+    Vm = Rackett_fit(T=298.15*u.K, Tc=425.18*u.K, rhoc=228.3*u.kg/u.m**3, b=0.2724, n=0.2863, MW=58.123*u.g/u.mol)
+    assert_pint_allclose(Vm, 0.00010143656181568518, {'[length]': 3, '[substance]': -1})
+
+    Vm = Rackett_fit(T=298.15*u.K, Tc=425.18*u.K, rhoc=228.3*u.kg/u.m**3, b=0.2724, n=0.2863)
+    assert_pint_allclose(Vm, 0.001745205199588548, {'[length]': 3, '[mass]': -1})
+
+
