@@ -546,6 +546,28 @@ def test_rachford_rice_polynomial():
     assert_close1d(xs, xs_new)
     assert_close1d(ys, ys_new)
 
+@mark_as_numba
+def test_fitting_jacobians():
+    T, Tc, Pc, a, b, c, d = 100.0, 475.03, 2980000.0, -8.32915, 2.37044, -3.75113, -4.6033
+    der_expect = [[6.38493817686558e-10, 5.67321421625625e-10, 3.9796661447548854e-10, 1.9583105182859243e-10]]
+    der_analytical = chemicals.numba.Wagner_original_fitting_jacobian(np.array([T]), Tc, Pc, a, b, c, d)
+    assert_close1d(der_expect, der_analytical, rtol=1e-13)
+    
+    T, Tc, Pc, a, b, c, d = 100.0, 475.03, 2980000.0, -8.32915, 2.37044, -3.75113, -4.6033
+    der_expect = [[5.1791400515036586e-11, 4.601825445175529e-11, 3.633081272138977e-11, 2.0120443215711467e-11]]
+    der_analytical = chemicals.numba.Wagner_fitting_jacobian(np.array([T]), Tc, Pc, a, b, c, d)
+    assert_close1d(der_expect, der_analytical, rtol=1e-13)
+
+    T, A, B, C, D, E = 300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2
+    der_expect = [[3537.44834545549, 11.791494484851635, 20176.835877810598, 318370351.0909941, 7563.831703366002]]
+    der_analytical = chemicals.numba.EQ101_fitting_jacobian(np.array([T]), A, B, C, D, E)
+    assert_close1d(der_analytical, der_expect, rtol=1e-13)
+    
+    T, A, B, C, D = 300.0, 2e-6, 0.42, 900.0, -4e4
+    der_expect = [[3.08662207669995, 3.521084181393621e-05, -5.787416393812407e-09, -1.9291387979374693e-11]]
+    der_analytical = chemicals.numba.EQ102_fitting_jacobian(np.array([T]), A, B, C, D)
+    assert_close1d(der_analytical, der_expect, rtol=1e-13)
+
 
 @mark_as_numba
 def test_lazy_loading():

@@ -72,6 +72,12 @@ def transform():
              'thermal_conductivity.Lindsay_Bromley',
              'thermal_conductivity.DIPPR9I',
              'virial.Z_from_virial_density_form',
+             
+             'vapor_pressure.Wagner_fitting_jacobian',
+             'vapor_pressure.Wagner_original_fitting_jacobian',
+             
+             'dippr.EQ102_fitting_jacobian',
+             'dippr.EQ101_fitting_jacobian',
              ]
         normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist)
 

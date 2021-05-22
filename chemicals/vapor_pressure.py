@@ -1063,7 +1063,7 @@ def Wagner_original_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
         parameters, [various]
     '''
     N = len(Ts)
-    # out = np.zeros((N, 4)) # numba: uncomment
+#    out = np.zeros((N, 4)) # numba: uncomment
     out = [[0.0]*4 for _ in range(N)] # numba: delete
     for i in range(N):
         Tr = Ts[i]/Tc
@@ -1105,7 +1105,7 @@ def Wagner_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
         parameters, [various]
     '''
     N = len(Ts)
-    # out = np.zeros((N, 4)) # numba: uncomment
+#    out = np.zeros((N, 4)) # numba: uncomment
     out = [[0.0]*4 for _ in range(N)] # numba: delete
     for i in range(N):
         Tr = Ts[i]/Tc

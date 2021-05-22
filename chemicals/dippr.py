@@ -345,7 +345,7 @@ def EQ101_fitting_jacobian(Ts, A, B, C, D, E):
 
     '''
     N = len(Ts)
-    # out = np.zeros((N, 5)) # numba: uncomment
+#    out = np.zeros((N, 5)) # numba: uncomment
     out = [[0.0]*5 for _ in range(N)] # numba: delete
     for i in range(N):
         x0 = log(Ts[i])
@@ -381,7 +381,7 @@ def EQ102_fitting_jacobian(Ts, A, B, C, D):
 
     '''
     N = len(Ts)
-    # out = np.zeros((N, 4)) # numba: uncomment
+#    out = np.zeros((N, 4)) # numba: uncomment
     out = [[0.0]*4 for _ in range(N)] # numba: delete
     for i in range(N):
         x0 = Ts[i]**B

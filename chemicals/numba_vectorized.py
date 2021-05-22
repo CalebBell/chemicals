@@ -29,6 +29,7 @@ import numpy as np
 import chemicals as normal_chemicals
 import numba
 import fluids.numba
+import chemicals.numba
 
 __all__ = []
 __funcs = {}
