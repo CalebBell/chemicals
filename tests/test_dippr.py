@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fluids.numerics import assert_close
+from fluids.numerics import assert_close, assert_close1d
 from scipy.misc import derivative
 from scipy.integrate import quad
 import pytest
@@ -340,3 +340,11 @@ def test_EQ104_more():
         EQ104(20., *coeffs, order=1E100)
 
 
+def test_EQ102_fitting():
+    T, A, B, C, D = 300.0, 2e-6,  0.42, 900.0, -4e4
+    der_num = [derivative(lambda A: EQ102(T, A, B, C, D), A, dx=A*1e-5),
+                 derivative(lambda B: EQ102(T, A, B, C, D), B, dx=B*1e-5),
+                 derivative(lambda C: EQ102(T, A, B, C, D), C, dx=C*1e-5),
+                 derivative(lambda D: EQ102(T, A, B, C, D), D, dx=D*1e-5)]
+
+    assert_close1d(EQ102_fitting_jacobian([300.0], A, B, C, D), [der_num])

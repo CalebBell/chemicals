@@ -46,6 +46,11 @@ Equations
 .. autofunction:: chemicals.dippr.EQ116
 .. autofunction:: chemicals.dippr.EQ127
 
+Jacobians (for fitting)
+-----------------------
+.. autofunction:: chemicals.dippr.EQ101_fitting_jacobian
+
+
 """
 
 from __future__ import division
@@ -320,12 +325,27 @@ def EQ102(T, A, B, C, D, order=0):
         raise ValueError(order_not_found_msg)
 
 def EQ101_fitting_jacobian(Ts, A, B, C, D, E):
-    
-    N = len(Ts)
-    param_count = 5
-    # out = np.zeros((N, param_count)) # numba: uncomment
-    out = [[0.0]*param_count for _ in range(N)] # numba: delete
+    r'''Compute and return the Jacobian of the property predicted by 
+    DIPPR Equation # 101 with respect to all the coefficients. This is used in
+    fitting parameters for chemicals.
 
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of the experimental data points, [K]
+    A-E : float
+        Parameter for the equation; chemical and property specific [-]
+
+    Returns
+    -------
+    jac : list[list[float, 5], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+
+    '''
+    N = len(Ts)
+    # out = np.zeros((N, 5)) # numba: uncomment
+    out = [[0.0]*5 for _ in range(N)] # numba: delete
     for i in range(N):
         x0 = log(Ts[i])
         x1 = 1.0/Ts[i]
