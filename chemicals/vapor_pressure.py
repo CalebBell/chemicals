@@ -49,6 +49,10 @@ Fit Correlation Derivatives
 .. autofunction:: chemicals.vapor_pressure.dTRC_Antoine_extended_dT
 .. autofunction:: chemicals.vapor_pressure.d2TRC_Antoine_extended_dT2
 
+Jacobians (for fitting)
+-----------------------
+.. autofunction:: chemicals.vapor_pressure.Wagner_fitting_jacobian
+.. autofunction:: chemicals.vapor_pressure.Wagner_original_fitting_jacobian
 
 Vapor Pressure Estimation Correlations
 --------------------------------------
@@ -154,7 +158,8 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Tsat_IAPWS',
            'Psub_Clapeyron',
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
-           'DIPPR101_ABC_coeffs_from_point']
+           'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
+           'Wagner_fitting_jacobian']
 
 import os
 from fluids.constants import R
@@ -1033,6 +1038,94 @@ def d2Wagner_original_dT2(T, Tc, Pc, a, b, c, d):
                    + (0.75*b/tau_rt + 6.0*c*tau + 30.0*d*tau2*tau2)*Tr
                    + 2.0*x1*T_inv)*exp_term)
 
+def Wagner_original_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
+    r'''Calculates the jacobian of the Wagner (3, 6) vapor pressure equation
+    for use in fitting these parameters when experimental values are known.
+    
+    Requires critical temperature and pressure as well as four coefficients
+    specific to each chemical.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    Tc : float
+        Critical temperature, [K]
+    Pc : float
+        Critical pressure, [Pa]
+    a, b, c, d : floats
+        Parameters for wagner equation. Specific to each chemical. [-]
+
+    Returns
+    -------
+    jac : list[list[float, 4], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+    '''
+    N = len(Ts)
+    if True:
+        n1, n2, n3, n4 = 1.0, 1.5, 3.0, 6.0
+    else:
+        n1, n2, n3, n4 = 1.0, 1.5, 2.5, 5.0
+    # out = np.zeros((N, 4)) # numba: uncomment
+    out = [[0.0]*4 for _ in range(N)] # numba: delete
+    for i in range(N):
+        Tr = Ts[i]/Tc
+        tau = 1.0 - Tr
+        x0 = tau**n1
+        x2 = tau**n2
+        x3 = tau**n3
+        x4 = tau**n4
+        x1 = 1.0/Tr
+        x5 = Pc*x1*exp(x1*(a*x0 + b*x2 + c*x3 + d*x4))
+        out[i][0] = x0*x5
+        out[i][1] = x2*x5
+        out[i][2] = x3*x5
+        out[i][3] = x4*x5
+    return out
+
+def Wagner_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
+    r'''Calculates the jacobian of the Wagner (2.5, 5) vapor pressure equation
+    for use in fitting these parameters when experimental values are known.
+    
+    Requires critical temperature and pressure as well as four coefficients
+    specific to each chemical.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    Tc : float
+        Critical temperature, [K]
+    Pc : float
+        Critical pressure, [Pa]
+    a, b, c, d : floats
+        Parameters for wagner equation. Specific to each chemical. [-]
+
+    Returns
+    -------
+    jac : list[list[float, 4], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+    '''
+    N = len(Ts)
+    n1, n2, n3, n4 = 1.0, 1.5, 2.5, 5.0
+    # out = np.zeros((N, 4)) # numba: uncomment
+    out = [[0.0]*4 for _ in range(N)] # numba: delete
+    for i in range(N):
+        Tr = Ts[i]/Tc
+        tau = 1.0 - Tr
+        x0 = tau
+        x2 = tau**n2
+        x3 = tau**n3
+        x4 = tau**n4
+        x1 = 1.0/Tr
+        x5 = Pc*x1*exp(x1*(a*x0 + b*x2 + c*x3 + d*x4))
+        out[i][0] = x0*x5
+        out[i][1] = x2*x5
+        out[i][2] = x3*x5
+        out[i][3] = x4*x5
+    return out
 
 def Wagner(T, Tc, Pc, a, b, c, d):
     r'''Calculates vapor pressure using the Wagner equation (2.5, 5 form).

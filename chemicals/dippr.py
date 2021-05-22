@@ -49,6 +49,7 @@ Equations
 Jacobians (for fitting)
 -----------------------
 .. autofunction:: chemicals.dippr.EQ101_fitting_jacobian
+.. autofunction:: chemicals.dippr.EQ102_fitting_jacobian
 
 
 """

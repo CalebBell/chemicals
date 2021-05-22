@@ -353,3 +353,28 @@ def test_Tsat_IAPWS():
 def test_Psub_Clapeyron():
     Psub = Psub_Clapeyron(250.0, Tt=273.15, Pt=611.0, Hsub_t=51100.0)
     assert_close(Psub, 76.06457150831804)
+
+def test_Wagner_original_fitting_jacobian():
+    T, Tc, Pc, a, b, c, d = 100.0, 475.03, 2980000.0, -8.32915, 2.37044, -3.75113, -4.6033
+    der_num = [derivative(lambda a: Wagner_original(T, Tc, Pc, a, b, c, d), a, dx=a*1e-5),
+     derivative(lambda b: Wagner_original(T, Tc, Pc, a, b, c, d), b, dx=b*1e-5),
+     derivative(lambda c: Wagner_original(T, Tc, Pc, a, b, c, d), c, dx=c*1e-5),
+     derivative(lambda d: Wagner_original(T, Tc, Pc, a, b, c, d), d, dx=d*1e-5)]
+    
+    der_expect = [[6.38493817686558e-10, 5.67321421625625e-10, 3.9796661447548854e-10, 1.9583105182859243e-10]]
+    der_analytical = Wagner_original_fitting_jacobian([T], Tc, Pc, a, b, c, d)
+    assert_close1d(der_expect, der_analytical, rtol=1e-13)
+    assert_close1d(der_analytical, [der_num], rtol=1e-7)
+    
+def test_Wagner_fitting_jacobian():
+    T, Tc, Pc, a, b, c, d = 100.0, 475.03, 2980000.0, -8.32915, 2.37044, -3.75113, -4.6033
+    der_num = [derivative(lambda a: Wagner(T, Tc, Pc, a, b, c, d), a, dx=a*1e-5),
+     derivative(lambda b: Wagner(T, Tc, Pc, a, b, c, d), b, dx=b*1e-5),
+     derivative(lambda c: Wagner(T, Tc, Pc, a, b, c, d), c, dx=c*1e-5),
+     derivative(lambda d: Wagner(T, Tc, Pc, a, b, c, d), d, dx=d*1e-5)]
+    
+    der_expect = [[5.1791400515036586e-11, 4.601825445175529e-11, 3.633081272138977e-11, 2.0120443215711467e-11]]
+    der_analytical = Wagner_fitting_jacobian([T], Tc, Pc, a, b, c, d)
+    assert_close1d(der_expect, der_analytical, rtol=1e-13)
+    assert_close1d(der_analytical, [der_num], rtol=1e-7)
+    
