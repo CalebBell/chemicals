@@ -361,10 +361,26 @@ def EQ101_fitting_jacobian(Ts, A, B, C, D, E):
     return out
 
 def EQ102_fitting_jacobian(Ts, A, B, C, D):
-    
+    r'''Compute and return the Jacobian of the property predicted by 
+    DIPPR Equation # 102 with respect to all the coefficients. This is used in
+    fitting parameters for chemicals.
+
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of the experimental data points, [K]
+    A-D : float
+        Parameter for the equation; chemical and property specific [-]
+
+    Returns
+    -------
+    jac : list[list[float, 4], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+
+    '''
     N = len(Ts)
-    param_count = 4
-    # out = np.zeros((N, param_count)) # numba: uncomment
+    # out = np.zeros((N, 4)) # numba: uncomment
     out = [[0.0]*4 for _ in range(N)] # numba: delete
     for i in range(N):
         x0 = Ts[i]**B
