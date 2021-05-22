@@ -102,6 +102,9 @@ def test_EQ106_more():
     overflow_kwargs = {'T': 304.747, 'Tc': 405.4, 'A': 56.743647419038744, 'B': -75.36242555958763,
                    'C': -141.1028969227863, 'D': -254.76349199392695, 'E': -442.5916844036474, 'order': 0}
     EQ106(**overflow_kwargs)
+    
+    # Point exactly on the critical point that was an error, needed an if statement.
+    assert 0.0 == EQ106(T=473.2, Tc=473.2, **{'A': 4761730.0, 'B': -11.5565, 'C': 30.6629, 'D': -31.89366, 'E': 12.67797})
 
 
 def test_EQ101_more():

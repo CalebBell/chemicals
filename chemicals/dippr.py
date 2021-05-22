@@ -51,7 +51,8 @@ Equations
 from __future__ import division
 
 __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
-           'EQ114', 'EQ115', 'EQ116', 'EQ127']
+           'EQ114', 'EQ115', 'EQ116', 'EQ127', 
+           'EQ101_fitting_jacobian', 'EQ102_fitting_jacobian']
 
 from chemicals.utils import log, exp, sinh, cosh, atan, atanh, sqrt, tanh
 from cmath import log as clog
@@ -318,15 +319,28 @@ def EQ102(T, A, B, C, D, order=0):
     else:
         raise ValueError(order_not_found_msg)
 
-def EQ102_fitting_jacobian(Ts, params):
-    A, B, C, D = params
-    # x0 = Ts**B
-    # x1 = 1.0/Ts
-    # x2 = x1*x1
-    # x3 = C*x1 + D*x2 + 1.0
-    # x4 = x0/x3
-    # x5 = A*x4/x3
-    # lnTs = np.log(Ts)
+def EQ101_fitting_jacobian(Ts, A, B, C, D, E):
+    
+    N = len(Ts)
+    param_count = 5
+    # out = np.zeros((N, param_count)) # numba: uncomment
+    out = [[0.0]*param_count for _ in range(N)] # numba: delete
+
+    for i in range(N):
+        x0 = log(Ts[i])
+        x1 = 1.0/Ts[i]
+        x2 = Ts[i]**E
+        x3 = D*x2
+        x4 = exp(A + B*x1 + C*x0 + x3)
+        x5 = x0*x4
+        out[i][0] = x4
+        out[i][1] = x1*x4
+        out[i][2] = x5
+        out[i][3] = x2*x4
+        out[i][4] = x3*x5
+    return out
+
+def EQ102_fitting_jacobian(Ts, A, B, C, D):
     
     N = len(Ts)
     param_count = 4
@@ -611,6 +625,8 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
     if order == 0:
         Tr = T/Tc
         tau = (1.0 - Tr)
+        if tau == 0.0:
+            return 0.0
         power = (B + Tr*(C + Tr*(D + E*Tr)))
         try:
             return A*tau**power
