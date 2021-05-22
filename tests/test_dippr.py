@@ -339,12 +339,28 @@ def test_EQ104_more():
     with pytest.raises(Exception):
         EQ104(20., *coeffs, order=1E100)
 
+def test_EQ101_fitting():
+    T, A, B, C, D, E = 300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2
+    der_num = [derivative(lambda A: EQ101(T, A, B, C, D, E), A, dx=A*1e-5),
+                 derivative(lambda B: EQ101(T, A, B, C, D, E), B, dx=B*1e-5),
+                 derivative(lambda C: EQ101(T, A, B, C, D, E), C, dx=C*1e-5),
+                 derivative(lambda D: EQ101(T, A, B, C, D, E), D, dx=D*1e-5),
+                 derivative(lambda E: EQ101(T, A, B, C, D, E), E, dx=E*1e-5),
+              ]
+    
+    der_expect = [[3537.44834545549, 11.791494484851635, 20176.835877810598, 318370351.0909941, 7563.831703366002]]
+    der_analytical = EQ101_fitting_jacobian([T], A, B, C, D, E)
+    assert_close1d(der_analytical, [der_num])
+    assert_close1d(der_analytical, der_expect, rtol=1e-13)
+
 
 def test_EQ102_fitting():
-    T, A, B, C, D = 300.0, 2e-6,  0.42, 900.0, -4e4
+    T, A, B, C, D = 300.0, 2e-6, 0.42, 900.0, -4e4
     der_num = [derivative(lambda A: EQ102(T, A, B, C, D), A, dx=A*1e-5),
                  derivative(lambda B: EQ102(T, A, B, C, D), B, dx=B*1e-5),
                  derivative(lambda C: EQ102(T, A, B, C, D), C, dx=C*1e-5),
                  derivative(lambda D: EQ102(T, A, B, C, D), D, dx=D*1e-5)]
-
-    assert_close1d(EQ102_fitting_jacobian([300.0], A, B, C, D), [der_num])
+    der_expect = [[3.08662207669995, 3.521084181393621e-05, -5.787416393812407e-09, -1.9291387979374693e-11]]
+    der_analytical = EQ102_fitting_jacobian([T], A, B, C, D)
+    assert_close1d(der_analytical, [der_num])
+    assert_close1d(der_analytical, der_expect, rtol=1e-13)
