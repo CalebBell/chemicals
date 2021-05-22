@@ -1063,25 +1063,21 @@ def Wagner_original_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
         parameters, [various]
     '''
     N = len(Ts)
-    if True:
-        n1, n2, n3, n4 = 1.0, 1.5, 3.0, 6.0
-    else:
-        n1, n2, n3, n4 = 1.0, 1.5, 2.5, 5.0
     # out = np.zeros((N, 4)) # numba: uncomment
     out = [[0.0]*4 for _ in range(N)] # numba: delete
     for i in range(N):
         Tr = Ts[i]/Tc
         tau = 1.0 - Tr
-        x0 = tau**n1
-        x2 = tau**n2
-        x3 = tau**n3
-        x4 = tau**n4
+        x2 = tau*sqrt(tau)
+        x3 = x2*x2
+        x4 = x3*x3
         x1 = 1.0/Tr
-        x5 = Pc*x1*exp(x1*(a*x0 + b*x2 + c*x3 + d*x4))
-        out[i][0] = x0*x5
-        out[i][1] = x2*x5
-        out[i][2] = x3*x5
-        out[i][3] = x4*x5
+        x5 = Pc*x1*exp(x1*(a*tau + b*x2 + c*x3 + d*x4))
+        row = out[i]
+        row[0] = tau*x5
+        row[1] = x2*x5
+        row[2] = x3*x5
+        row[3] = x4*x5
     return out
 
 def Wagner_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
