@@ -760,7 +760,7 @@ def mu_Yaws(T, A, B, C, D):
     log10(1000) from `A`; this is required for the coefficients in [1]_.
 
     .. math::
-        \log_{10} \mu = A + B/T + C*T + DT^2
+        \log_{10} \mu = A + B/T + CT + DT^2
 
     Parameters
     ----------
