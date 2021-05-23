@@ -83,6 +83,7 @@ Fit Correlations
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_3
 .. autofunction:: chemicals.viscosity.mu_Yaws
 .. autofunction:: chemicals.viscosity.dmu_Yaws_dT
+.. autofunction:: chemicals.viscosity.mu_Yaws_fitting_jacobian
 
 Conversion functions
 --------------------
@@ -174,7 +175,7 @@ from __future__ import division
 __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9', 'dPPDS9_dT',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer',
-'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large', 'mu_Yaws', 'dmu_Yaws_dT',
+'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large', 'mu_Yaws', 'dmu_Yaws_dT', 'mu_Yaws_fitting_jacobian',
 'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon']
 
 from fluids.numerics import secant, interp, numpy as np, trunc_exp
@@ -834,6 +835,45 @@ def dmu_Yaws_dT(T, A, B, C, D):
     x0 = D*T
     B_T = B/T
     return 10.0**(A + B_T + T*(C + x0))*(-B_T/T + C + 2.0*x0)*2.302585092994046
+
+def mu_Yaws_fitting_jacobian(Ts, A, B, C, D):
+    r'''Compute and return the Jacobian of the property predicted by 
+    the Yaws viscosity equation with respect to all the coefficients. This is 
+    used in fitting parameters for chemicals.
+
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of the experimental data points, [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [K]
+    C : float
+        Coefficient, [1/K]
+    D : float
+        Coefficient, [1/K^2]
+
+    Returns
+    -------
+    jac : list[list[float, 4], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+
+    '''
+    N = len(Ts)
+#    out = np.zeros((N, 4)) # numba: uncomment
+    out = [[0.0]*4 for _ in range(N)] # numba: delete
+    for i in range(N):
+        T = Ts[i]
+        r = out[i]
+        x0 = 1.0/T
+        x1 = 10.0**(A + B*x0 + T*(C + D*T))*2.302585092994046
+        r[0] = x1
+        r[1] = x0*x1
+        r[2] = T*x1
+        r[3] = T*T*x1
+    return out
 
 def PPDS9(T, A, B, C, D, E):
     r'''Calculate the viscosity of a liquid using the 5-term exponential power

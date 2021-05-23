@@ -538,3 +538,15 @@ def test_mu_Yaws():
     d = dmu_Yaws_dT(300.0, -9.4406, 1117.6, 0.0137, -0.000015465)
     d_num = derivative(lambda T: mu_Yaws(T,  -9.4406, 1117.6, 0.0137, -0.000015465), 300.0, dx=300.0*1e-7)
     assert_close(d, d_num)
+    
+    
+    T, A, B, C, D = 300.0, -9.4406, 1117.6, 0.0137, -0.000015465
+    der_num = [derivative(lambda A: mu_Yaws(T, A, B, C, D), A, dx=A*1e-5),
+         derivative(lambda B: mu_Yaws(T, A, B, C, D), B, dx=B*1e-5),
+         derivative(lambda C: mu_Yaws(T, A, B, C, D), C, dx=C*1e-5),
+         derivative(lambda D: mu_Yaws(T, A, B, C, D), D, dx=D*1e-5)]
+    
+    der_expect = [[0.0023179230916164487, 7.726410305388163e-06, 0.6953769274849346, 208.61307824548038]]
+    der_analytical = mu_Yaws_fitting_jacobian([T], A, B, C, D)
+    assert_close1d(der_expect, der_analytical, rtol=1e-13)
+    assert_close1d(der_analytical, [der_num], rtol=1e-7)
