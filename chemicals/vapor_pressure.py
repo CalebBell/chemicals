@@ -278,22 +278,31 @@ def Yaws_Psat(T, A, B, C, D, E):
     **Converting units in input coefficients:**
 
         * **mmHg to Pa**: Add log10(101325/760)= 2.1249 to A.
-        * **kPa to Pa**: Add log_{base}(1000)= 6.908 to A for log(base)
-        * **bar to Pa**: Add log_{base}(100000)= 11.5129254 to A for log(base)
+        * **kPa to Pa**: Add log_{10}(1000)= 3 to A
+        * **bar to Pa**: Add log_{10}(100000)= 5 to A
 
     Examples
     --------
     Acetone, coefficients from [1]_, at 400 K and with the conversion of `A`
     to obtain a result in Pa:
         
-    >>> Yaws_Psat(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6)
+    >>> Yaws_Psat(T=400.0, A=28.588 + log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6)
     708657.089106
+    
+    Coefficients for benzene from [2]_ at 400 K; that source outputs vapor
+    pressure in kPa. That style of coefficients can be converted to `Pa`
+    by adding `3` to `A`.
+    
+    >>> Yaws_Psat(T=400.0, A=39.7918+3, B=-2965.83, C=-12.073, D=0.0033269, E=1.58609e-6)
+    352443.191026
 
     References
     ----------
     .. [1] Yaws, Carl L. Chemical Properties Handbook: Physical, Thermodynamic,
        Environmental, Transport, Safety, and Health Related Properties for
        Organic and Inorganic Chemicals. McGraw-Hill, 2001.
+    .. [2] "ThermoData Engine (TDE103a V10.1) User’s Guide."
+       https://trc.nist.gov/TDE/Help/TDE103a/Eqns-Pure-PhaseBoundaryLG/Yaws-VaporPressure.htm.
     '''
     return 10.0**(A + B/T + C*log10(T) + D*T + E*T*T)
 
