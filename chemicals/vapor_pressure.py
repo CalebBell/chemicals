@@ -49,6 +49,8 @@ Fit Correlation Derivatives
 .. autofunction:: chemicals.vapor_pressure.d2Wagner_original_dT2
 .. autofunction:: chemicals.vapor_pressure.dTRC_Antoine_extended_dT
 .. autofunction:: chemicals.vapor_pressure.d2TRC_Antoine_extended_dT2
+.. autofunction:: chemicals.vapor_pressure.dYaws_Psat_dT
+.. autofunction:: chemicals.vapor_pressure.d2Yaws_Psat_dT2
 
 Jacobians (for fitting)
 -----------------------
@@ -154,10 +156,10 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Wagner_original',  'dWagner_original_dT', 'd2Wagner_original_dT2',
            'Wagner', 'dWagner_dT', 'd2Wagner_dT2',
            'TRC_Antoine_extended', 'dTRC_Antoine_extended_dT',
-           'd2TRC_Antoine_extended_dT2',
+           'd2TRC_Antoine_extended_dT2', 'dYaws_Psat_dT',
            'boiling_critical_relation', 'Lee_Kesler', 'Ambrose_Walton',
            'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Tsat_IAPWS',
-           'Psub_Clapeyron', 'Yaws_Psat',
+           'Psub_Clapeyron', 'Yaws_Psat', 'd2Yaws_Psat_dT2',
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
            'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
            'Wagner_fitting_jacobian']
@@ -306,6 +308,22 @@ def Yaws_Psat(T, A, B, C, D, E):
     '''
     return 10.0**(A + B/T + C*log10(T) + D*T + E*T*T)
 
+def dYaws_Psat_dT(T, A, B, C, D, E):
+    x0 = 2.302585092994046
+    x1 = T*T
+    x2 = 1.0/T
+    x3 = C/x0
+    return 10.0**(A + B*x2 + D*T + E*x1 + x3*log(T))*x0*(-B/x1 + D + 2.0*E*T + x2*x3)
+
+def d2Yaws_Psat_dT2(T, A, B, C, D, E):
+    x0 = 2.302585092994046
+    x1 = 1.0/T
+    x2 = T*T
+    x3 = C/x0
+    x4 = 2.0*E
+    x5 = 1.0/x2
+    x6 = (-B*x5 + D + T*x4 + x1*x3)
+    return 10.0**(A + B*x1 + D*T + E*x2 + x3*log(T))*x0*(2.0*B*x1*x1*x1 + x0*x6*x6 - x3*x5 + x4)
 
 def Antoine(T, A, B, C, base=10.0):
     r'''Calculates vapor pressure of a chemical using the Antoine equation.

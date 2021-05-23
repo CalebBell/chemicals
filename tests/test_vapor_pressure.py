@@ -380,3 +380,17 @@ def test_Wagner_fitting_jacobian():
     
 def test_Yaws_Psat():
     assert_close(Yaws_Psat(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6), 708657.0891069275, rtol=1e-14)
+    
+    dPsat_analytical = dYaws_Psat_dT(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6)
+    assert_close(dPsat_analytical, 15728.182983674578, rtol=1e-13)
+    
+    dPsat_num = derivative(lambda T: Yaws_Psat(T=T, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6),
+               400.0, dx=400.0*1e-6)
+    
+    assert_close(dPsat_num, dPsat_analytical, rtol=1e-9)
+    
+    d2Psat_analytical = d2Yaws_Psat_dT2(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6)
+    assert_close(d2Psat_analytical, 264.6651867661574, rtol=1e-13)
+    d2Psat_num = derivative(lambda T: dYaws_Psat_dT(T=T, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6),
+               400.0, dx=400.0*1e-6)
+    assert_close(d2Psat_num, d2Psat_analytical, rtol=1e-9)
