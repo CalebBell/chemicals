@@ -530,3 +530,7 @@ def test_mu_air_lemmon():
     assert round(mu_air_lemmon(200.0, 10e3), 10) == 21.1392e-6
     assert round(mu_air_lemmon(300.0, 5e3), 10) == 21.3241e-6
     assert round(mu_air_lemmon(132.64, 10.4e3), 10) == 17.7623e-6
+    
+    
+def test_mu_Yaws():
+    assert_close(mu_Yaws(300.0, -6.4406-log10(1000), 1117.6, 0.0137, -0.000015465), 0.00100666120816515, rtol=1e-14)

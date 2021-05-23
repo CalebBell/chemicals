@@ -81,7 +81,7 @@ Fit Correlations
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2_exponential
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_3
-
+.. autofunction:: chemicals.viscosity.mu_Yaws
 
 Conversion functions
 --------------------
@@ -173,7 +173,7 @@ from __future__ import division
 __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9', 'dPPDS9_dT',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer',
-'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large',
+'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large', 'mu_Yaws',
 'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon']
 
 from fluids.numerics import secant, interp, numpy as np, trunc_exp
@@ -750,6 +750,50 @@ def Viswanath_Natarajan_3(T, A, B, C):
        Liquids. New York: Taylor & Francis, 1989
     '''
     return 10.0**(A + B/(C - T))
+
+def mu_Yaws(T, A, B, C, D):
+    r'''Calculate the viscosity of a liquid using the 4-term Yaws polynomial
+    form. Requires input coefficients. If the
+    coefficients do not yield viscosity in Pa*s, but rather cP, remove
+    log10(1000) from `A`; this is required for the coefficients in [1]_.
+
+    .. math::
+        \log_{10} \mu = A + B/T + C*T + DT^2
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [K]
+    C : float
+        Coefficient, [1/K]
+    D : float
+        Coefficient, [1/K^2]
+
+    Returns
+    -------
+    mu : float
+        Liquid viscosity, [Pa*s]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> from math import log10
+    >>> mu_Yaws(300.0, -6.4406-log10(1000), 1117.6, 0.0137, -0.000015465)
+    0.0010066612081
+
+    References
+    ----------
+    .. [1] Yaws, Carl L. Thermophysical Properties of Chemicals and 
+       Hydrocarbons, Second Edition. 2 edition. Amsterdam Boston: Gulf
+       Professional Publishing, 2014.
+    '''
+    return 10.0**(A + B/T + T*(C + D*T))
 
 def PPDS9(T, A, B, C, D, E):
     r'''Calculate the viscosity of a liquid using the 5-term exponential power
