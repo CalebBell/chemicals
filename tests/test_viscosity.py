@@ -550,3 +550,10 @@ def test_mu_Yaws():
     der_analytical = mu_Yaws_fitting_jacobian([T], A, B, C, D)
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
     assert_close1d(der_analytical, [der_num], rtol=1e-7)
+    
+    # Point where overflow would occur
+    kwargs = {'T': 489.2, 'A': 1.0, 'B': 1.0, 'C': 1.0, 'D': 1.0}
+    mu_Yaws(**kwargs)
+
+
+

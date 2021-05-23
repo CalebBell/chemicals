@@ -378,3 +378,5 @@ def test_Wagner_fitting_jacobian():
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
     assert_close1d(der_analytical, [der_num], rtol=1e-7)
     
+def test_Yaws_Psat():
+    assert_close(Yaws_Psat(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6), 708657.0891069275, rtol=1e-14)

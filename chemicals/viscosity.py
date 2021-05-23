@@ -795,7 +795,10 @@ def mu_Yaws(T, A, B, C=0.0, D=0.0):
        Hydrocarbons, Second Edition. 2 edition. Amsterdam Boston: Gulf
        Professional Publishing, 2014.
     '''
-    return 10.0**(A + B/T + T*(C + D*T))
+    exponent = (A + B/T + T*(C + D*T))
+    if exponent > 308.0:
+        return 1e308
+    return 10.0**exponent
 
 def dmu_Yaws_dT(T, A, B, C=0.0, D=0.0):
     r'''Calculate the temperature derivative of the viscosity of a liquid using

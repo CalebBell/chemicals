@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -37,6 +37,7 @@ Fit Correlations
 .. autofunction:: chemicals.vapor_pressure.Wagner
 .. autofunction:: chemicals.vapor_pressure.Wagner_original
 .. autofunction:: chemicals.vapor_pressure.TRC_Antoine_extended
+.. autofunction:: chemicals.vapor_pressure.Yaws_Psat
 
 Fit Correlation Derivatives
 ---------------------------
@@ -156,7 +157,7 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'd2TRC_Antoine_extended_dT2',
            'boiling_critical_relation', 'Lee_Kesler', 'Ambrose_Walton',
            'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Tsat_IAPWS',
-           'Psub_Clapeyron',
+           'Psub_Clapeyron', 'Yaws_Psat',
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
            'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
            'Wagner_fitting_jacobian']
@@ -165,7 +166,7 @@ import os
 from fluids.constants import R
 from fluids.numerics import numpy as np
 from math import e
-from chemicals.utils import log, exp, sqrt, isnan
+from chemicals.utils import log, log10, exp, sqrt, isnan
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.dippr import EQ101
 from chemicals import miscdata
@@ -239,6 +240,62 @@ else:
         load_vapor_pressure_dfs()
 
 
+def Yaws_Psat(T, A, B, C, D, E):
+    r'''Calculates vapor pressure of a chemical using the Yaws equation for
+    vapor pressure.
+    Parameters `A`, `B`, `C`, `D`, and `E` are chemical-dependent. Parameters
+    can be found in numerous sources; however units of the coefficients used 
+    vary.
+
+    .. math::
+        \log_{10} P^{\text{sat}} = A + \frac{B}{T} + C\log_{10}(T) + DT + ET^2
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    A : float
+        `A` parameter, [-]
+    B : float
+        `B` parameter, [K]
+    C : float
+        `C` parameter, [-]
+    D : float
+        `D` parameter, [1/K]
+    E : float
+        `E` parameter, [1/K^2]
+
+    Returns
+    -------
+    Psat : float
+        Vapor pressure calculated with coefficients [Pa]
+
+    Notes
+    -----
+    Assumes coefficients are for calculating vapor pressure in Pascal.
+    Coefficients should be consistent with input temperatures in Kelvin;
+
+    **Converting units in input coefficients:**
+
+        * **mmHg to Pa**: Add log10(101325/760)= 2.1249 to A.
+        * **kPa to Pa**: Add log_{base}(1000)= 6.908 to A for log(base)
+        * **bar to Pa**: Add log_{base}(100000)= 11.5129254 to A for log(base)
+
+    Examples
+    --------
+    Acetone, coefficients from [1]_, at 400 K and with the conversion of `A`
+    to obtain a result in Pa:
+        
+    >>> Yaws_Psat(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6)
+    708657.089106
+
+    References
+    ----------
+    .. [1] Yaws, Carl L. Chemical Properties Handbook: Physical, Thermodynamic,
+       Environmental, Transport, Safety, and Health Related Properties for
+       Organic and Inorganic Chemicals. McGraw-Hill, 2001.
+    '''
+    return 10.0**(A + B/T + C*log10(T) + D*T + E*T*T)
 
 
 def Antoine(T, A, B, C, base=10.0):
