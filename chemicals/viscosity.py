@@ -753,7 +753,7 @@ def Viswanath_Natarajan_3(T, A, B, C):
     '''
     return 10.0**(A + B/(C - T))
 
-def mu_Yaws(T, A, B, C, D):
+def mu_Yaws(T, A, B, C=0.0, D=0.0):
     r'''Calculate the viscosity of a liquid using the 4-term Yaws polynomial
     form. Requires input coefficients. If the
     coefficients do not yield viscosity in Pa*s, but rather cP, remove
@@ -797,7 +797,7 @@ def mu_Yaws(T, A, B, C, D):
     '''
     return 10.0**(A + B/T + T*(C + D*T))
 
-def dmu_Yaws_dT(T, A, B, C, D):
+def dmu_Yaws_dT(T, A, B, C=0.0, D=0.0):
     r'''Calculate the temperature derivative of the viscosity of a liquid using
     the 4-term Yaws polynomial form. Requires input coefficients.
 
