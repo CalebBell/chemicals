@@ -534,3 +534,7 @@ def test_mu_air_lemmon():
     
 def test_mu_Yaws():
     assert_close(mu_Yaws(300.0, -6.4406-log10(1000), 1117.6, 0.0137, -0.000015465), 0.00100666120816515, rtol=1e-14)
+    
+    d = dmu_Yaws_dT(300.0, -9.4406, 1117.6, 0.0137, -0.000015465)
+    d_num = derivative(lambda T: mu_Yaws(T,  -9.4406, 1117.6, 0.0137, -0.000015465), 300.0, dx=300.0*1e-7)
+    assert_close(d, d_num)

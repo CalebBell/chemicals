@@ -82,6 +82,7 @@ Fit Correlations
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2_exponential
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_3
 .. autofunction:: chemicals.viscosity.mu_Yaws
+.. autofunction:: chemicals.viscosity.dmu_Yaws_dT
 
 Conversion functions
 --------------------
@@ -173,7 +174,7 @@ from __future__ import division
 __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9', 'dPPDS9_dT',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer',
-'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large', 'mu_Yaws',
+'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large', 'mu_Yaws', 'dmu_Yaws_dT',
 'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon']
 
 from fluids.numerics import secant, interp, numpy as np, trunc_exp
@@ -794,6 +795,45 @@ def mu_Yaws(T, A, B, C, D):
        Professional Publishing, 2014.
     '''
     return 10.0**(A + B/T + T*(C + D*T))
+
+def dmu_Yaws_dT(T, A, B, C, D):
+    r'''Calculate the temperature derivative of the viscosity of a liquid using
+    the 4-term Yaws polynomial form. Requires input coefficients.
+
+    .. math::
+        \frac{\partial \mu}{\partial T} = 10^{A + \frac{B}{T} + T \left(C 
+        + D T\right)} \left(- \frac{B}{T^{2}} + C + 2 D T\right)
+        \log{\left(10 \right)}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [K]
+    C : float
+        Coefficient, [1/K]
+    D : float
+        Coefficient, [1/K^2]
+
+    Returns
+    -------
+    dmu_dT : float
+        First temperature derivative of liquid viscosity, [Pa*s/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> dmu_Yaws_dT(300.0, -9.4406, 1117.6, 0.0137, -0.000015465)
+    -1.853591586963e-05
+    '''
+    x0 = D*T
+    B_T = B/T
+    return 10.0**(A + B_T + T*(C + x0))*(-B_T/T + C + 2.0*x0)*2.302585092994046
 
 def PPDS9(T, A, B, C, D, E):
     r'''Calculate the viscosity of a liquid using the 5-term exponential power
