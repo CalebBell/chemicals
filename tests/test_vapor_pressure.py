@@ -400,7 +400,7 @@ def test_Yaws_Psat():
     der_num = [derivative(lambda A: Yaws_Psat(T, A, B, C, D, E), A, dx=A*1e-5),
          derivative(lambda B: Yaws_Psat(T, A, B, C, D, E), B, dx=B*1e-5),
          derivative(lambda C: Yaws_Psat(T, A, B, C, D, E), C, dx=C*1e-5),
-         derivative(lambda D: Yaws_Psat(T, A, B, C, D, E), D, dx=D*3e-4),
+         derivative(lambda D: Yaws_Psat(T, A, B, C, D, E), D, dx=D*3e-4), # This derivative is not tight but sympy checks it out
          derivative(lambda E: Yaws_Psat(T, A, B, C, D, E), E, dx=E*1e-5),]
     
     der_expect = [[1631743.2494221947, 4079.3581235554866, 4245893.825440976, 652697299.7688779, 261078919907.55115]]
