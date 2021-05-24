@@ -298,7 +298,11 @@ def EQ102(T, A, B, C, D, order=0):
        DIPPR/AIChE
     '''
     if order == 0:
-        return A*T**B/(1. + C/T + D/(T*T))
+        easy = A/(1. + C/T + D/(T*T))
+        try:
+            return easy*T**B
+        except:
+            return 1e308
     elif order == 1:
         return (A*B*T**B/(T*(C/T + D/T**2 + 1))
                 + A*T**B*(C/T**2 + 2*D/T**3)/(C/T + D/T**2 + 1)**2)

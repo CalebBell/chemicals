@@ -282,6 +282,9 @@ def test_EQ102_more():
 #
     with pytest.raises(Exception):
         EQ102(20., *coeffs, order=1E100)
+        
+    # No overflow
+    EQ102(T = 194.6, A = 0.0, B = 4000.0, C = 0.75, D = 0.0, order = 0)
 
 
 def test_EQ100_more():
