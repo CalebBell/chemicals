@@ -309,6 +309,46 @@ def Yaws_Psat(T, A, B, C, D, E):
     return 10.0**(A + B/T + C*log10(T) + D*T + E*T*T)
 
 def dYaws_Psat_dT(T, A, B, C, D, E):
+    r'''Calculates the first temperature derivative of vapor pressure of a 
+    chemical using the Yaws equation for vapor pressure.
+    Parameters `A`, `B`, `C`, `D`, and `E` are chemical-dependent. Parameters
+    can be found in numerous sources; however units of the coefficients used 
+    vary.
+
+    .. math::
+        \frac{\partial  P^{\text{sat}} }{\partial T} = 10^{A + \frac{B}{T}
+        + \frac{C \log{\left(T \right)}}{\log{\left(10 \right)}} + D T 
+        + E T^{2}} \left(- \frac{B}{T^{2}} + \frac{C}{T \log{\left(10 \right)}}
+        + D + 2 E T\right) \log{\left(10 \right)}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    A : float
+        `A` parameter, [-]
+    B : float
+        `B` parameter, [K]
+    C : float
+        `C` parameter, [-]
+    D : float
+        `D` parameter, [1/K]
+    E : float
+        `E` parameter, [1/K^2]
+
+    Returns
+    -------
+    dPsat_dT : float
+        First temperature derivative of vapor pressure calculated with
+        coefficients [Pa/K]
+
+    Examples
+    --------
+    Benzene:
+        
+    >>> dYaws_Psat_dT(T=400.0, A=42.7918, B=-2965.83, C=-12.073, D=0.0033269, E=1.58609e-6)
+    8134.87548930
+    '''
     x0 = 2.302585092994046
     x1 = T*T
     x2 = 1.0/T
