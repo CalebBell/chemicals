@@ -84,6 +84,7 @@ Fit Correlations
 .. autofunction:: chemicals.viscosity.mu_Yaws
 .. autofunction:: chemicals.viscosity.dmu_Yaws_dT
 .. autofunction:: chemicals.viscosity.mu_Yaws_fitting_jacobian
+.. autofunction:: chemicals.viscosity.mu_TDE
 
 Conversion functions
 --------------------
@@ -174,6 +175,7 @@ from __future__ import division
 
 __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9', 'dPPDS9_dT',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
+'mu_TDE',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer',
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large', 'mu_Yaws', 'dmu_Yaws_dT', 'mu_Yaws_fitting_jacobian',
 'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon']
@@ -1023,6 +1025,50 @@ def dPPDS9_dT(T, A, B, C, D, E):
         x8 = x7*(x1*x7 + 1.0)*(1.0/3.0)
         dmu_dT = -x5*mu*(-A*x2*x8/x1 + B*x1*x3*x3 - B*x3 + B*x8)
     return (dmu_dT, mu)
+
+def mu_TDE(T, A, B, C, D):
+    r'''Calculate the viscosity of a liquid using the 4-term exponential
+    inverse-temperature fit equation used in NIST's TDE.
+
+    .. math::
+       \mu = \exp\left[A + \frac{B}{T} + \frac{C}{T^2} + \frac{D}{T^3}\right]
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    A : float
+        Coefficient, [-]
+    B : float
+        Coefficient, [K]
+    C : float
+        Coefficient, [K^2]
+    D : float
+        Coefficient, [K^3]
+
+    Returns
+    -------
+    mu : float
+        Liquid viscosity, [Pa*s]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Coefficients for isooctane at 400 K, as shown in [1]_.
+    
+    >>> mu_TDE(400.0, -14.0878, 3500.26, -678132.0, 6.17706e7)
+    0.0001822175281438
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscositySatL/ViscosityL.htm.
+    '''
+    T_inv = 1.0/T
+    expr = A + B*T_inv + C*T_inv*T_inv + D*T_inv*T_inv*T_inv
+    return trunc_exp(expr)
 
 
 def Letsou_Stiel(T, MW, Tc, Pc, omega):
