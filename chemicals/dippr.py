@@ -209,7 +209,10 @@ def EQ101(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
        DIPPR/AIChE
     '''
     T_inv = 1.0/T
-    T_E = T**E
+    try:
+        T_E = T**E
+    except:
+        T_E = 1e250
     expr = trunc_exp(A + B*T_inv + C*trunc_log(T) + D*T_E)
     if order == 0:
         return expr
