@@ -56,6 +56,7 @@ Jacobians (for fitting)
 -----------------------
 .. autofunction:: chemicals.vapor_pressure.Wagner_fitting_jacobian
 .. autofunction:: chemicals.vapor_pressure.Wagner_original_fitting_jacobian
+.. autofunction:: chemicals.vapor_pressure.Yaws_Psat_fitting_jacobian
 
 Vapor Pressure Estimation Correlations
 --------------------------------------
@@ -162,7 +163,7 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Psub_Clapeyron', 'Yaws_Psat', 'd2Yaws_Psat_dT2',
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
            'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
-           'Wagner_fitting_jacobian']
+           'Wagner_fitting_jacobian', 'Yaws_Psat_fitting_jacobian',]
 
 import os
 from fluids.constants import R
@@ -406,6 +407,52 @@ def d2Yaws_Psat_dT2(T, A, B, C, D, E):
     x5 = 1.0/x2
     x6 = (-B*x5 + D + T*x4 + x1*x3)
     return 10.0**(A + B*x1 + D*T + E*x2 + x3*log(T))*x0*(2.0*B*x1*x1*x1 + x0*x6*x6 - x3*x5 + x4)
+
+def Yaws_Psat_fitting_jacobian(Ts, A, B, C, D, E):
+    r'''Compute and return the Jacobian of the property predicted by 
+    the Yaws vapor pressure equation with respect to all the coefficients. This is 
+    used in fitting parameters for chemicals.
+
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of the experimental data points, [K]
+    A : float
+        `A` parameter, [-]
+    B : float
+        `B` parameter, [K]
+    C : float
+        `C` parameter, [-]
+    D : float
+        `D` parameter, [1/K]
+    E : float
+        `E` parameter, [1/K^2]
+
+    Returns
+    -------
+    jac : list[list[float, 5], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+
+    '''
+    x0 = 2.302585092994046
+    N = len(Ts)
+#    out = np.zeros((N, 5)) # numba: uncomment
+    out = [[0.0]*5 for _ in range(N)] # numba: delete
+    for i in range(N):
+        T = Ts[i]
+        r = out[i]
+        x1 = 1.0/T
+        x2 = T*T
+        x3 = log(T)
+        x4 = 10.0**(A + B*x1 + C*x3/x0 + D*T + E*x2)
+        x5 = x0*x4
+        r[0] = x5
+        r[1] = x1*x5
+        r[2] = x3*x4
+        r[3] = T*x5
+        r[4] = x2*x5
+    return out
 
 def Antoine(T, A, B, C, base=10.0):
     r'''Calculates vapor pressure of a chemical using the Antoine equation.

@@ -394,3 +394,20 @@ def test_Yaws_Psat():
     d2Psat_num = derivative(lambda T: dYaws_Psat_dT(T=T, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6),
                400.0, dx=400.0*1e-6)
     assert_close(d2Psat_num, d2Psat_analytical, rtol=1e-9)
+
+
+    T, A, B, C, D, E = 400.0, 28.588+ log10(101325/760), -2469, -7.351, 2.8025E-10, 2.7361E-6
+    der_num = [derivative(lambda A: Yaws_Psat(T, A, B, C, D, E), A, dx=A*1e-5),
+         derivative(lambda B: Yaws_Psat(T, A, B, C, D, E), B, dx=B*1e-5),
+         derivative(lambda C: Yaws_Psat(T, A, B, C, D, E), C, dx=C*1e-5),
+         derivative(lambda D: Yaws_Psat(T, A, B, C, D, E), D, dx=D*3e-4),
+         derivative(lambda E: Yaws_Psat(T, A, B, C, D, E), E, dx=E*1e-5),]
+    
+    der_expect = [[1631743.2494221947, 4079.3581235554866, 4245893.825440976, 652697299.7688779, 261078919907.55115]]
+    der_analytical = Yaws_Psat_fitting_jacobian([T], A, B, C, D, E)
+    assert_close1d(der_expect, der_analytical, rtol=1e-13)
+    assert_close1d(der_analytical, [der_num], rtol=1e-6)
+
+
+
+
