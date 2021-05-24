@@ -6658,7 +6658,8 @@ def iapws95_T(P, rho):
 
 def iapws95_rho(T, P):
     r'''Calculate the density of water according to the IAPWS-95
-    standard given a temperature `T` and pressure `P`.
+    standard given a temperature `T` and pressure `P`. The phase is determined
+    in this calculation.
 
     Parameters
     ----------
@@ -6674,6 +6675,9 @@ def iapws95_rho(T, P):
 
     Notes
     -----
+    There is a sudden transition at the saturation pressure between liquid and
+    vapor density, by design.
+    
     This solution is iterative due to the nature of the equation.
     The solution procedure begins with IAPWS-97's explicit equations as an
     initial guess, extrapolating when out of range. If the temperature is under
@@ -6694,6 +6698,11 @@ def iapws95_rho(T, P):
 
     >>> iapws95_rho(T=5000.0, P=1e9)
     326.79451662743
+    
+    See Also
+    --------
+    iapws95_rhol_sat
+    iapws95_rhog_sat
 
     References
     ----------
