@@ -78,6 +78,9 @@ def transform():
              
              'dippr.EQ102_fitting_jacobian',
              'dippr.EQ101_fitting_jacobian',
+             
+             'vapor_pressure.Yaws_Psat_fitting_jacobian',
+             'viscosity.mu_Yaws_fitting_jacobian',
              ]
         normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist)
 

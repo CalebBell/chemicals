@@ -307,7 +307,10 @@ def Yaws_Psat(T, A, B, C, D, E):
     .. [2] "ThermoData Engine (TDE103a V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103a/Eqns-Pure-PhaseBoundaryLG/Yaws-VaporPressure.htm.
     '''
-    return 10.0**(A + B/T + C*log10(T) + D*T + E*T*T)
+    exponent = (A + B/T + C*log10(T) + T*(D + E*T))
+    if exponent > 308.0:
+        return 1e308
+    return 10.0**exponent
 
 def dYaws_Psat_dT(T, A, B, C, D, E):
     r'''Calculates the first temperature derivative of vapor pressure of a 

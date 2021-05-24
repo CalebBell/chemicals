@@ -407,6 +407,10 @@ def test_Yaws_Psat():
     der_analytical = Yaws_Psat_fitting_jacobian([T], A, B, C, D, E)
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
     assert_close1d(der_analytical, [der_num], rtol=1e-6)
+    
+    
+    # Overflow catch
+    Yaws_Psat(T=20000.0, A=39.7918+3, B=-2965.83, C=-12.073, D=0.0033269, E=1.58609e-6)
 
 
 
