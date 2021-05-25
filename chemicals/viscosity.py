@@ -78,6 +78,7 @@ Fit Correlations
 ----------------
 .. autofunction:: chemicals.viscosity.PPDS9
 .. autofunction:: chemicals.viscosity.dPPDS9_dT
+.. autofunction:: chemicals.viscosity.PPDS5
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_2_exponential
 .. autofunction:: chemicals.viscosity.Viswanath_Natarajan_3
@@ -178,7 +179,8 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9
 'mu_TDE',
 'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer',
 'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large', 'mu_Yaws', 'dmu_Yaws_dT', 'mu_Yaws_fitting_jacobian',
-'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon']
+'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon',
+'PPDS5']
 
 from fluids.numerics import secant, interp, numpy as np, trunc_exp
 from chemicals.utils import log, exp, sqrt, atan, tan, sin, acos
@@ -1070,6 +1072,48 @@ def mu_TDE(T, A, B, C, D):
     expr = A + B*T_inv + C*T_inv*T_inv + D*T_inv*T_inv*T_inv
     return trunc_exp(expr)
 
+def PPDS5(T, Tc, a0, a1, a2):
+    r'''Calculate the viscosity of a low-pressure gas using the 3-term
+    exponential power fit developed by the PPDS and named PPDS equation 5.
+
+    .. math::
+       \mu = \frac{a_0 T_r}{\left( 1 + a_1 T_r^{a_2}(T_r - 1) \right)^{1/6}}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    a0 : float
+        Coefficient, [-]
+    a1 : float
+        Coefficient, [-]
+    a2 : float
+        Coefficient, [-]
+
+    Returns
+    -------
+    mu : float
+        Low pressure gas viscosity, [Pa*s]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Sample coefficients for n-pentane in [1]_, at 350 K:
+        
+    >>> PPDS5(T=350.0, Tc=470.008, a0=1.08003e-5, a1=0.19583, a2=0.811897)
+    8.096643275836e-06
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscosityG/PPDS5-ViscosityGas.htm.
+    '''
+    Tr = T/Tc
+    return a0*Tr/(1.0 + a1*(Tr - 1.0)*Tr**a2)**(1.0/6.0)
 
 def Letsou_Stiel(T, MW, Tc, Pc, omega):
     r'''Calculates the viscosity of a liquid using an emperical model

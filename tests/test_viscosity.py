@@ -558,3 +558,6 @@ def test_mu_Yaws():
 
 def test_mu_TDE():
     assert_close(mu_TDE(400.0, -14.0878, 3500.26, -678132.0, 6.17706e7), 0.00018221752814389364, rtol=1e-12)
+    
+def test_PPDS5():
+    assert_close(PPDS5(T=350.0, Tc=470.008, a0=1.08003e-5, a1=0.19583, a2=0.811897), 8.096643275836458e-06, rtol=1e-13)
