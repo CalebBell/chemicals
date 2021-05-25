@@ -284,3 +284,6 @@ def test_Wassiljewa_Herning_Zipperer():
 def test_DIPPR9I():
     k = DIPPR9I(zs=[.682, .318], Vms=[1.723e-2, 7.338e-2], ks=[.6037, .1628])
     assert_close(k, 0.25397430656658937, rtol=1e-13)
+    
+def test_PPDS8():
+    assert_close(PPDS8(T=500.0, Tc=562.05, a0=0.0641126, a1=0.61057, a2=-1.72442, a3=3.94394), 0.08536381765218425, rtol=1e-13)

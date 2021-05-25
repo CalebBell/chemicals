@@ -78,6 +78,9 @@ Correlations for Specific Substances
 .. autofunction:: chemicals.thermal_conductivity.k_IAPWS
 .. autofunction:: chemicals.thermal_conductivity.k_air_lemmon
 
+Fit Correlations
+----------------
+.. autofunction:: chemicals.thermal_conductivity.PPDS8
 
 Fit Coefficients
 ----------------
@@ -125,7 +128,7 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid',
 'kl_Mersmann_Kind', 'DIPPR9G', 'DIPPR9I','k_IAPWS',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
-'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas',
+'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 'PPDS8',
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
 'Wassiljewa_Herning_Zipperer', 'k_air_lemmon']
 
@@ -174,6 +177,54 @@ else:
         _load_k_data()
 
 pi_inv = 1.0/pi # todo move to fluids.constants
+
+def PPDS8(T, Tc, a0, a1, a2, a3):
+    r'''Calculate the thermal conductivity of a liquid using the 4-term
+    `tau` polynomial developed by the PPDS and named PPDS equation 8.
+
+    .. math::
+        k_l = a_0\left(1 + \sum_i^3 a_i\tau^{i/3} \right)
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    a0 : float
+        Coefficient, [-]
+    a1 : float
+        Coefficient, [-]
+    a2 : float
+        Coefficient, [-]
+    a3 : float
+        Coefficient, [-]
+
+    Returns
+    -------
+    k : float
+        Low pressure liquid thermal conductivity, [W/(m*K)]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Sample coefficients for benzene in [1]_, at 500 K:
+        
+    >>> PPDS8(T=500.0, Tc=562.05, a0=0.0641126, a1=0.61057, a2=-1.72442, a3=3.94394)
+    0.08536381765218425
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondSatL/PPDS8.htm
+    '''
+    tau = 1.0 - T/Tc
+    tau_cbrt = tau**(1.0/3.0)
+    return a0*(1.0 + a1*tau_cbrt + a2*tau_cbrt*tau_cbrt + a3*tau)
+
+
 
 def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     r'''Calculate the thermal conductivity of water or steam according to the
