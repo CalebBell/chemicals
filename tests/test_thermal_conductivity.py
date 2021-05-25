@@ -287,3 +287,7 @@ def test_DIPPR9I():
     
 def test_PPDS8():
     assert_close(PPDS8(T=500.0, Tc=562.05, a0=0.0641126, a1=0.61057, a2=-1.72442, a3=3.94394), 0.08536381765218425, rtol=1e-13)
+    
+    
+def test_PPDS3():
+    assert_close(PPDS3(T=400.0, Tc=470.008, a1=11.6366, a2=25.1191, a3=-7.21674), 0.0251734811601927, rtol=1e-13)

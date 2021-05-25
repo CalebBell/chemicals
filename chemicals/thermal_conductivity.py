@@ -81,6 +81,7 @@ Correlations for Specific Substances
 Fit Correlations
 ----------------
 .. autofunction:: chemicals.thermal_conductivity.PPDS8
+.. autofunction:: chemicals.thermal_conductivity.PPDS3
 
 Fit Coefficients
 ----------------
@@ -128,7 +129,7 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid',
 'kl_Mersmann_Kind', 'DIPPR9G', 'DIPPR9I','k_IAPWS',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
-'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 'PPDS8',
+'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 'PPDS8', 'PPDS3',
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
 'Wassiljewa_Herning_Zipperer', 'k_air_lemmon']
 
@@ -224,6 +225,50 @@ def PPDS8(T, Tc, a0, a1, a2, a3):
     tau_cbrt = tau**(1.0/3.0)
     return a0*(1.0 + a1*tau_cbrt + a2*tau_cbrt*tau_cbrt + a3*tau)
 
+def PPDS3(T, Tc, a1, a2, a3):
+    r'''Calculate the thermal conductivity of a low-pressure gas using the 3-term
+    `Tr` polynomial developed by the PPDS and named PPDS equation 3.
+
+    .. math::
+        k_g = \sqrt{T_r}\left( \sum_{i=1}^3 \frac{a_i}{T_r^i} \right)^{-1}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    a1 : float
+        Coefficient, [-]
+    a2 : float
+        Coefficient, [-]
+    a3 : float
+        Coefficient, [-]
+
+    Returns
+    -------
+    k : float
+        Low pressure gas thermal conductivity, [W/(m*K)]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Sample coefficients for pentane in [1]_, at 400 K:
+        
+    >>> PPDS3(T=400.0, Tc=470.008, a1=11.6366, a2=25.1191, a3=-7.21674)
+    0.0251734811601927
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondG/PPDS3-ThermCondGas.htm
+    '''
+    Tr = T/Tc
+    Tr_inv = 1.0/Tr
+    tot = a1/Tr + a2*Tr_inv*Tr_inv + a3*Tr_inv*Tr_inv*Tr_inv
+    return sqrt(Tr)/tot
 
 
 def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
