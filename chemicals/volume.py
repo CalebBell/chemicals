@@ -31,7 +31,6 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 Pure Low Pressure Liquid Correlations
 -------------------------------------
-.. autofunction:: chemicals.volume.volume_VDI_PPDS
 .. autofunction:: chemicals.volume.Rackett
 .. autofunction:: chemicals.volume.COSTALD
 .. autofunction:: chemicals.volume.Yen_Woods_saturation
@@ -76,6 +75,7 @@ in the geochemical or astronomical domain is normally neglected.
 Pure Component Liquid Fit Correlations
 --------------------------------------
 .. autofunction:: chemicals.volume.Rackett_fit
+.. autofunction:: chemicals.volume.volume_VDI_PPDS
 
 Pure Component Solid Fit Correlations
 -------------------------------------
@@ -281,7 +281,7 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     References
     ----------
     .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
-           Berlin; New York:: Springer, 2010.
+       Berlin; New York:: Springer, 2010.
     '''
     tau = 1. - T/Tc if T < Tc else 0.
     rho = rhoc + a*tau**0.35 + b*tau**(2/3.) + c*tau + d*tau**(4/3.)

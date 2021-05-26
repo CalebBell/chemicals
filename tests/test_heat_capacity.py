@@ -345,3 +345,12 @@ def test_zabransky_dict_types():
     for d in (zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s):
         for v in d.values():
             assert type(v) is PiecewiseHeatCapacity
+            
+            
+def test_PPDS2():
+    Cp = PPDS2(T=350.0, Ts=462.493, C_low=4.54115, C_inf=9.96847, a1=-103.419, a2=695.484, a3=-2006.1, a4=2476.84, a5=-1186.47)
+    assert_close(Cp, 136.46338956689826, rtol=1e-13)
+    
+def test_PPDS15():
+    Cp = PPDS15(T=400.0, Tc=562.05, a0=0.198892, a1=24.1389, a2=-20.2301, a3=5.72481, a4=4.43613e-7, a5=-3.10751e-7)
+    assert_close(Cp, 161.89831435090065, rtol=1e-14)

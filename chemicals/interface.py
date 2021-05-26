@@ -63,6 +63,8 @@ Fit Correlations
 .. autofunction:: chemicals.interface.REFPROP_sigma
 .. autofunction:: chemicals.interface.Somayajulu
 .. autofunction:: chemicals.interface.Jasper
+.. autofunction:: chemicals.interface.PPDS14
+.. autofunction:: chemicals.interface.Watson_sigma
 
 Fit Coefficients
 ----------------
@@ -132,7 +134,7 @@ from __future__ import division
 
 __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Brock_Bird', 'Pitzer_sigma', 'Sastri_Rao', 'Zuo_Stenby',
-           'sigma_IAPWS',
+           'sigma_IAPWS', 'PPDS14', 'Watson_sigma',
            'Mersmann_Kind_sigma', 'API10A32',
            'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem',
            'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 'Weinaug_Katz',
@@ -277,7 +279,7 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
     Returns
     -------
     sigma : float
-        Liquid surface tension, N/m
+        Liquid surface tension, [N/m]
 
     Notes
     -----
@@ -307,6 +309,104 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
     sigma = sigma0*(one_minus_Tr)**n0 + sigma1*(one_minus_Tr)**n1 + sigma2*(one_minus_Tr)**n2
     return sigma
 
+
+def PPDS14(T, Tc, a0, a1, a2):
+    r'''Calculates air-water surface tension  using the [1]_
+    emperical (parameter-regressed) method, called the PPDS 14 equation for
+    surface tension.
+    
+    .. math::
+        \sigma = a_0 \tau^{a_1}(1 + a_2 \tau)
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    a0 : float
+        Regression parameter, [N/m]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+
+    Returns
+    -------
+    sigma : float
+        Liquid surface tension, [N/m]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Benzene at 280 K from [1]_
+
+    >>> PPDS14(T=280, Tc=562.05, a0=0.0786269, a1=1.28646, a2=-0.112304)
+    0.030559764256249854
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/PPDS14.htm.
+    .. [2] Frenkel, Michael, Robert D. Chirico, Vladimir Diky, Xinjian Yan, 
+       Qian Dong, and Chris Muzny. "ThermoData Engine (TDE):  Software
+       Implementation of the Dynamic Data Evaluation Concept." Journal of 
+       Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38. 
+       https://doi.org/10.1021/ci050067b.
+    '''
+    tau = 1.0 - T/Tc
+    return a0*tau**a1*(1.0 + a2*tau)
+
+def Watson_sigma(T, Tc, a1, a2, a3, a4, a5):
+    r'''Calculates air-water surface tension  using the Watson [1]_
+    emperical (parameter-regressed) method developed by NIST.
+    
+    .. math::
+        \sigma = \exp\left[a_{1} + \ln(1 - T_r)\left(
+        a_2 + a_3T_r + a_4T_r^2 + a_5T_r^3 \right)\right]
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+    a3 : float
+        Regression parameter, [-]
+    a4 : float
+        Regression parameter, [-]
+    a5 : float
+        Regression parameter, [-]
+
+    Returns
+    -------
+    sigma : float
+        Liquid surface tension, [N/m]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Isooctane at 350 K from [1]_:
+
+    >>> Watson_sigma(T=350.0, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
+    0.0138340926605649
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/HVPExpansion-SurfaceTension.htm
+    '''
+    Tr = T/Tc
+    l = log(1.0 - Tr)
+    return exp(a1 + l*(a2 + Tr*(a3 + Tr*(a4 + a5*Tr))))
 
 def Somayajulu(T, Tc, A, B, C):
     r'''Calculates air-water surface tension  using the [1]_

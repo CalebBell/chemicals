@@ -44,12 +44,14 @@ Gas Heat Capacity Estimation Models
 .. autofunction:: chemicals.heat_capacity.Poling
 .. autofunction:: chemicals.heat_capacity.Poling_integral
 .. autofunction:: chemicals.heat_capacity.Poling_integral_over_T
+.. autofunction:: chemicals.heat_capacity.PPDS2
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_integral
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_integral_over_T
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_T_for_Hm
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_T_for_Sm
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_term_A
+
 
 Liquid Heat Capacity Model Equations
 ------------------------------------
@@ -61,6 +63,7 @@ Liquid Heat Capacity Model Equations
 .. autofunction:: chemicals.heat_capacity.Zabransky_cubic_integral_over_T
 .. autoclass:: chemicals.heat_capacity.ZabranskySpline
 .. autoclass:: chemicals.heat_capacity.ZabranskyQuasipolynomial
+.. autofunction:: chemicals.heat_capacity.PPDS15
 
 Liquid Heat Capacity Estimation Models
 --------------------------------------
@@ -153,7 +156,7 @@ __all__ = ['heat_capacity_gas_methods',
            'Lastovka_Shaw', 'Lastovka_Shaw_integral', 'Lastovka_Shaw_integral_over_T',
            'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'Lastovka_Shaw_term_A',
            'TRCCp', 'TRCCp_integral', 'TRCCp_integral_over_T',
-           'heat_capacity_liquid_methods',
+           'heat_capacity_liquid_methods', 'PPDS2', 'PPDS15',
            'Rowlinson_Poling', 'Rowlinson_Bondi', 'Dadgostar_Shaw',
            'Zabransky_quasi_polynomial', 'Zabransky_quasi_polynomial_integral',
            'Zabransky_quasi_polynomial_integral_over_T', 'Zabransky_cubic',
@@ -916,6 +919,118 @@ def Poling_integral_over_T(T, a, b, c, d, e):
 
     """
     return R*(((((0.25*e)*T + d*(1.0/3.))*T + 0.5*c)*T + b)*T + a*log(T))
+
+def PPDS2(T, Ts, C_low, C_inf, a1, a2, a3, a4, a5):
+    r'''Calculates the ideal-gas heat capacity using the [1]_
+    emperical (parameter-regressed) method, called the PPDS 2 equation for
+    heat capacity.
+    
+    .. math::
+        \frac{C_p^\circ}{R} = C_{low} + (C_\inf - C_{low})y^2\left(1 + (y-1)
+        \left[\sum_{i=0}^4 a_i y^i\right]\right)
+        
+    .. math::
+        y = \frac{T}{T + T_s}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Ts : float
+        Fit temperature; no physical meaning [K]
+    C_low : float
+        Fit parameter equal to Cp/R at a low temperature, [-]
+    C_inf : float
+        Fit parameter equal to Cp/R at a high temperature, [-]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+    a3 : float
+        Regression parameter, [-]
+    a4 : float
+        Regression parameter, [-]
+    a5 : float
+        Regression parameter, [-]
+
+    Returns
+    -------
+    Cpgm : float
+        Gas molar heat capacity, [J/mol/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    n-pentane at 350 K from [1]_
+
+    >>> PPDS2(T=350.0, Ts=462.493, C_low=4.54115, C_inf=9.96847, a1=-103.419, a2=695.484, a3=-2006.1, a4=2476.84, a5=-1186.47)
+    136.46338956689
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-Cp0/PPDS2Cp0.htm.
+    '''
+    y = T/(T + Ts)
+    tot = a1 + y*(a2 + y*(a3 + y*(a4 + a5*y)))
+    main = C_low + (C_inf - C_low)*y*y*(1.0 + (y - 1.0)*tot)
+    return R*main
+
+def PPDS15(T, Tc, a0, a1, a2, a3, a4, a5):
+    r'''Calculates the saturation liquid heat capacity using the [1]_
+    emperical (parameter-regressed) method, called the PPDS 15 equation for
+    heat capacity.
+    
+    .. math::
+        \frac{C_{p,l}}{R} = \frac{a_0}{\tau} + a_1 + a_2\tau + a_3\tau^2
+        + a_4\tau^3 + a_5\tau^4
+
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    a0 : float
+        Regression parameter, [-]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+    a3 : float
+        Regression parameter, [-]
+    a4 : float
+        Regression parameter, [-]
+    a5 : float
+        Regression parameter, [-]
+
+    Returns
+    -------
+    Cplm : float
+        Liquid molar saturation heat capacity, [J/mol/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Benzene at 400 K from [1]_
+
+    >>> PPDS15(T=400.0, Tc=562.05, a0=0.198892, a1=24.1389, a2=-20.2301, a3=5.72481, a4=4.43613e-7, a5=-3.10751e-7)
+    161.8983143509
+    
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/PPDS15-Csat.htm.
+    '''
+    tau = 1.0 - T/Tc
+    poly_term = a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau)))
+    return R*(a0/tau + poly_term)
+
 
 def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     """
