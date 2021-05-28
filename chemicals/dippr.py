@@ -231,7 +231,7 @@ def EQ101(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     else:
         raise ValueError(order_not_found_pos_only_msg)
 
-def EQ102(T, A, B, C, D, order=0):
+def EQ102(T, A, B, C=0.0, D=0.0, order=0):
     r'''DIPPR Equation # 102. Used in calculating vapor viscosity, vapor
     thermal conductivity, and sometimes solid heat capacity. High values of B
     raise an OverflowError.

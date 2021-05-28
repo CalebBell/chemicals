@@ -23,165 +23,169 @@ SOFTWARE.
 """
 
 import os
-from . import utils
-from .utils import mark_numba_incompatible, PY37
-from . import critical
-from . import elements
-from . import reaction
-from . import dipole
-from . import dippr
-from . import temperature
-from . import miscdata
-from . import environment
-from . import refractivity
-from . import solubility
-from . import lennard_jones
-from . import heat_capacity
-from . import vapor_pressure
-from . import virial
-from . import phase_change
-from . import triple
-from . import acentric
-from . import exceptions
-from . import viscosity
-from . import interface
-from . import identifiers
-from . import permittivity
-from . import thermal_conductivity
-from . import combustion
-from . import volume
-from . import rachford_rice
-from . import flash_basic
-from . import safety
-from . import iapws
-from . import air
-
-from .utils import *
-from .critical import *
-from .elements import *
-from .reaction import *
-from .dipole import *
-from .dippr import *
-from .temperature import *
-from .miscdata import *
-from .environment import *
-from .refractivity import *
-from .solubility import *
-from .lennard_jones import *
-from .heat_capacity import *
-from .vapor_pressure import *
-from .virial import *
-from .phase_change import *
-from .triple import *
-from .acentric import *
-from .exceptions import *
-from .viscosity import *
-from .identifiers import *
-from .interface import *
-from .permittivity import *
-from .thermal_conductivity import *
-from .combustion import *
-from .volume import *
-from .rachford_rice import *
-from .flash_basic import *
-from .safety import *
-from .iapws import *
-from .air import *
-__all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr',
-           'temperature', 'miscdata', 'environment', 'refractivity', 'solubility',
-           'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial',
-           'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity',
-           'interface', 'permittivity', 'thermal_conductivity', 'combustion',
-           'volume', 'rachford_rice', 'flash_basic', 'identifiers', 'safety',
-           'iapws', 'air']
-
-__all__.extend(exceptions.__all__)
-__all__.extend(critical.__all__)
-__all__.extend(utils.__all__)
-__all__.extend(elements.__all__)
-__all__.extend(reaction.__all__)
-__all__.extend(dipole.__all__)
-__all__.extend(dippr.__all__)
-__all__.extend(temperature.__all__)
-__all__.extend(miscdata.__all__)
-__all__.extend(environment.__all__)
-__all__.extend(refractivity.__all__)
-__all__.extend(solubility.__all__)
-__all__.extend(lennard_jones.__all__)
-__all__.extend(heat_capacity.__all__)
-__all__.extend(vapor_pressure.__all__)
-__all__.extend(virial.__all__)
-__all__.extend(phase_change.__all__)
-__all__.extend(triple.__all__)
-__all__.extend(acentric.__all__)
-__all__.extend(viscosity.__all__)
-__all__.extend(interface.__all__)
-__all__.extend(permittivity.__all__)
-__all__.extend(thermal_conductivity.__all__)
-__all__.extend(combustion.__all__)
-__all__.extend(volume.__all__)
-__all__.extend(rachford_rice.__all__)
-__all__.extend(flash_basic.__all__)
-__all__.extend(identifiers.__all__)
-__all__.extend(safety.__all__)
-__all__.extend(iapws.__all__)
-__all__.extend(air.__all__)
-
-
-submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
-              environment, refractivity, solubility, lennard_jones,
-              vapor_pressure, virial, phase_change, triple, acentric, viscosity,
-              interface, permittivity, thermal_conductivity, combustion,
-              heat_capacity, reaction, volume, rachford_rice, flash_basic, identifiers, safety,
-              iapws, air]
-
-
-chemicals_dir = utils.source_path
-
+import fluids
 __version__ = '1.0.9'
 
-def complete_lazy_loading():
-    critical._load_critical_data()
-    dipole._load_dipole_data()
-    environment._load_GWP_ODP_data()
-    environment._load_logP_data()
-    heat_capacity._load_Cp_data()
-    interface.load_interface_dfs()
-    lennard_jones._load_LJ_data()
-    miscdata._load_VDI_saturation_dict()
-    miscdata._load_CRC_data()
-    permittivity._load_permittivity_data()
-    phase_change._load_phase_change_constants()
-    phase_change._load_phase_change_correlations()
-    reaction._load_reaction_data()
-    refractivity._load_RI_data()
-    safety._load_safety_data()
-    thermal_conductivity._load_k_data()
-    triple._load_triple_data()
-    vapor_pressure.load_vapor_pressure_dfs()
-    viscosity._load_mu_data()
-    volume._load_rho_data()
-    try:
-        identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
-    except:
-        pass
+if not fluids.numerics.is_micropython:
 
-global vectorized, numba, units, numba_vectorized
-if PY37:
-    def __getattr__(name):
-        global vectorized, numba, units, numba_vectorized
-        if name == 'vectorized':
-            import chemicals.vectorized as vectorized
-            return vectorized
-        if name == 'numba':
-            import chemicals.numba as numba
-            return numba
-        if name == 'units':
-            import chemicals.units as units
-            return units
-        if name == 'numba_vectorized':
-            import chemicals.numba_vectorized as numba_vectorized
-            return numba_vectorized
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
-else:
-    from . import vectorized
+    from . import utils
+    from .utils import mark_numba_incompatible, PY37
+    from . import critical
+    from . import elements
+    from . import reaction
+    from . import dipole
+    from . import dippr
+    from . import temperature
+    from . import miscdata
+    from . import environment
+    from . import refractivity
+    from . import solubility
+    from . import lennard_jones
+    from . import heat_capacity
+    from . import vapor_pressure
+    from . import virial
+    from . import phase_change
+    from . import triple
+    from . import acentric
+    from . import exceptions
+    from . import viscosity
+    from . import interface
+    from . import identifiers
+    from . import permittivity
+    from . import thermal_conductivity
+    from . import combustion
+    from . import volume
+    from . import rachford_rice
+    from . import flash_basic
+    from . import safety
+    from . import iapws
+    from . import air
+    
+    from .utils import *
+    from .critical import *
+    from .elements import *
+    from .reaction import *
+    from .dipole import *
+    from .dippr import *
+    from .temperature import *
+    from .miscdata import *
+    from .environment import *
+    from .refractivity import *
+    from .solubility import *
+    from .lennard_jones import *
+    from .heat_capacity import *
+    from .vapor_pressure import *
+    from .virial import *
+    from .phase_change import *
+    from .triple import *
+    from .acentric import *
+    from .exceptions import *
+    from .viscosity import *
+    from .identifiers import *
+    from .interface import *
+    from .permittivity import *
+    from .thermal_conductivity import *
+    from .combustion import *
+    from .volume import *
+    from .rachford_rice import *
+    from .flash_basic import *
+    from .safety import *
+    from .iapws import *
+    from .air import *
+    __all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr',
+               'temperature', 'miscdata', 'environment', 'refractivity', 'solubility',
+               'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial',
+               'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity',
+               'interface', 'permittivity', 'thermal_conductivity', 'combustion',
+               'volume', 'rachford_rice', 'flash_basic', 'identifiers', 'safety',
+               'iapws', 'air']
+    
+    __all__.extend(exceptions.__all__)
+    __all__.extend(critical.__all__)
+    __all__.extend(utils.__all__)
+    __all__.extend(elements.__all__)
+    __all__.extend(reaction.__all__)
+    __all__.extend(dipole.__all__)
+    __all__.extend(dippr.__all__)
+    __all__.extend(temperature.__all__)
+    __all__.extend(miscdata.__all__)
+    __all__.extend(environment.__all__)
+    __all__.extend(refractivity.__all__)
+    __all__.extend(solubility.__all__)
+    __all__.extend(lennard_jones.__all__)
+    __all__.extend(heat_capacity.__all__)
+    __all__.extend(vapor_pressure.__all__)
+    __all__.extend(virial.__all__)
+    __all__.extend(phase_change.__all__)
+    __all__.extend(triple.__all__)
+    __all__.extend(acentric.__all__)
+    __all__.extend(viscosity.__all__)
+    __all__.extend(interface.__all__)
+    __all__.extend(permittivity.__all__)
+    __all__.extend(thermal_conductivity.__all__)
+    __all__.extend(combustion.__all__)
+    __all__.extend(volume.__all__)
+    __all__.extend(rachford_rice.__all__)
+    __all__.extend(flash_basic.__all__)
+    __all__.extend(identifiers.__all__)
+    __all__.extend(safety.__all__)
+    __all__.extend(iapws.__all__)
+    __all__.extend(air.__all__)
+    
+    
+    submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
+                  environment, refractivity, solubility, lennard_jones,
+                  vapor_pressure, virial, phase_change, triple, acentric, viscosity,
+                  interface, permittivity, thermal_conductivity, combustion,
+                  heat_capacity, reaction, volume, rachford_rice, flash_basic, identifiers, safety,
+                  iapws, air]
+    
+    
+    chemicals_dir = utils.source_path
+    
+    
+    def complete_lazy_loading():
+        critical._load_critical_data()
+        dipole._load_dipole_data()
+        environment._load_GWP_ODP_data()
+        environment._load_logP_data()
+        heat_capacity._load_Cp_data()
+        interface.load_interface_dfs()
+        lennard_jones._load_LJ_data()
+        miscdata._load_VDI_saturation_dict()
+        miscdata._load_CRC_data()
+        permittivity._load_permittivity_data()
+        phase_change._load_phase_change_constants()
+        phase_change._load_phase_change_correlations()
+        reaction._load_reaction_data()
+        refractivity._load_RI_data()
+        safety._load_safety_data()
+        thermal_conductivity._load_k_data()
+        triple._load_triple_data()
+        vapor_pressure.load_vapor_pressure_dfs()
+        viscosity._load_mu_data()
+        volume._load_rho_data()
+        try:
+            identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
+        except:
+            pass
+    
+    global vectorized, numba, units, numba_vectorized
+    if PY37:
+        def __getattr__(name):
+            global vectorized, numba, units, numba_vectorized
+            if name == 'vectorized':
+                import chemicals.vectorized as vectorized
+                return vectorized
+            if name == 'numba':
+                import chemicals.numba as numba
+                return numba
+            if name == 'units':
+                import chemicals.units as units
+                return units
+            if name == 'numba_vectorized':
+                import chemicals.numba_vectorized as numba_vectorized
+                return numba_vectorized
+            raise AttributeError("module %s has no attribute %s" %(__name__, name))
+    else:
+        from . import vectorized

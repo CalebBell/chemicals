@@ -142,7 +142,7 @@ def to_num(values):
 try:
     ndarray = np.ndarray
 except:
-    pass
+    from fluids.numerics import FakePackage as ndarray
 
 @mark_numba_incompatible
 def hash_any_primitive(v):
