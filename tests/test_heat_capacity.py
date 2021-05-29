@@ -355,4 +355,6 @@ def test_PPDS15():
     Cp = PPDS15(T=400.0, Tc=562.05, a0=0.198892, a1=24.1389, a2=-20.2301, a3=5.72481, a4=4.43613e-7, a5=-3.10751e-7)
     assert_close(Cp, 161.89831435090065, rtol=1e-14)
     
-    
+def test_TDE_CSExpansion():
+    Cp = TDE_CSExpansion(550.0, 778.0, 0.626549, 120.705, 0.255987, 0.000381027, -3.03077e-7)
+    assert_close(Cp, 328.4720426864035, rtol=1e-14)

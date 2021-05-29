@@ -1164,13 +1164,24 @@ def PPDS12(T, Tc, A, B, C, D, E):
 
     Examples
     --------
+    Example from [1]_:
+    
     >>> PPDS12(300.0, 591.75, 4.60584, 13.97224, -10.592315, 2.120205, 4.277128)
     37948.76862035925
-
+    
+    Example from [2]_ for benzene; note the coefficients from [2]_ predict 
+    enthalpy of vaporization in kJ/mol, so the output must be adjusted. The same
+    effect can be obtained by multiplying each of the coefficients by 1000.
+    
+    >>> 1000.0*PPDS12(300.0, 562.05, 0.00171484, 0.0258604, -0.0243564, 0.00740881, 0.00680068)
+    33662.4258030
+    
     References
     ----------
     .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
        Berlin; New York:: Springer, 2010.
+    .. [2] "Enthalpy of Vaporization: PPDS12."
+       https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-Hvap/PPDS12.htm.
     '''
     tau = 1. - T/Tc
     tau_cbrt = tau**(1/3.)

@@ -38,6 +38,7 @@ Fit Correlations
 .. autofunction:: chemicals.vapor_pressure.Wagner_original
 .. autofunction:: chemicals.vapor_pressure.TRC_Antoine_extended
 .. autofunction:: chemicals.vapor_pressure.Yaws_Psat
+.. autofunction:: chemicals.vapor_pressure.TDE_PVExpansion
 
 Fit Correlation Derivatives
 ---------------------------
@@ -163,7 +164,8 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Psub_Clapeyron', 'Yaws_Psat', 'd2Yaws_Psat_dT2',
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
            'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
-           'Wagner_fitting_jacobian', 'Yaws_Psat_fitting_jacobian',]
+           'Wagner_fitting_jacobian', 'Yaws_Psat_fitting_jacobian',
+           'TDE_PVExpansion']
 
 import os
 from fluids.constants import R
@@ -242,6 +244,64 @@ else:
     if can_load_data:
         load_vapor_pressure_dfs()
 
+
+def TDE_PVExpansion(T, a1, a2, a3, a4=0.0, a5=0.0, a6=0.0, a7=0.0, a8=0.0):
+    r'''Calculates vapor pressure or sublimation pressure of a chemical using 
+    the PVExpansion equation for vapor pressure or sublimation pressure.
+    Parameters `a1`, `a2`, `a3`, `a4`, `a5`, `a6`, `a7`, and `a8` 
+    are chemical-dependent. Parameters
+    can be found in various sources; however units of the coefficients used 
+    vary.
+
+    .. math::
+        \log P^{\text{sat}} = a_1 + \frac{a_2}{T} + a_3\ln(T) + a_4T + a_5T^2 
+        + \frac{a_6}{T^2} + a_7 T^6 + \frac{a_8}{T^4}
+        
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid, [K]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+    a3 : float
+        Regression parameter, [-]
+    a4 : float
+        Regression parameter, [-]
+    a5 : float
+        Regression parameter, [-]
+    a6 : float
+        Regression parameter, [-]
+    a7 : float
+        Regression parameter, [-]
+    a8 : float
+        Regression parameter, [-]
+
+    Returns
+    -------
+    Psat : float
+        Vapor pressure calculated with coefficients [Pa]
+
+    Notes
+    -----
+    Coefficients in [1]_ produce a vapor pressure in kPa; add log(1000) to
+    `a1` to make them produce vapor pressure in Pa.
+
+    Examples
+    --------
+    Coefficients for sublimation pressure from [1]_:
+    
+    >>> TDE_PVExpansion(T=273.16, a1=23.7969+log(1000), a2=-11422, a3=0.177978)
+    4.06220657398e-05
+    
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103a V10.1) User’s Guide."
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-PhaseBoundaryLG/PVExpansion.htm
+    '''
+    T2 = T*T
+    return exp(a1 + a2/T + a3*log(T) + a4*T + a5*T2 + a6/T2 + a7*T2*T2*T2 + a8/(T2*T2))
 
 def Yaws_Psat(T, A, B, C, D, E):
     r'''Calculates vapor pressure of a chemical using the Yaws equation for
@@ -1083,6 +1143,7 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
     Notes
     -----
     Warning: Pc is often treated as adjustable constant.
+    This is also called the PPDS1 equation [3]_.
 
     Examples
     --------
@@ -1100,6 +1161,9 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
        Pure Liquids over Large Pressure Ranges." Industrial & Engineering
        Chemistry Process Design and Development 22, no. 2 (April 1, 1983):
        313-22. doi:10.1021/i200021a023.
+    .. [3] PPDS2 Temperature-Dependent Equation Forms. National Engineering
+       Laboratory, 2004
+       https://web.archive.org/web/20050510061545/http://www.ppds.co.uk/library/pdf/PPDS_EquationForms.pdf
     '''
     Tr = T/Tc
     tau = 1.0 - Tr
@@ -1370,6 +1434,7 @@ def Wagner(T, Tc, Pc, a, b, c, d):
     Notes
     -----
     Warning: Pc is often treated as adjustable constant.
+    This is also called the PPDS16 equation [3]_.
 
     Examples
     --------
@@ -1385,6 +1450,9 @@ def Wagner(T, Tc, Pc, a, b, c, d):
        Cryogenics 13, no. 8 (August 1973): 470-82. doi:10.1016/0011-2275(73)90003-9
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
+    .. [3] PPDS2 Temperature-Dependent Equation Forms. National Engineering
+       Laboratory, 2004
+       https://web.archive.org/web/20050510061545/http://www.ppds.co.uk/library/pdf/PPDS_EquationForms.pdf
     '''
     Tr = T/Tc
     tau = 1.0 - Tr

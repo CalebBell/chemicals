@@ -65,6 +65,7 @@ Fit Correlations
 .. autofunction:: chemicals.interface.Jasper
 .. autofunction:: chemicals.interface.PPDS14
 .. autofunction:: chemicals.interface.Watson_sigma
+.. autofunction:: chemicals.interface.ISTExpansion
 
 Fit Coefficients
 ----------------
@@ -138,7 +139,7 @@ __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Mersmann_Kind_sigma', 'API10A32',
            'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem',
            'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 'Weinaug_Katz',
-           'Meybodi_Daryasafar_Karimi']
+           'Meybodi_Daryasafar_Karimi', 'ISTExpansion']
 
 import os
 from fluids.numerics import numpy as np
@@ -360,7 +361,7 @@ def PPDS14(T, Tc, a0, a1, a2):
     return a0*tau**a1*(1.0 + a2*tau)
 
 def Watson_sigma(T, Tc, a1, a2, a3, a4, a5):
-    r'''Calculates air-water surface tension  using the Watson [1]_
+    r'''Calculates air-water surface tension using the Watson [1]_
     emperical (parameter-regressed) method developed by NIST.
     
     .. math::
@@ -407,6 +408,53 @@ def Watson_sigma(T, Tc, a1, a2, a3, a4, a5):
     Tr = T/Tc
     l = log(1.0 - Tr)
     return exp(a1 + l*(a2 + Tr*(a3 + Tr*(a4 + a5*Tr))))
+
+def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
+    r'''Calculates air-water surface tension using the IST expansion [1]_
+    emperical (parameter-regressed) method developed by NIST.
+    
+    .. math::
+        \sigma = \sum_i a_i\left(1 - \frac{T}{T_c} \right)^i
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+    a3 : float
+        Regression parameter, [-]
+    a4 : float
+        Regression parameter, [-]
+    a5 : float
+        Regression parameter, [-]
+
+    Returns
+    -------
+    sigma : float
+        Liquid surface tension, [N/m]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Diethyl phthalate at 400 K from [1]_:
+
+    >>> ISTExpansion(T=400.0, Tc=776.0, a1=0.037545, a2=0.0363288)
+    0.02672100905515996
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/ISTExpansion-SurfaceTension.htm
+    '''
+    tau = 1.0 - T/Tc
+    return tau*(a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau))))
 
 def Somayajulu(T, Tc, A, B, C):
     r'''Calculates air-water surface tension  using the [1]_

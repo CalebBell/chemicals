@@ -213,20 +213,25 @@ def test_Amgat():
     Vl = Amgat([0.5, 0.5], [4.057e-05, 5.861e-05])
     assert_close(Vl, 4.9590000000000005e-05)
 
-#    with pytest.raises(Exception):
-#        Amgat([0.5], [4.057e-05, 5.861e-05])
-
 
 def test_Rackett_mixture():
     Vl = Rackett_mixture(T=298., xs=[0.4576, 0.5424], MWs=[32.04, 18.01], Tcs=[512.58, 647.29], Pcs=[8.096E6, 2.209E7], Zrs=[0.2332, 0.2374])
     assert_close(Vl, 2.6252894930056885e-05)
 
-#    with pytest.raises(Exception):
-#        Rackett_mixture(T=298., xs=[0.4576], MWs=[32.04, 18.01], Tcs=[512.58, 647.29], Pcs=[8.096E6, 2.209E7], Zrs=[0.2332, 0.2374])
-
 def test_COSTALD_mixture():
     Vl = COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29],[0.000117, 5.6e-05], [0.559,0.344] )
     assert_close(Vl, 2.706588773271354e-05)
 
-#    with pytest.raises(Exception):
-#        COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58],[0.000117, 5.6e-05], [0.559,0.344] )
+def test_TDE_VDNS_rho():
+    rho = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
+    assert_close(947.4906064903166, rho, rtol=1e-13)
+    
+    V = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931, MW=154.2078)
+    assert_close(0.00016275390905585302, V, rtol=1e-13)
+
+def test_PPDS17():
+    rho_mass = PPDS17(300, 562.05, a0=0.0115508, a1=0.281004, a2=-0.00635447)
+    assert_close(rho_mass, 871.5200877071184, rtol=1e-13)
+    
+    Vl = PPDS17(300, 562.05, a0=0.0115508, a1=0.281004, a2=-0.00635447, MW=78.11184)
+    assert_close(Vl, 8.96271251825123e-05, rtol=1e-13)

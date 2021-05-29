@@ -64,6 +64,7 @@ Liquid Heat Capacity Model Equations
 .. autoclass:: chemicals.heat_capacity.ZabranskySpline
 .. autoclass:: chemicals.heat_capacity.ZabranskyQuasipolynomial
 .. autofunction:: chemicals.heat_capacity.PPDS15
+.. autofunction:: chemicals.heat_capacity.TDE_CSExpansion
 
 Liquid Heat Capacity Estimation Models
 --------------------------------------
@@ -157,6 +158,7 @@ __all__ = ['heat_capacity_gas_methods',
            'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'Lastovka_Shaw_term_A',
            'TRCCp', 'TRCCp_integral', 'TRCCp_integral_over_T',
            'heat_capacity_liquid_methods', 'PPDS2', 'PPDS15',
+           'TDE_CSExpansion',
            'Rowlinson_Poling', 'Rowlinson_Bondi', 'Dadgostar_Shaw',
            'Zabransky_quasi_polynomial', 'Zabransky_quasi_polynomial_integral',
            'Zabransky_quasi_polynomial_integral_over_T', 'Zabransky_cubic',
@@ -1031,6 +1033,52 @@ def PPDS15(T, Tc, a0, a1, a2, a3, a4, a5):
     poly_term = a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau)))
     return R*(a0/tau + poly_term)
 
+def TDE_CSExpansion(T, Tc, b, a1, a2=0.0, a3=0.0, a4=0.0):
+    r'''Calculates the saturation liquid heat capacity using the [1]_
+    CSExpansion method from NIST's TDE:
+    
+    .. math::
+        C_{p,l}= \frac{b}{\tau} + a_1 + a_2T + a_3 T^2 + a_4 T^3
+        
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    b : float
+        Regression parameter, [-]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+    a3 : float
+        Regression parameter, [-]
+    a4 : float
+        Regression parameter, [-]
+
+    Returns
+    -------
+    Cplm : float
+        Liquid molar saturation heat capacity, [J/mol/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    2-methylquinoline at 550 K from [1]_
+
+    >>> TDE_CSExpansion(550.0, 778.0, 0.626549, 120.705, 0.255987, 0.000381027, -3.03077e-7)
+    328.472042686
+    
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/CSExpansion.htm
+    '''
+    tau = 1.0 - T/Tc
+    return b/tau + a1 + a2*T + a3*T*T + a4*T*T*T
 
 def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     """

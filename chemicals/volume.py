@@ -76,6 +76,8 @@ Pure Component Liquid Fit Correlations
 --------------------------------------
 .. autofunction:: chemicals.volume.Rackett_fit
 .. autofunction:: chemicals.volume.volume_VDI_PPDS
+.. autofunction:: chemicals.volume.TDE_VDNS_rho
+.. autofunction:: chemicals.volume.PPDS17
 
 Pure Component Solid Fit Correlations
 -------------------------------------
@@ -176,7 +178,7 @@ from __future__ import division
 __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
 'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic',
 'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture',
-'ideal_gas', 'Goodman', 'Rackett_fit',
+'ideal_gas', 'Goodman', 'Rackett_fit', 'TDE_VDNS_rho', 'PPDS17',
 ]
 
 import os
@@ -246,8 +248,12 @@ else:
 
 def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     r'''Calculates saturation liquid volume, using the critical properties
-    and fitted coefficients from [1]_.
-
+    and fitted coefficients from [1]_. This is also known as the PPDS equation
+    10 or PPDS10.
+    
+    .. math::
+        \rho_{mass} = \rho_{c} + a\tau^{0.35} +  b \tau^{2/3} + c\tau + d\tau^{4/3}
+    
     Parameters
     ----------
     T : float
@@ -286,6 +292,97 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     tau = 1. - T/Tc if T < Tc else 0.
     rho = rhoc + a*tau**0.35 + b*tau**(2/3.) + c*tau + d*tau**(4/3.)
     return rho if MW is None else 0.001 * MW / rho
+
+def TDE_VDNS_rho(T, Tc, rhoc, a1, a2, a3, a4, MW=None):
+    r'''Calculates saturation liquid volume, using the critical properties
+    and fitted coefficients in the TDE VDNW form from [1]_.
+    
+    .. math::
+        \rho_{mass} = \rho_{c} + a\tau^{0.35} +  b \tau + c\tau^2 + d\tau^3
+    
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    rhoc : float
+        Critical density of fluid [kg/m^3]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+    a3 : float
+        Regression parameter, [-]
+    a4 : float
+        Regression parameter, [-]
+    MW : float, optional
+        Molecular weight of chemical [g/mol]
+
+    Returns
+    -------
+    Vs : float
+        Saturation liquid molar volume or density, 
+        [m^3/mol if MW given; kg/m^3 otherwise]
+
+    Examples
+    --------
+    >>> TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
+    947.4906064903
+    
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-DensityLG/VDNSExpansion.htm.
+    '''
+    tau = 1.0 - T/Tc
+    rho = rhoc + a1*tau**0.35 + tau*(a2 + tau*(a3 + a4*tau))
+    return rho if MW is None else 0.001 * MW / rho
+
+def PPDS17(T, Tc, a0, a1, a2, MW=None):
+    r'''Calculates saturation liquid volume, using the critical temperature
+    and fitted coefficients in the PPDS17 form in [1]_.
+    
+    .. math::
+        \rho_{mass} = \frac{1}{a_0(a_1 + a_2\tau)^{\left(1 + \tau^{2/7} \right)}}
+    
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    a0 : float
+        Regression parameter, [-]
+    a1 : float
+        Regression parameter, [-]
+    a2 : float
+        Regression parameter, [-]
+    MW : float, optional
+        Molecular weight of chemical [g/mol]
+
+    Returns
+    -------
+    Vs : float
+        Saturation liquid molar volume or density, 
+        [m^3/mol if MW given; kg/m^3 otherwise]
+
+    Examples
+    --------
+    Coefficients for the liquid density of benzene from [1]_ at 300 K:
+    
+    >>> PPDS17(300, 562.05, a0=0.0115508, a1=0.281004, a2=-0.00635447)
+    871.520087707
+    
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-DensityLG/PPDS17.htm.
+    '''
+    tau = 1.0 - T/Tc
+    rho = 1.0/(a0*(a1 + a2*tau)**(1.0 + tau**(2.0/7.)))
+    return rho if MW is None else 0.001 * MW / rho
+
 
 ### Critical-properties based
 
