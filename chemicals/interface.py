@@ -392,6 +392,8 @@ def Watson_sigma(T, Tc, a1, a2, a3, a4, a5):
 
     Notes
     -----
+    This expression is also used for enthalpy of vaporization in [1]_.
+    The coefficients from NIST TDE for enthalpy of vaporization are kJ/mol.
 
     Examples
     --------
