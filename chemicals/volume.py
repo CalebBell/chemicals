@@ -184,7 +184,7 @@ __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 
 import os
 from fluids.numerics import np, splev, implementation_optimize_tck
 from fluids.constants import R, atm_inv
-from chemicals.utils import log, exp, isnan
+from chemicals.utils import log, exp, isnan, sqrt
 from chemicals.utils import Vm_to_rho, mixing_simple
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import data_source, register_df_source
@@ -290,7 +290,8 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
        Berlin; New York:: Springer, 2010.
     '''
     tau = 1. - T/Tc if T < Tc else 0.
-    rho = rhoc + a*tau**0.35 + b*tau**(2/3.) + c*tau + d*tau**(4/3.)
+    tau_cbrt = tau**(1.0/3.)
+    rho = rhoc + a*tau**0.35 + b*tau_cbrt*tau_cbrt + tau*(c + d*tau_cbrt)
     return rho if MW is None else 0.001 * MW / rho
 
 def TDE_VDNS_rho(T, Tc, rhoc, a1, a2, a3, a4, MW=None):
@@ -1000,10 +1001,12 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
     '''
     Tr = T/Tc
     m = 0.480 + 1.574*omega - 0.176*omega*omega
-    alpha_SRK = (1.0 + m*(1.0 - Tr**0.5))**2
+    x0 = (1.0 + m*(1.0 - sqrt(Tr)))
+    alpha_SRK = x0*x0
     tau = 1. - Tr/alpha_SRK
-
-    rho0 = 1. + 1.169*tau**(1/3.) + 1.818*tau**(2/3.) - 2.658*tau + 2.161*tau**(4/3.)
+    
+    tau_cbrt = tau**(1/3.)
+    rho0 = 1. + tau_cbrt*(1.169 + 1.818*tau_cbrt) - 2.658*tau + 2.161*tau*tau_cbrt
     V0 = 1./rho0
 
     if delta_SRK is None:

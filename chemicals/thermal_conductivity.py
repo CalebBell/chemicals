@@ -267,7 +267,7 @@ def PPDS3(T, Tc, a1, a2, a3):
     '''
     Tr = T/Tc
     Tr_inv = 1.0/Tr
-    tot = a1/Tr + a2*Tr_inv*Tr_inv + a3*Tr_inv*Tr_inv*Tr_inv
+    tot = Tr_inv*(a1 + Tr_inv*(a2 + a3*Tr_inv))
     return sqrt(Tr)/tot
 
 
@@ -786,7 +786,7 @@ def Lakshmi_Prasad(T, MW):
     Examples
     --------
     >>> Lakshmi_Prasad(273.15, 100)
-    0.013664450000000009
+    0.013664450
 
     References
     ----------
@@ -794,7 +794,7 @@ def Lakshmi_Prasad(T, MW):
        Thermal Conductivity of Pure Liquids." The Chemical Engineering Journal
        48, no. 3 (April 1992): 211-14. doi:10.1016/0300-9467(92)80037-B
     '''
-    return 0.0655 - 0.0005*T + (1.3855 - 0.00197*T)*MW**-0.5
+    return 0.0655 - 0.0005*T + (1.3855 - 0.00197*T)/sqrt(MW)
 
 
 def Gharagheizi_liquid(T, MW, Tb, Pc, omega):

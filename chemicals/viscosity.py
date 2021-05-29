@@ -1069,7 +1069,7 @@ def mu_TDE(T, A, B, C, D):
     https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscositySatL/ViscosityL.htm.
     '''
     T_inv = 1.0/T
-    expr = A + B*T_inv + C*T_inv*T_inv + D*T_inv*T_inv*T_inv
+    expr = A + T_inv*(B + T_inv*(C + D*T_inv))
     return trunc_exp(expr)
 
 def PPDS5(T, Tc, a0, a1, a2):

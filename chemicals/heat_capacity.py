@@ -1078,7 +1078,7 @@ def TDE_CSExpansion(T, Tc, b, a1, a2=0.0, a3=0.0, a4=0.0):
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/CSExpansion.htm
     '''
     tau = 1.0 - T/Tc
-    return b/tau + a1 + a2*T + a3*T*T + a4*T*T*T
+    return b/tau + a1 + T*(a2 + T*(a3 + a4*T))
 
 def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     """
