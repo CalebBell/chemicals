@@ -50,14 +50,18 @@ Utility functions
 .. autofunction:: chemicals.refractivity.molar_refractivity_from_RI
 .. autofunction:: chemicals.refractivity.RI_from_molar_refractivity
 
+Pure Component Liquid Fit Correlations
+--------------------------------------
+.. autofunction:: chemicals.refractivity.TDE_RIXExpansion
+
 """
 
 __all__ = ['RI', 'RI_methods', 'RI_all_methods',
            'polarizability_from_RI', 'molar_refractivity_from_RI',
            'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
-           'brix_to_RI']
+           'brix_to_RI', 'TDE_RIXExpansion']
 
-from fluids.numerics import interp
+from fluids.numerics import interp, horner
 from fluids.constants import pi, N_A
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
@@ -302,7 +306,7 @@ def RI_from_molar_refractivity(Rm, Vm):
     return Rm
 
 
-def RI_IAPWS(T, rho, wavelength=0.5893):
+def RI_IAPWS(T, rho, wavelength=0.5893e-6):
     r'''Calculates the refractive index of water at a given temperature,
     density, and wavelength.
 
@@ -337,7 +341,7 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
     rho : float
         Density of the water [kg/m^3]
     wavelength : float
-        Wavelength of fluid [micrometers]
+        Wavelength of fluid [meters]
 
     Returns
     -------
@@ -355,7 +359,7 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
 
     Examples
     --------
-    >>> RI_IAPWS(298.15, 997.047435, 0.5893)
+    >>> RI_IAPWS(298.15, 997.047435)
     1.3328581926471605
 
     References
@@ -363,6 +367,7 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
     .. [1] IAPWS, 1997. Release on the Refractive Index of Ordinary Water
        Substance as a Function of Wavelength, Temperature and Pressure.
     '''
+    wavelength *= 1e6
     delta = rho*1e-3
     theta = T*(1.0/273.15)
     Lambda = wavelength*(1.0/0.589)
@@ -377,6 +382,60 @@ def RI_IAPWS(T, rho, wavelength=0.5893):
     0.90070492/(Lambda2 - LambdaIR*LambdaIR) - 0.0166626219*delta*delta)
     n = sqrt((2.0*A + 1.)/(1. - A))
     return n
+
+def TDE_RIXExpansion(T, Bs, Cs, wavelength=589.26e-9):
+    r'''Calculates the refractive index of a pure liquid at a given temperature,
+    and wavelength, using the NIST TDE RIXExpansion formula [1]_.
+
+    .. math::
+        n(T, \lambda) = \sum_{i=0}^{i} B_i t^i + \sum_j C_j w^j
+    
+    .. math::
+        t = T - 298.15
+        
+    .. math::
+        w = WL\times 10^{9} - 589.26
+
+
+    Parameters
+    ----------
+    T : float
+        Temperature of the fluid [K]
+    Bs : list[float]
+        Polynomial temperature expansion coefficients, in reverse order to the
+        polynomial (as needed for efficient computation with horner's method'),
+        [-]
+    Cs : list[float]
+        Polynomial wavelength expansion coefficients, in reverse order to the
+        polynomial (as needed for efficient computation with horner's method'),
+        [-]
+    wavelength : float
+        Wavelength of fluid [meters]
+
+    Returns
+    -------
+    RI : float
+        Refractive index of the pure fluid, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> TDE_RIXExpansion(330.0, Bs=[-0.000125041, 1.33245], Cs=[1.20771e-7, -3.56795e-5, 0.0], wavelength=589.26e-9*.7)
+    1.33854894426073
+
+    References
+    ----------
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-RefractiveIndex/RIXExpansion.htm.
+    '''
+    t = T - 298.15
+    w = (wavelength - 589.26e-9)*1e9
+    n_D = horner(Bs, t)
+    if Cs is not None:
+        n_D += horner(Cs, w)
+    return n_D
 
 ICUMSA_1974_brix = list([float(i) for i in range(96)])
 ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175,

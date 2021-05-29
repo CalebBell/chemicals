@@ -988,9 +988,9 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
     is 3.4613e-05. The fit increases the error on this occasion.
 
     >>> SNM0(121, 150.8, 7.49e-05, -0.004)
-    3.4402256402733416e-05
+    3.440225640273e-05
     >>> SNM0(121, 150.8, 7.49e-05, -0.004, -0.03259620)
-    3.493288100008123e-05
+    3.493288100008e-05
 
     References
     ----------

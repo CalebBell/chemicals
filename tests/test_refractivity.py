@@ -90,7 +90,7 @@ def test_RI_from_molar_refractivity():
 
 
 def test_RI_IAPWS():
-    assert_close(RI_IAPWS(298.15, 997.047435, 0.5893), 1.3328581926471605, rtol=1e-12)
+    assert_close(RI_IAPWS(298.15, 997.047435, 0.5893e-6), 1.3328581926471605, rtol=1e-12)
 
 
 def test_RI_to_brix():
@@ -105,3 +105,8 @@ def test_brix_to_RI():
     assert_close(brix_to_RI(0), 1.33299)
     assert_close(brix_to_RI(95.0), 1.532)
     assert_close(brix_to_RI(RI_to_brix(1.3)), 1.3)
+
+
+def test_TDE_RIXExpansion():
+    RI = TDE_RIXExpansion(330.0, Bs=[-0.000125041, 1.33245], Cs=[1.20771e-7, -3.56795e-5, 0.0], wavelength=589.26e-9*.7)
+    assert_close(RI, 1.33854894426073, rtol=1e-14)
