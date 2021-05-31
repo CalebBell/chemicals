@@ -82,6 +82,7 @@ Fit Correlations
 ----------------
 .. autofunction:: chemicals.thermal_conductivity.PPDS8
 .. autofunction:: chemicals.thermal_conductivity.PPDS3
+.. autofunction:: chemicals.thermal_conductivity.Chemsep_16
 
 Fit Coefficients
 ----------------
@@ -131,7 +132,7 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
 'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 'PPDS8', 'PPDS3',
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
-'Wassiljewa_Herning_Zipperer', 'k_air_lemmon']
+'Wassiljewa_Herning_Zipperer', 'k_air_lemmon', 'Chemsep_16']
 
 from fluids.numerics import bisplev, implementation_optimize_tck, numpy as np
 from fluids.constants import R, R_inv, N_A, k, pi
@@ -269,6 +270,51 @@ def PPDS3(T, Tc, a1, a2, a3):
     Tr_inv = 1.0/Tr
     tot = Tr_inv*(a1 + Tr_inv*(a2 + a3*Tr_inv))
     return sqrt(Tr)/tot
+
+def Chemsep_16(T, A, B, C, D, E):
+    r'''Calculate the thermal conductivity of a low-pressure liquid using the 
+    5-term `T` exponential polynomial found in ChemSep.
+
+    .. math::
+        k_l = A + \exp\left(\frac{B}{T} + C + DT + ET^2 \right)
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    A : float
+        Coefficient, [W/(m*K)]
+    B : float
+        Coefficient, [K]
+    C : float
+        Coefficient, [-]
+    D : float
+        Coefficient, [1/K]
+    E : float
+        Coefficient, [1/K^2]
+
+    Returns
+    -------
+    k : float
+        Low pressure liquid thermal conductivity, [W/(m*K)]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Sample coefficients for liquid thermal conductivity of n-hexane in [1]_, at
+    300 K:
+        
+    >>> Chemsep_16(300.0, -0.12682, -1.5015, -1.0467, -0.00088709, -9.3679E-07)
+    0.11924904787869
+
+    References
+    ----------
+    .. [1] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on 
+       Demand Norderstedt, Germany, 2000.
+    '''
+    return A + exp(B/T + C + D*T + E*T*T)
 
 
 def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):

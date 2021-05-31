@@ -291,3 +291,8 @@ def test_PPDS8():
     
 def test_PPDS3():
     assert_close(PPDS3(T=400.0, Tc=470.008, a1=11.6366, a2=25.1191, a3=-7.21674), 0.0251734811601927, rtol=1e-13)
+    
+    
+def test_Chemsep_16():
+    k = Chemsep_16(300.0, -0.12682, -1.5015, -1.0467, -0.00088709, -9.3679E-07)
+    assert_close(k, 0.11924904787869492, rtol=1e-14)
