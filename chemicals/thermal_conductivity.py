@@ -134,7 +134,7 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
 'Wassiljewa_Herning_Zipperer', 'k_air_lemmon', 'Chemsep_16']
 
-from fluids.numerics import bisplev, implementation_optimize_tck, numpy as np
+from fluids.numerics import bisplev, implementation_optimize_tck, numpy as np, trunc_exp
 from fluids.constants import R, R_inv, N_A, k, pi
 from chemicals.utils import log, exp, sqrt, atan, PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import register_df_source, data_source
@@ -314,7 +314,7 @@ def Chemsep_16(T, A, B, C, D, E):
     .. [1] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on 
        Demand Norderstedt, Germany, 2000.
     '''
-    return A + exp(B/T + C + D*T + E*T*T)
+    return A + trunc_exp(B/T + C + D*T + E*T*T)
 
 
 def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
