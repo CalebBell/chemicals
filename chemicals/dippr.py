@@ -313,26 +313,24 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
     elif order == 1:
         return (A*B*T**B/(T*(C/T + D/T**2 + 1))
                 + A*T**B*(C/T**2 + 2*D/T**3)/(C/T + D/T**2 + 1)**2)
-    elif order == -1:
+    elif order == -1: # numba: delete
         # numba-scipy does not support complex numbers so this does not work in numba
         # imaginary part is 0
-        # Hours spend trying to make hyp2f1 use real inputs only: 2
-        c0 = 3.0 + B
-        x0 = csqrt(C*C - 4.0*D)
-        arg3_hyp = (-2.0*T/(C - x0))
-        #arg3_hyp2 = (-2*T/(C + csqrt(C*C - 4*D)))
-        hyp2f1_term1 = hyp2f1(1.0, c0, 4.0+B, arg3_hyp)
-        hyp2f1_term2 = hyp2f1_term1.real - hyp2f1_term1.imag*1.0j #hyp2f1(1.0, 3.0+B, 4.0+B, arg3_hyp2)
-
-        x5 = 2.0*A*T**(c0)/(c0*x0)
-        x10 = x5/(C - x0)
-        x11 = x5/(C + x0)
-        return float((hyp2f1_term1*x10 - hyp2f1_term2*x11).real)
-    elif order == -1j:
-        return float((2*A*T**(2+B)*hyp2f1(1.0, 2.0+B, 3.0+B, -2*T/(C - csqrt(C*C - 4*D)))/(
-                (2+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D)) -2*A*T**(2+B)*hyp2f1(
-                1.0, 2.0+B, 3.0+B, -2*T/(C + csqrt(C*C - 4*D)))/((2+B)*(C + csqrt(
-                C*C-4*D))*csqrt(C*C-4*D))).real)
+        # Hours spend trying to make hyp2f1 use real inputs only: 3
+        c0 = 3.0 + B # numba: delete
+        x0 = csqrt(C*C - 4.0*D) # numba: delete
+        arg3_hyp = (-2.0*T/(C - x0)) # numba: delete
+        hyp2f1_term1 = hyp2f1(1.0, c0, 4.0+B, arg3_hyp) # numba: delete
+        hyp2f1_term2 = hyp2f1_term1.real - hyp2f1_term1.imag*1.0j# numba: delete
+        x5 = 2.0*A*T**(c0)/(c0*x0) # numba: delete
+        x10 = x5/(C - x0) # numba: delete
+        x11 = x5/(C + x0) # numba: delete
+        return float((hyp2f1_term1*x10 - hyp2f1_term2*x11).real) # numba: delete
+    elif order == -1j: # numba: delete
+        return float((2*A*T**(2+B)*hyp2f1(1.0, 2.0+B, 3.0+B, -2*T/(C - csqrt(C*C - 4*D)))/( # numba: delete
+                (2+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D)) -2*A*T**(2+B)*hyp2f1( # numba: delete
+                1.0, 2.0+B, 3.0+B, -2*T/(C + csqrt(C*C - 4*D)))/((2+B)*(C + csqrt( # numba: delete
+                C*C-4*D))*csqrt(C*C-4*D))).real) # numba: delete
     else:
         raise ValueError(order_not_found_msg)
 

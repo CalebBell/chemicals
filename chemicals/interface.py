@@ -360,7 +360,7 @@ def PPDS14(T, Tc, a0, a1, a2):
     tau = 1.0 - T/Tc
     return a0*tau**a1*(1.0 + a2*tau)
 
-def Watson_sigma(T, Tc, a1, a2, a3, a4, a5):
+def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     r'''Calculates air-water surface tension using the Watson [1]_
     emperical (parameter-regressed) method developed by NIST.
     

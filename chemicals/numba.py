@@ -82,6 +82,7 @@ def transform():
              'dippr.EQ106_fitting_jacobian',
              'dippr.EQ105_fitting_jacobian',
              'dippr.EQ107_fitting_jacobian',
+             'dippr.EQ102',
              
              'vapor_pressure.Yaws_Psat_fitting_jacobian',
              'viscosity.mu_Yaws_fitting_jacobian',
