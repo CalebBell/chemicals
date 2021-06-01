@@ -57,6 +57,7 @@ Jacobians (for fitting)
 -----------------------
 .. autofunction:: chemicals.vapor_pressure.Wagner_fitting_jacobian
 .. autofunction:: chemicals.vapor_pressure.Wagner_original_fitting_jacobian
+.. autofunction:: chemicals.vapor_pressure.Antoine_fitting_jacobian
 .. autofunction:: chemicals.vapor_pressure.Yaws_Psat_fitting_jacobian
 
 Vapor Pressure Estimation Correlations
@@ -165,6 +166,7 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
            'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
            'Wagner_fitting_jacobian', 'Yaws_Psat_fitting_jacobian',
+           'Antoine_fitting_jacobian',
            'TDE_PVExpansion']
 
 import os
@@ -1327,8 +1329,8 @@ def Wagner_original_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
 
     Parameters
     ----------
-    T : float
-        Temperature of fluid, [K]
+    Ts : list[float]
+        Temperatures of fluid data points, [K]
     Tc : float
         Critical temperature, [K]
     Pc : float
@@ -1369,8 +1371,8 @@ def Wagner_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
 
     Parameters
     ----------
-    T : float
-        Temperature of fluid, [K]
+    Ts : list[float]
+        Temperatures of fluid data points, [K]
     Tc : float
         Critical temperature, [K]
     Pc : float
@@ -1400,6 +1402,50 @@ def Wagner_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
         row[1] = x2*x5
         row[2] = x3*x5
         row[3] = x4*x5
+    return out
+
+def Antoine_fitting_jacobian(Ts, A, B, C, base=10.0):
+    r'''Calculates the jacobian of the Antoine vapor pressure equation
+    for use in fitting these parameters when experimental values are known.
+    
+    Requires three coefficients specific to each chemical.
+
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of fluid data points, [K]
+    A : float
+        Antoine `A` parameter, [-]
+    B : float
+        Antoine `B` parameter, [K]
+    C : float
+        Antoine `C` parameter, [K]
+    base : float, optional
+        Optional base of logarithm; 10 by default, [-]
+
+    Returns
+    -------
+    jac : list[list[float, 3], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+    '''
+    N = len(Ts)
+#    out = np.zeros((N, 3)) # numba: uncomment
+    out = [[0.0]*3 for _ in range(N)] # numba: delete
+    ln_base = log(base)
+    for i in range(N):
+        row = out[i]
+        x0 = C + Ts[i]
+        if x0 <= 0.0:
+            row[0] = 0.0
+            row[1] = 0.0
+            row[2] = 0.0
+        else:
+            x1 = 1.0/x0
+            x2 = base**(A - B*x1)*ln_base
+            row[0] = x2
+            row[1] = -x1*x2
+            row[2] =  B*x2*x1*x1
     return out
 
 def Wagner(T, Tc, Pc, a, b, c, d):

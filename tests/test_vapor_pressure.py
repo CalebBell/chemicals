@@ -378,6 +378,27 @@ def test_Wagner_fitting_jacobian():
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
     assert_close1d(der_analytical, [der_num], rtol=1e-7)
     
+def test_Antoine_fitting_jacobian():
+
+    T, A, B, C = 100.0, 8.7687, 395.744, -6.469
+    der_num = [derivative(lambda A: Antoine(T, A, B, C), A, dx=A*1e-5),
+     derivative(lambda B: Antoine(T, A, B, C), B, dx=B*1e-5),
+     derivative(lambda C: Antoine(T, A, B, C), C, dx=C*1e-5)]
+    der_expect =  [[79389.37469005348, -848.802800034785, 3591.414774748115]]
+    der_analytical = Antoine_fitting_jacobian([T], A, B, C)
+    assert_close1d(der_analytical, [der_num], rtol=1e-7)
+    assert_close1d(der_expect, der_analytical, rtol=1e-13)
+    
+    # Zero point
+    T, A, B, C = 30, 3.45604+5, 1044.038, -53.893
+    der_num = [derivative(lambda A: Antoine(T, A, B, C), A, dx=A*1e-5),
+     derivative(lambda B: Antoine(T, A, B, C), B, dx=B*1e-5),
+     derivative(lambda C: Antoine(T, A, B, C), C, dx=C*1e-5)]
+    der_expect =  [[0.0, 0.0, 0.0]]
+    der_analytical = Antoine_fitting_jacobian([T], A, B, C)
+    assert_close1d(der_analytical, [der_num], rtol=1e-7)
+    assert_close1d(der_expect, der_analytical, rtol=1e-13)
+
 def test_Yaws_Psat():
     assert_close(Yaws_Psat(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6), 708657.0891069275, rtol=1e-14)
     

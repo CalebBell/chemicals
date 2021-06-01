@@ -227,6 +227,10 @@ def test_EQ107_more():
 
     with pytest.raises(Exception):
         EQ107(20., *coeffs, order=1E100)
+    
+    # Case that requires overflow handling
+    EQ107(**{'T': 377.77777777777777, 'A': 1539249.2020718465, 'B': -46807441.804555826, 'C': -409401.9169728528, 'D': -2164118.45731599, 'E': 339.5030595758336, 'order': 0})
+
 
 def test_EQ114_more():
     # T derivative
@@ -367,3 +371,56 @@ def test_EQ102_fitting():
     der_analytical = EQ102_fitting_jacobian([T], A, B, C, D)
     assert_close1d(der_analytical, [der_num])
     assert_close1d(der_analytical, der_expect, rtol=1e-13)
+
+def test_EQ105_fitting():
+    T, A, B, C, D = 300., 0.70824, 0.26411, 507.6, 0.27537
+    der_num = [derivative(lambda A: EQ105(T, A, B, C, D), A, dx=A*1e-5),
+                 derivative(lambda B: EQ105(T, A, B, C, D), B, dx=B*1e-5),
+                 derivative(lambda C: EQ105(T, A, B, C, D), C, dx=C*1e-5),
+                 derivative(lambda D: EQ105(T, A, B, C, D), D, dx=D*1e-5)]
+    der_expect = [[10.721182221195127, -51.225752844842916, 0.006195731841673147, -7.0661094492142285]]
+    der_analytical = EQ105_fitting_jacobian([T], A, B, C, D)
+    assert_close1d(der_analytical, [der_num])
+    assert_close1d(der_analytical, der_expect, rtol=1e-13)
+
+
+    T, A, B, C, D = 304, 3733.087734888731, 0.30552803535622014, 301.6993863907116, 0.3415888512743092
+    der_num = [derivative(lambda A: EQ105(T, A, B, C, D), A, dx=A*1e-5),
+                 derivative(lambda B: EQ105(T, A, B, C, D), B, dx=B*1e-5),
+                 derivative(lambda C: EQ105(T, A, B, C, D), C, dx=C*1e-5),
+                 derivative(lambda D: EQ105(T, A, B, C, D), D, dx=D*1e-5)]
+    der_analytical = EQ105_fitting_jacobian([T], A, B, C, D)
+    assert_close1d(der_analytical, [der_num])
+
+
+def test_EQ106_fitting():
+    T, Tc, A, B, C, D, E = 300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, 0.25
+    der_num = [derivative(lambda A: EQ106(T, Tc, A, B, C, D, E), A, dx=A*1e-5),
+                 derivative(lambda B: EQ106(T, Tc, A, B, C, D, E), B, dx=B*1e-5),
+                 derivative(lambda C: EQ106(T, Tc, A, B, C, D, E), C, dx=C*1e-5),
+                 derivative(lambda D: EQ106(T, Tc, A, B, C, D, E), D, dx=D*1e-5),
+                 derivative(lambda E: EQ106(T, Tc, A, B, C, D, E), E, dx=E*1e-5),
+              ]
+        
+    der_expect = [[0.4007741423076755, -0.04435095583995359, -0.020561534535812425, -0.009532527415937865, -0.004419372434354963]]
+    der_analytical = EQ106_fitting_jacobian([T], Tc, A, B, C, D, E)
+    assert_close1d(der_analytical, [der_num])
+    assert_close1d(der_analytical, der_expect, rtol=1e-13)
+    
+    # Test case with errors
+    EQ106_fitting_jacobian(Ts=[466.],Tc = 466.0, A = 47700.0, B = 0.37, C = 0.0, D = 0.0, E = 0.0)
+
+def test_EQ107_fitting():
+    T, A, B, C, D, E = 250.0, 33363., 26790., 2610.5, 8896., 1169
+    der_num = [derivative(lambda A: EQ107(T, A, B, C, D, E), A, dx=A*1e-5),
+                 derivative(lambda B: EQ107(T, A, B, C, D, E), B, dx=B*3e-3, order=3),
+                 derivative(lambda C: EQ107(T, A, B, C, D, E), C, dx=C*1e-3, order=9),
+                 derivative(lambda D: EQ107(T, A, B, C, D, E), D, dx=D*1e-5, order=3),
+                 derivative(lambda E: EQ107(T, A, B, C, D, E), E, dx=E*1e-5),
+              ]
+    
+    der_expect = [[1.0, 3.7138247806865474e-07, -7.197214038362036e-05, 0.00758947296962729, -0.42452325330497365]]
+    der_analytical = EQ107_fitting_jacobian([T], A, B, C, D, E)
+    assert_close1d(der_analytical, [der_num])
+    assert_close1d(der_analytical, der_expect, rtol=1e-13)
+

@@ -50,7 +50,9 @@ Jacobians (for fitting)
 -----------------------
 .. autofunction:: chemicals.dippr.EQ101_fitting_jacobian
 .. autofunction:: chemicals.dippr.EQ102_fitting_jacobian
-
+.. autofunction:: chemicals.dippr.EQ105_fitting_jacobian
+.. autofunction:: chemicals.dippr.EQ106_fitting_jacobian
+.. autofunction:: chemicals.dippr.EQ107_fitting_jacobian
 
 """
 
@@ -58,7 +60,9 @@ from __future__ import division
 
 __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
            'EQ114', 'EQ115', 'EQ116', 'EQ127', 
-           'EQ101_fitting_jacobian', 'EQ102_fitting_jacobian']
+           'EQ101_fitting_jacobian', 'EQ102_fitting_jacobian',
+           'EQ106_fitting_jacobian', 'EQ105_fitting_jacobian',
+           'EQ107_fitting_jacobian']
 
 from chemicals.utils import log, exp, sinh, cosh, atan, atanh, sqrt, tanh
 from cmath import log as clog
@@ -402,6 +406,125 @@ def EQ102_fitting_jacobian(Ts, A, B, C, D):
         out[i][1] = A*x4*lnT
         out[i][2] = -x1*x5
         out[i][3] = -x2*x5
+    return out
+
+def EQ105_fitting_jacobian(Ts, A, B, C, D):
+    r'''Compute and return the Jacobian of the property predicted by 
+    DIPPR Equation # 105 with respect to all the coefficients. This is used in
+    fitting parameters for chemicals.
+
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of the experimental data points, [K]
+    A-D : float
+        Parameter for the equation; chemical and property specific [-]
+
+    Returns
+    -------
+    jac : list[list[float, 4], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+
+    '''
+    N = len(Ts)
+#    out = np.zeros((N, 4)) # numba: uncomment
+    out = [[0.0]*4 for _ in range(N)] # numba: delete
+    for i in range(N):
+        r = out[i]
+        x0 = 1.0 - Ts[i]/C
+        
+        if D < 1.0 and x0 < 0.0:
+            r[0] = 1.0/B
+            r[1] = -A/(B*B)
+        else:
+            x1 = x0**D
+            x2 = x1 + 1.0
+            x3 = A*B**(-x1 - 1.0)
+            x4 = x1*x3*log(B)
+            r[0] = B**(-x2)
+            r[1] = -x2*x3/B
+            r[2] = -D*Ts[i]*x4/(C*C*x0)
+            r[3] = -x4*log(x0)
+    return out
+
+def EQ106_fitting_jacobian(Ts, Tc, A, B, C, D, E):
+    r'''Compute and return the Jacobian of the property predicted by 
+    DIPPR Equation # 106 with respect to all the coefficients. This is used in
+    fitting parameters for chemicals.
+
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of the experimental data points, [K]
+    Tc : float
+        Critical temperature, [K]
+    A-E : float
+        Parameter for the equation; chemical and property specific [-]
+
+    Returns
+    -------
+    jac : list[list[float, 5], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+
+    '''
+    N = len(Ts)
+#    out = np.zeros((N, 5)) # numba: uncomment
+    out = [[0.0]*5 for _ in range(N)] # numba: delete
+    for i in range(N):
+        x0 = Ts[i]/Tc
+        if x0 != 1.0:
+            x1 = 1.0 - x0
+            x2 = x1**(B + x0*(C + x0*(D + E*x0)))
+            x3 = A*x2*log(x1)
+            r = out[i]
+            r[0] = x2
+            r[1] = x3
+            r[2] = x0*x3
+            r[3] = x0*x0*x3
+            r[4] = x0*x0*x0*x3
+    return out
+
+def EQ107_fitting_jacobian(Ts, A, B, C, D, E):
+    r'''Compute and return the Jacobian of the property predicted by 
+    DIPPR Equation # 107 with respect to all the coefficients. This is used in
+    fitting parameters for chemicals.
+
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of the experimental data points, [K]
+    A-E : float
+        Parameter for the equation; chemical and property specific [-]
+
+    Returns
+    -------
+    jac : list[list[float, 5], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+
+    '''
+    N = len(Ts)
+#    out = np.zeros((N, 5)) # numba: uncomment
+    out = [[0.0]*5 for _ in range(N)] # numba: delete
+    for i in range(N):
+        r = out[i]
+        x1 = 1.0/Ts[i]
+        x0 = x1*x1
+        x2 = C*x1
+        x3 = sinh(x2)
+        x3_inv = 1.0/x3
+        x4 = x0*x3_inv*x3_inv
+        x5 = E*x1
+        x6 = cosh(x5)
+        x6_inv = 1.0/x6
+        x7 = x0*x6_inv*x6_inv
+        r[0] = 1.0
+        r[1] = C*C*x4
+        r[2] = 2.0*B*C*x4*(-x2*cosh(x2)*x3_inv + 1.0)
+        r[3] = E*E*x7
+        r[4] = 2.0*D*E*x7*(-x5*sinh(x5)*x6_inv + 1.0)
     return out
 
 def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
@@ -788,7 +911,11 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
        doi:10.1016/0378-3812(81)85002-9.
     '''
     if order == 0:
-        return A + B*((C/T)/sinh(C/T))**2 + D*((E/T)/cosh(E/T))**2
+        C_T = C/T
+        t0 = 2.0*C_T/(trunc_exp(C_T) - trunc_exp(-C_T))
+        E_T = E/T
+        t1 = 2.0*E_T/(trunc_exp(-E_T) + trunc_exp(E_T))
+        return A + B*t0*t0 + D*t1*t1
     elif order == 1:
         return (2*B*C**3*cosh(C/T)/(T**4*sinh(C/T)**3)
                 - 2*B*C**2/(T**3*sinh(C/T)**2)
