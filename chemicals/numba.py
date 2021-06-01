@@ -18,84 +18,84 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from chemicals.utils import PY37, numba_blacklisted, numba_cache_blacklisted
+import fluids as normal_fluids
 
 busy = False
 __all__ = []
 
+to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
+     'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
+     'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
+     'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
+     'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
+     'viscosity.Wilke_large', 'viscosity.Wilke_prefactored',
+     'interface.Winterfeld_Scriven_Davis',
+
+     'rachford_rice.Rachford_Rice_solution',
+     'rachford_rice.Rachford_Rice_solution_LN2',
+     'rachford_rice.Rachford_Rice_solution_numpy',
+     'rachford_rice.Rachford_Rice_polynomial',
+     'rachford_rice.Rachford_Rice_polynomial_3',
+     'rachford_rice.Rachford_Rice_polynomial_4',
+     'rachford_rice.Rachford_Rice_polynomial_5',
+     'rachford_rice.Rachford_Rice_solution_polynomial',
+     'rachford_rice.Rachford_Rice_numpy_err_fprime2',
+     'rachford_rice.Li_Johns_Ahmadi_solution',
+     'rachford_rice._Rachford_Rice_analytical_3',
+     'rachford_rice.flash_inner_loop',
+     'rachford_rice.Rachford_Rice_solution2',
+     'rachford_rice.Rachford_Rice_solutionN',
+     'rachford_rice.RRN_new_betas',
+     'rachford_rice.Rachford_Rice_flashN_f_jac',
+     'rachford_rice.Rachford_Rice_flash2_f_jac',
+     'rachford_rice.Rachford_Rice_valid_solution_naive',
+     'flash_basic.flash_wilson',
+     'solubility.Henry_pressure_mixture',
+     'critical.Chueh_Prausnitz_Tc',
+     'critical.Chueh_Prausnitz_Vc',
+     'thermal_conductivity.Lindsay_Bromley',
+     'thermal_conductivity.DIPPR9I',
+     'virial.Z_from_virial_density_form',
+     
+     'vapor_pressure.Wagner_fitting_jacobian',
+     'vapor_pressure.Wagner_original_fitting_jacobian',
+     'vapor_pressure.Antoine_fitting_jacobian',
+     
+     'dippr.EQ102_fitting_jacobian',
+     'dippr.EQ101_fitting_jacobian',
+     'dippr.EQ106_fitting_jacobian',
+     'dippr.EQ105_fitting_jacobian',
+     'dippr.EQ107_fitting_jacobian',
+     'dippr.EQ102',
+     
+     'vapor_pressure.Yaws_Psat_fitting_jacobian',
+     'viscosity.mu_Yaws_fitting_jacobian',
+     ]
+
+def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec):
+    cache_blacklist = set(numba_cache_blacklisted)
+    __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
+    new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,
+                                                    blacklist=set(numba_blacklisted),
+                                                    cache_blacklist=cache_blacklist)
+
+    normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist, vec=vec)
+
+    for mod in new_mods:
+        mod.__dict__.update(__funcs)
+        try:
+            __all__.extend(mod.__all__)
+        except AttributeError:
+            pass
+
 def transform():
     gdct = globals()
     import chemicals
-    import fluids
     import fluids.numba
     normal = chemicals
     __funcs = {}
     replaced = fluids.numba.numerics_dict.copy()
-    normal_fluids = fluids
     orig_file = __file__
-    def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec):
-        cache_blacklist = set(numba_cache_blacklisted)
-        __funcs.update(normal_fluids.numba.numbafied_fluids_functions.copy())
-        new_mods = normal_fluids.numba.transform_module(normal, __funcs, replaced, vec=vec,
-                                                        blacklist=set(numba_blacklisted),
-                                                        cache_blacklist=cache_blacklist)
-
-        to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
-             'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
-             'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
-             'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',
-             'viscosity.Herning_Zipperer', 'volume.COSTALD_mixture',
-             'viscosity.Wilke_large', 'viscosity.Wilke_prefactored',
-             'interface.Winterfeld_Scriven_Davis',
-
-             'rachford_rice.Rachford_Rice_solution',
-             'rachford_rice.Rachford_Rice_solution_LN2',
-             'rachford_rice.Rachford_Rice_solution_numpy',
-             'rachford_rice.Rachford_Rice_polynomial',
-             'rachford_rice.Rachford_Rice_polynomial_3',
-             'rachford_rice.Rachford_Rice_polynomial_4',
-             'rachford_rice.Rachford_Rice_polynomial_5',
-             'rachford_rice.Rachford_Rice_solution_polynomial',
-             'rachford_rice.Rachford_Rice_numpy_err_fprime2',
-             'rachford_rice.Li_Johns_Ahmadi_solution',
-             'rachford_rice._Rachford_Rice_analytical_3',
-             'rachford_rice.flash_inner_loop',
-             'rachford_rice.Rachford_Rice_solution2',
-             'rachford_rice.Rachford_Rice_solutionN',
-             'rachford_rice.RRN_new_betas',
-             'rachford_rice.Rachford_Rice_flashN_f_jac',
-             'rachford_rice.Rachford_Rice_flash2_f_jac',
-             'rachford_rice.Rachford_Rice_valid_solution_naive',
-             'flash_basic.flash_wilson',
-             'solubility.Henry_pressure_mixture',
-             'critical.Chueh_Prausnitz_Tc',
-             'critical.Chueh_Prausnitz_Vc',
-             'thermal_conductivity.Lindsay_Bromley',
-             'thermal_conductivity.DIPPR9I',
-             'virial.Z_from_virial_density_form',
-             
-             'vapor_pressure.Wagner_fitting_jacobian',
-             'vapor_pressure.Wagner_original_fitting_jacobian',
-             'vapor_pressure.Antoine_fitting_jacobian',
-             
-             'dippr.EQ102_fitting_jacobian',
-             'dippr.EQ101_fitting_jacobian',
-             'dippr.EQ106_fitting_jacobian',
-             'dippr.EQ105_fitting_jacobian',
-             'dippr.EQ107_fitting_jacobian',
-             'dippr.EQ102',
-             
-             'vapor_pressure.Yaws_Psat_fitting_jacobian',
-             'viscosity.mu_Yaws_fitting_jacobian',
-             ]
-        normal_fluids.numba.transform_lists_to_arrays(normal, to_change, __funcs, cache_blacklist=cache_blacklist)
-
-        for mod in new_mods:
-            mod.__dict__.update(__funcs)
-            try:
-                __all__.extend(mod.__all__)
-            except AttributeError:
-                pass
-
     transform_complete_chemicals(replaced, __funcs, __all__, normal, vec=False)
     gdct.update(__funcs)
     gdct.update(replaced)

@@ -64,6 +64,16 @@ def mark_as_numba(func):
     func = pytest.mark.skipif(numba is None, reason="Numba is missing")(func)
     return func
 
+@mark_as_numba
+def test_numba_vectorized_basics():
+    vectorized = chemicals.numba_vectorized.EQ102(np.array([301.0, 302.3]), 1.7096E-8, 1.1146, 0, 0, 0)
+    scalar = [chemicals.EQ102(T, 1.7096E-8, 1.1146, 0, 0, 0) for T in [301.0, 302.3]]
+    assert_close1d(vectorized, scalar, rtol=1e-13)
+    
+    args = (276370., -2090.1, 8.125, -0.014116, 0.0000093701, 0, 0, 0)
+    vectorized = chemicals.numba_vectorized.EQ100(np.array([300]), *args)
+    scalar = chemicals.EQ100(300, *args)
+    assert_close1d(vectorized, [scalar], rtol=1e-13)
 
 @mark_as_numba
 def test_return_1d_array():

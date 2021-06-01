@@ -36,10 +36,17 @@ __funcs = {}
 
 
 replaced = {}
-replaced, NUMERICS_SUBMOD = fluids.numba.create_numerics(replaced, vec=True)
-normal = normal_chemicals
+# replaced, NUMERICS_SUBMOD = fluids.numba.create_numerics(replaced, vec=True)
+# normal = normal_chemicals
 
-fluids.numba.transform_module(normal, __funcs, replaced, vec=True)
+# fluids.numba.transform_module(normal, __funcs, replaced, vec=True)
+
+replaced = fluids.numba.numerics_dict.copy()
+orig_file = __file__
+chemicals.numba.transform_complete_chemicals(replaced, __funcs, __all__, normal_chemicals, vec=True)
+
 
 globals().update(__funcs)
 globals().update(replaced)
+__name__ = chemicals.numba
+__file__ = orig_file
