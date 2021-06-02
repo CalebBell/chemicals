@@ -258,7 +258,7 @@ def Stiel_polar_factor(Psat, Pc, omega):
     Returns
     -------
     factor : float
-        Stiel polar factor of compound
+        Stiel polar factor of compound, [-]
 
     Notes
     -----

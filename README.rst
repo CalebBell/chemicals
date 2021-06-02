@@ -123,27 +123,28 @@ chemical properties is done by CASRN:
     >>> Pc(CAS_water)   # Critical pressure [Pa]
     22048320.0
     >>> Vc(CAS_water)   # Critical volume [m^3/mol]
-    5.6000000000000006e-05
+    5.600e-05
     >>> Hfus(CAS_water) # Heat of fusion [J/mol]
     6010.0
-    >>> Hfs(CAS_water)  # Solid heat of formation [J/mol] 
-    None 
+    >>> Hfs('101-81-5')  # Solid heat of formation of Diphenylmethane, [J/mol] 
+    71500.0
     >>> Hfl(CAS_water)  # Liquid heat of formation [J/mol]
     -285825.0
     >>> Hfg(CAS_water)  # Gas heat of formation [J/mol] 
     -241822.0
-    >>> S0s(CAS_water)  # Absolute solid enthalpy of formation [J/mol/K]
-    None
+    >>> S0s('101-81-5')  # Absolute solid enthalpy of formation of Diphenylmethane [J/mol/K]
+    239.3
     >>> S0l(CAS_water)  # Absolute liquid enthalpy of formation [J/mol/K]
     70.0
     >>> S0g(CAS_water)  # Absolute gas enthalpy of formation [J/mol/K]
     188.8
 
 Such "lookup functions" search through many databanks until the value for the 
-given CASRN is found. When no value is available, None is returned. Note that some 
-properties, including the solid heat of formation (Hfs) and absolute entropy of 
-formation (S0s) are missing for water. You can optionally pass a "method" to select 
-which from databank to retrieve data:
+given CASRN is found. When no value is available, None is returned. Note that chemicals
+is not a project to exhaustively obtain recommended property values for all properties
+and chemicals; it is a collection of cited and openly published data and equations.
+
+You can optionally pass a "method" to select  which from databank to retrieve data:
 
 .. code-block:: python
 
@@ -162,20 +163,21 @@ To view all available methods for a given chemical, just use the functions with
 The databanks can also be accessed through their respective module:
 
 >>> from chemicals.critical import critical_data_Yaws
->>> critical_data_Yaws
-                               Chemical       Tc  ...  omega        Zc
-CASRN                                             ...                 
-100-00-5           p-chloronitrobenzene   751.00  ...  0.491  0.275355
-100-01-6                 p-nitroaniline   851.00  ...  0.782  0.253621
-100-10-7    p-dimethylaminobenzaldehyde   832.00  ...  0.527  0.209027
-100-18-5           p-diisopropylbenzene   689.00  ...  0.390  0.255749
-100-21-0              terephthalic acid  1113.00  ...  1.059  0.180981
-                                ...      ...  ...    ...       ...
-99814-65-0            1-pentadeceN-3-ol   713.00  ...    NaN  0.215149
-999-21-3                diallyl maleate   693.00  ...  0.789  0.245054
-999-52-0                3-chloroheptane   621.08  ...  0.418  0.248495
-999-78-0         4,4-dimethyl-2-pentyne   552.81  ...  0.191  0.281303
-999-97-3           hexamethyldisilazane   544.00  ...  0.510  0.260213
+>>> critical_data_Yaws # doctest: +SKIP
+                               Chemical       Tc         Pc        Vc  omega        Zc
+CASRN                                                                                 
+100-00-5           p-chloronitrobenzene   751.00  3980000.0  0.000432  0.491  0.275355
+100-01-6                 p-nitroaniline   851.00  4420000.0  0.000406  0.782  0.253621
+100-10-7    p-dimethylaminobenzaldehyde   832.00  3070000.0  0.000471  0.527  0.209027
+100-18-5           p-diisopropylbenzene   689.00  2450000.0  0.000598  0.390  0.255749
+100-21-0              terephthalic acid  1113.00  3950000.0  0.000424  1.059  0.180981
+...                                 ...      ...        ...       ...    ...       ...
+99814-65-0            1-pentadeceN-3-ol   713.00  1500000.0  0.000850    NaN  0.215149
+999-21-3                diallyl maleate   693.00  2330000.0  0.000606  0.789  0.245054
+999-52-0                3-chloroheptane   621.08  2693000.0  0.000476  0.418  0.248495
+999-78-0         4,4-dimethyl-2-pentyne   552.81  3416000.0  0.000378  0.191  0.281303
+999-97-3           hexamethyldisilazane   544.00  1920000.0  0.000613  0.510  0.260213
+
 [7549 rows x 6 columns]
 
 An extensive set of functions for calculating all sorts of chemical properties 
@@ -184,7 +186,7 @@ are available along with their respective coefficients for a wide range of chemi
 >>> from chemicals import Antoine
 >>> from chemicals.vapor_pressure import Psat_data_AntoinePoling
 >>> antoine_coefficients = Psat_data_AntoinePoling.loc[CAS_water] # For calculating saturated vapor pressure 
->>> antoine_coefficients
+>>> antoine_coefficients  # doctest: +SKIP
 Chemical     water 
 A              10.1
 B          1.69e+03
@@ -195,20 +197,20 @@ Name: 7732-18-5, dtype: object
 >>> _, A, B, C, *_ = antoine_coefficients
 >>> T = 373.15 # Temperature [K]
 >>> Antoine(T, A, B, C) # Vapor pressure [Pa]
-101047.25357066597
+101047.2535
 
 To use JIT compiled functions, import the `numba` module:
 
 >>> from chemicals import numba
 >>> numba.Antoine(T, A, B, C)
-101047.25357066603
+101047.2535
 
 To use Quantity objects, import the `units` module: 
 
 >>> from chemicals import units
 >>> from chemicals.units import u
 >>> units.Antoine(T * u.K, A, B * u.K, C * u.K)
-101047.25357 pascal
+<Quantity(101047.254, 'pascal')>
 
 To use vectorized functions, import the `vectorized` module:
 

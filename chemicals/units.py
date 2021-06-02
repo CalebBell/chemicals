@@ -89,13 +89,18 @@ variable_output_unit_funcs = {
                   }, 6),
 }
 
-
+unwrapped_objects = frozenset(['PeriodicTable'])
 for name in dir(chemicals):
     if name == '__getattr__' or name == '__test__':
         continue
     obj = getattr(chemicals, name)
     if isinstance(obj, types.FunctionType):
         obj = wraps_numpydoc(u)(obj)
+    elif type(obj) == type:
+        if obj.__name__ not in unwrapped_objects:
+            obj = wrap_numpydoc_obj(obj)
+    elif type(obj) is types.ModuleType:
+        continue
     elif isinstance(obj, str):
         continue
     if name == '__all__':

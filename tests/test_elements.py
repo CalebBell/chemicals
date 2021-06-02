@@ -143,6 +143,10 @@ def test_misc_elements():
     assert (periodic_table.N.CAS, periodic_table.N.CAS_standard) == ('17778-88-0', '7727-37-9')
     assert (periodic_table.F.CAS, periodic_table.F.CAS_standard) == ('14762-94-8', '7782-41-4')
     assert (periodic_table.Cl.CAS, periodic_table.Cl.CAS_standard) == ('22537-15-1', '7782-50-5')
+    
+    
+    assert periodic_table.Os.neutrons == 114
+    assert periodic_table.Bi.neutrons == 126
 
 def test_Hill_formula():
     Hill_formulas = {'ClNa': {'Na': 1, 'Cl': 1}, 'BrI': {'I': 1, 'Br': 1},

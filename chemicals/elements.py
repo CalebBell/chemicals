@@ -180,7 +180,7 @@ class PeriodicTable:
     Parameters
     ----------
     elements : list[Element]
-        List of Element objects
+        List of Element objects, [-]
 
     Notes
     -----
@@ -255,49 +255,49 @@ class Element:
     Attributes
     ----------
     number : int
-        Atomic number
+        Atomic number, [-]
     name : str
-        name
+        name, [-]
     symbol : str
-        Elemental symbol
+        Elemental symbol, [-]
     MW : float
-        Molecular weight
+        Molecular weight, [g/mol]
     CAS : str
-        CAS number
+        CAS number, [-]
     period : str
-        Period in the periodic table
+        Period in the periodic table, [-]
     group : str
-        Group in the periodic table
+        Group in the periodic table, [-]
     block : str
-        Block in the periodic table
+        Block in the periodic table, [-]
     AReneg : float
-        Allred and Rochow electronegativity
+        Allred and Rochow electronegativity, [-]
     rcov : float
         Covalent radius, [Angstrom]
     rvdw : float
         Van der Waals radius, [Angstrom]
     maxbonds : float
-        Maximum valence of a bond with this element
+        Maximum valence of a bond with this element, [-]
     elneg : float
-        Pauling electronegativity
+        Pauling electronegativity, [-]
     ionization : float
         Ionization potential, [eV]
     ionization : float
         elaffinity affinity, [eV]
     protons : int
-        Number of protons
+        Number of protons, [-]
     electrons : int
-        Number of electrons of the element in the ground state
+        Number of electrons of the element in the ground state, [-]
     InChI : str
-        Standard InChI string of the element
+        Standard InChI string of the element, [-]
     InChI_key : str
-        25-character hash of the compound's InChI.
+        25-character hash of the compound's InChI, [-]
     smiles : str
-        Standard smiles string of the element
+        Standard smiles string of the element, [-]
     PubChem : int
-        PubChem Compound identifier (CID) of the chemical
+        PubChem Compound identifier (CID) of the chemical, [-]
     phase : str
-        Standard state at 1 atm and 298.15 K
+        Standard state at 1 atm and 298.15 K, [-]
     Hf : float
         Enthalpy of formation of the element in its standard state (0 by
         definition), [J/mol]
@@ -359,6 +359,11 @@ class Element:
     def electrons(self):
         r'''The number of electrons of the element.'''
         return self.number
+
+    @property
+    def neutrons(self):
+        r'''The number of neutrons of the element.'''
+        return int(round(self.MW - self.number, 0))
 
     @property
     def smiles(self):
@@ -533,7 +538,7 @@ class directly.
 A brief overview of using the periodic table and its elements:
 
 >>> periodic_table.Na
-<Element Sodium (Na) number 11, MW=22.98977>
+<Element Sodium (Na), number 11, MW=22.98977>
 >>> periodic_table.U.MW
 238.02891
 >>> periodic_table['Th'].CAS
@@ -542,15 +547,30 @@ A brief overview of using the periodic table and its elements:
 82
 >>> periodic_table['7440-57-5'].symbol
 'Au'
->> len(periodic_table)
+>>> len(periodic_table)
 118
 >>> 'gold' in periodic_table
 True
->>> periodic_table.He.electrons, periodic_table.He.phase, periodic_table.He.Hf, periodic_table.He.S0
-(2, 'g', 0.0, 126.2)
+>>> periodic_table.He.protons, periodic_table.He.neutrons, periodic_table.He.electrons # Standard number of protons, neutrons, electrons
+(2, 2, 2)
+>>> periodic_table.He.phase # Phase of the element in the standard state
+'g'
+>>> periodic_table.He.Hf # Heat of formation in standard state in J/mol - by definition 0
+0.0
+>>> periodic_table.He.S0 # Absolute entropy (J/(mol*K) in standard state - non-zero)
+126.2
 >>> periodic_table.Kr.block, periodic_table.Kr.period, periodic_table.Kr.group
 ('p', 4, 18)
-
+>>> periodic_table.Rn.InChI
+'Rn'
+>>> periodic_table.Rn.smiles
+'[Rn]'
+>>> periodic_table.Pu.number
+94
+>>> periodic_table.Pu.PubChem
+23940
+>>> periodic_table.Bi.InChI_key
+'JCXGWMGPZLAOME-UHFFFAOYSA-N'
 '''
 del openbabel_element_data
 

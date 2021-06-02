@@ -14,7 +14,7 @@ calculation of:
 
 - Chemical constants including formula, molecular weight, normal boiling and 
   melting points, triple point, heat of formation, absolute entropy of 
-  formation, heat of fusion, similarity variable, dipole moment, accentric 
+  formation, heat of fusion, similarity variable, dipole moment, acentric 
   factor, etc.
   
 - Assorted information of safety and toxicity of chemicals.
@@ -22,12 +22,12 @@ calculation of:
 - Methods (and their respective coefficients) for the calculation of temperature
   and pressure dependent chemical properties including vapor pressure, 
   heat capacity, molar volume, thermal conductivity, surface tension, dynamic 
-  viscosity, heat of vaporization, relative permitivity, etc.
+  viscosity, heat of vaporization, relative permittivity, etc.
   
 - Methods to solve thermodynamic phase equilibrium, including flash routines, 
   vapor-liquid equilibrium constant correlations, and both numerical and 
-  analytical solutions for the Rashford Rice and Li-Johns-Ahmadi equations. 
-  Rashford Rice solutions for systems of 3 or more phases are also available.
+  analytical solutions for the Rachford Rice and Li-Johns-Ahmadi equations. 
+  Rachford Rice solutions for systems of 3 or more phases are also available.
 
 Data for over 20,000 chemicals are made available as local databanks in this 
 library. All databanks are loaded on-demand, saving loading time and RAM. For
@@ -49,8 +49,9 @@ If you need to know something about a chemical, give chemicals a try.
 
 .. toctree::
    :maxdepth: 1
-   :numbered:
    :caption: Tutorial
+
+   tutorial.rst
 
 .. toctree::
    :maxdepth: 2
@@ -84,6 +85,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.thermal_conductivity
    chemicals.triple
    chemicals.utils
+   chemicals.units
    chemicals.vapor_pressure
    chemicals.vectorized
    chemicals.virial

@@ -438,3 +438,6 @@ def test_Yaws_Psat():
 
 def test_TDE_PVExpansion():
     assert_close(TDE_PVExpansion(T=273.16, a1=23.7969+log(1000), a2=-11422, a3=0.177978), 4.062206573980815e-05, rtol=1e-14)
+    
+    # overflow
+    TDE_PVExpansion(**{'T': 203.65, 'a1': 1.0, 'a2': 1.0, 'a3': 1.0, 'a4': 0.0, 'a5': 1.0, 'a6': 0, 'a7': 0, 'a8': 0})

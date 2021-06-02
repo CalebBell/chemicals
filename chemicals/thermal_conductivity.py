@@ -220,7 +220,7 @@ def PPDS8(T, Tc, a0, a1, a2, a3):
     References
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
-    https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondSatL/PPDS8.htm
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondSatL/PPDS8.htm
     '''
     tau = 1.0 - T/Tc
     tau_cbrt = tau**(1.0/3.0)
@@ -264,7 +264,7 @@ def PPDS3(T, Tc, a1, a2, a3):
     References
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
-    https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondG/PPDS3-ThermCondGas.htm
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondG/PPDS3-ThermCondGas.htm
     '''
     Tr = T/Tc
     Tr_inv = 1.0/Tr
@@ -2087,7 +2087,7 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     Vc : float
         Critical volume of the gas [m^3/mol]
     Zc : float
-        Critical compressibility of the gas []
+        Critical compressibility of the gas [-]
     omega : float
         Acentric factor of the gas [-]
     Cvm : float

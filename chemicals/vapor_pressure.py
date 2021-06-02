@@ -171,7 +171,7 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
 
 import os
 from fluids.constants import R
-from fluids.numerics import numpy as np
+from fluids.numerics import numpy as np, trunc_exp
 from math import e
 from chemicals.utils import log, log10, exp, sqrt, isnan
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
@@ -303,7 +303,7 @@ def TDE_PVExpansion(T, a1, a2, a3, a4=0.0, a5=0.0, a6=0.0, a7=0.0, a8=0.0):
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-PhaseBoundaryLG/PVExpansion.htm
     '''
     T2 = T*T
-    return exp(a1 + a2/T + a3*log(T) + a4*T + a5*T2 + a6/T2 + a7*T2*T2*T2 + a8/(T2*T2))
+    return trunc_exp(a1 + a2/T + a3*log(T) + a4*T + a5*T2 + a6/T2 + a7*T2*T2*T2 + a8/(T2*T2))
 
 def Yaws_Psat(T, A, B, C, D, E):
     r'''Calculates vapor pressure of a chemical using the Yaws equation for

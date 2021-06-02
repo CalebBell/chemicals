@@ -225,18 +225,17 @@ class ZabranskySpline(object):
     Parameters
     ----------
     coeffs : list[float]
-        Six coefficients for the equation.
+        Six coefficients for the equation, [-]
     Tmin : float
-        Minimum temperature any experimental data was available at.
+        Minimum temperature any experimental data was available at, [K]
     Tmax : float
-        Maximum temperature any experimental data was available at.
+        Maximum temperature any experimental data was available at, [K]
 
     References
     ----------
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-
     '''
     try:
         IS_NUMBA
@@ -323,20 +322,19 @@ class ZabranskyQuasipolynomial(object):
     Parameters
     ----------
     coeffs : list[float]
-        Six coefficients for the equation.
+        Six coefficients for the equation, [-]
     Tc : float
-        Critical temperature of the chemical, as used in the formula.
+        Critical temperature of the chemical, as used in the formula, [K]
     Tmin : float
-        Minimum temperature any experimental data was available at.
+        Minimum temperature any experimental data was available at, [K]
     Tmax : float
-        Maximum temperature any experimental data was available at.
+        Maximum temperature any experimental data was available at, [K]
 
     References
     ----------
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-
     '''
     try:
         IS_NUMBA
@@ -423,7 +421,7 @@ class PiecewiseHeatCapacity(object):
     Parameters
     ----------
     models : Iterable[HeatCapacity]
-        Piecewise heat capacity objects.
+        Piecewise heat capacity objects, [-]
 
     """
     # Dev note - not possible to jitclass this as the model types are not explicit

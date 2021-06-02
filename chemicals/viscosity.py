@@ -1066,7 +1066,7 @@ def mu_TDE(T, A, B, C, D):
     References
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
-    https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscositySatL/ViscosityL.htm.
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscositySatL/ViscosityL.htm.
     '''
     T_inv = 1.0/T
     expr = A + T_inv*(B + T_inv*(C + D*T_inv))
@@ -1110,7 +1110,7 @@ def PPDS5(T, Tc, a0, a1, a2):
     References
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
-    https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscosityG/PPDS5-ViscosityGas.htm.
+       https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscosityG/PPDS5-ViscosityGas.htm.
     '''
     Tr = T/Tc
     return a0*Tr/(1.0 + a1*(Tr - 1.0)*Tr**a2)**(1.0/6.0)

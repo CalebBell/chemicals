@@ -112,7 +112,7 @@ def Tt_methods(CASRN):
     return methods
 
 @mark_numba_incompatible
-def Tt(CASRN, get_methods=False, method=None):
+def Tt(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's triple temperature.
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
@@ -197,7 +197,7 @@ def Pt_methods(CASRN):
     return list_available_methods_from_df_dict(Pt_sources, CASRN, 'Pt')
 
 @mark_numba_incompatible
-def Pt(CASRN, get_methods=False, method=None):
+def Pt(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's triple pressure.
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
@@ -218,9 +218,6 @@ def Pt(CASRN, get_methods=False, method=None):
     -------
     Pt : float
         Triple point pressure, [Pa]
-    methods : list, only returned if get_methods == True
-        List of methods which can be used to obtain Pt with the
-        given inputs
 
     Other Parameters
     ----------------

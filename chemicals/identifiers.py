@@ -73,9 +73,11 @@ __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
 import os
 from io import open
 from chemicals.utils import mark_numba_incompatible
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data, to_num
+from chemicals.utils import (PY37, source_path, os_path_join, can_load_data, 
+                             to_num)
 from chemicals.elements import (periodic_table, homonuclear_elements,
-                             charge_from_formula, serialize_formula)
+                                charge_from_formula, serialize_formula, 
+                                simple_formula_parser)
 
 
 folder = os_path_join(source_path, 'Identifiers')
@@ -388,6 +390,11 @@ class ChemicalMetadataDB(object):
 
         f.close()
 
+    def __iter__(self):
+        if not self.finished_loading:
+            self.autoload_main_db()
+        return iter(i for i in self.InChI_key_index.values())
+
     @property
     def finished_loading(self):
         '''Whether or not the database has loaded the main database.
@@ -459,7 +466,13 @@ def CAS_from_any(ID, autoload=False, cache=True):
     Parameters
     ----------
     ID : str
-        One of the name formats described by `search_chemical`
+        One of the name formats described by `search_chemical`, [-]
+    autoload : bool, optional
+        Whether to load new chemical databanks during the search if a hit is
+        not immediately found, [-]
+    cache : bool, optional
+        Whether or not to cache the search for faster lookup in subsequent
+        queries, [-]
 
     Returns
     -------
@@ -555,6 +568,12 @@ def search_chemical(ID, autoload=False, cache=True):
     ----------
     ID : str
         One of the name formats described above
+    autoload : bool, optional
+        Whether to load new chemical databanks during the search if a hit is
+        not immediately found, [-]
+    cache : bool, optional
+        Whether or not to cache the search for faster lookup in subsequent
+        queries, [-]
 
     Returns
     -------
