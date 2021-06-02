@@ -201,8 +201,8 @@ Name: 7732-18-5, dtype: object
 
 To use JIT compiled functions, import the `numba` module:
 
->>> from chemicals import numba
->>> numba.Antoine(T, A, B, C)
+>>> from chemicals import numba  # doctest: +SKIP
+>>> numba.Antoine(T, A, B, C)  # doctest: +SKIP
 101047.2535
 
 To use Quantity objects, import the `units` module: 
