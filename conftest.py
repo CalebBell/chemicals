@@ -6,7 +6,7 @@ ver_tup = tuple(int(i) for i in ver_tup)
 
 def pytest_ignore_collect(path):
     path = str(path)
-    if 'benchmark' in path or 'manual_runner' in path or 'make_test_stubs' in path or 'plot' in path or 'prerelease' in path:
+    if 'benchmark' in path or 'manual_runner' in path or 'make_test_stubs' in path or 'plot' in path or 'prerelease' in path or 'conf.py' in path:
         return True
     if 'dev' in path:
         return True 
