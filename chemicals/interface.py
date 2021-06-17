@@ -143,9 +143,9 @@ __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
 
 import os
 from fluids.numerics import numpy as np
-from fluids.constants import N_A, k
+from fluids.constants import N_A, k, root_two
 from chemicals.utils import log, exp, sqrt
-from chemicals.utils import mixing_simple, PY37, source_path, os_path_join, can_load_data
+from chemicals.utils import mixing_simple, PY37, source_path, os_path_join, can_load_data, mark_numba_incompatible
 from chemicals.data_reader import register_df_source, data_source
 
 folder = os_path_join(source_path, 'Interface')
@@ -158,6 +158,7 @@ register_df_source(folder, 'SomayajuluRevised.tsv')
 register_df_source(folder, 'VDI PPDS surface tensions.tsv')
 
 _interface_dfs_loaded = False
+@mark_numba_incompatible
 def load_interface_dfs():
     global _interface_dfs_loaded, sigma_data_Mulero_Cachadina, sigma_values_Mulero_Cachadina
     global sigma_data_Jasper_Lange, sigma_values_Jasper_Lange
@@ -1149,7 +1150,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
         Vms[i] = 1e3/rhoms[i]
         rho += xs[i]*Vms[i]
 #    rho = 1./rho
-    rho = 1.4142135623730951/rho # factor out rt2
+    rho = root_two/rho # factor out rt2
     # For speed, transform the Vms array to contain
 #    xs[i]*Vms[i]*sigmas_05[i]*rho
     tot = 0.0

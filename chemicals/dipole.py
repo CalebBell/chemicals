@@ -39,7 +39,7 @@ __all__ = ['dipole_moment',
            'dipole_moment_methods',
            'dipole_moment_all_methods']
 
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data, mark_numba_incompatible
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -60,6 +60,7 @@ register_df_source(folder, 'Muller Supporting Info Dipoles.csv')
 
 
 _dipole_data_loaded = False
+@mark_numba_incompatible
 def _load_dipole_data():
     global dipole_data_CCDB, dipole_data_Muller, dipole_data_Poling, dipole_sources
     dipole_data_CCDB = data_source('cccbdb.nist.gov Dipoles.csv')
@@ -86,6 +87,7 @@ else: # pragma: no cover
 dipole_moment_all_methods = (CCCBDB, MULLER, POLING)
 '''Tuple of method name keys. See the `dipole` for the actual references'''
 
+@mark_numba_incompatible
 def dipole_moment_methods(CASRN):
     """Return all methods available to obtain the dipole moment for the desired
     chemical.
@@ -108,6 +110,7 @@ def dipole_moment_methods(CASRN):
     if not _dipole_data_loaded: _load_dipole_data()
     return list_available_methods_from_df_dict(dipole_sources, CASRN, 'Dipole')
 
+@mark_numba_incompatible
 def dipole_moment(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's dipole moment.
     Lookup is based on CASRNs. Will automatically select a data source to use

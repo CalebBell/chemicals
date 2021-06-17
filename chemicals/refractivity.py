@@ -70,7 +70,7 @@ from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
-                                   list_available_methods_from_df_dict)
+                                   list_available_methods_from_df_dict,)
 
 
 # Register data sources and lazy load them
@@ -82,6 +82,7 @@ register_df_source(folder, 'CRC Handbook Organic RI.csv',
 CRC = 'CRC'
 
 _RI_data_loaded = False
+@mark_numba_incompatible
 def _load_RI_data():
     global _RI_data_loaded, RI_data_CRC_organic, RI_sources
     RI_data_CRC_organic = data_source('CRC Handbook Organic RI.csv')

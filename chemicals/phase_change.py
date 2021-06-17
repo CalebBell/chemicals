@@ -164,6 +164,7 @@ OPEN_NTBKM = 'OPEN_NTBKM'
 CRC = 'CRC'
 
 _phase_change_const_loaded = False
+@mark_numba_incompatible
 def _load_phase_change_constants():
     global Tb_data_Yaws, Tm_ON_data, Hvap_data_Gharagheizi, Hvap_data_CRC
     global Hfus_data_CRC, Hsub_data_Gharagheizi, _phase_change_const_loaded
@@ -191,6 +192,7 @@ def _load_phase_change_constants():
 
 
 _phase_change_corrs_loaded = False
+@mark_numba_incompatible
 def _load_phase_change_correlations():
     global phase_change_data_Perrys2_150, phase_change_values_Perrys2_150
     global phase_change_data_VDI_PPDS_4, phase_change_values_VDI_PPDS_4

@@ -173,7 +173,7 @@ import os
 from fluids.constants import R
 from fluids.numerics import numpy as np, trunc_exp
 from math import e
-from chemicals.utils import log, log10, exp, sqrt, isnan
+from chemicals.utils import log, log10, exp, sqrt, isnan, mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.dippr import EQ101
 from chemicals import miscdata
@@ -201,6 +201,7 @@ register_df_source(folder, 'VDI PPDS Boiling temperatures at different pressures
                  'B': float, 'C': float, 'D': float}})
 
 _vapor_pressure_dfs_loaded = False
+@mark_numba_incompatible
 def load_vapor_pressure_dfs():
     global Psat_data_WagnerMcGarry, Psat_values_WagnerMcGarry, Psat_data_AntoinePoling, Psat_values_AntoinePoling
     global Psat_data_WagnerPoling, Psat_values_WagnerPoling, Psat_data_AntoineExtended, Psat_values_AntoineExtended

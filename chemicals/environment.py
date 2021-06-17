@@ -75,6 +75,7 @@ register_df_source(folder, 'Syrres logP data.csv.gz',
                    csv_kwargs={'compression': 'gzip'})
 
 _GWP_ODP_data_loaded = False
+@mark_numba_incompatible
 def _load_GWP_ODP_data():
     global _GWP_ODP_data_loaded, GWP_data, ODP_data
     global _GWP_keys_by_method, _ODP_keys_by_method
@@ -99,6 +100,7 @@ def _load_GWP_ODP_data():
     }
 
 _logP_data_loaded = False
+@mark_numba_incompatible
 def _load_logP_data():
     global _logP_data_loaded, logP_data_CRC, logP_data_Syrres, logP_sources
     logP_data_CRC = data_source('CRC logP table.tsv')

@@ -136,7 +136,7 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 
 from fluids.numerics import bisplev, implementation_optimize_tck, numpy as np, trunc_exp
 from fluids.constants import R, R_inv, N_A, k, pi
-from chemicals.utils import log, exp, sqrt, atan, PY37, source_path, os_path_join, can_load_data
+from chemicals.utils import log, exp, sqrt, atan, PY37, source_path, os_path_join, can_load_data, mark_numba_incompatible
 from chemicals.data_reader import register_df_source, data_source
 from chemicals.viscosity import Herning_Zipperer
 
@@ -149,6 +149,7 @@ register_df_source(folder, 'VDI PPDS Thermal conductivity of saturated liquids.t
 register_df_source(folder, 'VDI PPDS Thermal conductivity of gases.tsv', csv_kwargs={'float_precision': 'legacy'})
 
 _k_data_loaded = False
+@mark_numba_incompatible
 def _load_k_data():
     global _k_data_loaded, k_data_Perrys_8E_2_314, k_values_Perrys_8E_2_314
     global k_data_Perrys_8E_2_315, k_values_Perrys_8E_2_315, k_data_VDI_PPDS_9

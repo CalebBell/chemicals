@@ -183,9 +183,9 @@ __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 
 
 import os
 from fluids.numerics import np, splev, implementation_optimize_tck
-from fluids.constants import R, atm_inv
+from fluids.constants import R, atm_inv, root_two
 from chemicals.utils import log, exp, isnan, sqrt
-from chemicals.utils import Vm_to_rho, mixing_simple
+from chemicals.utils import Vm_to_rho, mixing_simple, mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.data_reader import data_source, register_df_source
 
@@ -206,6 +206,7 @@ register_df_source(folder, 'CRC Virial polynomials.tsv', csv_kwargs={
 
 
 _rho_data_loaded = False
+@mark_numba_incompatible
 def _load_rho_data():
     global _rho_data_loaded, rho_data_COSTALD, rho_data_SNM0
     global rho_data_Perry_8E_105_l, rho_values_Perry_8E_105_l
@@ -1323,7 +1324,6 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
         sum3 += v*p
         omega += xs[i]*omegas[i]
 
-    root_two = 1.4142135623730951 #2.0**0.5
     Vm = 0.25*(sum1 + 3.0*sum2*sum3)
     Vm_inv_root = root_two*(Vm)**-0.5
     vec = [0.0]*N

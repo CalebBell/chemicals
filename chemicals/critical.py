@@ -115,6 +115,7 @@ YAWS = 'YAWS'
 
 ### Register data sources and lazy load them
 
+@mark_numba_incompatible
 def _add_Zc_to_df(df):
     # Some files don't have the `Zc` column; this adds it
     # TODO: Think about adding these to the files
@@ -135,6 +136,7 @@ register_df_source(folder, 'Appendix to PSRK Revision 4.tsv', postload=_add_Zc_t
 register_df_source(folder, 'PassutDanner1973.tsv')
 register_df_source(folder, 'Yaws Collection.tsv', postload=_add_Zc_to_df)
 _critical_data_loaded = False
+@mark_numba_incompatible
 def _load_critical_data():
     global critical_data_IUPAC, critical_data_Matthews, critical_data_CRC
     global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner
@@ -1261,6 +1263,7 @@ MEISSNER = 'MEISSNER'
 GRIGORAS = 'GRIGORAS'
 critical_surface_all_methods = (IHMELS, MEISSNER, GRIGORAS)
 
+@mark_numba_incompatible
 def critical_surface_methods(Tc=None, Pc=None, Vc=None):
     """Return all methods available to obtain the third critial property for the
     desired chemical.
@@ -1291,6 +1294,7 @@ def critical_surface_methods(Tc=None, Pc=None, Vc=None):
     else:
         return []
 
+@mark_numba_incompatible
 def critical_surface(Tc=None, Pc=None, Vc=None,
                      method=None):
     r'''Function for calculating a critical property of a substance from its
@@ -1326,6 +1330,7 @@ def critical_surface(Tc=None, Pc=None, Vc=None,
     critical_surface_methods_methods
 
     '''
+    # Numba compatibility should come eventually with no work done here
     if not method or method == IHMELS:
         return Ihmels(Tc=Tc, Pc=Pc, Vc=Vc)
     elif method == MEISSNER:
@@ -1333,8 +1338,9 @@ def critical_surface(Tc=None, Pc=None, Vc=None,
     elif method == GRIGORAS:
         return Grigoras(Tc=Tc, Pc=Pc, Vc=Vc)
     else:
-        raise ValueError('invalid method %s'%method)
+        raise ValueError('Method not recognized; available methods are "IHMELS", "MEISSNER", and "GRIGORAS"')
 
+@mark_numba_incompatible
 def third_property(CASRN=None, T=False, P=False, V=False):
     r'''Function for calculating a critical property of a substance from its
     other two critical properties, but retrieving the actual other critical

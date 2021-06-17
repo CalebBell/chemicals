@@ -185,7 +185,7 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9
 from fluids.numerics import secant, interp, numpy as np, trunc_exp
 from chemicals.utils import log, exp, sqrt, atan, tan, sin, acos
 
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data, mark_numba_incompatible
 from chemicals.data_reader import register_df_source, data_source
 
 
@@ -215,6 +215,7 @@ register_df_source(folder, 'VDI PPDS Dynamic viscosity of gases polynomials.tsv'
 
 
 _mu_data_loaded = False
+@mark_numba_incompatible
 def _load_mu_data():
     global _mu_data_loaded, mu_data_Dutt_Prasad, mu_values_Dutt_Prasad
     global mu_data_VN3, mu_values_VN3, mu_data_VN2, mu_values_VN2
