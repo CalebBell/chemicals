@@ -1118,7 +1118,7 @@ def charge_from_formula(formula):
     positive = '+' in formula
     if positive and negative:
         raise ValueError('Both negative and positive signs were found in the formula; only one sign is allowed')
-    elif not (positive or negative):
+    if not (positive or negative):
         return 0
     multiplier, sign = (-1, '-') if negative else (1, '+')
 
@@ -1135,8 +1135,7 @@ def charge_from_formula(formula):
         splits = formula.split(sign)
         if splits[1] == '' or splits[1] == ')':
             return multiplier
-        else:
-            return multiplier*int(splits[1])
+        return multiplier*int(splits[1])
     else:
         return multiplier*count
 
