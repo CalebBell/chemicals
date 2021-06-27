@@ -171,7 +171,7 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
 
 import os
 from fluids.constants import R
-from fluids.numerics import numpy as np, trunc_exp
+from fluids.numerics import numpy as np, trunc_exp, trunc_log
 from math import e
 from chemicals.utils import log, log10, exp, sqrt, isnan, mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
@@ -826,9 +826,15 @@ def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
+
     log_base_inv = 1.0/log(base)
     Psat_inv = 1.0/Psat
-    A = log(Psat*exp(T*dPsat_dT*Psat_inv))*log_base_inv
+    # The expression from SymPy is as follows
+    #A = log(Psat*exp(T*dPsat_dT*Psat_inv))*log_base_inv
+    # However, that expression has overflows a lot
+    # Mathematical manipulation yields the following, which avoids overflows
+    A = (T*dPsat_dT*Psat_inv + log(Psat))*log_base_inv
+
     B = T*T*dPsat_dT*log_base_inv*Psat_inv
     return (A, B)
 

@@ -186,6 +186,12 @@ def test_test_Antoine_AB():
     AB = Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=exp(1))
     assert_close(A, AB[0])
     assert_close(B, AB[1])
+    
+    # Nasty overflow point
+    kwargs = {'T': 159.10000000000002, 'Psat': 0.0007352199499947608, 'dPsat_dT': 0.004770694513544764, 'base': 2.718281828459045}
+    AB = Antoine_AB_coeffs_from_point(**kwargs)
+    # Validated with mpmath
+    assert_close1d(AB, (1025.1525881065513, 164249.7374972777), rtol=1e-13)
 
 
 
