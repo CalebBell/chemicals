@@ -406,44 +406,54 @@ def test_db_vs_ChemSep():
     EVEN THAT HAS BEEN REDUCED By 80% by using cElementTree instead of
     ElementTree.
     """
+    import chemicals
+    ChemSep_data = chemicals.miscdata.ChemSep_data
+#     import xml.etree.cElementTree as ET
+#     folder = os.path.join(os.path.dirname(__file__), '..', 'chemicals', 'Misc')
 
-    import xml.etree.cElementTree as ET
-    folder = os.path.join(os.path.dirname(__file__), '..', 'chemicals', 'Misc')
+#     tree = ET.parse(os.path.join(folder, 'ChemSep8.26.xml'))
+#     root = tree.getroot()
 
-    tree = ET.parse(os.path.join(folder, 'ChemSep8.26.xml'))
-    root = tree.getroot()
+#     data = {}
+#     for child in root:
+#         CAS, name, smiles, formula = None, None, None, None
+#         for i in child:
+#             tag = i.tag
+#             if CAS is None and tag == 'CAS':
+#                 CAS = i.attrib['value']
+#             elif name is None and tag == 'CompoundID':
+#                 name = i.attrib['value']
+#             elif smiles is None and tag == 'Smiles':
+#                 smiles = i.attrib['value']
+#             elif formula is None and tag == 'StructureFormula':
+#                 formula = i.attrib['value']
+
+# #        CAS = [i.attrib['value'] if  ][0]
+# #        name = [i.attrib['value'] for i in child if i.tag ][0]
+# #        smiles = [i.attrib['value'] for i in child if i.tag == ]
+# #        formula = [i.attrib['value'] for i in child if i.tag == 'StructureFormula'][0]
+
+#         try:
+#             if '-' in formula:
+#                 formula = None
+#             else:
+#                 formula = serialize_formula(formula)
+#         except:
+#             pass
+#         if smiles:
+#             smiles = smiles[0]
+#         else:
+#             smiles = None
 
     data = {}
-    for child in root:
-        CAS, name, smiles, formula = None, None, None, None
-        for i in child:
-            tag = i.tag
-            if CAS is None and tag == 'CAS':
-                CAS = i.attrib['value']
-            elif name is None and tag == 'CompoundID':
-                name = i.attrib['value']
-            elif smiles is None and tag == 'Smiles':
-                smiles = i.attrib['value']
-            elif formula is None and tag == 'StructureFormula':
-                formula = i.attrib['value']
-
-#        CAS = [i.attrib['value'] if  ][0]
-#        name = [i.attrib['value'] for i in child if i.tag ][0]
-#        smiles = [i.attrib['value'] for i in child if i.tag == ]
-#        formula = [i.attrib['value'] for i in child if i.tag == 'StructureFormula'][0]
-
-        try:
-            if '-' in formula:
-                formula = None
-            else:
-                formula = serialize_formula(formula)
-        except:
-            pass
-        if smiles:
-            smiles = smiles[0]
+    for CAS, values in ChemSep_data.items():
+        formula = values['StructureFormula']
+        smiles = values.get('Smiles', None)
+        name = values['CompoundID']
+        if '-' in formula:
+            formula = None
         else:
-            smiles = None
-
+            formula = serialize_formula(formula)
         data[CAS] = {'name': name, 'smiles': smiles, 'formula': formula}
 
     for CAS, d in data.items():

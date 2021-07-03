@@ -74,6 +74,72 @@ def _load_CRC_data():
     CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
     _CRC_data_loaded = True
 
+_ChemSep_data_loaded = False
+def _load_ChemSep_data():
+    global _ChemSep_data_loaded, ChemSep_data
+    import xml.etree.cElementTree as ET
+    import os
+    tree = ET.parse(os.path.join(folder, 'ChemSep8.26.xml'))
+    root = tree.getroot()
+    T_dependent_property_tags = ['LiquidDensity',
+                 'VaporPressure', 
+                 'HeatOfVaporization', 'LiquidHeatCapacityCp',
+                 'IdealGasHeatCapacityCp', 'SecondVirialCoefficient',
+                 'LiquidViscosity',
+                 'VaporViscosity', 
+                 'LiquidThermalConductivity', 'VaporThermalConductivity', 'RPPHeatCapacityCp', 
+                 'RelativeStaticPermittivity', 'AntoineVaporPressure', 'LiquidViscosityRPS']
+    
+    constant_property_tags = ['LibraryIndex', 'CompoundID', 'StructureFormula', 'Family', 'CriticalTemperature',
+                  'CriticalPressure', 'CriticalVolume', 'CriticalCompressibility', 
+                  'NormalBoilingPointTemperature', 'NormalMeltingPointTemperature', 
+                  'TriplePointTemperature', 'TriplePointPressure', 'MolecularWeight',
+                  'LiquidVolumeAtNormalBoilingPoint', 'AcentricityFactor', 'SolubilityParameter',
+                  'DipoleMoment', 'HeatOfFormation', 'GibbsEnergyOfFormation', 'AbsEntropy',
+                  'HeatOfFusionAtMeltingPoint', 'HeatOfCombustion', 'COSTALDVolume', 'DiameterLJ', 
+                  'EnergyLJ', 'RacketParameter', 'FullerVolume', 'Parachor', 'SpecificGravity', 
+                  'Charge', 'CostaldAcentricFactor', 'WilsonVolume', 'ChaoSeaderAcentricFactor',
+                  'ChaoSeaderSolubilityParameter', 'ChaoSeaderLiquidVolume',
+                  'Smiles', 'VanDerWaalsVolume', 'VanDerWaalsArea', 'MatthiasCopemanC1',
+                  'MatthiasCopemanC2', 'MatthiasCopemanC3', 'UniquacR', 'UniquacQ']
+    
+    const_tag_set = frozenset(constant_property_tags)
+    prop_tags_set = frozenset(T_dependent_property_tags)
+
+    prop_coeff_names = ('A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax')
+    prop_coeff_names_set = frozenset(prop_coeff_names)
+    all_data = {}
+    for child in root:
+        compound_data = {'prop_data': {}}
+        for i in child:
+            tag = i.tag
+            if tag in const_tag_set:
+                v = i.attrib['value']
+                try:
+                    v = float(v)
+                except:
+                    pass
+                compound_data[tag] = v
+            if tag == 'CAS':
+                CAS = i.attrib['value']
+            if tag in prop_tags_set:
+                property_name = tag
+                eqn = None
+                some_coeffs = {}
+                for coeff_tag in i:
+                    if coeff_tag.tag == 'eqno':
+                        eqn = int(coeff_tag.attrib['value'])
+                    elif coeff_tag.tag in prop_coeff_names_set:
+                        prop =  float(coeff_tag.attrib['value'])
+                        some_coeffs[coeff_tag.tag] = prop
+                some_coeffs['eqn'] = eqn
+                compound_data['prop_data'][property_name] = some_coeffs
+        compound_data['CAS'] = CAS
+        all_data[CAS] = compound_data
+    ChemSep_data = all_data
+    return ChemSep_data
+
+
 if PY37:
     def __getattr__(name):
         if name in ('CRC_inorganic_data', 'CRC_organic_data'):
@@ -82,11 +148,14 @@ if PY37:
         elif name == 'VDI_saturation_dict':
             _load_VDI_saturation_dict()
             return VDI_saturation_dict
+        elif name == 'ChemSep_data':
+            return _load_ChemSep_data()
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
     if can_load_data:
         _load_CRC_data()
         _load_VDI_saturation_dict()
+        _load_ChemSep_data()
 
 ### VDI Saturation
 
