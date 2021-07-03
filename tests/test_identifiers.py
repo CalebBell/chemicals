@@ -401,16 +401,16 @@ def test_db_vs_ChemSep():
     and are ignored; otherwise it is a very effective test.
 
     DO NOT TRY TO OPTimizE THis FUNCTION - IT HAS ALREADY BEEN TRIED AND
-    FAILED AT. THE TIME IS ONLY TAKEN py the PARSE function.
+    FAILED AT. THE TIME IS ONLY TAKEN by the PARSE function.
 
     EVEN THAT HAS BEEN REDUCED By 80% by using cElementTree instead of
     ElementTree.
     """
 
     import xml.etree.cElementTree as ET
-    folder = os.path.join(os.path.dirname(__file__), 'Data')
+    folder = os.path.join(os.path.dirname(__file__), '..', 'chemicals', 'Misc')
 
-    tree = ET.parse(os.path.join(folder, 'chemsep1.xml'))
+    tree = ET.parse(os.path.join(folder, 'ChemSep8.26.xml'))
     root = tree.getroot()
 
     data = {}
