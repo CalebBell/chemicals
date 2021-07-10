@@ -1506,18 +1506,21 @@ def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
     Tc_n8 = Tc_inv4*Tc_inv4
     Tc_n12 = Tc_n8*Tc_inv4
     
+    v0 = - to - c0
+    
     for i in range(N):
         row = out[i]
         T = Ts[i]
-        x = (T - to - c0)/Tc
+        x = (T + v0)*Tc_inv
         if x < 0.0:
             x0 = C + T
             if x0 > 0.0:
                 x1 = 1.0/x0
                 x2 = 10.0**(A - B*x1)*ln_base
+                x1x2 = x1*x2
                 row[1] = x2
-                row[2] = -x1*x2
-                row[3] = B*x2*x1*x1
+                row[2] = -x1x2
+                row[3] = B*x1x2*x1
         else:
             x1 = -T + c0 + to
             x1_2 = x1*x1
