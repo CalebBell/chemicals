@@ -1497,13 +1497,16 @@ def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
     N = len(Ts)
 #    out = np.zeros((N, 7)) # numba: uncomment
     out = [[0.0]*7 for _ in range(N)] # numba: delete
-    ln_base = log(10)
+    ln_base = 2.302585092994046 #log(10)
     c0 = 273.15
     c1 = 0.43429
+    Tc_n12 = Tc**(-12.0)
+    Tc_n8 = Tc**(-8.0)
+    
     for i in range(N):
         row = out[i]
         T = Ts[i]
-        x = (T - to - 273.15)/Tc
+        x = (T - to - c0)/Tc
         if x < 0.0:
             x0 = C + T
             if x0 > 0.0:
@@ -1511,25 +1514,23 @@ def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
                 x2 = 10.0**(A - B*x1)*ln_base
                 row[1] = x2
                 row[2] = -x1*x2
-                row[3] = B*x2/(x0*x0)
+                row[3] = B*x2*x1*x1
         else:
-            x0 = Tc**(-12)
             x1 = -T + c0 + to
             x2 = -x1/Tc
             x3 = c1*x2**n
-            x4 = Tc**(-8)
-            x5 = x4*(E + F*x1**4/Tc**4)
+            x5 = Tc_n8*(E + F*x1**4/Tc**4)
             x6 = C + T
             x7 = 1/x6
             x8 = x1**8
             x9 = 10**(A - B*x7 + x3 + x5*x8)*ln_base
-            row[0] = x9*(4*F*x0*x1**11 + n*x3/x1 + 8*x1**7*x5)
+            row[0] = x9*(4*F*Tc_n12*x1**11 + n*x3/x1 + 8*x1**7*x5)
             row[1] = x9
             row[2] = -x7*x9
             row[3] = B*x9/x6**2
             row[4] = x3*x9*log(x2)
-            row[5] = x4*x8*x9
-            row[6] = x0*x1**12*x9
+            row[5] = Tc_n8*x8*x9
+            row[6] = Tc_n12*x1**12*x9
     return out
 
 def Wagner(T, Tc, Pc, a, b, c, d):
