@@ -24,7 +24,7 @@ SOFTWARE.
 import pytest
 import numpy as np
 import pandas as pd
-from fluids.numerics import assert_close, derivative, assert_close1d
+from fluids.numerics import assert_close, derivative, assert_close1d, jacobian, assert_close2d
 from chemicals.vapor_pressure import *
 from chemicals.vapor_pressure import Psat_data_WagnerMcGarry, Psat_data_AntoinePoling, Psat_data_WagnerPoling, Psat_data_AntoineExtended, Psat_data_Perrys2_8, Psat_data_VDI_PPDS_3
 from chemicals.identifiers import check_CAS
@@ -452,3 +452,39 @@ def test_TDE_PVExpansion():
     
     # overflow
     TDE_PVExpansion(**{'T': 203.65, 'a1': 1.0, 'a2': 1.0, 'a3': 1.0, 'a4': 0.0, 'a5': 1.0, 'a6': 0, 'a7': 0, 'a8': 0})
+    
+    
+def test_TRC_Antoine_extended_fitting_jacobian():
+    T, Tc = 180.0, 227.51
+    args_in = [-120., 8.95894, 510.595, -15.95, 2.41377, -93.74, 7425.9]
+    TRC_Antoine_extended(T, Tc, *args_in)
+    
+    def to_jac(args):
+        return TRC_Antoine_extended(T, Tc, *args)
+    
+    jac_num = jacobian(to_jac, args_in, scalar=True, perturbation=1e-6)
+    jac_analytical = TRC_Antoine_extended_fitting_jacobian([T], Tc, *args_in)
+    jac_expect = [[-363.615682458313, 1626355.201995779, -9913.777519023339, 30855.99044392394, -8683.023631650121, 0.0612020261205086, 1.1872467742453418e-05]]
+    jac_sympy = [[-363.615682458313801, 1626355.20199577895, -9913.77751902333938, 30855.9904439239311, -8683.02363165013643, 0.0612020261205090756, 0.0000118724677424535564]]
+    
+    assert_close2d([jac_num], jac_analytical, rtol=4e-3)
+    assert_close2d(jac_analytical, jac_expect, rtol=1e-12)
+    assert_close2d(jac_analytical, jac_sympy, rtol=1e-13)
+    
+    T = 120
+    # x = 0
+    jac_num = jacobian(to_jac, args_in, scalar=True, perturbation=1e-8)
+    jac_sympy_medium = [[0, 25938.6647261630280, -249.290386604161739, 1223.31979767565516, 0, 0, 0]]
+    jac_analytical_expect = [[0.0, 25938.66472616303, -249.2903866041618, 1223.3197976756558, 0.0, 0.0, 0.0]]
+    jac_analytical = TRC_Antoine_extended_fitting_jacobian([T], Tc, *args_in)
+    assert_close2d([jac_num], jac_analytical, rtol=1e-6)
+    assert_close2d(jac_analytical, jac_analytical_expect, rtol=1e-12)
+    assert_close2d(jac_analytical, jac_sympy_medium, rtol=1e-13)
+    
+    T = 10
+    # Hard zeros
+    jac_analytical = TRC_Antoine_extended_fitting_jacobian([T], Tc, *args_in)
+    jac_num = jacobian(to_jac, args_in, scalar=True, perturbation=1e-8)
+    jac_expect = [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]]
+    assert_close2d([jac_num], jac_analytical, rtol=0, atol=0)
+    assert_close2d(jac_expect, jac_analytical, rtol=0, atol=0)

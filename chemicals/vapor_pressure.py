@@ -59,6 +59,7 @@ Jacobians (for fitting)
 .. autofunction:: chemicals.vapor_pressure.Wagner_original_fitting_jacobian
 .. autofunction:: chemicals.vapor_pressure.Antoine_fitting_jacobian
 .. autofunction:: chemicals.vapor_pressure.Yaws_Psat_fitting_jacobian
+.. autofunction:: chemicals.vapor_pressure.TRC_Antoine_extended_fitting_jacobian
 
 Vapor Pressure Estimation Correlations
 --------------------------------------
@@ -166,7 +167,7 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
            'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
            'Wagner_fitting_jacobian', 'Yaws_Psat_fitting_jacobian',
-           'Antoine_fitting_jacobian',
+           'Antoine_fitting_jacobian', 'TRC_Antoine_extended_fitting_jacobian',
            'TDE_PVExpansion']
 
 import os
@@ -1456,6 +1457,79 @@ def Antoine_fitting_jacobian(Ts, A, B, C, base=10.0):
             row[0] = x2
             row[1] = -x1*x2
             row[2] =  B*x2*x1*x1
+    return out
+
+def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
+    r'''Calculates the jacobian of the TRC Antoine extended vapor pressure 
+    equation for use in fitting these parameters when experimental values are 
+    known.
+    
+    Requires 7 coefficients specific to each chemical.
+
+    Parameters
+    ----------
+    Ts : list[float]
+        Temperatures of fluid data points, [K]
+    Tc : float
+        Critical temperature of fluid, [K]
+    to : float
+        Fit temperature-transition parameter, [K]
+    A : float
+        Antoine `A` parameter, [-]
+    B : float
+        Antoine `B` parameter, [K]
+    C : float
+        Antoine `C` parameter, [K]
+    n : float
+        Fit parameter, [-]
+    E : float
+        Fit parameter, [-]
+    F : float
+        Fit parameter, [-]
+
+
+    Returns
+    -------
+    jac : list[list[float, 7], len(Ts)]
+        Matrix of derivatives of the equation with respect to the fitting
+        parameters, [various]
+    '''
+    N = len(Ts)
+#    out = np.zeros((N, 7)) # numba: uncomment
+    out = [[0.0]*7 for _ in range(N)] # numba: delete
+    ln_base = log(10)
+    c0 = 273.15
+    c1 = 0.43429
+    for i in range(N):
+        row = out[i]
+        T = Ts[i]
+        x = (T - to - 273.15)/Tc
+        if x < 0.0:
+            x0 = C + T
+            if x0 > 0.0:
+                x1 = 1.0/x0
+                x2 = 10.0**(A - B*x1)*ln_base
+                row[1] = x2
+                row[2] = -x1*x2
+                row[3] = B*x2/(x0*x0)
+        else:
+            x0 = Tc**(-12)
+            x1 = -T + c0 + to
+            x2 = -x1/Tc
+            x3 = c1*x2**n
+            x4 = Tc**(-8)
+            x5 = x4*(E + F*x1**4/Tc**4)
+            x6 = C + T
+            x7 = 1/x6
+            x8 = x1**8
+            x9 = 10**(A - B*x7 + x3 + x5*x8)*ln_base
+            row[0] = x9*(4*F*x0*x1**11 + n*x3/x1 + 8*x1**7*x5)
+            row[1] = x9
+            row[2] = -x7*x9
+            row[3] = B*x9/x6**2
+            row[4] = x3*x9*log(x2)
+            row[5] = x4*x8*x9
+            row[6] = x0*x1**12*x9
     return out
 
 def Wagner(T, Tc, Pc, a, b, c, d):

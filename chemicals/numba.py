@@ -60,6 +60,8 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
      'vapor_pressure.Wagner_fitting_jacobian',
      'vapor_pressure.Wagner_original_fitting_jacobian',
      'vapor_pressure.Antoine_fitting_jacobian',
+     'vapor_pressure.TRC_Antoine_extended_fitting_jacobian',
+     'vapor_pressure.Yaws_Psat_fitting_jacobian',
      
      'dippr.EQ102_fitting_jacobian',
      'dippr.EQ101_fitting_jacobian',
@@ -68,7 +70,6 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
      'dippr.EQ107_fitting_jacobian',
      'dippr.EQ102',
      
-     'vapor_pressure.Yaws_Psat_fitting_jacobian',
      'viscosity.mu_Yaws_fitting_jacobian',
      ]
 
