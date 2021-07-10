@@ -958,7 +958,10 @@ def TRC_Antoine_extended(T, Tc, to, A, B, C, n, E, F):
     if x < 0.0:
         x = 0.0
     x4 = x*x*x*x
-    return 10.**(A - B/(T+C) + 0.43429*x**n + x4*x4*(E + F*x4))
+    T_C = T + C
+    if T_C <= 0.0:
+        return 0.0
+    return 10.**(A - B/T_C + 0.43429*x**n + x4*x4*(E + F*x4))
 
 def dTRC_Antoine_extended_dT(T, Tc, to, A, B, C, n, E, F):
     r'''Calculates the first temperature derivative of vapor pressure of a

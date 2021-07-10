@@ -87,6 +87,7 @@ def test_Wagner():
 
 def test_TRC_Antoine_extended():
     # Tetrafluoromethane, coefficients from [1]_, at 180 K:
+    near_bad_Ts = [0, 1e-10, 1, 12, 13, 14, 15, 15.95, 15.96, 15.94, 16, 17]
     Psat = TRC_Antoine_extended(180.0, 227.51, -120., 8.95894, 510.595, -15.95, 2.41377, -93.74, 7425.9)
     assert_close(Psat, 706317.0898414153)
 
@@ -104,7 +105,7 @@ def test_TRC_Antoine_extended():
     assert_close(dPsat_dT_analytical, 31219.606126382252, rtol=1e-13)
     assert_close(dPsat_dT_numerical, dPsat_dT_analytical, rtol=1e-8)
 
-    for T in (0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307):
+    for T in [0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307] + near_bad_Ts:
         assert dTRC_Antoine_extended_dT(T, 227.51, -120., 8.95894, 510.595, -15.95, 2.41377, -93.74, 7425.9) == 0.0
 
     d2Psat_dT2_numerical = derivative(dTRC_Antoine_extended_dT, 180.0, dx=1e-3, args=(227.51, -120., 8.95894, 510.595, -15.95, 2.41377, -93.74, 7425.9))
@@ -112,8 +113,12 @@ def test_TRC_Antoine_extended():
     assert_close(d2Psat_dT2_analytical, 1022.5503689444175, rtol=1e-13)
     assert_close(d2Psat_dT2_numerical, d2Psat_dT2_analytical, rtol=1e-8)
 
-    for T in (0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307):
+    for T in [0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307] + near_bad_Ts:
         assert d2TRC_Antoine_extended_dT2(T, 227.51, -120., 8.95894, 510.595, -15.95, 2.41377, -93.74, 7425.9) == 0.0
+        
+    
+    for T in near_bad_Ts:
+        assert 0 == TRC_Antoine_extended(T=T, Tc=227.51, to=-120., A=8.95894,  B=510.595, C=-15.95, n=2.41377, E=-93.74, F=7425.9)
 
 def test_Antoine():
     # Methane, coefficients from [1]_, at 100 K:
