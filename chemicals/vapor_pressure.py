@@ -1520,20 +1520,22 @@ def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
                 row[3] = B*x2*x1*x1
         else:
             x1 = -T + c0 + to
+            x1_2 = x1*x1
+            x1_4 = x1_2*x1_2
+            x1_8 = x1_4*x1_4
             x2 = -x1*Tc_inv
             x3 = c1*x2**n
-            x5 = Tc_n8*(E + F*x1**4*Tc_inv4)
+            x5 = Tc_n8*(E + F*x1_4*Tc_inv4)
             x6 = C + T
             x7 = 1.0/x6
-            x8 = x1**8
-            x9 = 10**(A - B*x7 + x3 + x5*x8)*ln_base
-            row[0] = x9*(4*F*Tc_n12*x1**11 + n*x3/x1 + 8*x1**7*x5)
+            x9 = 10.0**(A - B*x7 + x3 + x5*x1_8)*ln_base
+            row[0] = x9*(4.0*F*Tc_n12*x1_8*x1_2*x1 + n*x3/x1 + 8.0*x1_4*x1_2*x1*x5)
             row[1] = x9
             row[2] = -x7*x9
             row[3] = B*x9*x7*x7
             row[4] = x3*x9*log(x2)
-            row[5] = Tc_n8*x8*x9
-            row[6] = Tc_n12*x1**12*x9
+            row[5] = Tc_n8*x1_8*x9
+            row[6] = Tc_n12*x1_8*x1_4*x9
     return out
 
 def Wagner(T, Tc, Pc, a, b, c, d):
