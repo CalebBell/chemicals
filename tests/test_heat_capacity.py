@@ -20,12 +20,12 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import numpy as np
 import pytest
-from math import log10
+from math import log10, log
 from fluids.numerics import assert_close, assert_close1d, linspace, logspace
 from chemicals.heat_capacity import *
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data, Cp_data_Poling
 from fluids.numerics import NotBoundedError
-from chemicals.heat_capacity import zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s
+from chemicals.heat_capacity import zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s, PiecewiseHeatCapacity
 
 def test_heat_capacity_CSP():
     # Example is for cis-2-butene at 350K from Poling. It is not consistent with
@@ -77,7 +77,6 @@ def test_Zabransky_quasi_polynomial():
     S2 = Zabransky_quasi_polynomial_integral_over_T(300, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     S1 = Zabransky_quasi_polynomial_integral_over_T(200, 591.79, -3.12743, 0.0857315, 13.7282, 1.28971, 6.42297, 4.10989)
     assert_close(S2-S1, 59.16999297436473) # result from quadrature, not the integral
-
 
 def test_Zabransky_cubic():
     Cp = Zabransky_cubic(298.15, 20.9634, -10.1344, 2.8253, -0.256738)
@@ -358,3 +357,48 @@ def test_PPDS15():
 def test_TDE_CSExpansion():
     Cp = TDE_CSExpansion(550.0, 778.0, 0.626549, 120.705, 0.255987, 0.000381027, -3.03077e-7)
     assert_close(Cp, 328.4720426864035, rtol=1e-14)
+
+def test_piece_wise_heat_capacity():
+    class HeatCapacity:
+        __slots__ = ('value', 'Tmin', 'Tmax')
+        def __init__(self, value, Tmin, Tmax):
+            self.value = value
+            self.Tmin = Tmin
+            self.Tmax = Tmax
+        
+        def calculate_integral(self, Ta, Tb):
+            return self.value * (Tb - Ta)
+        
+        def calculate_integral_over_T(self, Ta, Tb):
+            return self.value * log(Tb/Ta)
+    
+    models = [HeatCapacity(1, 200, 250), HeatCapacity(1, 250, 300), HeatCapacity(1, 300, 350)]
+    
+    Cp = PiecewiseHeatCapacity(models)
+    # Trivial
+    assert_close(0., Cp.force_calculate_integral(298.15, 298.15))
+    assert_close(0., Cp.force_calculate_integral_over_T(298.15, 298.15))
+    
+    # Within bounds
+    H_TminTmax = sum([i.calculate_integral(i.Tmin, i.Tmax) for i in models])
+    S_TminTmax = sum([i.calculate_integral_over_T(i.Tmin, i.Tmax) for i in models])
+    assert_close(H_TminTmax, Cp.force_calculate_integral(Cp.Tmin, Cp.Tmax))
+    assert_close(S_TminTmax, Cp.force_calculate_integral_over_T(Cp.Tmin, Cp.Tmax))
+    
+    # Left to center
+    assert_close(models[0].calculate_integral(100, 250), Cp.force_calculate_integral(100, 250))
+    assert_close(models[0].calculate_integral_over_T(100, 250), Cp.force_calculate_integral_over_T(100, 250))
+    
+    # Center to right
+    assert_close(models[-1].calculate_integral(300, 400), Cp.force_calculate_integral(300, 400))
+    assert_close(models[-1].calculate_integral_over_T(300, 400), Cp.force_calculate_integral_over_T(300, 400))
+    
+    # Across both sides
+    H = (models[0].calculate_integral(100, 200)
+         + H_TminTmax
+         +models[-1].calculate_integral(350, 400))
+    S = (models[0].calculate_integral_over_T(100, 200)
+         + S_TminTmax
+         +models[-1].calculate_integral_over_T(350, 400))
+    assert_close(H, Cp.force_calculate_integral(100, 400))
+    assert_close(S, Cp.force_calculate_integral_over_T(100, 400))

@@ -569,7 +569,7 @@ class PiecewiseHeatCapacity(object):
             Tmax = model.Tmax
             if Tb <= Tmax:
                 return integral + model.calculate_integral(Ta, Tb)
-            else:
+            elif Ta < Tmax:
                 integral += model.calculate_integral(Ta, Tmax)
                 Ta = Tmax
         return integral + model.calculate_integral(Ta, Tb)
@@ -643,7 +643,7 @@ class PiecewiseHeatCapacity(object):
             Tmax = model.Tmax
             if Tb <= Tmax:
                 return integral + model.calculate_integral_over_T(Ta, Tb)
-            else:
+            elif Ta < Tmax:
                 integral += model.calculate_integral_over_T(Ta, Tmax)
                 Ta = Tmax
         return integral + model.calculate_integral_over_T(Ta, Tb)
