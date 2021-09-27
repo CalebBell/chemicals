@@ -66,9 +66,9 @@ from chemicals.data_reader import (register_df_source,
                                    list_available_methods_from_df_dict)
 
 ### Register data sources and lazy load them
-
 folder = os_path_join(source_path, 'Environment')
-register_df_source(folder, 'Official Global Warming Potentials.tsv')
+register_df_source(folder, 'Official Global Warming Potentials 2007.tsv')
+register_df_source(folder, 'Official Global Warming Potentials 2013.tsv')
 register_df_source(folder, 'Ozone Depletion Potentials.tsv')
 register_df_source(folder, 'CRC logP table.tsv')
 register_df_source(folder, 'Syrres logP data.csv.gz',
@@ -79,14 +79,19 @@ _GWP_ODP_data_loaded = False
 def _load_GWP_ODP_data():
     global _GWP_ODP_data_loaded, GWP_data, ODP_data
     global _GWP_keys_by_method, _ODP_keys_by_method
-    GWP_data = data_source('Official Global Warming Potentials.tsv')
+    GWP_data = {
+        2007: data_source('Official Global Warming Potentials 2007.tsv'),
+        2013: data_source('Official Global Warming Potentials 2013.tsv'),
+    }
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_data_loaded = True
     _GWP_keys_by_method = {
-        'IPCC (2007) 100yr' : '100yr GWP',
-        'IPCC (2007) 100yr-SAR': 'SAR 100yr',
-        'IPCC (2007) 20yr': '20yr GWP',
-        'IPCC (2007) 500yr': '500yr GWP',
+        2007: {'IPCC 100yr' : '100yr GWP',
+               'IPCC 100yr-SAR': 'SAR 100yr',
+               'IPCC 20yr': '20yr GWP',
+               'IPCC 500yr': '500yr GWP'},
+        2013: {'IPCC 100yr' : '100yr GWP',
+               'IPCC 20yr': '20yr GWP'},
     }
     _ODP_keys_by_method = {
         'ODP2 Max': 'ODP2 Max',
@@ -125,24 +130,32 @@ else:  # pragma: no cover
         _load_GWP_ODP_data()
         _load_logP_data()
 
-IPCC100 = 'IPCC (2007) 100yr'
-IPCC100SAR = 'IPCC (2007) 100yr-SAR'
-IPCC20 = 'IPCC (2007) 20yr'
-IPCC500 = 'IPCC (2007) 500yr'
-GWP_all_methods = (IPCC100, IPCC100SAR, IPCC20, IPCC500)
-'''Tuple of method name keys. See the `GWP` for the actual references'''
+IPCC100 = 'IPCC 100yr'
+IPCC100SAR = 'IPCC 100yr-SAR'
+IPCC20 = 'IPCC 20yr'
+IPCC50 = 'IPCC 50yr'
+IPCC500 = 'IPCC 500yr'
+
+GWP_all_methods = {
+    2007: (IPCC100, IPCC100SAR, IPCC20, IPCC50, IPCC500),
+    2013: (IPCC100, IPCC20, IPCC50)
+}
+'''Dictionary of method names by year. See the `GWP` for the actual references'''
 
 
 ### Environmental data functions
 
 @mark_numba_incompatible
-def GWP_methods(CASRN):
+def GWP_methods(CASRN, year=2013):
     """Return all methods available to obtain GWP for the desired chemical.
 
     Parameters
     ----------
     CASRN : str
         CASRN, [-]
+    year : int
+        The year which the data was published. For example, use 2007 or 2013 
+        for IPCC 4th or 5th assessment reports, respectively.
 
     Returns
     -------
@@ -154,10 +167,10 @@ def GWP_methods(CASRN):
     GWP
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
-    return list_available_methods_from_df(GWP_data, CASRN, _GWP_keys_by_method)
+    return list_available_methods_from_df(GWP_data[year], CASRN, _GWP_keys_by_method[year])
     
 @mark_numba_incompatible
-def GWP(CASRN, method=None):
+def GWP(CASRN, method=None, year=2013):
     r'''This function handles the retrieval of a chemical's Global Warming
     Potential, relative to CO2. Lookup is based on CASRNs. Will automatically
     select a data source to use if no method is provided; returns None if the
@@ -178,22 +191,26 @@ def GWP(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are IPCC (2007) 100yr',
-        'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'.
+        The method name to use. Accepted methods include 'IPCC 20yr' and 'IPCC 100yr'.
         All valid values are also held in the variable `GWP_all_methods`.
+    year : int
+        The year which the data was published. For example, use 2007 or 2013 
+        for IPCC 4th or 5th assessment reports, respectively. Defaults to 2013
 
     Notes
     -----
-    All data is from [1]_, the official source. Several chemicals are available
-    in [1]_ are not included here as they do not have a CAS.
-    Methods are 'IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR',
-    'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'.
+    All data is from [1]_ and [2]_, the official source. Several chemicals available
+    in [1]_ and [2]_ are not included here as they do not have a CAS.
+    Methods are 'IPCC 100yr', 'IPCC 100yr-SAR',
+    'IPCC 20yr', and 'IPCC 500yr'.
 
     Examples
     --------
     Methane, 100-yr outlook
 
-    >>> GWP(CASRN='74-82-8')
+    >>> GWP(CASRN='74-82-8', year=2013)
+    28.0
+    >>> GWP(CASRN='74-82-8', year=2007)
     25.0
 
     See Also
@@ -205,16 +222,19 @@ def GWP(CASRN, method=None):
     .. [1] IPCC. "2.10.2 Direct Global Warming Potentials - AR4 WGI Chapter 2:
        Changes in Atmospheric Constituents and in Radiative Forcing." 2007.
        https://www.ipcc.ch/publications_and_data/ar4/wg1/en/ch2s2-10-2.html.
+    .. [2] IPCC. "Climate Change 2013: The Physical Science Basis. - AR5 WGI Chapter 8:
+       Anthropogenic and Natural Radiative Forcing." 2013.
+       https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
+    
     '''
-    # TODO update with 5th edition values
-    # Official table is at https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
-    # page 73
+    # TODO: Finish adding CASRNs to the 2013 report. Add documentation on 
+    # how some None values are actually <1 values.
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
-        key = _GWP_keys_by_method[method]
-        return retrieve_from_df(GWP_data, CASRN, key)
+        key = _GWP_keys_by_method[year][method]
+        return retrieve_from_df(GWP_data[year], CASRN, key)
     else:
-        return retrieve_any_from_df(GWP_data, CASRN, _GWP_keys_by_method.values())
+        return retrieve_any_from_df(GWP_data[year], CASRN, _GWP_keys_by_method[year].values())
 
 ### Ozone Depletion Potentials
 
