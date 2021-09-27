@@ -200,7 +200,7 @@ def GWP(CASRN, method=None, year=2013):
     Notes
     -----
     All data is from [1]_ and [2]_, the official source. Several chemicals available
-    in [1]_ and and [2]_ are not included here as they do not have a CAS.
+    in [1]_ and [2]_ are not included here as they do not have a CAS.
     Methods are 'IPCC 100yr', 'IPCC 100yr-SAR',
     'IPCC 20yr', and 'IPCC 500yr'.
 
