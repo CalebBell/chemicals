@@ -73,9 +73,10 @@ def GWP_available():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_GWP_all_values():
-    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP_methods(i)]).sum()
+    year = 2007
+    tot = sum([GWP(i, method=j, year=year) for i in GWP_data[year].index for j in GWP_methods(i, year=year)])
     assert_close(tot, 960256, rtol=1e-11)
-
+    # TODO: include 2013 year after adding all CASRN to the data
 
 def test_logP_data():
     tot = np.abs(logP_data_CRC['logP']).sum()
