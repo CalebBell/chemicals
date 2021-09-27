@@ -227,6 +227,8 @@ def GWP(CASRN, method=None, year=2013):
        https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
     
     '''
+    # TODO: Finish adding CASRNs to the 2013 report. Add documentation on 
+    # how some None values are actually <1 values.
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
         key = _GWP_keys_by_method[year][method]
