@@ -30,10 +30,14 @@ from chemicals.environment import ODP_data, GWP_data, logP_data_CRC, logP_data_S
 
 
 def test_GWP_data():
-    dat_calc = [GWP_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficienty, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
-    dat = [85518.965000000011, 17.063414000000002, 128282.0, 288251, 274671.70000000001, 269051.29999999999]
-    assert_close1d(dat_calc, dat)
-
+    all_data = GWP_data[2007]
+    dat_calc = [all_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
+    dat_actual = [85518.965000000011, 17.063414000000002, 128282.0, 288251, 274671.70000000001, 269051.29999999999]
+    assert_close1d(dat_calc, dat_actual)
+    all_data = GWP_data[2013]
+    dat_calc = [all_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'20yr GWP', u'100yr GWP', u'20yr GTP', u'50yr GTP', u'100yr GTP']]
+    dat_actual = [99942.63, 56.93000000000001, 578288.0, 415568.0, 519751.0, 380900.0, 333720.0]
+    assert_close1d(dat_calc, dat_actual)
 
 def GWP_available():
     year = 2007
