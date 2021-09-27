@@ -35,24 +35,36 @@ def test_GWP_data():
     assert_close1d(dat_calc, dat)
 
 
-def test_GWP():
-    GWP1_calc = GWP(CASRN='74-82-8')
-    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (2007) 100yr-SAR')
+def GWP_available():
+    year = 2007
+    GWP1_calc = GWP(CASRN='74-82-8', year=year)
+    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC 100yr-SAR', year=year)
     assert [GWP1_calc, GWP2_calc] == [25.0, 21.0]
 
-    GWP_available = GWP_methods(CASRN='56-23-5')
-    assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr']
+    GWP_available = GWP_methods(CASRN='56-23-5', year=year)
+    assert GWP_available == ['IPCC 100yr', 'IPCC 100yr-SAR', 'IPCC 20yr', 'IPCC 500yr']
 
     with pytest.raises(Exception):
         GWP(CASRN='74-82-8', method='BADMETHOD')
 
-    # No value
     assert GWP('7732-18-5', method=None) is None
-
     assert GWP_methods('14882353275-98-3') == []
+    assert type(GWP(CASRN='74-82-8', year=year)) is float
+    
+    year = 2013
+    GWP1_calc = GWP(CASRN='74-82-8', year=year)
+    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC 100yr', year=year)
+    assert [GWP1_calc, GWP2_calc] == [28.0, 28.0]
 
+    GWP_available = GWP_methods(CASRN='56-23-5', year=year)
+    assert GWP_available == ['IPCC 100yr', 'IPCC 20yr']
 
-    assert type(GWP(CASRN='74-82-8')) is float
+    with pytest.raises(Exception):
+        GWP(CASRN='74-82-8', method='BADMETHOD')
+
+    assert GWP('7732-18-5', method=None) is None
+    assert GWP_methods('14882353275-98-3') == []
+    assert type(GWP(CASRN='74-82-8', year=year)) is float
 
 @pytest.mark.slow
 @pytest.mark.fuzz
