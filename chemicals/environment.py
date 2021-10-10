@@ -80,18 +80,18 @@ def _load_GWP_ODP_data():
     global _GWP_ODP_data_loaded, GWP_data, ODP_data
     global _GWP_keys_by_method, _ODP_keys_by_method
     GWP_data = {
-        2007: data_source('Official Global Warming Potentials 2007.tsv'),
-        2013: data_source('Official Global Warming Potentials 2013.tsv'),
+        'IPCC 2013': data_source('Official Global Warming Potentials 2013.tsv'),
+        'IPCC 2007': data_source('Official Global Warming Potentials 2007.tsv'),
     }
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_data_loaded = True
     _GWP_keys_by_method = {
-        2007: {'IPCC 100yr' : '100yr GWP',
-               'IPCC 100yr-SAR': 'SAR 100yr',
-               'IPCC 20yr': '20yr GWP',
-               'IPCC 500yr': '500yr GWP'},
-        2013: {'IPCC 100yr' : '100yr GWP',
-               'IPCC 20yr': '20yr GWP'},
+        'IPCC 2013': {'100yr': '100yr GWP',
+                      '20yr': '20yr GWP'},
+        'IPCC 2007': {'100yr' : '100yr GWP',
+                      '100yr-SAR': 'SAR 100yr',
+                      '20yr': '20yr GWP',
+                      '500yr': '500yr GWP'},
     }
     _ODP_keys_by_method = {
         'ODP2 Max': 'ODP2 Max',
@@ -130,32 +130,21 @@ else:  # pragma: no cover
         _load_GWP_ODP_data()
         _load_logP_data()
 
-IPCC100 = 'IPCC 100yr'
-IPCC100SAR = 'IPCC 100yr-SAR'
-IPCC20 = 'IPCC 20yr'
-IPCC50 = 'IPCC 50yr'
-IPCC500 = 'IPCC 500yr'
-
-GWP_all_methods = {
-    2007: (IPCC100, IPCC100SAR, IPCC20, IPCC50, IPCC500),
-    2013: (IPCC100, IPCC20, IPCC50)
-}
-'''Dictionary of method names by year. See the `GWP` for the actual references'''
+GWP_all_methods = (*['IPCC 2013; ' + i for i in ('100yr', '20yr')],
+                   *['IPCC 2007; ' + i for i in ('100yr', '100yr-SAR', '20yr', '500yr')])
+'''Tuple of method names. See the `GWP` for the actual references'''
 
 
 ### Environmental data functions
 
 @mark_numba_incompatible
-def GWP_methods(CASRN, year=2013):
+def GWP_methods(CASRN):
     """Return all methods available to obtain GWP for the desired chemical.
 
     Parameters
     ----------
     CASRN : str
         CASRN, [-]
-    year : int
-        The year which the data was published. For example, use 2007 or 2013 
-        for IPCC 4th or 5th assessment reports, respectively.
 
     Returns
     -------
@@ -167,10 +156,14 @@ def GWP_methods(CASRN, year=2013):
     GWP
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
-    return list_available_methods_from_df(GWP_data[year], CASRN, _GWP_keys_by_method[year])
+    return sum(
+        [[(key + '; ' + i) for i in list_available_methods_from_df(GWP_data[key], CASRN, _GWP_keys_by_method[key])]
+         for key in GWP_data],
+        []
+    )
     
 @mark_numba_incompatible
-def GWP(CASRN, method=None, year=2013):
+def GWP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's Global Warming
     Potential, relative to CO2. Lookup is based on CASRNs. Will automatically
     select a data source to use if no method is provided; returns None if the
@@ -191,26 +184,22 @@ def GWP(CASRN, method=None, year=2013):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods include 'IPCC 20yr' and 'IPCC 100yr'.
-        All valid values are also held in the variable `GWP_all_methods`.
-    year : int
-        The year which the data was published. For example, use 2007 or 2013 
-        for IPCC 4th or 5th assessment reports, respectively. Defaults to 2013
+        The method name to use. Accepted methods include 'IPCC 2007; 20yr' 
+        and 'IPCC 2007; 100yr'. All valid values are also held in the 
+        variable `GWP_all_methods`.
 
     Notes
     -----
     All data is from [1]_ and [2]_, the official source. Several chemicals available
     in [1]_ and [2]_ are not included here as they do not have a CAS.
-    Methods are 'IPCC 100yr', 'IPCC 100yr-SAR',
-    'IPCC 20yr', and 'IPCC 500yr'.
 
     Examples
     --------
     Methane, 100-yr outlook
 
-    >>> GWP(CASRN='74-82-8', year=2013)
+    >>> GWP(CASRN='74-82-8', method='IPCC 2007; 100yr')
     28.0
-    >>> GWP(CASRN='74-82-8', year=2007)
+    >>> GWP(CASRN='74-82-8', method='IPCC 2007; 100yr')
     25.0
 
     See Also
@@ -227,14 +216,20 @@ def GWP(CASRN, method=None, year=2013):
        https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
     
     '''
-    # TODO: Finish adding CASRNs to the 2013 report. Add documentation on 
-    # how some None values are actually <1 values.
+    # TODO: Finish adding CASRNs to the 2013 report. 
+    # The ratio of AGWP in W m^2 yr/kg to GWP is constant. 
+    # Use this to calculate to maybe 2 significant figures the GWP, 
+    # GTP, etc for the places where the table says they are under 1.
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
-        key = _GWP_keys_by_method[year][method]
-        return retrieve_from_df(GWP_data[year], CASRN, key)
+        keys = method.split('; ') 
+        data_key, method = keys
+        key = _GWP_keys_by_method[data_key][method]
+        return retrieve_from_df(GWP_data[data_key], CASRN, key)
     else:
-        return retrieve_any_from_df(GWP_data[year], CASRN, _GWP_keys_by_method[year].values())
+        for i, j in zip(GWP_data.values(), _GWP_keys_by_method.values()):
+            value = retrieve_any_from_df(i, CASRN, j.values())
+            if value is not None: return value
 
 ### Ozone Depletion Potentials
 
