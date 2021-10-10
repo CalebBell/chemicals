@@ -198,9 +198,9 @@ def GWP(CASRN, method=None):
     Methane, 100-yr outlook
 
     >>> GWP(CASRN='74-82-8', method='IPCC 2007; 100yr')
-    28.0
-    >>> GWP(CASRN='74-82-8', method='IPCC 2007; 100yr')
     25.0
+    >>> GWP(CASRN='74-82-8', method='IPCC 2013; 100yr')
+    28.0
 
     See Also
     --------
