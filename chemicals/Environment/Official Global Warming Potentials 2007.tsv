@@ -1,4 +1,4 @@
-CASRN	Name	Formula	Lifetime, years	Radiative efficienty, W/m^2/ppb	SAR 100yr	20yr GWP	100yr GWP	500yr GWP
+CASRN	Name	Formula	Lifetime, years	Radiative efficiency, W/m^2/ppb	SAR 100yr	20yr GWP	100yr GWP	500yr GWP
 124-38-9	Carbon dioxide 	CO2 		0.000014	1	1	1	1
 74-82-8	Methanec 	CH4 	12	0.00037	21	72	25	7.6
 10024-97-2	Nitrous oxide 	N2O 	114	0.00303	310	289	298	153

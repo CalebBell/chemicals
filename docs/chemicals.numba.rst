@@ -14,7 +14,7 @@ imported separately on Python < 3.7; it is not loaded automatically as part of c
 >>> import chemicals
 >>> import chemicals.numba
 >>> chemicals.numba.Antoine(180, A=8.95894, B=510.595, C=-15.95)
-702271.0518579542
+702271.05185795
 
 There is a delay while the code is compiled when using Numba;
 the speed is not quite free.

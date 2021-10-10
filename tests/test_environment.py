@@ -30,10 +30,14 @@ from chemicals.environment import ODP_data, GWP_data, logP_data_CRC, logP_data_S
 
 
 def test_GWP_data():
-    dat_calc = [GWP_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficienty, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
-    dat = [85518.965000000011, 17.063414000000002, 128282.0, 288251, 274671.70000000001, 269051.29999999999]
-    assert_close1d(dat_calc, dat)
-
+    all_data = GWP_data[2007]
+    dat_calc = [all_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
+    dat_actual = [85518.965000000011, 17.063414000000002, 128282.0, 288251, 274671.70000000001, 269051.29999999999]
+    assert_close1d(dat_calc, dat_actual)
+    all_data = GWP_data[2013]
+    dat_calc = [all_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'20yr GWP', u'100yr GWP', u'20yr GTP', u'50yr GTP', u'100yr GTP']]
+    dat_actual = [99942.63, 56.93000000000001, 578288.0, 415568.0, 519751.0, 380900.0, 333720.0]
+    assert_close1d(dat_calc, dat_actual)
 
 def GWP_available():
     year = 2007
@@ -69,9 +73,10 @@ def GWP_available():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_GWP_all_values():
-    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP_methods(i)]).sum()
+    year = 2007
+    tot = sum([GWP(i, method=j, year=year) for i in GWP_data[year].index for j in GWP_methods(i, year=year)])
     assert_close(tot, 960256, rtol=1e-11)
-
+    # TODO: include 2013 year after adding all CASRN to the data
 
 def test_logP_data():
     tot = np.abs(logP_data_CRC['logP']).sum()
