@@ -30,51 +30,39 @@ from chemicals.environment import ODP_data, GWP_data, logP_data_CRC, logP_data_S
 
 
 def test_GWP_data():
-    all_data = GWP_data[2007]
+    all_data = GWP_data['IPCC 2007']
     dat_calc = [all_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
     dat_actual = [85518.965000000011, 17.063414000000002, 128282.0, 288251, 274671.70000000001, 269051.29999999999]
     assert_close1d(dat_calc, dat_actual)
-    all_data = GWP_data[2013]
+    all_data = GWP_data['IPCC 2013']
     dat_calc = [all_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'20yr GWP', u'100yr GWP', u'20yr GTP', u'50yr GTP', u'100yr GTP']]
     dat_actual = [99942.63, 56.93000000000001, 578288.0, 415568.0, 519751.0, 380900.0, 333720.0]
     assert_close1d(dat_calc, dat_actual)
 
 def GWP_available():
-    year = 2007
-    GWP1_calc = GWP(CASRN='74-82-8', year=year)
-    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC 100yr-SAR', year=year)
-    assert [GWP1_calc, GWP2_calc] == [25.0, 21.0]
+    GWP1_calc = GWP(CASRN='74-82-8')
+    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC 2013; 20yr')
+    assert [GWP1_calc, 84.0] == [28.0, 84.0]
 
-    GWP_available = GWP_methods(CASRN='56-23-5', year=year)
-    assert GWP_available == ['IPCC 100yr', 'IPCC 100yr-SAR', 'IPCC 20yr', 'IPCC 500yr']
-
-    with pytest.raises(Exception):
-        GWP(CASRN='74-82-8', method='BADMETHOD')
-
-    assert GWP('7732-18-5', method=None) is None
-    assert GWP_methods('14882353275-98-3') == []
-    assert type(GWP(CASRN='74-82-8', year=year)) is float
-    
-    year = 2013
-    GWP1_calc = GWP(CASRN='74-82-8', year=year)
-    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC 100yr', year=year)
-    assert [GWP1_calc, GWP2_calc] == [28.0, 28.0]
-
-    GWP_available = GWP_methods(CASRN='56-23-5', year=year)
-    assert GWP_available == ['IPCC 100yr', 'IPCC 20yr']
+    GWP_available = GWP_methods(CASRN='56-23-5')
+    assert GWP_available == ['IPCC 2013; 100yr',
+                             'IPCC 2013; 20yr',
+                             'IPCC 2007; 100yr',
+                             'IPCC 2007; 100yr-SAR',
+                             'IPCC 2007; 20yr',
+                             'IPCC 2007; 500yr']
 
     with pytest.raises(Exception):
         GWP(CASRN='74-82-8', method='BADMETHOD')
 
     assert GWP('7732-18-5', method=None) is None
     assert GWP_methods('14882353275-98-3') == []
-    assert type(GWP(CASRN='74-82-8', year=year)) is float
+    assert type(GWP(CASRN='74-82-8')) is float
 
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_GWP_all_values():
-    year = 2007
-    tot = sum([GWP(i, method=j, year=year) for i in GWP_data[year].index for j in GWP_methods(i, year=year)])
+    tot = sum([GWP(i, method=j) for i in GWP_data['IPCC 2007'].index for j in GWP_methods(i) if j.startswith('IPCC 2007')])
     assert_close(tot, 960256, rtol=1e-11)
     # TODO: include 2013 year after adding all CASRN to the data
 
