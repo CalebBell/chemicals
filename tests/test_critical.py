@@ -201,7 +201,7 @@ def test_Tc_all_values():
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_close(Tcs_default_sum, 6055023.896122223)
+    assert_close(Tcs_default_sum, 6050113.336122222)
 
 def test_Tc():
     Tc_val = Tc(CASRN='64-17-5')
@@ -253,7 +253,7 @@ def test_Pc_all_values():
     # Use the default method for each chemical in this file
     Pcs = [Pc(i) for i in CASs]
     Pcs_default_sum = pd.Series(Pcs).sum()
-    assert_close(Pcs_default_sum, 63159160396.183258)
+    assert_close(Pcs_default_sum, 63141480396.18326)
 
 def test_Vc():
     assert_close(0.000168, Vc(CASRN='64-17-5'))
@@ -279,7 +279,7 @@ def test_Vc_all_values():
     # Use the default method for each chemical in this file
     Vcs = [Vc(i) for i in CASs]
     Vcs_default_sum = pd.Series(Vcs).sum()
-    assert_close(Vcs_default_sum, 4.7955320200000005)
+    assert_close(Vcs_default_sum, 4.79277302)
 
 def test_Zc():
     assert_close(0.241, Zc(CASRN='64-17-5'))
@@ -305,7 +305,7 @@ def test_Zc_all_values():
     # Use the default method for each chemical in this file
     Zcs = [Zc(i) for i in CASs]
     Zcs_default_sum = pd.Series(Zcs).sum()
-    assert_close(Zcs_default_sum, 1930.7388004412558, 1e-6)
+    assert_close(Zcs_default_sum, 1929.7152711084107, 1e-6)
 
 
 
