@@ -2547,7 +2547,7 @@ def viscosity_index(nu_40, nu_100, rounding=False):
         VI = (L-nu_40)/(L-H)*100.0
     else:
         N = (log(H) - log(nu_40))/log(nu_100)
-        VI = (10**N - 1.0)/0.00715 + 100.0
+        VI = (10**N - 1.0)*(1.0/0.00715) + 100.0
     if rounding:
         VI = _round_whole_even(VI)
     return VI
