@@ -69,6 +69,7 @@ from chemicals.data_reader import (register_df_source,
 
 folder = os_path_join(source_path, 'Environment')
 register_df_source(folder, 'Official Global Warming Potentials 2007.tsv')
+register_df_source(folder, 'Official Global Warming Potentials 2013.tsv')
 register_df_source(folder, 'Ozone Depletion Potentials.tsv')
 register_df_source(folder, 'CRC logP table.tsv')
 register_df_source(folder, 'Syrres logP data.csv.gz',
