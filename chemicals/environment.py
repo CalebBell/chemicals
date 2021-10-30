@@ -75,6 +75,14 @@ register_df_source(folder, 'CRC logP table.tsv')
 register_df_source(folder, 'Syrres logP data.csv.gz',
                    csv_kwargs={'compression': 'gzip'})
 
+IPCC_2007_100YR_GWP = 'IPCC (2007) 100yr'
+IPCC_1995_100YR_GWP = 'IPCC (1995) 100yr'
+IPCC_2007_20YR_GWP = 'IPCC (2007) 20yr'
+IPCC_2007_500YR_GWP = 'IPCC (2007) 500yr'
+GWP_all_methods = (IPCC_2007_100YR_GWP, IPCC_1995_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP)
+'''Tuple of method name keys. See the `GWP` for the actual references'''
+
+
 _GWP_ODP_data_loaded = False
 @mark_numba_incompatible
 def _load_GWP_ODP_data():
@@ -86,10 +94,10 @@ def _load_GWP_ODP_data():
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_data_loaded = True
     _IPCC_2007_GWP_keys_by_method = {
-        'IPCC (2007) 100yr' : '100yr GWP',
-        'IPCC (1995) 100yr': 'SAR 100yr',
-        'IPCC (2007) 20yr': '20yr GWP',
-        'IPCC (2007) 500yr': '500yr GWP',
+        IPCC_2007_100YR_GWP : '100yr GWP',
+        IPCC_1995_100YR_GWP: 'SAR 100yr',
+        IPCC_2007_20YR_GWP: '20yr GWP',
+        IPCC_2007_500YR_GWP: '500yr GWP',
     }
     
     _ODP_keys_by_method = {
@@ -128,13 +136,6 @@ else:  # pragma: no cover
     if can_load_data:
         _load_GWP_ODP_data()
         _load_logP_data()
-
-IPCC_2007_100YR_GWP = 'IPCC (2007) 100yr'
-IPCC_1995_100YR_GWP = 'IPCC (1995) 100yr'
-IPCC_2007_20YR_GWP = 'IPCC (2007) 20yr'
-IPCC_2007_500YR_GWP = 'IPCC (2007) 500yr'
-GWP_all_methods = (IPCC_2007_100YR_GWP, IPCC_1995_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP)
-'''Tuple of method name keys. See the `GWP` for the actual references'''
 
 
 ### Environmental data functions
