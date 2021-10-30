@@ -224,9 +224,6 @@ def GWP(CASRN, method=None):
        Changes in Atmospheric Constituents and in Radiative Forcing." 2007.
        https://www.ipcc.ch/publications_and_data/ar4/wg1/en/ch2s2-10-2.html.
     '''
-    # TODO update with 5th edition values
-    # Official table is at https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
-    # page 73
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
         if method in _IPCC_2014_GWP_keys_by_method:
