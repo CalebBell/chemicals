@@ -79,13 +79,13 @@ _GWP_ODP_data_loaded = False
 @mark_numba_incompatible
 def _load_GWP_ODP_data():
     global _GWP_ODP_data_loaded, IPCC_2007_GWPs, IPCC_2013_GWPs, ODP_data
-    global _GWP_keys_by_method, _ODP_keys_by_method
+    global _IPCC_2007_GWP_keys_by_method, _ODP_keys_by_method
     IPCC_2007_GWPs = data_source('Official Global Warming Potentials 2007.tsv')
     IPCC_2013_GWPs = data_source('Official Global Warming Potentials 2013.tsv')
 
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_data_loaded = True
-    _GWP_keys_by_method = {
+    _IPCC_2007_GWP_keys_by_method = {
         'IPCC (2007) 100yr' : '100yr GWP',
         'IPCC (1995) 100yr': 'SAR 100yr',
         'IPCC (2007) 20yr': '20yr GWP',
@@ -158,7 +158,7 @@ def GWP_methods(CASRN):
     GWP
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
-    return list_available_methods_from_df(IPCC_2007_GWPs, CASRN, _GWP_keys_by_method)
+    return list_available_methods_from_df(IPCC_2007_GWPs, CASRN, _IPCC_2007_GWP_keys_by_method)
     
 @mark_numba_incompatible
 def GWP(CASRN, method=None):
@@ -215,10 +215,10 @@ def GWP(CASRN, method=None):
     # page 73
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
-        key = _GWP_keys_by_method[method]
+        key = _IPCC_2007_GWP_keys_by_method[method]
         return retrieve_from_df(IPCC_2007_GWPs, CASRN, key)
     else:
-        return retrieve_any_from_df(IPCC_2007_GWPs, CASRN, _GWP_keys_by_method.values())
+        return retrieve_any_from_df(IPCC_2007_GWPs, CASRN, _IPCC_2007_GWP_keys_by_method.values())
 
 ### Ozone Depletion Potentials
 
