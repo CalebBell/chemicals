@@ -39,6 +39,8 @@ def test_IPCC_2007_GWPs():
     assert_close1d(dat_calc, dat)
     for CAS in IPCC_2007_GWPs.index:
         assert check_CAS(CAS)
+        
+    assert IPCC_2007_GWPs.index.is_unique
 
 def test_IPCC_2014_data():
     dat_calc = [IPCC_2014_GWPs[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'20yr GWP', u'100yr GWP', u'20yr GTP', '50yr GTP', '100yr GTP', '20yr AGWP', '100yr AGWP', '20yr AGTP', '50yr AGTP', '100yr AGTP']]
@@ -47,6 +49,8 @@ def test_IPCC_2014_data():
 
     for CAS in IPCC_2014_GWPs.index:
         assert check_CAS(CAS)
+
+    assert IPCC_2014_GWPs.index.is_unique
 
 def test_only_removed_GWPs():
     old = set(IPCC_2007_GWPs.index)
