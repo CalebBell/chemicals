@@ -78,9 +78,11 @@ register_df_source(folder, 'Syrres logP data.csv.gz',
 _GWP_ODP_data_loaded = False
 @mark_numba_incompatible
 def _load_GWP_ODP_data():
-    global _GWP_ODP_data_loaded, GWP_data, ODP_data
+    global _GWP_ODP_data_loaded, IPCC_2007_GWPs, IPCC_2013_GWPs, ODP_data
     global _GWP_keys_by_method, _ODP_keys_by_method
-    GWP_data = data_source('Official Global Warming Potentials 2007.tsv')
+    IPCC_2007_GWPs = data_source('Official Global Warming Potentials 2007.tsv')
+    IPCC_2013_GWPs = data_source('Official Global Warming Potentials 2013.tsv')
+
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_data_loaded = True
     _GWP_keys_by_method = {
@@ -89,6 +91,7 @@ def _load_GWP_ODP_data():
         'IPCC (2007) 20yr': '20yr GWP',
         'IPCC (2007) 500yr': '500yr GWP',
     }
+    
     _ODP_keys_by_method = {
         'ODP2 Max': 'ODP2 Max',
         'ODP1 Max': 'ODP1 Max',
@@ -114,7 +117,7 @@ def _load_logP_data():
 
 if PY37:
     def __getattr__(name):
-        if name in ('GWP_data', 'ODP_data'):
+        if name in ('IPCC_2007_GWPs', 'IPCC_2013_GWPs', 'ODP_data'):
             _load_GWP_ODP_data()
             return globals()[name]
         elif name in ('logP_data_CRC', 'logP_data_Syrres'):
@@ -155,7 +158,7 @@ def GWP_methods(CASRN):
     GWP
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
-    return list_available_methods_from_df(GWP_data, CASRN, _GWP_keys_by_method)
+    return list_available_methods_from_df(IPCC_2007_GWPs, CASRN, _GWP_keys_by_method)
     
 @mark_numba_incompatible
 def GWP(CASRN, method=None):
@@ -213,9 +216,9 @@ def GWP(CASRN, method=None):
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
         key = _GWP_keys_by_method[method]
-        return retrieve_from_df(GWP_data, CASRN, key)
+        return retrieve_from_df(IPCC_2007_GWPs, CASRN, key)
     else:
-        return retrieve_any_from_df(GWP_data, CASRN, _GWP_keys_by_method.values())
+        return retrieve_any_from_df(IPCC_2007_GWPs, CASRN, _GWP_keys_by_method.values())
 
 ### Ozone Depletion Potentials
 

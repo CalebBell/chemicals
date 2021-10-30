@@ -26,11 +26,11 @@ import numpy as np
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.environment import *
-from chemicals.environment import ODP_data, GWP_data, logP_data_CRC, logP_data_Syrres
+from chemicals.environment import ODP_data, IPCC_2007_GWPs, logP_data_CRC, logP_data_Syrres
 
 
-def test_GWP_data():
-    dat_calc = [GWP_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
+def test_IPCC_2007_GWPs():
+    dat_calc = [IPCC_2007_GWPs[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
     dat = [85518.965000000011, 17.063414000000002, 128282.0, 288251, 274671.70000000001, 269051.29999999999]
     assert_close1d(dat_calc, dat)
 
@@ -57,7 +57,7 @@ def test_GWP():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_GWP_all_values():
-    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP_methods(i)]).sum()
+    tot = pd.DataFrame( [GWP(i, method=j) for i in IPCC_2007_GWPs.index for j in GWP_methods(i)]).sum()
     assert_close(tot, 960256, rtol=1e-11)
 
 
