@@ -37,11 +37,11 @@ def test_IPCC_2007_GWPs():
 
 def test_GWP():
     GWP1_calc = GWP(CASRN='74-82-8')
-    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (2007) 100yr-SAR')
+    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (1995) 100yr')
     assert [GWP1_calc, GWP2_calc] == [25.0, 21.0]
 
     GWP_available = GWP_methods(CASRN='56-23-5')
-    assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr']
+    assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (1995) 100yr', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr']
 
     with pytest.raises(Exception):
         GWP(CASRN='74-82-8', method='BADMETHOD')

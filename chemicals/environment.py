@@ -87,7 +87,7 @@ def _load_GWP_ODP_data():
     _GWP_ODP_data_loaded = True
     _GWP_keys_by_method = {
         'IPCC (2007) 100yr' : '100yr GWP',
-        'IPCC (2007) 100yr-SAR': 'SAR 100yr',
+        'IPCC (1995) 100yr': 'SAR 100yr',
         'IPCC (2007) 20yr': '20yr GWP',
         'IPCC (2007) 500yr': '500yr GWP',
     }
@@ -129,11 +129,11 @@ else:  # pragma: no cover
         _load_GWP_ODP_data()
         _load_logP_data()
 
-IPCC100 = 'IPCC (2007) 100yr'
-IPCC100SAR = 'IPCC (2007) 100yr-SAR'
-IPCC20 = 'IPCC (2007) 20yr'
-IPCC500 = 'IPCC (2007) 500yr'
-GWP_all_methods = (IPCC100, IPCC100SAR, IPCC20, IPCC500)
+IPCC_2007_100YR_GWP = 'IPCC (2007) 100yr'
+IPCC_1995_100YR_GWP = 'IPCC (1995) 100yr'
+IPCC_2007_20YR_GWP = 'IPCC (2007) 20yr'
+IPCC_2007_500YR_GWP = 'IPCC (2007) 500yr'
+GWP_all_methods = (IPCC_2007_100YR_GWP, IPCC_1995_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP)
 '''Tuple of method name keys. See the `GWP` for the actual references'''
 
 
@@ -183,14 +183,14 @@ def GWP(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are IPCC (2007) 100yr',
-        'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'.
+        'IPCC (1995) 100yr', 'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'.
         All valid values are also held in the variable `GWP_all_methods`.
 
     Notes
     -----
     All data is from [1]_, the official source. Several chemicals are available
     in [1]_ are not included here as they do not have a CAS.
-    Methods are 'IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR',
+    Methods are 'IPCC (2007) 100yr', 'IPCC (1995) 100yr',
     'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'.
 
     Examples
