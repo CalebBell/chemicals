@@ -27,7 +27,11 @@ import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.environment import *
 from chemicals.environment import ODP_data, IPCC_2007_GWPs, logP_data_CRC, logP_data_Syrres
+from chemicals.environment import IPCC_2014_GWPs, IPCC_1995_100YR_GWP, IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP, IPCC_2014_20YR_GWP, IPCC_2014_100YR_GWP
 
+
+def test_CFC_11_in_all_GWP_methods():
+    assert set(GWP_methods('75-69-4')) == set(GWP_all_methods)
 
 def test_IPCC_2007_GWPs():
     dat_calc = [IPCC_2007_GWPs[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
@@ -37,11 +41,12 @@ def test_IPCC_2007_GWPs():
 
 def test_GWP():
     GWP1_calc = GWP(CASRN='74-82-8')
+    assert_close(GWP1_calc, 28.0) # methane 100 year
     GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (1995) 100yr')
-    assert [GWP1_calc, GWP2_calc] == [25.0, 21.0]
+    assert_close(GWP2_calc, 21.0)
 
     GWP_available = GWP_methods(CASRN='56-23-5')
-    assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (1995) 100yr', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr']
+    assert set(GWP_available) == set(GWP_all_methods)
 
     with pytest.raises(Exception):
         GWP(CASRN='74-82-8', method='BADMETHOD')
@@ -57,9 +62,25 @@ def test_GWP():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_GWP_all_values():
-    tot = pd.DataFrame( [GWP(i, method=j) for i in IPCC_2007_GWPs.index for j in GWP_methods(i)]).sum()
-    assert_close(tot, 960256, rtol=1e-11)
-
+    values_1995 = [GWP(i, method=IPCC_1995_100YR_GWP) for i in IPCC_2007_GWPs.index]
+    sum_1995_100 = sum(filter(lambda x: x is not None, values_1995))
+    assert_close(sum_1995_100, 128282.0)
+    
+    sum_2007_100 = sum([GWP(i, method=IPCC_2007_100YR_GWP) for i in IPCC_2007_GWPs.index])
+    assert_close(sum_2007_100, 274671.7)
+    
+    sum_2007_20 = sum([GWP(i, method=IPCC_2007_20YR_GWP) for i in IPCC_2007_GWPs.index])
+    assert_close(sum_2007_20, 288251.0)
+    
+    sum_2007_500 = sum([GWP(i, method=IPCC_2007_500YR_GWP) for i in IPCC_2007_GWPs.index])
+    assert_close(sum_2007_500, 269051.3)
+    
+    sum_2014_20 = sum([GWP(i, method=IPCC_2014_20YR_GWP) for i in IPCC_2014_GWPs.index])
+    assert_close(sum_2014_20, 545139.8269)
+    
+    sum_2014_100 = sum([GWP(i, method=IPCC_2014_100YR_GWP) for i in IPCC_2014_GWPs.index])
+    assert_close(sum_2014_100, 402141.69451)
+    
 
 def test_logP_data():
     tot = np.abs(logP_data_CRC['logP']).sum()

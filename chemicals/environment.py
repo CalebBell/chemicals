@@ -83,7 +83,7 @@ IPCC_2007_500YR_GWP = 'IPCC (2007) 500yr'
 IPCC_2014_20YR_GWP = 'IPCC (2014) 20yr'
 IPCC_2014_100YR_GWP = 'IPCC (2014) 100yr'
 
-GWP_all_methods = (IPCC_2014_20YR_GWP, IPCC_2014_100YR_GWP,
+GWP_all_methods = (IPCC_2014_100YR_GWP, IPCC_2014_20YR_GWP,
                    IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP,
                    IPCC_1995_100YR_GWP)
 '''Tuple of method name keys. See the `GWP` for the actual references'''
@@ -93,7 +93,7 @@ _GWP_ODP_data_loaded = False
 @mark_numba_incompatible
 def _load_GWP_ODP_data():
     global _GWP_ODP_data_loaded, IPCC_2007_GWPs, IPCC_2014_GWPs, ODP_data
-    global _IPCC_2007_GWP_keys_by_method, _ODP_keys_by_method
+    global _IPCC_2007_GWP_keys_by_method, _IPCC_2014_GWP_keys_by_method, _ODP_keys_by_method
     IPCC_2007_GWPs = data_source('Official Global Warming Potentials 2007.tsv')
     IPCC_2014_GWPs = data_source('Official Global Warming Potentials 2014.tsv')
 
@@ -104,6 +104,10 @@ def _load_GWP_ODP_data():
         IPCC_1995_100YR_GWP: 'SAR 100yr',
         IPCC_2007_20YR_GWP: '20yr GWP',
         IPCC_2007_500YR_GWP: '500yr GWP',
+    }
+    _IPCC_2014_GWP_keys_by_method = {
+        IPCC_2014_100YR_GWP: '100yr GWP',
+        IPCC_2014_20YR_GWP : '20yr GWP',
     }
     
     _ODP_keys_by_method = {
@@ -165,7 +169,10 @@ def GWP_methods(CASRN):
     GWP
     """
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
-    return list_available_methods_from_df(IPCC_2007_GWPs, CASRN, _IPCC_2007_GWP_keys_by_method)
+    methods_4e = list_available_methods_from_df(IPCC_2007_GWPs, CASRN, _IPCC_2007_GWP_keys_by_method)
+    methods_5e = list_available_methods_from_df(IPCC_2014_GWPs, CASRN, _IPCC_2014_GWP_keys_by_method)
+    return methods_4e + methods_5e
+    
     
 @mark_numba_incompatible
 def GWP(CASRN, method=None):
@@ -222,10 +229,19 @@ def GWP(CASRN, method=None):
     # page 73
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
-        key = _IPCC_2007_GWP_keys_by_method[method]
-        return retrieve_from_df(IPCC_2007_GWPs, CASRN, key)
+        if method in _IPCC_2014_GWP_keys_by_method:
+            key, df = _IPCC_2014_GWP_keys_by_method[method], IPCC_2014_GWPs
+        elif method in _IPCC_2007_GWP_keys_by_method:
+            key, df = _IPCC_2007_GWP_keys_by_method[method], IPCC_2007_GWPs
+        return retrieve_from_df(df, CASRN, key)
     else:
-        return retrieve_any_from_df(IPCC_2007_GWPs, CASRN, _IPCC_2007_GWP_keys_by_method.values())
+        try:
+            return retrieve_any_from_df(IPCC_2014_GWPs, CASRN, _IPCC_2014_GWP_keys_by_method.values())
+        except:
+            try:
+                return retrieve_any_from_df(IPCC_2007_GWPs, CASRN, _IPCC_2007_GWP_keys_by_method.values())
+            except:
+                return None
 
 ### Ozone Depletion Potentials
 
