@@ -69,7 +69,7 @@ from chemicals.data_reader import (register_df_source,
 
 folder = os_path_join(source_path, 'Environment')
 register_df_source(folder, 'Official Global Warming Potentials 2007.tsv')
-register_df_source(folder, 'Official Global Warming Potentials 2013.tsv')
+register_df_source(folder, 'Official Global Warming Potentials 2014.tsv')
 register_df_source(folder, 'Ozone Depletion Potentials.tsv')
 register_df_source(folder, 'CRC logP table.tsv')
 register_df_source(folder, 'Syrres logP data.csv.gz',
@@ -79,6 +79,9 @@ IPCC_2007_100YR_GWP = 'IPCC (2007) 100yr'
 IPCC_1995_100YR_GWP = 'IPCC (1995) 100yr'
 IPCC_2007_20YR_GWP = 'IPCC (2007) 20yr'
 IPCC_2007_500YR_GWP = 'IPCC (2007) 500yr'
+
+IPCC_2007_20YR_GWP = 'IPCC (2007) 20yr'
+
 GWP_all_methods = (IPCC_2007_100YR_GWP, IPCC_1995_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP)
 '''Tuple of method name keys. See the `GWP` for the actual references'''
 
@@ -86,10 +89,10 @@ GWP_all_methods = (IPCC_2007_100YR_GWP, IPCC_1995_100YR_GWP, IPCC_2007_20YR_GWP,
 _GWP_ODP_data_loaded = False
 @mark_numba_incompatible
 def _load_GWP_ODP_data():
-    global _GWP_ODP_data_loaded, IPCC_2007_GWPs, IPCC_2013_GWPs, ODP_data
+    global _GWP_ODP_data_loaded, IPCC_2007_GWPs, IPCC_2014_GWPs, ODP_data
     global _IPCC_2007_GWP_keys_by_method, _ODP_keys_by_method
     IPCC_2007_GWPs = data_source('Official Global Warming Potentials 2007.tsv')
-    IPCC_2013_GWPs = data_source('Official Global Warming Potentials 2013.tsv')
+    IPCC_2014_GWPs = data_source('Official Global Warming Potentials 2014.tsv')
 
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_data_loaded = True
@@ -125,7 +128,7 @@ def _load_logP_data():
 
 if PY37:
     def __getattr__(name):
-        if name in ('IPCC_2007_GWPs', 'IPCC_2013_GWPs', 'ODP_data'):
+        if name in ('IPCC_2007_GWPs', 'IPCC_2014_GWPs', 'ODP_data'):
             _load_GWP_ODP_data()
             return globals()[name]
         elif name in ('logP_data_CRC', 'logP_data_Syrres'):
