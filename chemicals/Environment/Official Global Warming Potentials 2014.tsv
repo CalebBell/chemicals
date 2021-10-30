@@ -1,4 +1,4 @@
-"CASRN"	"Name"	"Formula"	"Lifetime, years"	"Radiative efficiency, W/m^2/ppb"	"20yr GWP"	"100yr GWP"	"20yr GTP"	"50yr GTP"	"100yr GTP"	"20yr AGWP"	"100yr AGWP"	"20yr AGTP"	"50yr AGTP "	"100yr AGTP"
+"CASRN"	"Name"	"Formula"	"Lifetime, years"	"Radiative efficiency, W/m^2/ppb"	"20yr GWP"	"100yr GWP"	"20yr GTP"	"50yr GTP"	"100yr GTP"	"20yr AGWP"	"100yr AGWP"	"20yr AGTP"	"50yr AGTP"	"100yr AGTP"
 "124-38-9"	"Carbon dioxide"	"CO2"		0	1	1	1	1	1	2.49E-14	9.17E-14	6.84E-16	6.17E-16	5.47E-16
 "74-82-8"	"Methane"	"CH4"	12.4	0	84	28	67	14	4	2.09E-12	2.61E-12	4.62E-14	8.69E-15	2.34E-15
 "10024-97-2"	"Nitrous Oxide"	"N2O"	121	0	264	265	277	282	234	6.58E-12	2.43E-11	1.89E-13	1.74E-13	1.28E-13
