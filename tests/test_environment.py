@@ -43,7 +43,11 @@ def test_IPCC_2014_data():
     dat = [99873.62999999999, 51.46000000000001, 545139.8269, 402141.69450999994, 491538.24423, 371372.361614, 330862.17449599993, 1.3603687693e-08, 3.6891094493e-08, 3.3635677188e-10, 2.2900033490900003e-10, 1.8091880086000002e-10]
     assert_close1d(dat_calc, dat)
 
-
+def test_only_removed_GWPs():
+    old = set(IPCC_2007_GWPs.index)
+    new = set(IPCC_2014_GWPs.index)
+    # dimethyl ether is the only chemical in 4e but not 5e; it has a GWP of 1
+    assert old.difference(new) == set(['115-10-6'])
 
 def test_GWP():
     GWP1_calc = GWP(CASRN='74-82-8')
