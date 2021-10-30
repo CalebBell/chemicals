@@ -28,7 +28,7 @@ from fluids.numerics import assert_close, assert_close1d
 from chemicals.environment import *
 from chemicals.environment import ODP_data, IPCC_2007_GWPs, logP_data_CRC, logP_data_Syrres
 from chemicals.environment import IPCC_2014_GWPs, IPCC_1995_100YR_GWP, IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP, IPCC_2014_20YR_GWP, IPCC_2014_100YR_GWP
-
+from chemicals.identifiers import check_CAS
 
 def test_CFC_11_in_all_GWP_methods():
     assert set(GWP_methods('75-69-4')) == set(GWP_all_methods)
@@ -37,11 +37,16 @@ def test_IPCC_2007_GWPs():
     dat_calc = [IPCC_2007_GWPs[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
     dat = [85518.965000000011, 17.063414000000002, 128282.0, 288251, 274671.70000000001, 269051.29999999999]
     assert_close1d(dat_calc, dat)
+    for CAS in IPCC_2007_GWPs.index:
+        assert check_CAS(CAS)
 
 def test_IPCC_2014_data():
     dat_calc = [IPCC_2014_GWPs[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'20yr GWP', u'100yr GWP', u'20yr GTP', '50yr GTP', '100yr GTP', '20yr AGWP', '100yr AGWP', '20yr AGTP', '50yr AGTP', '100yr AGTP']]
     dat = [99873.62999999999, 51.46000000000001, 545139.8269, 402141.69450999994, 491538.24423, 371372.361614, 330862.17449599993, 1.3603687693e-08, 3.6891094493e-08, 3.3635677188e-10, 2.2900033490900003e-10, 1.8091880086000002e-10]
     assert_close1d(dat_calc, dat)
+
+    for CAS in IPCC_2014_GWPs.index:
+        assert check_CAS(CAS)
 
 def test_only_removed_GWPs():
     old = set(IPCC_2007_GWPs.index)
