@@ -177,11 +177,15 @@ def GWP_methods(CASRN):
 @mark_numba_incompatible
 def GWP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's Global Warming
-    Potential, relative to CO2. Lookup is based on CASRNs. Will automatically
-    select a data source to use if no method is provided; returns None if the
-    data is not available.
+    Potential, relative to CO2. Lookup is based on CASRNs.
+    
+    There are three sources of data:
+        
+        * IPCC Fifth Assessment Report (AR5) from 2014 [2]_
+        * IPCC Fourth Assessment Report (AR4) from 2007 [1]_
+        * IPCC Second Assesment Report or (SAR) from 1995 [1]_
 
-    Returns the GWP for the 100yr outlook by default.
+    This function returns the GWP for the 100yr outlook from the AR5 by default.
 
     Parameters
     ----------
@@ -196,23 +200,37 @@ def GWP(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are IPCC (2007) 100yr',
-        'IPCC (1995) 100yr', 'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'.
+        The method name to use. Accepted methods are ('IPCC (2014) 100yr', 
+        'IPCC (2014) 20yr', 'IPCC (2007) 100yr', 'IPCC (2007) 20yr', 
+        'IPCC (2007) 500yr', 'IPCC (1995) 100yr').
         All valid values are also held in the variable `GWP_all_methods`.
 
     Notes
     -----
-    All data is from [1]_, the official source. Several chemicals are available
-    in [1]_ are not included here as they do not have a CAS.
-    Methods are 'IPCC (2007) 100yr', 'IPCC (1995) 100yr',
-    'IPCC (2007) 20yr', and 'IPCC (2007) 500yr'.
+    "Fossil methane" is included in the IPCC reports to take into account
+    different isotopic composition, but as that has the same CAS number it
+    is not included in this function.
+    
+    Six of the entries in [2]_ are actually duplicates; the entries
+    with data similar to more recent data [3]_ were prefered.
 
     Examples
     --------
-    Methane, 100-yr outlook
+    Methane, 100-yr outlook AR5
 
     >>> GWP(CASRN='74-82-8')
-    25.0
+    28.0
+    
+    Methane, specifying the default method explicitly (this is recommended
+    the default data source may be updated in the future)
+    
+    >>> GWP(CASRN='74-82-8', method='IPCC (2014) 100yr')
+    28.0
+    
+    Methane, 20-year values from 1995 and 2007
+    
+    >>> (GWP(CASRN='74-82-8', method='IPCC (1995) 100yr'), GWP(CASRN='74-82-8', method='IPCC (2007) 100yr'))
+    (21.0, 25.0)
 
     See Also
     --------
@@ -223,6 +241,14 @@ def GWP(CASRN, method=None):
     .. [1] IPCC. "2.10.2 Direct Global Warming Potentials - AR4 WGI Chapter 2:
        Changes in Atmospheric Constituents and in Radiative Forcing." 2007.
        https://www.ipcc.ch/publications_and_data/ar4/wg1/en/ch2s2-10-2.html.
+    .. [2] IPCC. "Climate Change 2013: The Physical Science Basis. - AR5 WGI Chapter 8:
+       Anthropogenic and Natural Radiative Forcing." 2013.
+       https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
+    .. [3] Hodnebrog, Ø., B. Aamaas, J. S. Fuglestvedt, G. Marston, G. Myhre, C. 
+       J. Nielsen, M. Sandstad, K. P. Shine, and T. J. Wallington. "Updated
+       Global Warming Potentials and Radiative Efficiencies of Halocarbons and 
+       Other Weak Atmospheric Absorbers." Reviews of Geophysics 58, no. 3 
+       (2020): e2019RG000691. https://doi.org/10.1029/2019RG000691.
     '''
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
