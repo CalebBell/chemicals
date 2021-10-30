@@ -68,7 +68,7 @@ from chemicals.data_reader import (register_df_source,
 ### Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Environment')
-register_df_source(folder, 'Official Global Warming Potentials.tsv')
+register_df_source(folder, 'Official Global Warming Potentials 2007.tsv')
 register_df_source(folder, 'Ozone Depletion Potentials.tsv')
 register_df_source(folder, 'CRC logP table.tsv')
 register_df_source(folder, 'Syrres logP data.csv.gz',
@@ -79,7 +79,7 @@ _GWP_ODP_data_loaded = False
 def _load_GWP_ODP_data():
     global _GWP_ODP_data_loaded, GWP_data, ODP_data
     global _GWP_keys_by_method, _ODP_keys_by_method
-    GWP_data = data_source('Official Global Warming Potentials.tsv')
+    GWP_data = data_source('Official Global Warming Potentials 2007.tsv')
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_data_loaded = True
     _GWP_keys_by_method = {
