@@ -26,40 +26,76 @@ import numpy as np
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.environment import *
-from chemicals.environment import ODP_data, GWP_data, logP_data_CRC, logP_data_Syrres
+from chemicals.environment import ODP_data, IPCC_2007_GWPs, logP_data_CRC, logP_data_Syrres
+from chemicals.environment import IPCC_2014_GWPs, IPCC_1995_100YR_GWP, IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP, IPCC_2014_20YR_GWP, IPCC_2014_100YR_GWP
+from chemicals.identifiers import check_CAS
 
+def test_CFC_11_in_all_GWP_methods():
+    assert set(GWP_methods('75-69-4')) == set(GWP_all_methods)
 
-def test_GWP_data():
-    dat_calc = [GWP_data[i].sum() for i in [u'Lifetime, years', u'Radiative efficienty, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
+def test_IPCC_2007_GWPs():
+    dat_calc = [IPCC_2007_GWPs[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'SAR 100yr', u'20yr GWP', u'100yr GWP', u'500yr GWP']]
     dat = [85518.965000000011, 17.063414000000002, 128282.0, 288251, 274671.70000000001, 269051.29999999999]
     assert_close1d(dat_calc, dat)
+    for CAS in IPCC_2007_GWPs.index:
+        assert check_CAS(CAS)
+        
+    assert IPCC_2007_GWPs.index.is_unique
 
+def test_IPCC_2014_data():
+    dat_calc = [IPCC_2014_GWPs[i].sum() for i in [u'Lifetime, years', u'Radiative efficiency, W/m^2/ppb', u'20yr GWP', u'100yr GWP', u'20yr GTP', '50yr GTP', '100yr GTP', '20yr AGWP', '100yr AGWP', '20yr AGTP', '50yr AGTP', '100yr AGTP']]
+    dat = [99873.62999999999, 51.46000000000001, 545139.8269, 402141.69450999994, 491538.24423, 371372.361614, 330862.17449599993, 1.3603687693e-08, 3.6891094493e-08, 3.3635677188e-10, 2.2900033490900003e-10, 1.8091880086000002e-10]
+    assert_close1d(dat_calc, dat)
+
+    for CAS in IPCC_2014_GWPs.index:
+        assert check_CAS(CAS)
+
+    assert IPCC_2014_GWPs.index.is_unique
+
+def test_only_removed_GWPs():
+    old = set(IPCC_2007_GWPs.index)
+    new = set(IPCC_2014_GWPs.index)
+    # dimethyl ether is the only chemical in 4e but not 5e; it has a GWP of 1
+    assert old.difference(new) == set(['115-10-6'])
 
 def test_GWP():
     GWP1_calc = GWP(CASRN='74-82-8')
-    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (2007) 100yr-SAR')
-    assert [GWP1_calc, GWP2_calc] == [25.0, 21.0]
+    assert_close(GWP1_calc, 28.0) # methane 100 year
+    GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (1995) 100yr')
+    assert_close(GWP2_calc, 21.0)
 
     GWP_available = GWP_methods(CASRN='56-23-5')
-    assert GWP_available == ['IPCC (2007) 100yr', 'IPCC (2007) 100yr-SAR', 'IPCC (2007) 20yr', 'IPCC (2007) 500yr']
+    assert set(GWP_available) == set(GWP_all_methods)
 
     with pytest.raises(Exception):
         GWP(CASRN='74-82-8', method='BADMETHOD')
 
-    # No value
     assert GWP('7732-18-5', method=None) is None
-
     assert GWP_methods('14882353275-98-3') == []
-
-
     assert type(GWP(CASRN='74-82-8')) is float
 
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_GWP_all_values():
-    tot = pd.DataFrame( [GWP(i, method=j) for i in GWP_data.index for j in GWP_methods(i)]).sum()
-    assert_close(tot, 960256, rtol=1e-11)
-
+    values_1995 = [GWP(i, method=IPCC_1995_100YR_GWP) for i in IPCC_2007_GWPs.index]
+    sum_1995_100 = sum(filter(lambda x: x is not None, values_1995))
+    assert_close(sum_1995_100, 128282.0)
+    
+    sum_2007_100 = sum([GWP(i, method=IPCC_2007_100YR_GWP) for i in IPCC_2007_GWPs.index])
+    assert_close(sum_2007_100, 274671.7)
+    
+    sum_2007_20 = sum([GWP(i, method=IPCC_2007_20YR_GWP) for i in IPCC_2007_GWPs.index])
+    assert_close(sum_2007_20, 288251.0)
+    
+    sum_2007_500 = sum([GWP(i, method=IPCC_2007_500YR_GWP) for i in IPCC_2007_GWPs.index])
+    assert_close(sum_2007_500, 269051.3)
+    
+    sum_2014_20 = sum([GWP(i, method=IPCC_2014_20YR_GWP) for i in IPCC_2014_GWPs.index])
+    assert_close(sum_2014_20, 545139.8269)
+    
+    sum_2014_100 = sum([GWP(i, method=IPCC_2014_100YR_GWP) for i in IPCC_2014_GWPs.index])
+    assert_close(sum_2014_100, 402141.69451)
+    
 
 def test_logP_data():
     tot = np.abs(logP_data_CRC['logP']).sum()
