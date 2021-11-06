@@ -43,6 +43,7 @@ Two Phase - Implementations
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_LN2
 .. autofunction:: chemicals.rachford_rice.Li_Johns_Ahmadi_solution
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_mpmath
 
 
 Three Phase
@@ -69,13 +70,14 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution2', 'Rachford_Rice_solutionN',
            'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
-           'flash_inner_loop_all_methods', 'flash_inner_loop_methods']
+           'flash_inner_loop_all_methods', 'flash_inner_loop_methods',
+           'Rachford_Rice_solution_mpmath']
 
 from fluids.constants import R
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
 from chemicals.utils import exp, log
-from chemicals.utils import normalize, mark_numba_uncacheable
+from chemicals.utils import normalize, mark_numba_uncacheable, mark_numba_incompatible
 from chemicals.exceptions import PhaseCountReducedError
 try:
     from itertools import combinations
@@ -876,6 +878,157 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
     ys = Ks*xs
 #    return V_over_F, xs, ys # numba: uncomment
     return float(V_over_F), xs.tolist(), ys.tolist() # numba: delete
+
+@mark_numba_incompatible
+def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
+    r'''Solves the the Rachford-Rice flash equation using numerical 
+    root-finding to a high precision using the `mpmath` library.
+    
+    .. math::
+        \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
+
+    Parameters
+    ----------
+    zs : list[float]
+        Overall mole fractions of all species, [-]
+    Ks : list[float]
+        Equilibrium K-values, [-]
+    dps : int, optional
+        Number of decimal places to use in the intermediate values of the 
+        calculation, [-]
+    tol : float, optional
+        The tolerance of the solver used in `mpmath`, [-]
+
+    Returns
+    -------
+    L_over_F : float
+        Liquid fraction solution [-]
+    V_over_F : float
+        Vapor fraction solution [-]
+    xs : list[float]
+        Mole fractions of each species in the liquid phase, [-]
+    ys : list[float]
+        Mole fractions of each species in the vapor phase, [-]
+
+    Notes
+    -----
+    This function is written solely for development purposes with the aim
+    of returning bit-accurate solutions.
+    
+    Note that the liquid fraction is also returned; it is insufficient to 
+    compute it as :math:`\frac{L}{F} = 1 - \frac{V}{F}`.
+
+    Examples
+    --------
+    >>> Rachford_Rice_solution_mpmath(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
+    (0.3092697372261456, 0.6907302627738544, [0.33940869696634357, 0.3650560590371706, 0.29553524399648584], [0.5719036543882889, 0.27087159580558057, 0.15722474980613046])
+    >>> Rachford_Rice_solution_mpmath(zs=[0.999999999999, 1e-12], Ks=[2.0, 1e-12])
+    (1e-12, 0.999999999999, [0.49999999999975003, 0.50000000000025], [0.9999999999995001, 5.0000000000025e-13])
+    '''
+    # extremely important to validate high decimal precision with mpmath
+    # numerical issues make this an open research problem with respect to maintaining speed
+    from mpmath import mp, mpf, findroot
+
+    mp.dps = dps
+    N = len(zs)
+
+    def make_objf(zs_k_minus_1, K_minus_1):
+        def Rachford_Rice_err(V_over_F):
+            # Compute the objective function
+            err = 0
+            for i in range(len(zs_k_minus_1)):
+                err += zs_k_minus_1[i]/(1 + V_over_F*K_minus_1[i])
+            return err
+        return Rachford_Rice_err
+
+    def make_objf_der(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
+        def Rachford_Rice_err_fprime(V_over_F):
+            # Compute the objective function and its derivative w.r.t. V_over_F
+            err0, err1 = 0, 0
+            for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
+                VF_kim1_1_inv = 1/(1 + V_over_F*Kim1)
+                err0 += num0*VF_kim1_1_inv
+                err1 += num1*VF_kim1_1_inv*VF_kim1_1_inv
+            return err0, err1
+        return Rachford_Rice_err_fprime
+
+    zs_orig, Ks_orig = zs, Ks
+    
+    solve_order = 1 # 1 for newton, 0 for secant - development only, should always return the correct answer
+    
+    Kmin = mpf(min(Ks))
+    Kmax = mpf(max(Ks))
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))
+    
+    z_of_Kmax = mpf(zs[Ks.index(Kmax)])
+    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1- Kmin))/((1- Kmin)*(Kmax- 1))
+    V_over_F_max = 1/(1 - Kmin)
+
+    # Attempt to avoid zero division errors at either boundary
+    V_over_F_min += V_over_F_min*tol
+    V_over_F_max -= V_over_F_max*tol
+
+    zs_mp = [mpf(i) for i in zs]
+    Ks_mp = [mpf(i) for i in Ks]
+    Ks_minus_1 = [Ki - 1 for Ki in Ks_mp]
+
+    zs_k_minus_1 = [zs_mp[i]*Ks_minus_1[i] for i in range(N)]
+    
+    zs_k_minus_1_2 = [0.0]*N
+    for i in range(N):
+        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*Ks_minus_1[i]
+
+    if solve_order == 0:
+        objf = make_objf(zs_k_minus_1, Ks_minus_1)
+    elif solve_order == 1:
+        objf = make_objf_der(zs_k_minus_1, zs_k_minus_1_2, Ks_minus_1)
+    
+    guess = None
+    try:
+        # Try to obtain an initial guess for speed and convergence from the
+        # other solvers
+        guess, _, _ = flash_inner_loop(zs_orig, Ks_orig)
+    except:
+        pass
+    if guess is None or (guess < V_over_F_min or guess > V_over_F_max):
+        # Check the guess to ensure it is within bounds
+        guess = 0.5*(V_over_F_min + V_over_F_max)
+
+    # mpmath does not have an option to respect boundaries, so its solvers
+    # often go outside the correct range
+    # try:
+    #     V_over_F = findroot(objf, guess, tol=tol, solver='newton')
+    # except:
+    if N == 2:
+        # A peculiar amount of numerical issues come up in binaries with the solvers
+        # Fortunately, the analytical solution is easy to compute and we have lots of
+        # decimals!
+        z1, z2 = zs_mp
+        K1, K2 = Ks_mp
+        z1z2 = z1 + z2
+        K1z1 = K1*z1
+        K2z2 = K2*z2
+        t1 = z1z2 - K1z1 - K2z2
+        den = t1 + K2*K1z1 + K1*K2z2 - K1*z2 - K2*z1
+        V_over_F = t1/den
+    else:
+        # Requiring a low ytol seems to guarantee a correct solution
+        if solve_order == 0:
+            p1 = 0.4*V_over_F_min + 0.6*V_over_F_max
+            V_over_F = secant(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, x1=p1)
+        elif solve_order == 1:
+            V_over_F = newton(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, fprime=True)
+
+    xs = [0]*N
+    ys = [0]*N
+
+    for i in range(N):
+        x_calc = zs_mp[i]/(1 + V_over_F*Ks_minus_1[i])
+        xs[i] = float(x_calc)
+        ys[i] = float(x_calc*Ks_mp[i])
+    return float(1-V_over_F), float(V_over_F), xs, ys
+
 
 
 def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):

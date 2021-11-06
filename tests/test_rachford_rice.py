@@ -29,7 +29,7 @@ import sys
 from chemicals.exceptions import PhaseCountReducedError
 from fluids.constants import calorie, R
 from chemicals.rachford_rice import *
-from chemicals.rachford_rice import Rachford_Rice_solution_numpy
+from chemicals.rachford_rice import Rachford_Rice_solution_numpy, Rachford_Rice_solution_mpmath
 from chemicals.rachford_rice import Rachford_Rice_valid_solution_naive, Rachford_Rice_solution2
 from chemicals.rachford_rice import Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac
 from fluids.numerics import isclose, assert_close, assert_close1d, assert_close2d, normalize
@@ -38,38 +38,27 @@ from chemicals import normalize
 
 is_pypy = 'PyPy' in sys.version
 
-def RR_solution_mpmath(zs, Ks, dps=200):
-    # extremely important to validate high decimal precision with mpmath
-    # numerical issues make this an open research problem with respect to maintaining speed
-    from mpmath import mp, mpf, findroot
-
-    def make_objf(zs_k_minus_1, K_minus_1):
-        def Rachford_Rice_err(V_over_F):
-            err = 0
-            for i in range(len(zs_k_minus_1)):
-                err += zs_k_minus_1[i]/(1 + V_over_F*K_minus_1[i])
-            return err
-        return Rachford_Rice_err
-
-    mp.dps = dps
-    N = len(zs)
-    zs_mp = [mpf(i) for i in zs]
-    Ks_mp = [mpf(i) for i in Ks]
-    Ks_minus_1 = [Ki - 1 for Ki in Ks_mp]
-
-    zs_k_minus_1 = [zs_mp[i]*Ks_minus_1[i] for i in range(N)]
-    objf = make_objf(zs_k_minus_1, Ks_minus_1)
-
-    V_over_F = findroot(objf, .5, tol=1e-100)
-    xs = [0]*N
-    ys = [0]*N
-
-    for i in range(N):
-        xs[i] = float(zs[i]/(1 + V_over_F*Ks_minus_1[i]))
-        ys[i] = float(xs[i]*Ks[i])
-    return float(V_over_F), xs, ys
+def RR_solution_mpmath(zs, Ks, guess=None, dps=200):
+    LV, VF, xs, ys = Rachford_Rice_solution_mpmath(zs, Ks, dps=dps) 
+    return (VF, xs, ys)
 
 
+def test_RR_mpmath_points():
+    # points from RR contest update
+    zs = [0.003496418103652993, 0.08134996284399883, 0.08425781368698183, 0.08660015587158083, 0.03393676648390093, 0.046912148366909906, 0.04347295855013991, 0.03528846893106793, 0.06836282476823487, 0.06778643033352585, 0.014742967176819971, 0.07489046659005885, 0.04595208887032791, 0.053716354661293896, 0.022344804838081954, 0.0490901205575939, 0.009318396845552981, 0.06683329012632486, 0.07237858894810185, 0.03528438046562893, 0.003984592980220992] 
+    Ks = [0.000160672721667, 0.018356845386159, 0.094445181723264, 0.117250574977987, 0.053660474066903, 0.53790315308842, 0.026109136837427, 0.106588294438016, 0.013998763838654, 0.162417382603121, 0.007558903680426, 0.064534061436341, 0.731006576434576, 0.005441443070815, 0.015600385380209, 0.012020711491011, 0.238827317565149, 0.022727947741144, 0.001778015519249, 0.007597040584824, 5.87425090047782]    
+    LF, VF, xs, ys = Rachford_Rice_solution_mpmath(zs, Ks)
+    assert_close(VF, -0.19984637297628843, rtol=1e-16)
+    
+    
+    zs = [0.004157284954252984, 0.0014213285047209943, 0.014848717759705941, 0.03044981105958088, 0.11359772999756554, 0.10729135314739957, 0.029101839157508882, 0.06599513817538073, 0.010324751675473958, 0.04473237952961382, 0.06963277351376072, 0.08645767360282165, 0.08930957642684664, 0.0251765398366809, 0.01594252170408694, 0.09571836326377162, 0.04078154182757284, 0.08243486397206067, 0.013175199166126948, 0.029268130397145882, 0.030182482327921877]
+    Ks = [0.723423674540192, 1.16174499507754, 1.17547301996336, 1.03037454150302, 1.13879814918106, 1.70014675310204, 1.05877209838981, 1.28326927930614, 1.16351944743047, 1.41069373097001, 1.00536461101331, 1.77523784049187, 1.51071399916121, 1.14835523974627, 1.60369203193725, 1.29606646034495, 1.17053941125983, 1.03935905847522, 1.15389315235544, 1.09443270044454, 1.93013701123472]
+    xs_expect = [0.44904982468349636, 0.0008999183019312609, 0.009117623147622485, 0.02746178684472478, 0.07587355807545791, 0.030584404973243343, 0.02404054965205764, 0.032756525185209176, 0.006510943046530854, 0.018101680695012657, 0.0683198757920764, 0.02289038644790009, 0.03156415667512449, 0.01643985772271979, 0.005041074553077012, 0.046452621333235224, 0.02531599345252268, 0.07224850132659927, 0.00849316591461233, 0.021870066188561105, 0.006967485988285152]
+    ys_expect = [0.32485327422416393, 0.001045475583247321, 0.01071752001622364, 0.028295926028986965, 0.08640466750811313, 0.05199797681081755, 0.02545346320155348, 0.0420354424669968, 0.00757560885575084, 0.02553592747647521, 0.06868638535017856, 0.040635880205794526, 0.04768441336082832, 0.01887879675656845, 0.008084331093171238, 0.0602056845051105, 0.029633368071373612, 0.07509213431505989, 0.009800205990689797, 0.02393531559764776, 0.013448202581248493]
+    LF, VF, xs, ys = Rachford_Rice_solution_mpmath(zs, Ks)
+    assert_close(VF, 3.582165028608595, rtol=1e-16)
+    assert_close1d(xs, xs_expect, rtol=1e-16)
+    assert_close1d(ys, ys_expect, rtol=1e-16)
 
 def assert_same_RR_results(zs, Ks, f0, f1, rtol=1e-9):
     N = len(zs)
@@ -242,11 +231,13 @@ flash_inner_loop_LJA = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks,
 flash_inner_loop_poly = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (polynomial)')
 flash_inner_loop_LN2 = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Nichita 2')
 
+
 algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
               flash_inner_loop, flash_inner_loop_secant,
               flash_inner_loop_NR, flash_inner_loop_halley,
               flash_inner_loop_numpy, flash_inner_loop_LJA,
-              flash_inner_loop_poly, flash_inner_loop_LN2]
+              flash_inner_loop_poly, flash_inner_loop_LN2,
+              RR_solution_mpmath]
 
 @pytest.mark.parametrize("algorithm", algorithms)
 @pytest.mark.parametrize("array", [False])
