@@ -1157,7 +1157,6 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
         x7 = zix5*x5x1x6
         dF0 += x7
         ddF0 += x7*(t51 + x5x1x6 + x5x1x6)
-
     return F0, -dF0, ddF0
 
 @mark_numba_uncacheable
@@ -1235,7 +1234,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     Examples
     --------
     >>> Rachford_Rice_solution_LN2(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
-    (0.6907302627738541, [0.3394086969663436, 0.3650560590371706, 0.29553524399648573], [0.571903654388289, 0.27087159580558057, 0.1572247498061304])
+    (0.6907302627738, [0.3394086969663, 0.3650560590371, 0.29553524399648], [0.571903654388, 0.27087159580558, 0.1572247498061])
 
     References
     ----------
@@ -1279,6 +1278,9 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
 
     # Suggests guess V_over_F_min, not using
     log_transform = (V_over_F_max-guess)/(guess-V_over_F_min)
+    if abs(log_transform-1) < 1e-10:
+        # The derivative is huge around a log transform of 1, better to start at a hard-coded location
+        log_transform = 0.8
     if log_transform > 0.0:
         guess = -log(log_transform)
     else:
@@ -1291,7 +1293,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         if one_m_Kmin == 1.0: # numba: delete
             V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
         else: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, ytol=1e-8, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
+            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1.48e-12, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
     except:
 #        return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True) # numba: delete
 #        raise ValueError("Could not solve") # numba: uncomment
@@ -1317,12 +1319,23 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
             #     V_over_F = -log((V_over_F_max - V_over_F_max) / (V_over_F_max - V_over_F_min))
 
     V_over_F = (V_over_F_min + (V_over_F_max - V_over_F_min)/(1.0 + exp(-V_over_F)))
-
-    xs = [0.0]*N
-    for i in range(N):
-        xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
-        xs[i] = xi
-        cis_ys[i] = Ks[i]*xi
+    
+    if 1-1e-4 < V_over_F < 1+1e-4:
+        # Re-calculate while inverting phase compositions and inverting the K values
+        # This is necessary for the correct calculation for x compositions when the
+        # liquid fraction is very near zero.
+        Ks_inv = cis_ys
+        for i in range(N):
+            Ks_inv[i] = 1.0/Ks[i]
+        LF, xs, ys = Rachford_Rice_solution_LN2(zs, Ks_inv, guess=1.0-V_over_F)
+        return V_over_F, ys, xs
+        
+    else:
+        xs = [0.0]*N
+        for i in range(N):
+            xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
+            xs[i] = xi
+            cis_ys[i] = Ks[i]*xi
     return V_over_F, xs, cis_ys
 
 def LJA_err(x1, t1, terms_2, terms_3, N2):
@@ -1692,7 +1705,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
     Examples
     --------
     >>> flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
-    (0.6907302627738541, [0.3394086969663436, 0.3650560590371706, 0.29553524399648573], [0.571903654388289, 0.27087159580558057, 0.1572247498061304])
+    (0.6907302627738, [0.3394086969663, 0.3650560590371, 0.29553524399648], [0.571903654388, 0.27087159580558, 0.1572247498061])
     '''
     l = len(zs)
     if method is None:
