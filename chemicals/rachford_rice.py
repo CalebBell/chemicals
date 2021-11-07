@@ -992,8 +992,18 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     # Right the boundaries, the derivative goes very large and microscopic steps are made and the newton solver switches
     # The boundaries need to be handled with bisection-style solvers
     low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
-    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-14, fprime=True, high=high,
+    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, fprime=True, high=high,
                         low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
+    if 1-1e-4 < V_over_F < 1+1e-4:
+        # Re-calculate while inverting phase compositions and inverting the K values
+        # This is necessary for the correct calculation for x compositions when the
+        # liquid fraction is very near zero.
+        Ks_inv = [0.0]*N
+        for i in range(N):
+            Ks_inv[i] = 1.0/Ks[i]
+        LF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks_inv, guess=1.0-V_over_F)
+        return V_over_F, ys, xs
+
     xs = zs_k_minus_1
     ys = K_minus_1
     for i in range(N):
