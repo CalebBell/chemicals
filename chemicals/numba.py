@@ -31,9 +31,12 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
      'viscosity.Wilke_large', 'viscosity.Wilke_prefactored',
      'interface.Winterfeld_Scriven_Davis',
 
+
+
      'rachford_rice.Rachford_Rice_solution',
      'rachford_rice.Rachford_Rice_solution_LN2',
      'rachford_rice.Rachford_Rice_solution_numpy',
+     'rachford_rice.Rachford_Rice_solution_binary_dd',
      'rachford_rice.Rachford_Rice_polynomial',
      'rachford_rice.Rachford_Rice_polynomial_3',
      'rachford_rice.Rachford_Rice_polynomial_4',

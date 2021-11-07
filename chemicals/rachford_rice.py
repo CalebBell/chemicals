@@ -44,7 +44,7 @@ Two Phase - Implementations
 .. autofunction:: chemicals.rachford_rice.Li_Johns_Ahmadi_solution
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_mpmath
-
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_binary_dd
 
 Three Phase
 -----------
@@ -71,11 +71,12 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
            'flash_inner_loop_all_methods', 'flash_inner_loop_methods',
-           'Rachford_Rice_solution_mpmath']
+           'Rachford_Rice_solution_mpmath', 'Rachford_Rice_solution_binary_dd']
 
 from fluids.constants import R
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
+from fluids.numerics import add_dd, div_dd, mul_dd, mul_noerrors_dd
 from chemicals.utils import exp, log
 from chemicals.utils import normalize, mark_numba_uncacheable, mark_numba_incompatible
 from chemicals.exceptions import PhaseCountReducedError
@@ -878,6 +879,109 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
     ys = Ks*xs
 #    return V_over_F, xs, ys # numba: uncomment
     return float(V_over_F), xs.tolist(), ys.tolist() # numba: delete
+
+def Rachford_Rice_solution_binary_dd(zs, Ks):
+    r'''Solves the the Rachford-Rice flash equation for a binary system using
+    double-double math. This increases the range in which the
+    calculation can be performed accurately but does not totally eliminate
+    error.
+    
+    .. math::
+        \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
+        
+    The analytical solution for a binary system is:
+        
+    .. math::
+        \frac{V}{F} = \frac{- K_{0} z_{0} - K_{1} z_{1} + z_{0} + z_{1}}
+        {K_{0} K_{1} z_{0} + K_{0} K_{1} z_{1} - K_{0} z_{0} - K_{0} z_{1}
+         - K_{1} z_{0} - K_{1} z_{1} + z_{0} + z_{1}}
+
+    Parameters
+    ----------
+    zs : list[float]
+        Overall mole fractions of all species, [-]
+    Ks : list[float]
+        Equilibrium K-values, [-]
+
+    Returns
+    -------
+    L_over_F : float
+        Liquid fraction solution [-]
+    V_over_F : float
+        Vapor fraction solution [-]
+    xs : list[float]
+        Mole fractions of each species in the liquid phase, [-]
+    ys : list[float]
+        Mole fractions of each species in the vapor phase, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    This system with large volatility difference and a trace of a component
+    shows a correct calculation. Try it out with other solvers for bad results!
+    
+    >>> Rachford_Rice_solution_binary_dd(zs=[1E-27, 1.0], Ks=[1000000000000,0.1])
+    (1.000000000001, -1.0000000000009988e-12, [9.0000000000009e-13, 0.9999999999991], [0.90000000000009, 0.09999999999991001])
+    
+    Note the limitations of this solver can be explored by comparing against
+    :obj:`Rachford_Rice_solution_mpmath`. For example, with `z0` of 1e-28
+    in the above example error creeps back in.
+    
+    '''
+    if len(zs) != 2:
+        raise ValueError("This solution method works on two components only")
+    z0, z1 = zs
+    K0, K1 = Ks
+    if (K0 < 1.0 and K1 < 1.0) or (K0 > 1.0 and K1 > 1.0):
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#                raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+    l = 2
+    xs = [0.0]*l
+    ys = [0.0]*l
+    
+    z0z1r, z0z1e = add_dd(z0, 0.0, z1, 0.0)
+    K0z0r, K0z0e = mul_noerrors_dd(K0, z0)
+    K1z1r, K1z1e = mul_noerrors_dd(K1, z1)
+    
+    tempr, tempe = add_dd(z0z1r, z0z1e, -K0z0r, -K0z0e)
+    t0r, t0e = add_dd(tempr, tempe, -K1z1r, -K1z1e)
+    
+    tempr, tempe = mul_dd(K1, 0.0, K0z0r, K0z0e)
+    denr, dene = add_dd(t0r, t0e, tempr, tempe)
+    tempr, tempe = mul_dd(K0, 0.0, K1z1r, K1z1e)
+    denr, dene = add_dd(denr, dene, tempr, tempe)
+    tempr, tempe = mul_noerrors_dd(K0, z1)
+    denr, dene = add_dd(denr, dene, -tempr, -tempe)
+    tempr, tempe = mul_noerrors_dd(K1, z0)
+    denr, dene = add_dd(denr, dene, -tempr, -tempe)
+    V_over_Fr, V_over_Fe = div_dd(t0r, t0e, denr, dene)
+    L_over_Fr, L_over_Fe = add_dd(1.0, 0.0, -V_over_Fr, -V_over_Fe)
+    
+    # Compute x0
+    denr, dene = add_dd(K0, 0.0, -1.0, 0.0)
+    denr, dene = mul_dd(V_over_Fr, V_over_Fe, denr, dene)
+    denr, dene = add_dd(1.0, 0.0, denr, dene)
+    x0r, x0e = div_dd(z0, 0.0, denr, dene)
+    # Compute x1 from the balance since we are higher precision
+#     x1r, x1e = add_dd(1.0, 0.0, -x0r, -x0e)
+    # it usually works but sometimes causes issues; beter to compute it with the slow way
+    denr, dene = add_dd(K1, 0.0, -1.0, 0.0)
+    denr, dene = mul_dd(V_over_Fr, V_over_Fe, denr, dene)
+    denr, dene = add_dd(1.0, 0.0, denr, dene)
+    x1r, x1e = div_dd(z1, 0.0, denr, dene)
+
+    # Compute y0 and y1
+    y0r, y0e = mul_dd(x0r, x0e, K0, 0.0)
+    y1r, y1e = mul_dd(x1r, x1e, K1, 0.0)
+    
+    xs[0] = x0r
+    xs[1] = x1r
+    ys[0] = y0r
+    ys[1] = y1r
+    return L_over_Fr, V_over_Fr, xs, ys
+
 
 @mark_numba_incompatible
 def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
