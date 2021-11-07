@@ -1157,6 +1157,7 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
         x7 = zix5*x5x1x6
         dF0 += x7
         ddF0 += x7*(t51 + x5x1x6 + x5x1x6)
+    # print(F0, y)
     return F0, -dF0, ddF0
 
 @mark_numba_uncacheable
@@ -1291,15 +1292,27 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     
     # The function cannot be evaluated in some regions due to a zero division however
     # ci should be the minimum
-    near_high = V_over_F_max*one_epsilon_smaller
+    if V_over_F_max > 0.0:
+        near_high = V_over_F_max*one_epsilon_smaller
+    else:
+        near_high = V_over_F_max*one_epsilon_larger
     solver_high = -log((V_over_F_max-near_high)/(near_high-V_over_F_min))
     
+    if V_over_F_min < 0.0:
+        near_low = V_over_F_min*one_epsilon_smaller
+    elif V_over_F_min > 0.0:
+        near_low = V_over_F_min*one_epsilon_larger
+    else:
+        # V_over_F_min equals zero case, cannot evaluate there
+        near_low = min(1e-20, V_over_F_max*1e-15)
+    solver_low = -log((V_over_F_max-near_low)/(near_low-V_over_F_min))
+
     try:
 #        V_over_F = halley(Rachford_Rice_err_LN2, guess, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: uncomment
         if one_m_Kmin == 1.0: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1e-10, high=solver_high, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
+            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1e-10, low=solver_low, high=solver_high, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
         else: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1.48e-12, high=solver_high, bisection=True, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
+            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1.48e-12, low=solver_low, high=solver_high, bisection=True, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
     except:
 #        return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True) # numba: delete
 #        raise ValueError("Could not solve") # numba: uncomment
