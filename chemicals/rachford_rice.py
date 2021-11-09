@@ -1007,7 +1007,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None, d=0):
     ys = K_minus_1
     for i in range(N):
         if d == 0:
-            switch = -1.01 < V_over_F*K_minus_1[i] < -0.99
+            switch = -1.001 < V_over_F*K_minus_1[i] < -0.999
             if switch:
                 xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
             else:
@@ -1018,6 +1018,8 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None, d=0):
             
     
     
+    # The following trick can ensure the compositions sum to 1; small precision 
+    # gain but sometimes a higher value exists.
     i_max_x = xs.index(max(xs))
     x_sum = sum(xs)
     xs[i_max_x] = xs[i_max_x]  + (1.0-x_sum)
