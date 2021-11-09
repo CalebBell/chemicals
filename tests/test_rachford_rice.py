@@ -246,7 +246,37 @@ def test_Rachford_Rice_solution_LN2_backup():
     assert_close1d(ys, ys_expect)
     assert_close(V_over_F, 0, atol=1e-15)
 
-
+def test_Rachford_Rice_err_fprime2():
+    from chemicals.rachford_rice import Rachford_Rice_err_fprime2
+    from fluids.numerics import derivative
+    zs = [3.258590774148712e-05, 0.0855674799425748, 0.009907756583964976, 0.03242799232313792, 0.06405534358003384, 0.0407877177144799, 0.0429904884262149, 0.10553180868514973, 0.07215842486490982, 0.00817995842172398, 0.007225050744427983, 0.032055594027854926, 0.07557529887997982, 0.07594897920010082, 0.09464635004469177, 0.07293318614515282, 0.07302600324098982, 0.013146394881267967, 0.015193544313053963, 0.0786100420725488] 
+    Ks = [0.635957172105807, 34.953439212485, 24.7527921272948, 12.9137056581466, 1.35723577136999, 2.30409616690551, 17.9039985386828, 19.6712603823201, 2.07125745940443, 12.2476396229288, 18.8510028727113, 17.1009075919156, 7.58781202809508, 1.66373195678154, 14.0847959943925, 27.544230800887, 7.05182838537604, 5.29686235867337, 19.2910119250303, 76.7641388925591]
+    N = len(zs)
+    K_minus_1 = [0.0]*N
+    zs_k_minus_1 = [0.0]*N
+    for i in range(N):
+        Kim1 = Ks[i] - 1.0
+        K_minus_1[i] = Kim1
+        zs_k_minus_1[i] = zs[i]*Kim1
+    zs_k_minus_1_2 = [0.0]*N
+    for i in range(N):
+        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
+    zs_k_minus_1_3 = [0.0]*N
+    for i in range(N):
+        zs_k_minus_1_3[i] = -2.0*zs_k_minus_1_2[i]*K_minus_1[i]
+    
+                
+    args = (zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1)
+                
+    point = 1.47 # vapor fraction
+    num_der = derivative(lambda VF, *args: Rachford_Rice_err_fprime2(VF, *args)[0], point, order=3, dx=point*8e-6, args=args)
+    implemented_der = Rachford_Rice_err_fprime2(point, *args)[1]
+    assert_close(num_der, implemented_der, rtol=1e-10)
+    
+    num_der = derivative(lambda VF, *args: Rachford_Rice_err_fprime2(VF, *args)[1], point, order=3, dx=point*4e-6, args=args)
+    implemented_der = Rachford_Rice_err_fprime2(point, *args)[2]
+    assert_close(num_der, implemented_der, rtol=1e-10)
+    
 
 def test_flash_inner_loop():
     V_over_F, xs, ys = flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], method='Analytical')

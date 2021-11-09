@@ -629,6 +629,7 @@ def Rachford_Rice_err_fprime2(V_over_F, zs_k_minus_1, zs_k_minus_1_2, zs_k_minus
         err1 += num1*t2
         err2 += num2*t2*VF_kim1_1_inv
 #            print(err0, err1, err2)
+    # print(err0, V_over_F)
     return err0, err1, err2
 
 def Rachford_Rice_err(V_over_F, zs_k_minus_1, K_minus_1):
@@ -1785,6 +1786,8 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         return Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=guess)
     elif method2 == FLASH_INNER_ANALYTICAL:
         if l == 2:
+            # _, VF, xs, ys = Rachford_Rice_solution_binary_dd(zs, Ks)
+            # return VF, xs, ys
             z1, z2 = zs
             K1, K2 = Ks
             if (K1 < 1.0 and K2 < 1.0) or (K1 > 1.0 and K2 > 1.0):
@@ -1826,7 +1829,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         ys = [0.0]*l
         for i in range(l):
             try:
-                xs[i] = zs[i]/(1.+V_over_F*(Ks[i] - 1.))
+                xs[i] = zs[i]/(1.0 + V_over_F*Ks[i]-V_over_F)
             except:
                 pass
             ys[i] = xs[i]*Ks[i]
