@@ -897,7 +897,7 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_min
 
     
 @mark_numba_uncacheable
-def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
+def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None, d=0):
     r'''Solves the objective function of the Rachford-Rice flash equation as
     modified by Leibovici and Neoschil. This modification helps
     convergence near the vapor fraction boundaries only; it slows
@@ -956,7 +956,9 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     N = len(Ks)
     Kmin = min(Ks) # numba: delete
     Kmax = max(Ks)# numba: delete
-    z_of_Kmax = zs[Ks.index(Kmax)]# numba: delete
+    i_Kmin = Ks.index(Kmin)
+    i_Kmax = Ks.index(Kmax)# numba: delete
+    z_of_Kmax = zs[i_Kmax]# numba: delete
 
 #    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
 #    for i in range(N): # numba: uncomment
@@ -995,20 +997,32 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
     V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, fprime=True, high=high,
                         low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
-    if 1-1e-4 < V_over_F < 1+1e-4:
-        # Re-calculate while inverting phase compositions and inverting the K values
-        # This is necessary for the correct calculation for x compositions when the
-        # liquid fraction is very near zero.
+    if d == 0:
         Ks_inv = [0.0]*N
         for i in range(N):
             Ks_inv[i] = 1.0/Ks[i]
-        LF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks_inv, guess=1.0-V_over_F)
-        return V_over_F, ys, xs
+        LF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks_inv, guess=1.0-V_over_F, d=1)
 
     xs = zs_k_minus_1
     ys = K_minus_1
     for i in range(N):
-        xs[i] = zs[i]/(1. + V_over_F*K_minus_1[i])
+        if d == 0:
+            switch = -1.01 < V_over_F*K_minus_1[i] < -0.99
+            if switch:
+                xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
+            else:
+                # Attempt to avoid truncation error
+                xs[i] = zs[i]/(1. + V_over_F*K_minus_1[i])
+        else:
+            xs[i] = zs[i]/(1. + V_over_F*K_minus_1[i])
+            
+    
+    
+    i_max_x = xs.index(max(xs))
+    x_sum = sum(xs)
+    xs[i_max_x] = xs[i_max_x]  + (1.0-x_sum)
+    
+    for i in range(N):
         ys[i] = xs[i]*Ks[i]
     return V_over_F, xs, ys
 
