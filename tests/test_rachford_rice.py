@@ -154,6 +154,33 @@ def test_Rachford_Rice_solution_Leibovici_Neoschil():
     assert_close1d(ys, ys_expect, rtol=1e-11)
 
     
+
+    # This test is exactly at VF = 4.1264419553378904e-18.
+    # It is within the 10-epsilon and will bounce at the border.
+    Ks = [1.2566703532018493e-21, 3.35062752053393, 1.0300675710905643e-23, 1.706258568414198e-39, 1.6382855298440747e-20]
+    zs = [0.13754371891028325, 0.2984515568715462, 0.2546683930289046, 0.08177453852283137, 0.22756179266643456]
+    LF, VF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks)
+    assert_close(LF, 1, atol=1e-15)
+    assert_close(VF, 0, atol=1e-15)
+    xs_expect = [0.13754371891028325, 0.2984515568715462, 0.2546683930289046, 0.08177453852283137, 0.22756179266643456]
+    ys_expect = [1.7284711382368154e-22, 0.9999999999999999, 2.6232565304082093e-24, 1.3952850703269794e-40, 3.728111920707972e-21]
+    assert_close1d(xs, xs_expect, rtol=1e-15)
+    assert_close1d(ys, ys_expect, rtol=1e-15)
+
+    # Had some issues with this at one point
+    zs = [0.41042475489889, 0.58462647333824, 0.00494877176287]
+    Ks = [0.000574132577225, 0.077495765699309, 13.0198048982224]
+    LF, VF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks)
+    assert_close(LF, 1.077597613507732, rtol=1e-15)
+    assert_close(VF,  -0.07759761350773206, rtol=1e-15)
+    xs_expect = [0.3808858879439191, 0.545572166095087, 0.073541945960994]
+    ys_expect =  [0.0002186789964738748, 0.04227953275576935, 0.9575017882477568]
+    assert_close1d(xs, xs_expect, rtol=1e-14)
+    assert_close1d(ys, ys_expect, rtol=1e-14)
+
+
+
+
 def test_RR_numpy():
     def Wilson_K_value(T, P, Tc, Pc, omega):
         return Pc/P*exp((5.37*(1.0 + omega)*(1.0 - Tc/T)))

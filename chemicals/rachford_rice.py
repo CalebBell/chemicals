@@ -992,7 +992,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     # The boundaries need to be handled with bisection-style solvers
     # The 1e-15 tolerance is able to be found with the 10*epsilon limits.
     low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
-    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, fprime=True, high=high,
+    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-10, fprime=True, high=high,
                         low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
     
     # For maximum accuracy, the equation should be re-solved to obtain 16 digits
@@ -1010,7 +1010,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     x0 = 1.0 - V_over_F
     L_over_F_min_LN = -1.0/(1/Kmin-1)
     L_over_F_max = 1./(1.-1/Kmax)
-    LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, fprime=True, high=x0+1e-4,
+    LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-10, fprime=True, high=x0+1e-4,
                     low=x0-1e-4, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, L_over_F_min_LN, L_over_F_max))
 
     xs = zs_k_minus_1
