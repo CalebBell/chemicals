@@ -24,7 +24,7 @@ SOFTWARE.
 
 import os
 import fluids
-__version__ = '1.0.12'
+__version__ = '1.0.13'
 
 if not fluids.numerics.is_micropython:
 
