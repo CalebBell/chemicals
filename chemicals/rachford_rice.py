@@ -42,6 +42,7 @@ Two Phase - Implementations
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_LN2
 .. autofunction:: chemicals.rachford_rice.Li_Johns_Ahmadi_solution
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_Leibovici_Neoschil
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_mpmath
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_binary_dd
@@ -71,10 +72,10 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
            'flash_inner_loop_all_methods', 'flash_inner_loop_methods',
-           'Rachford_Rice_solution_mpmath', 'Rachford_Rice_solution_binary_dd']
+           'Rachford_Rice_solution_mpmath', 'Rachford_Rice_solution_binary_dd',
+           'Rachford_Rice_solution_Leibovici_Neoschil']
 
-from fluids.constants import R
-from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, NotBoundedError, numpy as np
+from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, one_10_epsilon_larger, one_10_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
 from fluids.numerics import add_dd, div_dd, mul_dd, mul_noerrors_dd
 from chemicals.utils import exp, log
@@ -84,9 +85,6 @@ try:
     from itertools import combinations
 except:
     pass
-
-
-R_inv = 1.0/R
 
 
 def Rachford_Rice_polynomial_3(zs, Cs):
@@ -629,6 +627,7 @@ def Rachford_Rice_err_fprime2(V_over_F, zs_k_minus_1, zs_k_minus_1_2, zs_k_minus
         err1 += num1*t2
         err2 += num2*t2*VF_kim1_1_inv
 #            print(err0, err1, err2)
+    # print(err0, V_over_F)
     return err0, err1, err2
 
 def Rachford_Rice_err(V_over_F, zs_k_minus_1, K_minus_1):
@@ -879,6 +878,171 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
     ys = Ks*xs
 #    return V_over_F, xs, ys # numba: uncomment
     return float(V_over_F), xs.tolist(), ys.tolist() # numba: delete
+
+def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min, V_over_F_max):
+    plain_err, plan_diff = 0.0, 0.0
+    for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
+        VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
+        plain_err += num0*VF_kim1_1_inv
+        plan_diff += num1*VF_kim1_1_inv*VF_kim1_1_inv
+    err = (V_over_F - V_over_F_min)*(V_over_F_max - V_over_F)*plain_err
+    fprime = (plan_diff*(-V_over_F + V_over_F_max)*(V_over_F - V_over_F_min) 
+              + plain_err*(-V_over_F + V_over_F_max)
+              + plain_err*(-V_over_F + V_over_F_min))
+    # print(err, V_over_F)
+    return err, fprime
+
+    
+@mark_numba_uncacheable
+def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
+    r'''Solves the objective function of the Rachford-Rice flash equation as
+    modified by Leibovici and Neoschil. This modification helps
+    convergence near the vapor fraction boundaries only; it slows
+    convergence in other regions.
+
+    .. math::
+        \left(\frac{V}{F} - \alpha_L\right)\left(\alpha_R - \frac{V}{F}\right)
+        \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
+        
+    .. math::
+        \alpha_L = - \frac{1}{K_{max} - 1}
+    
+    .. math::
+        \alpha_R = \frac{1}{1 - K_{min}}
+
+    ----------
+    zs : list[float]
+        Overall mole fractions of all species, [-]
+    Ks : list[float]
+        Equilibrium K-values, [-]
+    guess : float, optional
+        Optional initial guess for vapor fraction, [-]
+
+    Returns
+    -------
+    L_over_F : float
+        Liquid fraction solution [-]
+    V_over_F : float
+        Vapor fraction solution [-]
+    xs : list[float]
+        Mole fractions of each species in the liquid phase, [-]
+    ys : list[float]
+        Mole fractions of each species in the vapor phase, [-]
+
+    Notes
+    -----
+    The initial guess is the average of the following, as described in [2]_.
+
+    .. math::
+        \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
+        - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
+
+    .. math::
+        \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
+
+    Examples
+    --------
+    >>> Rachford_Rice_solution_Leibovici_Neoschil(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
+    (0.3092697372261, 0.69073026277385, [0.339408696966343, 0.36505605903717, 0.29553524399648], [0.57190365438828, 0.270871595805580, 0.157224749806130])
+
+    References
+    ----------
+    .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the 
+       Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992): 
+       303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
+    '''
+    N = len(Ks)
+    Kmin = min(Ks) # numba: delete
+    Kmax = max(Ks)# numba: delete
+    i_Kmax = Ks.index(Kmax)# numba: delete
+    z_of_Kmax = zs[i_Kmax]# numba: delete
+
+#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if Ks[i] > Kmax: # numba: uncomment
+#            z_of_Kmax = zs[i] # numba: uncomment
+#            Kmax = Ks[i] # numba: uncomment
+#        if Ks[i] < Kmin: # numba: uncomment
+#            Kmin = Ks[i] # numba: uncomment
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
+    V_over_F_min_LN = -1.0/(Kmax-1) # There is a special lower limit to use for this method
+    V_over_F_max = 1./(1.-Kmin)
+
+    if guess is not None and guess > V_over_F_min and guess < V_over_F_max:
+        x0 = guess
+    else:
+        x0 = (V_over_F_min + V_over_F_max)*0.5
+
+    # Pre-compute as much as we can to speedup the slower solve of the
+    # error equation
+    K_minus_1 = [0.0]*N
+    zs_k_minus_1 = [0.0]*N
+    zs_k_minus_1_2 = [0.0]*N
+    for i in range(N):
+        Kim1 = Ks[i] - 1.0
+        K_minus_1[i] = Kim1
+        zs_k_minus_1[i] = zs[i]*Kim1
+        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
+    
+    # Right the boundaries, the derivative goes very large and microscopic steps are made and the newton solver switches
+    # The boundaries need to be handled with bisection-style solvers
+    # The 1e-15 tolerance is able to be found with the 10*epsilon limits.
+    low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
+    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
+                        low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
+    
+    # For maximum accuracy, the equation should be re-solved to obtain 16 digits
+    # of precision for the liquid fraction
+    # Fortunately, we have an extremely good guess. 
+    # We can re-use the same arrays.
+    for i in range(N):
+        Kim1 = 1.0/Ks[i] - 1.0
+        K_minus_1[i] = Kim1
+        zs_k_minus_1[i] = zs[i]*Kim1
+        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
+    
+    # Translate the limits, noting that Kmin and Kmax are their inverses
+    # and they trade places.
+    x0 = 1.0 - V_over_F
+    L_over_F_min_LN = -1.0/(1/Kmin-1)
+    L_over_F_max = 1./(1.-1/Kmax)
+    # Try to polish it but do not require a ytol, but do allow it to exit on hitting a boundary or there being a large ytol error.
+    LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e100, fprime=True, high=x0+1e-4,
+                    low=x0-1e-4, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, L_over_F_min_LN, L_over_F_max))
+
+    xs = zs_k_minus_1
+    ys = K_minus_1
+    for i in range(N):
+        K_minus_1 = Ks[i] - 1.0
+            # Attempt to avoid truncation error by using the liquid fraction
+            # some of the time.
+        switch = -1.001 < V_over_F*K_minus_1 < -0.999
+        if switch:
+            xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
+        else:
+            xs[i] = zs[i]/(1. + V_over_F*K_minus_1)
+            
+    # The following trick can ensure the compositions sum to 1; small precision 
+    # gain but sometimes a large error can still exist.
+    i_max_x = xs.index(max(xs))# numba: delete
+    
+#    max_x = 0  # numba: uncomment
+#    i_max_x = 0 # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if xs[i] > max_x: # numba: uncomment
+#            max_x = xs[i] # numba: uncomment
+#            i_max_x = i # numba: uncomment
+    
+    
+    x_sum = sum(xs)
+    xs[i_max_x] = xs[i_max_x]  + (1.0-x_sum)
+    
+    for i in range(N):
+        ys[i] = xs[i]*Ks[i]
+    return LF, V_over_F, xs, ys
 
 def Rachford_Rice_solution_binary_dd(zs, Ks):
     r'''Solves the the Rachford-Rice flash equation for a binary system using
@@ -1157,7 +1321,7 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
         x7 = zix5*x5x1x6
         dF0 += x7
         ddF0 += x7*(t51 + x5x1x6 + x5x1x6)
-
+    # print(F0, y)
     return F0, -dF0, ddF0
 
 @mark_numba_uncacheable
@@ -1235,7 +1399,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     Examples
     --------
     >>> Rachford_Rice_solution_LN2(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
-    (0.6907302627738541, [0.3394086969663436, 0.3650560590371706, 0.29553524399648573], [0.571903654388289, 0.27087159580558057, 0.1572247498061304])
+    (0.6907302627738, [0.3394086969663, 0.3650560590371, 0.29553524399648], [0.571903654388, 0.27087159580558, 0.1572247498061])
 
     References
     ----------
@@ -1279,6 +1443,9 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
 
     # Suggests guess V_over_F_min, not using
     log_transform = (V_over_F_max-guess)/(guess-V_over_F_min)
+    if abs(log_transform-1) < 1e-10:
+        # The derivative is huge around a log transform of 1, better to start at a hard-coded location
+        log_transform = 0.8
     if log_transform > 0.0:
         guess = -log(log_transform)
     else:
@@ -1286,12 +1453,30 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         guess = 0.5*(V_over_F_min + V_over_F_max)
         guess = -log((V_over_F_max-guess)/(guess-V_over_F_min))
     # Should always converge - no poles
+    
+    # The function cannot be evaluated in some regions due to a zero division however
+    # ci should be the minimum
+    if V_over_F_max > 0.0:
+        near_high = V_over_F_max*one_epsilon_smaller
+    else:
+        near_high = V_over_F_max*one_epsilon_larger
+    solver_high = -log((V_over_F_max-near_high)/(near_high-V_over_F_min))
+    
+    if V_over_F_min < 0.0:
+        near_low = V_over_F_min*one_epsilon_smaller
+    elif V_over_F_min > 0.0:
+        near_low = V_over_F_min*one_epsilon_larger
+    else:
+        # V_over_F_min equals zero case, cannot evaluate there
+        near_low = min(1e-20, V_over_F_max*1e-15)
+    solver_low = -log((V_over_F_max-near_low)/(near_low-V_over_F_min))
+
     try:
 #        V_over_F = halley(Rachford_Rice_err_LN2, guess, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: uncomment
         if one_m_Kmin == 1.0: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
+            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1e-10, low=solver_low, high=solver_high, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
         else: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, ytol=1e-8, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
+            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1.48e-12, low=solver_low, high=solver_high, bisection=True, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
     except:
 #        return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True) # numba: delete
 #        raise ValueError("Could not solve") # numba: uncomment
@@ -1317,12 +1502,23 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
             #     V_over_F = -log((V_over_F_max - V_over_F_max) / (V_over_F_max - V_over_F_min))
 
     V_over_F = (V_over_F_min + (V_over_F_max - V_over_F_min)/(1.0 + exp(-V_over_F)))
-
-    xs = [0.0]*N
-    for i in range(N):
-        xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
-        xs[i] = xi
-        cis_ys[i] = Ks[i]*xi
+    
+    if 1-1e-4 < V_over_F < 1+1e-4:
+        # Re-calculate while inverting phase compositions and inverting the K values
+        # This is necessary for the correct calculation for x compositions when the
+        # liquid fraction is very near zero.
+        Ks_inv = cis_ys
+        for i in range(N):
+            Ks_inv[i] = 1.0/Ks[i]
+        LF, xs, ys = Rachford_Rice_solution_LN2(zs, Ks_inv, guess=1.0-V_over_F)
+        return V_over_F, ys, xs
+        
+    else:
+        xs = [0.0]*N
+        for i in range(N):
+            xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
+            xs[i] = xi
+            cis_ys[i] = Ks[i]*xi
     return V_over_F, xs, cis_ys
 
 def LJA_err(x1, t1, terms_2, terms_3, N2):
@@ -1588,13 +1784,14 @@ FLASH_INNER_NUMPY = 'Rachford-Rice (NumPy)'
 FLASH_INNER_LJA = 'Li-Johns-Ahmadi'
 FLASH_INNER_POLY = 'Rachford-Rice (polynomial)'
 FLASH_INNER_LN2 = 'Leibovici and Nichita 2'
-
+FLASH_INNER_LN = 'Leibovici and Neoschil'
 
 flash_inner_loop_all_methods = (FLASH_INNER_ANALYTICAL,
                                 FLASH_INNER_SECANT,
                                 FLASH_INNER_NR, FLASH_INNER_HALLEY,
                                 FLASH_INNER_NUMPY, FLASH_INNER_LJA,
-                                FLASH_INNER_POLY, FLASH_INNER_LN2)
+                                FLASH_INNER_POLY, FLASH_INNER_LN2,
+                                FLASH_INNER_LN)
 '''Tuple of method name keys. See the `flash_inner_loop` for the actual references'''
 
 def flash_inner_loop_methods(N):
@@ -1621,7 +1818,7 @@ def flash_inner_loop_methods(N):
     if N >= 10 and not IS_PYPY:
         methods.append(FLASH_INNER_NUMPY)
     if N >= 2:
-        methods.extend([FLASH_INNER_LN2, FLASH_INNER_SECANT, FLASH_INNER_NR, FLASH_INNER_HALLEY])
+        methods.extend([FLASH_INNER_LN2, FLASH_INNER_SECANT, FLASH_INNER_NR, FLASH_INNER_HALLEY, FLASH_INNER_LN])
         if N < 10 and not IS_PYPY:
             methods.append(FLASH_INNER_NUMPY)
     if N >= 3:
@@ -1688,11 +1885,13 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
           described in :obj:`Rachford_Rice_solution_LN2`.
         * 'Li-Johns-Ahmadi', which numerically solves an objective function
           described in :obj:`Li_Johns_Ahmadi_solution`.
+        * 'Leibovici and Neoschil', which numerically solves an objective
+          function described in :obj:`Rachford_Rice_solution_Leibovici_Neoschil`.
 
     Examples
     --------
     >>> flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
-    (0.6907302627738541, [0.3394086969663436, 0.3650560590371706, 0.29553524399648573], [0.571903654388289, 0.27087159580558057, 0.1572247498061304])
+    (0.6907302627738, [0.3394086969663, 0.3650560590371, 0.29553524399648], [0.571903654388, 0.27087159580558, 0.1572247498061])
     '''
     l = len(zs)
     if method is None:
@@ -1749,10 +1948,15 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
 
     if method2 == FLASH_INNER_LN2:
         return Rachford_Rice_solution_LN2(zs, Ks, guess)
+    elif method2 == FLASH_INNER_LN:
+        LF, VF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=guess)
+        return (VF, xs, ys)
     elif method2 == FLASH_INNER_SECANT:
         return Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=guess)
     elif method2 == FLASH_INNER_ANALYTICAL:
         if l == 2:
+            # _, VF, xs, ys = Rachford_Rice_solution_binary_dd(zs, Ks)
+            # return VF, xs, ys
             z1, z2 = zs
             K1, K2 = Ks
             if (K1 < 1.0 and K2 < 1.0) or (K1 > 1.0 and K2 > 1.0):
@@ -1794,7 +1998,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         ys = [0.0]*l
         for i in range(l):
             try:
-                xs[i] = zs[i]/(1.+V_over_F*(Ks[i] - 1.))
+                xs[i] = zs[i]/(1.0 + V_over_F*Ks[i]-V_over_F)
             except:
                 pass
             ys[i] = xs[i]*Ks[i]
