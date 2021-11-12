@@ -954,7 +954,6 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     N = len(Ks)
     Kmin = min(Ks) # numba: delete
     Kmax = max(Ks)# numba: delete
-    i_Kmin = Ks.index(Kmin)
     i_Kmax = Ks.index(Kmax)# numba: delete
     z_of_Kmax = zs[i_Kmax]# numba: delete
 
@@ -1027,7 +1026,16 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
             
     # The following trick can ensure the compositions sum to 1; small precision 
     # gain but sometimes a large error can still exist.
-    i_max_x = xs.index(max(xs))
+    i_max_x = xs.index(max(xs))# numba: delete
+    
+#    max_x = 0  # numba: uncomment
+#    i_max_x = 0 # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if xs[i] > max_x: # numba: uncomment
+#            max_x = xs[i] # numba: uncomment
+#            i_max_x = i # numba: uncomment
+    
+    
     x_sum = sum(xs)
     xs[i_max_x] = xs[i_max_x]  + (1.0-x_sum)
     
