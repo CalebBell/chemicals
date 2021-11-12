@@ -178,6 +178,8 @@ def test_Rachford_Rice_solution_Leibovici_Neoschil():
     assert_close1d(xs, xs_expect, rtol=1e-14)
     assert_close1d(ys, ys_expect, rtol=1e-14)
 
+    # Call it once with the outer method
+    flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], method='Leibovici and Neoschil')
 
 
 
@@ -396,7 +398,7 @@ def test_flash_inner_loop():
 def test_flash_inner_loop_methods():
     methods = flash_inner_loop_methods(4)
     assert methods == ['Analytical', 'Leibovici and Nichita 2', 'Rachford-Rice (Secant)',
-                       'Rachford-Rice (Newton-Raphson)', 'Rachford-Rice (Halley)',
+                       'Rachford-Rice (Newton-Raphson)', 'Rachford-Rice (Halley)', 'Leibovici and Neoschil',
                        'Rachford-Rice (NumPy)', 'Li-Johns-Ahmadi',
                        'Rachford-Rice (polynomial)']
 
@@ -408,7 +410,8 @@ flash_inner_loop_numpy = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=K
 flash_inner_loop_LJA = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Li-Johns-Ahmadi')
 flash_inner_loop_poly = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (polynomial)')
 flash_inner_loop_LN2 = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Nichita 2')
-flash_LN = lambda zs, Ks, guess=None: Rachford_Rice_solution_Leibovici_Neoschil(zs=zs, Ks=Ks, guess=guess)[1:]
+flash_inner_loop_LN = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Neoschil')
+# flash_LN = lambda zs, Ks, guess=None: Rachford_Rice_solution_Leibovici_Neoschil(zs=zs, Ks=Ks, guess=guess)[1:]
 
 
 algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
@@ -416,7 +419,7 @@ algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
               flash_inner_loop_NR, flash_inner_loop_halley,
               flash_inner_loop_numpy, flash_inner_loop_LJA,
               flash_inner_loop_poly, flash_inner_loop_LN2,
-              RR_solution_mpmath, flash_LN]
+              RR_solution_mpmath, flash_inner_loop_LN]
 
 @pytest.mark.parametrize("algorithm", algorithms)
 @pytest.mark.parametrize("array", [False])

@@ -991,7 +991,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     # The boundaries need to be handled with bisection-style solvers
     # The 1e-15 tolerance is able to be found with the 10*epsilon limits.
     low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
-    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-10, fprime=True, high=high,
+    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
                         low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
     
     # For maximum accuracy, the equation should be re-solved to obtain 16 digits
@@ -1009,7 +1009,8 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     x0 = 1.0 - V_over_F
     L_over_F_min_LN = -1.0/(1/Kmin-1)
     L_over_F_max = 1./(1.-1/Kmax)
-    LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-10, fprime=True, high=x0+1e-4,
+    # Try to polish it but do not require a ytol, but do allow it to exit on hitting a boundary or there being a large ytol error.
+    LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e100, fprime=True, high=x0+1e-4,
                     low=x0-1e-4, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, L_over_F_min_LN, L_over_F_max))
 
     xs = zs_k_minus_1
@@ -1783,13 +1784,14 @@ FLASH_INNER_NUMPY = 'Rachford-Rice (NumPy)'
 FLASH_INNER_LJA = 'Li-Johns-Ahmadi'
 FLASH_INNER_POLY = 'Rachford-Rice (polynomial)'
 FLASH_INNER_LN2 = 'Leibovici and Nichita 2'
-
+FLASH_INNER_LN = 'Leibovici and Neoschil'
 
 flash_inner_loop_all_methods = (FLASH_INNER_ANALYTICAL,
                                 FLASH_INNER_SECANT,
                                 FLASH_INNER_NR, FLASH_INNER_HALLEY,
                                 FLASH_INNER_NUMPY, FLASH_INNER_LJA,
-                                FLASH_INNER_POLY, FLASH_INNER_LN2)
+                                FLASH_INNER_POLY, FLASH_INNER_LN2,
+                                FLASH_INNER_LN)
 '''Tuple of method name keys. See the `flash_inner_loop` for the actual references'''
 
 def flash_inner_loop_methods(N):
@@ -1816,7 +1818,7 @@ def flash_inner_loop_methods(N):
     if N >= 10 and not IS_PYPY:
         methods.append(FLASH_INNER_NUMPY)
     if N >= 2:
-        methods.extend([FLASH_INNER_LN2, FLASH_INNER_SECANT, FLASH_INNER_NR, FLASH_INNER_HALLEY])
+        methods.extend([FLASH_INNER_LN2, FLASH_INNER_SECANT, FLASH_INNER_NR, FLASH_INNER_HALLEY, FLASH_INNER_LN])
         if N < 10 and not IS_PYPY:
             methods.append(FLASH_INNER_NUMPY)
     if N >= 3:
@@ -1883,6 +1885,8 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
           described in :obj:`Rachford_Rice_solution_LN2`.
         * 'Li-Johns-Ahmadi', which numerically solves an objective function
           described in :obj:`Li_Johns_Ahmadi_solution`.
+        * 'Leibovici and Neoschil', which numerically solves an objective
+          function described in :obj:`Rachford_Rice_solution_Leibovici_Neoschil`.
 
     Examples
     --------
@@ -1944,6 +1948,9 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
 
     if method2 == FLASH_INNER_LN2:
         return Rachford_Rice_solution_LN2(zs, Ks, guess)
+    elif method2 == FLASH_INNER_LN:
+        LF, VF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=guess)
+        return (VF, xs, ys)
     elif method2 == FLASH_INNER_SECANT:
         return Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=guess)
     elif method2 == FLASH_INNER_ANALYTICAL:
