@@ -879,20 +879,36 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
 #    return V_over_F, xs, ys # numba: uncomment
     return float(V_over_F), xs.tolist(), ys.tolist() # numba: delete
 
+from math import fsum
+from doubledouble import DoubleDouble
 def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min, V_over_F_max):
     plain_err, plan_diff = 0.0, 0.0
+    errs = []
+    diffs = []
     for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
         VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
         plain_err += num0*VF_kim1_1_inv
         plan_diff += num1*VF_kim1_1_inv*VF_kim1_1_inv
+        errs.append(num0*VF_kim1_1_inv)
+        diffs.append(num1*VF_kim1_1_inv*VF_kim1_1_inv)
+        
+    plain_err = fsum(errs)
+    plan_diff = fsum(diffs)
+    V_over_F = DoubleDouble(V_over_F)
+    V_over_F_min = DoubleDouble(V_over_F_min)
+    V_over_F_max = DoubleDouble(V_over_F_max)
+    plain_err = DoubleDouble(plain_err)
+    plan_diff = DoubleDouble(plan_diff)
     err = (V_over_F - V_over_F_min)*(V_over_F_max - V_over_F)*plain_err
+
     fprime = (plan_diff*(-V_over_F + V_over_F_max)*(V_over_F - V_over_F_min) 
               + plain_err*(-V_over_F + V_over_F_max)
               + plain_err*(-V_over_F + V_over_F_min))
     # print(err, V_over_F)
-    return err, fprime
+    return err.x, fprime.x
 
-    
+from fluids.numerics.doubledouble import add_dd, mul_dd, div_dd, div_dd
+
 @mark_numba_uncacheable
 def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     r'''Solves the objective function of the Rachford-Rice flash equation as
@@ -1016,15 +1032,20 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     xs = zs_k_minus_1
     ys = K_minus_1
     for i in range(N):
-        K_minus_1 = Ks[i] - 1.0
+        K_minus_1r, K_minus_1e = add_dd(Ks[i], 0, - 1.0, 0)
             # Attempt to avoid truncation error by using the liquid fraction
             # some of the time.
-        switch = -1.001 < V_over_F*K_minus_1 < -0.999
+        switch = -1.001 < V_over_F*K_minus_1r < -0.999
         if switch:
-            xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
+            denr, dene = add_dd(-LF, 0, 1.0, 0)
+            denr, dene = mul_dd(denr, dene, Ks[i], 0)
+            denr, dene =  add_dd(LF, 0, denr, dene)
+            xs[i] = div_dd(zs[i], 0.0, denr, dene)[0]
         else:
-            xs[i] = zs[i]/(1. + V_over_F*K_minus_1)
-            
+            denr, dene = mul_dd(K_minus_1r, K_minus_1e, V_over_F, 0)
+            denr, dene = add_dd(1.0, 0, denr, dene)
+            xs[i] = div_dd(zs[i], 0.0, denr, dene)[0]
+                
     # The following trick can ensure the compositions sum to 1; small precision 
     # gain but sometimes a large error can still exist.
     i_max_x = xs.index(max(xs))# numba: delete
@@ -1039,7 +1060,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     
     x_sum = sum(xs)
     xs[i_max_x] = xs[i_max_x]  + (1.0-x_sum)
-    
+    # 
     for i in range(N):
         ys[i] = xs[i]*Ks[i]
     return LF, V_over_F, xs, ys
