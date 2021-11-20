@@ -39,6 +39,8 @@ Pure Component Correlations
 .. autofunction:: chemicals.interface.Miqueu
 .. autofunction:: chemicals.interface.Aleem
 .. autofunction:: chemicals.interface.Mersmann_Kind_sigma
+.. autofunction:: chemicals.interface.sigma_Gharagheizi_1
+.. autofunction:: chemicals.interface.sigma_Gharagheizi_2
 
 Mixing Rules
 ------------
@@ -139,7 +141,8 @@ __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Mersmann_Kind_sigma', 'API10A32',
            'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem',
            'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 'Weinaug_Katz',
-           'Meybodi_Daryasafar_Karimi', 'ISTExpansion']
+           'Meybodi_Daryasafar_Karimi', 'ISTExpansion', 'sigma_Gharagheizi_1',
+           'sigma_Gharagheizi_2']
 
 import os
 from fluids.numerics import numpy as np
@@ -223,7 +226,7 @@ def sigma_IAPWS(T):
     Returns
     -------
     sigma : float
-        Air-water surface tension, [N/m]
+        Air-liquid surface tension, [N/m]
 
     Notes
     -----
@@ -313,7 +316,7 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
 
 
 def PPDS14(T, Tc, a0, a1, a2):
-    r'''Calculates air-water surface tension  using the [1]_
+    r'''Calculates air-liquid surface tension  using the [1]_
     emperical (parameter-regressed) method, called the PPDS 14 equation for
     surface tension.
     
@@ -362,7 +365,7 @@ def PPDS14(T, Tc, a0, a1, a2):
     return a0*tau**a1*(1.0 + a2*tau)
 
 def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
-    r'''Calculates air-water surface tension using the Watson [1]_
+    r'''Calculates air-liquid surface tension using the Watson [1]_
     emperical (parameter-regressed) method developed by NIST.
     
     .. math::
@@ -413,7 +416,7 @@ def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     return exp(a1 + l*(a2 + Tr*(a3 + Tr*(a4 + a5*Tr))))
 
 def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
-    r'''Calculates air-water surface tension using the IST expansion [1]_
+    r'''Calculates air-liquid surface tension using the IST expansion [1]_
     emperical (parameter-regressed) method developed by NIST.
     
     .. math::
@@ -460,7 +463,7 @@ def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     return tau*(a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau))))
 
 def Somayajulu(T, Tc, A, B, C):
-    r'''Calculates air-water surface tension  using the [1]_
+    r'''Calculates air-liquid surface tension  using the [1]_
     emperical (parameter-regressed) method. Well regressed, no recent data.
 
     .. math::
@@ -558,7 +561,7 @@ def Jasper(T, a, b):
 
 
 def Brock_Bird(T, Tb, Tc, Pc):
-    r'''Calculates air-water surface tension  using the [1]_
+    r'''Calculates air-liquid surface tension  using the [1]_
     emperical method. Old and tested.
 
     .. math::
@@ -621,7 +624,7 @@ def Brock_Bird(T, Tb, Tc, Pc):
 
 
 def Pitzer_sigma(T, Tc, Pc, omega):
-    r'''Calculates air-water surface tension using the correlation derived
+    r'''Calculates air-liquid surface tension using the correlation derived
     by [1]_ from the works of [2]_ and [3]_. Based on critical property CSP
     methods.
 
@@ -676,7 +679,7 @@ def Pitzer_sigma(T, Tc, Pc, omega):
 
 
 def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
-    r'''Calculates air-water surface tension using the correlation derived by
+    r'''Calculates air-liquid surface tension using the correlation derived by
     [1]_ based on critical property CSP methods and chemical classes.
 
     .. math::
@@ -732,7 +735,7 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
 
 
 def Zuo_Stenby(T, Tc, Pc, omega):
-    r'''Calculates air-water surface tension using the reference fluids
+    r'''Calculates air-liquid surface tension using the reference fluids
     methods of [1]_.
 
     .. math::
@@ -803,7 +806,7 @@ def Zuo_Stenby(T, Tc, Pc, omega):
 
 
 def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
-    r'''Calculates air-water surface tension using the reference fluids methods
+    r'''Calculates air-liquid surface tension using the reference fluids methods
     of [1]_.
 
     .. math::
@@ -865,7 +868,7 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
 
 
 def Miqueu(T, Tc, Vc, omega):
-    r'''Calculates air-water surface tension using the methods of [1]_.
+    r'''Calculates air-liquid surface tension using the methods of [1]_.
 
     .. math::
         \sigma = k T_c \left( \frac{N_a}{V_c}\right)^{2/3}
@@ -1044,6 +1047,115 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
     return sigma
 
 
+def sigma_Gharagheizi_1(T, Tc, MW, omega):
+    r'''Calculates air-liquid surface tension using the 
+    equation 4 derived in [1]_ by gene expression programming.
+
+    .. math::
+        \sigma = 8.948226\times 10^{-4}\left[\frac{A^2}{MW}\sqrt{\frac{A\omega}{MW}}
+        \right]^{0.5}
+
+    .. math::
+        A = (T_{c} - T - \omega)
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    MW : float
+        Molecular weight [g/mol]
+    omega : float
+        Acentric factor for fluid, [-]
+
+    Returns
+    -------
+    sigma : float
+        Liquid surface tension, N/m
+
+    Notes
+    -----
+    This equation may fail before the critical point.
+
+    Examples
+    --------
+    Methane at 93 K, point from [1]_'s supporting material:
+    
+    >>> sigma_Gharagheizi_1(T=95, Tc=190.564, MW=16.04, omega=0.012)
+    0.0110389739
+
+    References
+    ----------
+    .. [1] Gharagheizi, Farhad, Ali Eslamimanesh, Mehdi Sattari, Amir H. Mohammadi,
+       and Dominique Richon. "Development of Corresponding States Model for 
+       Estimation of the Surface Tension of Chemical Compounds." AIChE Journal 59, 
+       no. 2 (2013): 613-21. https://doi.org/10.1002/aic.13824.
+    '''
+    # Equation 4
+    A = (Tc - T - omega)
+    sigma = 8.948226e-4*sqrt(A*A/MW*sqrt(A*omega/MW))
+    return sigma
+
+def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
+    r'''Calculates air-liquid surface tension using the 
+    equation 6 derived in [1]_ by gene expression programming.
+
+    .. math::
+        \frac{\sigma}{\text{N}/\text{m}} = 10^{-4}\left(\frac{P_c}{\text{bar}}\right)^{2/3}
+        \left(\frac{T_c}{\text{K}}\right)^{1/3}(1-T_r)^{11/9}
+        \left[7.728729T_{br} + 2.476318\left(T_{br}^3 + \frac{V_{c}}{\text{m}^3 /\text{kmol}}\right)
+        \right]
+        
+        
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tb : float
+        Boiling temperature of the fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of fluid [Pa]
+    MW : float
+        Molecular weight [g/mol]
+    Vc : float
+        Critical volume of fluid [m^3/mol]
+
+    Returns
+    -------
+    sigma : float
+        Liquid surface tension, N/m
+
+    Notes
+    -----
+    This expression gives does converge to 0 at the critical point. 
+
+    Examples
+    --------
+    Methane at 93 K, point from [1]_'s supporting material:
+    
+    >>> sigma_Gharagheizi_2(T=95, Tb=111.66, Tc=190.564, Pc=45.99e5, Vc=0.0986e-3)
+    0.01674894057
+
+    References
+    ----------
+    .. [1] Gharagheizi, Farhad, Ali Eslamimanesh, Mehdi Sattari, Amir H. Mohammadi,
+       and Dominique Richon. "Development of Corresponding States Model for 
+       Estimation of the Surface Tension of Chemical Compounds." AIChE Journal 59, 
+       no. 2 (2013): 613-21. https://doi.org/10.1002/aic.13824.
+    '''
+    # Equation 6
+    Pc *= 1e-5 # Pc, Pa to bar
+    Tr = T/Tc
+    Tbr = Tb/Tc
+    Tbr2 = Tbr*Tbr
+    Vc *= 1e3 # m^3/mol to m^3/kmol
+    sigma = 1e-4*Pc**(2.0/3.0)*Tc**(1.0/3.0)*(1.0 - Tr)**(11/9.)
+    sigma *= (7.728729*Tbr + 2.476318*(Tbr*Tbr2 + Vc))
+    return sigma
+
 def API10A32(T, Tc, K_W):
     r'''Calculates the interfacial tension between
     a liquid petroleum fraction and air, using the oil's pseudocritical
@@ -1065,7 +1177,7 @@ def API10A32(T, Tc, K_W):
     Returns
     -------
     sigma : float
-        Air-water surface tension, [N/m]
+        Air-liquid surface tension, [N/m]
 
     Notes
     -----

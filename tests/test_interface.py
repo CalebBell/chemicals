@@ -207,3 +207,18 @@ def test_ISTExpansion():
     
     sigma = ISTExpansion(T=400.0, Tc=776.0, a1=0.037545, a2=0.0363288, a3=1e-4, a4=1e-3, a5=1e-4)
     assert_close(sigma, 0.02679017489704166, rtol=1e-15)
+    
+    
+def test_sigma_Gharagheizi_1():
+    # point from article supporting material exactly matches
+    sigma_methane1 = sigma_Gharagheizi_1(T=93.1500015258789, Tc=190.564, MW=16.04246, omega=0.0115478)
+    assert_close(sigma_methane1, 0.0111974953003432, rtol=1e-13)
+
+    # Point that math errors before critical point
+    # sigma_Gharagheizi_1(T=190.56, Tc=190.564, MW=16.04, omega=0.012)
+    
+def test_sigma_Gharagheizi_2():
+    # point from article supporting material exactly matches
+    
+    sigma_methane1 = sigma_Gharagheizi_2(T=93.1500015258789, Tb=111.66, Tc=190.564, Pc=45.99*1e5, Vc=0.0986e-3)
+    assert_close(sigma_methane1, 0.0171460800730683, rtol=1e-13)
