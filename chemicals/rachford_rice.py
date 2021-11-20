@@ -952,18 +952,18 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
        303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
     '''
     N = len(Ks)
-    Kmin = min(Ks) # numba: delete
-    Kmax = max(Ks)# numba: delete
-    i_Kmax = Ks.index(Kmax)# numba: delete
-    z_of_Kmax = zs[i_Kmax]# numba: delete
+    # Kmin = min(Ks) # numba: delete
+    # Kmax = max(Ks)# numba: delete
+    # i_Kmax = Ks.index(Kmax)# numba: delete
+    # z_of_Kmax = zs[i_Kmax]# numba: delete
 
-#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
-#    for i in range(N): # numba: uncomment
-#        if Ks[i] > Kmax: # numba: uncomment
-#            z_of_Kmax = zs[i] # numba: uncomment
-#            Kmax = Ks[i] # numba: uncomment
-#        if Ks[i] < Kmin: # numba: uncomment
-#            Kmin = Ks[i] # numba: uncomment
+    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
+    for i in range(N): # numba: uncomment
+        if Ks[i] > Kmax: # numba: uncomment
+            z_of_Kmax = zs[i] # numba: uncomment
+            Kmax = Ks[i] # numba: uncomment
+        if Ks[i] < Kmin: # numba: uncomment
+            Kmin = Ks[i] # numba: uncomment
     if Kmin > 1.0 or Kmax < 1.0:
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
@@ -1027,14 +1027,14 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
             
     # The following trick can ensure the compositions sum to 1; small precision 
     # gain but sometimes a large error can still exist.
-    i_max_x = xs.index(max(xs))# numba: delete
+    # i_max_x = xs.index(max(xs))# numba: delete
     
-#    max_x = 0  # numba: uncomment
-#    i_max_x = 0 # numba: uncomment
-#    for i in range(N): # numba: uncomment
-#        if xs[i] > max_x: # numba: uncomment
-#            max_x = xs[i] # numba: uncomment
-#            i_max_x = i # numba: uncomment
+    max_x = 0  # numba: uncomment
+    i_max_x = 0 # numba: uncomment
+    for i in range(N): # numba: uncomment
+        if xs[i] > max_x: # numba: uncomment
+            max_x = xs[i] # numba: uncomment
+            i_max_x = i # numba: uncomment
     
     
     x_sum = sum(xs)
