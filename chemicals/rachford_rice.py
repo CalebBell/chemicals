@@ -1249,22 +1249,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         denr, dene = mul_dd(K_minus_1r, K_minus_1e, VFr, VFe)
         denr, dene = add_dd(1.0, 0, denr, dene)
         xs[i] = div_dd(zs[i], 0.0, denr, dene)[0]
-                
-    # The following trick can ensure the compositions sum to 1; small precision 
-    # gain but sometimes a large error can still exist.
-    i_max_x = xs.index(max(xs))# numba: delete
-    
-#    max_x = 0  # numba: uncomment
-#    i_max_x = 0 # numba: uncomment
-#    for i in range(N): # numba: uncomment
-#        if xs[i] > max_x: # numba: uncomment
-#            max_x = xs[i] # numba: uncomment
-#            i_max_x = i # numba: uncomment
-    
-    
-    x_sum = sum(xs)
-    xs[i_max_x] = xs[i_max_x]  + (1.0-x_sum)
-    # 
+
     for i in range(N):
         ys[i] = xs[i]*Ks[i]
     return LFr, VFr, xs, ys
