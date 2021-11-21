@@ -87,14 +87,16 @@ working_exact_multicomponents = [
     ]
 def test_Rachford_Rice_solution_exact_dd():
     # With double-double precision, a huge range of points can be calculated exactly    
-    for zs, Ks in working_exact_multicomponents:
-        LF_mp, VF_mp, xs_mp, ys_mp = Rachford_Rice_solution_mpmath(zs, Ks)
-        LF, VF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks)
-        assert LF == LF_mp
-        assert VF == VF_mp
-        assert xs == xs_mp
-        assert ys == ys_mp
-
+    point_collections = (working_exact_binarys, working_exact_multicomponents)
+    for points in point_collections:
+        for zs, Ks in points:
+            LF_mp, VF_mp, xs_mp, ys_mp = Rachford_Rice_solution_mpmath(zs, Ks)
+            LF, VF, xs, ys = Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks)
+            assert LF == LF_mp
+            assert VF == VF_mp
+            assert xs == xs_mp
+            assert ys == ys_mp
+    
 
 
 def test_RR_mpmath_points():

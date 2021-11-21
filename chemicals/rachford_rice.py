@@ -1156,6 +1156,8 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
        303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
     '''
     N = len(Ks)
+    if N == 2:
+        return Rachford_Rice_solution_binary_dd(zs, Ks)
     Kmin = min(Ks) # numba: delete
     Kmax = max(Ks)# numba: delete
     i_Kmax = Ks.index(Kmax)# numba: delete
@@ -1241,10 +1243,10 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         
         if abs(errr) < 1e-20:
             break
-    if it > 30:
-        print(f'zs={zs}')
-        print(f'Ks={Ks}')
-        1/0
+    # if it > 30:
+    #     print(f'zs={zs}')
+    #     print(f'Ks={Ks}')
+    #     1/0
         
     LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
     
