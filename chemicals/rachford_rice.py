@@ -986,7 +986,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
 
     Notes
     -----
-    The initial guess is the average of the following, as described in [2]_.
+    The initial guess is the average of the following.
 
     .. math::
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
@@ -1139,7 +1139,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
 
     Notes
     -----
-    The initial guess is the average of the following, as described in [2]_.
+    The initial guess is the average of the following.
 
     .. math::
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
