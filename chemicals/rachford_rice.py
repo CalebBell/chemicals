@@ -940,7 +940,7 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, z
               + plain_err*(-VF_r + VF_max_r)
               + plain_err*(-VF_r + VF_min_r))
     
-    # return errr, erre, fprimer, fprimee
+    return errr, erre, fprimer, fprimee
     return err, fprime
 
 
@@ -1125,11 +1125,40 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
     # V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
     #                     low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
-    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil_dd, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
-                        low=low, bisection=True, args=(0.0, zs_k_minus_1r, zs_k_minus_1e, zs_k_minus_1_2r, zs_k_minus_1_2e,
-                                                       K_minus_1r, K_minus_1e, VFminLNr, VFminLNe, VFmaxr, VFmaxe))
     
     
+    VFr = x0
+    VFe = 0.0
+    
+    VF_minr, VF_mine = VFminr, VFmine
+    VF_maxr, VF_maxe = VFmaxr, VFmaxe
+    
+    for it in range(100):
+        errr, erre, fprimer, fprimee = Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VFr, VFe,
+                                                                zs_k_minus_1r, zs_k_minus_1e, zs_k_minus_1_2r, zs_k_minus_1_2e,
+                                                       K_minus_1r, K_minus_1e, VFminLNr, VFminLNe, VFmaxr, VFmaxe)
+        if errr > 0.0:
+            VF_minr, VF_mine = VFr, VFe
+        else:
+            VF_maxr, VF_maxe = VFr, VFe
+        
+        stepe, stepr = div_dd(errr, erre, fprimer, fprimee)
+        VFr, VFe = add_dd(VFr, VFe, -stepe, -stepr)
+        
+        if VFr < VF_minr or VFr > VF_maxr:
+            VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
+            VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
+        
+        if errr < 1e-20:
+            break
+        
+    # V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil_dd, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
+    #                     low=low, bisection=True, args=(0.0, zs_k_minus_1r, zs_k_minus_1e, zs_k_minus_1_2r, zs_k_minus_1_2e,
+    #                                                    K_minus_1r, K_minus_1e, VFminLNr, VFminLNe, VFmaxr, VFmaxe))
+    
+    V_over_F = VFr
+    LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
+    LF = LFr
     
     # Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, zs_k_minus_1_e,
     #                                                zs_k_minus_1_r_2_r, zs_k_minus_1_r_2_e, 
@@ -1139,20 +1168,20 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     # of precision for the liquid fraction
     # Fortunately, we have an extremely good guess. 
     # We can re-use the same arrays.
-    for i in range(N):
-        Kim1 = 1.0/Ks[i] - 1.0
-        K_minus_1[i] = Kim1
-        zs_k_minus_1[i] = zs[i]*Kim1
-        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
+    # for i in range(N):
+    #     Kim1 = 1.0/Ks[i] - 1.0
+    #     K_minus_1[i] = Kim1
+    #     zs_k_minus_1[i] = zs[i]*Kim1
+    #     zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
     
-    # Translate the limits, noting that Kmin and Kmax are their inverses
-    # and they trade places.
-    x0 = 1.0 - V_over_F
-    L_over_F_min_LN = -1.0/(1/Kmin-1)
-    L_over_F_max = 1./(1.-1/Kmax)
-    # Try to polish it but do not require a ytol, but do allow it to exit on hitting a boundary or there being a large ytol error.
-    LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e100, fprime=True, high=x0+1e-4,
-                    low=x0-1e-4, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, L_over_F_min_LN, L_over_F_max))
+    # # Translate the limits, noting that Kmin and Kmax are their inverses
+    # # and they trade places.
+    # x0 = 1.0 - V_over_F
+    # L_over_F_min_LN = -1.0/(1/Kmin-1)
+    # L_over_F_max = 1./(1.-1/Kmax)
+    # # Try to polish it but do not require a ytol, but do allow it to exit on hitting a boundary or there being a large ytol error.
+    # LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e100, fprime=True, high=x0+1e-4,
+    #                 low=x0-1e-4, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, L_over_F_min_LN, L_over_F_max))
 
     xs = zs_k_minus_1
     ys = K_minus_1
