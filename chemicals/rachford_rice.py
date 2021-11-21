@@ -1248,10 +1248,12 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         K_minus_1r, K_minus_1e = add_dd(Ks[i], 0, - 1.0, 0)
         denr, dene = mul_dd(K_minus_1r, K_minus_1e, VFr, VFe)
         denr, dene = add_dd(1.0, 0, denr, dene)
-        xs[i] = div_dd(zs[i], 0.0, denr, dene)[0]
+        xir, xie = div_dd(zs[i], 0.0, denr, dene)
+        
+        xs[i] = xir
+        yir, yie = mul_dd(xir, xie, Ks[i], 0.0)
+        ys[i] = yir
 
-    for i in range(N):
-        ys[i] = xs[i]*Ks[i]
     return LFr, VFr, xs, ys
 
 def Rachford_Rice_solution_binary_dd(zs, Ks):
