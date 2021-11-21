@@ -79,7 +79,7 @@ __all__ = ['Rachford_Rice_flash_error',
 
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, one_10_epsilon_larger, one_10_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
-from fluids.numerics import add_dd, div_dd, mul_dd, mul_noerrors_dd
+from fluids.numerics import add_dd, div_dd, mul_dd, mul_noerrors_dd, lt_dd, gt_dd
 from chemicals.utils import exp, log
 from chemicals.utils import normalize, mark_numba_uncacheable, mark_numba_incompatible
 from chemicals.exceptions import PhaseCountReducedError
@@ -891,16 +891,17 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, z
         denr, dene = add_dd(1.0, 0.0, denr, dene)
         VF_kim1_1_invr, VF_kim1_1_inve = div_dd(1.0, 0.0, denr, dene)
         tmpr, tmpe = mul_dd(zs_k_minus_1_r[i], zs_k_minus_1_e[i], VF_kim1_1_invr, VF_kim1_1_inve)
-        plain_errr += tmpr
-        plain_erre += tmpe
+        
+        # Add the error to the summation variables
+        plain_errr, plain_erre = add_dd(plain_errr, plain_erre, tmpr, tmpe)
         
         tmpr, tmpe = mul_dd(VF_kim1_1_invr, VF_kim1_1_inve, VF_kim1_1_invr, VF_kim1_1_inve)
         tmpr, tmpe = mul_dd(zs_k_minus_1_r_2_r[i], zs_k_minus_1_r_2_e[i], tmpr, tmpe)
         
-        plan_diffr += tmpr
-        plan_diffe += tmpe
-        
-
+        # Add the error to the derivative variables
+        plan_diffr, plan_diffe = add_dd(plan_diffr, plan_diffe, tmpr, tmpe)
+    
+    # err = (V_over_F - V_over_F_min)*(V_over_F_max - V_over_F)*plain_err
     errr, erre = add_dd(VF_r, VF_e, -VF_min_r, -VF_min_e)
     tmpr, tmpe = add_dd(VF_max_r, VF_max_e, -VF_r, -VF_e)
     errr, erre = mul_dd(errr, erre, tmpr, tmpe)
@@ -1232,16 +1233,19 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         
         stepe, stepr = div_dd(errr, erre, fprimer, fprimee)
         VFr, VFe = add_dd(VFr, VFe, -stepe, -stepr)
-        
-        if VFr < VF_minr or VFr > VF_maxr:
-            VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
-            VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
+
+        # Do a bisection step if we are outside of the bounds
+        # if lt_dd(VFr, VFe, VF_minr, VF_mine) or gt_dd(VFr, VFe, VF_maxr, VF_maxe):
+        #     VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
+        #     print('bisecion')
+        #     VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
         
         if abs(errr) < 1e-20:
             break
     # if it > 30:
     #     print(f'zs={zs}')
     #     print(f'Ks={Ks}')
+    #     1/0
         
     LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
     
