@@ -1187,31 +1187,13 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     denr, dene = add_dd(1.0, 0, -Kmin, 0.0)
     VFmaxr, VFmaxe = div_dd(1.0, 0.0, denr, dene)
 
-    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin)) / ((1.- Kmin)*(Kmax- 1.))
-    
-    V_over_F_min_LN = -1.0/(Kmax-1) # There is a special lower limit to use for this method
-
-    V_over_F_max = 1./(1.-Kmin)
-
-    if guess is not None and guess > V_over_F_min and guess < V_over_F_max:
+    if guess is not None and guess > VFminr and guess < VFmaxr:
         x0 = guess
     else:
         x0 = 0.5*(VFminr + VFmaxr)
 
     # Pre-compute as much as we can to speedup the slower solve of the
     # error equation
-    K_minus_1 = [0.0]*N
-    zs_k_minus_1 = [0.0]*N
-    zs_k_minus_1_2 = [0.0]*N
-
-
-
-    for i in range(N):
-        Kim1 = Ks[i] - 1.0
-        K_minus_1[i] = Kim1
-        zs_k_minus_1[i] = zs[i]*Kim1
-        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
-
     K_minus_1r = [0.0]*N
     K_minus_1e = [0.0]*N
 
@@ -1233,21 +1215,6 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         z_k_minus_1_2r, z_k_minus_1_2e = mul_dd(z_k_minus_1r, z_k_minus_1e, -Kim1r, -Kim1e)
         zs_k_minus_1_2r[i] = z_k_minus_1_2r
         zs_k_minus_1_2e[i] = z_k_minus_1_2e
-    # print(K_minus_1)
-    # print(K_minus_1r)
-    # print(zs_k_minus_1r)
-    # print(zs_k_minus_1)
-    # print(zs_k_minus_1_2)
-    # print(zs_k_minus_1_2r)
-    
-    # Right the boundaries, the derivative goes very large and microscopic steps are made and the newton solver switches
-    # The boundaries need to be handled with bisection-style solvers
-    # The 1e-15 tolerance is able to be found with the 10*epsilon limits.
-    low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
-    # V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
-    #                     low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
-    
-    
     VFr = x0
     VFe = 0.0
     
@@ -1273,39 +1240,12 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         if abs(errr) < 1e-20:
             break
         
-    # V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil_dd, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
-    #                     low=low, bisection=True, args=(0.0, zs_k_minus_1r, zs_k_minus_1e, zs_k_minus_1_2r, zs_k_minus_1_2e,
-    #                                                    K_minus_1r, K_minus_1e, VFminLNr, VFminLNe, VFmaxr, VFmaxe))
-    
     V_over_F = VFr
     LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
     LF = LFr
     
-    # Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, zs_k_minus_1_e,
-    #                                                zs_k_minus_1_r_2_r, zs_k_minus_1_r_2_e, 
-    #                                                Km1r, Km1e, VF_min_r, VF_min_e, VF_max_r, VF_max_e)
-    
-    # For maximum accuracy, the equation should be re-solved to obtain 16 digits
-    # of precision for the liquid fraction
-    # Fortunately, we have an extremely good guess. 
-    # We can re-use the same arrays.
-    # for i in range(N):
-    #     Kim1 = 1.0/Ks[i] - 1.0
-    #     K_minus_1[i] = Kim1
-    #     zs_k_minus_1[i] = zs[i]*Kim1
-    #     zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
-    
-    # # Translate the limits, noting that Kmin and Kmax are their inverses
-    # # and they trade places.
-    # x0 = 1.0 - V_over_F
-    # L_over_F_min_LN = -1.0/(1/Kmin-1)
-    # L_over_F_max = 1./(1.-1/Kmax)
-    # # Try to polish it but do not require a ytol, but do allow it to exit on hitting a boundary or there being a large ytol error.
-    # LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e100, fprime=True, high=x0+1e-4,
-    #                 low=x0-1e-4, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, L_over_F_min_LN, L_over_F_max))
-
-    xs = zs_k_minus_1
-    ys = K_minus_1
+    xs = zs_k_minus_1_2r
+    ys = zs_k_minus_1_2e
     for i in range(N):
         K_minus_1r, K_minus_1e = add_dd(Ks[i], 0, - 1.0, 0)
             # Attempt to avoid truncation error by using the liquid fraction
