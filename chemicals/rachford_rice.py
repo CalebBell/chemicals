@@ -1235,17 +1235,16 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         VFr, VFe = add_dd(VFr, VFe, -stepe, -stepr)
 
         # Do a bisection step if we are outside of the bounds
-        # if lt_dd(VFr, VFe, VF_minr, VF_mine) or gt_dd(VFr, VFe, VF_maxr, VF_maxe):
-        #     VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
-        #     print('bisecion')
-        #     VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
+        if lt_dd(VFr, VFe, VF_minr, VF_mine) or gt_dd(VFr, VFe, VF_maxr, VF_maxe):
+            VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
+            VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
         
         if abs(errr) < 1e-20:
             break
-    # if it > 30:
-    #     print(f'zs={zs}')
-    #     print(f'Ks={Ks}')
-    #     1/0
+    if it > 30:
+        print(f'zs={zs}')
+        print(f'Ks={Ks}')
+        1/0
         
     LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
     
