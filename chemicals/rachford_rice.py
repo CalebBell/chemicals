@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -63,6 +63,48 @@ Two Phase Utility Functions
 ---------------------------
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_polynomial
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_flash_error
+
+
+Numerical Notes
+---------------
+For the two-phase problem, there are the following ways of computing the vapor
+and liquid mole fractions once the vapor fraction and liquid fraction has
+been computed:
+    
+
+The most commonly shown expression is:
+    
+
+.. math::
+    x_i = \frac{z_i}{1 + \frac{V}{F}(K_i-1)}
+
+This can cause numerical issues when :math:`K_i` is near 1. It also shows
+issues near :math:`\frac{V}{F}(K_i-1) = -1`.
+
+Another expression which avoids the second issue is 
+
+.. math::
+    x_i = \frac{z_i}{\frac{L}{F} + (1 - \frac{L}{F})K_i}
+
+Much like the other expression above this numerical issues but at different
+conditions: :math:`\frac{L}{F} = 1` and :math:`\frac{L}{F} = -(1 - \frac{L}{F})K_i`.
+
+One more expression using both liquid and vapor fraction is:
+    
+.. math::
+    x_i = \frac{z_i}{K_i\frac{V}{F} + \frac{L}{F} }
+    
+This expression only has one problematic area: :math:`K_i\frac{V}{F} = \frac{L}{F}`. 
+Preferably, this is computed with a fused-multiply-add operation.
+
+Another expression which flips the K value into the liquid form and swaps the
+vapor fraction for the liquid fraction in-line is as follows
+
+.. math::
+    x_i = \frac{\frac{z_i}{K_i}}
+    {\frac{\frac{L}{F}}{K_i} + \frac{V}{F}}
+
+This also has numerical problems when :math:`-\frac{\frac{L}{F}}{K_i} = \frac{V}{F}`.
 
 
 """
@@ -1079,6 +1121,9 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
             xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
         else:
             xs[i] = zs[i]/(1. + V_over_F*K_minus_1)
+        
+        # xs[i] = zs[i]/(Ks[i]*V_over_F + LF)
+        # xs[i] = zs[i]/fma(Ks[i],V_over_F, LF)
             
     # The following trick can ensure the compositions sum to 1; small precision 
     # gain but sometimes a large error can still exist.
@@ -1098,6 +1143,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     for i in range(N):
         ys[i] = xs[i]*Ks[i]
     return LF, V_over_F, xs, ys
+
 
 @mark_numba_uncacheable
 def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
