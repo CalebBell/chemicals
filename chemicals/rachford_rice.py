@@ -1163,7 +1163,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
 
     Examples
     --------
-    >>> Rachford_Rice_solution_Leibovici_Neoschil(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
+    >>> Rachford_Rice_solution_Leibovici_Neoschil_dd(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
     (0.3092697372261, 0.69073026277385, [0.339408696966343, 0.36505605903717, 0.29553524399648], [0.57190365438828, 0.270871595805580, 0.157224749806130])
 
     References
@@ -1288,7 +1288,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
             VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
             VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
         
-        if errr < 1e-20:
+        if abs(errr) < 1e-20:
             break
         
     # V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil_dd, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
