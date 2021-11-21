@@ -900,20 +900,11 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, z
         plan_diffr += tmpr
         plan_diffe += tmpe
         
-    plain_err, plan_diff = 0, 0
-    for num0, num1, Kim1 in zip(zs_k_minus_1_r, zs_k_minus_1_r_2_r, Km1r):
-        VF_kim1_1_inv = 1.0/(1. + VF_r*Kim1)
-        plain_err += num0*VF_kim1_1_inv
-        plan_diff += num1*VF_kim1_1_inv*VF_kim1_1_inv
-    # print(plain_err, plain_errr)
-    # print(plan_diff/plan_diffr)
-    
+
     errr, erre = add_dd(VF_r, VF_e, -VF_min_r, -VF_min_e)
     tmpr, tmpe = add_dd(VF_max_r, VF_max_e, -VF_r, -VF_e)
     errr, erre = mul_dd(errr, erre, tmpr, tmpe)
     errr, erre = mul_dd(errr, erre, plain_errr, plain_erre)
-
-    err = (VF_r - VF_min_r)*(VF_max_r - VF_r)*plain_err
     
     fprimer, fprimee = add_dd(-VF_r, -VF_e, VF_max_r, VF_max_e)
     fprimer, fprimee = mul_dd(plan_diffr, plan_diffe, fprimer, fprimee)
@@ -927,23 +918,14 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, z
     tmpr, tmpe = mul_dd(tmpr, tmpe, plain_errr, plain_erre)
     # This line finishes adding + plain_err*(-VF_r + VF_max_r)
     fprimer, fprimee = add_dd(tmpr, tmpe, fprimer, fprimee)
-    # print(err, errr)
-    # print(fprimer, (plan_diff*(-VF_r + VF_max_r)*(VF_r - VF_min_r) 
-    #           + plain_err*(-VF_r + VF_max_r)))
-    
 
     tmpr, tmpe = add_dd(-VF_r, -VF_e, VF_min_r, VF_min_e)
     tmpr, tmpe = mul_dd(tmpr, tmpe, plain_errr, plain_erre)
 
+    # This line finishes adding + plain_err*(-VF_r + VF_min_r)
     fprimer, fprimee = add_dd(tmpr, tmpe, fprimer, fprimee)
 
-    
-    fprime = (plan_diff*(-VF_r + VF_max_r)*(VF_r - VF_min_r) 
-              + plain_err*(-VF_r + VF_max_r)
-              + plain_err*(-VF_r + VF_min_r))
-    
     return errr, erre, fprimer, fprimee
-    return err, fprime
 
 
 
