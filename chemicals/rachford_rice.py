@@ -44,6 +44,9 @@ Two Phase - Implementations
 .. autofunction:: chemicals.rachford_rice.Li_Johns_Ahmadi_solution
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_Leibovici_Neoschil
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
+
+Two Phase - High-Precision Implementations
+------------------------------------------
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_mpmath
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_binary_dd
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_Leibovici_Neoschil_dd
@@ -1099,9 +1102,10 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
 @mark_numba_uncacheable
 def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     r'''Solves the objective function of the Rachford-Rice flash equation as
-    modified by Leibovici and Neoschil. This modification helps
-    convergence near the vapor fraction boundaries only; it slows
-    convergence in other regions.
+    modified by Leibovici and Neoschil, using double-double precision math 
+    for maximum accuracy. For most cases, this function will return
+    bit-for-bit accurate results; but there are pathological inputs where
+    error still occurs.
 
     .. math::
         \left(\frac{V}{F} - \alpha_L\right)\left(\alpha_R - \frac{V}{F}\right)
@@ -1248,7 +1252,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
             VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
             VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
         
-        if abs(errr) < 1e-20:
+        if abs(errr) < 1e-25:
             break
     # if it > 30:
     #     print(f'zs={zs}')
@@ -1260,12 +1264,21 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     xs = zs_k_minus_1_2r
     ys = zs_k_minus_1_2e
     for i in range(N):
+        # Should not be necessary and does not help numba
+        # switch = -1.001 < VFr*(Ks[i]-1) < -0.999
+        # if switch:
+        #     # xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
+        #     denr, dene = add_dd(1.0, 0, -LFr, -LFe)
+        #     denr, dene = mul_dd(denr, dene, Ks[i], 0.0)
+        #     denr, dene = add_dd(denr, dene, LFr, LFe)
+        #     xir, xie = div_dd(zs[i], 0.0, denr, dene)
+        # else:
         # xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
         K_minus_1r, K_minus_1e = add_dd(Ks[i], 0, -1.0, 0)
         denr, dene = mul_dd(K_minus_1r, K_minus_1e, VFr, VFe)
         denr, dene = add_dd(1.0, 0, denr, dene)
         xir, xie = div_dd(zs[i], 0.0, denr, dene)
-        
+    
         xs[i] = xir
         yir, yie = mul_dd(xir, xie, Ks[i], 0.0)
         ys[i] = yir
