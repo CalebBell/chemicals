@@ -1016,11 +1016,42 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     K_minus_1 = [0.0]*N
     zs_k_minus_1 = [0.0]*N
     zs_k_minus_1_2 = [0.0]*N
+
+
+
     for i in range(N):
         Kim1 = Ks[i] - 1.0
         K_minus_1[i] = Kim1
         zs_k_minus_1[i] = zs[i]*Kim1
         zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
+
+    K_minus_1r = [0.0]*N
+    K_minus_1e = [0.0]*N
+
+    zs_k_minus_1r = [0.0]*N
+    zs_k_minus_1e = [0.0]*N
+
+    zs_k_minus_1_2r = [0.0]*N
+    zs_k_minus_1_2e = [0.0]*N
+    for i in range(N):
+        Kim1r, Kim1e = add_dd(Ks[i], 0.0, -1.0, 0.0)
+        K_minus_1r[i] = Kim1r
+        K_minus_1e[i] = Kim1e
+        
+        z_k_minus_1r, z_k_minus_1e = mul_dd(zs[i], 0.0, Kim1r, Kim1e)
+
+        zs_k_minus_1r[i] = z_k_minus_1r
+        zs_k_minus_1e[i] = z_k_minus_1e
+        
+        z_k_minus_1_2r, z_k_minus_1_2e = mul_dd(z_k_minus_1r, z_k_minus_1e, -Kim1r, -Kim1e)
+        zs_k_minus_1_2r[i] = z_k_minus_1_2r
+        zs_k_minus_1_2e[i] = z_k_minus_1_2e
+    # print(K_minus_1)
+    # print(K_minus_1r)
+    # print(zs_k_minus_1r)
+    # print(zs_k_minus_1)
+    # print(zs_k_minus_1_2)
+    # print(zs_k_minus_1_2r)
     
     # Right the boundaries, the derivative goes very large and microscopic steps are made and the newton solver switches
     # The boundaries need to be handled with bisection-style solvers
