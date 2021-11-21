@@ -879,6 +879,41 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
 #    return V_over_F, xs, ys # numba: uncomment
     return float(V_over_F), xs.tolist(), ys.tolist() # numba: delete
 
+def Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, zs_k_minus_1_e,
+                                                   zs_k_minus_1_r_2_r, zs_k_minus_1_r_2_e, 
+                                                   Km1r, Km1e, VF_min_r, VF_min_e, VF_max_r, VF_max_e):
+    plain_errr, plain_erre, plan_diffr, plan_diffe = 0.0, 0.0, 0.0, 0.0
+    
+    for i in range(len(zs_k_minus_1_r)):
+        denr, dene = mul_dd(VF_r, VF_e, Km1r[i], Km1e[i])
+        denr, dene = add_dd(1.0, 0.0, denr, dene)
+        VF_kim1_1_invr, VF_kim1_1_inve = div_dd(1.0, 0.0, denr, dene)
+        tmpr, tmpe = mul_dd(zs_k_minus_1_r[i], zs_k_minus_1_e[i], VF_kim1_1_invr, VF_kim1_1_inve)
+        plain_errr += tmpr
+        plain_erre += tmpe
+        
+        tmpr, tmpe = mul_dd(VF_kim1_1_invr, VF_kim1_1_inve, VF_kim1_1_invr, VF_kim1_1_inve)
+        tmpr, tmpe = mul_dd(zs_k_minus_1_r_2_r[i], zs_k_minus_1_r_2_e[i], tmpr, tmpe)
+        
+        plan_diffr += tmpr
+        plan_diffe += tmpe
+        
+    plain_err, plan_diff = 0, 0
+    for num0, num1, Kim1 in zip(zs_k_minus_1_r, zs_k_minus_1_r_2_r, Km1r):
+        VF_kim1_1_inv = 1.0/(1. + VF_r*Kim1)
+        plain_err += num0*VF_kim1_1_inv
+        plan_diff += num1*VF_kim1_1_inv*VF_kim1_1_inv
+    # print(plain_err, plain_errr)
+    # print(plan_diff/plan_diffr)
+        
+    err = (VF_r - VF_min_r)*(VF_max_r - VF_r)*plain_err
+    fprime = (plan_diff*(-VF_r + VF_max_r)*(VF_r - VF_min_r) 
+              + plain_err*(-VF_r + VF_max_r)
+              + plain_err*(-VF_r + VF_min_r))
+    return err, fprime
+
+
+
 from math import fsum
 from doubledouble import DoubleDouble
 def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min, V_over_F_max):
@@ -1057,8 +1092,17 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     # The boundaries need to be handled with bisection-style solvers
     # The 1e-15 tolerance is able to be found with the 10*epsilon limits.
     low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
-    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
-                        low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
+    # V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
+    #                     low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
+    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil_dd, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
+                        low=low, bisection=True, args=(0.0, zs_k_minus_1r, zs_k_minus_1e, zs_k_minus_1_2r, zs_k_minus_1_2e,
+                                                       K_minus_1r, K_minus_1e, VFminLNr, VFminLNe, VFmaxr, VFmaxe))
+    
+    
+    
+    # Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, zs_k_minus_1_e,
+    #                                                zs_k_minus_1_r_2_r, zs_k_minus_1_r_2_e, 
+    #                                                Km1r, Km1e, VF_min_r, VF_min_e, VF_max_r, VF_max_e)
     
     # For maximum accuracy, the equation should be re-solved to obtain 16 digits
     # of precision for the liquid fraction
