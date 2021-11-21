@@ -414,7 +414,8 @@ flash_inner_loop_LJA = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks,
 flash_inner_loop_poly = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (polynomial)')
 flash_inner_loop_LN2 = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Nichita 2')
 flash_inner_loop_LN = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Neoschil')
-# flash_LN = lambda zs, Ks, guess=None: Rachford_Rice_solution_Leibovici_Neoschil(zs=zs, Ks=Ks, guess=guess)[1:]
+flash_LNdd = lambda zs, Ks, guess=None: Rachford_Rice_solution_Leibovici_Neoschil_dd(zs=zs, Ks=Ks, guess=guess)[1:]
+
 
 
 algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
@@ -422,7 +423,8 @@ algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
               flash_inner_loop_NR, flash_inner_loop_halley,
               flash_inner_loop_numpy, flash_inner_loop_LJA,
               flash_inner_loop_poly, flash_inner_loop_LN2,
-              RR_solution_mpmath, flash_inner_loop_LN]
+              RR_solution_mpmath, flash_inner_loop_LN,
+              flash_LNdd]
 
 @pytest.mark.parametrize("algorithm", algorithms)
 @pytest.mark.parametrize("array", [False])
