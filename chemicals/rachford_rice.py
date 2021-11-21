@@ -46,6 +46,7 @@ Two Phase - Implementations
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_mpmath
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_binary_dd
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_Leibovici_Neoschil_dd
 
 Three Phase
 -----------
@@ -73,7 +74,8 @@ __all__ = ['Rachford_Rice_flash_error',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
            'flash_inner_loop_all_methods', 'flash_inner_loop_methods',
            'Rachford_Rice_solution_mpmath', 'Rachford_Rice_solution_binary_dd',
-           'Rachford_Rice_solution_Leibovici_Neoschil']
+           'Rachford_Rice_solution_Leibovici_Neoschil',
+           'Rachford_Rice_solution_Leibovici_Neoschil_dd']
 
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, one_10_epsilon_larger, one_10_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
@@ -945,35 +947,19 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, z
 
 
 
-from math import fsum
-from doubledouble import DoubleDouble
 def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min, V_over_F_max):
     plain_err, plan_diff = 0.0, 0.0
-    errs = []
-    diffs = []
     for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
         VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
         plain_err += num0*VF_kim1_1_inv
         plan_diff += num1*VF_kim1_1_inv*VF_kim1_1_inv
-        errs.append(num0*VF_kim1_1_inv)
-        diffs.append(num1*VF_kim1_1_inv*VF_kim1_1_inv)
-        
-    plain_err = fsum(errs)
-    plan_diff = fsum(diffs)
-    V_over_F = DoubleDouble(V_over_F)
-    V_over_F_min = DoubleDouble(V_over_F_min)
-    V_over_F_max = DoubleDouble(V_over_F_max)
-    plain_err = DoubleDouble(plain_err)
-    plan_diff = DoubleDouble(plan_diff)
     err = (V_over_F - V_over_F_min)*(V_over_F_max - V_over_F)*plain_err
-
     fprime = (plan_diff*(-V_over_F + V_over_F_max)*(V_over_F - V_over_F_min) 
               + plain_err*(-V_over_F + V_over_F_max)
               + plain_err*(-V_over_F + V_over_F_min))
     # print(err, V_over_F)
-    return err.x, fprime.x
+    return err, fprime
 
-from fluids.numerics.doubledouble import add_dd, mul_dd, div_dd, div_dd
 
 @mark_numba_uncacheable
 def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
@@ -992,6 +978,159 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     .. math::
         \alpha_R = \frac{1}{1 - K_{min}}
 
+    Parameters
+    ----------
+    zs : list[float]
+        Overall mole fractions of all species, [-]
+    Ks : list[float]
+        Equilibrium K-values, [-]
+    guess : float, optional
+        Optional initial guess for vapor fraction, [-]
+
+    Returns
+    -------
+    L_over_F : float
+        Liquid fraction solution [-]
+    V_over_F : float
+        Vapor fraction solution [-]
+    xs : list[float]
+        Mole fractions of each species in the liquid phase, [-]
+    ys : list[float]
+        Mole fractions of each species in the vapor phase, [-]
+
+    Notes
+    -----
+    The initial guess is the average of the following, as described in [2]_.
+
+    .. math::
+        \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
+        - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
+
+    .. math::
+        \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
+
+    Examples
+    --------
+    >>> Rachford_Rice_solution_Leibovici_Neoschil(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
+    (0.3092697372261, 0.69073026277385, [0.339408696966343, 0.36505605903717, 0.29553524399648], [0.57190365438828, 0.270871595805580, 0.157224749806130])
+
+    References
+    ----------
+    .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the 
+       Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992): 
+       303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
+    '''
+    N = len(Ks)
+    Kmin = min(Ks) # numba: delete
+    Kmax = max(Ks)# numba: delete
+    i_Kmax = Ks.index(Kmax)# numba: delete
+    z_of_Kmax = zs[i_Kmax]# numba: delete
+
+#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if Ks[i] > Kmax: # numba: uncomment
+#            z_of_Kmax = zs[i] # numba: uncomment
+#            Kmax = Ks[i] # numba: uncomment
+#        if Ks[i] < Kmin: # numba: uncomment
+#            Kmin = Ks[i] # numba: uncomment
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
+    V_over_F_min_LN = -1.0/(Kmax-1) # There is a special lower limit to use for this method
+    V_over_F_max = 1./(1.-Kmin)
+
+    if guess is not None and guess > V_over_F_min and guess < V_over_F_max:
+        x0 = guess
+    else:
+        x0 = (V_over_F_min + V_over_F_max)*0.5
+
+    # Pre-compute as much as we can to speedup the slower solve of the
+    # error equation
+    K_minus_1 = [0.0]*N
+    zs_k_minus_1 = [0.0]*N
+    zs_k_minus_1_2 = [0.0]*N
+    for i in range(N):
+        Kim1 = Ks[i] - 1.0
+        K_minus_1[i] = Kim1
+        zs_k_minus_1[i] = zs[i]*Kim1
+        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
+    
+    # Right the boundaries, the derivative goes very large and microscopic steps are made and the newton solver switches
+    # The boundaries need to be handled with bisection-style solvers
+    # The 1e-15 tolerance is able to be found with the 10*epsilon limits.
+    low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
+    V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
+                        low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
+    
+    # For maximum accuracy, the equation should be re-solved to obtain 16 digits
+    # of precision for the liquid fraction
+    # Fortunately, we have an extremely good guess. 
+    # We can re-use the same arrays.
+    for i in range(N):
+        Kim1 = 1.0/Ks[i] - 1.0
+        K_minus_1[i] = Kim1
+        zs_k_minus_1[i] = zs[i]*Kim1
+        zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
+    
+    # Translate the limits, noting that Kmin and Kmax are their inverses
+    # and they trade places.
+    x0 = 1.0 - V_over_F
+    L_over_F_min_LN = -1.0/(1/Kmin-1)
+    L_over_F_max = 1./(1.-1/Kmax)
+    # Try to polish it but do not require a ytol, but do allow it to exit on hitting a boundary or there being a large ytol error.
+    LF = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e100, fprime=True, high=x0+1e-4,
+                    low=x0-1e-4, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, L_over_F_min_LN, L_over_F_max))
+
+    xs = zs_k_minus_1
+    ys = K_minus_1
+    for i in range(N):
+        K_minus_1 = Ks[i] - 1.0
+            # Attempt to avoid truncation error by using the liquid fraction
+            # some of the time.
+        switch = -1.001 < V_over_F*K_minus_1 < -0.999
+        if switch:
+            xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
+        else:
+            xs[i] = zs[i]/(1. + V_over_F*K_minus_1)
+            
+    # The following trick can ensure the compositions sum to 1; small precision 
+    # gain but sometimes a large error can still exist.
+    i_max_x = xs.index(max(xs))# numba: delete
+    
+#    max_x = 0  # numba: uncomment
+#    i_max_x = 0 # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if xs[i] > max_x: # numba: uncomment
+#            max_x = xs[i] # numba: uncomment
+#            i_max_x = i # numba: uncomment
+    
+    
+    x_sum = sum(xs)
+    xs[i_max_x] = xs[i_max_x]  + (1.0-x_sum)
+    
+    for i in range(N):
+        ys[i] = xs[i]*Ks[i]
+    return LF, V_over_F, xs, ys
+
+@mark_numba_uncacheable
+def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
+    r'''Solves the objective function of the Rachford-Rice flash equation as
+    modified by Leibovici and Neoschil. This modification helps
+    convergence near the vapor fraction boundaries only; it slows
+    convergence in other regions.
+
+    .. math::
+        \left(\frac{V}{F} - \alpha_L\right)\left(\alpha_R - \frac{V}{F}\right)
+        \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
+        
+    .. math::
+        \alpha_L = - \frac{1}{K_{max} - 1}
+    
+    .. math::
+        \alpha_R = \frac{1}{1 - K_{min}}
+
+    Parameters
     ----------
     zs : list[float]
         Overall mole fractions of all species, [-]
