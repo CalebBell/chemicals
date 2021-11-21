@@ -983,14 +983,33 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     if Kmin > 1.0 or Kmax < 1.0:
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
-    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
+    
+    numr, nume = add_dd(Kmax, 0, -Kmin, 0)
+    numr, nume = mul_dd(numr, nume, z_of_Kmax, 0)
+    tmpr, tmpe = add_dd(1.0, 0.0, -Kmin, 0.0)
+    numr, nume = add_dd(numr, nume, -tmpr, -tmpe)
+    
+    denr, dene = add_dd(1.0, 0, -Kmin, 0)
+    tmpr, tmpe = add_dd(Kmax, 0.0, -1.0, 0.0)
+    denr, dene = mul_dd(denr, dene, tmpr, tmpe)
+    VFminr, VFmine = div_dd(numr, nume, denr, dene)
+    
+    denr, dene = add_dd(Kmax, 0, -1.0, 0.0)
+    VFminLNr, VFminLNe = div_dd(-1.0, 0.0, denr, dene)
+
+    denr, dene = add_dd(1.0, 0, -Kmin, 0.0)
+    VFmaxr, VFmaxe = div_dd(1.0, 0.0, denr, dene)
+
+    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin)) / ((1.- Kmin)*(Kmax- 1.))
+    
     V_over_F_min_LN = -1.0/(Kmax-1) # There is a special lower limit to use for this method
+
     V_over_F_max = 1./(1.-Kmin)
 
     if guess is not None and guess > V_over_F_min and guess < V_over_F_max:
         x0 = guess
     else:
-        x0 = (V_over_F_min + V_over_F_max)*0.5
+        x0 = 0.5*(VFminr + VFmaxr)
 
     # Pre-compute as much as we can to speedup the slower solve of the
     # error equation
