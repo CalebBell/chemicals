@@ -1239,6 +1239,9 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         
         if abs(errr) < 1e-20:
             break
+    # if it > 30:
+    #     print(f'zs={zs}')
+    #     print(f'Ks={Ks}')
         
     LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
     
