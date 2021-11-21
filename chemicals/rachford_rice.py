@@ -1260,6 +1260,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     xs = zs_k_minus_1_2r
     ys = zs_k_minus_1_2e
     for i in range(N):
+        # xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
         K_minus_1r, K_minus_1e = add_dd(Ks[i], 0, -1.0, 0)
         denr, dene = mul_dd(K_minus_1r, K_minus_1e, VFr, VFe)
         denr, dene = add_dd(1.0, 0, denr, dene)
