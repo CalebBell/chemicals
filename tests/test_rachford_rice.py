@@ -1010,5 +1010,3 @@ def test_check_flash_inner():
 
 
 
-def test_Rachford_Rice_exact():
-    pass
