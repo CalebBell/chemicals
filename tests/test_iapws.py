@@ -712,7 +712,7 @@ def test_iapws97_region_3_rho_coolprop():
         def test_Ps(T, N):
              # Do not check too low to the boundary
              # Sometimes CoolProp says a different region
-            lower_P = iapws97_boundary_2_3(T)*(1+4e-6)
+            lower_P = iapws97_boundary_2_3(T)*(1+1e-4)
             if lower_P >= P_lim:
                 # No valid points in region 3
                 return []
@@ -792,12 +792,13 @@ def iapws97_dGr_dpi_region2_fastest(tau, pi):
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_2_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
-    P_lim = 1e-6
-    Ts = linspace(273.15+1e-10,  1073.15-1e-10, 100)
+    tol = 1e-4
+    P_lim = 1e-5
+    Ts = linspace(273.15+tol,  1073.15-tol, 100)
     def test_Ps(T, N):
-        upper_P = iapws97_boundary_2_3(T)*(1.0-1e-10)
+        upper_P = iapws97_boundary_2_3(T)*(1.0-tol)
         if T <= 623.15:
-            upper_P = min(Psat_IAPWS(T)*(1.0-1e-10), upper_P)
+            upper_P = min(Psat_IAPWS(T)*(1.0-tol), upper_P)
 
 
         if upper_P < P_lim or upper_P > 100e6:
@@ -823,9 +824,10 @@ def test_iapws97_region_2_rho_coolprop():
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_1_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
-    Ts = linspace(273.15+1e-10,  623.15-1e-10, 500)
+    tol = 1e-4
+    Ts = linspace(273.15+tol,  623.15-tol, 500)
     def test_Ps(T, N):
-        Psat = Psat_IAPWS(T)*(1+1e-10)
+        Psat = Psat_IAPWS(T)*(1+tol)
         return logspace(log10(Psat), log10(100e6), N)
 
     for T in Ts:
@@ -833,10 +835,10 @@ def test_iapws97_region_1_rho_coolprop():
             assert iapws97_identify_region_TP(T, P) == 1
             rho_implemented = iapws97_rho(T=T, P=P)
             rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
-            try:
-                assert_close(rho_CoolProp, rho_implemented, rtol=2e-13)
-            except:
-                print([T, P, 1-rho_implemented/rho_CoolProp])
+            # try:
+            assert_close(rho_CoolProp, rho_implemented, rtol=2e-13)
+            # except:
+            #     print([T, P, 1-rho_implemented/rho_CoolProp])
 
 
 def test_iapws97_P():

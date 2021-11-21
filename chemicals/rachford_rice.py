@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
+r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -44,8 +44,12 @@ Two Phase - Implementations
 .. autofunction:: chemicals.rachford_rice.Li_Johns_Ahmadi_solution
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_Leibovici_Neoschil
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_polynomial
+
+Two Phase - High-Precision Implementations
+------------------------------------------
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_mpmath
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_binary_dd
+.. autofunction:: chemicals.rachford_rice.Rachford_Rice_solution_Leibovici_Neoschil_dd
 
 Three Phase
 -----------
@@ -61,6 +65,60 @@ Two Phase Utility Functions
 .. autofunction:: chemicals.rachford_rice.Rachford_Rice_flash_error
 
 
+Numerical Notes
+---------------
+For the two-phase problem, there are the following ways of computing the vapor
+and liquid mole fractions once the vapor fraction and liquid fraction has
+been computed:
+    
+
+The most commonly shown expression is:
+    
+
+.. math::
+    x_i = \frac{z_i}{1 + \frac{V}{F}(K_i-1)}
+
+This can cause numerical issues when :math:`K_i` is near 1. It also shows
+issues near :math:`\frac{V}{F}(K_i-1) = -1`.
+
+Another expression which avoids the second issue is 
+
+.. math::
+    x_i = \frac{z_i}{\frac{L}{F} + (1 - \frac{L}{F})K_i}
+
+Much like the other expression above this numerical issues but at different
+conditions: :math:`\frac{L}{F} = 1` and :math:`\frac{L}{F} = -(1 - \frac{L}{F})K_i`.
+
+One more expression using both liquid and vapor fraction is:
+    
+.. math::
+    x_i = \frac{z_i}{K_i\frac{V}{F} + \frac{L}{F} }
+    
+This expression only has one problematic area: :math:`K_i\frac{V}{F} = \frac{L}{F}`. 
+Preferably, this is computed with a fused-multiply-add operation.
+
+Another expression which flips the K value into the liquid form and swaps the
+vapor fraction for the liquid fraction in-line is as follows
+
+.. math::
+    x_i = \frac{\frac{z_i}{K_i}}
+    {\frac{\frac{L}{F}}{K_i} + \frac{V}{F}}
+
+This also has numerical problems when :math:`-\frac{\frac{L}{F}}{K_i} = \frac{V}{F}`.
+
+Even when computing a solution with high precision such as with `mpmath`, 
+the resulting compositions and phase fractions may fail basic tests. In the
+following case, a nasty problem has a low-composition but relatively volatile
+last component. Mathematically, :math:`1 = \frac{\frac{L}{F} x_i + \frac{V}{F} y_i}{z_i}`.
+This is true for all components except the last one in this case, where 
+significant error exists.
+
+>>> zs = [0.004632150100959984, 0.019748784459594933, 0.0037494212674659875, 0.0050492815033649835, 7.049818284201636e-05, 0.019252941309184937, 0.022923068733233923, 0.02751809363371991, 0.044055273670258854, 0.026348159124199914, 0.029384949788372902, 0.022368938441593926, 0.03876345111451487, 0.03440715821883388, 0.04220510198067186, 0.04109191458414686, 0.031180945124537895, 0.024703227642798916, 0.010618543295340965, 0.043262442161003854, 0.006774922650311977, 0.02418090788262392, 0.033168278052077886, 0.03325881573680989, 0.027794535589044905, 0.00302091746847699, 0.013693571363003955, 0.043274465132840854, 0.02431371852108292, 0.004119055065872986, 0.03314056562191489, 0.03926511182895087, 0.0305068048046159, 0.014495317922126952, 0.03603737707409988, 0.04346278949361786, 0.019715052322446934, 0.028565255195219907, 0.023343683279902924, 0.026532427286078915, 2.0833722372767433e-06] 
+>>> Ks = [0.000312001984979, 0.478348350355814, 0.057460349529956, 0.142866526725442, 0.186076915390803, 1.67832923245552, 0.010784509466239, 0.037204384948088, 0.005359146955631, 2.41896552551221, 0.020514598049597, 0.104545054017411, 2.37825397780443, 0.176463709057649, 0.000474240879865, 0.004738042026669, 0.02556030236928, 0.00300089652604, 0.010614774675069, 1.75142303167203, 1.47213647779132, 0.035773024794854, 4.15016401471676, 0.024475125100923, 0.00206952065986, 2.09173484409107, 0.06290795470216, 0.001537212006245, 1.16935817509767, 0.001830422812888, 0.058398776367331, 0.516860928072656, 1.03039372722559, 0.460775800103578, 0.10980302936483, 0.009883724220094, 0.021938589630783, 0.983011657214417, 0.01978995396409, 0.204144939961852, 14.0521979447538]
+>>> LF, VF, xs, ys = Rachford_Rice_solution_mpmath(zs=zs, Ks=Ks)
+>>> (LF*xs[-1] + VF*ys[-1])/zs[-1]
+1.0000000000028162
+
 """
 
 from __future__ import division
@@ -73,11 +131,12 @@ __all__ = ['Rachford_Rice_flash_error',
            'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
            'flash_inner_loop_all_methods', 'flash_inner_loop_methods',
            'Rachford_Rice_solution_mpmath', 'Rachford_Rice_solution_binary_dd',
-           'Rachford_Rice_solution_Leibovici_Neoschil']
+           'Rachford_Rice_solution_Leibovici_Neoschil',
+           'Rachford_Rice_solution_Leibovici_Neoschil_dd']
 
 from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, one_10_epsilon_larger, one_10_epsilon_smaller, NotBoundedError, numpy as np
 from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
-from fluids.numerics import add_dd, div_dd, mul_dd, mul_noerrors_dd
+from fluids.numerics import add_dd, div_dd, mul_dd, mul_noerrors_dd, lt_dd, gt_dd
 from chemicals.utils import exp, log
 from chemicals.utils import normalize, mark_numba_uncacheable, mark_numba_incompatible
 from chemicals.exceptions import PhaseCountReducedError
@@ -879,6 +938,55 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
 #    return V_over_F, xs, ys # numba: uncomment
     return float(V_over_F), xs.tolist(), ys.tolist() # numba: delete
 
+def Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, zs_k_minus_1_e,
+                                                   zs_k_minus_1_r_2_r, zs_k_minus_1_r_2_e, 
+                                                   Km1r, Km1e, VF_min_r, VF_min_e, VF_max_r, VF_max_e):
+    plain_errr, plain_erre, plan_diffr, plan_diffe = 0.0, 0.0, 0.0, 0.0
+    
+    for i in range(len(zs_k_minus_1_r)):
+        denr, dene = mul_dd(VF_r, VF_e, Km1r[i], Km1e[i])
+        denr, dene = add_dd(1.0, 0.0, denr, dene)
+        VF_kim1_1_invr, VF_kim1_1_inve = div_dd(1.0, 0.0, denr, dene)
+        tmpr, tmpe = mul_dd(zs_k_minus_1_r[i], zs_k_minus_1_e[i], VF_kim1_1_invr, VF_kim1_1_inve)
+        
+        # Add the error to the summation variables
+        plain_errr, plain_erre = add_dd(plain_errr, plain_erre, tmpr, tmpe)
+        
+        tmpr, tmpe = mul_dd(VF_kim1_1_invr, VF_kim1_1_inve, VF_kim1_1_invr, VF_kim1_1_inve)
+        tmpr, tmpe = mul_dd(zs_k_minus_1_r_2_r[i], zs_k_minus_1_r_2_e[i], tmpr, tmpe)
+        
+        # Add the error to the derivative variables
+        plan_diffr, plan_diffe = add_dd(plan_diffr, plan_diffe, tmpr, tmpe)
+    
+    # err = (V_over_F - V_over_F_min)*(V_over_F_max - V_over_F)*plain_err
+    errr, erre = add_dd(VF_r, VF_e, -VF_min_r, -VF_min_e)
+    tmpr, tmpe = add_dd(VF_max_r, VF_max_e, -VF_r, -VF_e)
+    errr, erre = mul_dd(errr, erre, tmpr, tmpe)
+    errr, erre = mul_dd(errr, erre, plain_errr, plain_erre)
+    
+    fprimer, fprimee = add_dd(-VF_r, -VF_e, VF_max_r, VF_max_e)
+    fprimer, fprimee = mul_dd(plan_diffr, plan_diffe, fprimer, fprimee)
+    
+    tmpr, tmpe = add_dd(VF_r, VF_e, -VF_min_r, -VF_min_e)
+    # This line finishes plan_diff*(-VF_r + VF_max_r)*(VF_r - VF_min_r)
+    fprimer, fprimee = mul_dd(tmpr, tmpe, fprimer, fprimee)
+    
+    
+    tmpr, tmpe = add_dd(-VF_r, -VF_e, VF_max_r, VF_max_e)
+    tmpr, tmpe = mul_dd(tmpr, tmpe, plain_errr, plain_erre)
+    # This line finishes adding + plain_err*(-VF_r + VF_max_r)
+    fprimer, fprimee = add_dd(tmpr, tmpe, fprimer, fprimee)
+
+    tmpr, tmpe = add_dd(-VF_r, -VF_e, VF_min_r, VF_min_e)
+    tmpr, tmpe = mul_dd(tmpr, tmpe, plain_errr, plain_erre)
+
+    # This line finishes adding + plain_err*(-VF_r + VF_min_r)
+    fprimer, fprimee = add_dd(tmpr, tmpe, fprimer, fprimee)
+
+    return errr, erre, fprimer, fprimee
+
+
+
 def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min, V_over_F_max):
     plain_err, plan_diff = 0.0, 0.0
     for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
@@ -892,7 +1000,7 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_min
     # print(err, V_over_F)
     return err, fprime
 
-    
+
 @mark_numba_uncacheable
 def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     r'''Solves the objective function of the Rachford-Rice flash equation as
@@ -910,6 +1018,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     .. math::
         \alpha_R = \frac{1}{1 - K_{min}}
 
+    Parameters
     ----------
     zs : list[float]
         Overall mole fractions of all species, [-]
@@ -931,7 +1040,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
 
     Notes
     -----
-    The initial guess is the average of the following, as described in [2]_.
+    The initial guess is the average of the following.
 
     .. math::
         \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
@@ -1024,6 +1133,9 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
             xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
         else:
             xs[i] = zs[i]/(1. + V_over_F*K_minus_1)
+        
+        # xs[i] = zs[i]/(Ks[i]*V_over_F + LF)
+        # xs[i] = zs[i]/fma(Ks[i],V_over_F, LF)
             
     # The following trick can ensure the compositions sum to 1; small precision 
     # gain but sometimes a large error can still exist.
@@ -1043,6 +1155,193 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     for i in range(N):
         ys[i] = xs[i]*Ks[i]
     return LF, V_over_F, xs, ys
+
+
+@mark_numba_uncacheable
+def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
+    r'''Solves the objective function of the Rachford-Rice flash equation as
+    modified by Leibovici and Neoschil, using double-double precision math 
+    for maximum accuracy. For most cases, this function will return
+    bit-for-bit accurate results; but there are pathological inputs where
+    error still occurs.
+
+    .. math::
+        \left(\frac{V}{F} - \alpha_L\right)\left(\alpha_R - \frac{V}{F}\right)
+        \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
+        
+    .. math::
+        \alpha_L = - \frac{1}{K_{max} - 1}
+    
+    .. math::
+        \alpha_R = \frac{1}{1 - K_{min}}
+
+    Parameters
+    ----------
+    zs : list[float]
+        Overall mole fractions of all species, [-]
+    Ks : list[float]
+        Equilibrium K-values, [-]
+    guess : float, optional
+        Optional initial guess for vapor fraction, [-]
+
+    Returns
+    -------
+    L_over_F : float
+        Liquid fraction solution [-]
+    V_over_F : float
+        Vapor fraction solution [-]
+    xs : list[float]
+        Mole fractions of each species in the liquid phase, [-]
+    ys : list[float]
+        Mole fractions of each species in the vapor phase, [-]
+
+    Notes
+    -----
+    The initial guess is the average of the following.
+
+    .. math::
+        \left(\frac{V}{F}\right)_{min} = \frac{(K_{max}-K_{min})z_{of\;K_{max}}
+        - (1-K_{min})}{(1-K_{min})(K_{max}-1)}
+
+    .. math::
+        \left(\frac{V}{F}\right)_{max} = \frac{1}{1-K_{min}}
+
+    Examples
+    --------
+    >>> Rachford_Rice_solution_Leibovici_Neoschil_dd(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
+    (0.3092697372261, 0.69073026277385, [0.339408696966343, 0.36505605903717, 0.29553524399648], [0.57190365438828, 0.270871595805580, 0.157224749806130])
+
+    References
+    ----------
+    .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the 
+       Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992): 
+       303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
+    '''
+    N = len(Ks)
+    if N == 2:
+        return Rachford_Rice_solution_binary_dd(zs, Ks)
+    Kmin = min(Ks) # numba: delete
+    Kmax = max(Ks)# numba: delete
+    i_Kmax = Ks.index(Kmax)# numba: delete
+    z_of_Kmax = zs[i_Kmax]# numba: delete
+
+#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
+#    for i in range(N): # numba: uncomment
+#        if Ks[i] > Kmax: # numba: uncomment
+#            z_of_Kmax = zs[i] # numba: uncomment
+#            Kmax = Ks[i] # numba: uncomment
+#        if Ks[i] < Kmin: # numba: uncomment
+#            Kmin = Ks[i] # numba: uncomment
+    if Kmin > 1.0 or Kmax < 1.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
+    
+    numr, nume = add_dd(Kmax, 0, -Kmin, 0)
+    numr, nume = mul_dd(numr, nume, z_of_Kmax, 0)
+    tmpr, tmpe = add_dd(1.0, 0.0, -Kmin, 0.0)
+    numr, nume = add_dd(numr, nume, -tmpr, -tmpe)
+    
+    denr, dene = add_dd(1.0, 0, -Kmin, 0)
+    tmpr, tmpe = add_dd(Kmax, 0.0, -1.0, 0.0)
+    denr, dene = mul_dd(denr, dene, tmpr, tmpe)
+    VFminr, VFmine = div_dd(numr, nume, denr, dene)
+    
+    denr, dene = add_dd(Kmax, 0, -1.0, 0.0)
+    VFminLNr, VFminLNe = div_dd(-1.0, 0.0, denr, dene)
+
+    denr, dene = add_dd(1.0, 0, -Kmin, 0.0)
+    VFmaxr, VFmaxe = div_dd(1.0, 0.0, denr, dene)
+
+    if guess is not None and guess > VFminr and guess < VFmaxr:
+        x0 = guess
+    else:
+        try:
+            # Try to obtain an initial guess for speed and convergence from the
+            # other solvers
+            x0, _, _ = Rachford_Rice_solution_LN2(zs, Ks)
+        except:
+            x0 = 0.5*(VFminr + VFmaxr)
+    
+
+
+    # Pre-compute as much as we can to speedup the slower solve of the
+    # error equation
+    K_minus_1r = [0.0]*N
+    K_minus_1e = [0.0]*N
+
+    zs_k_minus_1r = [0.0]*N
+    zs_k_minus_1e = [0.0]*N
+
+    zs_k_minus_1_2r = [0.0]*N
+    zs_k_minus_1_2e = [0.0]*N
+    for i in range(N):
+        Kim1r, Kim1e = add_dd(Ks[i], 0.0, -1.0, 0.0)
+        K_minus_1r[i] = Kim1r
+        K_minus_1e[i] = Kim1e
+        
+        z_k_minus_1r, z_k_minus_1e = mul_dd(zs[i], 0.0, Kim1r, Kim1e)
+
+        zs_k_minus_1r[i] = z_k_minus_1r
+        zs_k_minus_1e[i] = z_k_minus_1e
+        
+        z_k_minus_1_2r, z_k_minus_1_2e = mul_dd(z_k_minus_1r, z_k_minus_1e, -Kim1r, -Kim1e)
+        zs_k_minus_1_2r[i] = z_k_minus_1_2r
+        zs_k_minus_1_2e[i] = z_k_minus_1_2e
+    VFr = x0
+    VFe = 0.0
+    
+    VF_minr, VF_mine = VFminr, VFmine
+    VF_maxr, VF_maxe = VFmaxr, VFmaxe
+    
+    for it in range(100):
+        errr, erre, fprimer, fprimee = Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VFr, VFe,
+                                                                zs_k_minus_1r, zs_k_minus_1e, zs_k_minus_1_2r, zs_k_minus_1_2e,
+                                                       K_minus_1r, K_minus_1e, VFminLNr, VFminLNe, VFmaxr, VFmaxe)
+        if errr > 0.0:
+            VF_minr, VF_mine = VFr, VFe
+        else:
+            VF_maxr, VF_maxe = VFr, VFe
+        
+        stepe, stepr = div_dd(errr, erre, fprimer, fprimee)
+        VFr, VFe = add_dd(VFr, VFe, -stepe, -stepr)
+
+        # Do a bisection step if we are outside of the bounds
+        if lt_dd(VFr, VFe, VF_minr, VF_mine) or gt_dd(VFr, VFe, VF_maxr, VF_maxe):
+            VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
+            VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
+        
+        if abs(errr) < 1e-25:
+            break
+    # if it > 30:
+    #     print(f'zs={zs}')
+    #     print(f'Ks={Ks}')
+    #     1/0
+        
+    LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
+    
+    xs = zs_k_minus_1_2r
+    ys = zs_k_minus_1_2e
+    for i in range(N):
+        # Should not be necessary and does not help numba
+        # switch = -1.001 < VFr*(Ks[i]-1) < -0.999
+        # if switch:
+        #     # xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
+        #     denr, dene = add_dd(1.0, 0, -LFr, -LFe)
+        #     denr, dene = mul_dd(denr, dene, Ks[i], 0.0)
+        #     denr, dene = add_dd(denr, dene, LFr, LFe)
+        #     xir, xie = div_dd(zs[i], 0.0, denr, dene)
+        # else:
+        # xi = zs[i]/(1.0 + V_over_F*(Ks[i] - 1.0))
+        K_minus_1r, K_minus_1e = add_dd(Ks[i], 0, -1.0, 0)
+        denr, dene = mul_dd(K_minus_1r, K_minus_1e, VFr, VFe)
+        denr, dene = add_dd(1.0, 0, denr, dene)
+        xir, xie = div_dd(zs[i], 0.0, denr, dene)
+    
+        xs[i] = xir
+        yir, yie = mul_dd(xir, xie, Ks[i], 0.0)
+        ys[i] = yir
+
+    return LFr, VFr, xs, ys
 
 def Rachford_Rice_solution_binary_dd(zs, Ks):
     r'''Solves the the Rachford-Rice flash equation for a binary system using
@@ -1291,11 +1590,17 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     xs = [0]*N
     ys = [0]*N
 
+    LF = 1 - V_over_F
     for i in range(N):
         x_calc = zs_mp[i]/(1 + V_over_F*Ks_minus_1[i])
+        y_calc = x_calc*Ks_mp[i]
+        
+        # This printed value should be 1. Once the values are converted to
+        # floating-point, this may no longer be true!
+        # print((LF*x_calc + V_over_F*y_calc)/zs[i])
         xs[i] = float(x_calc)
-        ys[i] = float(x_calc*Ks_mp[i])
-    return float(1-V_over_F), float(V_over_F), xs, ys
+        ys[i] = float(y_calc)
+    return float(LF), float(V_over_F), xs, ys
 
 
 

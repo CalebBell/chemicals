@@ -471,6 +471,11 @@ def test_rachford_rice():
     assert_close(VF, VF_new, rtol=1e-14)
     assert_close1d(xs, xs_new, rtol=1e-14)
     assert_close1d(ys, ys_new, rtol=1e-14)
+    
+    LF_new, VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_Leibovici_Neoschil_dd(zs=zs, Ks=Ks)
+    assert_close(VF, VF_new, rtol=1e-14)
+    assert_close1d(xs, xs_new, rtol=1e-14)
+    assert_close1d(ys, ys_new, rtol=1e-14)
 
     zs = [0.1, 0.2, 0.3, 0.4]
     Ks = [1.0161456228504933, 1.001260709063004, 0.9882448742560694, 1.0237689436500155]
@@ -487,6 +492,9 @@ def test_rachford_rice():
     test_flash_solution_algorithms(chemicals.numba.flash_inner_loop, array=True)
     test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_LN2, array=True)
     test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution, array=True)
+    
+    f = lambda zs, Ks, guess=None: chemicals.numba.Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess)[1:]
+    test_flash_solution_algorithms(f, array=True)
     # test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_numpy, array=True) # Does not currently pass
 # test_rachford_rice()
 
