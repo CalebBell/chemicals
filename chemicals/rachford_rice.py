@@ -1240,26 +1240,15 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         if abs(errr) < 1e-20:
             break
         
-    V_over_F = VFr
     LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
-    LF = LFr
     
     xs = zs_k_minus_1_2r
     ys = zs_k_minus_1_2e
     for i in range(N):
         K_minus_1r, K_minus_1e = add_dd(Ks[i], 0, - 1.0, 0)
-            # Attempt to avoid truncation error by using the liquid fraction
-            # some of the time.
-        switch = -1.001 < V_over_F*K_minus_1r < -0.999
-        if switch:
-            denr, dene = add_dd(-LF, 0, 1.0, 0)
-            denr, dene = mul_dd(denr, dene, Ks[i], 0)
-            denr, dene =  add_dd(LF, 0, denr, dene)
-            xs[i] = div_dd(zs[i], 0.0, denr, dene)[0]
-        else:
-            denr, dene = mul_dd(K_minus_1r, K_minus_1e, V_over_F, 0)
-            denr, dene = add_dd(1.0, 0, denr, dene)
-            xs[i] = div_dd(zs[i], 0.0, denr, dene)[0]
+        denr, dene = mul_dd(K_minus_1r, K_minus_1e, VFr, VFe)
+        denr, dene = add_dd(1.0, 0, denr, dene)
+        xs[i] = div_dd(zs[i], 0.0, denr, dene)[0]
                 
     # The following trick can ensure the compositions sum to 1; small precision 
     # gain but sometimes a large error can still exist.
@@ -1278,7 +1267,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     # 
     for i in range(N):
         ys[i] = xs[i]*Ks[i]
-    return LF, V_over_F, xs, ys
+    return LFr, VFr, xs, ys
 
 def Rachford_Rice_solution_binary_dd(zs, Ks):
     r'''Solves the the Rachford-Rice flash equation for a binary system using
