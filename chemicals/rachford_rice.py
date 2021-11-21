@@ -1578,11 +1578,17 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     xs = [0]*N
     ys = [0]*N
 
+    LF = 1 - V_over_F
     for i in range(N):
         x_calc = zs_mp[i]/(1 + V_over_F*Ks_minus_1[i])
+        y_calc = x_calc*Ks_mp[i]
+        
+        # This printed value should be 1. Once the values are converted to
+        # floating-point, this may no longer be true!
+        # print((LF*x_calc + V_over_F*y_calc)/zs[i])
         xs[i] = float(x_calc)
-        ys[i] = float(x_calc*Ks_mp[i])
-    return float(1-V_over_F), float(V_over_F), xs, ys
+        ys[i] = float(y_calc)
+    return float(LF), float(V_over_F), xs, ys
 
 
 
