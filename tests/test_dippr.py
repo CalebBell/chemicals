@@ -105,6 +105,9 @@ def test_EQ106_more():
     
     # Point exactly on the critical point that was an error, needed an if statement.
     assert 0.0 == EQ106(T=473.2, Tc=473.2, **{'A': 4761730.0, 'B': -11.5565, 'C': 30.6629, 'D': -31.89366, 'E': 12.67797})
+    
+    # Point above critical point, just set it to zero as the two properties used work
+    assert 0.0 == EQ106(647.097, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
 
 
 def test_EQ101_more():

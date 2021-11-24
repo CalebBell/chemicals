@@ -1179,6 +1179,8 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
        https://web.archive.org/web/20050510061545/http://www.ppds.co.uk/library/pdf/PPDS_EquationForms.pdf
     '''
     Tr = T/Tc
+    if Tr > 1.0:
+        Tr = 1.0
     tau = 1.0 - Tr
     tau2 = tau*tau
     try:

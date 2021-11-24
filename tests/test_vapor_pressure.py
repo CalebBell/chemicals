@@ -60,6 +60,9 @@ def test_Wagner_original():
 
     for T in (0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307):
         assert d2Wagner_original_dT2(T, 190.53, 4596420., -6.00435, 1.1885, -0.834082, -1.22833) == 0.0
+        
+    over_kwargs = {'T': 657.9000000000001, 'Tc': 657.9, 'Pc': 2806700.0, 'a': -8.11413, 'b': 1.77697, 'c': -4.4396, 'd': -1.47477}
+    assert_close(Wagner_original(**over_kwargs), over_kwargs['Pc'], rtol=1e-12)
 
 
 def test_Wagner():

@@ -790,7 +790,7 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
     if order == 0:
         Tr = T/Tc
         tau = (1.0 - Tr)
-        if tau == 0.0:
+        if tau <= 0.0:
             return 0.0
         power = (B + Tr*(C + Tr*(D + E*Tr)))
         try:
