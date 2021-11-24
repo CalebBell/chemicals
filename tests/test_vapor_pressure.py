@@ -313,6 +313,12 @@ def test_Ambrose_Walton():
     # Their result is 0.1329 bar.
     Psat = Ambrose_Walton(347.25, 617.15, 36.09E5, 0.304)
     assert_close(Psat, 13278.878504306222)
+    
+    
+    # Add limit on omega with this test
+    low_T_kwargs = {'T': 0.010000000000218279, 'Tc': 4287.0, 'Pc': 19252000.0, 'omega': -0.7998}
+    Psat = Ambrose_Walton(**low_T_kwargs)
+    assert_close(Psat, 0, atol=1e-30)
 
 
 def test_Edalat():

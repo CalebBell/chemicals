@@ -2094,13 +2094,17 @@ def Ambrose_Walton(T, Tc, Pc, omega):
     '''
     Tr = T/Tc
     tau = 1.0 - Tr
-    tau15 = tau**1.5
+    tau15 = tau*sqrt(tau)
     tau25 = tau*tau15
     tau5 = tau25*tau25
+    if omega < 0.0:
+        # The omega term is based on positive omegas only, prevent it from
+        # going negative
+        omega = 0.0
     f0 = (-5.97616*tau + 1.29874*tau15 - 0.60394*tau25 - 1.06841*tau5)
     f1 = (-5.03365*tau + 1.11505*tau15 - 5.41217*tau25 - 7.46628*tau5)
     f2 = (-0.64771*tau + 2.41539*tau15 - 4.26979*tau25 + 3.25259*tau5)
-    return Pc*exp((f0 + omega*(f1 + f2*omega))/Tr)
+    return Pc*trunc_exp((f0 + omega*(f1 + f2*omega))/Tr)
 
 
 def Sanjari(T, Tc, Pc, omega):
