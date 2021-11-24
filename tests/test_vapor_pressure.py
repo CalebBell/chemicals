@@ -87,6 +87,10 @@ def test_Wagner():
 
     for T in (0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307):
         assert d2Wagner_dT2(T, 190.551, 4599200, -6.02242, 1.26652, -0.5707, -1.366) == 0.0
+        
+        
+    high_T_kwargs = {'T': 449.05000000000007, 'Tc': 449.05, 'Pc': 5990000.0, 'a': -7.49333, 'b': 1.78753, 'c': -4.04253, 'd': 8.50574}
+    assert_close(Wagner(**high_T_kwargs), high_T_kwargs['Pc'], rtol=1e-13)
 
 def test_TRC_Antoine_extended():
     # Tetrafluoromethane, coefficients from [1]_, at 180 K:
