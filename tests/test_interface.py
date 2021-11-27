@@ -86,11 +86,15 @@ def test_REFPROP():
     sigma = REFPROP_sigma(298.15, 647.096, -0.1306, 2.471, 0.2151, 1.233)
     assert_close(sigma, 0.07205503890847453)
 
+    assert_close(REFPROP_sigma(647.096, 647.096, -0.1306, 2.471, 0.2151, 1.233), 0, atol=1e-12)
+    assert_close(REFPROP_sigma(700.0, 647.096, -0.1306, 2.471, 0.2151, 1.233), 0, atol=1e-12)
 
 def test_Somayajulu():
     sigma = Somayajulu(300, 647.126, 232.713514, -140.18645, -4.890098)
     assert_close(sigma, 0.07166386387996757)
-
+    
+    assert 0 == Somayajulu(647.13, 647.126, 232.713514, -140.18645, -4.890098)
+    assert_close(0, Somayajulu(647.126, 647.126, 232.713514, -140.18645, -4.890098), atol=1e-13)
 
 def test_Jasper():
     sigma = Jasper(298.15, 24, 0.0773)

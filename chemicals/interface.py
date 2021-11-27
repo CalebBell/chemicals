@@ -290,8 +290,13 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
     -----
     Function as implemented in [1]_. No example necessary; results match
     literature values perfectly.
-    Form of function returns imaginary results when T > Tc; None is returned
+    Form of function returns imaginary results when T > Tc; 0 is returned
     if this is the case.
+    
+    When fitting parameters to this function, it is easy to end up with a
+    fit that returns negative surface tension near but not quite at the 
+    critical point.
+    
 
 
     Examples
@@ -310,8 +315,10 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
        and Modeling 53, no. 12 (2013): 3418-30. doi:10.1021/ci4005699.
     '''
     Tr = T/Tc
-    one_minus_Tr = 1.0 - Tr
-    sigma = sigma0*(one_minus_Tr)**n0 + sigma1*(one_minus_Tr)**n1 + sigma2*(one_minus_Tr)**n2
+    tau = 1.0 - Tr
+    if tau <= 0.0:
+        return 0.0
+    sigma = sigma0*(tau)**n0 + sigma1*(tau)**n1 + sigma2*(tau)**n2
     return sigma
 
 
@@ -493,7 +500,7 @@ def Somayajulu(T, Tc, A, B, C):
     Notes
     -----
     Presently untested, but matches expected values. Internal units are mN/m.
-    Form of function returns imaginary results when T > Tc; None is returned
+    Form of function returns imaginary results when T > Tc; 0.0 is returned
     if this is the case. Function is claimed valid from the triple to the
     critical point. Results can be evaluated beneath the triple point.
 
@@ -510,6 +517,8 @@ def Somayajulu(T, Tc, A, B, C):
        the Triple Point to the Critical Point." International Journal of
        Thermophysics 9, no. 4 (July 1988): 559-66. doi:10.1007/BF00503154.
     '''
+    if T >= Tc:
+        return 0.0
     X = (Tc-T)/Tc
     return X*sqrt(sqrt(X))*(A + X*(B + C*X))*1e-3
 
