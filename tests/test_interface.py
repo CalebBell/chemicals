@@ -207,12 +207,28 @@ def test_Watson_sigma():
     sigma = Watson_sigma(T=350.0, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
     assert_close(sigma, 0.013834092660564925, rtol=1e-14)
     
+    # Test a couple calls very near to Tc
+    Watson_sigma(T=543.835999999, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
+    Watson_sigma(T=543.839999999999, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
+    
+    assert 0 == Watson_sigma(T=543.836, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
+    assert 0 == Watson_sigma(T=600, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
+
+    # This call will give very large numbers
+    Watson_sigma(T=543.836*(1-1e-10), Tc=543.836, a1=-3.02417, a2=-1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
+
+
 def test_ISTExpansion():
     sigma = ISTExpansion(T=400.0, Tc=776.0, a1=0.037545, a2=0.0363288)
     assert_close(sigma, 0.02672100905515996, rtol=1e-13)
     
     sigma = ISTExpansion(T=400.0, Tc=776.0, a1=0.037545, a2=0.0363288, a3=1e-4, a4=1e-3, a5=1e-4)
     assert_close(sigma, 0.02679017489704166, rtol=1e-15)
+    
+    assert 0 == ISTExpansion(T=777.0, Tc=776.0, a1=0.037545, a2=0.0363288)
+    
+    # Point near Tc but with really high values
+    ISTExpansion(T=775.999999, Tc=776.0, a1=1e20, a2=0.0363288)
     
     
 def test_sigma_Gharagheizi_1():

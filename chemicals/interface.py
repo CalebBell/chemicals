@@ -413,6 +413,14 @@ def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     -----
     This expression is also used for enthalpy of vaporization in [1]_.
     The coefficients from NIST TDE for enthalpy of vaporization are kJ/mol.
+    
+    This model is coded to return 0 values at Tr >= 1. It is otherwise not
+    possible to evaluate this expression at Tr = 1, as log(0) is undefined
+    (although the limit shows the expression converges to 0).
+    
+    This equation does not have any term forcing it to become near-zero
+    at the critical point, but it cannot be fit so as to produce negative 
+    values.
 
     Examples
     --------
@@ -427,6 +435,8 @@ def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/HVPExpansion-SurfaceTension.htm
     '''
     Tr = T/Tc
+    if Tr >= 1.0:
+        return 0.0
     l = log(1.0 - Tr)
     return exp(a1 + l*(a2 + Tr*(a3 + Tr*(a4 + a5*Tr))))
 
@@ -461,6 +471,9 @@ def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
 
     Notes
     -----
+    This equation hsa a term term forcing it to become zero
+    at the critical point, but it can easily be fit so as to produce negative 
+    values at any reduced temperature.
 
     Examples
     --------
@@ -475,6 +488,8 @@ def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/ISTExpansion-SurfaceTension.htm
     '''
     tau = 1.0 - T/Tc
+    if tau <= 0.0:
+        return 0.0
     return tau*(a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau))))
 
 def Somayajulu(T, Tc, A, B, C):
