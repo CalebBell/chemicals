@@ -350,6 +350,12 @@ def PPDS14(T, Tc, a0, a1, a2):
 
     Notes
     -----
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
+    
+    If this model is fit with `a0` and `a2` as positive values, it is 
+    guaranteed to predict only positive values of `sigma` right up to the
+    critical point. However, `a2` is often fit to be a negative value.
 
     Examples
     --------
@@ -369,6 +375,8 @@ def PPDS14(T, Tc, a0, a1, a2):
        https://doi.org/10.1021/ci050067b.
     '''
     tau = 1.0 - T/Tc
+    if tau <= 0.0:
+        return 0.0
     return a0*tau**a1*(1.0 + a2*tau)
 
 def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
@@ -503,6 +511,9 @@ def Somayajulu(T, Tc, A, B, C):
     Form of function returns imaginary results when T > Tc; 0.0 is returned
     if this is the case. Function is claimed valid from the triple to the
     critical point. Results can be evaluated beneath the triple point.
+    
+    This function can be accidentally fit to return negative
+    values of surface tension.
 
     Examples
     --------
@@ -548,6 +559,9 @@ def Jasper(T, a, b):
     -----
     Internal units are mN/m, and degrees Celcius.
     This function has been checked against several references.
+    
+    As this is a linear model, negative values of surface tension will 
+    eventually arise.
 
     Examples
     --------

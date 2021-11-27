@@ -201,6 +201,8 @@ def test_PPDS14():
     sigma = PPDS14(T=280, Tc=562.05, a0=0.0786269, a1=1.28646, a2=-0.112304)
     assert_close(sigma, 0.030559764256249854, rtol=1e-14)
     
+    assert 0 == PPDS14(T=600, Tc=562.05, a0=0.0786269, a1=1.28646, a2=-0.112304)
+    
 def test_Watson_sigma():
     sigma = Watson_sigma(T=350.0, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
     assert_close(sigma, 0.013834092660564925, rtol=1e-14)
