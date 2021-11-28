@@ -110,6 +110,21 @@ def test_EQ106_more():
     assert 0.0 == EQ106(647.097, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
 
 
+def test_EQ106_AB_and_ABC():
+    Tmin, Tc, A, B = 194.0, 592.5, 0.056, 1.32
+    C = -0.01
+    Tmax = 590.0
+    
+    kwargs = {'T': 590.0, 'Tc': 592.5, 'val': 4.106957515154657e-05, 'der': -2.1684735680016856e-05}
+
+    res = EQ106_AB(**kwargs)
+    assert_close1d(res, (0.056, 1.32), rtol=1e-13)
+
+    kwargs = {'T': 590.0, 'Tc': 592.5, 'val': 4.33678101801987e-05, 'der': -2.2721462154946353e-05, 'der2': 2.814732501661309e-06}
+    res = EQ106_ABC(**kwargs)
+    assert_close1d(res, (0.056, 1.32, -0.01), rtol=1e-9)
+
+
 def test_EQ101_more():
     assert_close(EQ101(300.0, 73.649, -7258.2, -7.3037, 4.1653E-6, 2, order=1), 208.00259945348506, rtol=1e-13)
     assert_close(derivative(lambda T: EQ101(T, 73.649, -7258.2, -7.3037, 4.1653E-6, 2), 300, dx=1e-4),

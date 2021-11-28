@@ -62,7 +62,8 @@ __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
            'EQ114', 'EQ115', 'EQ116', 'EQ127', 
            'EQ101_fitting_jacobian', 'EQ102_fitting_jacobian',
            'EQ106_fitting_jacobian', 'EQ105_fitting_jacobian',
-           'EQ107_fitting_jacobian']
+           'EQ107_fitting_jacobian',
+           'EQ106_AB', 'EQ106_ABC']
 
 from chemicals.utils import log, exp, sinh, cosh, atan, atanh, sqrt, tanh
 from cmath import log as clog
@@ -836,6 +837,154 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
                           + 2*x4/x7**3 + 6*E*x5 + 6*x6*x8)/Tc**3)
     else:
         raise ValueError(order_not_found_msg)
+
+def EQ106_AB(T, Tc, val, der):
+    r'''Calculate the coefficients `A` and `B` of the DIPPR Equation #106 using
+    the value of the function and its derivative at a specific point.
+    
+    .. math::
+        A = val \left(\frac{1}{Tc} \left(- T + Tc\right)\right)^{- \frac{der}{val} \left(T - Tc\right)}
+
+    .. math::
+        B = \frac{der}{val} \left(T - Tc\right)
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    Tc : float
+        Critical temperature, [K]
+    val : float
+        Property value [constant-specific]
+    der : float
+        First temperature derivative of property value [constant-specific/K]
+    
+    Returns
+    -------
+    A : float
+        Parameter for the equation [constant-specific]
+    B : float
+        Parameter for the equation [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    
+    >>> val = EQ106(300, 647.096, A=0.17766, B=2.567)
+    >>> der = EQ106(300, 647.096, A=0.17766, B=2.567, order=1)
+    >>> EQ106_AB(300, 647.096, val, der)
+    (0.17766, 2.567)
+
+    '''
+
+    '''# Derived with:
+    from sympy import *
+    T, Tc, A, B, val, der = symbols('T, Tc, A, B, val, der')
+    Tr = T/Tc
+    expr = A*(1 - Tr)**B
+    
+    Eq0 = Eq(expr, val)
+    Eq1 = Eq(diff(expr, T), der)
+    s = solve([Eq0, Eq1], [A, B])
+    '''
+    x0 = T - Tc
+    x1 = der*x0/val
+    A, B = val*(-x0/Tc)**(-x1), x1
+    return (A, B)
+
+def EQ106_ABC(T, Tc, val, der, der2):
+    r'''Calculate the coefficients `A`, `B`, and `C` of the DIPPR Equation #106 
+    using, the value of the function and its first and second derivative at a
+    specific point.
+    
+    .. math::
+        A = val \left(\frac{1}{Tc} \left(- T + Tc\right)\right)^{\frac{1}{val^{2}
+        \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} + 2\right)} 
+         \left(T \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )}
+        + 1\right) \left(- T der^{2} + T der_{2} val + Tc der^{2} - Tc der_{2} 
+        val + der val\right) - T \left(- T der^{2} + T der_{2} val + Tc der^{2} 
+        - Tc der_{2} val + der val\right) - Tc \left(- T der^{2} + T der_{2} val
+        + Tc der^{2} - Tc der_{2} val + der val\right) \log{\left (\frac{1}{Tc} 
+        \left(- T + Tc\right) \right )} - der val \left(T - Tc\right) 
+        \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} 
+        + 2\right)\right)}
+        
+    .. math::
+        B = \frac{1}{val^{2} \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right)
+        \right )} + 2\right)} \left(- T \left(\log{\left (\frac{1}{Tc} 
+        \left(- T + Tc\right) \right )} + 1\right) \left(- T der^{2} + T der_{2}
+        val + Tc der^{2} - Tc der_{2} val + der val\right) + Tc \left(- T der^{2}
+        + T der_{2} val + Tc der^{2} - Tc der_{2} val + der val\right) 
+        \log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} + der val
+        \left(T - Tc\right) \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} + 2\right)\right)
+        
+    .. math::
+        C = \frac{Tc \left(- T der^{2} + T der_{2} val + Tc der^{2} - Tc der_{2} 
+        val + der val\right)}{val^{2} \left(\log{\left (\frac{1}{Tc}
+        \left(- T + Tc\right) \right )} + 2\right)}
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    Tc : float
+        Critical temperature, [K]
+    val : float
+        Property value [constant-specific]
+    der : float
+        First temperature derivative of property value [constant-specific/K]
+    der2 : float
+        Second temperature derivative of property value [constant-specific/K^2]
+    
+    Returns
+    -------
+    A : float
+        Parameter for the equation [constant-specific]
+    B : float
+        Parameter for the equation [-]
+    C : float
+        Parameter for the equation [-]
+    
+    Notes
+    -----
+
+    Examples
+    --------
+    
+    >>> val = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01)
+    >>> der = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01, order=1)
+    >>> der2 = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01, order=2)
+    >>> EQ106_ABC(300, 647.096, val, der, der2)
+    (0.17766, 2.567, -0.01)
+
+    '''
+    '''# Broken in recent versions of SymPy, SymPy 1.1 is good
+    from sympy import *
+    T, Tc, A, B, C, val, der, der2 = symbols('T, Tc, A, B, C, val, der, der2')
+    Tr = T/Tc
+    expr = A*(1 - Tr)**(B + C*Tr)
+    
+    Eq0 = Eq(expr, val)
+    Eq1 = Eq(diff(expr, T), der)
+    Eq2 = Eq(diff(expr, T, 2), der2)
+    s = solve([Eq0, Eq1, Eq2], [A, B, C])
+    '''
+    x0 = T - Tc
+    x1 = -x0/Tc
+    x2 = log(x1)
+    x3 = x2 + 2
+    x4 = 1/(val*val*x3)
+    x5 = der*val
+    x6 = der2*val
+    x7 = der*der
+    x8 = T*x6 - T*x7 - Tc*x6 + Tc*x7 + x5
+    x9 = T*x8
+    x10 = Tc*x8
+    x11 = x0*x3*x5 + x10*x2 - x9*(x2 + 1)
+    A, B, C = val*x1**(-x4*(x11 + x9)), x11*x4, x10*x4
+    return (A, B, C)
 
 
 def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
