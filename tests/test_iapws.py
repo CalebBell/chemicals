@@ -267,6 +267,7 @@ def test_iapws97_d2G_dpidtau_region1():
 
 @pytest.mark.fuzz
 @pytest.mark.slow
+@pytest.mark.iapws
 def test_iapws97_region1_fuzz():
     funcs_naive = [iapws97_dG_dpi_region1_naive, iapws97_G_region1_naive, iapws97_d2G_dpi2_region1_naive,
                    iapws97_dG_dtau_region1_naive, iapws97_d2G_dtau2_region1_naive, iapws97_d2G_dpidtau_region1_naive]
@@ -324,6 +325,7 @@ def test_iapws97_d2Gr_dpi2_region2():
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws97_region2_fuzz():
     funcs_naive = [iapws97_d2G0_dtau2_region2_naive, iapws97_dG0_dtau_region2_naive, iapws97_G0_region2_naive, iapws97_d2Gr_dpidtau_region2_naive, iapws97_d2Gr_dtau2_region2_naive, iapws97_dGr_dtau_region2_naive, iapws97_d2Gr_dpi2_region2_naive, iapws97_Gr_region2_naive, iapws97_dGr_dpi_region2_naive]
@@ -379,6 +381,7 @@ def test_iapws97_d2A_dtau2_region3():
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws97_region3_fuzz():
     funcs_naive = [iapws97_d2A_ddeltadtau_region3_naive, iapws97_d2A_dtau2_region3_naive, iapws97_dA_dtau_region3_naive, iapws97_d2A_ddelta2_region3_naive, iapws97_dA_ddelta_region3_naive, iapws97_A_region3_naive]
@@ -443,6 +446,7 @@ def test_iapws97_d2Gr_dpidtau_region5():
     assert_close(iapws97_d2Gr_dpidtau_region5(.9, 1.01), -0.009039988008632744, rtol=1e-13)
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws97_region5_fuzz():
     funcs_naive = [iapws97_d2G0_dtau2_region5_naive, iapws97_dG0_dtau_region5_naive,
@@ -702,6 +706,7 @@ def test_iapws97_rho():
 
 @pytest.mark.CoolProp
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_3_rho_coolprop():
@@ -734,6 +739,7 @@ def test_iapws97_region_3_rho_coolprop():
 
 @pytest.mark.CoolProp
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_5_rho_coolprop():
@@ -788,6 +794,7 @@ def iapws97_dGr_dpi_region2_fastest(tau, pi):
 
 @pytest.mark.CoolProp
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_2_rho_coolprop():
@@ -820,6 +827,7 @@ def test_iapws97_region_2_rho_coolprop():
 
 @pytest.mark.CoolProp
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws97_region_1_rho_coolprop():
@@ -873,6 +881,7 @@ def test_iapws97_P():
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws97_P_fuzz():
     N = 40
@@ -1020,6 +1029,7 @@ def test_iapws97_identify_region_TP():
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws97_T_fuzz():
     # region 2 and 1
@@ -1547,6 +1557,7 @@ def test_iapws95_d2A_d2deltar():
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d2A_d2deltar_vs_naive(precise=False, allow_fail=True):
     '''Overall performs very well. 2e-10 was needed in 2000^2 points for like 1 point.
@@ -1583,6 +1594,7 @@ def test_iapws95_d2A_d2deltar_vs_naive(precise=False, allow_fail=True):
 #test_iapws95_d2A_d2deltar_vs_naive(precise=True, allow_fail=False)
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
     if precise:
@@ -1667,6 +1679,7 @@ def test_iapws95_d3Ar_ddelta3():
     assert_close(iapws95_d3Ar_ddelta3(tau, delta), num, rtol=1e-7)
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.mpmath
 def test_iapws95_d3Ar_ddelta3_mpmath():
     import mpmath as mp
@@ -1685,6 +1698,7 @@ def test_iapws95_d3Ar_ddelta3_mpmath():
 #0.5809660021590505 3.7540725845964094e-13 1113.8276553106205 1.208811372240044e-10 0.668894347495896 0.6689624104240159 0.00010174402486495815
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
     '''
@@ -1720,6 +1734,7 @@ def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d3Ar_ddelta2dtau_vs_naive(precise=False, allow_fail=True):
     '''
@@ -1767,6 +1782,7 @@ def test_iapws95_dA_ddeltar():
                  iapws95_dAr_ddelta(1,1), rtol=1e-13)
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_dA_ddeltar_vs_naive(precise=False, allow_fail=True):
     '''
@@ -1801,6 +1817,7 @@ def test_iapws95_dA_ddeltar_vs_naive(precise=False, allow_fail=True):
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_Ar_vs_naive(precise=False, allow_fail=True):
     if precise:
@@ -1845,6 +1862,7 @@ def test_iapws95_dAr_dtau():
                  -7.704333630957023, rtol=1e-11)
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_dAr_dtau_vs_naive(precise=False, allow_fail=True):
     '''
@@ -1879,6 +1897,7 @@ def test_iapws95_dAr_dtau_vs_naive(precise=False, allow_fail=True):
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d2Ar_dtau2_vs_naive(precise=False, allow_fail=True):
     '''
@@ -1917,6 +1936,7 @@ def test_iapws95_d2Ar_dtau2():
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d2Ar_ddeltadtau_vs_naive(precise=False, allow_fail=True):
     '''
@@ -1954,6 +1974,7 @@ def test_iapws95_d2Ar_ddeltadtau():
     assert_close(val, -0.1984035623854279, rtol=1e-12)
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_A0_vs_naive():
     '''Can't think of a way to optimize this.
@@ -1978,6 +1999,7 @@ def test_iapws95_A0_vs_naive():
 #test_iapws95_A0_vs_naive()
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_iapws95_dA0_dtau_vs_naive():
     '''Can't think of a way to optimize this.
@@ -2001,6 +2023,7 @@ def test_iapws95_iapws95_dA0_dtau_vs_naive():
 #    print(rerr/N**2, np.std(errs), np.max(errs))
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_ddAddtau_idg_vs_naive():
     '''Can't think of a way to optimize this.
@@ -2044,6 +2067,7 @@ def test_iapws95_d3A0_dtau3():
     assert_close(ans, derivative(iapws95_d2A0_dtau2, .5345, args=(.575745,), dx=1e-8))
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.CoolProp
 @pytest.mark.fuzz
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
@@ -2123,6 +2147,7 @@ def test_iapws95_rho():
 
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.CoolProp
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_iapws95_rho_vs_Coolprop():
@@ -2266,6 +2291,7 @@ def test_iapws95_saturation_fits_concise():
     iapws.reset_backend()
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.mpmath
 @pytest.mark.fuzz
 def test_iapws95_saturation_fits():
@@ -2307,6 +2333,7 @@ def test_rhog_sat_IAPWS95_vs_saturation():
 
     # 647 requires mpmath
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.fuzz
 def test_rhog_sat_IAPWS95_vs_saturation2():
     Ts = [260.0, 400.0, 600.0, 630.0, 645]
@@ -2326,6 +2353,7 @@ def test_rhog_sat_IAPWS95_vs_saturation2():
     iapws.reset_backend()
 
 @pytest.mark.slow
+@pytest.mark.iapws
 @pytest.mark.CoolProp
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_rhog_sat_IAPWS95_CoolProp():

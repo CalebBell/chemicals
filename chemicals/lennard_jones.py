@@ -106,7 +106,9 @@ from chemicals.data_reader import (register_df_source,
 
 folder = os_path_join(source_path, 'Viscosity')
 register_df_source(folder, 'MagalhaesLJ.tsv')
+register_df_source(folder, 'PolingLJ.tsv')
 
+POLING = 'Poling et al. (2001)'
 FLYNN = 'Flynn (1960)'
 STIELTHODOS = 'Stiel and Thodos Tc, Zc (1962)'
 MAGALHAES = 'Magalhães, Lito, Da Silva, and Silva (2013)'
@@ -118,16 +120,18 @@ BSLM = 'Bird, Stewart, and Light (2002) melting relation'
 
 _LJ_data_loaded = False
 def _load_LJ_data():
-    global _LJ_data_loaded, LJ_data_Magalhaes, LJ_sources
+    global _LJ_data_loaded, LJ_data_Magalhaes, LJ_data_Poling, LJ_sources
     LJ_data_Magalhaes = data_source('MagalhaesLJ.tsv')
+    LJ_data_Poling = data_source('PolingLJ.tsv')
     _LJ_data_loaded = True
     LJ_sources = {
         MAGALHAES: LJ_data_Magalhaes,
+        POLING: LJ_data_Poling,
     }
 
 if PY37:
     def __getattr__(name):
-        if name in ('LJ_data_Magalhaes', 'LJ_sources'):
+        if name in ('LJ_data_Magalhaes', 'LJ_data_Poling', 'LJ_sources'):
             _load_LJ_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
@@ -135,7 +139,7 @@ else:
     if can_load_data:
         _load_LJ_data()
 
-Stockmayer_all_methods = (MAGALHAES, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
+Stockmayer_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
                           TEEGOTOSTEWARD1, BSLB, BSLM)
 '''Tuple of method name keys. See the `Stockmayer` for the actual references'''
 
@@ -198,6 +202,8 @@ def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
     --------
     >>> Stockmayer(CASRN='64-17-5')
     1291.41
+    >>> Stockmayer('7727-37-9')
+    71.4
 
     Parameters
     ----------
@@ -277,7 +283,7 @@ BSLC1 = 'Bird, Stewart, and Light (2002) critical relation with Vc'
 BSLC2 = 'Bird, Stewart, and Light (2002) critical relation with Tc, Pc'
 STIELTHODOSMD = 'Stiel and Thodos Vc, Zc (1962)'
 SILVALIUMACEDO = 'Silva, Liu, and Macedo (1998) critical relation with Tc, Pc'
-molecular_diameter_all_methods = (MAGALHAES, TEEGOTOSTEWARD4, SILVALIUMACEDO,
+molecular_diameter_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD4, SILVALIUMACEDO,
                                   BSLC2, TEEGOTOSTEWARD3, STIELTHODOSMD, FLYNN,
                                   BSLC1, BSLB, BSLM)
 '''Tuple of method name keys. See the `molecular_diameter` for the actual references'''
@@ -349,7 +355,9 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
     --------
     >>> molecular_diameter(CASRN='64-17-5')
     4.23738
-
+    >>> molecular_diameter('7727-37-9')
+    3.798
+    
     Parameters
     ----------
     CASRN : str, optional

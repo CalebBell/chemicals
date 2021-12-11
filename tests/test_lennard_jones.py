@@ -24,8 +24,9 @@ SOFTWARE.
 import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
+from chemicals import check_CAS
 from chemicals.lennard_jones import *
-from chemicals.lennard_jones import LJ_data_Magalhaes
+from chemicals.lennard_jones import LJ_data_Magalhaes, LJ_data_Poling, POLING
 from fluids.constants import k
 
 
@@ -40,7 +41,19 @@ def test_LJ_data():
 
     assert LJ_data_Magalhaes.index.is_unique
     assert LJ_data_Magalhaes.shape == (322, 3)
+    for c in LJ_data_Magalhaes.index:
+        assert check_CAS(c)
 
+    tot = LJ_data_Poling['epsilon'].abs().sum()
+    assert_close(tot, 24742.620000000003)
+
+    tot = LJ_data_Poling['sigma'].abs().sum()
+    assert_close(tot, 329.24199999999996)
+
+    assert LJ_data_Poling.index.is_unique
+    assert LJ_data_Poling.shape == (75, 4)
+    for c in LJ_data_Poling.index:
+        assert check_CAS(c)
 
 def test_molecular_diameter_CSP():
     # Example from DIPPR 1983 Manual for Predicting Chemical Process Design
@@ -85,6 +98,10 @@ def test_stockmayer_all_lookups():
     # Use the default method for each chemical in this file
     Stockmayers = sum([Stockmayer(CASRN=i) for i in LJ_data_Magalhaes.index])
     assert_close(Stockmayers, 187099.82029999999)
+    
+    Stockmayers = sum([Stockmayer(CASRN=i, method=POLING) for i in LJ_data_Poling.index])
+    assert_close(Stockmayers, 24742.62)
+    
 
 def test_stockmayer_function():
 
@@ -94,7 +111,7 @@ def test_stockmayer_function():
     assert tuple(methods) == Stockmayer_all_methods
 
     values_calc = [Stockmayer(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975, CASRN='110-54-3', method=i) for i in methods]
-    values = [434.76, 427.33156230000003, 273.54201582027196, 318.10801442820025, 390.85200000000003, 392.8824, 393.15049999999997, 341.90399999999994]
+    values = [434.76, 399.3, 427.33156230000003, 273.54201582027196, 318.10801442820025, 390.85200000000003, 392.8824, 393.15049999999997, 341.90399999999994]
     assert_close1d(values_calc, values)
 
     # Error handling
@@ -110,6 +127,9 @@ def test_molecular_diameter_all_values():
     MDs_sum = sum([molecular_diameter(CASRN=i) for i in LJ_data_Magalhaes.index])
     assert_close(MDs_sum, 1995.8174799999997)
 
+    MDs_sum = sum([molecular_diameter(CASRN=i, method=POLING) for i in LJ_data_Poling.index])
+    assert_close(MDs_sum, 329.24199999999996)
+
 def test_molecular_diameter_function():
 
     assert_close(4.23738, molecular_diameter(CASRN='64-17-5'))
@@ -118,7 +138,7 @@ def test_molecular_diameter_function():
     assert tuple(sorted(methods)) == tuple(sorted(molecular_diameter_all_methods))
 
     values_calc = [molecular_diameter(Tc=507.6, Pc=3025000.0, Vc=0.000368, Zc=0.2638, omega=0.2975, Vm=0.000113, Vb=0.000140, CASRN='110-54-3', method=i) for i in methods]
-    values = [5.61841, 5.989061939666203, 5.688003783388763, 6.27423491655056, 6.080607912773406, 6.617051217297049, 5.960764840627408, 6.0266865190488215, 6.054448122758386, 5.9078666913304225]
+    values = [5.61841, 5.949, 5.989061939666203, 5.688003783388763, 6.27423491655056, 6.080607912773406, 6.617051217297049, 5.960764840627408, 6.0266865190488215, 6.054448122758386, 5.9078666913304225]
     assert_close1d(values_calc, values)
 
     # Error handling
