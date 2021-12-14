@@ -62,8 +62,10 @@ def test_Tt():
 def test_Tt_fuzz():
     Tt_sum = sum([Tt(i) for i in triple_data_Staveley.index])
     assert_close(Tt_sum, 31251.845000000001)
+    
+    # These will change a lot
     Tt_sum2 = pd.Series([Tt(i, method='MELTING') for i in triple_data_Staveley.index]).sum()
-    assert_close(Tt_sum2, 28778.196000000004)
+    assert Tt_sum2 >= 28778.196
 
 
 def test_Pt():

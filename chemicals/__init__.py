@@ -153,7 +153,7 @@ if not fluids.numerics.is_micropython:
         interface.load_interface_dfs()
         lennard_jones._load_LJ_data()
         miscdata._load_VDI_saturation_dict()
-        miscdata._load_CRC_data()
+        miscdata._load_miscdata()
         permittivity._load_permittivity_data()
         phase_change._load_phase_change_constants()
         phase_change._load_phase_change_correlations()

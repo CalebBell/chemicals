@@ -196,7 +196,10 @@ def test_relationships():
 def test_Tc_all_values():
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
     CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'Tc']):
+                CASs.add(i)
 
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
@@ -248,7 +251,10 @@ def test_Pc():
 def test_Pc_all_values():
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
     CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'Pc']):
+                CASs.add(i)
 
     # Use the default method for each chemical in this file
     Pcs = [Pc(i) for i in CASs]
@@ -274,7 +280,10 @@ def test_Vc():
 def test_Vc_all_values():
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
     CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'Vc']):
+                CASs.add(i)
 
     # Use the default method for each chemical in this file
     Vcs = [Vc(i) for i in CASs]
@@ -300,7 +309,10 @@ def test_Zc():
 def test_Zc_all_values():
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
     CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'Zc']):
+                CASs.add(i)
 
     # Use the default method for each chemical in this file
     Zcs = [Zc(i) for i in CASs]

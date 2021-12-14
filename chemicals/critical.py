@@ -99,6 +99,7 @@ import os
 from chemicals.utils import mark_numba_incompatible
 from fluids.constants import R, R_inv, N_A
 from chemicals.utils import log, PY37, source_path, os_path_join, can_load_data
+from chemicals import miscdata
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -155,8 +156,11 @@ def _load_critical_data():
         CRC: critical_data_CRC,
         PSRK: critical_data_PSRKR4,
         PD: critical_data_PassutDanner,
-        YAWS: critical_data_Yaws
+        YAWS: critical_data_Yaws,
+        miscdata.JOBACK: miscdata.joback_predictions,
     }
+    
+    _add_Zc_to_df(miscdata.joback_predictions)
 
     # Create copies just incase new dfs need to be added later
     Pc_sources = Tc_sources.copy()
@@ -188,7 +192,7 @@ else: # pragma: no cover
 
 ### Critical point functions
 
-Tc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
+Tc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tc` for the actual references'''
 
 @mark_numba_incompatible
@@ -346,7 +350,7 @@ def Tc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
 
-Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
+Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Pc` for the actual references'''
 
 @mark_numba_incompatible
@@ -502,7 +506,7 @@ def Pc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
 
-Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
+Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Vc` for the actual references'''
 
 @mark_numba_incompatible
@@ -653,7 +657,7 @@ def Vc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc')
 
-Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
+Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Zc` for the actual references'''
 
 @mark_numba_incompatible

@@ -49,6 +49,9 @@ folder = os_path_join(source_path, 'Misc')
 ### CRC Handbook general tables
 register_df_source(folder, 'Physical Constants of Inorganic Compounds.csv')
 register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
+register_df_source(folder, 'joback_predictions.tsv')
+
+JOBACK = 'JOBACK'
 
 _VDI_dict_loaded = False
 def _load_VDI_saturation_dict():
@@ -67,17 +70,18 @@ def _load_VDI_saturation_dict():
         VDI_saturation_dict = json.loads(f.read())
     _VDI_dict_loaded = True
 
-_CRC_data_loaded = False
-def _load_CRC_data():
-    global CRC_inorganic_data, CRC_organic_data, _CRC_data_loaded
+_miscdata_loaded = False
+def _load_miscdata():
+    global CRC_inorganic_data, CRC_organic_data, joback_predictions, _miscdata_loaded
     CRC_inorganic_data = data_source('Physical Constants of Inorganic Compounds.csv')
     CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
-    _CRC_data_loaded = True
+    joback_predictions = data_source('joback_predictions.tsv')
+    _miscdata_loaded = True
 
 if PY37:
     def __getattr__(name):
-        if name in ('CRC_inorganic_data', 'CRC_organic_data'):
-            _load_CRC_data()
+        if name in ('CRC_inorganic_data', 'CRC_organic_data', 'joback_predictions'):
+            _load_miscdata()
             return globals()[name]
         elif name == 'VDI_saturation_dict':
             _load_VDI_saturation_dict()
@@ -85,7 +89,7 @@ if PY37:
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
 else:
     if can_load_data:
-        _load_CRC_data()
+        _load_miscdata()
         _load_VDI_saturation_dict()
 
 ### VDI Saturation

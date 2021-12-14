@@ -239,7 +239,7 @@ def test_Tb():
     assert_close1d(Tbs, Tbs_calc)
 
     hits = [Tb_methods(i) for i in ['993-50-0', '626-94-8', '7631-99-4']]
-    assert hits == [['CRC_INORG'], ['CRC_ORG'], ['YAWS']]
+    assert hits == [['CRC_INORG'], ['CRC_ORG', 'JOBACK'], ['YAWS']]
 
 
     with pytest.raises(Exception):
@@ -279,7 +279,7 @@ def test_Tm():
     assert_close1d(Tms, Tms_calc)
 
     hits = [Tm_methods(i) for i in ['996-50-9', '999-78-0', '993-50-0']]
-    assert hits == [['OPEN_NTBKM'], ['CRC_ORG'], ['CRC_INORG']]
+    assert hits == [['OPEN_NTBKM'], ['CRC_ORG', 'JOBACK'], ['CRC_INORG']]
 
     with pytest.raises(Exception):
         Tm('993-50-0', method='BADMETHOD')

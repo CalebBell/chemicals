@@ -89,9 +89,9 @@ def test_Hfg():
     assert_close(Hfg('7732-18-5'), -241822.0)
 
     Hfs = [Hfg('67-56-1', method=i) for i in Hfg_all_methods]
-    assert_close1d(Hfs, [-200700., -190100., -201000., -200900.])
+    assert_close1d(Hfs, [-200700., -190100., -201000., -200900., -216200.0])
 
-    assert Hfg_methods('67-56-1') == ['ATCT_G', 'CRC', 'API_TDB_G','TRC', 'YAWS']
+    assert Hfg_methods('67-56-1') == ['ATCT_G', 'CRC', 'API_TDB_G','TRC', 'YAWS', 'JOBACK']
     assert_close(-211800.0, Hfg('98-00-0'))
 
     with pytest.raises(Exception):

@@ -88,7 +88,7 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
 
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import ceil, log10, PY37, source_path, os_path_join, can_load_data
-from chemicals import heat_capacity
+from chemicals import heat_capacity, miscdata
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -136,6 +136,7 @@ def _load_reaction_data():
         API_TDB_G: Hfg_API_TDB_data,
         TRC: heat_capacity.TRC_gas_data,
         YAWS: Hfg_S0g_YAWS_data,
+        miscdata.JOBACK: miscdata.joback_predictions,
     }
     Hfl_sources = {
         ATCT_L: Hfl_ATcT_data,
@@ -321,7 +322,7 @@ def Hfl(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
-Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS)
+Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Hfg` for the actual references'''
 
 @mark_numba_incompatible
