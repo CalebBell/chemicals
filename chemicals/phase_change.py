@@ -180,16 +180,19 @@ def _load_phase_change_constants():
         CRC_ORG: miscdata.CRC_organic_data,
         CRC_INORG: miscdata.CRC_inorganic_data,
         YAWS: Tb_data_Yaws,
+        miscdata.WIKIDATA: miscdata.wikidata_data,
         miscdata.JOBACK: miscdata.joback_predictions,
     }
     Tm_sources = {
         OPEN_NTBKM: Tm_ON_data,
         CRC_INORG: miscdata.CRC_inorganic_data,
         CRC_ORG: miscdata.CRC_organic_data,
+        miscdata.WIKIDATA: miscdata.wikidata_data,
         miscdata.JOBACK: miscdata.joback_predictions,
     }
     Hfus_sources = {
         CRC: Hfus_data_CRC,
+        miscdata.WIKIDATA: miscdata.wikidata_data,
         miscdata.JOBACK: miscdata.joback_predictions,
     }
 
@@ -236,7 +239,7 @@ else:
 
 ### Boiling Point at 1 atm
 
-Tb_all_methods = (CRC_INORG, CRC_ORG, YAWS, miscdata.JOBACK)
+Tb_all_methods = (CRC_INORG, CRC_ORG, YAWS, miscdata.WIKIDATA, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tb` for the actual references'''
 
 @mark_numba_incompatible
@@ -323,7 +326,7 @@ def Tb(CASRN, method=None):
 
 ### Melting Point
 
-Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG, miscdata.JOBACK)
+Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG, miscdata.WIKIDATA, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tm` for the actual references'''
 
 @mark_numba_incompatible
@@ -1197,7 +1200,7 @@ def PPDS12(T, Tc, A, B, C, D, E):
 
 ### Heat of Fusion
 
-Hfus_all_methods = (CRC, miscdata.JOBACK)
+Hfus_all_methods = (CRC, miscdata.WIKIDATA, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Hfus` for the actual references'''
 
 @mark_numba_incompatible

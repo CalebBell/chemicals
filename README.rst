@@ -158,7 +158,7 @@ To view all available methods for a given chemical, just use the functions with
     
     >>> from chemicals import Tb_methods
     >>> Tb_methods(CAS_water)
-    ['CRC_INORG', 'YAWS']
+    ['CRC_INORG', 'YAWS', 'WIKIDATA']
 
 The databanks can also be accessed through their respective module:
 

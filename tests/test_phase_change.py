@@ -250,10 +250,10 @@ def test_Tb():
 
 
     w_methods = Tb_methods('7732-18-5')
-    assert w_methods == ['CRC_INORG', 'YAWS']
+    assert w_methods == ['CRC_INORG', 'YAWS', 'WIKIDATA']
 
     Tbs = [Tb('7732-18-5', method=i) for i in w_methods]
-    assert_close1d(Tbs, [373.124, 373.15])
+    assert_close1d(Tbs, [373.124, 373.15, 373.15])
 
 
 @pytest.mark.slow
@@ -279,7 +279,7 @@ def test_Tm():
     assert_close1d(Tms, Tms_calc)
 
     hits = [Tm_methods(i) for i in ['996-50-9', '999-78-0', '993-50-0']]
-    assert hits == [['OPEN_NTBKM'], ['CRC_ORG', 'JOBACK'], ['CRC_INORG']]
+    assert hits == [['OPEN_NTBKM', 'WIKIDATA'], ['CRC_ORG', 'JOBACK'], ['CRC_INORG']]
 
     with pytest.raises(Exception):
         Tm('993-50-0', method='BADMETHOD')
@@ -289,10 +289,10 @@ def test_Tm():
 
 
     w_methods = Tm_methods('7732-18-5')
-    assert w_methods == ['OPEN_NTBKM', 'CRC_INORG']
+    assert w_methods == ['OPEN_NTBKM', 'CRC_INORG', 'WIKIDATA']
 
     Tms = [Tm('7732-18-5', method=i) for i in w_methods]
-    assert_close1d(Tms, [273.15, 273.15])
+    assert_close1d(Tms, [273.15, 273.15, 273.15])
 
 
 def test_Alibakhshi():

@@ -50,8 +50,10 @@ folder = os_path_join(source_path, 'Misc')
 register_df_source(folder, 'Physical Constants of Inorganic Compounds.csv')
 register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
 register_df_source(folder, 'joback_predictions.tsv')
+register_df_source(folder, 'wikidata_properties.tsv')
 
 JOBACK = 'JOBACK'
+WIKIDATA = 'WIKIDATA'
 
 _VDI_dict_loaded = False
 def _load_VDI_saturation_dict():
@@ -72,15 +74,16 @@ def _load_VDI_saturation_dict():
 
 _miscdata_loaded = False
 def _load_miscdata():
-    global CRC_inorganic_data, CRC_organic_data, joback_predictions, _miscdata_loaded
+    global CRC_inorganic_data, CRC_organic_data, joback_predictions, wikidata_data, _miscdata_loaded
     CRC_inorganic_data = data_source('Physical Constants of Inorganic Compounds.csv')
     CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
     joback_predictions = data_source('joback_predictions.tsv')
+    wikidata_data = data_source('wikidata_properties.tsv')
     _miscdata_loaded = True
 
 if PY37:
     def __getattr__(name):
-        if name in ('CRC_inorganic_data', 'CRC_organic_data', 'joback_predictions'):
+        if name in ('CRC_inorganic_data', 'CRC_organic_data', 'joback_predictions', 'wikidata_data'):
             _load_miscdata()
             return globals()[name]
         elif name == 'VDI_saturation_dict':
