@@ -24,6 +24,7 @@ SOFTWARE.
 import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
+from chemicals.miscdata import webbook_data
 from chemicals.critical import *
 from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_Matthews,
@@ -194,7 +195,9 @@ def test_relationships():
 
 @pytest.mark.slow
 def test_Tc_all_values():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC,
+               critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
+               webbook_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -204,7 +207,7 @@ def test_Tc_all_values():
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_close(Tcs_default_sum, 6050113.336122222)
+    assert_close(Tcs_default_sum, 6060096.626122229)
 
 def test_Tc():
     Tc_val = Tc(CASRN='64-17-5')
@@ -219,7 +222,7 @@ def test_Tc():
     assert_close(126.2, Tc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Tc_methods(CASRN='98-01-1')
-    assert methods == ['IUPAC', 'PSRK', 'YAWS']
+    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'YAWS']
 
     # Error handling
     assert Tc(CASRN='BADCAS') is None
@@ -239,7 +242,7 @@ def test_Pc():
     assert_close(3394387.5, Pc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Pc_methods(CASRN='98-01-1')
-    assert methods == ['IUPAC', 'PSRK', 'YAWS']
+    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'YAWS']
 
     # Error handling
     assert None == Pc(CASRN='BADCAS')
@@ -249,7 +252,9 @@ def test_Pc():
 
 @pytest.mark.slow
 def test_Pc_all_values():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+               critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
+               webbook_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -259,7 +264,7 @@ def test_Pc_all_values():
     # Use the default method for each chemical in this file
     Pcs = [Pc(i) for i in CASs]
     Pcs_default_sum = pd.Series(Pcs).sum()
-    assert_close(Pcs_default_sum, 63141480396.18326)
+    assert_close(Pcs_default_sum, 63777088266.18326)
 
 def test_Vc():
     assert_close(0.000168, Vc(CASRN='64-17-5'))
@@ -278,7 +283,8 @@ def test_Vc():
 
 @pytest.mark.slow
 def test_Vc_all_values():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+               critical_data_PSRKR4, critical_data_Yaws, webbook_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -288,7 +294,7 @@ def test_Vc_all_values():
     # Use the default method for each chemical in this file
     Vcs = [Vc(i) for i in CASs]
     Vcs_default_sum = pd.Series(Vcs).sum()
-    assert_close(Vcs_default_sum, 4.79277302)
+    assert_close(Vcs_default_sum, 4.794341693439)
 
 def test_Zc():
     assert_close(0.241, Zc(CASRN='64-17-5'))
@@ -307,7 +313,8 @@ def test_Zc():
 
 @pytest.mark.slow
 def test_Zc_all_values():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+               critical_data_PSRKR4, critical_data_Yaws, webbook_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -317,7 +324,7 @@ def test_Zc_all_values():
     # Use the default method for each chemical in this file
     Zcs = [Zc(i) for i in CASs]
     Zcs_default_sum = pd.Series(Zcs).sum()
-    assert_close(Zcs_default_sum, 1929.7152711084107, 1e-6)
+    assert_close(Zcs_default_sum, 1931.1695942856318, 1e-6)
 
 
 

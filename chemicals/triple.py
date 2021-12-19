@@ -109,7 +109,7 @@ def Tt_methods(CASRN):
     Tt
     """
     if not _triple_data_loaded: _load_triple_data()
-    methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt68')
+    methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt')
     if Tm(CASRN): methods.append(MELTING)
     return methods
 
@@ -142,19 +142,21 @@ def Tt(CASRN, method=None):
     Median difference between melting points and triple points is 0.02 K.
     Accordingly, this should be more than good enough for engineering
     applications.
-
-    Temperatures are on the ITS-68 scale.
+    
+    The data in [1]_ is originally on the ITS-68 temperature scale, but was
+    converted to ITS-90. The numbers were rounded to 6 decimal places
+    arbitrarily and the coversion was performed with this library.
 
     Examples
     --------
     Ammonia
 
     >>> Tt('7664-41-7')
-    195.48
+    195.49
 
     See Also
     --------
-    Tt
+    Tt_methods
 
     References
     ----------
@@ -167,9 +169,9 @@ def Tt(CASRN, method=None):
         if method == MELTING:
             return Tm(CASRN)
         else:
-            return retrieve_from_df_dict(Tt_sources, CASRN, 'Tt68', method)
+            return retrieve_from_df_dict(Tt_sources, CASRN, 'Tt', method)
     else:
-        Tt = retrieve_any_from_df_dict(Tt_sources, CASRN, 'Tt68')
+        Tt = retrieve_any_from_df_dict(Tt_sources, CASRN, 'Tt')
         if Tt: return Tt
         return Tm(CASRN)
 

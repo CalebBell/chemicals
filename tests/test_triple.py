@@ -29,8 +29,8 @@ from chemicals.triple import triple_data_Staveley
 
 
 def test_data():
-    Tt_sum = triple_data_Staveley['Tt68'].sum()
-    assert_close(Tt_sum, 31251.845000000001)
+    Tt_sum = triple_data_Staveley['Tt'].sum()
+    assert_close(Tt_sum, 31253.97552)
 
     Pt_sum = triple_data_Staveley['Pt'].sum()
     assert_close(Pt_sum, 1886624.8374376972)
@@ -44,15 +44,15 @@ def test_data():
 
 def test_Tt():
     Tt1_calc = Tt('7664-41-7')
-    Tt1 = 195.48
+    Tt1 = 195.491545
     Tt2_calc = Tt('74-82-8', method='MELTING')
     Tt2 = 90.75
     Tt3_calc = Tt('74-82-8')
-    Tt3 = 90.69
+    Tt3 = 90.698
     assert_close1d([Tt1_calc, Tt2_calc, Tt3_calc], [Tt1, Tt2, Tt3])
 
     m = Tt_methods('7439-90-9')
-    assert m == ['STAVELEY', 'MELTING']
+    assert m == ['STAVELEY', 'WEBBOOK', 'MELTING']
     assert None == Tt('72433223439-90-9')
     with pytest.raises(Exception):
         Tt('74-82-8', method='BADMETHOD')
@@ -61,7 +61,7 @@ def test_Tt():
 @pytest.mark.slow
 def test_Tt_fuzz():
     Tt_sum = sum([Tt(i) for i in triple_data_Staveley.index])
-    assert_close(Tt_sum, 31251.845000000001)
+    assert_close(Tt_sum, 31253.97552)
     
     # These will change a lot
     Tt_sum2 = pd.Series([Tt(i, method='MELTING') for i in triple_data_Staveley.index]).sum()
@@ -72,9 +72,11 @@ def test_Pt():
     Pt1_calc = Pt('7664-41-7')
     Pt1 = 6079.5
     assert_close(Pt1_calc, Pt1)
+    
+    assert_close(Pt('7664-41-7', 'WEBBOOK'), 6060)
 
     m = Pt_methods('7664-41-7')
-    assert m == ['STAVELEY']
+    assert m == ['STAVELEY', 'WEBBOOK']
     assert None == Pt('72433223439-90-9')
     with pytest.raises(Exception):
         Pt('74-82-8', method='BADMETHOD')

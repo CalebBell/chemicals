@@ -57,7 +57,7 @@ def test_Hfg_ATcT_data():
 def test_Hfg_API_TDB_data():
     assert_close(Hfg('7732-18-5', method='API_TDB_G'), -241820.0)
 
-    assert Hfg_methods('7732-18-5') == ['ATCT_G', 'CRC', 'API_TDB_G', 'TRC', 'YAWS']
+    assert Hfg_methods('7732-18-5') == ['ATCT_G', 'CRC', 'API_TDB_G', 'WEBBOOK', 'TRC', 'YAWS']
 
     assert None == Hfg('98-00-1')
 
@@ -74,7 +74,7 @@ def test_Hfl():
     Hfs = [Hfl('67-56-1'), Hfl('67-56-1', method='ATCT_L')]
     assert_close1d(Hfs, [-238400.0]*2)
 
-    assert Hfl_methods('67-56-1') == ['ATCT_L', 'CRC']
+    assert Hfl_methods('67-56-1') == ['ATCT_L', 'CRC', 'WEBBOOK']
     assert None == Hfl('98-00-1')
 
     tot = sum([abs(Hfl(i)) for i in Hfl_ATcT_data.index])
@@ -89,9 +89,9 @@ def test_Hfg():
     assert_close(Hfg('7732-18-5'), -241822.0)
 
     Hfs = [Hfg('67-56-1', method=i) for i in Hfg_all_methods]
-    assert_close1d(Hfs, [-200700., -190100., -201000., -200900., -216200.0])
+    assert_close1d(Hfs, [-200700.0, -190100.0, -201000.0, -205000.0, -200900.0, -216200.0])
 
-    assert Hfg_methods('67-56-1') == ['ATCT_G', 'CRC', 'API_TDB_G','TRC', 'YAWS', 'JOBACK']
+    assert Hfg_methods('67-56-1') == ['ATCT_G', 'CRC', 'API_TDB_G', 'WEBBOOK', 'TRC', 'YAWS', 'JOBACK']
     assert_close(-211800.0, Hfg('98-00-0'))
 
     with pytest.raises(Exception):
@@ -100,7 +100,7 @@ def test_Hfg():
 def test_Hfs():
     assert_close(Hfs('101-81-5'), 71500)
     assert_close(Hfs('101-81-5', method='CRC'), 71500)
-    assert ['CRC'] == Hfs_methods('101-81-5')
+    assert ['CRC', 'WEBBOOK'] == Hfs_methods('101-81-5')
 
 
 
@@ -121,7 +121,7 @@ def test_Hfg_all_values():
 
 def test_S0g():
     S0s = [S0g('7732-18-5', method=i) for i in S0g_all_methods]
-    assert_close1d(S0s, [188.8, 188.84])
+    assert_close1d(S0s, [188.8, 188.83842, 188.84])
 
     assert S0g_methods('67-56-1') == ['CRC', 'YAWS']
 
@@ -145,14 +145,14 @@ def test_S0s():
     assert_close(S0s('7439-93-2', method='CRC'), 29.1)
 
     methods = S0s_methods('7439-93-2')
-    assert methods == ['CRC']
+    assert methods == ['CRC', 'WEBBOOK']
 
 def test_S0l():
     assert_close(S0l('7439-97-6'), 75.9) # Lithium
     assert_close(S0l('7439-97-6', method='CRC'), 75.9)
 
     methods = S0l_methods('7439-97-6')
-    assert methods == ['CRC']
+    assert methods == ['CRC', 'WEBBOOK']
 
 def test_Gibbs_formation():
     Gf =  Gibbs_formation(-285830.0, 69.91,  [0.0, 0.0], [130.571, 205.147], [1.0, .5])
