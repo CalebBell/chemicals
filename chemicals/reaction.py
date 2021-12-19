@@ -122,18 +122,22 @@ def _load_reaction_data():
     _reaction_data_loaded = True
     S0g_sources = {
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
         YAWS: Hfg_S0g_YAWS_data,
     }
     S0l_sources = {
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
     S0s_sources = {
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
     Hfg_sources = {
         ATCT_G: Hfg_ATcT_data,
         CRC: heat_capacity.CRC_standard_data,
         API_TDB_G: Hfg_API_TDB_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
         TRC: heat_capacity.TRC_gas_data,
         YAWS: Hfg_S0g_YAWS_data,
         miscdata.JOBACK: miscdata.joback_predictions,
@@ -141,9 +145,11 @@ def _load_reaction_data():
     Hfl_sources = {
         ATCT_L: Hfl_ATcT_data,
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
     Hfs_sources = {
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
 
 if PY37:
@@ -165,7 +171,7 @@ else:
 # TODO: more data from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3692305/
 # has dippr standard heats of formation, about 55% of the database
 
-Hfs_all_methods = (CRC,)
+Hfs_all_methods = (CRC, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `Hfs` for the actual references'''
 
 @mark_numba_incompatible
@@ -242,7 +248,7 @@ def Hfs(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
-Hfl_all_methods = (ATCT_L, CRC)
+Hfl_all_methods = (ATCT_L, CRC, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `Hfl` for the actual references'''
 
 @mark_numba_incompatible
@@ -322,7 +328,7 @@ def Hfl(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
-Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS, miscdata.JOBACK)
+Hfg_all_methods = (ATCT_G, TRC, CRC, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Hfg` for the actual references'''
 
 @mark_numba_incompatible
@@ -420,7 +426,7 @@ def Hfg(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfg_sources, CASRN, 'Hfg')
 
-S0s_all_methods = (CRC,)
+S0s_all_methods = (CRC, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `S0s` for the actual references'''
 
 @mark_numba_incompatible
@@ -491,7 +497,7 @@ def S0s(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(S0s_sources, CASRN, 'S0s')
 
-S0l_all_methods = (CRC,)
+S0l_all_methods = (CRC, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `S0l` for the actual references'''
 
 @mark_numba_incompatible
@@ -568,7 +574,7 @@ def S0l(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(S0l_sources, CASRN, 'S0l')
 
-S0g_all_methods = (CRC, YAWS)
+S0g_all_methods = (CRC, miscdata.WEBBOOK, YAWS)
 '''Tuple of method name keys. See the `S0g` for the actual references'''
 
 @mark_numba_incompatible

@@ -49,6 +49,7 @@ __all__ = ['Tt_all_methods', 'Tt_methods', 'Tt',
 import os
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from chemicals import miscdata
 from chemicals.phase_change import Tm
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -71,6 +72,7 @@ def _load_triple_data():
     _triple_data_loaded = True
     Tt_sources = {
         STAVELEY: triple_data_Staveley,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
     Pt_sources = Tt_sources.copy()
 
@@ -84,7 +86,7 @@ else:
     if can_load_data:
         _load_triple_data()
 
-Tt_all_methods = (STAVELEY, MELTING)
+Tt_all_methods = (STAVELEY, miscdata.WEBBOOK, MELTING)
 '''Tuple of method name keys. See the `Tt` for the actual references'''
 
 @mark_numba_incompatible
@@ -171,7 +173,7 @@ def Tt(CASRN, method=None):
         if Tt: return Tt
         return Tm(CASRN)
 
-Pt_all_methods = (STAVELEY,)
+Pt_all_methods = (STAVELEY, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `Pt` for the actual references'''
 
 @mark_numba_incompatible

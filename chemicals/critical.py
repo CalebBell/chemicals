@@ -156,11 +156,13 @@ def _load_critical_data():
         CRC: critical_data_CRC,
         PSRK: critical_data_PSRKR4,
         PD: critical_data_PassutDanner,
+        miscdata.WEBBOOK: miscdata.webbook_data,
         YAWS: critical_data_Yaws,
         miscdata.JOBACK: miscdata.joback_predictions,
     }
     
     _add_Zc_to_df(miscdata.joback_predictions)
+    _add_Zc_to_df(miscdata.webbook_data)
 
     # Create copies just incase new dfs need to be added later
     Pc_sources = Tc_sources.copy()
@@ -192,7 +194,7 @@ else: # pragma: no cover
 
 ### Critical point functions
 
-Tc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS, miscdata.JOBACK)
+Tc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tc` for the actual references'''
 
 @mark_numba_incompatible
@@ -350,7 +352,7 @@ def Tc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
 
-Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS, miscdata.JOBACK)
+Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Pc` for the actual references'''
 
 @mark_numba_incompatible
@@ -506,7 +508,7 @@ def Pc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
 
-Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS, miscdata.JOBACK)
+Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Vc` for the actual references'''
 
 @mark_numba_incompatible
@@ -657,7 +659,7 @@ def Vc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc')
 
-Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS, miscdata.JOBACK)
+Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Zc` for the actual references'''
 
 @mark_numba_incompatible
