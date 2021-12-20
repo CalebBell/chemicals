@@ -52,10 +52,12 @@ register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
 register_df_source(folder, 'joback_predictions.tsv')
 register_df_source(folder, 'wikidata_properties.tsv')
 register_df_source(folder, 'webbook_constants.tsv')
+register_df_source(folder, 'common_chemistry.tsv')
 
 JOBACK = 'JOBACK'
 WIKIDATA = 'WIKIDATA'
 WEBBOOK = 'WEBBOOK'
+COMMON_CHEMISTRY = 'COMMON_CHEMISTRY'
 
 _VDI_dict_loaded = False
 def _load_VDI_saturation_dict():
@@ -76,17 +78,20 @@ def _load_VDI_saturation_dict():
 
 _miscdata_loaded = False
 def _load_miscdata():
-    global CRC_inorganic_data, CRC_organic_data, joback_predictions, wikidata_data, webbook_data, _miscdata_loaded
+    global CRC_inorganic_data, CRC_organic_data, joback_predictions, wikidata_data, webbook_data, common_chemistry_data, _miscdata_loaded
     CRC_inorganic_data = data_source('Physical Constants of Inorganic Compounds.csv')
     CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
     joback_predictions = data_source('joback_predictions.tsv')
     wikidata_data = data_source('wikidata_properties.tsv')
     webbook_data = data_source('webbook_constants.tsv')
+    common_chemistry_data = data_source('common_chemistry.tsv')
     _miscdata_loaded = True
 
 if PY37:
     def __getattr__(name):
-        if name in ('CRC_inorganic_data', 'CRC_organic_data', 'joback_predictions', 'wikidata_data', 'webbook_data'):
+        if name in ('CRC_inorganic_data', 'CRC_organic_data', 
+                    'joback_predictions', 'wikidata_data', 'webbook_data', 
+                    'common_chemistry_data'):
             _load_miscdata()
             return globals()[name]
         elif name == 'VDI_saturation_dict':
