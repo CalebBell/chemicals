@@ -239,7 +239,7 @@ def test_Tb():
     assert_close1d(Tbs, Tbs_calc)
 
     hits = [Tb_methods(i) for i in ['993-50-0', '626-94-8', '7631-99-4']]
-    assert hits == [['CRC_INORG'], ['CRC_ORG', 'JOBACK'], ['YAWS']]
+    assert hits == [['CRC_INORG', 'COMMON_CHEMISTRY'], ['CRC_ORG', 'JOBACK'], ['YAWS']]
 
 
     with pytest.raises(Exception):
@@ -250,10 +250,10 @@ def test_Tb():
 
 
     w_methods = Tb_methods('7732-18-5')
-    assert w_methods == ['CRC_INORG', 'WEBBOOK', 'YAWS', 'WIKIDATA']
+    assert w_methods == ['CRC_INORG', 'COMMON_CHEMISTRY', 'WEBBOOK', 'YAWS', 'WIKIDATA']
 
     Tbs = [Tb('7732-18-5', method=i) for i in w_methods]
-    assert_close1d(Tbs, [373.124, 373.17, 373.15, 373.15])
+    assert_close1d(Tbs, [373.124, 373.15, 373.17, 373.15, 373.15])
 
 
 @pytest.mark.slow
@@ -289,10 +289,10 @@ def test_Tm():
 
 
     w_methods = Tm_methods('7732-18-5')
-    assert w_methods == ['OPEN_NTBKM', 'CRC_INORG', 'WIKIDATA']
+    assert w_methods == ['OPEN_NTBKM', 'CRC_INORG', 'COMMON_CHEMISTRY', 'WIKIDATA']
 
     Tms = [Tm('7732-18-5', method=i) for i in w_methods]
-    assert_close1d(Tms, [273.15, 273.15, 273.15])
+    assert_close1d(Tms, [273.15, 273.15, 273.15, 273.15])
 
 
 def test_Alibakhshi():
