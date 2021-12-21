@@ -52,7 +52,7 @@ register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
 register_df_source(folder, 'joback_predictions.tsv')
 register_df_source(folder, 'wikidata_properties.tsv')
 register_df_source(folder, 'webbook_constants.tsv')
-register_df_source(folder, 'common_chemistry.tsv')
+register_df_source(folder, 'common_chemistry_data.tsv')
 
 JOBACK = 'JOBACK'
 WIKIDATA = 'WIKIDATA'
@@ -84,7 +84,7 @@ def _load_miscdata():
     joback_predictions = data_source('joback_predictions.tsv')
     wikidata_data = data_source('wikidata_properties.tsv')
     webbook_data = data_source('webbook_constants.tsv')
-    common_chemistry_data = data_source('common_chemistry.tsv')
+    common_chemistry_data = data_source('common_chemistry_data.tsv')
     _miscdata_loaded = True
 
 if PY37:
