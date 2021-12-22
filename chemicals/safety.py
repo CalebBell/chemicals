@@ -850,7 +850,7 @@ def T_flash(CASRN, method=None):
        Farid Bagui. "Nonlinear Group Contribution Model for the Prediction of
        Flash Points Using Normal Boiling Points." Fluid Phase Equilibria 449
        (October 15, 2017): 52-59. doi:10.1016/j.fluid.2017.06.008.
-
+    .. [4] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _safety_data_loaded: _load_safety_data()
     if method:
@@ -933,6 +933,7 @@ def T_autoignition(CASRN, method=None):
     .. [2] National Fire Protection Association. NFPA 497: Recommended
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
+    .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _safety_data_loaded: _load_safety_data()
     if method:
@@ -1034,7 +1035,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     .. [2] National Fire Protection Association. NFPA 497: Recommended
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
-
+    .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _safety_data_loaded: _load_safety_data()
     if not method:
@@ -1147,7 +1148,7 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
     .. [2] National Fire Protection Association. NFPA 497: Recommended
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
-
+    .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _safety_data_loaded: _load_safety_data()
     if not method:
