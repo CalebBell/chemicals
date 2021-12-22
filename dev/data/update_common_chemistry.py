@@ -1,6 +1,5 @@
 import lxml.html
-import os, json, re
-import appdirs
+import os, json, re, requests, appdirs
 from joblib import Parallel, delayed
 
 from fluids.constants import torr
@@ -152,13 +151,24 @@ def MW_from_smiles(smiles):
     except:
         print(smiles, type(smiles))
         
+base_url = '''https://rboq1qukh0.execute-api.us-east-2.amazonaws.com/default/detail?cas_rn='''
+
 def common_chemistry_data(CASRN):
     '''Load the chemical data for the specified CAS.
     This function returns None if no data is available.
     '''
-    file_path = os.path.join(common_chemistry_cache_dir, CASRN)
-    file_data = open(file_path).read()
-    json_data = json.loads(file_data)
+    cache_loc = os.path.join(common_chemistry_cache_dir, CASRN)
+    cached = False
+    if os.path.exists(cache_loc):
+        f = open(cache_loc, 'r')
+        json_data = json.loads(f.read())
+        f.close()
+    else:
+        r = requests.get(base_url + CASRN)
+        json_data = r.json()
+        f = open(cache_loc, 'w')
+        json.dump(json_data, f)
+        f.close()
 #     print(json_data)
 
     if 'message' in json_data and 'Detail not found' == json_data['message']:
