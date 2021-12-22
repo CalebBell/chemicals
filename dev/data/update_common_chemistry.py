@@ -23,6 +23,10 @@ common_chemistry_cache_dir = os.path.join(cache_dir, 'common_chemistry')
 if not os.path.exists(common_chemistry_cache_dir):
     os.mkdir(common_chemistry_cache_dir)
 
+'''The following file contains ~60% of the CASs in the common CAS database.
+It is unknown what the remaining CASs are, but it would be nice to include
+them as well.
+'''
 CASs_process = open(os.path.join(folder, 'common_chemistry_CASs.tsv')).readlines()
 CASs_process = [i.strip() for i in CASs_process]
 
