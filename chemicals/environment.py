@@ -420,7 +420,7 @@ def logP(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'SYRRES', or 'CRC',
+        The method name to use. Accepted methods are 'SYRRES', 'CRC', and 'WIKIDATA'.
         All valid values are also held in the list logP_methods.
 
     Notes

@@ -270,7 +270,7 @@ def Tc(CASRN, method=None):
         * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [19]_
-        * 'PINAMARTINES', a series of values in the supporting material of [20_]
+        * 'PINAMARTINES', a series of values in the supporting material of [20]_
 
     Examples
     --------
@@ -421,6 +421,7 @@ def Pc(CASRN, method=None):
 
     Other Parameters
     ----------------
+    method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
         'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
         All valid values are also held in the list `Pc_all_methods`.
@@ -445,7 +446,7 @@ def Pc(CASRN, method=None):
         * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [19]_
-        * 'PINAMARTINES', a series of values in the supporting material of [20_]
+        * 'PINAMARTINES', a series of values in the supporting material of [20]_
 
     See Also
     --------
