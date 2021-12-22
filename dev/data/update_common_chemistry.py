@@ -7,8 +7,7 @@ from fluids.constants import torr
 from fluids.core import C2K, F2K, R2K
 from fluids.numerics import mean
 
-from chemicals.identifiers import serialize_formula
-from chemicals.elements import molecular_weight, nested_formula_parser
+from chemicals import serialize_formula, rho_to_Vm, molecular_weight, nested_formula_parser
 
 from rdkit import Chem
 from rdkit.Chem import Descriptors
@@ -142,14 +141,17 @@ for r_str, expect in cases:
     assert process_density(r_str) == expect
 
 def MW_from_smiles(smiles):
-    if smiles is not None:
-        mol = Chem.MolFromSmiles(smiles)
-        if mol is not None:
-            formula = CalcMolFormula(mol, True, True)
-            formula = serialize_formula(formula)
-            MW = molecular_weight(nested_formula_parser(formula))
-            return MW
-    
+    try:
+        if smiles is not None:
+            mol = Chem.MolFromSmiles(smiles)
+            if mol is not None:
+                formula = CalcMolFormula(mol, True, True)
+                formula = serialize_formula(formula)
+                MW = molecular_weight(nested_formula_parser(formula))
+                return MW
+    except:
+        print(smiles, type(smiles))
+        
 def common_chemistry_data(CASRN):
     '''Load the chemical data for the specified CAS.
     This function returns None if no data is available.
@@ -192,7 +194,7 @@ def common_chemistry_data(CASRN):
         if prop['name'] == 'Density':
             rho, rhoT, rhoP = process_density(prop_val)
     return {'CAS': json_data['rn'], 'name': remove_html(json_data['name']), 'synonyms': synonyms,
-            'formula': formula, 'inchi': inchi, 'inchiKey': inchiKey, 'smiles': Chem,
+            'formula': formula, 'inchi': inchi, 'inchiKey': inchiKey, 'smiles': smiles,
            'Tm': Tm, 'Tb': Tb, 'TbP': TbP, 'rho': rho, 'rhoT': rhoT, 'rhoP': rhoP, 'MW': MW,
            }
 '''Load and process the data into dictionaries in-memory.
@@ -200,8 +202,126 @@ def common_chemistry_data(CASRN):
 processed_data = Parallel(n_jobs=16, batch_size=10000, verbose=60)(delayed(common_chemistry_data)(c) for c in CASs_process)
 print('Loaded %d chemicals from specified CAS list' %(len(processed_data)))
 
+print('Computing MW for chemicals with structures not no MW')
 chemical_data = {}
 for dat in processed_data:
     if dat['Tb'] is not None or dat['Tm'] is not None or dat['rho'] is not None:
         chemical_data[dat['CAS']] = dat
+        if dat['MW'] is None:
+            dat['MW'] = MW_from_smiles(dat['smiles'])
 print('%d chemicals have at least one experimental property' %(len(chemical_data)))
+
+
+'''Make a full dump of the parsed data for future use.
+'''
+keys = ['CAS', 'name', 'formula', 'MW', 'smiles', 'inchi', 'inchiKey', 'Tm', 'Tb', 'TbP', 'rho', 'rhoT', 'rhoP']
+lines = ['\t'.join(keys) + '\n']
+for CAS in sorted(chemical_data.keys()):
+    d = chemical_data[CAS]
+    values = [d.get(k, '') for k in keys]
+    for i, v in enumerate(values):
+        if v is None:
+            values[i] = ''
+        elif v == '':
+            pass
+        elif isinstance(v, (int, float)):
+            values[i] = '{:.8g}'.format(v)
+        elif type(v) is str:
+            pass
+        else:
+            values[i] = str(v)
+        v = values[i]
+        v = v.replace('\t', ' ')
+    to_write = '\t'.join(values) + '\n'
+    lines.append(to_write)
+print('Writting all common chemistry data')
+f = open(os.path.join(folder, 'common_chemistry_complete.tsv'), 'w')
+f.writelines(lines)
+f.close()
+lines = []
+print('Complete data dump complete')
+
+
+
+
+
+'''Process the mass densities into molar volumes. Note that the phase of the density
+is not specified, so if it cannot be deduced from the melting and boiling point,
+just ignore the data unfortunately.
+
+Do not take gas densities as they are not needed.
+'''
+missed_rho = 0
+for dat in chemical_data.values():
+    rho, Tm, Tb, TbP, rhoT, rhoP, MW = dat['rho'], dat['Tm'], dat['Tb'], dat['TbP'], dat['rhoT'], dat['rhoP'], dat['MW']
+    if rho is None:
+        continue
+    if MW is None:
+        missed_rho += 1
+        continue
+
+    Vm = rho_to_Vm(rho=rho, MW=MW)
+        
+    # If we are solid, easy
+    if rhoT is not None and Tm is not None and rhoT < Tm:
+        dat['Vms'] = Vm
+        continue
+    # Are we above the boiling point? Call it a gas.
+    if rhoT is not None and Tb is not None and rhoT > Tb:
+#         dat['Vmg'] = Vm
+        continue
+    if rhoT is not None and Tm is not None and Tb is not None and Tm <= rhoT <= Tb:
+        dat['Vml'] = Vm
+        continue
+    if Tm is not None and Tm > 298.15:
+        # We are very likely a solid as the substance melts above room temperature
+        dat['Vms'] = Vm
+        continue
+        
+    # 15 degree liquid
+    if Tm is not None and Tb is not None and Tm <= 288.15 and Tb > 310:
+        # We are very likely a liquid
+        dat['Vml'] = Vm
+        continue
+    if TbP is not None and rhoT is not None and Tb is not None and Tm is None and rhoT < Tb:
+        # If the substance is volatile enough a pressure is reported for the boiling point
+        # the density measurement is likely liquid
+        dat['Vml'] = Vm
+        continue
+    missed_rho += 1
+#     print(rho, Tm, Tb, TbP, rhoT, rhoP, dat['CAS'])
+    
+print('Identified phases of densities for most compounds but could not identify %s' %(missed_rho))
+
+for dat in chemical_data.values():
+    '''If we have a boiling point more than 10 kPa outside of the appropriate range, drop it.
+    '''
+    if dat['TbP'] is not None and not (90000 < dat['TbP'] < 110000):
+        dat['Tb'] = None
+
+keys = ['CAS', 'Tm', 'Tb', 'Vms', 'Vml']
+lines = ['\t'.join(keys) + '\n']
+for CAS in sorted(chemical_data.keys()):
+    d = chemical_data[CAS]
+    values = [d.get(k, '') for k in keys]
+    for i, v in enumerate(values):
+        if v is None:
+            values[i] = ''
+        elif v == '':
+            pass
+        elif isinstance(v, (int, float)):
+            values[i] = '{:.8g}'.format(v)
+        elif type(v) is str:
+            pass
+        else:
+            values[i] = str(v)
+        v = values[i]
+        v = v.replace('\t', ' ')
+    to_write = '\t'.join(values) + '\n'
+    lines.append(to_write)
+f = open(os.path.join(folder, '..', '..', 'chemicals', 'Misc', 'common_chemistry_data.tsv'), 'w')
+f.writelines(lines)
+f.close()
+lines = []
+print('Dumped relevant data')
+print('Complete!')

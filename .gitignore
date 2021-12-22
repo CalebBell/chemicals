@@ -66,3 +66,5 @@ binary dump.marshal
 
 thermo/Misc/constants dump 2018.json
 thermo/Misc/constants dump*
+
+dev/data/common_chemistry_complete.tsv
