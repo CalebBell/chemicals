@@ -170,6 +170,42 @@ if not fluids.numerics.is_micropython:
         except:
             pass
     
+    def remove_missing(values, CASs):
+        values_found, CASs_found = [], []
+        for i in range(len(values)):
+            if not isnan(values[i]):
+                values_found.append(values[i])
+                CASs_found.append(CASs[i])
+        return values_found, CASs_found
+    def constant_statistics():
+        '''
+
+        Returns
+        -------
+        dict : str[int]
+            Counts of each constant property and the number of chemicals that
+            values are available for, [-]
+
+        '''
+        complete_lazy_loading()
+        counts = {}
+        properties = ['Tt', 'Pt', 'Tm', 'Tb', 'Tc', 'Pc', 'Vc',
+                      'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
+                     'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
+                     'RI', 'Hfus', 
+                     'Dipole', 'logP']
+        for df in data_reader.df_sources.values():
+            for p in properties:
+                if p in df.columns:
+                    prop_values, prop_CASs = df[p].values, df.index.values
+                    prop_values, prop_CASs = remove_missing(prop_values, prop_CASs)
+                    if p in counts:
+                        counts[p].update(prop_CASs)
+                    else:
+                        counts[p] = set(prop_CASs)
+        return {k: len(v) for k, v in counts.items()}
+                        
+                
     global vectorized, numba, units, numba_vectorized
     if PY37:
         def __getattr__(name):
