@@ -189,7 +189,7 @@ if not fluids.numerics.is_micropython:
         '''
         complete_lazy_loading()
         counts = {}
-        properties = ['Tt', 'Pt', 'Tm', 'Tb', 'Tc', 'Pc', 'Vc',
+        properties = ['Tt', 'Pt', 'Tm', 'Tb', 'Tc', 'Pc', 'Vc', 'Zc',
                       'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
                      'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
                      'RI', 'Hfus', 

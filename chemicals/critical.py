@@ -204,7 +204,8 @@ Tc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES
 
 @mark_numba_incompatible
 def Tc_methods(CASRN):
-    """Return all methods available to obtain Tc for the desired chemical.
+    """Return all methods available to obtain the critical temperature for the 
+    desired chemical.
 
     Parameters
     ----------
@@ -230,8 +231,7 @@ def Tc(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
-    inorganic chemicals. Function has data for approximately 1000 chemicals.
+    Function has data for approximately 26000 chemicals.
 
     Parameters
     ----------
@@ -246,27 +246,31 @@ def Tc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
-        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held
-        in the list `Tc_all_methods`.
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
+        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        All valid values are also held in the list `Tc_all_methods`.
 
     Notes
     -----
-    A total of seven sources are available for this function. They are:
+    The available sources are as follows:
 
-        * 'IUPAC Organic Critical Properties', a series of critically evaluated
+        * 'IUPAC', a series of critically evaluated
           experimental datum for organic compounds in [1]_, [2]_, [3]_, [4]_,
           [5]_, [6]_, [7]_, [8]_, [9]_, [10]_, [11]_, and [12]_.
-        * 'Matthews Inorganic Critical Properties', a series of critically
+        * 'MATTHEWS', a series of critically
           evaluated data for inorganic compounds in [13]_.
-        * 'CRC Organic Critical Properties', a compillation of critically
+        * 'CRC', a compillation of critically
           evaluated data by the TRC as published in [14]_.
-        * 'PSRK Revision 4 Appendix', a compillation of experimental and
+        * 'PSRK', a compillation of experimental and
           estimated data published in [15]_.
-        * 'Passut Danner 1973 Critical Properties', an older compillation of
+        * 'PD', an older compillation of
           data published in [16]_
-        * 'Yaws Critical Properties', a large compillation of data from a
+        * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
+        * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [19]_
+        * 'PINAMARTINES', a series of values in the supporting material of [20_]
 
     Examples
     --------
@@ -349,7 +353,17 @@ def Tc(CASRN, method=None):
     .. [17] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
-
+    .. [18] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [19] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [20] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+       of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
+       Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       https://doi.org/10.1002/aic.17518.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
@@ -362,7 +376,8 @@ Pc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES
 
 @mark_numba_incompatible
 def Pc_methods(CASRN):
-    """Return all methods available to obtain Pc for the desired chemical.
+    """Return all methods available to obtain the critical pressure for the 
+    desired chemical.
 
     Parameters
     ----------
@@ -387,8 +402,7 @@ def Pc(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
-    inorganic chemicals. Function has data for approximately 7500 chemicals.
+    Function has data for approximately 26000 chemicals.
 
     Examples
     --------
@@ -407,14 +421,13 @@ def Pc(CASRN, method=None):
 
     Other Parameters
     ----------------
-    method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
-        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held
-        in the list `Pc_all_methods`.
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
+        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        All valid values are also held in the list `Pc_all_methods`.
 
     Notes
     -----
-    A total of seven sources are available for this function. They are:
+    The available sources are as follows:
 
         * 'IUPAC', a series of critically evaluated
           experimental datum for organic compounds in [1]_, [2]_, [3]_, [4]_,
@@ -429,6 +442,10 @@ def Pc(CASRN, method=None):
           data published in [16]_
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
+        * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [19]_
+        * 'PINAMARTINES', a series of values in the supporting material of [20_]
 
     See Also
     --------
@@ -506,6 +523,17 @@ def Pc(CASRN, method=None):
     .. [17] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [18] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [19] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [20] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+       of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
+       Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       https://doi.org/10.1002/aic.17518.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
@@ -518,7 +546,8 @@ Vc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YA
 
 @mark_numba_incompatible
 def Vc_methods(CASRN):
-    """Return all methods available to obtain Vc for the desired chemical.
+    """Return all methods available to obtain the critical volume for the
+    desired chemical.
 
     Parameters
     ----------
@@ -545,7 +574,7 @@ def Vc(CASRN, method=None):
     available.
 
     Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
-    inorganic chemicals. Function has data for approximately 7500 chemicals.
+    inorganic chemicals. Function has data for approximately 25000 chemicals.
 
     Examples
     --------
@@ -565,13 +594,13 @@ def Vc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
-        'CRC', 'PSRK', and 'YAWS'. All valid values are also held
-        in the list `Vc_all_methods`.
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
+        'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        All valid values are also held in the list `Vc_all_methods`.
 
     Notes
     -----
-    A total of six sources are available for this function. They are:
+    The available sources are as follows:
 
         * 'IUPAC', a series of critically evaluated
           experimental datum for organic compounds in [1]_, [2]_, [3]_, [4]_,
@@ -584,6 +613,10 @@ def Vc(CASRN, method=None):
           estimated data published in [15]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [16]_.
+        * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [18]_
+        * 'PINAMARTINES', a series of values in the supporting material of [19]_
 
     See Also
     --------
@@ -657,6 +690,17 @@ def Vc(CASRN, method=None):
     .. [16] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [17] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [18] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [19] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+       of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
+       Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       https://doi.org/10.1002/aic.17518.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
@@ -669,7 +713,8 @@ Zc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YA
 
 @mark_numba_incompatible
 def Zc_methods(CASRN):
-    """Return all methods available to obtain Zc for the desired chemical.
+    """Return all methods available to obtain the critical compressibility for 
+    the desired chemical.
 
     Parameters
     ----------
@@ -696,7 +741,7 @@ def Zc(CASRN, method=None):
     not available.
 
     Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
-    inorganic chemicals. Function has data for approximately 7500 chemicals.
+    inorganic chemicals. Function has data for approximately 25000 chemicals.
 
     Examples
     --------
@@ -722,7 +767,7 @@ def Zc(CASRN, method=None):
 
     Notes
     -----
-    A total of five sources are available for this function. They are:
+    The available sources are as follows:
 
         * 'IUPAC', a series of critically evaluated
           experimental datum for organic compounds in [1]_, [2]_, [3]_, [4]_,
@@ -735,6 +780,10 @@ def Zc(CASRN, method=None):
           estimated data published in [15]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [16]_.
+        * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [18]_
+        * 'PINAMARTINES', a series of values in the supporting material of [19]_
 
     See Also
     --------
@@ -808,6 +857,17 @@ def Zc(CASRN, method=None):
     .. [16] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [17] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [18] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [19] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+       of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
+       Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       https://doi.org/10.1002/aic.17518.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
