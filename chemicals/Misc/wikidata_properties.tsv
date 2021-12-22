@@ -2057,7 +2057,7 @@ CAS	name	formula	MW	Tm	Tb	Hfus	Hvap	Hf	S0	LFL	UFL	T_flash	T_autoignition	RI	RIT	
 151982-51-3	2-Fluoro-4-bromobenzoyl chloride	C7H3BrClFO	237.45352	298.15												
 152-16-9	schradan	C8H24N4O3P2	286.132	290.15												
 152-58-9	cortodoxone	C21H30O4	346.21441	481.15												
-1520-21-4	4-Vinylaniline	C8H9N	119.16376	297.15												
+1520-21-4	4-vinylaniline	C8H9N	119.16376	297.15												
 1520-50-9	Diethyl 2-butenedioate			262.15												
 15205-66-0	2-(methanesulfonyl)ethanol	C3H8O3S	124.019	302.15												
 1521-38-6	2,3-dimethoxybenzoic acid	C9H10O4	182.058	396.15												
@@ -6787,7 +6787,7 @@ CAS	name	formula	MW	Tm	Tb	Hfus	Hvap	Hf	S0	LFL	UFL	T_flash	T_autoignition	RI	RIT	
 615-84-9	N,N'-diethyloxamide	C6H12N2O2	144.08988	453.15												
 615-93-0	2,5-Dichloro-1,4-benzoquinone	C6H2Cl2O2	176.98488	433.15												
 61584-07-4	lithium heptapalladium	Pd7Li	751.881	1773.15												
-61593-48-4	2,3-Dichlorobenzonitrile	C7H3Cl2N	172.01142	336.15												
+61593-48-4	Dichlorobenzonitriles	C7H3Cl2N	172.01142	336.15												
 616-02-4	citraconic anhydride	C5H4O3	112.016	281.15												
 616-03-5	5-methylimidazolidine-2,4-dione	C4H6N2O2	114.043	424.15												
 616-04-6	1-methylhydantoin	C4H6N2O2	114.04293	431.15												
@@ -7885,7 +7885,7 @@ CAS	name	formula	MW	Tm	Tb	Hfus	Hvap	Hf	S0	LFL	UFL	T_flash	T_autoignition	RI	RIT	
 75-28-5	isobutane	C4H10	58.078	113.70556	261.48333					0.016	0.084					
 75-29-6	isopropyl chloride	C3H7Cl	78.024	156.15												
 75-30-9	isopropyl iodide	C3H7I	169.959	183.15												
-75-31-0	isopropylamine	C3H9N	59.073	172.03889	305.92778							235.92778				
+75-31-0	isopropylamine	C3H9N	59.073	172.03889	305.92778			-112300				235.92778	673.15			
 75-33-2	isopropyl mercaptan	C3H8S	76.035	142.15												
 75-34-3	ethylidene chloride	C2H4Cl2	97.969	175.92778	330.37222					0.054	0.114	256.48333		1.4164		
 75-35-4	1,1-dichloroethene	C2H2Cl2	95.953	150.37222	304.81667					0.065	0.155	254.26111				
@@ -8031,7 +8031,7 @@ CAS	name	formula	MW	Tm	Tb	Hfus	Hvap	Hf	S0	LFL	UFL	T_flash	T_autoignition	RI	RIT	
 7658-80-2	o-Toluic hydrazide	C8H10N2O	150.1778	396.15												
 766-09-6	N-Ethylpiperidine	C7H15N	113.12	253.15												
 766-77-8	Dimethylphenylsilane	C8H12Si	136.26638	149.15												
-766-84-7	3-Chlorobenzonitrile	C7H4ClN	137.56636	314.15												
+766-84-7	3-chlorobenzonitrile	C7H4ClN	137.56636	314.15												
 766-96-1	4-Bromophenylacetylene	C8H5Br	181.0293	339.15												
 766-97-2	4-Ethynyltoluene	C9H8	116.15982	294.15												
 766-98-3	4-Fluorophenylacetylene	C8H5F	120.1237	301.15												
@@ -8162,7 +8162,7 @@ CAS	name	formula	MW	Tm	Tb	Hfus	Hvap	Hf	S0	LFL	UFL	T_flash	T_autoignition	RI	RIT	
 77644-45-2	N-[2-(Morpholin-4-yl)ethyl]hydrazinecarbothioamide			439.15												
 777-37-7	2-Chloro-5-nitrobenzotrifluoride	C7H3ClF3NO2	225.55243	295.15												
 777-84-4	4-nitrophenyl chloroacetate			367.15												
-7772-98-7	sodium thiosulfate	Na2O3S2	157.908	321.65												
+7772-98-7	sodium thiosulfate	Na2S2O3	157.908	321.65												
 7772-99-8	stannous chloride	Cl2Sn	189.84	520.15	896.15											
 7773-06-0	ammonium sulfamate	H6N2O3S	114.00991	404.26111												
 7775-19-1	sodium metaborate	BNaO2	65.988904	1239.15	1707.15			-1059000								
@@ -8307,6 +8307,7 @@ CAS	name	formula	MW	Tm	Tb	Hfus	Hvap	Hf	S0	LFL	UFL	T_flash	T_autoignition	RI	RIT	
 79-15-2	N-bromoacetamide	C2H4BrNO	136.948	377.15												
 79-16-3	methyl acetamide	C3H7NO	73.053	301.15	475.15											
 79-20-9	methyl acetate	C3H6O2	74.037	174.81667	330.37222					0.031	0.16	263.15				
+79-21-0	peracetic acid	C2H4O3	76.016	273.25	383.15			340000						1.3964		
 79-24-3	nitroethane	C2H5NO2	75.032	183.15	387.03889					0.034		300.92778				
 79-27-6	1,1,2,2-tetrabromoethane	C2H2Br4	345.685	273.15									608.15			
 79-29-8	2,3-dimethylbutane	C6H14	86.11	144.15	331.18											
@@ -8655,7 +8656,7 @@ CAS	name	formula	MW	Tm	Tb	Hfus	Hvap	Hf	S0	LFL	UFL	T_flash	T_autoignition	RI	RIT	
 872-50-4	N-methyl-2-pyrrolidone	C5H9NO	99.068	249.15												
 872-85-5	4-pyridinecarboxaldehyde	C6H5NO	107.03711	269.15												
 872460-12-3	3-Carboxy-4-fluorophenylboronic acid	C7H6BFO4	183.92954	491.15												
-873-32-5	2-Chlorobenzonitrile	C7H4ClN	137.56636	318.15												
+873-32-5	2-chlorobenzonitrile	C7H4ClN	137.56636	318.15												
 873-38-1	2-Bromo-4-chloroaniline	C6H5BrClN	206.4676	339.15												
 873-51-8	Dichlorophenylborane	C6H5BCl2	158.8209	280.15												
 873-62-1	3-Cyanophenol	C7H5NO	119.1207	353.15												

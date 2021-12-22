@@ -228,6 +228,6 @@ for CAS in sorted(chemical_data.keys()):
     lines.append(to_write)
     
 folder = os.path.dirname(__file__)
-f = open(os.path.join(folder, 'wikidata_properties.tsv'), 'w')
+f = open(os.path.join(folder, '..', '..', 'chemicals', 'Misc', 'wikidata_properties.tsv'), 'w')
 f.writelines(lines)
 f.close()
