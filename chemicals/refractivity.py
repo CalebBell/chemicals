@@ -109,7 +109,8 @@ RI_all_methods = (CRC, miscdata.WIKIDATA)
 
 @mark_numba_incompatible
 def RI_methods(CASRN):
-    """Return all methods available to obtain the RI for the desired chemical.
+    """Return all methods available to obtain the refractive index for the
+    desired chemical.
 
     Parameters
     ----------
@@ -158,9 +159,10 @@ def RI(CASRN, method=None):
 
     Notes
     -----
-    Only one source is available in this function. It is:
+    The available sources are as follows:
 
         * 'CRC', a compillation of Organic RI data in [1]_.
+        * 'WIKIDATA', data from the Wikidata project [2]_
 
     Examples
     --------
@@ -175,6 +177,7 @@ def RI(CASRN, method=None):
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
+    .. [2] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _RI_data_loaded: _load_RI_data()
     key = ('RI', 'RIT')

@@ -91,7 +91,8 @@ Tt_all_methods = (STAVELEY, miscdata.WEBBOOK, MELTING)
 
 @mark_numba_incompatible
 def Tt_methods(CASRN):
-    """Return all methods available to obtain the Tt for the desired chemical.
+    """Return all methods available to obtain the triple temperature for the 
+    desired chemical.
 
     Parameters
     ----------
@@ -119,7 +120,7 @@ def Tt(CASRN, method=None):
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
-    Returns data from [1]_, or a chemical's melting point if available.
+    Returns data from [1]_ or [2]_, or a chemical's melting point if available.
 
     Parameters
     ----------
@@ -146,6 +147,8 @@ def Tt(CASRN, method=None):
     The data in [1]_ is originally on the ITS-68 temperature scale, but was
     converted to ITS-90. The numbers were rounded to 6 decimal places
     arbitrarily and the coversion was performed with this library.
+    
+    
 
     Examples
     --------
@@ -163,6 +166,8 @@ def Tt(CASRN, method=None):
     .. [1] Staveley, L. A. K., L. Q. Lobo, and J. C. G. Calado. "Triple-Points
        of Low Melting Substances and Their Use in Cryogenic Work." Cryogenics
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
+    .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _triple_data_loaded: _load_triple_data()
     if method:
@@ -206,9 +211,9 @@ def Pt(CASRN, method=None):
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
-    Returns data from [1]_ only.
+    Returns data from [1]_ or [2]_.
 
-    This function doe snot implement it but it is also possible to calculate
+    This function does not implement it but it is also possible to calculate
     the vapor pressure at the triple temperature from a vapor pressure
     correlation, if data is available; note most Antoine-type correlations do
     not extrapolate well to this low of a pressure.
@@ -248,6 +253,8 @@ def Pt(CASRN, method=None):
     .. [1] Staveley, L. A. K., L. Q. Lobo, and J. C. G. Calado. "Triple-Points
        of Low Melting Substances and Their Use in Cryogenic Work." Cryogenics
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
+    .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _triple_data_loaded: _load_triple_data()
     if method:
