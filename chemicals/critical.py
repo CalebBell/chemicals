@@ -113,6 +113,7 @@ CRC = 'CRC'
 PSRK = 'PSRK'
 PD = 'PD'
 YAWS = 'YAWS'
+PINAMARTINES = 'PINAMARTINES'
 
 ### Register data sources and lazy load them
 
@@ -136,11 +137,12 @@ register_df_source(folder, 'Mathews1972InorganicCriticalProps.tsv')
 register_df_source(folder, 'Appendix to PSRK Revision 4.tsv', postload=_add_Zc_to_df)
 register_df_source(folder, 'PassutDanner1973.tsv')
 register_df_source(folder, 'Yaws Collection.tsv', postload=_add_Zc_to_df)
+register_df_source(folder, 'DIPPRPinaMartines.tsv', postload=_add_Zc_to_df)
 _critical_data_loaded = False
 @mark_numba_incompatible
 def _load_critical_data():
     global critical_data_IUPAC, critical_data_Matthews, critical_data_CRC
-    global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner
+    global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner, critical_data_PinaMartines
     global Tc_sources, Pc_sources, Vc_sources, Zc_sources, omega_sources
     global _critical_data_loaded
     critical_data_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')
@@ -149,6 +151,7 @@ def _load_critical_data():
     critical_data_PSRKR4 = data_source('Appendix to PSRK Revision 4.tsv')
     critical_data_Yaws = data_source('Yaws Collection.tsv')
     critical_data_PassutDanner = data_source('PassutDanner1973.tsv')
+    critical_data_PinaMartines = data_source('DIPPRPinaMartines.tsv')
     _critical_data_loaded = True
     Tc_sources = {
         IUPAC: critical_data_IUPAC,
@@ -157,6 +160,7 @@ def _load_critical_data():
         PSRK: critical_data_PSRKR4,
         PD: critical_data_PassutDanner,
         miscdata.WEBBOOK: miscdata.webbook_data,
+        PINAMARTINES: critical_data_PinaMartines,
         YAWS: critical_data_Yaws,
         miscdata.JOBACK: miscdata.joback_predictions,
     }
@@ -183,6 +187,7 @@ if PY37:
         if name in ('critical_data_IUPAC', 'critical_data_Matthews',
                     'critical_data_CRC', 'critical_data_PSRKR4',
                     'critical_data_Yaws', 'critical_data_PassutDanner',
+                    'critical_data_PinaMartines',
                     'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
                     'omega_sources'):
             _load_critical_data()
@@ -194,7 +199,7 @@ else: # pragma: no cover
 
 ### Critical point functions
 
-Tc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
+Tc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tc` for the actual references'''
 
 @mark_numba_incompatible
@@ -352,7 +357,7 @@ def Tc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
 
-Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
+Pc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Pc` for the actual references'''
 
 @mark_numba_incompatible
@@ -508,7 +513,7 @@ def Pc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
 
-Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
+Vc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Vc` for the actual references'''
 
 @mark_numba_incompatible
@@ -659,7 +664,7 @@ def Vc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc')
 
-Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
+Zc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Zc` for the actual references'''
 
 @mark_numba_incompatible
