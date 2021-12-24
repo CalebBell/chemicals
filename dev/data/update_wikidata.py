@@ -206,7 +206,8 @@ print("Processed %s items in %s seconds" %(len(chemical_data), (time() - start))
 
 
 
-keys = ['CAS', 'name', 'formula', 'MW', 'Tm', 'Tb', 'Hfus', 'Hvap', 'Hf', 'S0', 'LFL', 'UFL', 'T_flash', 'T_autoignition', 'RI', 'RIT', 'logP']
+#keys = ['CAS', 'name', 'formula', 'MW', 'Tm', 'Tb', 'Hfus', 'Hvap', 'Hf', 'S0', 'LFL', 'UFL', 'T_flash', 'T_autoignition', 'RI', 'RIT', 'logP']
+keys = ['CAS', 'Tm', 'Tb', 'Hfus', 'Hvap', 'Hf', 'S0', 'LFL', 'UFL', 'T_flash', 'T_autoignition', 'RI', 'RIT', 'logP']
 lines = ['\t'.join(keys) + '\n']
 for CAS in sorted(chemical_data.keys()):
     d = chemical_data[CAS]
