@@ -25,6 +25,7 @@ import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.miscdata import webbook_data
+from chemicals import int_to_CAS
 from chemicals.critical import *
 from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_Matthews,
@@ -203,7 +204,7 @@ def test_Tc_all_values():
     for k in sources:
         for i in k.index:
             if pd.notnull(k.at[i, 'Tc']):
-                CASs.add(i)
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
@@ -260,7 +261,7 @@ def test_Pc_all_values():
     for k in sources:
         for i in k.index:
             if pd.notnull(k.at[i, 'Pc']):
-                CASs.add(i)
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     Pcs = [Pc(i) for i in CASs]
@@ -291,7 +292,7 @@ def test_Vc_all_values():
     for k in sources:
         for i in k.index:
             if pd.notnull(k.at[i, 'Vc']):
-                CASs.add(i)
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     Vcs = [Vc(i) for i in CASs]
@@ -322,7 +323,7 @@ def test_Zc_all_values():
     for k in sources:
         for i in k.index:
             if pd.notnull(k.at[i, 'Zc']):
-                CASs.add(i)
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     Zcs = [Zc(i) for i in CASs]

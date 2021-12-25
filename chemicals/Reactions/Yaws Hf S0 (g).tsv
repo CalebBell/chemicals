@@ -3280,7 +3280,7 @@ CAS	name	Hfg	S0g
 23009-73-6	1-chloro-2-methyl-trans-2-butene	-54840	373.45
 23009-74-7	1-chloro-2-methyl-cis-2-butene	-54840	373.45
 23010-04-0	1,2-dichloro-2-methylbutane	-186760	378.73
-23010-05-I	1,1-dichloro-2-methylbutane	-188570	398.56
+23010-05-1	1,1-dichloro-2-methylbutane	-188570	398.56
 23010-07-3	1,3-dichloro-2-methylbutane	-188570	398.56
 23068-94-2	3-bromo-cis-2-pentene	-12770	391.07
 23068-95-3	4-bromo-trans-2-pentene	-8260	385.7
@@ -3649,7 +3649,7 @@ CAS	name	Hfg	S0g
 53566-37-3	5-methyl-2-hexyne	74400	401.99
 53594-82-4	2,2-dimethylheptadecane	-444240	857.22
 53731-22-9	1,1-difluoro-3-methylbutane	-549310	395.1
-53731-23-O	1,1-difluoro-2,2-dimethylpropane	-552780	365.76
+53731-23-0	1,1-difluoro-2,2-dimethylpropane	-552780	365.76
 53731-24-1	3-fluoro-2-methyl-1-butene	-232280	364.17
 53731-25-2	2,3-difluoro-2-methylbutane	-552780	365.76
 53750-52-0	4-iodo-2-methyl-1-butene	45980	397.62
@@ -4126,7 +4126,7 @@ CAS	name	Hfg	S0g
 62127-42-8	1,1-difluorononane	-645200	560.54
 62127-43-9	1,1-difluorodecane	-665800	600.36
 62127-44-0	1,1-difluoroundecane	-686500	639.52
-62127-45-I	1,1-difluorododecane	-707100	679.34
+62127-45-0	1,1-difluorododecane	-707100	679.34
 62127-46-2	1,3,3-tribromobutane	-55650	426.08
 62127-47-3	2,3,3-tribromobutane	-60930	416.55
 62127-48-4	1,3-dibromo-2-(bromomethyl)propane	-52180	455.43
@@ -4794,7 +4794,7 @@ CAS	name	Hfg	S0g
 66553-15-9	2,3-dimethyl-1,2-butanediol	-494400	413.79
 66553-16-0	2-ethyl-1,2-butanediol	-490200	419.69
 66553-17-1	2-ethyl-1,3-butanediol	-484400	465.03
-66553-33-I	1,1-diiodododecane	-142550	725.14
+66553-33-0	1,1-diiodododecane	-142550	725.14
 66553-34-2	1-nitro-2,3-dimethylbutane	-188490	450.96
 66553-39-7	cis-1-bromo-1-dodecene	-147460	667.9
 66553-40-0	trans-1-bromo-1-dodecene	-147460	667.9
@@ -4925,7 +4925,7 @@ CAS	name	Hfg	S0g
 66688-66-2	1,3-difluoro-2,2-dimethylpropane	-547500	375.28
 66688-67-3	1,1-difluoro-2-methylbutane	-549310	395.1
 66688-69-5	1,2-difluoro-3-methylbutane	-549310	395.1
-66688-6R-4	1,2-difluoro-2-methylbutane	-547500	375.28
+66688-68-4	1,2-difluoro-2-methylbutane	-547500	375.28
 66688-72-0	cis-1-chloro-1-nonene	-127610	533.41
 66688-73-1	trans-1-chloro-1-nonene	-127610	533.41
 66688-74-2	cis-1-fluoro-1-nonene	-307980	531.69
@@ -4967,7 +4967,7 @@ CAS	name	Hfg	S0g
 66719-53-7	2,5-dimethyl-4-octanol	-417800	567.84
 66719-54-8	2,6-dimethyl-4-octanol	-417800	567.84
 66719-55-9	2,7-dimethyl-3-octanol	-417800	567.84
-66719-5I-5	4,4-dimethyl-3-isopropyl-1-pentanol	-421270	538.49
+66719-51-5	4,4-dimethyl-3-isopropyl-1-pentanol	-421270	538.49
 66731-94-0	4-methyl-5-ethyl-3-heptanol	-417800	567.84
 66731-95-1	5-methyl-2-nonanol	-412520	577.37
 66779-42-4	3-methyl-5-nonanol	-412520	577.37

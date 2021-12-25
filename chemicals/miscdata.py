@@ -49,10 +49,10 @@ folder = os_path_join(source_path, 'Misc')
 ### CRC Handbook general tables
 register_df_source(folder, 'Physical Constants of Inorganic Compounds.csv')
 register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
-register_df_source(folder, 'joback_predictions.tsv')
-register_df_source(folder, 'wikidata_properties.tsv', sparsify=True)
-register_df_source(folder, 'webbook_constants.tsv', sparsify=True)
-register_df_source(folder, 'common_chemistry_data.tsv', sparsify=True)
+register_df_source(folder, 'joback_predictions.tsv', int_CAS=True)
+register_df_source(folder, 'wikidata_properties.tsv', sparsify=True, int_CAS=True)
+register_df_source(folder, 'webbook_constants.tsv', sparsify=True, int_CAS=True)
+register_df_source(folder, 'common_chemistry_data.tsv', sparsify=True, int_CAS=True)
 
 JOBACK = 'JOBACK'
 WIKIDATA = 'WIKIDATA'
