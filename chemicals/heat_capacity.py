@@ -926,7 +926,7 @@ def PPDS2(T, Ts, C_low, C_inf, a1, a2, a3, a4, a5):
     heat capacity.
     
     .. math::
-        \frac{C_p^\circ}{R} = C_{low} + (C_\inf - C_{low})y^2\left(1 + (y-1)
+        \frac{C_p^0}{R} = C_{low} + (C_\inf - C_{low})y^2\left(1 + (y-1)
         \left[\sum_{i=0}^4 a_i y^i\right]\right)
         
     .. math::
