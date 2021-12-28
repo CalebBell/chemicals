@@ -90,7 +90,7 @@ def test_IARC_data():
 
 
 def test_NTP_data():
-    dict_exp = {1: 36, 2: 191}
+    dict_exp = {1: 36, 2: 198}
     dict_calc = NTP_data['Listing'].value_counts().to_dict()
     assert dict_exp == dict_calc
 

@@ -209,7 +209,7 @@ CASRN	Chemical	Listing
 23214-92-8	Adriamycin	2
 23246-96-0	Riddelliine	2
 25013-16-5	Butylated Hydroxyanisole	2
-25136-40-9	Doxorubicin Hydrochloride (seeAdriamycin)	2
+25316-40-9	Doxorubicin Hydrochloride (seeAdriamycin)	2
 26471-62-5	Toluene Diisocyanates	2
 36355-01-8	Hexabromobiphenyl (underPolybrominated Biphenyls)	2
 39156-41-7	2,4-Diaminoanisole Sulfate	2
@@ -226,3 +226,10 @@ CASRN	Chemical	Listing
 77500-04-0	2-Amino-3,8-Dimethylimidazo[4,5-f]quinoxaline (MeIQx) (seeHeterocyclic Amines [Selected])	2
 105650-23-5	2-Amino-1-methyl-6-phenylimidazo[4,5-b]pyridine (PhIP) (seeHeterocyclic Amines [Selected])	2
 108171-26-2	Chlorinated Paraffins (C12, 60% Chlorine)	2
+1309-64-4	Antimony Trioxide	2
+5589-96-8	Bromochloroacetic Acid (see Selected Haloacetic Acids Found as Water Disinfection By-Products)	2
+71133-14-7	Bromodichloroacetic Acid (see Selected Haloacetic Acids Found as Water Disinfection By-Products)	2
+5278-95-5	Chlorodibromoacetic acid (see Selected Haloacetic Acids Found as Water Disinfection By-Products)	2
+631-64-1	Dibromoacetic Acid (see Selected Haloacetic Acids Found as Water Disinfection By-Products)	2
+79-43-6	Dichloroacetic Acid (see Selected Haloacetic Acids Found as Water Disinfection By-Products)	2
+75-96-7	Tribromoacetic Acid (see Selected Haloacetic Acids Found as Water Disinfection By-Products)	2

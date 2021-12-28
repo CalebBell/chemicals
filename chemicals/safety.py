@@ -742,10 +742,10 @@ def Carcinogen(CASRN, method=None):
     .. [1] International Agency for Research on Cancer. Agents Classified by
        the IARC Monographs, Volumes 1-115. Lyon, France: IARC; 2020 Available
        from: http://monographs.iarc.fr/ENG/Classification/
-    .. [2] NTP (National Toxicology Program). 2016. Report on Carcinogens,
-       Fourteenth Edition. Research Triangle Park, NC: U.S. Department of
+    .. [2] NTP (National Toxicology Program). 2021. Report on Carcinogens, 
+       Fifteenth Edition.; Research Triangle Park, NC: U.S. Department of 
        Health and Human Services, Public Health Service.
-       https://ntp.niehs.nih.gov/whatwestudy/assessments/cancer/roc/index.html
+       https://doi.org/10.22427/NTP-OTHER-1003
     '''
     if not _safety_data_loaded: _load_safety_data()
     if not method:
