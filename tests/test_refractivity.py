@@ -53,7 +53,7 @@ def test_refractivity_general():
     assert_close1d(vals, (1.3611, 293.15))
 
     vals = RI_methods(CASRN='64-17-5')
-    assert vals == ['CRC']
+    assert vals == ['CRC', 'WIKIDATA']
     assert RI_data_CRC_organic.index.is_unique
     assert RI_data_CRC_organic.shape == (4490, 2)
     assert RI_methods(CASRN='6400000-17-5') == []

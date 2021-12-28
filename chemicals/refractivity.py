@@ -66,6 +66,7 @@ from fluids.constants import pi, N_A
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.utils import sqrt, isnan
+from chemicals import miscdata
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -88,6 +89,7 @@ def _load_RI_data():
     RI_data_CRC_organic = data_source('CRC Handbook Organic RI.csv')
     RI_sources = {
         CRC: RI_data_CRC_organic,
+        miscdata.WIKIDATA: miscdata.wikidata_data
     }
 
 if PY37:
@@ -102,12 +104,13 @@ else:
 
 #  Refractive index functions
 
-RI_all_methods = (CRC,)
+RI_all_methods = (CRC, miscdata.WIKIDATA)
 '''Tuple of method name keys. See the `RI` for the actual references'''
 
 @mark_numba_incompatible
 def RI_methods(CASRN):
-    """Return all methods available to obtain the RI for the desired chemical.
+    """Return all methods available to obtain the refractive index for the
+    desired chemical.
 
     Parameters
     ----------
@@ -156,9 +159,10 @@ def RI(CASRN, method=None):
 
     Notes
     -----
-    Only one source is available in this function. It is:
+    The available sources are as follows:
 
         * 'CRC', a compillation of Organic RI data in [1]_.
+        * 'WIKIDATA', data from the Wikidata project [2]_
 
     Examples
     --------
@@ -166,12 +170,14 @@ def RI(CASRN, method=None):
     (1.3611, 293.15)
     >>> RI("60-35-5")
     (1.4278, None)
+    >>> RI('100-41-4', method='WIKIDATA')
+    (1.495, None)
 
     References
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
-
+    .. [2] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _RI_data_loaded: _load_RI_data()
     key = ('RI', 'RIT')

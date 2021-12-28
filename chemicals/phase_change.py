@@ -179,15 +179,26 @@ def _load_phase_change_constants():
     Tb_sources = {
         CRC_ORG: miscdata.CRC_organic_data,
         CRC_INORG: miscdata.CRC_inorganic_data,
+        miscdata.COMMON_CHEMISTRY: miscdata.common_chemistry_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
         YAWS: Tb_data_Yaws,
+        miscdata.WIKIDATA: miscdata.wikidata_data,
+        miscdata.JOBACK: miscdata.joback_predictions,
     }
     Tm_sources = {
         OPEN_NTBKM: Tm_ON_data,
         CRC_INORG: miscdata.CRC_inorganic_data,
         CRC_ORG: miscdata.CRC_organic_data,
+        miscdata.COMMON_CHEMISTRY: miscdata.common_chemistry_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
+        miscdata.WIKIDATA: miscdata.wikidata_data,
+        miscdata.JOBACK: miscdata.joback_predictions,
     }
     Hfus_sources = {
         CRC: Hfus_data_CRC,
+        miscdata.WEBBOOK: miscdata.webbook_data,
+        miscdata.WIKIDATA: miscdata.wikidata_data,
+        miscdata.JOBACK: miscdata.joback_predictions,
     }
 
 
@@ -233,12 +244,14 @@ else:
 
 ### Boiling Point at 1 atm
 
-Tb_all_methods = (CRC_INORG, CRC_ORG, YAWS)
+Tb_all_methods = (CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY, 
+                  miscdata.WEBBOOK, YAWS, miscdata.WIKIDATA, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tb` for the actual references'''
 
 @mark_numba_incompatible
 def Tb_methods(CASRN):
-    """Return all methods available to obtain the Tb for the desired chemical.
+    """Return all methods available to obtain the normal boiling point
+    for the desired chemical.
 
     Parameters
     ----------
@@ -259,14 +272,10 @@ def Tb_methods(CASRN):
 
 @mark_numba_incompatible
 def Tb(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's boiling
+    r'''This function handles the retrieval of a chemical's normal boiling
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
-    available.
-
-    Preferred sources are 'CRC Physical Constants, organic' for organic
-    chemicals, and 'CRC Physical Constants, inorganic' for inorganic
-    chemicals. Function has data for approximately 13000 chemicals.
+    available. Function has data for approximately 34000 chemicals.
 
     Parameters
     ----------
@@ -286,14 +295,20 @@ def Tb(CASRN, method=None):
 
     Notes
     -----
-    A total of three methods are available for this function. They are:
+    The available sources are as follows:
 
         * 'CRC_ORG', a compillation of data on organics
           as published in [1]_.
         * 'CRC_INORG', a compillation of data on
           inorganic as published in [1]_.
+        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental 
+          and averaged values
+        * 'WIKIDATA', data from the Wikidata project [3]_
+        * 'COMMON_CHEMISTRY', a project from the CAS [4]_
+        * 'JOBACK', an estimation method for organic substances in [5]_
         * 'YAWS', a large compillation of data from a
-          variety of sources; no data points are sourced in the work of [2]_.
+          variety of sources both experimental and predicted;
+          no data points are sourced in the work of [2]_.
 
     Examples
     --------
@@ -311,6 +326,14 @@ def Tb(CASRN, method=None):
     .. [2] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
+    .. [4] "CAS Common Chemistry". https://commonchemistry.cas.org/.
+    .. [5] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
@@ -320,12 +343,14 @@ def Tb(CASRN, method=None):
 
 ### Melting Point
 
-Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG)
+Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY, 
+                  miscdata.WEBBOOK, miscdata.WIKIDATA, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tm` for the actual references'''
 
 @mark_numba_incompatible
 def Tm_methods(CASRN):
-    """Return all methods available to obtain the Tm for the desired chemical.
+    """Return all methods available to obtain the melting point for the desired
+    chemical.
 
     Parameters
     ----------
@@ -349,12 +374,7 @@ def Tm(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's melting
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
-    available.
-
-    Preferred sources are 'Open Notebook Melting Points', with backup sources
-    'CRC Physical Constants, organic' for organic chemicals, and
-    'CRC Physical Constants, inorganic' for inorganic chemicals. Function has
-    data for approximately 14000 chemicals.
+    available. Function has data for approximately 83000 chemicals.
 
     Parameters
     ----------
@@ -374,7 +394,7 @@ def Tm(CASRN, method=None):
 
     Notes
     -----
-    A total of three sources are available for this function. They are:
+    The available sources are as follows:
 
         * 'OPEN_NTBKM, a compillation of data on organics
           as published in [1]_ as Open Notebook Melting Points; Averaged
@@ -386,6 +406,11 @@ def Tm(CASRN, method=None):
           as published in [2]_.
         * 'CRC_INORG', a compillation of data on
           inorganic as published in [2]_.
+        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental 
+          and averaged values
+        * 'WIKIDATA', data from the Wikidata project [3]_
+        * 'COMMON_CHEMISTRY', a project from the CAS [4]_
+        * 'JOBACK', an estimation method for organic substances in [5]_
 
     Examples
     --------
@@ -403,6 +428,14 @@ def Tm(CASRN, method=None):
        https://figshare.com/articles/Jean_Claude_Bradley_Open_Melting_Point_Datset/1031637.
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
+    .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
+    .. [4] "CAS Common Chemistry". https://commonchemistry.cas.org/.
+    .. [5] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
@@ -1194,12 +1227,13 @@ def PPDS12(T, Tc, A, B, C, D, E):
 
 ### Heat of Fusion
 
-Hfus_all_methods = (CRC,)
+Hfus_all_methods = (CRC, miscdata.WEBBOOK, miscdata.WIKIDATA, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Hfus` for the actual references'''
 
 @mark_numba_incompatible
 def Hfus_methods(CASRN):
-    """Return all methods available to obtain the Hfus for the desired chemical.
+    """Return all methods available to obtain the heat of fusion for the 
+    desired chemical.
 
     Parameters
     ----------
@@ -1225,8 +1259,7 @@ def Hfus(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    The Preferred source is 'CRC'. Function has data for approximately 1100
-    chemicals.
+    Function has data for approximately 22000 chemicals.
 
     Parameters
     ----------
@@ -1246,11 +1279,14 @@ def Hfus(CASRN, method=None):
 
     Notes
     -----
-    A total of one method is available for this function. They are:
+    The available sources are as follows:
 
-    * 'CRC', a compillation of data on organics and inorganics as published
-      in [1]_.
-
+        * 'CRC', a compillation of data on organics and inorganics as published
+          in [1]_.
+        * 'WEBBOOK', a NIST resource [4]_ containing mostly experimental 
+          and averaged values
+        * 'WIKIDATA', data from the Wikidata project [2]_
+        * 'JOBACK', an estimation method for organic substances in [3]_
 
     Examples
     --------
@@ -1265,6 +1301,13 @@ def Hfus(CASRN, method=None):
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
+    .. [2] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
+    .. [3] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [4] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:

@@ -995,6 +995,9 @@ formula_token_matcher_rational_re_str = r'[A-Z][a-z]?|(?:\d*[.])?\d+|\d+|[()]'
 bracketed_charge_re_str = r'\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$'
 formula_token_matcher_rational = bracketed_charge_re = None
 letter_set = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+subscripts = '₀₁₂₃₄₅₆₇₈₉'
+numbers = '0123456789'
+translate_subscripts = str.maketrans(subscripts, numbers)
 
 @mark_numba_incompatible
 def nested_formula_parser(formula, check=True):
@@ -1034,7 +1037,11 @@ def nested_formula_parser(formula, check=True):
     if formula_token_matcher_rational is None:
         formula_token_matcher_rational = re.compile(formula_token_matcher_rational_re_str)
         bracketed_charge_re = re.compile(bracketed_charge_re_str)
-
+    
+    # Handle subscripts - these are found in wikipedia.
+    # Benchmarking shows a call to translate is faster than checking if it is needed.
+    formula = formula.translate(translate_subscripts)
+    
     formula = formula.replace('[', '').replace(']', '')
     charge_splits = bracketed_charge_re.split(formula)
     if len(charge_splits) > 1:

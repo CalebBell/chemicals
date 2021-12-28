@@ -88,7 +88,7 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
 
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import ceil, log10, PY37, source_path, os_path_join, can_load_data
-from chemicals import heat_capacity
+from chemicals import heat_capacity, miscdata
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -122,27 +122,34 @@ def _load_reaction_data():
     _reaction_data_loaded = True
     S0g_sources = {
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
         YAWS: Hfg_S0g_YAWS_data,
     }
     S0l_sources = {
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
     S0s_sources = {
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
     Hfg_sources = {
         ATCT_G: Hfg_ATcT_data,
         CRC: heat_capacity.CRC_standard_data,
         API_TDB_G: Hfg_API_TDB_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
         TRC: heat_capacity.TRC_gas_data,
         YAWS: Hfg_S0g_YAWS_data,
+        miscdata.JOBACK: miscdata.joback_predictions,
     }
     Hfl_sources = {
         ATCT_L: Hfl_ATcT_data,
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
     Hfs_sources = {
         CRC: heat_capacity.CRC_standard_data,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
 
 if PY37:
@@ -164,12 +171,13 @@ else:
 # TODO: more data from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3692305/
 # has dippr standard heats of formation, about 55% of the database
 
-Hfs_all_methods = (CRC,)
+Hfs_all_methods = (CRC, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `Hfs` for the actual references'''
 
 @mark_numba_incompatible
 def Hfs_methods(CASRN):
-    """Return all methods available to obtain the Hfs for the desired chemical.
+    """Return all methods available to obtain the solid-phase heat of
+    formation for the desired chemical.
 
     Parameters
     ----------
@@ -216,7 +224,8 @@ def Hfs(CASRN, method=None):
     -----
     Sources are:
 
-        * 'CRC', from the CRC handbook (1360 values)
+        * 'CRC', from the CRC handbook (1360 values) [1]_
+        * 'WEBBOOK' (2000 values) [2]_
 
     Examples
     --------
@@ -229,11 +238,10 @@ def Hfs(CASRN, method=None):
 
     References
     ----------
-    .. [1] Ruscic, Branko, Reinhardt E. Pinzon, Gregor von Laszewski, Deepti
-       Kodeboyina, Alexander Burcat, David Leahy, David Montoy, and Albert F.
-       Wagner. "Active Thermochemical Tables: Thermochemistry for the 21st
-       Century." Journal of Physics: Conference Series 16, no. 1
-       (January 1, 2005): 561. doi:10.1088/1742-6596/16/1/078.
+    .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+       Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+    .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
@@ -241,12 +249,13 @@ def Hfs(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
-Hfl_all_methods = (ATCT_L, CRC)
+Hfl_all_methods = (ATCT_L, CRC, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `Hfl` for the actual references'''
 
 @mark_numba_incompatible
 def Hfl_methods(CASRN):
-    """Return all methods available to obtain the Hfl for the desired chemical.
+    """Return all methods available to obtain the standard liquid-state heat
+    of formation for the desired chemical.
 
     Parameters
     ----------
@@ -293,8 +302,9 @@ def Hfl(CASRN, method=None):
     -----
     Sources are:
 
-        * 'ATCT_L', the Active Thermochemical Tables version 1.112.
-        * 'CRC', from the CRC handbook (1360 values)
+        * 'ATCT_L', the Active Thermochemical Tables version 1.112. [1]_
+        * 'CRC', from the CRC handbook (1360 values) [2]_
+        * 'WEBBOOK' (2000 values) [3]_
 
     Examples
     --------
@@ -314,6 +324,8 @@ def Hfl(CASRN, method=None):
        (January 1, 2005): 561. doi:10.1088/1742-6596/16/1/078.
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+    .. [3] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
@@ -321,12 +333,13 @@ def Hfl(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
-Hfg_all_methods = (ATCT_G, TRC, CRC, YAWS)
+Hfg_all_methods = (ATCT_G, TRC, CRC, miscdata.WEBBOOK, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Hfg` for the actual references'''
 
 @mark_numba_incompatible
 def Hfg_methods(CASRN):
-    """Return all methods available to obtain the Hfg for the desired chemical.
+    """Return all methods available to obtain the gas phase heat of formation
+    for the desired chemical.
 
     Parameters
     ----------
@@ -373,10 +386,13 @@ def Hfg(CASRN, method=None):
     -----
     Function has data for approximately 8700 chemicals. Sources are:
 
-        * 'ATCT_G', the Active Thermochemical Tables version 1.112 (600 values)
-        * 'TRC', from a 1994 compilation (1750 values)
-        * 'CRC', from the CRC handbook (1360 values)
-        * 'YAWS', a large compillation of values, mostly estimated (5000 values)
+        * 'ATCT_G', the Active Thermochemical Tables version 1.112 (600 values) [1]_
+        * 'TRC', from a 1994 compilation (1750 values) [2]_
+        * 'CRC', from the CRC handbook (1360 values) [3]_
+        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [5]_
+        * 'YAWS', a large compillation of values, mostly estimated (5000 values) [4]_
 
     'TRC' data may have come from computational procedures, for example petane
     is off by 30%.
@@ -412,6 +428,12 @@ def Hfg(CASRN, method=None):
     .. [4] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [5] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
@@ -419,12 +441,13 @@ def Hfg(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfg_sources, CASRN, 'Hfg')
 
-S0s_all_methods = (CRC,)
+S0s_all_methods = (CRC, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `S0s` for the actual references'''
 
 @mark_numba_incompatible
 def S0s_methods(CASRN):
-    """Return all methods available to obtain the S0s for the desired chemical.
+    """Return all methods available to obtain the absolute entropy of the
+    compound in the solid phase for the desired chemical.
 
     Parameters
     ----------
@@ -472,7 +495,9 @@ def S0s(CASRN, method=None):
     -----
     Sources are:
 
-        * 'CRC', from the CRC handbook (1360 values)
+        * 'CRC' [1]_ from the CRC handbook (1360 values)
+        * 'WEBBOOK', a NIST resource [2]_ containing mostly experimental 
+          and averaged values
 
     Examples
     --------
@@ -483,6 +508,12 @@ def S0s(CASRN, method=None):
     --------
     S0s_methods
 
+    References
+    ----------
+    .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+       Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+    .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
@@ -490,12 +521,12 @@ def S0s(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(S0s_sources, CASRN, 'S0s')
 
-S0l_all_methods = (CRC,)
+S0l_all_methods = (CRC, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `S0l` for the actual references'''
 
 @mark_numba_incompatible
 def S0l_methods(CASRN):
-    """Return all methods available to obtain the S0l for the desired chemical.
+    """Return all methods available to obtain the absolute entropy for the desired chemical.
 
     Parameters
     ----------
@@ -567,7 +598,7 @@ def S0l(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(S0l_sources, CASRN, 'S0l')
 
-S0g_all_methods = (CRC, YAWS)
+S0g_all_methods = (CRC, miscdata.WEBBOOK, YAWS)
 '''Tuple of method name keys. See the `S0g` for the actual references'''
 
 @mark_numba_incompatible
@@ -623,6 +654,8 @@ def S0g(CASRN, method=None):
 
         * 'CRC', from the CRC handbook (520 values)
         * 'YAWS', a large compillation of values, mostly estimated (4890 values)
+        * 'WEBBOOK', a NIST resource [3]_ containing mostly experimental 
+          and averaged values
 
     Examples
     --------
@@ -642,6 +675,8 @@ def S0g(CASRN, method=None):
     .. [2] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [3] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _reaction_data_loaded: _load_reaction_data()
     if method:

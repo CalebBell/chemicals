@@ -24,13 +24,16 @@ SOFTWARE.
 import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
+from chemicals.miscdata import webbook_data
+from chemicals import int_to_CAS
 from chemicals.critical import *
 from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_Matthews,
                                 critical_data_CRC,
                                 critical_data_PSRKR4,
                                 critical_data_Yaws,
-                                critical_data_PassutDanner)
+                                critical_data_PassutDanner,
+                                critical_data_PinaMartines)
 
 def test_data_IUPAC():
     MW_sum = critical_data_IUPAC['MW'].sum()
@@ -194,14 +197,19 @@ def test_relationships():
 
 @pytest.mark.slow
 def test_Tc_all_values():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC,
+               critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
+               critical_data_PinaMartines, webbook_data]
     CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'Tc']):
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_close(Tcs_default_sum, 6050113.336122222)
+    assert_close(Tcs_default_sum, 6247147.3661222225)
 
 def test_Tc():
     Tc_val = Tc(CASRN='64-17-5')
@@ -216,7 +224,7 @@ def test_Tc():
     assert_close(126.2, Tc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Tc_methods(CASRN='98-01-1')
-    assert methods == ['IUPAC', 'PSRK', 'YAWS']
+    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS']
 
     # Error handling
     assert Tc(CASRN='BADCAS') is None
@@ -236,7 +244,7 @@ def test_Pc():
     assert_close(3394387.5, Pc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Pc_methods(CASRN='98-01-1')
-    assert methods == ['IUPAC', 'PSRK', 'YAWS']
+    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS']
 
     # Error handling
     assert None == Pc(CASRN='BADCAS')
@@ -246,14 +254,19 @@ def test_Pc():
 
 @pytest.mark.slow
 def test_Pc_all_values():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+               critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
+               critical_data_PinaMartines, webbook_data]
     CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'Pc']):
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     Pcs = [Pc(i) for i in CASs]
     Pcs_default_sum = pd.Series(Pcs).sum()
-    assert_close(Pcs_default_sum, 63141480396.18326)
+    assert_close(Pcs_default_sum, 64608461266.18326)
 
 def test_Vc():
     assert_close(0.000168, Vc(CASRN='64-17-5'))
@@ -263,7 +276,7 @@ def test_Vc():
     assert_close(8.950e-05, Vc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Vc_methods(CASRN='98-01-1')
-    assert methods == ['PSRK', 'YAWS']
+    assert methods == ['PSRK', 'PINAMARTINES', 'YAWS']
 
     # Error handling
     assert None == Vc(CASRN='BADCAS')
@@ -272,14 +285,19 @@ def test_Vc():
 
 @pytest.mark.slow
 def test_Vc_all_values():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+               critical_data_PSRKR4, critical_data_Yaws, critical_data_PinaMartines,
+               webbook_data]
     CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'Vc']):
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     Vcs = [Vc(i) for i in CASs]
     Vcs_default_sum = pd.Series(Vcs).sum()
-    assert_close(Vcs_default_sum, 4.79277302)
+    assert_close(Vcs_default_sum, 4.956260233439)
 
 def test_Zc():
     assert_close(0.241, Zc(CASRN='64-17-5'))
@@ -289,7 +307,7 @@ def test_Zc():
     assert_close(0.29, Zc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Zc_methods(CASRN='98-01-1')
-    assert methods == ['PSRK', 'YAWS']
+    assert methods == ['PSRK', 'PINAMARTINES', 'YAWS']
 
     # Error handling
     assert None == Zc(CASRN='BADCAS')
@@ -298,14 +316,19 @@ def test_Zc():
 
 @pytest.mark.slow
 def test_Zc_all_values():
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PSRKR4, critical_data_Yaws]
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+               critical_data_PSRKR4, critical_data_PinaMartines,
+               critical_data_Yaws, webbook_data]
     CASs = set()
-    [CASs.update(set(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'Zc']):
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     Zcs = [Zc(i) for i in CASs]
     Zcs_default_sum = pd.Series(Zcs).sum()
-    assert_close(Zcs_default_sum, 1929.7152711084107, 1e-6)
+    assert_close(Zcs_default_sum, 1999.5705747225877, 1e-6)
 
 
 

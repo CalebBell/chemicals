@@ -49,6 +49,7 @@ __all__ = ['Tt_all_methods', 'Tt_methods', 'Tt',
 import os
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from chemicals import miscdata
 from chemicals.phase_change import Tm
 from chemicals.data_reader import (register_df_source,
                                    data_source,
@@ -71,6 +72,7 @@ def _load_triple_data():
     _triple_data_loaded = True
     Tt_sources = {
         STAVELEY: triple_data_Staveley,
+        miscdata.WEBBOOK: miscdata.webbook_data,
     }
     Pt_sources = Tt_sources.copy()
 
@@ -84,12 +86,13 @@ else:
     if can_load_data:
         _load_triple_data()
 
-Tt_all_methods = (STAVELEY, MELTING)
+Tt_all_methods = (STAVELEY, miscdata.WEBBOOK, MELTING)
 '''Tuple of method name keys. See the `Tt` for the actual references'''
 
 @mark_numba_incompatible
 def Tt_methods(CASRN):
-    """Return all methods available to obtain the Tt for the desired chemical.
+    """Return all methods available to obtain the triple temperature for the 
+    desired chemical.
 
     Parameters
     ----------
@@ -107,7 +110,7 @@ def Tt_methods(CASRN):
     Tt
     """
     if not _triple_data_loaded: _load_triple_data()
-    methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt68')
+    methods = list_available_methods_from_df_dict(Tt_sources, CASRN, 'Tt')
     if Tm(CASRN): methods.append(MELTING)
     return methods
 
@@ -117,7 +120,7 @@ def Tt(CASRN, method=None):
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
-    Returns data from [1]_, or a chemical's melting point if available.
+    Returns data from [1]_ or [2]_, or a chemical's melting point if available.
 
     Parameters
     ----------
@@ -140,38 +143,44 @@ def Tt(CASRN, method=None):
     Median difference between melting points and triple points is 0.02 K.
     Accordingly, this should be more than good enough for engineering
     applications.
-
-    Temperatures are on the ITS-68 scale.
+    
+    The data in [1]_ is originally on the ITS-68 temperature scale, but was
+    converted to ITS-90. The numbers were rounded to 6 decimal places
+    arbitrarily and the coversion was performed with this library.
+    
+    
 
     Examples
     --------
     Ammonia
 
     >>> Tt('7664-41-7')
-    195.48
+    195.49
 
     See Also
     --------
-    Tt
+    Tt_methods
 
     References
     ----------
     .. [1] Staveley, L. A. K., L. Q. Lobo, and J. C. G. Calado. "Triple-Points
        of Low Melting Substances and Their Use in Cryogenic Work." Cryogenics
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
+    .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _triple_data_loaded: _load_triple_data()
     if method:
         if method == MELTING:
             return Tm(CASRN)
         else:
-            return retrieve_from_df_dict(Tt_sources, CASRN, 'Tt68', method)
+            return retrieve_from_df_dict(Tt_sources, CASRN, 'Tt', method)
     else:
-        Tt = retrieve_any_from_df_dict(Tt_sources, CASRN, 'Tt68')
+        Tt = retrieve_any_from_df_dict(Tt_sources, CASRN, 'Tt')
         if Tt: return Tt
         return Tm(CASRN)
 
-Pt_all_methods = (STAVELEY,)
+Pt_all_methods = (STAVELEY, miscdata.WEBBOOK)
 '''Tuple of method name keys. See the `Pt` for the actual references'''
 
 @mark_numba_incompatible
@@ -202,9 +211,9 @@ def Pt(CASRN, method=None):
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
-    Returns data from [1]_ only.
+    Returns data from [1]_ or [2]_.
 
-    This function doe snot implement it but it is also possible to calculate
+    This function does not implement it but it is also possible to calculate
     the vapor pressure at the triple temperature from a vapor pressure
     correlation, if data is available; note most Antoine-type correlations do
     not extrapolate well to this low of a pressure.
@@ -244,6 +253,8 @@ def Pt(CASRN, method=None):
     .. [1] Staveley, L. A. K., L. Q. Lobo, and J. C. G. Calado. "Triple-Points
        of Low Melting Substances and Their Use in Cryogenic Work." Cryogenics
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
+    .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if not _triple_data_loaded: _load_triple_data()
     if method:

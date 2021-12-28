@@ -99,6 +99,7 @@ import os
 from chemicals.utils import mark_numba_incompatible
 from fluids.constants import R, R_inv, N_A
 from chemicals.utils import log, PY37, source_path, os_path_join, can_load_data
+from chemicals import miscdata
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -112,6 +113,7 @@ CRC = 'CRC'
 PSRK = 'PSRK'
 PD = 'PD'
 YAWS = 'YAWS'
+PINAMARTINES = 'PINAMARTINES'
 
 ### Register data sources and lazy load them
 
@@ -135,11 +137,12 @@ register_df_source(folder, 'Mathews1972InorganicCriticalProps.tsv')
 register_df_source(folder, 'Appendix to PSRK Revision 4.tsv', postload=_add_Zc_to_df)
 register_df_source(folder, 'PassutDanner1973.tsv')
 register_df_source(folder, 'Yaws Collection.tsv', postload=_add_Zc_to_df)
+register_df_source(folder, 'DIPPRPinaMartines.tsv', postload=_add_Zc_to_df)
 _critical_data_loaded = False
 @mark_numba_incompatible
 def _load_critical_data():
     global critical_data_IUPAC, critical_data_Matthews, critical_data_CRC
-    global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner
+    global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner, critical_data_PinaMartines
     global Tc_sources, Pc_sources, Vc_sources, Zc_sources, omega_sources
     global _critical_data_loaded
     critical_data_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')
@@ -148,6 +151,7 @@ def _load_critical_data():
     critical_data_PSRKR4 = data_source('Appendix to PSRK Revision 4.tsv')
     critical_data_Yaws = data_source('Yaws Collection.tsv')
     critical_data_PassutDanner = data_source('PassutDanner1973.tsv')
+    critical_data_PinaMartines = data_source('DIPPRPinaMartines.tsv')
     _critical_data_loaded = True
     Tc_sources = {
         IUPAC: critical_data_IUPAC,
@@ -155,8 +159,14 @@ def _load_critical_data():
         CRC: critical_data_CRC,
         PSRK: critical_data_PSRKR4,
         PD: critical_data_PassutDanner,
-        YAWS: critical_data_Yaws
+        miscdata.WEBBOOK: miscdata.webbook_data,
+        PINAMARTINES: critical_data_PinaMartines,
+        YAWS: critical_data_Yaws,
+        miscdata.JOBACK: miscdata.joback_predictions,
     }
+    
+    _add_Zc_to_df(miscdata.joback_predictions)
+    _add_Zc_to_df(miscdata.webbook_data)
 
     # Create copies just incase new dfs need to be added later
     Pc_sources = Tc_sources.copy()
@@ -177,6 +187,7 @@ if PY37:
         if name in ('critical_data_IUPAC', 'critical_data_Matthews',
                     'critical_data_CRC', 'critical_data_PSRKR4',
                     'critical_data_Yaws', 'critical_data_PassutDanner',
+                    'critical_data_PinaMartines',
                     'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
                     'omega_sources'):
             _load_critical_data()
@@ -188,12 +199,13 @@ else: # pragma: no cover
 
 ### Critical point functions
 
-Tc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
+Tc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tc` for the actual references'''
 
 @mark_numba_incompatible
 def Tc_methods(CASRN):
-    """Return all methods available to obtain Tc for the desired chemical.
+    """Return all methods available to obtain the critical temperature for the 
+    desired chemical.
 
     Parameters
     ----------
@@ -219,8 +231,7 @@ def Tc(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
-    inorganic chemicals. Function has data for approximately 1000 chemicals.
+    Function has data for approximately 26000 chemicals.
 
     Parameters
     ----------
@@ -235,27 +246,31 @@ def Tc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
-        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held
-        in the list `Tc_all_methods`.
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
+        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        All valid values are also held in the list `Tc_all_methods`.
 
     Notes
     -----
-    A total of seven sources are available for this function. They are:
+    The available sources are as follows:
 
-        * 'IUPAC Organic Critical Properties', a series of critically evaluated
+        * 'IUPAC', a series of critically evaluated
           experimental datum for organic compounds in [1]_, [2]_, [3]_, [4]_,
           [5]_, [6]_, [7]_, [8]_, [9]_, [10]_, [11]_, and [12]_.
-        * 'Matthews Inorganic Critical Properties', a series of critically
+        * 'MATTHEWS', a series of critically
           evaluated data for inorganic compounds in [13]_.
-        * 'CRC Organic Critical Properties', a compillation of critically
+        * 'CRC', a compillation of critically
           evaluated data by the TRC as published in [14]_.
-        * 'PSRK Revision 4 Appendix', a compillation of experimental and
+        * 'PSRK', a compillation of experimental and
           estimated data published in [15]_.
-        * 'Passut Danner 1973 Critical Properties', an older compillation of
+        * 'PD', an older compillation of
           data published in [16]_
-        * 'Yaws Critical Properties', a large compillation of data from a
+        * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
+        * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [19]_
+        * 'PINAMARTINES', a series of values in the supporting material of [20]_
 
     Examples
     --------
@@ -338,7 +353,17 @@ def Tc(CASRN, method=None):
     .. [17] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
-
+    .. [18] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [19] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [20] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+       of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
+       Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       https://doi.org/10.1002/aic.17518.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
@@ -346,12 +371,13 @@ def Tc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
 
-Pc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, PD, YAWS)
+Pc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Pc` for the actual references'''
 
 @mark_numba_incompatible
 def Pc_methods(CASRN):
-    """Return all methods available to obtain Pc for the desired chemical.
+    """Return all methods available to obtain the critical pressure for the 
+    desired chemical.
 
     Parameters
     ----------
@@ -376,8 +402,7 @@ def Pc(CASRN, method=None):
     source to use if no method is provided; returns None if the data is not
     available.
 
-    Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
-    inorganic chemicals. Function has data for approximately 7500 chemicals.
+    Function has data for approximately 26000 chemicals.
 
     Examples
     --------
@@ -397,13 +422,13 @@ def Pc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
-        'CRC', 'PSRK', 'PD', and 'YAWS'. All valid values are also held
-        in the list `Pc_all_methods`.
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
+        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        All valid values are also held in the list `Pc_all_methods`.
 
     Notes
     -----
-    A total of seven sources are available for this function. They are:
+    The available sources are as follows:
 
         * 'IUPAC', a series of critically evaluated
           experimental datum for organic compounds in [1]_, [2]_, [3]_, [4]_,
@@ -418,6 +443,10 @@ def Pc(CASRN, method=None):
           data published in [16]_
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
+        * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [19]_
+        * 'PINAMARTINES', a series of values in the supporting material of [20]_
 
     See Also
     --------
@@ -495,6 +524,17 @@ def Pc(CASRN, method=None):
     .. [17] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [18] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [19] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [20] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+       of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
+       Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       https://doi.org/10.1002/aic.17518.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
@@ -502,12 +542,13 @@ def Pc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
 
-Vc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
+Vc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Vc` for the actual references'''
 
 @mark_numba_incompatible
 def Vc_methods(CASRN):
-    """Return all methods available to obtain Vc for the desired chemical.
+    """Return all methods available to obtain the critical volume for the
+    desired chemical.
 
     Parameters
     ----------
@@ -534,7 +575,7 @@ def Vc(CASRN, method=None):
     available.
 
     Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
-    inorganic chemicals. Function has data for approximately 7500 chemicals.
+    inorganic chemicals. Function has data for approximately 25000 chemicals.
 
     Examples
     --------
@@ -554,13 +595,13 @@ def Vc(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
-        'CRC', 'PSRK', and 'YAWS'. All valid values are also held
-        in the list `Vc_all_methods`.
+        The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
+        'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        All valid values are also held in the list `Vc_all_methods`.
 
     Notes
     -----
-    A total of six sources are available for this function. They are:
+    The available sources are as follows:
 
         * 'IUPAC', a series of critically evaluated
           experimental datum for organic compounds in [1]_, [2]_, [3]_, [4]_,
@@ -573,6 +614,10 @@ def Vc(CASRN, method=None):
           estimated data published in [15]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [16]_.
+        * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [18]_
+        * 'PINAMARTINES', a series of values in the supporting material of [19]_
 
     See Also
     --------
@@ -646,6 +691,17 @@ def Vc(CASRN, method=None):
     .. [16] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [17] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [18] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [19] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+       of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
+       Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       https://doi.org/10.1002/aic.17518.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
@@ -653,12 +709,13 @@ def Vc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc')
 
-Zc_all_methods = (IUPAC, MATTHEWS, CRC, PSRK, YAWS)
+Zc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Zc` for the actual references'''
 
 @mark_numba_incompatible
 def Zc_methods(CASRN):
-    """Return all methods available to obtain Zc for the desired chemical.
+    """Return all methods available to obtain the critical compressibility for 
+    the desired chemical.
 
     Parameters
     ----------
@@ -685,7 +742,7 @@ def Zc(CASRN, method=None):
     not available.
 
     Preferred sources are 'IUPAC' for organic chemicals, and 'MATTHEWS' for
-    inorganic chemicals. Function has data for approximately 7500 chemicals.
+    inorganic chemicals. Function has data for approximately 25000 chemicals.
 
     Examples
     --------
@@ -711,7 +768,7 @@ def Zc(CASRN, method=None):
 
     Notes
     -----
-    A total of five sources are available for this function. They are:
+    The available sources are as follows:
 
         * 'IUPAC', a series of critically evaluated
           experimental datum for organic compounds in [1]_, [2]_, [3]_, [4]_,
@@ -724,6 +781,10 @@ def Zc(CASRN, method=None):
           estimated data published in [15]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [16]_.
+        * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental 
+          and averaged values
+        * 'JOBACK', an estimation method for organic substances in [18]_
+        * 'PINAMARTINES', a series of values in the supporting material of [19]_
 
     See Also
     --------
@@ -797,6 +858,17 @@ def Zc(CASRN, method=None):
     .. [16] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [17] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [18] Joback, K.G., and R.C. Reid. "Estimation of Pure-Component
+       Properties from Group-Contributions." Chemical Engineering
+       Communications 57, no. 1-6 (July 1, 1987): 233-43.
+       doi:10.1080/00986448708960487.
+    .. [19] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+       of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
+       Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       https://doi.org/10.1002/aic.17518.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:

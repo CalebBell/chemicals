@@ -56,6 +56,7 @@ __all__ = ['GWP', 'ODP', 'logP',
            'GWP_methods', 'ODP_methods', 'logP_methods']
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from chemicals import miscdata
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df,
@@ -130,6 +131,7 @@ def _load_logP_data():
     logP_sources = {
         'CRC': logP_data_CRC,
         'SYRRES': logP_data_Syrres,
+        miscdata.WIKIDATA: miscdata.wikidata_data
     }
 
 if PY37:
@@ -374,7 +376,7 @@ def ODP(CASRN, method=None):
 
 SYRRES = 'SYRRES'
 CRC = 'CRC'
-logP_all_methods = (SYRRES, CRC)
+logP_all_methods = (SYRRES, CRC, miscdata.WIKIDATA)
 '''Tuple of method name keys. See the `logP` for the actual references'''
 
 @mark_numba_incompatible
@@ -418,7 +420,7 @@ def logP(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'SYRRES', or 'CRC',
+        The method name to use. Accepted methods are 'SYRRES', 'CRC', and 'WIKIDATA'.
         All valid values are also held in the list logP_methods.
 
     Notes
@@ -435,6 +437,8 @@ def logP(CASRN, method=None):
     --------
     >>> logP('67-56-1')
     -0.74
+    >>> logP('100-66-3', 'WIKIDATA')
+    2.11
 
     References
     ----------

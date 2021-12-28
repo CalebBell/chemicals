@@ -184,6 +184,8 @@ def test_nested_formula_parser():
 
     res = nested_formula_parser('Pd(NH3)4.0001Na(NH3H2)2+2')
     assert res == {'Pd': 1, 'N': 6.0001, 'H': 22.0003, 'Na': 1}
+    
+    assert nested_formula_parser('C₁₇H₂₀N₄O₆') == {'C': 17, 'H': 20, 'N': 4, 'O': 6}
 
 def test_charge_from_formula():
     assert charge_from_formula('Br3-') == -1

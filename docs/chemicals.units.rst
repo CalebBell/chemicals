@@ -18,7 +18,7 @@ will be imported from chemicals.units.
 >>> Tc(CAS), Pc(CAS), Vc(CAS), Zc(CAS)
 (<Quantity(512.5, 'kelvin')>, <Quantity(8084000.0, 'pascal')>, <Quantity(0.000117, 'meter ** 3 / mole')>, <Quantity(0.223, 'dimensionless')>)
 >>> (Tt(CAS), Tm(CAS), Tb(CAS), Pt(CAS))
-(<Quantity(175.59, 'kelvin')>, <Quantity(175.15, 'kelvin')>, <Quantity(337.65, 'kelvin')>, None)
+(<Quantity(175.602316, 'kelvin')>, <Quantity(175.15, 'kelvin')>, <Quantity(337.65, 'kelvin')>, None)
 
 >>> iapws95_rho(T=55*u.degF, P=500*u.psi)
 <Quantity(1000.97992, 'kilogram / meter ** 3')>

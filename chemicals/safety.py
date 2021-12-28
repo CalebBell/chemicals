@@ -132,6 +132,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
 
 import os
 from fluids.core import F2K
+from chemicals import miscdata
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import source_path, R, none_and_length_check, normalize, PY37, os_path_join, can_load_data
 from chemicals.data_reader import (register_df_source,
@@ -276,9 +277,12 @@ def _load_safety_data():
     IARC_data = data_source('IARC Carcinogen Database.tsv')
     Tflash_sources = {IEC: IEC_2010_data,
                       NFPA: NFPA_2008_data,
-                      SERAT: DIPPR_SERAT_data}
+                      SERAT: DIPPR_SERAT_data,
+                      miscdata.WIKIDATA: miscdata.wikidata_data,
+                      }
     Tautoignition_sources = {IEC: IEC_2010_data,
-                             NFPA: NFPA_2008_data}
+                             NFPA: NFPA_2008_data,
+                             miscdata.WIKIDATA: miscdata.wikidata_data}
     LFL_sources = Tautoignition_sources.copy()
     UFL_sources = Tautoignition_sources.copy()
     _safety_data_loaded = True
@@ -764,7 +768,7 @@ def Carcinogen(CASRN, method=None):
 ### Fire-related functions
 
 
-T_flash_all_methods = (IEC, NFPA, SERAT)
+T_flash_all_methods = (IEC, NFPA, SERAT, miscdata.WIKIDATA)
 '''Tuple of method name keys. See the :obj:`T_flash` for the actual references'''
 
 @mark_numba_incompatible
@@ -800,7 +804,9 @@ def T_flash(CASRN, method=None):
     --------
     >>> T_flash(CASRN='64-17-5')
     285.15
-
+    >>> T_flash('111-69-3', method='WIKIDATA')
+    365.92778
+    
     Parameters
     ----------
     CASRN : str
@@ -844,7 +850,7 @@ def T_flash(CASRN, method=None):
        Farid Bagui. "Nonlinear Group Contribution Model for the Prediction of
        Flash Points Using Normal Boiling Points." Fluid Phase Equilibria 449
        (October 15, 2017): 52-59. doi:10.1016/j.fluid.2017.06.008.
-
+    .. [4] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _safety_data_loaded: _load_safety_data()
     if method:
@@ -853,7 +859,7 @@ def T_flash(CASRN, method=None):
         return retrieve_any_from_df_dict(Tflash_sources, CASRN, 'T_flash')
 
 
-T_autoignition_all_methods = (IEC, NFPA)
+T_autoignition_all_methods = (IEC, NFPA, miscdata.WIKIDATA)
 '''Tuple of method name keys. See the :obj:`T_autoignition` for the actual references'''
 
 @mark_numba_incompatible
@@ -906,6 +912,8 @@ def T_autoignition(CASRN, method=None):
     --------
     >>> T_autoignition(CASRN='71-43-2')
     771.15
+    >>> T_autoignition('111-69-3', method='WIKIDATA')
+    823.15
 
     Notes
     -----
@@ -925,6 +933,7 @@ def T_autoignition(CASRN, method=None):
     .. [2] National Fire Protection Association. NFPA 497: Recommended
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
+    .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _safety_data_loaded: _load_safety_data()
     if method:
@@ -934,7 +943,7 @@ def T_autoignition(CASRN, method=None):
 
 
 
-LFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
+LFL_all_methods = (IEC, NFPA, miscdata.WIKIDATA, SUZUKI, CROWLLOUVAR)
 '''Tuple of method name keys. See the :obj:`LFL` for the actual references'''
 
 @mark_numba_incompatible
@@ -1007,6 +1016,8 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     0.012
     >>> LFL(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
     0.044
+    >>> LFL(CASRN='111-69-3', method='WIKIDATA')
+    0.017
 
     Notes
     -----
@@ -1024,7 +1035,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     .. [2] National Fire Protection Association. NFPA 497: Recommended
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
-
+    .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _safety_data_loaded: _load_safety_data()
     if not method:
@@ -1042,7 +1053,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     else:
         return retrieve_from_df_dict(LFL_sources, CASRN, 'LFL', method)
 
-UFL_all_methods = (IEC, NFPA, SUZUKI, CROWLLOUVAR)
+UFL_all_methods = (IEC, NFPA, miscdata.WIKIDATA, SUZUKI, CROWLLOUVAR)
 '''Tuple of method name keys. See the :obj:`UFL` for the actual references'''
 
 @mark_numba_incompatible
@@ -1098,6 +1109,8 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
 
     >>> UFL(Hc=-890590.0, atoms={'C': 1, 'H': 4}, CASRN='74-82-8')
     0.17
+    >>> UFL(CASRN='111-69-3', method='WIKIDATA')
+    0.05
 
     Parameters
     ----------
@@ -1135,7 +1148,7 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
     .. [2] National Fire Protection Association. NFPA 497: Recommended
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
-
+    .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if not _safety_data_loaded: _load_safety_data()
     if not method:
