@@ -716,11 +716,11 @@ CASRN	Chemical	Hvap298
 333-36-8	1,1,1-trifluoro-2-(2,2,2-trifluoroethoxy)ethane 	35000
 333-57-9	perfluoroheptane 	36100
 334-68-9	1-fluorododecane 	64000
-335-04-4	perfluoro-2-methylpentane 	31400
+355-04-4	perfluoro-2-methylpentane 	31400
 335-21-7	perfluoroethylcyclohexane 	38700
 335-44-4	2,3,3-trichloroheptafluorobutane 	35600
 335-65-9	1,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8-heptadecafluorooctane 	43400
-338-83-3	tris(heptafluoropropyl)amine 	46800
+338-83-0	tris(heptafluoropropyl)amine 	46800
 344-04-7	bromopentafluorobenzene 	43100
 344-07-0	chloropentafluorobenzene 	41300
 348-54-9	2-fluoroaniline 	52000
@@ -814,7 +814,7 @@ CASRN	Chemical	Hvap298
 479-27-6	1,8-diaminonaphthalene 	79600
 486-25-9	9-fluorenone 	79900
 488-23-3	1,2,3,4-tetramethylbenzene 	54600
-489-91-3	4-methylcyclohexanol 	65900
+589-91-3	4-methylcyclohexanol 	65900
 491-35-0	4-methylquinoline 	67600
 493-09-4	1,4-benzodioxan 	67400
 496-11-7	indane 	49000
@@ -859,7 +859,7 @@ CASRN	Chemical	Hvap298
 513-53-1	(dl) 2-butanethiol 	34100
 513-86-0	3-hydroxy-2-butanone 	48700
 514-03-4	perfluoro-N-methyl-N,N-dibutylamine 	48500
-515-35-9	2-methyl-2-butene 	27100
+513-35-9	2-methyl-2-butene 	27100
 515-84-4	ethyl trichloroacetate 	51000
 519-73-3	triphenylmethane 	94300
 526-73-8	1,2,3-trimethylbenzene 	49000
@@ -1096,7 +1096,7 @@ CASRN	Chemical	Hvap298
 625-25-2	2-methyl-2-heptanol 	62900
 625-27-4	2-methyl-2-pentene 	31600
 625-29-6	2-chloropentane 	36000
-625-36-3	2,5-dimethylfuran 	31800
+625-86-5	2,5-dimethylfuran 	31800
 625-50-3	N-ethylacetamide 	64900
 625-54-7	ethyl isopropyl ether 	30000
 625-60-5	S-ethyl thiolacetate 	40000
@@ -1154,7 +1154,7 @@ CASRN	Chemical	Hvap298
 629-41-4	1,8-octanediol 	106200
 629-45-8	dibutyl disulfide 	62900
 629-50-5	tridecane 	66500
-629-54-4	tetradecane 	71300
+629-59-4	tetradecane 	71300
 629-60-7	tridecanonitrile 	80300
 629-62-9	pentadecane 	76100
 629-63-0	myristonitrile 	84800
@@ -1247,7 +1247,7 @@ CASRN	Chemical	Hvap298
 706-79-6	1,2-dichlorohexafluorocyclopentene 	36500
 707-07-3	trimethyl orthobenzoate 	59300
 707-35-7	1,3,5-trimethyladamantane 	51700
-707-79-4	1,3-dimethyladamantane 	49700
+702-79-4	1,3-dimethyladamantane 	49700
 713-68-8	3-phenoxyphenol 	90400
 717-74-8	1,3,5-triisopropylbenzene 	66000
 719-79-9	1,1-diphenylbutane 	77200
@@ -1278,7 +1278,7 @@ CASRN	Chemical	Hvap298
 774-48-1	phenyldiethoxymethane 	62800
 776-35-2	9,10-dihydrophenanthene 	76600
 777-22-0	2-phenyloctane 	70000
-779-02-0	9-methylanthracene 	88100
+779-02-2	9-methylanthracene 	88100
 781-43-1	9,10-dimethylanthracene 	94500
 811-93-8	2-methyl-1,2-propanediamine 	43600
 815-24-7	2,2,4,4-tetramethyl-3-pentanone 	45400
@@ -1307,7 +1307,7 @@ CASRN	Chemical	Hvap298
 832-69-9	1-methylphenanthrene 	84500
 834-12-8	2-methylthio-4-ethylamino-6-isopropylamino-1,3,5-triazine 	121500
 838-15-3	2,3:6,7-dibenzocycloocta-2,6-dien-1-one 	90600
-849-30-4	dicyclohexyl adipate 	106300
+849-99-0	dicyclohexyl adipate 	106300
 865-71-4	perfluoro-3-methylpentane 	30800
 867-27-6	phosphorothioic acid, O-[2-(ethylthio)ethyl]-O,O-dimethyl ester 	71000
 868-85-9	dimethyl phosphite 	46700
@@ -1383,7 +1383,7 @@ CASRN	Chemical	Hvap298
 1003-31-2	2-thiophenecarbonitrile 	49500
 1003-64-1	ethylidenecyclohexane 	42000
 1008-88-4	3-phenylpyridine 	66500
-1009-89-5	2-phenylpyridine 	68600
+1008-89-5	2-phenylpyridine 	68600
 1012-72-2	1,4-di-tert-butylbenzene 	62500
 1013-88-3	benzophenone imine 	75700
 1014-60-4	1,3-di-tert-butylbenzene 	59600
@@ -1480,7 +1480,7 @@ CASRN	Chemical	Hvap298
 1517-05-1	2-azidoethanol 	62200
 1518-72-5	diisobutyl disulfide 	57200
 1522-22-1	1,1,1,5,5,5-hexafluoropentan-2,4-dione 	30600
-1530-03-6 	1,1-diphenylpropane 	72800
+1530-03-6	1,1-diphenylpropane 	72800
 1551-21-9	methyl isopropyl sulfide 	34100
 1551-27-5	2-propylthiophene 	43700
 1551-43-5	cyclohexyl valerate 	64300
@@ -1646,7 +1646,7 @@ CASRN	Chemical	Hvap298
 2528-38-3	tripentyl phosphate 	91500
 2528-39-4	trihexyl phosphate 	104900
 2528-45-2	tri-sec-butyl phosphate 	70100
-2530-10-4	3-acetyl-2,5-dimethylthiophene 	61300
+2530-10-1	3-acetyl-2,5-dimethylthiophene 	61300
 2532-58-3	cis 1,3-dimethylcyclopentane 	34300
 2566-89-4	methyl Z,Z,Z 11,14,17-eicosadieneoate 	122600
 2566-90-7	Z,Z,Z,Z,Z,Z 4,7,10,13,16,19-docosahexaeneoate 	131800
@@ -1671,7 +1671,7 @@ CASRN	Chemical	Hvap298
 2845-89-8	3-chloroanisole 	53600
 2867-05-2	alpha-thujene 	44800
 2868-37-3	methyl cyclopropanecarboxylate 	42000
-2870-04-0	1,3-dimethyl-2-ethylbenzene 	53900
+2870-04-4	1,3-dimethyl-2-ethylbenzene 	53900
 2882-98-6	nonylcyclopentane 	70700
 2883-02-5	nonylcyclohexane 	74700
 3001-72-7	1,5-diazabicyclo[4.3.0]non-5-ene 	61500
@@ -1859,7 +1859,7 @@ CASRN	Chemical	Hvap298
 5821-51-2	corannulene 	115500
 5834-16-2	3-methyl-2-thiophenecarboxyaldehyde 	56200
 5856-66-6	tetrapentacontane 	271000
-5857-36-2	2,2,4-trimethyl-3-pentanone 	43300
+5857-36-3	2,2,4-trimethyl-3-pentanone 	43300
 5881-17-4	3-ethyloctane 	49000
 5910-89-4	2,3-dimethylpyrazine 	52600
 5911-04-6	3-methylnonane 	50200
@@ -1900,7 +1900,7 @@ CASRN	Chemical	Hvap298
 6742-54-7	undecylbenzene 	82400
 6765-39-5	1-heptadecene 	84900
 6785-23-5	undecylcyclopentane 	80600
-6795-92-4	2,5-dimethyl-1-hexene 	38900
+6975-92-4	2,5-dimethyl-1-hexene 	38900
 6812-38-0	hexadecylcyclohexane 	109300
 6812-39-1	hexadecylcyclopentane 	105300
 6857-85-1	R,S (1-sec-butoxyethyl)benzene 	58700
@@ -2042,7 +2042,7 @@ CASRN	Chemical	Hvap298
 14919-01-8	trans 3-octene 	40200
 14959-86-5	(Z) 7-dodecenyl acetate 	79800
 15232-76-5	3-octyne 	43900
-15351-09-1	2-(dimethylamino)-1-phenyl-1-propanone 	64800
+15351-09-4	2-(dimethylamino)-1-phenyl-1-propanone 	64800
 15364-56-4	1-(dimethylamino)-2-propanone 	43600
 15706-73-7	butyl 2-methylbutanoate 	52500
 15840-60-5	cis 2-methyl-3-hexene 	34300
@@ -2081,7 +2081,7 @@ CASRN	Chemical	Hvap298
 16747-25-4	2,2,3-trimethylhexane 	41700
 16747-26-5	2,2,4-trimethylhexane 	40700
 16747-28-7	2,3,3-trimethylhexane 	42100
-16747-30-0	2,4,4-trimethylhexane 	41100
+16747-30-1	2,4,4-trimethylhexane 	41100
 16747-31-2	3,3,4-trimethylhexane 	42200
 16747-32-3	2,2-dimethyl-3-ethylpentane 	41700
 16747-33-4	2,3-dimethyl-3-ethylpentane 	42700
@@ -2124,7 +2124,7 @@ CASRN	Chemical	Hvap298
 18854-58-5	1-butyoxy-2-propoxyethane 	54700
 19132-06-0	(S,S) 2,3-butanediol 	63200
 19220-93-0	acidic acid, pentafluorophenyl ester 	48100
-19340-91-9	2-(diethylamino)pentanenitrile 	58800
+19340-91-1	2-(diethylamino)pentanenitrile 	58800
 19398-77-7	3,4-diethylhexane 	47700
 19432-68-9	methyl 2-thiopheneacetate 	61900
 19485-35-9	4,5-dicyano-1-methylimidazole 	86900
@@ -2209,7 +2209,7 @@ CASRN	Chemical	Hvap298
 26348-85-6	methyl (trifluoromethyl)phosphinous acid, tert-butyl ester 	39700
 26459-85-8	2-ethoxy-1,1,1-trinitropropane 	57700
 26535-66-0	6-chlorododecane 	65500
-26555-56-5	2-cyclopentene-1-carbonitrile 	44900
+26555-56-6	2-cyclopentene-1-carbonitrile 	44900
 26675-46-7	2-chloro-1,1,1-trifluoro-2-(difluoromethoxy)ethane 	31900
 26719-47-1	ditetradecyl sebacate 	170600
 26719-48-2	dihexadecyl sebacate 	183800
@@ -2256,7 +2256,7 @@ CASRN	Chemical	Hvap298
 33564-24-8	difluorooxo(trifluoromethyl)(pentafluoroethyl) sulfur 	28000
 33564-25-9	difluorobis[1,1,2,2,2-pentafluorothananaminato]sulfur 	31200
 33622-15-0	difluorobis(pentafluoroethyl) sulfur 	34000
-33670-50-7 	azidocyclopentane 	41300
+33670-50-7	azidocyclopentane 	41300
 33757-10-7	N,1,1-trichloro-N,1-difluoromethylamine 	27800
 33785-99-8	3,3,6,6-tetraethyl-1,2,4,5-tetraoxacyclohexane 	50100
 33951-95-0	(Z) 11-tridecenyl acetate 	86400
@@ -2453,7 +2453,7 @@ CASRN	Chemical	Hvap298
 56797-40-1	(Z) 7-hexadecenal 	87800
 56860-81-2	3-(difluoromethoxy)-1,1,1,2,2-pentafluoropropane 	31200
 56922-71-5	propyl 3-methylbut-2-enoate 	53000
-56922-76-2	pentyl 3-methylbut-2-enoate 	61800
+56922-72-6	pentyl 3-methylbut-2-enoate 	61800
 57074-37-0	(Z) 4-decen-1-ol 	79600
 57382-97-5	ethyl 2-thiopheneacetate 	61800
 57393-02-9	(Z) 10-tetradecen-1-ol 	101100
@@ -2488,7 +2488,7 @@ CASRN	Chemical	Hvap298
 62154-78-3	2,3,3-trinitro-2-methylpentane 	91400
 62184-82-1	(dl) 1,3-dimethylcyclopentene 	35000
 62391-95-1	ethyl bis(isopropyl)cyanoacetate 	65000
-62881-9 	butyl ethyl ether 	36400
+628-81-9	butyl ethyl ether 	36400
 62936-12-3	(E) 5-dodecen-1-ol 	90700
 62936-14-5	(E) 5-tetradecen-1-ol 	100800
 62957-60-2	ethoxyacetonitrile 	46500
