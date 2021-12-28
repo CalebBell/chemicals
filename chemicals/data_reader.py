@@ -102,8 +102,8 @@ def load_df(key):
     if low_mem:
         for col_name in df.columns.values.tolist():
             if col_name in spurious_columns:
-                del df[col_name]
-                
+                df[col_name] = pd.Series([], dtype=float).astype(pd.SparseDtype("float", nan))
+
     if int_CAS:
         '''Most CAS numbers fit in 32 bits. Not all of them do though, for 
         example https://commonchemistry.cas.org/detail?cas_rn=2222298-66-8
