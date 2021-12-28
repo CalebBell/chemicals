@@ -33,7 +33,6 @@ from chemicals.reaction import Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, H
 def test_API_TDB_data():
     assert Hfg_API_TDB_data['Hfg'].abs().sum() == 101711260
     assert Hfg_API_TDB_data.shape == (571, 2)
-    assert all([check_CAS(i) for i in Hfg_API_TDB_data.index])
 
 
 def test_ATcT_l():

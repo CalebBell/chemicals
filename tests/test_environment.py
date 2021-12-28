@@ -92,11 +92,9 @@ def test_GWP_all_values():
 def test_logP_data():
     tot = np.abs(logP_data_CRC['logP']).sum()
     assert_close(tot, 1216.99)
-    assert logP_data_CRC.index.is_unique
 
     tot = np.abs(logP_data_Syrres['logP']).sum()
     assert_close(tot, 25658.06)
-    assert logP_data_Syrres.index.is_unique
 
 
 def test_logP():

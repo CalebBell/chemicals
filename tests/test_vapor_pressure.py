@@ -237,7 +237,6 @@ def test_WagnerMcGarry_data():
     sums = [1889.3027499999998, 509.57053652899992, 1098.2766456999998, 1258.0866876, 1005210819, 129293.19100000001, 68482]
     assert_close1d(sums_calc, sums)
 
-    assert Psat_data_WagnerMcGarry.index.is_unique
     assert Psat_data_WagnerMcGarry.shape == (245, 8)
 
 

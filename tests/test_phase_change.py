@@ -167,18 +167,14 @@ def test_Perrys2_150_data():
     tots = [189407.42499999999, 18617223.739999998, 174.34494000000001, 112.51209900000001, 63.894040000000004, 70810.849999999991, 189407.005]
     assert_close1d(tots_calc, tots)
 
-    assert phase_change_data_Perrys2_150.index.is_unique
     assert phase_change_data_Perrys2_150.shape == (344, 8)
 
 
 def test_Alibakhshi_Cs_data():
-    # Oops, a bunch of these now-lonely coefficients have an invalid CAS...
-    # assert all([check_CAS(i) for i in phase_change_data_Alibakhshi_Cs.index])
     tots_calc = [phase_change_data_Alibakhshi_Cs[i].abs().sum() for i in [u'C']]
     tots = [28154.361500000003]
     assert_close1d(tots_calc, tots)
 
-    assert phase_change_data_Alibakhshi_Cs.index.is_unique
     assert phase_change_data_Alibakhshi_Cs.shape == (1890, 2)
 
 
