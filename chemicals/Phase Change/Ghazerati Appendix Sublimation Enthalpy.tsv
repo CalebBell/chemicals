@@ -28,7 +28,7 @@ CASRN	Chemical	Hsub	error
 61-68-7	2-[(2,3-dimethylphenyl)amino]benzoic acid 	136300	800
 62-23-7	4-nitrobenzoic acid 	119700	600
 62-55-5	thioacetamide   	83050	
-62-56-5	thiourea   	110650	
+62-56-6	thiourea   	110650	
 63-68-3	L-(d)-methionine   	164000	4000
 64-69-7	iodoacetic acid 	86500	1000
 65-45-2	2-hydroxybenzamide 	100600	
@@ -155,7 +155,7 @@ CASRN	Chemical	Hsub	error
 95-96-5	(dl) 3,6-dimethyl-1,4-dioxane-2,5-dione 	91600	400
 96-31-1	1,3-dimethylurea 	89300	400
 96-53-7	2-mercapto-2-thiazoline 	100500	3400
-96-65-8	3,4-dimethylphenol 	85050	
+95-65-8	3,4-dimethylphenol 	85050	
 96-76-4	2,4-di-tert-butylphenol 	89800	
 96-98-0	4-methyl-3-nitrobenzoic acid 	118600	2500
 98-10-2	benzenesulfonamide 	115300	1700
@@ -289,9 +289,9 @@ CASRN	Chemical	Hsub	error
 126-81-8	5,5-dimethyl-1,3-cyclohexanedione 	99800	1100
 128-37-0	2,6-di-tert-butyl-4-methylphenol 	89950	
 128-39-2	2,6-di-tert-butylphenol 	83050	
-128-83-2	2,4-dichlorophenol 	74050	
+120-83-2	2,4-dichlorophenol 	74050	
 129-00-0	pyrene 	101500	
-129-29-9	3-(4-methoxyphenyl)propionic acid 	124500	1700
+1929-29-9	3-(4-methoxyphenyl)propionic acid 	124500	1700
 129-64-6	endo-5-norbornene-2,3-dicarboxylic anhydride  	97000	4200
 130-15-4	1,4-naphthoquinone   	91000	800
 130-16-5	5-chloro-8-hydroxyquinoline   	98700	900
@@ -327,8 +327,8 @@ CASRN	Chemical	Hsub	error
 230-27-3	7,8-benzoquinoline 	90200	2000
 253-52-1	phthalazine   	81700	
 253-82-7	quinazoline  	77100	
-260-27-3	3,4-benzoquinoline 	98600	
-260-65-9	bicyclo[3.3.1]nonane   	50600	2000
+229-87-8	3,4-benzoquinoline 	98600	
+280-65-9	bicyclo[3.3.1]nonane   	50600	2000
 260-94-6	acridine 	92620	
 261-31-4	thioxanthene  	101300	
 262-12-4	dibenzo[b,e][1,4]dioxin   	90550	
@@ -363,7 +363,7 @@ CASRN	Chemical	Hsub	error
 334-48-5	decanoic acid 	118800	2200
 350-46-9	4-fluoronitrobenzene 	70900	300
 350-62-9	1,1-difluoro-1,2-diphenylethane 	94700	900
-351-81-7	coumarin-3-carboxylic acid 	118200	2700
+531-81-7	coumarin-3-carboxylic acid 	118200	2700
 352-33-0	1-chloro-4-iodobenzene 	71880	
 354-38-1	trifluoroacetamide   	77700	1400
 355-49-7	n-perfluorohexadecane 	104600	
@@ -502,7 +502,7 @@ CASRN	Chemical	Hsub	error
 598-52-7	N-methylthiourea 	112900	3000
 598-55-0	methyl carbamate 	73600	1300
 598-94-7	1,1-dimethylurea 	93500	300
-598-95-0	acridone 	136200	500
+578-95-0	acridone 	136200	500
 599-67-7	1,1-diphenylethanol 	105000	800
 601-75-2	ethylmalonic acid 	112800	2200
 602-60-8	9--nitroanthracene 	115400	600
@@ -629,7 +629,7 @@ CASRN	Chemical	Hsub	error
 700-58-3	2-adamantanone 	72280	
 702-98-7	2-methyl-2-adamantanol 	91350	
 707-35-7	1,3,5-trimethyladamantane 	77800	1300
-707-79-4	1,3-dimethyladamantane 	67800	1300
+702-79-4	1,3-dimethyladamantane 	67800	1300
 709-62-6	3,5-bis(trifluoromethyl)-1,2,4-triazole  	74700	800
 711-01-3	1-adamantyl-1-carboxylic acid methyl ester 	82400	600
 716-79-0	2-phenylbenzimidazole 	123000	1700
@@ -638,7 +638,7 @@ CASRN	Chemical	Hsub	error
 732-26-3	2,4,6-tri-tert-butylphenol   	87500	400
 751-38-2	1,2,3,4-tetraphenylnaphthalene 	154200	800
 758-19-0	1-methyl-1-nitrosohydrazine 	79500	400
-759-10-9	2,2-dimethylpropanamide  	87800	
+754-10-9	2,2-dimethylpropanamide  	87800	
 762-84-5	tert-butylacetamide   	77900	400
 764-42-1	fumaronitrile   	68600	
 766-32-5	4-methyl-2,6,7-trioxabicyclo[2.2.2]octane 	67400	
@@ -649,7 +649,7 @@ CASRN	Chemical	Hsub	error
 769-42-6	1,3-dimethylbarbituric acid 	92300	600
 771-60-8	pentafluoroaniline 	63700	1100
 773-76-2	5,7-dichloro-8-hydroxyquinoline   	109300	700
-779-02-0	9-methylanthracene 	101800	1000
+779-02-2	9-methylanthracene 	101800	1000
 781-43-1	9,10-dimethylanthracene  	113000	1700
 785-80-8	N-phenyl 4-nitrobenzaldehyde imine  	126000	1300
 787-70-2	4,4'-biphenyldicarboxylic acid 	196400	7100
@@ -725,10 +725,10 @@ CASRN	Chemical	Hsub	error
 1134-35-6	4,4’-dimethyl-2,2’-bipyridyl 	99700	2300
 1135-24-6	3-(4-hydroxy-3-methoxyphenyl)-2-propenoic acid 	131800	4000
 1137-42-4	(4-hydroxyphenyl)phenylmethanone 	130300	1000
-1137-98-8	N-phenylmethylene benzenamine N-oxide 	115000	800
+1137-96-8	N-phenylmethylene benzenamine N-oxide 	115000	800
 1138-52-9	3,5-di-tert-butylphenol 	97700	3700
 1139-82-8	5,7-dihydro-6H-dibenzo[a,c]cyclohepten-6-one 	95600	800
-1144-74-4	4-nitrobenzophenone 	122600	
+1144-74-7	4-nitrobenzophenone 	122600	
 1165-14-6	1,2,3-triphenylbenzene 	134100	1100
 1165-53-3	1,2,4-triphenylbenzene 	147800	700
 1192-53-6	4,5-dichloro-1-methylimidazole 	81400	100
@@ -743,7 +743,7 @@ CASRN	Chemical	Hsub	error
 1452-15-9	4-cyanothiazole   	73900	400
 1452-77-3	2-pyridinecarboxamide   	93100	3300
 1453-82-3	4-pyridinecarboxamide 	116100	1500
-1456-33-0	bicyclo[4.2.1]non-3-ene 	49700	800
+16456-33-0	bicyclo[4.2.1]non-3-ene 	49700	800
 1459-93-4	dimethyl isophthalate 	100800	
 1460-02-2	1,3,5-tri-tert-butylbenzene   	81200	300
 1462-03-9	1-methylcyclopentanol 	67000	200
@@ -825,7 +825,7 @@ CASRN	Chemical	Hsub	error
 2423-84-9	pyrazine 1,4-dioxide 	116900	800
 2424-92-2	eicosanedioic acid 	170000	3300
 2432-11-3	2,6-diphenylphenol  	119100	1100
-2433-66-7	quinoxaline-1,4-dioxide 	112000	1900
+2423-66-7	quinoxaline-1,4-dioxide 	112000	1900
 2434-53-9	6-amino-1-methyluracil 	158200	
 2437-66-3	2,3,5-trimethylbenzoic acid 	106700	300
 2438-04-2	2-isopropylbenzoic acid 	101000	400
@@ -1007,7 +1007,7 @@ CASRN	Chemical	Hsub	error
 7364-25-2	1,2-dihydro-3H-indazol-3-one 	127600	1500
 7372-88-5	4-methyldibenzothiophene 	90300	700
 7400-08-0	3-(4-hydroxyphenyl)propenoic acid (p-coumaric acid) 	130900	3300
-7491-74-1	2-oxo-1-pyrrolidineacetamide 	123150	
+7491-74-9	2-oxo-1-pyrrolidineacetamide 	123150	
 7597-18-4	6-nitroindazole 	117000	600
 7640-33-7	7-bromo-5-chloro-8-hydroxyquinoline   	113200	800
 7791-49-3	5-methoxybenzofurazan-1-oxide 	96000	1600
@@ -1041,7 +1041,7 @@ CASRN	Chemical	Hsub	error
 14906-64-0	3-cyanopyridine N-oxide 	101900	2000
 15029-30-8	1-(cyanoacetyl)piperidine 	103500	1900
 15065-28-8	cis-heptacyclene 	127900	
-15271-39-6	1,1,1-triphenylethane 	108600	900
+5271-39-6	1,1,1-triphenylethane 	108600	900
 15300-82-0	9,9’-dimethyl-9,9’-bifluorenyl 	119700	1300
 15307-86-5	2-[(2,6-dichlorophenyl)amino]benzoic acid (diclofenac acid) 	115600	1300
 15506-53-3	cyclobutane-1,3-dione 	73600	3700
@@ -1071,7 +1071,7 @@ CASRN	Chemical	Hsub	error
 17767-20-3	phosphorus-tris(N,N-diethyldithiocarbamate)  	143000	2000
 17872-39-8	Heptacyclo[6.6.0.02,6.03,13.04,11.05,9.010,14]tetradecane 	81950	
 18594-93-9	3-anilino-1-phenylbut-2-enone 	126800	3000
-18617-86-6	2-methyl-4-hydroxypyridine 	113000	1300
+18615-86-6	2-methyl-4-hydroxypyridine 	113000	1300
 18708-70-8	2,4,6-trichloro-1-nitrobenzene 	85500	
 18771-85-2	4-nitrobenzofurazan-1-oxide 	97300	1600
 19164-41-1	5-methylbenzofurazan-1-oxide 	92200	1200
@@ -1151,7 +1151,7 @@ CASRN	Chemical	Hsub	error
 40016-70-4	2-methyl-3-carboxymethoxyquinoxaline-1,4-dioxide 	118300	2600
 40915-96-6	peroxytridecanoic acid 	142700	5000
 40932-63-6	3-acetyl-2-methyl-5-phenylthiophene 	108900	400
-41643-38-9	4-hexylbenzoic acid 	123600	1000
+21643-38-9	4-hexylbenzoic acid 	123600	1000
 41902-42-5	tri-tert-butylmethanol  	63200	1200
 42216-58-0	1,1,1,3-tetranitro-2-methylpropane 	91200	
 43044-69-5	1,1,1-triphenylbutane 	114300	1100
