@@ -152,7 +152,7 @@ CASRN	Chemical	Hvap298
 91-62-3	6-methylquinoline 	67700
 91-63-4	2-methylquinoline 	63300
 92-06-8	m-terphenyl 	97200
-92-12-0	1-methylnaphthalene 	61200
+90-12-0	1-methylnaphthalene 	61200
 92-24-0	naphthacene 	106200
 92-51-3	bicyclohexyl 	58300
 92-52-4	biphenyl 	64900
@@ -421,7 +421,7 @@ CASRN	Chemical	Hvap298
 110-52-1	1,4-dibromobutane 	52600
 110-53-2	1-bromopentane 	41100
 110-54-3	hexane 	31500
-110-56-2	1,4-dichlorobutane 	46500
+110-56-5	1,4-dichlorobutane 	46500
 110-58-7	pentylamine 	40500
 110-59-8	valeronitrile 	44200
 110-60-1	butane-1,4-diamine 	55200
@@ -439,7 +439,7 @@ CASRN	Chemical	Hvap298
 110-86-1	pyridine 	40600
 110-89-4	piperidine 	39400
 110-91-8	morpholine 	45200
-110-93-3	N,N-diisobutylamine 	41200
+110-96-3	N,N-diisobutylamine 	41200
 110-94-1	glutaric acid 	101600
 110-95-2	N,N,N',N'-tetramethyl-1,3-propanediamine 	45300
 111-11-5	methyl octanoate 	56600
@@ -531,7 +531,7 @@ CASRN	Chemical	Hvap298
 120-72-9	indole 	65300
 120-80-9	1,2-dihydroxybenzene 	71900
 120-82-1	1,2,4-trichlorobenzene 	56600
-120-93-2	cyclopentanone 	42500
+120-92-3	cyclopentanone 	42500
 120-94-5	1-methylpyrrolidine 	35400
 121-33-5	4-hydroxy-3-methoxybenzaldehyde 	66900
 121-44-8	triethylamine 	35100
@@ -590,7 +590,7 @@ CASRN	Chemical	Hvap298
 127-19-5	N,N-dimethylacetamide 	47600
 127-91-3	beta-pinene 	45800
 128-39-2	2,6-di-tert-butylphenol 	66000
-128-83-2	2,4-dichlorophenol 	58600
+120-83-2	2,4-dichlorophenol 	58600
 129-00-0	pyrene 	89800
 132-65-0	dibenzothiophene 	78300
 134-20-3	methyl 2-aminobenzoate 	67100
@@ -616,12 +616,12 @@ CASRN	Chemical	Hvap298
 141-97-9	ethyl 3-oxobutanoate 	54200
 142-28-9	1,3-dichloropropane 	40900
 142-29-0	cyclopentene 	26600
-142-30-2	2,5-dimethyl-3-hexyne-2,5-diol 	82800
+142-30-3	2,5-dimethyl-3-hexyne-2,5-diol 	82800
 142-60-9	octyl propanoate 	66400
 142-62-1	hexanoic acid 	71200
 142-68-7	tetrahydropyran 	38200
 142-84-7	dipropylamine 	40600
-142-85-5	heptane 	36700
+142-82-5	heptane 	36700
 142-92-7	hexyl acetate 	52000
 142-96-1	dibutyl ether 	44700
 143-08-8	1-nonanol 	75600
@@ -665,7 +665,7 @@ CASRN	Chemical	Hvap298
 253-82-7	quinazoline 	59300
 261-31-4	thioxanthene 	77800
 262-20-4	phenoxathiin 	77300
-264-35-2	2-hexyne 	35900
+764-35-2	2-hexyne 	35900
 271-58-9	benz[a]isoxazole 	55300
 271-89-6	2,3-benzofuran 	48800
 274-76-0	imidazo[1,2-a]pyridine 	65000
