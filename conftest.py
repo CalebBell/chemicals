@@ -1,5 +1,6 @@
 import sys
 import platform
+import os
 is_pypy = 'PyPy' in sys.version
 ver_tup = platform.python_version_tuple()[0:2]
 ver_tup = tuple(int(i) for i in ver_tup)
@@ -20,3 +21,12 @@ def pytest_ignore_collect(path):
         # numba does not yet run under pypy, numba support 3.6 to 3.9 for now
         if 'numba' in path:
             return True
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--enable-low-memory", action="store", default="0", help="my option: 0 or 1"
+    )
+
+def pytest_configure(config):
+    os.environ["CHEDL_LOW_MEMORY"] = config.getoption("--enable-low-memory")
+    

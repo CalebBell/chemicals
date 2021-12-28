@@ -63,18 +63,13 @@ def make_df_sparse(df, non_sparse_columns=[]):
     '''Take a dataframe, and convert any floating-point columns which are mostly
     missing into sparse series. Return the resulting dataframe.
     '''
+    sparse_float = pd.SparseDtype("float", nan)
     for col, dtype in zip(df.columns, df.dtypes):
-        if col in non_sparse_columns:
-            continue
-        if id(dtype) in float_dtype_ids:
+        if col not in non_sparse_columns and id(dtype) in float_dtype_ids:
             series_orig = df[col]
-            series_small = series_orig.astype(pd.SparseDtype("float", nan))
+            series_small = series_orig.astype(sparse_float)
             if series_small.memory_usage() < series_orig.memory_usage():
                 df[col] = series_small
-        elif dtype in int_dtype_ids:
-            pass
-        else:
-            continue
     return df
 
 
@@ -110,7 +105,7 @@ def load_df(key):
                 del df[col_name]
                 
     if int_CAS:
-        df.index = pd.Index([CAS_to_int(s) for s in df.index])
+        df.index = pd.Index([CAS_to_int(s) for s in df.index], dtype=int64_dtype)
         
     df_sources[key] = df
 
@@ -141,12 +136,8 @@ def retrieve_any_from_df_dict(df_dict, index, key):
 
 def retrieve_from_df(df, index, key):
     df_index = df.index
-    if df_index.dtype is not object_dtype:
-        try:
-            index = CAS_to_int(index)
-        except:
-            pass
-
+    if df_index.dtype is int64_dtype and isinstance(index, str):
+        index = CAS_to_int(index)
     if index in df_index:
         if isinstance(key, (int, str)):
             return get_value_from_df(df, index, key)
@@ -155,12 +146,8 @@ def retrieve_from_df(df, index, key):
 
 def retrieve_any_from_df(df, index, keys):
     df_index = df.index
-    if df_index.dtype is not object_dtype:
-        try:
-            index = CAS_to_int(index)
-        except:
-            pass
-
+    if df_index.dtype is int64_dtype and isinstance(index, str):
+        index = CAS_to_int(index)
     if index not in df.index: return None
     for key in keys:
         value = df.at[index, key]
@@ -182,17 +169,10 @@ def list_available_methods_from_df_dict(df_dict, index, key):
     methods = []
     for method, df in df_dict.items():
         df_index = df.index
-        if df_index.dtype is not object_dtype:
-            try:
-                index_int = CAS_to_int(index)
-            except:
-                pass
-            if (index_int in df_index) and not isnan(df.at[index_int, key]):
-                methods.append(method)
-        else:
-            if (index in df_index) and not isnan(df.at[index, key]):
-                methods.append(method)
-
+        if df_index.dtype is int64_dtype and isinstance(index, str):
+            index = CAS_to_int(index)
+        if (index in df_index) and not isnan(df.at[index, key]):
+            methods.append(method)
     return methods
 
 def list_available_methods_from_df(df, index, keys_by_method):
