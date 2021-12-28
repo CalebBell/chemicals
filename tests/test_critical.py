@@ -52,7 +52,6 @@ def test_data_IUPAC():
     assert_close(Zc_sum, 109.892)
 
     assert critical_data_IUPAC.shape == (810, 7)
-    assert critical_data_IUPAC.index.is_unique
 
 
 def test_data_Matthews():
@@ -72,7 +71,6 @@ def test_data_Matthews():
     assert_close(Zc_sum, 12.141000000000002)
 
     assert critical_data_Matthews.shape == (120, 6)
-    assert critical_data_Matthews.index.is_unique
 
 
 def test_data_CRC():
@@ -89,7 +87,6 @@ def test_data_CRC():
     assert_close(Zc_sum, 207.98663028416496, 1e-6)
 
     assert critical_data_CRC.shape == (861, 8)
-    assert critical_data_CRC.index.is_unique
 
     Tc_error_sum = critical_data_CRC['Tc_error'].sum()
     assert_close(Tc_error_sum, 2444.24)
@@ -118,7 +115,6 @@ def test_data_PSRKR4():
     assert_close(omega_sum, 410.50560000000002)
 
     assert critical_data_PSRKR4.shape == (995, 6)
-    assert critical_data_PSRKR4.index.is_unique
 
 
 def test_data_PassutDanner():
@@ -132,7 +128,6 @@ def test_data_PassutDanner():
     assert_close(omega_sum, 65.567000000000007)
 
     assert critical_data_PassutDanner.shape == (192, 4)
-    assert critical_data_PassutDanner.index.is_unique
 
 
 def test_data_Yaws():
@@ -152,7 +147,6 @@ def test_data_Yaws():
     assert_close(omega_sum, 3170.3041999999996)
 
     assert critical_data_Yaws.shape == (7549, 6)
-    assert critical_data_Yaws.index.is_unique
 
 
 def test_relationships():

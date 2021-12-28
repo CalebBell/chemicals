@@ -37,12 +37,7 @@ def test_CRC_inorganic():
     tots = [1543322.6125999999, 639213.23099999991, 8767127.4880000018]
     assert_close1d(tots, tots_calculated)
 
-    assert CRC_inorganic_data.index.is_unique
     assert CRC_inorganic_data.shape == (2438, 4)
-
-@pytest.mark.slow
-def test_CRC_inorganic_check_CAS():
-    assert all([check_CAS(i) for i in CRC_inorganic_data.index])
 
 
 def test_CRC_organic():
@@ -50,13 +45,8 @@ def test_CRC_organic():
     tots = [2571284.4804000002, 2280667.0800000001, 6020405.0616999995, 6575.4144047999998]
     assert_close1d(tots_calc, tots)
 
-    assert CRC_organic_data.index.is_unique
     assert CRC_organic_data.shape == (10867, 5)
 
-@pytest.mark.slow
-def test_CRC_organic_check_CAS():
-    for i in CRC_organic_data.index:
-        assert check_CAS(i)
 
 
 def test_lookup_VDI_tabular_data():

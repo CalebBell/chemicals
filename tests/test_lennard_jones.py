@@ -39,10 +39,7 @@ def test_LJ_data():
     tot = LJ_data_Magalhaes['sigma'].abs().sum()
     assert_close(tot, 1995.8174799999997)
 
-    assert LJ_data_Magalhaes.index.is_unique
     assert LJ_data_Magalhaes.shape == (322, 3)
-    for c in LJ_data_Magalhaes.index:
-        assert check_CAS(c)
 
     tot = LJ_data_Poling['epsilon'].abs().sum()
     assert_close(tot, 24742.620000000003)
@@ -50,10 +47,7 @@ def test_LJ_data():
     tot = LJ_data_Poling['sigma'].abs().sum()
     assert_close(tot, 329.24199999999996)
 
-    assert LJ_data_Poling.index.is_unique
     assert LJ_data_Poling.shape == (75, 4)
-    for c in LJ_data_Poling.index:
-        assert check_CAS(c)
 
 def test_molecular_diameter_CSP():
     # Example from DIPPR 1983 Manual for Predicting Chemical Process Design

@@ -31,25 +31,20 @@ from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data
 from chemicals.reaction import Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, Hfg_S0g_YAWS_data
 
 def test_API_TDB_data():
-    assert Hfg_API_TDB_data.index.is_unique
     assert Hfg_API_TDB_data['Hfg'].abs().sum() == 101711260
     assert Hfg_API_TDB_data.shape == (571, 2)
     assert all([check_CAS(i) for i in Hfg_API_TDB_data.index])
 
 
 def test_ATcT_l():
-    assert Hfl_ATcT_data.index.is_unique
     assert Hfl_ATcT_data.shape == (34,5)
-    assert all([check_CAS(i) for i in Hfl_ATcT_data.index])
     tots_calc = [Hfl_ATcT_data[i].abs().sum() for i in ['Hfl_0K', 'Hfl', 'uncertainty']]
     tots = [2179500.0, 6819443, 19290]
     assert_close1d(tots_calc, tots)
 
 
 def test_Hfg_ATcT_data():
-    assert Hfg_ATcT_data.index.is_unique
     assert Hfg_ATcT_data.shape == (595, 5)
-    assert all([check_CAS(i) for i in Hfg_ATcT_data.index])
     tots_calc = [Hfg_ATcT_data[i].abs().sum() for i in ['Hfg_0K', 'Hfg', 'uncertainty']]
     tots = [300788330, 300592764, 829204]
     assert_close1d(tots_calc, tots)

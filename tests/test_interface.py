@@ -110,34 +110,26 @@ def test_data():
                                                     u'n2', u'Tc', u'Tmin',
                                                     u'Tmax'])
     assert sigma_data_Mulero_Cachadina.shape == (115, 10)
-    assert sigma_data_Mulero_Cachadina.index.is_unique
 
     tot = sum([sigma_data_Jasper_Lange[i].sum() for i in sigma_data_Jasper_Lange.columns[1:]])
     assert_close(tot, 343153.38953333395)
 
     assert np.all(sigma_data_Jasper_Lange.columns == [u'Name', u'a', u'b', u'Tmin', u'Tmax'])
     assert sigma_data_Jasper_Lange.shape == (522, 5)
-    assert sigma_data_Jasper_Lange.index.is_unique
 
     tot = sum([sigma_data_Somayajulu[i].sum() for i in sigma_data_Somayajulu.columns[1:]])
     assert_close(tot, 38941.199955999997)
 
     assert np.all(sigma_data_Somayajulu.columns == [u'Chemical', u'Tt', u'Tc', u'A', u'B', u'C'])
     assert sigma_data_Somayajulu.shape == (64, 6)
-    assert sigma_data_Somayajulu.index.is_unique
 
     tot = sum([sigma_data_Somayajulu2[i].sum() for i in sigma_data_Somayajulu2.columns[1:]])
     assert_close(tot, 39471.356771000006)
     assert np.all(sigma_data_Somayajulu2.columns == [u'Chemical', u'Tt', u'Tc', u'A', u'B', u'C'])
     assert sigma_data_Somayajulu2.shape == (64, 6)
-    assert sigma_data_Somayajulu2.index.is_unique
 
 def test_VDI_PPDS_11_data():
     """I believe there are no errors here."""
-    for i in sigma_data_VDI_PPDS_11.index:
-        assert check_CAS(i)
-
-    assert sigma_data_VDI_PPDS_11.index.is_unique
     assert sigma_data_VDI_PPDS_11.shape == (272, 8)
 
     # Doing the sums on the arrays is faster but much uglier. Worth it?

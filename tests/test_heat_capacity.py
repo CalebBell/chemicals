@@ -185,7 +185,6 @@ def test_CRC_standard_data():
     tots = [628580900.0, 306298700.0, 68541.800000000003, 56554.400000000001, 265782700.0, 23685900.0, 61274.0, 88464.399999999994, 392946600.0, 121270700.0, 141558.29999999999, 33903.300000000003]
     assert_close1d(tots_calc, tots)
 
-    assert CRC_standard_data.index.is_unique
     assert CRC_standard_data.shape == (2470, 13)
 
 
@@ -194,8 +193,6 @@ def test_Cp_data_Poling():
     tots = [40966.0, 301000.0, 1394.7919999999999, 10.312580799999999, 0.024578948000000003, 3.1149672999999997e-05, 1.2539125599999999e-08, 43530.690000000002, 50002.459999999999]
     assert_close1d(tots_calc, tots)
 
-
-    assert Cp_data_Poling.index.is_unique
     assert Cp_data_Poling.shape == (368, 10)
 
 
@@ -204,7 +201,6 @@ def test_TRC_gas_data():
     tots = [365114, 3142000, 7794.1999999999998, 24465781000, 1056180, 133537.068, 67639.309000000008, 156121050000, 387884, 212320, 967467.89999999991, 30371.91, 495689880.0]
     assert_close1d(tots_calc, tots)
 
-    assert TRC_gas_data.index.is_unique
     assert TRC_gas_data.shape == (1961, 14)
 
 def test_TRC_gas():

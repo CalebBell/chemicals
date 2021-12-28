@@ -38,7 +38,6 @@ def test_data():
     Pt_uncertainty_sum = triple_data_Staveley['Pt_uncertainty'].sum()
     assert_close(Pt_uncertainty_sum, 138.65526315789461)
 
-    assert triple_data_Staveley.index.is_unique
     assert triple_data_Staveley.shape == (189, 5)
 
 

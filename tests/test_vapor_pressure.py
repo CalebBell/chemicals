@@ -239,8 +239,6 @@ def test_WagnerMcGarry_data():
 
     assert Psat_data_WagnerMcGarry.index.is_unique
     assert Psat_data_WagnerMcGarry.shape == (245, 8)
-    for i in Psat_data_WagnerMcGarry.index:
-        assert check_CAS(i)
 
 
 def test_AntoinePoling_data():
@@ -248,19 +246,14 @@ def test_AntoinePoling_data():
     sums = [2959.75131, 398207.29786, 18532.246009999995, 86349.09, 120340.66]
     assert_close1d(sums_calc, sums)
 
-    assert Psat_data_AntoinePoling.index.is_unique
     assert Psat_data_AntoinePoling.shape == (325, 6)
-    assert all([check_CAS(i) for i in Psat_data_AntoinePoling.index])
-
 
 def test_WagnerPoling_data():
     sums_calc =  [Psat_data_WagnerPoling[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'Tmin', 'Tmax', 'Tc', 'Pc']]
     sums = [894.39071999999999, 271.76480999999995, 525.8134399999999, 538.25393000000008, 24348.006000000001, 59970.149999999994, 63016.021000000001, 357635500]
     assert_close1d(sums_calc, sums)
 
-    assert Psat_data_WagnerPoling.index.is_unique
     assert Psat_data_WagnerPoling.shape == (104, 9)
-    assert all([check_CAS(i) for i in Psat_data_WagnerPoling.index])
 
 
 def test_AntoineExtended_data():
@@ -268,9 +261,7 @@ def test_AntoineExtended_data():
     sums = [873.55827000000011, 107160.285, 4699.9650000000001, 47592.470000000001, 7647, 241.56537999999998, 22816.815000000002, 1646509.79, 33570.550000000003, 46510.849999999999]
     assert_close1d(sums_calc, sums)
 
-    assert Psat_data_AntoineExtended.index.is_unique
     assert Psat_data_AntoineExtended.shape == (97, 11)
-    assert all([check_CAS(i) for i in Psat_data_AntoineExtended.index])
 
 def test_VDI_PPDS_3_data():
     """I believe there are no errors here.
@@ -278,21 +269,17 @@ def test_VDI_PPDS_3_data():
     Average temperature deviation
     0.144% vs tabulated values.
     """
-    assert all([check_CAS(i) for i in Psat_data_VDI_PPDS_3.index])
     tots_calc = [Psat_data_VDI_PPDS_3[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'Pc', u'Tm']]
     tots = [2171.4607300000002, 694.38631999999996, 931.3604499999999, 919.88944000000004, 150225.16000000003, 1265565000, 56957.849999999991]
     assert_close1d(tots_calc, tots)
 
-    assert Psat_data_VDI_PPDS_3.index.is_unique
     assert Psat_data_VDI_PPDS_3.shape == (275, 8)
 
 def test_Perrys2_8_data():
-    assert all([check_CAS(i) for i in Psat_data_Perrys2_8.index])
     tots_calc = [Psat_data_Perrys2_8[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'C5', 'Tmin', 'Tmax']]
     tots = [30288.457300000002, 2574584.506, 3394.9677, 1.1357374248600194, 1223.7, 70399.92, 187558.921]
     assert_close1d(tots_calc, tots)
 
-    assert Psat_data_Perrys2_8.index.is_unique
     assert Psat_data_Perrys2_8.shape == (340, 8)
 
 ### CSP relationships

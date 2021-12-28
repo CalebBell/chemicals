@@ -29,7 +29,6 @@ from chemicals.permittivity import *
 from chemicals.permittivity import permittivity_data_CRC
 
 def test_permittivity_data():
-    assert permittivity_data_CRC.index.is_unique
     assert permittivity_data_CRC.shape == (1303, 9)
 
 

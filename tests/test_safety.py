@@ -80,8 +80,6 @@ def test_OntarioExposureLimits():
 
 
 def test_IARC_data():
-    assert IARC_data.index.is_unique
-    assert all([check_CAS(i) for i in IARC_data.index])
     assert IARC_data.shape == (863, 4)
 
     dict_exp = {11: 76, 1: 75, 3: 438, 12: 274}
@@ -176,7 +174,6 @@ def test_NFPA_497_2008():
     tots = [52112.200000000019, 127523.69999999998, 4.2690000000000001, 29.948999999999998]
     assert_close1d(tots_calc, tots)
 
-    assert NFPA_2008_data.index.is_unique
     assert NFPA_2008_data.shape == (231, 5)
 
 
@@ -185,13 +182,11 @@ def test_IEC_2010():
     tots = [83054.500000000015, 199499.94999999998, 6.4436999999999998, 40.034999999999997]
     assert_close1d(tots_calc, tots)
 
-    assert IEC_2010_data.index.is_unique
     assert IEC_2010_data.shape == (327, 5)
 
 def test_DIPPR_SERAT():
     assert_close(DIPPR_SERAT_data['T_flash'].sum(), 285171.13471004181)
 
-    assert DIPPR_SERAT_data.index.is_unique
     assert DIPPR_SERAT_data.shape == (870, 2)
 
 

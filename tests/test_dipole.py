@@ -38,11 +38,6 @@ def test_dipole_moment_methods():
     tot = dipole.dipole_data_Muller['Dipole'].sum()
     assert_close(tot, 420.05190108045235)
 
-    assert dipole.dipole_data_CCDB.index.is_unique
-    assert dipole.dipole_data_Muller.index.is_unique
-    assert dipole.dipole_data_Poling.index.is_unique
-
-
 def test_dipole():
     d = dipole_moment(CASRN='64-17-5')
     assert_close(d, 1.44)
