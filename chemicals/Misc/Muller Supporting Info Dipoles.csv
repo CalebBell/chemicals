@@ -170,7 +170,7 @@ CAS	Chemical	Dipole
 111-87-5	1-octanol	1.64999820124474
 111-92-2	dibutylamine	1.1
 112-27-6	triethylene glycol	5.58
-112-66-0	1-octene	0.3
+111-66-0	1-octene	0.3
 112-80-1	oleic acid	1.44
 115-07-1	propene	0.365986737177873
 115-10-6	dimethyl ether	1.29999040663861
@@ -250,6 +250,6 @@ CAS	Chemical	Dipole
 1640-89-7	ethylcyclopentane	0
 5194-50-3	cis-2,trans-4-hexadiene	0.309
 6915-15-7	malic acid	3.118
- 7642-09-3	cis-3-hexene	0.339
+7642-09-3	cis-3-hexene	0.339
 13269-52-8	trans-3-hexene	0
 13952-84-6	sec-butylamine	1.28
