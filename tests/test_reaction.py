@@ -114,7 +114,7 @@ def test_Hfg_all_values():
     assert_close(tot2, 300592764.0)
 
     tot3 = sum([abs(Hfg(i, method='YAWS')) for i in Hfg_S0g_YAWS_data.index[pd.notnull(Hfg_S0g_YAWS_data['Hfg'])]])
-    assert_close(tot3, 1545148533.0)
+    assert_close(tot3, 1544220403.0)
 
     tot4 = sum([abs(Hfg(i, method='CRC')) for i in CRC_standard_data.index[pd.notnull(CRC_standard_data['Hfg'])]])
     assert_close(tot4, 392946600.0)
@@ -134,7 +134,7 @@ def test_S0g():
 @pytest.mark.slow
 def test_S0g_all_values():
     tot3 = sum([abs(S0g(i, method='YAWS')) for i in Hfg_S0g_YAWS_data.index[pd.notnull(Hfg_S0g_YAWS_data['S0g'])]])
-    assert_close(tot3, 2691892.382999995)
+    assert_close(tot3, 2690113.4130000058)
 
     tot4 = sum([abs(S0g(i, method='CRC')) for i in CRC_standard_data.index[pd.notnull(CRC_standard_data['S0g'])]])
     assert_close(tot4, 141558.30000000008)

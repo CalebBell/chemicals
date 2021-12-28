@@ -1705,7 +1705,7 @@ CAS	name	Hfg	S0g
 1615-75-4	1-chloro-1-fluoroethane	-313800	300.63
 1617-31-8	3-methyl-3-butenoic acid	-385800	379.58
 1617-32-9	trans-3-pentenoic acid	-369100	432.47
-1628-00-2	2-heptanethiol	-158500	484.44
+628-00-2	2-heptanethiol	-158500	484.44
 1630-77-9	cis-1,2-difluoroethene	-322200	268.81
 1630-78-0	trans-1,2-difluoroethene	-322200	268.14
 1630-94-0	1,1-dimethylcyclopropane	-8200	307.79
@@ -2175,7 +2175,7 @@ CAS	name	Hfg	S0g
 4850-28-6	1,cis-2,trans-4-trimethylcyclopentane	-188650	332.48
 4850-32-2	sec-butylcyclopentane	-173890	446.63
 4860-03-1	1-chlorohexadecane	-394890	793.95
-4862-03-1	1-chloropentadecane	-374890	752.85
+4862-03-7	1-chloropentadecane	-374890	752.85
 4894-61-5	1-chloro-trans-2-butene	-24410	338.65
 4905-79-7	1,1,1-trichlorooctane	-266100	558.03
 4911-70-0	2,3-dimethyl-2-pentanol	-354070	431.16
@@ -2487,8 +2487,7 @@ CAS	name	Hfg	S0g
 7646-78-8	stannic chloride	-471500	365.53
 7646-79-9	cobalt chloride	-93720	298.43
 7646-85-7	zinc chloride	-266100	
-7647-01-00	hydrogen chloride	-92300	188.98
-7647-01-0	hydrogen chloride	-92310	186.9
+7647-01-0	hydrogen chloride	-92300	188.98
 7647-14-5	sodium chloride	-181420	229.64
 7647-15-6	sodium bromide	-143930	241.06
 7647-17-8	cesium chloride	-240160	256.15
@@ -3305,7 +3304,7 @@ CAS	name	Hfg	S0g
 24298-09-7	2-iodo-cis-2-butene	58410	356.69
 24304-00-5	aluminum nitride	523000	228.58
 24308-61-0	2-iodo-1-butene	66620	358.67
-24319-05-2	3-iodo-3-methylpentane	-99050	406.46
+24319-08-2	3-iodo-3-methylpentane	-99050	406.46
 24319-07-1	2-iodo-3-methylpentane	-100860	426.28
 24319-09-3	2-chloro-3-methylpentane	-193470	404.09
 24346-53-0	1-iodo-3-methylpentane	-95580	435.81
@@ -4126,7 +4125,7 @@ CAS	name	Hfg	S0g
 62127-42-8	1,1-difluorononane	-645200	560.54
 62127-43-9	1,1-difluorodecane	-665800	600.36
 62127-44-0	1,1-difluoroundecane	-686500	639.52
-62127-45-0	1,1-difluorododecane	-707100	679.34
+62127-45-1	1,1-difluorododecane	-707100	679.34
 62127-46-2	1,3,3-tribromobutane	-55650	426.08
 62127-47-3	2,3,3-tribromobutane	-60930	416.55
 62127-48-4	1,3-dibromo-2-(bromomethyl)propane	-52180	455.43
@@ -4744,7 +4743,6 @@ CAS	name	Hfg	S0g
 66326-16-7	1-chloroheneicosane	-494890	999.44
 66326-18-9	diethylheptadecylamine	-409240	990.08
 66326-20-3	methyleicosylamine	-423300	1014.7
-66326-79-0	ethylnonadecylamine	-423300	1014.7
 66359-36-2	1-nitrononadecane	-446250	976.39
 66359-38-4	1,3-nonadecanediol	-745230	988.35
 66359-40-8	ethyl heptadecyl sulfide	-393130	962.26
@@ -4794,7 +4792,7 @@ CAS	name	Hfg	S0g
 66553-15-9	2,3-dimethyl-1,2-butanediol	-494400	413.79
 66553-16-0	2-ethyl-1,2-butanediol	-490200	419.69
 66553-17-1	2-ethyl-1,3-butanediol	-484400	465.03
-66553-33-0	1,1-diiodododecane	-142550	725.14
+66553-33-1	1,1-diiodododecane	-142550	725.14
 66553-34-2	1-nitro-2,3-dimethylbutane	-188490	450.96
 66553-39-7	cis-1-bromo-1-dodecene	-147460	667.9
 66553-40-0	trans-1-bromo-1-dodecene	-147460	667.9
@@ -4970,7 +4968,6 @@ CAS	name	Hfg	S0g
 66719-51-5	4,4-dimethyl-3-isopropyl-1-pentanol	-421270	538.49
 66731-94-0	4-methyl-5-ethyl-3-heptanol	-417800	567.84
 66731-95-1	5-methyl-2-nonanol	-412520	577.37
-66779-42-4	3-methyl-5-nonanol	-412520	577.37
 66793-71-3	2,5,5-trimethyl-2-hexanol	-398820	479.72
 66793-72-4	2,5,5-trimethyl-3-hexanol	-400630	499.54
 66793-73-5	3,4,4-trimethyl-1-hexanol	-395350	509.07
