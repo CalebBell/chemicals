@@ -138,12 +138,11 @@ def test_Hfus():
     assert Hfus_methods('7732-18-5') == ['CRC']
 
 def test_Gharagheizi_Hvap_data():
-    # 51 CAS number DO NOT validate
     Hvap298_tot = Hvap_data_Gharagheizi['Hvap298'].sum()
-    assert_close(Hvap298_tot, 173584900)
+    assert_close(Hvap298_tot, 173139200)
 
     assert Hvap_data_Gharagheizi.index.is_unique
-    assert Hvap_data_Gharagheizi.shape == (2730, 2)
+    assert Hvap_data_Gharagheizi.shape == (2723, 2)
 
 
 def test_Gharagheizi_Hsub_data():
