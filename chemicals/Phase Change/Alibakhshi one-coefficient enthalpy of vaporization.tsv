@@ -1813,7 +1813,7 @@ CAS	Chemical	C
 39972-78-6	allyl-tert-butylperoxide	-10.1395
 42205-08-3	1,2,3-triethylbenzene	-4.9427
 42448-85-1	trans-2-eicosene	15.5495
-50465	4-(2-aminoethyl)morpholine	-7.2195
+2038-03-1	4-(2-aminoethyl)morpholine	-7.2195
 50623-57-9	n-butyl nonanoate	6.5273
 51526-06-8	1-(4-ethylphenyl)-2-(4-ethylphenyl)ethane	-0.3165
 51655-57-3	2-butyl-nonan-1-ol	29.8458
@@ -1843,49 +1843,49 @@ CAS	Chemical	C
 78448-33-6	isopropyl isobutyl ether	-13.7889
 79808-30-3	1,3-di-tert-butyl glycerin	5.0768
 88917-22-0	dipropylene glycol monomethyl ether acetate	6.8902
-91352	dimercaptoethyl ether	-9.8116
+2150-02-9	dimercaptoethyl ether	-9.8116
 94023-15-1	propylene glycol 2-tert-butyl ether	-4.0427
 99172-63-1	n-butylbenzene hydroperoxide	23.0814
 100524-60-5	sec-butenyl glycol ether	4.5137
 103554-13-8	(3s)-3-hexylbicyclo[4.4.0]decane	-7.5223
 106538-38-9	2,3,4,5,2',3',4',5'-octahydro-bifuryl-(3,3')	-12.2905
-112134	cis-1,2-dimethylcyclohexane	-21.7108
-112195	trans-1,3-dimethylcyclohexane	-21.3984
-112227	trans-1,4-dimethylcyclohexane	-21.1222
+2207-01-4	cis-1,2-dimethylcyclohexane	-21.7108
+591-21-9	trans-1,3-dimethylcyclohexane	-21.3984
+2207-04-7	trans-1,4-dimethylcyclohexane	-21.1222
 132739-31-2	dipropylene glycol t-butyl ether	25.9842
-136911	ethylene glycol diacrylate	5.4019
+2274-11-5	ethylene glycol diacrylate	5.4019
 148462-57-1	1-methoxy-2-propanol propanoate	-1.2491
 163702-07-6	1,1,2,2,3,3,4,4,4-nonafluoro-1-methoxybutane	-9.7784
-204446	benzene-1,2,4-tricarboxylic acid trimethyl ester	17.2479
-237563	3-chloropropyltrichlorosilane	-9.9532
-288761	di-n-octyl sulfide	14.1556
-317069	vinyltrimethoxysilane	-1.3664
+2459-10-1	benzene-1,2,4-tricarboxylic acid trimethyl ester	17.2479
+2550-06-3	3-chloropropyltrichlorosilane	-9.9532
+2690-08-6	di-n-octyl sulfide	14.1556
+2768-02-7	vinyltrimethoxysilane	-1.3664
 354381	2-ethyl-m-xylene	-11.3303
-359554	2,3-dimethylnonane	-5.9718
-401255	sec-butyl acrylate	-6.0883
-485076	1-methyl-3-hydroxy-6-isopropyl benzene	0.5831
-485106	1-methyl-3-hydroxy-5-isopropyl benzene	2.3043
-567040	1-eicosene	11.4798
-567104	1-nonyne	-5.911
-567776	p-ethylstyrene	-10.7628
+2884-06-2	2,3-dimethylnonane	-5.9718
+2998-08-5	sec-butyl acrylate	-6.0883
+3228-02-2	1-methyl-3-hydroxy-6-isopropyl benzene	0.5831
+3228-03-3	1-methyl-3-hydroxy-5-isopropyl benzene	2.3043
+3452-07-1	1-eicosene	11.4798
+3452-09-3	1-nonyne	-5.911
+3454-07-7	p-ethylstyrene	-10.7628
 735273	2-butyl-octan-1-ol	25.3024
-780984	3-ethyl-1-pentene	-17.1925
+4038-04-4	3-ethyl-1-pentene	-17.1925
 857237-25-3	2-(alpha-methylbenzyloxy)-1-propanol	4.4764
 871518-84-2	propylene glycol alpha-methylbenzyl ether	3.7714
-909554	2,2,4,4,6,8,8-heptamethylnonane	-4.4667
-929727	n-octadecylbenzene	16.8539
-932952	methoxydihydropyran	-12.5992
+4390-04-9	2,2,4,4,6,8,8-heptamethylnonane	-4.4667
+4445-07-2	n-octadecylbenzene	16.8539
+4454-05-1	methoxydihydropyran	-12.5992
 1243297-10-0	1-tert-butoxy-2-[2-(tert-butoxy)propoxy]propane	2.9151
-1465084	3-methylnonane	-6.7824
-1531866	2-methyl-1-hexene	-16.6413
+5911-04-6	3-methylnonane	-6.7824
+6094-02-6	2-methyl-1-hexene	-16.6413
 1766990	sec-butenyl acetate	-9.1697
-1883929	sec-butylcyclohexane	-13.7287
-2023695	potassium	-48.1091
-2025884	sulfur dioxide	-20.2358
-2097322	cis-2-octene	-12.7022
-2097470	cis-3-hexene	-19.1116
-2097503	cis-3-heptene	-17.8032
-2125597	thionyl chloride	-31.2745
-2125683	phosphorus trichloride	-27.0024
-2148878	hydrogen sulfide	-37.3259
-2148909	hydrogen selenide	-38.532
+7058-01-7	sec-butylcyclohexane	-13.7287
+7440-09-7	potassium	-48.1091
+7446-09-5	sulfur dioxide	-20.2358
+111-67-1	cis-2-octene	-12.7022
+7642-09-3	cis-3-hexene	-19.1116
+7642-10-6	cis-3-heptene	-17.8032
+7719-09-7	thionyl chloride	-31.2745
+7719-12-2	phosphorus trichloride	-27.0024
+7783-06-4	hydrogen sulfide	-37.3259
+7783-07-5	hydrogen selenide	-38.532
