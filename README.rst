@@ -194,7 +194,7 @@ C               -43
 Tmin            273
 Tmax            473
 Name: 7732-18-5, dtype: object
->>> _, A, B, C, *_ = antoine_coefficients
+>>> A, B, C = antoine_coefficients['A'], antoine_coefficients['B'], antoine_coefficients['C']
 >>> T = 373.15 # Temperature [K]
 >>> Antoine(T, A, B, C) # Vapor pressure [Pa]
 101047.2535
