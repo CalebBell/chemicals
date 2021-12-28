@@ -83,10 +83,10 @@ jobs:
       if: ${{ matrix.python-version == '3.7' || matrix.python-version == '3.8' || matrix.python-version == '3.9' }}
       run: |
         pip install numba
-    - name: Test with low memory
-      run: |
-        pytest . -v --enable-low-memory=1 -m "not online and not sympy and not CoolProp and not fuzz"
-    - name: Test without low memory
+    #- name: Test with low memory
+      #run: |
+        #pytest . -v --enable-low-memory=1 -m "not online and not sympy and not CoolProp and not fuzz"
+    - name: Test
       run: |
         pytest . -v --enable-low-memory=0 --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not sympy and not CoolProp and not fuzz"
         coveralls
