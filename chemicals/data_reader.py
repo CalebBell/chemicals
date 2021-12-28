@@ -137,7 +137,8 @@ def retrieve_any_from_df_dict(df_dict, index, key):
 def retrieve_from_df(df, index, key):
     df_index = df.index
     if df_index.dtype is int64_dtype and isinstance(index, str):
-        index = CAS_to_int(index)
+        try: index = CAS_to_int(index)
+        except: pass
     if index in df_index:
         if isinstance(key, (int, str)):
             return get_value_from_df(df, index, key)
@@ -147,7 +148,8 @@ def retrieve_from_df(df, index, key):
 def retrieve_any_from_df(df, index, keys):
     df_index = df.index
     if df_index.dtype is int64_dtype and isinstance(index, str):
-        index = CAS_to_int(index)
+        try: index = CAS_to_int(index)
+        except: pass
     if index not in df.index: return None
     for key in keys:
         value = df.at[index, key]
@@ -167,11 +169,20 @@ def get_value_from_df(df, index, key):
 
 def list_available_methods_from_df_dict(df_dict, index, key):
     methods = []
+    int_index = None
     for method, df in df_dict.items():
         df_index = df.index
         if df_index.dtype is int64_dtype and isinstance(index, str):
-            index = CAS_to_int(index)
-        if (index in df_index) and not isnan(df.at[index, key]):
+            if int_index is None:
+                try:
+                    int_index = CAS_to_int(index)
+                except:
+                    int_index = 'skip'
+            elif int_index == 'skip':
+                continue
+            if (int_index in df_index) and not isnan(df.at[int_index, key]):
+                methods.append(method)
+        elif (index in df_index) and not isnan(df.at[index, key]):
             methods.append(method)
     return methods
 
