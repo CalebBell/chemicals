@@ -105,6 +105,23 @@ def load_df(key):
                 del df[col_name]
                 
     if int_CAS:
+        '''Most CAS numbers fit in 32 bits. Not all of them do though, for 
+        example https://commonchemistry.cas.org/detail?cas_rn=2222298-66-8
+        or 2627558-64-7
+        
+        The maximum value of an unsigned integer is 4294967295. 
+        
+        It would be possible to remove the check digit of the CAS number,
+        which would allow all 10-digit current CAS format integers to fit
+        into an unsigned integer. 
+        https://www.cas.org/support/documentation/chemical-substances/faqs
+        CAS says they are only "up to ten digits". However, before 2008 all
+        CAS numbers were "up to nine digits"; and they are already 25% of the
+        way through 10 digits. It is only a matter of time before they add
+        another digit. At their current rate this will be in 2036, but it will 
+        likely be well before that. Therefore, it does not justify removing
+        the check digit.
+        '''
         df.index = pd.Index([CAS_to_int(s) for s in df.index], dtype=int64_dtype)
         
     df_sources[key] = df
