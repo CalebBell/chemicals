@@ -151,8 +151,8 @@ def test_VDI_PPDS_2_data():
     Note this table needed to have Tc and MW added to it as well, from the same
     source.
     """
-    tots_calc = [rho_data_VDI_PPDS_2[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'rhoc', u'MW']]
-    tots = [208878.27130000002, 117504.59450000001, 202008.99950000001, 85280.333600000013, 150142.28, 97269, 27786.919999999998]
+    tots_calc = [rho_data_VDI_PPDS_2[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'rhoc']]
+    tots = [208878.27130000002, 117504.59450000001, 202008.99950000001, 85280.333600000013, 150142.28, 97269]
     assert_close1d(tots_calc, tots)
 
     assert rho_data_VDI_PPDS_2.shape == (272, 8)

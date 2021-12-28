@@ -36,9 +36,6 @@ from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_PinaMartines)
 
 def test_data_IUPAC():
-    MW_sum = critical_data_IUPAC['MW'].sum()
-    assert_close(MW_sum,122998.43799999992)
-
     Tc_sum = critical_data_IUPAC['Tc'].sum()
     assert_close(Tc_sum, 462157.51300000004)
 
@@ -55,9 +52,6 @@ def test_data_IUPAC():
 
 
 def test_data_Matthews():
-    MW_sum = critical_data_Matthews['MW'].sum()
-    assert_close(MW_sum, 19541.760399999999)
-
     Tc_sum = critical_data_Matthews['Tc'].sum()
     assert_close(Tc_sum, 65343.210900000005)
 

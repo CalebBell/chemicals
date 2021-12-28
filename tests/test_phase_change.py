@@ -180,8 +180,8 @@ def test_Alibakhshi_Cs_data():
 
 def test_VDI_PPDS_4_data():
     """I believe there are no errors here."""
-    tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc', u'MW']]
-    tots = [1974.2929800000002, 2653.9399000000003, 2022.530649, 943.25633100000005, 3124.9258610000002, 150142.28, 27786.919999999998]
+    tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc']]
+    tots = [1974.2929800000002, 2653.9399000000003, 2022.530649, 943.25633100000005, 3124.9258610000002, 150142.28]
     assert_close1d(tots_calc, tots)
 
     assert phase_change_data_VDI_PPDS_4.shape == (272, 8)
