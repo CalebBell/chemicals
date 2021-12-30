@@ -727,7 +727,8 @@ register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Su
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, TRC_gas_values
-    global CRC_standard_data, Cp_dict_PerryI
+    global CRC_standard_data
+    global WebBook_Shomate_liquids, WebBook_Shomate_gases, WebBook_Shomate_solids, WebBook_Shomate_coefficients
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
@@ -836,6 +837,22 @@ def _load_Cp_data():
     import json
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
         Cp_dict_PerryI = json.loads(f.read())
+
+    import json
+    with open(os.path.join(folder, 'webbook_shomate_coefficients.json')) as f:
+        WebBook_Shomate_coefficients = json.loads(f.read())
+        WebBook_Shomate_solids, WebBook_Shomate_liquids, WebBook_Shomate_gases = {}, {}, {}
+        for i, d in zip(range(3), [WebBook_Shomate_solids, WebBook_Shomate_liquids, WebBook_Shomate_gases]):
+            for CAS, phase_values in WebBook_Shomate_coefficients.items():
+                Cp_dat = phase_values[i]
+                if Cp_dat is not None:
+                    if len(Cp_dat) == 1:
+                        d[CAS] = ShomateRange(Cp_dat[0][:6], Cp_dat[0][0], Cp_dat[0][1])
+                    else:
+                        phase_models = [ShomateRange(Cp_dat[i][:6], Cp_dat[i][0], Cp_dat[i][1]) for i in range(len(Cp_dat))]
+                        d[CAS] = PiecewiseHeatCapacity(phase_models)
+            
+        
     _Cp_data_loaded = True
 
 if PY37:
@@ -843,7 +860,9 @@ if PY37:
         if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
                     'Cp_dict_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
-                    'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts'):
+                    'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
+                    'WebBook_Shomate_liquids', 'WebBook_Shomate_gases', 'WebBook_Shomate_solids',
+                    'WebBook_Shomate_coefficients'):
             _load_Cp_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
