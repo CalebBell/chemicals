@@ -89,11 +89,24 @@ def test_Zabransky_cubic():
     assert_close(S0, 24.732465342840854)
 
 def test_Shomate_single():
+    from scipy.integrate import quad
     water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
     assert_close(Shomate(500, *water_low_gas_coeffs), 35.21836175, rtol=1e-12)
+    
     assert_close(Shomate_integral(500, *water_low_gas_coeffs), 15979.244791666666, rtol=1e-12)
+    
+    
+    
     assert_close(Shomate_integral_over_T(500, *water_low_gas_coeffs), 191.00554193938726, rtol=1e-12)
     
+    over_T_test_expect = Shomate_integral_over_T(500, *water_low_gas_coeffs) - Shomate_integral_over_T(300, *water_low_gas_coeffs)
+    over_T_calc = quad(lambda T: Shomate(T, *water_low_gas_coeffs)/T, 300, 500)[0]
+    assert_close(over_T_test_expect, over_T_calc)
+    
+    enthalpy_calc = quad(lambda T: Shomate(T, *water_low_gas_coeffs), 400, 500)[0]
+    enthalpy_expect = Shomate_integral(500, *water_low_gas_coeffs) - Shomate_integral(400, *water_low_gas_coeffs)
+    
+    assert_close(enthalpy_calc, enthalpy_expect, rtol=1e-7)
     
 def test_Lastovka_Shaw():
     # C64H52S2 (M = 885.2 alpha = 0.1333 mol/g
