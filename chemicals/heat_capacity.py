@@ -308,6 +308,10 @@ class ZabranskySpline(object):
         '''
         return (Zabransky_cubic_integral_over_T(Tb, *self.coeffs)
                 - Zabransky_cubic_integral_over_T(Ta, *self.coeffs))
+    
+    force_calculate_integral_over_T = calculate_integral_over_T
+    force_calculate_integral = calculate_integral
+    force_calculate = calculate
 try:
     if IS_NUMBA:
         ZabranskySpline = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 4)),
@@ -364,7 +368,9 @@ class ShomateRange(object):
         calculate_integral_over_T.__doc__ = ZabranskySpline.calculate_integral_over_T.__doc__
     except:
         pass
-
+    force_calculate_integral_over_T = calculate_integral_over_T
+    force_calculate_integral = calculate_integral
+    force_calculate = calculate
 try:
     if IS_NUMBA:
         ShomateRange = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 6)),
@@ -727,7 +733,7 @@ register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Su
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, TRC_gas_values
-    global CRC_standard_data
+    global CRC_standard_data, Cp_dict_PerryI
     global WebBook_Shomate_liquids, WebBook_Shomate_gases, WebBook_Shomate_solids, WebBook_Shomate_coefficients
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
@@ -838,7 +844,6 @@ def _load_Cp_data():
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
         Cp_dict_PerryI = json.loads(f.read())
 
-    import json
     with open(os.path.join(folder, 'webbook_shomate_coefficients.json')) as f:
         WebBook_Shomate_coefficients = json.loads(f.read())
         WebBook_Shomate_solids, WebBook_Shomate_liquids, WebBook_Shomate_gases = {}, {}, {}
@@ -847,9 +852,9 @@ def _load_Cp_data():
                 Cp_dat = phase_values[i]
                 if Cp_dat is not None:
                     if len(Cp_dat) == 1:
-                        d[CAS] = ShomateRange(Cp_dat[0][:6], Cp_dat[0][0], Cp_dat[0][1])
+                        d[CAS] = ShomateRange(Cp_dat[0][2:], Cp_dat[0][0], Cp_dat[0][1])
                     else:
-                        phase_models = [ShomateRange(Cp_dat[i][:6], Cp_dat[i][0], Cp_dat[i][1]) for i in range(len(Cp_dat))]
+                        phase_models = [ShomateRange(Cp_dat[i][2:], Cp_dat[i][0], Cp_dat[i][1]) for i in range(len(Cp_dat))]
                         d[CAS] = PiecewiseHeatCapacity(phase_models)
             
         
