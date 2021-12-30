@@ -41,6 +41,7 @@ Gas Heat Capacity Model Equations
 .. autofunction:: chemicals.heat_capacity.Shomate
 .. autofunction:: chemicals.heat_capacity.Shomate_integral
 .. autofunction:: chemicals.heat_capacity.Shomate_integral_over_T
+.. autoclass:: chemicals.heat_capacity.ShomateRange
 .. autofunction:: chemicals.heat_capacity.Poling
 .. autofunction:: chemicals.heat_capacity.Poling_integral
 .. autofunction:: chemicals.heat_capacity.Poling_integral_over_T
@@ -68,6 +69,7 @@ Liquid Heat Capacity Model Equations
 .. autoclass:: chemicals.heat_capacity.ZabranskyQuasipolynomial
 .. autofunction:: chemicals.heat_capacity.PPDS15
 .. autofunction:: chemicals.heat_capacity.TDE_CSExpansion
+
 
 Liquid Heat Capacity Estimation Models
 --------------------------------------
@@ -313,6 +315,64 @@ try:
                 ('Tmax', numba.float64)])(ZabranskySpline)
 except:
     pass
+
+class ShomateRange(object):
+    r'''
+    Implementation of a range of the Shomate equation presented in [1]_ for
+    calculating the heat capacity of a chemical.
+    Implements the enthalpy and entropy integrals as well.
+
+    Parameters
+    ----------
+    coeffs : list[float]
+        Six coefficients for the equation, [-]
+    Tmin : float
+        Minimum temperature any experimental data was available at, [K]
+    Tmax : float
+        Maximum temperature any experimental data was available at, [K]
+
+    References
+    ----------
+    .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    '''
+    try:
+        IS_NUMBA
+    except:
+        __slots__ = ('coeffs', 'Tmin', 'Tmax')
+    def __init__(self, coeffs, Tmin, Tmax):
+        self.coeffs = coeffs
+        self.Tmin = Tmin
+        self.Tmax = Tmax
+    def calculate(self, T):
+        return Shomate(T, *self.coeffs)
+    try:
+        calculate.__doc__ = ZabranskySpline.calculate.__doc__
+    except:
+        pass
+    def calculate_integral(self, Ta, Tb):
+        return (Shomate_integral(Tb, *self.coeffs)
+                - Shomate_integral(Ta, *self.coeffs))
+    try:
+        calculate_integral.__doc__ = ZabranskySpline.calculate_integral.__doc__
+    except:
+        pass
+    def calculate_integral_over_T(self, Ta, Tb):
+        return (Shomate_integral_over_T(Tb, *self.coeffs)
+                - Shomate_integral_over_T(Ta, *self.coeffs))
+    try:
+        calculate_integral_over_T.__doc__ = ZabranskySpline.calculate_integral_over_T.__doc__
+    except:
+        pass
+
+try:
+    if IS_NUMBA:
+        ShomateRange = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 6)),
+                ('Tmin', numba.float64),
+                ('Tmax', numba.float64)])(ShomateRange)
+except:
+    pass
+
 
 class ZabranskyQuasipolynomial(object):
     r'''
