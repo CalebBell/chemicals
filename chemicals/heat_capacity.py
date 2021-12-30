@@ -42,6 +42,7 @@ Gas Heat Capacity Model Equations
 .. autofunction:: chemicals.heat_capacity.Shomate_integral
 .. autofunction:: chemicals.heat_capacity.Shomate_integral_over_T
 .. autoclass:: chemicals.heat_capacity.ShomateRange
+    :members: calculate, calculate_integral, calculate_integral_over_T
 .. autofunction:: chemicals.heat_capacity.Poling
 .. autofunction:: chemicals.heat_capacity.Poling_integral
 .. autofunction:: chemicals.heat_capacity.Poling_integral_over_T
@@ -66,7 +67,9 @@ Liquid Heat Capacity Model Equations
 .. autofunction:: chemicals.heat_capacity.Zabransky_cubic_integral
 .. autofunction:: chemicals.heat_capacity.Zabransky_cubic_integral_over_T
 .. autoclass:: chemicals.heat_capacity.ZabranskySpline
+    :members: calculate, calculate_integral, calculate_integral_over_T
 .. autoclass:: chemicals.heat_capacity.ZabranskyQuasipolynomial
+    :members: calculate, calculate_integral, calculate_integral_over_T
 .. autofunction:: chemicals.heat_capacity.PPDS15
 .. autofunction:: chemicals.heat_capacity.TDE_CSExpansion
 
@@ -283,8 +286,8 @@ class ZabranskySpline(object):
 
         Returns
         -------
-        dS : float
-            Enthalpy difference between `Ta` and `Tb`, [J/mol/K]
+        dH : float
+            Enthalpy difference between `Ta` and `Tb`, [J/mol]
 
         '''
         return (Zabransky_cubic_integral(Tb, *self.coeffs)
