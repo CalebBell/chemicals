@@ -376,7 +376,7 @@ class ShomateRange(object):
     force_calculate = calculate
 try:
     if IS_NUMBA:
-        ShomateRange = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 6)),
+        ShomateRange = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 5)),
                 ('Tmin', numba.float64),
                 ('Tmax', numba.float64)])(ShomateRange)
 except:
@@ -855,9 +855,9 @@ def _load_Cp_data():
                 Cp_dat = phase_values[i]
                 if Cp_dat is not None:
                     if len(Cp_dat) == 1:
-                        d[CAS] = ShomateRange(Cp_dat[0][2:], Cp_dat[0][0], Cp_dat[0][1])
+                        d[CAS] = ShomateRange(tuple(Cp_dat[0][2:]), Cp_dat[0][0], Cp_dat[0][1])
                     else:
-                        phase_models = [ShomateRange(Cp_dat[i][2:], Cp_dat[i][0], Cp_dat[i][1]) for i in range(len(Cp_dat))]
+                        phase_models = [ShomateRange(tuple(Cp_dat[i][2:]), Cp_dat[i][0], Cp_dat[i][1]) for i in range(len(Cp_dat))]
                         d[CAS] = PiecewiseHeatCapacity(phase_models)
             
         
