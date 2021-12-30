@@ -38,13 +38,16 @@ Gas Heat Capacity Model Equations
 .. autofunction:: chemicals.heat_capacity.TRCCp
 .. autofunction:: chemicals.heat_capacity.TRCCp_integral
 .. autofunction:: chemicals.heat_capacity.TRCCp_integral_over_T
-
-Gas Heat Capacity Estimation Models
------------------------------------
+.. autofunction:: chemicals.heat_capacity.Shomate
+.. autofunction:: chemicals.heat_capacity.Shomate_integral
+.. autofunction:: chemicals.heat_capacity.Shomate_integral_over_T
 .. autofunction:: chemicals.heat_capacity.Poling
 .. autofunction:: chemicals.heat_capacity.Poling_integral
 .. autofunction:: chemicals.heat_capacity.Poling_integral_over_T
 .. autofunction:: chemicals.heat_capacity.PPDS2
+
+Gas Heat Capacity Estimation Models
+-----------------------------------
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_integral
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_integral_over_T
@@ -170,6 +173,7 @@ __all__ = ['heat_capacity_gas_methods',
            'Lastovka_solid_integral_over_T', 'heat_capacity_solid_methods',
            'ZabranskySpline', 'ZabranskyQuasipolynomial',
            'PiecewiseHeatCapacity',
+           'Shomate_integral_over_T', 'Shomate_integral', 'Shomate',
            ]
 import os
 from io import open
@@ -1723,6 +1727,148 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
     x2 = a2/T
     return R*(J + a0*log(T) + a1/(a2*a2)*(1. + x2)*exp(-x2) + s)
 
+def Shomate(T, A, B, C, D, E):
+    r'''Calculates heat capacity using the Shomate polynomial model [1]_.
+    The heat capacity is given by:
+
+    .. math::
+        C_p = A + BT + CT^2 + DT^3 + \frac{E}{T^2}
+
+    Parameters
+    ----------
+    T : float
+        Temperature [K]
+    A : float
+        Parameter, [J/(mol*K)]
+    B : float
+        Parameter, [J/(mol*K^2)]
+    C : float
+        Parameter, [J/(mol*K^3)]
+    D : float
+        Parameter, [J/(mol*K^4)]
+    E : float
+        Parameter, [J*K/(mol)]
+
+    Returns
+    -------
+    Cp : float
+        Heat capacity , [J/mol/K]
+
+    Notes
+    -----
+    Analytical integrals are available for this expression. In some sources
+    such as [1]_, the equation is written with temperature in units of 
+    kilokelvin. The coefficients can be easily adjusted to be in the proper
+    SI form.
+
+    Examples
+    --------
+    Coefficients for water vapor from [1]_:
+    
+    >>> water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
+    >>> Shomate(500, *water_low_gas_coeffs)
+    35.21836175
+
+    References
+    ----------
+    .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    '''
+    return A + T*(B + T*(C + D*T)) + E/(T*T)
+
+def Shomate_integral(T, A, B, C, D, E):
+    r'''Calculates the enthalpy integral using the Shomate polynomial model [1]_.
+    The difference in enthalpy with respect to 0 K is given by:
+
+    .. math::
+        {H(T) - H^{0}} = A T + \frac{B T^{2}}{2} + \frac{C T^{3}}{3} 
+        + \frac{D T^{4}}{4} - \frac{E}{T}
+
+    Parameters
+    ----------
+    T : float
+        Temperature [K]
+    A : float
+        Parameter, [J/(mol*K)]
+    B : float
+        Parameter, [J/(mol*K^2)]
+    C : float
+        Parameter, [J/(mol*K^3)]
+    D : float
+        Parameter, [J/(mol*K^4)]
+    E : float
+        Parameter, [J*K/(mol)]
+
+    Returns
+    -------
+    H-H(0) : float
+        Difference in enthalpy from 0 K , [J/mol]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Coefficients for water vapor from [1]_:
+    
+    >>> water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
+    >>> Shomate_integral(500, *water_low_gas_coeffs)
+    15979.2447
+
+    References
+    ----------
+    .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    '''
+    return T*(A + T*(B*0.5 + T*(C*(1.0/3.0) + D*T*0.25))) - E/T
+
+def Shomate_integral_over_T(T, A, B, C, D, E):
+    r'''Integrates the heat capacity over T using the model developed in
+    [1]_. 
+    The difference in entropy with respect to 0 K is given by:
+
+    .. math::
+        s(T) = A \log{\left(T \right)} + B T + \frac{C T^{2}}{2} 
+        + \frac{D T^{3}}{3} - \frac{E}{2 T^{2}}
+
+    Parameters
+    ----------
+    T : float
+        Temperature [K]
+    A : float
+        Parameter, [J/(mol*K)]
+    B : float
+        Parameter, [J/(mol*K^2)]
+    C : float
+        Parameter, [J/(mol*K^3)]
+    D : float
+        Parameter, [J/(mol*K^4)]
+    E : float
+        Parameter, [J*K/(mol)]
+
+    Returns
+    -------
+    S-S(0) : float
+        Difference in entropy from 0 K , [J/mol/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Coefficients for water vapor from [1]_:
+    
+    >>> water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
+    >>> Shomate_integral_over_T(500, *water_low_gas_coeffs)
+    191.00554
+
+    References
+    ----------
+    .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
+       NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    '''
+    T2 = T*T
+    return A*log(T) + B*T + 0.5*C*T2 + D*T*T2*(1.0/3.0) - E/T2*0.5
 
 ### Heat capacities of liquids
 

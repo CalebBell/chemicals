@@ -88,7 +88,13 @@ def test_Zabransky_cubic():
     S0 = Zabransky_cubic_integral_over_T(298.15, 20.9634, -10.1344, 2.8253,  -0.256738)
     assert_close(S0, 24.732465342840854)
 
-
+def test_Shomate_single():
+    water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
+    assert_close(Shomate(500, *water_low_gas_coeffs), 35.21836175, rtol=1e-12)
+    assert_close(Shomate_integral(500, *water_low_gas_coeffs), 15979.244791666666, rtol=1e-12)
+    assert_close(Shomate_integral_over_T(500, *water_low_gas_coeffs), 191.00554193938726, rtol=1e-12)
+    
+    
 def test_Lastovka_Shaw():
     # C64H52S2 (M = 885.2 alpha = 0.1333 mol/g
     # From figure 22, part b
