@@ -108,6 +108,9 @@ def test_HHV_stoichiometry():
                                                 'Br2': 30881, 'I2': 62416, 'HCl': -92172, 'HF': -272710,
                                                 'P4O10': -3009941, 'O2': 0.0, 'N2': 0.0})
     assert_close(H_calc, H_custom)
+    
+    
+    assert HHV_stoichiometry({'Ar': 1}, Hf=0) == 0.0
 
 
 def test_combustion():

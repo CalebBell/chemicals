@@ -34,7 +34,8 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Cp_minus_Cv', 'speed_of_sound', 'Joule_Thomson',
 'phase_identification_parameter', 'phase_identification_parameter_phase',
-'isentropic_exponent', 'Vm_to_rho', 'rho_to_Vm',
+'isentropic_exponent', 'isentropic_exponent_TV', 'isentropic_exponent_PT', 'isentropic_exponent_PV',
+'Vm_to_rho', 'rho_to_Vm',
 'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs',
 'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros',
  'mixing_simple',
@@ -60,11 +61,6 @@ from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
                   isnan, ldexp, log, log10, modf, pi, pow,
                   radians, sin, sinh, sqrt, tan, tanh, trunc) # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
 
-__all__.extend(['acos', 'acosh', 'asin', 'asinh', 'atan', 'atan2', 'atanh',
-'ceil', 'copysign', 'cos', 'cosh', 'degrees', 'e', 'exp',
-'fabs', 'floor', 'fmod', 'frexp',
-'isinf', 'isnan', 'ldexp',  'log', 'log10', 'modf',
-'pi', 'pow', 'radians', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc'])
 __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma',
 # Obtained from SciPy 0.19 (2014 CODATA)
 # Included here so calculations are consistent across SciPy versions
@@ -988,7 +984,7 @@ def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
 
 
 def isentropic_exponent(Cp, Cv):
-    r'''Calculate the isentropic coefficient of a gas, given its constant-
+    r'''Calculate the isentropic coefficient of an ideal gas, given its constant-
     pressure and constant-volume heat capacity.
 
     .. math::
@@ -997,9 +993,9 @@ def isentropic_exponent(Cp, Cv):
     Parameters
     ----------
     Cp : float
-        Gas heat capacity at constant pressure, [J/mol/K]
+        Ideal gas heat capacity at constant pressure, [J/mol/K]
     Cv : float
-        Gas heat capacity at constant volume, [J/mol/K]
+        Ideal gas heat capacity at constant volume, [J/mol/K]
 
     Returns
     -------
@@ -1010,6 +1006,17 @@ def isentropic_exponent(Cp, Cv):
     --------
     >>> isentropic_exponent(33.6, 25.27)
     1.329639889196676
+    
+    Notes
+    -----
+    For real gases, there are more complexities and formulas. Each of the 
+    formulas reverts to this formula in the case of an ideal gas.
+
+    See Also
+    --------
+    isentropic_exponent_PV
+    isentropic_exponent_PT
+    isentropic_exponent_TV
 
     References
     ----------
@@ -1018,6 +1025,152 @@ def isentropic_exponent(Cp, Cv):
     '''
     return Cp/Cv
 
+def isentropic_exponent_PV(Cp, Cv, Vm, P, dP_dV_T):
+    r'''Calculate the isentropic coefficient of real fluid using the definition
+    of :math:`PV^k = \text{const}`.
+
+    .. math::
+        k = -\frac{V}{P}\frac{C_p}{C_v}\left(\frac{\partial P}{\partial V}\right)_T
+
+    Parameters
+    ----------
+    Cp : float
+        Real heat capacity at constant pressure, [J/mol/K]
+    Cv : float
+        Real heat capacity at constant volume, [J/mol/K]
+    Vm : float
+        Molar volume, [m^3/mol]
+    P : float
+        Pressure [Pa]
+    dP_dV_T : float
+        Derivative of `P` with respect to `V` (at constant temperature), 
+        [Pa*mol/m^3]
+
+    Returns
+    -------
+    k_PV : float
+        Isentropic exponent of a real fluid, [-]
+
+    Examples
+    --------
+    Isentropic exponent of air according to Lemmon (2000) at 1000 bar and 300 K:
+        
+    >>> isentropic_exponent_PV(Cp=38.36583283578205, Cv=23.98081290153672, Vm=4.730885141495376e-05, P=100000000.0, dP_dV_T=-5417785576072.434)
+    4.100576762582646
+
+    See Also
+    --------
+    isentropic_exponent
+    isentropic_exponent_PT
+    isentropic_exponent_TV
+
+    References
+    ----------
+    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational 
+       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022): 
+       100897.
+    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of 
+       Real Gases and Application for the Air at Temperatures from 150 K to 450
+       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99. 
+       https://doi.org/10.1007/BF01176874.
+    '''
+    return -Vm*Cp*dP_dV_T/(P*Cv)
+
+def isentropic_exponent_PT(Cp, P, dV_dT_P):
+    r'''Calculate the isentropic coefficient of real fluid using the definition
+    of :math:`P^{(1-k)}T^k = \text{const}`.
+
+    .. math::
+        k = \frac{1}{1 - \frac{P}{C_p}\left(\frac{\partial V}{\partial T}\right)_P}
+        
+    Parameters
+    ----------
+    Cp : float
+        Real heat capacity at constant pressure, [J/mol/K]
+    P : float
+        Pressure [Pa]
+    dV_dT_P : float
+        Derivative of `V` with respect to `T` (at constant pressure), 
+        [m^3/(mol*K)]
+
+    Returns
+    -------
+    k_PT : float
+        Isentropic exponent of a real fluid, [-]
+
+    Examples
+    --------
+    Isentropic exponent of air according to Lemmon (2000) at 1000 bar and 300 K:
+        
+    >>> isentropic_exponent_PT(Cp=38.36583283578205, P=100000000.0, dV_dT_P=9.407705210161724e-08)
+    1.32487270350443
+
+    See Also
+    --------
+    isentropic_exponent_PV
+    isentropic_exponent
+    isentropic_exponent_TV
+
+    References
+    ----------
+    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational 
+       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022): 
+       100897.
+    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of 
+       Real Gases and Application for the Air at Temperatures from 150 K to 450
+       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99. 
+       https://doi.org/10.1007/BF01176874.
+    '''
+    return -Cp/(P*dV_dT_P - Cp) # Avoids a division
+    # return 1.0/(1.0 - P*dV_dT_P/Cp)
+
+
+def isentropic_exponent_TV(Cv, Vm, dP_dT_V):
+    r'''Calculate the isentropic coefficient of real fluid using the definition
+    of :math:`TV^{k-1} = \text{const}`.
+
+    .. math::
+        k = 1 + \frac{V}{C_v} \left(\frac{\partial P}{\partial T}\right)_V
+
+    Parameters
+    ----------
+    Cv : float
+        Real heat capacity at constant volume, [J/mol/K]
+    Vm : float
+        Molar volume, [m^3/mol]
+    dP_dT_V : float
+        Derivative of `P` with respect to `T` (at constant volume), 
+        [Pa/K]
+
+    Returns
+    -------
+    k_TV : float
+        Isentropic exponent of a real fluid, [-]
+
+    Examples
+    --------
+    Isentropic exponent of air according to Lemmon (2000) at 1000 bar and 300 K:
+        
+    >>> isentropic_exponent_TV(Cv=23.98081290153672, Vm=4.730885141495376e-05, dP_dT_V=509689.2959155567)
+    2.005504495083
+
+    See Also
+    --------
+    isentropic_exponent_PV
+    isentropic_exponent_PT
+    isentropic_exponent
+
+    References
+    ----------
+    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational 
+       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022): 
+       100897.
+    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of 
+       Real Gases and Application for the Air at Temperatures from 150 K to 450
+       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99. 
+       https://doi.org/10.1007/BF01176874.
+    '''
+    return 1.0 + Vm*dP_dT_V/Cv
 
 def Vm_to_rho(Vm, MW):
     r'''Calculate the density of a chemical, given its molar volume and

@@ -151,7 +151,15 @@ def test_rho_to_Vm():
 def test_isentropic_exponent():
     k = isentropic_exponent(33.6, 25.27)
     assert_close(k, 1.329639889196676)
+    
+    k = isentropic_exponent_TV(Cv=23.98081290153672, Vm=4.730885141495376e-05, dP_dT_V=509689.2959155567)
+    assert_close(k, 2.005504495083913, rtol=1e-14)
+    
+    k = isentropic_exponent_PT(Cp=38.36583283578205, P=100000000.0, dV_dT_P=9.407705210161724e-08)
+    assert_close(k, 1.32487270350443, rtol=1e-14)
 
+    k = isentropic_exponent_PV(Cp=38.36583283578205, Cv=23.98081290153672, Vm=4.730885141495376e-05, P=100000000.0, dP_dV_T=-5417785576072.434)
+    assert_close(k, 4.100576762582646, rtol=1e-14)
 
 def test_Parachor():
     P = Parachor(100.15888, 800.8088185536124, 4.97865317223119, 0.02672166960656005)
