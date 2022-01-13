@@ -50,17 +50,19 @@ Working with Parsed Formulas
 ----------------------------
 .. autofunction:: chemicals.elements.molecular_weight
 .. autofunction:: chemicals.elements.similarity_variable
+.. autofunction:: chemicals.elements.index_hydrogen_deficiency
 .. autofunction:: chemicals.elements.atom_fractions
 .. autofunction:: chemicals.elements.mass_fractions
 .. autofunction:: chemicals.elements.mixture_atomic_composition
 .. autofunction:: chemicals.elements.mixture_atomic_composition_ordered
 .. autofunction:: chemicals.elements.atom_matrix
 
+
 """
 
 __all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions',
            'atom_fractions','mixture_atomic_composition', 'atom_matrix',
-           'similarity_variable', 'atoms_to_Hill',
+           'similarity_variable', 'atoms_to_Hill', 'index_hydrogen_deficiency',
            'simple_formula_parser', 'nested_formula_parser', 'CAS_by_number',
            'periods', 'groups',  'homonuclear_elements',
            'blocks', 'homonuclear_elemental_gases', 'charge_from_formula',
@@ -1188,4 +1190,57 @@ def serialize_formula(formula):
         else:
             base +=  str(charge)
     return base
+
+
+allowable_atoms_index_hydrogen_deficiency = frozenset(['C', 'O', 'H', 'N', 'F', 'Cl', 'Br', 'I', 'At'])
+
+@mark_numba_incompatible
+def index_hydrogen_deficiency(atoms):
+    r'''Calculate the index of hydrogen deficiency of a compound, given a
+    dictionary of its atoms and their counts, in the format {symbol: count}.
+
+    Parameters
+    ----------
+    atoms : dict
+        dictionary of counts of individual atoms, indexed by symbol with
+        proper capitalization, [-]
+
+    Returns
+    -------
+    HDI : float
+        Hydrogen deficiency index, [-]
+
+    Notes
+    -----
+    The calculation is according to:
+        
+    .. math::
+        \text{IDH} = 0.5\left(2C + 2 + N - H -X + 0O \right)
+        
+    where `X` is the number of halogen atoms. The number of oxygen atoms does
+    not impact this calculation.
+
+    Examples
+    --------
+    Agelastatin A:
+    
+    >>> index_hydrogen_deficiency({'C': 12, 'H': 13, 'Br': 1, 'N': 4, 'O': 3})
+    8.0
+    
+    References
+    ----------
+    .. [1] Brown, William H., and Thomas Poon. Introduction to Organic 
+       Chemistry. 4th edition. Hoboken, NJ: Wiley, 2010.
+    '''
+    if not set(atoms.keys()).issubset(allowable_atoms_index_hydrogen_deficiency):
+        raise ValueError("Atoms contain unsupported element; supported elements are 'C', 'O', 'H', 'N', 'F', 'Cl', 'Br', 'I', 'At'.")
+    # https://www.chem.ucalgary.ca/courses/350/Carey5th/Ch13/ch13-ihd.html
+    halogens = ('F', 'Cl', 'Br', 'I', 'At')
+    halogen_count = 0
+    for atom in halogens:
+        halogen_count += atoms.get(atom, 0)
+        
+    # Oxygen is OK also, does not alter the calculation
+    IDH = 0.5*(2*atoms.get('C', 0) + 2 - atoms.get('H', 0) - halogen_count + atoms.get('N', 0))
+    return IDH
 

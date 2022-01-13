@@ -250,3 +250,16 @@ def test_atom_matrix():
 
     OCH = atom_matrix(atomss, ['O', 'C', 'H'])
     assert_close2d(OCH, OCH_expect, rtol=1e-12)
+    
+    
+def test_index_hydrogen_deficiency():
+    assert 2 == index_hydrogen_deficiency({'C': 6, 'H': 10})
+    assert 4 == index_hydrogen_deficiency({'C': 6, 'H': 6})
+    assert 1 == index_hydrogen_deficiency({'C': 3, 'H': 6})
+    assert 1 == index_hydrogen_deficiency({'C': 4, 'H': 8, 'O': 1})
+    assert 1 == index_hydrogen_deficiency({'C': 4, 'H':9, 'N': 1})
+    assert 2 == index_hydrogen_deficiency({'C': 2, 'Cl': 2})
+    assert 0 == index_hydrogen_deficiency({'C': 4, 'H': 10, 'O': 1})
+    assert 1 == index_hydrogen_deficiency({'C': 2, 'H': 4})
+    with pytest.raises(ValueError):
+        index_hydrogen_deficiency({'C': 2, 'H': 4, 'U': 4})
