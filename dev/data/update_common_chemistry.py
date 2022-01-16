@@ -315,7 +315,7 @@ for dat in chemical_data.values():
     if dat['TbP'] is not None and not (90000 < dat['TbP'] < 110000):
         dat['Tb'] = None
         
-    if dat['Tb'] is not None and dat['Tm'] is not None and dat['Tb'] < dat['Tb']:
+    if dat['Tb'] is not None and dat['Tm'] is not None and dat['Tb'] <= dat['Tm']:
         dat['Tb'] = None
     
 
