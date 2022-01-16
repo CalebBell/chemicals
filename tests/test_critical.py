@@ -453,3 +453,30 @@ def test_Hekayati_Raeissi():
 
     with pytest.raises(ValueError):
         Hekayati_Raeissi(MW=92.13842, Vc=0.000316)
+
+
+def test_Tb_Tc_relationship():
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Perry8E'), 700.526)
+    assert_close(Tb_Tc_relationship(Tc=700.526, fit='Perry8E'), 427.15)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitInorganic'), 686.0029)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitOrganic'), 620.64895)
+
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitBinary'), 669.7712)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitTernary'), 683.8671499999999)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitElements'), 746.6582)
+
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitBr'), 668.0626)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitSi'), 651.8309)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitC'), 688.13865)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitI'), 620.2218)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitN'), 690.2744)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitCl'), 665.4997)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitF'), 671.9069499999999)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitO'),688.99295)
+    
+    with pytest.raises(ValueError):
+        Tb_Tc_relationship(Tb=427.15, fit='BAD')
+    with pytest.raises(ValueError):
+        Tb_Tc_relationship(fit='Perry8E')
+    with pytest.raises(ValueError):
+        Tb_Tc_relationship(Tb=1, Tc=2, fit='Perry8E')

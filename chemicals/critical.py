@@ -66,6 +66,7 @@ Critical Property Relationships
 .. autofunction:: chemicals.critical.Meissner
 .. autofunction:: chemicals.critical.Grigoras
 .. autofunction:: chemicals.critical.Hekayati_Raeissi
+.. autofunction:: chemicals.critical.Tb_Tc_relationship
 
 Critical Temperature of Mixtures
 --------------------------------
@@ -85,6 +86,7 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
            'third_property',
            'critical_surface',
            'Ihmels', 'Meissner', 'Grigoras', 'Hekayati_Raeissi', 'Li',
+           'Tb_Tc_relationship',
            'Chueh_Prausnitz_Tc', 'Grieves_Thodos',
            'modified_Wilson_Tc', 'Chueh_Prausnitz_Vc',
            'modified_Wilson_Vc',
@@ -1011,7 +1013,112 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
     da_SI = da*1e-10 # Convert from angstrom to m
     return ((coeff/(ra/H_RADIUS_COV)**power)*da_SI)**3*N_A*atom_count
 
-### Critical Property Relationships
+### Property Relationships
+
+def Tb_Tc_relationship(Tb=None, Tc=None, fit='Perry8E'):
+    r'''This function relates the normal boiling point and the critical point
+    of a compound. It is inspired by the relationship shown in [1]_ on page
+    2-468 for inorganic compounds.
+
+    .. math::
+        T_c = 1.64 T_b
+
+    Parameters
+    ----------
+    Tb : float, optional
+        Normal boiling temperature of fluid [K]
+    Tc : float, optional
+        Critical temperature of fluid [K]
+    fit : str, optional
+        One of 'Perry8E', 'Chemicals2021FitInorganic',
+        'Chemicals2021FitElements', 'Chemicals2021FitBinary',
+        'Chemicals2021FitTernary', Chemicals2021FitOrganic', 
+        'Chemicals2021FitBr',
+        'Chemicals2021FitC', 'Chemicals2021FitCl',
+        'Chemicals2021FitF', 'Chemicals2021FitI', 
+        'Chemicals2021FitN', 'Chemicals2021FitO', '
+        'Chemicals2021FitSi'.
+        
+    Returns
+    -------
+    Tc or Tb : float
+        The temperature variable not provided [K]
+
+    Notes
+    -----
+    `Chemicals2021FitBinary` applies for inorganic compounds with two types of
+    atoms; `Chemicals2021FitTernary` for three; and the various models 
+    `Chemicals2021FitO`, `Chemicals2021FitC`, etc apply for inorganic compounds
+    with those elements in them.
+    
+    The quality of this relationship is low, but if no further information is
+    available it can be used to obtain an approximate value.
+
+    Examples
+    --------
+    Tetrabromosilane has a known boiling point of 427.15 K and a critical
+    temperature of 663.0 K.
+    
+    >>> Tb_Tc_relationship(Tb=427.15, fit='Perry8E')
+    700.526
+    >>> Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitBr')
+    668.0626
+    >>> Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitSi')
+    651.8309
+    >>> Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitBinary')
+    669.7712
+    >>> Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitInorganic')
+    686.0029
+    
+    The performance of the fits is fairly representative. However, because this
+    method should only be used on compounds that don't have experimental 
+    critical points measured, many of the worst outlier chemicals have already
+    been measured and the performance may be better than expected.
+    
+    It is recommended to use the methods `Chemicals2021FitElements`,
+    `Chemicals2021FitBinary`, and `Chemicals2021FitTernary`.
+    
+    References
+    ----------
+    .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+       Eighth Edition. McGraw-Hill Professional, 2007.
+    '''
+    if Tb is None and Tc is None or (Tc is not None and Tb is not None):
+        raise ValueError("This function relates boiling and critical temperature; only one value must be provided")
+    if fit == 'Perry8E':
+        coeff = 1.64
+    elif fit == 'Chemicals2021FitInorganic':
+        coeff = 1.606
+    elif fit == 'Chemicals2021FitOrganic':
+        coeff = 1.453
+    elif fit == 'Chemicals2021FitElements':
+        coeff = 1.748
+    elif fit == 'Chemicals2021FitBinary':
+        coeff = 1.568
+    elif fit == 'Chemicals2021FitTernary':
+        coeff = 1.601
+    elif fit == 'Chemicals2021FitCl':
+        coeff = 1.558
+    elif fit == 'Chemicals2021FitN':
+        coeff = 1.616
+    elif fit == 'Chemicals2021FitC':
+        coeff = 1.611
+    elif fit == 'Chemicals2021FitF':
+        coeff = 1.573
+    elif fit == 'Chemicals2021FitO':
+        coeff = 1.613
+    elif fit == 'Chemicals2021FitI':
+        coeff = 1.452
+    elif fit == 'Chemicals2021FitBr':
+        coeff = 1.564
+    elif fit == 'Chemicals2021FitSi':
+        coeff = 1.526
+    else:
+        raise ValueError("Unrecognized method")
+    if Tb is None:
+        return Tc/coeff
+    elif Tc is None:
+        return coeff*Tb
 
 def _assert_two_critical_properties_provided(Tc, Pc, Vc):
     specs = 0 # numba compatibility
