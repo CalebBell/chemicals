@@ -309,9 +309,15 @@ print('Identified phases of densities for most compounds but could not identify 
 
 for dat in chemical_data.values():
     '''If we have a boiling point more than 10 kPa outside of the appropriate range, drop it.
+    
+    If the boiling point is less than the melting point, drop it - data error.
     '''
     if dat['TbP'] is not None and not (90000 < dat['TbP'] < 110000):
         dat['Tb'] = None
+        
+    if dat['Tb'] is not None and dat['Tm'] is not None and dat['Tb'] <= dat['Tm']:
+        dat['Tb'] = None
+    
 
 keys = ['CAS', 'Tm', 'Tb', 'Vms', 'Vml']
 lines = ['\t'.join(keys) + '\n']

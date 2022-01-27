@@ -623,6 +623,7 @@ def mu_air_lemmon(T, rho):
 #     etar = 0.0
 #     for i in range(5):
 #         etar += Ni[i]*tau**ti[i]*delta**di[i]*exp(-gammai[i]*delta**Ii[i])
+    print(eta0)
     return (eta0 + etar)
 
 
