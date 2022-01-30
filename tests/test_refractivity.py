@@ -62,6 +62,8 @@ def test_refractivity_general():
 
 
     assert RI("60-35-5") == (1.4278, None)
+    
+    assert RI(CASRN='74-82-8', method='CRC') == (None, None)
 
 
 

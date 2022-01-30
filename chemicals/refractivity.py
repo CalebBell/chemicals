@@ -188,7 +188,9 @@ def RI(CASRN, method=None):
     if value is None:
         value = (None, None)
     else:
-        if isnan(value[1]):
+        if isnan(value[0]):
+            value = (None, None)
+        elif isnan(value[1]):
             value = (value[0], None)
         else:
             value = tuple(value)
