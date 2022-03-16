@@ -25,12 +25,12 @@ def generate_line(CASi):
     Tb_db = Tb(CAS)
     if Tb_db is None:
         return False
-    Tc, Pc, Tc_stat, Pc_stat = Wilson_Jasperson(mol, Tb=Tb_db)
-    if not Tc_stat:
+    Tc, Pc, missing_Tc_increments, missing_Pc_increments = Wilson_Jasperson(mol, Tb=Tb_db)
+    if missing_Tc_increments:
         Tc = nan
-    if not Pc_stat:
+    if missing_Pc_increments:
         Pc = nan
-    if Tc_stat or Pc_stat:
+    if not missing_Tc_increments or not missing_Pc_increments:
         values = [Tc, Pc]
         line = values
         line.insert(0, CAS)
@@ -46,11 +46,15 @@ def generate_line(CASi):
     return False
     
     
+for CASi in sorted(pubchem_db.CAS_index):
+    ans = generate_line(CASi)
+    if ans is not False:
+        lines.append(ans)
     
-retVals = Parallel()(delayed(generate_line)(CASi) for CASi in sorted(pubchem_db.CAS_index))
-for l in retVals:
-    if l is not False:
-        lines.append(l)
+#retVals = Parallel()(delayed(generate_line)(CASi) for CASi in sorted(pubchem_db.CAS_index))
+#for l in retVals:
+#    if l is not False:
+#        lines.append(l)
 
 f.writelines(lines)
 f.close()
