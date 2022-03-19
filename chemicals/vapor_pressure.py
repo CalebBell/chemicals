@@ -173,7 +173,7 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
 import os
 from fluids.constants import R
 from fluids.numerics import numpy as np, trunc_exp, trunc_log
-from math import e
+from math import e, isinf
 from chemicals.utils import log, log10, exp, sqrt, isnan, mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
 from chemicals.dippr import EQ101
@@ -874,7 +874,7 @@ def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
 
     >>> from sympy import * # doctest: +SKIP
     >>> base, A, B, C, T = symbols('base, A, B, C, T') # doctest: +SKIP
-    >>> v = exp(A - B/T + C*log(T)) # doctest: +SKIP
+    >>> v = exp(A + B/T + C*log(T)) # doctest: +SKIP
     >>> d1, d2 = diff(v, T), diff(v, T, 2) # doctest: +SKIP
     >>> vk, d1k, d2k = symbols('vk, d1k, d2k') # doctest: +SKIP
     >>> solve([Eq(v, vk), Eq(d1, d1k), Eq(d2, d2k)], [A, B, C]) # doctest: +SKIP
@@ -888,6 +888,13 @@ def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
     >>> DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2)
     (72.47169926642, -6744.620564969, -7.2976291987890)
     '''
+    if isinf(d2Psat_dT2):
+        # We cannot match the second derivative, so there will definitely be
+        # a discontinuity
+        # This means only two parameters can be obtained
+        # If the A and B parameters are matched, the vapor pressure will go down
+        # so the A and C paramters have to be matched.
+        return (-T*dPsat_dT*log(T)/Psat + log(Psat), 0.0, T*dPsat_dT/Psat)
     x0 = Psat*Psat
     x1 = 1.0/x0
     x2 = Psat*dPsat_dT
