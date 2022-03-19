@@ -116,6 +116,8 @@ PSRK = 'PSRK'
 PD = 'PD'
 YAWS = 'YAWS'
 PINAMARTINES = 'PINAMARTINES'
+FEDORS = 'FEDORS'
+WILSON_JASPERSON = 'WILSON_JASPERSON'
 
 ### Register data sources and lazy load them
 
@@ -140,6 +142,8 @@ register_df_source(folder, 'Appendix to PSRK Revision 4.tsv', postload=_add_Zc_t
 register_df_source(folder, 'PassutDanner1973.tsv')
 register_df_source(folder, 'Yaws Collection.tsv', postload=_add_Zc_to_df)
 register_df_source(folder, 'DIPPRPinaMartines.tsv', postload=_add_Zc_to_df)
+register_df_source(folder, 'wilson_jasperson_Tc_Pc_predictions.tsv', int_CAS=True)
+register_df_source(folder, 'fedors_Vc_predictions.tsv', int_CAS=True)
 _critical_data_loaded = False
 @mark_numba_incompatible
 def _load_critical_data():
@@ -154,6 +158,8 @@ def _load_critical_data():
     critical_data_Yaws = data_source('Yaws Collection.tsv')
     critical_data_PassutDanner = data_source('PassutDanner1973.tsv')
     critical_data_PinaMartines = data_source('DIPPRPinaMartines.tsv')
+    critical_data_WilsonJasperson = data_source('wilson_jasperson_Tc_Pc_predictions.tsv')
+    critical_data_Fedors = data_source('fedors_Vc_predictions.tsv')
     _critical_data_loaded = True
     Tc_sources = {
         IUPAC: critical_data_IUPAC,
@@ -165,6 +171,7 @@ def _load_critical_data():
         PINAMARTINES: critical_data_PinaMartines,
         YAWS: critical_data_Yaws,
         miscdata.JOBACK: miscdata.joback_predictions,
+        WILSON_JASPERSON: critical_data_WilsonJasperson,
     }
     
     _add_Zc_to_df(miscdata.joback_predictions)
@@ -172,11 +179,27 @@ def _load_critical_data():
 
     # Create copies just incase new dfs need to be added later
     Pc_sources = Tc_sources.copy()
-    Vc_sources = Tc_sources.copy()
-
-    # The Passut Danner tsv file doesn't have Vc, so its not included
-    del Vc_sources['PD']
-    Zc_sources = Vc_sources.copy()
+    Vc_sources =  {
+        IUPAC: critical_data_IUPAC,
+        MATTHEWS: critical_data_Matthews,
+        CRC: critical_data_CRC,
+        PSRK: critical_data_PSRKR4,
+        miscdata.WEBBOOK: miscdata.webbook_data,
+        PINAMARTINES: critical_data_PinaMartines,
+        YAWS: critical_data_Yaws,
+        miscdata.JOBACK: miscdata.joback_predictions,
+        FEDORS: critical_data_Fedors,
+        }
+    Zc_sources =  {
+        IUPAC: critical_data_IUPAC,
+        MATTHEWS: critical_data_Matthews,
+        CRC: critical_data_CRC,
+        PSRK: critical_data_PSRKR4,
+        miscdata.WEBBOOK: miscdata.webbook_data,
+        PINAMARTINES: critical_data_PinaMartines,
+        YAWS: critical_data_Yaws,
+        miscdata.JOBACK: miscdata.joback_predictions,
+        }
 
     omega_sources = {
         PSRK: critical_data_PSRKR4,
@@ -190,6 +213,7 @@ if PY37:
                     'critical_data_CRC', 'critical_data_PSRKR4',
                     'critical_data_Yaws', 'critical_data_PassutDanner',
                     'critical_data_PinaMartines',
+                    'critical_data_WilsonJasperson', 'critical_data_Fedors',
                     'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
                     'omega_sources'):
             _load_critical_data()
@@ -201,7 +225,7 @@ else: # pragma: no cover
 
 ### Critical point functions
 
-Tc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
+Tc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tc` for the actual references'''
 
 @mark_numba_incompatible
@@ -249,7 +273,8 @@ def Tc(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
-        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON', 
+        'JOBACK'.
         All valid values are also held in the list `Tc_all_methods`.
 
     Notes
@@ -272,6 +297,7 @@ def Tc(CASRN, method=None):
         * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [19]_
+        * 'WILSON_JASPERSON', an estimation method in [21]_
         * 'PINAMARTINES', a series of values in the supporting material of [20]_
 
     Examples
@@ -366,6 +392,9 @@ def Tc(CASRN, method=None):
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
        Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
        https://doi.org/10.1002/aic.17518.
+    .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc, 
+       Estimation Based on Zero, First and Second Order Methods." In 
+       Proceedings of the AIChE Spring Meeting, 21, 1996.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
@@ -373,7 +402,7 @@ def Tc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
 
-Pc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
+Pc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Pc` for the actual references'''
 
 @mark_numba_incompatible
@@ -425,7 +454,8 @@ def Pc(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
-        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON',
+        'JOBACK'.
         All valid values are also held in the list `Pc_all_methods`.
 
     Notes
@@ -449,6 +479,7 @@ def Pc(CASRN, method=None):
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [19]_
         * 'PINAMARTINES', a series of values in the supporting material of [20]_
+        * 'WILSON_JASPERSON', an estimation method in [21]_
 
     See Also
     --------
@@ -537,6 +568,9 @@ def Pc(CASRN, method=None):
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
        Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
        https://doi.org/10.1002/aic.17518.
+    .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc, 
+       Estimation Based on Zero, First and Second Order Methods." In 
+       Proceedings of the AIChE Spring Meeting, 21, 1996.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:
@@ -544,7 +578,7 @@ def Pc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
 
-Vc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
+Vc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, FEDORS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Vc` for the actual references'''
 
 @mark_numba_incompatible
@@ -598,7 +632,7 @@ def Vc(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
-        'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'JOBACK'.
+        'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'FEDORS', 'JOBACK'.
         All valid values are also held in the list `Vc_all_methods`.
 
     Notes
@@ -619,6 +653,7 @@ def Vc(CASRN, method=None):
         * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental 
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [18]_
+        * 'FEDORS', an estimation methid in [20]_
         * 'PINAMARTINES', a series of values in the supporting material of [19]_
 
     See Also
@@ -704,6 +739,8 @@ def Vc(CASRN, method=None):
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
        Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
        https://doi.org/10.1002/aic.17518.
+    .. [20] Fedors, R. F. "A Method to Estimate Critical Volumes." AIChE 
+       Journal 25, no. 1 (1979): 202-202. https://doi.org/10.1002/aic.690250129.
     '''
     if not _critical_data_loaded: _load_critical_data()
     if method:

@@ -212,7 +212,7 @@ def test_Tc():
     assert_close(126.2, Tc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Tc_methods(CASRN='98-01-1')
-    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS']
+    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON']
 
     # Error handling
     assert Tc(CASRN='BADCAS') is None
@@ -232,7 +232,7 @@ def test_Pc():
     assert_close(3394387.5, Pc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Pc_methods(CASRN='98-01-1')
-    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS']
+    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON']
 
     # Error handling
     assert None == Pc(CASRN='BADCAS')
@@ -264,7 +264,7 @@ def test_Vc():
     assert_close(8.950e-05, Vc(CASRN='7727-37-9', method='MATTHEWS'))
 
     methods = Vc_methods(CASRN='98-01-1')
-    assert methods == ['PSRK', 'PINAMARTINES', 'YAWS']
+    assert methods == ['PSRK', 'PINAMARTINES', 'YAWS', 'FEDORS']
 
     # Error handling
     assert None == Vc(CASRN='BADCAS')
