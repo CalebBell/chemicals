@@ -24,7 +24,7 @@ SOFTWARE.
 
 import os
 import fluids
-__version__ = '1.0.17'
+__version__ = '1.0.18'
 from math import isnan
 
 if not fluids.numerics.is_micropython:
