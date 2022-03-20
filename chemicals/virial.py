@@ -970,7 +970,8 @@ def BVirial_Xiang(T, Tc, Pc, Vc, omega):
     Examples
     --------
 
-    >>> BVirial_Xiang
+    >>> BVirial_Xiang(388.26, 647.1, 22050000.0, 5.543076e-05, 0.344)
+    (-0.0004799570, 4.6778266e-06, -7.0157656e-08, 1.4137862e-09)
 
     References
     ----------
