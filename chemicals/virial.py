@@ -991,6 +991,68 @@ def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     return C, dC, d2C, d3C
 
 def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
+    r'''Calculates the third virial coefficient using the model in [1]_.
+    
+    .. math::
+        C = V_c^2 (f_{T_r}^{(0)} + \omega f_{T_r}^{(1)} + \theta f_{T_r}^{(2)})
+        
+
+    .. math::
+        f_{T_r}^{(0)} = a_{00} + a_{10}T_r^{-3} + a_{20}T_r^{-6} + a_{30}T_r^{-11}
+        
+    .. math::
+        f_{T_r}^{(1)} = a_{01} + a_{11}T_r^{-3} + a_{21}T_r^{-6} + a_{31}T_r^{-11}
+
+    .. math::
+        f_{T_r}^{(2)} = a_{02} + a_{12}T_r^{-3} + a_{22}T_r^{-6} + a_{32}T_r^{-11}
+        
+    .. math::
+        \theta = (Z_c - 0.29)^2
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of the fluid [Pa]
+    Vc : float
+        Critical volume of the fluid [m^3/mol]
+    omega : float
+        Acentric factor for fluid, [-]
+
+    Returns
+    -------
+    C : float
+        Second virial coefficient in density form [m^6/mol^2]
+    dC_dT : float
+        First temperature derivative of second virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2 : float
+        Second temperature derivative of second virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3 : float
+        Third temperature derivative of second virial coefficient in density
+        form [m^6/mol^2/K^3]
+    
+    Notes
+    -----
+
+    Examples
+    --------
+    Water at Tr = 0.6
+    
+    >>> CVirial_Liu_Xiang(388.26, 647.1, 22050000.0, 5.543076923076923e-05, 0.344)
+    (-1.4779977e-07, 4.9949901e-09, -1.652899e-10, 5.720067e-12)
+
+    References
+    ----------
+    .. [1] Liu, D. X., and H. W. Xiang. "Corresponding-States Correlation and
+       Prediction of Third Virial Coefficients for a Wide Range of Substances."
+       International Journal of Thermophysics 24, no. 6 (November 1, 2003):
+       1667-80. https://doi.org/10.1023/B:IJOT.0000004098.98614.38.
+    '''
     a00 = 0.1623538
     a01 = -0.5390344
     a02 = 34.22804
