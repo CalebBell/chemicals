@@ -369,3 +369,32 @@ def test_CVirial_Orbey_Vera():
     assert_close(derivative(lambda T: CVirial_Orbey_Vera(T, Tc, Pc, omega)[0], T, dx=T*1e-6), expect[1])
     assert_close(derivative(lambda T: CVirial_Orbey_Vera(T, Tc, Pc, omega)[1], T, dx=T*1e-6), expect[2])
     assert_close(derivative(lambda T: CVirial_Orbey_Vera(T, Tc, Pc, omega)[2], T, dx=T*1e-6), expect[3])
+    
+    
+def test_CVirial_Liu_Xiang():
+    T = 300
+    Tc = 568.7
+    Pc = 2490000.0
+    Vc = 0.000492
+    omega = 0.394
+    expect = (-1.3720744771519268e-05, 5.131512522084089e-07, -2.031692047127711e-08, 8.713867012492766e-10)
+    C = CVirial_Liu_Xiang(T=T, Tc=Tc, Pc=Pc, Vc=Vc, omega=omega)[0]
+    assert_close(C, expect[0])
+    
+    assert_close(derivative(lambda T: CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega)[0], T, dx=T*1e-6), expect[1])
+    assert_close(derivative(lambda T: CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega)[1], T, dx=T*1e-6), expect[2])
+    assert_close(derivative(lambda T: CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega)[2], T, dx=T*1e-6), expect[3])
+    
+    
+    # POint with a graph
+    from chemicals import rho_to_Vm
+    Tc = 647.10
+    Pc = 22050e3
+    omega = 0.344
+    MW = 18.015
+    rhoc_mass = 325.0
+    Vc = rho_to_Vm(MW=MW, rho=rhoc_mass)
+    
+    graph_point = CVirial_Liu_Xiang(T=0.6*Tc, Tc=Tc, Pc=Pc, Vc=Vc, omega=omega)[0]/Vc**2
+    assert_close(graph_point, -48.10297670037914)
+

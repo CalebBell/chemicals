@@ -47,14 +47,14 @@ Second Virial Correlations
 Third Virial Correlations
 -------------------------
 .. autofunction:: chemicals.virial.CVirial_Orbey_Vera
-
+.. autofunction:: chemicals.virial.CVirial_Liu_Xiang
 
 """
 from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
            'BVirial_Tsonopoulos_extended', 'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
-           'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera']
+           'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang']
 
 from fluids.numerics import numpy as np
 from cmath import sqrt as csqrt
@@ -988,4 +988,38 @@ def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     dC = x7*(32865.0*x1 - 68096.0*x2 + x8*(399.0*x1 - 826.0*x2 + 300.0*x3 + x6))*Tinv*(1/1000000)
     d2C = -x7*(3779475.0*x1 - 2587648.0*x2 + x8*(45885.0*x1 - 31388.0*x2 + 21000.0*x3 - 80000.0*x5))*Tinv2*(1/10000000)
     d3C = 3.0*x4*x7*(20.0*omega*(5735625.0*x1 - 1506624.0*x2 + 1680000.0*x3 - 4000000.0*x5) + 157478125.0*x1 - 41402368.0*x2)*(1/100000000)
+    return C, dC, d2C, d3C
+
+def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
+    a00 = 0.1623538
+    a01 = -0.5390344
+    a02 = 34.22804
+    a10 = 0.3087440
+    a11 = 1.783526
+    a12 = -74.76559
+    a20 = -0.01790184
+    a21 = -1.055391
+    a22 = 279.9220
+    a30 = -0.02789157
+    a31 = 0.09955867
+    a32 = -62.85431
+    x0 = Vc**2
+    x1 = Tc**11/T**11
+    x2 = T**(-6)
+    x3 = Tc**6*x2
+    x4 = Tc**3
+    x5 = x4/T**3
+    x6 = (100*Pc*Vc/(R*Tc) - 29)**2/10000
+    x7 = Tc**8/T**8
+    x8 = 11*x7
+    x9 = 6*x5
+    x10 = x0*x4
+    x11 = 22*x7
+    x12 = 7*x5
+    x13 = 143*x7
+    x14 = 28*x5
+    C = x0*(a00 + a10*x5 + a20*x3 + a30*x1 + omega*(a01 + a11*x5 + a21*x3 + a31*x1) + x6*(a02 + a12*x5 + a22*x3 + a32*x1))
+    dC = -x10*(3*a10 + a20*x9 + a30*x8 + omega*(3*a11 + a21*x9 + a31*x8) + x6*(3*a12 + a22*x9 + a32*x8))/T**4
+    d2C = 6*x10*(2*a10 + a20*x12 + a30*x11 + omega*(2*a11 + a21*x12 + a31*x11) + x6*(2*a12 + a22*x12 + a32*x11))/T**5
+    d3C = -12*x10*x2*(5*a10 + a20*x14 + a30*x13 + omega*(5*a11 + a21*x14 + a31*x13) + x6*(5*a12 + a22*x14 + a32*x13))
     return C, dC, d2C, d3C
