@@ -43,6 +43,7 @@ Second Virial Correlations
 .. autofunction:: chemicals.virial.BVirial_Abbott
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_extended
+.. autofunction:: chemicals.virial.BVirial_Xiang
 
 Third Virial Correlations
 -------------------------
@@ -53,12 +54,13 @@ Third Virial Correlations
 from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
-           'BVirial_Tsonopoulos_extended', 'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
+           'BVirial_Tsonopoulos_extended', 'BVirial_Xiang',
+           'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang']
 
 from fluids.numerics import numpy as np
 from cmath import sqrt as csqrt
-from chemicals.utils import log
+from chemicals.utils import log, sqrt, exp
 from fluids.constants import R, R_inv
 
 
@@ -916,6 +918,98 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
     Br = B0 + omega*B1 + a*B2 + b*B3
     return Br*R*Tc/Pc
 
+def BVirial_Xiang(T, Tc, Pc, Vc, omega):
+    r'''Calculates the second virial coefficient using the model in [1]_.
+
+    .. math::
+        B = \frac{\left(-b_0T_r^{-3/4}\exp(b_1T_r^{-3}) + b_2T_r^{-1/2})
+            \right)}V_c
+    
+    .. math::
+        b_0 = b_{00} + b_{01}\omega + b_{02}\theta
+        
+    .. math::
+        b_1 = b_{10} + b_{11}\omega + b_{12}\theta
+
+    .. math::
+        b_2 = b_{20} + b_{21}\omega + b_{22}\theta
+
+    .. math::
+        \theta = (Z_c - 0.29)^2
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of the fluid [Pa]
+    Vc : float
+        Critical volume of the fluid [m^3/mol]
+    omega : float
+        Acentric factor for fluid, [-]
+
+    Returns
+    -------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+    dB_dT : float
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2 : float
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3 : float
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+
+    Examples
+    --------
+
+    >>> BVirial_Xiang
+
+    References
+    ----------
+    .. [1] Xiang, H. W. "The New Simple Extended Corresponding-States 
+       Principle: Vapor Pressure and Second Virial Coefficient." Chemical 
+       Engineering Science 57, no. 8 (April 2002): 1439049. 
+       https://doi.org/10.1016/S0009-2509(02)00017-9.
+    '''
+    b00 = 4.553
+    b01 = 4.172 
+    b02 = 0.0
+    b10 = 0.02644
+    b11 = 0.075
+    b12 = 16.5
+    b20 = 3.530
+    b21 = 4.297
+    b22 = 0.0
+    
+    # TODO optimize the powers and divides
+    x0 = 1/Tc
+    x1 = T*x0
+    x2 = 10000*omega
+    x3 = (100*Pc*Vc*x0/R - 29)**2
+    x4 = (10000*b20 + b21*x2 + b22*x3)/sqrt(x1)
+    x5 = b11*omega
+    x6 = b12*x3
+    x7 = T**(-3)
+    x8 = Tc**3*x7
+    x9 = (10000*b00 + b01*x2 + b02*x3)*exp(x8*(b10 + x5 + x6/10000))/x1**(3/4)
+    x10 = 3*x9
+    x11 = 10000*b10 + 10000*x5 + x6
+    x12 = x11*x8
+    x13 = x12*x9
+    x14 = Tc**6*x11**2/T**6
+    B = Vc*(x4 - x9)/10000
+    dB = -Vc*(-x10*x12 + 5000*x4 - 7500*x9)/(100000000*T)
+    d2B = -3*Vc*(x10*x14 + 55000*x13 - 25000000*x4 + 43750000*x9)/(1000000000000*T**2)
+    d3B = 3*Vc*x7*(3293750000*x13 + 427500*x14*x9 - 625000000000*x4 + 1203125000000*x9 + 9*Tc**9*x11**3*x9/T**9)/10000000000000000
+    return (B, dB, d2B, d3B)
 
 def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     r'''Calculates the third virial coefficient using the model in [1]_.

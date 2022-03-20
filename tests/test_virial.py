@@ -25,6 +25,7 @@ import pytest
 import numpy as np
 from fluids.numerics import linspace, assert_close, assert_close1d, derivative
 from chemicals.virial import *
+from chemicals import rho_to_Vm
 from fluids.constants import R as _R
 from scipy.integrate import quad
 
@@ -387,7 +388,6 @@ def test_CVirial_Liu_Xiang():
     
     
     # POint with a graph
-    from chemicals import rho_to_Vm
     Tc = 647.10
     Pc = 22050e3
     omega = 0.344
@@ -398,3 +398,19 @@ def test_CVirial_Liu_Xiang():
     graph_point = CVirial_Liu_Xiang(T=0.6*Tc, Tc=Tc, Pc=Pc, Vc=Vc, omega=omega)[0]/Vc**2
     assert_close(graph_point, -48.10297670037914)
 
+
+def test_BVirial_Xiang():
+    # Acetone, figure 5 acetone
+    MW = 58.080
+    Tc = 508.1
+    Pc = 4696e3
+    rhoc_mass = 268
+    omega = 0.308
+    T = 0.7*Tc
+    Vc = rho_to_Vm(MW=MW, rho=rhoc_mass)
+    # ~-4.5 expected if ans not multiplied by Vc
+    expect = [-0.0008878022797789029, 7.467113021775213e-06, -9.800480205221981e-08, 1.7837228334430914e-09]
+    assert_close(BVirial_Xiang(T, Tc, Pc, Vc, omega)[0], -0.0008878022797789028)
+    assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[0], T, dx=T*1e-6), expect[1])
+    assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[1], T, dx=T*1e-6), expect[2])
+    assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[2], T, dx=T*1e-6), expect[3])
