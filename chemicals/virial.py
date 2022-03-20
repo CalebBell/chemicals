@@ -43,12 +43,18 @@ Second Virial Correlations
 .. autofunction:: chemicals.virial.BVirial_Abbott
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_extended
+
+Third Virial Correlations
+-------------------------
+.. autofunction:: chemicals.virial.CVirial_Orbey_Vera
+
+
 """
 from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
            'BVirial_Tsonopoulos_extended', 'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
-           'Z_from_virial_pressure_form']
+           'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera']
 
 from fluids.numerics import numpy as np
 from cmath import sqrt as csqrt
@@ -909,3 +915,77 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
                 a, b = 0.0878, 0.00908+0.0006957*dipole_r
     Br = B0 + omega*B1 + a*B2 + b*B3
     return Br*R*Tc/Pc
+
+
+def CVirial_Orbey_Vera(T, Tc, Pc, omega):
+    r'''Calculates the third virial coefficient using the model in [1]_.
+    
+    .. math::
+        C = (RT_c/P_c)^2 (fC_{Tr}^{(0)} + \omega fC_{Tr}^{(1)})
+
+    .. math::
+        fC_{Tr}^{(0)} = 0.01407 + 0.02432T_r^{-2.8} - 0.00313T_r^{-10.5}
+        
+    .. math::
+        fC_{Tr}^{(1)} = -0.02676 + 0.01770T_r^{-2.8} + 0.040T_r^{-3} - 0.003T_r^{-6} - 0.00228T_r^{-10.5}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of the fluid [Pa]
+    omega : float
+        Acentric factor for fluid, [-]
+
+    Returns
+    -------
+    C : float
+        Second virial coefficient in density form [m^6/mol^2]
+    dC_dT : float
+        First temperature derivative of second virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2 : float
+        Second temperature derivative of second virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3 : float
+        Third temperature derivative of second virial coefficient in density
+        form [m^6/mol^2/K^3]
+    
+    Notes
+    -----
+
+    Examples
+    --------
+    n-octane
+    
+    >>> CVirial_Orbey_Vera(T=300, Tc=568.7, Pc=2490000.0, omega=0.394)
+    (-1.1107124e-05, 4.1326808e-07, -1.6041435e-08, 6.7035158e-10)
+
+    References
+    ----------
+    .. [1] Orbey, Hasan, and J. H. Vera. "Correlation for the Third Virial 
+       Coefficient Using Tc, Pc and ω as Parameters." AIChE Journal 29, no. 1 
+       (January 1, 1983): 107-13. https://doi.org/10.1002/aic.690290115.
+    '''
+    x0 = T/Tc
+    Tinv = 1.0/T
+    Tinv2 = Tinv*Tinv
+    x7 = R*Tc/Pc
+    x7 *= x7
+    Tc3 = Tc*Tc*Tc
+    x3 = Tc3*Tc3*Tinv2*Tinv2*Tinv2
+    x4 = Tinv2*Tinv
+    x5 = Tc3*x4
+    x1 = x0**(-21.0/2.0)
+    x2 = x0**(-14.0/5.0)
+    x6 = -2000.0*x5
+    x8 = 60.0*omega
+    
+    C = -x7*(2.0*omega*(114.0*x1 - 885.0*x2 + 150.0*x3 + x6 + 1338.0) + 313.0*x1 - 2432.0*x2 - 1407.0)*(1/100000)
+    dC = x7*(32865.0*x1 - 68096.0*x2 + x8*(399.0*x1 - 826.0*x2 + 300.0*x3 + x6))*Tinv*(1/1000000)
+    d2C = -x7*(3779475.0*x1 - 2587648.0*x2 + x8*(45885.0*x1 - 31388.0*x2 + 21000.0*x3 - 80000.0*x5))*Tinv2*(1/10000000)
+    d3C = 3.0*x4*x7*(20.0*omega*(5735625.0*x1 - 1506624.0*x2 + 1680000.0*x3 - 4000000.0*x5) + 157478125.0*x1 - 41402368.0*x2)*(1/100000000)
+    return C, dC, d2C, d3C

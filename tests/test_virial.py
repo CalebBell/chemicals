@@ -23,7 +23,7 @@ SOFTWARE.
 
 import pytest
 import numpy as np
-from fluids.numerics import linspace, assert_close, assert_close1d
+from fluids.numerics import linspace, assert_close, assert_close1d, derivative
 from chemicals.virial import *
 from fluids.constants import R as _R
 from scipy.integrate import quad
@@ -358,3 +358,14 @@ def test_BVirial_Tsonopoulos_extended_calculus():
 
         Bcalc2 = [BVirial_Tsonopoulos_extended(T2, Tc2, Pc2, omega2, a=a, b=b, order=order) for T2, Tc2, Pc2, omega2 in zip(_Ts, _Tcs, _Pcs, _omegas)]
         assert_close1d(Bcalcs, Bcalc2)
+        
+        
+def test_CVirial_Orbey_Vera():
+    Tc, Pc, omega = 568.7, 2490000.0, 0.394
+    T = 0.866*Tc
+    expect = (1.9314651915020253e-07, 3.3074098632105e-11, -2.2771746296770828e-11, 7.437013303758471e-13)
+    calc = CVirial_Orbey_Vera(T, Tc, Pc, omega)
+    assert_close1d(expect, calc, rtol=1e-14)
+    assert_close(derivative(lambda T: CVirial_Orbey_Vera(T, Tc, Pc, omega)[0], T, dx=T*1e-6), expect[1])
+    assert_close(derivative(lambda T: CVirial_Orbey_Vera(T, Tc, Pc, omega)[1], T, dx=T*1e-6), expect[2])
+    assert_close(derivative(lambda T: CVirial_Orbey_Vera(T, Tc, Pc, omega)[2], T, dx=T*1e-6), expect[3])
