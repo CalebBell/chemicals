@@ -1020,15 +1020,15 @@ def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
     theta = (Zc - 0.29)
     theta *= theta
     x7 = Tc8*T_inv8
-    x8 = 11*x7
-    x9 = 6*x5
+    x8 = 11.0*x7
+    x9 = 6.0*x5
     x10 = x0*Tc3
-    x11 = 22*x7
-    x12 = 7*x5
-    x13 = 143*x7
-    x14 = 28*x5
+    x11 = 22.0*x7
+    x12 = 7.0*x5
+    x13 = 143.0*x7
+    x14 = 28.0*x5
     C = x0*(a00 + a10*x5 + a20*x3 + a30*x1 + omega*(a01 + a11*x5 + a21*x3 + a31*x1) + theta*(a02 + a12*x5 + a22*x3 + a32*x1))
-    dC = -x10*(3*a10 + a20*x9 + a30*x8 + omega*(3*a11 + a21*x9 + a31*x8) + theta*(3*a12 + a22*x9 + a32*x8))*T_inv2*T_inv2
-    d2C = 6*x10*(2*a10 + a20*x12 + a30*x11 + omega*(2*a11 + a21*x12 + a31*x11) + theta*(2*a12 + a22*x12 + a32*x11))*T_inv2*T_inv3
-    d3C = -12*x10*x2*(5*a10 + a20*x14 + a30*x13 + omega*(5*a11 + a21*x14 + a31*x13) + theta*(5*a12 + a22*x14 + a32*x13))
+    dC = -x10*(3.0*a10 + a20*x9 + a30*x8 + omega*(3.0*a11 + a21*x9 + a31*x8) + theta*(3.0*a12 + a22*x9 + a32*x8))*T_inv2*T_inv2
+    d2C = 6.0*x10*(2.0*a10 + a20*x12 + a30*x11 + omega*(2.0*a11 + a21*x12 + a31*x11) + theta*(2.0*a12 + a22*x12 + a32*x11))*T_inv2*T_inv3
+    d3C = -12.0*x10*x2*(5.0*a10 + a20*x14 + a30*x13 + omega*(5.0*a11 + a21*x14 + a31*x13) + theta*(5.0*a12 + a22*x14 + a32*x13))
     return C, dC, d2C, d3C
