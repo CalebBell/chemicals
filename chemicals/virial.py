@@ -59,7 +59,7 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
 from fluids.numerics import numpy as np
 from cmath import sqrt as csqrt
 from chemicals.utils import log
-from fluids.constants import R
+from fluids.constants import R, R_inv
 
 
 def B_to_Z(B, T, P):
@@ -1005,15 +1005,21 @@ def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
     a32 = -62.85431
     x0 = Vc*Vc
     T_inv = 1.0/T
-    T_inv3 = T_inv*T_inv*T_inv
+    T_inv2 = T_inv*T_inv
+    T_inv3 = T_inv2*T_inv
     T_inv8 = T_inv3*T_inv3*T_inv*T_inv
-    Tc3 = Tc*Tc*Tc
+    Tc2 = Tc*Tc
+    Tc3 = Tc2*Tc
+    Tc8 = Tc3*Tc3*Tc2
     x2 = T_inv3*T_inv3
-    x1 = Tc**11/T**11
+    x1 = Tc8*Tc3*T_inv8*T_inv3
     x3 = Tc3*Tc3*x2
     x5 = Tc3*T_inv3
-    x6 = (100*Pc*Vc/(R*Tc) - 29)**2/10000
-    x7 = Tc**8*T_inv8
+
+    Zc = Pc*Vc*R_inv/Tc
+    theta = (Zc - 0.29)
+    theta *= theta
+    x7 = Tc8*T_inv8
     x8 = 11*x7
     x9 = 6*x5
     x10 = x0*Tc3
@@ -1021,8 +1027,8 @@ def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
     x12 = 7*x5
     x13 = 143*x7
     x14 = 28*x5
-    C = x0*(a00 + a10*x5 + a20*x3 + a30*x1 + omega*(a01 + a11*x5 + a21*x3 + a31*x1) + x6*(a02 + a12*x5 + a22*x3 + a32*x1))
-    dC = -x10*(3*a10 + a20*x9 + a30*x8 + omega*(3*a11 + a21*x9 + a31*x8) + x6*(3*a12 + a22*x9 + a32*x8))/T**4
-    d2C = 6*x10*(2*a10 + a20*x12 + a30*x11 + omega*(2*a11 + a21*x12 + a31*x11) + x6*(2*a12 + a22*x12 + a32*x11))/T**5
-    d3C = -12*x10*x2*(5*a10 + a20*x14 + a30*x13 + omega*(5*a11 + a21*x14 + a31*x13) + x6*(5*a12 + a22*x14 + a32*x13))
+    C = x0*(a00 + a10*x5 + a20*x3 + a30*x1 + omega*(a01 + a11*x5 + a21*x3 + a31*x1) + theta*(a02 + a12*x5 + a22*x3 + a32*x1))
+    dC = -x10*(3*a10 + a20*x9 + a30*x8 + omega*(3*a11 + a21*x9 + a31*x8) + theta*(3*a12 + a22*x9 + a32*x8))*T_inv2*T_inv2
+    d2C = 6*x10*(2*a10 + a20*x12 + a30*x11 + omega*(2*a11 + a21*x12 + a31*x11) + theta*(2*a12 + a22*x12 + a32*x11))*T_inv2*T_inv3
+    d3C = -12*x10*x2*(5*a10 + a20*x14 + a30*x13 + omega*(5*a11 + a21*x14 + a31*x13) + theta*(5*a12 + a22*x14 + a32*x13))
     return C, dC, d2C, d3C
