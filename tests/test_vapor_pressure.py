@@ -224,10 +224,25 @@ def test_Antoine_AB_fit_extrapolate():
     assert_close(d2Psat_dT2, d2Psat_dT2_analytical, rtol=1e-2)
 
 def test_DIPPR101_ABC_coeffs_from_point():
+    from chemicals.dippr import EQ101
     T = 178.01
     Psat, dPsat_dT, d2Psat_dT2 = (0.03946094565666715, 0.006781441203850251, 0.0010801244983894853)
     ABC = DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2)
     assert_close1d(ABC, (72.47169926642722, -6744.620564969687, -7.2976291987890844))
+
+
+    # Case with infinity second derivative
+    a, b, c, d, Pc, Tc, Tmin = -7.29343 , 1.083950 ,-1.63882 ,-2.306770 ,6586100.0 ,408.00 ,184.0
+    T = Tc*(1-1e-15)
+    d2Psat_dT2 = d2Wagner_original_dT2(T, Tc, Pc, a, b, c, d)
+    dPsat_dT = dWagner_original_dT(T, Tc, Pc, a, b, c, d)
+    Psat = Wagner_original(T, Tc, Pc, a, b, c, d)
+    
+    A, B, C = DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, float('inf'))
+    assert EQ101(Tc*2, A, B, C) > EQ101(Tc, A, B, C)
+    assert EQ101(Tc*20, A, B, C) > EQ101(Tc*10, A, B, C)
+    assert EQ101(Tc*200, A, B, C) > EQ101(Tc*100, A, B, C)
+    assert EQ101(Tc*200000, A, B, C) > EQ101(Tc*100, A, B, C)
 
 
 

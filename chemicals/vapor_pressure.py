@@ -842,6 +842,10 @@ def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
 def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
     r'''Calculates the first three DIPPR101 coefficients `A`, `B`, and `C`
     from a known vapor pressure and its first and second temperature derivative.
+    
+    If the second derivative is infinity as is the case in some vapor pressure
+    models at the critical point, only the `A` and `C` coefficients are fit,
+    using the first derivative an the actual value of vapor pressure.
 
     Parameters
     ----------
