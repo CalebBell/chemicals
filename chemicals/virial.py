@@ -50,13 +50,22 @@ Third Virial Correlations
 .. autofunction:: chemicals.virial.CVirial_Orbey_Vera
 .. autofunction:: chemicals.virial.CVirial_Liu_Xiang
 
+Cross-Parameters
+----------------
+.. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_kij
+.. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_Tcijs
+.. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_Pcijs
+.. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_omegaijs
+
 """
 from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
            'BVirial_Tsonopoulos_extended', 'BVirial_Xiang',
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
-           'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang']
+           'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
+           'Tarakad_Danner_virial_CSP_kij', 'Tarakad_Danner_virial_CSP_Tcijs',
+           'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs']
 
 from fluids.numerics import numpy as np
 from cmath import sqrt as csqrt
@@ -991,25 +1000,30 @@ def BVirial_Xiang(T, Tc, Pc, Vc, omega):
     b22 = 0.0
     
     # TODO optimize the powers and divides
-    x0 = 1/Tc
+    x0 = 1.0/Tc
     x1 = T*x0
-    x2 = 10000*omega
-    x3 = (100*Pc*Vc*x0/R - 29)**2
-    x4 = (10000*b20 + b21*x2 + b22*x3)/sqrt(x1)
+    x2 = 10000.0*omega
+    x3 = (100.0*Pc*Vc*x0/R - 29.0)
+    x3 = x3*x3
+
+    x1_sqrt_inv = 1.0/sqrt(x1)
+    x4 = (10000.0*b20 + b21*x2 + b22*x3)*x1_sqrt_inv
     x5 = b11*omega
     x6 = b12*x3
-    x7 = T**(-3)
-    x8 = Tc**3*x7
-    x9 = (10000*b00 + b01*x2 + b02*x3)*exp(x8*(b10 + x5 + x6/10000))/x1**(3/4)
-    x10 = 3*x9
-    x11 = 10000*b10 + 10000*x5 + x6
+    T_inv = 1.0/T
+    T_inv3 = T_inv*T_inv*T_inv
+    Tc3 = Tc*Tc*Tc
+    x8 = Tc3*T_inv3
+    x9 = (10000.0*b00 + b01*x2 + b02*x3)*exp(x8*(b10 + x5 + x6*(1/10000)))*(x1_sqrt_inv*sqrt(x1_sqrt_inv))
+    x10 = 3.0*x9
+    x11 = 10000.0*b10 + 10000.0*x5 + x6
     x12 = x11*x8
     x13 = x12*x9
-    x14 = Tc**6*x11**2/T**6
-    B = Vc*(x4 - x9)/10000
-    dB = -Vc*(-x10*x12 + 5000*x4 - 7500*x9)/(100000000*T)
-    d2B = -3*Vc*(x10*x14 + 55000*x13 - 25000000*x4 + 43750000*x9)/(1000000000000*T**2)
-    d3B = 3*Vc*x7*(3293750000*x13 + 427500*x14*x9 - 625000000000*x4 + 1203125000000*x9 + 9*Tc**9*x11**3*x9/T**9)/10000000000000000
+    x14 = Tc3*Tc3*x11*x11*T_inv3*T_inv3
+    B = Vc*(x4 - x9)*(1/10000)
+    dB = -Vc*(-x10*x12 + 5000.0*x4 - 7500.0*x9)*T_inv*(1/(100000000))
+    d2B = -3.0*Vc*(x10*x14 + 55000.0*x13 - 25000000.0*x4 + 43750000.0*x9)*T_inv*T_inv*(1/(1000000000000))
+    d3B = 3.0*Vc*T_inv3*(3293750000.0*x13 + 427500.*x14*x9 - 625000000000.*x4 + 1203125000000.*x9 + 9.*Tc3*Tc3*Tc3*x11*x11*x11*x9*T_inv3*T_inv3*T_inv3)*(1/10000000000000000)
     return (B, dB, d2B, d3B)
 
 def CVirial_Orbey_Vera(T, Tc, Pc, omega):
@@ -1189,3 +1203,247 @@ def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
     d2C = 6.0*x10*(2.0*a10 + a20*x12 + a30*x11 + omega*(2.0*a11 + a21*x12 + a31*x11) + theta*(2.0*a12 + a22*x12 + a32*x11))*T_inv2*T_inv3
     d3C = -12.0*x10*x2*(5.0*a10 + a20*x14 + a30*x13 + omega*(5.0*a11 + a21*x14 + a31*x13) + theta*(5.0*a12 + a22*x14 + a32*x13))
     return C, dC, d2C, d3C
+
+
+### Mixing Rules
+
+def Tarakad_Danner_virial_CSP_kij(Vcs):
+    r'''Calculates a binary interaction parameter for the calculation of Bij
+    binary virial coefficient as shown in [1]_ and [2]_.
+    
+    This equation for kij is:
+        
+    .. math::
+        k_{ij} = 1 - \frac{8\sqrt{v_{ci}v_{cj}}}{(V_{ci}^{1/3} +V_{ci}^{1/3})^3}
+        
+    The equation this kij is used in is 
+
+    .. math::
+        T_{cij} = \sqrt{T_{ci}T_{cj}}(1-k_{ij})
+
+    Parameters
+    ----------
+    Vcs : list[float]
+        Critical volumes for each species, [m^3/mol]
+
+    Returns
+    -------
+    kijs : list[list[float]]
+        Binary interaction parameters, [-]
+    
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Tarakad_Danner_virial_CSP_kij(Vcs=[0.000168, 0.000316])
+    [[0.0, 0.01646332091], [0.0164633209, 0.0]]
+
+    References
+    ----------
+    .. [1] Tarakad, Ramanathan R., and Ronald P. Danner. "An Improved 
+       Corresponding States Method for Polar Fluids: Correlation of Second 
+       Virial Coefficients." AIChE Journal 23, no. 5 (1977): 685-95. 
+       https://doi.org/10.1002/aic.690230510.
+    .. [2] Meng, Long, and Yuan-Yuan Duan. "Prediction of the Second Cross 
+       Virial Coefficients of Nonpolar Binary Mixtures." Fluid Phase Equilibria
+       238 (December 1, 2005): 229-38.
+       https://doi.org/10.1016/j.fluid.2005.10.007.
+    '''
+    N = len(Vcs)
+    kijs = [[0.0]*N for i in range(N)] # numba: delete
+#     kijs = zeros((N, N)) # numba: uncomment
+    Vc_cbrts = [0.0]*N
+    for i in range(N):
+        Vc_cbrts[i] = Vcs[i]**(1.0/3.0)
+        
+    rt8 = 2.8284271247461903 #sqrt(8)
+    Vc_sqrts = [0.0]*N
+    for i in range(N):
+        Vc_sqrts[i] = rt8*sqrt(Vcs[i])
+        
+    # There is Symmetry here but it is not used
+    for i in range(N):
+        r = kijs[i]
+        Vci_cbrt = Vc_cbrts[i]
+        Vci_sqrt = Vc_sqrts[i]
+        for j in range(N):
+            den = Vci_cbrt + Vc_cbrts[j]
+            r[j] = 1.0 - Vci_sqrt*Vc_sqrts[j]/(den*den*den)
+        # More efficient and numerical error makes this non-zero
+        r[i] = 0.0
+    return kijs
+
+def Tarakad_Danner_virial_CSP_Tcijs(Tcs, kijs):
+    r'''Calculates the corresponding states critical temperature for the 
+    calculation of Bij
+    binary virial coefficient as shown in [1]_ and [2]_.
+    
+    .. math::
+        T_{cij} = \sqrt{T_{ci}T_{cj}}(1-k_{ij})
+
+    Parameters
+    ----------
+    Tcs : list[float]
+        Critical temperatures for each species, [K]
+    kijs : list[list[float]]
+        Binary interaction parameters, [-]
+
+    Returns
+    -------
+    Tcijs : list[list[float]]
+        CSP Critical temperatures for each pair of species, [K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> kijs = Tarakad_Danner_virial_CSP_kij(Vcs=[0.000168, 0.000316])
+    >>> Tarakad_Danner_virial_CSP_Tcijs(Tcs=[514.0, 591.75], kijs=kijs)
+    [[514.0, 542.42694], [542.42694, 591.75000]]
+
+    References
+    ----------
+    .. [1] Tarakad, Ramanathan R., and Ronald P. Danner. "An Improved 
+       Corresponding States Method for Polar Fluids: Correlation of Second 
+       Virial Coefficients." AIChE Journal 23, no. 5 (1977): 685-95. 
+       https://doi.org/10.1002/aic.690230510.
+    .. [2] Meng, Long, and Yuan-Yuan Duan. "Prediction of the Second Cross 
+       Virial Coefficients of Nonpolar Binary Mixtures." Fluid Phase Equilibria
+       238 (December 1, 2005): 229-38.
+       https://doi.org/10.1016/j.fluid.2005.10.007.
+    '''
+    N = len(Tcs)
+    Tc_sqrts = [0.0]*N
+    for i in range(N):
+        Tc_sqrts[i] = sqrt(Tcs[i])
+    Tcijs = [[0.0]*N for i in range(N)] # numba: delete
+#     Tcijs = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        # also symmetric
+        kij_row = kijs[i]
+        Tcij_row = Tcijs[i]
+        Tci = Tc_sqrts[i]
+        for j in range(N):
+            Tcij_row[j] = Tci*Tc_sqrts[j]*(1.0 - kij_row[j])
+    return Tcijs
+
+def Tarakad_Danner_virial_CSP_Pcijs(Tcs, Pcs, Vcs, Tcijs):
+    r'''Calculates the corresponding states critical pressure for the 
+    calculation of Bij
+    binary virial coefficient as shown in [1]_ and [2]_.
+    
+    .. math::
+        P_{cij} = \frac{4T_{cij} \left(  
+            \frac{P_{ci}V_{ci}}{T_{ci}} + \frac{P_{cj}V_{cj}}{T_{cj}}
+            \right)
+            }{(V_{ci}^{1/3} +V_{ci}^{1/3})^3}
+
+    Parameters
+    ----------
+    Tcs : list[float]
+        Critical temperatures for each species, [K]
+    Pcs : list[float]
+        Critical pressures for each species, [Pa]
+    Vcs : list[float]
+        Critical volumes for each species, [m^3/mol]
+    Tcijs : list[list[float]]
+        CSP Critical temperatures for each pair of species, [K]
+
+    Returns
+    -------
+    Pcijs : list[list[float]]
+        CSP Critical pressures for each pair of species, [Pa]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> kijs = Tarakad_Danner_virial_CSP_kij(Vcs=[0.000168, 0.000316])
+    >>> Tcijs = Tarakad_Danner_virial_CSP_Tcijs(Tcs=[514.0, 591.75], kijs=kijs)
+    >>> Tarakad_Danner_virial_CSP_Pcijs(Tcs=[514.0, 591.75], Pcs=[6137000.0, 4108000.0], Vcs=[0.000168, 0.000316], Tcijs=Tcijs)
+    [[6136999.9, 4861936.4], [4861936.4, 4107999.9]]
+    
+    References
+    ----------
+    .. [1] Tarakad, Ramanathan R., and Ronald P. Danner. "An Improved 
+       Corresponding States Method for Polar Fluids: Correlation of Second 
+       Virial Coefficients." AIChE Journal 23, no. 5 (1977): 685-95. 
+       https://doi.org/10.1002/aic.690230510.
+    .. [2] Meng, Long, and Yuan-Yuan Duan. "Prediction of the Second Cross 
+       Virial Coefficients of Nonpolar Binary Mixtures." Fluid Phase Equilibria
+       238 (December 1, 2005): 229-38.
+       https://doi.org/10.1016/j.fluid.2005.10.007.
+    '''
+    N = len(Vcs)
+    Pcijs = [[0.0]*N for i in range(N)] # numba: delete
+#     Pcijs = zeros((N, N)) # numba: uncomment
+    Vc_cbrts = [0.0]*N
+    for i in range(N):
+        Vc_cbrts[i] = Vcs[i]**(1.0/3.0)
+    factors = [0.0]*N
+    for i in range(N):
+        factors[i] = 4.0*Pcs[i]*Vcs[i]/Tcs[i]
+        
+    for i in range(N):
+        Vci_cbrt = Vc_cbrts[i]
+        factori = factors[i]
+        Tcij_row = Tcijs[i]
+        Pcij_row = Pcijs[i]
+        for j in range(N):
+            den = Vci_cbrt + Vc_cbrts[j]
+            Pcij_row[j] = Tcij_row[j]*(factori + factors[j])/(den*den*den)
+            
+#             Pcijs[i][j] = 4.0*Tcijs[i][j]*(Pcs[i]*Vcs[i]/Tcs[i]
+#             + Pcs[j]*Vcs[j]/Tcs[j])/(Vcs[i]**(1/3) + Vcs[j]**(1/3)  )**3
+            
+    return Pcijs
+
+def Tarakad_Danner_virial_CSP_omegaijs(omegas):
+    r'''Calculates the corresponding states acentric factor for the 
+    calculation of Bij
+    binary virial coefficient as shown in [1]_ and [2]_.
+    
+    .. math::
+        \omega_{ij} = 0.5(\omega_i + \omega_j)
+
+    Parameters
+    ----------
+    omegas : list[float]
+        Acentric factor for each species, [-]
+
+    Returns
+    -------
+    omegaijs : list[list[float]]
+        CSP acentric factors for each pair of species, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Tarakad_Danner_virial_CSP_omegaijs([0.635, 0.257])
+    [[0.635, 0.446], [0.446, 0.257]]
+    
+    References
+    ----------
+    .. [1] Tarakad, Ramanathan R., and Ronald P. Danner. "An Improved 
+       Corresponding States Method for Polar Fluids: Correlation of Second 
+       Virial Coefficients." AIChE Journal 23, no. 5 (1977): 685-95. 
+       https://doi.org/10.1002/aic.690230510.
+    .. [2] Meng, Long, and Yuan-Yuan Duan. "Prediction of the Second Cross 
+       Virial Coefficients of Nonpolar Binary Mixtures." Fluid Phase Equilibria
+       238 (December 1, 2005): 229-38.
+       https://doi.org/10.1016/j.fluid.2005.10.007.
+    '''
+    N = len(omegas)
+    omegaijs = [[0.0]*N for i in range(N)] # numba: delete
+#     omegaijs = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        omegai = omegas[i]
+        r = omegaijs[i]
+        for j in range(N):
+            r[j] = 0.5*(omegai + omegas[j])
+    return omegaijs

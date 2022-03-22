@@ -23,7 +23,7 @@ SOFTWARE.
 
 import pytest
 import numpy as np
-from fluids.numerics import linspace, assert_close, assert_close1d, derivative
+from fluids.numerics import linspace, assert_close, assert_close1d, assert_close2d, derivative
 from chemicals.virial import *
 from chemicals import rho_to_Vm
 from fluids.constants import R as _R
@@ -414,3 +414,33 @@ def test_BVirial_Xiang():
     assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[0], T, dx=T*1e-6), expect[1])
     assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[1], T, dx=T*1e-6), expect[2])
     assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[2], T, dx=T*1e-6), expect[3])
+
+
+def test_Tarakad_Danner_virial_CSP_kij():
+    
+    expect = [[0.0, 0.016463320918394864, 0.048781060667435705, 0.2243198001812905],
+     [0.016463320918394864, 0.0, 0.11579684127861978, 0.1338961298780077],
+     [0.048781060667435705, 0.11579684127861978, 0.0, 0.4001799396649175],
+     [0.2243198001812905, 0.1338961298780077, 0.4001799396649175, 0.0]]
+    
+    
+    Vcs = [0.000168, 0.000316, 5.6e-05, 0.002055]
+    ans = Tarakad_Danner_virial_CSP_kij(Vcs)
+    assert_close2d(ans, expect, rtol=1e-13)
+    
+def test_Tarakad_Danner_virial_CSP_Tcijs():
+    Vcs = [0.000168, 0.000316, 5.6e-05, 0.002055]
+    Tcs = [514.0, 591.75, 647.14, 843.0]
+    kijs = Tarakad_Danner_virial_CSP_kij(Vcs)
+    Tcijs = Tarakad_Danner_virial_CSP_Tcijs(Tcs=Tcs, kijs=kijs)
+    Tcijs_expect = [[514.0, 542.4269432446305, 548.606779975124, 510.5967574676473],
+     [542.4269432446305, 591.7500000000001, 547.1675300600267, 611.7203098423653],
+     [548.606779975124, 547.1675300600267, 647.14, 443.0307753796196],
+     [510.5967574676473, 611.7203098423653, 443.0307753796196, 842.9999999999999]]
+    assert_close2d(Tcijs, Tcijs_expect, rtol=1e-12)
+    
+def test_Tarakad_Danner_virial_CSP_omegaijs():
+    omegaijs = Tarakad_Danner_virial_CSP_omegaijs([0.635, 0.257, 0.344, 1.26])
+    omegaijs_expect = [[0.635, 0.446, 0.4895, 0.9475], [0.446, 0.257, 0.3005, 0.7585], [0.4895, 0.3005, 0.344, 0.802], [0.9475, 0.7585, 0.802, 1.26]]
+    
+    assert_close2d(omegaijs, omegaijs_expect, rtol=1e-12)
