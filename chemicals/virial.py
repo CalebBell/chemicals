@@ -52,20 +52,31 @@ Third Virial Correlations
 
 Cross-Parameters
 ----------------
-.. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_kij
+.. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_kijs
 .. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_Tcijs
 .. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_Pcijs
 .. autofunction:: chemicals.virial.Tarakad_Danner_virial_CSP_omegaijs
+.. autofunction:: chemicals.virial.Lee_Kesler_virial_CSP_Vcijs
+.. autofunction:: chemicals.virial.Meng_Duan_2005_virial_CSP_kijs
+
+
+
+Second Virial Correlations Dense Implementations
+------------------------------------------------
+.. autofunction:: chemicals.virial.BVirial_Xiang_vec
+.. autofunction:: chemicals.virial.BVirial_Xiang_mat
 
 """
 from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
-           'BVirial_Tsonopoulos_extended', 'BVirial_Xiang',
+           'BVirial_Tsonopoulos_extended',
+           'BVirial_Xiang', 'BVirial_Xiang_vec', 'BVirial_Xiang_mat',
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
-           'Tarakad_Danner_virial_CSP_kij', 'Tarakad_Danner_virial_CSP_Tcijs',
-           'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs']
+           'Tarakad_Danner_virial_CSP_kijs', 'Tarakad_Danner_virial_CSP_Tcijs',
+           'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs',
+           'Meng_Duan_2005_virial_CSP_kijs', 'Lee_Kesler_virial_CSP_Vcijs']
 
 from fluids.numerics import numpy as np
 from cmath import sqrt as csqrt
@@ -208,6 +219,7 @@ def Z_from_virial_density_form(T, P, *args):
     if l == 2:
         B, C = args[0], args[1]
         # A small imaginary part is ignored
+        # Seriously needs to be optimized
         return (P*(-(3*B*R*T/P + R**2*T**2/P**2)/(3*(-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)) - (-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)/3 + R*T/(3*P))/(R*T)).real
     if l == 3:
         # Huge mess. Ideally sympy could optimize a function for quick python
@@ -1026,6 +1038,147 @@ def BVirial_Xiang(T, Tc, Pc, Vc, omega):
     d3B = 3.0*Vc*T_inv3*(3293750000.0*x13 + 427500.*x14*x9 - 625000000000.*x4 + 1203125000000.*x9 + 9.*Tc3*Tc3*Tc3*x11*x11*x11*x9*T_inv3*T_inv3*T_inv3)*(1/10000000000000000)
     return (B, dB, d2B, d3B)
 
+def BVirial_Xiang_vec(T, Tcs, Pcs, Vcs, omegas, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a vectorized calculation of the Xiang B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[float]
+        Critical temperature of fluids [K]
+    Pcs : list[float]
+        Critical pressure of the fluids [Pa]
+    Vcs : list[float]
+        Critical volume of the fluids [m^3/mol]
+    omegas : list[float]
+        Acentric factor for fluids, [-]
+    Bs : list[float], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[float]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [0.0]*N
+    if dB_dTs is None:
+        dB_dTs = [0.0]*N
+    if d2B_dT2s is None:
+        d2B_dT2s = [0.0]*N
+    if d3B_dT3s is None:
+        d3B_dT3s = [0.0]*N
+    for i in range(N):
+        B, dB, d2B, d3B = BVirial_Xiang(T, Tcs[i], Pcs[i], Vcs[i], omegas[i])
+        Bs[i] = B
+        dB_dTs[i] = dB
+        d2B_dT2s[i] = d2B
+        d3B_dT3s[i] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
+def BVirial_Xiang_mat(T, Tcs, Pcs, Vcs, omegas, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a matrix calculation of the Xiang B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[list[float]]
+        Critical temperature of fluids [K]
+    Pcs : list[list[float]]
+        Critical pressure of the fluids [Pa]
+    Vcs : list[list[float]]
+        Critical volume of the fluids [m^3/mol]
+    omegas : list[list[float]]
+        Acentric factor for fluids, [-]
+    Bs : list[list[float]], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [[0.0]*N for _ in range(N)] # numba: delete
+#        Bs = zeros((N, N)) # numba: uncomment
+    if dB_dTs is None:
+        dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
+#        dB_dTs = zeros((N, N)) # numba: uncomment
+    if d2B_dT2s is None:
+        d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+    if d3B_dT3s is None:
+        d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Tc_row = Tcs[i]
+        Pc_row = Pcs[i]
+        Vc_row = Vcs[i]
+        omega_row = omegas[i]
+        
+        B_row = Bs[i]
+        dB_row = dB_dTs[i]
+        d2B_row = d2B_dT2s[i]
+        d3B_row = d3B_dT3s[i]
+        
+        for j in range(N):
+            B, dB, d2B, d3B = BVirial_Xiang(T, Tc_row[j], Pc_row[j], Vc_row[j], omega_row[j])
+            B_row[j] = B
+            dB_row[j] = dB
+            d2B_row[j] = d2B
+            d3B_row[j] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
 def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     r'''Calculates the third virial coefficient using the model in [1]_.
     
@@ -1207,7 +1360,97 @@ def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
 
 ### Mixing Rules
 
-def Tarakad_Danner_virial_CSP_kij(Vcs):
+def Meng_Duan_2005_virial_CSP_kij_alkane(nci, ncj):
+    # This whole thing can be cached as a lookup table
+    # Also, not temperature dependent so no issues here
+    if nci > ncj:
+        nci, ncj = ncj, nci
+    m = 0.00678/(1.0 + 0.336*nci)
+    kij = m*(log(ncj - nci + 1.0)**(7.0/2.0))
+    return kij
+
+def Meng_Duan_2005_virial_CSP_kij_alkane_N2(nci):
+    if nci < 1:
+        return 0.0
+    m = 0.04311
+    return m*log(nci + 1.0)**1.5 # equation 15
+
+def Meng_Duan_2005_virial_CSP_kij_alkane_CO2(nci):
+    if nci < 1:
+        return 0.0
+    m = 0.07475
+    return m*log(nci + 1.0)**1.5 # equation 15
+
+CO2_CAS = '124-38-9'
+N2_CAS = '7727-37-9'
+
+def Meng_Duan_2005_virial_CSP_kijs(CASs, atomss):
+    r'''Calculates a binary interaction parameter for the calculation of Bij
+    binary virial coefficient as shown in [1]_. This implements a correlation
+    of alkane-alkane, CO2-alkane, and N2-alkane.
+    
+    The equation this kij is used in is 
+
+    .. math::
+        T_{cij} = \sqrt{T_{ci}T_{cj}}(1-k_{ij})
+
+    Parameters
+    ----------
+    CASs : list[str]
+        CAS registration numbers for each component, [-]
+    atomss : list[dict]
+        Breakdown of each component into its elements and their counts, as a
+        dict, [-]
+
+    Returns
+    -------
+    kijs : list[list[float]]
+        Binary interaction parameters, [-]
+    
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> CASs = ['74-82-8', '74-84-0', '124-38-9', '7727-37-9', '7439-89-6']
+    >>> atomss = [{'C': 1, 'H': 4}, {'C': 2, 'H': 6}, {'C': 1, 'O': 2}, {'N': 2}, {'Fe': 1}]
+    >>> kijs = Meng_Duan_2005_virial_CSP_kijs(CASs=CASs, atomss=atomss)
+
+    References
+    ----------
+    .. [1] Meng, Long, and Yuan-Yuan Duan. "Prediction of the Second Cross 
+       Virial Coefficients of Nonpolar Binary Mixtures." Fluid Phase Equilibria
+       238 (December 1, 2005): 229-38.
+       https://doi.org/10.1016/j.fluid.2005.10.007.
+    '''
+    N = len(CASs)
+    kijs = [[0.0]*N for _ in range(N)]
+    for i in range(N):
+        CAS1 = CASs[i]
+        kij_row = kijs[i]
+        C_i = atomss[i].get('C', 0)
+        # symmetrical
+        for j in range(i):
+            CAS2 = CASs[j]
+    
+            if CAS1 == CO2_CAS:
+                C = atomss[j].get('C', 0)
+                kij_row[j] = kijs[j][i] = Meng_Duan_2005_virial_CSP_kij_alkane_CO2(C)
+            elif CAS2 == CO2_CAS:
+                kij_row[j] = kijs[j][i] = Meng_Duan_2005_virial_CSP_kij_alkane_CO2(C_i)
+
+            elif CAS1 == N2_CAS:
+                C = atomss[j].get('C', 0)
+                kij_row[j] = kijs[j][i] = Meng_Duan_2005_virial_CSP_kij_alkane_N2(C)
+            elif CAS2 == N2_CAS:
+                kij_row[j] = kijs[j][i] = Meng_Duan_2005_virial_CSP_kij_alkane_N2(C_i)
+            elif C_i and atomss[j].get('C', 0):
+                kij_row[j] = kijs[j][i] = Meng_Duan_2005_virial_CSP_kij_alkane(C_i, atomss[j].get('C', 0))
+            else:
+                continue
+    return kijs
+
+def Tarakad_Danner_virial_CSP_kijs(Vcs):
     r'''Calculates a binary interaction parameter for the calculation of Bij
     binary virial coefficient as shown in [1]_ and [2]_.
     
@@ -1236,7 +1479,7 @@ def Tarakad_Danner_virial_CSP_kij(Vcs):
 
     Examples
     --------
-    >>> Tarakad_Danner_virial_CSP_kij(Vcs=[0.000168, 0.000316])
+    >>> Tarakad_Danner_virial_CSP_kijs(Vcs=[0.000168, 0.000316])
     [[0.0, 0.01646332091], [0.0164633209, 0.0]]
 
     References
@@ -1299,7 +1542,7 @@ def Tarakad_Danner_virial_CSP_Tcijs(Tcs, kijs):
 
     Examples
     --------
-    >>> kijs = Tarakad_Danner_virial_CSP_kij(Vcs=[0.000168, 0.000316])
+    >>> kijs = Tarakad_Danner_virial_CSP_kijs(Vcs=[0.000168, 0.000316])
     >>> Tarakad_Danner_virial_CSP_Tcijs(Tcs=[514.0, 591.75], kijs=kijs)
     [[514.0, 542.42694], [542.42694, 591.75000]]
 
@@ -1361,7 +1604,7 @@ def Tarakad_Danner_virial_CSP_Pcijs(Tcs, Pcs, Vcs, Tcijs):
 
     Examples
     --------
-    >>> kijs = Tarakad_Danner_virial_CSP_kij(Vcs=[0.000168, 0.000316])
+    >>> kijs = Tarakad_Danner_virial_CSP_kijs(Vcs=[0.000168, 0.000316])
     >>> Tcijs = Tarakad_Danner_virial_CSP_Tcijs(Tcs=[514.0, 591.75], kijs=kijs)
     >>> Tarakad_Danner_virial_CSP_Pcijs(Tcs=[514.0, 591.75], Pcs=[6137000.0, 4108000.0], Vcs=[0.000168, 0.000316], Tcijs=Tcijs)
     [[6136999.9, 4861936.4], [4861936.4, 4107999.9]]
@@ -1447,3 +1690,52 @@ def Tarakad_Danner_virial_CSP_omegaijs(omegas):
         for j in range(N):
             r[j] = 0.5*(omegai + omegas[j])
     return omegaijs
+
+def Lee_Kesler_virial_CSP_Vcijs(Vcs):
+    r'''Calculates the corresponding states critical volumes for the 
+    calculation of Vcijs
+    binary virial coefficient as shown in [1]_ and [2]_.
+    
+    .. math::
+        V_{cij} = \frac{1}{8}\left(V_{c,i}^{1/3} + V_{c,j}^{1/3}
+            \right)^3
+
+    Parameters
+    ----------
+    Vcs : list[float]
+        Critical volume of the fluids [m^3/mol]
+
+    Returns
+    -------
+    Vcijs : list[list[float]]
+        CSP critical volumes for each pair of species, [m^3/mol]
+
+    Notes
+    -----
+    [1]_ cites this as Lee-Kesler rules.
+
+    Examples
+    --------
+    >>> Lee_Kesler_virial_CSP_Vcijs(Vcs=[0.000168, 0.000316])
+    [[0.000168, 0.00023426], [0.000234265, 0.000316]]
+    
+    References
+    ----------
+    .. [1] Estela-Uribe, J. F., and J. Jaramillo. "Generalised Virial Equation
+       of State for Natural Gas Systems." Fluid Phase Equilibria 231, no. 1 
+       (April 1, 2005): 84-98. https://doi.org/10.1016/j.fluid.2005.01.005.
+    '''
+    N = len(Vcs)
+    Vcijs = [[0.0]*N for i in range(N)] # numba: delete
+#     Vcijs = zeros((N, N)) # numba: uncomment
+    Vc_cbrts = [0.0]*N
+    for i in range(N):
+        Vc_cbrts[i] = Vcs[i]**(1.0/3.0)
+    for i in range(N):
+        Vci_cbrt = Vc_cbrts[i]
+        Vcij_row = Vcijs[i]
+        
+        for j in range(N):
+            f = Vci_cbrt + Vc_cbrts[j]
+            Vcij_row[j] = 0.125*f*f*f
+    return Vcijs

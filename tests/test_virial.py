@@ -23,7 +23,7 @@ SOFTWARE.
 
 import pytest
 import numpy as np
-from fluids.numerics import linspace, assert_close, assert_close1d, assert_close2d, derivative
+from fluids.numerics import linspace, assert_close, assert_close1d, assert_close2d, assert_close3d, derivative
 from chemicals.virial import *
 from chemicals import rho_to_Vm
 from fluids.constants import R as _R
@@ -410,13 +410,41 @@ def test_BVirial_Xiang():
     Vc = rho_to_Vm(MW=MW, rho=rhoc_mass)
     # ~-4.5 expected if ans not multiplied by Vc
     expect = [-0.0008878022797789029, 7.467113021775213e-06, -9.800480205221981e-08, 1.7837228334430914e-09]
-    assert_close(BVirial_Xiang(T, Tc, Pc, Vc, omega)[0], -0.0008878022797789028)
+    assert_close(BVirial_Xiang(T, Tc, Pc, Vc, omega)[0], -0.0008878022797789028, rtol=1e-13)
     assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[0], T, dx=T*1e-6), expect[1])
     assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[1], T, dx=T*1e-6), expect[2])
     assert_close(derivative(lambda T: BVirial_Xiang(T, Tc, Pc, Vc, omega)[2], T, dx=T*1e-6), expect[3])
+    
 
+    # Vector call with out memory savings
+    vec_call = BVirial_Xiang_vec(T, [Tc], [Pc], [Vc], [omega])
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, vec_call, rtol=1e-13)
+    
+    Bs_out = [0]
+    dBs_out = [0]
+    d2Bs_out = [0]
+    d3Bs_out = [0]
+    
+    # vector call with memory savings
+    BVirial_Xiang_vec(T, [Tc], [Pc], [Vc], [omega], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
+    
+    # matrix call
+    mat_call = BVirial_Xiang_mat(T, [[Tc]], [[Pc]], [[Vc]], [[omega]])
+    expect_mat = [[[expect[0]]], [[expect[1]]], [[expect[2]]], [[expect[3]]]]
+    assert_close2d(expect_mat, mat_call, rtol=1e-13)
 
-def test_Tarakad_Danner_virial_CSP_kij():
+    # matrix call for memory savings
+    Bs_out = [[0]]
+    dBs_out = [[0]]
+    d2Bs_out = [[0]]
+    d3Bs_out = [[0]]
+    BVirial_Xiang_mat(T, [[Tc]], [[Pc]], [[Vc]], [[omega]], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    assert_close3d(expect_mat, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
+    
+def test_Tarakad_Danner_virial_CSP_kijs():
     
     expect = [[0.0, 0.016463320918394864, 0.048781060667435705, 0.2243198001812905],
      [0.016463320918394864, 0.0, 0.11579684127861978, 0.1338961298780077],
@@ -425,13 +453,13 @@ def test_Tarakad_Danner_virial_CSP_kij():
     
     
     Vcs = [0.000168, 0.000316, 5.6e-05, 0.002055]
-    ans = Tarakad_Danner_virial_CSP_kij(Vcs)
+    ans = Tarakad_Danner_virial_CSP_kijs(Vcs)
     assert_close2d(ans, expect, rtol=1e-13)
     
 def test_Tarakad_Danner_virial_CSP_Tcijs():
     Vcs = [0.000168, 0.000316, 5.6e-05, 0.002055]
     Tcs = [514.0, 591.75, 647.14, 843.0]
-    kijs = Tarakad_Danner_virial_CSP_kij(Vcs)
+    kijs = Tarakad_Danner_virial_CSP_kijs(Vcs)
     Tcijs = Tarakad_Danner_virial_CSP_Tcijs(Tcs=Tcs, kijs=kijs)
     Tcijs_expect = [[514.0, 542.4269432446305, 548.606779975124, 510.5967574676473],
      [542.4269432446305, 591.7500000000001, 547.1675300600267, 611.7203098423653],
@@ -444,3 +472,22 @@ def test_Tarakad_Danner_virial_CSP_omegaijs():
     omegaijs_expect = [[0.635, 0.446, 0.4895, 0.9475], [0.446, 0.257, 0.3005, 0.7585], [0.4895, 0.3005, 0.344, 0.802], [0.9475, 0.7585, 0.802, 1.26]]
     
     assert_close2d(omegaijs, omegaijs_expect, rtol=1e-12)
+    
+    
+def test_Meng_Duan_2005_virial_CSP_kijs():
+    CASs = ['74-82-8', '74-84-0', '124-38-9', '7727-37-9', '7439-89-6']
+    atomss = [{'C': 1, 'H': 4}, {'C': 2, 'H': 6}, {'C': 1, 'O': 2}, {'N': 2}, {'Fe': 1}]
+    kijs = Meng_Duan_2005_virial_CSP_kijs(CASs=CASs, atomss=atomss)
+    kijs_expect = [[0.0, 0.0014070591327669385, 0.04313694538361394, 0.024878043016556484, 0.0],
+                   [0.0014070591327669385, 0.0, 0.08607516737052616, 0.0496414777972359, 0.0],
+                   [0.04313694538361394, 0.08607516737052616, 0.0, 0.0, 0.0],
+                   [0.024878043016556484, 0.0496414777972359, 0.0, 0.0, 0.0],
+                   [0.0, 0.0, 0.0, 0.0, 0.0]]
+    
+    assert_close2d(kijs, kijs_expect, rtol=1e-13)
+    
+def test_Lee_Kesler_virial_CSP_Vcijs():
+    Vcs = [0.000168, 0.000316, 5.6e-05, 0.002055]
+    ans = Lee_Kesler_virial_CSP_Vcijs(Vcs)
+    expect = [[0.00016800000000000004, 0.00023426511495004188, 0.00010196900126054562, 0.0007574916472147805], [0.00023426511495004188, 0.00031600000000000015, 0.00015044767921762743, 0.0009304209382011844], [0.00010196900126054562, 0.00015044767921762743, 5.6000000000000047e-05, 0.0005655603315853534], [0.0007574916472147805, 0.0009304209382011844, 0.0005655603315853534, 0.002055000000000001]]
+    assert_close2d(expect, ans, rtol=1e-13)
