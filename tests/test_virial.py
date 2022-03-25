@@ -371,7 +371,37 @@ def test_CVirial_Orbey_Vera():
     assert_close(derivative(lambda T: CVirial_Orbey_Vera(T, Tc, Pc, omega)[1], T, dx=T*1e-6), expect[2])
     assert_close(derivative(lambda T: CVirial_Orbey_Vera(T, Tc, Pc, omega)[2], T, dx=T*1e-6), expect[3])
     
+    # Vector call with out memory savings
+    vec_call = CVirial_Orbey_Vera_vec(T, [Tc], [Pc], [omega])
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, vec_call, rtol=1e-13)
     
+    Cs_out = [0]
+    dCs_out = [0]
+    d2Cs_out = [0]
+    d3Cs_out = [0]
+    
+    # vector call with memory savings
+    CVirial_Orbey_Vera_vec(T, [Tc], [Pc],  [omega], Cs_out, dCs_out, d2Cs_out, d3Cs_out)
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, [Cs_out, dCs_out, d2Cs_out, d3Cs_out], rtol=1e-13)
+    
+    # matrix call
+    mat_call = CVirial_Orbey_Vera_mat(T, [[Tc]], [[Pc]], [[omega]])
+    expect_mat = [[[expect[0]]], [[expect[1]]], [[expect[2]]], [[expect[3]]]]
+    assert_close2d(expect_mat, mat_call, rtol=1e-13)
+
+    # matrix call for memory savings
+    Cs_out = [[0]]
+    dCs_out = [[0]]
+    d2Cs_out = [[0]]
+    d3Cs_out = [[0]]
+    CVirial_Orbey_Vera_mat(T, [[Tc]], [[Pc]],  [[omega]], Cs_out, dCs_out, d2Cs_out, d3Cs_out)
+    assert_close3d(expect_mat, [Cs_out, dCs_out, d2Cs_out, d3Cs_out], rtol=1e-13)
+
+
+
+
 def test_CVirial_Liu_Xiang():
     T = 300
     Tc = 568.7
@@ -385,7 +415,35 @@ def test_CVirial_Liu_Xiang():
     assert_close(derivative(lambda T: CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega)[0], T, dx=T*1e-6), expect[1])
     assert_close(derivative(lambda T: CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega)[1], T, dx=T*1e-6), expect[2])
     assert_close(derivative(lambda T: CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega)[2], T, dx=T*1e-6), expect[3])
+
+    # Vector call with out memory savings
+    vec_call = CVirial_Liu_Xiang_vec(T, [Tc], [Pc], [Vc], [omega])
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, vec_call, rtol=1e-13)
     
+    Cs_out = [0]
+    dCs_out = [0]
+    d2Cs_out = [0]
+    d3Cs_out = [0]
+    
+    # vector call with memory savings
+    CVirial_Liu_Xiang_vec(T, [Tc], [Pc], [Vc], [omega], Cs_out, dCs_out, d2Cs_out, d3Cs_out)
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, [Cs_out, dCs_out, d2Cs_out, d3Cs_out], rtol=1e-13)
+    
+    # matrix call
+    mat_call = CVirial_Liu_Xiang_mat(T, [[Tc]], [[Pc]], [[Vc]], [[omega]])
+    expect_mat = [[[expect[0]]], [[expect[1]]], [[expect[2]]], [[expect[3]]]]
+    assert_close2d(expect_mat, mat_call, rtol=1e-13)
+
+    # matrix call for memory savings
+    Cs_out = [[0]]
+    dCs_out = [[0]]
+    d2Cs_out = [[0]]
+    d3Cs_out = [[0]]
+    CVirial_Liu_Xiang_mat(T, [[Tc]], [[Pc]], [[Vc]], [[omega]], Cs_out, dCs_out, d2Cs_out, d3Cs_out)
+    assert_close3d(expect_mat, [Cs_out, dCs_out, d2Cs_out, d3Cs_out], rtol=1e-13)
+
     
     # POint with a graph
     Tc = 647.10
@@ -397,6 +455,7 @@ def test_CVirial_Liu_Xiang():
     
     graph_point = CVirial_Liu_Xiang(T=0.6*Tc, Tc=Tc, Pc=Pc, Vc=Vc, omega=omega)[0]/Vc**2
     assert_close(graph_point, -48.10297670037914)
+
 
 
 def test_BVirial_Xiang():
@@ -491,3 +550,23 @@ def test_Lee_Kesler_virial_CSP_Vcijs():
     ans = Lee_Kesler_virial_CSP_Vcijs(Vcs)
     expect = [[0.00016800000000000004, 0.00023426511495004188, 0.00010196900126054562, 0.0007574916472147805], [0.00023426511495004188, 0.00031600000000000015, 0.00015044767921762743, 0.0009304209382011844], [0.00010196900126054562, 0.00015044767921762743, 5.6000000000000047e-05, 0.0005655603315853534], [0.0007574916472147805, 0.0009304209382011844, 0.0005655603315853534, 0.002055000000000001]]
     assert_close2d(expect, ans, rtol=1e-13)
+    
+def test_Meng_virial_a():
+    calc = Meng_virial_a(317.4, 5870000.0, 1.85, haloalkane=True)
+    assert_close(calc, -0.04493829786760545, rtol=1e-13)
+    
+    calc = Meng_virial_a(514.0, 6137000.0, 1.44, haloalkane=False)
+    assert_close(calc, -0.006378416625935997, rtol=1e-13)
+    
+    
+def test_BVirial_mixture():
+    Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
+    zs = [.5, .3, .2]
+    ans = BVirial_mixture(zs=zs, Bijs=Bijs)
+    assert_close(ans, -0.000116432, rtol=1e-13)
+    
+def test_CVirial_mixture_Orentlicher_Prausnitz():
+    Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    zs = [.5, .3, .2]
+    C = CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs)
+    assert_close(C, 2.0787313269445096e-09, rtol=1e-13)

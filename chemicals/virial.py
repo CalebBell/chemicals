@@ -36,6 +36,9 @@ Utilities
 .. autofunction:: chemicals.virial.B_from_Z
 .. autofunction:: chemicals.virial.Z_from_virial_density_form
 .. autofunction:: chemicals.virial.Z_from_virial_pressure_form
+.. autofunction:: chemicals.virial.BVirial_mixture
+.. autofunction:: chemicals.virial.CVirial_mixture_Orentlicher_Prausnitz
+
 
 Second Virial Correlations
 --------------------------
@@ -44,6 +47,8 @@ Second Virial Correlations
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_extended
 .. autofunction:: chemicals.virial.BVirial_Xiang
+.. autofunction:: chemicals.virial.Meng_virial_a
+
 
 Third Virial Correlations
 -------------------------
@@ -66,14 +71,26 @@ Second Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.BVirial_Xiang_vec
 .. autofunction:: chemicals.virial.BVirial_Xiang_mat
 
+Third Virial Correlations Dense Implementations
+-----------------------------------------------
+.. autofunction:: chemicals.virial.CVirial_Liu_Xiang_vec
+.. autofunction:: chemicals.virial.CVirial_Orbey_Vera_vec
+.. autofunction:: chemicals.virial.CVirial_Liu_Xiang_mat
+.. autofunction:: chemicals.virial.CVirial_Orbey_Vera_mat
 """
+
 from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
            'BVirial_Tsonopoulos_extended',
            'BVirial_Xiang', 'BVirial_Xiang_vec', 'BVirial_Xiang_mat',
+           'BVirial_mixture',
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
+           'CVirial_Liu_Xiang_mat', 'CVirial_Liu_Xiang_vec',
+           'CVirial_Orbey_Vera_vec', 'CVirial_Orbey_Vera_mat',
+           'CVirial_mixture_Orentlicher_Prausnitz',
+           'Meng_virial_a',
            'Tarakad_Danner_virial_CSP_kijs', 'Tarakad_Danner_virial_CSP_Tcijs',
            'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs',
            'Meng_Duan_2005_virial_CSP_kijs', 'Lee_Kesler_virial_CSP_Vcijs']
@@ -315,6 +332,50 @@ def Z_from_virial_pressure_form(P, *args):
 
 ### Second Virial Coefficients
 
+def BVirial_mixture(zs, Bijs):
+    r'''Calculate the `B` second virial coefficient from a matrix of 
+    virial cross-coefficients. The diagonal is virial coefficients of the
+    pure components.
+    
+    .. math::
+        B = \sum_i \sum_j y_i y_j B(T)
+
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Bijs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+
+    Returns
+    -------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
+    >>> zs = [.5, .3, .2]
+    >>> BVirial_mixture(zs=zs, Bijs=Bijs)
+    -0.000116432
+
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    B = 0.0
+    N = len(Bijs)
+    for i in range(N):
+        B_tmp = 0.0
+        row = Bijs[i]
+        for j in range(N):
+            B += zs[j]*row[j]
+        B += zs[i]*B_tmp
+    return B
 
 def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
     r'''Calculates the second virial coefficient using the model in [1]_.
@@ -1179,6 +1240,128 @@ def BVirial_Xiang_mat(T, Tcs, Pcs, Vcs, omegas, Bs=None, dB_dTs=None,
             d3B_row[j] = d3B
     return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
+
+def Meng_virial_a(Tc, Pc, dipole=0.0, haloalkane=False):
+    r'''Calculate the `a` parameter which is used in the Meng 
+    `B` second virial coefficient for polar components. There are two
+    correlations implemented - one for haloalkanes, and another for other
+    polar molecules. If the dipole moment is not provided, a value of 0.0
+    will be returned.
+    
+    If the compound is a haloalkane
+    
+    .. math::
+        a = -1.1524\times 10^{-6}{\mu}_r^2 + 7.2238\times 10^{-11}{\mu}_r^4
+        - 1.8701\times 10^{-15}{\mu}_r^6
+        
+    Otherwise
+    
+    .. math::
+        a = -3.0309\times 10^{-6}{\mu}_r^2 + 9.503\times 10^{-11}{\mu}_r^4
+        - 1.2469\times 10^{-15}{\mu}_r^6
+
+    Parameters
+    ----------
+    Tc : float
+        Critical temperature, [K]
+    Pc : float
+        Critical pressure, [Pa]
+    dipole : float
+        Dipole moment, [debye]
+    haloalkane : bool
+        Whether or not the compound is a haloalkane, [-]
+
+    Returns
+    -------
+    a : float
+        Coefficient [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Ethanol
+    
+    >>> Meng_virial_a(514.0, 6137000.0, 1.44, haloalkane=False)
+    -0.00637841
+    
+    R-41 Fluoromethane
+    
+    >>> Meng_virial_a(317.4, 5870000.0, 1.85, haloalkane=True)
+    -0.04493829
+
+    References
+    ----------
+    .. [1] Meng, Long, Yuan-Yuan Duan, and Lei Li. "Correlations for Second and
+       Third Virial Coefficients of Pure Fluids." Fluid Phase Equilibria 226
+       (December 10, 2004): 109-20. https://doi.org/10.1016/j.fluid.2004.09.023.
+    '''
+    # Perfect validated with graph
+    mur = dipole*dipole*Pc/(1.01325*Tc*Tc)
+    if haloalkane:
+        a = -1.1524e-6*mur**2 + 7.2238e-11*mur**4 - 1.8701E-15*mur**6
+    else:
+        a = -3.0309E-6*mur**2 + 9.503E-11*mur**4 - 1.2469E-15*mur**6
+    return a
+
+def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
+    r'''Calculate the `C` third virial coefficient from a matrix of 
+    virial cross-coefficients. The diagonal is virial coefficients of the
+    pure components.
+
+    .. math::
+        C = \sum_i \sum_j \sum_k y_i y_j y_k C_{ijk}(T)
+        
+    .. math::
+        C_{ijk} = \left(C_{ij}C_{jk}C_{ik}\right)^{1/3}
+
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Cijs : list[list[float]]
+        Third virial binary interaction coefficients in density form [m^6/mol^2]
+
+    Returns
+    -------
+    C : float
+        Third virial coefficient in density form [m^6/mol^2]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> zs = [.5, .3, .2]
+    >>> CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs)
+    2.0787313269445096e-09
+
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    N = len(zs)
+    Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
+#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Cij_cbrt_row = Cij_cbrts[i]
+        Cij_row = Cijs[i]
+        for j in range(i):
+            Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
+        Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+    
+#     print(np.array(Cijs)**(1/3)/Cij_cbrts)
+    C = 0.0
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                C += zs[i]*zs[j]*zs[k]*Cij_cbrts[i][j]*Cij_cbrts[i][k]*Cij_cbrts[j][k]
+    return C
+
+
 def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     r'''Calculates the third virial coefficient using the model in [1]_.
     
@@ -1205,15 +1388,15 @@ def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     Returns
     -------
     C : float
-        Second virial coefficient in density form [m^6/mol^2]
+        Third virial coefficient in density form [m^6/mol^2]
     dC_dT : float
-        First temperature derivative of second virial coefficient in density
+        First temperature derivative of third virial coefficient in density
         form [m^6/mol^2/K]
     d2C_dT2 : float
-        Second temperature derivative of second virial coefficient in density
+        Second temperature derivative of third virial coefficient in density
         form [m^6/mol^2/K^2]
     d3C_dT3 : float
-        Third temperature derivative of second virial coefficient in density
+        Third temperature derivative of third virial coefficient in density
         form [m^6/mol^2/K^3]
     
     Notes
@@ -1252,6 +1435,142 @@ def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     d3C = 3.0*x4*x7*(20.0*omega*(5735625.0*x1 - 1506624.0*x2 + 1680000.0*x3 - 4000000.0*x5) + 157478125.0*x1 - 41402368.0*x2)*(1/100000000)
     return C, dC, d2C, d3C
 
+def CVirial_Orbey_Vera_vec(T, Tcs, Pcs, omegas, Cs=None, dC_dTs=None, 
+                         d2C_dT2s=None, d3C_dT3s=None):
+    r'''Perform a vectorized calculation of the Orbey-Vera C virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[float]
+        Critical temperature of fluids [K]
+    Pcs : list[float]
+        Critical pressure of the fluids [Pa]
+    omegas : list[float]
+        Acentric factor for fluids, [-]
+    Cs : list[float], optional
+        Third virial coefficient in density form [m^6/mol^2]
+    dC_dTs : list[float], optional
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2s : list[float], optional
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3s : list[float], optional
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Returns
+    -------
+    Cs : list[float]
+        Third virial coefficient in density form [m^6/mol^2]
+    dC_dTs : list[float]
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2s : list[float]
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3s : list[float]
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Cs is None:
+        Cs = [0.0]*N
+    if dC_dTs is None:
+        dC_dTs = [0.0]*N
+    if d2C_dT2s is None:
+        d2C_dT2s = [0.0]*N
+    if d3C_dT3s is None:
+        d3C_dT3s = [0.0]*N
+    for i in range(N):
+        C, dC, d2C, d3C = CVirial_Orbey_Vera(T, Tcs[i], Pcs[i], omegas[i])
+        Cs[i] = C
+        dC_dTs[i] = dC
+        d2C_dT2s[i] = d2C
+        d3C_dT3s[i] = d3C
+    return Cs, dC_dTs, d2C_dT2s, d3C_dT3s
+
+def CVirial_Orbey_Vera_mat(T, Tcs, Pcs, omegas, Cs=None, dC_dTs=None, 
+                         d2C_dT2s=None, d3C_dT3s=None):
+    r'''Perform a matrix calculation of the Orbey-Vera C virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[list[float]]
+        Critical temperature of fluids [K]
+    Pcs : list[list[float]]
+        Critical pressure of the fluids [Pa]
+    omegas : list[list[float]]
+        Acentric factor for fluids, [-]
+    Cs : list[list[float]], optional
+        Third virial coefficient in density form [m^6/mol^2]
+    dC_dTs : list[list[float]], optional
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2s : list[list[float]], optional
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3s : list[list[float]], optional
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Returns
+    -------
+    Cs : list[list[float]]
+        Third virial coefficient in density form [m^6/mol^2]
+    dC_dTs : list[list[float]]
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2s : list[list[float]]
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3s : list[list[float]]
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Cs is None:
+        Cs = [[0.0]*N for _ in range(N)] # numba: delete
+#        Cs = zeros((N, N)) # numba: uncomment
+    if dC_dTs is None:
+        dC_dTs = [[0.0]*N for _ in range(N)] # numba: delete
+#        dC_dTs = zeros((N, N)) # numba: uncomment
+    if d2C_dT2s is None:
+        d2C_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d2C_dT2s = zeros((N, N)) # numba: uncomment
+    if d3C_dT3s is None:
+        d3C_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d3C_dT3s = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Tc_row = Tcs[i]
+        Pc_row = Pcs[i]
+        omega_row = omegas[i]
+        
+        C_row = Cs[i]
+        dC_row = dC_dTs[i]
+        d2C_row = d2C_dT2s[i]
+        d3C_row = d3C_dT3s[i]
+        
+        for j in range(N):
+            C, dC, d2C, d3C = CVirial_Orbey_Vera(T, Tc_row[j], Pc_row[j], omega_row[j])
+            C_row[j] = C
+            dC_row[j] = dC
+            d2C_row[j] = d2C
+            d3C_row[j] = d3C
+    return Cs, dC_dTs, d2C_dT2s, d3C_dT3s
+
 def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
     r'''Calculates the third virial coefficient using the model in [1]_.
     
@@ -1287,15 +1606,15 @@ def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
     Returns
     -------
     C : float
-        Second virial coefficient in density form [m^6/mol^2]
+        Third virial coefficient in density form [m^6/mol^2]
     dC_dT : float
-        First temperature derivative of second virial coefficient in density
+        First temperature derivative of third virial coefficient in density
         form [m^6/mol^2/K]
     d2C_dT2 : float
-        Second temperature derivative of second virial coefficient in density
+        Second temperature derivative of third virial coefficient in density
         form [m^6/mol^2/K^2]
     d3C_dT3 : float
-        Third temperature derivative of second virial coefficient in density
+        Third temperature derivative of third virial coefficient in density
         form [m^6/mol^2/K^3]
     
     Notes
@@ -1356,6 +1675,148 @@ def CVirial_Liu_Xiang(T, Tc, Pc, Vc, omega):
     d2C = 6.0*x10*(2.0*a10 + a20*x12 + a30*x11 + omega*(2.0*a11 + a21*x12 + a31*x11) + theta*(2.0*a12 + a22*x12 + a32*x11))*T_inv2*T_inv3
     d3C = -12.0*x10*x2*(5.0*a10 + a20*x14 + a30*x13 + omega*(5.0*a11 + a21*x14 + a31*x13) + theta*(5.0*a12 + a22*x14 + a32*x13))
     return C, dC, d2C, d3C
+
+
+def CVirial_Liu_Xiang_vec(T, Tcs, Pcs, Vcs, omegas, Cs=None, dC_dTs=None, 
+                         d2C_dT2s=None, d3C_dT3s=None):
+    r'''Perform a vectorized calculation of the Xiang C virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[float]
+        Critical temperature of fluids [K]
+    Pcs : list[float]
+        Critical pressure of the fluids [Pa]
+    Vcs : list[float]
+        Critical volume of the fluids [m^3/mol]
+    omegas : list[float]
+        Acentric factor for fluids, [-]
+    Cs : list[float], optional
+        Third virial coefficient in density form [m^6/mol^2]
+    dC_dTs : list[float], optional
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2s : list[float], optional
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3s : list[float], optional
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Returns
+    -------
+    Cs : list[float]
+        Third virial coefficient in density form [m^6/mol^2]
+    dC_dTs : list[float]
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2s : list[float]
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3s : list[float]
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Cs is None:
+        Cs = [0.0]*N
+    if dC_dTs is None:
+        dC_dTs = [0.0]*N
+    if d2C_dT2s is None:
+        d2C_dT2s = [0.0]*N
+    if d3C_dT3s is None:
+        d3C_dT3s = [0.0]*N
+    for i in range(N):
+        C, dC, d2C, d3C = CVirial_Liu_Xiang(T, Tcs[i], Pcs[i], Vcs[i], omegas[i])
+        Cs[i] = C
+        dC_dTs[i] = dC
+        d2C_dT2s[i] = d2C
+        d3C_dT3s[i] = d3C
+    return Cs, dC_dTs, d2C_dT2s, d3C_dT3s
+
+def CVirial_Liu_Xiang_mat(T, Tcs, Pcs, Vcs, omegas, Cs=None, dC_dTs=None, 
+                         d2C_dT2s=None, d3C_dT3s=None):
+    r'''Perform a matrix calculation of the Xiang C virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[list[float]]
+        Critical temperature of fluids [K]
+    Pcs : list[list[float]]
+        Critical pressure of the fluids [Pa]
+    Vcs : list[list[float]]
+        Critical volume of the fluids [m^3/mol]
+    omegas : list[list[float]]
+        Acentric factor for fluids, [-]
+    Cs : list[list[float]], optional
+        Third virial coefficient in density form [m^6/mol^2]
+    dC_dTs : list[list[float]], optional
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2s : list[list[float]], optional
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3s : list[list[float]], optional
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Returns
+    -------
+    Cs : list[list[float]]
+        Third virial coefficient in density form [m^6/mol^2]
+    dC_dTs : list[list[float]]
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+    d2C_dT2s : list[list[float]]
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+    d3C_dT3s : list[list[float]]
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Cs is None:
+        Cs = [[0.0]*N for _ in range(N)] # numba: delete
+#        Cs = zeros((N, N)) # numba: uncomment
+    if dC_dTs is None:
+        dC_dTs = [[0.0]*N for _ in range(N)] # numba: delete
+#        dC_dTs = zeros((N, N)) # numba: uncomment
+    if d2C_dT2s is None:
+        d2C_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d2C_dT2s = zeros((N, N)) # numba: uncomment
+    if d3C_dT3s is None:
+        d3C_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d3C_dT3s = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Tc_row = Tcs[i]
+        Pc_row = Pcs[i]
+        Vc_row = Vcs[i]
+        omega_row = omegas[i]
+        
+        C_row = Cs[i]
+        dC_row = dC_dTs[i]
+        d2C_row = d2C_dT2s[i]
+        d3C_row = d3C_dT3s[i]
+        
+        for j in range(N):
+            C, dC, d2C, d3C = CVirial_Liu_Xiang(T, Tc_row[j], Pc_row[j], Vc_row[j], omega_row[j])
+            C_row[j] = C
+            dC_row[j] = dC
+            d2C_row[j] = d2C
+            d3C_row[j] = d3C
+    return Cs, dC_dTs, d2C_dT2s, d3C_dT3s
 
 
 ### Mixing Rules
@@ -1724,6 +2185,9 @@ def Lee_Kesler_virial_CSP_Vcijs(Vcs):
     .. [1] Estela-Uribe, J. F., and J. Jaramillo. "Generalised Virial Equation
        of State for Natural Gas Systems." Fluid Phase Equilibria 231, no. 1 
        (April 1, 2005): 84-98. https://doi.org/10.1016/j.fluid.2005.01.005.
+    .. [2] Lee, Byung Ik, and Michael G. Kesler. "A Generalized Thermodynamic
+       Correlation Based on Three-Parameter Corresponding States." AIChE
+       Journal 21, no. 3 (1975): 510-27. https://doi.org/10.1002/aic.690210313.
     '''
     N = len(Vcs)
     Vcijs = [[0.0]*N for i in range(N)] # numba: delete
