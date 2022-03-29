@@ -558,6 +558,10 @@ def test_Meng_virial_a():
     calc = Meng_virial_a(514.0, 6137000.0, 1.44, haloalkane=False)
     assert_close(calc, -0.006378416625935997, rtol=1e-13)
     
+def test_BVirial_Meng():
+    calc = BVirial_Meng(388.26, 647.1, 22050000.0, 5.543076e-05, 0.344)
+    expect = (-0.00032436028497558636, 2.470038900338557e-06, -3.132003987118147e-08, 5.776332655071256e-10)
+    assert_close1d(calc, expect, rtol=1e-13)
     
 def test_BVirial_mixture():
     Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
@@ -570,3 +574,10 @@ def test_CVirial_mixture_Orentlicher_Prausnitz():
     zs = [.5, .3, .2]
     C = CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs)
     assert_close(C, 2.0787313269445096e-09, rtol=1e-13)
+    
+def test_dCVirial_mixture_dT_Orentlicher_Prausnitz():
+    Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
+    zs = [.5, .3, .2]
+    dC = dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs)
+    assert_close(dC, -7.276497863811498e-12, rtol=1e-14)

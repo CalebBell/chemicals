@@ -38,7 +38,7 @@ Utilities
 .. autofunction:: chemicals.virial.Z_from_virial_pressure_form
 .. autofunction:: chemicals.virial.BVirial_mixture
 .. autofunction:: chemicals.virial.CVirial_mixture_Orentlicher_Prausnitz
-
+.. autofunction:: chemicals.virial.dCVirial_mixture_dT_Orentlicher_Prausnitz
 
 Second Virial Correlations
 --------------------------
@@ -47,6 +47,7 @@ Second Virial Correlations
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_extended
 .. autofunction:: chemicals.virial.BVirial_Xiang
+.. autofunction:: chemicals.virial.BVirial_Meng
 .. autofunction:: chemicals.virial.Meng_virial_a
 
 
@@ -89,8 +90,8 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
            'CVirial_Liu_Xiang_mat', 'CVirial_Liu_Xiang_vec',
            'CVirial_Orbey_Vera_vec', 'CVirial_Orbey_Vera_mat',
-           'CVirial_mixture_Orentlicher_Prausnitz',
-           'Meng_virial_a',
+           'CVirial_mixture_Orentlicher_Prausnitz', 'dCVirial_mixture_dT_Orentlicher_Prausnitz',
+           'Meng_virial_a', 'BVirial_Meng',
            'Tarakad_Danner_virial_CSP_kijs', 'Tarakad_Danner_virial_CSP_Tcijs',
            'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs',
            'Meng_Duan_2005_virial_CSP_kijs', 'Lee_Kesler_virial_CSP_Vcijs']
@@ -1072,7 +1073,6 @@ def BVirial_Xiang(T, Tc, Pc, Vc, omega):
     b21 = 4.297
     b22 = 0.0
     
-    # TODO optimize the powers and divides
     x0 = 1.0/Tc
     x1 = T*x0
     x2 = 10000.0*omega
@@ -1240,7 +1240,90 @@ def BVirial_Xiang_mat(T, Tcs, Pcs, Vcs, omegas, Bs=None, dB_dTs=None,
             d3B_row[j] = d3B
     return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
+def BVirial_Meng(T, Tc, Pc, Vc, omega, a=0.0):
+    r'''Calculates the second virial coefficient using the model in [1]_.
 
+    .. math::
+        B = \frac{RT_c}{P_c}\left(f_0 + \omega f_1 + f_2\right)
+    
+    .. math::
+        f_0 = c_0 + c_1/T_r + c_2/T_r^2 + c_3/T_r^3 + c_4/T_r^8
+
+    .. math::
+        f_1 = d_0 + d_1/T_r + d_2/T_r^2 + d_3/T_r^3 + d_4/T_r^8
+        
+    .. math::
+        f_2 = \frac{a}{T_r^6}
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of the fluid [Pa]
+    Vc : float
+        Critical volume of the fluid [m^3/mol]
+    omega : float
+        Acentric factor for fluid, [-]
+
+    Returns
+    -------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+    dB_dT : float
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2 : float
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3 : float
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+
+    Examples
+    --------
+
+    >>> BVirial_Meng(388.26, 647.1, 22050000.0, 5.543076e-05, 0.344)
+    (-0.00032436028, 2.47004e-06, -3.132e-08, 5.8e-10)
+
+    References
+    ----------
+    .. [1] Meng, Long, Yuan-Yuan Duan, and Lei Li. "Correlations for Second and
+       Third Virial Coefficients of Pure Fluids." Fluid Phase Equilibria 226
+       (December 10, 2004): 109-20. https://doi.org/10.1016/j.fluid.2004.09.023.
+    '''
+    c0, c1, c2, c3, c4 =  0.13356, -0.30252, -0.15668, -0.00724, -0.00022
+    d0, d1, d2, d3, d4 = 0.17404, -0.15581, 0.38183, -0.44044, -0.00541
+    x0 = Tc/T
+    x1 = Tc**8/T**8
+    x2 = T**(-3)
+    x3 = Tc**3*x2
+    x4 = Tc**2
+    x5 = x4/T**2
+    x6 = R/Pc
+    x7 = 2*x0
+    x8 = Tc**7/T**7
+    x9 = 8*x8
+    x10 = Tc**5*a/T**5
+    x11 = 3*x5
+    x12 = 3*x0
+    x13 = 36*x8
+    x14 = 6*x5
+    x15 = x4*x6
+    x16 = 4*x0
+    x17 = 120*x8
+    x18 = 10*x5
+    B = Tc*x6*(c0 + c1*x0 + c2*x5 + c3*x3 + c4*x1 + omega*(d0 + d1*x0 + d2*x5 + d3*x3 + d4*x1) + Tc**6*a/T**6)
+    dB = -x5*x6*(c1 + c2*x7 + c3*x11 + c4*x9 + omega*(d1 + d2*x7 + d3*x11 + d4*x9) + 6*x10)
+    dB2 = 2*x15*x2*(c1 + c2*x12 + c3*x14 + c4*x13 + omega*(d1 + d2*x12 + d3*x14 + d4*x13) + 21*x10)
+    dB3 = -6*x15*(c1 + c2*x16 + c3*x18 + c4*x17 + omega*(d1 + d2*x16 + d3*x18 + d4*x17) + 56*x10)/T**4
+    return B, dB, dB2, dB3
+    
 def Meng_virial_a(Tc, Pc, dipole=0.0, haloalkane=False):
     r'''Calculate the `a` parameter which is used in the Meng 
     `B` second virial coefficient for polar components. There are two
@@ -1356,11 +1439,93 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
 #     print(np.array(Cijs)**(1/3)/Cij_cbrts)
     C = 0.0
     for i in range(N):
+        Cij_cbrts_i = Cij_cbrts[i]
         for j in range(N):
+            x0 = zs[i]*zs[j]*Cij_cbrts_i[j]
+            Cij_cbrts_j = Cij_cbrts[j]
             for k in range(N):
-                C += zs[i]*zs[j]*zs[k]*Cij_cbrts[i][j]*Cij_cbrts[i][k]*Cij_cbrts[j][k]
+                C += x0*zs[k]*Cij_cbrts_i[k]*Cij_cbrts_j[k]
     return C
 
+def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
+    r'''Calculate the first temperature derivative of the `C` third virial
+    coefficient from matrices of 
+    virial cross-coefficients and their first temperature derivatives. 
+    The diagonal is virial coefficients of the pure components.
+
+    .. math::
+        \frac{\partial C}{\partial T} = \sum_i \sum_j \sum_k 
+        \frac{zi zj zk \sqrt[3]{\operatorname{Cij}{\left(T \right)} \operatorname{Cik}{\left(T \right)} 
+        \operatorname{Cjk}{\left(T \right)}} \left(\frac{\operatorname{Cij}{\left(T \right)}
+        \operatorname{Cik}{\left(T \right)} \frac{d}{d T} \operatorname{Cjk}{\left(T \right)}}{3} 
+        + \frac{\operatorname{Cij}{\left(T \right)} \operatorname{Cjk}{\left(T \right)} \frac{d}{d T}
+        \operatorname{Cik}{\left(T \right)}}{3} + \frac{\operatorname{Cik}{\left(T \right)} \operatorname{Cjk}{\left(T \right)}
+        \frac{d}{d T} \operatorname{Cij}{\left(T \right)}}{3}\right)}{\operatorname{Cij}{\left(T \right)} 
+        \operatorname{Cik}{\left(T \right)} \operatorname{Cjk}{\left(T \right)}}
+        
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Cijs : list[list[float]]
+        Third virial binary interaction coefficients in density form [m^6/mol^2]
+    dCij_dTs : list[list[float]]
+        First temperature derivative of third virial binary interaction 
+        coefficients in density form [m^6/mol^2/K]
+        
+    Returns
+    -------
+    dC_dT : float
+        First temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
+    >>> zs = [.5, .3, .2]
+    >>> dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs)
+    -7.2764978638114e-12
+
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    N = len(zs)
+    Cij_pow_n23 = [[0.0]*N for _ in range(N)] # numba: delete
+#     Cij_pow_n23 = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Cij_pow_n23_row = Cij_pow_n23[i]
+        Cij_row = Cijs[i]
+        for j in range(i):
+            Cij_pow_n23_row[j] = Cij_pow_n23[j][i] = Cij_row[j]**(1.0/3)/Cij_row[j]
+        Cij_pow_n23_row[i] = Cij_row[i]**(1.0/3.0)/Cij_row[i]
+    
+    # expect = np.array(Cijs)**(1/3)/Cijs
+    # print(Cij_pow_n23/expect)
+
+    dC = 0.0
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                t0 = Cijs[i][j]*Cijs[i][k]*dCij_dTs[j][k]
+                t1 = Cijs[i][j]*Cijs[j][k]*dCij_dTs[i][k]
+                t2 = Cijs[i][k]*Cijs[j][k]*dCij_dTs[i][j]
+                
+                # Good
+                # dC += zs[i]*zs[j]*zs[k]*(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])**(1/3)*(t0 + t1 + t2)/(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])
+                # Good but suboptimal
+                # dC += zs[i]*zs[j]*zs[k]*(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])**(-2/3)*(t0 + t1 + t2)#/(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])
+
+                # Factor out the powers out
+                dC += zs[i]*zs[j]*zs[k]*Cij_pow_n23[i][j]*Cij_pow_n23[i][k]*Cij_pow_n23[j][k]*(t0 + t1 + t2)
+                
+    dC *= 1/3
+    return dC
 
 def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     r'''Calculates the third virial coefficient using the model in [1]_.
