@@ -365,7 +365,7 @@ def BVirial_mixture(zs, Bijs):
     >>> Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
     >>> zs = [.5, .3, .2]
     >>> BVirial_mixture(zs=zs, Bijs=Bijs)
-    -0.000116432
+    -3.19884e-05
 
     References
     ----------
@@ -378,7 +378,7 @@ def BVirial_mixture(zs, Bijs):
         B_tmp = 0.0
         row = Bijs[i]
         for j in range(N):
-            B += zs[j]*row[j]
+            B_tmp += zs[j]*row[j]
         B += zs[i]*B_tmp
     return B
 

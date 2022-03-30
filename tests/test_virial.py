@@ -567,7 +567,7 @@ def test_BVirial_mixture():
     Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
     zs = [.5, .3, .2]
     ans = BVirial_mixture(zs=zs, Bijs=Bijs)
-    assert_close(ans, -0.000116432, rtol=1e-13)
+    assert_close(ans, -3.19884e-05, rtol=1e-13)
     
 def test_CVirial_mixture_Orentlicher_Prausnitz():
     Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
