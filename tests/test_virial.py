@@ -581,3 +581,20 @@ def test_dCVirial_mixture_dT_Orentlicher_Prausnitz():
     zs = [.5, .3, .2]
     dC = dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs)
     assert_close(dC, -7.276497863811498e-12, rtol=1e-14)
+    
+def test_d2CVirial_mixture_dT2_Orentlicher_Prausnitz():
+    Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
+    d2Cij_dT2s = [[ 2.6469e-14,  5.0512e-14,  1.1509e-13], [ 5.0512e-14,  9.3272e-14,  1.7836e-13], [ 1.1509e-13,  1.7836e-13, -1.4906e-13]]
+    zs = [.5, .3, .2]
+    ans = d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s)
+    assert_close(ans, 6.723627522976708e-14, rtol=1e-14)
+    
+def test_d3CVirial_mixture_dT3_Orentlicher_Prausnitz():
+    Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
+    d2Cij_dT2s = [[ 2.6469e-14,  5.0512e-14,  1.1509e-13], [ 5.0512e-14,  9.3272e-14,  1.7836e-13], [ 1.1509e-13,  1.7836e-13, -1.4906e-13]]
+    d3Cij_dT3s = [[-4.2300e-16, -7.9727e-16, -1.6962e-15], [-7.9727e-16, -1.3826e-15, -1.4525e-15], [-1.6962e-15, -1.4525e-15,  1.9786e-14]]
+    zs = [.5, .3, .2]
+    ans = d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s, d3Cij_dT3s)
+    assert_close(ans, -3.7356470379612563e-16, rtol=1e-14)

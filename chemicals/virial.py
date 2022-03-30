@@ -39,6 +39,8 @@ Utilities
 .. autofunction:: chemicals.virial.BVirial_mixture
 .. autofunction:: chemicals.virial.CVirial_mixture_Orentlicher_Prausnitz
 .. autofunction:: chemicals.virial.dCVirial_mixture_dT_Orentlicher_Prausnitz
+.. autofunction:: chemicals.virial.d2CVirial_mixture_dT2_Orentlicher_Prausnitz
+.. autofunction:: chemicals.virial.d3CVirial_mixture_dT3_Orentlicher_Prausnitz
 
 Second Virial Correlations
 --------------------------
@@ -91,6 +93,8 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
            'CVirial_Liu_Xiang_mat', 'CVirial_Liu_Xiang_vec',
            'CVirial_Orbey_Vera_vec', 'CVirial_Orbey_Vera_mat',
            'CVirial_mixture_Orentlicher_Prausnitz', 'dCVirial_mixture_dT_Orentlicher_Prausnitz',
+           'd2CVirial_mixture_dT2_Orentlicher_Prausnitz',
+           'd3CVirial_mixture_dT3_Orentlicher_Prausnitz',
            'Meng_virial_a', 'BVirial_Meng',
            'Tarakad_Danner_virial_CSP_kijs', 'Tarakad_Danner_virial_CSP_Tcijs',
            'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs',
@@ -1438,6 +1442,7 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
     
 #     print(np.array(Cijs)**(1/3)/Cij_cbrts)
     C = 0.0
+    # TODO: can we use symmetry to cut time down?
     for i in range(N):
         Cij_cbrts_i = Cij_cbrts[i]
         for j in range(N):
@@ -1451,7 +1456,6 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
     r'''Calculate the first temperature derivative of the `C` third virial
     coefficient from matrices of 
     virial cross-coefficients and their first temperature derivatives. 
-    The diagonal is virial coefficients of the pure components.
 
     .. math::
         \frac{\partial C}{\partial T} = \sum_i \sum_j \sum_k 
@@ -1488,7 +1492,7 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
     >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
     >>> zs = [.5, .3, .2]
     >>> dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs)
-    -7.2764978638114e-12
+    -7.276497e-12
 
     References
     ----------
@@ -1527,6 +1531,216 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
     dC *= 1/3
     return dC
 
+def d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s):
+    r'''Calculate the second temperature derivative of the `C` third virial
+    coefficient from matrices of 
+    virial cross-coefficients and their first and second temperature derivatives. 
+
+    .. math::
+        \frac{\partial^2 C}{\partial T^2} = \sum_i \sum_j \sum_k z_i z_j z_k
+        \frac{\sqrt[3]{\operatorname{Cij}{\left(T \right)} \operatorname{Cik}{\left(T \right)} 
+        \operatorname{Cjk}{\left(T \right)}} \left(\frac{\left(\operatorname{Cij}{\left(T \right)}
+        \operatorname{Cik}{\left(T \right)} \frac{d}{d T} \operatorname{Cjk}{\left(T \right)} 
+        + \operatorname{Cij}{\left(T \right)} \operatorname{Cjk}{\left(T \right)} \frac{d}{d T}
+        \operatorname{Cik}{\left(T \right)} + \operatorname{Cik}{\left(T \right)}
+        \operatorname{Cjk}{\left(T \right)} \frac{d}{d T} \operatorname{Cij}{\left(T \right)}\right)^{2}}
+        {\operatorname{Cij}{\left(T \right)} \operatorname{Cik}{\left(T \right)} 
+        \operatorname{Cjk}{\left(T \right)}} - \frac{3 \left(\operatorname{Cij}{\left(T \right)}
+        \operatorname{Cik}{\left(T \right)} \frac{d}{d T} \operatorname{Cjk}{\left(T \right)} 
+        + \operatorname{Cij}{\left(T \right)} \operatorname{Cjk}{\left(T \right)} \frac{d}{d T}
+        \operatorname{Cik}{\left(T \right)} + \operatorname{Cik}{\left(T \right)}
+        \operatorname{Cjk}{\left(T \right)} \frac{d}{d T} \operatorname{Cij}{\left(T \right)}\right)
+        \frac{d}{d T} \operatorname{Cjk}{\left(T \right)}}{\operatorname{Cjk}{\left(T \right)}} 
+        - \frac{3 \left(\operatorname{Cij}{\left(T \right)} \operatorname{Cik}{\left(T \right)} 
+        \frac{d}{d T} \operatorname{Cjk}{\left(T \right)} + \operatorname{Cij}{\left(T \right)} 
+        \operatorname{Cjk}{\left(T \right)} \frac{d}{d T} \operatorname{Cik}{\left(T \right)}
+        + \operatorname{Cik}{\left(T \right)} \operatorname{Cjk}{\left(T \right)} \frac{d}{d T} 
+        \operatorname{Cij}{\left(T \right)}\right) \frac{d}{d T} \operatorname{Cik}{\left(T \right)}}
+        {\operatorname{Cik}{\left(T \right)}} - \frac{3 \left(\operatorname{Cij}{\left(T \right)} 
+        \operatorname{Cik}{\left(T \right)} \frac{d}{d T} \operatorname{Cjk}{\left(T \right)} 
+        + \operatorname{Cij}{\left(T \right)} \operatorname{Cjk}{\left(T \right)} \frac{d}{d T} 
+        \operatorname{Cik}{\left(T \right)} + \operatorname{Cik}{\left(T \right)} 
+        \operatorname{Cjk}{\left(T \right)} \frac{d}{d T} \operatorname{Cij}{\left(T \right)}\right) 
+        \frac{d}{d T} \operatorname{Cij}{\left(T \right)}}{\operatorname{Cij}{\left(T \right)}} 
+        + 3 \operatorname{Cij}{\left(T \right)} \operatorname{Cik}{\left(T \right)} \frac{d^{2}}{d T^{2}} 
+        \operatorname{Cjk}{\left(T \right)} + 3 \operatorname{Cij}{\left(T \right)} \operatorname{Cjk}{\left(T \right)}
+        \frac{d^{2}}{d T^{2}} \operatorname{Cik}{\left(T \right)} + 6 \operatorname{Cij}{\left(T \right)} \frac{d}{d T}
+        \operatorname{Cik}{\left(T \right)} \frac{d}{d T} \operatorname{Cjk}{\left(T \right)} 
+        + 3 \operatorname{Cik}{\left(T \right)} \operatorname{Cjk}{\left(T \right)} 
+        \frac{d^{2}}{d T^{2}} \operatorname{Cij}{\left(T \right)} + 6 \operatorname{Cik}{\left(T \right)} 
+        \frac{d}{d T} \operatorname{Cij}{\left(T \right)} \frac{d}{d T} \operatorname{Cjk}{\left(T \right)} 
+        + 6 \operatorname{Cjk}{\left(T \right)} \frac{d}{d T} \operatorname{Cij}{\left(T \right)}
+        \frac{d}{d T} \operatorname{Cik}{\left(T \right)}\right)}{9 \operatorname{Cij}{\left(T \right)}
+        \operatorname{Cik}{\left(T \right)} \operatorname{Cjk}{\left(T \right)}}
+        
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Cijs : list[list[float]]
+        Third virial binary interaction coefficients in density form [m^6/mol^2]
+    dCij_dTs : list[list[float]]
+        First temperature derivative of third virial binary interaction 
+        coefficients in density form [m^6/mol^2/K]
+    d2Cij_dT2s : list[list[float]]
+        Second temperature derivative of third virial binary interaction 
+        coefficients in density form [m^6/mol^2/K^2]
+
+    Returns
+    -------
+    d2C_dT2 : float
+        Second temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^2]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
+    >>> d2Cij_dT2s = [[ 2.6469e-14,  5.0512e-14,  1.1509e-13], [ 5.0512e-14,  9.3272e-14,  1.7836e-13], [ 1.1509e-13,  1.7836e-13, -1.4906e-13]]
+    >>> zs = [.5, .3, .2]
+    >>> d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s)
+    6.72362752e-14
+
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    N = len(zs)
+    d2C = 0.0
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                x0 = Cijs[i][j]
+                x1 = Cijs[i][k]
+                x2 = Cijs[j][k]
+                x3 = x1*x2
+                x4 = x0*x1
+                x5 = x0*x2
+                x8 = dCij_dTs[i][j]
+                x6 = dCij_dTs[i][k]
+                x7 = dCij_dTs[j][k]
+                x9 = 6*x8
+                x10 = 1/x0
+                x11 = x3*x8 + x4*x7 + x5*x6
+                x12 = 3*x11
+                x13 = 1/x1
+                x14 = 1/x2
+                x15 = x10*x13*x14
+                big = (x15*(x0*x3)**(1/3)*(6*x0*x6*x7 + x1*x7*x9 - x10*x12*x8 
+                        + x11**2*x15 - x12*x13*x6 - x12*x14*x7 + x2*x6*x9
+                        + 3*x3*d2Cij_dT2s[i][j] + 3*x4*d2Cij_dT2s[j][k] + 3*x5*d2Cij_dT2s[i][k])/9)
+                d2C += zs[i]*zs[j]*zs[k]*big
+    return d2C
+                
+def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
+                                                d3Cij_dT3s):
+    r'''Calculate the third temperature derivative of the `C` third virial
+    coefficient from matrices of 
+    virial cross-coefficients and their first, second, and third temperature
+    derivatives. 
+    
+    The expression is quite lengthy and not shown here.
+
+    .. math::
+        \frac{\partial^3 C}{\partial T^3} 
+        
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Cijs : list[list[float]]
+        Third virial binary interaction coefficients in density form [m^6/mol^2]
+    dCij_dTs : list[list[float]]
+        First temperature derivative of third virial binary interaction 
+        coefficients in density form [m^6/mol^2/K]
+    d2Cij_dT2s : list[list[float]]
+        Second temperature derivative of third virial binary interaction 
+        coefficients in density form [m^6/mol^2/K^2]
+    d3Cij_dT3s : list[list[float]]
+        Third temperature derivative of third virial binary interaction 
+        coefficients in density form [m^6/mol^2/K^2^2]
+
+    Returns
+    -------
+    d3C_dT3 : float
+        Third temperature derivative of third virial coefficient in density
+        form [m^6/mol^2/K^3]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
+    >>> d2Cij_dT2s = [[ 2.6469e-14,  5.0512e-14,  1.1509e-13], [ 5.0512e-14,  9.3272e-14,  1.7836e-13], [ 1.1509e-13,  1.7836e-13, -1.4906e-13]]
+    >>> d3Cij_dT3s = [[-4.2300e-16, -7.9727e-16, -1.6962e-15], [-7.9727e-16, -1.3826e-15, -1.4525e-15], [-1.6962e-15, -1.4525e-15,  1.9786e-14]]
+    >>> zs = [.5, .3, .2]
+    >>> d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s, d3Cij_dT3s)
+    -3.73564703e-16
+
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    N = len(zs)
+    d3C = 0.0
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                x0 = Cijs[j][k]
+                x1 = 1/x0
+                x2 = Cijs[i][j]
+                x3 = Cijs[i][k]
+                x4 = x0*x3
+                x5 = x2/3
+                x6 = d2Cij_dT2s[j][k]
+                x7 = dCij_dTs[i][k]
+                x8 = x2*x7
+                x9 = dCij_dTs[j][k]
+                x10 = d2Cij_dT2s[i][k]
+                x11 = dCij_dTs[i][j]
+                x12 = x3*x6
+                x13 = d2Cij_dT2s[i][j]
+                x14 = x3*x9
+                x15 = x0*x10
+                x16 = x0*x7
+                x17 = 2*x11
+                x18 = x7*x9
+                x19 = 1/x2
+                x20 = x11*x4 + x14*x2 + x16*x2
+                x21 = x20/3
+                x22 = x19*x21
+                x23 = 1/x3
+                x24 = x2**(-2)
+                x25 = 2*x20/3
+                x26 = x3**(-2)
+                x27 = x0**(-2)
+                x28 = x23*x7
+                x29 = x11*x19
+                x30 = x25*x29
+                x31 = x1*x9
+                x32 = x1*x23
+                x33 = x20**2/3
+                x34 = x1*x33
+                x35 = x19*x23
+                x36 = x12*x2 + x13*x4 + x14*x17 + x15*x2 + x16*x17 + 2*x8*x9
+                x37 = 2*x36/3
+                big = (x1*x35*(x2*x4)**(1/3)*(x0*x5*d3Cij_dT3s[i][k] - x1*x21*x6
+                      + x10*x2*x9 - x10*x21*x23 + x11**2*x24*x25 + x11*x12 + x11*x15 
+                      - x11*x23*x24*x34 + x13*x14 + x13*x16 - x13*x22 + x17*x18 + x18*x25*x32 
+                      - x19*x26*x34*x7 + x20**3*x24*x26*x27/27 + x22*x32*x36 + x25*x26*x7**2
+                      + x25*x27*x9**2 - x27*x33*x35*x9 + x28*x30 - x28*x37 - x29*x37
+                      + x3*x5*d3Cij_dT3s[j][k] + x30*x31 - x31*x37 + x4*d3Cij_dT3s[i][j]/3 + x6*x8))
+                d3C += zs[i]*zs[j]*zs[k]*big
+    return d3C
+
+    
 def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     r'''Calculates the third virial coefficient using the model in [1]_.
     
