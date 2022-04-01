@@ -233,6 +233,9 @@ def sigma_IAPWS(T):
     This function is valid from the triple temperature to the critical
     temperature. No effects for pressure are included in the formulation.
     Test values are from IAPWS 2010 book.
+    
+    The equation is valid from the triple point to the critical point, 
+    647.096 K; but [1]_ also recommends its use down to -25°C.
 
     Examples
     --------

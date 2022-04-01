@@ -74,6 +74,7 @@ IAPWS Constants
 .. autodata:: chemicals.iapws.iapws95_MW
 .. autodata:: chemicals.iapws.iapws95_R
 .. autodata:: chemicals.iapws.iapws97_R
+.. autodata:: chemicals.iapws.iapws95_Tt
 
 IAPWS-97 Region 1
 -----------------
@@ -256,12 +257,16 @@ iapws95_Tc = 647.096
 
 iapws95_Tc_inv = 1.0 / iapws95_Tc
 
+
 iapws95_rhoc = 322.0
 '''Critical density of water in kg/m^3 according to IAPWS-95, also used in IAPWS-97'''
 
 iapws95_rhoc_inv = 1.0 / iapws95_rhoc
 
 iapws95_R_rhoc_inv2 = iapws95_R*iapws95_rhoc_inv*iapws95_rhoc_inv
+
+iapws95_Tt = 273.16
+'''Triple temperature of water in K according to IAPWS'''
 
 def use_mpmath_backend():
     import mpmath as mp

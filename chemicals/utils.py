@@ -53,6 +53,7 @@ import sys
 from cmath import sqrt as csqrt
 from fluids.numerics import (brenth, newton, linspace, polyint,
                              polyint_over_x, derivative, polyder,
+                             trunc_log,
                              horner, horner_and_der2, assert_close,
                              quadratic_from_f_ders, numpy as np)
 from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
@@ -1983,7 +1984,7 @@ def mixing_logarithmic(fracs, props):
     try:
         tot = 0.0
         for i in range(len(fracs)):
-            tot += fracs[i]*log(props[i])
+            tot += fracs[i]*trunc_log(props[i])
         return exp(tot)
     except:
         return None
