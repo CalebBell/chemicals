@@ -88,7 +88,8 @@ Second Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.BVirial_Abbott_mat
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_vec
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_mat
-
+.. autofunction:: chemicals.virial.BVirial_Meng_vec
+.. autofunction:: chemicals.virial.BVirial_Meng_mat
 
 Third Virial Correlations Dense Implementations
 -----------------------------------------------
@@ -109,6 +110,8 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'BVirial_Tsonopoulos', 'BVirial_Tsonopoulos_fast',
            'BVirial_Tsonopoulos_vec', 'BVirial_Tsonopoulos_mat',
            
+           'Meng_virial_a', 'BVirial_Meng',
+           'BVirial_Meng_vec', 'BVirial_Meng_mat',
            
            'BVirial_Tsonopoulos_extended',
            'dBVirial_mixture_dzs', 'd2BVirial_mixture_dzizjs',
@@ -121,7 +124,6 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'CVirial_mixture_Orentlicher_Prausnitz', 'dCVirial_mixture_dT_Orentlicher_Prausnitz',
            'd2CVirial_mixture_dT2_Orentlicher_Prausnitz',
            'd3CVirial_mixture_dT3_Orentlicher_Prausnitz',
-           'Meng_virial_a', 'BVirial_Meng',
            'Tarakad_Danner_virial_CSP_kijs', 'Tarakad_Danner_virial_CSP_Tcijs',
            'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs',
            'Meng_Duan_2005_virial_CSP_kijs', 'Lee_Kesler_virial_CSP_Vcijs']
@@ -2017,6 +2019,8 @@ def BVirial_Meng(T, Tc, Pc, Vc, omega, a=0.0):
         Critical volume of the fluid [m^3/mol]
     omega : float
         Acentric factor for fluid, [-]
+    a : float
+        Polar parameter that can be estimated by :obj:`chemicals.virial.Meng_virial_a`
 
     Returns
     -------
@@ -2073,7 +2077,154 @@ def BVirial_Meng(T, Tc, Pc, Vc, omega, a=0.0):
     dB2 = 2*x15*x2*(c1 + c2*x12 + c3*x14 + c4*x13 + omega*(d1 + d2*x12 + d3*x14 + d4*x13) + 21*x10)
     dB3 = -6*x15*(c1 + c2*x16 + c3*x18 + c4*x17 + omega*(d1 + d2*x16 + d3*x18 + d4*x17) + 56*x10)/T**4
     return B, dB, dB2, dB3
-    
+
+def BVirial_Meng_vec(T, Tcs, Pcs, Vcs, omegas, ais, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a vectorized calculation of the Meng B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[float]
+        Critical temperature of fluids [K]
+    Pcs : list[float]
+        Critical pressure of the fluids [Pa]
+    Vcs : list[float]
+        Critical volume of the fluids [m^3/mol]
+    omegas : list[float]
+        Acentric factor for fluids, [-]
+    ais : list[float]
+        Polar parameters that can be estimated by :obj:`chemicals.virial.Meng_virial_a`
+    Bs : list[float], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[float]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [0.0]*N
+    if dB_dTs is None:
+        dB_dTs = [0.0]*N
+    if d2B_dT2s is None:
+        d2B_dT2s = [0.0]*N
+    if d3B_dT3s is None:
+        d3B_dT3s = [0.0]*N
+    for i in range(N):
+        B, dB, d2B, d3B = BVirial_Meng(T, Tcs[i], Pcs[i], Vcs[i], omegas[i], ais[i])
+        Bs[i] = B
+        dB_dTs[i] = dB
+        d2B_dT2s[i] = d2B
+        d3B_dT3s[i] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
+def BVirial_Meng_mat(T, Tcs, Pcs, Vcs, omegas, ais, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a matrix calculation of the Meng B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[list[float]]
+        Critical temperature of fluids [K]
+    Pcs : list[list[float]]
+        Critical pressure of the fluids [Pa]
+    Vcs : list[list[float]]
+        Critical volume of the fluids [m^3/mol]
+    omegas : list[list[float]]
+        Acentric factor for fluids, [-]
+    ais : list[float]
+        Polar parameters that can be estimated as the average of the pure
+        component values predicted by :obj:`chemicals.virial.Meng_virial_a`
+    Bs : list[list[float]], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [[0.0]*N for _ in range(N)] # numba: delete
+#        Bs = zeros((N, N)) # numba: uncomment
+    if dB_dTs is None:
+        dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
+#        dB_dTs = zeros((N, N)) # numba: uncomment
+    if d2B_dT2s is None:
+        d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+    if d3B_dT3s is None:
+        d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Tc_row = Tcs[i]
+        Pc_row = Pcs[i]
+        Vc_row = Vcs[i]
+        omega_row = omegas[i]
+        a_row = ais[i]
+        
+        B_row = Bs[i]
+        dB_row = dB_dTs[i]
+        d2B_row = d2B_dT2s[i]
+        d3B_row = d3B_dT3s[i]
+        
+        for j in range(N):
+            B, dB, d2B, d3B = BVirial_Meng(T, Tc_row[j], Pc_row[j], Vc_row[j], omega_row[j], a_row[j])
+            B_row[j] = B
+            dB_row[j] = dB
+            d2B_row[j] = d2B
+            d3B_row[j] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
 def Meng_virial_a(Tc, Pc, dipole=0.0, haloalkane=False):
     r'''Calculate the `a` parameter which is used in the Meng 
     `B` second virial coefficient for polar components. There are two

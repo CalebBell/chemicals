@@ -678,10 +678,53 @@ def test_Meng_virial_a():
     assert_close(calc, -0.006378416625935997, rtol=1e-13)
     
 def test_BVirial_Meng():
-    calc = BVirial_Meng(388.26, 647.1, 22050000.0, 5.543076e-05, 0.344)
+    T = 388.26
+    Tc = 647.1
+    Pc = 22050000.0
+    Vc = 5.543076e-05
+    omega = 0.344
+    a = 0.0
+    calc = BVirial_Meng(T, Tc, Pc, Vc, omega, a)
     expect = (-0.00032436028497558636, 2.470038900338557e-06, -3.132003987118147e-08, 5.776332655071256e-10)
     assert_close1d(calc, expect, rtol=1e-13)
     
+    assert_close(BVirial_Meng(T, Tc, Pc, Vc, omega)[0], -0.00032436028497558636, rtol=1e-13)
+    assert_close(derivative(lambda T: BVirial_Meng(T, Tc, Pc, Vc, omega)[0], T, dx=T*1e-6), expect[1])
+    assert_close(derivative(lambda T: BVirial_Meng(T, Tc, Pc, Vc, omega)[1], T, dx=T*1e-6), expect[2])
+    assert_close(derivative(lambda T: BVirial_Meng(T, Tc, Pc, Vc, omega)[2], T, dx=T*1e-6), expect[3])
+    
+
+    # Vector call with out memory savings
+    vec_call = BVirial_Meng_vec(T, [Tc], [Pc], [Vc], [omega], [a])
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, vec_call, rtol=1e-13)
+    
+    Bs_out = [0]
+    dBs_out = [0]
+    d2Bs_out = [0]
+    d3Bs_out = [0]
+    
+    # vector call with memory savings
+    BVirial_Meng_vec(T, [Tc], [Pc], [Vc], [omega], [a], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
+    
+    # matrix call
+    mat_call = BVirial_Meng_mat(T, [[Tc]], [[Pc]], [[Vc]], [[omega]], [[a]])
+    expect_mat = [[[expect[0]]], [[expect[1]]], [[expect[2]]], [[expect[3]]]]
+    assert_close2d(expect_mat, mat_call, rtol=1e-13)
+
+    # matrix call for memory savings
+    Bs_out = [[0]]
+    dBs_out = [[0]]
+    d2Bs_out = [[0]]
+    d3Bs_out = [[0]]
+    BVirial_Meng_mat(T, [[Tc]], [[Pc]], [[Vc]], [[omega]], [[a]], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    assert_close3d(expect_mat, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
+
+
+
+
 def test_BVirial_mixture():
     Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
     zs = [.5, .3, .2]
