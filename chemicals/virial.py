@@ -55,6 +55,7 @@ Second Virial Correlations
 New implementations, returning the derivatives as well
 
 .. autofunction:: chemicals.virial.BVirial_Pitzer_Curl_fast
+.. autofunction:: chemicals.virial.BVirial_Abbott_fast
 .. autofunction:: chemicals.virial.BVirial_Xiang
 .. autofunction:: chemicals.virial.BVirial_Meng
 .. autofunction:: chemicals.virial.Meng_virial_a
@@ -82,6 +83,9 @@ Second Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.BVirial_Xiang_mat
 .. autofunction:: chemicals.virial.BVirial_Pitzer_Curl_vec
 .. autofunction:: chemicals.virial.BVirial_Pitzer_Curl_mat
+.. autofunction:: chemicals.virial.BVirial_Abbott_vec
+.. autofunction:: chemicals.virial.BVirial_Abbott_mat
+
 
 Third Virial Correlations Dense Implementations
 -----------------------------------------------
@@ -96,7 +100,10 @@ from __future__ import division
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'BVirial_Pitzer_Curl_vec', 'BVirial_Pitzer_Curl_mat',
            
-           'BVirial_Abbott', 'BVirial_Tsonopoulos',
+           'BVirial_Abbott', 'BVirial_Abbott_fast',
+           'BVirial_Abbott_vec', 'BVirial_Abbott_mat',
+           
+           'BVirial_Tsonopoulos',
            'BVirial_Tsonopoulos_extended',
            'dBVirial_mixture_dzs', 'd2BVirial_mixture_dzizjs',
            'BVirial_Xiang', 'BVirial_Xiang_vec', 'BVirial_Xiang_mat',
@@ -506,6 +513,10 @@ def d3BVirial_mixture_dzizjzks(zs, Bijs):
     d3B_dzizjzks = [[[0.0]*N for _ in range(N)] for _ in range(N)] # numba: delete
     # d3B_dzizjzks = zeros((N, N, N)) # numba: uncomment
     return d3B_dzizjzks
+
+
+### B correlations
+
 
 def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
     r'''Calculates the second virial coefficient using the model in [1]_.
@@ -949,6 +960,197 @@ def BVirial_Abbott(T, Tc, Pc, omega, order=0):
     Br = B0 + omega*B1
     return Br*R*Tc/Pc
 
+def BVirial_Abbott_fast(T, Tc, Pc, omega):
+    r'''Implementation of :obj:`BVirial_Abbott` in the interface
+    which calculates virial coefficients and their derivatives at the 
+    same time.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of the fluid [Pa]
+    omega : float
+        Acentric factor for fluid, [-]
+
+    Returns
+    -------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+    dB_dT : float
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2 : float
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3 : float
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> BVirial_Abbott_fast(510., 425.2, 38E5, 0.193)
+    (-0.0002057018500, 1.039249294e-06, -5.902233639e-09, 4.78222764e-11)
+    '''
+    c0 = 0.083
+    c1 = -0.422
+    d0 = 0.139
+    d1 = - 0.172
+
+    x0 = T/Tc
+    x1 = c1*x0**(-1.6)
+    x2 = d1*x0**(-4.2)
+    x3 = R*Tc/Pc
+    x4 = omega*x2
+    
+    B = x3*(c0 + omega*(d0 + x2) + x1)
+    dB = -x3*(1.6*x1 + 4.2*x4)/T
+    d2B = x3*(4.16*x1 + 21.84*x4)/T**2
+    d3B = -x3*(14.976*x1 + 135.408*x4)/T**3
+
+    return (B, dB, d2B, d3B)
+
+def BVirial_Abbott_vec(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a vectorized calculation of the Abbott B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[float]
+        Critical temperature of fluids [K]
+    Pcs : list[float]
+        Critical pressure of the fluids [Pa]
+    omegas : list[float]
+        Acentric factor for fluids, [-]
+    Bs : list[float], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[float]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [0.0]*N
+    if dB_dTs is None:
+        dB_dTs = [0.0]*N
+    if d2B_dT2s is None:
+        d2B_dT2s = [0.0]*N
+    if d3B_dT3s is None:
+        d3B_dT3s = [0.0]*N
+    for i in range(N):
+        B, dB, d2B, d3B = BVirial_Abbott_fast(T, Tcs[i], Pcs[i], omegas[i])
+        Bs[i] = B
+        dB_dTs[i] = dB
+        d2B_dT2s[i] = d2B
+        d3B_dT3s[i] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
+def BVirial_Abbott_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a matrix calculation of the Abbott B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[list[float]]
+        Critical temperature of fluids [K]
+    Pcs : list[list[float]]
+        Critical pressure of the fluids [Pa]
+    omegas : list[list[float]]
+        Acentric factor for fluids, [-]
+    Bs : list[list[float]], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [[0.0]*N for _ in range(N)] # numba: delete
+#        Bs = zeros((N, N)) # numba: uncomment
+    if dB_dTs is None:
+        dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
+#        dB_dTs = zeros((N, N)) # numba: uncomment
+    if d2B_dT2s is None:
+        d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+    if d3B_dT3s is None:
+        d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Tc_row = Tcs[i]
+        Pc_row = Pcs[i]
+        omega_row = omegas[i]
+        
+        B_row = Bs[i]
+        dB_row = dB_dTs[i]
+        d2B_row = d2B_dT2s[i]
+        d3B_row = d3B_dT3s[i]
+        
+        for j in range(N):
+            B, dB, d2B, d3B = BVirial_Abbott_fast(T, Tc_row[j], Pc_row[j], omega_row[j])
+            B_row[j] = B
+            dB_row[j] = dB
+            d2B_row[j] = d2B
+            d3B_row[j] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
 def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
     r'''Calculates the second virial coefficient using the model in [1]_.

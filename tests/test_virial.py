@@ -497,6 +497,45 @@ def test_BVirial_Pitzer_Curl_fast():
     BVirial_Pitzer_Curl_mat(T, [[Tc]], [[Pc]], [[omega]], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
     assert_close3d(expect_mat, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
 
+def test_BVirial_Abbott_fast():
+    Tc = 508.1
+    Pc = 4696e3
+    T = 0.7*Tc
+    omega = 0.308
+    expect = [-0.0007717412887871863, 5.539165302002657e-06, -5.889351243581266e-08, 8.651388154761998e-10]
+    assert_close(BVirial_Abbott_fast(T, Tc, Pc, omega)[0], -0.0007717412887871863, rtol=1e-13)
+    assert_close(derivative(lambda T: BVirial_Abbott_fast(T, Tc, Pc, omega)[0], T, dx=T*1e-6), expect[1])
+    assert_close(derivative(lambda T: BVirial_Abbott_fast(T, Tc, Pc, omega)[1], T, dx=T*1e-6), expect[2])
+    assert_close(derivative(lambda T: BVirial_Abbott_fast(T, Tc, Pc, omega)[2], T, dx=T*1e-6), expect[3])
+    
+
+    # Vector call with out memory savings
+    vec_call = BVirial_Abbott_vec(T, [Tc], [Pc], [omega])
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, vec_call, rtol=1e-13)
+    
+    Bs_out = [0]
+    dBs_out = [0]
+    d2Bs_out = [0]
+    d3Bs_out = [0]
+    
+    # vector call with memory savings
+    BVirial_Abbott_vec(T, [Tc], [Pc], [omega], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
+    
+    # matrix call
+    mat_call = BVirial_Abbott_mat(T, [[Tc]], [[Pc]], [[omega]])
+    expect_mat = [[[expect[0]]], [[expect[1]]], [[expect[2]]], [[expect[3]]]]
+    assert_close2d(expect_mat, mat_call, rtol=1e-13)
+
+    # matrix call for memory savings
+    Bs_out = [[0]]
+    dBs_out = [[0]]
+    d2Bs_out = [[0]]
+    d3Bs_out = [[0]]
+    BVirial_Abbott_mat(T, [[Tc]], [[Pc]], [[omega]], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    assert_close3d(expect_mat, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
 
 def test_BVirial_Xiang():
     # Acetone, figure 5 acetone
