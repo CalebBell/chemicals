@@ -37,6 +37,9 @@ Utilities
 .. autofunction:: chemicals.virial.Z_from_virial_density_form
 .. autofunction:: chemicals.virial.Z_from_virial_pressure_form
 .. autofunction:: chemicals.virial.BVirial_mixture
+.. autofunction:: chemicals.virial.dBVirial_mixture_dzs
+.. autofunction:: chemicals.virial.d2BVirial_mixture_dzizjs
+.. autofunction:: chemicals.virial.d3BVirial_mixture_dzizjzks
 .. autofunction:: chemicals.virial.CVirial_mixture_Orentlicher_Prausnitz
 .. autofunction:: chemicals.virial.dCVirial_mixture_dT_Orentlicher_Prausnitz
 .. autofunction:: chemicals.virial.d2CVirial_mixture_dT2_Orentlicher_Prausnitz
@@ -86,6 +89,7 @@ from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Abbott', 'BVirial_Tsonopoulos',
            'BVirial_Tsonopoulos_extended',
+           'dBVirial_mixture_dzs', 'd2BVirial_mixture_dzizjs',
            'BVirial_Xiang', 'BVirial_Xiang_vec', 'BVirial_Xiang_mat',
            'BVirial_mixture',
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
@@ -379,8 +383,120 @@ def BVirial_mixture(zs, Bijs):
         row = Bijs[i]
         for j in range(N):
             B_tmp += zs[j]*row[j]
-        B += zs[i]*B_tmp
+        B += zs[i]*(B_tmp)
     return B
+
+def dBVirial_mixture_dzs(zs, Bijs):
+    r'''Calculate first mole fraction derivative of the `B` second virial
+    coefficient from a matrix of virial cross-coefficients.
+    
+    .. math::
+        \frac{\partial B}{\partial x_i} = \sum_j z_j(B_{i,j} + B_{j,i})
+
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Bijs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+
+    Returns
+    -------
+    dB_dzs : list[float]
+        First mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
+    >>> zs = [.5, .3, .2]
+    >>> dBVirial_mixture_dzs(zs=zs, Bijs=Bijs)
+    [-3.4089e-05, -7.2301e-05, -0.00012621]
+    '''
+    N = len(Bijs)
+    dB_dzs = [0.0]*N
+    for k in range(N):
+        dB = 0.0
+        for i in range(N):
+            dB += zs[i]*Bijs[i][k] + zs[i]*Bijs[k][i]
+        dB_dzs[k] = dB
+    return dB_dzs
+
+def d2BVirial_mixture_dzizjs(zs, Bijs):
+    r'''Calculate second mole fraction derivative of the `B` second virial
+    coefficient from a matrix of virial cross-coefficients.
+    
+    .. math::
+        \frac{\partial^2 B}{\partial x_i \partial x_j} = B_{i,j} + B_{j,i}
+
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Bijs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+
+    Returns
+    -------
+    d2B_dzizjs : list[list[float]]
+        First mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
+    >>> zs = [.5, .3, .2]
+    >>> d2BVirial_mixture_dzizjs(zs=zs, Bijs=Bijs)
+    [[-1.248e-05, -4.023e-05, -7.89e-05], [-4.023e-05, -8.782e-05, -0.0001292], [-7.89e-05, -0.0001292, -0.00024]]
+    '''
+    N = len(Bijs)
+    d2B_dzizjs = [[0.0]*N for _ in range(N)] # numba: delete
+    # d2B_dzizjs = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        for j in range(N):
+            d2B_dzizjs[i][j] = Bijs[i][j] + Bijs[j][i]
+    return d2B_dzizjs
+
+def d3BVirial_mixture_dzizjzks(zs, Bijs):
+    r'''Calculate third mole fraction derivative of the `B` third virial
+    coefficient from a matrix of virial cross-coefficients.
+    
+    .. math::
+        \frac{\partial^3 B}{\partial x_i \partial x_j \partial x_k} = 0
+        
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Bijs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+
+    Returns
+    -------
+    d3B_dzizjzks : list[list[list[float]]]
+        Third mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
+    >>> zs = [.5, .3, .2]
+    >>> d3BVirial_mixture_dzizjzks(zs=zs, Bijs=Bijs)
+    [[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]]
+    '''
+    N = len(Bijs)
+    d3B_dzizjzks = [[[0.0]*N for _ in range(N)] for _ in range(N)] # numba: delete
+    # d3B_dzizjzks = zeros((N, N, N)) # numba: uncomment
+    return d3B_dzizjzks
 
 def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
     r'''Calculates the second virial coefficient using the model in [1]_.

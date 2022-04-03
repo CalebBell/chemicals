@@ -23,7 +23,7 @@ SOFTWARE.
 
 import pytest
 import numpy as np
-from fluids.numerics import linspace, assert_close, assert_close1d, assert_close2d, assert_close3d, derivative
+from fluids.numerics import linspace, assert_close, assert_close1d, assert_close2d, assert_close3d, derivative, jacobian, hessian
 from chemicals.virial import *
 from chemicals import rho_to_Vm
 from fluids.constants import R as _R
@@ -598,3 +598,24 @@ def test_d3CVirial_mixture_dT3_Orentlicher_Prausnitz():
     zs = [.5, .3, .2]
     ans = d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s, d3Cij_dT3s)
     assert_close(ans, -3.7356470379612563e-16, rtol=1e-14)
+
+def test_dBVirial_mixture_dzs():
+    Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
+    zs = [.5, .3, .2]
+    calc = dBVirial_mixture_dzs(zs=zs, Bijs=Bijs)
+    expect = [-3.4089e-05, -7.2301e-05, -0.00012621]
+    assert_close1d(calc, expect, rtol=1e-13)
+    
+    numerical = jacobian(BVirial_mixture, zs, args=(Bijs,), perturbation=1e-7)
+    assert_close1d(numerical, expect, rtol=1e-7)
+
+
+def test_d2BVirial_mixture_dzizjs():
+    Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
+    zs = [.5, .3, .2]
+    calc = d2BVirial_mixture_dzizjs(zs=zs, Bijs=Bijs)
+    expect = [[-1.248e-05, -4.023e-05, -7.89e-05], [-4.023e-05, -8.782e-05, -0.0001292], [-7.89e-05, -0.0001292, -0.00024]]
+    assert_close2d(calc, expect, rtol=1e-13)
+
+    numerical = hessian(BVirial_mixture, zs, args=(Bijs,), perturbation=25e-5)
+    assert_close1d(numerical, expect, rtol=1e-7)
