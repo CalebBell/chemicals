@@ -537,6 +537,46 @@ def test_BVirial_Abbott_fast():
     BVirial_Abbott_mat(T, [[Tc]], [[Pc]], [[omega]], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
     assert_close3d(expect_mat, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
 
+def test_BVirial_Tsonopoulos_fast():
+    Tc = 508.1
+    Pc = 4696e3
+    T = 0.7*Tc
+    omega = 0.308
+    expect = [-0.0007649313249027217, 5.797597679149657e-06, -7.258950480792238e-08, 1.3572606703229816e-09]
+    assert_close(BVirial_Tsonopoulos_fast(T, Tc, Pc, omega)[0], -0.0007649313249027217, rtol=1e-13)
+    assert_close(derivative(lambda T: BVirial_Tsonopoulos_fast(T, Tc, Pc, omega)[0], T, dx=T*1e-6), expect[1])
+    assert_close(derivative(lambda T: BVirial_Tsonopoulos_fast(T, Tc, Pc, omega)[1], T, dx=T*1e-6), expect[2])
+    assert_close(derivative(lambda T: BVirial_Tsonopoulos_fast(T, Tc, Pc, omega)[2], T, dx=T*1e-6), expect[3])
+    
+
+    # Vector call with out memory savings
+    vec_call = BVirial_Tsonopoulos_vec(T, [Tc], [Pc], [omega])
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, vec_call, rtol=1e-13)
+    
+    Bs_out = [0]
+    dBs_out = [0]
+    d2Bs_out = [0]
+    d3Bs_out = [0]
+    
+    # vector call with memory savings
+    BVirial_Tsonopoulos_vec(T, [Tc], [Pc], [omega], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
+    
+    # matrix call
+    mat_call = BVirial_Tsonopoulos_mat(T, [[Tc]], [[Pc]], [[omega]])
+    expect_mat = [[[expect[0]]], [[expect[1]]], [[expect[2]]], [[expect[3]]]]
+    assert_close2d(expect_mat, mat_call, rtol=1e-13)
+
+    # matrix call for memory savings
+    Bs_out = [[0]]
+    dBs_out = [[0]]
+    d2Bs_out = [[0]]
+    d3Bs_out = [[0]]
+    BVirial_Tsonopoulos_mat(T, [[Tc]], [[Pc]], [[omega]], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    assert_close3d(expect_mat, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
+
 def test_BVirial_Xiang():
     # Acetone, figure 5 acetone
     MW = 58.080

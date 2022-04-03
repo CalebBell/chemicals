@@ -56,6 +56,7 @@ New implementations, returning the derivatives as well
 
 .. autofunction:: chemicals.virial.BVirial_Pitzer_Curl_fast
 .. autofunction:: chemicals.virial.BVirial_Abbott_fast
+.. autofunction:: chemicals.virial.BVirial_Tsonopoulos_fast
 .. autofunction:: chemicals.virial.BVirial_Xiang
 .. autofunction:: chemicals.virial.BVirial_Meng
 .. autofunction:: chemicals.virial.Meng_virial_a
@@ -85,6 +86,8 @@ Second Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.BVirial_Pitzer_Curl_mat
 .. autofunction:: chemicals.virial.BVirial_Abbott_vec
 .. autofunction:: chemicals.virial.BVirial_Abbott_mat
+.. autofunction:: chemicals.virial.BVirial_Tsonopoulos_vec
+.. autofunction:: chemicals.virial.BVirial_Tsonopoulos_mat
 
 
 Third Virial Correlations Dense Implementations
@@ -103,7 +106,10 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'BVirial_Abbott', 'BVirial_Abbott_fast',
            'BVirial_Abbott_vec', 'BVirial_Abbott_mat',
            
-           'BVirial_Tsonopoulos',
+           'BVirial_Tsonopoulos', 'BVirial_Tsonopoulos_fast',
+           'BVirial_Tsonopoulos_vec', 'BVirial_Tsonopoulos_mat',
+           
+           
            'BVirial_Tsonopoulos_extended',
            'dBVirial_mixture_dzs', 'd2BVirial_mixture_dzizjs',
            'BVirial_Xiang', 'BVirial_Xiang_vec', 'BVirial_Xiang_mat',
@@ -1272,6 +1278,214 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
     Br = (B0+omega*B1)
     return Br*R*Tc/Pc
 
+def BVirial_Tsonopoulos_fast(T, Tc, Pc, omega):
+    r'''Implementation of :obj:`BVirial_Tsonopoulos` in the interface
+    which calculates virial coefficients and their derivatives at the 
+    same time.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of the fluid [Pa]
+    omega : float
+        Acentric factor for fluid, [-]
+
+    Returns
+    -------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+    dB_dT : float
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2 : float
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3 : float
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> BVirial_Tsonopoulos_fast(510., 425.2, 38E5, 0.193)
+    (-0.0002093529540, 9.95742355e-07, -5.54234465e-09, 4.57035160e-11)
+    '''
+    c0 = 0.1445
+    c1 = -0.33
+    c2 = -0.1385
+    c3 = -0.0121
+    c4 = -0.000607
+
+    d0 = 0.0637
+    d1 = 0.331
+    d2 = - 0.423
+    d3 = - 0.008
+
+    x0 = Tc/T
+    x1 = Tc**8/T**8
+    x2 = T**(-3)
+    x3 = Tc**3*x2
+    x4 = Tc**2
+    x5 = x4/T**2
+    x6 = R/Pc
+    x7 = c2*x0
+    x8 = Tc**7*c4/T**7
+    x9 = c3*x5
+    x10 = 2*d1
+    x11 = d2*x0
+    x12 = Tc**6*d3/T**6
+    x13 = omega*x0
+    x14 = x4*x6
+
+
+    B = Tc*x6*(c0 + c1*x0 + c2*x5 + c3*x3 + c4*x1 + omega*(d0 + d1*x5 + d2*x3 + d3*x1))
+    dB = -x5*x6*(c1 + x13*(x10 + 3*x11 + 8*x12) + 2*x7 + 8*x8 + 3*x9)
+    d2B = 2*x14*x2*(c1 + 3*x13*(d1 + 2*x11 + 12*x12) + 3*x7 + 36*x8 + 6*x9)
+    d3B = -6*x14*(c1 + 2*x13*(x10 + 5*x11 + 60*x12) + 4*x7 + 120*x8 + 10*x9)/T**4
+
+    return (B, dB, d2B, d3B)
+
+def BVirial_Tsonopoulos_vec(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a vectorized calculation of the Tsonopoulos B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[float]
+        Critical temperature of fluids [K]
+    Pcs : list[float]
+        Critical pressure of the fluids [Pa]
+    omegas : list[float]
+        Acentric factor for fluids, [-]
+    Bs : list[float], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[float]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [0.0]*N
+    if dB_dTs is None:
+        dB_dTs = [0.0]*N
+    if d2B_dT2s is None:
+        d2B_dT2s = [0.0]*N
+    if d3B_dT3s is None:
+        d3B_dT3s = [0.0]*N
+    for i in range(N):
+        B, dB, d2B, d3B = BVirial_Tsonopoulos_fast(T, Tcs[i], Pcs[i], omegas[i])
+        Bs[i] = B
+        dB_dTs[i] = dB
+        d2B_dT2s[i] = d2B
+        d3B_dT3s[i] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
+def BVirial_Tsonopoulos_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a matrix calculation of the Tsonopoulos B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[list[float]]
+        Critical temperature of fluids [K]
+    Pcs : list[list[float]]
+        Critical pressure of the fluids [Pa]
+    omegas : list[list[float]]
+        Acentric factor for fluids, [-]
+    Bs : list[list[float]], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [[0.0]*N for _ in range(N)] # numba: delete
+#        Bs = zeros((N, N)) # numba: uncomment
+    if dB_dTs is None:
+        dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
+#        dB_dTs = zeros((N, N)) # numba: uncomment
+    if d2B_dT2s is None:
+        d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+    if d3B_dT3s is None:
+        d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Tc_row = Tcs[i]
+        Pc_row = Pcs[i]
+        omega_row = omegas[i]
+        
+        B_row = Bs[i]
+        dB_row = dB_dTs[i]
+        d2B_row = d2B_dT2s[i]
+        d3B_row = d3B_dT3s[i]
+        
+        for j in range(N):
+            B, dB, d2B, d3B = BVirial_Tsonopoulos_fast(T, Tc_row[j], Pc_row[j], omega_row[j])
+            B_row[j] = B
+            dB_row[j] = dB
+            d2B_row[j] = d2B
+            d3B_row[j] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
 def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
                                  dipole=0, order=0):
