@@ -54,6 +54,7 @@ Second Virial Correlations
 
 New implementations, returning the derivatives as well
 
+.. autofunction:: chemicals.virial.BVirial_Oconnell_Prausnitz
 .. autofunction:: chemicals.virial.BVirial_Pitzer_Curl_fast
 .. autofunction:: chemicals.virial.BVirial_Abbott_fast
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_fast
@@ -90,6 +91,8 @@ Second Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_mat
 .. autofunction:: chemicals.virial.BVirial_Meng_vec
 .. autofunction:: chemicals.virial.BVirial_Meng_mat
+.. autofunction:: chemicals.virial.BVirial_Oconnell_Prausnitz_vec
+.. autofunction:: chemicals.virial.BVirial_Oconnell_Prausnitz_mat
 
 Third Virial Correlations Dense Implementations
 -----------------------------------------------
@@ -112,6 +115,9 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            
            'Meng_virial_a', 'BVirial_Meng',
            'BVirial_Meng_vec', 'BVirial_Meng_mat',
+           
+           'BVirial_Oconnell_Prausnitz','BVirial_Oconnell_Prausnitz_vec',
+           'BVirial_Oconnell_Prausnitz_mat',
            
            'BVirial_Tsonopoulos_extended',
            'dBVirial_mixture_dzs', 'd2BVirial_mixture_dzizjs',
@@ -525,6 +531,238 @@ def d3BVirial_mixture_dzizjzks(zs, Bijs):
 
 ### B correlations
 
+def BVirial_Oconnell_Prausnitz(T, Tc, Pc, omega):
+    r'''Calculates the second virial coefficient using the model in [1]_.
+
+    .. math::
+        B_r=B^{(0)}+\omega B^{(1)}
+
+    .. math::
+        B^{(0)}=c0 + \frac{c1}{T_r} + \frac{c2}{T_r^2} + \frac{c3}{T_r^3}
+
+    .. math::
+        B^{(1)}=d0 + \frac{d1}{T_r^2} + \frac{d2}{T_r^3} + \frac{d3}{T_r^8}
+
+    
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of the fluid [Pa]
+    omega : float
+        Acentric factor for fluid, [-]
+
+    Returns
+    -------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+    dB_dT : float
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2 : float
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3 : float
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    The coefficients are as follows:
+    
+    c0 = 0.1445
+    c1 = -0.330
+    c2 = -0.1385
+    c3 = -0.0121
+
+    d0 = 0.073
+    d1 = 0.46
+    d2 = -0.50
+    d3 = -0.097
+    d4 = -0.0073
+
+
+    Examples
+    --------
+    >>> BVirial_Oconnell_Prausnitz(510., 425.2, 38E5, 0.193)
+    (-0.000203193781, 1.036185972e-06, -6.53679132e-09, 6.59478287e-11)
+
+    References
+    ----------
+    .. [1] O’Connell, J. P., and J. M. Prausnitz. "Empirical Correlation of 
+       Second Virial Coefficients for Vapor-Liquid Equilibrium Calculations."
+       Industrial & Engineering Chemistry Process Design and Development 6, 
+       no. 2 (April 1, 1967): 245-50. https://doi.org/10.1021/i260022a016.
+    '''
+    c0 = 0.1445
+    c1 = -0.330
+    c2 = -0.1385
+    c3 = -0.0121
+
+    d0 = 0.073
+    d1 = 0.46
+    d2 = -0.50
+    d3 = -0.097
+    d4 = -0.0073
+
+    x0 = Tc/T
+    x1 = T**(-3)
+    x2 = Tc**3*x1
+    x3 = Tc**2
+    x4 = x3/T**2
+    x5 = R/Pc
+    x6 = c2*x0
+    x7 = c3*x4
+    x8 = 2*d1
+    x9 = d2*x0
+    x10 = Tc**6*d3/T**6
+    x11 = omega*x0
+    x12 = x3*x5
+
+    B = Tc*x5*(c0 + c1*x0 + c2*x4 + c3*x2 + omega*(d0 + d1*x4 + d2*x2 + Tc**8*d3/T**8))
+    dB = -x4*x5*(c1 + x11*(8*x10 + x8 + 3*x9) + 2*x6 + 3*x7)
+    d2B = 2*x1*x12*(c1 + 3*x11*(d1 + 12*x10 + 2*x9) + 3*x6 + 6*x7)
+    d3B = -6*x12*(c1 + 2*x11*(60*x10 + x8 + 5*x9) + 4*x6 + 10*x7)/T**4
+    return (B, dB, d2B, d3B)
+
+def BVirial_Oconnell_Prausnitz_vec(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a vectorized calculation of the O'connell Prausnitz B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[float]
+        Critical temperature of fluids [K]
+    Pcs : list[float]
+        Critical pressure of the fluids [Pa]
+    omegas : list[float]
+        Acentric factor for fluids, [-]
+    Bs : list[float], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[float]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [0.0]*N
+    if dB_dTs is None:
+        dB_dTs = [0.0]*N
+    if d2B_dT2s is None:
+        d2B_dT2s = [0.0]*N
+    if d3B_dT3s is None:
+        d3B_dT3s = [0.0]*N
+    for i in range(N):
+        B, dB, d2B, d3B = BVirial_Oconnell_Prausnitz(T, Tcs[i], Pcs[i], omegas[i])
+        Bs[i] = B
+        dB_dTs[i] = dB
+        d2B_dT2s[i] = d2B
+        d3B_dT3s[i] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
+def BVirial_Oconnell_Prausnitz_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a matrix calculation of the Oconnell_Prausnitz B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[list[float]]
+        Critical temperature of fluids [K]
+    Pcs : list[list[float]]
+        Critical pressure of the fluids [Pa]
+    omegas : list[list[float]]
+        Acentric factor for fluids, [-]
+    Bs : list[list[float]], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [[0.0]*N for _ in range(N)] # numba: delete
+#        Bs = zeros((N, N)) # numba: uncomment
+    if dB_dTs is None:
+        dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
+#        dB_dTs = zeros((N, N)) # numba: uncomment
+    if d2B_dT2s is None:
+        d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+    if d3B_dT3s is None:
+        d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Tc_row = Tcs[i]
+        Pc_row = Pcs[i]
+        omega_row = omegas[i]
+        
+        B_row = Bs[i]
+        dB_row = dB_dTs[i]
+        d2B_row = d2B_dT2s[i]
+        d3B_row = d3B_dT3s[i]
+        
+        for j in range(N):
+            B, dB, d2B, d3B = BVirial_Oconnell_Prausnitz(T, Tc_row[j], Pc_row[j], omega_row[j])
+            B_row[j] = B
+            dB_row[j] = dB
+            d2B_row[j] = d2B
+            d3B_row[j] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
 def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
     r'''Calculates the second virial coefficient using the model in [1]_.
@@ -681,7 +919,7 @@ def BVirial_Pitzer_Curl_fast(T, Tc, Pc, omega):
     Examples
     --------
     >>> BVirial_Pitzer_Curl_fast(510., 425.2, 38E5, 0.193)
-    (-0.0002084536247930173, 1.0653775169998658e-06, -5.795710171294465e-09, 4.5135330434001515e-11)
+    (-0.000208453624, 1.065377516e-06, -5.7957101e-09, 4.513533043e-11)
     '''
     c0 = 0.1445
     c1 =  - 0.33
@@ -937,7 +1175,7 @@ def BVirial_Abbott(T, Tc, Pc, omega, order=0):
     Example is from [1]_, p. 93, and matches the result exactly, for isobutane.
 
     >>> BVirial_Abbott(510., 425.2, 38E5, 0.193)
-    -0.00020570185009564064
+    -0.000205701850095
 
     References
     ----------
@@ -1248,7 +1486,7 @@ def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
     Example matching that in BVirial_Abbott, for isobutane.
 
     >>> BVirial_Tsonopoulos(510., 425.2, 38E5, 0.193)
-    -0.00020935295404416802
+    -0.0002093529540
 
     References
     ----------
@@ -1683,7 +1921,7 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
     Example from Perry's Handbook, 8E, p2-499. Matches to a decimal place.
 
     >>> BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469)
-    -9.679718337596426e-05
+    -9.679718337596e-05
 
     References
     ----------
@@ -1743,10 +1981,10 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
             if (species_type == 'ketone' or species_type == 'aldehyde'
             or species_type == 'alkyl nitrile' or species_type == 'ether'
             or species_type == 'carboxylic acid' or species_type == 'ester'):
-                a, b = -2.14E-4*dipole_r-4.308E-21*dipole_r**8, 0
+                a, b = -2.14E-4*dipole_r-4.308E-21*dipole_r**8, 0.0
             elif (species_type == 'alkyl halide' or species_type == 'mercaptan'
             or species_type == 'sulfide' or species_type == 'disulfide'):
-                a, b = -2.188E-4*dipole_r**4-7.831E-21*dipole_r**8, 0
+                a, b = -2.188E-4*dipole_r**4-7.831E-21*dipole_r**8, 0.0
 
             elif species_type == 'alkanol':
                 a, b = 0.0878, 0.00908+0.0006957*dipole_r
@@ -2320,7 +2558,7 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
     >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
     >>> zs = [.5, .3, .2]
     >>> CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs)
-    2.0787313269445096e-09
+    2.07873132694e-09
 
     References
     ----------

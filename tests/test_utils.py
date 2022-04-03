@@ -457,3 +457,11 @@ def test_hash_any_primitive():
     a = {'a': 1, 'b': 2}
     b = {'b': 2, 'a': 1}
     assert hash_any_primitive(a) == hash_any_primitive(b)
+    
+    
+def test_radius_of_gyration():
+    assert_close(radius_of_gyration(MW=32.00452, planar=False, A=6.345205205562681e-47, B=3.2663291891213418e-46, C=3.4321304373822523e-46),
+                 1.507895671067054e-10, rtol=1e-13)
+    
+    calc = radius_of_gyration(A=9.972482951577335e-47, B=1.941784104125803e-45, planar=True, MW=111.01, C=0)
+    assert_close(calc, 4.8859099776532495e-11, rtol=1e-13)

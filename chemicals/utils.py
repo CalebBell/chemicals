@@ -45,7 +45,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'd2xs_to_dxdn_partials', 'dxs_to_dxsn1', 'd2xs_to_d2xsn1',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows',
-'solve_flow_composition_mix',
+'solve_flow_composition_mix', 'radius_of_gyration',
 'v_to_v_molar', 'v_molar_to_v']
 
 import os
@@ -2360,3 +2360,83 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
     ws = zs_to_ws(zs, MWs)
 
     return Fs, zs, ws
+
+
+
+def radius_of_gyration(MW, A, B, C, planar=False):
+    r'''Calculates the radius of gyration of a molecule using the DIPPR
+    definition. The parameters `A`, `B`, and `C` must be obtained from 
+    either vibrational scpectra and analysis or quantum chemistry calculations
+    of programs such as `psi <https://psicode.org/>`.
+
+    For planar molecules defined by only two moments of inertia,
+
+    .. math::
+        R_g = \sqrt{\sqrt{AB}\frac{N_A}{\text{MW}}}
+        
+    For non-planar molecules with three moments of inertia,
+
+    .. math::
+        R_g = \sqrt{\frac{2\pi(ABC)^{1/3}N_A}{\text{MW}}}
+
+    Parameters
+    ----------
+    MW : float
+        Molecular weight, [g/mol]
+    A : float
+        First principle moment of inertia, [kg*m^2]
+    B : float
+        Second principle moment of inertia, [kg*m^2]
+    C : float
+        Third principle moment of inertia, [kg*m^2]
+    planar : bool
+        Whether the molecule is flat or not, [-]
+
+    Returns
+    -------
+    Rg : float
+        Radius of gyration, [m]
+
+    Notes
+    -----
+    There are many, many quantum chemistry models available which give
+    different results.
+
+    Examples
+    --------
+    Example calcultion in [1]_ for hydrazine (optimized with HF/6-31G model):
+        
+    >>> radius_of_gyration(MW=32.00452, planar=False, A=5.692E-47, B=3.367E-46, C=3.681E-46)
+    1.50581642e-10
+    
+    The same calculation was performed with `psi` and somewhat different parameters obtained
+    
+    >>> radius_of_gyration(MW=32.00452, planar=False, A=6.345205205562681e-47, B=3.2663291891213418e-46, C=3.4321304373822523e-46)
+    1.507895671e-10
+    
+    A planar moleculr, bromosilane, has two principle moments of inertia
+    in [2]_. They are 2.80700 cm^-1 and 0.14416 cm^-1. These can be converted to
+    MHz as follows:
+    
+    These can then be converted to units of AMU*Angstrom^2, and from there 
+    to kg*m^2.
+    
+    >>> A, B = 2.80700, 0.14416
+    >>> from scipy.constants import atomic_mass, c, angstrom
+    >>> A, B = A*c*1e-4, B*c*1e-4 # from cm^-1 to MHz
+    >>> A, B = [505379.15/i for i in (A, B)] #  TODO which constants did this conversion factor come from, AMU*Angstrom^2
+    >>> A, B = [i*atomic_mass*angstrom**2 for i in (A, B)]
+    >>> radius_of_gyration(A=A, B=B, planar=True, MW=111.01, C=0)
+    4.8859099776e-11
+    
+    References
+    ----------
+    .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+       8E. McGraw-Hill Professional, 2007.
+    .. [2] Johnson III, Russell D. "NIST 101. Computational Chemistry 
+       Comparison and Benchmark Database," 1999. https://cccbdb.nist.gov
+    '''
+    if planar:
+        return sqrt(sqrt(A*B)*N_A*1e3/MW)
+    else:
+        return sqrt(2*pi*(A*B*C)**(1/3)*N_A*1e3/MW)
