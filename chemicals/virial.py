@@ -2062,31 +2062,36 @@ def BVirial_Tsonopoulos_extended_fast(T, Tc, Pc, omega, a=0.0, b=0.0):
     d1 = 0.331
     d2 = -0.423
     d3 = -0.008
-    
-    x0 = Tc/T
-    x1 = Tc**8/T**8
-    x2 = Tc**6/T**6
-    x3 = T**(-3)
-    x4 = Tc**3*x3
-    x5 = Tc**2
-    x6 = x5/T**2
+
+    T_inv = 1.0/T
+    T_inv2 = T_inv*T_inv
+    T_inv3 = T_inv*T_inv2
+    T_inv4 = T_inv2*T_inv2
+    Tc2 = Tc*Tc
+    Tc3 = Tc*Tc2
+    Tc4 = Tc*Tc3
+    x0 = Tc*T_inv
+    x1 = Tc4*Tc4*T_inv4*T_inv4
+    x2 = Tc3*Tc3*T_inv3*T_inv3
+    x4 = Tc3*T_inv3
+    x6 = Tc2*T_inv2
     x7 = R/Pc
     x8 = c2*x0
-    x9 = Tc**7/T**7
+    x9 = Tc4*Tc3*T_inv3*T_inv4
     x10 = 8*x9
-    x11 = Tc**5*a/T**5
+    x11 = Tc3*Tc2*a*T_inv3*T_inv2
     x12 = c3*x6
     x13 = 2*d1
     x14 = d2*x0
     x15 = d3*x2
     x16 = omega*x0
     x17 = 36*x9
-    x18 = x5*x7
+    x18 = Tc2*x7
     x19 = 120*x9
     B = Tc*x7*(a*x2 - b*x1 + c0 + c1*x0 + c2*x6 + c3*x4 + c4*x1 + omega*(d0 + d1*x6 + d2*x4 + d3*x1))
     dB = -x6*x7*(-b*x10 + c1 + c4*x10 + 6*x11 + 3*x12 + x16*(x13 + 3*x14 + 8*x15) + 2*x8)
-    d2B = 2*x18*x3*(-b*x17 + c1 + c4*x17 + 21*x11 + 6*x12 + 3*x16*(d1 + 2*x14 + 12*x15) + 3*x8)
-    d3B = -6*x18*(-b*x19 + c1 + c4*x19 + 56*x11 + 10*x12 + 2*x16*(x13 + 5*x14 + 60*x15) + 4*x8)/T**4
+    d2B = 2*x18*T_inv3*(-b*x17 + c1 + c4*x17 + 21*x11 + 6*x12 + 3*x16*(d1 + 2*x14 + 12*x15) + 3*x8)
+    d3B = -6*x18*(-b*x19 + c1 + c4*x19 + 56*x11 + 10*x12 + 2*x16*(x13 + 5*x14 + 60*x15) + 4*x8)*T_inv4
     return (B, dB, d2B, d3B)
 
 
