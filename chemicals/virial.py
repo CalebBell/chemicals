@@ -945,26 +945,30 @@ def BVirial_Pitzer_Curl_fast(T, Tc, Pc, omega):
     d2 = - 0.5
     d3 = - 0.097
     d4 = - 0.0073
-    
-    x0 = Tc/T
-    x1 = T**(-3.0)
-    x2 = Tc**3.0*x1
-    x3 = Tc**2.0
-    x4 = x3/T**2.0
+
+    T_inv = 1.0/T
+    x0 = Tc*T_inv
+    T_inv2 = T_inv*T_inv
+    T_inv3 = T_inv2*T_inv
+    T_inv4 = T_inv2*T_inv2
+    Tc2 = Tc*Tc
+    Tc3 = Tc*Tc2
+    x2 = Tc3*T_inv3
+    x4 = Tc2*T_inv2
     x5 = R/Pc
     x6 = 2.0*x0
     x7 = 3.0*x4
-    x8 = Tc**7.0*d4/T**7.0
+    x8 = Tc3*Tc3*Tc*d4*T_inv4*T_inv3
     x9 = 3.0*x0
     x10 = 6.0*x4
-    x11 = x3*x5
+    x11 = Tc2*x5
     x12 = 4.0*x0
     x13 = 10.0*x4
     
-    B = Tc*x5*(c0 + c1*x0 + c2*x4 + c3*x2 + omega*(d0 + d1*x0 + d2*x4 + d3*x2 + Tc**8.0*d4/T**8.0))
+    B = Tc*x5*(c0 + c1*x0 + c2*x4 + c3*x2 + omega*(d0 + d1*x0 + d2*x4 + d3*x2 + Tc3*Tc3*Tc2*d4*T_inv4*T_inv4))
     dB = -x4*x5*(c1 + c2*x6 + c3*x7 + omega*(d1 + d2*x6 + d3*x7 + 8.0*x8))
-    d2B = 2.0*x1*x11*(c1 + c2*x9 + c3*x10 + omega*(d1 + d2*x9 + d3*x10 + 36.0*x8))
-    d3B = -6.0*x11*(c1 + c2*x12 + c3*x13 + omega*(d1 + d2*x12 + d3*x13 + 120.0*x8))/T**4.0
+    d2B = 2.0*T_inv3*x11*(c1 + c2*x9 + c3*x10 + omega*(d1 + d2*x9 + d3*x10 + 36.0*x8))
+    d3B = -6.0*x11*(c1 + c2*x12 + c3*x13 + omega*(d1 + d2*x12 + d3*x13 + 120.0*x8))*T_inv4
     return (B, dB, d2B, d3B)
 
 def BVirial_Pitzer_Curl_vec(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
