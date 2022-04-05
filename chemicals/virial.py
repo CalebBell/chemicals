@@ -619,25 +619,27 @@ def BVirial_Oconnell_Prausnitz(T, Tc, Pc, omega):
     d2 = -0.50
     d3 = -0.097
     d4 = -0.0073
-
-    x0 = Tc/T
-    x1 = T**(-3)
-    x2 = Tc**3*x1
-    x3 = Tc**2
-    x4 = x3/T**2
+    T_inv = 1.0/T
+    T_inv2 = T_inv*T_inv
+    x0 = Tc*T_inv
+    T_inv3 = T_inv*T_inv2
+    Tc2 = Tc*Tc
+    Tc3 = Tc2*Tc
+    x2 = Tc3*T_inv3
+    x4 = Tc2*T_inv2
     x5 = R/Pc
     x6 = c2*x0
     x7 = c3*x4
     x8 = 2*d1
     x9 = d2*x0
-    x10 = Tc**6*d3/T**6
+    x10 = Tc3*Tc3*d3*T_inv3*T_inv3
     x11 = omega*x0
-    x12 = x3*x5
+    x12 = Tc2*x5
 
-    B = Tc*x5*(c0 + c1*x0 + c2*x4 + c3*x2 + omega*(d0 + d1*x4 + d2*x2 + Tc**8*d3/T**8))
+    B = Tc*x5*(c0 + c1*x0 + c2*x4 + c3*x2 + omega*(d0 + d1*x4 + d2*x2 + Tc3*Tc3*Tc2*d3*T_inv3*T_inv3*T_inv2))
     dB = -x4*x5*(c1 + x11*(8*x10 + x8 + 3*x9) + 2*x6 + 3*x7)
-    d2B = 2*x1*x12*(c1 + 3*x11*(d1 + 12*x10 + 2*x9) + 3*x6 + 6*x7)
-    d3B = -6*x12*(c1 + 2*x11*(60*x10 + x8 + 5*x9) + 4*x6 + 10*x7)/T**4
+    d2B = 2*T_inv3*x12*(c1 + 3*x11*(d1 + 12*x10 + 2*x9) + 3*x6 + 6*x7)
+    d3B = -6*x12*(c1 + 2*x11*(60*x10 + x8 + 5*x9) + 4*x6 + 10*x7)*T_inv3*T_inv
     return (B, dB, d2B, d3B)
 
 def BVirial_Oconnell_Prausnitz_vec(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
