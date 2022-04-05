@@ -1264,15 +1264,16 @@ def BVirial_Abbott_fast(T, Tc, Pc, omega):
     d1 = - 0.172
 
     x0 = T/Tc
+    T_inv = 1.0/T
     x1 = c1*x0**(-1.6)
     x2 = d1*x0**(-4.2)
-    x3 = R*Tc/Pc
+    x3 = T_inv*R*Tc/Pc
     x4 = omega*x2
     
-    B = x3*(c0 + omega*(d0 + x2) + x1)
-    dB = -x3*(1.6*x1 + 4.2*x4)/T
-    d2B = x3*(4.16*x1 + 21.84*x4)/T**2
-    d3B = -x3*(14.976*x1 + 135.408*x4)/T**3
+    B = x3*(c0 + omega*(d0 + x2) + x1)*T
+    dB = -x3*(1.6*x1 + 4.2*x4)
+    d2B = x3*(4.16*x1 + 21.84*x4)*T_inv
+    d3B = -x3*(14.976*x1 + 135.408*x4)*T_inv*T_inv
 
     return (B, dB, d2B, d3B)
 
