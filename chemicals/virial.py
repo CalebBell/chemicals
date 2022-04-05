@@ -54,14 +54,14 @@ Second Virial Correlations
 
 New implementations, returning the derivatives as well
 
-.. autofunction:: chemicals.virial.BVirial_Oconnell_Prausnitz
 .. autofunction:: chemicals.virial.BVirial_Pitzer_Curl_fast
 .. autofunction:: chemicals.virial.BVirial_Abbott_fast
 .. autofunction:: chemicals.virial.BVirial_Tsonopoulos_fast
+.. autofunction:: chemicals.virial.BVirial_Tsonopoulos_extended_fast
+.. autofunction:: chemicals.virial.BVirial_Oconnell_Prausnitz
 .. autofunction:: chemicals.virial.BVirial_Xiang
 .. autofunction:: chemicals.virial.BVirial_Meng
 .. autofunction:: chemicals.virial.Meng_virial_a
-
 
 Third Virial Correlations
 -------------------------
@@ -93,6 +93,8 @@ Second Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.BVirial_Meng_mat
 .. autofunction:: chemicals.virial.BVirial_Oconnell_Prausnitz_vec
 .. autofunction:: chemicals.virial.BVirial_Oconnell_Prausnitz_mat
+.. autofunction:: chemicals.virial.BVirial_Tsonopoulos_extended_vec
+.. autofunction:: chemicals.virial.BVirial_Tsonopoulos_extended_mat
 
 Third Virial Correlations Dense Implementations
 -----------------------------------------------
@@ -113,13 +115,17 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'BVirial_Tsonopoulos', 'BVirial_Tsonopoulos_fast',
            'BVirial_Tsonopoulos_vec', 'BVirial_Tsonopoulos_mat',
            
+           'BVirial_Tsonopoulos_extended',
+           'BVirial_Tsonopoulos_extended_fast',
+           'BVirial_Tsonopoulos_extended_vec', 
+           'BVirial_Tsonopoulos_extended_mat',
+           
            'Meng_virial_a', 'BVirial_Meng',
            'BVirial_Meng_vec', 'BVirial_Meng_mat',
            
            'BVirial_Oconnell_Prausnitz','BVirial_Oconnell_Prausnitz_vec',
            'BVirial_Oconnell_Prausnitz_mat',
            
-           'BVirial_Tsonopoulos_extended',
            'dBVirial_mixture_dzs', 'd2BVirial_mixture_dzizjs',
            'BVirial_Xiang', 'BVirial_Xiang_vec', 'BVirial_Xiang_mat',
            'BVirial_mixture',
@@ -269,8 +275,14 @@ def Z_from_virial_density_form(T, P, *args):
        Butterworth-Heinemann, 1985.
     '''
     l = len(args)
-    if l == 1:
-        return 1/2. + (4*args[0]*P + R*T)**0.5/(2*(R*T)**0.5)
+    if l == 1 or l==2 and args[1] == 0.0:
+        B = args[0]
+        determining_factor = 4.0*B*P + R*T
+        if determining_factor < 0.0:
+            Pmin = -0.25*R*T/(B)
+#            raise ValueError("Too high of pressure for provided T and B") # numba: uncomment
+            raise ValueError(f"Maximum allowed pressure for virial coefficient B of {B} m^3/mol is {Pmin} Pa") # numba: delete
+        return 1/2. + 0.5*sqrt((determining_factor)/(R*T))
 #        return ((R*T*(4*args[0]*P + R*T))**0.5 + R*T)/(2*P)
     if l == 2:
         B, C = args[0], args[1]
@@ -1991,6 +2003,233 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
     Br = B0 + omega*B1 + a*B2 + b*B3
     return Br*R*Tc/Pc
 
+def BVirial_Tsonopoulos_extended_fast(T, Tc, Pc, omega, a=0.0, b=0.0):
+    r'''Implementation of :obj:`BVirial_Tsonopoulos_extended` in the interface
+    which calculates virial coefficients and their derivatives at the 
+    same time.
+    
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tc : float
+        Critical temperature of fluid [K]
+    Pc : float
+        Critical pressure of the fluid [Pa]
+    omega : float
+        Acentric factor for fluid, [-]
+    a : float, optional
+        Fit parameter [-]
+    b : float, optional
+        Fit parameter [-]
+
+    Returns
+    -------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+    dB_dT : float
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2 : float
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3 : float
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> BVirial_Tsonopoulos_extended_fast(510., 425.2, 38E5, 0.193)
+    (-0.0002093529540, 9.9574235e-07, -5.54234465e-09, 4.5703516e-11)
+    '''
+    c0 = 0.1445
+    c1 = -0.33
+    c2 = -0.1385
+    c3 = -0.0121
+    c4 = -0.000607
+    
+    d0 = 0.0637
+    d1 = 0.331
+    d2 = -0.423
+    d3 = -0.008
+    
+    x0 = Tc/T
+    x1 = Tc**8/T**8
+    x2 = Tc**6/T**6
+    x3 = T**(-3)
+    x4 = Tc**3*x3
+    x5 = Tc**2
+    x6 = x5/T**2
+    x7 = R/Pc
+    x8 = c2*x0
+    x9 = Tc**7/T**7
+    x10 = 8*x9
+    x11 = Tc**5*a/T**5
+    x12 = c3*x6
+    x13 = 2*d1
+    x14 = d2*x0
+    x15 = d3*x2
+    x16 = omega*x0
+    x17 = 36*x9
+    x18 = x5*x7
+    x19 = 120*x9
+    B = Tc*x7*(a*x2 - b*x1 + c0 + c1*x0 + c2*x6 + c3*x4 + c4*x1 + omega*(d0 + d1*x6 + d2*x4 + d3*x1))
+    dB = -x6*x7*(-b*x10 + c1 + c4*x10 + 6*x11 + 3*x12 + x16*(x13 + 3*x14 + 8*x15) + 2*x8)
+    d2B = 2*x18*x3*(-b*x17 + c1 + c4*x17 + 21*x11 + 6*x12 + 3*x16*(d1 + 2*x14 + 12*x15) + 3*x8)
+    d3B = -6*x18*(-b*x19 + c1 + c4*x19 + 56*x11 + 10*x12 + 2*x16*(x13 + 5*x14 + 60*x15) + 4*x8)/T**4
+    return (B, dB, d2B, d3B)
+
+
+def BVirial_Tsonopoulos_extended_vec(T, Tcs, Pcs, omegas, ais, bs, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a vectorized calculation of the Tsonopoulos (extended) B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[float]
+        Critical temperature of fluids [K]
+    Pcs : list[float]
+        Critical pressure of the fluids [Pa]
+    omegas : list[float]
+        Acentric factor for fluids, [-]
+    ais : list[float]
+        Fit parameters, [-]
+    bs : list[float]
+        Fit parameters, [-]
+    Bs : list[float], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[float]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[float]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[float]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[float]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [0.0]*N
+    if dB_dTs is None:
+        dB_dTs = [0.0]*N
+    if d2B_dT2s is None:
+        d2B_dT2s = [0.0]*N
+    if d3B_dT3s is None:
+        d3B_dT3s = [0.0]*N
+    for i in range(N):
+        B, dB, d2B, d3B = BVirial_Tsonopoulos_extended_fast(T, Tcs[i], Pcs[i], omegas[i], ais[i], bs[i])
+        Bs[i] = B
+        dB_dTs[i] = dB
+        d2B_dT2s[i] = d2B
+        d3B_dT3s[i] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
+def BVirial_Tsonopoulos_extended_mat(T, Tcs, Pcs, omegas, ais, bs, Bs=None, dB_dTs=None, 
+                      d2B_dT2s=None, d3B_dT3s=None):
+    r'''Perform a matrix calculation of the Tsonopoulos (extended) B virial coefficient model
+    and its first three temperature derivatives.
+
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    Tcs : list[list[float]]
+        Critical temperature of fluids [K]
+    Pcs : list[list[float]]
+        Critical pressure of the fluids [Pa]
+    omegas : list[list[float]]
+        Acentric factor for fluids, [-]
+    ais : list[list[float]]
+        Fit parameters, [-]
+    bs : list[list[float]]
+        Fit parameters, [-]
+    Bs : list[list[float]], optional
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]], optional
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]], optional
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]], optional
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Returns
+    -------
+    Bs : list[list[float]]
+        Second virial coefficient in density form [m^3/mol]
+    dB_dTs : list[list[float]]
+        First temperature derivative of second virial coefficient in density
+        form [m^3/mol/K]
+    d2B_dT2s : list[list[float]]
+        Second temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^2]
+    d3B_dT3s : list[list[float]]
+        Third temperature derivative of second virial coefficient in density
+        form [m^3/mol/K^3]
+
+    Notes
+    -----
+    '''
+    N = len(Tcs)
+    if Bs is None:
+        Bs = [[0.0]*N for _ in range(N)] # numba: delete
+#        Bs = zeros((N, N)) # numba: uncomment
+    if dB_dTs is None:
+        dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
+#        dB_dTs = zeros((N, N)) # numba: uncomment
+    if d2B_dT2s is None:
+        d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+    if d3B_dT3s is None:
+        d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
+#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Tc_row = Tcs[i]
+        Pc_row = Pcs[i]
+        omega_row = omegas[i]
+        
+        B_row = Bs[i]
+        dB_row = dB_dTs[i]
+        d2B_row = d2B_dT2s[i]
+        d3B_row = d3B_dT3s[i]
+        a_row = ais[i]
+        b_row = bs[i]
+        
+        for j in range(N):
+            B, dB, d2B, d3B = BVirial_Tsonopoulos_extended_fast(T, Tc_row[j], Pc_row[j], omega_row[j], a_row[j], b_row[j])
+            B_row[j] = B
+            dB_row[j] = dB
+            d2B_row[j] = d2B
+            d3B_row[j] = d3B
+    return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
+
+
 def BVirial_Xiang(T, Tc, Pc, Vc, omega):
     r'''Calculates the second virial coefficient using the model in [1]_.
 
@@ -2572,8 +2811,11 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
         Cij_cbrt_row = Cij_cbrts[i]
         Cij_row = Cijs[i]
         for j in range(i):
-            Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
-        Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+            if Cij_row[j] > 0.0:
+                Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
+                
+        if Cij_row[i] > 0.0:
+            Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
     
 #     print(np.array(Cijs)**(1/3)/Cij_cbrts)
     C = 0.0
@@ -2584,7 +2826,8 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
             x0 = zs[i]*zs[j]*Cij_cbrts_i[j]
             Cij_cbrts_j = Cij_cbrts[j]
             for k in range(N):
-                C += x0*zs[k]*Cij_cbrts_i[k]*Cij_cbrts_j[k]
+                if Cij_cbrts_i[k]*Cij_cbrts_j[k] > 0.0:
+                    C += x0*zs[k]*Cij_cbrts_i[k]*Cij_cbrts_j[k]
     return C
 
 def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
@@ -2641,8 +2884,11 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
         Cij_pow_n23_row = Cij_pow_n23[i]
         Cij_row = Cijs[i]
         for j in range(i):
-            Cij_pow_n23_row[j] = Cij_pow_n23[j][i] = Cij_row[j]**(1.0/3)/Cij_row[j]
-        Cij_pow_n23_row[i] = Cij_row[i]**(1.0/3.0)/Cij_row[i]
+            if Cij_row[j] > 0.0: 
+                Cij_pow_n23_row[j] = Cij_pow_n23[j][i] = Cij_row[j]**(1.0/3)/Cij_row[j]
+                
+        if Cij_row[i] > 0.0:
+            Cij_pow_n23_row[i] = Cij_row[i]**(1.0/3.0)/Cij_row[i]
     
     # expect = np.array(Cijs)**(1/3)/Cijs
     # print(Cij_pow_n23/expect)
@@ -2661,7 +2907,10 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
                 # dC += zs[i]*zs[j]*zs[k]*(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])**(-2/3)*(t0 + t1 + t2)#/(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])
 
                 # Factor out the powers out
-                dC += zs[i]*zs[j]*zs[k]*Cij_pow_n23[i][j]*Cij_pow_n23[i][k]*Cij_pow_n23[j][k]*(t0 + t1 + t2)
+                term = Cij_pow_n23[i][j]*Cij_pow_n23[i][k]*Cij_pow_n23[j][k]
+                if term < 0.0:
+                    continue
+                dC += zs[i]*zs[j]*zs[k]*term*(t0 + t1 + t2)
                 
     dC *= 1/3
     return dC
@@ -2753,6 +3002,9 @@ def d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s):
                 x1 = Cijs[i][k]
                 x2 = Cijs[j][k]
                 x3 = x1*x2
+                x0x3 = x0*x3
+                if x0x3 < 0.0:
+                    continue
                 x4 = x0*x1
                 x5 = x0*x2
                 x8 = dCij_dTs[i][j]
@@ -2765,7 +3017,7 @@ def d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s):
                 x13 = 1/x1
                 x14 = 1/x2
                 x15 = x10*x13*x14
-                big = (x15*(x0*x3)**(1/3)*(6*x0*x6*x7 + x1*x7*x9 - x10*x12*x8 
+                big = (x15*(x0x3)**(1/3)*(6*x0*x6*x7 + x1*x7*x9 - x10*x12*x8 
                         + x11**2*x15 - x12*x13*x6 - x12*x14*x7 + x2*x6*x9
                         + 3*x3*d2Cij_dT2s[i][j] + 3*x4*d2Cij_dT2s[j][k] + 3*x5*d2Cij_dT2s[i][k])/9)
                 d2C += zs[i]*zs[j]*zs[k]*big
@@ -2833,6 +3085,12 @@ def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
                 x2 = Cijs[i][j]
                 x3 = Cijs[i][k]
                 x4 = x0*x3
+                x2x4 = x2*x4
+                
+                # Create a discontinuity in this mixing rule if we were going to have complex components
+                if x2x4 < 0.0:
+                    continue
+                term = (x2x4)**(1/3)
                 x5 = x2/3
                 x6 = d2Cij_dT2s[j][k]
                 x7 = dCij_dTs[i][k]
@@ -2866,7 +3124,7 @@ def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
                 x35 = x19*x23
                 x36 = x12*x2 + x13*x4 + x14*x17 + x15*x2 + x16*x17 + 2*x8*x9
                 x37 = 2*x36/3
-                big = (x1*x35*(x2*x4)**(1/3)*(x0*x5*d3Cij_dT3s[i][k] - x1*x21*x6
+                big = (x1*x35*term*(x0*x5*d3Cij_dT3s[i][k] - x1*x21*x6
                       + x10*x2*x9 - x10*x21*x23 + x11**2*x24*x25 + x11*x12 + x11*x15 
                       - x11*x23*x24*x34 + x13*x14 + x13*x16 - x13*x22 + x17*x18 + x18*x25*x32 
                       - x19*x26*x34*x7 + x20**3*x24*x26*x27/27 + x22*x32*x36 + x25*x26*x7**2

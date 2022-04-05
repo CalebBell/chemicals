@@ -281,6 +281,13 @@ def test_BVirial_Tsonopoulos_extended():
     B = BVirial_Tsonopoulos_extended(510., 425.2, 38E5, 0.193, species_type='normal', dipole=0)
     assert_close(B, -0.00020935295404416802)
 
+    B = BVirial_Tsonopoulos_extended_fast(510., 425.2, 38E5, 0.193, a=0, b=0)[0]
+    assert_close(B, -0.00020935295404416802)
+    for i in range(1, 4):
+        assert_close(BVirial_Tsonopoulos_extended(510., 425.2, 38E5, 0.193, a=0, b=0, order=i),
+                     BVirial_Tsonopoulos_extended_fast(510., 425.2, 38E5, 0.193, a=0, b=0)[i], rtol=1e-13)
+
+
     B = BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469)
     assert_close(B, -9.679718337596426e-05)
 
@@ -296,6 +303,24 @@ def test_BVirial_Tsonopoulos_extended():
                                             a=0, b=0, species_type=i, dipole=0.1) for i in types]
     Bs = [-9.00253249139901e-05, -9.00253249139901e-05, -8.136808332317606e-05, -9.232253763245037e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.00558374295638e-05, -9.003498498098181e-05, -9.003498498098181e-05, -9.003498498098181e-05, -9.003498498098181e-05, -7.331249596682434e-05]
     assert_close1d(Bs_calc, Bs)
+
+    # Test the fast call - with a group specified
+    calc0 = BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608,
+                                            a=0, b=0, species_type='ketone', dipole=0.1)
+    
+    calc1 = BVirial_Tsonopoulos_extended_fast(430., 405.65, 11.28E6, 0.252608,
+                                            a=-0.00014477824238067583, b=0)[0]
+    assert_close(calc0, calc1, rtol=1e-10)
+    
+    # Test compare a and b both being specified
+    
+    calc0 = BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608,
+                                            a=-1e-5, b=-1e-7)
+    
+    calc1 = BVirial_Tsonopoulos_extended_fast(430., 405.65, 11.28E6, 0.252608,
+                                            a=-1e-5, b=-1e-7)[0]
+    assert_close(calc0, calc1, rtol=1e-10)
+
 
 
 @pytest.mark.slow
@@ -722,6 +747,51 @@ def test_BVirial_Meng():
     BVirial_Meng_mat(T, [[Tc]], [[Pc]], [[Vc]], [[omega]], [[a]], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
     assert_close3d(expect_mat, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
 
+def test_BVirial_Tsonopoulos_extended_vec():
+    T = 388.26
+    Tc = 647.1
+    Pc = 22050000.0
+    Vc = 5.543076e-05
+    omega = 0.344
+    a = 1e-7
+    b = 1e-12
+    calc = BVirial_Tsonopoulos_extended_fast(T, Tc, Pc, omega, a, b)
+    expect = (-0.0003371378639247552, 2.8128391774419057e-06, -3.992508039858756e-08, 8.034145734426842e-10)
+    assert_close1d(calc, expect, rtol=1e-13)
+    
+    assert_close(BVirial_Tsonopoulos_extended_fast(T, Tc, Pc, omega, a, b)[0], -0.0003371378639247552, rtol=1e-13)
+    assert_close(derivative(lambda T: BVirial_Tsonopoulos_extended_fast(T, Tc, Pc, omega, a, b)[0], T, dx=T*1e-6), expect[1])
+    assert_close(derivative(lambda T: BVirial_Tsonopoulos_extended_fast(T, Tc, Pc, omega, a, b)[1], T, dx=T*1e-6), expect[2])
+    assert_close(derivative(lambda T: BVirial_Tsonopoulos_extended_fast(T, Tc, Pc, omega, a, b)[2], T, dx=T*1e-6), expect[3])
+    
+
+    # Vector call with out memory savings
+    vec_call = BVirial_Tsonopoulos_extended_vec(T, [Tc], [Pc], [omega], [a], [b])
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, vec_call, rtol=1e-13)
+    
+    Bs_out = [0]
+    dBs_out = [0]
+    d2Bs_out = [0]
+    d3Bs_out = [0]
+    
+    # vector call with memory savings
+    BVirial_Tsonopoulos_extended_vec(T, [Tc], [Pc], [omega], [a], [b], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    expect_vec = [[expect[0]], [expect[1]], [expect[2]], [expect[3]]]
+    assert_close2d(expect_vec, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
+    
+    # matrix call
+    mat_call = BVirial_Tsonopoulos_extended_mat(T, [[Tc]], [[Pc]], [[omega]], [[a]], [[b]])
+    expect_mat = [[[expect[0]]], [[expect[1]]], [[expect[2]]], [[expect[3]]]]
+    assert_close2d(expect_mat, mat_call, rtol=1e-13)
+
+    # matrix call for memory savings
+    Bs_out = [[0]]
+    dBs_out = [[0]]
+    d2Bs_out = [[0]]
+    d3Bs_out = [[0]]
+    BVirial_Tsonopoulos_extended_mat(T, [[Tc]], [[Pc]], [[omega]], [[a]], [[b]], Bs_out, dBs_out, d2Bs_out, d3Bs_out)
+    assert_close3d(expect_mat, [Bs_out, dBs_out, d2Bs_out, d3Bs_out], rtol=1e-13)
 
 def test_BVirial_Oconnell_Prausnitz():
     Tc = 508.1
