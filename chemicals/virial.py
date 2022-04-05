@@ -1582,27 +1582,31 @@ def BVirial_Tsonopoulos_fast(T, Tc, Pc, omega):
     d2 = - 0.423
     d3 = - 0.008
 
-    x0 = Tc/T
-    x1 = Tc**8/T**8
-    x2 = T**(-3)
-    x3 = Tc**3*x2
-    x4 = Tc**2
-    x5 = x4/T**2
+    T_inv = 1.0/T
+    T_inv2 = T_inv*T_inv
+    T_inv3 = T_inv2*T_inv
+    T_inv4 = T_inv2*T_inv2
+    Tc2 = Tc*Tc
+    Tc4 = Tc2*Tc2
+    x0 = Tc*T_inv
+    x1 = Tc4*Tc4*T_inv4*T_inv4
+    x3 = Tc2*Tc*T_inv3
+    x5 = Tc2*T_inv2
     x6 = R/Pc
     x7 = c2*x0
-    x8 = Tc**7*c4/T**7
+    x8 = Tc4*Tc2*Tc*c4*T_inv3*T_inv4
     x9 = c3*x5
     x10 = 2*d1
     x11 = d2*x0
-    x12 = Tc**6*d3/T**6
+    x12 = Tc4*Tc2*d3*T_inv3*T_inv3
     x13 = omega*x0
-    x14 = x4*x6
+    x14 = Tc2*x6
 
 
     B = Tc*x6*(c0 + c1*x0 + c2*x5 + c3*x3 + c4*x1 + omega*(d0 + d1*x5 + d2*x3 + d3*x1))
     dB = -x5*x6*(c1 + x13*(x10 + 3*x11 + 8*x12) + 2*x7 + 8*x8 + 3*x9)
-    d2B = 2*x14*x2*(c1 + 3*x13*(d1 + 2*x11 + 12*x12) + 3*x7 + 36*x8 + 6*x9)
-    d3B = -6*x14*(c1 + 2*x13*(x10 + 5*x11 + 60*x12) + 4*x7 + 120*x8 + 10*x9)/T**4
+    d2B = 2*x14*T_inv3*(c1 + 3*x13*(d1 + 2*x11 + 12*x12) + 3*x7 + 36*x8 + 6*x9)
+    d3B = -6*x14*(c1 + 2*x13*(x10 + 5*x11 + 60*x12) + 4*x7 + 120*x8 + 10*x9)*T_inv4
 
     return (B, dB, d2B, d3B)
 
