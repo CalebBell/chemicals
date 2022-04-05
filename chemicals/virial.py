@@ -630,16 +630,16 @@ def BVirial_Oconnell_Prausnitz(T, Tc, Pc, omega):
     x5 = R/Pc
     x6 = c2*x0
     x7 = c3*x4
-    x8 = 2*d1
+    x8 = 2.0*d1
     x9 = d2*x0
     x10 = Tc3*Tc3*d3*T_inv3*T_inv3
     x11 = omega*x0
     x12 = Tc2*x5
 
     B = Tc*x5*(c0 + c1*x0 + c2*x4 + c3*x2 + omega*(d0 + d1*x4 + d2*x2 + Tc3*Tc3*Tc2*d3*T_inv3*T_inv3*T_inv2))
-    dB = -x4*x5*(c1 + x11*(8*x10 + x8 + 3*x9) + 2*x6 + 3*x7)
-    d2B = 2*T_inv3*x12*(c1 + 3*x11*(d1 + 12*x10 + 2*x9) + 3*x6 + 6*x7)
-    d3B = -6*x12*(c1 + 2*x11*(60*x10 + x8 + 5*x9) + 4*x6 + 10*x7)*T_inv3*T_inv
+    dB = -x4*x5*(c1 + x11*(8.0*x10 + x8 + 3.0*x9) + 2.0*x6 + 3.0*x7)
+    d2B = 2.0*T_inv3*x12*(c1 + 3.0*x11*(d1 + 12.0*x10 + 2.0*x9) + 3.0*x6 + 6.0*x7)
+    d3B = -6.0*x12*(c1 + 2.0*x11*(60.0*x10 + x8 + 5.0*x9) + 4.0*x6 + 10.0*x7)*T_inv3*T_inv
     return (B, dB, d2B, d3B)
 
 def BVirial_Oconnell_Prausnitz_vec(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
@@ -947,24 +947,24 @@ def BVirial_Pitzer_Curl_fast(T, Tc, Pc, omega):
     d4 = - 0.0073
     
     x0 = Tc/T
-    x1 = T**(-3)
-    x2 = Tc**3*x1
-    x3 = Tc**2
-    x4 = x3/T**2
+    x1 = T**(-3.0)
+    x2 = Tc**3.0*x1
+    x3 = Tc**2.0
+    x4 = x3/T**2.0
     x5 = R/Pc
-    x6 = 2*x0
-    x7 = 3*x4
-    x8 = Tc**7*d4/T**7
-    x9 = 3*x0
-    x10 = 6*x4
+    x6 = 2.0*x0
+    x7 = 3.0*x4
+    x8 = Tc**7.0*d4/T**7.0
+    x9 = 3.0*x0
+    x10 = 6.0*x4
     x11 = x3*x5
-    x12 = 4*x0
-    x13 = 10*x4
+    x12 = 4.0*x0
+    x13 = 10.0*x4
     
-    B = Tc*x5*(c0 + c1*x0 + c2*x4 + c3*x2 + omega*(d0 + d1*x0 + d2*x4 + d3*x2 + Tc**8*d4/T**8))
-    dB = -x4*x5*(c1 + c2*x6 + c3*x7 + omega*(d1 + d2*x6 + d3*x7 + 8*x8))
-    d2B = 2*x1*x11*(c1 + c2*x9 + c3*x10 + omega*(d1 + d2*x9 + d3*x10 + 36*x8))
-    d3B = -6*x11*(c1 + c2*x12 + c3*x13 + omega*(d1 + d2*x12 + d3*x13 + 120*x8))/T**4
+    B = Tc*x5*(c0 + c1*x0 + c2*x4 + c3*x2 + omega*(d0 + d1*x0 + d2*x4 + d3*x2 + Tc**8.0*d4/T**8.0))
+    dB = -x4*x5*(c1 + c2*x6 + c3*x7 + omega*(d1 + d2*x6 + d3*x7 + 8.0*x8))
+    d2B = 2.0*x1*x11*(c1 + c2*x9 + c3*x10 + omega*(d1 + d2*x9 + d3*x10 + 36.0*x8))
+    d3B = -6.0*x11*(c1 + c2*x12 + c3*x13 + omega*(d1 + d2*x12 + d3*x13 + 120.0*x8))/T**4.0
     return (B, dB, d2B, d3B)
 
 def BVirial_Pitzer_Curl_vec(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None, 
@@ -1596,7 +1596,7 @@ def BVirial_Tsonopoulos_fast(T, Tc, Pc, omega):
     x7 = c2*x0
     x8 = Tc4*Tc2*Tc*c4*T_inv3*T_inv4
     x9 = c3*x5
-    x10 = 2*d1
+    x10 = 2.0*d1
     x11 = d2*x0
     x12 = Tc4*Tc2*d3*T_inv3*T_inv3
     x13 = omega*x0
@@ -1604,9 +1604,9 @@ def BVirial_Tsonopoulos_fast(T, Tc, Pc, omega):
 
 
     B = Tc*x6*(c0 + c1*x0 + c2*x5 + c3*x3 + c4*x1 + omega*(d0 + d1*x5 + d2*x3 + d3*x1))
-    dB = -x5*x6*(c1 + x13*(x10 + 3*x11 + 8*x12) + 2*x7 + 8*x8 + 3*x9)
-    d2B = 2*x14*T_inv3*(c1 + 3*x13*(d1 + 2*x11 + 12*x12) + 3*x7 + 36*x8 + 6*x9)
-    d3B = -6*x14*(c1 + 2*x13*(x10 + 5*x11 + 60*x12) + 4*x7 + 120*x8 + 10*x9)*T_inv4
+    dB = -x5*x6*(c1 + x13*(x10 + 3.0*x11 + 8.0*x12) + 2.0*x7 + 8.0*x8 + 3.0*x9)
+    d2B = 2.0*x14*T_inv3*(c1 + 3.0*x13*(d1 + 2.0*x11 + 12.0*x12) + 3.0*x7 + 36.0*x8 + 6.0*x9)
+    d3B = -6.0*x14*(c1 + 2.0*x13*(x10 + 5.0*x11 + 60.0*x12) + 4.0*x7 + 120.0*x8 + 10.0*x9)*T_inv4
 
     return (B, dB, d2B, d3B)
 
@@ -2078,20 +2078,20 @@ def BVirial_Tsonopoulos_extended_fast(T, Tc, Pc, omega, a=0.0, b=0.0):
     x7 = R/Pc
     x8 = c2*x0
     x9 = Tc4*Tc3*T_inv3*T_inv4
-    x10 = 8*x9
+    x10 = 8.0*x9
     x11 = Tc3*Tc2*a*T_inv3*T_inv2
     x12 = c3*x6
-    x13 = 2*d1
+    x13 = 2.0*d1
     x14 = d2*x0
     x15 = d3*x2
     x16 = omega*x0
-    x17 = 36*x9
+    x17 = 36.0*x9
     x18 = Tc2*x7
-    x19 = 120*x9
+    x19 = 120.0*x9
     B = Tc*x7*(a*x2 - b*x1 + c0 + c1*x0 + c2*x6 + c3*x4 + c4*x1 + omega*(d0 + d1*x6 + d2*x4 + d3*x1))
-    dB = -x6*x7*(-b*x10 + c1 + c4*x10 + 6*x11 + 3*x12 + x16*(x13 + 3*x14 + 8*x15) + 2*x8)
-    d2B = 2*x18*T_inv3*(-b*x17 + c1 + c4*x17 + 21*x11 + 6*x12 + 3*x16*(d1 + 2*x14 + 12*x15) + 3*x8)
-    d3B = -6*x18*(-b*x19 + c1 + c4*x19 + 56*x11 + 10*x12 + 2*x16*(x13 + 5*x14 + 60*x15) + 4*x8)*T_inv4
+    dB = -x6*x7*(-b*x10 + c1 + c4*x10 + 6.0*x11 + 3.0*x12 + x16*(x13 + 3.0*x14 + 8.0*x15) + 2.0*x8)
+    d2B = 2.0*x18*T_inv3*(-b*x17 + c1 + c4*x17 + 21.0*x11 + 6.0*x12 + 3.0*x16*(d1 + 2.0*x14 + 12.0*x15) + 3.0*x8)
+    d3B = -6.0*x18*(-b*x19 + c1 + c4*x19 + 56.0*x11 + 10.0*x12 + 2.0*x16*(x13 + 5.0*x14 + 60.0*x15) + 4.0*x8)*T_inv4
     return (B, dB, d2B, d3B)
 
 
@@ -2543,28 +2543,28 @@ def BVirial_Meng(T, Tc, Pc, Vc, omega, a=0.0):
     c0, c1, c2, c3, c4 =  0.13356, -0.30252, -0.15668, -0.00724, -0.00022
     d0, d1, d2, d3, d4 = 0.17404, -0.15581, 0.38183, -0.44044, -0.00541
     x0 = Tc/T
-    x1 = Tc**8/T**8
-    x2 = T**(-3)
-    x3 = Tc**3*x2
-    x4 = Tc**2
-    x5 = x4/T**2
+    x1 = Tc**8.0/T**8.0
+    x2 = T**(-3.0)
+    x3 = Tc**3.0*x2
+    x4 = Tc**2.0
+    x5 = x4/T**2.0
     x6 = R/Pc
-    x7 = 2*x0
-    x8 = Tc**7/T**7
-    x9 = 8*x8
-    x10 = Tc**5*a/T**5
-    x11 = 3*x5
-    x12 = 3*x0
-    x13 = 36*x8
-    x14 = 6*x5
+    x7 = 2.0*x0
+    x8 = Tc**7.0/T**7.0
+    x9 = 8.0*x8
+    x10 = Tc**5.0*a/T**5.0
+    x11 = 3.0*x5
+    x12 = 3.0*x0
+    x13 = 36.0*x8
+    x14 = 6.0*x5
     x15 = x4*x6
-    x16 = 4*x0
-    x17 = 120*x8
-    x18 = 10*x5
-    B = Tc*x6*(c0 + c1*x0 + c2*x5 + c3*x3 + c4*x1 + omega*(d0 + d1*x0 + d2*x5 + d3*x3 + d4*x1) + Tc**6*a/T**6)
-    dB = -x5*x6*(c1 + c2*x7 + c3*x11 + c4*x9 + omega*(d1 + d2*x7 + d3*x11 + d4*x9) + 6*x10)
-    dB2 = 2*x15*x2*(c1 + c2*x12 + c3*x14 + c4*x13 + omega*(d1 + d2*x12 + d3*x14 + d4*x13) + 21*x10)
-    dB3 = -6*x15*(c1 + c2*x16 + c3*x18 + c4*x17 + omega*(d1 + d2*x16 + d3*x18 + d4*x17) + 56*x10)/T**4
+    x16 = 4.0*x0
+    x17 = 120.0*x8
+    x18 = 10.0*x5
+    B = Tc*x6*(c0 + c1*x0 + c2*x5 + c3*x3 + c4*x1 + omega*(d0 + d1*x0 + d2*x5 + d3*x3 + d4*x1) + Tc**6.0*a/T**6.0)
+    dB = -x5*x6*(c1 + c2*x7 + c3*x11 + c4*x9 + omega*(d1 + d2*x7 + d3*x11 + d4*x9) + 6.0*x10)
+    dB2 = 2.0*x15*x2*(c1 + c2*x12 + c3*x14 + c4*x13 + omega*(d1 + d2*x12 + d3*x14 + d4*x13) + 21.0*x10)
+    dB3 = -6.0*x15*(c1 + c2*x16 + c3*x18 + c4*x17 + omega*(d1 + d2*x16 + d3*x18 + d4*x17) + 56.0*x10)/T**4.0
     return B, dB, dB2, dB3
 
 def BVirial_Meng_vec(T, Tcs, Pcs, Vcs, omegas, ais, Bs=None, dB_dTs=None, 
@@ -3022,16 +3022,16 @@ def d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s):
                 x8 = dCij_dTs[i][j]
                 x6 = dCij_dTs[i][k]
                 x7 = dCij_dTs[j][k]
-                x9 = 6*x8
-                x10 = 1/x0
+                x9 = 6.0*x8
+                x10 = 1.0/x0
                 x11 = x3*x8 + x4*x7 + x5*x6
-                x12 = 3*x11
-                x13 = 1/x1
-                x14 = 1/x2
+                x12 = 3.0*x11
+                x13 = 1.0/x1
+                x14 = 1.0/x2
                 x15 = x10*x13*x14
-                big = (x15*(x0x3)**(1/3)*(6*x0*x6*x7 + x1*x7*x9 - x10*x12*x8 
-                        + x11**2*x15 - x12*x13*x6 - x12*x14*x7 + x2*x6*x9
-                        + 3*x3*d2Cij_dT2s[i][j] + 3*x4*d2Cij_dT2s[j][k] + 3*x5*d2Cij_dT2s[i][k])/9)
+                big = (x15*(x0x3)**(1.0/3.0)*(6.0*x0*x6*x7 + x1*x7*x9 - x10*x12*x8 
+                        + x11**2.0*x15 - x12*x13*x6 - x12*x14*x7 + x2*x6*x9
+                        + 3.0*x3*d2Cij_dT2s[i][j] + 3.0*x4*d2Cij_dT2s[j][k] + 3.0*x5*d2Cij_dT2s[i][k])/9.0)
                 d2C += zs[i]*zs[j]*zs[k]*big
     return d2C
                 
@@ -3103,7 +3103,7 @@ def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
                 if x2x4 < 0.0:
                     continue
                 term = (x2x4)**(1/3)
-                x5 = x2/3
+                x5 = x2/3.0
                 x6 = d2Cij_dT2s[j][k]
                 x7 = dCij_dTs[i][k]
                 x8 = x2*x7
@@ -3115,33 +3115,33 @@ def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
                 x14 = x3*x9
                 x15 = x0*x10
                 x16 = x0*x7
-                x17 = 2*x11
+                x17 = 2.0*x11
                 x18 = x7*x9
-                x19 = 1/x2
+                x19 = 1.0/x2
                 x20 = x11*x4 + x14*x2 + x16*x2
-                x21 = x20/3
+                x21 = x20/3.0
                 x22 = x19*x21
-                x23 = 1/x3
-                x24 = x2**(-2)
-                x25 = 2*x20/3
-                x26 = x3**(-2)
-                x27 = x0**(-2)
+                x23 = 1.0/x3
+                x24 = x2**(-2.0)
+                x25 = 2.0*x20/3.0
+                x26 = x3**(-2.0)
+                x27 = x0**(-2.0)
                 x28 = x23*x7
                 x29 = x11*x19
                 x30 = x25*x29
                 x31 = x1*x9
                 x32 = x1*x23
-                x33 = x20**2/3
+                x33 = x20**2.0/3.0
                 x34 = x1*x33
                 x35 = x19*x23
-                x36 = x12*x2 + x13*x4 + x14*x17 + x15*x2 + x16*x17 + 2*x8*x9
-                x37 = 2*x36/3
+                x36 = x12*x2 + x13*x4 + x14*x17 + x15*x2 + x16*x17 + 2.0*x8*x9
+                x37 = 2.0*x36/3.0
                 big = (x1*x35*term*(x0*x5*d3Cij_dT3s[i][k] - x1*x21*x6
-                      + x10*x2*x9 - x10*x21*x23 + x11**2*x24*x25 + x11*x12 + x11*x15 
+                      + x10*x2*x9 - x10*x21*x23 + x11**2.0*x24*x25 + x11*x12 + x11*x15 
                       - x11*x23*x24*x34 + x13*x14 + x13*x16 - x13*x22 + x17*x18 + x18*x25*x32 
-                      - x19*x26*x34*x7 + x20**3*x24*x26*x27/27 + x22*x32*x36 + x25*x26*x7**2
-                      + x25*x27*x9**2 - x27*x33*x35*x9 + x28*x30 - x28*x37 - x29*x37
-                      + x3*x5*d3Cij_dT3s[j][k] + x30*x31 - x31*x37 + x4*d3Cij_dT3s[i][j]/3 + x6*x8))
+                      - x19*x26*x34*x7 + x20**3.0*x24*x26*x27/27.0 + x22*x32*x36 + x25*x26*x7**2.0
+                      + x25*x27*x9**2.0 - x27*x33*x35*x9 + x28*x30 - x28*x37 - x29*x37
+                      + x3*x5*d3Cij_dT3s[j][k] + x30*x31 - x31*x37 + x4*d3Cij_dT3s[i][j]/3.0 + x6*x8))
                 d3C += zs[i]*zs[j]*zs[k]*big
     return d3C
 
