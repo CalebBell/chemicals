@@ -125,10 +125,12 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            
            'BVirial_Oconnell_Prausnitz','BVirial_Oconnell_Prausnitz_vec',
            'BVirial_Oconnell_Prausnitz_mat',
-           
-           'dBVirial_mixture_dzs', 'd2BVirial_mixture_dzizjs',
+
            'BVirial_Xiang', 'BVirial_Xiang_vec', 'BVirial_Xiang_mat',
-           'BVirial_mixture',
+           
+           'BVirial_mixture', 'dBVirial_mixture_dzs',
+           'd2BVirial_mixture_dzizjs', 'd3BVirial_mixture_dzizjzks',
+           
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
            'CVirial_Liu_Xiang_mat', 'CVirial_Liu_Xiang_vec',
@@ -428,7 +430,7 @@ def BVirial_mixture(zs, Bijs):
         B += zs[i]*(B_tmp)
     return B
 
-def dBVirial_mixture_dzs(zs, Bijs):
+def dBVirial_mixture_dzs(zs, Bijs, dB_dzs=None):
     r'''Calculate first mole fraction derivative of the `B` second virial
     coefficient from a matrix of virial cross-coefficients.
     
@@ -441,6 +443,9 @@ def dBVirial_mixture_dzs(zs, Bijs):
         Mole fractions of each species, [-]
     Bijs : list[list[float]]
         Second virial coefficient in density form [m^3/mol]
+    dB_dzs : list[float], optional
+        Array for first mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
 
     Returns
     -------
@@ -459,7 +464,8 @@ def dBVirial_mixture_dzs(zs, Bijs):
     [-3.4089e-05, -7.2301e-05, -0.00012621]
     '''
     N = len(Bijs)
-    dB_dzs = [0.0]*N
+    if dB_dzs is None:
+        dB_dzs = [0.0]*N
     for k in range(N):
         dB = 0.0
         for i in range(N):
@@ -467,7 +473,7 @@ def dBVirial_mixture_dzs(zs, Bijs):
         dB_dzs[k] = dB
     return dB_dzs
 
-def d2BVirial_mixture_dzizjs(zs, Bijs):
+def d2BVirial_mixture_dzizjs(zs, Bijs, d2B_dzizjs=None):
     r'''Calculate second mole fraction derivative of the `B` second virial
     coefficient from a matrix of virial cross-coefficients.
     
@@ -480,6 +486,10 @@ def d2BVirial_mixture_dzizjs(zs, Bijs):
         Mole fractions of each species, [-]
     Bijs : list[list[float]]
         Second virial coefficient in density form [m^3/mol]
+    d2B_dzizjs : list[list[float]], optional
+        Array for First mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
+
 
     Returns
     -------
@@ -498,14 +508,15 @@ def d2BVirial_mixture_dzizjs(zs, Bijs):
     [[-1.248e-05, -4.023e-05, -7.89e-05], [-4.023e-05, -8.782e-05, -0.0001292], [-7.89e-05, -0.0001292, -0.00024]]
     '''
     N = len(Bijs)
-    d2B_dzizjs = [[0.0]*N for _ in range(N)] # numba: delete
-    # d2B_dzizjs = zeros((N, N)) # numba: uncomment
+    if d2B_dzizjs is None:
+        d2B_dzizjs = [[0.0]*N for _ in range(N)] # numba: delete
+        # d2B_dzizjs = zeros((N, N)) # numba: uncomment
     for i in range(N):
         for j in range(N):
             d2B_dzizjs[i][j] = Bijs[i][j] + Bijs[j][i]
     return d2B_dzizjs
 
-def d3BVirial_mixture_dzizjzks(zs, Bijs):
+def d3BVirial_mixture_dzizjzks(zs, Bijs, d3B_dzizjzks=None):
     r'''Calculate third mole fraction derivative of the `B` third virial
     coefficient from a matrix of virial cross-coefficients.
     
@@ -518,6 +529,9 @@ def d3BVirial_mixture_dzizjzks(zs, Bijs):
         Mole fractions of each species, [-]
     Bijs : list[list[float]]
         Second virial coefficient in density form [m^3/mol]
+    d3B_dzizjzks : list[list[list[float]]]
+        Array for third mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
 
     Returns
     -------
@@ -536,8 +550,9 @@ def d3BVirial_mixture_dzizjzks(zs, Bijs):
     [[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]]
     '''
     N = len(Bijs)
-    d3B_dzizjzks = [[[0.0]*N for _ in range(N)] for _ in range(N)] # numba: delete
-    # d3B_dzizjzks = zeros((N, N, N)) # numba: uncomment
+    if d3B_dzizjzks is None:
+        d3B_dzizjzks = [[[0.0]*N for _ in range(N)] for _ in range(N)] # numba: delete
+#        d3B_dzizjzks = zeros((N, N, N)) # numba: uncomment
     return d3B_dzizjzks
 
 

@@ -1452,7 +1452,7 @@ def Vfs_to_zs(Vfs, Vms):
     return zs
 
 
-def dxs_to_dns(dxs, xs):
+def dxs_to_dns(dxs, xs, dns=None):
     r'''Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to mole number derivatives (where the mole fractions
     do sum to one). Requires the derivatives and the mole fractions of the
@@ -1471,6 +1471,8 @@ def dxs_to_dns(dxs, xs):
         1), [prop]
     xs : list[float]
         Mole fractions of the species, [-]
+    dns : list[float], optional
+        Return array, [prop/mol]
 
     Returns
     -------
@@ -1491,9 +1493,14 @@ def dxs_to_dns(dxs, xs):
     [0.0014570000000000004, -0.002933, -0.004333]
     '''
     xdx_tot = 0.0
-    for j in range(len(xs)):
+    N = len(xs)
+    for j in range(N):
         xdx_tot += xs[j]*dxs[j]
-    return [dxi - xdx_tot for dxi in dxs]
+    if dns is None:
+        dns = [0.0]*N
+    for i in range(N):
+        dns[i] = dxs[i] - xdx_tot
+    return dns
 
 
 def dns_to_dn_partials(dns, F):
@@ -1538,7 +1545,7 @@ def dns_to_dn_partials(dns, F):
     return [F + dni for dni in dns]
 
 
-def dxs_to_dn_partials(dxs, xs, F):
+def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
     r'''Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to partial molar quantites. Requires the derivatives
     and the mole fractions of the mixture.
@@ -1552,7 +1559,9 @@ def dxs_to_dn_partials(dxs, xs, F):
         Mole fractions of the species, [-]
     F : float
         Property evaluated at constant composition, [prop]
-
+    partial_properties : list[float], optional
+        Array for Derivatives of a quantity with respect to mole number (summing to
+        1), [prop]
     Returns
     -------
     partial_properties : list[float]
@@ -1578,9 +1587,14 @@ def dxs_to_dn_partials(dxs, xs, F):
     [-0.00015182, -0.0047014199999999996, -0.00610142]
     '''
     xdx_totF = F
-    for j in range(len(xs)):
+    N = len(xs)
+    if partial_properties is None:
+        partial_properties = [0.0]*N
+    for j in range(N):
         xdx_totF -= xs[j]*dxs[j]
-    return [dxi + xdx_totF for dxi in dxs]
+    for i in range(N):
+        partial_properties[i] = dxs[i] + xdx_totF
+    return partial_properties
 
 
 def d2ns_to_dn2_partials(d2ns, dns):

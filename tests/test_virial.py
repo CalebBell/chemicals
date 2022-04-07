@@ -879,7 +879,10 @@ def test_dBVirial_mixture_dzs():
     
     numerical = jacobian(BVirial_mixture, zs, args=(Bijs,), perturbation=1e-7)
     assert_close1d(numerical, expect, rtol=1e-7)
-
+    
+    out = [0.0]*3
+    calc = dBVirial_mixture_dzs(zs=zs, Bijs=Bijs, dB_dzs=out)
+    assert calc is out
 
 def test_d2BVirial_mixture_dzizjs():
     Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
@@ -887,6 +890,22 @@ def test_d2BVirial_mixture_dzizjs():
     calc = d2BVirial_mixture_dzizjs(zs=zs, Bijs=Bijs)
     expect = [[-1.248e-05, -4.023e-05, -7.89e-05], [-4.023e-05, -8.782e-05, -0.0001292], [-7.89e-05, -0.0001292, -0.00024]]
     assert_close2d(calc, expect, rtol=1e-13)
-
+    
+    out = [[0.0]*3 for _ in range(3)]
+    calc = d2BVirial_mixture_dzizjs(zs=zs, Bijs=Bijs, d2B_dzizjs=out)
+    assert calc is out
+    
     numerical = hessian(BVirial_mixture, zs, args=(Bijs,), perturbation=25e-5)
     assert_close1d(numerical, expect, rtol=1e-7)
+
+
+def test_d3BVirial_mixture_dzizjzks():
+    Bijs = [[-6.24e-06, -2.013e-05, -3.9e-05], [-2.01e-05, -4.391e-05, -6.46e-05], [-3.99e-05, -6.46e-05, -0.00012]]
+    zs = [.5, .3, .2]
+    out = d3BVirial_mixture_dzizjzks(zs=zs, Bijs=Bijs)
+    expect = [[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]]
+    assert_close3d(out, expect, atol=0)
+    
+    data = [[[0.0]*3 for _ in range(3)] for _ in range(3)]
+    out = d3BVirial_mixture_dzizjzks(zs=zs, Bijs=Bijs, d3B_dzizjzks=data)
+    assert out is data
