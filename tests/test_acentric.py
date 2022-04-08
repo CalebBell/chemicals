@@ -25,16 +25,18 @@ from fluids.numerics import assert_close
 import pytest
 import pandas as pd
 from chemicals.acentric import *
-from chemicals.critical import critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws
+from chemicals.critical import critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws, ACENTRIC_DEFINITION
 
 
 @pytest.mark.fuzz
 @pytest.mark.slow
 def test_acentric_fuzz():
     sources = [critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
-
     CASs = set()
-    [CASs.update(list(k.index.values)) for k in sources]
+    for k in sources:
+        for i in k.index:
+            if pd.notnull(k.at[i, 'omega']):
+                CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
     omegas = [omega(i) for i in CASs] # This is quite slow
@@ -55,7 +57,7 @@ def test_acentric_main():
     assert_close(omega_calc, 0.852, rtol=1e-13)
 
     methods = omega_methods('74-98-6')
-    assert methods == ['PSRK', 'PD', 'YAWS']
+    assert methods == ['PSRK', 'PD', 'YAWS', 'ACENTRIC_DEFINITION']
 
     # Error handling
     assert None == omega(CASRN='BADCAS')

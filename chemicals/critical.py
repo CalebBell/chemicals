@@ -118,6 +118,7 @@ YAWS = 'YAWS'
 PINAMARTINES = 'PINAMARTINES'
 FEDORS = 'FEDORS'
 WILSON_JASPERSON = 'WILSON_JASPERSON'
+ACENTRIC_DEFINITION = 'ACENTRIC_DEFINITION'
 
 ### Register data sources and lazy load them
 
@@ -144,6 +145,8 @@ register_df_source(folder, 'Yaws Collection.tsv', postload=_add_Zc_to_df)
 register_df_source(folder, 'DIPPRPinaMartines.tsv', postload=_add_Zc_to_df)
 register_df_source(folder, 'wilson_jasperson_Tc_Pc_predictions.tsv', int_CAS=True)
 register_df_source(folder, 'fedors_Vc_predictions.tsv', int_CAS=True)
+register_df_source(folder, 'omega_Psat_Tc_predictions.tsv', int_CAS=True)
+
 _critical_data_loaded = False
 @mark_numba_incompatible
 def _load_critical_data():
@@ -160,6 +163,7 @@ def _load_critical_data():
     critical_data_PinaMartines = data_source('DIPPRPinaMartines.tsv')
     critical_data_WilsonJasperson = data_source('wilson_jasperson_Tc_Pc_predictions.tsv')
     critical_data_Fedors = data_source('fedors_Vc_predictions.tsv')
+    critical_data_omega_Psat_Tc = data_source('omega_Psat_Tc_predictions.tsv')
     _critical_data_loaded = True
     Tc_sources = {
         IUPAC: critical_data_IUPAC,
@@ -204,7 +208,8 @@ def _load_critical_data():
     omega_sources = {
         PSRK: critical_data_PSRKR4,
         PD: critical_data_PassutDanner,
-        YAWS: critical_data_Yaws
+        YAWS: critical_data_Yaws,
+        ACENTRIC_DEFINITION: critical_data_omega_Psat_Tc
     }
 
 if PY37:
@@ -214,6 +219,7 @@ if PY37:
                     'critical_data_Yaws', 'critical_data_PassutDanner',
                     'critical_data_PinaMartines',
                     'critical_data_WilsonJasperson', 'critical_data_Fedors',
+                    'critical_data_omega_Psat_Tc',
                     'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
                     'omega_sources'):
             _load_critical_data()
