@@ -58,7 +58,7 @@ from chemicals.data_reader import (retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
 
-omega_all_methods = ('PSRK', 'PD', 'YAWS')
+omega_all_methods = ('PSRK', 'PD', 'YAWS', critical.ACENTRIC_DEFINITION)
 '''Tuple of method name keys. See the `omega` for the actual references'''
 
 @mark_numba_incompatible
@@ -115,7 +115,7 @@ def omega(CASRN, method=None):
 
     Notes
     -----
-    A total of three sources are available for this function. They are:
+    A total of four sources are available for this function. They are:
 
         * 'PSRK', a compillation of experimental and estimated data published
           in the Appendix of [2]_, the fourth revision of the PSRK model.
@@ -123,6 +123,9 @@ def omega(CASRN, method=None):
           data published in (Passut & Danner, 1973) [3]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [4]_.
+        * 'ACENTRIC_DEFINITION', the precalculated results using the
+          `VaporPressure` object of Thermo and the critical properties of
+          `chemicals`.
 
     See Also
     --------
