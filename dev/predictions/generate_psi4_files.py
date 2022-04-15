@@ -26,29 +26,44 @@ from thermo import *
 from rdkit import Chem
 from joblib import Parallel, delayed
 from subprocess import Popen, PIPE
-
-
+from chemicals.identifiers import pubchem_db
 from fluids.constants import c, h, pi
+try:
+    Chemical('asdfasdfsadfasd')
+except:
+    pass
 
 
 def get_radius_gyration(lines, MW, linear=False):
     '''Given a molecular weight and input lines from psi4
     calculate the radius of gyration in units of m.
     '''
-    rotational_constants_line = '  Rotational constants: '
+    rotational_constants_line = 'Rotational constants: '
     for l in lines:
-        if l.startswith(rotational_constants_line):
+        if rotational_constants_line in l:
+            l = l.strip()
             segments = l.replace(rotational_constants_line, '').replace('  ', ' ').replace('  ', ' ').replace('  ', ' ').split(' ')
+            print(l)
+            print(segments)
             assert segments[-1] == '[cm^-1]'
             _, _, A, _, _, B, _, _, C, _ = segments
-            A, B, C = float(A), float(B), float(C)
-            A, B, C = A*c*100.0, B*c*100.0, C*c*100.0
-            A, B, C = [h/(8*pi**2)/i for i in (A, B, C)]
+            try:
+                A, B, C = float(A), float(B), float(C)
+                A, B, C = A*c*100.0, B*c*100.0, C*c*100.0
+                A, B, C = [h/(8*pi**2)/i for i in (A, B, C)]
+            except:
+                if '*' in A:
+                    A, B = float(B), float(C)
+                    A, B = A*c*100.0, B*c*100.0
+                    A, B = [h/(8*pi**2)/i for i in (A, B)]
+                    linear = True
+                else:
+                    raise ValueError('DEBUG')
             
             if not linear:
                 return radius_of_gyration(A=A, B=B, C=C, MW=MW)
             else:
-                return radius_of_gyration(A=A, B=B, MW=MW, planar=True)
+                return radius_of_gyration(A=A, B=B, C=0, MW=MW, planar=True)
     raise ValueError("Rotational constants not found")
 
 def get_dipole_moment(lines):
@@ -90,12 +105,17 @@ def get_vibration_freqs(lines):
     freqs = []
     for i, l in enumerate(lines):
         if l.startswith(expect_line):
-            l = l.replace(expect_line, '')
+            #print(l)
+            l = l.strip().replace(expect_line, '').replace(expect_line, '').replace('Freq', '').replace('[cm^-1]', '')
             while '  ' in l:
                 l = l.replace('  ', ' ')
             segments = l.split(' ')
+            #print(segments)
             for s in segments:
                 if s:
+                    if s.endswith('i'):
+                        # Probably a bug and the results should be discarded
+                        continue
                     freqs.append(float(s))
 #             print(segments)
     if not freqs:
@@ -139,8 +159,34 @@ def get_data(f):
             print(CAS)
             raise e
 
+    try:
+        freqs = get_vibration_freqs(lines)
+        frequencies[CAS] = freqs
+    except Exception as e:
+        if not failure_OK:
+            print(CAS)
+            raise e
+        
+    MW = pubchem_db.search_CAS(CAS).MW
+
+    try:
+        rgyr = get_radius_gyration(lines, MW, linear=linear)
+        radius_gyrations[CAS] = rgyr
+    except Exception as e:
+        if not failure_OK:
+            print(CAS)
+            raise e
+
 for f in to_process:
     get_data(f)
-print(dipoles)
+
+#print(dipoles)
 print(f'Found {len(dipoles)} dipoles' )
+print(f'Found {len(linears)} linears' )
+print(f'Found {len(frequencies)} frequencies' )
+print(f'Found {len(radius_gyrations)} radius_gyrations' )
+
+#for k, v in linears.items():
+    #if v:
+        #print(k)
 
