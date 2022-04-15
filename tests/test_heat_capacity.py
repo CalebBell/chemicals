@@ -21,6 +21,7 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import numpy as np
 import pytest
 from math import log10, log
+from fluids.constants import R, h, k
 from fluids.numerics import assert_close, assert_close1d, linspace, logspace
 from chemicals.heat_capacity import *
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data, Cp_data_Poling
@@ -417,3 +418,59 @@ def test_piece_wise_heat_capacity():
          +models[-1].calculate_integral_over_T(350, 400))
     assert_close(H, Cp.force_calculate_integral(100, 400))
     assert_close(S, Cp.force_calculate_integral_over_T(100, 400))
+    
+    
+def test_Cpg_statistical_mechanics():
+    thetas = [1360, 2330, 2330, 4800, 4880, 4880]
+    Cp_from_spectra = Cpg_statistical_mechanics(300.0,thetas)
+    assert_close(Cp_from_spectra, 35.55983440173097, rtol=1e-12)
+    
+    test = Cpg_statistical_mechanics(300.0,thetas, linear=True)
+    assert_close(test, 35.55983440173097-R/2, rtol=1e-12)
+    
+    # Test the high limit
+    assert_close(Cpg_statistical_mechanics(1e100, thetas)/R, 10, rtol=1e-14)
+    
+    # Test there is a check to ensure at high temperatures numerical error does not make the value too high
+    
+    assert_close(Cpg_statistical_mechanics(1e10, thetas)/R, 9.99999999999993, rtol=1e-14)
+    
+    #Test the use of expm1 at high temperatures
+    assert_close(Cpg_statistical_mechanics(1e11, thetas)/R, 10, rtol=1e-15)
+    
+    # Low temperatures
+    
+    assert 4 == Cpg_statistical_mechanics(1, thetas)/R
+    assert 4 == Cpg_statistical_mechanics(10, thetas)/R
+    assert 4 == Cpg_statistical_mechanics(0, thetas)/R
+    assert 4 == Cpg_statistical_mechanics(1e-10, thetas)/R
+
+    # Other Perry's sample from software as Hz
+    v_scaled = [3.24, 4.97, 4.97, 9.90, 10.26, 10.26] # divided by 10^13, 
+    v_scaled_Hz = [vj*1e13 for vj in v_scaled]
+    thetas_comp = [h*vj/k for vj in v_scaled_Hz]
+    
+    Cp_perry_stat = Cpg_statistical_mechanics(300.0,thetas_comp)
+    assert_close(Cp_perry_stat, 34.89647856513431, rtol=1e-12)
+    
+    
+    thetas_caleb_psi4_mp2_631G = [1615.6879, 2486.5201, 2486.6163, 5128.4685, 5353.9398, 5354.6923]
+    thetas_caleb_psi4_mp2_6311ppG3df3pd = [1472.1887, 2385.2593, 2385.3405, 5084.3735, 5296.0091, 5296.3665]
+
+    # Yep, it's matching
+    Cp = Cpg_statistical_mechanics(298.15,thetas_caleb_psi4_mp2_631G)
+    assert_close(Cp, 34.626, atol=1e-3)
+
+
+def test_vibration_frequency_cm_to_characteristic_temperature():
+    T = vibration_frequency_cm_to_characteristic_temperature(667)
+    assert_close(T, 959.6641613636505, rtol=1e-13)
+
+    NIST_RECOMMENDED_SCALE_FREQ = 0.9365
+
+    # acetylene
+    cminvs = [458.0292,726.0247,755.0628, 2002.2779,3501.5995,3591.7215]
+    things = [vibration_frequency_cm_to_characteristic_temperature(f, NIST_RECOMMENDED_SCALE_FREQ) for f in cminvs]
+
+    Cp = Cpg_statistical_mechanics(298.15, things)
+    assert_close(Cp, 46.27123343052294, rtol=1e-12)

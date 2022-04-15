@@ -2428,7 +2428,7 @@ def radius_of_gyration(MW, A, B, C, planar=False):
     >>> radius_of_gyration(MW=32.00452, planar=False, A=6.345205205562681e-47, B=3.2663291891213418e-46, C=3.4321304373822523e-46)
     1.507895671e-10
     
-    A planar moleculr, bromosilane, has two principle moments of inertia
+    A planar molecule, bromosilane, has two principle moments of inertia
     in [2]_. They are 2.80700 cm^-1 and 0.14416 cm^-1. These can be converted to
     MHz as follows:
     
@@ -2439,10 +2439,24 @@ def radius_of_gyration(MW, A, B, C, planar=False):
     >>> from scipy.constants import atomic_mass, c, angstrom
     >>> A, B = A*c*1e-4, B*c*1e-4 # from cm^-1 to MHz
     >>> A, B = [505379.15/i for i in (A, B)] #  TODO which constants did this conversion factor come from, AMU*Angstrom^2
-    >>> A, B = [i*atomic_mass*angstrom**2 for i in (A, B)]
+    >>> A, B = [i*atomic_mass*angstrom**2 for i in (A, B)] # amu*angstrom^2 to kg*m^2
     >>> radius_of_gyration(A=A, B=B, planar=True, MW=111.01, C=0)
     4.8859099776e-11
     
+    
+    Alternatively, doing the conversion all in one:
+        
+    >>> A, B = 2.80700, 0.14416
+    >>> from scipy.constants import c, h, pi
+    >>> A, B = A*c*100, B*c*100 # from cm^-1 to Hz
+    >>> A, B = [h/(8*pi**2)/i for i in (A, B)] # from Hz to kg*m^2 
+    >>> radius_of_gyration(A=A, B=B, planar=True, MW=111.01, C=0)
+    4.885909296e-11
+    
+    This is also nicely documented on this page: https://cccbdb.nist.gov/convertmomint.asp
+    which was unfortunately found by the author after figuring it out the hard way.
+
+
     References
     ----------
     .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,

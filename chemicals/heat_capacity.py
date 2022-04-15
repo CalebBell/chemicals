@@ -57,6 +57,11 @@ Gas Heat Capacity Estimation Models
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_T_for_Sm
 .. autofunction:: chemicals.heat_capacity.Lastovka_Shaw_term_A
 
+Gas Heat Capacity Theory
+------------------------
+.. autofunction:: chemicals.heat_capacity.Cpg_statistical_mechanics
+.. autofunction:: chemicals.heat_capacity.vibration_frequency_cm_to_characteristic_temperature
+
 
 Liquid Heat Capacity Model Equations
 ------------------------------------
@@ -179,10 +184,13 @@ __all__ = ['heat_capacity_gas_methods',
            'ZabranskySpline', 'ZabranskyQuasipolynomial',
            'PiecewiseHeatCapacity',
            'Shomate_integral_over_T', 'Shomate_integral', 'Shomate',
+           'Cpg_statistical_mechanics', 'vibration_frequency_cm_to_characteristic_temperature',
            ]
 import os
 from io import open
-from chemicals.utils import R, log, exp, to_num, PY37, property_mass_to_molar, source_path, os_path_join, can_load_data, mark_numba_uncacheable
+from chemicals.utils import log, exp, to_num, PY37, property_mass_to_molar, source_path, os_path_join, can_load_data, mark_numba_uncacheable
+from fluids.constants import h, k, c, R
+from math import expm1
 from cmath import log as clog, exp as cexp
 from chemicals.data_reader import register_df_source, data_source
 from fluids.numerics import newton, brenth, secant, polylog2, numpy as np
@@ -2732,3 +2740,135 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
            + T*(C1 + C2*a)
            + 3.0*R*theta*A_term*(1/(T*exp_theta_T - T) + 1/T))
     return S*1000. if MW is None else S*MW
+
+def Cpg_statistical_mechanics(T, thetas, linear=False):
+    r'''Calculates the ideal-gas heat capacity using of a molecule using
+    its characteristic temperatures, themselves calculated from each of the
+    frequencies of vibration of the molecule. These can be obtained from 
+    spectra or quantum mechanical calculations.
+    
+    .. math::
+        \frac{C_p^{0}}{R} =  \frac{C_p^{0}}{R} \text{rotational}
+        + \frac{C_p^{0}}{R} \text{translational}
+        + \frac{C_p^{0}}{R} \text{vibrational}
+        
+    .. math::
+       \frac{C_p^{0}}{R} \text{rotational} = 2.5
+
+    .. math::
+       \frac{C_p^{0}}{R} \text{translational} = 1 \text{ if linear else } 2.5
+
+    .. math::
+       \frac{C_p^{0}}{R} \text{vibrational} = \sum_{i=1}^{3n_A-6+\delta}
+       \left(\frac{\theta_i}{T}\right)^2
+       \left[\frac{\exp(\theta_i/T)}
+       {\left(\exp(\theta_i/T)-1\right)^2}\right]
+       
+    In the above equation, :math:`delta` is 1 if the molecule is linear
+    otherwise 0.
+       
+       
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    thetas : list[float]
+        Characteristic temperatures, [K]
+
+    Returns
+    -------
+    Cpgm : float
+        Gas molar heat capacity at specified temperature, [J/mol/K]
+
+    Notes
+    -----
+    This equation implies that there is a maximum heat capacity for an ideal
+    gas, and all diatomic or larger gases 
+    
+    Monoatomic gases have a simple heat capacity of 2.5R, the lower limit for
+    ideal gas heat capacity. This function does not cover that type of a gas.
+    At very low temperatures hydrogen behaves like a monoatomic gas as well.
+
+    Examples
+    --------
+    Sample calculation in [1]_ for ammonia:
+        
+    >>> thetas = [1360, 2330, 2330, 4800, 4880, 4880]
+    >>> Cpg_statistical_mechanics(300.0, thetas)
+    35.55983440173097
+
+    References
+    ----------
+    .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
+       Eighth Edition. McGraw-Hill Professional, 2007.
+    '''
+    # delta == 1 for linear molecules, 0 for nonlinear
+    # linear molecules have 1 R
+    # nonlinear have 1.5 R
+    # https://github.com/psi4/psi4/blob/7636787c5a3adac3b85493d3922663b7a5fcdea8/psi4/driver/qcdb/vib.py#L935
+    
+    # 2.5 is always a fixed translational heat capacity
+    Cp_R = 2.5 + (1.0 if linear else 1.5)
+    tmp = 0.0
+    
+    # The limit for this term as T approaches 0 is zero
+    # The limit for this term as T approaches infinity is 1 per term!
+    if T > 0.0:
+        for j in range(len(thetas)):
+            t = thetas[j]
+            r = t/T
+            if r > 120.0:
+                # The term is too small, nothing to add, no need to compute and a computational error will occur
+                continue
+            exponential = exp(r)
+            if exponential == 1.0:
+                tmp += 1.0
+            else:
+                den = expm1(r)
+                val = r*r*(exponential/(den*den))
+                if val > 1.0:
+                    val = 1.0
+                tmp += val
+    
+    Cp_R += tmp
+    return Cp_R*R
+
+
+def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
+    r'''Convert a vibrational frequency in units of 1/cm to a characteristic
+    temperature for use in calculating heat capacity.
+    
+    .. math::
+        \theta = \frac{100\cdot h\cdot c\cdot \text{scale}}{k}
+        
+    Parameters
+    ----------
+    frequency : float
+        Vibrational frequency, [1/cm]
+    scale : float
+        A scale factor used to adjust the frequency for differences in 
+        experimental vs. calculated values, [-] 
+
+    Returns
+    -------
+    theta : float
+        Characteristic temperature [K]
+
+    Notes
+    -----
+    
+    In the equation, `k` is Boltzmann's constant, `c` is the speed of light,
+    and `h` is the Planck constant.
+    
+    A scale factor for the MP2/6-31G** method recommended by NIST is  0.9365.
+    Using this scale factor will not improve results in all cases however.
+
+    Examples
+    --------
+    
+    >>> vibration_frequency_cm_to_characteristic_temperature(667)
+    959.6641613636505
+    '''
+    frequency *= 100.0*scale # convert to 1/m
+    hz = frequency*c
+    return h*hz/k
