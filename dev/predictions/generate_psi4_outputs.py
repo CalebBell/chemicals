@@ -39,7 +39,7 @@ def is_psi4_fast(metadata):
         # Failing on isotopes
         return False
     atom_count = sum(v for e, v in atoms.items() if e != 'H')
-    is_small = atom_count < 3
+    is_small = atom_count < 4
     #is_small = atom_count == 3
     return is_small
 
