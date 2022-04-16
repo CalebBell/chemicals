@@ -153,12 +153,22 @@ def get_data(f):
             raise e
 
     try:
+        Cp = get_total_Cp(lines)
+        Cps[CAS] = Cp
+    except Exception as e:
+        if not failure_OK:
+            print(CAS)
+            raise e
+
+    try:
         linear = get_is_linear(lines)
         linears[CAS] = linear
     except Exception as e:
         if not failure_OK:
             print(CAS)
             raise e
+
+
 
     try:
         freqs = get_vibration_freqs(lines)
@@ -263,9 +273,9 @@ def write_linear_file():
     f.close()
     return True
 
+adjusted_Ts = {}
+unadjusted_Ts = {}
 def write_frequencies():
-    adjusted_Ts = {}
-    unadjusted_Ts = {}
     for CAS, cminvs in frequencies.items():
         adjusted_Ts[CAS] = [vibration_frequency_cm_to_characteristic_temperature(f, scale=0.9365) for f in cminvs]
         unadjusted_Ts[CAS] = [vibration_frequency_cm_to_characteristic_temperature(f, scale=1) for f in cminvs]
@@ -280,3 +290,10 @@ write_dipole_file()
 write_rg_file()
 write_frequencies()
 write_linear_file()
+#print(Cps)
+#def print_Cp_diffs():
+    #for CAS, temps in unadjusted_Ts.items():
+        #Cp_calc = Cpg_statistical_mechanics(298.15, temps, linear=linears[CAS])
+        #print(Cp_calc/Cps[CAS], Cp_calc, Cps[CAS], linears[CAS], temps, CAS)
+        
+#print_Cp_diffs()
