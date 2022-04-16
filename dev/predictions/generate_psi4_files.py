@@ -23,11 +23,12 @@ SOFTWARE.'''
 import sys, os, argparse
 from chemicals import *
 from thermo import *
-from rdkit import Chem
 from joblib import Parallel, delayed
 from subprocess import Popen, PIPE
 from chemicals.identifiers import pubchem_db
 from fluids.constants import c, h, pi
+import json
+
 try:
     Chemical('asdfasdfsadfasd')
 except:
@@ -239,5 +240,19 @@ def write_rg_file():
     f.close()
     return True
 
+def write_frequencies():
+    adjusted_Ts = {}
+    unadjusted_Ts = {}
+    for CAS, cminvs in frequencies.items():
+        adjusted_Ts[CAS] = [vibration_frequency_cm_to_characteristic_temperature(f, scale=0.9365) for f in cminvs]
+        unadjusted_Ts[CAS] = [vibration_frequency_cm_to_characteristic_temperature(f, scale=1) for f in cminvs]
+    
+    separators = (',', ':')
+    json.dump(adjusted_Ts, open('../../chemicals/Heat Capacity/psi4_adjusted_characteristic_temperatures.json', 'w'),
+              sort_keys=True, indent=2, separators=separators)
+    json.dump(unadjusted_Ts, open('../../chemicals/Heat Capacity/psi4_unadjusted_characteristic_temperatures.json', 'w'),
+              sort_keys=True, indent=2, separators=separators)
+        
 write_dipole_file()
 write_rg_file()
+write_frequencies()
