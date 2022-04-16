@@ -54,3 +54,9 @@ def test_dipole():
 
     with pytest.raises(Exception):
         dipole_moment(CASRN='78-78-4', method='FAIL')
+        
+    
+    # Just test one thing with psi4
+    # git can track everything
+    val = dipole_moment(CASRN='64-17-5', method='PSI4_2022A')
+    assert val > 1

@@ -53,10 +53,12 @@ folder = os_path_join(source_path, 'Misc')
 CCCBDB = 'CCCBDB'
 MULLER = 'MULLER'
 POLING = 'POLING'
+PSI4_2022A = 'PSI4_2022A'
 
 register_df_source(folder, 'Poling Dipole.csv')
 register_df_source(folder, 'cccbdb.nist.gov Dipoles.csv')
 register_df_source(folder, 'Muller Supporting Info Dipoles.csv')
+register_df_source(folder, 'psi4_dipoles.tsv')
 
 
 _dipole_data_loaded = False
@@ -66,15 +68,17 @@ def _load_dipole_data():
     dipole_data_CCDB = data_source('cccbdb.nist.gov Dipoles.csv')
     dipole_data_Muller = data_source('Muller Supporting Info Dipoles.csv')
     dipole_data_Poling = data_source('Poling Dipole.csv')
+    dipole_data_psi4_2022a = data_source('psi4_dipoles.tsv')
     dipole_sources = {
         CCCBDB: dipole_data_CCDB,
         MULLER: dipole_data_Muller,
         POLING: dipole_data_Poling,
+        PSI4_2022A: dipole_data_psi4_2022a,
     }
 
 if PY37:
     def __getattr__(name):
-        if name in ('dipole_data_Poling', 'dipole_data_CCDB', 'dipole_data_Muller'):
+        if name in ('dipole_data_Poling', 'dipole_data_CCDB', 'dipole_data_Muller', 'dipole_data_psi4_2022a'):
             _load_dipole_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
@@ -84,7 +88,7 @@ else: # pragma: no cover
 
 # %% Dipole moment functions
 
-dipole_moment_all_methods = (CCCBDB, MULLER, POLING)
+dipole_moment_all_methods = (CCCBDB, MULLER, POLING, PSI4_2022A)
 '''Tuple of method name keys. See the `dipole` for the actual references'''
 
 @mark_numba_incompatible
@@ -133,7 +137,8 @@ def dipole_moment(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'CCCBDB', 'MULLER', or
-        'POLING'. All valid values are also held in the list `dipole_all_methods`.
+        'POLING', 'PSI4_2022A'. All valid values are also held in the list 
+        `dipole_all_methods`.
 
     Notes
     -----
@@ -144,6 +149,9 @@ def dipole_moment(CASRN, method=None):
         * 'MULLER', a collection of data in a
           group-contribution scheme in [2]_.
         * 'POLING', in the appendix in [3].
+        * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum 
+          chemistry software, with initialized positions from rdkit's EmbedMolecule 
+          method, the basis set 6-31G** and the method mp2.
 
     This function returns dipole moment in units of Debye. This is actually
     a non-SI unit; to convert to SI, multiply by 3.33564095198e-30 and its

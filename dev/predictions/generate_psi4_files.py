@@ -43,8 +43,8 @@ def get_radius_gyration(lines, MW, linear=False):
         if rotational_constants_line in l:
             l = l.strip()
             segments = l.replace(rotational_constants_line, '').replace('  ', ' ').replace('  ', ' ').replace('  ', ' ').split(' ')
-            print(l)
-            print(segments)
+            #print(l)
+            #print(segments)
             assert segments[-1] == '[cm^-1]'
             _, _, A, _, _, B, _, _, C, _ = segments
             try:
@@ -58,7 +58,7 @@ def get_radius_gyration(lines, MW, linear=False):
                     A, B = [h/(8*pi**2)/i for i in (A, B)]
                     linear = True
                 else:
-                    raise ValueError('DEBUG')
+                    raise NotImplementedError('DEBUG')
             
             if not linear:
                 return radius_of_gyration(A=A, B=B, C=C, MW=MW)
@@ -162,7 +162,7 @@ def get_data(f):
     try:
         freqs = get_vibration_freqs(lines)
         frequencies[CAS] = freqs
-    except Exception as e:
+    except ValueError as e:
         if not failure_OK:
             print(CAS)
             raise e
@@ -190,3 +190,30 @@ print(f'Found {len(radius_gyrations)} radius_gyrations' )
     #if v:
         #print(k)
 
+#print(frequencies)
+
+
+def write_dipole_file():
+    dump_oder = ['Dipole',]
+    keys = ['CAS', 'Dipole']
+    lines = ['\t'.join(keys) + '\n']
+    for CAS, dipole in dipoles.items():
+        values = [dipole]
+        line = values
+        line.insert(0, CAS)
+        for i, v in enumerate(line):
+            if v is None:
+                line[i] = ''
+            elif v == '':
+                pass
+            elif isinstance(v, (int, float)):
+                line[i] = '{:.8g}'.format(v)
+        to_write = '\t'.join(line) + '\n'
+        lines.append(to_write)
+    
+    f = open('../../chemicals/Misc/psi4_dipoles.tsv', 'w') 
+    f.writelines(lines)
+    f.close()
+    return True
+    
+write_dipole_file()
