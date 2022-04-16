@@ -60,8 +60,9 @@ Gas Heat Capacity Estimation Models
 Gas Heat Capacity Theory
 ------------------------
 .. autofunction:: chemicals.heat_capacity.Cpg_statistical_mechanics
+.. autofunction:: chemicals.heat_capacity.Cpg_statistical_mechanics_integral
+.. autofunction:: chemicals.heat_capacity.Cpg_statistical_mechanics_integral_over_T
 .. autofunction:: chemicals.heat_capacity.vibration_frequency_cm_to_characteristic_temperature
-
 
 Liquid Heat Capacity Model Equations
 ------------------------------------
@@ -184,7 +185,9 @@ __all__ = ['heat_capacity_gas_methods',
            'ZabranskySpline', 'ZabranskyQuasipolynomial',
            'PiecewiseHeatCapacity',
            'Shomate_integral_over_T', 'Shomate_integral', 'Shomate',
-           'Cpg_statistical_mechanics', 'vibration_frequency_cm_to_characteristic_temperature',
+           'Cpg_statistical_mechanics', 'Cpg_statistical_mechanics_integral',
+           'Cpg_statistical_mechanics_integral_over_T',
+           'vibration_frequency_cm_to_characteristic_temperature',
            ]
 import os
 from io import open
@@ -2833,6 +2836,21 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
     Cp_R += tmp
     return Cp_R*R
 
+def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
+    H_R = (2.5 + (1.0 if linear else 1.5))*T
+    if T > 0.0:
+        for j in range(len(thetas)):
+            t = thetas[j]
+            r = t/T
+            if r < 120.0:
+                # The term can be too small, nothing to add, no need to compute and a computational error will occur
+                # Also important to use expm1 for accuracy at higher temperatures
+                # At high temperatures the contribution to enthalpy is R*T
+                H_R += t/expm1(r)
+    return H_R*R
+
+def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
+    pass
 
 def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
     r'''Convert a vibrational frequency in units of 1/cm to a characteristic

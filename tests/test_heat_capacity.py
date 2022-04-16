@@ -22,7 +22,7 @@ import numpy as np
 import pytest
 from math import log10, log
 from fluids.constants import R, h, k
-from fluids.numerics import assert_close, assert_close1d, linspace, logspace
+from fluids.numerics import assert_close, assert_close1d, linspace, logspace, quad
 from chemicals.heat_capacity import *
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data, Cp_data_Poling
 from fluids.numerics import NotBoundedError
@@ -460,6 +460,42 @@ def test_Cpg_statistical_mechanics():
     # Yep, it's matching
     Cp = Cpg_statistical_mechanics(298.15,thetas_caleb_psi4_mp2_631G)
     assert_close(Cp, 34.626, atol=1e-3)
+
+
+def test_Cpg_statistical_mechanics_integral():
+    thetas = [1360, 2330, 2330, 4800, 4880, 4880]
+    
+    # numerical = quad(Cpg_statistical_mechanics, 399, 400, args=(thetas,))[0]
+    analytical = Cpg_statistical_mechanics_integral(400, thetas)-Cpg_statistical_mechanics_integral(399, thetas)
+    assert_close(38.371249200803504, analytical, rtol=1e-13)
+    
+
+    # numerical = quad(Cpg_statistical_mechanics, 1, 400, args=(thetas,))[0]
+    analytical = Cpg_statistical_mechanics_integral(400, thetas)-Cpg_statistical_mechanics_integral(1, thetas)
+    assert_close(13775.685078010132, analytical, rtol=1e-13)
+    
+    # numerical = quad(Cpg_statistical_mechanics, 0, 400, args=(thetas,))[0]
+    analytical = Cpg_statistical_mechanics_integral(400, thetas)-Cpg_statistical_mechanics_integral(0, thetas)
+    assert_close(13808.942928482746, analytical, rtol=1e-13)
+    
+    # numerical = quad(Cpg_statistical_mechanics, 0, 1e-10, args=(thetas,))[0]
+    analytical = Cpg_statistical_mechanics_integral(1e-10, thetas)-Cpg_statistical_mechanics_integral(0, thetas)
+    assert_close(3.325785047261296e-09, analytical, rtol=1e-13)
+    
+    # numerical = quad(Cpg_statistical_mechanics, 1000, 2000, args=(thetas,))[0]
+    analytical = Cpg_statistical_mechanics_integral(2000, thetas)-Cpg_statistical_mechanics_integral(1000, thetas)
+    assert_close(65130.40200286856, analytical, rtol=1e-13)
+    
+    # numerical = quad(Cpg_statistical_mechanics, 1e9, 2e9, args=(thetas,))[0]
+    analytical = Cpg_statistical_mechanics_integral(2e9, thetas)-Cpg_statistical_mechanics_integral(1e9, thetas)
+    assert_close(83144626181.50354, analytical, rtol=1e-13)
+
+    val = Cpg_statistical_mechanics_integral(1e100, thetas)
+    assert val > 0
+    
+    # numerical = quad(Cpg_statistical_mechanics, 1e100, 2e100, args=(thetas,))[0]
+    analytical = Cpg_statistical_mechanics_integral(2e100, thetas)-Cpg_statistical_mechanics_integral(1e100, thetas)
+    assert_close(8.31446261815324e+101, analytical, rtol=1e-13)
 
 
 def test_vibration_frequency_cm_to_characteristic_temperature():
