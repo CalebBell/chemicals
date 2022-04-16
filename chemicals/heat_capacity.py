@@ -133,6 +133,17 @@ attribute of this module.
 .. data:: zabransky_dicts
 
     Complicated fits covering different cases and with different forms from [2]_.
+    
+.. data:: Cp_dict_characteristic_temperatures_adjusted_psi4_2022a
+
+    Theoretically calculated chatacteristic temperatures from vibrational
+    frequencies using psi4
+
+.. data:: Cp_dict_characteristic_temperatures_psi4_2022a
+
+    Theoretically calculated chatacteristic temperatures from vibrational
+    frequencies using psi4, adjusted using a recommended coefficient
+
 
 .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
     in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
@@ -752,6 +763,7 @@ def _load_Cp_data():
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
+    global Cp_dict_characteristic_temperatures_adjusted_psi4_2022a, Cp_dict_characteristic_temperatures_psi4_2022a
     Cp_data_Poling = data_source('PolingDatabank.tsv')
     TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
     CRC_standard_data = data_source('CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
@@ -857,6 +869,12 @@ def _load_Cp_data():
     import json
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
         Cp_dict_PerryI = json.loads(f.read())
+
+    with open(os.path.join(folder, 'psi4_unadjusted_characteristic_temperatures.json')) as f:
+        Cp_dict_characteristic_temperatures_psi4_2022a = json.loads(f.read())
+
+    with open(os.path.join(folder, 'psi4_adjusted_characteristic_temperatures.json')) as f:
+        Cp_dict_characteristic_temperatures_adjusted_psi4_2022a = json.loads(f.read())
 
     with open(os.path.join(folder, 'webbook_shomate_coefficients.json')) as f:
         WebBook_Shomate_coefficients = json.loads(f.read())
@@ -2759,7 +2777,7 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
        \frac{C_p^{0}}{R} \text{rotational} = 2.5
 
     .. math::
-       \frac{C_p^{0}}{R} \text{translational} = 1 \text{ if linear else } 2.5
+       \frac{C_p^{0}}{R} \text{translational} = 1 \text{ if linear else } 1.5
 
     .. math::
        \frac{C_p^{0}}{R} \text{vibrational} = \sum_{i=1}^{3n_A-6+\delta}
@@ -2841,7 +2859,7 @@ def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
     using its characteristic temperatures.
     
     .. math::
-        \int {C_p^{0}} =  2.5RT + 1RT \text{ if linear else } 2.5RT
+        \int {C_p^{0}} =  2.5RT + RT \text{ if linear else } 1.5RT
         + \int C_p^{0}\text{vibrational}
         
 
@@ -2888,7 +2906,7 @@ def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
     
     .. math::
         \int \frac{C_p^{0}}{T} =  2.5R\log(T) + 1R\log(T) 
-        \text{ if linear else } 2.5R\log(T)
+        \text{ if linear else } 1.5R\log(T)
         + \int \frac{C_p^{0}}{T}\text{vibrational}
         
 
