@@ -45,7 +45,7 @@ from chemicals.data_reader import (register_df_source,
                                    retrieve_from_df_dict,
                                    retrieve_any_from_df_dict,
                                    list_available_methods_from_df_dict)
-
+from chemicals.miscdata import PSI4_2022A
 # %% Register data sources and lazy load them
 
 folder = os_path_join(source_path, 'Misc')
@@ -53,7 +53,6 @@ folder = os_path_join(source_path, 'Misc')
 CCCBDB = 'CCCBDB'
 MULLER = 'MULLER'
 POLING = 'POLING'
-PSI4_2022A = 'PSI4_2022A'
 
 register_df_source(folder, 'Poling Dipole.csv')
 register_df_source(folder, 'cccbdb.nist.gov Dipoles.csv')
@@ -151,7 +150,7 @@ def dipole_moment(CASRN, method=None):
         * 'POLING', in the appendix in [3].
         * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum 
           chemistry software, with initialized positions from rdkit's EmbedMolecule 
-          method, the basis set 6-31G** and the method mp2.
+          method, the basis set 6-31G** and the method mp2 [4]_.
 
     This function returns dipole moment in units of Debye. This is actually
     a non-SI unit; to convert to SI, multiply by 3.33564095198e-30 and its
@@ -179,6 +178,11 @@ def dipole_moment(CASRN, method=None):
        2012): 1231-36. doi:10.1021/je2013395.
     .. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
+    .. [4] Turney, Justin M., Andrew C. Simmonett, Robert M. Parrish, Edward G.
+       Hohenstein, Francesco A. Evangelista, Justin T. Fermann, Benjamin J.
+       Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure 
+       Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65. 
+       https://doi.org/10.1002/wcms.93.
     '''
     if not _dipole_data_loaded: _load_dipole_data()
     if method:

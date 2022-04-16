@@ -61,7 +61,8 @@ if not fluids.numerics.is_micropython:
     from . import safety
     from . import iapws
     from . import air
-    
+    from . import molecular_geometry
+
     from .utils import *
     from .critical import *
     from .elements import *
@@ -93,13 +94,14 @@ if not fluids.numerics.is_micropython:
     from .safety import *
     from .iapws import *
     from .air import *
+    from .molecular_geometry import *
     __all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr',
                'temperature', 'miscdata', 'environment', 'refractivity', 'solubility',
                'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial',
                'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity',
                'interface', 'permittivity', 'thermal_conductivity', 'combustion',
                'volume', 'rachford_rice', 'flash_basic', 'identifiers', 'safety',
-               'iapws', 'air']
+               'iapws', 'air', 'molecular_geometry']
     
     __all__.extend(exceptions.__all__)
     __all__.extend(critical.__all__)
@@ -132,14 +134,14 @@ if not fluids.numerics.is_micropython:
     __all__.extend(safety.__all__)
     __all__.extend(iapws.__all__)
     __all__.extend(air.__all__)
-    
+    __all__.extend(molecular_geometry.__all__)
     
     submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
                   environment, refractivity, solubility, lennard_jones,
                   vapor_pressure, virial, phase_change, triple, acentric, viscosity,
                   interface, permittivity, thermal_conductivity, combustion,
                   heat_capacity, reaction, volume, rachford_rice, flash_basic, identifiers, safety,
-                  iapws, air]
+                  iapws, air, molecular_geometry]
     
     
     chemicals_dir = utils.source_path
@@ -166,6 +168,7 @@ if not fluids.numerics.is_micropython:
         vapor_pressure.load_vapor_pressure_dfs()
         viscosity._load_mu_data()
         volume._load_rho_data()
+        molecular_geometry._load_RG_data()
         try:
             identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
         except:
@@ -194,7 +197,7 @@ if not fluids.numerics.is_micropython:
                       'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
                      'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
                      'RI', 'Hfus', 
-                     'Dipole', 'logP']
+                     'Dipole', 'logP', 'RG']
         for df in data_reader.df_sources.values():
             for p in properties:
                 if p in df.columns:

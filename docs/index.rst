@@ -73,6 +73,7 @@ If you need to know something about a chemical, give chemicals a try.
    chemicals.interface
    chemicals.lennard_jones
    chemicals.miscdata
+   chemicals.molecular_geometry
    chemicals.numba
    chemicals.permittivity
    chemicals.phase_change

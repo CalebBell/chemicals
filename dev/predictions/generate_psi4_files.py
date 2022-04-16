@@ -215,5 +215,29 @@ def write_dipole_file():
     f.writelines(lines)
     f.close()
     return True
+
+def write_rg_file():
+    dump_oder = ['RG',]
+    keys = ['CAS', 'RG']
+    lines = ['\t'.join(keys) + '\n']
+    for CAS, rg in radius_gyrations.items():
+        values = [rg]
+        line = values
+        line.insert(0, CAS)
+        for i, v in enumerate(line):
+            if v is None:
+                line[i] = ''
+            elif v == '':
+                pass
+            elif isinstance(v, (int, float)):
+                line[i] = '{:.8g}'.format(v)
+        to_write = '\t'.join(line) + '\n'
+        lines.append(to_write)
     
+    f = open('../../chemicals/Misc/psi4_radius_of_gyrations.tsv', 'w') 
+    f.writelines(lines)
+    f.close()
+    return True
+
 write_dipole_file()
+write_rg_file()

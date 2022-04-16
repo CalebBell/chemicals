@@ -58,6 +58,7 @@ JOBACK = 'JOBACK'
 WIKIDATA = 'WIKIDATA'
 WEBBOOK = 'WEBBOOK'
 COMMON_CHEMISTRY = 'COMMON_CHEMISTRY'
+PSI4_2022A = 'PSI4_2022A'
 
 _VDI_dict_loaded = False
 def _load_VDI_saturation_dict():
