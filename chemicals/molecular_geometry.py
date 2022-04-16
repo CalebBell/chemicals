@@ -33,10 +33,14 @@ Lookup Functions
 .. autofunction:: chemicals.molecular_geometry.RG
 .. autofunction:: chemicals.molecular_geometry.RG_methods
 .. autodata:: chemicals.molecular_geometry.RG_all_methods
+.. autofunction:: chemicals.molecular_geometry.linear
+.. autofunction:: chemicals.molecular_geometry.linear_methods
+.. autodata:: chemicals.molecular_geometry.linear_all_methods
 
 """
 
-__all__ = ['RG', 'RG_methods', 'RG_all_methods']
+__all__ = ['RG', 'RG_methods', 'RG_all_methods',
+           'linear', 'linear_methods', 'linear_all_methods']
 
 from fluids.numerics import interp, horner
 from chemicals.utils import mark_numba_incompatible
@@ -54,18 +58,29 @@ from chemicals.data_reader import (register_df_source,
 folder = os_path_join(source_path, 'Misc')
 register_df_source(folder, 'psi4_radius_of_gyrations.tsv')
 
+register_df_source(folder, 'psi4_linear.tsv')
+
 _RG_data_loaded = False
 @mark_numba_incompatible
 def _load_RG_data():
-    global _RG_data_loaded, radius_of_gyration_data_psi4_2022a, RG_sources
+    global _RG_data_loaded, radius_of_gyration_data_psi4_2022a,linear_data_psi4_2022a
+    global RG_sources, linear_sources
     radius_of_gyration_data_psi4_2022a = data_source('psi4_radius_of_gyrations.tsv')
+    linear_data_psi4_2022a = data_source('psi4_linear.tsv')
     RG_sources = {
-        PSI4_2022A: radius_of_gyration_data_psi4_2022a
+        PSI4_2022A: radius_of_gyration_data_psi4_2022a,
     }
 
+    linear_sources = {
+        PSI4_2022A: linear_data_psi4_2022a,
+    }
+    
 if PY37:
     def __getattr__(name):
-        if name in ('radius_of_gyration_data_psi4_2022a', 'RG_sources'):
+        if name in ('radius_of_gyration_data_psi4_2022a',
+                    'linear_data_psi4_2022a',
+                    'RG_sources',
+                    'linear_sources'):
             _load_RG_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))
@@ -152,3 +167,86 @@ def RG(CASRN, method=None):
     else:
         value = retrieve_any_from_df_dict(RG_sources, CASRN, 'RG')
     return value
+
+
+
+linear_all_methods = (PSI4_2022A,)
+'''Tuple of method name keys. See the `linear` for the actual references'''
+
+@mark_numba_incompatible
+def linear_methods(CASRN):
+    """Return all methods available to obtain whether or not the
+    desired chemical is linear.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the linear with the given
+        inputs.
+
+    See Also
+    --------
+    linear
+    """
+    if not _RG_data_loaded: _load_RG_data()
+    return list_available_methods_from_df_dict(linear_sources, CASRN, 'linear')
+
+@mark_numba_incompatible
+def linear(CASRN, method=None):
+    r'''This function handles the retrieval whether or not a chemical is linear.
+    Lookup is based on CASRNs. Will automatically select a data source
+    to use if no method is provided; returns None if the data is not available.
+
+    Function has data for approximately 300 chemicals.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN [-]
+
+    Returns
+    -------
+    linear : bool
+        Whether or not the chemical is linear, [-]
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined by constants in
+        linear_methods
+
+    Notes
+    -----
+    The available sources are as follows:
+
+        * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum 
+          chemistry software, with initialized positions from rdkit's EmbedMolecule 
+          method, the basis set 6-31G** and the method mp2 [1]_.
+          
+    .. warning::
+        This function does not yet have a reliable data source.
+
+    Examples
+    --------
+    >>> linear(CASRN='64-17-5')
+    False
+
+    References
+    ----------
+    .. [1] Turney, Justin M., Andrew C. Simmonett, Robert M. Parrish, Edward G.
+       Hohenstein, Francesco A. Evangelista, Justin T. Fermann, Benjamin J.
+       Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure 
+       Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65. 
+       https://doi.org/10.1002/wcms.93.
+    '''
+    if not _RG_data_loaded: _load_RG_data()
+    if method:
+        value = retrieve_from_df_dict(linear_sources, CASRN, 'linear', method)
+    else:
+        value = retrieve_any_from_df_dict(linear_sources, CASRN, 'linear')
+    return bool(value)

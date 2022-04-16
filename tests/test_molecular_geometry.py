@@ -42,3 +42,10 @@ def test_RG():
 
     with pytest.raises(Exception):
         RG(CASRN='78-78-4', method='FAIL')
+
+
+def test_linear():
+    assert linear(CASRN='64-17-5') == False
+    
+    
+    assert linear_methods(CASRN='64-17-5')  == ['PSI4_2022A']

@@ -240,6 +240,29 @@ def write_rg_file():
     f.close()
     return True
 
+def write_linear_file():
+    dump_oder = ['linear',]
+    keys = ['CAS', 'linear']
+    lines = ['\t'.join(keys) + '\n']
+    for CAS, linear in linears.items():
+        values = [linear]
+        line = values
+        line.insert(0, CAS)
+        for i, v in enumerate(line):
+            if v is None:
+                line[i] = ''
+            elif v == '':
+                pass
+            elif isinstance(v, (int, float)):
+                line[i] = '{:.8g}'.format(v)
+        to_write = '\t'.join(line) + '\n'
+        lines.append(to_write)
+    
+    f = open('../../chemicals/Misc/psi4_linear.tsv', 'w') 
+    f.writelines(lines)
+    f.close()
+    return True
+
 def write_frequencies():
     adjusted_Ts = {}
     unadjusted_Ts = {}
@@ -256,3 +279,4 @@ def write_frequencies():
 write_dipole_file()
 write_rg_file()
 write_frequencies()
+write_linear_file()
