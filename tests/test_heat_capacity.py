@@ -497,7 +497,39 @@ def test_Cpg_statistical_mechanics_integral():
     analytical = Cpg_statistical_mechanics_integral(2e100, thetas)-Cpg_statistical_mechanics_integral(1e100, thetas)
     assert_close(8.31446261815324e+101, analytical, rtol=1e-13)
 
+def test_Cpg_statistical_mechanics_integral_over_T():
+    thetas = [1360, 2330, 2330, 4800, 4880, 4880]
+    
+    # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 399, 400)[0]
+    analytical = Cpg_statistical_mechanics_integral_over_T(400, thetas)-Cpg_statistical_mechanics_integral_over_T(399, thetas)
+    assert_close(0.09604821735794644, analytical, rtol=1e-13)
+    
+    # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1e-2, 1)[0]
+    analytical = Cpg_statistical_mechanics_integral_over_T(1, thetas)-Cpg_statistical_mechanics_integral_over_T(1e-2, thetas)
+    assert_close(153.15806144652714, analytical, rtol=1e-13)
+    
+    # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1e-2, 10)[0]
+    analytical = Cpg_statistical_mechanics_integral_over_T(10, thetas)-Cpg_statistical_mechanics_integral_over_T(1e-2, thetas)
+    assert_close(229.73709216979074, analytical, rtol=1e-13)
+    
+    # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1e-20, 1e-10)[0]
+    analytical = Cpg_statistical_mechanics_integral_over_T(1e-10, thetas)-Cpg_statistical_mechanics_integral_over_T(1e-20, thetas)
+    assert_close(765.7903072326358, analytical, rtol=1e-13)
+    
+    # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1000, 2000)[0]
+    analytical = Cpg_statistical_mechanics_integral_over_T(2000, thetas)-Cpg_statistical_mechanics_integral_over_T(1000, thetas)
+    assert_close(44.506610727671244, analytical, rtol=1e-13)
+    
+    # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1e9, 2e9)[0]
+    analytical = Cpg_statistical_mechanics_integral_over_T(2e9, thetas)-Cpg_statistical_mechanics_integral_over_T(1e9, thetas)
+    assert_close(57.6314632164183, analytical, rtol=1e-13)
+    
+    # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1, 400)[0]
+    analytical = Cpg_statistical_mechanics_integral_over_T(400, thetas)-Cpg_statistical_mechanics_integral_over_T(1, thetas)
+    assert_close(200.85926489512875, analytical, rtol=1e-13)
+    
 
+    
 def test_vibration_frequency_cm_to_characteristic_temperature():
     T = vibration_frequency_cm_to_characteristic_temperature(667)
     assert_close(T, 959.6641613636505, rtol=1e-13)

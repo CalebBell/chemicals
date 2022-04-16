@@ -2837,6 +2837,39 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
     return Cp_R*R
 
 def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
+    r'''Calculates the integral of ideal-gas heat capacity using of a molecule 
+    using its characteristic temperatures.
+    
+    .. math::
+        \int {C_p^{0}} =  2.5RT + 1RT \text{ if linear else } 2.5RT
+        + \int C_p^{0}\text{vibrational}
+        
+
+    .. math::
+       \int {C_p^{0}} \text{vibrational} = R\sum_{i=1}^{3n_A-6+\delta}
+       \frac{\theta_i}{\exp(\theta_i/T)-1}
+              
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    thetas : list[float]
+        Characteristic temperatures, [K]
+
+    Returns
+    -------
+    H : float
+        Integrated gas molar heat capacity at specified temperature, [J/mol]
+
+    Notes
+    -----
+
+    Examples
+    --------        
+    >>> thetas = [1360, 2330, 2330, 4800, 4880, 4880]
+    >>> Cpg_statistical_mechanics_integral(300.0, thetas)
+    10116.6053294
+    '''
     H_R = (2.5 + (1.0 if linear else 1.5))*T
     if T > 0.0:
         for j in range(len(thetas)):
@@ -2850,7 +2883,53 @@ def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
     return H_R*R
 
 def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
-    pass
+    r'''Calculates the integral over T of ideal-gas heat capacity using of a
+     molecule  using its characteristic temperatures.
+    
+    .. math::
+        \int \frac{C_p^{0}}{T} =  2.5R\log(T) + 1R\log(T) 
+        \text{ if linear else } 2.5R\log(T)
+        + \int \frac{C_p^{0}}{T}\text{vibrational}
+        
+
+    .. math::
+       \int \frac{C_p^{0}}{T} \text{vibrational} = \sum_{i=1}^{3n_A-6+\delta}
+       \frac{\theta_i}{T\exp(\theta_i/T)-T} - \log(\exp(\theta_i/T)-1) 
+       + \theta_i/T
+       
+    Parameters
+    ----------
+    T : float
+        Temperature of fluid [K]
+    thetas : list[float]
+        Characteristic temperatures, [K]
+
+    Returns
+    -------
+    S : float
+        Entropy integral of gas molar heat capacity at specified temperature,
+        [J/mol/K]
+
+    Notes
+    -----
+
+    Examples
+    --------        
+    >>> thetas = [1360, 2330, 2330, 4800, 4880, 4880]
+    >>> Cpg_statistical_mechanics_integral_over_T(300.0, thetas)
+    190.25658088
+    '''
+    S_R = (2.5 + (1.0 if linear else 1.5))*log(T)
+    for j in range(len(thetas)):
+        t = thetas[j]
+        r = t/T
+        if r < 36.87869878248:
+            # The term is always zero above 37 ish, polished to find exactly where the transition happens
+            # but it could technically be libm dependent, but should be good!
+            factor = expm1(r)
+            S_R += r/factor - log(factor) + r
+    return S_R*R
+
 
 def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
     r'''Convert a vibrational frequency in units of 1/cm to a characteristic
