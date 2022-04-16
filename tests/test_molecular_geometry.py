@@ -37,7 +37,7 @@ def test_RG():
 
 
     methods = RG_methods(CASRN='64-17-5')
-    methods_fixed = ['PSI4_2022A']
+    methods_fixed = ['PSI4_2022A', 'CHEMSEP']
     assert methods == methods_fixed
 
     with pytest.raises(Exception):

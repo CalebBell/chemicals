@@ -45,7 +45,7 @@ __all__ = ['RG', 'RG_methods', 'RG_all_methods',
 from fluids.numerics import interp, horner
 from chemicals.utils import mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
-from chemicals.miscdata import PSI4_2022A
+from chemicals.miscdata import PSI4_2022A, CHEMSEP
 from chemicals.data_reader import (register_df_source,
                                    data_source,
                                    retrieve_from_df_dict,
@@ -57,18 +57,21 @@ from chemicals.data_reader import (register_df_source,
 
 folder = os_path_join(source_path, 'Misc')
 register_df_source(folder, 'psi4_radius_of_gyrations.tsv')
+register_df_source(folder, 'chemsep_radius_of_gyrations.tsv')
 
 register_df_source(folder, 'psi4_linear.tsv')
 
 _RG_data_loaded = False
 @mark_numba_incompatible
 def _load_RG_data():
-    global _RG_data_loaded, radius_of_gyration_data_psi4_2022a,linear_data_psi4_2022a
-    global RG_sources, linear_sources
+    global _RG_data_loaded, radius_of_gyration_data_psi4_2022a, linear_data_psi4_2022a
+    global RG_sources, linear_sources, radius_of_gyration_data_chemsep
     radius_of_gyration_data_psi4_2022a = data_source('psi4_radius_of_gyrations.tsv')
+    radius_of_gyration_data_chemsep = data_source('chemsep_radius_of_gyrations.tsv')
     linear_data_psi4_2022a = data_source('psi4_linear.tsv')
     RG_sources = {
         PSI4_2022A: radius_of_gyration_data_psi4_2022a,
+        CHEMSEP: radius_of_gyration_data_chemsep,
     }
 
     linear_sources = {
@@ -78,6 +81,7 @@ def _load_RG_data():
 if PY37:
     def __getattr__(name):
         if name in ('radius_of_gyration_data_psi4_2022a',
+                    'radius_of_gyration_data_chemsep',
                     'linear_data_psi4_2022a',
                     'RG_sources',
                     'linear_sources'):
@@ -90,7 +94,7 @@ else:
 
 #  Refractive index functions
 
-RG_all_methods = (PSI4_2022A,)
+RG_all_methods = (PSI4_2022A, CHEMSEP)
 '''Tuple of method name keys. See the `RG` for the actual references'''
 
 @mark_numba_incompatible
@@ -122,7 +126,7 @@ def RG(CASRN, method=None):
     Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
-    Function has data for approximately 300 chemicals.
+    Function has data for approximately 670 chemicals.
 
     Parameters
     ----------
@@ -132,7 +136,7 @@ def RG(CASRN, method=None):
     Returns
     -------
     RG : float
-        Radius of Gyration, [m]
+        Radius of gyration, [m]
 
     Other Parameters
     ----------------
@@ -147,6 +151,10 @@ def RG(CASRN, method=None):
         * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum 
           chemistry software, with initialized positions from rdkit's EmbedMolecule 
           method, the basis set 6-31G** and the method mp2 [1]_.
+        * 'CHEMSEP', from the databank included and distributed with the licence
+          notice ChemSep v8.1 pure component data - Copyright (c) Harry Kooijman
+          and Ross Taylor (2018) - http://www.perlfoundation.org/artistic_license_2_0.
+          A small portion of the data is used.
 
     Examples
     --------
@@ -160,6 +168,8 @@ def RG(CASRN, method=None):
        Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure 
        Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65. 
        https://doi.org/10.1002/wcms.93.
+    .. [2] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on 
+       Demand Norderstedt, Germany, 2000.
     '''
     if not _RG_data_loaded: _load_RG_data()
     if method:
