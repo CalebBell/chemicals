@@ -51,11 +51,38 @@ Basic Combustion Spec Solvers
 .. autofunction:: chemicals.combustion.combustion_spec_solver
 .. autofunction:: chemicals.combustion.air_fuel_ratio_solver
 
+
+Engine Combustion
+-----------------
+.. autofunction:: chemicals.combustion.Perez_Boehman_RON_from_ignition_delay
+.. autofunction:: chemicals.combustion.Perez_Boehman_MON_from_ignition_delay
+.. autofunction:: chemicals.combustion.octane_sensitivity
+.. autofunction:: chemicals.combustion.AKI
+.. autofunction:: chemicals.combustion.IDT_to_DCN
+
+Lookup Functions
+----------------
+.. autofunction:: chemicals.combustion.RON
+.. autofunction:: chemicals.combustion.RON_methods
+.. autodata:: chemicals.combustion.RON_all_methods
+.. autofunction:: chemicals.combustion.MON
+.. autofunction:: chemicals.combustion.MON_methods
+.. autodata:: chemicals.combustion.MON_all_methods
+.. autofunction:: chemicals.combustion.ignition_delay
+.. autofunction:: chemicals.combustion.ignition_delay_methods
+.. autodata:: chemicals.combustion.ignition_delay_all_methods
+
 """
 
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
 from chemicals.utils import property_molar_to_mass, property_mass_to_molar, mark_numba_incompatible
 from fluids.numerics import normalize
+from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from chemicals.data_reader import (register_df_source,
+                                   data_source,
+                                   retrieve_from_df_dict,
+                                   retrieve_any_from_df_dict,
+                                   list_available_methods_from_df_dict,)
 
 __all__ = ('combustion_stoichiometry',
            'CombustionData',
@@ -66,7 +93,551 @@ __all__ = ('combustion_stoichiometry',
            'combustion_products_mixture',
            'air_fuel_ratio_solver',
            'fuel_air_spec_solver',
-           'combustion_spec_solver')
+           'combustion_spec_solver',
+           'RON', 'RON_methods',
+           'MON', 'MON_methods',
+           'Perez_Boehman_RON_from_ignition_delay',
+           'Perez_Boehman_MON_from_ignition_delay',
+           'octane_sensitivity',
+           'AKI',
+           'ignition_delay_all_methods', 'ignition_delay_methods',
+           'ignition_delay',
+           'IDT_to_DCN')
+
+
+# Register data sources and lazy load them
+
+folder = os_path_join(source_path, 'Misc')
+register_df_source(folder, 'Florian_Liming_RON_experimental.tsv')
+register_df_source(folder, 'Florian_Liming_MON_experimental.tsv')
+register_df_source(folder, 'Florian_Liming_RON_MON_ANN.tsv')
+register_df_source(folder, 'Travis_Kessler_Combustdb_RON.tsv')
+register_df_source(folder, 'Travis_Kessler_Combustdb_MON.tsv')
+register_df_source(folder, 'Travis_Kessler_Combustdb_predictions.tsv')
+register_df_source(folder, 'Dahmen_Marquardt_ignition_delay_IQT.tsv')
+
+
+FLORIAN_LIMING = 'FLORIAN_LIMING'
+FLORIAN_LIMING_ANN = 'FLORIAN_LIMING_ANN'
+COMBUSTDB = 'COMBUSTDB'
+COMBUSTDB_PREDICTIONS = 'COMBUSTDB_PREDICTIONS'
+DAHMEN_MARQUARDT = 'DAHMEN_MARQUARDT'
+
+
+_combustion_data_loaded = False
+@mark_numba_incompatible
+def _load_combustion_data():
+    global _combustion_data_loaded, florian_liming_ron_experimental, RON_sources, combustdb_ron, combustdb_predictions
+    global florian_liming_ron_mon_ann, florian_liming_mon_experimental, MON_sources, dahmen_marquardt_iqt
+    global ignition_delay_sources
+    florian_liming_ron_experimental = data_source('Florian_Liming_RON_experimental.tsv')
+    florian_liming_mon_experimental = data_source('Florian_Liming_MON_experimental.tsv')
+    florian_liming_ron_mon_ann = data_source('Florian_Liming_RON_MON_ANN.tsv')
+    combustdb_ron = data_source('Travis_Kessler_Combustdb_RON.tsv')
+    combustdb_mon = data_source('Travis_Kessler_Combustdb_MON.tsv')
+    combustdb_predictions = data_source('Travis_Kessler_Combustdb_predictions.tsv')
+    dahmen_marquardt_iqt = data_source('Dahmen_Marquardt_ignition_delay_IQT.tsv')
+    
+    RON_sources = {
+        FLORIAN_LIMING: florian_liming_ron_experimental,
+        COMBUSTDB: combustdb_ron,
+        COMBUSTDB_PREDICTIONS: combustdb_predictions,
+        FLORIAN_LIMING_ANN: florian_liming_ron_mon_ann,
+    }
+    MON_sources = {
+        FLORIAN_LIMING: florian_liming_mon_experimental,
+        COMBUSTDB: combustdb_mon,
+        COMBUSTDB_PREDICTIONS: combustdb_predictions,
+        FLORIAN_LIMING_ANN: florian_liming_ron_mon_ann,
+    }
+
+    ignition_delay_sources = {
+        DAHMEN_MARQUARDT: dahmen_marquardt_iqt,
+    }
+
+if PY37:
+    def __getattr__(name):
+        if name in ('florian_liming_ron_experimental',
+                    'florian_liming_ron_mon_ann',
+                    'combustdb_ron',
+                    'combustdb_predictions',
+                    'dahmen_marquardt_iqt'
+                    'RON_sources',
+                    'MON_sources',
+                    'ignition_delay_sources'):
+            _load_combustion_data()
+            return globals()[name]
+        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+else:
+    if can_load_data:
+        _load_combustion_data()
+
+
+RON_all_methods = (FLORIAN_LIMING, COMBUSTDB, FLORIAN_LIMING_ANN, COMBUSTDB_PREDICTIONS)
+'''Tuple of method name keys. See the `RON` for the actual references'''
+
+@mark_numba_incompatible
+def RON_methods(CASRN):
+    """Return all methods available to obtain the research octane number (RON)
+    for the desired chemical.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the RON with the given
+        inputs.
+
+    See Also
+    --------
+    RON
+    """
+    if not _combustion_data_loaded: _load_combustion_data()
+    return list_available_methods_from_df_dict(RON_sources, CASRN, 'RON')
+
+@mark_numba_incompatible
+def RON(CASRN, method=None):
+    r'''This function handles the retrieval of a chemical's research octane 
+    number (RON). Lookup is based on CASRNs. Will automatically select a data source
+    to use if no method is provided; returns None if the data is not available.
+
+    Function has data for approximately 1400 chemicals.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN [-]
+
+    Returns
+    -------
+    RON : float
+        Research octane number, [-]
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined by constants in
+        RON_methods
+
+    Notes
+    -----
+    The available sources are as follows:
+
+        * 'FLORIAN_LIMING', the experimental values compiled in [1]_.
+        * 'FLORIAN_LIMING_ANN', a set of predicted values using a QSPR-ANN model
+          developed in the author's earlier publication [3]_, from 260 comonents.
+        * 'COMBUSTDB', a compilation of values from various sources [2]_.
+        * 'COMBUSTDB_PREDICTIONS', a set of predicted values developed by the
+          author of CombustDB (Travis Kessler) using the tool [4]_.
+
+    Examples
+    --------
+    >>> RON(CASRN='64-17-5')
+    108.6
+
+    References
+    ----------
+    .. [1] Lehn, Florian vom, Liming Cai, Rupali Tripathi, Rafal Broda, and
+       Heinz Pitsch. "A Property Database of Fuel Compounds with Emphasis on
+       Spark-Ignition Engine Applications." Applications in Energy and
+       Combustion Science 5 (March 1, 2021): 100018.
+       https://doi.org/10.1016/j.jaecs.2020.100018.
+    .. [2] Kessler, Travis. CombustDB. Python. 2019. UMass Lowell Energy and
+       Combustion Research Laboratory, 2021. https://github.com/ecrl/combustdb.
+    .. [3] Lehn, Florian vom, Benedict Brosius, Rafal Broda, Liming Cai, and 
+       Heinz Pitsch. "Using Machine Learning with Target-Specific Feature Sets
+       for Structure-Property Relationship Modeling of Octane Numbers and 
+       Octane Sensitivity." Fuel 281 (December 1, 2020): 118772. 
+       https://doi.org/10.1016/j.fuel.2020.118772.
+    .. [4] Kessler, Travis, and John Hunter Mack. "ECNet: Large Scale Machine
+       Learning Projects for Fuel Property Prediction." Journal of Open Source 
+       Software 2, no. 17 (2017): 401.
+    '''
+    if not _combustion_data_loaded: _load_combustion_data()
+    if method:
+        value = retrieve_from_df_dict(RON_sources, CASRN, 'RON', method)
+    else:
+        value = retrieve_any_from_df_dict(RON_sources, CASRN, 'RON')
+    return value
+
+
+MON_all_methods = (FLORIAN_LIMING, COMBUSTDB, FLORIAN_LIMING_ANN, COMBUSTDB_PREDICTIONS)
+'''Tuple of method name keys. See the `MON` for the actual references'''
+
+@mark_numba_incompatible
+def MON_methods(CASRN):
+    """Return all methods available to obtain the motor octane number (MON)
+    for the desired chemical.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the MON with the given
+        inputs.
+
+    See Also
+    --------
+    MON
+    """
+    if not _combustion_data_loaded: _load_combustion_data()
+    return list_available_methods_from_df_dict(MON_sources, CASRN, 'MON')
+
+@mark_numba_incompatible
+def MON(CASRN, method=None):
+    r'''This function handles the retrieval of a chemical's motor octane 
+    number (MON). Lookup is based on CASRNs. Will automatically select a data source
+    to use if no method is provided; returns None if the data is not available.
+
+    Function has data for approximately 1400 chemicals.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN [-]
+
+    Returns
+    -------
+    MON : float
+        Research octane number, [-]
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined by constants in
+        MON_methods
+
+    Notes
+    -----
+    The available sources are as follows:
+
+        * 'FLORIAN_LIMING', the experimental values compiled in [1]_.
+        * 'FLORIAN_LIMING_ANN', a set of predicted values using a QSPR-ANN model
+          developed in the author's earlier publication [3]_, from 260 comonents.
+        * 'COMBUSTDB', a compilation of values from various sources [2]_.
+        * 'COMBUSTDB_PREDICTIONS', a set of predicted values developed by the
+          author of CombustDB (Travis Kessler) using the tool [4]_.
+
+    Examples
+    --------
+    >>> MON(CASRN='64-17-5')
+    89.7
+
+    References
+    ----------
+    .. [1] Lehn, Florian vom, Liming Cai, Rupali Tripathi, Rafal Broda, and
+       Heinz Pitsch. "A Property Database of Fuel Compounds with Emphasis on
+       Spark-Ignition Engine Applications." Applications in Energy and
+       Combustion Science 5 (March 1, 2021): 100018.
+       https://doi.org/10.1016/j.jaecs.2020.100018.
+    .. [2] Kessler, Travis. CombustDB. Python. 2019. UMass Lowell Energy and
+       Combustion Research Laboratory, 2021. https://github.com/ecrl/combustdb.
+    .. [3] Lehn, Florian vom, Benedict Brosius, Rafal Broda, Liming Cai, and 
+       Heinz Pitsch. "Using Machine Learning with Target-Specific Feature Sets
+       for Structure-Property Relationship Modeling of Octane Numbers and 
+       Octane Sensitivity." Fuel 281 (December 1, 2020): 118772. 
+       https://doi.org/10.1016/j.fuel.2020.118772.
+    .. [4] Kessler, Travis, and John Hunter Mack. "ECNet: Large Scale Machine
+       Learning Projects for Fuel Property Prediction." Journal of Open Source 
+       Software 2, no. 17 (2017): 401.
+    '''
+    if not _combustion_data_loaded: _load_combustion_data()
+    if method:
+        value = retrieve_from_df_dict(MON_sources, CASRN, 'MON', method)
+    else:
+        value = retrieve_any_from_df_dict(MON_sources, CASRN, 'MON')
+    return value
+
+
+ignition_delay_all_methods = (DAHMEN_MARQUARDT,)
+'''Tuple of method name keys. See the `ignition_delay` for the actual references'''
+
+@mark_numba_incompatible
+def ignition_delay_methods(CASRN):
+    """Return all methods available to obtain the ignition delay time (IDT)
+    for the desired chemical.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the IDT with the given
+        inputs.
+
+    See Also
+    --------
+    ignition_delay
+    """
+    if not _combustion_data_loaded: _load_combustion_data()
+    return list_available_methods_from_df_dict(ignition_delay_sources, CASRN, 'IGNITION_DELAY')
+
+@mark_numba_incompatible
+def ignition_delay(CASRN, method=None):
+    r'''This function handles the retrieval of a chemical's ignition delay time (IDT).
+    Lookup is based on CASRNs. Will automatically select a data source
+    to use if no method is provided; returns None if the data is not available.
+
+    Function has data for approximately 60 chemicals.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN [-]
+
+    Returns
+    -------
+    ignition_delay : float
+        Ignition delay time, [s]
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined by constants in
+        ignition_delay_all_methods
+
+    Notes
+    -----
+    The available sources are as follows:
+
+        * 'DAHMEN_MARQUARDT', the experimental values compiled in [1]_;
+          all timings come from the IQT tester device
+          
+          
+    Note that different measurement devices can give different results.
+
+    Examples
+    --------
+    >>> ignition_delay(CASRN='110-54-3')
+    0.0043
+
+    References
+    ----------
+    .. [1] Dahmen, Manuel, and Wolfgang Marquardt. "A Novel Group Contribution Method
+       for the Prediction of the Derived Cetane Number of Oxygenated Hydrocarbons."
+       Energy & Fuels 29, no. 9 (September 17, 2015): 5781–5801.
+       https://doi.org/10.1021/acs.energyfuels.5b01032.
+
+    '''
+    if not _combustion_data_loaded: _load_combustion_data()
+    if method:
+        value = retrieve_from_df_dict(ignition_delay_sources, CASRN, 'IGNITION_DELAY', method)
+    else:
+        value = retrieve_any_from_df_dict(ignition_delay_sources, CASRN, 'IGNITION_DELAY')
+    return value
+
+def AKI(RON, MON):
+    r'''This function calculates the anti knock index (AKI) of a fuel, also
+    known as (R+M)/2 and by DON [1]_.
+    
+    .. math::
+        \text{AKI} = 0.5\text{RON} + 0.5\text{MON}
+
+    Parameters
+    ----------
+    RON : float
+        Research octane number, [-]
+    MON : float
+        Motor octane number, [-]
+
+    Returns
+    -------
+    AKI : float
+        Average of RON and MON, [-]
+
+    Notes
+    -----
+    This is the number displayed at the gas pumps in North America; in Europe
+    and Asia the RON is displayed.
+
+    Examples
+    --------
+    >>> AKI(RON=90, MON=74)
+    82.0
+
+    References
+    ----------
+    .. [1] McKinsey. "Octane." Accessed April 18, 2022. 
+       http://www.mckinseyenergyinsights.com/resources/refinery-reference-desk/octane/.
+    '''
+    return 0.5*(RON + MON)
+
+def octane_sensitivity(RON, MON):
+    r'''This function calculates the octane sensitivity of a fuel [1]_.
+    
+    .. math::
+        \text{OS} = \text{RON} - \text{MON}
+
+    Parameters
+    ----------
+    RON : float
+        Research octane number, [-]
+    MON : float
+        Motor octane number, [-]
+
+    Returns
+    -------
+    OS : float
+        Octane sensitivity, [-]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    >>> octane_sensitivity(RON=90, MON=74)
+    16
+
+    References
+    ----------
+    .. [1] Lehn, Florian vom, Liming Cai, Rupali Tripathi, Rafal Broda, and
+       Heinz Pitsch. "A Property Database of Fuel Compounds with Emphasis on
+       Spark-Ignition Engine Applications." Applications in Energy and
+       Combustion Science 5 (March 1, 2021): 100018.
+       https://doi.org/10.1016/j.jaecs.2020.100018.
+    '''
+    return RON - MON
+
+def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
+    r'''Esimates the research octane number (RON) from a known
+    ignition delay, as shown in [1]_.
+
+    .. math::
+        \text{RON} = 120.77 - \frac{425.48}{\tau_{ID}}
+        
+    In the above equation, ignition delay is in ms.
+
+    Parameters
+    ----------
+    ignition_delay : float
+        The ignition delay, [s]
+
+    Returns
+    -------
+    RON : float
+        Research Octane Number [-]
+
+    Notes
+    -----
+    The correlation was developed using 20 components, for a range of
+    approximately 3.6 ms to 67 ms.
+
+    Examples
+    --------
+    >>> Perez_Boehman_RON_from_ignition_delay(1/150)
+    56.948
+
+    References
+    ----------
+    .. [1] Perez, Peter L., and André L. Boehman. "Experimental 
+       Investigation of the Autoignition Behavior of Surrogate Gasoline
+       Fuels in a Constant-Volume Combustion Bomb Apparatus and Its
+       Relevance to HCCI Combustion." Energy & Fuels 26, no. 10 
+       (October 18, 2012): 6106-17. https://doi.org/10.1021/ef300503b.
+    '''
+    ignition_delay *= 1e3 # convert from seconds to ms
+    return 120.77 - 425.48/ignition_delay
+
+def Perez_Boehman_MON_from_ignition_delay(ignition_delay):
+    r'''Esimates the motor octane number (MON) from a known
+    ignition delay, as shown in [1]_.
+
+    .. math::
+        \text{MON} = 109.93 - \frac{374.73}{\tau_{ID}}
+        
+    In the above equation, ignition delay is in ms.
+
+    Parameters
+    ----------
+    ignition_delay : float
+        The ignition delay, [s]
+
+    Returns
+    -------
+    MON : float
+        Motor Octane Number [-]
+
+    Notes
+    -----
+    The correlation was developed using 20 components, for a range of
+    approximately 3.6 ms to 67 ms.
+
+    Examples
+    --------
+    >>> Perez_Boehman_MON_from_ignition_delay(1/150)
+    53.7205
+
+    References
+    ----------
+    .. [1] Perez, Peter L., and André L. Boehman. "Experimental 
+       Investigation of the Autoignition Behavior of Surrogate Gasoline
+       Fuels in a Constant-Volume Combustion Bomb Apparatus and Its
+       Relevance to HCCI Combustion." Energy & Fuels 26, no. 10 
+       (October 18, 2012): 6106-17. https://doi.org/10.1021/ef300503b.
+    '''
+    ignition_delay *= 1e3 # convert from seconds to ms
+    return 109.93 - 374.73/ignition_delay
+
+def IDT_to_DCN(IDT):
+    r'''This function converts the ignition delay
+    time [1]_ into a derived cetane number.
+    
+    If the ignition delay time is between 3.1 and 6.5 ms:
+    
+    .. math::
+        \text{DCN} = 4.46 + \frac{186.6}{\text{IDT}}
+        
+    Otherwise:
+    
+    .. math::
+        \text{DCN} = \left(83.99(\text{IDT} - 1.512)^{-0.658} \right) + 3.547
+
+    Parameters
+    ----------
+    IDT : float
+        Ignition delay time, [s]
+
+    Returns
+    -------
+    DCN : float
+        Derived cetane number, [-]
+
+    Notes
+    -----
+    This conversion is described in D6890-168.
+
+    Examples
+    --------
+    >>> IDT_to_DCN(4e-3)
+    51.11
+    
+    References
+    ----------
+    .. [1] Al Ibrahim, Emad, and Aamir Farooq. "Prediction of the Derived 
+       Cetane Number and Carbon/Hydrogen Ratio from Infrared Spectroscopic
+       Data." Energy & Fuels 35, no. 9 (May 6, 2021): 8141–52.
+       https://doi.org/10.1021/acs.energyfuels.0c03899.
+    .. [2] Dahmen, Manuel, and Wolfgang Marquardt. "A Novel Group Contribution
+       Method for the Prediction of the Derived Cetane Number of Oxygenated
+       Hydrocarbons." Energy & Fuels 29, no. 9 (September 17, 2015): 5781–5801. 
+       https://doi.org/10.1021/acs.energyfuels.5b01032.
+    '''
+    IDT *= 1000.0
+    if 3.1 < IDT < 6.5:
+        return 4.46 + (186.6/IDT)
+    else:
+        return (83.99*(IDT-1.512)**-0.658) + 3.547
 
 
 def as_atoms(formula):

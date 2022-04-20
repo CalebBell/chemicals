@@ -169,6 +169,7 @@ if not fluids.numerics.is_micropython:
         viscosity._load_mu_data()
         volume._load_rho_data()
         molecular_geometry._load_RG_data()
+        combustion._load_combustion_data()
         try:
             identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
         except:
@@ -197,7 +198,7 @@ if not fluids.numerics.is_micropython:
                       'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
                      'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
                      'RI', 'Hfus', 
-                     'Dipole', 'logP', 'RG']
+                     'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY']
         for df in data_reader.df_sources.values():
             for p in properties:
                 if p in df.columns:

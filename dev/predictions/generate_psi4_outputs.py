@@ -30,7 +30,7 @@ from rdkit import Chem
 from chemicals.identifiers import pubchem_db
 from joblib import Parallel, delayed
 from subprocess import Popen, PIPE
-
+from random import shuffle
 
 def is_psi4_fast(metadata):
     try:
@@ -166,8 +166,7 @@ for metadata in pubchem_db.CAS_index.values():
         dest = os.path.join(working_folder, "%s.dat" %(metadata.CASs))
         write_input(mol, dest)
         to_process.append(metadata.CASs)
-        
-        
+shuffle(to_process)
         
         #psi4 50-00-0.dat 50-00-0.out -n 1
 retVals = Parallel(n_jobs=7, verbose=100, backend='threading')(delayed(call_psi4)(CAS) for CAS in sorted(to_process))
