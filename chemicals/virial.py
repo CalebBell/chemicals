@@ -44,6 +44,7 @@ Utilities
 .. autofunction:: chemicals.virial.dCVirial_mixture_dT_Orentlicher_Prausnitz
 .. autofunction:: chemicals.virial.d2CVirial_mixture_dT2_Orentlicher_Prausnitz
 .. autofunction:: chemicals.virial.d3CVirial_mixture_dT3_Orentlicher_Prausnitz
+.. autofunction:: chemicals.virial.dCVirial_mixture_Orentlicher_Prausnitz_dzs
 
 Second Virial Correlations
 --------------------------
@@ -130,6 +131,8 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            
            'BVirial_mixture', 'dBVirial_mixture_dzs',
            'd2BVirial_mixture_dzizjs', 'd3BVirial_mixture_dzizjzks',
+           
+           'dCVirial_mixture_Orentlicher_Prausnitz_dzs',
            
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
@@ -2796,6 +2799,50 @@ def Meng_virial_a(Tc, Pc, dipole=0.0, haloalkane=False):
     else:
         a = -3.0309E-6*mur**2 + 9.503E-11*mur**4 - 1.2469E-15*mur**6
     return a
+
+def Kronecker_delta(i,j): return 1 if i == j else 0.0
+
+
+def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs):
+    '''
+    '''
+    '''# Derived with:
+    from sympy import *
+    i, j, k, m = symbols("i, j, k, m", cls=Idx)
+    zs = IndexedBase('zs')
+    Cs = IndexedBase('Cs')
+    C_expr = summation(zs[i]*zs[j]*zs[k]*cbrt(Cs[i,j]*Cs[i,k]*Cs[j,k]),[i,1,toMax],[j,1,toMax],[k,1,toMax])
+    diff(C_expr, zs[m])
+    '''
+    N = len(zs)
+    Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
+#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Cij_cbrt_row = Cij_cbrts[i]
+        Cij_row = Cijs[i]
+        for j in range(i):
+            if Cij_row[j] > 0.0:
+                Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
+                
+        if Cij_row[i] > 0.0:
+            Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+
+    cC = Cij_cbrts
+    
+    dCs = [0.0]*N
+    
+    d = Kronecker_delta
+    
+    for m in range(N):
+        dC = 0.0
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
+                    cCv = cC[i][j]*cC[i][k]*cC[j][k]
+                    dC += cCv*d(i,m)*zs[j]*zs[k] + cCv*d(j,m)*zs[i]*zs[k] + cCv*d(k,m)*zs[i]*zs[j]
+                    
+        dCs[m] = dC
+    return dCs
 
 def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
     r'''Calculate the `C` third virial coefficient from a matrix of 
