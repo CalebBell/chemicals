@@ -170,14 +170,11 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Antoine_fitting_jacobian', 'TRC_Antoine_extended_fitting_jacobian',
            'TDE_PVExpansion']
 
-import os
 from fluids.constants import R
-from fluids.numerics import numpy as np, trunc_exp, trunc_log
-from math import e, isinf
-from chemicals.utils import log, log10, exp, sqrt, isnan, mark_numba_incompatible
+from fluids.numerics import numpy as np, trunc_exp
+from math import isinf
+from chemicals.utils import log, log10, exp, sqrt, mark_numba_incompatible
 from chemicals.utils import PY37, source_path, os_path_join, can_load_data
-from chemicals.dippr import EQ101
-from chemicals import miscdata
 from chemicals.data_reader import register_df_source, data_source
 
 folder = os_path_join(source_path, 'Vapor Pressure')
@@ -191,7 +188,7 @@ register_df_source(folder, 'Wagner Original McGarry.tsv', csv_kwargs={
 
 register_df_source(folder, 'Wagner Collection Poling.tsv', csv_kwargs={
         'dtype': {'A': float, 'B': float, 'C': float, 'D': float, 'Pc': float,
-                  'Tc': float, 'Pc': float, 'Tmin': float, 'Tmax': float}})
+                  'Tc': float, 'Tmin': float, 'Tmax': float}})
 
 register_df_source(folder, 'Antoine Extended Collection Poling.tsv', csv_kwargs={
     'dtype':{'A': float, 'B': float, 'C': float, 'Tc': float, 'to': float,
@@ -609,8 +606,7 @@ def Antoine(T, A, B, C, base=10.0):
     T_C = T + C
     if T_C <= 0.0:
         return 0.0
-    else:
-        return base**(A - B/(T_C))
+    return base**(A - B/(T_C))
 
 def dAntoine_dT(T, A, B, C, base=10.0):
     r'''Calculates the first temperature derivative of vapor pressure of a
@@ -1047,7 +1043,8 @@ def dTRC_Antoine_extended_dT(T, Tc, to, A, B, C, n, E, F):
     x2 = E/Tc**8
     x3 = F/Tc**12
     x4 = f*(-x1/Tc)**n
-    return (-10**(A - B/x0 + x1**12*x3 + x1**8*x2 + x4)*(-B/x0**2 + n*x4/x1 + 12.0*x1**11*x3 + 8.0*x1**7*x2)*ln10)
+    return (-10**(A - B/x0 + x1**12*x3 + x1**8*x2 + x4)*(-B/x0**2 + n*x4/x1 
+                  + 12.0*x1**11*x3 + 8.0*x1**7*x2)*ln10)
 
 def d2TRC_Antoine_extended_dT2(T, Tc, to, A, B, C, n, E, F):
     r'''Calculates the second temperature derivative of vapor pressure of a
@@ -1660,7 +1657,6 @@ def dWagner_dT(T, Tc, Pc, a, b, c, d):
     3587.2910498076
 
     '''
-    Tr = T/Tc
     tau = 1.0 - T/Tc
     tau2 = tau*tau
     try:
@@ -1726,7 +1722,6 @@ def d2Wagner_dT2(T, Tc, Pc, a, b, c, d):
     >>> d2Wagner_dT2(100., 190.551, 4599200, -6.02242, 1.26652, -0.5707, -1.366)
     296.7091513877
     '''
-    Tr = T/Tc
     tau = 1.0 - T/Tc
     tau_rt = sqrt(tau)
     tau2 = tau*tau
