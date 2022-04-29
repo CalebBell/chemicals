@@ -2983,9 +2983,11 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
         for j in range(N):
             x0 = zs[i]*zs[j]*Cij_cbrts_i[j]
             Cij_cbrts_j = Cij_cbrts[j]
-            for k in range(N):
+            for k in range(j):
                 if Cij_cbrts_i[k]*Cij_cbrts_j[k] > 0.0:
-                    C += x0*zs[k]*Cij_cbrts_i[k]*Cij_cbrts_j[k]
+                    C += 2*x0*zs[k]*Cij_cbrts_i[k]*Cij_cbrts_j[k]
+            if Cij_cbrts_i[j]*Cij_cbrts_j[j] > 0.0:
+                C += x0*zs[j]*Cij_cbrts_i[j]*Cij_cbrts_j[j]
     return C
 
 def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
