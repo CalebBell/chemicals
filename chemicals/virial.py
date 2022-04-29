@@ -2876,8 +2876,10 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
                 t0 = zs[i]*zs[j]
                 for k in range(N):
                     cCv = cC[i][j]*cC[i][k]*cC[j][k]
-                    dC += cCv*(x0*zs[j]*zs[k] + x1*zs[i]*zs[k] + d(k,m)*t0)
-                    
+                    dC += cCv*(x0*zs[j]*zs[k] + x1*zs[i]*zs[k])
+                # Add the last m term
+                cCv = cC[i][j]*cC[i][m]*cC[j][m]
+                dC += cCv*t0
             dCs[m] += dC
     return dCs
 
