@@ -2872,16 +2872,17 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
             fact = cC[i][m]*zs[i]
             tmp = 0.0
             for j in range(N):
-                tmp += cC[i][j]*(cC[m][j])*zs[j]
+                tmp += cC[i][j]*cC[m][j]*zs[j]
             dC += fact*tmp
-                
+        
+        # symmetry double this term
         dC += dC
-
-        for j in range(N):
-            for k in range(N):
-                cCv = cC[m][j]*cC[m][k]*cC[j][k]
-                dC += cCv*(zs[j]*zs[k])
         dCs[m] += dC
+    for j in range(N):
+        for k in range(N):
+            x0 = zs[j]*zs[k]*cC[j][k]
+            for m in range(N):
+                dCs[m] += x0*cC[m][j]*cC[m][k]
     return dCs
 
 def d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs, d2Cs=None):
