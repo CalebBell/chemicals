@@ -2870,7 +2870,9 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
         dC = 0.0                    
         for i in range(N):
             for j in range(N):
-                dC += 2.0*cC[i][j]*cC[i][m]*(cC[m][j])*zs[i]*zs[j]
+                dC += cC[i][j]*cC[i][m]*(cC[m][j])*zs[i]*zs[j]
+                
+        dC += dC
 
         for j in range(N):
             for k in range(N):
