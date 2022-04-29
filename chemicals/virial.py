@@ -2865,16 +2865,15 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
     if dCs is None:
         dCs = [0.0]*N
     
-    d = Kronecker_delta
     
     for i in range(N):
         for m in range(N):
             dC = 0.0
-            x0 = d(i,m)
-            for j in range(N):
-                for k in range(N):
-                    cCv = cC[i][j]*cC[i][k]*cC[j][k]
-                    dC += cCv*(x0*zs[j]*zs[k])
+            if i == m:
+                for j in range(N):
+                    for k in range(N):
+                        cCv = cC[m][j]*cC[m][k]*cC[j][k]
+                        dC += cCv*(zs[j]*zs[k])
                     
             for j in range(N):
                 # Add the second last m term
