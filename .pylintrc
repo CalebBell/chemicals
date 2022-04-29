@@ -156,6 +156,8 @@ disable=print-statement,
         W0603, # globals can be good for performance and managing load-time state
         R1731, # max is slow than an if statement
         R1730, # max is slow than an if statement
+        C0103, # we are allowed to have our own styles for variable names
+        C0203, # f strings are good, but there is nothing wrong with other styles
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
