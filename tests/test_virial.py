@@ -21,13 +21,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
 import numpy as np
-from fluids.numerics import linspace, assert_close, assert_close1d, assert_close2d, assert_close3d, derivative, jacobian, hessian
-from chemicals.virial import *
-from chemicals import rho_to_Vm
+import pytest
 from fluids.constants import R as _R
-from scipy.integrate import quad
+from fluids.numerics import (assert_close, assert_close1d, assert_close2d,
+                             assert_close3d, derivative, hessian, jacobian,
+                             linspace)
+
+from chemicals import rho_to_Vm
+from chemicals.virial import (
+    B_from_Z, B_to_Z, BVirial_Abbott, BVirial_Abbott_fast, BVirial_Abbott_mat,
+    BVirial_Abbott_vec, BVirial_Meng, BVirial_Meng_mat, BVirial_Meng_vec,
+    BVirial_mixture, BVirial_Oconnell_Prausnitz,
+    BVirial_Oconnell_Prausnitz_mat, BVirial_Oconnell_Prausnitz_vec,
+    BVirial_Pitzer_Curl, BVirial_Pitzer_Curl_fast, BVirial_Pitzer_Curl_mat,
+    BVirial_Pitzer_Curl_vec, BVirial_Tsonopoulos, BVirial_Tsonopoulos_extended,
+    BVirial_Tsonopoulos_extended_fast, BVirial_Tsonopoulos_extended_mat,
+    BVirial_Tsonopoulos_extended_vec, BVirial_Tsonopoulos_fast,
+    BVirial_Tsonopoulos_mat, BVirial_Tsonopoulos_vec, BVirial_Xiang,
+    BVirial_Xiang_mat, BVirial_Xiang_vec, CVirial_Liu_Xiang,
+    CVirial_Liu_Xiang_mat, CVirial_Liu_Xiang_vec,
+    CVirial_mixture_Orentlicher_Prausnitz, CVirial_Orbey_Vera,
+    CVirial_Orbey_Vera_mat, CVirial_Orbey_Vera_vec,
+    Lee_Kesler_virial_CSP_Vcijs, Meng_Duan_2005_virial_CSP_kijs, Meng_virial_a,
+    Tarakad_Danner_virial_CSP_kijs, Tarakad_Danner_virial_CSP_omegaijs,
+    Tarakad_Danner_virial_CSP_Pcijs, Tarakad_Danner_virial_CSP_Tcijs,
+    Z_from_virial_density_form, Z_from_virial_pressure_form,
+    d2BVirial_mixture_dzizjs, d2CVirial_mixture_dT2_Orentlicher_Prausnitz,
+    d3BVirial_mixture_dzizjzks, d3CVirial_mixture_dT3_Orentlicher_Prausnitz,
+    dBVirial_mixture_dzs, dCVirial_mixture_dT_Orentlicher_Prausnitz,
+    dCVirial_mixture_Orentlicher_Prausnitz_dzs,
+    d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs)
+
 
 def test_B_To_Z():
     Z_calc = B_to_Z(-0.0015, 300.0, 1E5)
@@ -100,7 +125,8 @@ def test_BVirial_Pitzer_Curl():
 @pytest.mark.slow
 @pytest.mark.sympy
 def test_BVirial_Pitzer_Curl_calculus():
-    from sympy import symbols, Rational, diff, lambdify, integrate
+    from sympy import Rational, diff, integrate, lambdify, symbols
+
     # Derivatives check
     # Uses SymPy
     T, Tc, Pc, omega, R = symbols('T, Tc, Pc, omega, R')
@@ -164,8 +190,8 @@ def test_BVirial_Abbott_calculus():
 
 @pytest.mark.slow
 @pytest.mark.sympy
-def test_BVirial_Abbott_calculus():
-    from sympy import symbols, Rational, diff, lambdify, integrate
+def test_BVirial_Abbott_calculus_sympy():
+    from sympy import diff, integrate, lambdify, symbols
 
     B = BVirial_Abbott(510., 425.2, 38E5, 0.193)
     assert_close(B, -0.00020570185009564064)
@@ -232,7 +258,7 @@ def test_BVirial_Tsonopoulos():
 @pytest.mark.slow
 @pytest.mark.sympy
 def test_BVirial_Tsonopoulos_calculus():
-    from sympy import symbols, Rational, diff, lambdify, integrate
+    from sympy import Rational, diff, integrate, lambdify, symbols
 
     T, Tc, Pc, omega, R = symbols('T, Tc, Pc, omega, R')
     Tr = T/Tc
@@ -326,8 +352,7 @@ def test_BVirial_Tsonopoulos_extended():
 @pytest.mark.slow
 @pytest.mark.sympy
 def test_BVirial_Tsonopoulos_extended_calculus():
-    from sympy import symbols, Rational, diff, lambdify, integrate
-
+    from sympy import Rational, diff, integrate, lambdify, symbols
 
     # Use lambdify for fast evaluation
     pts = 3
@@ -669,6 +694,13 @@ def test_Tarakad_Danner_virial_CSP_Tcijs():
      [548.606779975124, 547.1675300600267, 647.14, 443.0307753796196],
      [510.5967574676473, 611.7203098423653, 443.0307753796196, 842.9999999999999]]
     assert_close2d(Tcijs, Tcijs_expect, rtol=1e-12)
+
+def test_Tarakad_Danner_virial_CSP_Pcijs():
+    kijs = Tarakad_Danner_virial_CSP_kijs(Vcs=[0.000168, 0.000316])
+    Tcijs = Tarakad_Danner_virial_CSP_Tcijs(Tcs=[514.0, 591.75], kijs=kijs)
+    Pcijs = Tarakad_Danner_virial_CSP_Pcijs(Tcs=[514.0, 591.75], Pcs=[6137000.0, 4108000.0], Vcs=[0.000168, 0.000316], Tcijs=Tcijs)
+    expect = [[6136999.999999997, 4861936.434873204], [4861936.434873204, 4107999.9999999995]]
+    assert_close2d(Pcijs, expect, rtol=1e-13)
     
 def test_Tarakad_Danner_virial_CSP_omegaijs():
     omegaijs = Tarakad_Danner_virial_CSP_omegaijs([0.635, 0.257, 0.344, 1.26])
@@ -751,7 +783,6 @@ def test_BVirial_Tsonopoulos_extended_vec():
     T = 388.26
     Tc = 647.1
     Pc = 22050000.0
-    Vc = 5.543076e-05
     omega = 0.344
     a = 1e-7
     b = 1e-12
@@ -909,3 +940,51 @@ def test_d3BVirial_mixture_dzizjzks():
     data = [[[0.0]*3 for _ in range(3)] for _ in range(3)]
     out = d3BVirial_mixture_dzizjzks(zs=zs, Bijs=Bijs, d3B_dzizjzks=data)
     assert out is data
+
+
+def test_dCVirial_mixture_Orentlicher_Prausnitz_dzs():
+    Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    zs = [.5, .3, .2]
+    dCs = dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs)
+    expect = [5.443601127587523e-09, 6.5483144255847115e-09, 7.749495446821764e-09]
+    assert_close1d(dCs, expect, rtol=1e-13)
+    
+    def to_jac(zs): return CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs)
+    
+    numerical = jacobian(to_jac, zs, perturbation=1e-7)
+    assert_close1d(dCs, numerical, rtol=1e-7)
+    
+    
+    # Large case to test the indexes better
+    Cijs = [[1.465189176575471e-09, 1.860435325911775e-09, 2.1207286035797035e-09, 3.4042362688416274e-09, 5.466385407462434e-09, 1.3120738106399996e-09], [1.860435325911775e-09, 2.4658163172184164e-09, 3.2101245346622573e-09, 4.92501739124829e-09, 8.157718655133752e-09, 1.6899226468398887e-09], [2.1207286035797035e-09, 3.2101245346622573e-09, 4.927821768068707e-09, 7.308756958853639e-09, 1.1651843838258561e-08, 2.0186446325603855e-09], [3.4042362688416274e-09, 4.92501739124829e-09, 7.308756958853639e-09, 1.047676572661861e-08, 1.606047782005346e-08, 3.228332375603084e-09], [5.466385407462434e-09, 8.157718655133752e-09, 1.1651843838258561e-08, 1.606047782005346e-08, 1.940333988459971e-08, 5.3077543954058676e-09], [1.3120738106399996e-09, 1.6899226468398887e-09, 2.0186446325603855e-09, 3.228332375603084e-09, 5.3077543954058676e-09, 1.1706982435200877e-09]]
+    zs = [.105, .095, .1, .11, .09, .5]
+    dCs = dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs)
+    expect = [6.723078338327948e-09, 8.31259485308936e-09, 1.0024423007706207e-08, 1.3182720227087849e-08, 1.7513764717771297e-08, 6.37515424248066e-09]
+    assert_close1d(expect, dCs, rtol=1e-13)
+    
+    numerical = jacobian(to_jac, zs, perturbation=1e-7)
+    assert_close1d(dCs, numerical, rtol=1e-7)
+
+
+def test_d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs():
+    Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    zs = [.5, .3, .2]
+    d2Cs = d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs)
+    expect =[[9.681675801038313e-09, 1.1445472662718372e-08, 1.3063612779201891e-08], [1.1445472662718372e-08, 1.3853560347545005e-08, 1.608912207773368e-08], [1.3063612779201891e-08, 1.608912207773368e-08, 2.070223940361239e-08]]
+    assert_close2d(d2Cs, expect, rtol=1e-13)
+    
+    def to_jac(zs): return dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs)
+    
+    numerical = jacobian(to_jac, zs, perturbation=1e-7, scalar=False)
+    assert_close1d(d2Cs, numerical, rtol=1e-7)
+    
+    
+    # Large case to test the indexes better
+    Cijs = [[1.465189176575471e-09, 1.860435325911775e-09, 2.1207286035797035e-09, 3.4042362688416274e-09, 5.466385407462434e-09, 1.3120738106399996e-09], [1.860435325911775e-09, 2.4658163172184164e-09, 3.2101245346622573e-09, 4.92501739124829e-09, 8.157718655133752e-09, 1.6899226468398887e-09], [2.1207286035797035e-09, 3.2101245346622573e-09, 4.927821768068707e-09, 7.308756958853639e-09, 1.1651843838258561e-08, 2.0186446325603855e-09], [3.4042362688416274e-09, 4.92501739124829e-09, 7.308756958853639e-09, 1.047676572661861e-08, 1.606047782005346e-08, 3.228332375603084e-09], [5.466385407462434e-09, 8.157718655133752e-09, 1.1651843838258561e-08, 1.606047782005346e-08, 1.940333988459971e-08, 5.3077543954058676e-09], [1.3120738106399996e-09, 1.6899226468398887e-09, 2.0186446325603855e-09, 3.228332375603084e-09, 5.3077543954058676e-09, 1.1706982435200877e-09]]
+    zs = [.105, .095, .1, .11, .09, .5]
+    d2Cs = d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs)
+    expect = [[1.071059420883899e-08, 1.2889939578666922e-08, 1.4774121572395523e-08, 1.9844462997775223e-08, 2.679252138715349e-08, 1.0050740025831605e-08], [1.2889939578666922e-08, 1.5744639953466747e-08, 1.887821938847448e-08, 2.496687544775576e-08, 3.403908283614765e-08, 1.2156619122970956e-08], [1.4774121572395523e-08, 1.887821938847448e-08, 2.394400241774843e-08, 3.129230073624375e-08, 4.2095296823327694e-08, 1.4158004743089302e-08], [1.9844462997775223e-08, 2.496687544775576e-08, 3.129230073624375e-08, 4.044962155652963e-08, 5.374127429084261e-08, 1.898903108170806e-08], [2.679252138715349e-08, 3.403908283614765e-08, 4.2095296823327694e-08, 5.374127429084261e-08, 6.604354929432281e-08, 2.5831225059285898e-08], [1.0050740025831605e-08, 1.2156619122970956e-08, 1.4158004743089302e-08, 1.898903108170806e-08, 2.5831225059285898e-08, 9.421395633868426e-09]]
+    assert_close2d(expect, d2Cs, rtol=1e-13)
+    
+    numerical = jacobian(to_jac, zs, perturbation=1e-7, scalar=False)
+    assert_close2d(d2Cs, numerical, rtol=1e-7)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021, 2022 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -45,6 +45,7 @@ Utilities
 .. autofunction:: chemicals.virial.d2CVirial_mixture_dT2_Orentlicher_Prausnitz
 .. autofunction:: chemicals.virial.d3CVirial_mixture_dT3_Orentlicher_Prausnitz
 .. autofunction:: chemicals.virial.dCVirial_mixture_Orentlicher_Prausnitz_dzs
+.. autofunction:: chemicals.virial.d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs
 
 Second Virial Correlations
 --------------------------
@@ -133,6 +134,7 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'd2BVirial_mixture_dzizjs', 'd3BVirial_mixture_dzizjzks',
            
            'dCVirial_mixture_Orentlicher_Prausnitz_dzs',
+           'd2CVirial_mixture_Orentlicher_Prausnitz_dzizjs',
            
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
@@ -636,7 +638,6 @@ def BVirial_Oconnell_Prausnitz(T, Tc, Pc, omega):
     d1 = 0.46
     d2 = -0.50
     d3 = -0.097
-    d4 = -0.0073
     T_inv = 1.0/T
     T_inv2 = T_inv*T_inv
     x0 = Tc*T_inv
@@ -2019,12 +2020,9 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
         elif dipole != 0 and Tc != 0 and Pc != 0:
             dipole_r = 1E5*dipole**2*(Pc/101325.0)/Tc**2
 
-            if (species_type == 'ketone' or species_type == 'aldehyde'
-            or species_type == 'alkyl nitrile' or species_type == 'ether'
-            or species_type == 'carboxylic acid' or species_type == 'ester'):
+            if species_type in ('ketone', 'aldehyde', 'alkyl nitrile',  'ether', 'carboxylic acid', 'ester'):
                 a, b = -2.14E-4*dipole_r-4.308E-21*dipole_r**8, 0.0
-            elif (species_type == 'alkyl halide' or species_type == 'mercaptan'
-            or species_type == 'sulfide' or species_type == 'disulfide'):
+            elif species_type in ('alkyl halide', 'mercaptan', 'sulfide', 'disulfide'):
                 a, b = -2.188E-4*dipole_r**4-7.831E-21*dipole_r**8, 0.0
 
             elif species_type == 'alkanol':
@@ -2800,19 +2798,54 @@ def Meng_virial_a(Tc, Pc, dipole=0.0, haloalkane=False):
         a = -3.0309E-6*mur**2 + 9.503E-11*mur**4 - 1.2469E-15*mur**6
     return a
 
-def Kronecker_delta(i,j): return 1 if i == j else 0.0
+def Kronecker_delta(i, j): return 1 if i == j else 0.0
 
 
-def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs):
-    '''
-    '''
-    '''# Derived with:
-    from sympy import *
-    i, j, k, m = symbols("i, j, k, m", cls=Idx)
-    zs = IndexedBase('zs')
-    Cs = IndexedBase('Cs')
-    C_expr = summation(zs[i]*zs[j]*zs[k]*cbrt(Cs[i,j]*Cs[i,k]*Cs[j,k]),[i,1,toMax],[j,1,toMax],[k,1,toMax])
-    diff(C_expr, zs[m])
+def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
+    r'''Calculate the first mole fraction derivatives of the `C` third virial
+    coefficient from a matrix of 
+    virial cross-coefficients.
+
+    .. math::
+        \frac{\partial C}{\partial m} = 
+        \sum_{\substack{0 \leq i \leq nc\\0 \leq j \leq nc\\0 \leq k \leq nc}}
+        \sqrt[3]{{Cs}_{i,j} {Cs}_{i,k} {Cs}_{j,k}} \left(\delta_{i m} {zs}_{j}
+        {zs}_{k} + \delta_{j m} {zs}_{i} {zs}_{k} + \delta_{k m} {zs}_{i} 
+        {zs}_{j}\right)
+
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Cijs : list[list[float]]
+        Third virial binary interaction coefficients in density form [m^6/mol^2]
+    dCs : list[float], optional
+        First derivatives of C with respect to mole fraction, [m^6/mol^2]
+
+    Returns
+    -------
+    dCs : list[float]
+        First derivatives of C with respect to mole fraction, [m^6/mol^2]
+
+    Notes
+    -----
+    This equation can be derived with SymPy, as follows
+    
+    >>> from sympy import * # doctest: +SKIP
+    >>> i, j, k, m, n, o = symbols("i, j, k, m, n, o", cls=Idx) # doctest: +SKIP
+    >>> zs = IndexedBase('zs') # doctest: +SKIP
+    >>> Cs = IndexedBase('Cs') # doctest: +SKIP
+    >>> nc = symbols('nc') # doctest: +SKIP
+    >>> C_expr = Sum(zs[i]*zs[j]*zs[k]*cbrt(Cs[i,j]*Cs[i,k]*Cs[j,k]),[i,0,nc],[j,0,nc],[k,0,nc]) # doctest: +SKIP
+    >>> diff(C_expr, zs[m]) # doctest: +SKIP
+    Sum((Cs[i, j]*Cs[i, k]*Cs[j, k])**(1/3)*KroneckerDelta(i, m)*zs[j]*zs[k] + (Cs[i, j]*Cs[i, k]*Cs[j, k])**(1/3)*KroneckerDelta(j, m)*zs[i]*zs[k] + (Cs[i, j]*Cs[i, k]*Cs[j, k])**(1/3)*KroneckerDelta(k, m)*zs[i]*zs[j], (i, 0, nc), (j, 0, nc), (k, 0, nc))
+
+    Examples
+    --------
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> zs = [.5, .3, .2]
+    >>> dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs)
+    [5.443601127e-09, 6.5483144255e-09, 7.749495446e-09]
     '''
     N = len(zs)
     Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
@@ -2829,7 +2862,8 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs):
 
     cC = Cij_cbrts
     
-    dCs = [0.0]*N
+    if dCs is None:
+        dCs = [0.0]*N
     
     d = Kronecker_delta
     
@@ -2843,6 +2877,45 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs):
                     
         dCs[m] = dC
     return dCs
+
+def d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs, d2Cs=None):
+    N = len(zs)
+    Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
+#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Cij_cbrt_row = Cij_cbrts[i]
+        Cij_row = Cijs[i]
+        for j in range(i):
+            if Cij_row[j] > 0.0:
+                Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
+                
+        if Cij_row[i] > 0.0:
+            Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+
+    cC = Cij_cbrts
+    
+    if d2Cs is None:
+        d2Cs = [[0.0]*N for _ in range(N)] # numba: delete
+        # d2Cs = zeros((N, N)) # numba: uncomment
+    d = Kronecker_delta
+    
+    for m in range(N):
+        for n in range(N):
+            d2C = 0.0
+            for i in range(N):
+                for j in range(N):
+                    for k in range(N):
+                        cCv = cC[i][j]*cC[i][k]*cC[j][k]
+                        d2C += cCv*(d(i,m)*d(j,n)*zs[k]
+                                    + d(i,m)*d(k,n)*zs[j]
+                                    + d(i,n)*d(j,m)*zs[k]
+                                    + d(i,n)*d(k,m)*zs[j]
+                                    + d(j,m)*d(k,n)*zs[i]
+                                    + d(j,n)*d(k,m)*zs[i])
+            d2Cs[m][n] = d2C
+    return d2Cs
+            
+
 
 def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
     r'''Calculate the `C` third virial coefficient from a matrix of 
