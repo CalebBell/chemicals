@@ -48,8 +48,11 @@ __all__ = ['solubility_parameter',
            'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture']
 
 import os
-from fluids.constants import R, atm, R_inv
-from chemicals.utils import log, exp, sqrt
+
+from fluids.constants import R, R_inv, atm
+
+from chemicals.utils import exp, log, sqrt
+
 
 def solubility_parameter(T, Hvapm, Vml):
     r'''This function handles the calculation of a chemical's solubility

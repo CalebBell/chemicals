@@ -131,15 +131,18 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'NFPA_30_classification')
 
 import os
+
 from fluids.core import F2K
+
 from chemicals import miscdata
-from chemicals.utils import mark_numba_incompatible
-from chemicals.utils import source_path, R, none_and_length_check, normalize, PY37, os_path_join, can_load_data
-from chemicals.data_reader import (register_df_source,
-                                   data_source,
-                                   retrieve_from_df_dict,
+from chemicals.data_reader import (data_source,
+                                   list_available_methods_from_df_dict,
+                                   register_df_source,
                                    retrieve_any_from_df_dict,
-                                   list_available_methods_from_df_dict)
+                                   retrieve_from_df_dict)
+from chemicals.utils import (PY37, R, can_load_data, mark_numba_incompatible,
+                             none_and_length_check, normalize, os_path_join,
+                             source_path)
 
 ### Utilities
 

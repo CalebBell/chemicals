@@ -42,16 +42,16 @@ Lookup Functions
 __all__ = ['RG', 'RG_methods', 'RG_all_methods',
            'linear', 'linear_methods', 'linear_all_methods']
 
-from fluids.numerics import interp, horner
-from chemicals.utils import mark_numba_incompatible
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
-from chemicals.miscdata import PSI4_2022A, CHEMSEP
-from chemicals.data_reader import (register_df_source,
-                                   data_source,
-                                   retrieve_from_df_dict,
-                                   retrieve_any_from_df_dict,
-                                   list_available_methods_from_df_dict,)
+from fluids.numerics import horner, interp
 
+from chemicals.data_reader import (data_source,
+                                   list_available_methods_from_df_dict,
+                                   register_df_source,
+                                   retrieve_any_from_df_dict,
+                                   retrieve_from_df_dict)
+from chemicals.miscdata import CHEMSEP, PSI4_2022A
+from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
+                             os_path_join, source_path)
 
 # Register data sources and lazy load them
 

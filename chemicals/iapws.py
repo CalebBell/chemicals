@@ -185,14 +185,16 @@ IAPWS-95 Residual Terms
 
 """
 from __future__ import division
+
 from math import exp, log, sqrt
+
+from fluids.numerics import (broyden2, damping_maintain_sign, horner,
+                             horner_and_der, newton, newton_system, secant,
+                             solve_2_direct, translate_bound_f_jac, trunc_exp,
+                             trunc_log)
+
 from chemicals.utils import mark_numba_uncacheable
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
-from fluids.numerics import (secant, newton, trunc_log, trunc_exp, horner,
-                             solve_2_direct, newton_system, broyden2,
-                             damping_maintain_sign, translate_bound_f_jac,
-                             horner_and_der)
-
 
 __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
            'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',

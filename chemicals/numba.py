@@ -17,8 +17,9 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from chemicals.utils import PY37, numba_blacklisted, numba_cache_blacklisted
 import fluids as normal_fluids
+
+from chemicals.utils import PY37, numba_blacklisted, numba_cache_blacklisted
 
 busy = False
 __all__ = []
@@ -96,8 +97,9 @@ def transform_complete_chemicals(replaced, __funcs, __all__, normal, vec):
 
 def transform():
     gdct = globals()
-    import chemicals
     import fluids.numba
+
+    import chemicals
     normal = chemicals
     __funcs = {}
     replaced = fluids.numba.numerics_dict.copy()

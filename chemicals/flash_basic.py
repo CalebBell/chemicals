@@ -49,12 +49,14 @@ Equilibrium Constants
 """
 
 from __future__ import division
+
 from math import exp, log
 
-from fluids.numerics import newton, brenth, oscillation_checker, secant, NotBoundedError
+from fluids.numerics import (NotBoundedError, brenth, newton,
+                             oscillation_checker, secant)
 
-from chemicals.utils import mark_numba_uncacheable
 from chemicals.rachford_rice import flash_inner_loop
+from chemicals.utils import mark_numba_uncacheable
 
 __all__ = ['K_value','Wilson_K_value', 'PR_water_K_value', 'flash_wilson',
            'flash_Tb_Tc_Pc', 'flash_ideal']

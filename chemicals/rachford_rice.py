@@ -134,12 +134,20 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution_Leibovici_Neoschil',
            'Rachford_Rice_solution_Leibovici_Neoschil_dd']
 
-from fluids.numerics import IS_PYPY, one_epsilon_larger, one_epsilon_smaller, one_10_epsilon_larger, one_10_epsilon_smaller, NotBoundedError, numpy as np
-from fluids.numerics import newton_system, roots_cubic, roots_quartic, secant, horner, brenth, newton, linspace, horner_and_der, halley, solve_2_direct, py_solve, solve_3_direct, solve_4_direct
-from fluids.numerics import add_dd, div_dd, mul_dd, mul_noerrors_dd, lt_dd, gt_dd
-from chemicals.utils import exp, log
-from chemicals.utils import normalize, mark_numba_uncacheable, mark_numba_incompatible
+from fluids.numerics import (IS_PYPY, NotBoundedError, add_dd, brenth, div_dd,
+                             gt_dd, halley, horner, horner_and_der, linspace,
+                             lt_dd, mul_dd, mul_noerrors_dd, newton,
+                             newton_system)
+from fluids.numerics import numpy as np
+from fluids.numerics import (
+    one_10_epsilon_larger, one_10_epsilon_smaller, one_epsilon_larger,
+    one_epsilon_smaller, py_solve, roots_cubic, roots_quartic, secant,
+    solve_2_direct, solve_3_direct, solve_4_direct)
+
 from chemicals.exceptions import PhaseCountReducedError
+from chemicals.utils import (exp, log, mark_numba_incompatible,
+                             mark_numba_uncacheable, normalize)
+
 try:
     from itertools import combinations
 except:
@@ -1494,7 +1502,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     '''
     # extremely important to validate high decimal precision with mpmath
     # numerical issues make this an open research problem with respect to maintaining speed
-    from mpmath import mp, mpf, findroot
+    from mpmath import findroot, mp, mpf
 
     mp.dps = dps
     N = len(zs)

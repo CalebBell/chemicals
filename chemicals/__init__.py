@@ -23,78 +23,54 @@ SOFTWARE.
 """
 
 import os
+
 import fluids
+
 __version__ = '1.0.20'
 from math import isnan
 
 if not fluids.numerics.is_micropython:
 
-    from . import utils
-    from .utils import mark_numba_incompatible, PY37
-    from . import critical
-    from . import elements
-    from . import reaction
-    from . import dipole
-    from . import dippr
-    from . import temperature
-    from . import miscdata
-    from . import environment
-    from . import refractivity
-    from . import solubility
-    from . import lennard_jones
-    from . import heat_capacity
-    from . import vapor_pressure
-    from . import virial
-    from . import phase_change
-    from . import triple
-    from . import acentric
-    from . import exceptions
-    from . import viscosity
-    from . import interface
-    from . import identifiers
-    from . import permittivity
-    from . import thermal_conductivity
-    from . import combustion
-    from . import volume
-    from . import rachford_rice
-    from . import flash_basic
-    from . import safety
-    from . import iapws
-    from . import air
-    from . import molecular_geometry
-
-    from .utils import *
+    from . import (
+        acentric, air, combustion, critical, dipole, dippr, elements,
+        environment, exceptions, flash_basic, heat_capacity, iapws,
+        identifiers, interface, lennard_jones, miscdata, molecular_geometry,
+        permittivity, phase_change, rachford_rice, reaction, refractivity,
+        safety, solubility, temperature, thermal_conductivity, triple, utils,
+        vapor_pressure, virial, viscosity, volume)
+    from .acentric import *
+    from .air import *
+    from .combustion import *
     from .critical import *
-    from .elements import *
-    from .reaction import *
     from .dipole import *
     from .dippr import *
-    from .temperature import *
-    from .miscdata import *
+    from .elements import *
     from .environment import *
-    from .refractivity import *
-    from .solubility import *
-    from .lennard_jones import *
-    from .heat_capacity import *
-    from .vapor_pressure import *
-    from .virial import *
-    from .phase_change import *
-    from .triple import *
-    from .acentric import *
     from .exceptions import *
-    from .viscosity import *
+    from .flash_basic import *
+    from .heat_capacity import *
+    from .iapws import *
     from .identifiers import *
     from .interface import *
-    from .permittivity import *
-    from .thermal_conductivity import *
-    from .combustion import *
-    from .volume import *
-    from .rachford_rice import *
-    from .flash_basic import *
-    from .safety import *
-    from .iapws import *
-    from .air import *
+    from .lennard_jones import *
+    from .miscdata import *
     from .molecular_geometry import *
+    from .permittivity import *
+    from .phase_change import *
+    from .rachford_rice import *
+    from .reaction import *
+    from .refractivity import *
+    from .safety import *
+    from .solubility import *
+    from .temperature import *
+    from .thermal_conductivity import *
+    from .triple import *
+    from .utils import *
+    from .utils import PY37, mark_numba_incompatible
+    from .vapor_pressure import *
+    from .virial import *
+    from .viscosity import *
+    from .volume import *
     __all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr',
                'temperature', 'miscdata', 'environment', 'refractivity', 'solubility',
                'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial',

@@ -72,13 +72,12 @@ __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
 
 import os
 from io import open
-from chemicals.utils import mark_numba_incompatible
-from chemicals.utils import (PY37, source_path, os_path_join, can_load_data, 
-                             to_num)
-from chemicals.elements import (periodic_table, homonuclear_elements,
-                                charge_from_formula, serialize_formula, 
-                                simple_formula_parser)
 
+from chemicals.elements import (charge_from_formula, homonuclear_elements,
+                                periodic_table, serialize_formula,
+                                simple_formula_parser)
+from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
+                             os_path_join, source_path, to_num)
 
 folder = os_path_join(source_path, 'Identifiers')
 

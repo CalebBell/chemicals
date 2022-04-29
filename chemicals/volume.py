@@ -182,12 +182,14 @@ __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 
 ]
 
 import os
-from fluids.numerics import np, splev, implementation_optimize_tck
+
 from fluids.constants import R, atm_inv, root_two
-from chemicals.utils import log, exp, isnan, sqrt
-from chemicals.utils import Vm_to_rho, mixing_simple, mark_numba_incompatible
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
+from fluids.numerics import implementation_optimize_tck, np, splev
+
 from chemicals.data_reader import data_source, register_df_source
+from chemicals.utils import (PY37, Vm_to_rho, can_load_data, exp, isnan, log,
+                             mark_numba_incompatible, mixing_simple,
+                             os_path_join, source_path, sqrt)
 
 folder = os_path_join(source_path, 'Density')
 

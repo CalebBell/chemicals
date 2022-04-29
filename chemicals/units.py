@@ -24,13 +24,16 @@ SOFTWARE.
 from __future__ import division
 
 __all__ = ['u']
-import types
-import re
-import inspect
-import functools
 import collections
-import chemicals
+import functools
+import inspect
+import re
+import types
+
 import numpy as np
+
+import chemicals
+
 try:
     import pint
     from pint import _DEFAULT_REGISTRY as u
@@ -40,7 +43,8 @@ except ImportError: # pragma: no cover
     raise ImportError('The unit handling in fluids requires the installation '
                       'of the package pint, available on pypi or from '
                       'https://github.com/hgrecco/pint')
-from fluids.units import wraps_numpydoc, wrap_numpydoc_obj, variable_output_wrapper
+from fluids.units import (variable_output_wrapper, wrap_numpydoc_obj,
+                          wraps_numpydoc)
 
 __pint_wrapped_functions = {}
 

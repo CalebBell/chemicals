@@ -38,9 +38,10 @@ Temperature Dependent data
 __all__ = ['lookup_VDI_tabular_data']
 
 import os
-from chemicals.utils import mark_numba_incompatible
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
-from chemicals.data_reader import register_df_source, data_source
+
+from chemicals.data_reader import data_source, register_df_source
+from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
+                             os_path_join, source_path)
 
 ### Register data sources and lazy load them
 

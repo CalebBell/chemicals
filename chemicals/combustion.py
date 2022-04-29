@@ -74,15 +74,18 @@ Lookup Functions
 
 """
 
-from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
-from chemicals.utils import property_molar_to_mass, property_mass_to_molar, mark_numba_incompatible
 from fluids.numerics import normalize
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
-from chemicals.data_reader import (register_df_source,
-                                   data_source,
-                                   retrieve_from_df_dict,
+
+from chemicals.data_reader import (data_source,
+                                   list_available_methods_from_df_dict,
+                                   register_df_source,
                                    retrieve_any_from_df_dict,
-                                   list_available_methods_from_df_dict,)
+                                   retrieve_from_df_dict)
+from chemicals.elements import (mass_fractions, molecular_weight,
+                                simple_formula_parser)
+from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
+                             os_path_join, property_mass_to_molar,
+                             property_molar_to_mass, source_path)
 
 __all__ = ('combustion_stoichiometry',
            'CombustionData',

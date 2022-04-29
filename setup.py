@@ -24,7 +24,6 @@ SOFTWARE.
 
 from distutils.core import setup
 
-
 classifiers=[
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',

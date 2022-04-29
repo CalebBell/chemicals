@@ -51,21 +51,21 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 import os
 import sys
 from cmath import sqrt as csqrt
-from fluids.numerics import (brenth, newton, linspace, polyint,
-                             polyint_over_x, derivative, polyder,
-                             trunc_log,
-                             horner, horner_and_der2, assert_close,
-                             quadratic_from_f_ders, numpy as np)
-from math import (acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign,
-                  cos, cosh, degrees, e,  exp, fabs,
-                  floor, fmod, frexp, isinf,
-                  isnan, ldexp, log, log10, modf, pi, pow,
-                  radians, sin, sinh, sqrt, tan, tanh, trunc) # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
+from math import (  # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
+    acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign, cos, cosh,
+    degrees, e, exp, fabs, floor, fmod, frexp, isinf, isnan, ldexp, log, log10,
+    modf, pi, pow, radians, sin, sinh, sqrt, tan, tanh, trunc)
+
+from fluids.numerics import (assert_close, brenth, derivative, horner,
+                             horner_and_der2, linspace, newton)
+from fluids.numerics import numpy as np
+from fluids.numerics import (polyder, polyint, polyint_over_x,
+                             quadratic_from_f_ders, trunc_log)
 
 __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma',
 # Obtained from SciPy 0.19 (2014 CODATA)
 # Included here so calculations are consistent across SciPy versions
-from fluids.constants import g, R, k, N_A, calorie, epsilon_0
+from fluids.constants import N_A, R, calorie, epsilon_0, g, k
 
 __all__.extend(['PY37'])
 version_components = sys.version.split('.')

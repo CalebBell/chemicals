@@ -61,8 +61,10 @@ from __future__ import division
 __all__ = ['permittivity_IAPWS', 'permittivity_CRC']
 
 from fluids.numerics import numpy as np
-from chemicals.utils import sqrt, PY37, source_path, os_path_join, can_load_data, mark_numba_incompatible
-from chemicals.data_reader import register_df_source, data_source
+
+from chemicals.data_reader import data_source, register_df_source
+from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
+                             os_path_join, source_path, sqrt)
 
 folder = os_path_join(source_path, 'Electrolytes')
 register_df_source(folder, 'Permittivity (Dielectric Constant) of Liquids.tsv')

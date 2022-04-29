@@ -61,18 +61,18 @@ __all__ = ['RI', 'RI_methods', 'RI_all_methods',
            'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
            'brix_to_RI', 'TDE_RIXExpansion']
 
-from fluids.numerics import interp, horner
-from fluids.constants import pi, N_A
-from chemicals.utils import mark_numba_incompatible
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
-from chemicals.utils import sqrt, isnan
-from chemicals import miscdata
-from chemicals.data_reader import (register_df_source,
-                                   data_source,
-                                   retrieve_from_df_dict,
-                                   retrieve_any_from_df_dict,
-                                   list_available_methods_from_df_dict,)
+from fluids.constants import N_A, pi
+from fluids.numerics import horner, interp
 
+from chemicals import miscdata
+from chemicals.data_reader import (data_source,
+                                   list_available_methods_from_df_dict,
+                                   register_df_source,
+                                   retrieve_any_from_df_dict,
+                                   retrieve_from_df_dict)
+from chemicals.utils import (PY37, can_load_data, isnan,
+                             mark_numba_incompatible, os_path_join,
+                             source_path, sqrt)
 
 # Register data sources and lazy load them
 

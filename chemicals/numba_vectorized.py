@@ -22,14 +22,17 @@ SOFTWARE.
 """
 
 from __future__ import division
-import sys
+
 import importlib.util
+import sys
 import types
-import numpy as np
-import chemicals as normal_chemicals
-import numba
+
 import fluids.numba
+import numpy as np
+
+import chemicals as normal_chemicals
 import chemicals.numba
+import numba
 
 __all__ = []
 __funcs = {}

@@ -33,6 +33,7 @@ __all__ = ['df_sources',
 
 import os
 from math import isnan, nan
+
 try:
     path_join = os.path.join
 except: # pragma: no cover
@@ -52,6 +53,7 @@ try:
 except:
     pass
 from chemicals.identifiers import CAS_to_int
+
 # %% Loading data from local databanks
 
 pd = None

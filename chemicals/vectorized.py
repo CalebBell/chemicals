@@ -57,7 +57,10 @@ array([591.75, 647.14])
 """
 
 from __future__ import division
-from fluids.numerics import numpy as np, FakePackage
+
+from fluids.numerics import FakePackage
+from fluids.numerics import numpy as np
+
 import chemicals
 
 __all__ = []

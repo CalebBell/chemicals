@@ -201,14 +201,20 @@ __all__ = ['heat_capacity_gas_methods',
            'vibration_frequency_cm_to_characteristic_temperature',
            ]
 import os
+from cmath import exp as cexp
+from cmath import log as clog
 from io import open
-from chemicals.utils import log, exp, to_num, PY37, property_mass_to_molar, source_path, os_path_join, can_load_data, mark_numba_uncacheable
-from fluids.constants import h, k, c, R
 from math import expm1
-from cmath import log as clog, exp as cexp
-from chemicals.data_reader import register_df_source, data_source
-from fluids.numerics import newton, brenth, secant, polylog2, numpy as np
 
+from fluids.constants import R, c, h, k
+from fluids.numerics import brenth, newton
+from fluids.numerics import numpy as np
+from fluids.numerics import polylog2, secant
+
+from chemicals.data_reader import data_source, register_df_source
+from chemicals.utils import (PY37, can_load_data, exp, log,
+                             mark_numba_uncacheable, os_path_join,
+                             property_mass_to_molar, source_path, to_num)
 
 ### Methods introduced in this module
 

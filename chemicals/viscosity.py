@@ -182,12 +182,14 @@ __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9
 'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon',
 'PPDS5']
 
-from fluids.numerics import secant, interp, numpy as np, trunc_exp
-from chemicals.utils import log, exp, sqrt, atan, tan, sin, acos
+from fluids.numerics import interp
+from fluids.numerics import numpy as np
+from fluids.numerics import secant, trunc_exp
 
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data, mark_numba_incompatible
-from chemicals.data_reader import register_df_source, data_source
-
+from chemicals.data_reader import data_source, register_df_source
+from chemicals.utils import (PY37, acos, atan, can_load_data, exp, log,
+                             mark_numba_incompatible, os_path_join, sin,
+                             source_path, sqrt, tan)
 
 folder = os_path_join(source_path, 'Viscosity')
 

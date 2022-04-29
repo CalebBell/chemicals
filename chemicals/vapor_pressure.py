@@ -170,12 +170,16 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Antoine_fitting_jacobian', 'TRC_Antoine_extended_fitting_jacobian',
            'TDE_PVExpansion']
 
-from fluids.constants import R
-from fluids.numerics import numpy as np, trunc_exp
 from math import isinf
-from chemicals.utils import log, log10, exp, sqrt, mark_numba_incompatible
-from chemicals.utils import PY37, source_path, os_path_join, can_load_data
-from chemicals.data_reader import register_df_source, data_source
+
+from fluids.constants import R
+from fluids.numerics import numpy as np
+from fluids.numerics import trunc_exp
+
+from chemicals.data_reader import data_source, register_df_source
+from chemicals.utils import (PY37, can_load_data, exp, log, log10,
+                             mark_numba_incompatible, os_path_join,
+                             source_path, sqrt)
 
 folder = os_path_join(source_path, 'Vapor Pressure')
 

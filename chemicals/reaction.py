@@ -86,15 +86,15 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
            'balance_stoichiometry', 'stoichiometric_matrix']
 
-from chemicals.utils import mark_numba_incompatible
-from chemicals.utils import ceil, log10, PY37, source_path, os_path_join, can_load_data
 from chemicals import heat_capacity, miscdata
-from chemicals.data_reader import (register_df_source,
-                                   data_source,
-                                   retrieve_from_df_dict,
+from chemicals.data_reader import (data_source,
+                                   list_available_methods_from_df_dict,
+                                   register_df_source,
                                    retrieve_any_from_df_dict,
-                                   list_available_methods_from_df_dict)
-
+                                   retrieve_from_df_dict)
+from chemicals.utils import (PY37, can_load_data, ceil, log10,
+                             mark_numba_incompatible, os_path_join,
+                             source_path)
 
 # %% Register data sources and lazy load them
 CRC = 'CRC'
