@@ -70,3 +70,4 @@ thermo/Misc/constants dump*
 dev/data/common_chemistry_complete.tsv
 
 dev/predictions/psi4
+.hypothesis

@@ -46,6 +46,11 @@ Utilities
 .. autofunction:: chemicals.virial.d3CVirial_mixture_dT3_Orentlicher_Prausnitz
 .. autofunction:: chemicals.virial.dCVirial_mixture_Orentlicher_Prausnitz_dzs
 .. autofunction:: chemicals.virial.d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs
+.. autofunction:: chemicals.virial.d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks
+.. autofunction:: chemicals.virial.d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs
+.. autofunction:: chemicals.virial.dV_dzs_virial
+.. autofunction:: chemicals.virial.d2V_dzizjs_virial
+
 
 Second Virial Correlations
 --------------------------
@@ -135,6 +140,7 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            
            'dCVirial_mixture_Orentlicher_Prausnitz_dzs',
            'd2CVirial_mixture_Orentlicher_Prausnitz_dzizjs',
+           'd3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks',
            
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
@@ -143,9 +149,11 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'CVirial_mixture_Orentlicher_Prausnitz', 'dCVirial_mixture_dT_Orentlicher_Prausnitz',
            'd2CVirial_mixture_dT2_Orentlicher_Prausnitz',
            'd3CVirial_mixture_dT3_Orentlicher_Prausnitz',
+           'd2CVirial_mixture_Orentlicher_Prausnitz_dTdzs',
            'Tarakad_Danner_virial_CSP_kijs', 'Tarakad_Danner_virial_CSP_Tcijs',
            'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs',
-           'Meng_Duan_2005_virial_CSP_kijs', 'Lee_Kesler_virial_CSP_Vcijs']
+           'Meng_Duan_2005_virial_CSP_kijs', 'Lee_Kesler_virial_CSP_Vcijs',
+           'dV_dzs_virial', 'd2V_dzizjs_virial']
 
 from cmath import sqrt as csqrt
 
@@ -2809,7 +2817,7 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
     virial cross-coefficients.
 
     .. math::
-        \frac{\partial C}{\partial m} = 
+        \frac{\partial C}{\partial z_m} = 
         \sum_{\substack{0 \leq i \leq nc\\0 \leq j \leq nc\\0 \leq k \leq nc}}
         \sqrt[3]{{Cs}_{i,j} {Cs}_{i,k} {Cs}_{j,k}} \left(\delta_{i m} {zs}_{j}
         {zs}_{k} + \delta_{j m} {zs}_{i} {zs}_{k} + \delta_{k m} {zs}_{i} 
@@ -2826,7 +2834,7 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
 
     Returns
     -------
-    dCs : list[float]
+    dC_dzs : list[float]
         First derivatives of C with respect to mole fraction, [m^6/mol^2]
 
     Notes
@@ -2888,6 +2896,53 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
     return dCs
 
 def d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs, d2Cs=None):
+    r'''Calculate the second mole fraction derivatives of the `C` third virial
+    coefficient from a matrix of 
+    virial cross-coefficients.
+
+    .. math::
+        \frac{\partial^2 C}{\partial z_m \partial z_n} = 
+        \sum_{\substack{0 \leq i \leq nc\\0 \leq j \leq nc\\0 \leq k \leq nc}} 
+        \sqrt[3]{{Cs}_{i,j} {Cs}_{i,k} {Cs}_{j,k}} \left(\delta_{i m}
+        \delta_{j n} {zs}_{k} + \delta_{i m} \delta_{k n} {zs}_{j}
+        + \delta_{i n} \delta_{j m} {zs}_{k} + \delta_{i n} \delta_{k m} 
+        {zs}_{j} + \delta_{j m} \delta_{k n} {zs}_{i}
+        + \delta_{j n} \delta_{k m} {zs}_{i}\right)
+
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Cijs : list[list[float]]
+        Third virial binary interaction coefficients in density form [m^6/mol^2]
+    d2Cs : list[list[float]], optional
+        Second derivatives of C with respect to mole fraction, [m^6/mol^2]
+
+    Returns
+    -------
+    d2Cs : list[list[float]]
+        Second derivatives of C with respect to mole fraction, [m^6/mol^2]
+
+    Notes
+    -----
+    This equation can be derived with SymPy, as follows
+    
+    >>> from sympy import * # doctest: +SKIP
+    >>> i, j, k, m, n, o = symbols("i, j, k, m, n, o", cls=Idx) # doctest: +SKIP
+    >>> zs = IndexedBase('zs') # doctest: +SKIP
+    >>> Cs = IndexedBase('Cs') # doctest: +SKIP
+    >>> nc = symbols('nc') # doctest: +SKIP
+    >>> C_expr = Sum(zs[i]*zs[j]*zs[k]*cbrt(Cs[i,j]*Cs[i,k]*Cs[j,k]),[i,0,nc],[j,0,nc],[k,0,nc]) # doctest: +SKIP
+    >>> diff(C_expr, zs[m], zs[n]) # doctest: +SKIP
+    Sum((Cs[i, j]*Cs[i, k]*Cs[j, k])**(1/3)*(KroneckerDelta(i, m)*KroneckerDelta(j, n)*zs[k] + KroneckerDelta(i, m)*KroneckerDelta(k, n)*zs[j] + KroneckerDelta(i, n)*KroneckerDelta(j, m)*zs[k] + KroneckerDelta(i, n)*KroneckerDelta(k, m)*zs[j] + KroneckerDelta(j, m)*KroneckerDelta(k, n)*zs[i] + KroneckerDelta(j, n)*KroneckerDelta(k, m)*zs[i]), (i, 0, nc), (j, 0, nc), (k, 0, nc))
+
+    Examples
+    --------
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> zs = [.5, .3, .2]
+    >>> d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs)
+    [[9.68167580103e-09, 1.14454726627e-08, 1.3063612779e-08], [1.144547266271e-08, 1.38535603475e-08, 1.608912207e-08], [1.306361277920e-08, 1.6089122077e-08, 2.0702239403e-08]]
+    '''
     N = len(zs)
     Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
 #     Cij_cbrts = zeros((N, N)) # numba: uncomment
@@ -2925,6 +2980,180 @@ def d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs, d2Cs=None):
     return d2Cs
             
 
+def d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks(zs, Cijs, d3Cs=None):
+    r'''Calculate the third mole fraction derivatives of the `C` third virial
+    coefficient from a matrix of 
+    virial cross-coefficients.
+
+    .. math::
+        \frac{\partial^3 C}{\partial z_m \partial z_n \partial z_o} = 
+        \sum_{\substack{0 \leq i \leq nc\\0 \leq j \leq nc\\0 \leq k \leq nc}} 
+        \sqrt[3]{{Cs}_{i,j} {Cs}_{i,k} {Cs}_{j,k}} \left(\delta_{i m} \delta_{j n}
+        \delta_{k o} + \delta_{i m} \delta_{j o} \delta_{k n} + \delta_{i n}
+        \delta_{j m} \delta_{k o} + \delta_{i n} \delta_{j o} \delta_{k m} 
+        + \delta_{i o} \delta_{j m} \delta_{k n} + \delta_{i o} \delta_{j n} 
+        \delta_{k m}\right)
+
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Cijs : list[list[float]]
+        Third virial binary interaction coefficients in density form [m^6/mol^2]
+    d3Cs : list[list[float]], optional
+        Third derivatives of C with respect to mole fraction, [m^6/mol^2]
+
+    Returns
+    -------
+    d3Cs : list[list[float]]
+        Third derivatives of C with respect to mole fraction, [m^6/mol^2]
+
+    Notes
+    -----
+    This equation can be derived with SymPy, as follows
+    
+    >>> from sympy import * # doctest: +SKIP
+    >>> i, j, k, m, n, o = symbols("i, j, k, m, n, o", cls=Idx) # doctest: +SKIP
+    >>> zs = IndexedBase('zs') # doctest: +SKIP
+    >>> Cs = IndexedBase('Cs') # doctest: +SKIP
+    >>> nc = symbols('nc') # doctest: +SKIP
+    >>> C_expr = Sum(zs[i]*zs[j]*zs[k]*cbrt(Cs[i,j]*Cs[i,k]*Cs[j,k]),[i,0,nc],[j,0,nc],[k,0,nc]) # doctest: +SKIP
+    >>> diff(C_expr, zs[m], zs[n], zs[o]) # doctest: +SKIP
+    Sum((Cs[i, j]*Cs[i, k]*Cs[j, k])**(1/3)*(KroneckerDelta(i, m)*KroneckerDelta(j, n)*KroneckerDelta(k, o) + KroneckerDelta(i, m)*KroneckerDelta(j, o)*KroneckerDelta(k, n) + KroneckerDelta(i, n)*KroneckerDelta(j, m)*KroneckerDelta(k, o) + KroneckerDelta(i, n)*KroneckerDelta(j, o)*KroneckerDelta(k, m) + KroneckerDelta(i, o)*KroneckerDelta(j, m)*KroneckerDelta(k, n) + KroneckerDelta(i, o)*KroneckerDelta(j, n)*KroneckerDelta(k, m)), (i, 0, nc), (j, 0, nc), (k, 0, nc))
+    
+    Examples
+    --------
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> zs = [.5, .3, .2]
+    >>> d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks(zs, Cijs)
+    [[[8.760000000e-09, 1.01836374334e-08, 1.12329228549e-08], [1.01836374334e-08, 1.2117983195e-08, 1.35912949367e-08], [1.12329228549e-08, 1.35912949367e-08, 1.6848814353e-08]], [[1.01836374334e-08, 1.2117983195e-08, 1.3591294936e-08], [1.211798319e-08, 1.4760000e-08, 1.6832843749e-08], [1.3591294936e-08, 1.6832843749e-08, 2.1218107423e-08]], [[1.1232922854e-08, 1.3591294936e-08, 1.6848814353e-08], [1.3591294936e-08, 1.6832843749e-08, 2.1218107423e-08], [1.6848814353e-08, 2.1218107423e-08, 2.956200e-08]]]
+    '''
+    N = len(zs)
+    Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
+#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Cij_cbrt_row = Cij_cbrts[i]
+        Cij_row = Cijs[i]
+        for j in range(i):
+            if Cij_row[j] > 0.0:
+                Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
+                
+        if Cij_row[i] > 0.0:
+            Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+
+    cC = Cij_cbrts
+    
+    if d3Cs is None:
+        d3Cs = [[[0.0]*N for _ in range(N)] for _ in range(N)]# numba: delete
+        # d3Cs = zeros((N, N, N)) # numba: uncomment
+    d = Kronecker_delta
+    for m in range(N):
+        for n in range(N):
+            for o in range(N):
+                d3C = 0.0
+                for i in range(N):
+                    for j in range(N):
+                        for k in range(N):
+                            cCv = cC[i][j]*cC[i][k]*cC[j][k]
+                            d3C += cCv*(d(i,m)*d(j,n)*d(k,o)
+                                        + d(i,m)*d(j,o)*d(k,n)
+                                        + d(i,n)*d(j,m)*d(k,o)
+                                        + d(i,n)*d(k,m)*d(j,o)
+                                        + d(j,m)*d(k,n)*d(i,o)
+                                        + d(j,n)*d(k,m)*d(i,o))
+                d3Cs[m][n][o]= d3C
+    return d3Cs
+
+def d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs(zs, Cijs, dCij_dTs, 
+                                                  d2C_dTdzs=None):
+    r'''Calculate the first mole fraction derivatives of the `C` third virial
+    coefficient from a matrix of 
+    virial cross-coefficients.
+
+    .. math::
+        \frac{\partial^2 C}{\partial T \partial z_m} 
+
+    Parameters
+    ----------
+    zs : list[float]
+        Mole fractions of each species, [-]
+    Cijs : list[list[float]]
+        Third virial binary interaction coefficients in density form [m^6/mol^2]
+    dCij_dTs : list[list[float]]
+        First temperature derivative of third virial binary interaction 
+        coefficients in density form [m^6/mol^2/K]
+    d2C_dTdzs : list[float], optional
+        Array for second derivatives of C with respect to mole fraction and 
+        temperature, [m^6/mol^2/K]
+
+    Returns
+    -------
+    d2C_dTdzs : list[float]
+        Second derivatives of C with respect to mole fraction and temperature,
+        [m^6/mol^2/K]
+
+    Notes
+    -----
+    This equation can be derived with SymPy, as follows
+    
+    >>> from sympy import * # doctest: +SKIP
+    >>> from sympy import * # doctest: +SKIP
+    >>> i, j, k, m, n, o, T = symbols("i, j, k, m, n, o, T", cls=Idx) # doctest: +SKIP
+    >>> zs = IndexedBase('zs') # doctest: +SKIP
+    >>> Cs = IndexedBase('Cs') # doctest: +SKIP
+    >>> dC_dTs = IndexedBase('dC_dTs') # doctest: +SKIP
+    >>> nc = symbols('nc') # doctest: +SKIP
+    >>> C_expr = Sum(zs[i]*zs[j]*zs[k]/3*cbrt(Cs[i,j]*Cs[i,k]*Cs[j,k])/(Cs[i,j]*Cs[i,k]*Cs[j,k])*(Cs[i,j]*Cs[i,k]*dC_dTs[j,k] + Cs[i,j]*dC_dTs[i,k]*Cs[j,k] + dC_dTs[i,j]*Cs[i,k]*Cs[j,k]),[i,0,nc],[j,0,nc],[k,0,nc]) # doctest: +SKIP
+    >>> diff(C_expr, zs[m]) # doctest: +SKIP
+    Sum((Cs[i, j]*Cs[i, k]*Cs[j, k])**(1/3)*(Cs[i, j]*Cs[i, k]*dC_dTs[j, k] + Cs[i, j]*Cs[j, k]*dC_dTs[i, k] + Cs[i, k]*Cs[j, k]*dC_dTs[i, j])*KroneckerDelta(i, m)*zs[j]*zs[k]/(3*Cs[i, j]*Cs[i, k]*Cs[j, k]) + (Cs[i, j]*Cs[i, k]*Cs[j, k])**(1/3)*(Cs[i, j]*Cs[i, k]*dC_dTs[j, k] + Cs[i, j]*Cs[j, k]*dC_dTs[i, k] + Cs[i, k]*Cs[j, k]*dC_dTs[i, j])*KroneckerDelta(j, m)*zs[i]*zs[k]/(3*Cs[i, j]*Cs[i, k]*Cs[j, k]) + (Cs[i, j]*Cs[i, k]*Cs[j, k])**(1/3)*(Cs[i, j]*Cs[i, k]*dC_dTs[j, k] + Cs[i, j]*Cs[j, k]*dC_dTs[i, k] + Cs[i, k]*Cs[j, k]*dC_dTs[i, j])*KroneckerDelta(k, m)*zs[i]*zs[j]/(3*Cs[i, j]*Cs[i, k]*Cs[j, k]), (i, 0, nc), (j, 0, nc), (k, 0, nc))
+
+
+    Examples
+    --------
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
+    >>> zs = [.5, .3, .2]
+    >>> d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs(zs, Cijs, dCij_dTs)
+    [-1.5738681437044977e-11, -2.2724179489395198e-11, -3.568115739596394e-11]
+    '''
+    N = len(zs)
+    Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
+#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        Cij_cbrt_row = Cij_cbrts[i]
+        Cij_row = Cijs[i]
+        for j in range(i):
+            if Cij_row[j] > 0.0:
+                Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
+                
+        if Cij_row[i] > 0.0:
+            Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+
+    cC = Cij_cbrts
+    
+    if d2C_dTdzs is None:
+        d2C_dTdzs = [0.0]*N
+    
+    d = Kronecker_delta
+    
+    for m in range(N):
+        d2C = 0.0
+        for i in range(N):
+            for j in range(N):
+                for k in range(N):
+                    t = cC[i][j]*cC[i][k]*cC[j][k]/(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])
+                    c0 = (Cijs[i][j]*Cijs[i][k]*dCij_dTs[j][k] 
+                          + Cijs[i][j]*Cijs[j][k]*dCij_dTs[i][k]
+                          + Cijs[i][k]*Cijs[j][k]*dCij_dTs[i][j])
+                    
+                    d2C += t*(d(i,m)*zs[j]*zs[k]*c0
+                              +d(j,m)*zs[i]*zs[k]*c0
+                              +d(k,m)*zs[i]*zs[j]*c0)
+                        
+                        
+                    
+        d2C_dTdzs[m] = d2C*(1/3.0)
+    return d2C_dTdzs
 
 def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
     r'''Calculate the `C` third virial coefficient from a matrix of 
@@ -4137,3 +4366,141 @@ def Lee_Kesler_virial_CSP_Vcijs(Vcs):
             f = Vci_cbrt + Vc_cbrts[j]
             Vcij_row[j] = 0.125*f*f*f
     return Vcijs
+
+
+
+def dV_dzs_virial(B, C, V, dB_dzs, dC_dzs, dV_dzs=None):
+    r'''Calculates first mole fraction derivative of volume for the virial 
+    equation of state.
+    
+    .. math::
+        \frac{\partial V}{\partial z_i} = \frac{V(V\frac{\partial B}{\partial z_i} + \frac{\partial C}{\partial z_i} )}{2BV + 3C + V^2}
+
+    Parameters
+    ----------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+    C : float
+        Third virial coefficient in density form [m^6/mol^2]
+    V : float
+        Molar volume from virial equation, [m^3/mol]
+    dB_dzs : list[float]
+        First mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
+    dC_dzs : list[float]
+        First derivatives of C with respect to mole fraction, [m^6/mol^2]
+    dV_dzs : list[float], optional
+        Array for first derivatives of molar volume with respect to mole fraction, [m^3/mol]
+
+    Returns
+    -------
+    dV_dzs : list[float]
+        First derivatives of molar volume with respect to mole fraction, [m^3/mol]
+
+    Notes
+    -----
+    
+    This expression was derived with SymPy as follows:
+        
+    >>> from sympy import * # doctest: +SKIP
+    >>> Z, R, T, P, z1 = symbols('Z, R, T, P, z1') # doctest: +SKIP
+    >>> B, C, V = symbols('B, C, V', cls=Function) # doctest: +SKIP
+    >>> base =Eq(P*V(z1)/(R*T), 1 + B(z1)/V(z1) + C(z1)/V(z1)**2) # doctest: +SKIP
+    >>> P_sln = solve(base, P)[0] # doctest: +SKIP
+    >>> solve(diff(P_sln, z1), Derivative(V(z1), z1)) # doctest: +SKIP
+    [(V(z1)*Derivative(B(z1), z1) + Derivative(C(z1), z1))*V(z1)/(2*B(z1)*V(z1) + 3*C(z1) + V(z1)**2)]
+
+    Examples
+    --------
+    >>> dV_dzs_virial(B=-5.130920247359858e-05, C=2.6627784284381213e-09, V=0.024892080086430797, dB_dzs=[-4.457911131778849e-05, -9.174964457681726e-05, -0.0001594258679841028], dC_dzs=[6.270599057032657e-09, 7.766612052069565e-09, 9.503031492910165e-09])
+    [-4.4510120473455416e-05, -9.181495962913208e-05, -0.00015970040988493522]
+    '''
+    N = len(dB_dzs)
+    if dV_dzs is None:
+        dV_dzs = [0.0]*N
+    for i in range(N):
+        dV_dzs[i] = (V*dB_dzs[i] + dC_dzs[i])*V/(2.0*B*V + 3.0*C + V*V)
+    return dV_dzs
+
+def d2V_dzizjs_virial(B, C, V, dB_dzs, dC_dzs, dV_dzs, d2B_dzizjs, d2C_dzizjs,
+                      d2V_dzizjs=None):
+    r'''Calculates second mole fraction derivative of volume for the virial 
+    equation of state.
+    
+    .. math::
+        \frac{\partial^2 V}{\partial z_i \partial z_j} 
+        
+    Parameters
+    ----------
+    B : float
+        Second virial coefficient in density form [m^3/mol]
+    C : float
+        Third virial coefficient in density form [m^6/mol^2]
+    V : float
+        Molar volume from virial equation, [m^3/mol]
+    dB_dzs : list[float]
+        First mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
+    dC_dzs : list[float]
+        First derivatives of C with respect to mole fraction, [m^6/mol^2]
+    dV_dzs : list[float]
+        First derivatives of molar volume with respect to mole fraction, [m^3/mol]
+    d2B_dzizjs : list[float]
+        Second mole fraction derivatives of second virial coefficient in 
+        density form [m^3/mol]
+    d2C_dzizjs : list[float]
+        Second derivatives of C with respect to mole fraction, [m^6/mol^2]
+    d2V_dzizjs : list[list[float]], optional
+        Array for second derivatives of molar volume with respect to mole
+        fraction, [m^3/mol]
+
+    Returns
+    -------
+    d2V_dzizjs : list[list[float]]
+        Second derivatives of molar volume with respect to mole
+        fraction, [m^3/mol]
+
+    Notes
+    -----
+    
+    This expression was derived with SymPy as follows:
+        
+    >>> from sympy import * # doctest: +SKIP
+    >>> Z, R, T, P, z1 = symbols('Z, R, T, P, z1') # doctest: +SKIP
+    >>> B, C, V = symbols('B, C, V', cls=Function) # doctest: +SKIP
+    >>> base =Eq(P*V(z1)/(R*T), 1 + B(z1)/V(z1) + C(z1)/V(z1)**2) # doctest: +SKIP
+    >>> P_sln = solve(base, P)[0] # doctest: +SKIP
+    >>> solve(diff(P_sln, z1), Derivative(V(z1), z1)) # doctest: +SKIP
+    [(V(z1)*Derivative(B(z1), z1) + Derivative(C(z1), z1))*V(z1)/(2*B(z1)*V(z1) + 3*C(z1) + V(z1)**2)]
+
+    Examples
+    --------
+    >>> d2C_dzizjs = [[1.0287075724127612e-08, 1.2388277824773021e-08, 1.4298813522844275e-08], [1.2388277824773021e-08, 1.514162073913238e-08, 1.8282527232061114e-08], [1.4298813522844275e-08, 1.8282527232061114e-08, 2.3350122217403063e-08]]
+    >>> d2B_dzizjs = [[-1.0639357784985337e-05, -3.966321845899801e-05, -7.53987684376414e-05], [-3.966321845899801e-05, -8.286257232134107e-05, -0.00014128571574782375], [-7.53987684376414e-05, -0.00014128571574782375, -0.00024567752140887547]]
+    >>> dB_dzs = [-4.457911131778849e-05, -9.174964457681726e-05, -0.0001594258679841028]
+    >>> dC_dzs = [6.270599057032657e-09, 7.766612052069565e-09, 9.503031492910165e-09]
+    >>> dV_dzs = [-4.4510120473455416e-05, -9.181495962913208e-05, -0.00015970040988493522]
+    >>> d2V_dzizjs_virial(B=-5.130920247359858e-05, C=2.6627784284381213e-09, V=0.024892080086430797, dB_dzs=dB_dzs, dC_dzs=dC_dzs, dV_dzs=dV_dzs, d2B_dzizjs=d2B_dzizjs, d2C_dzizjs=d2C_dzizjs)
+    [[-1.04268917389e-05, -3.9654694588e-05, -7.570310078e-05], [-3.9654694588e-05, -8.3270116767e-05, -0.0001423083584], [-7.5703100789e-05, -0.000142308358, -0.00024779788]]
+    '''
+    N = len(dB_dzs)
+    if d2V_dzizjs is None:
+        d2V_dzizjs = [[0.0]*N for _ in range(N)] # numba: delete
+        # d2V_dzizjs = zeros((N, N)) # numba: uncomment
+    for i in range(N):
+        for j in range(N):
+            x0 = V
+            x1 = C
+            x2 = x0*x0
+            x3 = B
+            x4 = x0*x3
+            x5 = dV_dzs[j]
+            x6 = dV_dzs[i]
+            x7 = x5*x6
+            x8 = 3*x0
+            x9 = 2*x2
+            x10 = x5*x9
+            d2V_dzizjs[i][j] = (x0**3*d2B_dzizjs[i][j]+ 12*x1*x7 + x10*x6 - x10*dB_dzs[i]
+                                + x2*d2C_dzizjs[i][j] + 6*x4*x7 - x5*x8*dC_dzs[i] - x6*x8*dC_dzs[j]
+                                - x6*x9*dB_dzs[j])/(x0*(3*x1 + x2 + 2*x4))
+    return d2V_dzizjs
