@@ -525,7 +525,7 @@ def d2BVirial_mixture_dzizjs(zs, Bijs, d2B_dzizjs=None):
     N = len(Bijs)
     if d2B_dzizjs is None:
         d2B_dzizjs = [[0.0]*N for _ in range(N)] # numba: delete
-        # d2B_dzizjs = zeros((N, N)) # numba: uncomment
+        # d2B_dzizjs = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         for j in range(N):
             d2B_dzizjs[i][j] = Bijs[i][j] + Bijs[j][i]
@@ -567,7 +567,7 @@ def d3BVirial_mixture_dzizjzks(zs, Bijs, d3B_dzizjzks=None):
     N = len(Bijs)
     if d3B_dzizjzks is None:
         d3B_dzizjzks = [[[0.0]*N for _ in range(N)] for _ in range(N)] # numba: delete
-#        d3B_dzizjzks = zeros((N, N, N)) # numba: uncomment
+#        d3B_dzizjzks = np.zeros((N, N, N)) # numba: uncomment
     return d3B_dzizjzks
 
 
@@ -779,16 +779,16 @@ def BVirial_Oconnell_Prausnitz_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None,
     N = len(Tcs)
     if Bs is None:
         Bs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Bs = zeros((N, N)) # numba: uncomment
+#        Bs = np.zeros((N, N)) # numba: uncomment
     if dB_dTs is None:
         dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dB_dTs = zeros((N, N)) # numba: uncomment
+#        dB_dTs = np.zeros((N, N)) # numba: uncomment
     if d2B_dT2s is None:
         d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+#        d2B_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3B_dT3s is None:
         d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+#        d3B_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -1108,16 +1108,16 @@ def BVirial_Pitzer_Curl_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None,
     N = len(Tcs)
     if Bs is None:
         Bs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Bs = zeros((N, N)) # numba: uncomment
+#        Bs = np.zeros((N, N)) # numba: uncomment
     if dB_dTs is None:
         dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dB_dTs = zeros((N, N)) # numba: uncomment
+#        dB_dTs = np.zeros((N, N)) # numba: uncomment
     if d2B_dT2s is None:
         d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+#        d2B_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3B_dT3s is None:
         d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+#        d3B_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -1418,16 +1418,16 @@ def BVirial_Abbott_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None,
     N = len(Tcs)
     if Bs is None:
         Bs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Bs = zeros((N, N)) # numba: uncomment
+#        Bs = np.zeros((N, N)) # numba: uncomment
     if dB_dTs is None:
         dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dB_dTs = zeros((N, N)) # numba: uncomment
+#        dB_dTs = np.zeros((N, N)) # numba: uncomment
     if d2B_dT2s is None:
         d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+#        d2B_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3B_dT3s is None:
         d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+#        d3B_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -1751,16 +1751,16 @@ def BVirial_Tsonopoulos_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None,
     N = len(Tcs)
     if Bs is None:
         Bs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Bs = zeros((N, N)) # numba: uncomment
+#        Bs = np.zeros((N, N)) # numba: uncomment
     if dB_dTs is None:
         dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dB_dTs = zeros((N, N)) # numba: uncomment
+#        dB_dTs = np.zeros((N, N)) # numba: uncomment
     if d2B_dT2s is None:
         d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+#        d2B_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3B_dT3s is None:
         d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+#        d3B_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -2241,16 +2241,16 @@ def BVirial_Tsonopoulos_extended_mat(T, Tcs, Pcs, omegas, ais, bs, Bs=None, dB_d
     N = len(Tcs)
     if Bs is None:
         Bs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Bs = zeros((N, N)) # numba: uncomment
+#        Bs = np.zeros((N, N)) # numba: uncomment
     if dB_dTs is None:
         dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dB_dTs = zeros((N, N)) # numba: uncomment
+#        dB_dTs = np.zeros((N, N)) # numba: uncomment
     if d2B_dT2s is None:
         d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+#        d2B_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3B_dT3s is None:
         d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+#        d3B_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -2482,16 +2482,16 @@ def BVirial_Xiang_mat(T, Tcs, Pcs, Vcs, omegas, Bs=None, dB_dTs=None,
     N = len(Tcs)
     if Bs is None:
         Bs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Bs = zeros((N, N)) # numba: uncomment
+#        Bs = np.zeros((N, N)) # numba: uncomment
     if dB_dTs is None:
         dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dB_dTs = zeros((N, N)) # numba: uncomment
+#        dB_dTs = np.zeros((N, N)) # numba: uncomment
     if d2B_dT2s is None:
         d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+#        d2B_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3B_dT3s is None:
         d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+#        d3B_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -2714,16 +2714,16 @@ def BVirial_Meng_mat(T, Tcs, Pcs, Vcs, omegas, ais, Bs=None, dB_dTs=None,
     N = len(Tcs)
     if Bs is None:
         Bs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Bs = zeros((N, N)) # numba: uncomment
+#        Bs = np.zeros((N, N)) # numba: uncomment
     if dB_dTs is None:
         dB_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dB_dTs = zeros((N, N)) # numba: uncomment
+#        dB_dTs = np.zeros((N, N)) # numba: uncomment
     if d2B_dT2s is None:
         d2B_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2B_dT2s = zeros((N, N)) # numba: uncomment
+#        d2B_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3B_dT3s is None:
         d3B_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3B_dT3s = zeros((N, N)) # numba: uncomment
+#        d3B_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -2852,14 +2852,14 @@ def dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs, dCs=None):
 
     Examples
     --------
-    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
     >>> zs = [.5, .3, .2]
     >>> dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs)
-    [5.443601127e-09, 6.5483144255e-09, 7.749495446e-09]
+    [5.44450470e-09, 6.54968776e-09, 7.74986672e-09]
     '''
     N = len(zs)
     Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
-#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+#    Cij_cbrts = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Cij_cbrt_row = Cij_cbrts[i]
         Cij_row = Cijs[i]
@@ -2938,14 +2938,14 @@ def d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs, d2Cs=None):
 
     Examples
     --------
-    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
     >>> zs = [.5, .3, .2]
     >>> d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs)
-    [[9.68167580103e-09, 1.14454726627e-08, 1.3063612779e-08], [1.144547266271e-08, 1.38535603475e-08, 1.608912207e-08], [1.306361277920e-08, 1.6089122077e-08, 2.0702239403e-08]]
+    [[9.6827886655e-09, 1.1449146725e-08, 1.3064355337e-08], [1.1449146725e-08, 1.38557674294e-08, 1.60903596751e-08], [1.3064355337e-08, 1.60903596751e-08, 2.0702239403e-08]]
     '''
     N = len(zs)
     Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
-#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+#    Cij_cbrts = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Cij_cbrt_row = Cij_cbrts[i]
         Cij_row = Cijs[i]
@@ -2960,7 +2960,7 @@ def d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs, d2Cs=None):
     
     if d2Cs is None:
         d2Cs = [[0.0]*N for _ in range(N)] # numba: delete
-        # d2Cs = zeros((N, N)) # numba: uncomment
+        # d2Cs = np.zeros((N, N)) # numba: uncomment
     d = Kronecker_delta
     
     for m in range(N):
@@ -3023,14 +3023,14 @@ def d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks(zs, Cijs, d3Cs=None):
     
     Examples
     --------
-    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
     >>> zs = [.5, .3, .2]
     >>> d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks(zs, Cijs)
-    [[[8.760000000e-09, 1.01836374334e-08, 1.12329228549e-08], [1.01836374334e-08, 1.2117983195e-08, 1.35912949367e-08], [1.12329228549e-08, 1.35912949367e-08, 1.6848814353e-08]], [[1.01836374334e-08, 1.2117983195e-08, 1.3591294936e-08], [1.211798319e-08, 1.4760000e-08, 1.6832843749e-08], [1.3591294936e-08, 1.6832843749e-08, 2.1218107423e-08]], [[1.1232922854e-08, 1.3591294936e-08, 1.6848814353e-08], [1.3591294936e-08, 1.6832843749e-08, 2.1218107423e-08], [1.6848814353e-08, 2.1218107423e-08, 2.956200e-08]]]
+    [[[8.760000000e-09, 1.0187346981e-08, 1.12329228549e-08], [1.01873469818e-08, 1.21223973593e-08, 1.35937701316e-08], [1.12329228549e-08, 1.35937701316e-08, 1.68488143533e-08]], [[1.01873469818e-08, 1.21223973593e-08, 1.35937701316e-08], [1.2122397359e-08, 1.47600000000e-08, 1.68328437491e-08], [1.35937701316e-08, 1.68328437491e-08, 2.12181074230e-08]], [[1.12329228549e-08, 1.35937701316e-08, 1.68488143533e-08], [1.35937701316e-08, 1.68328437491e-08, 2.12181074230e-08], [1.68488143533e-08, 2.12181074230e-08, 2.9562000000e-08]]]
     '''
     N = len(zs)
     Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
-#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+#    Cij_cbrts = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Cij_cbrt_row = Cij_cbrts[i]
         Cij_row = Cijs[i]
@@ -3045,7 +3045,7 @@ def d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks(zs, Cijs, d3Cs=None):
     
     if d3Cs is None:
         d3Cs = [[[0.0]*N for _ in range(N)] for _ in range(N)]# numba: delete
-        # d3Cs = zeros((N, N, N)) # numba: uncomment
+        # d3Cs = np.zeros((N, N, N)) # numba: uncomment
     d = Kronecker_delta
     for m in range(N):
         for n in range(N):
@@ -3110,49 +3110,59 @@ def d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs(zs, Cijs, dCij_dTs,
 
     Examples
     --------
-    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
     >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
     >>> zs = [.5, .3, .2]
     >>> d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs(zs, Cijs, dCij_dTs)
-    [-1.5738681437044977e-11, -2.2724179489395198e-11, -3.568115739596394e-11]
+    [-1.5740994103e-11, -2.27267309501e-11, -3.56846953115e-11]
     '''
     N = len(zs)
-    Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
-#     Cij_cbrts = zeros((N, N)) # numba: uncomment
-    for i in range(N):
-        Cij_cbrt_row = Cij_cbrts[i]
-        Cij_row = Cijs[i]
-        for j in range(i):
-            if Cij_row[j] > 0.0:
-                Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
-                
-        if Cij_row[i] > 0.0:
-            Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+    cC = [[0.0]*N for _ in range(N)] # numba: delete
+#    cC = np.zeros((N, N)) # numba: uncomment
 
-    cC = Cij_cbrts
+    for i in range(N):
+        cC_row = cC[i]
+        Ci_row = Cijs[i]
+        for j in range(i):
+            if Ci_row[j] > 0.0:
+                cC_row[j] = cC[j][i] = Ci_row[j]**(1.0/3)/Ci_row[j]
+            # else:
+                # raise ValueError("Negative C")
+        if Ci_row[i] > 0.0:
+            cC_row[i] = Ci_row[i]**(1.0/3.0)/Ci_row[i]
+        # else:
+            # raise ValueError("Negative C")
     
     if d2C_dTdzs is None:
         d2C_dTdzs = [0.0]*N
-    
-    d = Kronecker_delta
-    
-    for m in range(N):
-        d2C = 0.0
-        for i in range(N):
-            for j in range(N):
-                for k in range(N):
-                    t = cC[i][j]*cC[i][k]*cC[j][k]/(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])
-                    c0 = (Cijs[i][j]*Cijs[i][k]*dCij_dTs[j][k] 
-                          + Cijs[i][j]*Cijs[j][k]*dCij_dTs[i][k]
-                          + Cijs[i][k]*Cijs[j][k]*dCij_dTs[i][j])
-                    
-                    d2C += t*(d(i,m)*zs[j]*zs[k]*c0
-                              +d(j,m)*zs[i]*zs[k]*c0
-                              +d(k,m)*zs[i]*zs[j]*c0)
+
+    for i in range(N):
+        i_sum = 0.0
+        zi = zs[i]
+        for j in range(N):
+            j_sum = 0.0
+            zj = zs[j]
+            zizj = zi*zj
+            Cij = Cijs[i][j]
+            cCij = cC[i][j]
+            dCij = dCij_dTs[i][j]
+            for k in range(N):
+                t = cCij*cC[i][k]*cC[j][k]
+                c0 = (Cij*Cijs[i][k]*dCij_dTs[j][k] 
+                      + Cij*Cijs[j][k]*dCij_dTs[i][k]
+                      + Cijs[i][k]*Cijs[j][k]*dCij)
+                c1 = t*c0
+
+                i_sum += c1*zj*zs[k]
+                j_sum += c1*zi*zs[k]
+                d2C_dTdzs[k] += c1*zizj
+                
+            d2C_dTdzs[j] += j_sum
+        
+        d2C_dTdzs[i] += i_sum
                         
-                        
-                    
-        d2C_dTdzs[m] = d2C*(1/3.0)
+    for i in range(N):
+        d2C_dTdzs[i] *= (1.0/3.0)
     return d2C_dTdzs
 
 def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
@@ -3183,10 +3193,10 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
 
     Examples
     --------
-    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
     >>> zs = [.5, .3, .2]
     >>> CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs)
-    2.07873132694e-09
+    2.0790440095e-09
 
     References
     ----------
@@ -3195,7 +3205,8 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
     '''
     N = len(zs)
     Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
-#     Cij_cbrts = zeros((N, N)) # numba: uncomment
+#    Cij_cbrts = np.zeros((N, N)) # numba: uncomment
+
     for i in range(N):
         Cij_cbrt_row = Cij_cbrts[i]
         Cij_row = Cijs[i]
@@ -3207,7 +3218,7 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
             Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
     
 #     print(np.array(Cijs)**(1/3)/Cij_cbrts)
-    C = 0.0
+    C_diag, C_off = 0.0, 0.0
     # TODO: can we use symmetry to cut time down?
     for i in range(N):
         Cij_cbrts_i = Cij_cbrts[i]
@@ -3216,10 +3227,11 @@ def CVirial_mixture_Orentlicher_Prausnitz(zs, Cijs):
             Cij_cbrts_j = Cij_cbrts[j]
             for k in range(j):
                 if Cij_cbrts_i[k]*Cij_cbrts_j[k] > 0.0:
-                    C += 2.0*x0*zs[k]*Cij_cbrts_i[k]*Cij_cbrts_j[k]
+                    C_off += x0*zs[k]*Cij_cbrts_i[k]*Cij_cbrts_j[k]
+                    
             if Cij_cbrts_i[j]*Cij_cbrts_j[j] > 0.0:
-                C += x0*zs[j]*Cij_cbrts_i[j]*Cij_cbrts_j[j]
-    return C
+                C_diag += x0*zs[j]*Cij_cbrts_i[j]*Cij_cbrts_j[j]
+    return C_off*2.0 + C_diag
 
 def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
     r'''Calculate the first temperature derivative of the `C` third virial
@@ -3257,11 +3269,11 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
 
     Examples
     --------
-    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
     >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
     >>> zs = [.5, .3, .2]
     >>> dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs)
-    -7.276497e-12
+    -7.2751517e-12
 
     References
     ----------
@@ -3270,7 +3282,7 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
     '''
     N = len(zs)
     Cij_pow_n23 = [[0.0]*N for _ in range(N)] # numba: delete
-#     Cij_pow_n23 = zeros((N, N)) # numba: uncomment
+#    Cij_pow_n23 = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Cij_pow_n23_row = Cij_pow_n23[i]
         Cij_row = Cijs[i]
@@ -3287,10 +3299,16 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
     dC = 0.0
     for i in range(N):
         for j in range(N):
+            inner = 0.0
+            x0 = zs[i]*zs[j]*Cij_pow_n23[i][j]
+            if x0 < 0.0:
+                continue
+            Cij = Cijs[i][j]
+            dCij = dCij_dTs[i][j]
             for k in range(N):
-                t0 = Cijs[i][j]*Cijs[i][k]*dCij_dTs[j][k]
-                t1 = Cijs[i][j]*Cijs[j][k]*dCij_dTs[i][k]
-                t2 = Cijs[i][k]*Cijs[j][k]*dCij_dTs[i][j]
+                t0 = Cij*Cijs[i][k]*dCij_dTs[j][k]
+                t1 = Cij*Cijs[j][k]*dCij_dTs[i][k]
+                t2 = Cijs[i][k]*Cijs[j][k]*dCij
                 
                 # Good
                 # dC += zs[i]*zs[j]*zs[k]*(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])**(1/3)*(t0 + t1 + t2)/(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])
@@ -3298,10 +3316,11 @@ def dCVirial_mixture_dT_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs):
                 # dC += zs[i]*zs[j]*zs[k]*(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])**(-2/3)*(t0 + t1 + t2)#/(Cijs[i][j]*Cijs[i][k]*Cijs[j][k])
 
                 # Factor out the powers out
-                term = Cij_pow_n23[i][j]*Cij_pow_n23[i][k]*Cij_pow_n23[j][k]
+                term = Cij_pow_n23[i][k]*Cij_pow_n23[j][k]
                 if term < 0.0:
                     continue
-                dC += zs[i]*zs[j]*zs[k]*term*(t0 + t1 + t2)
+                inner += zs[k]*term*(t0 + t1 + t2)
+            dC += inner*x0
                 
     dC *= 1/3
     return dC
@@ -3372,12 +3391,12 @@ def d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s):
 
     Examples
     --------
-    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
     >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
     >>> d2Cij_dT2s = [[ 2.6469e-14,  5.0512e-14,  1.1509e-13], [ 5.0512e-14,  9.3272e-14,  1.7836e-13], [ 1.1509e-13,  1.7836e-13, -1.4906e-13]]
     >>> zs = [.5, .3, .2]
     >>> d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s)
-    6.72362752e-14
+    6.7237107787e-14
 
     References
     ----------
@@ -3385,34 +3404,52 @@ def d2CVirial_mixture_dT2_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s):
        New York: McGraw-Hill Professional, 2000.
     '''
     N = len(zs)
+    Cij_cbrts = [[0.0]*N for _ in range(N)] # numba: delete
+#    Cij_cbrts = np.zeros((N, N)) # numba: uncomment
+    # for i in range(N):
+    #     for j in range(N):
+    #         Cij_cbrts[i][j] = (Cijs[i][j])**(1/3)
+
+    for i in range(N):
+        Cij_cbrt_row = Cij_cbrts[i]
+        Cij_row = Cijs[i]
+        for j in range(i):
+            if Cij_row[j] > 0.0:
+                Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
+                
+        if Cij_row[i] > 0.0:
+            Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+
     d2C = 0.0
     for i in range(N):
         for j in range(N):
+            t0 = zs[i]*zs[j]
+            x8 = dCij_dTs[i][j]
+            x0 = Cijs[i][j]
+            x0_inv = 1.0/x0
+            x16 = d2Cij_dT2s[i][j]
+            cCij = Cij_cbrts[i][j]
             for k in range(N):
-                x0 = Cijs[i][j]
                 x1 = Cijs[i][k]
                 x2 = Cijs[j][k]
                 x3 = x1*x2
-                x0x3 = x0*x3
-                if x0x3 < 0.0:
+                if x0*x3 < 0.0:
                     continue
                 x4 = x0*x1
                 x5 = x0*x2
-                x8 = dCij_dTs[i][j]
                 x6 = dCij_dTs[i][k]
                 x7 = dCij_dTs[j][k]
                 x9 = 6.0*x8
-                x10 = 1.0/x0
                 x11 = x3*x8 + x4*x7 + x5*x6
                 x12 = 3.0*x11
                 x13 = 1.0/x1
                 x14 = 1.0/x2
-                x15 = x10*x13*x14
-                big = (x15*(x0x3)**(1.0/3.0)*(6.0*x0*x6*x7 + x1*x7*x9 - x10*x12*x8 
-                        + x11**2.0*x15 - x12*x13*x6 - x12*x14*x7 + x2*x6*x9
-                        + 3.0*x3*d2Cij_dT2s[i][j] + 3.0*x4*d2Cij_dT2s[j][k] + 3.0*x5*d2Cij_dT2s[i][k])/9.0)
-                d2C += zs[i]*zs[j]*zs[k]*big
-    return d2C
+                x15 = x0_inv*x13*x14
+                big = (x15*cCij*Cij_cbrts[i][k]*Cij_cbrts[j][k]*(6.0*x0*x6*x7 + x1*x7*x9 - x0_inv*x12*x8 
+                        + x11*x11*x15 - x12*x13*x6 - x12*x14*x7 + x2*x6*x9
+                        + 3.0*x3*x16 + 3.0*x4*d2Cij_dT2s[j][k] + 3.0*x5*d2Cij_dT2s[i][k]))
+                d2C += t0*zs[k]*big
+    return d2C*(1/9.0)
                 
 def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
                                                 d3Cij_dT3s):
@@ -3421,7 +3458,7 @@ def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
     virial cross-coefficients and their first, second, and third temperature
     derivatives. 
     
-    The expression is quite lengthy and not shown here.
+    The expression is quite lengthy and not shown here [1]_.
 
     .. math::
         \frac{\partial^3 C}{\partial T^3} 
@@ -3453,13 +3490,13 @@ def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
 
     Examples
     --------
-    >>> Cijs = [[1.46e-09, 1.831e-09, 2.1207e-09], [1.83e-09, 2.46e-09, 2.996e-09], [2.120e-09, 2.996e-09, 4.927e-09]]
+    >>> Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
     >>> dCij_dTs = [[-2.212e-12, -4.137e-12, -1.079e-11], [-4.137e-12, -7.669e-12, -1.809e-11], [-1.079e-11, -1.809e-11, -2.010e-11]]
     >>> d2Cij_dT2s = [[ 2.6469e-14,  5.0512e-14,  1.1509e-13], [ 5.0512e-14,  9.3272e-14,  1.7836e-13], [ 1.1509e-13,  1.7836e-13, -1.4906e-13]]
     >>> d3Cij_dT3s = [[-4.2300e-16, -7.9727e-16, -1.6962e-15], [-7.9727e-16, -1.3826e-15, -1.4525e-15], [-1.6962e-15, -1.4525e-15,  1.9786e-14]]
     >>> zs = [.5, .3, .2]
     >>> d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s, d3Cij_dT3s)
-    -3.73564703e-16
+    -3.7358368e-16
 
     References
     ----------
@@ -3706,16 +3743,16 @@ def CVirial_Orbey_Vera_mat(T, Tcs, Pcs, omegas, Cs=None, dC_dTs=None,
     N = len(Tcs)
     if Cs is None:
         Cs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Cs = zeros((N, N)) # numba: uncomment
+#        Cs = np.zeros((N, N)) # numba: uncomment
     if dC_dTs is None:
         dC_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dC_dTs = zeros((N, N)) # numba: uncomment
+#        dC_dTs = np.zeros((N, N)) # numba: uncomment
     if d2C_dT2s is None:
         d2C_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2C_dT2s = zeros((N, N)) # numba: uncomment
+#        d2C_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3C_dT3s is None:
         d3C_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3C_dT3s = zeros((N, N)) # numba: uncomment
+#        d3C_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -3952,16 +3989,16 @@ def CVirial_Liu_Xiang_mat(T, Tcs, Pcs, Vcs, omegas, Cs=None, dC_dTs=None,
     N = len(Tcs)
     if Cs is None:
         Cs = [[0.0]*N for _ in range(N)] # numba: delete
-#        Cs = zeros((N, N)) # numba: uncomment
+#        Cs = np.zeros((N, N)) # numba: uncomment
     if dC_dTs is None:
         dC_dTs = [[0.0]*N for _ in range(N)] # numba: delete
-#        dC_dTs = zeros((N, N)) # numba: uncomment
+#        dC_dTs = np.zeros((N, N)) # numba: uncomment
     if d2C_dT2s is None:
         d2C_dT2s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d2C_dT2s = zeros((N, N)) # numba: uncomment
+#        d2C_dT2s = np.zeros((N, N)) # numba: uncomment
     if d3C_dT3s is None:
         d3C_dT3s = [[0.0]*N for _ in range(N)] # numba: delete
-#        d3C_dT3s = zeros((N, N)) # numba: uncomment
+#        d3C_dT3s = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         Tc_row = Tcs[i]
         Pc_row = Pcs[i]
@@ -4119,7 +4156,7 @@ def Tarakad_Danner_virial_CSP_kijs(Vcs):
     '''
     N = len(Vcs)
     kijs = [[0.0]*N for i in range(N)] # numba: delete
-#     kijs = zeros((N, N)) # numba: uncomment
+#    kijs = np.zeros((N, N)) # numba: uncomment
     Vc_cbrts = [0.0]*N
     for i in range(N):
         Vc_cbrts[i] = Vcs[i]**(1.0/3.0)
@@ -4186,7 +4223,7 @@ def Tarakad_Danner_virial_CSP_Tcijs(Tcs, kijs):
     for i in range(N):
         Tc_sqrts[i] = sqrt(Tcs[i])
     Tcijs = [[0.0]*N for i in range(N)] # numba: delete
-#     Tcijs = zeros((N, N)) # numba: uncomment
+#    Tcijs = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         # also symmetric
         kij_row = kijs[i]
@@ -4246,7 +4283,7 @@ def Tarakad_Danner_virial_CSP_Pcijs(Tcs, Pcs, Vcs, Tcijs):
     '''
     N = len(Vcs)
     Pcijs = [[0.0]*N for i in range(N)] # numba: delete
-#     Pcijs = zeros((N, N)) # numba: uncomment
+#    Pcijs = np.zeros((N, N)) # numba: uncomment
     Vc_cbrts = [0.0]*N
     for i in range(N):
         Vc_cbrts[i] = Vcs[i]**(1.0/3.0)
@@ -4307,7 +4344,7 @@ def Tarakad_Danner_virial_CSP_omegaijs(omegas):
     '''
     N = len(omegas)
     omegaijs = [[0.0]*N for i in range(N)] # numba: delete
-#     omegaijs = zeros((N, N)) # numba: uncomment
+#    omegaijs = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         omegai = omegas[i]
         r = omegaijs[i]
@@ -4354,7 +4391,7 @@ def Lee_Kesler_virial_CSP_Vcijs(Vcs):
     '''
     N = len(Vcs)
     Vcijs = [[0.0]*N for i in range(N)] # numba: delete
-#     Vcijs = zeros((N, N)) # numba: uncomment
+#    Vcijs = np.zeros((N, N)) # numba: uncomment
     Vc_cbrts = [0.0]*N
     for i in range(N):
         Vc_cbrts[i] = Vcs[i]**(1.0/3.0)
@@ -4486,7 +4523,7 @@ def d2V_dzizjs_virial(B, C, V, dB_dzs, dC_dzs, dV_dzs, d2B_dzizjs, d2C_dzizjs,
     N = len(dB_dzs)
     if d2V_dzizjs is None:
         d2V_dzizjs = [[0.0]*N for _ in range(N)] # numba: delete
-        # d2V_dzizjs = zeros((N, N)) # numba: uncomment
+        # d2V_dzizjs = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
         for j in range(N):
             x0 = V

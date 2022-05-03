@@ -614,3 +614,15 @@ def test_safety_functions():
                         test_safety.test_NFPA_30_classification)
 
 
+
+def test_Tarakad_Danner_virial_CSP_Tcijs_numba():
+
+    Vcs = np.array([0.000168, 0.000316, 5.6e-05, 0.002055])
+    Tcs = np.array([514.0, 591.75, 647.14, 843.0])
+    kijs = chemicals.numba.Tarakad_Danner_virial_CSP_kijs(Vcs)
+    Tcijs = chemicals.numba.Tarakad_Danner_virial_CSP_Tcijs(Tcs=Tcs, kijs=kijs)
+    Tcijs_expect = np.array([[514.0, 542.4269432446305, 548.606779975124, 510.5967574676473],
+     [542.4269432446305, 591.7500000000001, 547.1675300600267, 611.7203098423653],
+     [548.606779975124, 547.1675300600267, 647.14, 443.0307753796196],
+     [510.5967574676473, 611.7203098423653, 443.0307753796196, 842.9999999999999]])
+    assert_close2d(Tcijs, Tcijs_expect, rtol=1e-12)
