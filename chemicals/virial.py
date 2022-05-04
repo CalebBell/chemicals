@@ -158,7 +158,7 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
 from cmath import sqrt as csqrt
 
 from fluids.constants import R, R_inv
-from fluids.numerics import numpy as np
+from fluids.numerics import numpy as np, roots_cubic
 
 from chemicals.utils import exp, log, sqrt
 
@@ -303,9 +303,10 @@ def Z_from_virial_density_form(T, P, *args):
 #        return ((R*T*(4*args[0]*P + R*T))**0.5 + R*T)/(2*P)
     if l == 2:
         B, C = args[0], args[1]
-        # A small imaginary part is ignored
-        # Seriously needs to be optimized
-        return (P*(-(3*B*R*T/P + R**2*T**2/P**2)/(3*(-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)) - (-1/2 + csqrt(3)*1j/2)*(-9*B*R**2*T**2/(2*P**2) - 27*C*R*T/(2*P) + csqrt(-4*(3*B*R*T/P + R**2*T**2/P**2)**(3+0j) + (-9*B*R**2*T**2/P**2 - 27*C*R*T/P - 2*R**3*T**3/P**3)**(2+0j))/2 - R**3*T**3/P**3)**(1/3.+0j)/3 + R*T/(3*P))/(R*T)).real
+        sln = roots_cubic(-P/(R*T), 1.0, B, C)
+        V = sln[0]
+        Z = P*V/(R*T)
+        return Z
     if l == 3:
         # Huge mess. Ideally sympy could optimize a function for quick python
         # execution. Derived with kate's text highlighting
@@ -527,8 +528,10 @@ def d2BVirial_mixture_dzizjs(zs, Bijs, d2B_dzizjs=None):
         d2B_dzizjs = [[0.0]*N for _ in range(N)] # numba: delete
         # d2B_dzizjs = np.zeros((N, N)) # numba: uncomment
     for i in range(N):
+        Bi_row = Bijs[i]
+        d2B_row = d2B_dzizjs[i]
         for j in range(N):
-            d2B_dzizjs[i][j] = Bijs[i][j] + Bijs[j][i]
+            d2B_row[j] = Bi_row[j] + Bijs[j][i]
     return d2B_dzizjs
 
 def d3BVirial_mixture_dzizjzks(zs, Bijs, d3B_dzizjzks=None):
@@ -2961,22 +2964,25 @@ def d2CVirial_mixture_Orentlicher_Prausnitz_dzizjs(zs, Cijs, d2Cs=None):
     if d2Cs is None:
         d2Cs = [[0.0]*N for _ in range(N)] # numba: delete
         # d2Cs = np.zeros((N, N)) # numba: uncomment
-    d = Kronecker_delta
     
-    for m in range(N):
-        for n in range(N):
-            d2C = 0.0
-            for i in range(N):
-                for j in range(N):
-                    for k in range(N):
-                        cCv = cC[i][j]*cC[i][k]*cC[j][k]
-                        d2C += cCv*(d(i,m)*d(j,n)*zs[k]
-                                    + d(i,m)*d(k,n)*zs[j]
-                                    + d(i,n)*d(j,m)*zs[k]
-                                    + d(i,n)*d(k,m)*zs[j]
-                                    + d(j,m)*d(k,n)*zs[i]
-                                    + d(j,n)*d(k,m)*zs[i])
-            d2Cs[m][n] = d2C
+    for i in range(N):
+        cCi = cC[i]
+        zi = zs[i]
+        d2Cis = d2Cs[i]
+        for j in range(N):
+            cCij = cC[i][j]
+            cCj = cC[j]
+            zj = zs[j]
+            d2Cjs = d2Cs[j]
+            for k in range(N):
+                cCv = cCij*cCi[k]*cCj[k]
+
+                d2Cis[j] += cCv*zs[k]
+                d2Cis[k] += cCv*zj
+                d2Cjs[i] += cCv*zs[k]
+                d2Cjs[k] += cCv*zi
+                d2Cs[k][i] += cCv*zj
+                d2Cs[k][j] += cCv*zi
     return d2Cs
             
 
@@ -3046,22 +3052,22 @@ def d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks(zs, Cijs, d3Cs=None):
     if d3Cs is None:
         d3Cs = [[[0.0]*N for _ in range(N)] for _ in range(N)]# numba: delete
         # d3Cs = np.zeros((N, N, N)) # numba: uncomment
-    d = Kronecker_delta
-    for m in range(N):
-        for n in range(N):
-            for o in range(N):
-                d3C = 0.0
-                for i in range(N):
-                    for j in range(N):
-                        for k in range(N):
-                            cCv = cC[i][j]*cC[i][k]*cC[j][k]
-                            d3C += cCv*(d(i,m)*d(j,n)*d(k,o)
-                                        + d(i,m)*d(j,o)*d(k,n)
-                                        + d(i,n)*d(j,m)*d(k,o)
-                                        + d(i,n)*d(k,m)*d(j,o)
-                                        + d(j,m)*d(k,n)*d(i,o)
-                                        + d(j,n)*d(k,m)*d(i,o))
-                d3Cs[m][n][o]= d3C
+    for i in range(N):
+        d3Cis = d3Cs[i]
+        cCis = cC[i]
+        for j in range(N):
+            d3Cijs = d3Cis[j]
+            d3Cjs = d3Cs[j]
+            cCij = cC[i][j]
+            cCjs = cC[j]
+            for k in range(N):
+                cCv = cCij*cCis[k]*cCjs[k]
+                d3Cijs[k]+= cCv
+                d3Cis[k][j]+= cCv
+                d3Cjs[i][k]+= cCv
+                d3Cjs[k][i]+= cCv
+                d3Cs[k][i][j]+= cCv
+                d3Cs[k][j][i]+= cCv
     return d3Cs
 
 def d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs(zs, Cijs, dCij_dTs, 
@@ -3139,6 +3145,7 @@ def d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs(zs, Cijs, dCij_dTs,
     for i in range(N):
         i_sum = 0.0
         zi = zs[i]
+        cCis = cC[i]
         for j in range(N):
             j_sum = 0.0
             zj = zs[j]
@@ -3146,8 +3153,9 @@ def d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs(zs, Cijs, dCij_dTs,
             Cij = Cijs[i][j]
             cCij = cC[i][j]
             dCij = dCij_dTs[i][j]
+            cCjs = cC[j]
             for k in range(N):
-                t = cCij*cC[i][k]*cC[j][k]
+                t = cCij*cCis[k]*cCjs[k]
                 c0 = (Cij*Cijs[i][k]*dCij_dTs[j][k] 
                       + Cij*Cijs[j][k]*dCij_dTs[i][k]
                       + Cijs[i][k]*Cijs[j][k]*dCij)
