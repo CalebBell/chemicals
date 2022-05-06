@@ -2412,3 +2412,19 @@ def test_iapws92_Psat():
 def test_iapws92_dPsat_dT():
     assert_close(iapws92_dPsat_dT(400.0)[0], 7483.4709410560408287, rtol=1e-12)
     assert_close(iapws92_dPsat_dT(400.0)[1], 245765.263541822, rtol=1e-12)
+
+
+def test_iapws11_Psub():
+    assert_close(iapws11_Psub(230.0), 8.947352740189151, rtol=1e-12)
+    '''
+    # Clean, original code
+    theta = T/273.16
+    ais = [-0.212144006E2, 0.273203819E2, -0.610598130E1]
+    bis = [0.333333333E-2, 0.120666667E1, 0.170333333E1]
+    tot = 0
+    for i in range(3):
+        tot += ais[i]*theta**bis[i]
+    tot *= theta**-1
+    P = exp(tot)*611.657
+    return P
+    '''

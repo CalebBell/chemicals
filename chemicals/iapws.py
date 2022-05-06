@@ -57,6 +57,7 @@ IAPWS Saturation Pressure/Temperature
 .. autofunction:: chemicals.iapws.iapws92_dPsat_dT
 .. autofunction:: chemicals.iapws.iapws95_Tsat
 .. autofunction:: chemicals.iapws.iapws95_saturation
+.. autofunction:: chemicals.iapws.iapws11_Psub
 
 IAPWS Saturation Density
 ------------------------
@@ -239,6 +240,7 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
            'iapws97_region3_y', 'iapws97_region3_z',
            'iapws95_properties',
            'iapws92_Psat', 'iapws92_dPsat_dT',
+           'iapws11_Psub',
            ]
 
 iapws95_R = 461.51805
@@ -6955,3 +6957,50 @@ def iapws95_properties(T, P):
     drho_dP = 1.0/(iapws95_R*T*(1.0 + 2.0*delta*dAr_ddelta + delta*delta*d2Ar_ddelta2))
 
     return (rho, U, S, H, Cv, Cp, w, JT, delta_T, beta_s, drho_dP)
+
+
+def iapws11_Psub(T):
+    r'''Compute the sublimation pressure of the frozen water using the IAPWS-11
+    equation from the Revised Release on the Pressure along the Melting and
+    Sublimation Curves of Ordinary Water Substance.
+
+    .. math::
+        P_{sub} = P_t\exp\left(
+            \theta^{-1} \sum_{i=1}^3 a_i \theta^{b_i}
+            \right)
+
+    .. math::
+        \theta = \frac{T}{T_t}
+
+    Parameters
+    ----------
+    T : float
+        Temperature at which to calculate the sublimation condition [K]
+
+    Returns
+    -------
+    Psub : float
+        Sublimation vapor pressure, [Pa]
+
+    Notes
+    -----
+    The triple temperature is 273.16 K, and triple pressure 611.657 Pa.
+    
+    
+    The coefficients are as follows:
+        
+    ais = [-0.212144006E2, 0.273203819E2, -0.610598130E1]
+    
+    bis = [0.333333333E-2, 0.120666667E1, 0.170333333E1]
+    
+    The equation is valid from 50 K to the triple temperature.
+
+    Examples
+    --------
+    >>> iapws11_Psub(230.0)
+    8.947352740189151
+    '''
+    return 611.657*exp(-5687.566391521397*T**-0.99666666667
+                       + 8.569600103586199*T**0.20666666999999994
+                       - 0.11807069369846021*T**0.70333333)
+

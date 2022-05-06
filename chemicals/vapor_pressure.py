@@ -123,6 +123,12 @@ attribute of this module.
     Coefficients for the Wagner equation :obj:`Wagner`, published
     openly in [3]_.
 
+.. data:: Psat_data_Alcock_elements
+
+    Coefficients for the DIPPR 101 equation :obj:`chemicals.dippr.EQ101`, 
+    published in [5]_ and converted to provide base SI units (and use the
+    natural logarithm).
+
 .. [1] McGarry, Jack. "Correlation and Prediction of the Vapor Pressures of
     Pure Liquids over Large Pressure Ranges." Industrial & Engineering
     Chemistry Process Design and Development 22, no. 2 (April 1, 1983):
@@ -133,6 +139,10 @@ attribute of this module.
     Berlin; New York:: Springer, 2010.
 .. [4] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
     Eighth Edition. McGraw-Hill Professional, 2007.
+.. [5] Alcock, C. B., V. P. Itkin, and M. K. Horrigan. "Vapour Pressure
+    Equations for the Metallic Elements: 298-2500K." Canadian Metallurgical
+    Quarterly 23, no. 3 (July 1, 1984): 309-13. 
+    https://doi.org/10.1179/cmq.1984.23.3.309.
 
 The structure of each dataframe is shown below:
 
@@ -152,6 +162,7 @@ The structure of each dataframe is shown below:
 
     In [7]: chemicals.vapor_pressure.Psat_data_VDI_PPDS_3
 
+    In [8]: chemicals.vapor_pressure.Psat_data_Alcock_elements
 """
 
 from __future__ import division
@@ -186,6 +197,11 @@ folder = os_path_join(source_path, 'Vapor Pressure')
 register_df_source(folder, 'Antoine Collection Poling.tsv')
 register_df_source(folder, 'Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv')
 
+register_df_source(folder, 'Alcock_Itkin_Horrigan_metalic_elements.tsv',
+                   csv_kwargs={'dtype':{'Tmin': float, 'Tmax': float, 'A': float,
+                            'B': float, 'C': float, 'D': float, 'E': float}})
+
+
 register_df_source(folder, 'Wagner Original McGarry.tsv', csv_kwargs={
         'dtype': {'A': float, 'B': float, 'C': float, 'D': float,
                  'Pc': float, 'Tc': float, 'Tmin': float}})
@@ -208,6 +224,7 @@ def load_vapor_pressure_dfs():
     global Psat_data_WagnerMcGarry, Psat_values_WagnerMcGarry, Psat_data_AntoinePoling, Psat_values_AntoinePoling
     global Psat_data_WagnerPoling, Psat_values_WagnerPoling, Psat_data_AntoineExtended, Psat_values_AntoineExtended
     global Psat_data_Perrys2_8, Psat_values_Perrys2_8, Psat_data_VDI_PPDS_3, Psat_values_VDI_PPDS_3
+    global Psat_data_Alcock_elements, Psat_values_Alcock_elements
     global _vapor_pressure_dfs_loaded
 
     # 57463 bytes for df; 13720 bytes for numpy
@@ -217,6 +234,9 @@ def load_vapor_pressure_dfs():
     # 58216 bytes for df; 13000 bytes for numpy
     Psat_data_AntoinePoling = data_source('Antoine Collection Poling.tsv')
     Psat_values_AntoinePoling = np.array(Psat_data_AntoinePoling.values[:, 1:], dtype=float)
+
+    Psat_data_Alcock_elements = data_source('Alcock_Itkin_Horrigan_metalic_elements.tsv')
+    Psat_values_Alcock_elements = np.array(Psat_data_Alcock_elements.values[:, 1:], dtype=float)
 
     # 20928 bytes for df; 7488 bytes for numpy
     Psat_data_WagnerPoling = data_source('Wagner Collection Poling.tsv')
@@ -241,7 +261,8 @@ if PY37:
         if name in ('Psat_data_WagnerMcGarry', 'Psat_values_WagnerMcGarry', 'Psat_data_AntoinePoling',
                     'Psat_values_AntoinePoling', 'Psat_data_WagnerPoling', 'Psat_values_WagnerPoling',
                     'Psat_data_AntoineExtended', 'Psat_values_AntoineExtended', 'Psat_data_Perrys2_8',
-                    'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3'):
+                    'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3',
+                    'Psat_data_Alcock_elements', 'Psat_values_Alcock_elements'):
             load_vapor_pressure_dfs()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))

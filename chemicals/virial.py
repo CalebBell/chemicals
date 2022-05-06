@@ -304,6 +304,7 @@ def Z_from_virial_density_form(T, P, *args):
     if l == 2:
         B, C = args[0], args[1]
         sln = roots_cubic(-P/(R*T), 1.0, B, C)
+        # print(sln)
         V = sln[0]
         Z = P*V/(R*T)
         return Z
