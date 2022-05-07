@@ -143,6 +143,7 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'd3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks',
            
            'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
+           'P_for_positive_volume_density_form_BC',
            'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
            'CVirial_Liu_Xiang_mat', 'CVirial_Liu_Xiang_vec',
            'CVirial_Orbey_Vera_vec', 'CVirial_Orbey_Vera_mat',
@@ -158,7 +159,7 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
 from cmath import sqrt as csqrt
 
 from fluids.constants import R, R_inv
-from fluids.numerics import numpy as np, roots_cubic
+from fluids.numerics import numpy as np, roots_cubic, bisect
 
 from chemicals.utils import exp, log, sqrt
 
@@ -239,6 +240,74 @@ def B_from_Z(Z, T, P):
     return (Z - 1.0)*R*T/P
 
 
+def _real_volume_cubic_virial(V1, V2, V3, T, P):
+    if abs(V1.imag) > 0:
+        V1 = 0.0
+    else:
+        V1 = V1.real
+    if abs(V2.imag) > 0:
+        V2 = 0.0
+    else:
+        V2 = V2.real
+    if abs(V3.imag) > 0:
+        V3 = 0.0
+    else:
+        V3 = V3.real
+    if V1 < 0.0:
+        V1 = 0.0
+    if V2 < 0.0:
+        V2 = 0.0
+    if V3 < 0.0:
+        V3 = 0.0
+    # All possible volumes are now zero or 1
+    V_ideal_gas = R*T/P
+    V1_diff = abs(V1-V_ideal_gas)
+    V2_diff = abs(V2-V_ideal_gas)
+    V3_diff = abs(V2-V_ideal_gas)
+    if V1_diff < V2_diff:
+        if V1_diff < V3_diff:
+            return V1
+        return V3
+    else:
+        if V2_diff <V3_diff:
+            return V2
+        return V3
+
+def virial_volume_solutions_mpmath(T, P, B, C, dps=50):
+    from fluids.constants import R
+    if P == 0.0 or T == 0.0:
+        raise ValueError("Bad P or T; issue is not the algorithm")
+
+    import mpmath as mp
+    mp.mp.dps = dps + 40
+    if P < 1e-10:
+        mp.mp.dps = dps + 400
+    T, P, B, C = [mp.mpf(i) for i in [T, P, B, C]]
+
+    extraprec = 15
+    for i in range(8):
+        try:
+            A = -P/(R*T)
+            roots = mp.polyroots([A, 1, B, C], extraprec=extraprec, maxsteps=2000)
+            break
+        except Exception as e:
+            extraprec += 20
+    roots = [complex(v) for v in roots]
+    return roots
+
+
+def _P_for_positive_volume_density_form_BC_objf(P, T, B, C):
+    sln = roots_cubic(-P/(R*T), 1.0, B, C)
+    V = _real_volume_cubic_virial(sln[0], sln[1], sln[2], T, P)
+    Z = P*V/(R*T)
+    return Z - 1e-5
+
+def P_for_positive_volume_density_form_BC(T, B, C):
+    ans = bisect(_P_for_positive_volume_density_form_BC_objf, 1e-12, 1e10, args=(T, B, C))
+    ans *= (1+1e-15)
+    return ans
+
+
 def Z_from_virial_density_form(T, P, *args):
     r'''Calculates the compressibility factor of a gas given its temperature,
     pressure, and molar density-form virial coefficients. Any number of
@@ -302,10 +371,18 @@ def Z_from_virial_density_form(T, P, *args):
         return 1/2. + 0.5*sqrt((determining_factor)/(R*T))
 #        return ((R*T*(4*args[0]*P + R*T))**0.5 + R*T)/(2*P)
     if l == 2:
+        # print(T, P, *args)
         B, C = args[0], args[1]
         sln = roots_cubic(-P/(R*T), 1.0, B, C)
-        # print(sln)
+        # print(sln, B, C)
+        # sln = virial_volume_solutions_mpmath(T, P, B, C)
         V = sln[0]
+        V = _real_volume_cubic_virial(sln[0], sln[1], sln[2], T, P)
+        if V == 0.0:
+            Pmin =  P_for_positive_volume_density_form_BC(T, B, C)
+#            raise ValueError("Too high of pressure for provided T, B, C") # numba: uncomment
+            raise ValueError(f"Minimum allowed pressure for virial coefficients is {Pmin} Pa") # numba: delete
+        # print(sln, V)
         Z = P*V/(R*T)
         return Z
     if l == 3:
