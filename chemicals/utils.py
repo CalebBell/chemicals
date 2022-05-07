@@ -1550,6 +1550,13 @@ def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
     they do not sum to 1) to partial molar quantites. Requires the derivatives
     and the mole fractions of the mixture.
 
+    .. math::
+
+        \left(\frac{\partial n F}{\partial n_i}\right) =
+        \left(\frac{\partial F}{\partial x_i}\right)+ F 
+        - \sum_j x_j \left(\frac{\partial F}{\partial x_j}\right) 
+
+
     Parameters
     ----------
     dxs : list[float]
