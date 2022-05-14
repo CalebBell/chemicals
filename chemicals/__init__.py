@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
+Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021, 2022 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +26,7 @@ import os
 
 import fluids
 
-__version__ = '1.0.20'
+__version__ = '1.0.21'
 from math import isnan
 
 if not fluids.numerics.is_micropython:
