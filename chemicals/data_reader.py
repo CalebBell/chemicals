@@ -233,7 +233,7 @@ def cached_constant_lookup(CASi, prop):
         init_constants_db()
     prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
     try:
-        return DATABASE_CONSTANTS_CACHE[CASi][prop_idx]
+        return DATABASE_CONSTANTS_CACHE[CASi][prop_idx], True
     except KeyError:
         pass
     # Fetch and store the whole row
@@ -241,7 +241,10 @@ def cached_constant_lookup(CASi, prop):
     result = CONSTANTS_CURSOR.fetchone()
     DATABASE_CONSTANTS_CACHE[CASi] = result
     if result is not None:
-        return result[prop_idx]
+        return result[prop_idx], True
+    
+    # Result the value, and whether the compound was in the index
+    return result, False
 
 def init_constants_db():
     global CONSTANTS_CURSOR
@@ -251,16 +254,16 @@ def init_constants_db():
 
 def database_constant_lookup(CAS, prop):
     if not USE_CONSTANTS_DATABASE:
-        return None
+        return None, False
     try:
         CASi = CAS_to_int(CAS)
     except:
         if type(CAS) is not int:
-            return None
+            return None, False
         else:
             # Was already an int
             CASi = CAS
     try:
         return cached_constant_lookup(CASi, prop)
     except:
-        return None
+        return None, False

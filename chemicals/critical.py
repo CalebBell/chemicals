@@ -405,8 +405,8 @@ def Tc(CASRN, method=None):
        Estimation Based on Zero, First and Second Order Methods." In 
        Proceedings of the AIChE Spring Meeting, 21, 1996.
     '''
-    val = database_constant_lookup(CASRN, 'Tc') if method is None else None
-    if val is not None: return val
+    val, found = database_constant_lookup(CASRN, 'Tc') if method is None else (None, False)
+    if found: return val
     if not _critical_data_loaded: _load_critical_data()
     if method:
         return retrieve_from_df_dict(Tc_sources, CASRN, 'Tc', method)
