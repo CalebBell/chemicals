@@ -53,6 +53,7 @@ try:
 except:
     pass
 from chemicals.identifiers import CAS_to_int
+from chemicals.utils import source_path
 
 # %% Loading data from local databanks
 
@@ -211,3 +212,55 @@ def list_available_methods_from_df(df, index, keys_by_method):
                 if not pd.isnull(df.at[index, key])]
     else:
         return []
+
+### Database
+
+USE_CONSTANTS_DATABASE = True
+
+CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 'Vc',
+         'Zc','omega', 'Tflash', 'Tautoignition', 'LFL', 'UFL',
+        'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
+        'RI', 'Hfus', 
+        'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY']
+
+
+CONSTANT_DATABASE_NAME_TO_IDX = {k: i for i, k in enumerate(CONSTANT_DATABASE_COLUMNS)}
+CONSTANTS_CURSOR = None
+    
+DATABASE_CONSTANTS_CACHE = {}
+def cached_constant_lookup(CASi, prop):
+    if CONSTANTS_CURSOR is None:
+        init_constants_db()
+    prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
+    try:
+        return DATABASE_CONSTANTS_CACHE[CASi][prop_idx]
+    except KeyError:
+        pass
+    # Fetch and store the whole row
+    CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
+    result = CONSTANTS_CURSOR.fetchone()
+    DATABASE_CONSTANTS_CACHE[CASi] = result
+    if result is not None:
+        return result[prop_idx]
+
+def init_constants_db():
+    global CONSTANTS_CURSOR
+    import sqlite3
+    conn = sqlite3.connect(path_join(source_path, 'Misc', 'default.sqlite'))
+    CONSTANTS_CURSOR = conn.cursor()
+
+def database_constant_lookup(CAS, prop):
+    if not USE_CONSTANTS_DATABASE:
+        return None
+    try:
+        CASi = CAS_to_int(CAS)
+    except:
+        if type(CAS) is not int:
+            return None
+        else:
+            # Was already an int
+            CASi = CAS
+    try:
+        return cached_constant_lookup(CASi, prop)
+    except:
+        return None

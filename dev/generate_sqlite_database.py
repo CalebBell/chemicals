@@ -32,6 +32,9 @@ try:
 except:
     pass
 
+# Can't use the database
+data_reader.USE_CONSTANTS_DATABASE = False
+
 props = ['MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 'Vc',
          'Zc','omega', 'Tflash', 'Tautoignition', 'LFL', 'UFL',
                      'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
@@ -66,6 +69,11 @@ for v in objs:
         
 prop_array_T = np.array(prop_array).T
 CASs_ints = [CAS_to_int(i) for i in CASs]
+
+# Would not be good if there were multiple values
+assert len(CASs_ints) == len(set(CASs_ints))
+
+
 df = pd.DataFrame(prop_array_T, columns=props, index=CASs_ints)
 df = df.fillna(value=np.nan).astype(np.float32) 
 # df.sort_values(by=['logP'], inplace=True)
