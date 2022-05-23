@@ -49,7 +49,7 @@ __all__ = ['Tt_all_methods', 'Tt_methods', 'Tt',
 import os
 
 from chemicals import miscdata
-from chemicals.data_reader import (data_source,
+from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
                                    register_df_source,
                                    retrieve_any_from_df_dict,
@@ -169,6 +169,8 @@ def Tt(CASRN, method=None):
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+    val, found = database_constant_lookup(CASRN, 'Tt') if method is None else (None, False)
+    if found: return val
     if not _triple_data_loaded: _load_triple_data()
     if method:
         if method == MELTING:
@@ -256,6 +258,8 @@ def Pt(CASRN, method=None):
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+    val, found = database_constant_lookup(CASRN, 'Pt') if method is None else (None, False)
+    if found: return val
     if not _triple_data_loaded: _load_triple_data()
     if method:
         return retrieve_from_df_dict(Pt_sources, CASRN, 'Pt', method)
