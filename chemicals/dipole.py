@@ -39,7 +39,7 @@ __all__ = ['dipole_moment',
            'dipole_moment_methods',
            'dipole_moment_all_methods']
 
-from chemicals.data_reader import (data_source,
+from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
                                    register_df_source,
                                    retrieve_any_from_df_dict,
@@ -113,7 +113,7 @@ def dipole_moment_methods(CASRN):
     dipole_moment
     """
     if not _dipole_data_loaded: _load_dipole_data()
-    return list_available_methods_from_df_dict(dipole_sources, CASRN, 'Dipole')
+    return list_available_methods_from_df_dict(dipole_sources, CASRN, 'dipole_moment')
 
 @mark_numba_incompatible
 def dipole_moment(CASRN, method=None):
@@ -186,8 +186,10 @@ def dipole_moment(CASRN, method=None):
        Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65. 
        https://doi.org/10.1002/wcms.93.
     '''
+    val, found = database_constant_lookup(CASRN, 'dipole_moment') if method is None else (None, False)
+    if found: return val
     if not _dipole_data_loaded: _load_dipole_data()
     if method:
-        return retrieve_from_df_dict(dipole_sources, CASRN, 'Dipole', method)
+        return retrieve_from_df_dict(dipole_sources, CASRN, 'dipole_moment', method)
     else:
-        return retrieve_any_from_df_dict(dipole_sources, CASRN, 'Dipole')
+        return retrieve_any_from_df_dict(dipole_sources, CASRN, 'dipole_moment')

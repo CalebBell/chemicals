@@ -53,6 +53,7 @@ __all__ = ['omega', 'LK_omega', 'Stiel_polar_factor',
 
 from chemicals import critical
 from chemicals.data_reader import (list_available_methods_from_df_dict,
+                                   database_constant_lookup,
                                    retrieve_any_from_df_dict,
                                    retrieve_from_df_dict)
 from chemicals.utils import log, log10, mark_numba_incompatible
@@ -149,6 +150,8 @@ def omega(CASRN, method=None):
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
     '''
+    val, found = database_constant_lookup(CASRN, 'omega') if method is None else (None, False)
+    if found: return val
     if method:
         return retrieve_from_df_dict(critical.omega_sources, CASRN, 'omega', method)
     else:

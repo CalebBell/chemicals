@@ -205,8 +205,8 @@ print(f'Found {len(radius_gyrations)} radius_gyrations' )
 
 
 def write_dipole_file():
-    dump_oder = ['Dipole',]
-    keys = ['CAS', 'Dipole']
+    dump_oder = ['dipole_moment',]
+    keys = ['CAS', 'dipole_moment']
     lines = ['\t'.join(keys) + '\n']
     for CAS, dipole in dipoles.items():
         values = [dipole]

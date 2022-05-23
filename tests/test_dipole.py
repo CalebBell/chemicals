@@ -29,13 +29,13 @@ from chemicals.dipole import *
 
 def test_dipole_moment_methods():
 
-    tot = dipole.dipole_data_Poling['Dipole'].sum()
+    tot = dipole.dipole_data_Poling['dipole_moment'].sum()
     assert_close(tot, 248.59999999999999)
 
-    tot = dipole.dipole_data_CCDB['Dipole'].sum()
+    tot = dipole.dipole_data_CCDB['dipole_moment'].sum()
     assert_close(tot, 632.97000000000003)
 
-    tot = dipole.dipole_data_Muller['Dipole'].sum()
+    tot = dipole.dipole_data_Muller['dipole_moment'].sum()
     assert_close(tot, 420.05190108045235)
 
 def test_dipole():

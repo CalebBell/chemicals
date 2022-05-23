@@ -76,7 +76,7 @@ Lookup Functions
 
 from fluids.numerics import normalize
 
-from chemicals.data_reader import (data_source,
+from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
                                    register_df_source,
                                    retrieve_any_from_df_dict,
@@ -260,6 +260,8 @@ def RON(CASRN, method=None):
        Learning Projects for Fuel Property Prediction." Journal of Open Source 
        Software 2, no. 17 (2017): 401.
     '''
+    val, found = database_constant_lookup(CASRN, 'RON') if method is None else (None, False)
+    if found: return val
     if not _combustion_data_loaded: _load_combustion_data()
     if method:
         value = retrieve_from_df_dict(RON_sources, CASRN, 'RON', method)
@@ -352,6 +354,8 @@ def MON(CASRN, method=None):
        Learning Projects for Fuel Property Prediction." Journal of Open Source 
        Software 2, no. 17 (2017): 401.
     '''
+    val, found = database_constant_lookup(CASRN, 'MON') if method is None else (None, False)
+    if found: return val
     if not _combustion_data_loaded: _load_combustion_data()
     if method:
         value = retrieve_from_df_dict(MON_sources, CASRN, 'MON', method)
@@ -383,6 +387,8 @@ def ignition_delay_methods(CASRN):
     --------
     ignition_delay
     """
+    val, found = database_constant_lookup(CASRN, 'IGNITION_DELAY') if method is None else (None, False)
+    if found: return val
     if not _combustion_data_loaded: _load_combustion_data()
     return list_available_methods_from_df_dict(ignition_delay_sources, CASRN, 'IGNITION_DELAY')
 
