@@ -179,6 +179,9 @@ def RI(CASRN, method=None):
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     .. [2] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
+    RI, found = database_constant_lookup(CASRN, 'RI') if method is None else (None, False)
+    RIT, _ = database_constant_lookup(CASRN, 'RIT') if method is None else (None, False)
+    if found: return (RI, RIT)
     if not _RI_data_loaded: _load_RI_data()
     key = ('RI', 'RIT')
     if method:
