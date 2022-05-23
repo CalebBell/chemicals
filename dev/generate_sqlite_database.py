@@ -61,7 +61,7 @@ for v in objs:
     CASs.append(CAS)
     for i, p in enumerate(props):
         if p == 'MW':
-            lookedup_constant = v.MW
+            lookedup_constant = float(v.MW)
         else:
             lookedup_constant = funcs[i](CASRN=CAS)
         prop_array[i].append(lookedup_constant)
