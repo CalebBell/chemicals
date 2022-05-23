@@ -1,4 +1,4 @@
-CASRN	Name	Formula	Lifetime, years	Radiative efficiency, W/m^2/ppb	SAR 100yr	20yr GWP	100yr GWP	500yr GWP
+CAS	Name	Formula	Lifetime, years	Radiative efficiency, W/m^2/ppb	SAR 100yr	20yr GWP	100yr GWP	500yr GWP
 56-23-5	Carbon tetrachloride 	CCl4 	26	0.13	1400	2700	1400	435
 71-55-6	Methyl chloroform 	CH3CCl3 	5	0.06		506	146	45
 74-82-8	Methanec 	CH4 	12	0.00037	21	72	25	7.6
