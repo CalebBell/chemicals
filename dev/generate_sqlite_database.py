@@ -36,14 +36,19 @@ except:
 
 # Can't use the database
 data_reader.USE_CONSTANTS_DATABASE = False
+_RI = RI
+def RI(CASRN):
+    return _RI(CAS)[0]
 
+def RIT(CASRN):
+    return _RI(CAS)[1]
 
 funcs = [MW, Tt, Tm, Tb, Tc, Pt, Pc, Vc,
          Zc,omega, T_flash, T_autoignition, LFL, UFL,
                      Hfs, Hfl, Hfg, S0s, S0l, S0g,
-                     RI, Hfus,  Stockmayer, molecular_diameter,
+                     Hfus,  Stockmayer, molecular_diameter,
                      dipole_moment, logP, RG, RON, MON, ignition_delay, linear,
-                     GWP, ODP]
+                     GWP, ODP, RI, RIT]
 props = [f.__name__ for f in funcs]
 CASs = []
 prop_array = [[] for _ in range(len(props))]
@@ -59,8 +64,6 @@ for v in objs:
             lookedup_constant = v.MW
         else:
             lookedup_constant = funcs[i](CASRN=CAS)
-        if p == 'RI':
-            lookedup_constant = lookedup_constant[0]
         prop_array[i].append(lookedup_constant)
         
         
