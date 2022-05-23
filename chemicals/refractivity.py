@@ -65,7 +65,7 @@ from fluids.constants import N_A, pi
 from fluids.numerics import horner, interp
 
 from chemicals import miscdata
-from chemicals.data_reader import (data_source,
+from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
                                    register_df_source,
                                    retrieve_any_from_df_dict,
