@@ -52,7 +52,7 @@ def test_only_removed_GWPs():
 
 def test_GWP():
     GWP1_calc = GWP(CASRN='74-82-8')
-    assert_close(GWP1_calc, 28.0) # methane 100 year
+    assert_close(GWP1_calc, 84.0) # methane 20 year
     GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (1995) 100yr')
     assert_close(GWP2_calc, 21.0)
 

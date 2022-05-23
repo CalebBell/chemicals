@@ -222,7 +222,8 @@ CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 
 'Zc', 'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
 'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
 'RI', 'Hfus', 'Stockmayer', 'molecular_diameter',
-'dipole_moment', 'logP', 'RG', 'RON', 'MON', 'ignition_delay', 'linear']
+'dipole_moment', 'logP', 'RG', 'RON', 'MON', 'ignition_delay', 'linear',
+'GWP', 'ODP']
 
 
 
