@@ -35,7 +35,7 @@ from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_PassutDanner,
                                 critical_data_PinaMartines)
 
-data_reader.USE_CONSTANTS_DATABASE = False
+# data_reader.USE_CONSTANTS_DATABASE = False
 
 def test_data_IUPAC():
     Tc_sum = critical_data_IUPAC['Tc'].sum()
