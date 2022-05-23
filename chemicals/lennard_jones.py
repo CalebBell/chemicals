@@ -96,7 +96,7 @@ import os
 
 from fluids.constants import k
 
-from chemicals.data_reader import (data_source,
+from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
                                    register_df_source,
                                    retrieve_any_from_df_dict,
@@ -252,6 +252,8 @@ def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
        Ranges of Temperature and Density." The Journal of Supercritical Fluids
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
+    val, found = database_constant_lookup(CASRN, 'Stockmayer') if method is None else (None, False)
+    if found: return val
     if not _LJ_data_loaded: _load_LJ_data()
     if method is not None:
         if method == FLYNN:
@@ -409,6 +411,8 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
        Ranges of Temperature and Density." The Journal of Supercritical Fluids
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
+    val, found = database_constant_lookup(CASRN, 'molecular_diameter') if method is None else (None, False)
+    if found: return val
     if not _LJ_data_loaded: _load_LJ_data()
     if method is not None:
         if method == FLYNN:
