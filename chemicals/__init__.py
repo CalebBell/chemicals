@@ -174,7 +174,8 @@ if not fluids.numerics.is_micropython:
                       'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
                      'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
                      'RI', 'Hfus', 'Stockmayer', 'molecular_diameter'
-                     'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY']
+                     'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY',
+                     'linear']
         for df in data_reader.df_sources.values():
             for p in properties:
                 if p in df.columns:

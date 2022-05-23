@@ -87,7 +87,7 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'balance_stoichiometry', 'stoichiometric_matrix']
 
 from chemicals import heat_capacity, miscdata
-from chemicals.data_reader import (data_source,
+from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
                                    register_df_source,
                                    retrieve_any_from_df_dict,
@@ -243,6 +243,8 @@ def Hfs(CASRN, method=None):
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+    val, found = database_constant_lookup(CASRN, 'Hfs') if method is None else (None, False)
+    if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
         return retrieve_from_df_dict(Hfs_sources, CASRN, 'Hfs', method)
@@ -327,6 +329,8 @@ def Hfl(CASRN, method=None):
     .. [3] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+    val, found = database_constant_lookup(CASRN, 'Hfl') if method is None else (None, False)
+    if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
         return retrieve_from_df_dict(Hfl_sources, CASRN, 'Hfl', method)
@@ -435,6 +439,8 @@ def Hfg(CASRN, method=None):
     .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+    val, found = database_constant_lookup(CASRN, 'Hfg') if method is None else (None, False)
+    if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
         return retrieve_from_df_dict(Hfg_sources, CASRN, 'Hfg', method)
@@ -515,6 +521,8 @@ def S0s(CASRN, method=None):
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+    val, found = database_constant_lookup(CASRN, 'S0s') if method is None else (None, False)
+    if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
         return retrieve_from_df_dict(S0s_sources, CASRN, 'S0s', method)
@@ -592,6 +600,8 @@ def S0l(CASRN, method=None):
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     '''
+    val, found = database_constant_lookup(CASRN, 'S0l') if method is None else (None, False)
+    if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
         return retrieve_from_df_dict(S0l_sources, CASRN, 'S0l', method)
@@ -678,6 +688,8 @@ def S0g(CASRN, method=None):
     .. [3] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+    val, found = database_constant_lookup(CASRN, 'S0g') if method is None else (None, False)
+    if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
         return retrieve_from_df_dict(S0g_sources, CASRN, 'S0g', method)

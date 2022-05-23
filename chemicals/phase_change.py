@@ -1317,6 +1317,8 @@ def Hfus(CASRN, method=None):
     .. [4] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+    val, found = database_constant_lookup(CASRN, 'Hfus') if method is None else (None, False)
+    if found: return val
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
         return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method)
