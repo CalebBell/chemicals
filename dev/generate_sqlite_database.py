@@ -77,7 +77,9 @@ assert len(CASs_ints) == len(set(CASs_ints))
 
 
 df = pd.DataFrame(prop_array_T, columns=props, index=CASs_ints)
-df = df.fillna(value=np.nan).astype(np.float32) 
+
+# Does not save memory except when compressed and causes many test failures
+#df = df.fillna(value=np.nan).astype(np.float32) 
 # df.sort_values(by=['logP'], inplace=True)
 df.sort_index(inplace=True)
 
