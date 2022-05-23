@@ -583,6 +583,8 @@ def Pc(CASRN, method=None):
        Estimation Based on Zero, First and Second Order Methods." In 
        Proceedings of the AIChE Spring Meeting, 21, 1996.
     '''
+    val, found = database_constant_lookup(CASRN, 'Pc') if method is None else (None, False)
+    if found: return val
     if not _critical_data_loaded: _load_critical_data()
     if method:
         return retrieve_from_df_dict(Pc_sources, CASRN, 'Pc', method)
@@ -753,6 +755,8 @@ def Vc(CASRN, method=None):
     .. [20] Fedors, R. F. "A Method to Estimate Critical Volumes." AIChE 
        Journal 25, no. 1 (1979): 202-202. https://doi.org/10.1002/aic.690250129.
     '''
+    val, found = database_constant_lookup(CASRN, 'Vc') if method is None else (None, False)
+    if found: return val
     if not _critical_data_loaded: _load_critical_data()
     if method:
         return retrieve_from_df_dict(Vc_sources, CASRN, 'Vc', method)
@@ -920,6 +924,8 @@ def Zc(CASRN, method=None):
        Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
        https://doi.org/10.1002/aic.17518.
     '''
+    val, found = database_constant_lookup(CASRN, 'Zc') if method is None else (None, False)
+    if found: return val
     if not _critical_data_loaded: _load_critical_data()
     if method:
         return retrieve_from_df_dict(Zc_sources, CASRN, 'Zc', method)

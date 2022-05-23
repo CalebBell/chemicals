@@ -23,8 +23,10 @@ SOFTWARE.
 
 from thermo import *
 from chemicals import *
+from chemicals import data_reader
 from chemicals.identifiers import pubchem_db
 import pandas as pd
+import os
 import numpy as np
 
 try:
@@ -81,4 +83,6 @@ df.sort_index(inplace=True)
 
 from sqlalchemy import create_engine
 engine = create_engine('sqlite:///../chemicals/Misc/default.sqlite', echo=False)
+if os.path.exists("../chemicals/Misc/default.sqlite"):
+    os.remove("../chemicals/Misc/default.sqlite")
 df.to_sql('constants', con=engine)

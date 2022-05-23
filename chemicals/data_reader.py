@@ -112,11 +112,12 @@ def load_df(key):
         example https://commonchemistry.cas.org/detail?cas_rn=2222298-66-8
         or 2627558-64-7
         
-        The maximum value of an unsigned integer is 4294967295. 
+        The maximum value of an unsigned 32 bit integer is 4294967295. 
+        For 64 bit it is 18446744073709551615.
         
         It would be possible to remove the check digit of the CAS number,
         which would allow all 10-digit current CAS format integers to fit
-        into an unsigned integer. 
+        into an unsigned 32 bit integer. 
         https://www.cas.org/support/documentation/chemical-substances/faqs
         CAS says they are only "up to ten digits". However, before 2008 all
         CAS numbers were "up to nine digits"; and they are already 25% of the
