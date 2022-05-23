@@ -115,6 +115,8 @@ def check_CAS(CASRN):
     >>> check_CAS('77332-18-5')
     False
     """
+    if CASRN.count('-') != 2:
+        return False
     try:
         check = CASRN[-1] # Don't store the int - it is not necessary and is slower
 

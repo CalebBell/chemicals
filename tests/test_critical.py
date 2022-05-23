@@ -25,7 +25,7 @@ import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.miscdata import webbook_data
-from chemicals import int_to_CAS
+from chemicals import int_to_CAS, data_reader
 from chemicals.critical import *
 from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_Matthews,
@@ -34,6 +34,8 @@ from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_Yaws,
                                 critical_data_PassutDanner,
                                 critical_data_PinaMartines)
+
+data_reader.USE_CONSTANTS_DATABASE = False
 
 def test_data_IUPAC():
     Tc_sum = critical_data_IUPAC['Tc'].sum()
@@ -197,7 +199,7 @@ def test_Tc_all_values():
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_close(Tcs_default_sum, 6247147.3661222225)
+    assert_close(Tcs_default_sum, 6246571.366122)
 
 def test_Tc():
     Tc_val = Tc(CASRN='64-17-5')
@@ -254,7 +256,7 @@ def test_Pc_all_values():
     # Use the default method for each chemical in this file
     Pcs = [Pc(i) for i in CASs]
     Pcs_default_sum = pd.Series(Pcs).sum()
-    assert_close(Pcs_default_sum, 64608461266.18326)
+    assert_close(Pcs_default_sum, 64604961266.18326)
 
 def test_Vc():
     assert_close(0.000168, Vc(CASRN='64-17-5'))
