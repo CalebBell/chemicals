@@ -37,16 +37,11 @@ except:
 # Can't use the database
 data_reader.USE_CONSTANTS_DATABASE = False
 
-props = ['MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 'Vc',
-         'Zc','omega', 'Tflash', 'Tautoignition', 'LFL', 'UFL',
-                     'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
-                     'RI', 'Hfus', 
-                     'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY']
 
 funcs = [MW, Tt, Tm, Tb, Tc, Pt, Pc, Vc,
          Zc,omega, T_flash, T_autoignition, LFL, UFL,
                      Hfs, Hfl, Hfg, S0s, S0l, S0g,
-                     RI, Hfus, 
+                     RI, Hfus,  Stockmayer, molecular_diameter,
                      dipole_moment, logP, RG, RON, MON, ignition_delay]
 props = [f.__name__ for f in funcs]
 CASs = []

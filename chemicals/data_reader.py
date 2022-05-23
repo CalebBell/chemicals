@@ -219,10 +219,11 @@ def list_available_methods_from_df(df, index, keys_by_method):
 USE_CONSTANTS_DATABASE = True
 
 CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 'Vc',
-         'Zc','omega', 'Tflash', 'Tautoignition', 'LFL', 'UFL',
-        'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
-        'RI', 'Hfus', 
-        'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY']
+'Zc', 'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
+'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
+'RI', 'Hfus', 'Stockmayer', 'molecular_diameter',
+'dipole_moment', 'logP', 'RG', 'RON', 'MON', 'ignition_delay']
+
 
 
 CONSTANT_DATABASE_NAME_TO_IDX = {k: i for i, k in enumerate(CONSTANT_DATABASE_COLUMNS)}

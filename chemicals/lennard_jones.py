@@ -176,7 +176,7 @@ def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=Non
     Stockmayer
     """
     if not _LJ_data_loaded: _load_LJ_data()
-    methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'epsilon')
+    methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'Stockmayer')
     if Tc:
         if omega: methods.append(TEEGOTOSTEWARD2)
         if Zc: methods.append(STIELTHODOS)
@@ -269,9 +269,9 @@ def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
         elif method == TEEGOTOSTEWARD2:
             return epsilon_Tee_Gotoh_Steward_2(Tc, omega)
         else:
-            return retrieve_from_df_dict(LJ_sources, CASRN, 'epsilon', method)
+            return retrieve_from_df_dict(LJ_sources, CASRN, 'Stockmayer', method)
     else:
-        epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'epsilon')
+        epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'Stockmayer')
         if epsilon is not None: return epsilon
         if Tc:
             if omega: return epsilon_Tee_Gotoh_Steward_2(Tc, omega)
@@ -325,7 +325,7 @@ def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
     --------
     molecular_diameter
     """
-    methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'sigma')
+    methods = list_available_methods_from_df_dict(LJ_sources, CASRN, 'molecular_diameter')
     if Tc:
         if Pc:
             if omega: methods.append(TEEGOTOSTEWARD4)
@@ -430,9 +430,9 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
         elif method == TEEGOTOSTEWARD4:
             return sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega)
         else:
-            return retrieve_from_df_dict(LJ_sources, CASRN, 'sigma', method)
+            return retrieve_from_df_dict(LJ_sources, CASRN, 'molecular_diameter', method)
     else:
-        epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'sigma')
+        epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'molecular_diameter')
         if epsilon is not None: return epsilon
         if Tc:
             if Pc:

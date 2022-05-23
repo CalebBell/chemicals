@@ -56,7 +56,7 @@ __all__ = ['GWP', 'ODP', 'logP',
            'GWP_methods', 'ODP_methods', 'logP_methods']
 from chemicals import miscdata
 from chemicals.data_reader import (
-    data_source, list_available_methods_from_df,
+    data_source, list_available_methods_from_df, database_constant_lookup,
     list_available_methods_from_df_dict, register_df_source,
     retrieve_any_from_df, retrieve_any_from_df_dict, retrieve_from_df,
     retrieve_from_df_dict)
@@ -444,6 +444,8 @@ def logP(CASRN, method=None):
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
+    val, found = database_constant_lookup(CASRN, 'logP') if method is None else (None, False)
+    if found: return val
     if not _logP_data_loaded: _load_logP_data()
     if method:
         return retrieve_from_df_dict(logP_sources, CASRN, 'logP', method)

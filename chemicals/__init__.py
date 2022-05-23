@@ -173,7 +173,7 @@ if not fluids.numerics.is_micropython:
         properties = ['Tt', 'Pt', 'Tm', 'Tb', 'Tc', 'Pc', 'Vc', 'Zc',
                       'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
                      'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
-                     'RI', 'Hfus', 
+                     'RI', 'Hfus', 'Stockmayer', 'molecular_diameter'
                      'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY']
         for df in data_reader.df_sources.values():
             for p in properties:
