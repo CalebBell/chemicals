@@ -76,8 +76,10 @@ def make_df_sparse(df, non_sparse_columns=[]):
     return df
 
 
-def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs={},
+def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs=None,
                        postload=None, sparsify=False, int_CAS=False):
+    if csv_kwargs is None:
+        csv_kwargs = {}
     load_cmds[name] = (folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS)
 
 '''The following flags will strip out the excess memory usage of redundant 
@@ -98,10 +100,10 @@ def load_df(key):
         import pandas as pd
     folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS = load_cmds[key]
     path = path_join(folder, name)
-    # if int_CAS:
-    #     dtype = csv_kwargs.get('dtype', {})
-    #     dtype['CASRN'] = int64_dtype
-    #     csv_kwargs['dtype'] = dtype
+    if int_CAS:
+        dtype = csv_kwargs.get('dtype', {})
+        dtype['CAS'] = int64_dtype
+        csv_kwargs['dtype'] = dtype
     df = pd.read_csv(path, sep=sep, index_col=index_col, **csv_kwargs)
     if postload: postload(df)
     if sparsify:
