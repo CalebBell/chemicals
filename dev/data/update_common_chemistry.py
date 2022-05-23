@@ -7,7 +7,7 @@ from fluids.core import C2K, F2K, R2K
 from fluids.numerics import mean
 
 from chemicals import serialize_formula, rho_to_Vm, molecular_weight, nested_formula_parser
-
+from chemicals.identifiers import CAS_to_int
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 from rdkit.Chem.rdMolDescriptors import CalcMolFormula
@@ -207,7 +207,7 @@ def common_chemistry_data(CASRN):
             Tm, _ = process_temperataure(prop_val)
         if prop['name'] == 'Density':
             rho, rhoT, rhoP = process_density(prop_val)
-    return {'CAS': json_data['rn'], 'name': remove_html(json_data['name']), 'synonyms': synonyms,
+    return {'CAS': CAS_to_int(json_data['rn']), 'name': remove_html(json_data['name']), 'synonyms': synonyms,
             'formula': formula, 'inchi': inchi, 'inchiKey': inchiKey, 'smiles': smiles,
            'Tm': Tm, 'Tb': Tb, 'TbP': TbP, 'rho': rho, 'rhoT': rhoT, 'rhoP': rhoP, 'MW': MW,
            }

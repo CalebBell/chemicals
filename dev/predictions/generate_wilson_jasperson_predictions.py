@@ -33,7 +33,7 @@ def generate_line(CASi):
     if not missing_Tc_increments or not missing_Pc_increments:
         values = [Tc, Pc]
         line = values
-        line.insert(0, CAS)
+        line.insert(0, CASi)
         for i, v in enumerate(line):
             if v is None:
                 line[i] = ''
