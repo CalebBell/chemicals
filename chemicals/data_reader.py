@@ -131,7 +131,7 @@ def load_df(key):
         likely be well before that. Therefore, it does not justify removing
         the check digit.
         '''
-        df.index = pd.Index([CAS_to_int(s) for s in df.index], dtype=int64_dtype)
+        df.index = pd.Index([CAS_to_int(s) for s in df.index], dtype=int64_dtype, name=df.index.name)
         
     df_sources[key] = df
 
