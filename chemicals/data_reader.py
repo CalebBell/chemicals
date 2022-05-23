@@ -98,6 +98,10 @@ def load_df(key):
         import pandas as pd
     folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS = load_cmds[key]
     path = path_join(folder, name)
+    # if int_CAS:
+    #     dtype = csv_kwargs.get('dtype', {})
+    #     dtype['CASRN'] = int64_dtype
+    #     csv_kwargs['dtype'] = dtype
     df = pd.read_csv(path, sep=sep, index_col=index_col, **csv_kwargs)
     if postload: postload(df)
     if sparsify:
@@ -107,7 +111,8 @@ def load_df(key):
             if col_name in spurious_columns:
                 df[col_name] = pd.Series([], dtype=float).astype(pd.SparseDtype("float", nan))
 
-    if int_CAS:
+    if int_CAS and df.index.dtype is object_dtype:
+        # If the index is already an int, leave it be
         '''Most CAS numbers fit in 32 bits. Not all of them do though, for 
         example https://commonchemistry.cas.org/detail?cas_rn=2222298-66-8
         or 2627558-64-7
