@@ -43,3 +43,7 @@ def test_CAS_numbers_valid_and_unique():
             CAS_int = CAS_to_int(CAS)
             # Check that the CAS number fits in a 64 bit int
             assert CAS_int < 9223372036854775807
+    
+    # Check that the name is CAS
+    for k, df in chemicals.data_reader.df_sources.items():
+        assert df.index.name == 'CAS'

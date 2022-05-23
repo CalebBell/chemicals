@@ -1,4 +1,4 @@
-CASRN	Chemical	T	Permittivity	A	B	C	D	Tmin	Tmax
+CAS	Chemical	T	Permittivity	A	B	C	D	Tmin	Tmax
 50-70-4	D-Glucitol	353.2	35.5						
 50-78-2	2-(Acetyloxy)benzoic acid	333.2	6.55	6.9994	-0.0014553			333	416
 51-79-6	Ethyl carbamate	328.2	14.14	32.431	-0.065097	0.000028571		328	368

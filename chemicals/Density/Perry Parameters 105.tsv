@@ -1,4 +1,4 @@
-CASRN	Chemical	C1	C2	C3	C4	Tmin	Tmax
+CAS	Chemical	C1	C2	C3	C4	Tmin	Tmax
 50-00-0	Formaldehyde 	1941.5	0.22309	408	0.28571	181.15	408
 55-21-0	Benzamide 	737.1	0.25487	824	0.28571	403	824
 56-23-5	Carbon tetrachloride 	998.35	0.274	556.35	0.287	250.33	556.35
