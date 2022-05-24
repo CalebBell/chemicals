@@ -267,6 +267,8 @@ def database_constant_lookup(CASi, prop):
             return None, False
     try:
         return cached_constant_lookup(CASi, prop)
+    except TypeError as e:
+        raise e from None
     except Exception:
         # Prevent database lookup after first failure considering it should work everytime.
         # This fails on Yoel's machine due to "OperationalError: no such table: constants".
