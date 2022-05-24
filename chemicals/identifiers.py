@@ -402,6 +402,12 @@ class ChemicalMetadataDB(object):
         '''
         return not (not self.loaded_main_db and self.main_db is not None)
 
+    def finish_loading(self):
+        '''Complete loading the main database, if it has not been fully loaded.
+        '''
+        if not self.finished_loading:
+            self.autoload_main_db()
+
     def autoload_main_db(self):
         '''Load the main database when needed.
         '''

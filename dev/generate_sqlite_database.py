@@ -29,10 +29,7 @@ import pandas as pd
 import os
 import numpy as np
 
-try:
-    Chemical('asdfsdaf')
-except:
-    pass
+pubchem_db.finish_loading()
 
 # Can't use the database
 data_reader.USE_CONSTANTS_DATABASE = False
