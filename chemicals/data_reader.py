@@ -78,8 +78,7 @@ def make_df_sparse(df, non_sparse_columns=[]):
 
 def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs=None,
                        postload=None, sparsify=False, int_CAS=False):
-    if csv_kwargs is None:
-        csv_kwargs = {}
+    if csv_kwargs is None: csv_kwargs = {}
     load_cmds[name] = (folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS)
 
 '''The following flags will strip out the excess memory usage of redundant 
@@ -196,7 +195,7 @@ def get_value_from_df(df, index, key):
 
 def list_available_methods_from_df_dict(df_dict, index, key):
     methods = []
-    int_index = None
+    int_index = None if isinstance(index, str) else index # Assume must be string or int
     for method, df in df_dict.items():
         df_index = df.index
         if df_index.dtype is int64_dtype:
@@ -205,6 +204,8 @@ def list_available_methods_from_df_dict(df_dict, index, key):
                     int_index = CAS_to_int(index)
                 except:
                     int_index = 'skip'
+                else:
+                    (int_index in df_index) and not isnan(df.at[int_index, key]) and methods.append(method)
             elif int_index != 'skip' and (int_index in df_index) and not isnan(df.at[int_index, key]):
                 methods.append(method)
         elif (index in df_index) and not isnan(df.at[index, key]):
@@ -235,17 +236,17 @@ CONSTANT_DATABASE_NAME_TO_IDX = {k: i for i, k in enumerate(CONSTANT_DATABASE_CO
 CONSTANTS_CURSOR = None
     
 DATABASE_CONSTANTS_CACHE = {}
-def cached_constant_lookup(CASi, prop, cache=DATABASE_CONSTANTS_CACHE):
+def cached_constant_lookup(CASi, prop):
     if CONSTANTS_CURSOR is None:
         init_constants_db()
     prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
-    if CASi in cache:
-        return cache[CASi][prop_idx], True
+    if CASi in DATABASE_CONSTANTS_CACHE:
+        return DATABASE_CONSTANTS_CACHE[CASi][prop_idx], True
     
     # Fetch and store the whole row
     CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
     result = CONSTANTS_CURSOR.fetchone()
-    cache[CASi] = result
+    DATABASE_CONSTANTS_CACHE[CASi] = result
     if result is not None:
         return result[prop_idx], True
     
@@ -259,14 +260,17 @@ def init_constants_db():
     CONSTANTS_CURSOR = conn.cursor()
 
 def database_constant_lookup(CASi, prop):
-    print("ASDSAAAAAAAAAAAAAAA")
     if isinstance(CASi, str):
-        print(CASi)
         try:
             CASi = CAS_to_int(CASi)
         except:
             return None, False
     try:
         return cached_constant_lookup(CASi, prop)
-    except:
+    except Exception:
+        # Prevent database lookup after first failure considering it should work everytime.
+        # This fails on Yoel's machine due to "OperationalError: no such table: constants".
+        # It might possibly fail for other users every time (and maybe for other reasons).
+        global USE_CONSTANTS_DATABASE
+        USE_CONSTANTS_DATABASE = False
         return None, False
