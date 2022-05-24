@@ -133,7 +133,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
 import os
 
 from fluids.core import F2K
-
+from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
@@ -855,8 +855,9 @@ def T_flash(CASRN, method=None):
        (October 15, 2017): 52-59. doi:10.1016/j.fluid.2017.06.008.
     .. [4] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
-    val, found = database_constant_lookup(CASRN, 'T_flash') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'T_flash')
+        if found: return val
     if not _safety_data_loaded: _load_safety_data()
     if method:
         return retrieve_from_df_dict(Tflash_sources, CASRN, 'T_flash', method)
@@ -940,8 +941,9 @@ def T_autoignition(CASRN, method=None):
        and of Hazardous. NFPA, 2008.
     .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
-    val, found = database_constant_lookup(CASRN, 'T_autoignition') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'T_autoignition')
+        if found: return val
     if not _safety_data_loaded: _load_safety_data()
     if method:
         return retrieve_from_df_dict(Tautoignition_sources, CASRN, 'T_autoignition', method)
@@ -1044,8 +1046,9 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
        and of Hazardous. NFPA, 2008.
     .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
-    val, found = database_constant_lookup(CASRN, 'LFL') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'LFL')
+        if found: return val
     if not _safety_data_loaded: _load_safety_data()
     if not method:
         LFL = retrieve_any_from_df_dict(LFL_sources, CASRN, 'LFL')
@@ -1159,8 +1162,9 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
        and of Hazardous. NFPA, 2008.
     .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
-    val, found = database_constant_lookup(CASRN, 'UFL') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'UFL')
+        if found: return val
     if not _safety_data_loaded: _load_safety_data()
     if not method:
         UFL = retrieve_any_from_df_dict(UFL_sources, CASRN, 'UFL')

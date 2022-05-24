@@ -136,7 +136,7 @@ import os
 
 from fluids.constants import N_A, R, pi
 from fluids.numerics import numpy as np
-
+from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
@@ -339,8 +339,9 @@ def Tb(CASRN, method=None):
     .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
-    val, found = database_constant_lookup(CASRN, 'Tb') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'Tb')
+        if found: return val
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
         return retrieve_from_df_dict(Tb_sources, CASRN, 'Tb', method)
@@ -443,8 +444,9 @@ def Tm(CASRN, method=None):
     .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
-    val, found = database_constant_lookup(CASRN, 'Tm') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'Tm')
+        if found: return val
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
         return retrieve_from_df_dict(Tm_sources, CASRN, 'Tm', method)
@@ -1317,8 +1319,9 @@ def Hfus(CASRN, method=None):
     .. [4] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
-    val, found = database_constant_lookup(CASRN, 'Hfus') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'Hfus')
+        if found: return val
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
         return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method)

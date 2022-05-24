@@ -166,7 +166,7 @@ def retrieve_from_df(df, index, key):
     df_index = df.index
     if df_index.dtype is int64_dtype and isinstance(index, str):
         try: index = CAS_to_int(index)
-        except: pass
+        except: return None
     if index in df_index:
         if isinstance(key, (int, str)):
             return get_value_from_df(df, index, key)
@@ -177,7 +177,7 @@ def retrieve_any_from_df(df, index, keys):
     df_index = df.index
     if df_index.dtype is int64_dtype and isinstance(index, str):
         try: index = CAS_to_int(index)
-        except: pass
+        except: return None
     if index not in df.index: return None
     for key in keys:
         value = df.at[index, key]
@@ -191,8 +191,7 @@ def get_value_from_df(df, index, key):
     value = df.at[index, key]
     try:
         return None if isnan(value) else float(value)
-    except TypeError:
-        # Not a number
+    except TypeError: # Not a number
         return value
 
 def list_available_methods_from_df_dict(df_dict, index, key):
@@ -200,15 +199,13 @@ def list_available_methods_from_df_dict(df_dict, index, key):
     int_index = None
     for method, df in df_dict.items():
         df_index = df.index
-        if df_index.dtype is int64_dtype and isinstance(index, str):
+        if df_index.dtype is int64_dtype:
             if int_index is None:
                 try:
                     int_index = CAS_to_int(index)
                 except:
                     int_index = 'skip'
-            elif int_index == 'skip':
-                continue
-            if (int_index in df_index) and not isnan(df.at[int_index, key]):
+            elif int_index != 'skip' and (int_index in df_index) and not isnan(df.at[int_index, key]):
                 methods.append(method)
         elif (index in df_index) and not isnan(df.at[index, key]):
             methods.append(method)
@@ -238,18 +235,17 @@ CONSTANT_DATABASE_NAME_TO_IDX = {k: i for i, k in enumerate(CONSTANT_DATABASE_CO
 CONSTANTS_CURSOR = None
     
 DATABASE_CONSTANTS_CACHE = {}
-def cached_constant_lookup(CASi, prop):
+def cached_constant_lookup(CASi, prop, cache=DATABASE_CONSTANTS_CACHE):
     if CONSTANTS_CURSOR is None:
         init_constants_db()
     prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
-    try:
-        return DATABASE_CONSTANTS_CACHE[CASi][prop_idx], True
-    except KeyError:
-        pass
+    if CASi in cache:
+        return cache[CASi][prop_idx], True
+    
     # Fetch and store the whole row
     CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
     result = CONSTANTS_CURSOR.fetchone()
-    DATABASE_CONSTANTS_CACHE[CASi] = result
+    cache[CASi] = result
     if result is not None:
         return result[prop_idx], True
     
@@ -262,17 +258,14 @@ def init_constants_db():
     conn = sqlite3.connect(path_join(source_path, 'Misc', 'default.sqlite'))
     CONSTANTS_CURSOR = conn.cursor()
 
-def database_constant_lookup(CAS, prop):
-    if not USE_CONSTANTS_DATABASE:
-        return None, False
-    try:
-        CASi = CAS_to_int(CAS)
-    except:
-        if type(CAS) is not int:
+def database_constant_lookup(CASi, prop):
+    print("ASDSAAAAAAAAAAAAAAA")
+    if isinstance(CASi, str):
+        print(CASi)
+        try:
+            CASi = CAS_to_int(CASi)
+        except:
             return None, False
-        else:
-            # Was already an int
-            CASi = CAS
     try:
         return cached_constant_lookup(CASi, prop)
     except:
