@@ -118,6 +118,8 @@ def check_CAS(CASRN):
     try:
         if CASRN.count('-') != 2:
             return False
+        if CASRN[-2] != '-' or CASRN[-5] != '-':
+            return False
         check = CASRN[-1] # Don't store the int - it is not necessary and is slower
 
         productsum = 0

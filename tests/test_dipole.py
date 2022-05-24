@@ -33,7 +33,7 @@ def test_dipole_moment_methods():
     assert_close(tot, 248.59999999999999)
 
     tot = dipole.dipole_data_CCDB['dipole_moment'].sum()
-    assert_close(tot, 632.97000000000003)
+    assert_close(tot, 629.69)
 
     tot = dipole.dipole_data_Muller['dipole_moment'].sum()
     assert_close(tot, 420.05190108045235)
