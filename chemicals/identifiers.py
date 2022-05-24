@@ -121,10 +121,11 @@ def check_CAS(CASRN):
         check = CASRN[-1] # Don't store the int - it is not necessary and is slower
 
         productsum = 0
-        i = 1
-        for num in CASRN.replace('-', '')[:-1][::-1]:
+        chars = CASRN.replace('-', '')[:-1]
+        i = len(chars)
+        for num in chars:
             productsum += i*int(num)
-            i += 1
+            i -= 1
         return productsum % 10 == int(check)
     except:
         return False

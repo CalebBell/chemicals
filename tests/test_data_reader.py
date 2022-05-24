@@ -54,3 +54,4 @@ def test_CAS_numbers_valid_and_unique():
     # Check that the name is CAS
     for k, df in chemicals.data_reader.df_sources.items():
         assert df.index.name == 'CAS'
+test_CAS_numbers_valid_and_unique()
