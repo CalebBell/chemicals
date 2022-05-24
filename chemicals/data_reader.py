@@ -260,7 +260,7 @@ def init_constants_db():
     CONSTANTS_CURSOR = conn.cursor()
 
 def database_constant_lookup(CASi, prop):
-    if isinstance(CASi, str):
+    if isinstance(CASi, str): # Assume it must be either an int or string
         try:
             CASi = CAS_to_int(CASi)
         except:
