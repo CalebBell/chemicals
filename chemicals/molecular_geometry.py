@@ -259,7 +259,7 @@ def linear(CASRN, method=None):
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'linear')
-        if found: return bool(found)
+        if found: return bool(val)
     if not _RG_data_loaded: _load_RG_data()
     if method:
         value = retrieve_from_df_dict(linear_sources, CASRN, 'linear', method)

@@ -237,21 +237,20 @@ CONSTANTS_CURSOR = None
     
 DATABASE_CONSTANTS_CACHE = {}
 def cached_constant_lookup(CASi, prop):
-    if CONSTANTS_CURSOR is None:
-        init_constants_db()
-    prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
+    if CONSTANTS_CURSOR is None: init_constants_db()
     if CASi in DATABASE_CONSTANTS_CACHE:
-        return DATABASE_CONSTANTS_CACHE[CASi][prop_idx], True
-    
-    # Fetch and store the whole row
-    CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
-    result = CONSTANTS_CURSOR.fetchone()
-    DATABASE_CONSTANTS_CACHE[CASi] = result
-    if result is not None:
+        result = DATABASE_CONSTANTS_CACHE[CASi]
+    else:
+        # Fetch and store the whole row
+        CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
+        result = CONSTANTS_CURSOR.fetchone()
+        DATABASE_CONSTANTS_CACHE[CASi] = result
+    if result is None:
+        # Result the value, and whether the compound was in the index
+        return result, False
+    else:
+        prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
         return result[prop_idx], True
-    
-    # Result the value, and whether the compound was in the index
-    return result, False
 
 def init_constants_db():
     global CONSTANTS_CURSOR
@@ -271,8 +270,7 @@ def database_constant_lookup(CASi, prop):
         raise e from None
     except Exception:
         # Prevent database lookup after first failure considering it should work everytime.
-        # This fails on Yoel's machine due to "OperationalError: no such table: constants".
-        # It might possibly fail for other users every time (and maybe for other reasons).
+        # It will possibly fail for users every time if database has not been created.
         global USE_CONSTANTS_DATABASE
         USE_CONSTANTS_DATABASE = False
         return None, False

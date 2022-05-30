@@ -526,7 +526,7 @@ def S0s(CASRN, method=None):
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'S02')
+        val, found = database_constant_lookup(CASRN, 'S0s')
         if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:

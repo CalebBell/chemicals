@@ -180,8 +180,8 @@ def RI(CASRN, method=None):
     .. [2] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        RI, found = database_constant_lookup(CASRN, 'dipole_moment')
-        RIT, _ = database_constant_lookup(CASRN, 'dipole_moment')
+        RI, found = database_constant_lookup(CASRN, 'RI')
+        RIT, _ = database_constant_lookup(CASRN, 'RIT')
         if found: return (RI, RIT)
     if not _RI_data_loaded: _load_RI_data()
     key = ('RI', 'RIT')
