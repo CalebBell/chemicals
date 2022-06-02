@@ -40,7 +40,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros',
  'mixing_simple',
 'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar',
-'SG_to_API', 'API_to_SG', 'SG',   'Watson_K',
+'SG_to_API', 'API_to_SG', 'API_to_rho', 'rho_to_API', 'SG',   'Watson_K',
 'dxs_to_dns', 'dns_to_dn_partials', 'dxs_to_dn_partials', 'd2ns_to_dn2_partials',
 'd2xs_to_dxdn_partials', 'dxs_to_dxsn1', 'd2xs_to_d2xsn1',
  'vapor_mass_quality', 'mix_component_flows',
@@ -430,9 +430,82 @@ def vapor_mass_quality(VF, MWl, MWg):
     nl = (1. - VF)
     return ng*MWg/(nl*MWl + ng*MWg)
 
+def rho_to_API(rho, rho_ref=999.0170824078306):
+    r'''Calculates API of a liquid given its mass density, as shown in
+    [1]_.
+
+    .. math::
+        \text{API gravity} = \frac{141.5\rho_{ref}}{\rho} - 131.5
+
+    Parameters
+    ----------
+    rho : float
+        Mass density the fluid at 60 degrees Farenheight [kg/m^3]
+    rho_ref : float, optional
+        Density of the reference substance, [kg/m^3]
+
+    Returns
+    -------
+    API : float
+        API of the fluid [-]
+
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+
+    Examples
+    --------
+    >>> rho_to_API(820)
+    40.8913623
+    >>> SG_to_API(SG(820))
+    40.8913623
+
+    References
+    ----------
+    .. [1] API Technical Data Book: General Properties & Characterization.
+       American Petroleum Institute, 7E, 2005.
+    '''
+    return 141.5*rho_ref/rho - 131.5
+
+def API_to_rho(API, rho_ref=999.0170824078306):
+    r'''Calculates mass density of a liquid given its API, as shown in
+    [1]_.
+
+    .. math::
+        \rho~60^\circ\text{F} = \frac{141.5\rho_{ref}}{\text{API} + 131.5}
+
+    Parameters
+    ----------
+    API : float
+        API of the fluid [-]
+    rho_ref : float, optional
+        Density of the reference substance, [kg/m^3]
+
+    Returns
+    -------
+    rho : float
+        Mass density the fluid at 60 degrees Farenheight [kg/m^3]
+
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+
+    Examples
+    --------
+    >>> API_to_rho(rho_to_API(820))
+    820.0
+
+    References
+    ----------
+    .. [1] API Technical Data Book: General Properties & Characterization.
+       American Petroleum Institute, 7E, 2005.
+    '''
+    return (141.5*rho_ref)/(API + 131.5)
+
+
 
 def SG_to_API(SG):
-    r'''Calculates specific gravity of a liquid given its API, as shown in
+    r'''Calculates API of a liquid given its specific gravity, as shown in
     [1]_.
 
     .. math::
@@ -466,7 +539,7 @@ def SG_to_API(SG):
 
 
 def API_to_SG(API):
-    r'''Calculates API of a liquid given its specific gravity, as shown in
+    r'''Calculates specific gravity of a liquid given its API, as shown in
     [1]_.
 
     .. math::
