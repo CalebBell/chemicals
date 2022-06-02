@@ -78,8 +78,7 @@ def make_df_sparse(df, non_sparse_columns=[]):
 
 def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs=None,
                        postload=None, sparsify=False, int_CAS=False):
-    if csv_kwargs is None:
-        csv_kwargs = {}
+    if csv_kwargs is None: csv_kwargs = {}
     load_cmds[name] = (folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS)
 
 '''The following flags will strip out the excess memory usage of redundant 
@@ -166,7 +165,7 @@ def retrieve_from_df(df, index, key):
     df_index = df.index
     if df_index.dtype is int64_dtype and isinstance(index, str):
         try: index = CAS_to_int(index)
-        except: pass
+        except: return None
     if index in df_index:
         if isinstance(key, (int, str)):
             return get_value_from_df(df, index, key)
@@ -177,7 +176,7 @@ def retrieve_any_from_df(df, index, keys):
     df_index = df.index
     if df_index.dtype is int64_dtype and isinstance(index, str):
         try: index = CAS_to_int(index)
-        except: pass
+        except: return None
     if index not in df.index: return None
     for key in keys:
         value = df.at[index, key]
@@ -191,24 +190,23 @@ def get_value_from_df(df, index, key):
     value = df.at[index, key]
     try:
         return None if isnan(value) else float(value)
-    except TypeError:
-        # Not a number
+    except TypeError: # Not a number
         return value
 
 def list_available_methods_from_df_dict(df_dict, index, key):
     methods = []
-    int_index = None
+    int_index = None if isinstance(index, str) else index # Assume must be string or int
     for method, df in df_dict.items():
         df_index = df.index
-        if df_index.dtype is int64_dtype and isinstance(index, str):
+        if df_index.dtype is int64_dtype:
             if int_index is None:
                 try:
                     int_index = CAS_to_int(index)
                 except:
                     int_index = 'skip'
-            elif int_index == 'skip':
-                continue
-            if (int_index in df_index) and not isnan(df.at[int_index, key]):
+                else:
+                    (int_index in df_index) and not isnan(df.at[int_index, key]) and methods.append(method)
+            elif int_index != 'skip' and (int_index in df_index) and not isnan(df.at[int_index, key]):
                 methods.append(method)
         elif (index in df_index) and not isnan(df.at[index, key]):
             methods.append(method)
@@ -239,22 +237,20 @@ CONSTANTS_CURSOR = None
     
 DATABASE_CONSTANTS_CACHE = {}
 def cached_constant_lookup(CASi, prop):
-    if CONSTANTS_CURSOR is None:
-        init_constants_db()
-    prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
-    try:
-        return DATABASE_CONSTANTS_CACHE[CASi][prop_idx], True
-    except KeyError:
-        pass
-    # Fetch and store the whole row
-    CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
-    result = CONSTANTS_CURSOR.fetchone()
-    DATABASE_CONSTANTS_CACHE[CASi] = result
-    if result is not None:
+    if CONSTANTS_CURSOR is None: init_constants_db()
+    if CASi in DATABASE_CONSTANTS_CACHE:
+        result = DATABASE_CONSTANTS_CACHE[CASi]
+    else:
+        # Fetch and store the whole row
+        CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
+        result = CONSTANTS_CURSOR.fetchone()
+        DATABASE_CONSTANTS_CACHE[CASi] = result
+    if result is None:
+        # Result the value, and whether the compound was in the index
+        return result, False
+    else:
+        prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
         return result[prop_idx], True
-    
-    # Result the value, and whether the compound was in the index
-    return result, False
 
 def init_constants_db():
     global CONSTANTS_CURSOR
@@ -262,18 +258,19 @@ def init_constants_db():
     conn = sqlite3.connect(path_join(source_path, 'Misc', 'default.sqlite'))
     CONSTANTS_CURSOR = conn.cursor()
 
-def database_constant_lookup(CAS, prop):
-    if not USE_CONSTANTS_DATABASE:
-        return None, False
-    try:
-        CASi = CAS_to_int(CAS)
-    except:
-        if type(CAS) is not int:
+def database_constant_lookup(CASi, prop):
+    if isinstance(CASi, str): # Assume it must be either an int or string
+        try:
+            CASi = CAS_to_int(CASi)
+        except:
             return None, False
-        else:
-            # Was already an int
-            CASi = CAS
     try:
         return cached_constant_lookup(CASi, prop)
-    except:
+    except (TypeError, KeyError) as e:
+        raise e from None
+    except Exception:
+        # Prevent database lookup after first failure considering it should work everytime.
+        # It will possibly fail for users every time if database has not been created.
+        global USE_CONSTANTS_DATABASE
+        USE_CONSTANTS_DATABASE = False
         return None, False

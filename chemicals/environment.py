@@ -54,6 +54,7 @@ Octanol-Water Partition Coefficient
 __all__ = ['GWP', 'ODP', 'logP',
            'GWP_all_methods', 'ODP_all_methods', 'logP_all_methods',
            'GWP_methods', 'ODP_methods', 'logP_methods']
+from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (
     data_source, list_available_methods_from_df, database_constant_lookup,
@@ -248,8 +249,9 @@ def GWP(CASRN, method=None):
        Other Weak Atmospheric Absorbers." Reviews of Geophysics 58, no. 3 
        (2020): e2019RG000691. https://doi.org/10.1029/2019RG000691.
     '''
-    val, found = database_constant_lookup(CASRN, 'GWP') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'GWP')
+        if found: return val
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
         if method in _IPCC_2014_GWP_keys_by_method:
@@ -364,8 +366,9 @@ def ODP(CASRN, method=None):
        Project-Report No. 52, Geneva, Switzerland, 516 p.
        https://www.wmo.int/pages/prog/arep/gaw/ozone_2010/documents/Ozone-Assessment-2010-complete.pdf
     '''
-    val, found = database_constant_lookup(CASRN, 'ODP') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'ODP')
+        if found: return val
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
         key = _ODP_keys_by_method[method]
@@ -448,8 +451,9 @@ def logP(CASRN, method=None):
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
-    val, found = database_constant_lookup(CASRN, 'logP') if method is None else (None, False)
-    if found: return val
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'logP')
+        if found: return val
     if not _logP_data_loaded: _load_logP_data()
     if method:
         return retrieve_from_df_dict(logP_sources, CASRN, 'logP', method)
