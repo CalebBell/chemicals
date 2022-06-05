@@ -1,4 +1,4 @@
-"CASRN"	"Name"	"Formula"	"Lifetime, years"	"Radiative efficiency, W/m^2/ppb"	"20yr GWP"	"100yr GWP"	"20yr GTP"	"50yr GTP"	"100yr GTP"	"20yr AGWP"	"100yr AGWP"	"20yr AGTP"	"50yr AGTP"	"100yr AGTP"
+"CAS"	"Name"	"Formula"	"Lifetime, years"	"Radiative efficiency, W/m^2/ppb"	"20yr GWP"	"100yr GWP"	"20yr GTP"	"50yr GTP"	"100yr GTP"	"20yr AGWP"	"100yr AGWP"	"20yr AGTP"	"50yr AGTP"	"100yr AGTP"
 "10024-97-2"	"Nitrous Oxide"	"N2O"	121	0	264	265	277	282	234	6.58E-12	2.43E-11	1.89E-13	1.74E-13	1.28E-13
 "102687-65-0"	"(E)-1-Chloro-3,3,3- trifluoroprop-1-ene"	"trans-CF3CH=CHCl"	0.07	0.04	5	1	2	0.25	0.205	1.37E-13	1.37E-13	1.09E-15	1.54E-16	1.12E-16
 "107-06-2"	"1,2-Dichloroethane"	"CH2ClCH2Cl"	0.18	0.01	3	0.899	0.975	0.151	0.124	8.24E-14	8.24E-14	6.67E-16	9.29E-17	6.77E-17

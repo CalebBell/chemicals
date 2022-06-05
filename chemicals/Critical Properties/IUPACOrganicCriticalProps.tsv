@@ -478,7 +478,7 @@ CAS	Chemical	MW	Tc	Pc	Vc	Zc	Reference
 462-95-3	diethoxymethane	104.149	531.7				7
 463-49-0	propadiene	40.065	394	5250000			6
 463-82-1	2,2-dimethylpropane	72.15	433.8	3196000	0.0003070	0.272	5
-0464-06-02	2,2,3-trimethylbutane	100.204	531.1	2950000	0.0003980	0.265	5
+464-06-2	2,2,3-trimethylbutane	100.204	531.1	2950000	0.0003980	0.265	5
 493-01-6	cis-bicyclo[4.4.0]decane	138.253	703.6	3200000			5
 493-02-7	trans-bicyclo[4.4.0]decane	138.253	687				5
 496-11-7	indan	118.178	684.9	3950000			3
@@ -781,7 +781,7 @@ CAS	Chemical	MW	Tc	Pc	Vc	Zc	Reference
 52447-22-0	tridecafluoroheptanoyl chloride	382.507	519.8	1450000	0.0006520	0.219	11
 53772-78-4	difluoro-bis(trifluoromethoxy)methane	220.018	372.4	2330000	0.0003610	0.271	11
 54822-22-9	2,2,3,3,4,4,5,5-octafluoropentanoic acid methyl ester	260.082	559	2320000	0.0005020	0.251	11
-56567-3	2-methyl-3-pentanol	102.177	576	3460000			4
+565-67-3	2-methyl-3-pentanol	102.177	576	3460000			4
 56860-81-2	3-difluoromethoxy-1,1,1,2,2-pentafluoropropane	200.055	455.1	2773000	0.0003470	0.255	11
 57041-67-5	1,1,1,2-tetrafluoro-2-(difluoromethoxy)ethane	168.038	428.9	3042000	0.0003150	0.269	11
 59426-77-6	1,1,1,2,2,3,3-heptafluoro-3-(trifluoromethoxy)propane	254.026	391.7	1870000	0.0004030	0.232	11

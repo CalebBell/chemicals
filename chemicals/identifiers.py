@@ -116,13 +116,18 @@ def check_CAS(CASRN):
     False
     """
     try:
+        if CASRN.count('-') != 2:
+            return False
+        if CASRN[-2] != '-' or CASRN[-5] != '-':
+            return False
         check = CASRN[-1] # Don't store the int - it is not necessary and is slower
 
         productsum = 0
-        i = 1
-        for num in CASRN.replace('-', '')[:-1][::-1]:
+        chars = CASRN.replace('-', '')[:-1]
+        i = len(chars)
+        for num in chars:
             productsum += i*int(num)
-            i += 1
+            i -= 1
         return productsum % 10 == int(check)
     except:
         return False
@@ -399,6 +404,12 @@ class ChemicalMetadataDB(object):
         '''Whether or not the database has loaded the main database.
         '''
         return not (not self.loaded_main_db and self.main_db is not None)
+
+    def finish_loading(self):
+        '''Complete loading the main database, if it has not been fully loaded.
+        '''
+        if not self.finished_loading:
+            self.autoload_main_db()
 
     def autoload_main_db(self):
         '''Load the main database when needed.

@@ -1,4 +1,4 @@
-CASRN	Fluid	sigma0	n0	sigma1	n1	sigma2	n2	Tc	Tmin	Tmax
+CAS	Fluid	sigma0	n0	sigma1	n1	sigma2	n2	Tc	Tmin	Tmax
 60-29-7	Diethyl ether	1.2348	1.4846	-1.1808	1.5021	0	0	466.7	156.85	453.15
 64-17-5	Ethanol 	0.05	0.952	0	0	0	0	513.9	180.12	513.15
 67-56-1	Methanol 	0.22421	1.3355	-0.21408	1.677	0.083233	4.4402	513.38	175.61	508.15

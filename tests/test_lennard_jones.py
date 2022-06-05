@@ -33,18 +33,18 @@ from fluids.constants import k
 def test_LJ_data():
     # Two instances of 174899-66-2 were present;
     # the apparently more common one, [Bmim][CF 3SO 3], was kept.
-    tot = LJ_data_Magalhaes['epsilon'].abs().sum()
+    tot = LJ_data_Magalhaes['Stockmayer'].abs().sum()
     assert_close(tot, 187099.82029999999)
 
-    tot = LJ_data_Magalhaes['sigma'].abs().sum()
+    tot = LJ_data_Magalhaes['molecular_diameter'].abs().sum()
     assert_close(tot, 1995.8174799999997)
 
     assert LJ_data_Magalhaes.shape == (322, 3)
 
-    tot = LJ_data_Poling['epsilon'].abs().sum()
+    tot = LJ_data_Poling['Stockmayer'].abs().sum()
     assert_close(tot, 24742.620000000003)
 
-    tot = LJ_data_Poling['sigma'].abs().sum()
+    tot = LJ_data_Poling['molecular_diameter'].abs().sum()
     assert_close(tot, 329.24199999999996)
 
     assert LJ_data_Poling.shape == (75, 4)

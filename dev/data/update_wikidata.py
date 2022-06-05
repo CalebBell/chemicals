@@ -8,6 +8,7 @@ from fluids.numerics import mean
 from fluids import C2K, R2K, F2K
 from time import time, sleep
 from chemicals.safety import mgm3_to_ppmv
+from chemicals.identifiers import CAS_to_int
 from chemicals import molecular_weight, nested_formula_parser
 import os
 
@@ -157,7 +158,7 @@ def retrieve_chemical_data(ID):
             MW = None
     else:
         MW = None
-    dat = {'CAS': CAS, 'name': name, 'MW': MW, 
+    dat = {'CAS': CAS_to_int(CAS), 'name': name, 'MW': MW, 
                           'formula': formula, 'smiles': smiles, 
                           'inchi': inchi, 'inchikey': inchikey}
     

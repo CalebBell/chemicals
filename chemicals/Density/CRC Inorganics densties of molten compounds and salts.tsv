@@ -1,4 +1,4 @@
-CASRN	Chemical	MW	rho	k	Tm	Tmax
+CAS	Chemical	MW	rho	k	Tm	Tmax
 497-19-8	Sodium carbonate	105.989	1972	0.448	1129.15	1277.15
 584-09-8	Rubidium carbonate	230.945	2840	0.64	1110.15	1280.15
 7429-90-5	Aluminum	26.982	2377	0.311	933.47	1190.15

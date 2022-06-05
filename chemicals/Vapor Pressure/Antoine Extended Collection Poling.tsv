@@ -1,4 +1,4 @@
-CASRN	Chemical	A	B	C	Tc	to	n	E	F	Tmin	Tmax
+CAS	Chemical	A	B	C	Tc	to	n	E	F	Tmin	Tmax
 62-53-3	benzeneamine 	9.4087	1692.77	-72.71	699	197	4.906	452.8	-239100	488.15	673.15
 74-85-1	ethene 	8.91382	596.53	-16.78	282.34	-99	2.79132	9.717	52.77	188.15	273.15
 74-89-5	methanamine 	9.213	899.03	-53.15	430	0	2.139	-151.85	7356	288.15	423.15

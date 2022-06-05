@@ -68,6 +68,6 @@ df = pd.DataFrame({'description': descriptions, 'group': groups, 'volumes': volu
                   'year': years}, index=CASRNs)
 df.fillna('', inplace=True)
 df = df.reindex(index=natsorted(df.index))
-df.index.name = 'CASRN'
+df.index.name = 'CAS'
 
 df.to_csv('../../chemicals/Safety/IARC Carcinogen Database.tsv', sep='\t')

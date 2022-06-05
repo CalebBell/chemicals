@@ -63,9 +63,9 @@ __all__ = ['RI', 'RI_methods', 'RI_all_methods',
 
 from fluids.constants import N_A, pi
 from fluids.numerics import horner, interp
-
+from chemicals import data_reader as dr
 from chemicals import miscdata
-from chemicals.data_reader import (data_source,
+from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
                                    register_df_source,
                                    retrieve_any_from_df_dict,
@@ -179,6 +179,10 @@ def RI(CASRN, method=None):
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     .. [2] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        RI, found = database_constant_lookup(CASRN, 'RI')
+        RIT, _ = database_constant_lookup(CASRN, 'RIT')
+        if found: return (RI, RIT)
     if not _RI_data_loaded: _load_RI_data()
     key = ('RI', 'RIT')
     if method:

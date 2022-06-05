@@ -173,8 +173,9 @@ if not fluids.numerics.is_micropython:
         properties = ['Tt', 'Pt', 'Tm', 'Tb', 'Tc', 'Pc', 'Vc', 'Zc',
                       'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
                      'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
-                     'RI', 'Hfus', 
-                     'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY']
+                     'RI', 'Hfus', 'Stockmayer', 'molecular_diameter'
+                     'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY',
+                     'linear']
         for df in data_reader.df_sources.values():
             for p in properties:
                 if p in df.columns:
@@ -185,7 +186,21 @@ if not fluids.numerics.is_micropython:
                     else:
                         counts[p] = set(prop_CASs)
         return {k: len(v) for k, v in counts.items()}
-                        
+    
+    def memory_usage(finish_loading=True):
+        if finish_loading:
+            complete_lazy_loading()
+        usages = []
+        names = []
+        for name, df in data_reader.df_sources.items():
+            names.append(name)
+            usages.append(df.memory_usage().values.sum())
+        
+        names = [x for _, x in sorted(zip(usages, names))]
+        usages.sort()
+        for name, use in zip(names, usages):
+            print(f'{name} : {use/1024**2:3f} MB')
+        print(f'Total usage: {sum(usages)/1024**2:3f} MB')
                 
     global vectorized, numba, units, numba_vectorized
     if PY37:

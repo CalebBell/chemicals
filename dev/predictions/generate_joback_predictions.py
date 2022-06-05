@@ -1,6 +1,6 @@
 import os
 from thermo import Joback
-from chemicals.identifiers import pubchem_db
+from chemicals.identifiers import pubchem_db, CAS_to_int
 import rdkit
 from rdkit import Chem
 from joblib import Parallel, delayed
@@ -16,7 +16,6 @@ keys = ['CAS', 'Tm', 'Hfus', 'Hvap','Tb', 'Tc', 'Pc', 'Vc', 'Hfg', 'Cpg0', 'Cpg1
 lines = ['\t'.join(keys) + '\n']
 def generate_line(CASi):
     chem_info = pubchem_db.CAS_index[CASi]
-    CAS = chem_info.CASs
     mol = Chem.MolFromSmiles(chem_info.smiles)
     if mol is None:
         # rdkit coult not parse
@@ -30,7 +29,7 @@ def generate_line(CASi):
             return False
         values = [estimates[k] for k in dump_oder]
         line = values
-        line.insert(0, CAS)
+        line.insert(0, CASi)
         if estimates['Cpig_coeffs'] is not None:
             line.extend(estimates['Cpig_coeffs'])
         else:

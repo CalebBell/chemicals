@@ -1,6 +1,4 @@
-CAS	Chemical	Dipole
--20-4	Methane selenol	1.29
--2-2	Ammonia Dimer	1.99
+CAS	Chemical	dipole_moment
 50-00-0	Formaldehyde	2.33
 56-23-5	Carbon tetrachloride	0
 56-40-6	Glycine	1.09

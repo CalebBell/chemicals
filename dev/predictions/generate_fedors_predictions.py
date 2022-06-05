@@ -16,7 +16,7 @@ keys = ['CAS', 'Vc']
 lines = ['\t'.join(keys) + '\n']
 def generate_line(CASi):
     chem_info = pubchem_db.CAS_index[CASi]
-    CAS = chem_info.CASs
+    CAS = CASi
     mol = Chem.MolFromSmiles(chem_info.smiles)
     if mol is None:
         # rdkit coult not parse

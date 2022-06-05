@@ -54,9 +54,10 @@ Octanol-Water Partition Coefficient
 __all__ = ['GWP', 'ODP', 'logP',
            'GWP_all_methods', 'ODP_all_methods', 'logP_all_methods',
            'GWP_methods', 'ODP_methods', 'logP_methods']
+from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (
-    data_source, list_available_methods_from_df,
+    data_source, list_available_methods_from_df, database_constant_lookup,
     list_available_methods_from_df_dict, register_df_source,
     retrieve_any_from_df, retrieve_any_from_df_dict, retrieve_from_df,
     retrieve_from_df_dict)
@@ -97,14 +98,14 @@ def _load_GWP_ODP_data():
     ODP_data = data_source('Ozone Depletion Potentials.tsv')
     _GWP_ODP_data_loaded = True
     _IPCC_2007_GWP_keys_by_method = {
+        IPCC_2007_20YR_GWP: '20yr GWP',
         IPCC_2007_100YR_GWP : '100yr GWP',
         IPCC_1995_100YR_GWP: 'SAR 100yr',
-        IPCC_2007_20YR_GWP: '20yr GWP',
         IPCC_2007_500YR_GWP: '500yr GWP',
     }
     _IPCC_2014_GWP_keys_by_method = {
-        IPCC_2014_100YR_GWP: '100yr GWP',
         IPCC_2014_20YR_GWP : '20yr GWP',
+        IPCC_2014_100YR_GWP: '100yr GWP',
     }
     
     _ODP_keys_by_method = {
@@ -183,7 +184,7 @@ def GWP(CASRN, method=None):
         * IPCC Fourth Assessment Report (AR4) from 2007 [1]_
         * IPCC Second Assesment Report or (SAR) from 1995 [1]_
 
-    This function returns the GWP for the 100yr outlook from the AR5 by default.
+    This function returns the GWP for the 20yr outlook from the AR5 by default.
 
     Parameters
     ----------
@@ -214,10 +215,10 @@ def GWP(CASRN, method=None):
 
     Examples
     --------
-    Methane, 100-yr outlook AR5
+    Methane, 20-yr outlook AR5
 
     >>> GWP(CASRN='74-82-8')
-    28.0
+    84.0
     
     Methane, specifying the default method explicitly (this is recommended
     the default data source may be updated in the future)
@@ -248,6 +249,9 @@ def GWP(CASRN, method=None):
        Other Weak Atmospheric Absorbers." Reviews of Geophysics 58, no. 3 
        (2020): e2019RG000691. https://doi.org/10.1029/2019RG000691.
     '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'GWP')
+        if found: return val
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
         if method in _IPCC_2014_GWP_keys_by_method:
@@ -362,6 +366,9 @@ def ODP(CASRN, method=None):
        Project-Report No. 52, Geneva, Switzerland, 516 p.
        https://www.wmo.int/pages/prog/arep/gaw/ozone_2010/documents/Ozone-Assessment-2010-complete.pdf
     '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'ODP')
+        if found: return val
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
         key = _ODP_keys_by_method[method]
@@ -444,6 +451,9 @@ def logP(CASRN, method=None):
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'logP')
+        if found: return val
     if not _logP_data_loaded: _load_logP_data()
     if method:
         return retrieve_from_df_dict(logP_sources, CASRN, 'logP', method)

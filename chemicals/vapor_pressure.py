@@ -226,6 +226,8 @@ def load_vapor_pressure_dfs():
     global Psat_data_Perrys2_8, Psat_values_Perrys2_8, Psat_data_VDI_PPDS_3, Psat_values_VDI_PPDS_3
     global Psat_data_Alcock_elements, Psat_values_Alcock_elements
     global _vapor_pressure_dfs_loaded
+    if _vapor_pressure_dfs_loaded:
+        return
 
     # 57463 bytes for df; 13720 bytes for numpy
     Psat_data_WagnerMcGarry = data_source('Wagner Original McGarry.tsv')

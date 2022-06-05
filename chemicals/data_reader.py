@@ -53,6 +53,7 @@ try:
 except:
     pass
 from chemicals.identifiers import CAS_to_int
+from chemicals.utils import source_path
 
 # %% Loading data from local databanks
 
@@ -75,8 +76,9 @@ def make_df_sparse(df, non_sparse_columns=[]):
     return df
 
 
-def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs={},
+def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs=None,
                        postload=None, sparsify=False, int_CAS=False):
+    if csv_kwargs is None: csv_kwargs = {}
     load_cmds[name] = (folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS)
 
 '''The following flags will strip out the excess memory usage of redundant 
@@ -97,6 +99,10 @@ def load_df(key):
         import pandas as pd
     folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS = load_cmds[key]
     path = path_join(folder, name)
+    if int_CAS:
+        dtype = csv_kwargs.get('dtype', {})
+        dtype['CAS'] = int64_dtype
+        csv_kwargs['dtype'] = dtype
     df = pd.read_csv(path, sep=sep, index_col=index_col, **csv_kwargs)
     if postload: postload(df)
     if sparsify:
@@ -106,16 +112,18 @@ def load_df(key):
             if col_name in spurious_columns:
                 df[col_name] = pd.Series([], dtype=float).astype(pd.SparseDtype("float", nan))
 
-    if int_CAS:
+    if int_CAS and df.index.dtype is object_dtype:
+        # If the index is already an int, leave it be
         '''Most CAS numbers fit in 32 bits. Not all of them do though, for 
         example https://commonchemistry.cas.org/detail?cas_rn=2222298-66-8
         or 2627558-64-7
         
-        The maximum value of an unsigned integer is 4294967295. 
+        The maximum value of an unsigned 32 bit integer is 4294967295. 
+        For 64 bit it is 18446744073709551615.
         
         It would be possible to remove the check digit of the CAS number,
         which would allow all 10-digit current CAS format integers to fit
-        into an unsigned integer. 
+        into an unsigned 32 bit integer. 
         https://www.cas.org/support/documentation/chemical-substances/faqs
         CAS says they are only "up to ten digits". However, before 2008 all
         CAS numbers were "up to nine digits"; and they are already 25% of the
@@ -124,7 +132,7 @@ def load_df(key):
         likely be well before that. Therefore, it does not justify removing
         the check digit.
         '''
-        df.index = pd.Index([CAS_to_int(s) for s in df.index], dtype=int64_dtype)
+        df.index = pd.Index([CAS_to_int(s) for s in df.index], dtype=int64_dtype, name=df.index.name)
         
     df_sources[key] = df
 
@@ -157,7 +165,7 @@ def retrieve_from_df(df, index, key):
     df_index = df.index
     if df_index.dtype is int64_dtype and isinstance(index, str):
         try: index = CAS_to_int(index)
-        except: pass
+        except: return None
     if index in df_index:
         if isinstance(key, (int, str)):
             return get_value_from_df(df, index, key)
@@ -168,7 +176,7 @@ def retrieve_any_from_df(df, index, keys):
     df_index = df.index
     if df_index.dtype is int64_dtype and isinstance(index, str):
         try: index = CAS_to_int(index)
-        except: pass
+        except: return None
     if index not in df.index: return None
     for key in keys:
         value = df.at[index, key]
@@ -182,24 +190,18 @@ def get_value_from_df(df, index, key):
     value = df.at[index, key]
     try:
         return None if isnan(value) else float(value)
-    except TypeError:
-        # Not a number
+    except TypeError: # Not a number
         return value
 
 def list_available_methods_from_df_dict(df_dict, index, key):
     methods = []
-    int_index = None
+    int_index = None if type(index) is str else index # Assume must be string or int
     for method, df in df_dict.items():
         df_index = df.index
-        if df_index.dtype is int64_dtype and isinstance(index, str):
+        if df_index.dtype is int64_dtype:
             if int_index is None:
-                try:
-                    int_index = CAS_to_int(index)
-                except:
-                    int_index = 'skip'
-            elif int_index == 'skip':
-                continue
-            if (int_index in df_index) and not isnan(df.at[int_index, key]):
+                int_index = CAS_to_int(index)
+            if int_index in df_index and not isnan(df.at[int_index, key]):
                 methods.append(method)
         elif (index in df_index) and not isnan(df.at[index, key]):
             methods.append(method)
@@ -211,3 +213,62 @@ def list_available_methods_from_df(df, index, keys_by_method):
                 if not pd.isnull(df.at[index, key])]
     else:
         return []
+
+### Database
+
+try:
+    USE_CONSTANTS_DATABASE = os.path.exists(path_join(source_path, 'Misc', 'default.sqlite'))
+except:
+    USE_CONSTANTS_DATABASE = False
+
+CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 'Vc',
+'Zc', 'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
+'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
+'Hfus', 'Stockmayer', 'molecular_diameter',
+'dipole_moment', 'logP', 'RG', 'RON', 'MON', 'ignition_delay', 'linear',
+'GWP', 'ODP', 'RI', 'RIT']
+
+
+
+CONSTANT_DATABASE_NAME_TO_IDX = {k: i for i, k in enumerate(CONSTANT_DATABASE_COLUMNS)}
+CONSTANTS_CURSOR = None
+    
+DATABASE_CONSTANTS_CACHE = {}
+def cached_constant_lookup(CASi, prop):
+    if CONSTANTS_CURSOR is None: init_constants_db()
+    if CASi in DATABASE_CONSTANTS_CACHE:
+        result = DATABASE_CONSTANTS_CACHE[CASi]
+    else:
+        # Fetch and store the whole row
+        CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
+        result = CONSTANTS_CURSOR.fetchone()
+        DATABASE_CONSTANTS_CACHE[CASi] = result
+    if result is None:
+        # Result the value, and whether the compound was in the index
+        return result, False
+    else:
+        prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
+        return result[prop_idx], True
+
+def init_constants_db():
+    global CONSTANTS_CURSOR
+    import sqlite3
+    conn = sqlite3.connect(path_join(source_path, 'Misc', 'default.sqlite'))
+    CONSTANTS_CURSOR = conn.cursor()
+
+def database_constant_lookup(CASi, prop):
+    if type(CASi) is str: # Assume it must be either an int or string
+        try:
+            CASi = CAS_to_int(CASi)
+        except:
+            return None, False
+    try:
+        return cached_constant_lookup(CASi, prop)
+    except (TypeError, KeyError) as e:
+        raise e
+    except Exception:
+        # Prevent database lookup after first failure considering it should work everytime.
+        # It will possibly fail for users every time if database has not been created.
+        global USE_CONSTANTS_DATABASE
+        USE_CONSTANTS_DATABASE = False
+        return None, False

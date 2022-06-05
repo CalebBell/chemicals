@@ -43,8 +43,8 @@ __all__ = ['RG', 'RG_methods', 'RG_all_methods',
            'linear', 'linear_methods', 'linear_all_methods']
 
 from fluids.numerics import horner, interp
-
-from chemicals.data_reader import (data_source,
+from chemicals import data_reader as dr
+from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,
                                    register_df_source,
                                    retrieve_any_from_df_dict,
@@ -171,6 +171,9 @@ def RG(CASRN, method=None):
     .. [2] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on 
        Demand Norderstedt, Germany, 2000.
     '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'RG')
+        if found: return val
     if not _RG_data_loaded: _load_RG_data()
     if method:
         value = retrieve_from_df_dict(RG_sources, CASRN, 'RG', method)
@@ -254,6 +257,9 @@ def linear(CASRN, method=None):
        Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65. 
        https://doi.org/10.1002/wcms.93.
     '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'linear')
+        if found: return bool(val)
     if not _RG_data_loaded: _load_RG_data()
     if method:
         value = retrieve_from_df_dict(linear_sources, CASRN, 'linear', method)

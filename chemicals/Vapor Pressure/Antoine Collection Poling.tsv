@@ -1,4 +1,4 @@
-CASRN	Chemical	A	B	C	Tmin	Tmax
+CAS	Chemical	A	B	C	Tmin	Tmax
 56-23-5	tetrachloromethane 	9.10445	1265.632	-41.002	259	373.76
 60-29-7	diethyl ether 	9.10962	1090.64	-41.95	229.71	328.31
 62-53-3	benzeneamine 	9.4087	1692.77	-72.71	349.86	484.81

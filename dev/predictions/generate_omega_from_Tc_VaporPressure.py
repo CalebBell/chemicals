@@ -28,7 +28,7 @@ def generate_line(CASi):
     
     values = [omega]
     line = values
-    line.insert(0, CAS)
+    line.insert(0, CASi)
     for i, v in enumerate(line):
         if v is None:
             line[i] = ''

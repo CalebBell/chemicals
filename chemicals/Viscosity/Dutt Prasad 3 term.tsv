@@ -1,4 +1,4 @@
-CASRN	Chemical	A	B	C	Tmin	Tmax
+CAS	Chemical	A	B	C	Tmin	Tmax
 56-23-5	Carbon tetrachloride 	-1.4708	-324.45	71.19	273	373
 60-29-7	Ethyl ether 	-4.4735	-3623.26	-648.55	273	373
 62-53-3	Aniline 	-1.1835	-224.31	170.82	268	393
