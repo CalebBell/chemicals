@@ -195,18 +195,13 @@ def get_value_from_df(df, index, key):
 
 def list_available_methods_from_df_dict(df_dict, index, key):
     methods = []
-    int_index = None if isinstance(index, str) else index # Assume must be string or int
+    int_index = None if type(index) is str else index # Assume must be string or int
     for method, df in df_dict.items():
         df_index = df.index
         if df_index.dtype is int64_dtype:
             if int_index is None:
-                try:
-                    int_index = CAS_to_int(index)
-                except:
-                    int_index = 'skip'
-                else:
-                    (int_index in df_index) and not isnan(df.at[int_index, key]) and methods.append(method)
-            elif int_index != 'skip' and (int_index in df_index) and not isnan(df.at[int_index, key]):
+                int_index = CAS_to_int(index)
+            if int_index in df_index and not isnan(df.at[int_index, key]):
                 methods.append(method)
         elif (index in df_index) and not isnan(df.at[index, key]):
             methods.append(method)
@@ -221,7 +216,10 @@ def list_available_methods_from_df(df, index, keys_by_method):
 
 ### Database
 
-USE_CONSTANTS_DATABASE = True
+try:
+    USE_CONSTANTS_DATABASE = os.path.exists(path_join(source_path, 'Misc', 'default.sqlite'))
+except:
+    USE_CONSTANTS_DATABASE = False
 
 CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 'Vc',
 'Zc', 'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
@@ -259,7 +257,7 @@ def init_constants_db():
     CONSTANTS_CURSOR = conn.cursor()
 
 def database_constant_lookup(CASi, prop):
-    if isinstance(CASi, str): # Assume it must be either an int or string
+    if type(CASi) is str: # Assume it must be either an int or string
         try:
             CASi = CAS_to_int(CASi)
         except:
@@ -267,7 +265,7 @@ def database_constant_lookup(CASi, prop):
     try:
         return cached_constant_lookup(CASi, prop)
     except (TypeError, KeyError) as e:
-        raise e from None
+        raise e
     except Exception:
         # Prevent database lookup after first failure considering it should work everytime.
         # It will possibly fail for users every time if database has not been created.

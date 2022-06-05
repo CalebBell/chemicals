@@ -35,7 +35,6 @@ from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_PassutDanner,
                                 critical_data_PinaMartines)
 
-# data_reader.USE_CONSTANTS_DATABASE = False
 
 def test_data_IUPAC():
     Tc_sum = critical_data_IUPAC['Tc'].sum()
@@ -185,8 +184,13 @@ def test_relationships():
 
     assert [] == critical_surface_methods(Tc=100)
 
+
+# 
+
 @pytest.mark.slow
-def test_Tc_all_values():
+@pytest.mark.parametrize("with_database", [True, False])
+def test_Tc_all_values(with_database):
+    data_reader.USE_CONSTANTS_DATABASE = with_database
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC,
                critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
                critical_data_PinaMartines, webbook_data]
@@ -201,7 +205,9 @@ def test_Tc_all_values():
     Tcs_default_sum = pd.Series(Tcs).sum()
     assert_close(Tcs_default_sum, 6246040.066122223)
 
-def test_Tc():
+@pytest.mark.parametrize("with_database", [True, False])
+def test_Tc(with_database):
+    data_reader.USE_CONSTANTS_DATABASE = with_database
     Tc_val = Tc(CASRN='64-17-5')
     assert_close(514.0, Tc_val)
     assert type(Tc_val) is float
@@ -225,7 +231,9 @@ def test_Tc():
     # https://github.com/CalebBell/thermo/issues/65
     assert Tc(CASRN='7784-42-1', method='MATTHEWS') == 373
 
-def test_Pc():
+@pytest.mark.parametrize("with_database", [True, False])
+def test_Pc(with_database):
+    data_reader.USE_CONSTANTS_DATABASE = with_database
 
     assert_close(6137000.0, Pc(CASRN='64-17-5'))
 
@@ -243,7 +251,9 @@ def test_Pc():
 
 
 @pytest.mark.slow
-def test_Pc_all_values():
+@pytest.mark.parametrize("with_database", [True, False])
+def test_Pc_all_values(with_database):
+    data_reader.USE_CONSTANTS_DATABASE = with_database
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
                critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
                critical_data_PinaMartines, webbook_data]
@@ -258,7 +268,9 @@ def test_Pc_all_values():
     Pcs_default_sum = pd.Series(Pcs).sum()
     assert_close(Pcs_default_sum, 64602001266.18326)
 
-def test_Vc():
+@pytest.mark.parametrize("with_database", [True, False])
+def test_Vc(with_database):
+    data_reader.USE_CONSTANTS_DATABASE = with_database
     assert_close(0.000168, Vc(CASRN='64-17-5'))
 
     assert_close(5.600e-05, Vc(CASRN='7732-18-5', method='PSRK'))
@@ -274,7 +286,9 @@ def test_Vc():
         Vc(CASRN='98-01-1', method='BADMETHOD')
 
 @pytest.mark.slow
-def test_Vc_all_values():
+@pytest.mark.parametrize("with_database", [True, False])
+def test_Vc_all_values(with_database):
+    data_reader.USE_CONSTANTS_DATABASE = with_database
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
                critical_data_PSRKR4, critical_data_Yaws, critical_data_PinaMartines,
                webbook_data]
@@ -289,7 +303,9 @@ def test_Vc_all_values():
     Vcs_default_sum = pd.Series(Vcs).sum()
     assert_close(Vcs_default_sum, 4.955859233439)
 
-def test_Zc():
+@pytest.mark.parametrize("with_database", [True, False])
+def test_Zc(with_database):
+    data_reader.USE_CONSTANTS_DATABASE = with_database
     assert_close(0.241, Zc(CASRN='64-17-5'))
 
     assert_close(0.22941602891834947, Zc(CASRN='7732-18-5', method='PSRK'))
@@ -304,8 +320,10 @@ def test_Zc():
     with pytest.raises(Exception):
         Zc(CASRN='98-01-1', method='BADMETHOD')
 
+@pytest.mark.parametrize("with_database", [True, False])
 @pytest.mark.slow
-def test_Zc_all_values():
+def test_Zc_all_values(with_database):
+    data_reader.USE_CONSTANTS_DATABASE = with_database
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
                critical_data_PSRKR4, critical_data_PinaMartines,
                critical_data_Yaws, webbook_data]
