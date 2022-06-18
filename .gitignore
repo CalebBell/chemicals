@@ -15,6 +15,8 @@ monkeytype.sqlite3
 *.spyproject*
 chemicals.build
 .asv
+build
+chemicals.egg-info
 
 # Docs #
 ########
