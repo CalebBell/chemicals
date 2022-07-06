@@ -141,6 +141,67 @@ try:
 except:
     from fluids.numerics import FakePackage as ndarray
 
+
+
+
+empty_dict = {}
+immutable_types = set([type(None), bool, int, float, complex, str, bytes,
+                       # dictionary views are read-only, kinda unexpected
+                      type(empty_dict.keys()), type(empty_dict.items()), type(empty_dict.values()),
+                      ])
+try:
+    numpy_immutable_types = [np.bool_, np.byte, np.ubyte, np.short, np.ushort, np.intc, np.uintc, np.int_, np.uint, np.longlong, np.ulonglong, np.half, np.float16, np.single, np.double, np.longdouble, np.csingle, np.cdouble, np.clongdouble]
+    immutable_types.update(numpy_immutable_types)
+except:
+    pass
+
+immutable_class_types = set(['Fraction', 'Decimal'])
+
+def recursive_copy(obj):
+    obj_type = type(obj)
+    if obj_type in immutable_types:
+        return obj
+    elif obj_type is tuple:
+        return tuple(recursive_copy(v) for v in obj)
+    elif obj_type is list:
+        return list([recursive_copy(v) for v in obj])
+    elif obj_type is dict:
+        d = {}
+        for k, v in obj.items():
+            d[recursive_copy(k)] = recursive_copy(v)
+        return d
+    elif obj_type is bytearray:
+        return obj.copy()
+    elif obj_type is np.ndarray or obj_type is np.matrix:
+        # Mutable objects
+        # .copy() won't work for obj arrays of mutable values, so have to handle it separately
+        if obj.dtype == object:
+            copy = np.array([recursive_copy(o) for o in obj.ravel().tolist()], dtype=object)
+            copy.reshape(obj.shape)
+            return copy
+        return obj.copy()
+    elif obj_type is range:
+        return range(obj.start, obj.stop, obj.step)
+    elif obj_type is set:
+        return set([recursive_copy(v) for v in obj])
+    elif obj_type is frozenset:
+        return frozenset([recursive_copy(v) for v in obj])
+
+    # We need to handle the copy on some object types
+    # that we don't want to import, so use their class names as a good proxy
+    
+    obj_class_name = obj_type.__name__
+    
+    if obj_class_name == 'array':
+        return obj.__copy__() # mutable
+    elif obj_class_name in immutable_class_types:
+        return obj
+    
+    if hasattr(obj, '__copy__'):
+        # Allow objects to provide their own hooks and wash our hands of them
+        return obj.__copy__()
+    raise ValueError("No copy function implemented")
+
 @mark_numba_incompatible
 def hash_any_primitive(v):
     '''Method to hash a primitive - with basic support for lists and

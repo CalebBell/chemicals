@@ -25,7 +25,110 @@ SOFTWARE.
 import pytest
 import numpy as np
 from chemicals.utils import *
+from chemicals.utils import recursive_copy, hash_any_primitive
 from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace
+
+def test_recursive_copy():
+    import array
+    from decimal import Decimal
+    from fractions import Fraction
+    from copy import deepcopy
+
+    test_cases = [None, 
+                  True, False, 
+                 -1, 0, 1, 2, 2000, 2**65,
+                  -1.1234, 0, 2e200, float("nan"),
+                  1j, 1.1234j, 1234132+123.234j, -12341-1234j,
+                  'a', 'b', 'asdfsdfasdf', 'asdf asdfadf',
+                  Decimal(2),Fraction(2.34),
+                 ]
+    
+    numpy_test_cases = [ np.complex128(1), np.complex256(1), np.complex64(1), np.float128(1), np.float16(1), np.float32(1), np.float64(1), np.int16(1), np.int32(1), np.int64(1), np.int8(1), np.longlong(1), np.uint16(1), np.uint32(1), np.uint64(1), np.uint8(1), np.ulonglong(1),]
+    
+    tuple_cases = [(12,21,34,3, None, -1, 'asd', 1j),
+                   (12., (123.352, None, 4, (123.352, None, 4), [123]), ),
+                   tuple(),
+                   tuple(range(129)),
+                  ]
+    
+    list_cases = [[2,21,34,3, None, -1, 'asd', 1j],
+                   [12., (123.352, None, 4, (123.352, None, 4), [123]), ],
+                   list(),
+                   list(range(129)),
+        
+    ]
+    
+    set_cases = [set([1,2,'a', 1j, np.float32(1)]),
+    ]
+    
+    frozenset_cases = [frozenset([1,2,'a', 1j, np.float32(1)]),
+    ]
+    
+    numpy_cases = [np.arange(13),
+                   np.arange(13, dtype=int),
+                   np.arange(13, dtype=np.uint32),
+                   np.arange(13, dtype=np.float32),
+                   np.arange(13, dtype=np.float16),
+                   np.matrix(np.arange(13, dtype=np.float16)),
+                   np.matrix(np.arange(13, dtype=int)),
+                  ]
+    
+    other_cases = [
+    ]
+    
+    
+    byte_cases = [b'asdfasd', b'1232', 
+                  bytes.fromhex('2Ef0 F1f2  '),
+                 ]
+    
+    test_cases += numpy_test_cases
+    test_cases += tuple_cases
+    test_cases += list_cases
+    test_cases += numpy_cases
+    test_cases += other_cases
+    test_cases += set_cases
+    test_cases += frozenset_cases
+    test_cases += byte_cases
+    
+    
+    
+    
+    for case in test_cases:
+        implemented_copy = recursive_copy(case)
+        original_copy = deepcopy(case)
+        assert type(implemented_copy) == type(original_copy)
+        assert hash_any_primitive(implemented_copy) == hash_any_primitive(original_copy)
+    
+    
+    unhashable_cases = [range(10),
+                        range(1,2,10),
+                        range(1,29,10),
+                        bytearray([0,1,3,2]),
+                        array.array('l', [-11111111, 22222222, -33333333, 44444444]),
+                       ]
+    
+    
+    for case in unhashable_cases:
+        implemented_copy = recursive_copy(case)
+        original_copy = deepcopy(case)
+        assert type(implemented_copy) == type(original_copy)
+        assert id(implemented_copy) != case
+    
+    
+    read_only_cases = [{'a': 3, 'b': 5}.items(),]
+    
+    for case in read_only_cases:
+        implemented_copy = recursive_copy(case)
+        assert type(implemented_copy) == type(case)
+        assert implemented_copy is case
+    
+    
+    # numpy case with object arrays    
+    original = np.array([set([2**66]), set([2**67])])
+    copy = recursive_copy(original)
+    original[1].add(1)
+    assert len(copy[1]) == 1
+
 
 
 def test_to_num():
