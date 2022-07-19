@@ -2367,6 +2367,7 @@ def Rachford_Rice_flashN_f_jac(betas, ns, Ks, Ksm1=None, zsKsm1=None):
                 dFs_dBetas[k][j] -= term
                 dFs_dBetas[j][k] -= term
             dFs_dBetas[j][j] -= f*Ksm1[j][i]
+    # print(Fs, betas)
     return Fs, dFs_dBetas
 
 
@@ -2501,9 +2502,42 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
     zsKsm1 = [[zi*Ksim1 for zi, Ksim1 in zip(ns, Ksm1i)] for Ksm1i in Ksm1] # numba: delete
 #    zsKsm1 = ns*Ksm1 # numba: uncomment
 
+    # if 1:
+    #     import matplotlib.pyplot as plt
+    #     from matplotlib import cm
+    #     betas_plot = linspace(-10, 10, 500)
+    #     errs = []
+    #     for b0 in betas_plot:
+    #         r = []
+    #         for b1 in betas_plot:
+    #             Fs = Rachford_Rice_flashN_f_jac([b0, b1], ns, Ks)[0]
+    #             err = abs(Fs[0]) + abs(Fs[1])
+    #             r.append(err)
+    #         errs.append(r)
+
+    #     trunc_err_low = 1e-9
+    #     trunc_err_high = 10
+    #     X, Y = np.meshgrid(betas_plot, betas_plot)
+    #     z = np.array(errs).T
+    #     if trunc_err_low is not None:
+    #         z[np.where(abs(z) < trunc_err_low)] = trunc_err_low
+    #     if trunc_err_high is not None:
+    #         z[np.where(abs(z) > trunc_err_high)] = trunc_err_high
+    #     color_map = cm.viridis
+
+    #     fig, ax = plt.subplots()
+    #     im = ax.pcolormesh(X, Y, z, cmap=color_map) # , norm=LogNorm(vmin=trunc_err_low, vmax=trunc_err_high)
+    #     cbar = fig.colorbar(im, ax=ax)
+    #     cbar.set_label('Relative error')
+    #     plt.show()
+
+
     betas, _ = newton_system(Rachford_Rice_flashN_f_jac, jac=True,
                              x0=betas, args=(ns, Ks, Ksm1, zsKsm1), solve_func=solve_func,
-                             ytol=1e-14, damping_func=RRN_new_betas)
+                             xtol=1e-12,
+                             # ytol=1e-14,
+                             damping_func=RRN_new_betas
+                             )
     all_betas = [0.0]*phase_count
     beta_sum = 0.0
     for i in range(phase_count_m1):
