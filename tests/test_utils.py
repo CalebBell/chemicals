@@ -43,7 +43,20 @@ def test_recursive_copy():
                   Decimal(2),Fraction(2.34),
                  ]
     
-    numpy_test_cases = [ np.complex128(1), np.complex256(1), np.complex64(1), np.float128(1), np.float16(1), np.float32(1), np.float64(1), np.int16(1), np.int32(1), np.int64(1), np.int8(1), np.longlong(1), np.uint16(1), np.uint32(1), np.uint64(1), np.uint8(1), np.ulonglong(1),]
+    numpy_test_cases = [ np.complex128(1), np.complex64(1), np.float16(1),
+                        np.float32(1), np.float64(1), np.int16(1), np.int32(1), np.int64(1), 
+                        np.int8(1), np.longlong(1), np.uint16(1), np.uint32(1), np.uint64(1),
+                        np.uint8(1), np.ulonglong(1),]
+    try:
+        numpy_test_cases.append(np.float128(1))
+    except:
+        # not supported on windows https://github.com/cupy/cupy/issues/2916
+        pass
+    try:
+        numpy_test_cases.append(np.complex256(1))
+    except:
+        # not supported on windows https://github.com/cupy/cupy/issues/2916
+        pass
     
     tuple_cases = [(12,21,34,3, None, -1, 'asd', 1j),
                    (12., (123.352, None, 4, (123.352, None, 4), [123]), ),
