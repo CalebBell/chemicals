@@ -46,7 +46,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows',
 'solve_flow_composition_mix', 'radius_of_gyration',
-'v_to_v_molar', 'v_molar_to_v']
+'v_to_v_molar', 'v_molar_to_v', 'molar_velocity_to_velocity', 'velocity_to_molar_velocity']
 
 import os
 import sys
@@ -1065,6 +1065,58 @@ def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
     else:
         return (-V*V*1000.0*dP_dV*Cp/(Cv*MW))**0.5
 
+def molar_velocity_to_velocity(v_molar, MW):
+    r'''Calculate the mass-based velocity (m/s) from the molar velocity of 
+    the fluid.
+    
+    .. math::
+        v = \frac{v_{molar}\sqrt{1000}}{\sqrt{\text{MW}}}
+
+    Parameters
+    ----------
+    v_molar : float
+        Molar velcoity, [m*kg^0.5/s/mol^0.5]
+    MW : float
+        Molecular weight, [g/mol]
+
+    Returns
+    -------
+    v : float
+        Velocity, [m/s]
+
+    Examples
+    --------
+    >>> molar_velocity_to_velocity(46., 40.445)
+    228.73
+
+    '''
+    return sqrt(1000)*v_molar/sqrt(MW)
+
+def velocity_to_molar_velocity(v, MW):
+    r'''Calculate the molar velocity from the mass-based (m/s) velocity of 
+    the fluid.
+    
+    .. math::
+        v_{molar} = \frac{v \sqrt{\text{MW}}}{\sqrt{1000}}
+
+    Parameters
+    ----------
+    v : float
+        Velocity, [m/s]
+    MW : float
+        Molecular weight, [g/mol]
+
+    Returns
+    -------
+    v_molar : float
+        Molar velcoity, [m*kg^0.5/s/mol^0.5]
+
+    Examples
+    --------
+    >>> velocity_to_molar_velocity(228.73, 40.445)
+    46.
+    '''
+    return v*sqrt(MW)/sqrt(1000)
 
 def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
     r'''Calculate a real fluid's Joule Thomson coefficient. The required

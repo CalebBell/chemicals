@@ -589,3 +589,9 @@ def test_radius_of_gyration():
     
     calc = radius_of_gyration(A=9.972482951577335e-47, B=1.941784104125803e-45, planar=True, MW=111.01, C=0)
     assert_close(calc, 4.8859099776532495e-11, rtol=1e-13)
+    
+    
+def test_molar_velocity():
+    molar_velocity_to_velocity(46.537593457316525, 67.152)
+
+    velocity_to_molar_velocity(179.5868138460819, 67.152)
