@@ -592,6 +592,6 @@ def test_radius_of_gyration():
     
     
 def test_molar_velocity():
-    molar_velocity_to_velocity(46.537593457316525, 67.152)
+    assert_close(molar_velocity_to_velocity(46.537593457316525, 67.152), 179.5868138460819, rtol=1e-12)
 
-    velocity_to_molar_velocity(179.5868138460819, 67.152)
+    assert_close(velocity_to_molar_velocity(179.5868138460819, 67.152), 46.537593457316525, rtol=1e-12)
