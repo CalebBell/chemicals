@@ -651,7 +651,7 @@ def IDT_to_DCN(IDT):
     else:
         return (83.99*(IDT-1.512)**-0.658) + 3.547
 
-
+@mark_numba_incompatible
 def as_atoms(formula):
     if isinstance(formula, str):
         atoms = simple_formula_parser(formula)

@@ -639,6 +639,7 @@ def S0g_methods(CASRN):
     if not _reaction_data_loaded: _load_reaction_data()
     return list_available_methods_from_df_dict(S0g_sources, CASRN, 'S0g')
 
+@mark_numba_incompatible
 def S0g(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
