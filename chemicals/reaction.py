@@ -96,6 +96,7 @@ from chemicals.data_reader import (data_source, database_constant_lookup,
 from chemicals.utils import (PY37, can_load_data, ceil, log10,
                              mark_numba_incompatible, os_path_join,
                              source_path)
+from fluids.numerics import numpy as np
 
 # %% Register data sources and lazy load them
 CRC = 'CRC'
@@ -960,15 +961,20 @@ def stoichiometric_matrix(atomss, reactants):
     elements = set()
     for atoms in atomss:
         elements.update(atoms.keys())
-    elements = sorted(list(elements)) # Ensure reproducibility
+    elements = list(elements)
+    elements.sort() # Ensure reproducibility
     n_elements = len(elements)
+    
 
     matrix = [[0]*n_compounds for _ in range(n_elements)]
+    element_to_row = {ele: matrix[idx] for idx, ele in enumerate(elements)}
     for i, atoms in enumerate(atomss):
-        for k, v in atoms.items():
-            if not reactants[i]:
-                v = -v
-            matrix[elements.index(k)][i] = v
+        if reactants[i]:
+            for k, v in atoms.items():
+                element_to_row[k][i] = v
+        else:
+            for k, v in atoms.items():
+                element_to_row[k][i] = -v
     return matrix
 
 def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
