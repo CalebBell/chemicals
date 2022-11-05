@@ -1000,7 +1000,8 @@ formula_token_matcher_rational = bracketed_charge_re = None
 letter_set = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 subscripts = '₀₁₂₃₄₅₆₇₈₉'
 numbers = '0123456789'
-translate_subscripts = str.maketrans(subscripts, numbers)
+# translate_subscripts = str.maketrans(subscripts, numbers)# missing in micropython
+translate_subscripts = {8320: 48, 8321: 49, 8322: 50, 8323: 51, 8324: 52, 8325: 53, 8326: 54, 8327: 55, 8328: 56, 8329: 57}
 
 @mark_numba_incompatible
 def nested_formula_parser(formula, check=True):
