@@ -332,6 +332,11 @@ class ChemicalMetadataDB(object):
         '''
         if not self.elements:
             return None
+        
+        InChI_key_index, CAS_index, pubchem_index = self.InChI_key_index, self.CAS_index, self.pubchem_index
+        smiles_index, InChI_index, formula_index = self.smiles_index, self.InChI_index, self.formula_index
+        name_index = self.name_index
+        
         for ele in periodic_table:
 
             CAS = int(ele.CAS.replace('-', '')) # Store as int for easier lookup
@@ -346,24 +351,24 @@ class ChemicalMetadataDB(object):
                                    synonyms=synonyms)
 
 
-            if ele.InChI_key in self.InChI_key_index:
+            if ele.InChI_key in InChI_key_index:
                 if ele.number not in homonuclear_elements:
-                    obj_old = self.InChI_key_index[ele.InChI_key]
+                    obj_old = InChI_key_index[ele.InChI_key]
                     for name in obj_old.synonyms:
-                        self.name_index[name] = obj
+                        name_index[name] = obj
 
-            self.InChI_key_index[ele.InChI_key] = obj
-            self.CAS_index[CAS] = obj
-            self.pubchem_index[ele.PubChem] = obj
-            self.smiles_index[ele.smiles] = obj
-            self.InChI_index[ele.InChI] = obj
+            InChI_key_index[ele.InChI_key] = obj
+            CAS_index[CAS] = obj
+            pubchem_index[ele.PubChem] = obj
+            smiles_index[ele.smiles] = obj
+            InChI_index[ele.InChI] = obj
             if ele.number in homonuclear_elements:
-                for name in synonyms:
-                    self.name_index['monatomic ' + name] = obj
+                for name in obj.synonyms:
+                    name_index['monatomic ' + name] = obj
             else:
-                for name in synonyms:
-                    self.name_index[name] = obj
-            self.formula_index[obj.formula] = obj
+                for name in obj.synonyms:
+                    name_index[name] = obj
+            formula_index[obj.formula] = obj
 
 
     def load(self, file_name):
