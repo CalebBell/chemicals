@@ -335,13 +335,14 @@ class ChemicalMetadataDB(object):
         for ele in periodic_table:
 
             CAS = int(ele.CAS.replace('-', '')) # Store as int for easier lookup
-            synonyms = [ele.name.lower()]
+            ele_lower_name = ele.name.lower()
+            synonyms = [ele_lower_name]
 
             obj = ChemicalMetadata(pubchemid=ele.PubChem, CAS=CAS,
                                    formula=ele.symbol, MW=ele.MW, smiles=ele.smiles,
                                    InChI=ele.InChI, InChI_key=ele.InChI_key,
-                                   iupac_name=ele.name.lower(),
-                                   common_name=ele.name.lower(),
+                                   iupac_name=ele_lower_name,
+                                   common_name=ele_lower_name,
                                    synonyms=synonyms)
 
 
