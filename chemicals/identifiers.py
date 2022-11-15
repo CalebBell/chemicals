@@ -73,7 +73,7 @@ __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
 import os
 from io import open
 
-from chemicals.elements import (charge_from_formula, homonuclear_elements,
+from chemicals.elements import (charge_from_formula, homonuclear_elements_CASs_set,
                                 periodic_table, serialize_formula,
                                 simple_formula_parser)
 from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
@@ -338,31 +338,28 @@ class ChemicalMetadataDB(object):
         name_index = self.name_index
         
         for ele in periodic_table:
-
             CAS = int(ele.CAS.replace('-', '')) # Store as int for easier lookup
             ele_lower_name = ele.name.lower()
-            synonyms = [ele_lower_name]
-
             obj = ChemicalMetadata(pubchemid=ele.PubChem, CAS=CAS,
                                    formula=ele.symbol, MW=ele.MW, smiles=ele.smiles,
                                    InChI=ele.InChI, InChI_key=ele.InChI_key,
                                    iupac_name=ele_lower_name,
                                    common_name=ele_lower_name,
-                                   synonyms=synonyms)
+                                   synonyms=[ele_lower_name])
 
 
-            if ele.InChI_key in InChI_key_index:
-                if ele.number not in homonuclear_elements:
-                    obj_old = InChI_key_index[ele.InChI_key]
+            if obj.InChI_key in InChI_key_index:
+                if ele.CAS not in homonuclear_elements_CASs_set:
+                    obj_old = InChI_key_index[obj.InChI_key]
                     for name in obj_old.synonyms:
                         name_index[name] = obj
 
-            InChI_key_index[ele.InChI_key] = obj
-            CAS_index[CAS] = obj
-            pubchem_index[ele.PubChem] = obj
-            smiles_index[ele.smiles] = obj
-            InChI_index[ele.InChI] = obj
-            if ele.number in homonuclear_elements:
+            InChI_key_index[obj.InChI_key] = obj
+            CAS_index[obj.CAS] = obj
+            pubchem_index[obj.pubchemid] = obj
+            smiles_index[obj.smiles] = obj
+            InChI_index[obj.InChI] = obj
+            if ele.CAS in homonuclear_elements_CASs_set:
                 for name in obj.synonyms:
                     name_index['monatomic ' + name] = obj
             else:

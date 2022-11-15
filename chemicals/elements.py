@@ -103,6 +103,7 @@ homonuclear_elemental_gases = [1, 7, 8, 9, 17] # 35, 53
 homonuclear_elemental_singlets_CASs = ["12385-13-6", "17778-88-0", "17778-80-2", "14762-94-8", "22537-15-1"]
 
 homonuclear_elements_CASs = homonuclear_elemental_singlets_CASs + ['10097-32-2', '14362-44-8']
+homonuclear_elements_CASs_set = frozenset(homonuclear_elements_CASs)
 
 for i, CAS in zip(homonuclear_elements, homonuclear_elements_CASs):
     CAS_by_number[i-1] = CAS
