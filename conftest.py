@@ -12,6 +12,8 @@ def pytest_ignore_collect(path):
         return True
     if 'dev' in path:
         return True 
+    if 'conf.py' in path:
+        return True
 #    if 'numba' in path:
 #        return True
 #    if 'units' in path:
