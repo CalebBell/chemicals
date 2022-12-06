@@ -26,7 +26,10 @@ import pytest
 import pandas as pd
 
 from chemicals.identifiers import check_CAS
-from chemicals.reaction import *
+from chemicals.reaction import (Gibbs_formation, Hf_basis_converter, Hfg, Hfg_all_methods,
+                                Hfg_methods, Hfl, Hfl_methods, Hfs, Hfs_methods, S0g,
+                                S0g_all_methods, S0g_methods, S0l, S0l_methods, S0s, S0s_methods,
+                                balance_stoichiometry, entropy_formation, stoichiometric_matrix)
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data
 from chemicals.reaction import Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, Hfg_S0g_YAWS_data
 
@@ -56,7 +59,7 @@ def test_Hfg_API_TDB_data():
     assert None == Hfg('98-00-1')
 
     with pytest.raises(Exception):
-        Hf('98-00-0', method='BADMETHOD')
+        Hfg('98-00-0', method='BADMETHOD')
 
 @pytest.mark.slow
 def test_Hfg_API_TDB_data_fuzz():

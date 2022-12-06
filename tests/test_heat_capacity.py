@@ -23,7 +23,21 @@ import pytest
 from math import log10, log
 from fluids.constants import R, h, k
 from fluids.numerics import assert_close, assert_close1d, linspace, logspace, quad
-from chemicals.heat_capacity import *
+from chemicals.heat_capacity import (Cpg_statistical_mechanics, Cpg_statistical_mechanics_integral,
+                                     Cpg_statistical_mechanics_integral_over_T, Dadgostar_Shaw,
+                                     Lastovka_Shaw, Lastovka_Shaw_T_for_Hm, Lastovka_Shaw_T_for_Sm,
+                                     Lastovka_Shaw_integral, Lastovka_Shaw_integral_over_T,
+                                     Lastovka_solid, Lastovka_solid_integral,
+                                     Lastovka_solid_integral_over_T, PPDS15, PPDS2, Rowlinson_Bondi,
+                                     Rowlinson_Poling, Shomate, Shomate_integral,
+                                     Shomate_integral_over_T, TDE_CSExpansion, TRCCp,
+                                     TRCCp_integral, TRCCp_integral_over_T,
+                                     ZabranskyQuasipolynomial, ZabranskySpline, Zabransky_cubic,
+                                     Zabransky_cubic_integral, Zabransky_cubic_integral_over_T,
+                                     Zabransky_quasi_polynomial,
+                                     Zabransky_quasi_polynomial_integral,
+                                     Zabransky_quasi_polynomial_integral_over_T,
+                                     vibration_frequency_cm_to_characteristic_temperature)
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data, Cp_data_Poling
 from fluids.numerics import NotBoundedError
 from chemicals.heat_capacity import zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s, PiecewiseHeatCapacity

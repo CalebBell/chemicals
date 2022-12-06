@@ -25,8 +25,21 @@ SOFTWARE.
 import numpy as np
 import pytest
 import chemicals
-from chemicals.air import *
-from math import *
+from chemicals.air import (TEOS10_BAW_derivatives, TEOS10_CAAW_derivatives, TEOS10_CAWW_derivatives,
+                           iapws04_Henry_air, iapws04_dHenry_air_dT, lemmon2000_P, lemmon2000_T,
+                           lemmon2000_air_A0, lemmon2000_air_Ar, lemmon2000_air_P_bubble,
+                           lemmon2000_air_P_dew, lemmon2000_air_d2A0_dtau2,
+                           lemmon2000_air_d2Ar_ddelta2, lemmon2000_air_d2Ar_ddeltadtau,
+                           lemmon2000_air_d2Ar_dtau2, lemmon2000_air_d3A0_dtau3,
+                           lemmon2000_air_d3Ar_ddelta2dtau, lemmon2000_air_d3Ar_ddelta3,
+                           lemmon2000_air_d3Ar_ddeltadtau2, lemmon2000_air_d3Ar_dtau3,
+                           lemmon2000_air_d4A0_dtau4, lemmon2000_air_d4Ar_ddelta2dtau2,
+                           lemmon2000_air_d4Ar_ddelta3dtau, lemmon2000_air_d4Ar_ddelta4,
+                           lemmon2000_air_d4Ar_ddeltadtau3, lemmon2000_air_d4Ar_dtau4,
+                           lemmon2000_air_dA0_dtau, lemmon2000_air_dAr_ddelta,
+                           lemmon2000_air_dAr_dtau, lemmon2000_air_rho_bubble,
+                           lemmon2000_air_rho_dew, lemmon2000_rho)
+from math import exp, log10
 from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace, derivative
 
 from chemicals.air import TAU_MAX_EXP_87

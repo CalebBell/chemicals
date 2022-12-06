@@ -25,7 +25,7 @@ import pytest
 from fluids.numerics import assert_close, assert_close1d
 
 from chemicals import miscdata
-from chemicals.miscdata import *
+from chemicals.miscdata import lookup_VDI_tabular_data
 from chemicals.miscdata import VDI_saturation_dict, CRC_inorganic_data, CRC_organic_data
 from chemicals.identifiers import check_CAS
 

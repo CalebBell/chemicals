@@ -25,7 +25,7 @@ from fluids.numerics import assert_close, assert_close1d, linspace
 import pytest
 import pandas as pd
 import numpy as np
-from chemicals.permittivity import *
+from chemicals.permittivity import permittivity_IAPWS
 from chemicals.permittivity import permittivity_data_CRC
 
 def test_permittivity_data():

@@ -24,7 +24,7 @@ SOFTWARE.
 from fluids.numerics import assert_close
 import pytest
 from chemicals import molecular_geometry
-from chemicals.molecular_geometry import *
+from chemicals.molecular_geometry import RG, RG_methods, linear, linear_methods
 
 
 def test_molecular_geometry_methods():

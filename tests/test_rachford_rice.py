@@ -29,7 +29,14 @@ import sys
 from chemicals.exceptions import PhaseCountReducedError
 from fluids.constants import calorie, R
 from fluids.numerics import derivative
-from chemicals.rachford_rice import *
+from chemicals.rachford_rice import (Li_Johns_Ahmadi_solution, Rachford_Rice_flash_error,
+                                     Rachford_Rice_polynomial, Rachford_Rice_solution,
+                                     Rachford_Rice_solutionN, Rachford_Rice_solution_LN2,
+                                     Rachford_Rice_solution_Leibovici_Neoschil,
+                                     Rachford_Rice_solution_Leibovici_Neoschil_dd,
+                                     Rachford_Rice_solution_binary_dd,
+                                     Rachford_Rice_solution_polynomial, flash_inner_loop,
+                                     flash_inner_loop_methods)
 from chemicals.rachford_rice import Rachford_Rice_solution_numpy, Rachford_Rice_solution_mpmath
 from chemicals.rachford_rice import Rachford_Rice_valid_solution_naive, Rachford_Rice_solution2
 from chemicals.rachford_rice import Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac

@@ -25,7 +25,10 @@ SOFTWARE.
 import numpy as np
 import pytest
 import pandas as pd
-from chemicals.volume import *
+from chemicals.volume import (Amgat, Bhirud_normal, COSTALD, COSTALD_compressed, COSTALD_mixture,
+                              CRC_inorganic, Campbell_Thodos, Goodman, PPDS17, Rackett,
+                              Rackett_mixture, SNM0, TDE_VDNS_rho, Townsend_Hales, Yamada_Gunn,
+                              ideal_gas)
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.volume import (rho_data_COSTALD, rho_data_SNM0, rho_data_Perry_8E_105_l, rho_data_CRC_inorg_l,
                               rho_data_VDI_PPDS_2, rho_data_CRC_inorg_l_const, rho_data_CRC_inorg_s_const,

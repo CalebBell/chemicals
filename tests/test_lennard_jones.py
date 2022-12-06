@@ -25,7 +25,21 @@ import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals import check_CAS
-from chemicals.lennard_jones import *
+from chemicals.lennard_jones import (Stockmayer, Stockmayer_all_methods, Stockmayer_methods, T_star,
+                                     collision_integral_Kim_Monroe,
+                                     collision_integral_Neufeld_Janzen_Aziz,
+                                     epsilon_Bird_Stewart_Lightfoot_boiling,
+                                     epsilon_Bird_Stewart_Lightfoot_critical,
+                                     epsilon_Bird_Stewart_Lightfoot_melting, epsilon_Flynn,
+                                     epsilon_Stiel_Thodos, epsilon_Tee_Gotoh_Steward_1,
+                                     epsilon_Tee_Gotoh_Steward_2, molecular_diameter,
+                                     molecular_diameter_all_methods, molecular_diameter_methods,
+                                     sigma_Bird_Stewart_Lightfoot_boiling,
+                                     sigma_Bird_Stewart_Lightfoot_critical_1,
+                                     sigma_Bird_Stewart_Lightfoot_critical_2,
+                                     sigma_Bird_Stewart_Lightfoot_melting, sigma_Flynn,
+                                     sigma_Silva_Liu_Macedo, sigma_Stiel_Thodos,
+                                     sigma_Tee_Gotoh_Steward_1, sigma_Tee_Gotoh_Steward_2)
 from chemicals.lennard_jones import LJ_data_Magalhaes, LJ_data_Poling, POLING
 from fluids.constants import k
 

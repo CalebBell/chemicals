@@ -24,7 +24,9 @@ SOFTWARE.
 import pytest
 
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.phase_change import *
+from chemicals.phase_change import (Alibakhshi, Chen, Clapeyron, Hfus, Hfus_methods, Liu, MK,
+                                    PPDS12, Pitzer, Riedel, SMK, Tb, Tb_methods, Tm, Tm_methods,
+                                    Velasco, Vetere, Watson)
 from chemicals.phase_change import (Hvap_data_CRC, Hfus_data_CRC,
                                     Hvap_data_Gharagheizi, Hsub_data_Gharagheizi,
                                     Tb_data_Yaws, Tm_ON_data,

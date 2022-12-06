@@ -24,7 +24,7 @@ SOFTWARE.
 from fluids.numerics import assert_close, assert_close1d
 import pytest
 import pandas as pd
-from chemicals.triple import *
+from chemicals.triple import Pt, Pt_methods, Tt, Tt_methods
 from chemicals.triple import triple_data_Staveley
 
 

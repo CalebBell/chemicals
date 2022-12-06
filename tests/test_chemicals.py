@@ -25,7 +25,6 @@ import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 import chemicals
-from chemicals import *
 
 def test_all_methods_accessible():
     all_methods = [i for i in dir(chemicals) if 'all_methods' in i]

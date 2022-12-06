@@ -25,7 +25,8 @@ import types
 from fluids.numerics import assert_close, assert_close1d
 import pytest
 import chemicals
-from chemicals.units import *
+from chemicals.units import (LHV_from_HHV, Lastovka_solid_integral_over_T, Rackett_fit,
+                             speed_of_sound, u)
 
 def assert_pint_allclose(value, magnitude, units, rtol=1e-7, atol=0):
     assert_close(value.to_base_units().magnitude, magnitude, rtol=rtol, atol=atol)

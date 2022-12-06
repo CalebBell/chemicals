@@ -24,7 +24,20 @@ SOFTWARE.
 
 import pytest
 import numpy as np
-from chemicals.utils import *
+from chemicals.utils import (API_to_SG, Cp_minus_Cv, Joule_Thomson, Parachor, SG, SG_to_API,
+                             Vfs_to_zs, Vm_to_rho, Watson_K, Z, d2ns_to_dn2_partials,
+                             d2xs_to_d2xsn1, dns_to_dn_partials, dxs_to_dn_partials, dxs_to_dns,
+                             dxs_to_dxsn1, isentropic_exponent, isentropic_exponent_PT,
+                             isentropic_exponent_PV, isentropic_exponent_TV, isobaric_expansion,
+                             isothermal_compressibility, mix_component_flows,
+                             mix_multiple_component_flows, mixing_logarithmic, mixing_power,
+                             mixing_simple, molar_velocity_to_velocity, none_and_length_check,
+                             normalize, phase_identification_parameter,
+                             phase_identification_parameter_phase, property_mass_to_molar,
+                             property_molar_to_mass, radius_of_gyration, remove_zeros, rho_to_Vm,
+                             solve_flow_composition_mix, speed_of_sound, to_num, v_molar_to_v,
+                             v_to_v_molar, vapor_mass_quality, velocity_to_molar_velocity, ws_to_zs,
+                             zs_to_Vfs, zs_to_ws)
 from chemicals.utils import recursive_copy, hash_any_primitive
 from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace
 
@@ -82,8 +95,6 @@ def test_recursive_copy():
                    np.arange(13, dtype=np.uint32),
                    np.arange(13, dtype=np.float32),
                    np.arange(13, dtype=np.float16),
-                   np.matrix(np.arange(13, dtype=np.float16)),
-                   np.matrix(np.arange(13, dtype=int)),
                   ]
     
     other_cases = [

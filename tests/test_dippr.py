@@ -26,7 +26,10 @@ from scipy.misc import derivative
 from scipy.integrate import quad
 import pytest
 
-from chemicals.dippr import *
+from chemicals.dippr import (EQ100, EQ101, EQ101_fitting_jacobian, EQ102, EQ102_fitting_jacobian,
+                             EQ104, EQ105, EQ105_fitting_jacobian, EQ106, EQ106_AB, EQ106_ABC,
+                             EQ106_fitting_jacobian, EQ107, EQ107_fitting_jacobian, EQ114, EQ115,
+                             EQ116, EQ127)
 
 def test_Eqs():
     a = EQ100(300, 276370., -2090.1, 8.125, -0.014116, 0.0000093701)

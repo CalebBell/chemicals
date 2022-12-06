@@ -24,7 +24,9 @@ SOFTWARE.
 import pandas as pd
 from math import isnan
 import pytest
-from chemicals.identifiers import *
+from chemicals.identifiers import (CAS_from_any, CAS_to_int, IDs_to_CASs, check_CAS,
+                                   dippr_compounds, int_to_CAS, mixture_from_any, search_chemical,
+                                   sorted_CAS_key)
 from chemicals.elements import periodic_table, nested_formula_parser, serialize_formula, molecular_weight
 import os
 from chemicals.identifiers import ChemicalMetadataDB, folder, pubchem_db

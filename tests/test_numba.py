@@ -22,11 +22,17 @@ SOFTWARE.
 """
 
 from __future__ import division
-from chemicals import *
+from chemicals import (Bahadori_liquid, Bhirud_normal, COSTALD_mixture, Campbell_Thodos,
+                       Chueh_Prausnitz_Tc, Chueh_Prausnitz_Vc, DIPPR9H, Filippov, Grieves_Thodos,
+                       Henry_converter, Li, Lucas_gas, Rachford_Rice_flash_error,
+                       Rachford_Rice_solution2, Rachford_Rice_solutionN,
+                       Rachford_Rice_solution_polynomial, Rackett_mixture, SNM0, Vfs_to_zs,
+                       Winterfeld_Scriven_Davis, brix_to_RI, d2xs_to_dxdn_partials,
+                       dns_to_dn_partials, dxs_to_dn_partials, dxs_to_dns, flash_inner_loop,
+                       modified_Wilson_Tc, modified_Wilson_Vc, normalize, ws_to_zs, zs_to_Vfs,
+                       zs_to_ws)
 import chemicals.vectorized
-from math import *
 from random import random
-from fluids.constants import *
 from fluids.numerics import assert_close, assert_close1d, assert_close2d
 import pytest
 try:

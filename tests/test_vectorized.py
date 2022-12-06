@@ -24,7 +24,6 @@ SOFTWARE.
 from __future__ import division
 import chemicals
 import chemicals.vectorized
-from chemicals import *
 from fluids.numerics import assert_close, assert_close1d
 import pytest
 import numpy as np

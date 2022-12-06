@@ -24,7 +24,11 @@ SOFTWARE.
 import pytest
 from fluids.numerics import assert_close, assert_close1d, assert_close2d
 
-from chemicals.elements import *
+from chemicals.elements import (atom_fractions, atom_matrix, atoms_to_Hill, charge_from_formula,
+                                index_hydrogen_deficiency, mass_fractions,
+                                mixture_atomic_composition_ordered, molecular_weight,
+                                nested_formula_parser, serialize_formula, similarity_variable,
+                                simple_formula_parser)
 from chemicals.elements import periodic_table
 
 def test_molecular_weight():

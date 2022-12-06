@@ -23,7 +23,15 @@ SOFTWARE.
 
 import pytest
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.thermal_conductivity import *
+from chemicals.thermal_conductivity import (Bahadori_gas, Bahadori_liquid, Chemsep_16, Chung,
+                                            Chung_dense, DIPPR9B, DIPPR9G, DIPPR9H, DIPPR9I,
+                                            Eli_Hanley, Eli_Hanley_dense, Eucken, Eucken_modified,
+                                            Filippov, Gharagheizi_gas, Gharagheizi_liquid,
+                                            Lakshmi_Prasad, Lindsay_Bromley, Missenard, Nicola,
+                                            Nicola_original, PPDS3, PPDS8, Sato_Riedel,
+                                            Sheffy_Johnson, Stiel_Thodos_dense,
+                                            Wassiljewa_Herning_Zipperer, k_IAPWS, k_air_lemmon,
+                                            kl_Mersmann_Kind)
 from chemicals.identifiers import check_CAS
 from chemicals.thermal_conductivity import k_data_Perrys_8E_2_314, k_data_Perrys_8E_2_315, k_data_VDI_PPDS_10, k_data_VDI_PPDS_9
 

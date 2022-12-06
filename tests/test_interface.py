@@ -26,7 +26,12 @@ import numpy as np
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.utils import rho_to_Vm
-from chemicals.interface import *
+from chemicals.interface import (API10A32, Aleem, Brock_Bird, Diguilio_Teja, Hakim_Steinberg_Stiel,
+                                 ISTExpansion, Jasper, Mersmann_Kind_sigma,
+                                 Meybodi_Daryasafar_Karimi, Miqueu, PPDS14, Pitzer_sigma,
+                                 REFPROP_sigma, Sastri_Rao, Somayajulu, Watson_sigma, Weinaug_Katz,
+                                 Winterfeld_Scriven_Davis, Zuo_Stenby, sigma_Gharagheizi_1,
+                                 sigma_Gharagheizi_2, sigma_IAPWS)
 from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_Lange, sigma_data_Somayajulu,
                                  sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
 from chemicals.identifiers import check_CAS

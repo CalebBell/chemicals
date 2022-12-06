@@ -22,7 +22,8 @@ SOFTWARE.
 """
 
 import pytest
-from chemicals.solubility import *
+from chemicals.solubility import (Henry_converter, Henry_pressure, Henry_pressure_mixture,
+                                  Tm_depression_eutectic, solubility_eutectic, solubility_parameter)
 from fluids.numerics import assert_close, assert_close1d
 
 def test_solubility():

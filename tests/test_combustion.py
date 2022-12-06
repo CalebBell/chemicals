@@ -18,7 +18,13 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import pytest
-from chemicals.combustion import *
+from chemicals.combustion import (AKI, HHV_modified_Dulong, HHV_stoichiometry, IDT_to_DCN,
+                                  LHV_from_HHV, MON, MON_methods,
+                                  Perez_Boehman_MON_from_ignition_delay,
+                                  Perez_Boehman_RON_from_ignition_delay, RON, RON_methods,
+                                  air_fuel_ratio_solver, combustion_data, combustion_spec_solver,
+                                  combustion_stoichiometry, fuel_air_spec_solver, ignition_delay,
+                                  octane_sensitivity)
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.combustion import fuel_air_third_spec_solver, is_combustible
 

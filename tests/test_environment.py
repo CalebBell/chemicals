@@ -25,7 +25,8 @@ import pytest
 import numpy as np
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.environment import *
+from chemicals.environment import (GWP, GWP_all_methods, GWP_methods, ODP, ODP_all_methods,
+                                   ODP_methods, logP, logP_methods)
 from chemicals.environment import ODP_data, IPCC_2007_GWPs, logP_data_CRC, logP_data_Syrres
 from chemicals.environment import IPCC_2014_GWPs, IPCC_1995_100YR_GWP, IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP, IPCC_2014_20YR_GWP, IPCC_2014_100YR_GWP
 from chemicals.identifiers import check_CAS

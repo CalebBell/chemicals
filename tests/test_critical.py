@@ -26,7 +26,11 @@ import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.miscdata import webbook_data
 from chemicals import int_to_CAS, data_reader
-from chemicals.critical import *
+from chemicals.critical import (Chueh_Prausnitz_Tc, Chueh_Prausnitz_Vc, Grieves_Thodos, Grigoras,
+                                Hekayati_Raeissi, Ihmels, Li, Meissner, Mersmann_Kind_predictor, Pc,
+                                Pc_methods, Tb_Tc_relationship, Tc, Tc_methods, Vc, Vc_methods, Zc,
+                                Zc_methods, critical_surface, critical_surface_methods,
+                                modified_Wilson_Tc, modified_Wilson_Vc, third_property)
 from chemicals.critical import (critical_data_IUPAC,
                                 critical_data_Matthews,
                                 critical_data_CRC,

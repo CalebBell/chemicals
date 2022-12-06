@@ -27,8 +27,8 @@ import pytest
 import numpy as np
 import pandas as pd
 from fluids.constants import calorie, R
-from chemicals.flash_basic import *
-from chemicals.rachford_rice import *
+from chemicals.flash_basic import (K_value, PR_water_K_value, Wilson_K_value, flash_Tb_Tc_Pc,
+                                   flash_ideal, flash_wilson)
 from chemicals.vapor_pressure import Ambrose_Walton, Antoine
 from fluids.numerics import assert_close, assert_close1d, normalize
 from random import uniform

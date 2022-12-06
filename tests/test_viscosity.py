@@ -31,7 +31,13 @@ from fluids.numerics import assert_close, assert_close1d, derivative
 from fluids.constants import psi, atm, foot, lb
 from fluids.core import R2K, F2K
 from chemicals.utils import normalize, mixing_simple
-from chemicals.viscosity import *
+from chemicals.viscosity import (Brokaw, Herning_Zipperer, Letsou_Stiel, Lorentz_Bray_Clarke, Lucas,
+                                 Lucas_gas, PPDS5, PPDS9, Przedziecki_Sridhar, Stiel_Thodos,
+                                 Twu_1985, Viswanath_Natarajan_2, Viswanath_Natarajan_2_exponential,
+                                 Viswanath_Natarajan_3, Wilke, Wilke_large, Wilke_prefactored,
+                                 Wilke_prefactors, Yoon_Thodos, dPPDS9_dT, dmu_Yaws_dT, mu_IAPWS,
+                                 mu_TDE, mu_Yaws, mu_Yaws_fitting_jacobian, mu_air_lemmon,
+                                 viscosity_converter, viscosity_gas_Gharagheizi, viscosity_index)
 from chemicals.viscosity import (mu_data_Dutt_Prasad, mu_data_VN3, mu_data_VN2,
                                  mu_data_VN2E, mu_data_Perrys_8E_2_313, mu_data_Perrys_8E_2_312,
                                  mu_data_VDI_PPDS_7, mu_data_VDI_PPDS_8)

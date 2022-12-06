@@ -26,7 +26,9 @@ from fluids.numerics import assert_close, assert_close1d
 import pytest
 import pandas as pd
 import numpy as np
-from chemicals.refractivity import *
+from chemicals.refractivity import (RI, RI_IAPWS, RI_from_molar_refractivity, RI_methods,
+                                    RI_to_brix, TDE_RIXExpansion, brix_to_RI,
+                                    molar_refractivity_from_RI, polarizability_from_RI)
 from chemicals.refractivity import RI_data_CRC_organic
 
 def test_refractivity_CRC():

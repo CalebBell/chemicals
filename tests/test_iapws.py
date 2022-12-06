@@ -25,8 +25,38 @@ SOFTWARE.
 import numpy as np
 import pytest
 import chemicals
-from math import *
-from chemicals.iapws import *
+from math import exp, log, log10
+from chemicals.iapws import (iapws11_Psub, iapws92_Psat, iapws92_dPsat_dT, iapws92_rhog_sat,
+                             iapws92_rhol_sat, iapws95_A0, iapws95_A0_tau_derivatives, iapws95_Ar,
+                             iapws95_P, iapws95_Psat, iapws95_T, iapws95_Tsat, iapws95_d2A0_dtau2,
+                             iapws95_d2Ar_ddelta2, iapws95_d2Ar_ddeltadtau, iapws95_d2Ar_dtau2,
+                             iapws95_d3A0_dtau3, iapws95_d3Ar_ddelta2dtau, iapws95_d3Ar_ddelta3,
+                             iapws95_d3Ar_ddeltadtau2, iapws95_d4Ar_ddelta2dtau2, iapws95_dA0_dtau,
+                             iapws95_dAr_ddelta, iapws95_dAr_dtau, iapws95_dPsat_dT,
+                             iapws95_drhol_sat_dT, iapws95_properties, iapws95_rho,
+                             iapws95_rhog_sat, iapws95_rhol_sat, iapws95_saturation,
+                             iapws97_A_region3, iapws97_G0_region2, iapws97_G0_region5,
+                             iapws97_G_region1, iapws97_Gr_region2, iapws97_Gr_region5, iapws97_P,
+                             iapws97_T, iapws97_boundary_2_3, iapws97_boundary_3ab,
+                             iapws97_boundary_3cd, iapws97_boundary_3ef, iapws97_boundary_3gh,
+                             iapws97_boundary_3ij, iapws97_boundary_3jk, iapws97_boundary_3mn,
+                             iapws97_boundary_3op, iapws97_boundary_3qu, iapws97_boundary_3rx,
+                             iapws97_boundary_3uv, iapws97_boundary_3wx,
+                             iapws97_d2A_ddelta2_region3, iapws97_d2A_ddeltadtau_region3,
+                             iapws97_d2A_dtau2_region3, iapws97_d2G0_dtau2_region2,
+                             iapws97_d2G0_dtau2_region5, iapws97_d2G_dpi2_region1,
+                             iapws97_d2G_dpidtau_region1, iapws97_d2G_dtau2_region1,
+                             iapws97_d2Gr_dpi2_region2, iapws97_d2Gr_dpi2_region5,
+                             iapws97_d2Gr_dpidtau_region2, iapws97_d2Gr_dpidtau_region5,
+                             iapws97_d2Gr_dtau2_region2, iapws97_d2Gr_dtau2_region5,
+                             iapws97_dA_ddelta_region3, iapws97_dA_dtau_region3,
+                             iapws97_dG0_dtau_region2, iapws97_dG0_dtau_region5,
+                             iapws97_dG_dpi_region1, iapws97_dG_dtau_region1,
+                             iapws97_dGr_dpi_region2, iapws97_dGr_dpi_region5,
+                             iapws97_dGr_dtau_region2, iapws97_dGr_dtau_region5,
+                             iapws97_identify_region_TP, iapws97_region2_rho, iapws97_region3_rho,
+                             iapws97_region5_rho, iapws97_region_3, iapws97_rho,
+                             iapws97_rho_extrapolated)
 from chemicals import iapws
 from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace, derivative
 from chemicals.vapor_pressure import Psat_IAPWS

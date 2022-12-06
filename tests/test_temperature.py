@@ -22,7 +22,8 @@ SOFTWARE.
 """
 
 import pytest
-from chemicals.temperature import *
+from chemicals.temperature import (ITS90_68_difference, T_converter, Ts_27, Ts_48, Ts_68, Ts_76,
+                                   diffs_27, diffs_48, diffs_68, diffs_76)
 import numpy as np
 from fluids.numerics import assert_close, assert_close1d, linspace
 

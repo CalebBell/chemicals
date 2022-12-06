@@ -172,7 +172,7 @@ def recursive_copy(obj):
         return d
     elif obj_type is bytearray:
         return obj.copy()
-    elif obj_type is np.ndarray or obj_type is np.matrix:
+    elif obj_type is np.ndarray:
         # Mutable objects
         # .copy() won't work for obj arrays of mutable values, so have to handle it separately
         if obj.dtype == object:

@@ -24,7 +24,7 @@ SOFTWARE.
 from fluids.numerics import assert_close
 import pytest
 from chemicals import dipole
-from chemicals.dipole import *
+from chemicals.dipole import dipole_moment, dipole_moment_methods
 
 
 def test_dipole_moment_methods():

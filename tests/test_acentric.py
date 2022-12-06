@@ -24,8 +24,9 @@ SOFTWARE.
 from fluids.numerics import assert_close
 import pytest
 import pandas as pd
-from chemicals.acentric import *
+from chemicals.acentric import LK_omega, Stiel_polar_factor, omega, omega_definition, omega_methods
 from chemicals.critical import critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws, ACENTRIC_DEFINITION
+from chemicals.identifiers import int_to_CAS
 
 
 @pytest.mark.fuzz
@@ -57,7 +58,7 @@ def test_acentric_main():
     assert_close(omega_calc, 0.852, rtol=1e-13)
 
     methods = omega_methods('74-98-6')
-    assert methods == ['PSRK', 'PD', 'YAWS', 'ACENTRIC_DEFINITION']
+    assert methods == ['PSRK', 'PD', 'YAWS', ACENTRIC_DEFINITION]
 
     # Error handling
     assert None == omega(CASRN='BADCAS')
