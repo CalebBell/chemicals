@@ -41,7 +41,6 @@ from __future__ import division
 
 __all__ = ['T_converter', 'T_scales', 'ITS90_68_difference', 'Ts_68',
 'diffs_68', 'Ts_48', 'diffs_48', 'Ts_76', 'diffs_76', 'Ts_27', 'diffs_27']
-from fluids.core import C2K
 
 '''Tabulated values of T68 vs. difference as in [2]_'''
 Ts_68 = [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,

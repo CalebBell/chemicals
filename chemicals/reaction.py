@@ -96,7 +96,6 @@ from chemicals.data_reader import (data_source, database_constant_lookup,
 from chemicals.utils import (PY37, can_load_data, ceil, log10,
                              mark_numba_incompatible, os_path_join,
                              source_path)
-from fluids.numerics import numpy as np
 
 # %% Register data sources and lazy load them
 CRC = 'CRC'

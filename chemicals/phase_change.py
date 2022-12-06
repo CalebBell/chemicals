@@ -132,7 +132,6 @@ __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm',
            'Liu', 'Vetere', 'Alibakhshi','PPDS12', 'Watson', 'Watson_n',
            'Hfus', 'Hfus_methods']
 
-import os
 
 from fluids.constants import N_A, R, pi
 from fluids.numerics import numpy as np

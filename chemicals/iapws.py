@@ -189,10 +189,9 @@ from __future__ import division
 
 from math import exp, log, sqrt
 
-from fluids.numerics import (broyden2, damping_maintain_sign, horner,
-                             horner_and_der, newton, newton_system, secant,
-                             solve_2_direct, translate_bound_f_jac, trunc_exp,
-                             trunc_log)
+from fluids.numerics import (broyden2, horner, horner_and_der,
+                             newton, newton_system, solve_2_direct, translate_bound_f_jac,
+                             trunc_exp)
 
 from chemicals.utils import mark_numba_uncacheable
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS

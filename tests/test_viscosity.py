@@ -25,8 +25,6 @@ SOFTWARE.
 from random import uniform
 import pytest
 from math import log, log10
-import numpy as np
-import pandas as pd
 from fluids.numerics import assert_close, assert_close1d, derivative
 from fluids.constants import psi, atm, foot, lb
 from fluids.core import R2K, F2K
@@ -41,7 +39,6 @@ from chemicals.viscosity import (Brokaw, Herning_Zipperer, Letsou_Stiel, Lorentz
 from chemicals.viscosity import (mu_data_Dutt_Prasad, mu_data_VN3, mu_data_VN2,
                                  mu_data_VN2E, mu_data_Perrys_8E_2_313, mu_data_Perrys_8E_2_312,
                                  mu_data_VDI_PPDS_7, mu_data_VDI_PPDS_8)
-from chemicals.identifiers import check_CAS
 
 ### Check data integrity
 

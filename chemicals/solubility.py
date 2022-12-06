@@ -47,7 +47,6 @@ __all__ = ['solubility_parameter',
            'solubility_eutectic', 'Tm_depression_eutectic',
            'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture']
 
-import os
 
 from fluids.constants import R, R_inv, atm
 

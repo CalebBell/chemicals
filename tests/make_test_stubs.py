@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import sys
 
 tests = ['test_acentric', 'test_combustion', 'test_critical', 'test_dipole', 'test_dippr', 'test_elements', 'test_environment', 'test_heat_capacity', 'test_interface', 'test_lennard_jones', 'test_miscdata', 'test_permittivity', 'test_phase_change', 'test_rachford_rice', 'test_reactions', 'test_refractivity', 'test_solubility', 'test_temperature', 'test_thermal_conductivity', 'test_triple', 'test_utils', 'test_vapor_pressure', 'test_vectorized', 'test_virial', 'test_viscosity', 'test_volume']
 try:

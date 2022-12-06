@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import os, json
+import os
 import xml.etree.cElementTree as ET
 folder = os.path.join(os.path.dirname(__file__), '..','..', 'chemicals', 'Misc')
 

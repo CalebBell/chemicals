@@ -130,9 +130,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'Crowl_Louvar_LFL', 'Crowl_Louvar_UFL', 'LFL_ISO_10156_2017',
            'NFPA_30_classification')
 
-import os
 
-from fluids.core import F2K
 from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (data_source, database_constant_lookup,
@@ -141,8 +139,7 @@ from chemicals.data_reader import (data_source, database_constant_lookup,
                                    retrieve_any_from_df_dict,
                                    retrieve_from_df_dict)
 from chemicals.utils import (PY37, R, can_load_data, mark_numba_incompatible,
-                             none_and_length_check, normalize, os_path_join,
-                             source_path)
+                             normalize, os_path_join, source_path)
 
 ### Utilities
 

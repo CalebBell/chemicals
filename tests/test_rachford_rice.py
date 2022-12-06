@@ -21,13 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from math import exp, log
+from math import exp
 import pytest
 import numpy as np
-import pandas as pd
 import sys
 from chemicals.exceptions import PhaseCountReducedError
-from fluids.constants import calorie, R
 from fluids.numerics import derivative
 from chemicals.rachford_rice import (Li_Johns_Ahmadi_solution, Rachford_Rice_flash_error,
                                      Rachford_Rice_polynomial, Rachford_Rice_solution,
@@ -40,7 +38,7 @@ from chemicals.rachford_rice import (Li_Johns_Ahmadi_solution, Rachford_Rice_fla
 from chemicals.rachford_rice import Rachford_Rice_solution_numpy, Rachford_Rice_solution_mpmath
 from chemicals.rachford_rice import Rachford_Rice_valid_solution_naive, Rachford_Rice_solution2
 from chemicals.rachford_rice import Rachford_Rice_flash2_f_jac, Rachford_Rice_flashN_f_jac
-from fluids.numerics import isclose, assert_close, assert_close1d, assert_close2d, normalize
+from fluids.numerics import assert_close, assert_close1d, isclose, normalize
 from random import uniform, randint, random
 from chemicals import normalize
 

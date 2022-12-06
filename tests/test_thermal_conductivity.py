@@ -32,7 +32,6 @@ from chemicals.thermal_conductivity import (Bahadori_gas, Bahadori_liquid, Chems
                                             Sheffy_Johnson, Stiel_Thodos_dense,
                                             Wassiljewa_Herning_Zipperer, k_IAPWS, k_air_lemmon,
                                             kl_Mersmann_Kind)
-from chemicals.identifiers import check_CAS
 from chemicals.thermal_conductivity import k_data_Perrys_8E_2_314, k_data_Perrys_8E_2_315, k_data_VDI_PPDS_10, k_data_VDI_PPDS_9
 
 

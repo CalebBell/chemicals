@@ -21,9 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
-import pandas as pd
-from fluids.numerics import assert_close, assert_close1d
 import chemicals
 
 def test_all_methods_accessible():

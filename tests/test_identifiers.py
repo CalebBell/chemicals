@@ -31,7 +31,7 @@ from chemicals.elements import periodic_table, nested_formula_parser, serialize_
 import os
 from chemicals.identifiers import ChemicalMetadataDB, folder, pubchem_db
 from chemicals.identifiers import common_mixtures
-from fluids.numerics import assert_close, assert_close1d
+from fluids.numerics import assert_close
 
 # Force the whole db to load
 try:

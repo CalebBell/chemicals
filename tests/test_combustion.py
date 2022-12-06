@@ -320,7 +320,6 @@ def test_fuel_air_third_spec_solver():
 
 def test_RON_MON_data():
     from chemicals.combustion import florian_liming_ron_experimental
-    from chemicals.identifiers import check_CAS
     
     RON_sum = florian_liming_ron_experimental['RON'].sum()
     assert_close(RON_sum, 23619.699999999997)

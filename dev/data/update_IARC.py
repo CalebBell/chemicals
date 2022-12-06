@@ -5,7 +5,6 @@ placed in the same directory as this script, and then the data file will be
 updated when this is run.
 """
 
-from math import isnan
 import pandas as pd
 from natsort import natsorted
 

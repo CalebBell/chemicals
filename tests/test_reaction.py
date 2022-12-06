@@ -25,7 +25,6 @@ from fluids.numerics import assert_close, assert_close1d, assert_close2d
 import pytest
 import pandas as pd
 
-from chemicals.identifiers import check_CAS
 from chemicals.reaction import (Gibbs_formation, Hf_basis_converter, Hfg, Hfg_all_methods,
                                 Hfg_methods, Hfl, Hfl_methods, Hfs, Hfs_methods, S0g,
                                 S0g_all_methods, S0g_methods, S0l, S0l_methods, S0s, S0s_methods,

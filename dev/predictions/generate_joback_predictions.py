@@ -1,7 +1,6 @@
 import os
 from thermo import Joback
-from chemicals.identifiers import pubchem_db, CAS_to_int
-import rdkit
+from chemicals.identifiers import pubchem_db
 from rdkit import Chem
 from joblib import Parallel, delayed
 

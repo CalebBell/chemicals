@@ -1,7 +1,6 @@
 import os
 from thermo import Fedors
 from chemicals.identifiers import pubchem_db
-import rdkit
 from rdkit import Chem
 from joblib import Parallel, delayed
 

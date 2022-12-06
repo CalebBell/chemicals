@@ -2,9 +2,7 @@ import os
 from thermo import Wilson_Jasperson
 from chemicals.identifiers import pubchem_db
 from chemicals import Tb
-import rdkit
 from rdkit import Chem
-from joblib import Parallel, delayed
 
 folder = os.path.join(os.path.dirname(__file__), '..', '..', 'chemicals', 'Critical Properties')
 nan = float("nan")

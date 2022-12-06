@@ -69,7 +69,6 @@ from cmath import log as clog
 from cmath import sqrt as csqrt
 
 from fluids.numerics import hyp2f1
-from fluids.numerics import numpy as np
 from fluids.numerics import trunc_exp, trunc_log
 
 from chemicals.utils import atan, atanh, cosh, exp, log, sinh, sqrt, tanh

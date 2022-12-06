@@ -21,9 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
 import numpy as np
-import pandas as pd
 from fluids.numerics import assert_close, derivative, assert_close1d, jacobian, assert_close2d
 from chemicals.vapor_pressure import (Ambrose_Walton, Antoine, Antoine_AB_coeffs_from_point,
                                       Antoine_coeffs_from_point, Antoine_fitting_jacobian,
@@ -38,7 +36,6 @@ from chemicals.vapor_pressure import (Ambrose_Walton, Antoine, Antoine_AB_coeffs
                                       dPsat_IAPWS_dT, dTRC_Antoine_extended_dT, dWagner_dT,
                                       dWagner_original_dT, dYaws_Psat_dT)
 from chemicals.vapor_pressure import Psat_data_WagnerMcGarry, Psat_data_AntoinePoling, Psat_data_WagnerPoling, Psat_data_AntoineExtended, Psat_data_Perrys2_8, Psat_data_VDI_PPDS_3
-from chemicals.identifiers import check_CAS
 from math import e, exp, log, log10
 
 ### Regression equations

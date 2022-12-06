@@ -29,7 +29,6 @@ from chemicals.environment import (GWP, GWP_all_methods, GWP_methods, ODP, ODP_a
                                    ODP_methods, logP, logP_methods)
 from chemicals.environment import ODP_data, IPCC_2007_GWPs, logP_data_CRC, logP_data_Syrres
 from chemicals.environment import IPCC_2014_GWPs, IPCC_1995_100YR_GWP, IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP, IPCC_2014_20YR_GWP, IPCC_2014_100YR_GWP
-from chemicals.identifiers import check_CAS
 
 def test_CFC_11_in_all_GWP_methods():
     assert set(GWP_methods('75-69-4')) == set(GWP_all_methods)

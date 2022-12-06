@@ -39,7 +39,7 @@ from chemicals.utils import (API_to_SG, Cp_minus_Cv, Joule_Thomson, Parachor, SG
                              v_to_v_molar, vapor_mass_quality, velocity_to_molar_velocity, ws_to_zs,
                              zs_to_Vfs, zs_to_ws)
 from chemicals.utils import recursive_copy, hash_any_primitive
-from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace
+from fluids.numerics import assert_close, assert_close1d, assert_close2d
 
 def test_recursive_copy():
     import array

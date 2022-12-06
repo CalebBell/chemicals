@@ -42,7 +42,6 @@ Lookup Functions
 __all__ = ['RG', 'RG_methods', 'RG_all_methods',
            'linear', 'linear_methods', 'linear_all_methods']
 
-from fluids.numerics import horner, interp
 from chemicals import data_reader as dr
 from chemicals.data_reader import (data_source, database_constant_lookup,
                                    list_available_methods_from_df_dict,

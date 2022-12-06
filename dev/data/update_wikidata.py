@@ -6,7 +6,7 @@ client = Client()
 from joblib import Parallel, delayed
 from fluids.numerics import mean
 from fluids import C2K, R2K, F2K
-from time import time, sleep
+from time import time
 from chemicals.safety import mgm3_to_ppmv
 from chemicals.identifiers import CAS_to_int
 from chemicals import molecular_weight, nested_formula_parser

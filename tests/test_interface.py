@@ -23,7 +23,6 @@ SOFTWARE.
 
 import pytest
 import numpy as np
-import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
 from chemicals.utils import rho_to_Vm
 from chemicals.interface import (API10A32, Aleem, Brock_Bird, Diguilio_Teja, Hakim_Steinberg_Stiel,
@@ -34,7 +33,6 @@ from chemicals.interface import (API10A32, Aleem, Brock_Bird, Diguilio_Teja, Hak
                                  sigma_Gharagheizi_2, sigma_IAPWS)
 from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_Lange, sigma_data_Somayajulu,
                                  sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
-from chemicals.identifiers import check_CAS
 
 def test_sigma_IAPWS():
     assert_close(sigma_IAPWS(300.), 0.07168596252716256, rtol=1e-13)

@@ -181,15 +181,14 @@ __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 
 'ideal_gas', 'Goodman', 'Rackett_fit', 'TDE_VDNS_rho', 'PPDS17',
 ]
 
-import os
 
-from fluids.constants import R, atm_inv, root_two
+from fluids.constants import R, root_two
 from fluids.numerics import implementation_optimize_tck, np, splev
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import (PY37, Vm_to_rho, can_load_data, exp, isnan, log,
-                             mark_numba_incompatible, mixing_simple,
-                             os_path_join, source_path, sqrt)
+from chemicals.utils import (PY37, can_load_data, exp, log, mark_numba_incompatible, mixing_simple,
+                             os_path_join, source_path,
+                             sqrt)
 
 folder = os_path_join(source_path, 'Density')
 
@@ -496,6 +495,7 @@ def Rackett(T, Tc, Pc, Zc):
     --------
     Propane, example from the API Handbook
 
+    >>> from chemicals.utils import Vm_to_rho
     >>> Vm_to_rho(Rackett(272.03889, 369.83, 4248000.0, 0.2763), 44.09562)
     531.3221411755724
 
@@ -812,6 +812,7 @@ def COSTALD(T, Tc, Vc, omega):
     --------
     Propane, from an example in the API Handbook:
 
+    >>> from chemicals.utils import Vm_to_rho
     >>> Vm_to_rho(COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532), 44.097)
     530.3009967969844
 

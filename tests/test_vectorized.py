@@ -24,9 +24,7 @@ SOFTWARE.
 from __future__ import division
 import chemicals
 import chemicals.vectorized
-from fluids.numerics import assert_close, assert_close1d
-import pytest
-import numpy as np
+from fluids.numerics import assert_close1d
 
 def test_Tc_multi():
     Tcs_simple = [chemicals.critical.Tc(i) for i in ['108-88-3', '7732-18-5']]

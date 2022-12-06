@@ -74,8 +74,7 @@ import os
 from io import open
 
 from chemicals.elements import (charge_from_formula, homonuclear_elements_CASs_set,
-                                periodic_table, serialize_formula,
-                                simple_formula_parser)
+                                periodic_table, serialize_formula)
 from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
                              os_path_join, source_path, to_num)
 

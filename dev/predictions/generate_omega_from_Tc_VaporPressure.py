@@ -1,5 +1,5 @@
 import os
-from thermo import VaporPressure, Chemical
+from thermo import Chemical
 from chemicals import Tc, Pc, omega_definition
 from chemicals.identifiers import pubchem_db
 from joblib import Parallel, delayed

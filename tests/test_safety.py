@@ -23,9 +23,7 @@ SOFTWARE.
 
 import pytest
 import pandas as pd
-import numpy as np
 from fluids.core import F2K
-from chemicals.identifiers import check_CAS
 from chemicals.safety import (Carcinogen, Carcinogen_methods, Crowl_Louvar_LFL, Crowl_Louvar_UFL,
                               IARC_codes, LFL, LFL_ISO_10156_2017, LFL_all_methods, LFL_methods,
                               NFPA_30_classification, NTP_codes, Skin, Suzuki_LFL, Suzuki_UFL,
@@ -34,9 +32,8 @@ from chemicals.safety import (Carcinogen, Carcinogen_methods, Crowl_Louvar_LFL, 
                               mgm3_to_ppmv, ppmv_to_mgm3)
 from chemicals.utils import normalize
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.safety import (Ontario_exposure_limits_dict, NFPA_2008_data, IEC_2010_data,
-                              DIPPR_SERAT_data, NTP_data, IARC_data, Tflash_sources,
-                              Tautoignition_sources, LFL_sources, UFL_sources, SERAT)
+from chemicals.safety import (NFPA_2008_data, IEC_2010_data, DIPPR_SERAT_data,
+                              NTP_data, IARC_data, SERAT)
 
 SUZUKI = 'Suzuki (1994)'
 CROWLLOUVAR = 'Crowl and Louvar (2001)'

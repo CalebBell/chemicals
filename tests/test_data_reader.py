@@ -23,7 +23,6 @@ SOFTWARE.
 
 import pytest
 
-from fluids.numerics import assert_close, assert_close1d
 from chemicals.identifiers import check_CAS, int_to_CAS, CAS_to_int
 import numpy as np
 import chemicals

@@ -20,11 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-import sys, os, argparse
+import os
 from chemicals import *
 from thermo import *
-from joblib import Parallel, delayed
-from subprocess import Popen, PIPE
 from chemicals.identifiers import pubchem_db
 from fluids.constants import c, h, pi
 import json

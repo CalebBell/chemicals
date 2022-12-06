@@ -21,10 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
 from __future__ import division
-import types
-from fluids.numerics import assert_close, assert_close1d
-import pytest
-import chemicals
+from fluids.numerics import assert_close
 from chemicals.units import (LHV_from_HHV, Lastovka_solid_integral_over_T, Rackett_fit,
                              speed_of_sound, u)
 

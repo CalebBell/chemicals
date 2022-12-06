@@ -3,15 +3,13 @@ import os, json, re, requests, appdirs
 from joblib import Parallel, delayed
 
 from fluids.constants import torr
-from fluids.core import C2K, F2K, R2K
+from fluids.core import C2K
 from fluids.numerics import mean
 
 from chemicals import serialize_formula, rho_to_Vm, molecular_weight, nested_formula_parser
 from chemicals.identifiers import CAS_to_int
 from rdkit import Chem
-from rdkit.Chem import Descriptors
 from rdkit.Chem.rdMolDescriptors import CalcMolFormula
-from rdkit.Chem.inchi import MolToInchi, MolFromInchi, InchiToInchiKey
 
 folder = os.path.dirname(__file__)
 

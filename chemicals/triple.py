@@ -46,7 +46,6 @@ Triple Pressure
 __all__ = ['Tt_all_methods', 'Tt_methods', 'Tt',
            'Pt_all_methods', 'Pt_methods', 'Pt']
 
-import os
 from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (data_source, database_constant_lookup,

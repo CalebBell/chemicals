@@ -135,9 +135,8 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution_Leibovici_Neoschil_dd']
 
 from fluids.numerics import (IS_PYPY, NotBoundedError, add_dd, brenth, div_dd,
-                             gt_dd, halley, horner, horner_and_der, linspace,
-                             lt_dd, mul_dd, mul_noerrors_dd, newton,
-                             newton_system)
+                             gt_dd, halley, horner, horner_and_der, lt_dd,
+                             mul_dd, mul_noerrors_dd, newton, newton_system)
 from fluids.numerics import numpy as np
 from fluids.numerics import (
     one_10_epsilon_larger, one_10_epsilon_smaller, one_epsilon_larger,
@@ -146,7 +145,7 @@ from fluids.numerics import (
 
 from chemicals.exceptions import PhaseCountReducedError
 from chemicals.utils import (exp, log, mark_numba_incompatible,
-                             mark_numba_uncacheable, normalize)
+                             mark_numba_uncacheable)
 
 try:
     from itertools import combinations
@@ -1502,7 +1501,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     '''
     # extremely important to validate high decimal precision with mpmath
     # numerical issues make this an open research problem with respect to maintaining speed
-    from mpmath import findroot, mp, mpf
+    from mpmath import mp, mpf
 
     mp.dps = dps
     N = len(zs)

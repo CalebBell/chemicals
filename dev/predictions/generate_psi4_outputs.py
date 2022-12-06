@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.'''
 
-import sys, os, argparse
+import os
 from rdkit import Chem
 from rdkit.Chem import AllChem
  
@@ -127,7 +127,6 @@ def call_psi4(CAS):
         if run:
             process = Popen(['psi4',file_in, file_out, '-n', '1'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = process.communicate()
-            pass
         
         if os.path.exists(file_out):
             output_file = open(file_out, 'r')

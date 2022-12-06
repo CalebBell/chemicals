@@ -97,7 +97,6 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
            'Vc_all_methods', 'Zc_all_methods',
            'critical_surface_all_methods']
 
-import os
 
 from fluids.constants import N_A, R, R_inv
 from chemicals import data_reader as dr

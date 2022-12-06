@@ -144,15 +144,14 @@ __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Meybodi_Daryasafar_Karimi', 'ISTExpansion', 'sigma_Gharagheizi_1',
            'sigma_Gharagheizi_2']
 
-import os
 
 from fluids.constants import N_A, k, root_two
 from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import (PY37, can_load_data, exp, log,
-                             mark_numba_incompatible, mixing_simple,
-                             os_path_join, source_path, sqrt)
+                             mark_numba_incompatible, os_path_join,
+                             source_path, sqrt)
 
 folder = os_path_join(source_path, 'Interface')
 

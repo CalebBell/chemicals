@@ -24,7 +24,6 @@ SOFTWARE.
 
 import numpy as np
 import pytest
-import chemicals
 from chemicals.air import (TEOS10_BAW_derivatives, TEOS10_CAAW_derivatives, TEOS10_CAWW_derivatives,
                            iapws04_Henry_air, iapws04_dHenry_air_dT, lemmon2000_P, lemmon2000_T,
                            lemmon2000_air_A0, lemmon2000_air_Ar, lemmon2000_air_P_bubble,
@@ -40,7 +39,7 @@ from chemicals.air import (TEOS10_BAW_derivatives, TEOS10_CAAW_derivatives, TEOS
                            lemmon2000_air_dAr_dtau, lemmon2000_air_rho_bubble,
                            lemmon2000_air_rho_dew, lemmon2000_rho)
 from math import exp, log10
-from fluids.numerics import assert_close, assert_close1d, assert_close2d, linspace, logspace, derivative
+from fluids.numerics import assert_close, assert_close1d, derivative, linspace, logspace
 
 from chemicals.air import TAU_MAX_EXP_87
 

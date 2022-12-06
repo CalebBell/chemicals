@@ -92,7 +92,6 @@ __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
            'As_collision', 'Bs_collision', 'Cs_collision',
            'collision_integral_Kim_Monroe', 'T_star']
 
-import os
 
 from fluids.constants import k
 from chemicals import data_reader as dr

@@ -22,9 +22,7 @@ SOFTWARE.
 """
 
 import pytest
-import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
-from chemicals import check_CAS
 from chemicals.lennard_jones import (Stockmayer, Stockmayer_all_methods, Stockmayer_methods, T_star,
                                      collision_integral_Kim_Monroe,
                                      collision_integral_Neufeld_Janzen_Aziz,
