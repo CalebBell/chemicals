@@ -196,7 +196,7 @@ def recursive_copy(obj):
     if hasattr(obj, '__copy__'):
         # Allow objects to provide their own hooks and wash our hands of them
         return obj.__copy__()
-    raise ValueError("No copy function implemented")
+    raise ValueError(f"No copy function implemented for type {obj_type}")
 
 @mark_numba_incompatible
 def hash_any_primitive(v):
@@ -1685,7 +1685,7 @@ def dxs_to_dns(dxs, xs, dns=None):
     return dns
 
 
-def dns_to_dn_partials(dns, F):
+def dns_to_dn_partials(dns, F, partial_properties=None):
     r'''Convert the mole number derivatives of a quantity (calculated so
     they do sum to 1) to partial molar quantites.
 
@@ -1703,6 +1703,9 @@ def dns_to_dn_partials(dns, F):
         1), [prop/mol]
     F : float
         Property evaluated at constant composition, [prop]
+    partial_properties : list[float], optional
+        Optional output array for derivatives of a quantity with respect
+        to mole number (summing to 1), [prop]
 
     Returns
     -------
@@ -1724,7 +1727,11 @@ def dns_to_dn_partials(dns, F):
     >>> dns_to_dn_partials([0.001459, -0.002939, -0.004334], -0.0016567)
     [-0.0001977000000000001, -0.0045957, -0.0059907]
     '''
-    return [F + dni for dni in dns]
+    if partial_properties is None:
+        partial_properties = [0.0]*len(dns)
+    for i in range(len(dns)):
+        partial_properties[i] = F + dns[i]
+    return partial_properties
 
 
 def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
@@ -1751,6 +1758,7 @@ def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
     partial_properties : list[float], optional
         Array for Derivatives of a quantity with respect to mole number (summing to
         1), [prop]
+
     Returns
     -------
     partial_properties : list[float]

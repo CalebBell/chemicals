@@ -534,11 +534,17 @@ def test_dxs_to_dns():
     
     out = [0.0]*3
     ans = dxs_to_dns([-0.0028, -0.00719, -0.00859], [0.7, 0.2, 0.1], out)
+    assert_close1d(ans, [0.001457, -0.0029330000000000003, -0.004333])
     assert out is ans
     
 def test_dns_to_dn_partials():
     ans = dns_to_dn_partials([0.001459, -0.002939, -0.004334], -0.0016567)
     assert_close1d(ans, [-0.0001977000000000001, -0.0045957, -0.0059907])
+
+    out_arr = [0.0]*3
+    ans = dns_to_dn_partials([0.001459, -0.002939, -0.004334], -0.0016567, out_arr)
+    assert_close1d(ans, [-0.0001977000000000001, -0.0045957, -0.0059907])
+    assert out_arr is ans
 
 def test_dxs_to_dn_partials():
     ans = dxs_to_dn_partials([-0.0026404, -0.00719, -0.00859], [0.7, 0.2, 0.1], -0.0016567)

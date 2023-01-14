@@ -242,6 +242,12 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
            'iapws11_Psub',
            ]
 
+try:
+    from math import cbrt
+except:
+    def cbrt(x):
+        return x**(1.0/3.0)
+
 iapws95_R = 461.51805
 '''Specific gas constant in J/(kg*K) according to IAPWS-95'''
 
@@ -2998,56 +3004,60 @@ def iapws97_rho(T, P, use_95_boundary=False):
 def iapws97_rho_extrapolated(T, P, use_95_boundary=False):
     # Intended to extend the range using first derivatives
     # for use in iapws-95 solver.
-    try:
+    out_of_range = (T < 273.15 
+                    or T > 2273.15
+                    or P > 100e6
+                    or (T > 1073.15 and 50e6 <= P <= 100e6))
+    
+    if not out_of_range:
+        return iapws97_rho(T, P, use_95_boundary)
+    if T > 2273.15 and P < 50E6:
+        T_border = 2273.15
+        Pref = 1e6
+        Tref = 1e3
+        P_inv = 1.0/P
+        pi = P*1e-6
+        tau = Tref/T_border
+        # region 5 upwards T extrapolate drho_dT
+        dGr_dpi = iapws97_dGr_dpi_region5(tau, pi)
+        dG_dpi = 1e6*P_inv + dGr_dpi
+        rho = P/(iapws97_R*T_border*pi*dG_dpi)
+        d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region5(tau, pi)
+        x0 = (dGr_dpi + Pref*P_inv)
+        x1 = iapws97_R*T_border*T_border
+        drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
+        rho = rho + drho_dT*(T - T_border)
+    elif T > 1073.15 and 50e6 <= P <= 100e6:
+        T_border = 1073.15
+        Pref = 1e6
+        Tref = 540.0
+        P_inv = 1.0/P
+        pi = P*1e-6
+        tau = Tref/T_border
+        # region 5 upwards T extrapolate drho_dT
+        dGr_dpi = iapws97_dGr_dpi_region2(tau, pi)
+        dG_dpi = 1e6*P_inv + dGr_dpi
+        rho = P/(iapws97_R*T_border*pi*dG_dpi)
+        d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region2(tau, pi)
+        x0 = (dGr_dpi + Pref*P_inv)
+        x1 = iapws97_R*T_border*T_border
+        drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
+        drho = drho_dT*(T - T_border)
+        if (rho + drho) > .1*rho:
+            # Do not take the extrapolation if density has decreased too much
+            rho = rho + drho
+    elif T < 273.15:
+        # region 1 - fairly incompressible, don't bother extrapolating
+        if P > 100e6: P = 100e6
+        rho = iapws97_region1_rho(273.15, P)
+    else:
+        # Don't bother extrapolating to higher P at this point, the density
+        # change is small there
+        if P > 100e6:
+            P = 100e6
+        if T > 1073.15:
+            T = 1073.15
         rho = iapws97_rho(T, P, use_95_boundary)
-    except:
-        if T > 2273.15 and P < 50E6:
-            T_border = 2273.15
-            Pref = 1e6
-            Tref = 1e3
-            P_inv = 1.0/P
-            pi = P*1e-6
-            tau = Tref/T_border
-            # region 5 upwards T extrapolate drho_dT
-            dGr_dpi = iapws97_dGr_dpi_region5(tau, pi)
-            dG_dpi = 1e6*P_inv + dGr_dpi
-            rho = P/(iapws97_R*T_border*pi*dG_dpi)
-            d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region5(tau, pi)
-            x0 = (dGr_dpi + Pref*P_inv)
-            x1 = iapws97_R*T_border*T_border
-            drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
-            rho = rho + drho_dT*(T - T_border)
-        elif T > 1073.15 and 50e6 <= P <= 100e6:
-            T_border = 1073.15
-            Pref = 1e6
-            Tref = 540.0
-            P_inv = 1.0/P
-            pi = P*1e-6
-            tau = Tref/T_border
-            # region 5 upwards T extrapolate drho_dT
-            dGr_dpi = iapws97_dGr_dpi_region2(tau, pi)
-            dG_dpi = 1e6*P_inv + dGr_dpi
-            rho = P/(iapws97_R*T_border*pi*dG_dpi)
-            d2Gr_dpidtau = iapws97_d2Gr_dpidtau_region2(tau, pi)
-            x0 = (dGr_dpi + Pref*P_inv)
-            x1 = iapws97_R*T_border*T_border
-            drho_dT = -Pref/(x1*x0) + Pref*Tref*d2Gr_dpidtau/(x1*T_border*x0*x0)
-            drho = drho_dT*(T - T_border)
-            if (rho + drho) > .1*rho:
-                # Do not take the extrapolation if density has decreased too much
-                rho = rho + drho
-        elif T < 273.15:
-            # region 1 - fairly incompressible, don't bother extrapolating
-            if P > 100e6: P = 100e6
-            rho = iapws97_region1_rho(273.15, P)
-        else:
-            # Don't bother extrapolating to higher P at this point, the density
-            # change is small there
-            if P > 100e6:
-                P = 100e6
-            if T > 1073.15:
-                T = 1073.15
-            rho = iapws97_rho(T, P, use_95_boundary)
     return rho
 
 
@@ -4144,7 +4154,7 @@ def iapws95_dAr_ddelta(tau, delta):
     x48 = delta8*x47
     x50 = delta - 1.0
     x51 = x50*x50
-    dm1rt23 = x51**(1.0/3.0) # numba will make this a cbrt, PyPy does not care, CPython slows a by a multiply and assign
+    dm1rt23 = cbrt(x51)#**(1.0/3.0) # numba will make this a cbrt, PyPy does not care, CPython slows a by a multiply and assign
     dm1rt23 *= dm1rt23
     x65 = x51*dm1rt23
     x52 = -20.0*x51
@@ -4311,7 +4321,7 @@ def iapws95_d2Ar_ddelta2(tau, delta):
     y6 = y4*exp150
     y7 = delta*tau
     y9 = 2.0 - 2.0*delta
-    dm1rt23 = y3**(1.0/3.0)
+    dm1rt23 = cbrt(y3)
     y12 = y3*dm1rt23*dm1rt23
     y3rt = _sqrt(y3)
     y16 = y3*y3*y3rt

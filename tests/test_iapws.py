@@ -2117,6 +2117,10 @@ def test_rho_iapws95_CoolProp():
 
 def test_iapws97_rho_extrapolated():
     region5_highT = iapws97_rho_extrapolated(2300, 20e6)
+    assert_close(region5_highT, 18.67076800412673, rtol=1e-10)
+
+
+
     region5_highT_num = (iapws97_region5_rho(2273.15, 20e6)
                          + (2300-2273.15)*derivative(iapws97_region5_rho, 2273.15, args=(20e6,), dx=.1, order=3))
     assert_close(region5_highT, region5_highT_num, rtol=1e-10)
@@ -2124,6 +2128,7 @@ def test_iapws97_rho_extrapolated():
     region2_highT = iapws97_rho_extrapolated(1100, 80e6)
     region2_highT_num = (iapws97_region2_rho(1073.15, 80e6)
                          + (1100-1073.15)*derivative(iapws97_region2_rho, 1073.15, args=(80e6,), dx=.1, order=5))
+    assert_close(region2_highT, 174.58062182792997, rtol=1e-9)
 
     assert_close(region2_highT, region2_highT_num, rtol=1e-9)
 
@@ -2433,7 +2438,7 @@ def test_consistency_iapws95_rho_iapws95_P():
 
 def test_iapws95_properties():
     expect = [996.5563403888951, 112553.33413264707, 393.06243381456477, 112653.67968858521, 4130.178615033825, 4180.639522022912, 1501.520415056628, -2.2023653545981183e-07, 0.0009207295643366906, 1.978788044482276e-08, 4.4896388297803826e-07]
-    assert_close1d(iapws95_properties(T=300.0, P=1e5), expect, rtol=1e-13)
+    assert_close1d(iapws95_properties(T=300.0, P=1e5), expect, rtol=1e-12)
 
 
 def test_iapws92_Psat():
