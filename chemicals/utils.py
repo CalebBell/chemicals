@@ -1727,9 +1727,10 @@ def dns_to_dn_partials(dns, F, partial_properties=None):
     >>> dns_to_dn_partials([0.001459, -0.002939, -0.004334], -0.0016567)
     [-0.0001977000000000001, -0.0045957, -0.0059907]
     '''
+    N = len(dns)
     if partial_properties is None:
-        partial_properties = [0.0]*len(dns)
-    for i in range(len(dns)):
+        partial_properties = [0.0]*N
+    for i in range(N):
         partial_properties[i] = F + dns[i]
     return partial_properties
 
