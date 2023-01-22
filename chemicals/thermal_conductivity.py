@@ -2419,7 +2419,6 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
     k = 0.0
     for i in range(N):
         den = 0.0
-        S_rooti = S_roots[i]
         for j in range(N):
             # 1 multiply, 3 indexes into different arrays
             x0 = Ss_invT[i] + TSrootSsinv[i]*S_roots[j]
