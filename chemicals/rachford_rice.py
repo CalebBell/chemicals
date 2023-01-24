@@ -1783,36 +1783,8 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         near_low = min(1e-20, V_over_F_max*1e-15)
     solver_low = -log((V_over_F_max-near_low)/(near_low-V_over_F_min))
 
-    try:
-#        V_over_F = halley(Rachford_Rice_err_LN2, guess, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: uncomment
-        if one_m_Kmin == 1.0: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1e-10, low=solver_low, high=solver_high, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
-        else: # numba: delete
-            V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1.48e-12, low=solver_low, high=solver_high, bisection=True, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
-    except:
-#        return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True) # numba: delete
-#        raise ValueError("Could not solve") # numba: uncomment
-#        return Rachford_Rice_solution_numpy(zs=zs, Ks=Ks)
-        return flash_inner_loop(zs=zs, Ks=Ks, check=True, method=FLASH_INNER_HALLEY)
-        try: # numba: delete
-            V_over_F = brenth(lambda x: Rachford_Rice_err_LN2(x, zs, cis_ys, x0, V_over_F_min, N)[0], V_over_F_min, V_over_F_max)  # numba: delete
-        except NotBoundedError:  # numba: delete
-            return Rachford_Rice_solution(zs=zs, Ks=Ks, fprime=True)  # numba: delete
-            # err_low = 1e100
-            # try:
-            #     err_low = Rachford_Rice_flash_error(V_over_F_min, zs, Ks)
-            # except ZeroDivisionError:
-            #     pass
-            # if abs(err_low) < 1e-12:
-            #     V_over_F = -log((V_over_F_max - V_over_F_min) / (V_over_F_min - V_over_F_min))
-            # err_high = 1e100
-            # try:
-            #     err_high = Rachford_Rice_flash_error(V_over_F_max, zs, Ks)
-            # except ZeroDivisionError:
-            #     pass
-            # if abs(err_high) < 1e-12:
-            #     V_over_F = -log((V_over_F_max - V_over_F_max) / (V_over_F_max - V_over_F_min))
-
+    V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1.48e-12, low=solver_low, high=solver_high, bisection=True, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
+#    V_over_F = halley(Rachford_Rice_err_LN2, guess, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: uncomment
     V_over_F = (V_over_F_min + (V_over_F_max - V_over_F_min)/(1.0 + exp(-V_over_F)))
     
     if 1-1e-4 < V_over_F < 1+1e-4:
