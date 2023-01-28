@@ -1736,14 +1736,14 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
 #            Kmax = Ks[i] # numba: uncomment
 #        if Ks[i] < Kmin: # numba: uncomment
 #            Kmin = Ks[i] # numba: uncomment
-    if Kmin > 1.0 or Kmax < 1.0:
+    one_m_Kmin = 1.0 - Kmin
+    Kmax_m_one = (Kmax - 1.)
+    if Kmin > 1.0 or Kmax < 1.0 or Kmax_m_one == 0.0:
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
-    one_m_Kmin = 1.0 - Kmin
     N = len(zs)
-
-    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - one_m_Kmin)/((one_m_Kmin)*(Kmax - 1.))
+    V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - one_m_Kmin)/((one_m_Kmin)*Kmax_m_one)
     V_over_F_max = 1./one_m_Kmin
 
     guess = 0.5*(V_over_F_min + V_over_F_max) if guess is None else guess

@@ -1044,3 +1044,8 @@ def test_check_flash_inner():
 
 
 
+def test_Rachford_Rice_solution_LN2_zero_division_beginning():
+    zs = [0.9999999999990656, 9.154737453161391e-13, 2.0075054368923945e-17, 1.8818386983248402e-14] 
+    Ks = [1.0, 1.0, 1.0, 0.9999999999999998]
+    with pytest.raises(PhaseCountReducedError):
+        Rachford_Rice_solution_LN2(zs=zs, Ks=Ks)
