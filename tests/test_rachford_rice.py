@@ -1049,3 +1049,14 @@ def test_Rachford_Rice_solution_LN2_zero_division_beginning():
     Ks = [1.0, 1.0, 1.0, 0.9999999999999998]
     with pytest.raises(PhaseCountReducedError):
         Rachford_Rice_solution_LN2(zs=zs, Ks=Ks)
+
+    zs = [0.7811124449779911, 0.20958383353341334, 0.009303721488595438]
+    Ks =[1.0000000000000004, 1.0, 1.0000000000000002]
+    with pytest.raises(PhaseCountReducedError):
+        Rachford_Rice_solution_LN2(zs=zs, Ks=Ks)
+
+    zs = [0.7811124449779911, 0.20958383353341334, 0.009303721488595438]
+    Ks =[1.0000000000000004, 1.0, 1.0000000000000002]
+    with pytest.raises(PhaseCountReducedError):
+        Rachford_Rice_solution_LN2(zs=zs, Ks=Ks)
+

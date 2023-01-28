@@ -1738,7 +1738,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
 #            Kmin = Ks[i] # numba: uncomment
     one_m_Kmin = 1.0 - Kmin
     Kmax_m_one = (Kmax - 1.)
-    if Kmin > 1.0 or Kmax < 1.0 or Kmax_m_one == 0.0:
+    if Kmin > 1.0 or Kmax < 1.0 or Kmax_m_one == 0.0 or one_m_Kmin == 0.0:
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
@@ -1772,6 +1772,9 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         near_high = V_over_F_max*one_epsilon_smaller
     else:
         near_high = V_over_F_max*one_epsilon_larger
+    if (near_high-V_over_F_min) == 0.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s"%(Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     solver_high = -log((V_over_F_max-near_high)/(near_high-V_over_F_min))
     
     if V_over_F_min < 0.0:
@@ -1781,6 +1784,9 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     else:
         # V_over_F_min equals zero case, cannot evaluate there
         near_low = min(1e-20, V_over_F_max*1e-15)
+    if (near_low-V_over_F_min) == 0.0:
+        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s"%(Ks))  # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     solver_low = -log((V_over_F_max-near_low)/(near_low-V_over_F_min))
 
     V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1.48e-12, low=solver_low, high=solver_high, bisection=True, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
