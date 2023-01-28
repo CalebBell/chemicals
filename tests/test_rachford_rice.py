@@ -298,6 +298,18 @@ def test_Rachford_Rice_solution_LN2_points():
     assert_close(V_over_F, 3.5508236001931017, rtol=1e-15)
     
 
+    # Case where newton solver was failing likely due to numerical precision, used to have to fall back to bisection now works
+    zs = [0.6480551863856568, 0.12961103727713136, 0.08973071811493709, 0.04985039895274283, 0.0299102393716457, 0.0299102393716457, 0.01994015958109713, 0.0029910239371645697, 9.970079790548566e-07]
+    Ks = [5.1544641218538165e-09, 3.934846069507833e-09, 9.409655923317114e-11, 1.5286904395427428e-12, 9.682653415202975e-15, 3298.898986867951, 2.93356738992248e-10, 9.033272758598859e-06, 0.00016745583234872865]
+    guess = 0.5
+    V_over_F, xs, ys = Rachford_Rice_solution_LN2(zs=zs, Ks=Ks, guess=guess)
+    xs_expect = [0.667833810142969, 0.13356676203356552, 0.09246929680330764, 0.05137183155753827, 0.030823098934524392, 0.00030313143020827595, 0.02054873262283229, 0.003082309043674632, 1.0274313802092515e-06]
+    ys_expect = [3.4423254137428674e-09, 5.255646486046633e-10, 8.70104266390212e-12, 7.853162776380893e-14, 2.984493841655118e-16, 0.9999999680019145, 6.028109192657703e-12, 2.7843338317808954e-08, 1.7204937695414332e-10]
+    assert_close1d(xs, xs_expect, rtol=1e-14)
+    assert_close1d(ys, ys_expect, rtol=1e-14)
+    assert_close(V_over_F, 0.029616086455739987, rtol=1e-15)
+
+
 def test_Rachford_Rice_solution_LN2_near_VF1():
 
     # Case where the derivative goes to zero from the start case
@@ -1028,7 +1040,7 @@ def test_check_flash_inner():
         Rachford_Rice_solution_LN2(zs, Ks, guess)
 
     with pytest.raises(PhaseCountReducedError):
-        Rachford_Rice_solution(zs, Ks, guess)
+        Rachford_Rice_solution(zs, Ks, False, False, guess)
 
 
 
