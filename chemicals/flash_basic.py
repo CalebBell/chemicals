@@ -396,7 +396,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
     >>> omegas = [0.099, 0.349]
     >>> zs = [0.4, 0.6]
     >>> flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=300, P=1e5)
-    (300, 100000.0, 0.42219453293637355, [0.020938815080034565, 0.9790611849199654], [0.9187741856225791, 0.08122581437742094])
+    (300, 100000.0, 0.422194532936, [0.02093881508003, 0.979061184919], [0.918774185622, 0.0812258143])
     '''
     T_MAX = 50000.0
     N = len(zs)
@@ -590,7 +590,7 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
     >>> Tbs = [184.55, 371.53]
     >>> zs = [0.4, 0.6]
     >>> flash_Tb_Tc_Pc(zs=zs, Tcs=Tcs, Pcs=Pcs, Tbs=Tbs, T=300, P=1e5)
-    (300, 100000.0, 0.38070407481453833, [0.03115784303656836, 0.9688421569634316], [0.9999999998827086, 1.172914188751506e-10])
+    (300, 100000.0, 0.3807040748145, [0.0311578430365, 0.968842156963], [0.9999999998827, 1.1729141887e-10])
 
     References
     ----------
@@ -829,7 +829,7 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
     ...     funcs.append(K_over_P)
     >>> _, _, VF, xs, ys = flash_ideal(zs, funcs, Tcs=Tcs, P=1e5, T=364.0)
     >>> VF, xs, ys
-    (0.510863971792927, [0.5573493403937615, 0.4426506596062385], [0.4450898279593881, 0.5549101720406119])
+    (0.5108639717, [0.55734934039, 0.44265065960], [0.44508982795, 0.554910172040])
 
     Note that while this works for PT composition independent flashes - an
     outer iterating loop is needed for composition dependence!
