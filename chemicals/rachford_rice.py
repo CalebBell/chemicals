@@ -798,18 +798,16 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
        doi:10.1016/0378-3812(89)80072-X.
     '''
     N = len(Ks)
-    Kmin = min(Ks) # numba: delete
-    Kmax = max(Ks)# numba: delete
-    z_of_Kmax = zs[Ks.index(Kmax)]# numba: delete
 
-#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
-#    for i in range(N): # numba: uncomment
-#        if Ks[i] > Kmax: # numba: uncomment
-#            z_of_Kmax = zs[i] # numba: uncomment
-#            Kmax = Ks[i] # numba: uncomment
-#        if Ks[i] < Kmin: # numba: uncomment
-#            Kmin = Ks[i] # numba: uncomment
-    if Kmin > 1.0 or Kmax < 1.0:
+    Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
+    for i in range(N):
+        if zs[i] > 0.0:
+            if Ks[i] > Kmax:
+                z_of_Kmax = zs[i]
+                Kmax = Ks[i]
+            if Ks[i] < Kmin:
+                Kmin = Ks[i]
+    if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
@@ -893,18 +891,18 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
     faster.
     """
     zs, Ks = np.array(zs), np.array(Ks) # numba: delete
-#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
-#    for i in range(len(zs)): # numba: uncomment
-#        if Ks[i] > Kmax: # numba: uncomment
-#            z_of_Kmax = zs[i] # numba: uncomment
-#            Kmax = Ks[i] # numba: uncomment
-#        if Ks[i] < Kmin: # numba: uncomment
-#            Kmin = Ks[i] # numba: uncomment
-    Kmin = Ks.min() # numba: delete
-    Kmax = Ks.max() # numba: delete
-    if Kmin > 1.0 or Kmax < 1.0:  # numba: delete
+    N = len(Ks)
+    Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
+    for i in range(N):
+        if zs[i] > 0.0:
+            if Ks[i] > Kmax:
+                z_of_Kmax = zs[i]
+                Kmax = Ks[i]
+            if Ks[i] < Kmin:
+                Kmin = Ks[i]
+    if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
-    z_of_Kmax = zs[Ks == Kmax][0] # numba: delete
+#        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.-Kmin))/((1.-Kmin)*(Kmax-1.))
     V_over_F_max = 1./(1.-Kmin)
@@ -1068,19 +1066,15 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
        303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
     '''
     N = len(Ks)
-    Kmin = min(Ks) # numba: delete
-    Kmax = max(Ks)# numba: delete
-    i_Kmax = Ks.index(Kmax)# numba: delete
-    z_of_Kmax = zs[i_Kmax]# numba: delete
-
-#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
-#    for i in range(N): # numba: uncomment
-#        if Ks[i] > Kmax: # numba: uncomment
-#            z_of_Kmax = zs[i] # numba: uncomment
-#            Kmax = Ks[i] # numba: uncomment
-#        if Ks[i] < Kmin: # numba: uncomment
-#            Kmin = Ks[i] # numba: uncomment
-    if Kmin > 1.0 or Kmax < 1.0:
+    Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
+    for i in range(N):
+        if zs[i] > 0.0:
+            if Ks[i] > Kmax:
+                z_of_Kmax = zs[i]
+                Kmax = Ks[i]
+            if Ks[i] < Kmin:
+                Kmin = Ks[i]
+    if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
@@ -1227,19 +1221,15 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     N = len(Ks)
     if N == 2:
         return Rachford_Rice_solution_binary_dd(zs, Ks)
-    Kmin = min(Ks) # numba: delete
-    Kmax = max(Ks)# numba: delete
-    i_Kmax = Ks.index(Kmax)# numba: delete
-    z_of_Kmax = zs[i_Kmax]# numba: delete
-
-#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
-#    for i in range(N): # numba: uncomment
-#        if Ks[i] > Kmax: # numba: uncomment
-#            z_of_Kmax = zs[i] # numba: uncomment
-#            Kmax = Ks[i] # numba: uncomment
-#        if Ks[i] < Kmin: # numba: uncomment
-#            Kmin = Ks[i] # numba: uncomment
-    if Kmin > 1.0 or Kmax < 1.0:
+    Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
+    for i in range(N):
+        if zs[i] > 0.0:
+            if Ks[i] > Kmax:
+                z_of_Kmax = zs[i]
+                Kmax = Ks[i]
+            if Ks[i] < Kmin:
+                Kmin = Ks[i]
+    if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     
@@ -1523,6 +1513,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
                 VF_kim1_1_inv = 1/(1 + V_over_F*Kim1)
                 err0 += num0*VF_kim1_1_inv
                 err1 += num1*VF_kim1_1_inv*VF_kim1_1_inv
+            # print(V_over_F, err0, err1)
             return err0, err1
         return Rachford_Rice_err_fprime
 
@@ -1530,12 +1521,19 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     
     solve_order = 1 # 1 for newton, 0 for secant - development only, should always return the correct answer
     
-    Kmin = mpf(min(Ks))
-    Kmax = mpf(max(Ks))
+    Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
+    for i in range(N):
+        if zs[i] > 0.0:
+            if Ks[i] > Kmax:
+                z_of_Kmax = zs[i]
+                Kmax = Ks[i]
+            if Ks[i] < Kmin:
+                Kmin = Ks[i]
     if Kmin > 1.0 or Kmax < 1.0:
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))
+
+    z_of_Kmax, Kmin, Kmax = mpf(z_of_Kmax), mpf(Kmin), mpf(Kmax)
     
-    z_of_Kmax = mpf(zs[Ks.index(Kmax)])
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1- Kmin))/((1- Kmin)*(Kmax- 1))
     V_over_F_max = 1/(1 - Kmin)
 
@@ -1568,6 +1566,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     if guess is None or (guess < V_over_F_min or guess > V_over_F_max):
         # Check the guess to ensure it is within bounds
         guess = 0.5*(V_over_F_min + V_over_F_max)
+    guess = mpf(guess)
 
     # mpmath does not have an option to respect boundaries, so its solvers
     # often go outside the correct range
@@ -1592,7 +1591,11 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
             p1 = 0.4*V_over_F_min + 0.6*V_over_F_max
             V_over_F = secant(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, x1=p1)
         elif solve_order == 1:
-            V_over_F = newton(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, fprime=True)
+            try:
+                V_over_F = newton(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, fprime=True)
+            except:
+                # Should happen only just barely because of numerical issues calculating the bounds
+                V_over_F = newton(objf, guess, xtol=tol, maxiter=1000, ytol=1e-50, fprime=True)
 
     xs = [0]*N
     ys = [0]*N
@@ -1726,16 +1729,15 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
        Computers & Chemical Engineering 26, no. 3 (March 15, 2002): 457-60.
        https://doi.org/10.1016/S0098-1354(01)00767-0.
     '''
-    Kmin = min(Ks) # numba: delete
-    Kmax = max(Ks) # numba: delete
-    z_of_Kmax = zs[Ks.index(Kmax)] # numba: delete
-#    Kmin, Kmax, z_of_Kmax = Ks[0], Ks[0], zs[0] # numba: uncomment
-#    for i in range(len(zs)): # numba: uncomment
-#        if Ks[i] > Kmax: # numba: uncomment
-#            z_of_Kmax = zs[i] # numba: uncomment
-#            Kmax = Ks[i] # numba: uncomment
-#        if Ks[i] < Kmin: # numba: uncomment
-#            Kmin = Ks[i] # numba: uncomment
+    N = len(Ks)
+    Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
+    for i in range(N):
+        if zs[i] > 0.0:
+            if Ks[i] > Kmax:
+                z_of_Kmax = zs[i]
+                Kmax = Ks[i]
+            if Ks[i] < Kmin:
+                Kmin = Ks[i]
     if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
@@ -1901,7 +1903,7 @@ def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
     # Smallest K value
     kn = Ks_sorted[-1]
 
-    if kn > 1.0 or k1 < 1.0:
+    if kn > 1.0*(1-1e-15) or k1 < 1.0*(1+1e-15):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
@@ -2188,6 +2190,8 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         method2 = FLASH_INNER_ANALYTICAL if l < 3 else (FLASH_INNER_NUMPY if (not IS_PYPY and l >= 10) else FLASH_INNER_LN2)
     else:
         method2 = method
+    # if check:
+    #     check = False
     if check:
         K_low, K_high = False, False
         for zi, Ki in zip(zs, Ks):

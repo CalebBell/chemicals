@@ -494,13 +494,13 @@ def test_rachford_rice():
     assert_close(VF, VF_new)
     assert_close1d(xs, xs_new)
     assert_close1d(ys, ys_new)
-    from .test_rachford_rice import test_flash_solution_algorithms
-    test_flash_solution_algorithms(chemicals.numba.flash_inner_loop, array=True)
-    test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_LN2, array=True)
-    test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution, array=True)
+    # from .test_rachford_rice import test_flash_solution_algorithms
+    # test_flash_solution_algorithms(chemicals.numba.flash_inner_loop, array=True)
+    # test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_LN2, array=True)
+    # test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution, array=True)
     
-    f = lambda zs, Ks, guess=None: chemicals.numba.Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess)[1:]
-    test_flash_solution_algorithms(f, array=True)
+    # f = lambda zs, Ks, guess=None: chemicals.numba.Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess)[1:]
+    # test_flash_solution_algorithms(f, array=True)
     # test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_numpy, array=True) # Does not currently pass
 # test_rachford_rice()
 

@@ -123,6 +123,21 @@ def test_RR_mpmath_points():
     assert_close1d(xs, xs_expect, rtol=1e-16)
     assert_close1d(ys, ys_expect, rtol=1e-16)
 
+    # point where just outside bounds
+    LF, VF, xs, ys = Rachford_Rice_solution_mpmath([0.2, 0.0, 0.8], [0.971209295156525, 0.7996504795406192, 1.1403683517535024])
+    xs_expect = [0.8298009848088178, 0.0, 0.17019901519118227]
+    ys_expect =  [0.8059104295763623, 0.0, 0.19408957042363784]
+    assert_close(VF, 26.36192330738411, rtol=1e-16)
+    assert_close1d(xs, xs_expect, rtol=1e-16)
+    assert_close1d(ys, ys_expect, rtol=1e-16)
+
+    LF, VF, xs, ys = Rachford_Rice_solution_mpmath([0.2, 1e-100, 0.8], [0.971209295156525, 1.140368351753502, 1.1403683517535024])
+    xs_expect = [0.8298009848088178, 2.1274876898897835e-101, 0.17019901519118227]
+    ys_expect = [0.8059104295763623, 2.4261196302954778e-101, 0.19408957042363784]
+    assert_close(VF, 26.36192330738411, rtol=1e-16)
+    assert_close1d(xs, xs_expect, rtol=1e-16)
+    assert_close1d(ys, ys_expect, rtol=1e-16)
+
 def assert_same_RR_results(zs, Ks, f0, f1, rtol=1e-9):
     N = len(zs)
     V_over_F1, xs1, ys1 = f0(zs, Ks)
@@ -455,12 +470,15 @@ flash_LNdd = lambda zs, Ks, guess=None: Rachford_Rice_solution_Leibovici_Neoschi
 
 
 algorithms = [Rachford_Rice_solution, Li_Johns_Ahmadi_solution,
-              flash_inner_loop, flash_inner_loop_secant,
+             flash_inner_loop, flash_inner_loop_secant,
               flash_inner_loop_NR, flash_inner_loop_halley,
-              flash_inner_loop_numpy, flash_inner_loop_LJA,
-              flash_inner_loop_poly, flash_inner_loop_LN2,
-              RR_solution_mpmath, flash_inner_loop_LN,
-              flash_LNdd]
+              flash_inner_loop_numpy,
+               flash_inner_loop_LJA,
+              flash_inner_loop_poly, 
+               flash_inner_loop_LN2,
+               RR_solution_mpmath, flash_inner_loop_LN,
+               flash_LNdd
+              ]
 
 @pytest.mark.parametrize("algorithm", algorithms)
 @pytest.mark.parametrize("array", [False])
@@ -528,6 +546,38 @@ def test_flash_solution_algorithms(algorithm, array):
     zs, Ks = [0.4, 0.5, 0.1], [2.269925647634519e2, 2.248989467272186e8, 1e3]
     with pytest.raises(PhaseCountReducedError):
         V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+
+
+    # Handle the case with a zero component - does not affect V_over_F_min or V_over_F_max
+    if algo not in (flash_inner_loop_LJA,Li_Johns_Ahmadi_solution, flash_inner_loop_poly):
+        # too lazy to code for the old unused methods
+        zs, Ks = [0.2, 0.0, 0.8], [0.971209295156525, 0.7996504795406192, 1.1403683517535024]
+        V_over_F_expect = 26.36192330738411
+        xs_expect = [0.8298009848088178, 0.0, 0.17019901519118227]
+        ys_expect = [0.8059104295763623, 0.0, 0.19408957042363784]
+        V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+        assert_close(V_over_F, V_over_F_expect, rtol=1E-13)
+        assert_close1d(xs, xs_expect, rtol=1E-9)
+        assert_close1d(ys, ys_expect, rtol=1E-9)
+
+    # Should error out on close cases
+    if algo not in (RR_solution_mpmath, flash_inner_loop_poly):
+        zs = [0.9999999999990656, 9.154737453161391e-13, 2.0075054368923945e-17, 1.8818386983248402e-14] 
+        Ks = [1.0, 1.0, 1.0, 0.9999999999999998]
+        with pytest.raises(PhaseCountReducedError):
+            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+
+        zs = [0.7811124449779911, 0.20958383353341334, 0.009303721488595438]
+        Ks =[1.0000000000000004, 1.0, 1.0000000000000002]
+        with pytest.raises(PhaseCountReducedError):
+            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+
+        zs = [0.7811124449779911, 0.20958383353341334, 0.009303721488595438]
+        Ks =[1.0000000000000004, 1.0, 1.0000000000000002]
+        with pytest.raises(PhaseCountReducedError):
+            V_over_F, xs, ys = algo(zs=zs, Ks=Ks)
+
+
 
     # Said to be in:  J.D. Seader, E.J. Henley, D.K. Roper, Separation Process Principles, third ed., John Wiley & Sons, New York, 2010.
     zs = [0.1, 0.2, 0.3, 0.4]
