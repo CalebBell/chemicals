@@ -299,7 +299,7 @@ def Z_from_virial_density_form(T, P, *args):
             Pmin = -0.25*R*T/(B)
 #            raise ValueError("Too high of pressure for provided T and B") # numba: uncomment
             raise ValueError(f"Maximum allowed pressure for virial coefficient B of {B} m^3/mol is {Pmin} Pa") # numba: delete
-        return 1/2. + 0.5*sqrt((determining_factor)/(R*T))
+        return 1.0/2. + 0.5*sqrt((determining_factor)/(R*T))
 #        return ((R*T*(4*args[0]*P + R*T))**0.5 + R*T)/(2*P)
     if l == 2:
         B, C = args[0], args[1]
@@ -2576,29 +2576,32 @@ def BVirial_Meng(T, Tc, Pc, Vc, omega, a=0.0):
     '''
     c0, c1, c2, c3, c4 =  0.13356, -0.30252, -0.15668, -0.00724, -0.00022
     d0, d1, d2, d3, d4 = 0.17404, -0.15581, 0.38183, -0.44044, -0.00541
-    x0 = Tc/T
-    x1 = Tc**8.0/T**8.0
-    x2 = T**(-3.0)
-    x3 = Tc**3.0*x2
-    x4 = Tc**2.0
-    x5 = x4/T**2.0
+    T_inv = 1.0/T
+    Tc_T = Tc*T_inv
+    Tc_T2 = Tc_T*Tc_T
+    Tc_T4 = Tc_T2*Tc_T2
+    x1 = Tc_T4*Tc_T4
+    T_inv3 = T_inv*T_inv*T_inv
+    Tc2 = Tc*Tc
+    x3 = Tc*Tc2*T_inv3
+    x5 = Tc2*T_inv*T_inv
     x6 = R/Pc
-    x7 = 2.0*x0
-    x8 = Tc**7.0/T**7.0
+    x7 = 2.0*Tc_T
+    x8 = Tc_T4*Tc_T2*Tc_T
     x9 = 8.0*x8
-    x10 = Tc**5.0*a/T**5.0
+    x10 = a*Tc_T4*Tc_T
     x11 = 3.0*x5
-    x12 = 3.0*x0
+    x12 = 3.0*Tc_T
     x13 = 36.0*x8
     x14 = 6.0*x5
-    x15 = x4*x6
-    x16 = 4.0*x0
+    x15 = Tc2*x6
+    x16 = 4.0*Tc_T
     x17 = 120.0*x8
     x18 = 10.0*x5
-    B = Tc*x6*(c0 + c1*x0 + c2*x5 + c3*x3 + c4*x1 + omega*(d0 + d1*x0 + d2*x5 + d3*x3 + d4*x1) + Tc**6.0*a/T**6.0)
+    B = Tc*x6*(c0 + c1*Tc_T + c2*x5 + c3*x3 + c4*x1 + omega*(d0 + d1*Tc_T + d2*x5 + d3*x3 + d4*x1) + a*Tc_T4*Tc_T2)
     dB = -x5*x6*(c1 + c2*x7 + c3*x11 + c4*x9 + omega*(d1 + d2*x7 + d3*x11 + d4*x9) + 6.0*x10)
-    dB2 = 2.0*x15*x2*(c1 + c2*x12 + c3*x14 + c4*x13 + omega*(d1 + d2*x12 + d3*x14 + d4*x13) + 21.0*x10)
-    dB3 = -6.0*x15*(c1 + c2*x16 + c3*x18 + c4*x17 + omega*(d1 + d2*x16 + d3*x18 + d4*x17) + 56.0*x10)/T**4.0
+    dB2 = 2.0*x15*T_inv3*(c1 + c2*x12 + c3*x14 + c4*x13 + omega*(d1 + d2*x12 + d3*x14 + d4*x13) + 21.0*x10)
+    dB3 = -6.0*x15*(c1 + c2*x16 + c3*x18 + c4*x17 + omega*(d1 + d2*x16 + d3*x18 + d4*x17) + 56.0*x10)*T_inv3*T_inv
     return B, dB, dB2, dB3
 
 def BVirial_Meng_vec(T, Tcs, Pcs, Vcs, omegas, ais, Bs=None, dB_dTs=None, 
@@ -3633,15 +3636,15 @@ def CVirial_Orbey_Vera(T, Tc, Pc, omega):
     x3 = Tc3*Tc3*Tinv2*Tinv2*Tinv2
     x4 = Tinv2*Tinv
     x5 = Tc3*x4
-    x1 = x0**(-21.0/2.0)
+    x1 = x0**(-21.0/2.0) # not worth optimizing, power tree is too large
     x2 = x0**(-14.0/5.0)
     x6 = -2000.0*x5
     x8 = 60.0*omega
     
-    C = -x7*(2.0*omega*(114.0*x1 - 885.0*x2 + 150.0*x3 + x6 + 1338.0) + 313.0*x1 - 2432.0*x2 - 1407.0)*(1/100000)
-    dC = x7*(32865.0*x1 - 68096.0*x2 + x8*(399.0*x1 - 826.0*x2 + 300.0*x3 + x6))*Tinv*(1/1000000)
-    d2C = -x7*(3779475.0*x1 - 2587648.0*x2 + x8*(45885.0*x1 - 31388.0*x2 + 21000.0*x3 - 80000.0*x5))*Tinv2*(1/10000000)
-    d3C = 3.0*x4*x7*(20.0*omega*(5735625.0*x1 - 1506624.0*x2 + 1680000.0*x3 - 4000000.0*x5) + 157478125.0*x1 - 41402368.0*x2)*(1/100000000)
+    C = -x7*(2.0*omega*(114.0*x1 - 885.0*x2 + 150.0*x3 + x6 + 1338.0) + 313.0*x1 - 2432.0*x2 - 1407.0)*(1.0/100000.0)
+    dC = x7*(32865.0*x1 - 68096.0*x2 + x8*(399.0*x1 - 826.0*x2 + 300.0*x3 + x6))*Tinv*(1.0/1000000.0)
+    d2C = -x7*(3779475.0*x1 - 2587648.0*x2 + x8*(45885.0*x1 - 31388.0*x2 + 21000.0*x3 - 80000.0*x5))*Tinv2*(1.0/10000000.0)
+    d3C = 3.0*x4*x7*(20.0*omega*(5735625.0*x1 - 1506624.0*x2 + 1680000.0*x3 - 4000000.0*x5) + 157478125.0*x1 - 41402368.0*x2)*(1.0/100000000.0)
     return C, dC, d2C, d3C
 
 def CVirial_Orbey_Vera_vec(T, Tcs, Pcs, omegas, Cs=None, dC_dTs=None, 

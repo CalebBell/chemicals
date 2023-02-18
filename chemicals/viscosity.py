@@ -1016,7 +1016,7 @@ def dPPDS9_dT(T, A, B, C, D, E):
         mu = E*trunc_exp(-x1**(1.0/3.0)*(A + x0*x4))
         x6 = D + x2
         x7 = 1.0/x6
-        x8 = x0*(x1 - 1.0)/3.0
+        x8 = x0*(x1 - 1.0)*(1.0/3.0)
         dmu_dT = -mu*(x3*x7)**(1.0/3.0)*(-A*x6*x8/x3 + B*x7 + B*x8 - x4*x7*x7)
     else:
         x0 = -T

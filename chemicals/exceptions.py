@@ -48,7 +48,7 @@ class OverspeficiedError(Exception):
 
 class TrivialSolutionError(Exception):
     """Error raised SS converges to trivial solution."""
-    def __init__(self, message, comp_difference, iterations, err):
+    def __init__(self, message, comp_difference=None, iterations=None, err=None):
         super().__init__(message)
         self.comp_difference = comp_difference
         self.iterations = iterations
