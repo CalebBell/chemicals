@@ -153,6 +153,27 @@ except:
 
 immutable_class_types = set(['Fraction', 'Decimal'])
 
+def object_data(obj):
+    # Always returns a new dictionary
+    try:
+        d = obj.__dict__.copy()
+    except:
+        d = {}
+    
+    for base in obj.__class__.__mro__[:-1]:
+        try:
+            slots = base.__slots__
+        except:
+            continue
+        for s in slots:
+            if s == '__dict__':
+                continue
+            try:
+                d[s] = getattr(obj, s)
+            except:
+                pass
+    return d
+
 def recursive_copy(obj):
     obj_type = type(obj)
     if obj_type in immutable_types:
