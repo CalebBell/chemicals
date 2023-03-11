@@ -3010,12 +3010,12 @@ def d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks(zs, Cijs, d3Cs=None):
         Mole fractions of each species, [-]
     Cijs : list[list[float]]
         Third virial binary interaction coefficients in density form [m^6/mol^2]
-    d3Cs : list[list[float]], optional
+    d3Cs : list[list[list[float]]], optional
         Third derivatives of C with respect to mole fraction, [m^6/mol^2]
 
     Returns
     -------
-    d3Cs : list[list[float]]
+    d3Cs : list[list[list[float]]]
         Third derivatives of C with respect to mole fraction, [m^6/mol^2]
 
     Notes
@@ -3530,16 +3530,16 @@ def d3CVirial_mixture_dT3_Orentlicher_Prausnitz(zs, Cijs, dCij_dTs, d2Cij_dT2s,
                 # Create a discontinuity in this mixing rule if we were going to have complex components
                 if x2x4 < 0.0:
                     continue
-                term = (x2x4)**(1/3)
-                x5 = x2/3.0
                 x6 = d2Cij_dT2s[j][k]
                 x7 = dCij_dTs[i][k]
-                x8 = x2*x7
                 x9 = dCij_dTs[j][k]
                 x10 = d2Cij_dT2s[i][k]
                 x11 = dCij_dTs[i][j]
-                x12 = x3*x6
                 x13 = d2Cij_dT2s[i][j]
+                term = (x2x4)**(1/3)
+                x5 = x2/3.0
+                x8 = x2*x7
+                x12 = x3*x6
                 x14 = x3*x9
                 x15 = x0*x10
                 x16 = x0*x7
