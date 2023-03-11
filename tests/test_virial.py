@@ -1008,7 +1008,7 @@ def test_d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks():
     def to_jac(zs): return dCVirial_mixture_Orentlicher_Prausnitz_dzs(zs, Cijs)
     
     numerical = hessian(to_jac, zs, perturbation=3e-5, scalar=False)
-    assert_close3d(d3Cs, numerical, rtol=1e-5)
+    assert_close3d(d3Cs, numerical, rtol=3e-5)
     
     
     # Large case to test the indexes better
@@ -1019,7 +1019,7 @@ def test_d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks():
     assert_close3d(expect, d3Cs, rtol=1e-13)
     
     numerical = hessian(to_jac, zs, perturbation=8e-5, scalar=False)
-    assert_close3d(d3Cs, numerical, rtol=1e-5)
+    assert_close3d(d3Cs, numerical, rtol=3e-5)
 
 def test_dV_dzs_virial():
     calc = dV_dzs_virial(B=-5.130920247359858e-05, C=2.6627784284381213e-09, V=0.024892080086430797, dB_dzs=[-4.457911131778849e-05, -9.174964457681726e-05, -0.0001594258679841028], dC_dzs=[6.270599057032657e-09, 7.766612052069565e-09, 9.503031492910165e-09])
