@@ -158,7 +158,7 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
 from cmath import sqrt as csqrt
 
 from fluids.constants import R, R_inv
-from fluids.numerics import numpy as np, roots_cubic
+from fluids.numerics import numpy as np, roots_cubic, cbrt
 
 from chemicals.utils import exp, log, sqrt
 
@@ -3046,10 +3046,10 @@ def d3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks(zs, Cijs, d3Cs=None):
         Cij_row = Cijs[i]
         for j in range(i):
             if Cij_row[j] > 0.0:
-                Cij_cbrt_row[j] = Cij_cbrts[j][i] = Cij_row[j]**(1.0/3)
+                Cij_cbrt_row[j] = Cij_cbrts[j][i] = cbrt(Cij_row[j])
                 
         if Cij_row[i] > 0.0:
-            Cij_cbrt_row[i] = Cij_row[i]**(1.0/3.0)
+            Cij_cbrt_row[i] = cbrt(Cij_row[i])
 
     cC = Cij_cbrts
     
