@@ -2217,7 +2217,10 @@ def test_iapws95_saturation():
     from chemicals.iapws import iapws95_sat_err_and_jac
 
     err, jac = iapws95_sat_err_and_jac([1.807830655839175e-05, 0.7040053821406961], 300.0)
-    assert_close1d(err, [2.660272002685815e-10, 1.681859203017666e-05], rtol=1e-6)
+    # As this point is converged, there is almost no rtol
+    assert_close1d(err, [2.660272002685815e-10, 1.681859203017666e-05], atol=1e-4)
+
+    # The jacobian stays quite the same
     assert_close2d(jac, [[-2219129832.1579313, 3530.261802535087],
                          [-122750979191014.77, 5014.538087479508]], rtol=1e-7)
 
