@@ -2152,6 +2152,9 @@ def test_iapws95_rho():
 
     iapws95_rho(200.0, 1e9) - not solving
     '''
+    with pytest.raises(ValueError):
+        iapws95_rho(0.000999999999999999, 900000.0)
+
     assert_close(iapws95_rho(273.1600000001, 0.001), 7.932210036861784e-09, rtol=1e-8)
 
     assert_close(iapws95_rho(350.0, 1e6), 974.1288271329855, rtol=1e-8)
