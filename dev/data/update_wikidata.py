@@ -29,6 +29,7 @@ properties = {'P2101': 'Tm',
              }
 
 max_chemicals = 100000 # For testing; set to a large number to ignore this; set to maybe 100 to test a small query.
+# max_chemicals = 30
 
 wiki_prop_IDs = list(properties.keys())
 wiki_prop_items = [client.get(v, load=True) for v in wiki_prop_IDs]
@@ -115,6 +116,8 @@ for d in data['results']['bindings']:
     s = d['cmpnd']['value']
     found_IDs.append(s.replace('http://www.wikidata.org/entity/', ''))
 chemical_IDs.update(found_IDs)
+# print(chemical_IDs)
+# print(list(chemical_IDs)[-1], type(list(chemical_IDs)[-1]))
 print('Identified %s chemicals in %s seconds' %(len(chemical_IDs), (time() - start) ))# 9344
 
 
@@ -158,6 +161,8 @@ def retrieve_chemical_data(ID):
             MW = None
     else:
         MW = None
+    assert  type(CAS_to_int(CAS)) is int
+    # print('CAs', type(CAS), CAS_to_int(CAS), type(CAS_to_int(CAS)), 'hi')
     dat = {'CAS': CAS_to_int(CAS), 'name': name, 'MW': MW, 
                           'formula': formula, 'smiles': smiles, 
                           'inchi': inchi, 'inchikey': inchikey}
@@ -209,12 +214,15 @@ print("Processed %s items in %s seconds" %(len(chemical_data), (time() - start))
 
 #keys = ['CAS', 'name', 'formula', 'MW', 'Tm', 'Tb', 'Hfus', 'Hvap', 'Hf', 'S0', 'LFL', 'UFL', 'T_flash', 'T_autoignition', 'RI', 'RIT', 'logP']
 keys = ['CAS', 'Tm', 'Tb', 'Hfus', 'Hvap', 'Hf', 'S0', 'LFL', 'UFL', 'T_flash', 'T_autoignition', 'RI', 'RIT', 'logP']
-lines = ['\t'.join(keys) + '\n']
+lines = []
 for CAS in sorted(chemical_data.keys()):
     d = chemical_data[CAS]
     values = [d.get(k, '') for k in keys]
     for i, v in enumerate(values):
-        if v is None:
+        if i == 0:
+            # CAS`
+            values[i] = str(v)
+        elif v is None:
             values[i] = ''
         elif v == '':
             pass
@@ -228,7 +236,10 @@ for CAS in sorted(chemical_data.keys()):
         v = v.replace('\t', ' ')
     to_write = '\t'.join(values) + '\n'
     lines.append(to_write)
-    
+
+lines.sort() # history
+lines.insert(0, '\t'.join(keys) + '\n')
+
 folder = os.path.dirname(__file__)
 f = open(os.path.join(folder, '..', '..', 'chemicals', 'Misc', 'wikidata_properties.tsv'), 'w')
 f.writelines(lines)

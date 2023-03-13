@@ -225,7 +225,7 @@ def test_Tb():
     assert w_methods == ['CRC_INORG', 'COMMON_CHEMISTRY', 'WEBBOOK', 'YAWS', 'WIKIDATA']
 
     Tbs = [Tb('7732-18-5', method=i) for i in w_methods]
-    assert_close1d(Tbs, [373.124, 373.15, 373.17, 373.15, 373.15])
+    assert_close1d(Tbs, [373.124, 373.15, 373.17, 373.15, 373.1339])
 
 
 @pytest.mark.slow
@@ -264,7 +264,7 @@ def test_Tm():
     assert w_methods == ['OPEN_NTBKM', 'CRC_INORG', 'COMMON_CHEMISTRY', 'WIKIDATA']
 
     Tms = [Tm('7732-18-5', method=i) for i in w_methods]
-    assert_close1d(Tms, [273.15, 273.15, 273.15, 273.15])
+    assert_close1d(Tms, [273.15, 273.15, 273.15, 273.15252])
 
 
 def test_Alibakhshi():
