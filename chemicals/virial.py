@@ -461,11 +461,23 @@ def dBVirial_mixture_dzs(zs, Bijs, dB_dzs=None):
     N = len(Bijs)
     if dB_dzs is None:
         dB_dzs = [0.0]*N
+    else:
+        for i in range(N):
+            dB_dzs[i] = 0.0
+    # Order this so that each row of B is processed sequentially.
+    for k in range(N):
+        zj = zs[k]
+        Bks = Bijs[k]
+        for i in range(N):
+            dB_dzs[i] += zj*Bks[i]
+
     for k in range(N):
         dB = 0.0
+        Bks = Bijs[k]
         for i in range(N):
-            dB += zs[i]*Bijs[i][k] + zs[i]*Bijs[k][i]
-        dB_dzs[k] = dB
+            dB += zs[i]*Bks[i]
+        dB_dzs[k] += dB
+
     return dB_dzs
 
 def d2BVirial_mixture_dzizjs(zs, Bijs, d2B_dzizjs=None):
