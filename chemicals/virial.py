@@ -4494,10 +4494,10 @@ def d2V_dzizjs_virial(B, C, V, dB_dzs, dC_dzs, dV_dzs, d2B_dzizjs, d2C_dzizjs,
         First derivatives of C with respect to mole fraction, [m^6/mol^2]
     dV_dzs : list[float]
         First derivatives of molar volume with respect to mole fraction, [m^3/mol]
-    d2B_dzizjs : list[float]
+    d2B_dzizjs : list[list[float]]
         Second mole fraction derivatives of second virial coefficient in 
         density form [m^3/mol]
-    d2C_dzizjs : list[float]
+    d2C_dzizjs : list[list[float]]
         Second derivatives of C with respect to mole fraction, [m^6/mol^2]
     d2V_dzizjs : list[list[float]], optional
         Array for second derivatives of molar volume with respect to mole
@@ -4549,7 +4549,7 @@ def d2V_dzizjs_virial(B, C, V, dB_dzs, dC_dzs, dV_dzs, d2B_dzizjs, d2C_dzizjs,
             x8 = 3*x0
             x9 = 2*x2
             x10 = x5*x9
-            d2V_dzizjs[i][j] = (x0**3*d2B_dzizjs[i][j]+ 12*x1*x7 + x10*x6 - x10*dB_dzs[i]
-                                + x2*d2C_dzizjs[i][j] + 6*x4*x7 - x5*x8*dC_dzs[i] - x6*x8*dC_dzs[j]
-                                - x6*x9*dB_dzs[j])/(x0*(3*x1 + x2 + 2*x4))
+            d2V_dzizjs[i][j] = (x0*x0*x0*d2B_dzizjs[i][j]+ 12.0*x1*x7 + x10*x6 - x10*dB_dzs[i]
+                                + x2*d2C_dzizjs[i][j] + 6.0*x4*x7 - x5*x8*dC_dzs[i] - x6*x8*dC_dzs[j]
+                                - x6*x9*dB_dzs[j])/(x0*(3.0*x1 + x2 + 2.0*x4))
     return d2V_dzizjs
