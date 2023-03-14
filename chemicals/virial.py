@@ -308,28 +308,6 @@ def Z_from_virial_density_form(T, P, *args):
         V = sln[0].real
         Z = P*V/(R*T)
         return Z
-    if l == 3:
-        # Huge mess. Ideally sympy could optimize a function for quick python
-        # execution. Derived with kate's text highlighting
-        B, C, D = args[0], args[1], args[2]
-        P2 = P**2
-        RT = R*T
-        BRT = B*RT
-        T2 = T**2
-        R2 = R**2
-        RT23 = 3*R2*T2
-        mCRT = -C*RT
-        P2256 = 256*P2
-
-        RT23P2256 = RT23/(P2256)
-        big1 = (D*RT/P - (-BRT/P - RT23/(8*P2))**2/12 - RT*(mCRT/(4*P) - RT*(BRT/(16*P) + RT23P2256)/P)/P)
-        big3 = (-BRT/P - RT23/(8*P2))
-        big4 = (mCRT/P - RT*(BRT/(2*P) + R2*T2/(8*P2))/P)
-        big5 = big3*(-D*RT/P + RT*(mCRT/(4*P) - RT*(BRT/(16*P) + RT23P2256)/P)/P)
-        big2 = 2*big1/(3*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3))
-        big7 = 2*BRT/(3*P) - big2 + 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(4*P2)
-        return (P*(((csqrt(big7)/2 + csqrt(4*BRT/(3*P) - (-2*C*RT/P - 2*RT*(BRT/(2*P) + R2*T2/(8*P2))/P)/csqrt(big7) + big2 - 2*(big3**3/216 - big5/6 + big4**2/16 + csqrt(big1**3/27 + (-big3**3/108 + big5/3 - big4**2/8)**2/4))**(1/3) + R2*T2/(2*P2))/2 + RT/(4*P))))/R/T).real
-
     size = l + 2
 #    arr = np.ones(size, dtype=np.complex128) # numba: uncomment
     arr = [1.0]*size # numba: delete
