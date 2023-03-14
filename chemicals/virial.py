@@ -468,15 +468,19 @@ def dBVirial_mixture_dzs(zs, Bijs, dB_dzs=None):
     for k in range(N):
         zj = zs[k]
         Bks = Bijs[k]
+        dB = 0.0
         for i in range(N):
             dB_dzs[i] += zj*Bks[i]
-
-    for k in range(N):
-        dB = 0.0
-        Bks = Bijs[k]
-        for i in range(N):
-            dB += zs[i]*Bks[i]
+            # dB_dzs[k] +=zs[i]*Bks[i]
+            dB +=zs[i]*Bks[i]
         dB_dzs[k] += dB
+
+    # for k in range(N):
+        # dB = 0.0
+    #     Bks = Bijs[k]
+    #     for i in range(N):
+    #         dB += zs[i]*Bks[i]
+    #     dB_dzs[k] += dB
 
     return dB_dzs
 
