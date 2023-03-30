@@ -103,6 +103,14 @@ def test_misc_elements():
 
     assert not 'BadElement' in periodic_table
 
+    periodic_table.H.formula_standard == 'H2'
+    periodic_table.N.formula_standard == 'N2'
+    periodic_table.O.formula_standard == 'O2'
+    periodic_table.Al.formula_standard == 'Al'
+
+    assert_close(periodic_table.H.MW_standard, 2.01588)
+    assert_close(periodic_table.C.MW_standard, 12.0107)
+
 
     # Found some disagreement between sources about these - test the borders and
     # a few random ones to write expected results in the tests as well as the code.

@@ -97,6 +97,7 @@ InChI_keys = ['YZCKVEUIGOORGS-UHFFFAOYSA-N', 'SWQJXJOGLNCZEY-UHFFFAOYSA-N', 'WHX
 # Big problem: Atoms like N2, O2 point to only the singlet
 
 homonuclear_elements = [1, 7, 8, 9, 17, 35, 53] # includes Br2, I2
+homonuclear_elements_set = frozenset(homonuclear_elements)
 # homonuclear_elemental_gases = [periodic_table[i] for i in ['hydrogen', 'nitrogen', 'oxygen', 'fluorine', 'chlorine', 'bromine', 'iodine']]
 
 homonuclear_elemental_gases = [1, 7, 8, 9, 17] # 35, 53
@@ -353,6 +354,20 @@ class Element:
         CAS number.
         '''
         return CAS_by_number_standard[self.number-1]
+
+    @property
+    def formula_standard(self):
+        r'''The formula of the element in its standard state. For homonuclear elements `2` is added to the formula.'''
+        if self.number in homonuclear_elements_set:
+            return self.symbol + '2'
+        return self.symbol
+
+    @property
+    def MW_standard(self):
+        r'''The molecular weight of the element in its standard state. For homonuclear elements the MW is doubled.'''
+        if self.number in homonuclear_elements_set:
+            return self.MW*2.0
+        return self.MW
 
     @property
     def protons(self):
