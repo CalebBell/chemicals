@@ -61,6 +61,8 @@ for v in objs:
             lookedup_constant = float(v.MW)
         else:
             lookedup_constant = funcs[i](CASRN=CAS)
+        if lookedup_constant is None:
+            lookedup_constant = float("nan")
         prop_array[i].append(lookedup_constant)
         
         
