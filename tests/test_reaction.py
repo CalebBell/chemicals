@@ -53,7 +53,7 @@ def test_Hfg_ATcT_data():
 def test_Hfg_API_TDB_data():
     assert_close(Hfg('7732-18-5', method='API_TDB_G'), -241820.0)
 
-    assert Hfg_methods('7732-18-5') == ['ATCT_G', 'CRC', 'API_TDB_G', 'WEBBOOK', 'TRC', 'YAWS']
+    assert Hfg_methods('7732-18-5') == ['ATCT_G', 'CRC', 'API_TDB_G', 'WEBBOOK', 'TRC', 'JANAF', 'YAWS']
 
     assert None == Hfg('98-00-1')
 
@@ -85,7 +85,7 @@ def test_Hfg():
     assert_close(Hfg('7732-18-5'), -241822.0)
 
     Hfs = [Hfg('67-56-1', method=i) for i in Hfg_all_methods]
-    assert_close1d(Hfs, [-200700.0, -190100.0, -201000.0, -205000.0, -200900.0, -216200.0])
+    assert_close1d(Hfs, [-200700.0, -190100.0, -201000.0, -205000.0, None, -200900.0, -216200.0])
 
     assert Hfg_methods('67-56-1') == ['ATCT_G', 'CRC', 'API_TDB_G', 'WEBBOOK', 'TRC', 'YAWS', 'JOBACK']
     assert_close(-211800.0, Hfg('98-00-0'))
@@ -117,7 +117,7 @@ def test_Hfg_all_values():
 
 def test_S0g():
     S0s = [S0g('7732-18-5', method=i) for i in S0g_all_methods]
-    assert_close1d(S0s, [188.8, 188.83842, 188.84])
+    assert_close1d(S0s, [188.8, 188.83842, 188.834, 188.84])
 
     assert S0g_methods('67-56-1') == ['CRC', 'YAWS']
 
