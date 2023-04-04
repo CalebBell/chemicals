@@ -34,6 +34,10 @@ Henry's Law
 .. autofunction:: chemicals.solubility.Henry_pressure
 .. autofunction:: chemicals.solubility.Henry_pressure_mixture
 .. autofunction:: chemicals.solubility.Henry_converter
+.. autofunction:: chemicals.solubility.Henry_constants
+.. autofunction:: chemicals.solubility.dHenry_constants_dT
+.. autofunction:: chemicals.solubility.d2Henry_constants_dT2
+
 
 Utility functions
 -----------------
@@ -45,7 +49,8 @@ Utility functions
 
 __all__ = ['solubility_parameter',
            'solubility_eutectic', 'Tm_depression_eutectic',
-           'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture']
+           'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture',
+           'Henry_constants', 'dHenry_constants_dT', 'd2Henry_constants_dT2']
 
 
 from fluids.constants import R, R_inv, atm
@@ -472,3 +477,253 @@ def Henry_pressure_mixture(Hs, weights=None, zs=None):
             num += weights[i]*log(Hs[i])
     H = exp(num)
     return H
+
+def Henry_constants(lnHenry_matrix, zs, henry_components, skip_zero=True, Hs=None):
+    r'''Calculate the Henry's law constants for a list of components, only some of
+    which are henry's law following components (solutes) and the rest that are 
+    solvents. The empirical mixing rule from [1]_ is used as follows:
+
+    .. math::
+         H_i = \exp\left(\frac{\sum_{\text{j=solvent}} z_j \ln H_{i,j}}
+         {\sum_{\text{j=solvent}} z_j}\right)
+
+    Parameters
+    ----------
+    lnHenry_matrix : list[list[float]]
+        Henry's law constants between every species; 0.0 for non-applicable
+        solvents, [log(Pa)]
+    zs : list[float]
+        Mole fractions of all species in phase; this can be mass or volume
+        fractions as well, [-]
+    henry_components : list[bool]
+        Whether or not each component is a henry's law solvent or not, [-]
+    skip_zero : bool
+        If true, if parameters are missing from a solvent-solute pair, that pair
+        will not be counted as part of the solvent fraction. If false, the 
+        calculation proceeds and the solubility is underestimated.
+        Missing parameters are assumed from the value of `lnHenry_matrix`
+        being 0, [-]
+    Hs : list[float], optional
+        Henry's law constants for each component; 0 for non-henry components
+        (input array), [Pa]
+
+    Returns
+    -------
+    Hs : list[float]
+        Henry's law constants for each component; 0 for non-henry components, [Pa]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Oxygen and methane in water:
+
+    >>> lnHenry_matrix = [[0.0, 0.0, 0.0], [22.13581843104147, 0.0, 0.0], [22.239038459475733, 0.0, 0.0]]
+    >>> Henry_constants(lnHenry_matrix, [0.8, 0.15, 0.05], [False, True, True], True)
+    [0.0, 4106424071.093, 4552937470.331]
+
+    References
+    ----------
+    .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
+       Weinheim, Germany: Wiley-VCH, 2012.
+    '''
+    N = len(zs)
+    if Hs is None:
+        Hs = [0.0]*N
+    for i in range(N):
+        solvent_fraction = 0.0
+        solvent_fraction_with_parameters = 0.0
+        if henry_components[i]:
+            for j in range(N):
+                Hij = lnHenry_matrix[i][j]
+                if not henry_components[j]:
+                    solvent_fraction += zs[j]
+                    if Hij != 0.0:
+                        solvent_fraction_with_parameters += zs[j]
+                Hs[i] += zs[j]*Hij
+            if solvent_fraction_with_parameters == 0.0:
+                # keep the Psats
+                pass
+            elif skip_zero:
+                Hs[i] = exp(Hs[i]/solvent_fraction_with_parameters)
+            else:
+                Hs[i] = exp(Hs[i]/solvent_fraction)
+    return Hs
+
+def dHenry_constants_dT(lnHenry_matrix, dlnHenry_matrix_dT, zs, 
+                        henry_components, skip_zero=True, dH_dTs=None):
+    r'''Calculate the first temperature derivative of 
+    Henry's law constants for a list of components, only some of
+    which are henry's law following components (solutes) and the rest that are 
+    solvents. The empirical mixing rule from [1]_ is used as follows:
+
+    Parameters
+    ----------
+    lnHenry_matrix : list[list[float]]
+        Henry's law constants between every species; 0.0 for non-applicable
+        solvents, [log(Pa)]
+    dlnHenry_matrix_dT : list[list[float]]
+        First temperature derivative of Henry's law constants between every 
+        species; 0.0 for non-applicable solvents, [log(Pa)/K]
+    zs : list[float]
+        Mole fractions of all species in phase; this can be mass or volume
+        fractions as well, [-]
+    henry_components : list[bool]
+        Whether or not each component is a henry's law solvent or not, [-]
+    skip_zero : bool
+        If true, if parameters are missing from a solvent-solute pair, that pair
+        will not be counted as part of the solvent fraction. If false, the 
+        calculation proceeds and the solubility is underestimated.
+        Missing parameters are assumed from the value of `lnHenry_matrix`
+        being 0, [-]
+    dH_dTs : list[float], optional
+        First temperature derivative of Henry's law constants for each component;
+        0 for non-henry components (input array), [Pa/K]
+
+    Returns
+    -------
+    dH_dTs : list[float]
+        First temperature derivative of Henry's law constants for each component;
+        0 for non-henry components, [Pa/K]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Oxygen and methane in water:
+
+    >>> lnHenry_matrix = [[0.0, 0.0, 0.0], [22.13581843104147, 0.0, 0.0], [22.239038459475733, 0.0, 0.0]]
+    >>> dlnHenry_matrix_dT = [[0.0, 0.0, 0.0], [0.017113988888888904, 0.0, 0.0], [0.015461911111111101, 0.0, 0.0]]
+    >>> dHenry_constants_dT(lnHenry_matrix, dlnHenry_matrix_dT, [0.8, 0.15, 0.05], [False, True, True], True)
+    [0.0, 70277295.92576516, 70397114.46071726]
+
+    References
+    ----------
+    .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
+       Weinheim, Germany: Wiley-VCH, 2012.
+    '''
+    N = len(zs)
+    if dH_dTs is None:
+        dH_dTs = [0.0]*N
+    for i in range(N):
+        solvent_fraction = 0.0
+        solvent_fraction_with_parameters = 0.0
+        Hi = 0.0
+        dHi_dT = 0.0
+        if henry_components[i]:
+            for j in range(N):
+                Hij = lnHenry_matrix[i][j]
+                dHij = dlnHenry_matrix_dT[i][j]
+                if not henry_components[j]:
+                    solvent_fraction += zs[j]
+                    if Hij != 0.0:
+                        solvent_fraction_with_parameters += zs[j]
+                
+                Hi += zs[j]*Hij
+                dHi_dT += zs[j]*dHij
+            if solvent_fraction_with_parameters == 0.0:
+                # keep the Psats
+                pass
+            elif skip_zero:
+                Hi = exp(Hi/solvent_fraction_with_parameters)
+                dH_dTs[i] = Hi*dHi_dT/solvent_fraction_with_parameters
+            else:
+                Hi = exp(Hi/solvent_fraction)
+                dH_dTs[i] = Hi*dHi_dT/solvent_fraction
+
+
+    return dH_dTs
+
+def d2Henry_constants_dT2(lnHenry_matrix, dlnHenry_matrix_dT, d2lnHenry_matrix_dT2,
+                          zs, henry_components, skip_zero=True, d2H_dT2s=None):
+    r'''Calculate the second temperature derivative of 
+    Henry's law constants for a list of components, only some of
+    which are henry's law following components (solutes) and the rest that are 
+    solvents. The empirical mixing rule from [1]_ is used as follows:
+
+    Parameters
+    ----------
+    lnHenry_matrix : list[list[float]]
+        Henry's law constants between every species; 0.0 for non-applicable
+        solvents, [log(Pa)]
+    dlnHenry_matrix_dT : list[list[float]]
+        First temperature derivative of Henry's law constants between every 
+        species; 0.0 for non-applicable solvents, [log(Pa)/K]
+    d2lnHenry_matrix_dT2 : list[list[float]]
+        Second temperature derivative of Henry's law constants between every 
+        species; 0.0 for non-applicable solvents, [log(Pa)/K^2]
+    zs : list[float]
+        Mole fractions of all species in phase; this can be mass or volume
+        fractions as well, [-]
+    henry_components : list[bool]
+        Whether or not each component is a henry's law solvent or not, [-]
+    skip_zero : bool
+        If true, if parameters are missing from a solvent-solute pair, that pair
+        will not be counted as part of the solvent fraction. If false, the 
+        calculation proceeds and the solubility is underestimated.
+        Missing parameters are assumed from the value of `lnHenry_matrix`
+        being 0, [-]
+    d2H_dT2s : list[float], optional
+        Second temperature derivative of Henry's law constants for each component;
+        0 for non-henry components (input array), [Pa/K^2]
+
+    Returns
+    -------
+    d2H_dT2s : list[float]
+        Second temperature derivative of Henry's law constants for each component;
+        0 for non-henry components, [Pa/K^2]
+
+    Notes
+    -----
+
+    Examples
+    --------
+    Oxygen and methane in water:
+
+    >>> lnHenry_matrix = [[0.0, 0.0, 0.0], [22.13581843104147, 0.0, 0.0], [22.239038459475733, 0.0, 0.0]]
+    >>> dlnHenry_matrix_dT = [[0.0, 0.0, 0.0], [0.017113988888888904, 0.0, 0.0], [0.015461911111111101, 0.0, 0.0]]
+    >>> d2lnHenry_matrix_dT2 = [[0.0, 0.0, 0.0], [-0.0004070325925925928, 0.0, 0.0], [-0.00034016518518518524, 0.0, 0.0]]
+    >>> d2Henry_constants_dT2(lnHenry_matrix, dlnHenry_matrix_dT, d2lnHenry_matrix_dT2, [0.8, 0.15, 0.05], [False, True, True], True)
+    [0.0, -468723.574327235, -460276.89146166]
+
+    References
+    ----------
+    .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
+       Weinheim, Germany: Wiley-VCH, 2012.
+    '''
+    N = len(zs)
+    if d2H_dT2s is None:
+        d2H_dT2s = [0.0]*N
+    for i in range(N):
+        solvent_fraction = 0.0
+        solvent_fraction_with_parameters = 0.0
+        Hi = 0.0
+        dHi_dT = 0.0
+        d2Hi_dT2 = 0.0
+        if henry_components[i]:
+            for j in range(N):
+                Hij = lnHenry_matrix[i][j]
+                dHij = dlnHenry_matrix_dT[i][j]
+                d2Hij = d2lnHenry_matrix_dT2[i][j]
+                if not henry_components[j]:
+                    solvent_fraction += zs[j]
+                    if Hij != 0.0:
+                        solvent_fraction_with_parameters += zs[j]
+                
+                Hi += zs[j]*Hij
+                dHi_dT += zs[j]*dHij
+                d2Hi_dT2 += zs[j]*d2Hij
+            if solvent_fraction_with_parameters == 0.0:
+                # keep the Psats
+                pass
+            elif skip_zero:
+                Hi = exp(Hi/solvent_fraction_with_parameters)
+                d2H = Hi/solvent_fraction_with_parameters*(d2Hi_dT2 + dHi_dT*dHi_dT/solvent_fraction_with_parameters)
+                d2H_dT2s[i] = d2H
+            else:
+                Hi = exp(Hi/solvent_fraction)
+                d2H = Hi/solvent_fraction*(d2Hi_dT2 + dHi_dT*dHi_dT/solvent_fraction)
+                d2H_dT2s[i] = d2H
+    return d2H_dT2s

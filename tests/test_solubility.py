@@ -23,7 +23,8 @@ SOFTWARE.
 
 import pytest
 from chemicals.solubility import (Henry_converter, Henry_pressure, Henry_pressure_mixture,
-                                  Tm_depression_eutectic, solubility_eutectic, solubility_parameter)
+                                  Tm_depression_eutectic, solubility_eutectic, solubility_parameter,
+                                  Henry_constants, dHenry_constants_dT, d2Henry_constants_dT2)
 from fluids.numerics import assert_close, assert_close1d
 
 def test_solubility():
@@ -73,3 +74,22 @@ def test_Henry_pressure():
 def test_Henry_pressure_mixture():
     H = Henry_pressure_mixture([1072330.36341, 744479.751106, None], zs=[.48, .48, .04])
     assert_close(H, 893492.1611602883)
+
+def test_Henry_constants():
+    lnHenry_matrix = [[0.0, 0.0, 0.0], [22.13581843104147, 0.0, 0.0], [22.239038459475733, 0.0, 0.0]]
+    Hs = Henry_constants(lnHenry_matrix, [0.8, 0.15, 0.05], [False, True, True], True)
+    assert_close1d([0.0, 4106424071.093, 4552937470.331], Hs)
+
+def test_dHenry_constants_dT():
+    lnHenry_matrix = [[0.0, 0.0, 0.0], [22.13581843104147, 0.0, 0.0], [22.239038459475733, 0.0, 0.0]]
+    dlnHenry_matrix_dT = [[0.0, 0.0, 0.0], [0.017113988888888904, 0.0, 0.0], [0.015461911111111101, 0.0, 0.0]]
+    calc = dHenry_constants_dT(lnHenry_matrix, dlnHenry_matrix_dT, [0.8, 0.15, 0.05], [False, True, True], True)
+    assert_close1d(calc, [0.0, 70277295.92576516, 70397114.46071726])
+
+def test_d2Henry_constants_dT2():
+    lnHenry_matrix = [[0.0, 0.0, 0.0], [22.13581843104147, 0.0, 0.0], [22.239038459475733, 0.0, 0.0]]
+    dlnHenry_matrix_dT = [[0.0, 0.0, 0.0], [0.017113988888888904, 0.0, 0.0], [0.015461911111111101, 0.0, 0.0]]
+    d2lnHenry_matrix_dT2 = [[0.0, 0.0, 0.0], [-0.0004070325925925928, 0.0, 0.0], [-0.00034016518518518524, 0.0, 0.0]]
+
+    calc = d2Henry_constants_dT2(lnHenry_matrix, dlnHenry_matrix_dT, d2lnHenry_matrix_dT2, [0.8, 0.15, 0.05], [False, True, True], True)
+    assert_close1d(calc, [0.0, -468723.574327235, -460276.89146166])
