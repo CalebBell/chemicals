@@ -56,6 +56,7 @@ __all__ = ['solubility_parameter',
 from fluids.constants import R, R_inv, atm
 
 from chemicals.utils import exp, log, sqrt
+from fluids.numerics import trunc_exp
 
 
 def solubility_parameter(T, Hvapm, Vml):
@@ -546,9 +547,9 @@ def Henry_constants(lnHenry_matrix, zs, henry_components, skip_zero=True, Hs=Non
                 # keep the Psats
                 pass
             elif skip_zero:
-                Hs[i] = exp(Hs[i]/solvent_fraction_with_parameters)
+                Hs[i] = trunc_exp(Hs[i]/solvent_fraction_with_parameters)
             else:
-                Hs[i] = exp(Hs[i]/solvent_fraction)
+                Hs[i] = trunc_exp(Hs[i]/solvent_fraction)
     return Hs
 
 def dHenry_constants_dT(lnHenry_matrix, dlnHenry_matrix_dT, zs, 
@@ -627,10 +628,10 @@ def dHenry_constants_dT(lnHenry_matrix, dlnHenry_matrix_dT, zs,
                 # keep the Psats
                 pass
             elif skip_zero:
-                Hi = exp(Hi/solvent_fraction_with_parameters)
+                Hi = trunc_exp(Hi/solvent_fraction_with_parameters)
                 dH_dTs[i] = Hi*dHi_dT/solvent_fraction_with_parameters
             else:
-                Hi = exp(Hi/solvent_fraction)
+                Hi = trunc_exp(Hi/solvent_fraction)
                 dH_dTs[i] = Hi*dHi_dT/solvent_fraction
 
 
@@ -719,11 +720,11 @@ def d2Henry_constants_dT2(lnHenry_matrix, dlnHenry_matrix_dT, d2lnHenry_matrix_d
                 # keep the Psats
                 pass
             elif skip_zero:
-                Hi = exp(Hi/solvent_fraction_with_parameters)
+                Hi = trunc_exp(Hi/solvent_fraction_with_parameters)
                 d2H = Hi/solvent_fraction_with_parameters*(d2Hi_dT2 + dHi_dT*dHi_dT/solvent_fraction_with_parameters)
                 d2H_dT2s[i] = d2H
             else:
-                Hi = exp(Hi/solvent_fraction)
+                Hi = trunc_exp(Hi/solvent_fraction)
                 d2H = Hi/solvent_fraction*(d2Hi_dT2 + dHi_dT*dHi_dT/solvent_fraction)
                 d2H_dT2s[i] = d2H
     return d2H_dT2s

@@ -80,6 +80,11 @@ def test_Henry_constants():
     Hs = Henry_constants(lnHenry_matrix, [0.8, 0.15, 0.05], [False, True, True], True)
     assert_close1d([0.0, 4106424071.093, 4552937470.331], Hs)
 
+    # Test no error, henry goes too high
+    kwargs = {'lnHenry_matrix': [[0.0, 0.0, 0.0, 10.219309168602226], [25.321910952013628, 0.0, 20.22048862340195, 18.156499431206274], [24.269833800974848, 15.365770016174015, 0.0, 18.57423773432834], [15.37228504674701, 0.0, 0.0, 0.0]], 'zs': [0.000242872042323124, 0.5796842606361365, 0.41952722776289886, 0.000545639558641481], 'henry_components': [False, True, True, False], 'skip_zero': True, 'Hs': [0.0, 0.0, 0.0, 0.0]}
+    Henry_constants(**kwargs)
+
+
 def test_dHenry_constants_dT():
     lnHenry_matrix = [[0.0, 0.0, 0.0], [22.13581843104147, 0.0, 0.0], [22.239038459475733, 0.0, 0.0]]
     dlnHenry_matrix_dT = [[0.0, 0.0, 0.0], [0.017113988888888904, 0.0, 0.0], [0.015461911111111101, 0.0, 0.0]]
