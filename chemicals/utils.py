@@ -153,6 +153,7 @@ except:
 
 immutable_class_types = set(['Fraction', 'Decimal'])
 
+@mark_numba_incompatible
 def object_data(obj):
     # Always returns a new dictionary
     try:
@@ -174,6 +175,7 @@ def object_data(obj):
                 pass
     return d
 
+@mark_numba_incompatible
 def recursive_copy(obj):
     obj_type = type(obj)
     if obj_type in immutable_types:

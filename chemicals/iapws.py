@@ -191,7 +191,7 @@ from math import exp, log, sqrt
 
 from fluids.numerics import (broyden2, horner, horner_and_der,
                              newton, newton_system, solve_2_direct, translate_bound_f_jac,
-                             trunc_exp)
+                             trunc_exp, cbrt)
 
 from chemicals.utils import mark_numba_uncacheable
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
@@ -241,12 +241,6 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
            'iapws92_Psat', 'iapws92_dPsat_dT',
            'iapws11_Psub',
            ]
-
-try:
-    from math import cbrt
-except:
-    def cbrt(x):
-        return x**(1.0/3.0)
 
 iapws95_R = 461.51805
 '''Specific gas constant in J/(kg*K) according to IAPWS-95'''

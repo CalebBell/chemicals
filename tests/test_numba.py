@@ -607,8 +607,9 @@ def test_lazy_loading():
     chemicals.numba.heat_capacity.zabransky_dicts
     chemicals.numba.heat_capacity.CRC_standard_data
 
-    assert 'jitclass' in str(chemicals.numba.heat_capacity.ZabranskySpline)
-    assert 'jitclass' in str(chemicals.numba.heat_capacity.ZabranskyQuasipolynomial)
+    assert hasattr(chemicals.numba.heat_capacity.ZabranskySpline, 'class_type')
+    assert hasattr(chemicals.numba.heat_capacity.ZabranskyQuasipolynomial, 'class_type')
+
     assert 'jitclass' in str(chemicals.numba.heat_capacity.zabransky_dict_iso_s['2016-57-1'].models[0])
 
 
