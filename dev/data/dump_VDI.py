@@ -15,6 +15,8 @@ with open('VDI Saturation Compounds Data.csv') as f:
     for line in f:
         values = to_num(line.strip('\n').split('\t'))
         (CASRN, _name, _MW, _Tc, T, P, rhol, rhog, Hvap, cpl, cpg, mul, mug, kl, kg, prl, prg, sigma, Beta) = values
+        CASRN = CASRN.replace('"', '')
+        _name = _name.replace('"', '').strip()
         newdict = (_VDISaturationDict[CASRN] if CASRN in _VDISaturationDict else copy.deepcopy(emptydict))
         newdict["Name"] = _name
         newdict["MW"] = _MW
