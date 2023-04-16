@@ -806,7 +806,10 @@ def Sato_Riedel(T, MW, Tb, Tc):
     '''
     Tr = T/Tc
     Tbr = Tb/Tc
-    return 1.1053*(3. + 20.*(1.0 - Tr)**(2.0/3.0))*MW**-0.5/(3.0 + 20.0*(1.0 - Tbr)**(2.0/3.))
+    Tr_term = 1.0 - Tr
+    if Tr_term < 0.0:
+        Tr_term = 0.0
+    return 1.1053*(3. + 20.*(Tr_term)**(2.0/3.0))*MW**-0.5/(3.0 + 20.0*(1.0 - Tbr)**(2.0/3.))
 
 
 def Lakshmi_Prasad(T, MW):

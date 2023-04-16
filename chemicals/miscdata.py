@@ -201,7 +201,7 @@ def lookup_VDI_tabular_data(CASRN, prop):
     Ts = [T for p, T in zip(props, Ts) if p]
     props = [p for p in props if p]
     # Not all data series converege to correct values
-    if prop == 'sigma':
+    if prop == 'sigma' and props:
         if Ts[-1] < d['Tc']:
             Ts.append(d['Tc'])
             props.append(0.0)

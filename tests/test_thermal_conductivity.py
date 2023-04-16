@@ -150,9 +150,6 @@ def test_CSP_liq():
     kl = Sheffy_Johnson(300, 47, 280)
     assert_close(kl, 0.17740150413112196)
 
-    kl = Sato_Riedel(300, 47, 390, 520)
-    assert_close(kl, 0.2103769246133769)
-
     kl = Lakshmi_Prasad(273.15, 100)
     assert_close(kl, 0.013664450000000009)
 
@@ -172,6 +169,16 @@ def test_CSP_liq():
     kl = kl_Mersmann_Kind(400, 170.33484, 658.0, 0.000754, 38)
     assert_close(kl, 0.0895271829899285)
 
+def test_Sato_Riedel():
+    kl = Sato_Riedel(300, 47, 390, 520)
+    assert_close(kl, 0.2103769246133769)
+
+    # Issue with neon, past the critical temperature. Applies generically. Was giving complex results.
+    assert_close(Sato_Riedel(45, 20.1797, 27.104, 44.4), Sato_Riedel(200, 20.1797, 27.104, 44.4))
+    assert_close(Sato_Riedel(45, 20.1797, 27.104, 44.4), Sato_Riedel(44.4, 20.1797, 27.104, 44.4))
+    assert_close(Sato_Riedel(44.4*(1-1e-13), 20.1797, 27.104, 44.4), Sato_Riedel(44.4, 20.1797, 27.104, 44.4))
+
+    assert_close(Sato_Riedel(44.4, 20.1797, 27.104, 44.4), 0.054006725845829766)
 
 def test_CSP_liq_dense():
     # From [2]_, for butyl acetate.
