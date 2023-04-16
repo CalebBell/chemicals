@@ -239,6 +239,8 @@ def sigma_IAPWS(T):
     The equation is valid from the triple point to the critical point, 
     647.096 K; but [1]_ also recommends its use down to -25°C.
 
+    If a value larger than the critical temperature is input, 0.0 is returned.
+
     Examples
     --------
     >>> sigma_IAPWS(300.)
@@ -254,6 +256,8 @@ def sigma_IAPWS(T):
        Substance
     '''
     tau = 1. - T*(1.0/647.096)
+    if tau < 0.0:
+        tau = 0.0
     return 0.2358*tau**1.256*(1.0 - 0.625*tau)
 
 ### Regressed coefficient-based functions
@@ -581,7 +585,7 @@ def Jasper(T, a, b):
     This function has been checked against several references.
     
     As this is a linear model, negative values of surface tension will 
-    eventually arise.
+    eventually arise. 0 is returned in these cases.
 
     Examples
     --------
@@ -597,6 +601,8 @@ def Jasper(T, a, b):
        McGraw-Hill Professional, 2005.
     '''
     sigma = (a - b*(T-273.15))*1e-3
+    if sigma < 0.0:
+        return 0.0
     return sigma
 
 
@@ -604,7 +610,7 @@ def Jasper(T, a, b):
 
 
 def Brock_Bird(T, Tb, Tc, Pc):
-    r'''Calculates air-liquid surface tension  using the [1]_
+    r'''Calculates air-liquid surface tension using the [1]_
     emperical method. Old and tested.
 
     .. math::
@@ -635,7 +641,8 @@ def Brock_Bird(T, Tb, Tc, Pc):
     This is DIPPR Procedure 7A: Method for the Surface Tension of Pure,
     Nonpolar, Nonhydrocarbon Liquids
     The exact equation is not in the original paper.
-    If the equation yields a negative result, return None.
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -656,6 +663,8 @@ def Brock_Bird(T, Tb, Tc, Pc):
        Principle of Corresponding States." AIChE Journal 1, no. 2
        (June 1, 1955): 174-77. doi:10.1002/aic.690010208
     '''
+    if T >= Tc:
+        return 0.0
     Tc_inv = 1.0/Tc
     Tbr = Tb*Tc_inv
     Tr = T*Tc_inv
@@ -695,6 +704,8 @@ def Pitzer_sigma(T, Tc, Pc, omega):
     -----
     The source of this equation has not been reviewed.
     Internal units of presure are bar, surface tension of mN/m.
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -714,6 +725,8 @@ def Pitzer_sigma(T, Tc, Pc, omega):
     .. [3] Pitzer, K. S.: Thermodynamics, 3d ed., New York, McGraw-Hill,
        1995, p. 521.
     '''
+    if T >= Tc:
+        return 0.0
     Tr = T/Tc
     Pc = Pc*1e-5  # Convert to bar
     sigma = Pc**(2.0/3.0)*Tc**(1.0/3.0)*(1.86 + 1.18*omega)*(1.0/19.05)*(
@@ -748,6 +761,8 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
     -----
     The source of this equation has not been reviewed.
     Internal units of presure are bar, surface tension of mN/m.
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -763,6 +778,8 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
        and the Biochemical Engineering Journal 59, no. 2 (October 1995): 181-86.
        doi:10.1016/0923-0467(94)02946-6.
     '''
+    if T >= Tc:
+        return 0.0
     if chemicaltype == 'alcohol':
         k, x, y, z, m = 2.28, 0.25, 0.175, 0, 0.8
     elif chemicaltype == 'acid':
@@ -813,8 +830,9 @@ def Zuo_Stenby(T, Tc, Pc, omega):
     Notes
     -----
     Presently untested. Have not personally checked the sources.
-    I strongly believe it is broken.
     The reference values for methane and n-octane are from the DIPPR database.
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -830,6 +848,8 @@ def Zuo_Stenby(T, Tc, Pc, omega):
        Canadian Journal of Chemical Engineering 75, no. 6 (December 1, 1997):
        1130-37. doi:10.1002/cjce.5450750617
     '''
+    if T >= Tc:
+        return 0.0
     Tc_1, Pc_1, omega_1 = 190.56, 4599000.0*1e-5, 0.012
     Tc_2, Pc_2, omega_2 = 568.7, 2490000.0*1e-5, 0.4
     Pc = Pc*1e-5
@@ -882,6 +902,8 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
     Notes
     -----
     Original equation for m and Q are used. Internal units are atm and mN/m.
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -897,6 +919,8 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
        Engineering Chemistry Fundamentals 10, no. 1 (February 1, 1971): 174-75.
        doi:10.1021/i160037a032.
     '''
+    if T >= Tc:
+        return 0.0
     omega2 = omega*omega
     StielPolar2 = StielPolar*StielPolar
     Q = (0.1574 + 0.359*omega - 1.769*StielPolar - 13.69*StielPolar2
@@ -941,6 +965,8 @@ def Miqueu(T, Tc, Vc, omega):
     corrected nonetheless.
     Created with 31 normal fluids, none polar or hydrogen bonded. Has an
     AARD of 3.5%.
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -957,6 +983,8 @@ def Miqueu(T, Tc, Vc, omega):
        Experimental Data." Fluid Phase Equilibria 172, no. 2 (July 5, 2000):
        169-82. doi:10.1016/S0378-3812(00)00384-8.
     '''
+    if T >= Tc:
+        return 0.0
     Vc = Vc*1E6
     t = 1. - T/Tc
     sigma = k*Tc*(N_A/Vc)**(2.0/3.0)*(4.35 + 4.14*omega)*t**1.26*(1.0 + 0.19*sqrt(t) - 0.25*t)*10000.0
@@ -1007,6 +1035,9 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
     .. math::
         \sigma = 0 \to T_{c,predicted} \text{ at } T_b + \frac{H_{vap}}{Cp_l}
 
+    To handle this case, if Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
+
     Because of its dependence on density, it has the potential to model the
     effect of pressure on surface tension.
 
@@ -1030,7 +1061,10 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
     '''
     MW = MW*1e-3 # Use kg/mol for consistency with the other units
     sphericity = 1. - MW*(0.0047 - 6.8E-6*MW)
-    return sphericity*MW**(1.0/3.0)/(6.*N_A**(1.0/3.0))*rhol**(2.0/3.)*(Hvap_Tb + Cpl*(Tb-T))
+    res = sphericity*MW**(1.0/3.0)/(6.*N_A**(1.0/3.0))*rhol**(2.0/3.)*(Hvap_Tb + Cpl*(Tb-T))
+    if res < 0.0:
+        return 0.0
+    return res
 
 
 def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
@@ -1069,6 +1103,8 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
     -----
     In the equation, all quantities must be in SI units. `k` is the boltzman
     constant.
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -1084,6 +1120,8 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
        Pressure." Industrial & Engineering Chemistry Research, January 31,
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     '''
+    if T >= Tc:
+        return 0.0
     Tr = T/Tc
     sigma_star = ((Tb - Tm)/Tm)**(1.0/3.)*(6.25*(1. - Tr) + 31.3*(1. - Tr)**(4.0/3.))
     sigma = sigma_star*(k*Tc)**(1.0/3.0)*(Tm/Tc)*Pc**(2.0/3.0)*n_associated**(-1.0/3.0)
@@ -1119,7 +1157,9 @@ def sigma_Gharagheizi_1(T, Tc, MW, omega):
 
     Notes
     -----
-    This equation may fail before the critical point.
+    This equation may fail before the critical point. In this case it returns 0.0
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -1137,6 +1177,8 @@ def sigma_Gharagheizi_1(T, Tc, MW, omega):
     '''
     # Equation 4
     A = (Tc - T - omega)
+    if A < 0.0:
+        return 0.0
     sigma = 8.948226e-4*sqrt(A*A/MW*sqrt(A*omega/MW))
     return sigma
 
@@ -1174,6 +1216,8 @@ def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
     Notes
     -----
     This expression gives does converge to 0 at the critical point. 
+    If Tc is larger than T, 0 is returned as the model would return complex
+    numbers.
 
     Examples
     --------
@@ -1190,6 +1234,8 @@ def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
        no. 2 (2013): 613-21. https://doi.org/10.1002/aic.13824.
     '''
     # Equation 6
+    if T >= Tc:
+        return 0.0
     Pc *= 1e-5 # Pc, Pa to bar
     Tr = T/Tc
     Tbr = Tb/Tc
@@ -1228,8 +1274,9 @@ def API10A32(T, Tc, K_W):
     and that it will give higher errors at pressures above 500 psi.
     [1]_ claims this has an average error of 10.7%.
 
-    This function converges to zero at `Tc`; do not use it above that
-    temperature!
+    This function converges to zero at `Tc`. If Tc is larger than T, 
+    0 is returned as the model would return complex numbers.
+
 
     Examples
     --------
@@ -1244,6 +1291,8 @@ def API10A32(T, Tc, K_W):
     .. [1] API Technical Data Book: General Properties & Characterization.
        American Petroleum Institute, 7E, 2005.
     '''
+    if T >= Tc:
+        return 0.0
     return 673.7*((Tc-T)/Tc)**1.232/K_W
 
 ### Surface Tension Mixtures

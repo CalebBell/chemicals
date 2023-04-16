@@ -39,6 +39,9 @@ def test_sigma_IAPWS():
     assert_close(sigma_IAPWS(450.), 0.04289149915650591, rtol=1e-13)
     assert_close(sigma_IAPWS(600.), 0.00837561087288565, rtol=1e-13)
 
+    assert 0.0 == sigma_IAPWS(647.096)
+    assert 0.0 == sigma_IAPWS(700.0)
+
 def test_CSP():
     # p-dichloribenzene at 412.15 K, from DIPPR; value differs due to a slight
     # difference in method.
@@ -49,11 +52,18 @@ def test_CSP():
     sigma1 = Brock_Bird(293.15, 404.75, 633.0, 4530000.0)
     assert_close(sigma1, 0.032985686413713036)
 
+    assert 0.0 == Brock_Bird(689, 447.3, 685, 3.952E6)
+    assert 0.0 == Brock_Bird(685, 447.3, 685, 3.952E6)
+
     # TODO: Find parameters where Brock Bird is negative
 
     # Chlorobenzene from Poling, as compared with a % error value at 293 K.
     sigma1 = Pitzer_sigma(293., 633.0, 4530000.0, 0.249)
     assert_close(sigma1, 0.03458453513446387)
+
+
+    assert 0.0 == Pitzer_sigma(633., 633.0, 4530000.0, 0.249)
+    assert 0.0 == Pitzer_sigma(700., 633.0, 4530000.0, 0.249)
 
     sigma1 = Sastri_Rao(293.15, 404.75, 633.0, 4530000.0)
     sigma2 = Sastri_Rao(293.15, 404.75, 633.0, 4530000.0, chemicaltype='alcohol')
@@ -61,18 +71,31 @@ def test_CSP():
     sigmas = [0.03234567739694441, 0.023255104102733407, 0.02558993464948134]
     assert_close1d([sigma1, sigma2, sigma3], sigmas)
 
+    assert 0.0 == Sastri_Rao(633, 404.75, 633.0, 4530000.0)
+    assert 0.0 == Sastri_Rao(900.0, 404.75, 633.0, 4530000.0)
+
     sigma = Zuo_Stenby(293., 633.0, 4530000.0, 0.249)
     assert_close(sigma, 0.03345569011871088)
+    assert 0.0 ==  Zuo_Stenby(633., 633.0, 4530000.0, 0.249)
+    assert 0.0 ==  Zuo_Stenby(700., 633.0, 4530000.0, 0.249)
 
     # 1-butanol, as compared to value in CRC Handbook of 0.02493.
     sigma = Hakim_Steinberg_Stiel(298.15, 563.0, 4414000.0, 0.59, StielPolar=-0.07872)
     assert_close(sigma, 0.021907902575190447)
 
+    assert 0.0 == Hakim_Steinberg_Stiel(563, 563.0, 4414000.0, 0.59, StielPolar=-0.07872)
+    assert 0.0 == Hakim_Steinberg_Stiel(600, 563.0, 4414000.0, 0.59, StielPolar=-0.07872)
+
     sigma_calc = Miqueu(300., 340.1, 0.000199, 0.1687)
     assert_close(sigma_calc, 0.003474100774091376)
+    assert 0.0 ==  Miqueu(340.1, 340.1, 0.000199, 0.1687)
+    assert 0.0 ==  Miqueu(700., 340.1, 0.000199, 0.1687)
 
     sigma_calc = Mersmann_Kind_sigma(298.15, 164.15, 328.25, 497.1, 3430000.0)
     assert_close(0.016744311449290426, sigma_calc)
+
+    assert 0.0 == Mersmann_Kind_sigma(497.1, 164.15, 328.25, 497.1, 3430000.0)
+    assert 0.0 == Mersmann_Kind_sigma(600.0, 164.15, 328.25, 497.1, 3430000.0)
 
 
 def test_Aleem():
@@ -83,6 +106,9 @@ def test_Aleem():
     st_at_Tc = Aleem(T=318.8494929006085, MW=16.04246, Tb=111.6, rhol=458.7,
                      Hvap_Tb=510870.,  Cpl=2465.)
     assert_close(st_at_Tc, 0, atol=1E-12)
+
+
+    assert 0.0 == Aleem(T=900, MW=16.04246, Tb=111.6, rhol=458.7, Hvap_Tb=510870., Cpl=2465.)
 
 
 def test_REFPROP():
@@ -102,6 +128,8 @@ def test_Somayajulu():
 def test_Jasper():
     sigma = Jasper(298.15, 24, 0.0773)
     assert_close(sigma, 0.0220675)
+
+    assert Jasper(4000, 24, 0.0773) == 0.0
 
 
 def test_data():
@@ -190,6 +218,9 @@ def test_API10A32():
     from fluids.core import F2K, R2K
     assert_close(API10A32(T=F2K(60), Tc=R2K(1334), K_W=12.4), 29.577333312096968, rtol=1e-13)
 
+    assert 0.0 == API10A32(200.0, 200.0, 14.0)
+    assert 0.0 == API10A32(300.0, 200.0, 14.0)
+
 
 def test_PPDS14():
     sigma = PPDS14(T=280, Tc=562.05, a0=0.0786269, a1=1.28646, a2=-0.112304)
@@ -231,10 +262,15 @@ def test_sigma_Gharagheizi_1():
     assert_close(sigma_methane1, 0.0111974953003432, rtol=1e-13)
 
     # Point that math errors before critical point
-    # sigma_Gharagheizi_1(T=190.56, Tc=190.564, MW=16.04, omega=0.012)
+
+    assert 0.0 == sigma_Gharagheizi_1(T=190.56, Tc=190.564, MW=16.04, omega=0.012)
+    assert 0.0 == sigma_Gharagheizi_1(T=400.0, Tc=190.564, MW=16.04, omega=0.012)
     
 def test_sigma_Gharagheizi_2():
     # point from article supporting material exactly matches
     
     sigma_methane1 = sigma_Gharagheizi_2(T=93.1500015258789, Tb=111.66, Tc=190.564, Pc=45.99*1e5, Vc=0.0986e-3)
     assert_close(sigma_methane1, 0.0171460800730683, rtol=1e-13)
+
+    assert 0.0 ==  sigma_Gharagheizi_2(T=190.564, Tb=111.66, Tc=190.564, Pc=45.99*1e5, Vc=0.0986e-3)
+    assert 0.0 ==  sigma_Gharagheizi_2(T=200.0, Tb=111.66, Tc=190.564, Pc=45.99*1e5, Vc=0.0986e-3)
