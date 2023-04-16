@@ -538,7 +538,8 @@ def Pitzer(T, Tc, omega):
     Hvap. This cites [2]_.
 
     The recommended range is 0.6 to 1 Tr. Users should expect up to 5% error.
-    T must be under Tc, or an exception is raised.
+    This function converges to zero at `Tc`. If Tc is larger than T, 
+    0 is returned as the model would return complex numbers.
 
     The original article has been reviewed and found to have a set of tabulated
     values which could be used instead of the fit function to provide additional
@@ -622,6 +623,9 @@ def SMK(T, Tc, omega):
 
     A sample problem in the article has been verified. The numerical result
     presented by the author requires high numerical accuracy to obtain.
+
+    This function converges to zero at `Tc`. If Tc is larger than T, 
+    0 is returned as the model would return complex numbers.
 
     Examples
     --------
@@ -710,6 +714,8 @@ def MK(T, Tc, omega):
     Its results match with other functions however.
 
     Has poor behavior for low-temperature use.
+    This function converges to zero at `Tc`. If Tc is larger than T, 
+    0 is returned as the model would return complex numbers.
 
     Examples
     --------
@@ -782,6 +788,8 @@ def Velasco(T, Tc, omega):
     vaporization values at 0.7Tr, from 121 fluids in REFPROP 9.1.
     A value in the article was read to be similar, but slightly too low from
     that calculated here.
+    This function converges to zero at `Tc`. If Tc is larger than T, 
+    0 is returned as the model would return complex numbers.
 
     Examples
     --------
