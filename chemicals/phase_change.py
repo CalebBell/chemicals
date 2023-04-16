@@ -562,6 +562,8 @@ def Pitzer(T, Tc, omega):
     .. [3] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        Eighth Edition. McGraw-Hill Professional, 2007.
     '''
+    if T >= Tc:
+        return 0.0
     Tr = T/Tc
     return R*Tc * (7.08*(1. - Tr)**0.354 + 10.95*omega*(1. - Tr)**0.456)
 
@@ -636,7 +638,7 @@ def SMK(T, Tc, omega):
        Engineering Chemistry Fundamentals 23, no. 1 (February 1, 1984): 97-100.
        doi:10.1021/i100013a017.
     '''
-    if T > Tc:
+    if T >= Tc:
         return 0.0
     omegaR1, omegaR2 = 0.212, 0.461
     A10 = 6.536924
@@ -723,6 +725,8 @@ def MK(T, Tc, omega):
        Hydrocarbons." Fluid Phase Equilibria 94 (March 15, 1994): 51-87.
        doi:10.1016/0378-3812(94)87051-9.
     '''
+    if T >= Tc:
+        return 0.0
     bs0 = [5.2804, 0.080022, 7.2543]
     bs1 = [12.8650, 273.23, -346.45]
     bs2 = [1.1710, 465.08, -610.48]
@@ -794,6 +798,8 @@ def Velasco(T, Tc, omega):
        Chemical Thermodynamics 85 (June 2015): 68-76.
        doi:10.1016/j.jct.2015.01.011.
     '''
+    if T >= Tc:
+        return 0.0
     return (7.2729 + 10.4962*omega + 0.6061*omega**2)*(1-T/Tc)**0.38*R*Tc
 
 ### Enthalpy of Vaporization at Normal Boiling Point.
@@ -962,7 +968,7 @@ def Liu(Tb, Tc, Pc):
     return R*Tb*(Tb/220.)**0.0627*(1. - Tbr)**0.38*log(Pc/101325.) \
         / (1 - Tbr + 0.38*Tbr*log(Tbr))
 
-def Vetere(Tb, Tc, Pc, F=1):
+def Vetere(Tb, Tc, Pc, F=1.0):
     r'''Calculates enthalpy of vaporization at the boiling point, using the
     Vetere [1]_ CSP method. Required information are critical temperature
     and pressure, and boiling point. Equation taken from [2]_.

@@ -58,10 +58,18 @@ def test_Pitzer():
     Hvap = Pitzer(452, 645.6, 0.35017)
     assert_close(Hvap, 36696.749078320056)
 
+    assert 0.0 == Pitzer(645.6, 645.6, 0.35017)
+    assert 0.0 == Pitzer(645.7, 645.6, 0.35017)
+    assert 0.0 == Pitzer(1000.0, 645.6, 0.35017)
+
 
 def test_SMK():
     Hvap = SMK(553.15, 751.35, 0.302)
     assert_close(Hvap, 39866.18999046232)
+
+    assert 0.0 == SMK(751.35, 751.35, 0.302)
+    assert 0.0 == SMK(751.36, 751.35, 0.302)
+    assert 0.0 == SMK(800.0, 751.35, 0.302)
 
 
 def test_MK():
@@ -72,6 +80,9 @@ def test_MK():
     assert_close(Hv1, 38728.00667307733, rtol=1e-12)
     assert_close(Hv2, 25940.988533726406, rtol=1e-12)
 
+    assert 0.0 == MK(751.35, 751.35, 0.302)
+    assert 0.0 == MK(751.36, 751.35, 0.302)
+    assert 0.0 == MK(800.0, 751.35, 0.302)
 
 def test_Velasco():
     Hv1 = Velasco(553.15, 751.35, 0.302)
@@ -79,6 +90,9 @@ def test_Velasco():
     assert_close(Hv1, 39524.251054691274, rtol=1e-12)
     assert_close(Hv2, 33299.428636069264, rtol=1e-12)
 
+    assert 0.0 == Velasco(751.35, 751.35, 0.302)
+    assert 0.0 == Velasco(751.36, 751.35, 0.302)
+    assert 0.0 == Velasco(800.0, 751.35, 0.302)
 
 def test_Riedel():
     # same problem as in Perry's examples
