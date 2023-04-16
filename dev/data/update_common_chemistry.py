@@ -10,6 +10,7 @@ from chemicals import serialize_formula, rho_to_Vm, molecular_weight, nested_for
 from chemicals.identifiers import CAS_to_int, int_to_CAS
 from rdkit import Chem
 from rdkit.Chem.rdMolDescriptors import CalcMolFormula
+import natsort
 
 folder = os.path.dirname(__file__)
 
@@ -229,7 +230,7 @@ print('%d chemicals have at least one experimental property' %(len(chemical_data
 keys = ['CAS', 'name', 'formula', 'MW', 'smiles', 'inchi', 'inchiKey', 'Tm', 'Tb', 'TbP', 'rho', 'rhoT', 'rhoP']
 lines = ['\t'.join(keys) + '\n']
 CASs_iter = [v['CASs'] for v in chemical_data.values()]
-# CASs_iter.sort()
+CASs_iter = natsort.natsorted(CASs_iter)
 
 for CASs in CASs_iter:
     CAS = CAS_to_int(CASs)
