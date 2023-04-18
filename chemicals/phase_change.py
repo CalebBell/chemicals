@@ -1241,6 +1241,8 @@ def PPDS12(T, Tc, A, B, C, D, E):
     .. [2] "Enthalpy of Vaporization: PPDS12."
        https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-Hvap/PPDS12.htm.
     '''
+    if T >= Tc:
+        return 0.0
     tau = 1. - T/Tc
     tau_cbrt = tau**(1/3.)
     tau2 = tau*tau
