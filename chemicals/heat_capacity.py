@@ -770,6 +770,7 @@ def _load_Cp_data():
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
     global Cp_dict_characteristic_temperatures_adjusted_psi4_2022a, Cp_dict_characteristic_temperatures_psi4_2022a
+    global Cp_dict_JANAF_liquid, Cp_dict_JANAF_gas, Cp_dict_JANAF_solid
     Cp_data_Poling = data_source('PolingDatabank.tsv')
     TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
     CRC_standard_data = data_source('CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
@@ -882,6 +883,15 @@ def _load_Cp_data():
     with open(os.path.join(folder, 'psi4_adjusted_characteristic_temperatures.json')) as f:
         Cp_dict_characteristic_temperatures_adjusted_psi4_2022a = json.loads(f.read())
 
+    with open(os.path.join(folder, 'JANAF_1998_liq_Cp.json')) as f:
+        Cp_dict_JANAF_liquid = json.loads(f.read())
+
+    with open(os.path.join(folder, 'JANAF_1998_gas_Cp.json')) as f:
+        Cp_dict_JANAF_gas = json.loads(f.read())
+
+    with open(os.path.join(folder, 'JANAF_1998_solid_Cp.json')) as f:
+        Cp_dict_JANAF_solid = json.loads(f.read())
+
     with open(os.path.join(folder, 'webbook_shomate_coefficients.json')) as f:
         WebBook_Shomate_coefficients = json.loads(f.read())
         WebBook_Shomate_solids, WebBook_Shomate_liquids, WebBook_Shomate_gases = {}, {}, {}
@@ -905,7 +915,8 @@ if PY37:
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
                     'WebBook_Shomate_liquids', 'WebBook_Shomate_gases', 'WebBook_Shomate_solids',
-                    'WebBook_Shomate_coefficients'):
+                    'WebBook_Shomate_coefficients',
+                    'Cp_dict_JANAF_liquid', 'Cp_dict_JANAF_gas', 'Cp_dict_JANAF_solid'):
             _load_Cp_data()
             return globals()[name]
         raise AttributeError("module %s has no attribute %s" %(__name__, name))

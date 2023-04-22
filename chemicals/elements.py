@@ -276,6 +276,12 @@ allotropes['B'] = [
     ('diboron', 2, 's', False, 'B#B', 'B2/c1-2', 'ZOCHARZZJNPSEU-UHFFFAOYSA-N', '14452-61-0', '14452-61-0'),
 ]
 
+
+allotropes['Zr'] = [
+    ('alpha zirconium', 1, 's', False, '[Zr]', 'Zr', 'QCWXUUIWCKQGHC-UHFFFAOYSA-N', '7440-67-7', '2099592000-00-0'),
+    ('beta zirconium', 1, 's', True, '[Zr]', 'Zr', 'QCWXUUIWCKQGHC-UHFFFAOYSA-N', '7440-67-7', '2099576000-00-0'),
+]
+
 # For each element that has allotropes, the allotrope which is used as a reference state at STP
 allotropic_standard_states = {'H': 'dihydrogen',
                               'N': 'dinitrogen',
@@ -294,6 +300,8 @@ allotropic_standard_states = {'H': 'dihydrogen',
                               'Se': 'gray selenium',
                               'As': 'gray arsenic',
                               'B': 'beta rhombohedral boron',
+
+                              'Zr': 'beta zirconium',
 }
 
 

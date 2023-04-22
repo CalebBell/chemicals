@@ -104,7 +104,6 @@ API_TDB_G = 'API_TDB_G'
 ATCT_L = 'ATCT_L'
 ATCT_G = 'ATCT_G'
 TRC = 'TRC'
-JANAF = 'JANAF'
 
 folder = os_path_join(source_path, 'Reactions')
 register_df_source(folder, 'API TDB Albahri Hf (g).tsv')
@@ -127,13 +126,13 @@ def _load_reaction_data():
     S0g_sources = {
         CRC: heat_capacity.CRC_standard_data,
         miscdata.WEBBOOK: miscdata.webbook_data,
-        JANAF: JANAF_1998_data,
+        miscdata.JANAF: JANAF_1998_data,
         YAWS: Hfg_S0g_YAWS_data,
     }
     S0l_sources = {
         CRC: heat_capacity.CRC_standard_data,
         miscdata.WEBBOOK: miscdata.webbook_data,
-        JANAF: JANAF_1998_data,
+        miscdata.JANAF: JANAF_1998_data,
     }
     S0s_sources = {
         CRC: heat_capacity.CRC_standard_data,
@@ -145,7 +144,7 @@ def _load_reaction_data():
         API_TDB_G: Hfg_API_TDB_data,
         miscdata.WEBBOOK: miscdata.webbook_data,
         TRC: heat_capacity.TRC_gas_data,
-        JANAF: JANAF_1998_data,
+        miscdata.JANAF: JANAF_1998_data,
         YAWS: Hfg_S0g_YAWS_data,
         miscdata.JOBACK: miscdata.joback_predictions,
     }
@@ -153,7 +152,7 @@ def _load_reaction_data():
         ATCT_L: Hfl_ATcT_data,
         CRC: heat_capacity.CRC_standard_data,
         miscdata.WEBBOOK: miscdata.webbook_data,
-        JANAF: JANAF_1998_data,
+        miscdata.JANAF: JANAF_1998_data,
     }
     Hfs_sources = {
         CRC: heat_capacity.CRC_standard_data,
@@ -260,7 +259,7 @@ def Hfs(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
-Hfl_all_methods = (ATCT_L, CRC, miscdata.WEBBOOK, JANAF)
+Hfl_all_methods = (ATCT_L, CRC, miscdata.WEBBOOK, miscdata.JANAF)
 '''Tuple of method name keys. See the `Hfl` for the actual references'''
 
 @mark_numba_incompatible
@@ -347,7 +346,7 @@ def Hfl(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
-Hfg_all_methods = (ATCT_G, TRC, CRC, miscdata.WEBBOOK, JANAF, YAWS, miscdata.JOBACK)
+Hfg_all_methods = (ATCT_G, TRC, CRC, miscdata.WEBBOOK, miscdata.JANAF, YAWS, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Hfg` for the actual references'''
 
 @mark_numba_incompatible
@@ -542,7 +541,7 @@ def S0s(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(S0s_sources, CASRN, 'S0s')
 
-S0l_all_methods = (CRC, miscdata.WEBBOOK, JANAF)
+S0l_all_methods = (CRC, miscdata.WEBBOOK, miscdata.JANAF)
 '''Tuple of method name keys. See the `S0l` for the actual references'''
 
 @mark_numba_incompatible
@@ -622,7 +621,7 @@ def S0l(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(S0l_sources, CASRN, 'S0l')
 
-S0g_all_methods = (CRC, miscdata.WEBBOOK, JANAF, YAWS)
+S0g_all_methods = (CRC, miscdata.WEBBOOK, miscdata.JANAF, YAWS)
 '''Tuple of method name keys. See the `S0g` for the actual references'''
 
 @mark_numba_incompatible

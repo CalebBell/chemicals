@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import warnings
 from chemicals.identifiers import check_CAS
+import json
 
 
 dirname = os.path.dirname(os.path.abspath(__file__))
@@ -426,7 +427,22 @@ Cpls_dict = {}
 Cpls_values_dict = {}
 Tl_values_dict = {}
 
+Hfss_dict = {}
+S0ss_dict = {}
+Gfss_dict = {}
+Cpss_dict = {}
+Cpss_values_dict = {}
+Ts_values_dict = {}
+
 bad_states = set(['l,g', 'cr,l'])
+
+solid_CAS_trans = {
+# (CAS, name, state) -> Fake CAS
+('7440-67-7', 'Zirconium, Alpha', 'cr'): '2099592000-00-0',
+('7440-67-7', 'Zirconium, Beta', 'cr'): '2099576000-00-0',
+
+}
+
 
 for CAS, row in metadata_table.iterrows():
     if CAS in bad_CASs:
@@ -435,6 +451,12 @@ for CAS, row in metadata_table.iterrows():
     formula = row['Formula']
     name = row['Name']
     state = row['State']
+    
+    solid_key = (CAS,  name, state) 
+    
+    if solid_key in solid_CAS_trans:
+        CAS = solid_CAS_trans[solid_key]
+        # print('changed!')
 
     if state in bad_states:
         continue
@@ -454,7 +476,8 @@ for CAS, row in metadata_table.iterrows():
     formulas_dict[CAS] = formula
     
     if state not in ('l', 'g'):
-        print(CAS, formula, name, state)
+        pass
+        # print(CAS, formula, name, state)
     try:
         p = db.getphasedata(formula=formula, name=name, phase=state)
     except Exception as e:
@@ -496,6 +519,15 @@ for CAS, row in metadata_table.iterrows():
         assert CAS not in Cpls_values_dict, CAS
         Cpls_values_dict[CAS] = Cps
         Tl_values_dict[CAS] = Ts_Cp
+    elif state == 'cr' and solid_key in solid_CAS_trans:
+        Hfss_dict[CAS] = Hf_298
+        Gfss_dict[CAS] = Gf_298
+        S0ss_dict[CAS] = S0_298
+        Cpss_dict[CAS] = Cp_298
+        assert CAS not in Cpss_values_dict, CAS
+        Cpss_values_dict[CAS] = Cps
+        Ts_values_dict[CAS] = Ts_Cp
+        
     assert  298.15 in p.rawdata['T'].tolist()
 
 
@@ -534,4 +566,30 @@ f.close()
 #     if CAS in Cpgs_dict:
 #         print(formulas_dict[CAS], names_dict[CAS], CAS)
 
+to_dump_Cp_gas = {}
+for CAS, Cps in Cpgs_values_dict.items():
+    to_dump_Cp_gas[CAS] = (Tg_values_dict[CAS], Cps)
 
+dump_Cpg_path = os.path.join(dirname, '..', '..', '..', 'chemicals', 'Heat Capacity', 'JANAF_1998_gas_Cp.json')
+f = open(dump_Cpg_path, 'w')
+json.dump(to_dump_Cp_gas, f, indent=2)
+f.close()
+
+to_dump_Cp_liq = {}
+for CAS, Cps in Cpls_values_dict.items():
+    to_dump_Cp_liq[CAS] = (Tl_values_dict[CAS], Cps)
+
+dump_Cp_path = os.path.join(dirname, '..', '..', '..', 'chemicals', 'Heat Capacity', 'JANAF_1998_liq_Cp.json')
+f = open(dump_Cp_path, 'w')
+json.dump(to_dump_Cp_liq, f, indent=2)
+f.close()
+
+
+to_dump_Cp_solid = {}
+for CAS, Cps in Cpss_values_dict.items():
+    to_dump_Cp_solid[CAS] = (Ts_values_dict[CAS], Cps)
+
+dump_Cp_path = os.path.join(dirname, '..', '..', '..', 'chemicals', 'Heat Capacity', 'JANAF_1998_solid_Cp.json')
+f = open(dump_Cp_path, 'w')
+json.dump(to_dump_Cp_solid, f, indent=2)
+f.close()
