@@ -343,7 +343,7 @@ class Janafdb(object):
         if formula is not None:
             formulasearch = self.db['formula'] == formula
         if name is not None:
-            namesearch = self.db['name'].str.lower().str.contains(name.lower())
+            namesearch = self.db['name'].str.lower().str.contains(name.lower(), regex=False)
         if phase is not None:
             phasesearch = self.db['phase'] == phase
         if filename is not None:
@@ -425,6 +425,8 @@ Cpls_dict = {}
 Cpls_values_dict = {}
 Tl_values_dict = {}
 
+bad_states = set(['l,g'])
+
 for CAS, row in metadata_table.iterrows():
     if CAS in bad_CASs:
         continue
@@ -434,11 +436,15 @@ for CAS, row in metadata_table.iterrows():
     state = row['State']
     names_dict[CAS] = name
     formulas_dict[CAS] = formula
+    
+    if state in bad_states:
+        continue
+    
 #     print(CAS, formula, name, state)
     try:
         p = db.getphasedata(formula=formula, name=name, phase=state)
     except Exception as e:
-        print('Failed', CAS, formula, name, state, e)
+        print(['Failed', CAS, formula, name, state], e)
         #p = db.getphasedata(formula=formula, name=name, phase=state)
         continue
     Hf_298 = float(p.DeltaH([298.15])[0])*1000.0
