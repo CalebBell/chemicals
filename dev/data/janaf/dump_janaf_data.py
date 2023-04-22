@@ -443,6 +443,16 @@ solid_CAS_trans = {
 
 }
 
+from collections import Counter
+
+cr_CAS_counter = Counter()
+for CAS, row in metadata_table.iterrows():
+    formula = row['Formula']
+    name = row['Name']
+    state = row['State']
+    if state == 'cr':
+        cr_CAS_counter[CAS] += 1
+
 
 for CAS, row in metadata_table.iterrows():
     if CAS in bad_CASs:
@@ -451,6 +461,7 @@ for CAS, row in metadata_table.iterrows():
     formula = row['Formula']
     name = row['Name']
     state = row['State']
+    is_cr_unique = cr_CAS_counter[CAS] == 1
     
     solid_key = (CAS,  name, state) 
     
@@ -478,6 +489,9 @@ for CAS, row in metadata_table.iterrows():
     if state not in ('l', 'g'):
         pass
         # print(CAS, formula, name, state)
+    if state == 'cr' and not is_cr_unique :
+        print([CAS, formula, name, state])
+        
     try:
         p = db.getphasedata(formula=formula, name=name, phase=state)
     except Exception as e:
@@ -519,7 +533,7 @@ for CAS, row in metadata_table.iterrows():
         assert CAS not in Cpls_values_dict, CAS
         Cpls_values_dict[CAS] = Cps
         Tl_values_dict[CAS] = Ts_Cp
-    elif state == 'cr' and solid_key in solid_CAS_trans:
+    elif state == 'cr' and (solid_key in solid_CAS_trans or is_cr_unique):
         Hfss_dict[CAS] = Hf_298
         Gfss_dict[CAS] = Gf_298
         S0ss_dict[CAS] = S0_298
