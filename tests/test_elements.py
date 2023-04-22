@@ -275,3 +275,35 @@ def test_index_hydrogen_deficiency():
     assert 1 == index_hydrogen_deficiency({'C': 2, 'H': 4})
     with pytest.raises(ValueError):
         index_hydrogen_deficiency({'C': 2, 'H': 4, 'U': 4})
+
+
+def test_allotrope_data():
+    from chemicals.identifiers import check_CAS
+    from chemicals.elements import allotropes
+
+    all_unique_CASs = set([])
+    processed_allotropes = 0
+    for key, tropes in allotropes.items():
+        
+        standard_state_set = 0
+        for value in tropes:
+            name, count, phase, stp_ref, smiles, inchi, inchi_key, closest_CAS, unique_CAS_maybe_fake = value
+            processed_allotropes += 1
+            all_unique_CASs.add(unique_CAS_maybe_fake)
+            if stp_ref:
+                standard_state_set += 1
+            
+            assert check_CAS(closest_CAS)
+            assert check_CAS(unique_CAS_maybe_fake)
+            
+            assert type(count) is int
+            
+            assert phase in ('l', 's', 'g')
+
+            assert inchi_key.count('-') == 2
+            assert len(inchi_key) == 27
+            
+        assert standard_state_set == 1
+
+    assert len(all_unique_CASs) == processed_allotropes
+

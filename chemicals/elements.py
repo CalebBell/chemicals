@@ -122,8 +122,8 @@ allotropes = {}
 allotropes['N'] = [
     ('dinitrogen', 2, 'g', True, 'N#N', 'N2/c1-2', 'IJGRMHOSHXDMSA-UHFFFAOYSA-N', '7727-37-9', '7727-37-9'),
     ('atomic nitrogen', 1, 'g', False, '[N]', 'N', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', '17778-88-0', '17778-88-0'),
-    ('linear trinitrogen', 3, 'g', False, '[N-]=[N+]=[N]', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', '12596-60-0', '12596-60-0'),
-    ('cyclic trinitrogen', 3, 'g', False, 'N1=N[N]1', 'RLXSTAGCZQYHDL-UHFFFAOYSA-N', '12596-60-0', '2099958000-00-0'),
+    ('linear trinitrogen', 3, 'g', False, '[N-]=[N+]=[N]', '1S/N3/c1-3-2', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', '12596-60-0', '12596-60-0'),
+    ('cyclic trinitrogen', 3, 'g', False, 'N1=N[N]1', '1S/N3/c1-2-3-1', 'RLXSTAGCZQYHDL-UHFFFAOYSA-N', '12596-60-0', '2099958000-00-0'),
 ]
 allotropes['H'] = [
     ('dihydrogen', 2, 'g', True, '[HH]', 'H2/h1H', 'UFHFLCQGNIYNRP-UHFFFAOYSA-N', '1333-74-0', '1333-74-0'),
@@ -141,7 +141,7 @@ allotropes['I'] = [
 ]
 
 allotropes['Br'] = [
-    ('dibromine', 2, 'l', True, 'BrBr', 'InChI=1S/Br2/c1-2', 'GDTBXPJZTBHREO-UHFFFAOYSA-N', '7726-95-6', '7726-95-6'),
+    ('dibromine', 2, 'l', True, 'BrBr', '1S/Br2/c1-2', 'GDTBXPJZTBHREO-UHFFFAOYSA-N', '7726-95-6', '7726-95-6'),
     ('atomic bromine', 1, 'g', False, '[Br]', 'Br', 'WKBOTKDWSSQWDR-UHFFFAOYSA-N', '10097-32-2', '10097-32-2')
 ]
 
@@ -158,92 +158,123 @@ allotropes['C'] = [
 
 
 allotropes['Po'] = [
+    # assuming alpha is more stable
     ('alpha polonium', 1, 's', True, '[Po]', 'Po', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', '7440-08-6', '2099953000-00-0'),
-    ('beta polonium', 1, 's', True, '[Po]', 'Po', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', '7440-08-6', '2099937000-00-0'),
+    ('beta polonium', 1, 's', False, '[Po]', 'Po', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', '7440-08-6', '2099937000-00-0'),
 ]
 
 allotropes['Sn'] = [
     # unfortunately sources report the same CAS
-    ('white tin', 1, 's', True, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099932000-00-0')
-    ('gray tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099916000-00-0')
-    ('gamma tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099911000-00-0') # not common
-    ('sigma tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099898000-00-0') # not common
+    ('white tin', 1, 's', True, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099932000-00-0'),
+    ('gray tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099916000-00-0'),
+    ('gamma tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099911000-00-0'), # not common
+    ('sigma tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099898000-00-0'), # not common
 ]
 
-allotropes['Se'] = {
-    'gray selenium': '7782-49-2', # most stable at STP, chiral hexagonal crystal lattice
-    'red gamma selenium': '7782-49-2', # monocrystaline puckered cyclooctaselenium (Se8) rings
-    'red beta selenium': '7782-49-2', # monocrystaline puckered cyclooctaselenium (Se8) rings
-    'amorphous black selenium': '7782-49-2', # amorphous
-    'amorphous red selenium': '7782-49-2', # amorphous
-}
-allotropes['As'] = {
-    'gray arsenic': '7440-38-2', # most stable form
-    'yellow arsenic': '7440-38-2', 
-    'black arsenic': '7440-38-2', 
-}
+allotropes['Se'] = [
+    # most stable at STP, chiral hexagonal crystal lattice
+    ('gray selenium', 1, 's', True, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2', '7782-49-2'),
 
-allotropes['P'] = {
-    'alpha white phosphorus': '12185-10-3', # most stable form at room Body-centred cubic or Triclinic also heard yellow phosphorus
-    'beta white phosphorus': '12185-10-3', #  Triclinic also heard yellow phosphorus
+    # monocrystaline puckered cyclooctaselenium (Se8) rings
+    ('red gamma selenium', 8, 's', False, '[Se]1[Se][Se][Se][Se][Se][Se][Se]1', 'Se8/c1-2-4-6-8-7-5-3-1', 
+                    'JWMKWLJGSKAGLH-UHFFFAOYSA-N', '12597-33-0', '2099893000-00-0'),
 
-    'red phosphorus': '7723-14-0',
-    'violet phosphorus': '7723-14-0', # Monoclinic
-    'black phosphorus': '7723-14-0', # Orthorhombic
-    'diphosphorus': '12185-09-0', # gas
-}
+    # monocrystaline puckered cyclooctaselenium (Se8) rings
+    ('red beta selenium', 8, 's', False, '[Se]1[Se][Se][Se][Se][Se][Se][Se]1', 'Se8/c1-2-4-6-8-7-5-3-1', 
+                    'JWMKWLJGSKAGLH-UHFFFAOYSA-N', '12597-33-0', '2099877000-00-0'),
 
-allotropes['Sb'] = {
-    'white antimony': '7440-36-0', # most stable form
-    'yellow antimony': '7440-36-0', # metastable
-    'black antimony': '7440-36-0', # metastable
-    'explosive antimony': '7440-36-0', # eep
-}
+    ('amorphous black selenium', 1, 's', False, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2', 
+                '2099872000-00-0'),  # amorphous, up to 1000 atoms per ring
+    ('amorphous red selenium', 1, 's', False, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2', 
+                '2099856000-00-0'),  # amorphous
+]
 
-allotropes['S'] = {
-    'atomic sulfur': '7704-34-9',
+allotropes['As'] = [
+    ('gray arsenic', 1, 's', True, '[As]', 'As', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', '7440-38-2', '2099851000-00-0'), # most stable form
+    ('yellow arsenic', 1, 's', False, '[As]', 'As', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', '7440-38-2', '2099835000-00-0'),
+    ('black arsenic', 1, 's', False, '[As]', 'As', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', '7440-38-2', '2099830000-00-0'),
+]
 
-    'alpha S8 sulfur': '10544-50-0', # orthorhombic  most common
-    'beta S8 sulfur': '10544-50-0', # orthorhombicform from alpha when raised to 95.3 °C
-    'gamma S8 sulfur': '10544-50-0', # orthorhombic  nacreous sulfur or mother of pearl sulfur
 
-    'disulfur': '23550-45-0', # most common component of sulfur vapour above 720 °C
-    'trisulfur': '12597-03-4', # vapor species 10% at 440 °C
-    'tetrasulfur': '19269-85-3', # gas only not characterized
-    'pentasulfur': '12597-10-3', # gas only not characterized
 
-    'cyclo-S6': '13798-23-7', # solid ring form
+allotropes['P'] = [
+    # most stable form at room Body-centred cubic or Triclinic also heard yellow phosphorus
+    ('alpha white phosphorus', 4, 's', True, 'P12P3P1P23', 'P4/c1-2-3(1)4(1)2', 'OBSZRRSYVTXPNB-UHFFFAOYSA-N', '12185-10-3', '2099819000-00-0'),
+    #  Triclinic also heard yellow phosphorus
+    ('beta white phosphorus', 4, 's', False, 'P12P3P1P23', 'P4/c1-2-3(1)4(1)2', 'OBSZRRSYVTXPNB-UHFFFAOYSA-N', '12185-10-3', '2099814000-00-0'),
 
-    'alpha S7 sulfur': '21459-04-1', # solid ring
-    'beta S7 sulfur': '21459-04-1', # solid ring
-    'gamma S7 sulfur': '21459-04-1', # solid ring 
-    'delta S7 sulfur': '21459-04-1', # solid ring
-}
+    ('red phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099796000-00-0'),
+    ('violet phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099791000-00-0'), # Monoclinic
+    ('black phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099775000-00-0'), # Orthorhombic
 
-allotropes['O'] = {
-    'dioxygen': '7782-44-7',
-    'atomic oxygen': '17778-80-2', 
-    'ozone': '10028-15-6',
-    'cyclic ozone': '153851-84-4', # theorized wikipedia only and chemspider
-    'tetraoxygen': '852461-27-9', # cyclotetraoxygen D2d structure form
-    'Octaoxygen': '176740-46-8', # wikidata for CAS, also called ε-oxygen or red oxygen, 600 K & 16 GPa and higher
-}
+    ('diphosphorus', 2, 'g', False, 'P#P', '1S/P2/c1-2', 'FOBPTJZYDGNHLR-UHFFFAOYSA-N', '12185-09-0', '12185-09-0'), # gas
+]
+
+allotropes['Sb'] = [
+    ('white antimony', 1, 's', True, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099770000-00-0'),# most stable form
+    ('yellow antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099759000-00-0'),# metastable
+    ('black antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099754000-00-0'),# metastable
+    ('explosive antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099738000-00-0'),# eep
+    
+]
+
+allotropes['S'] = [
+    ('atomic sulfur', 1, 's', False, '[S]', 'S', 'NINIDFKCEFEMDL-UHFFFAOYSA-N', '7704-34-9', '7704-34-9'),
+
+    # orthorhombic  most common
+    ('alpha S8 sulfur', 8, 's', True, 'S1SSSSSSS1', 'S8/c1-2-4-6-8-7-5-3-1', 'JLQNHALFVCURHW-UHFFFAOYSA-N', '10544-50-0', '2099733000-00-0'),
+    # orthorhombicform from alpha when raised to 95.3 °C
+    ('beta S8 sulfur', 8, 's', False, 'S1SSSSSSS1', 'S8/c1-2-4-6-8-7-5-3-1', 'JLQNHALFVCURHW-UHFFFAOYSA-N', '10544-50-0', '2099717000-00-0'),
+    # orthorhombic  nacreous sulfur or mother of pearl sulfur
+    ('gamma S8 sulfur', 8, 's', False, 'S1SSSSSSS1', 'S8/c1-2-4-6-8-7-5-3-1', 'JLQNHALFVCURHW-UHFFFAOYSA-N', '10544-50-0', '2099712000-00-0'),
+
+    # most common component of sulfur vapour above 720 °C
+    ('disulfur', 2, 'g', False, 'S=S', 'S2/c1-2', 'MAHNFPMIPQKPPI-UHFFFAOYSA-N', '23550-45-0', '23550-45-0'),
+    # vapor species 10% at 440 °C
+    ('trisulfur', 3, 'g', False, 'S=S=S', 'S3/c1-3-2', 'NVSDADJBGGUCLP-UHFFFAOYSA-N', '12597-03-4', '12597-03-4'),
+     # gas only not characterized
+    ('tetrasulfur', 4, 'g', False, 'S1SSS1', 'S4/c1-2-4-3-1', 'NWWQJUISNMIVLJ-UHFFFAOYSA-N', '19269-85-3', '19269-85-3'),
+     # gas only not characterized
+    ('pentasulfur', 5, 'g', False, 'S1SSSS1', 'S5/c1-2-4-5-3-1', 'DEVHCWHUQVZNMT-UHFFFAOYSA-N', '12597-10-3', '12597-10-3'),
+
+    # solid ring form
+    ('cyclo-S6', 6, 's', False, 'S1SSSSS1', 'S6/c1-2-4-6-5-3-1', 'FEXCMMPRRBSCRG-UHFFFAOYSA-N', '13798-23-7', '13798-23-7'),
+
+    # solid ring S7 forms
+    ('alpha S7 sulfur', 7, 's', False, 'S1SSSSSS1', 'S7/c1-2-4-6-7-5-3-1', 'VVNDVBPCYWJYSK-UHFFFAOYSA-N', '21459-04-1', '2099699000-00-0'),
+    ('beta S7 sulfur', 7, 's', False, 'S1SSSSSS1', 'S7/c1-2-4-6-7-5-3-1', 'VVNDVBPCYWJYSK-UHFFFAOYSA-N', '21459-04-1', '2099694000-00-0'),
+    ('gamma S7 sulfur', 7, 's', False, 'S1SSSSSS1', 'S7/c1-2-4-6-7-5-3-1', 'VVNDVBPCYWJYSK-UHFFFAOYSA-N', '21459-04-1', '2099678000-00-0'),
+    ('delta S7 sulfur', 7, 's', False, 'S1SSSSSS1', 'S7/c1-2-4-6-7-5-3-1', 'VVNDVBPCYWJYSK-UHFFFAOYSA-N', '21459-04-1', '2099673000-00-0'),
+]
+
+allotropes['O'] = [
+    ('dioxygen', 2, 'g', True, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '7782-44-7'),
+    ('atomic oxygen', 1, 'g', False, '[O]', 'O', 'QVGXLLKOCUKJST-UHFFFAOYSA-N', '17778-80-2', '17778-80-2'),
+    ('ozone', 3, 'g', False, '[O-][O+]=O', 'O3/c1-3-2', 'CBENFWSGALASAD-UHFFFAOYSA-N', '10028-15-6', '10028-15-6'),
+
+    # theorized wikipedia only and chemspider   
+    ('cyclic ozone', 3, 'g', False, 'o1oo1', '1S/O3/c1-2-3-1', 'XQOAKYYZMDCSIA-UHFFFAOYSA-N', '153851-84-4', '153851-84-4'),
+
+    # Don't have structures for these
+#     'tetraoxygen': '852461-27-9', # cyclotetraoxygen D2d structure form
+#     'Octaoxygen': '176740-46-8', # wikidata for CAS, also called ε-oxygen or red oxygen, 600 K & 16 GPa and higher
+]
 
 # https://janaf.nist.gov/tables/B-001.html
-allotropes['B'] = {
-    'alpha rhombohedral boron': '7440-42-8',
-    'beta rhombohedral boron': '7440-42-8', # most stable
-    'beta tetragonal boron': '7440-42-8',
+allotropes['B'] = [
+    ('alpha rhombohedral boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099657000-00-0'),
+    ('beta rhombohedral boron', 1, 's', True, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099652000-00-0'),# most stable
+    ('beta tetragonal boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099636000-00-0'),
 
-    'alpha tetragonal boron': '7440-42-8',
-    'gamma orthorhombic boron': '7440-42-8',
+    ('alpha tetragonal boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099631000-00-0'),
+    ('gamma orthorhombic boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099615000-00-0'),
 
-    'powder boron': '7440-42-8',
-    'glassy boron': '7440-42-8',
+    ('powder boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099610000-00-0'),
+    ('glassy boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099597000-00-0'),
 
-    'diboron': '14452-61-0', # not sure actually exists but is in common chemistry
-
-}
+    # not sure actually exists but is in common chemistry
+    ('diboron', 2, 's', False, 'B#B', 'B2/c1-2', 'ZOCHARZZJNPSEU-UHFFFAOYSA-N', '14452-61-0', '14452-61-0'),
+]
 
 # For each element that has allotropes, the allotrope which is used as a reference state at STP
 allotropic_standard_states = {'H': 'dihydrogen',
