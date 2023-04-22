@@ -435,9 +435,7 @@ for CAS, row in metadata_table.iterrows():
     formula = row['Formula']
     name = row['Name']
     state = row['State']
-    names_dict[CAS] = name
-    formulas_dict[CAS] = formula
-    
+
     if state in bad_states:
         continue
     
@@ -447,6 +445,13 @@ for CAS, row in metadata_table.iterrows():
     if CAS == '7664-39-3' and formula != 'HF':
         # H2F2 to H7F7 as well not sure why they are there
         continue
+    if ' bar' in name.lower():
+        # bad waters
+        continue
+
+    names_dict[CAS] = name
+    formulas_dict[CAS] = formula
+    
     
 #     print(CAS, formula, name, state)
     try:
@@ -515,5 +520,17 @@ print(dump_csv_path)
 f = open(dump_csv_path, 'w')
 f.writelines(lines)
 f.close()
+
+# print('Liquids found')
+# print('-'*100)
+# for CAS in CASs:
+#     if CAS in Cpls_dict:
+#         print(formulas_dict[CAS], names_dict[CAS], CAS)
+#     
+# print('gases found')
+# print('-'*100)
+# for CAS in CASs:
+#     if CAS in Cpgs_dict:
+#         print(formulas_dict[CAS], names_dict[CAS], CAS)
 
 
