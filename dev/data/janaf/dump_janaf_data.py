@@ -6,8 +6,8 @@ from chemicals.identifiers import check_CAS
 
 dirname = os.path.dirname(os.path.abspath(__file__))
 
-metadata_table = pd.read_csv(os.path.join(dirname, 'janaf_tables_index.csv'))
-
+metadata_table = pd.read_csv(os.path.join(dirname, 'janaf_tables_index.csv'), index_col=0)
+# print(metadata_table)
 # Identify the CAS numbers, that, well, aren't
 bad_CASs = set()
 for CAS in metadata_table.index.values.tolist():
@@ -138,7 +138,7 @@ class JanafPhase(object):
             delimiter=r'[\t\s]+',
             engine='python',
             names=['T', 'Cp', 'S', '[G-H(Tr)]/T', 'H-H(Tr)', 'Delta_fH', 'Delta_fG', 'log(Kf)'],
-            usecols=range(8) # Ignore extra columns -- those are caused by comments in the text file
+            usecols=['T', 'Cp', 'S', '[G-H(Tr)]/T', 'H-H(Tr)', 'Delta_fH', 'Delta_fG', 'log(Kf)'] # Ignore extra columns -- those are caused by comments in the text file
         )
         self.rawdata = data
 
@@ -403,6 +403,7 @@ class Janafdb(object):
         return JanafPhase(textdata)
 
 
+db = Janafdb()
 
 # Get as much data our for gases and liquids as possible (easy to understand)
 # Not copyright as above
@@ -427,6 +428,7 @@ Tl_values_dict = {}
 for CAS, row in metadata_table.iterrows():
     if CAS in bad_CASs:
         continue
+    # print('Processing CAS', CAS)
     formula = row['Formula']
     name = row['Name']
     state = row['State']
@@ -435,9 +437,10 @@ for CAS, row in metadata_table.iterrows():
 #     print(CAS, formula, name, state)
     try:
         p = db.getphasedata(formula=formula, name=name, phase=state)
-    except:
+    except Exception as e:
+        print('Failed', CAS, formula, name, state, e)
+        #p = db.getphasedata(formula=formula, name=name, phase=state)
         continue
-        print(CAS, formula, name, state)
     Hf_298 = float(p.DeltaH([298.15])[0])*1000.0
     Gf_298 = float(p.DeltaG([298.15])[0])*1000.0
     S0_298 =  float(p.S([298.15])[0])
@@ -476,7 +479,7 @@ for CAS, row in metadata_table.iterrows():
 
 # Format a file and dump it
 import natsort
-CASs = list(natsort.natsorted(list(set(metadata_table['CAS Number'].values.tolist()))))
+CASs = list(natsort.natsorted(list(set(metadata_table.index.values.tolist()))))
 keys = ['CAS', 'Chemical', 'formula', 'Hfl','Gfl', 'S0l','Cpl', 'Hfg', 'Gfg', 'S0g', 'Cpg']
 lines = ['\t'.join(keys) + '\n']
 search_dicts = [names_dict, formulas_dict, Hfls_dict, Gfls_dict, S0ls_dict, Cpls_dict, Hfgs_dict, Gfgs_dict, S0gs_dict, Cpgs_dict]
@@ -489,7 +492,7 @@ for CAS in CASs:
     line = '\t'.join(parts) + '\n'
     lines.append(line)
     
-    print(line)
+    # print(line)
     
 dump_csv_path = os.path.join(dirname, '..', '..', '..', 'chemicals', 'Reactions', 'JANAF_1998.tsv')
 print(dump_csv_path)
