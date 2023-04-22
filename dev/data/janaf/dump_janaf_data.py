@@ -440,6 +440,7 @@ solid_CAS_trans = {
 # (CAS, name, state) -> Fake CAS
 ('7440-67-7', 'Zirconium, Alpha', 'cr'): '2099592000-00-0',
 ('7440-67-7', 'Zirconium, Beta', 'cr'): '2099576000-00-0',
+# ('7782-42-5', 'Carbon', 'ref'): '7782-42-5',
 
 }
 
@@ -462,14 +463,15 @@ for CAS, row in metadata_table.iterrows():
     name = row['Name']
     state = row['State']
     is_cr_unique = cr_CAS_counter[CAS] == 1
+    is_graphite = CAS == '7440-44-0' and state == 'ref'
     
-    solid_key = (CAS,  name, state) 
+    solid_key = (CAS, name, state) 
     
     if solid_key in solid_CAS_trans:
         CAS = solid_CAS_trans[solid_key]
         # print('changed!')
 
-    if state in bad_states:
+    if state in bad_states and not is_graphite:
         continue
     
     if name == 'Nitrous Acid, Cis':
@@ -533,7 +535,7 @@ for CAS, row in metadata_table.iterrows():
         assert CAS not in Cpls_values_dict, CAS
         Cpls_values_dict[CAS] = Cps
         Tl_values_dict[CAS] = Ts_Cp
-    elif state == 'cr' and (solid_key in solid_CAS_trans or is_cr_unique):
+    elif state == 'cr' and (solid_key in solid_CAS_trans or is_cr_unique) or is_graphite:
         Hfss_dict[CAS] = Hf_298
         Gfss_dict[CAS] = Gf_298
         S0ss_dict[CAS] = S0_298
@@ -542,6 +544,15 @@ for CAS, row in metadata_table.iterrows():
         Cpss_values_dict[CAS] = Cps
         Ts_values_dict[CAS] = Ts_Cp
         
+        if is_graphite:
+            graphite_CAS = '7782-42-5'
+            Hfss_dict[graphite_CAS] = Hf_298
+            Gfss_dict[graphite_CAS] = Gf_298
+            S0ss_dict[graphite_CAS] = S0_298
+            Cpss_dict[graphite_CAS] = Cp_298
+            Cpss_values_dict[graphite_CAS] = Cps
+            Ts_values_dict[graphite_CAS] = Ts_Cp
+            
     assert  298.15 in p.rawdata['T'].tolist()
 
 
