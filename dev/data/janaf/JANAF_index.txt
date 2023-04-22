@@ -1,0 +1,1796 @@
+Al         | Aluminum                           | ref   | Al-001
+Al         | Aluminum                           | cr    | Al-002
+Al         | Aluminum                           | l     | Al-003
+Al         | Aluminum                           | cr,l  | Al-004
+Al         | Aluminum                           | g     | Al-005
+Al+        | Aluminum, Ion                      | g     | Al-006
+Al-        | Aluminum, Ion                      | g     | Al-007
+AlBO2      | Aluminum Borate                    | g     | Al-008
+AlBr       | Aluminum Bromide                   | g     | Al-009
+AlBr3      | Aluminum Bromide                   | cr    | Al-010
+AlBr3      | Aluminum Bromide                   | l     | Al-011
+AlBr3      | Aluminum Bromide                   | cr,l  | Al-012
+AlBr3      | Aluminum Bromide                   | g     | Al-013
+AlCl       | Aluminum Chloride                  | g     | Al-014
+AlCl+      | Aluminum Chloride, Ion             | g     | Al-015
+AlClF      | Aluminum Chloride Fluoride         | g     | Al-016
+AlClF+     | Aluminum Chloride Fluoride, Ion    | g     | Al-017
+AlClF2     | Aluminum Chloride Fluoride         | g     | Al-018
+AlClO      | Aluminum Chloride Oxide            | cr    | Al-019
+AlClO      | Aluminum Chloride Oxide            | g     | Al-020
+AlCl2      | Aluminum Chloride                  | g     | Al-021
+AlCl2+     | Aluminum Chloride, Ion             | g     | Al-022
+AlCl2-     | Aluminum Chloride, Ion             | g     | Al-023
+AlCl2F     | Aluminum Chloride Fluoride         | g     | Al-024
+AlCl3      | Aluminum Chloride                  | cr    | Al-025
+AlCl3      | Aluminum Chloride                  | l     | Al-026
+AlCl3      | Aluminum Chloride                  | cr,l  | Al-027
+AlCl3      | Aluminum Chloride                  | g     | Al-028
+AlCl4K     | Potassium Tetrachloroaluminate     | cr    | Al-029
+AlCl4Na    | Sodium Tetrachloroaluminate        | cr    | Al-030
+AlCl6K3    | Potassium Hexachloroaluminate      | cr    | Al-031
+AlCl6Na3   | Sodium Hexachloroaluminate         | cr    | Al-032
+AlF        | Aluminum Fluoride                  | g     | Al-033
+AlF+       | Aluminum Fluoride, Ion             | g     | Al-034
+AlFO       | Aluminum Fluoride Oxide            | g     | Al-035
+AlF2       | Aluminum Fluoride                  | g     | Al-036
+AlF2+      | Aluminum Fluoride, Ion             | g     | Al-037
+AlF2-      | Aluminum Fluoride, Ion             | g     | Al-038
+AlF2O      | Aluminum Fluoride Oxide            | g     | Al-039
+AlF2O-     | Aluminum Fluoride Oxide, Ion       | g     | Al-040
+AlF3       | Aluminum Fluoride                  | cr    | Al-041
+AlF3       | Aluminum Fluoride                  | l     | Al-042
+AlF3       | Aluminum Fluoride                  | cr,l  | Al-043
+AlF3       | Aluminum Fluoride                  | g     | Al-044
+AlF4-      | Tetrafluoroaluminate, Ion          | g     | Al-045
+AlF4Li     | Lithium Tetrafluoroaluminate       | g     | Al-046
+AlF4Na     | Sodium Tetrafluoroaluminate        | g     | Al-047
+AlF6K3     | Potassium Hexafluoraluminate       | cr    | Al-048
+AlF6Li3    | Lithium Hexafluoroaluminate        | cr    | Al-049
+AlF6Li3    | Lithium Hexafluoroaluminate        | l     | Al-050
+AlF6Li3    | Lithium Hexafluoroaluminate        | cr,l  | Al-051
+AlF6Na3    | Cryolite, Alpha                    | cr    | Al-052
+AlF6Na3    | Cryolite, Beta                     | cr    | Al-053
+AlF6Na3    | Cryolite                           | l     | Al-054
+AlF6Na3    | Cryolite                           | cr,l  | Al-055
+HAl        | Aluminum Hydride                   | g     | Al-056
+HAlO       | Aluminum Hydride Oxide             | g     | Al-057
+HAlO       | Aluminum Hydroxide                 | g     | Al-058
+HAlO+      | Aluminum Hydroxide, Ion            | g     | Al-059
+HAlO-      | Aluminum Hydroxide, Ion            | g     | Al-060
+HAlO2      | Aluminum Hydroxide Oxide           | g     | Al-061
+H4AlLi     | Lithium Tetrahydroaluminate        | cr    | Al-062
+AlI        | Aluminum Iodide                    | g     | Al-063
+AlI3       | Aluminum Iodide                    | cr    | Al-064
+AlI3       | Aluminum Iodide                    | l     | Al-065
+AlI3       | Aluminum Iodide                    | cr,l  | Al-066
+AlI3       | Aluminum Iodide                    | g     | Al-067
+AlLiO2     | Lithium Aluminum Oxide             | cr    | Al-068
+AlLiO2     | Lithium Aluminum Oxide             | l     | Al-069
+AlLiO2     | Lithium Aluminum Oxide             | cr,l  | Al-070
+AlN        | Aluminum Nitride                   | cr    | Al-071
+AlN        | Aluminum Nitride                   | g     | Al-072
+AlNaO2     | Sodium Aluminum Oxide              | cr    | Al-073
+AlO        | Aluminum Oxide                     | g     | Al-074
+AlO+       | Aluminum Oxide, Ion                | g     | Al-075
+AlO-       | Aluminum Oxide, Ion                | g     | Al-076
+AlO2       | Aluminum Oxide                     | g     | Al-077
+AlO2-      | Aluminum Oxide, Ion                | g     | Al-078
+AlS        | Aluminum Sulfide                   | g     | Al-079
+Al2        | Aluminum                           | g     | Al-080
+Al2BeO4    | Beryllium Aluminum Oxide           | cr    | Al-081
+Al2BeO4    | Beryllium Aluminum Oxide           | l     | Al-082
+Al2BeO4    | Beryllium Aluminum Oxide           | cr,l  | Al-083
+Al2Br6     | Aluminum Bromide                   | g     | Al-084
+Al2Cl6     | Aluminum Chloride                  | g     | Al-085
+Rn+        | Radon, Ion                         | g     | Rn-002
+Al2Cl9K3   | Potassium Aluminum Chloride        | cr    | Al-086
+Al2F6      | Aluminum Fluoride                  | g     | Al-087
+Al2I6      | Aluminum Iodide                    | g     | Al-088
+Al2MgO4    | Magnesium Aluminum Oxide           | cr    | Al-089
+Al2MgO4    | Magnesium Aluminum Oxide           | l     | Al-090
+Al2MgO4    | Magnesium Aluminum Oxide           | cr,l  | Al-091
+Al2O       | Aluminum Oxide                     | g     | Al-092
+Al2O+      | Aluminum Oxide, Ion                | g     | Al-093
+Al2O2      | Aluminum Oxide                     | g     | Al-094
+Al2O2+     | Aluminum Oxide, Ion                | g     | Al-095
+Al2O3      | Aluminum Oxide, Alpha              | cr    | Al-096
+Al2O3      | Aluminum Oxide, Delta              | cr    | Al-097
+Al2O3      | Aluminum Oxide, Gamma              | cr    | Al-098
+Al2O3      | Aluminum Oxide, Kappa              | cr    | Al-099
+Al2O3      | Aluminum Oxide                     | l     | Al-100
+Al2O3      | Aluminum Oxide                     | cr,l  | Al-101
+Al2O5Si    | Aluminum Silicate, Andalusite      | cr    | Al-102
+Al2O5Si    | Aluminum Silicate, Kyanite         | cr    | Al-103
+Al2O5Si    | Aluminum Silicate, Sillimanite     | cr    | Al-104
+Al2S3      | Aluminum Sulfide                   | cr    | Al-105
+Al3F14Na5  | Chiolite                           | cr    | Al-106
+Al3F14Na5  | Chiolite                           | l     | Al-107
+Al3F14Na5  | Chiolite                           | cr,l  | Al-108
+Al6BeO10   | Beryllium Aluminum Oxide           | cr    | Al-109
+Al6BeO10   | Beryllium Aluminum Oxide           | l     | Al-110
+Al6BeO10   | Beryllium Aluminum Oxide           | cr,l  | Al-111
+Al6O13Si2  | Aluminum Silicate, Mullite         | cr    | Al-112
+Ar         | Argon                              | ref   | Ar-001
+Ar+        | Argon, Ion                         | g     | Ar-002
+B          | Boron                              | ref   | B-001
+B          | Boron, Beta-Rhombohedral           | cr    | B-002
+B          | Boron                              | l     | B-003
+B          | Boron                              | cr,l  | B-004
+B          | Boron                              | g     | B-005
+B+         | Boron, Ion                         | g     | B-006
+B-         | Boron, Ion                         | g     | B-007
+BBeO2      | Beryllium Borate                   | g     | B-008
+BBr        | Bromoborane                        | g     | B-009
+BBrCl      | Bromochloroborane                  | g     | B-010
+BBrCl2     | Bromodichloroborane                | g     | B-011
+BBrF       | Bromofluoroborane                  | g     | B-012
+BBrF2      | Bromodifluoroborane                | g     | B-013
+BBrO       | Boron Bromide Oxide                | g     | B-014
+BBr2       | Dibromoborane                      | g     | B-015
+BBr2Cl     | Dibromochloroborane                | g     | B-016
+BBr2F      | Dibromofluoroborane                | g     | B-017
+HBBr2      | Dibromoborane                      | g     | B-018
+BBr3       | Tribromoborane                     | l     | B-019
+BBr3       | Tribromoborane                     | g     | B-020
+BCl        | Chloroborane                       | g     | B-021
+BCl+       | Chloroborane, Ion                  | g     | B-022
+BClF       | Chlorofluoroborane                 | g     | B-023
+BClF2      | Chlorodifluoroborane               | g     | B-024
+BClO       | Boron Chloride Oxide               | g     | B-025
+BCl2       | Dichloroborane                     | g     | B-026
+BCl2+      | Dichloroborane, Ion                | g     | B-027
+BCl2-      | Dichloroborane, Ion                | g     | B-028
+BCl2F      | Dichlorofluoroborane               | g     | B-029
+HBCl2      | Dichloroborane                     | g     | B-030
+BCl3       | Trichloroborane                    | g     | B-031
+BF         | Fluoroborane                       | g     | B-032
+BFO        | Boron Fluoride Oxide               | g     | B-033
+BF2        | Difluoroborane                     | g     | B-034
+BF2+       | Difluoroborane, Ion                | g     | B-035
+BF2-       | Difluoroborane, Ion                | g     | B-036
+HBF2       | Difluoroborane                     | g     | B-037
+HBF2O      | Difluorohydroxyborane              | g     | B-038
+BF2O       | Boron Fluoride Oxide               | g     | B-039
+BF3        | Trifluoroborane                    | g     | B-040
+BF4K       | Potassium Tetrafluoroborate        | cr    | B-041
+BF4K       | Potassium Tetrafluoroborate        | l     | B-042
+BF4K       | Potassium Tetrafluoroborate        | cr,l  | B-043
+BF4K       | Potassium Tetrafluoroborate        | g     | B-044
+HB         | Borane                             | g     | B-045
+HBO        | Boron Hydride Oxide                | g     | B-046
+HBO+       | Boron Hydride Oxide, Ion           | g     | B-047
+HBO-       | Boron Hydride Oxide, Ion           | g     | B-048
+HBO2       | Boric Acid                         | cr    | B-049
+HBO2       | Boric Acid                         | g     | B-050
+HBS        | Boron Hydride Sulfide              | g     | B-051
+HBS+       | Boron Hydride Sulfide, Ion         | g     | B-052
+H2B        | Borane                             | g     | B-053
+H2BO2      | Dihydroxyborane                    | g     | B-054
+H3B        | Borane                             | g     | B-055
+H3BO3      | Boric Acid                         | cr    | B-056
+H3BO3      | Boric Acid                         | g     | B-057
+H4BK       | Potassium Tetrahydroborate         | cr    | B-058
+H4BLi      | Lithium Tetrahydroborate           | cr    | B-059
+H4BNa      | Sodium Tetrahydroborate            | cr    | B-060
+BI         | Iodoborane                         | g     | B-061
+BI2        | Diiodoborane                       | g     | B-062
+BI3        | Triiodoborane                      | g     | B-063
+BKO2       | Potassium Borate                   | cr    | B-064
+BKO2       | Potassium Borate                   | l     | B-065
+BKO2       | Potassium Borate                   | cr,l  | B-066
+BKO2       | Potassium Borate                   | g     | B-067
+BLiO2      | Lithium Borate                     | cr    | B-068
+BLiO2      | Lithium Borate                     | l     | B-069
+BLiO2      | Lithium Borate                     | cr,l  | B-070
+BLiO2      | Lithium Borate                     | g     | B-071
+BN         | Boron Nitride                      | cr    | B-072
+BN         | Boron Nitride                      | g     | B-073
+BNaO2      | Sodium Borate                      | cr    | B-074
+BNaO2      | Sodium Borate                      | l     | B-075
+BNaO2      | Sodium Borate                      | cr,l  | B-076
+BNaO2      | Sodium Borate                      | g     | B-077
+BO         | Boron Oxide                        | g     | B-078
+BO2        | Boron Oxide                        | g     | B-079
+BO2-       | Boron Oxide, Ion                   | g     | B-080
+BS         | Boron Sulfide                      | g     | B-081
+BTi        | Titanium Boride                    | cr    | B-082
+B2         | Boron                              | g     | B-083
+B2BeO4     | Beryllium Borate                   | g     | B-084
+B2Be3O6    | Beryllium Borate                   | cr    | B-085
+B2Cl4      | Dichloroborane                     | g     | B-086
+B2F4       | Difluoroborane                     | g     | B-087
+B2F4O      | Difluoroborane Oxide               | g     | B-088
+H4B2O4     | Dihydroxyborane                    | cr    | B-089
+H4B2O4     | Dihydroxyborane                    | g     | B-090
+H6B2       | Diborane                           | g     | B-091
+B2Mg       | Magnesium Boride                   | cr    | B-092
+B2O        | Boron Oxide                        | g     | B-093
+B2O2       | Boron Oxide                        | g     | B-094
+B2O3       | Boron Oxide                        | cr    | B-095
+B2O3       | Boron Oxide                        | l     | B-096
+B2O3       | Boron Oxide                        | cr,l  | B-097
+B2O3       | Boron Oxide                        | g     | B-098
+B2O4Pb     | Lead Borate                        | cr    | B-099
+B2Ti       | Titanium Boride                    | cr    | B-100
+B2Ti       | Titanium Boride                    | l     | B-101
+B2Ti       | Titanium Boride                    | cr,l  | B-102
+B2Zr       | Zirconium Boride                   | cr    | B-103
+B2Zr       | Zirconium Boride                   | l     | B-104
+B2Zr       | Zirconium Boride                   | cr,l  | B-105
+B3Cl3O3    | Trichloroboroxin                   | g     | B-106
+H2B3FO3    | Fluoroboroxin                      | g     | B-107
+HB3F2O3    | Difluoroboroxin                    | g     | B-108
+B3F3O3     | Trifluoroboroxin                   | cr    | B-109
+B3F3O3     | Trifluoroboroxin                   | g     | B-110
+H3B3O3     | Boroxin                            | cr    | B-111
+H3B3O3     | Boroxin                            | g     | B-112
+H3B3O6     | Boric Acid                         | g     | B-113
+H6B3N3     | Borazine                           | g     | B-114
+B4K2O7     | Potassium Borate                   | cr    | B-115
+B4K2O7     | Potassium Borate                   | l     | B-116
+B4K2O7     | Potassium Borate                   | cr,l  | B-117
+B4Li2O7    | Lithium Borate                     | cr    | B-118
+B4Li2O7    | Lithium Borate                     | l     | B-119
+B4Li2O7    | Lithium Borate                     | cr,l  | B-120
+B4Mg       | Magnesium Boride                   | cr    | B-121
+B4Na2O7    | Sodium Borate                      | cr    | B-122
+B4Na2O7    | Sodium Borate                      | l     | B-123
+B4Na2O7    | Sodium Borate                      | cr,l  | B-124
+B4O7Pb     | Lead Borate                        | cr    | B-125
+H9B5       | Pentaborane                        | l     | B-126
+H9B5       | Pentaborane                        | g     | B-127
+B6K2O10    | Potassium Borate                   | cr    | B-128
+B6Li2O10   | Lithium Borate                     | cr    | B-129
+B6Na2O10   | Sodium Borate                      | cr    | B-130
+B6O10Pb    | Lead Borate                        | cr    | B-131
+B8K2O13    | Potassium Borate                   | cr    | B-132
+B8K2O13    | Potassium Borate                   | l     | B-133
+B8K2O13    | Potassium Borate                   | cr,l  | B-134
+B8Li2O13   | Lithium Borate                     | cr    | B-135
+H14B10     | Decaborane                         | cr    | B-136
+H14B10     | Decaborane                         | l     | B-137
+H14B10     | Decaborane                         | cr,l  | B-138
+H14B10     | Decaborane                         | g     | B-139
+B10O17Pb2  | Lead Borate                        | cr    | B-140
+Ba         | Barium                             | ref   | Ba-001
+Ba         | Barium                             | cr    | Ba-002
+Ba         | Barium                             | l     | Ba-003
+Ba         | Barium                             | cr,l  | Ba-004
+Ba         | Barium                             | g     | Ba-005
+Ba+        | Barium, Ion                        | g     | Ba-006
+BaBr       | Barium Bromide                     | g     | Ba-007
+BaBr2      | Barium Bromide                     | cr    | Ba-008
+BaBr2      | Barium Bromide                     | l     | Ba-009
+BaBr2      | Barium Bromide                     | cr,l  | Ba-010
+BaBr2      | Barium Bromide                     | g     | Ba-011
+BaCl       | Barium Chloride                    | g     | Ba-012
+BaCl2      | Barium Chloride                    | cr    | Ba-013
+BaCl2      | Barium Chloride                    | l     | Ba-014
+BaCl2      | Barium Chloride                    | cr,l  | Ba-015
+BaCl2      | Barium Chloride                    | g     | Ba-016
+BaF        | Barium Fluoride                    | g     | Ba-017
+BaF+       | Barium Fluoride, Ion               | g     | Ba-018
+BaF2       | Barium Fluoride                    | cr    | Ba-019
+BaF2       | Barium Fluoride                    | l     | Ba-020
+BaF2       | Barium Fluoride                    | cr,l  | Ba-021
+BaF2       | Barium Fluoride                    | g     | Ba-022
+HBaO       | Barium Hydroxide                   | g     | Ba-023
+HBaO+      | Barium Hydroxide, Ion              | g     | Ba-024
+H2BaO2     | Barium Hydroxide, Alpha            | cr    | Ba-025
+H2BaO2     | Barium Hydroxide                   | l     | Ba-026
+H2BaO2     | Barium Hydroxide                   | cr,l  | Ba-027
+H2BaO2     | Barium Hydroxide                   | g     | Ba-028
+BaI        | Barium Iodide                      | g     | Ba-029
+BaI2       | Barium Iodide                      | cr    | Ba-030
+BaI2       | Barium Iodide                      | l     | Ba-031
+BaI2       | Barium Iodide                      | cr,l  | Ba-032
+BaI2       | Barium Iodide                      | g     | Ba-033
+BaO        | Barium Oxide                       | cr    | Ba-034
+BaO        | Barium Oxide                       | l     | Ba-035
+BaO        | Barium Oxide                       | cr,l  | Ba-036
+BaO        | Barium Oxide                       | g     | Ba-037
+BaS        | Barium Sulfide                     | cr    | Ba-038
+BaS        | Barium Sulfide                     | g     | Ba-039
+Be         | Beryllium                          | ref   | Be-001
+Be         | Beryllium                          | cr    | Be-002
+Be         | Beryllium                          | l     | Be-003
+Be         | Beryllium                          | cr,l  | Be-004
+Be         | Beryllium                          | g     | Be-005
+Be+        | Beryllium, Ion                     | g     | Be-006
+BeBr       | Beryllium Bromide                  | g     | Be-007
+BeBr2      | Beryllium Bromide                  | cr    | Be-008
+BeBr2      | Beryllium Bromide                  | g     | Be-009
+BeCl       | Beryllium Chloride                 | g     | Be-010
+BeCl+      | Beryllium Chloride, Ion            | g     | Be-011
+BeClF      | Beryllium Chloride Fluoride        | g     | Be-012
+BeCl2      | Beryllium Chloride, Alpha          | cr    | Be-013
+BeCl2      | Beryllium Chloride, Beta           | cr    | Be-014
+BeCl2      | Beryllium Chloride                 | l     | Be-015
+BeCl2      | Beryllium Chloride                 | cr,l  | Be-016
+BeCl2      | Beryllium Chloride                 | g     | Be-017
+BeF        | Beryllium Fluoride                 | g     | Be-018
+BeF2       | Beryllium Fluoride                 | cr    | Be-019
+BeF2       | Beryllium Fluoride                 | l     | Be-020
+BeF2       | Beryllium Fluoride                 | cr,l  | Be-021
+BeF2       | Beryllium Fluoride                 | g     | Be-022
+BeF3Li     | Lithium Trifluoroberyllate         | cr    | Be-023
+BeF3Li     | Lithium Trifluoroberyllate         | l     | Be-024
+BeF3Li     | Lithium Trifluoroberyllate         | cr,l  | Be-025
+BeF3Li     | Lithium Trifluoroberyllate         | g     | Be-026
+BeF4Li2    | Lithium Tetrafluoroberyllate       | cr    | Be-027
+BeF4Li2    | Lithium Tetrafluoroberyllate       | l     | Be-028
+BeF4Li2    | Lithium Tetrafluoroberyllate       | cr,l  | Be-029
+HBe        | Beryllium Hydride                  | g     | Be-030
+HBe+       | Beryllium Hydride, Ion             | g     | Be-031
+HBeO       | Beryllium Hydroxide                | g     | Be-032
+HBeO+      | Beryllium Hydroxide, Ion           | g     | Be-033
+H2Be       | Beryllium Hydride                  | g     | Be-034
+H2BeO2     | Beryllium Hydroxide, Alpha         | cr    | Be-035
+H2BeO2     | Beryllium Hydroxide, Beta          | cr    | Be-036
+H2BeO2     | Beryllium Hydroxide                | g     | Be-037
+BeI        | Beryllium Iodide                   | g     | Be-038
+BeI2       | Beryllium Iodide                   | cr    | Be-039
+BeI2       | Beryllium Iodide                   | l     | Be-040
+BeI2       | Beryllium Iodide                   | cr,l  | Be-041
+BeI2       | Beryllium Iodide                   | g     | Be-042
+BeN        | Beryllium Nitride                  | g     | Be-043
+BeO        | Beryllium Oxide, Alpha             | cr    | Be-044
+BeO        | Beryllium Oxide, Beta              | cr    | Be-045
+BeO        | Beryllium Oxide                    | l     | Be-046
+BeO        | Beryllium Oxide                    | cr,l  | Be-047
+BeO        | Beryllium Oxide                    | g     | Be-048
+BeO4S      | Beryllium Sulfate, Alpha           | cr    | Be-049
+BeO4S      | Beryllium Sulfate, Beta            | cr    | Be-050
+BeO4S      | Beryllium Sulfate, Gamma           | cr    | Be-051
+BeO4W      | Beryllium Tungsten Oxide           | cr    | Be-052
+BeS        | Beryllium Sulfide                  | cr    | Be-053
+BeS        | Beryllium Sulfide                  | g     | Be-054
+Be2        | Beryllium                          | g     | Be-055
+Be2Cl4     | Beryllium Chloride                 | g     | Be-056
+Be2F2O     | Beryllium Fluoride Oxide           | g     | Be-057
+Be2O       | Beryllium Oxide                    | g     | Be-058
+Be2O2      | Beryllium Oxide                    | g     | Be-059
+S          | Sulfur                             | ref   | S-001
+Be2O4Si    | Beryllium Silicate                 | cr    | Be-060
+Be3N2      | Beryllium Nitride, Alpha           | cr    | Be-061
+Be3N2      | Beryllium Nitride                  | l     | Be-062
+Be3N2      | Beryllium Nitride                  | cr,l  | Be-063
+Be3O3      | Beryllium Oxide                    | g     | Be-064
+Be4O4      | Beryllium Oxide                    | g     | Be-065
+Be5O5      | Beryllium Oxide                    | g     | Be-066
+Be6O6      | Beryllium Oxide                    | g     | Be-067
+Br         | Bromine                            | g     | Br-001
+Br+        | Bromine, Ion                       | g     | Br-002
+Br-        | Bromine, Ion                       | g     | Br-003
+BrCa       | Calcium Bromide                    | g     | Br-004
+BrCl       | Bromine Chloride                   | g     | Br-005
+BrF        | Bromine Fluoride                   | g     | Br-006
+BrF3       | Bromine Fluoride                   | g     | Br-007
+BrF5       | Bromine Fluoride                   | g     | Br-008
+BrF5S      | Sulfur Bromide Fluoride            | g     | Br-009
+HBr        | Hydrogen Bromide                   | g     | Br-010
+H3BrSi     | Bromosilane                        | g     | Br-011
+H4BrN      | Ammonium Bromide                   | cr    | Br-012
+BrHg       | Mercury Bromide                    | g     | Br-013
+BrI        | Iodine Bromide                     | g     | Br-014
+BrK        | Potassium Bromide                  | cr    | Br-015
+BrK        | Potassium Bromide                  | l     | Br-016
+BrK        | Potassium Bromide                  | cr,l  | Br-017
+BrK        | Potassium Bromide                  | g     | Br-018
+BrLi       | Lithium Bromide                    | cr    | Br-019
+BrLi       | Lithium Bromide                    | l     | Br-020
+BrLi       | Lithium Bromide                    | cr,l  | Br-021
+BrLi       | Lithium Bromide                    | g     | Br-022
+BrMg       | Magnesium Bromide                  | g     | Br-023
+BrMo       | Molybdenum Bromide                 | g     | Br-024
+BrN        | Bromoimidogen                      | g     | Br-025
+BrNO       | Nitrosyl Bromide                   | g     | Br-026
+BrNa       | Sodium Bromide                     | cr    | Br-027
+BrNa       | Sodium Bromide                     | l     | Br-028
+BrNa       | Sodium Bromide                     | cr,l  | Br-029
+BrNa       | Sodium Bromide                     | g     | Br-030
+BrP        | Phosphorus Bromide                 | g     | Br-031
+BrPb       | Lead Bromide                       | g     | Br-032
+BrSi       | Bromosilylidyne                    | g     | Br-033
+BrSr       | Strontium Bromide                  | g     | Br-034
+BrTi       | Titanium Bromide                   | g     | Br-035
+BrW        | Tungsten Bromide                   | g     | Br-036
+BrZr       | Zirconium Bromide                  | g     | Br-037
+Br2        | Bromine                            | ref   | Br-038
+Br2        | Bromine                            | cr,l  | Br-039
+Br2        | Bromine                            | g     | Br-040
+Br2Ca      | Calcium Bromide                    | cr    | Br-041
+Br2Ca      | Calcium Bromide                    | l     | Br-042
+Br2Ca      | Calcium Bromide                    | cr,l  | Br-043
+Br2Ca      | Calcium Bromide                    | g     | Br-044
+Br2Fe      | Iron Bromide                       | cr    | Br-045
+Br2Fe      | Iron Bromide                       | l     | Br-046
+Br2Fe      | Iron Bromide                       | cr,l  | Br-047
+Br2Fe      | Iron Bromide                       | g     | Br-048
+H2Br2Si    | Dibromosilane                      | g     | Br-049
+Br2Hg      | Mercury Bromide                    | cr    | Br-050
+Br2Hg      | Mercury Bromide                    | l     | Br-051
+Br2Hg      | Mercury Bromide                    | cr,l  | Br-052
+Br2Hg      | Mercury Bromide                    | g     | Br-053
+Br2Hg2     | Mercury Bromide                    | cr    | Br-054
+Br2K2      | Potassium Bromide                  | g     | Br-055
+Br2Li2     | Lithium Bromide                    | g     | Br-056
+Br2Mg      | Magnesium Bromide                  | cr    | Br-057
+Br2Mg      | Magnesium Bromide                  | l     | Br-058
+Br2Mg      | Magnesium Bromide                  | cr,l  | Br-059
+Br2Mg      | Magnesium Bromide                  | g     | Br-060
+Br2Mg+     | Magnesium Bromide, Ion             | g     | Br-061
+Br2Mo      | Molybdenum Bromide                 | cr    | Br-062
+Br2Mo      | Molybdenum Bromide                 | g     | Br-063
+Br2Na2     | Sodium Bromide                     | g     | Br-064
+Br2Pb      | Lead Bromide                       | cr    | Br-065
+Br2Pb      | Lead Bromide                       | l     | Br-066
+Br2Pb      | Lead Bromide                       | cr,l  | Br-067
+Br2Pb      | Lead Bromide                       | g     | Br-068
+Br2Si      | Dibromosilylene                    | g     | Br-069
+Br2Sr      | Strontium Bromide                  | cr    | Br-070
+Br2Sr      | Strontium Bromide                  | l     | Br-071
+Br2Sr      | Strontium Bromide                  | cr,l  | Br-072
+Br2Sr      | Strontium Bromide                  | g     | Br-073
+Br2Ti      | Titanium Bromide                   | cr    | Br-074
+Br2Ti      | Titanium Bromide                   | g     | Br-075
+Br2Zr      | Zirconium Bromide                  | cr    | Br-076
+Br2Zr      | Zirconium Bromide                  | l     | Br-077
+Br2Zr      | Zirconium Bromide                  | cr,l  | Br-078
+Br2Zr      | Zirconium Bromide                  | g     | Br-079
+HBr3Si     | Tribromosilane                     | g     | Br-080
+Br3Mo      | Molybdenum Bromide                 | cr    | Br-081
+Br3Mo      | Molybdenum Bromide                 | g     | Br-082
+Br3OP      | Phosphoryl Bromide                 | g     | Br-083
+Br3P       | Phosphorus Bromide                 | g     | Br-084
+Br3PS      | Thiophosphoryl Bromide             | g     | Br-085
+Br3Si      | Tribromosilyl                      | g     | Br-086
+Br3Ti      | Titanium Bromide                   | cr    | Br-087
+Br3Ti      | Titanium Bromide                   | g     | Br-088
+Br3Zr      | Zirconium Bromide                  | cr    | Br-089
+Br3Zr      | Zirconium Bromide                  | g     | Br-090
+Br4Fe2     | Iron Bromide                       | g     | Br-091
+Br4Mg2     | Magnesium Bromide                  | g     | Br-092
+Br4Mo      | Molybdenum Bromide                 | cr    | Br-093
+Br4Mo      | Molybdenum Bromide                 | g     | Br-094
+Br4Pb      | Lead Bromide                       | g     | Br-095
+Br4Si      | Tetrabromosilane                   | l     | Br-096
+Br4Si      | Tetrabromosilane                   | g     | Br-097
+Br4Ti      | Titanium Bromide                   | cr    | Br-098
+Br4Ti      | Titanium Bromide                   | l     | Br-099
+Br4Ti      | Titanium Bromide                   | cr,l  | Br-100
+Br4Ti      | Titanium Bromide                   | g     | Br-101
+Br4Zr      | Zirconium Bromide                  | cr    | Br-102
+Br4Zr      | Zirconium Bromide                  | g     | Br-103
+Br5Nb      | Niobium Bromide                    | cr    | Br-104
+Br5Nb      | Niobium Bromide                    | l     | Br-105
+Br5Nb      | Niobium Bromide                    | cr,l  | Br-106
+Br5Nb      | Niobium Bromide                    | g     | Br-107
+Br5W       | Tungsten Bromide                   | cr    | Br-108
+Br5W       | Tungsten Bromide                   | l     | Br-109
+Br5W       | Tungsten Bromide                   | cr,l  | Br-110
+Br5W       | Tungsten Bromide                   | g     | Br-111
+Br6W       | Tungsten Bromide                   | cr    | Br-112
+Br6W       | Tungsten Bromide                   | g     | Br-113
+C0.98Nb    | Niobium Carbide                    | cr    | C-001
+C          | Carbon                             | ref   | C-002
+C          | Carbon                             | g     | C-003
+C+         | Carbon, Ion                        | g     | C-004
+C-         | Carbon, Ion                        | g     | C-005
+CAl        | Aluminum Carbide                   | g     | C-006
+CB         | Boron Carbide                      | g     | C-007
+CB4        | Boron Carbide                      | cr    | C-008
+CB4        | Boron Carbide                      | l     | C-009
+CB4        | Boron Carbide                      | cr,l  | C-010
+CBe2       | Beryllium Carbide                  | cr    | C-011
+CBe2       | Beryllium Carbide                  | l     | C-012
+CBe2       | Beryllium Carbide                  | cr,l  | C-013
+CBr        | Bromomethylidyne                   | g     | C-014
+CBrF3      | Bromotrifluoromethane              | g     | C-015
+CBrN       | Cyanogen Bromide                   | g     | C-016
+CBr4       | Tetrabromomethane                  | g     | C-017
+CCl        | Chloromethylidyne                  | g     | C-018
+CClFO      | Carbonic Chloride Fluoride         | g     | C-019
+CClF3      | Chlorotrifluoromethane             | g     | C-020
+CClN       | Cyanogen Chloride                  | g     | C-021
+CClO       | Carbonyl Chloride                  | g     | C-022
+CCl2       | Dichloromethylene                  | g     | C-023
+CCl2F2     | Dichlorodifluoromethane            | g     | C-024
+CCl2O      | Carbonic Dichloride                | g     | C-025
+CCl3       | Trichloromethyl                    | g     | C-026
+CCl3F      | Triclorofluormethane               | g     | C-027
+CCl4       | Tetrachloromethane                 | g     | C-028
+CCuN       | Copper Cyanide                     | cr    | C-029
+CF         | Fluoromethylidyne                  | g     | C-030
+CF+        | Fluoromethylidyne, Ion             | g     | C-031
+CFN        | Cyanogen Fluoride                  | g     | C-032
+CFO        | Carbonyl Fluoride                  | g     | C-033
+CF2        | Difluoromethylene                  | g     | C-034
+CF2+       | Difluoromethylene, Ion             | g     | C-035
+CF2O       | Carbonic Difluoride                | g     | C-036
+CF3        | Trifluoromethyl                    | g     | C-037
+CF3+       | Trifluoromethyl, Ion               | g     | C-038
+CF3I       | Trifluoriodomethane                | g     | C-039
+CF4        | Tetrafluoromethane                 | g     | C-040
+CF4O       | Trifluoromethyl Hypofluorite       | g     | C-041
+CF8S       | Pentafluoro(Trifluoromethyl)Sulfur | g     | C-042
+CH         | Methylidyne                        | g     | C-043
+CH+        | Methylidyne, Ion                   | g     | C-044
+CHCl       | Chloromethylene                    | g     | C-045
+CHClF2     | Chlorodifluoromethane              | g     | C-046
+CHCl2F     | Dichlorofluoromethane              | g     | C-047
+CHCl3      | Trichloromethane                   | g     | C-048
+CHF        | Fluoromethylene                    | g     | C-049
+CHFO       | Formyl Fluoride                    | g     | C-050
+CHF3       | Trifluoromethane                   | g     | C-051
+CHN        | Hydrogen Cyanide                   | g     | C-052
+CHNO       | Hydrogen Isocyanate                | g     | C-053
+CHO        | Formyl                             | g     | C-054
+CHO+       | Formyl, Ion                        | g     | C-055
+CHP        | Methinophosphide                   | g     | C-056
+CH2        | Methylene                          | g     | C-057
+CH2ClF     | Chlorofluoromethane                | g     | C-058
+CH2Cl2     | Dichloromethane                    | g     | C-059
+CH2F2      | Difluoromethane                    | g     | C-060
+CH2O       | Formaldehyde                       | g     | C-061
+CH3        | Methyl                             | g     | C-062
+CH3Cl      | Chloromethane                      | g     | C-063
+CH3Cl3Si   | Trichloromethylsilane              | g     | C-064
+CH3F       | Fluoromethane                      | g     | C-065
+CH3F3Si    | Trifluoromethylsilane              | g     | C-066
+CH4        | Methane                            | g     | C-067
+CIN        | Cyanogen Iodide                    | g     | C-068
+CKN        | Potassium Cyanide                  | cr    | C-069
+CKN        | Potassium Cyanide                  | l     | C-070
+CKN        | Potassium Cyanide                  | cr,l  | C-071
+CKN        | Potassium Cyanide                  | g     | C-072
+CK2O3      | Potassium Carbonate                | cr    | C-073
+CK2O3      | Potassium Carbonate                | l     | C-074
+CK2O3      | Potassium Carbonate                | cr,l  | C-075
+CLi2O3     | Lithium Carbonate                  | cr    | C-076
+CLi2O3     | Lithium Carbonate                  | l     | C-077
+CLi2O3     | Lithium Carbonate                  | cr,l  | C-078
+CMgO3      | Magnesium Carbonate                | cr    | C-079
+CN         | Cyanogen                           | g     | C-080
+CN+        | Cyanogen, Ion                      | g     | C-081
+CN-        | Cyanide                            | g     | C-082
+CNNa       | Sodium Cyanide                     | cr    | C-083
+CNNa       | Sodium Cyanide                     | l     | C-084
+CNNa       | Sodium Cyanide                     | cr,l  | C-085
+CNNa       | Sodium Cyanide                     | g     | C-086
+CNO        | NCO Radical                        | g     | C-087
+CN2        | CNN Radical                        | g     | C-088
+CN2        | NCN Radical                        | g     | C-089
+CNa2O3     | Sodium Carbonate                   | cr    | C-090
+CNa2O3     | Sodium Carbonate                   | l     | C-091
+CNaO3      | Sodium Carbonate                   | cr,l  | C-092
+CO         | Carbon Monoxide                    | g     | C-093
+COS        | Carbon Oxide Sulfide               | g     | C-094
+CO2        | Carbon Dioxide                     | g     | C-095
+CO2-       | Carbon Dioxide, Ion                | g     | C-096
+CP         | Carbon Phosphide                   | g     | C-097
+CS         | Carbon Sulfide                     | g     | C-098
+CS2        | Carbon Disulfide                   | g     | C-099
+CSi        | Silicon Carbide, Alpha             | cr    | C-100
+CSi        | Silicon Carbide, Beta              | cr    | C-101
+CSi        | Silicon Carbide                    | g     | C-102
+CSi2       | Silicon Carbide                    | g     | C-103
+CTa        | Tantalum Carbide                   | cr    | C-104
+CTa        | Tantalum Carbide                   | l     | C-105
+CTa        | Tantalum Carbide                   | cr,l  | C-106
+CTi        | Titanium Carbide                   | cr    | C-107
+CTi        | Titanium Carbide                   | l     | C-108
+CTi        | Titanium Carbide                   | cr,l  | C-109
+CZr        | Zirconium Carbide                  | cr    | C-110
+CZr        | Zirconium Carbide                  | l     | C-111
+CZr        | Zirconium Carbide                  | cr,l  | C-112
+C2         | Carbon                             | g     | C-113
+C2-        | Carbon, Ion                        | g     | C-114
+C2Be       | Beryllium Carbide                  | g     | C-115
+C2Cl2      | Dichloroethyne                     | g     | C-116
+C2Cl4      | Tetrachloroethene                  | g     | C-117
+C2Cl6      | Hexachloroethane                   | g     | C-118
+C2Cr3      | Chromium Carbide                   | cr    | C-119
+C2F2       | Difluoroethyne                     | g     | C-120
+C2F3N      | Trifluoroacetonitrile              | g     | C-121
+C2F4       | Tetrafluoroethene                  | g     | C-122
+C2F6       | Hexafluoroethane                   | g     | C-123
+C2H        | Ethynyl                            | g     | C-124
+C2HCl      | Chloroethyne                       | g     | C-125
+C2HF       | Fluoroethyne                       | g     | C-126
+C2H2       | Ethyne                             | g     | C-127
+C2H4       | Ethene                             | g     | C-128
+C2H4O      | Oxirane                            | g     | C-129
+C2K2N2     | Potassium Cyanide                  | g     | C-130
+C2Li2      | Lithium Carbide                    | cr    | C-131
+C2Mg       | Magnesium Carbide                  | cr    | C-132
+C2N        | CNC Radical                        | g     | C-133
+C2N2       | Ethanedinitrile                    | g     | C-134
+C2N2Na2    | Sodium Cyanide                     | g     | C-135
+C2O        | CCO Radical                        | g     | C-136
+C2Si       | Silicon Carbide                    | g     | C-137
+C3         | Carbon                             | g     | C-138
+C3Al4      | Aluminum Carbide                   | cr    | C-139
+C3Cr7      | Chromium Carbide                   | cr    | C-140
+C3Mg2      | Magnesium Carbide                  | cr    | C-141
+C3O2       | Carbon Suboxide                    | g     | C-142
+C4         | Carbon                             | g     | C-143
+C4H12Si    | Tetramethylsilane                  | g     | C-144
+C4N2       | 2-Butynedinitrile                  | g     | C-145
+C4NiO4     | Nickel Carbonyl                    | l     | C-146
+C4NiO4     | Nickel Carbonyl                    | g     | C-147
+C5         | Carbon                             | g     | C-148
+C5FeO5     | Iron Carbonyl                      | l     | C-149
+C5FeO5     | Iron Carbonyl                      | g     | C-150
+C6Cr23     | Chromium Carbide                   | cr    | C-151
+Ca         | Calcium                            | ref   | Ca-001
+Ca         | Calcium, Alpha                     | cr    | Ca-002
+Ca         | Calcium, Beta                      | cr    | Ca-003
+Ca         | Calcium                            | l     | Ca-004
+Ca         | Calcium                            | cr,l  | Ca-005
+Ca         | Calcium                            | g     | Ca-006
+Ca+        | Calcium, Ion                       | g     | Ca-007
+CaCl       | Calcium Chloride                   | g     | Ca-008
+CaCl2      | Calcium Chloride                   | cr    | Ca-009
+CaCl2      | Calcium Chloride                   | l     | Ca-010
+CaCl2      | Calcium Chloride                   | cr,l  | Ca-011
+CaCl2      | Calcium Chloride                   | g     | Ca-012
+CaF        | Calcium Fluoride                   | g     | Ca-013
+CaF2       | Calcium Fluoride                   | cr    | Ca-014
+CaF2       | Calcium Fluoride                   | l     | Ca-015
+CaF2       | Calcium Fluoride                   | cr,l  | Ca-016
+CaF2       | Calcium Fluoride                   | g     | Ca-017
+HCaO       | Calcium Hydroxide                  | g     | Ca-018
+HCaO+      | Calcium Hydroxide, Ion             | g     | Ca-019
+H2CaO2     | Calcium Hydroxide                  | cr    | Ca-020
+H2CaO2     | Calcium Hydroxide                  | g     | Ca-021
+CaI        | Calcium Iodide                     | g     | Ca-022
+CaI2       | Calcium Iodide                     | cr    | Ca-023
+CaI2       | Calcium Iodide                     | l     | Ca-024
+CaI2       | Calcium Iodide                     | cr,l  | Ca-025
+CaI2       | Calcium Iodide                     | g     | Ca-026
+CaO        | Calcium Oxide                      | cr    | Ca-027
+CaO        | Calcium Oxide                      | l     | Ca-028
+CaO        | Calcium Oxide                      | cr,l  | Ca-029
+CaO        | Calcium Oxide                      | g     | Ca-030
+CaS        | Calcium Sulfide                    | cr    | Ca-031
+CaS        | Calcium Sulfide                    | g     | Ca-032
+Ca2        | Calcium                            | g     | Ca-033
+Cl         | Chlorine                           | g     | Cl-001
+Cl+        | Chlorine, Ion                      | g     | Cl-002
+Cl-        | Chlorine, Ion                      | g     | Cl-003
+ClCo       | Cobalt Chloride                    | g     | Cl-004
+ClCs       | Cesium Chloride                    | cr    | Cl-005
+ClCs       | Cesium Chloride                    | l     | Cl-006
+ClCs       | Cesium Chloride                    | cr,l  | Cl-007
+ClCs       | Cesium Chloride                    | g     | Cl-008
+ClCu       | Copper Chloride                    | cr    | Cl-009
+ClCu       | Copper Chloride                    | l     | Cl-010
+ClCu       | Copper Chloride                    | cr,l  | Cl-011
+ClCu       | Copper Chloride                    | g     | Cl-012
+ClD        | Hydrochloric Acid-D                | g     | Cl-013
+ClDO       | Hypochlorous Acid-D                | g     | Cl-014
+ClF        | Chlorine Fluoride                  | g     | Cl-015
+ClFLi2     | Lithium Chloride Fluoride          | g     | Cl-016
+ClFMg      | Magnesium Chloride Fluoride        | g     | Cl-017
+ClFO2S     | Sulfuryl Chloride Fluoride         | g     | Cl-018
+ClFO3      | Perchloryl Fluoride                | g     | Cl-019
+ClF2OP     | Phosphoryl Chloride Fluoride       | g     | Cl-020
+ClF3       | Chlorine Fluoride                  | g     | Cl-021
+ClF3Si     | Chlorotrifluorosilane              | g     | Cl-022
+ClF5       | Chlorine Fluoride                  | g     | Cl-023
+ClF5S      | Sulfur Chloride Fluoride           | g     | Cl-024
+ClFe       | Iron Chloride                      | g     | Cl-025
+HCl        | Hydrogen Chloride                  | g     | Cl-026
+HClO       | Hypochlorous Acid                  | g     | Cl-027
+H3ClSi     | Chlorosilane                       | g     | Cl-028
+H4ClN      | Ammonium Chloride                  | cr    | Cl-029
+H4ClNO4    | Ammonium Perchlorate               | cr    | Cl-030
+ClHg       | Mercury Chloride                   | g     | Cl-031
+ClI        | Iodine Chloride                    | cr    | Cl-032
+ClI        | Iodine Chloride                    | l     | Cl-033
+ClI        | Iodine Chloride                    | cr,l  | Cl-034
+ClI        | Iodine Chloride                    | g     | Cl-035
+ClK        | Potassium Chloride                 | cr    | Cl-036
+ClK        | Potassium Chloride                 | l     | Cl-037
+ClK        | Potassium Chloride                 | cr,l  | Cl-038
+ClK        | Potassium Chloride                 | g     | Cl-039
+ClKO4      | Potassium Perchlorate              | cr    | Cl-040
+ClLi       | Lithium Chloride                   | cr    | Cl-041
+ClLi       | Lithium Chloride                   | l     | Cl-042
+ClLi       | Lithium Chloride                   | cr,l  | Cl-043
+ClLi       | Lithium Chloride                   | g     | Cl-044
+ClLiO      | Lithium Hypochlorite               | g     | Cl-045
+ClLiO4     | Lithium Perchlorate                | cr    | Cl-046
+ClLiO4     | Lithium Perchlorate                | l     | Cl-047
+ClLiO4     | Lithium Perchlorate                | cr,l  | Cl-048
+ClMg       | Magnesium Chloride                 | g     | Cl-049
+ClMg+      | Magnesium Chloride, Ion            | g     | Cl-050
+ClNO       | Nitrosyl Chloride                  | g     | Cl-051
+ClNO2      | Nitryl Chloride                    | g     | Cl-052
+ClNa       | Sodium Chloride                    | cr    | Cl-053
+ClNa       | Sodium Chloride                    | l     | Cl-054
+ClNa       | Sodium Chloride                    | cr,l  | Cl-055
+ClNa       | Sodium Chloride                    | g     | Cl-056
+ClNaO4     | Sodium Perchlorate                 | cr    | Cl-057
+ClNi       | Nickel Chloride                    | g     | Cl-058
+ClO        | Chlorine Oxide                     | g     | Cl-059
+ClOTi      | Titanium Chloride Oxide            | g     | Cl-060
+ClO2       | Chlorine Oxide                     | g     | Cl-061
+ClP        | Phosphorus Chloride                | g     | Cl-062
+ClPb       | Lead Chloride                      | g     | Cl-063
+ClPb+      | Lead Chloride, Ion                 | g     | Cl-064
+ClS        | Sulfur Chloride                    | g     | Cl-065
+ClS+       | Sulfur Chloride, Ion               | g     | Cl-066
+ClS2       | Sulfur Chloride                    | g     | Cl-067
+ClSi       | Clorosilylidyne                    | g     | Cl-068
+ClSr       | Strontium Chloride                 | g     | Cl-069
+ClTi       | Titanium Chloride                  | g     | Cl-070
+ClW        | Tungsten Chloride                  | g     | Cl-071
+ClZr       | Zirconium Chloride                 | g     | Cl-072
+Cl2        | Chlorine                           | ref   | Cl-073
+Cl2Co      | Cobalt Chloride                    | cr    | Cl-074
+Cl2Co      | Cobalt Chloride                    | l     | Cl-075
+Cl2Co      | Cobalt Chloride                    | cr,l  | Cl-076
+Cl2Co      | Cobalt Chloride                    | g     | Cl-077
+Cl2Cs2     | Cesium Chloride                    | g     | Cl-078
+Cl2Cu      | Copper Chloride                    | cr    | Cl-079
+Cl2FOP     | Phosphoryl Chloride Fluoride       | g     | Cl-080
+Cl2Fe      | Iron Chloride                      | cr    | Cl-081
+Cl2Fe      | Iron Chloride                      | l     | Cl-082
+Cl2Fe      | Iron Chloride                      | cr,l  | Cl-083
+Cl2Fe      | Iron Chloride                      | g     | Cl-084
+H2Cl2Si    | Dichlorosilane                     | g     | Cl-085
+Cl2Hg      | Mercury Chloride                   | cr    | Cl-086
+Cl2Hg      | Mercury Chloride                   | l     | Cl-087
+Cl2Hg      | Mercury Chloride                   | cr,l  | Cl-088
+Cl2Hg      | Mercury Chloride                   | g     | Cl-089
+Cl2Hg2     | Mercury Chloride                   | cr    | Cl-090
+Cl2K2      | Potassium Chloride                 | g     | Cl-091
+Cl2Li2     | Lithium Chloride                   | g     | Cl-092
+Cl2Mg      | Magnesium Chloride                 | cr    | Cl-093
+Cl2Mg      | Magnesium Chloride                 | l     | Cl-094
+Cl2Mg      | Magnesium Chloride                 | cr,l  | Cl-095
+Cl2Mg      | Magnesium Chloride                 | g     | Cl-096
+Cl2MoO2    | Molybdenum Chloride Oxide          | g     | Cl-097
+Cl2Na2     | Sodium Chloride                    | g     | Cl-098
+Cl2Ni      | Nickel Chloride                    | cr    | Cl-099
+Cl2Ni      | Nickel Chloride                    | l     | Cl-100
+Cl2Ni      | Nickel Chloride                    | cr,l  | Cl-101
+Cl2Ni      | Nickel Chloride                    | g     | Cl-102
+Cl2O       | Chlorine Oxide                     | g     | Cl-103
+Cl2OTi     | Titanium Chloride Oxide            | g     | Cl-104
+Cl2O2S     | Sulfuryl Chloride                  | g     | Cl-105
+Cl2O2W     | Tungsten Chloride Oxide            | cr    | Cl-106
+Cl2O2W     | Tungsten Chloride Oxide            | g     | Cl-107
+Cl2Pb      | Lead Chloride                      | cr    | Cl-108
+Cl2Pb      | Lead Chloride                      | l     | Cl-109
+Cl2Pb      | Lead Chloride                      | cr,l  | Cl-110
+Cl2Pb      | Lead Chloride                      | g     | Cl-111
+Cl2Pb+     | Lead Chloride, Ion                 | g     | Cl-112
+Cl2S       | Sulfur Chloride                    | l     | Cl-113
+Cl2S       | Sulfur Chloride                    | g     | Cl-114
+Cl2S+      | Sulfur Chloride, Ion               | g     | Cl-115
+Cl2S2      | Sulfur Chloride                    | l     | Cl-116
+Cl2S2      | Sulfur Chloride                    | g     | Cl-117
+Cl2Si      | Dichlorosilylene                   | g     | Cl-118
+Cl2Sr      | Strontium Chloride                 | cr    | Cl-119
+Cl2Sr      | Strontium Chloride                 | l     | Cl-120
+Cl2Sr      | Strontium Chloride                 | cr,l  | Cl-121
+Cl2Sr      | Strontium Chloride                 | g     | Cl-122
+Cl2Ti      | Titanium Chloride                  | cr    | Cl-123
+Cl2Ti      | Titanium Chloride                  | g     | Cl-124
+Cl2W       | Tungsten Chloride                  | cr    | Cl-125
+Cl2W       | Tungsten Chloride                  | g     | Cl-126
+Cl2Zr      | Zirconium Chloride                 | cr    | Cl-127
+Cl2Zr      | Zirconium Chloride                 | l     | Cl-128
+Cl2Zr      | Zirconium Chloride                 | cr,l  | Cl-129
+Cl2Zr      | Zirconium Chloride                 | g     | Cl-130
+Cl3Co      | Cobalt Chloride                    | g     | Cl-131
+Cl3Cu3     | Copper Chloride                    | g     | Cl-132
+Cl3FSi     | Trichlorofluorosilane              | g     | Cl-133
+Cl3Fe      | Iron Chloride                      | cr    | Cl-134
+Cl3Fe      | Iron Chloride                      | l     | Cl-135
+Cl3Fe      | Iron Chloride                      | cr,l  | Cl-136
+Cl3Fe      | Iron Chloride                      | g     | Cl-137
+HCl3Si     | Trichlorosilane                    | g     | Cl-138
+Cl3Li3     | Lithium Chloride                   | g     | Cl-139
+Cl3OP      | Phosphoryl Chloride                | g     | Cl-140
+Cl3P       | Phosphorus Chloride                | g     | Cl-141
+Cl3PS      | Thiophosphoryl Chloride            | g     | Cl-142
+Cl3Si      | Trichlorosilyl                     | g     | Cl-143
+Cl3Ti      | Titanium Chloride                  | cr    | Cl-144
+Cl3Ti      | Titanium Chloride                  | g     | Cl-145
+Cl3Zr      | Zirconium Chloride                 | cr    | Cl-146
+Cl3Zr      | Zirconium Chloride                 | g     | Cl-147
+Cl4Co2     | Cobalt Chloride                    | g     | Cl-148
+Cl4Fe2     | Iron Chloride                      | g     | Cl-149
+Cl4Mg2     | Magnesium Chloride                 | g     | Cl-150
+Cl4Mo      | Molybdenum Chloride                | cr    | Cl-151
+Cl4Mo      | Molybdenum Chloride                | l     | Cl-152
+Cl4Mo      | Molybdenum Chloride                | cr,l  | Cl-153
+Cl4Mo      | Molybdenum Chloride                | g     | Cl-154
+Cl4OW      | Tungsten Chloride Oxide            | cr    | Cl-155
+Cl4OW      | Tungsten Chloride Oxide            | l     | Cl-156
+Cl4OW      | Tungsten Chloride Oxide            | cr,l  | Cl-157
+Cl4OW      | Tungsten Chloride Oxide            | g     | Cl-158
+Cl4Pb      | Lead Chloride                      | g     | Cl-159
+Cl4Si      | Tetrachlorosilane                  | g     | Cl-160
+Cl4Ti      | Titanium Chloride                  | cr    | Cl-161
+Cl4Ti      | Titanium Chloride                  | l     | Cl-162
+Cl4Ti      | Titanium Chloride                  | cr,l  | Cl-163
+Cl4Ti      | Titanium Chloride                  | g     | Cl-164
+Cl4W       | Tungsten Chloride                  | cr    | Cl-165
+Cl4W       | Tungsten Chloride                  | g     | Cl-166
+Cl4Zr      | Zirconium Chloride                 | cr    | Cl-167
+Cl4Zr      | Zirconium Chloride                 | g     | Cl-168
+Cl5Mo      | Molybdenum Chloride                | cr    | Cl-169
+Cl5Mo      | Molybdenum Chloride                | l     | Cl-170
+Cl5Mo      | Molybdenum Chloride                | cr,l  | Cl-171
+Cl5Mo      | Molybdenum Chloride                | g     | Cl-172
+Cl5Nb      | Niobium Chloride                   | cr    | Cl-173
+Cl5Nb      | Niobium Chloride                   | l     | Cl-174
+Cl5Nb      | Niobium Chloride                   | cr,l  | Cl-175
+Cl5Nb      | Niobium Chloride                   | g     | Cl-176
+Cl5P       | Phosphorus Chloride                | g     | Cl-177
+Cl5Ta      | Tantalum Chloride                  | cr    | Cl-178
+Cl5Ta      | Tantalum Chloride                  | l     | Cl-179
+Cl5Ta      | Tantalum Chloride                  | cr,l  | Cl-180
+Cl5Ta      | Tantalum Chloride                  | g     | Cl-181
+Cl5W       | Tungsten Chloride                  | cr    | Cl-182
+Cl5W       | Tungsten Chloride                  | l     | Cl-183
+Cl5W       | Tungsten Chloride                  | cr,l  | Cl-184
+Cl5W       | Tungsten Chloride                  | g     | Cl-185
+Cl6Fe2     | Iron Chloride                      | g     | Cl-186
+Cl6Mo      | Molybdenum Chloride                | cr    | Cl-187
+Cl6Mo      | Molybdenum Chloride                | g     | Cl-188
+Cl6W       | Tungsten Chloride, Alpha           | cr    | Cl-189
+Cl6W       | Tungsten Chloride, Beta            | cr    | Cl-190
+Cl6W       | Tungsten Chloride                  | l     | Cl-191
+Cl6W       | Tungsten Chloride                  | cr,l  | Cl-192
+Cl6W       | Tungsten Chloride                  | g     | Cl-193
+Cl10W2     | Tungsten Chloride                  | g     | Cl-194
+Co         | Cobalt                             | ref   | Co-001
+Co         | Cobalt                             | cr    | Co-002
+Co         | Cobalt                             | l     | Co-003
+Co         | Cobalt                             | cr,l  | Co-004
+Co         | Cobalt                             | g     | Co-005
+Co+        | Cobalt, Ion                        | g     | Co-006
+Co-        | Cobalt, Ion                        | g     | Co-007
+CoF2       | Cobalt Fluoride                    | cr    | Co-008
+CoF2       | Cobalt Fluoride                    | l     | Co-009
+CoF2       | Cobalt Fluoride                    | cr,l  | Co-010
+CoF2       | Cobalt Fluoride                    | g     | Co-011
+CoF3       | Cobalt Fluoride                    | cr    | Co-012
+CoO        | Cobalt Oxide                       | cr    | Co-013
+CoO4S      | Cobalt Sulfate                     | cr    | Co-014
+Co3O4      | Cobalt Oxide                       | cr    | Co-015
+Cr         | Chromium                           | ref   | Cr-001
+Cr         | Chromium                           | cr    | Cr-002
+Cr         | Chromium                           | l     | Cr-003
+Cr         | Chromium                           | cr,l  | Cr-004
+Cr         | Chromium                           | g     | Cr-005
+Cr+        | Chromium, Ion                      | g     | Cr-006
+Cr-        | Chromium, Ion                      | g     | Cr-007
+CrN        | Chromium Nitride                   | cr    | Cr-008
+CrN        | Chromium Nitride                   | g     | Cr-009
+CrO        | Chromium Oxide                     | g     | Cr-010
+CrO2       | Chromium Oxide                     | g     | Cr-011
+CrO3       | Chromium Oxide                     | g     | Cr-012
+Cr2N       | Chromium Nitride                   | cr    | Cr-013
+Cr2O3      | Chromium Oxide                     | cr    | Cr-014
+Cr2O3      | Chromium Oxide                     | l     | Cr-015
+Cr2O3      | Chromium Oxide                     | cr,l  | Cr-016
+Cs         | Cesium                             | ref   | Cs-001
+Cs         | Cesium                             | cr    | Cs-002
+Cs         | Cesium                             | l     | Cs-003
+Cs         | Cesium                             | cr,l  | Cs-004
+Cs         | Cesium                             | g     | Cs-005
+Cs+        | Cesium, Ion                        | g     | Cs-006
+Cs-        | Cesium, Ion                        | g     | Cs-007
+CsF        | Cesium Fluoride                    | cr    | Cs-008
+CsF        | Cesium Fluoride                    | l     | Cs-009
+CsF        | Cesium Fluoride                    | cr,l  | Cs-010
+CsF        | Cesium Fluoride                    | g     | Cs-011
+HCsO       | Cesium Hydroxide                   | cr    | Cs-012
+HCsO       | Cesium Hydroxide                   | l     | Cs-013
+HCsO       | Cesium Hydroxide                   | cr,l  | Cs-014
+HCsO       | Cesium Hydroxide                   | g     | Cs-015
+HCsO+      | Cesium Hydroxide, Ion              | g     | Cs-016
+CsO        | Cesium Oxide                       | g     | Cs-017
+Cs2        | Cesium                             | g     | Cs-018
+Cs2F2      | Cesium Fluoride                    | g     | Cs-019
+H2Cs2O2    | Cesium Hydroxide                   | g     | Cs-020
+Cs2O       | Cesium Oxide                       | g     | Cs-021
+Cs2O4S     | Cesium Sulfate, I                  | cr    | Cs-022
+Cs2O4S     | Cesium Sulfate, II                 | cr    | Cs-023
+Cs2O4S     | Cesium Sulfate                     | l     | Cs-024
+Cs2O4S     | Cesium Sulfate                     | cr,l  | Cs-025
+Cs2O4S     | Cesium Sulfate                     | g     | Cs-026
+Cu         | Copper                             | ref   | Cu-001
+Cu         | Copper                             | cr    | Cu-002
+Cu         | Copper                             | l     | Cu-003
+Cu         | Copper                             | cr,l  | Cu-004
+Cu         | Copper                             | g     | Cu-005
+Cu+        | Copper, Ion                        | g     | Cu-006
+Cu-        | Copper, Ion                        | g     | Cu-007
+CuF        | Copper Fluoride                    | cr    | Cu-008
+CuF        | Copper Fluoride                    | g     | Cu-009
+CuF2       | Copper Fluoride                    | cr    | Cu-010
+CuF2       | Copper Fluoride                    | l     | Cu-011
+CuF2       | Copper Fluoride                    | cr,l  | Cu-012
+CuF2       | Copper Fluoride                    | g     | Cu-013
+H2CuO2     | Copper Hydroxide                   | cr    | Cu-014
+CuO        | Copper Oxide                       | cr    | Cu-015
+CuO        | Copper Oxide                       | g     | Cu-016
+CuO4S      | Copper Sulfate                     | cr    | Cu-017
+Cu2        | Copper                             | g     | Cu-018
+Cu2O       | Copper Oxide                       | cr    | Cu-019
+Cu2O       | Copper Oxide                       | l     | Cu-020
+Cu2O       | Copper Oxide                       | cr,l  | Cu-021
+Cu2O5S     | Copper Oxide Sulfate               | cr    | Cu-022
+D          | Deuterium                          | g     | D-001
+D+         | Deuterium, Ion                     | g     | D-002
+D-         | Deuterium, Ion                     | g     | D-003
+DF         | Hydrofluoric Acid-D                | g     | D-004
+HD         | Hydrogen-D                         | g     | D-005
+HD+        | Hydrogen-D , Ion                   | g     | D-006
+HD-        | Hydrogen-D , Ion                   | g     | D-007
+HDO        | Water-D                            | g     | D-008
+DN         | Imidogen-D                         | g     | D-009
+DO         | Hydroxyl-D                         | g     | D-010
+DS         | Mercapto-D                         | g     | D-011
+D2         | Deuterium                          | ref   | D-012
+D2+        | Deuterium, Ion                     | g     | D-013
+D2-        | Deuterium, Ion                     | g     | D-014
+D2N        | Amidogen-D                         | g     | D-015
+D2N2       | Diazene-D , Cis                    | g     | D-016
+D2O        | Water-D                            | g     | D-017
+D2S        | Hydrogen Sulfide-D                 | g     | D-018
+D3N        | Ammonia-D                          | g     | D-019
+e-         | Electron Gas                       | ref   | D-020
+F          | Fluorine                           | g     | F-001
+F+         | Fluorine, Ion                      | g     | F-002
+F-         | Fluorine, Ion                      | g     | F-003
+FFe        | Iron Fluoride                      | g     | F-004
+HF         | Hydrogen Fluoride                  | g     | F-005
+H2F2       | Hydrogen Fluoride                  | g     | F-006
+H3F3       | Hydrogen Fluoride                  | g     | F-007
+H4F4       | Hydrogen Fluoride                  | g     | F-008
+H5F5       | Hydrogen Fluoride                  | g     | F-009
+H6F6       | Hydrogen Fluoride                  | g     | F-010
+H7F7       | Hydrogen Fluoride                  | g     | F-011
+HFO        | Hypofluorous Acid                  | g     | F-012
+HFO3S      | Fluorosulfuric Acid                | g     | F-013
+H3FSi      | Fluorosilane                       | g     | F-014
+FHg        | Mercury Fluoride                   | g     | F-015
+FI         | Iodine Fluoride                    | g     | F-016
+FK         | Potassium Fluoride                 | cr    | F-017
+FK         | Potassium Fluoride                 | l     | F-018
+FK         | Potassium Fluoride                 | cr,l  | F-019
+FK         | Potassium Fluoride                 | g     | F-020
+FLi        | Lithium Fluoride                   | cr    | F-021
+FLi        | Lithium Fluoride                   | l     | F-022
+FLi        | Lithium Fluoride                   | cr,l  | F-023
+FLi        | Lithium Fluoride                   | g     | F-024
+FLiO       | Lithium Hypofluorite               | g     | F-025
+FMg        | Magnesium Fluoride                 | g     | F-026
+FMg+       | Magnesium Fluoride, Ion            | g     | F-027
+FMo        | Molybdenum Fluoride                | g     | F-028
+FN         | Fluoroimidogen                     | g     | F-029
+FNO        | Nitrosyl Fluoride                  | g     | F-030
+FNO2       | Nitryl Fluoride                    | g     | F-031
+FNO3       | Fluorine Nitrate                   | g     | F-032
+FNa        | Sodium Fluoride                    | cr    | F-033
+FNa        | Sodium Fluoride                    | l     | F-034
+FNa        | Sodium Fluoride                    | cr,l  | F-035
+FNa        | Sodium Fluoride                    | g     | F-036
+FO         | Oxygen Fluoride                    | g     | F-037
+FOTi       | Titanium Fluoride Oxide            | g     | F-038
+FO2        | Oxygen Fluoride                    | g     | F-039
+FP         | Phosphorus Fluoride                | g     | F-040
+FP+        | Phosphorus Fluoride, Ion           | g     | F-041
+FP-        | Phosphorus Fluoride, Ion           | g     | F-042
+FPS        | Thiophosphoryl Fluoride            | g     | F-043
+FPb        | Lead Fluoride                      | g     | F-044
+FS         | Sulfur Fluoride                    | g     | F-045
+FS+        | Sulfur Fluoride, Ion               | g     | F-046
+FS-        | Sulfur Fluoride, Ion               | g     | F-047
+FSi        | Fluorosilylidyne                   | g     | F-048
+FSr        | Strontium Fluoride                 | g     | F-049
+FSr+       | Strontium Fluoride, Ion            | g     | F-050
+FTi        | Titanium Fluoride                  | g     | F-051
+FW         | Tungsten Fluoride                  | g     | F-052
+FZr        | Zirconium Fluoride                 | g     | F-053
+F2         | Fluorine                           | ref   | F-054
+F2Fe       | Iron Fluoride                      | cr    | F-055
+F2Fe       | Iron Fluoride                      | l     | F-056
+F2Fe       | Iron Fluoride                      | cr,l  | F-057
+F2Fe       | Iron Fluoride                      | g     | F-058
+HF2K       | Potassium Fluoride                 | cr    | F-059
+HF2K       | Potassium Fluoride                 | l     | F-060
+HF2K       | Potassium Fluoride                 | cr,l  | F-061
+H2F2Si     | Difluorosilane                     | g     | F-062
+F2Hg       | Mercury Fluoride                   | cr    | F-063
+F2Hg       | Mercury Fluoride                   | l     | F-064
+F2Hg       | Mercury Fluoride                   | cr,l  | F-065
+F2Hg       | Mercury Fluoride                   | g     | F-066
+F2Hg2      | Mercury Fluoride                   | cr    | F-067
+F2K-       | Potassium Fluoride, Ion            | g     | F-068
+F2K2       | Potassium Fluoride                 | g     | F-069
+F2Li-      | Lithium Fluoride, Ion              | g     | F-070
+F2Li2      | Lithium Fluoride                   | g     | F-071
+F2Mg       | Magnesium Fluoride                 | cr    | F-072
+F2Mg       | Magnesium Fluoride                 | l     | F-073
+F2Mg       | Magnesium Fluoride                 | cr,l  | F-074
+F2Mg       | Magnesium Fluoride                 | g     | F-075
+F2Mg+      | Magnesium Fluoride, Ion            | g     | F-076
+F2Mo       | Molybdenum Fluoride                | g     | F-077
+F2N        | Difluoroamidogen                   | g     | F-078
+F2N2       | Nitrogen Fluoride, Cis             | g     | F-079
+F2N2       | Nitrogen Fluoride, Trans           | g     | F-080
+F2Na-      | Sodium Fluoride, Ion               | g     | F-081
+F2Na2      | Sodium Fluoride                    | g     | F-082
+F2O        | Oxygen Fluoride                    | g     | F-083
+F2OS       | Thionyl Fluoride                   | g     | F-084
+F2OSi      | Difluorooxosilane                  | g     | F-085
+F2OTi      | Titanium Fluoride Oxide            | g     | F-086
+F2O2S      | Sulfuryl Fluoride                  | g     | F-087
+F2P        | Phosphorus Fluoride                | g     | F-088
+F2P+       | Phosphorus Fluoride, Ion           | g     | F-089
+F2P-       | Phosphorus Fluoride, Ion           | g     | F-090
+F2Pb       | Lead Fluoride, Alpha               | cr    | F-091
+F2Pb       | Lead Fluoride, Beta                | cr    | F-092
+F2Pb       | Lead Fluoride                      | l     | F-093
+F2Pb       | Lead Fluoride                      | cr,l  | F-094
+F2Pb       | Lead Fluoride                      | g     | F-095
+F2S        | Sulfur Fluoride                    | g     | F-096
+F2S+       | Sulfur Fluoride, Ion               | g     | F-097
+F2S-       | Sulfur Fluoride, Ion               | g     | F-098
+F2S2       | Difluorodisulfane                  | g     | F-099
+F2S2       | Thiothionyl Fluoride               | g     | F-100
+F2Si       | Difluorosilylene                   | g     | F-101
+F2Sr       | Strontium Fluoride                 | cr    | F-102
+F2Sr       | Strontium Fluoride                 | l     | F-103
+F2Sr       | Strontium Fluoride                 | cr,l  | F-104
+F2Sr       | Strontium Fluoride                 | g     | F-105
+F2Ti       | Titanium Fluoride                  | g     | F-106
+F2Zr       | Zirconium Fluoride                 | cr    | F-107
+F2Zr       | Zirconium Fluoride                 | l     | F-108
+F2Zr       | Zirconium Fluoride                 | cr,l  | F-109
+F2Zr       | Zirconium Fluoride                 | g     | F-110
+F3Fe       | Iron Fluoride                      | cr    | F-111
+F3Fe       | Iron Fluoride                      | g     | F-112
+HF3Si      | Trifluorosilane                    | g     | F-113
+F3Li3      | Lithium Fluoride                   | g     | F-114
+F3Mo       | Molybdenum Fluoride                | g     | F-115
+F3N        | Nitrogen Fluoride                  | g     | F-116
+F3NO       | Nitrogen Fluoride Oxide            | g     | F-117
+F3OP       | Phosphoryl Fluoride                | g     | F-118
+F3P        | Phosphorus Fluoride                | g     | F-119
+F3PS       | Thiophosphoryl Fluoride            | g     | F-120
+F3S        | Sulfur Fluoride                    | g     | F-121
+F3S+       | Sulfur Fluoride, Ion               | g     | F-122
+F3S-       | Sulfur Fluoride, Ion               | g     | F-123
+F3Si       | Trifluorosilyl                     | g     | F-124
+F3Ti       | Titanium Fluoride                  | cr    | F-125
+F3Ti       | Titanium Fluoride                  | g     | F-126
+F3Zr       | Zirconium Fluoride                 | cr    | F-127
+F3Zr       | Zirconium Fluoride                 | g     | F-128
+F4Mg2      | Magnesium Fluoride                 | g     | F-129
+F4Mo       | Molybdenum Fluoride                | g     | F-130
+F4MoO      | Molybdenum Fluoride Oxide          | g     | F-131
+F4N2       | Tetrafluorohydrazine               | g     | F-132
+F4OW       | Tungsten Fluoride Oxide            | cr    | F-133
+F4OW       | Tungsten Fluoride Oxide            | l     | F-134
+F4OW       | Tungsten Fluoride Oxide            | cr,l  | F-135
+F4OW       | Tungsten Fluoride Oxide            | g     | F-136
+F4Pb       | Lead Fluoride                      | g     | F-137
+F4S        | Sulfur Fluoride                    | g     | F-138
+F4S+       | Sulfur Fluoride, Ion               | g     | F-139
+F4S-       | Sulfur Fluoride, Ion               | g     | F-140
+F4Si       | Tetrafluorosilane                  | g     | F-141
+F4Ti       | Titanium Fluoride                  | cr    | F-142
+F4Ti       | Titanium Fluoride                  | g     | F-143
+F4Zr       | Zirconium Fluoride                 | cr    | F-144
+F4Zr       | Zirconium Fluoride                 | g     | F-145
+F5I        | Iodine Fluoride                    | g     | F-146
+F5Mo       | Molybdenum Fluoride                | g     | F-147
+F5P        | Phosphorus Fluoride                | g     | F-148
+F5S        | Sulfur Fluoride                    | g     | F-149
+F5S+       | Sulfur Fluoride, Ion               | g     | F-150
+F5S-       | Sulfur Fluoride, Ion               | g     | F-151
+F6Mo       | Molybdenum Fluoride                | l     | F-152
+F6Mo       | Molybdenum Fluoride                | g     | F-153
+F6S        | Sulfur Fluoride                    | g     | F-154
+F6S-       | Sulfur Fluoride, Ion               | g     | F-155
+F6W        | Tungsten Fluoride                  | l     | F-156
+F6W        | Tungsten Fluoride                  | g     | F-157
+F7I        | Iodine Fluoride                    | g     | F-158
+F10Mo2     | Molybdenum Fluoride                | g     | F-159
+F10S2      | Sulfur Fluoride                    | g     | F-160
+F15Mo3     | Molybdenum Fluoride                | g     | F-161
+Fe0.947O   | Iron Oxide, Wustite                | cr    | Fe-001
+Fe0.877S   | Iron Sulfide, Pyrrhotite           | cr    | Fe-002
+Fe         | Iron                               | ref   | Fe-003
+Fe         | Iron, Alpha-Delta                  | cr    | Fe-004
+Fe         | Iron, Gamma                        | cr    | Fe-005
+Fe         | Iron                               | l     | Fe-006
+Fe         | Iron                               | cr,l  | Fe-007
+Fe         | Iron                               | g     | Fe-008
+Fe+        | Iron, Ion                          | g     | Fe-009
+Fe-        | Iron, Ion                          | g     | Fe-010
+H2FeO2     | Iron Hydroxide                     | cr    | Fe-011
+H2FeO2     | Iron Hydroxide                     | g     | Fe-012
+H3FeO3     | Iron Hydroxide                     | cr    | Fe-013
+FeI2       | Iron Iodide                        | cr    | Fe-014
+FeI2       | Iron Iodide                        | l     | Fe-015
+FeI2       | Iron Iodide                        | cr,l  | Fe-016
+FeI2       | Iron Iodide                        | g     | Fe-017
+FeO        | Iron Oxide                         | cr    | Fe-018
+FeO        | Iron Oxide                         | l     | Fe-019
+FeO        | Iron Oxide                         | cr,l  | Fe-020
+FeO        | Iron Oxide                         | g     | Fe-021
+FeO4S      | Iron Sulfate                       | cr    | Fe-022
+FeS        | Iron Sulfide, Troilite             | cr    | Fe-023
+FeS        | Iron Sulfide                       | l     | Fe-024
+FeS        | Iron Sulfide, Troilite             | cr,l  | Fe-025
+FeS        | Iron Sulfide                       | g     | Fe-026
+FeS2       | Iron Sulfide, Marcasite            | cr    | Fe-027
+FeS2       | Iron Sulfide, Pyrite               | cr    | Fe-028
+Fe2I4      | Iron Iodide                        | g     | Fe-029
+Fe2O3      | Iron Oxide, Hematite               | cr    | Fe-030
+Fe2O12S3   | Iron Sulfate                       | cr    | Fe-031
+Fe3O4      | Iron Oxide, Magnetite              | cr    | Fe-032
+Ga         | Gallium                            | ref   | Ga-001
+Ga         | Gallium                            | cr    | Ga-002
+Ga         | Gallium                            | l     | Ga-003
+Ga         | Gallium                            | cr,l  | Ga-004
+Ga         | Gallium                            | g     | Ga-005
+Ga+        | Gallium, Ion                       | g     | Ga-006
+Ga-        | Gallium, Ion                       | g     | Ga-007
+H          | Hydrogen                           | g     | H-001
+H+         | Hydrogen, Ion                      | g     | H-002
+H-         | Hydrogen, Ion                      | g     | H-003
+HHg        | Mercury Hydride                    | g     | H-004
+HI         | Hydrogen Iodide                    | g     | H-005
+HI3Si      | Triiodosilane                      | g     | H-006
+HK         | Potassium Hydride                  | cr    | H-007
+HK         | Potassium Hydride                  | g     | H-008
+HKO        | Potassium Hydroxide                | cr    | H-009
+HKO        | Potassium Hydroxide                | l     | H-010
+HKO        | Potassium Hydroxide                | cr,l  | H-011
+HKO        | Potassium Hydroxide                | g     | H-012
+HKO+       | Potassium Hydroxide, Ion           | g     | H-013
+HLi        | Lithium Hydride                    | cr    | H-014
+HLi        | Lithium Hydride                    | l     | H-015
+HLi        | Lithium Hydride                    | cr,l  | H-016
+HLi        | Lithium Hydride                    | g     | H-017
+HLiO       | Lithium Hydroxide                  | cr    | H-018
+HLiO       | Lithium Hydroxide                  | l     | H-019
+HLiO       | Lithium Hydroxide                  | cr,l  | H-020
+HLiO       | Lithium Hydroxide                  | g     | H-021
+HLiO+      | Lithium Hydroxide, Ion             | g     | H-022
+HMg        | Magnesium Hydride                  | g     | H-023
+HMgO       | Magnesium Hydroxide                | g     | H-024
+HMgO+      | Magnesium Hydroxide, Ion           | g     | H-025
+HN         | Imidogen                           | g     | H-026
+HNO        | Nitrosyl Hydride                   | g     | H-027
+HNO2       | Nitrous Acid, Cis                  | g     | H-028
+HNO2       | Nitrous Acid, Trans                | g     | H-029
+HNO3       | Nitric Acid                        | g     | H-030
+HNa        | Sodium Hydride                     | cr    | H-031
+HNa        | Sodium Hydride                     | g     | H-032
+HNaO       | Sodium Hydroxide                   | cr    | H-033
+HNaO       | Sodium Hydroxide                   | l     | H-034
+HNaO       | Sodium Hydroxide                   | cr,l  | H-035
+HNaO       | Sodium Hydroxide                   | g     | H-036
+HNaO+      | Sodium Hydroxide, Ion              | g     | H-037
+HO         | Hydroxyl                           | g     | H-038
+HO+        | Hydroxyl, Ion                      | g     | H-039
+HO-        | Hydroxyl, Ion                      | g     | H-040
+HOSr       | Strontium Hydroxide                | g     | H-041
+HOSr+      | Strontium Hydroxide, Ion           | g     | H-042
+HO2        | Hydroperoxo                        | g     | H-043
+HP         | Phosphinidene                      | g     | H-044
+HPb        | Lead Hydride                       | g     | H-045
+HS         | Mercapto                           | g     | H-046
+HSi        | Silylidyne                         | g     | H-047
+HSi+       | Silylidyne, Ion                    | g     | H-048
+HZr        | Zirconium Hydride                  | g     | H-049
+H2         | Hydrogen                           | ref   | H-050
+H2+        | Hydrogen, Ion                      | g     | H-051
+H2-        | Hydrogen, Ion                      | g     | H-052
+H2I2Si     | Diiodosilane                       | g     | H-053
+H2K2O2     | Potassium Hydroxide                | g     | H-054
+H2Li2O2    | Lithium Hydroxide                  | g     | H-055
+H2Mg       | Magnesium Hydride                  | cr    | H-056
+H2MgO2     | Magnesium Hydroxide                | cr    | H-057
+H2MgO2     | Magnesium Hydroxide                | g     | H-058
+H2MoO4     | Molybdic Acid                      | g     | H-059
+H2N        | Amidogen                           | g     | H-060
+H2N2       | Diazene, Cis                       | g     | H-061
+H2Na2O2    | Sodium Hydroxide                   | g     | H-062
+H2O        | Water                              | l     | H-063
+H2O        | Water                              | g     | H-064
+H2O        | Water, 1 Bar                       | l,g   | H-065
+H2O        | Water, 10 Bar                      | l,g   | H-066
+H2O        | Water, 100 Bar                     | l,g   | H-067
+H2O        | Water, 500 Bar                     | fl    | H-068
+H2O        | Water, 5000 Bar                    | fl    | H-069
+H2O2       | Hydrogen Peroxide                  | g     | H-070
+H2O2Sr     | Strontium Hydroxide                | cr    | H-071
+H2O2Sr     | Strontium Hydroxide                | l     | H-072
+H2O2Sr     | Strontium Hydroxide                | cr,l  | H-073
+H2O2Sr     | Strontium Hydroxide                | g     | H-074
+H2O4S      | Sulfuric Acid                      | cr,l  | H-075
+H2O4S      | Sulfuric Acid                      | g     | H-076
+H2O4W      | Tungstic Acid                      | cr    | H-077
+H2O4W      | Tungstic Acid                      | g     | H-078
+H2P        | Phosphino                          | g     | H-079
+H2S        | Hydrogen Sulfide                   | g     | H-080
+H2Ti       | Titanium Hydride                   | cr    | H-081
+H3ISi      | Iodosilane                         | g     | H-082
+H3N        | Ammonia                            | g     | H-083
+H3O+       | Hydronium, Ion                     | g     | H-084
+H3O4P      | Phosphoric Acid                    | cr    | H-085
+H3O4P      | Phosphoric Acid                    | l     | H-086
+H3O4P      | Phosphoric Acid                    | cr,l  | H-087
+H3P        | Phosphine                          | g     | H-088
+H4IN       | Ammonium Iodide                    | cr    | H-089
+H4N2       | Hydrazine                          | l     | H-090
+H4N2       | Hydrazine                          | g     | H-091
+H4O5S      | Sulfuric Acid, Monohydrate         | cr,l  | H-092
+H4Si       | Silane                             | g     | H-093
+H6O6S      | Sulfuric Acid, Dihydrate           | cr,l  | H-094
+H8O7S      | Sulfuric Acid, Trihydrate          | cr,l  | H-095
+H10O8S     | Sulfuric Acid, Tetrahydrate        | cr,l  | H-096
+H15O10.5S  | Sulfuric Acid, Hemihexahydrate     | cr,l  | H-097
+He         | Helium                             | ref   | He-001
+He+        | Helium, Ion                        | g     | He-002
+Hf         | Hafnium                            | ref   | Hf-001
+Hf         | Hafnium, Alpha                     | cr    | Hf-002
+Hf         | Hafnium, Beta                      | cr    | Hf-003
+Hf         | Hafnium                            | l     | Hf-004
+Hf         | Hafnium                            | cr,l  | Hf-005
+Hf         | Hafnium                            | g     | Hf-006
+Hf+        | Hafnium, Ion                       | g     | Hf-007
+Hf-        | Hafnium, Ion                       | g     | Hf-008
+Hg         | Mercury                            | ref   | Hg-001
+Hg         | Mercury                            | cr,l  | Hg-002
+Hg         | Mercury                            | g     | Hg-003
+Hg+        | Mercury, Ion                       | g     | Hg-004
+HgI        | Mercury Iodide                     | g     | Hg-005
+HgI2       | Mercury Iodide                     | cr    | Hg-006
+HgI2       | Mercury Iodide                     | l     | Hg-007
+HgI2       | Mercury Iodide                     | cr,l  | Hg-008
+HgI2       | Mercury Iodide                     | g     | Hg-009
+HgO        | Mercury Oxide                      | cr    | Hg-010
+HgO        | Mercury Oxide                      | g     | Hg-011
+Hg2I2      | Mercury Iodide                     | cr    | Hg-012
+Hg2I2      | Mercury Iodide                     | l     | Hg-013
+Hg2I2      | Mercury Iodide                     | cr,l  | Hg-014
+I          | Iodine                             | g     | I-001
+I+         | Iodine, Ion                        | g     | I-002
+I-         | Iodine, Ion                        | g     | I-003
+IK         | Potassium Iodide                   | cr    | I-004
+IK         | Potassium Iodide                   | l     | I-005
+IK         | Potassium Iodide                   | cr,l  | I-006
+IK         | Potassium Iodide                   | g     | I-007
+ILi        | Lithium Iodide                     | cr    | I-008
+ILi        | Lithium Iodide                     | l     | I-009
+ILi        | Lithium Iodide                     | cr,l  | I-010
+ILi        | Lithium Iodide                     | g     | I-011
+IMg        | Magnesium Iodide                   | g     | I-012
+IMo        | Molybdenum Iodide                  | g     | I-013
+INO        | Nitrosyl Iodide                    | g     | I-014
+INa        | Sodium Iodide                      | cr    | I-015
+INa        | Sodium Iodide                      | l     | I-016
+INa        | Sodium Iodide                      | cr,l  | I-017
+IPb        | Lead Iodide                        | g     | I-018
+ISi        | Iodosilylidyne                     | g     | I-019
+ISr        | Strontium Iodide                   | g     | I-020
+ITi        | Titanium Iodide                    | g     | I-021
+IZr        | Zirconium Iodide                   | g     | I-022
+I2         | Iodine                             | ref   | I-023
+I2         | Iodine                             | cr    | I-024
+I2         | Iodine                             | l     | I-025
+I2         | Iodine                             | cr,l  | I-026
+I2         | Iodine                             | g     | I-027
+I2K2       | Potassium Iodide                   | g     | I-028
+I2Li2      | Lithium Iodide                     | g     | I-029
+I2Mg       | Magnesium Iodide                   | cr    | I-030
+I2Mg       | Magnesium Iodide                   | l     | I-031
+I2Mg       | Magnesium Iodide                   | cr,l  | I-032
+I2Mg       | Magnesium Iodide                   | g     | I-033
+I2Mo       | Molybdenum Iodide, Alpha           | cr    | I-034
+I2Mo       | Molybdenum Iodide                  | g     | I-035
+I2Pb       | Lead Iodide                        | cr    | I-036
+I2Pb       | Lead Iodide                        | l     | I-037
+I2Pb       | Lead Iodide                        | cr,l  | I-038
+I2Pb       | Lead Iodide                        | g     | I-039
+I2Si       | Diiodosilylene                     | g     | I-040
+I2Sr       | Strontium Iodide                   | cr    | I-041
+I2Sr       | Strontium Iodide                   | l     | I-042
+I2Sr       | Strontium Iodide                   | cr,l  | I-043
+I2Sr       | Strontium Iodide                   | g     | I-044
+I2Ti       | Titanium Iodide                    | cr    | I-045
+I2Ti       | Titanium Iodide                    | g     | I-046
+I2Zr       | Zirconium Iodide                   | cr    | I-047
+I2Zr       | Zirconium Iodide                   | l     | I-048
+I2Zr       | Zirconium Iodide                   | cr,l  | I-049
+I2Zr       | Zirconium Iodide                   | g     | I-050
+I3Mo       | Molybdenum Iodide                  | cr    | I-051
+I3Mo       | Molybdenum Iodide                  | g     | I-052
+I3Si       | Triiodosilyl                       | g     | I-053
+I3Ti       | Titanium Iodide                    | cr    | I-054
+I3Ti       | Titanium Iodide                    | g     | I-055
+I3Zr       | Zirconium Iodide                   | cr    | I-056
+I3Zr       | Zirconium Iodide                   | g     | I-057
+I4Mo       | Molybdenum Iodide                  | cr    | I-058
+I4Mo       | Molybdenum Iodide                  | g     | I-059
+I4Pb       | Lead Iodide                        | g     | I-060
+I4Si       | Tetraiodosilane                    | cr    | I-061
+I4Si       | Tetraiodosilane                    | l     | I-062
+I4Si       | Tetraiodosilane                    | cr,l  | I-063
+I4Si       | Tetraiodosilane                    | g     | I-064
+I4Ti       | Titanium Iodide                    | cr    | I-065
+I4Ti       | Titanium Iodide                    | l     | I-066
+I4Ti       | Titanium Iodide                    | cr,l  | I-067
+I4Ti       | Titanium Iodide                    | g     | I-068
+I4Zr       | Zirconium Iodide                   | cr    | I-069
+I4Zr       | Zirconium Iodide                   | g     | I-070
+K          | Potassium                          | ref   | K-001
+K          | Potassium                          | cr    | K-002
+K          | Potassium                          | l     | K-003
+K          | Potassium                          | cr,l  | K-004
+K          | Potassium                          | g     | K-005
+K+         | Potassium, Ion                     | g     | K-006
+K-         | Potassium, Ion                     | g     | K-007
+KO         | Potassium Oxide                    | g     | K-008
+KO-        | Potassium Oxide, Ion               | g     | K-009
+KO2        | Potassium Superoxide               | cr    | K-010
+K2         | Potassium                          | g     | K-011
+K2O        | Potassium Oxide                    | cr    | K-012
+K2O2       | Potassium Peroxide                 | cr    | K-013
+K2O3Si     | Potassium Silicate                 | cr    | K-014
+K2O3Si     | Potassium Silicate                 | l     | K-015
+K2O3Si     | Potassium Silicate                 | cr,l  | K-016
+N          | Nitrogen                           | g     | N-002
+K2O4S      | Potassium Sulfate, Alpha           | cr    | K-017
+K2O4S      | Potassium Sulfate, Beta            | cr    | K-018
+K2O4S      | Potassium Sulfate                  | l     | K-019
+K2O4S      | Potassium Sulfate                  | cr,l  | K-020
+K2O4S      | Potassium Sulfate                  | g     | K-021
+K2S        | Potassium Sulfide                  | cr    | K-022
+K2S        | Potassium Sulfide                  | l     | K-023
+K2S        | Potassium Sulfide                  | cr,l  | K-024
+Kr         | Krypton                            | ref   | Kr-001
+Kr+        | Krypton, Ion                       | g     | Kr-002
+Li         | Lithium                            | ref   | Li-001
+Li         | Lithium                            | cr    | Li-002
+Li         | Lithium                            | l     | Li-003
+Li         | Lithium                            | cr,l  | Li-004
+Li         | Lithium                            | g     | Li-005
+Li+        | Lithium, Ion                       | g     | Li-006
+Li-        | Lithium, Ion                       | g     | Li-007
+LiN        | Lithium Nitride                    | g     | Li-008
+LiNO       | Lithium Oxynitride                 | g     | Li-009
+LiNaO      | Lithium Sodium Oxide               | g     | Li-010
+LiO        | Lithium Oxide                      | g     | Li-011
+LiO-       | Lithium Oxide, Ion                 | g     | Li-012
+Li2        | Lithium                            | g     | Li-013
+Li2O       | Lithium Oxide                      | cr    | Li-014
+Li2O       | Lithium Oxide                      | l     | Li-015
+Li2O       | Lithium Oxide                      | cr,l  | Li-016
+Li2O       | Lithium Oxide                      | g     | Li-017
+Li2O2      | Lithium Peroxide                   | cr    | Li-018
+Li2O2      | Lithium Oxide                      | g     | Li-019
+Li2O3Si    | Lithium Silicate                   | cr    | Li-020
+Li2O3Si    | Lithium Silicate                   | l     | Li-021
+Li2O3Si    | Lithium Silicate                   | cr,l  | Li-022
+Li2O3Ti    | Lithium Titanium Oxide             | cr    | Li-023
+Li2O3Ti    | Lithium Titanium Oxide             | l     | Li-024
+Li2O3Ti    | Lithium Titanium Oxide             | cr,l  | Li-025
+Li2O4S     | Lithium Sulfate, Alpha             | cr    | Li-026
+Li2O4S     | Lithium Sulfate, Beta              | cr    | Li-027
+Li2O4S     | Lithium Sulfate                    | l     | Li-028
+Li2O4S     | Lithium Sulfate                    | cr,l  | Li-029
+Li2O4S     | Lithium Sulfate                    | g     | Li-030
+Li2O5Si2   | Lithium Silicate                   | cr    | Li-031
+Li2O5Si2   | Lithium Silicate                   | l     | Li-032
+Li2O5Si2   | Lithium Silicate                   | cr,l  | Li-033
+Li3N       | Lithium Nitride                    | cr    | Li-034
+Mg         | Magnesium                          | ref   | Mg-001
+Mg         | Magnesium                          | cr    | Mg-002
+Mg         | Magnesium                          | l     | Mg-003
+Mg         | Magnesium                          | cr,l  | Mg-004
+Mg         | Magnesium                          | g     | Mg-005
+Mg+        | Magnesium, Ion                     | g     | Mg-006
+MgN        | Magnesium Nitride                  | g     | Mg-007
+MgO        | Magnesium Oxide                    | cr    | Mg-008
+MgO        | Magnesium Oxide                    | l     | Mg-009
+MgO        | Magnesium Oxide                    | cr,l  | Mg-010
+MgO        | Magnesium Oxide                    | g     | Mg-011
+MgO3Si     | Magnesium Silicate                 | cr    | Mg-012
+MgO3Si     | Magnesium Silicate                 | l     | Mg-013
+MgO3Si     | Magnesium Silicate                 | cr,l  | Mg-014
+MgO3Ti     | Magnesium Titanium Oxide           | cr    | Mg-015
+MgO3Ti     | Magnesium Titanium Oxide           | l     | Mg-016
+MgO3Ti     | Magnesium Titanium Oxide           | cr,l  | Mg-017
+MgO4S      | Magnesium Sulfate                  | cr    | Mg-018
+MgO4S      | Magnesium Sulfate                  | l     | Mg-019
+MgO4S      | Magnesium Sulfate                  | cr,l  | Mg-020
+MgO4W      | Magnesium Tungsten Oxide           | cr    | Mg-021
+MgO5Ti2    | Magnesium Titanium Oxide           | cr    | Mg-022
+MgO5Ti2    | Magnesium Titanium Oxide           | l     | Mg-023
+MgO5Ti2    | Magnesium Titanium Oxide           | cr,l  | Mg-024
+MgS        | Magnesium Sulfide                  | cr    | Mg-025
+MgS        | Magnesium Sulfide                  | g     | Mg-026
+Mg2        | Magnesium                          | g     | Mg-027
+Mg2O4Si    | Magnesium Silicate                 | cr    | Mg-028
+Mg2O4Si    | Magnesium Silicate                 | l     | Mg-029
+Mg2O4Si    | Magnesium Silicate                 | cr,l  | Mg-030
+Mg2O4Ti    | Magnesium Titanium Oxide           | cr    | Mg-031
+Mg2O4Ti    | Magnesium Titanium Oxide           | l     | Mg-032
+Mg2O4Ti    | Magnesium Titanium Oxide           | cr,l  | Mg-033
+Mg2Si      | Magnesium Silicide                 | cr    | Mg-034
+Mg2Si      | Magnesium Silicide                 | l     | Mg-035
+Mg2Si      | Magnesium Silicide                 | cr,l  | Mg-036
+Mg3N2      | Magnesium Nitride                  | cr    | Mg-037
+Mg3O8P2    | Magnesium Phosphate                | cr    | Mg-038
+Mg3O8P2    | Magnesium Phosphate                | l     | Mg-039
+Mg3O8P2    | Magnesium Phosphate                | cr,l  | Mg-040
+Mn         | Manganese                          | ref   | Mn-001
+Mn         | Manganese                          | cr    | Mn-002
+Mn         | Manganese                          | l     | Mn-003
+Mn         | Manganese                          | cr,l  | Mn-004
+Mn         | Manganese                          | g     | Mn-005
+Mn+        | Manganese, Ion                     | g     | Mn-006
+Mo         | Molybdenum                         | ref   | Mo-001
+Mo         | Molybdenum                         | cr    | Mo-002
+Mo         | Molybdenum                         | l     | Mo-003
+Mo         | Molybdenum                         | cr,l  | Mo-004
+Mo         | Molybdenum                         | g     | Mo-005
+Mo+        | Molybdenum, Ion                    | g     | Mo-006
+Mo-        | Molybdenum, Ion                    | g     | Mo-007
+MoO        | Molybdenum Oxide                   | g     | Mo-008
+MoO2       | Molybdenum Oxide                   | cr    | Mo-009
+MoO2       | Molybdenum Oxide                   | g     | Mo-010
+MoO2.750   | Molybdenum Oxide                   | cr    | Mo-011
+MoO2.875   | Molybdenum Oxide                   | cr    | Mo-012
+MoO2.889   | Molybdenum Oxide                   | cr    | Mo-013
+MoO3       | Molybdenum Oxide                   | cr    | Mo-014
+MoO3       | Molybdenum Oxide                   | l     | Mo-015
+MoO3       | Molybdenum Oxide                   | cr,l  | Mo-016
+MoO3       | Molybdenum Oxide                   | g     | Mo-017
+MoS2       | Molybdenum Sulfide                 | cr    | Mo-018
+Mo2S3      | Molybdenum Sulfide                 | cr    | Mo-019
+Mo2S3      | Molybdenum Sulfide                 | l     | Mo-020
+Mo2S3      | Molybdenum Sulfide                 | cr,l  | Mo-021
+N0.465V    | Vanadium Nitride                   | cr    | N-001
+N+         | Nitrogen, Ion                      | g     | N-003
+N-         | Nitrogen, Ion                      | g     | N-004
+NO         | Nitrogen Oxide                     | g     | N-005
+NO+        | Nitrogen Oxide, Ion                | g     | N-006
+NO2        | Nitrogen Oxide                     | g     | N-007
+NO2-       | Nitrogen Oxide, Ion                | g     | N-008
+NO3        | Nitrogen Oxide                     | g     | N-009
+NP         | Phosphorus Nitride                 | g     | N-010
+NS         | Nitrogen Sulfide                   | g     | N-011
+NSi        | Silicon Nitride                    | g     | N-012
+NSi2       | Silicon Nitride                    | g     | N-013
+NTi        | Titanium Nitride                   | cr    | N-014
+NTi        | Titanium Nitride                   | l     | N-015
+NTi        | Titanium Nitride                   | cr,l  | N-016
+NV         | Vanadium Nitride                   | cr    | N-017
+NV         | Vanadium Nitride                   | g     | N-018
+NZr        | Zirconium Nitride                  | cr    | N-019
+NZr        | Zirconium Nitride                  | l     | N-020
+NZr        | Zirconium Nitride                  | cr,l  | N-021
+NZr        | Zirconium Nitride                  | g     | N-022
+N2         | Nitrogen                           | ref   | N-023
+N2+        | Nitrogen, Ion                      | g     | N-024
+N2-        | Nitrogen, Ion                      | g     | N-025
+N2O        | Nitrogen Oxide                     | g     | N-026
+N2O+       | Nitrogen Oxide, Ion                | g     | N-027
+N2O3       | Nitrogen Oxide                     | g     | N-028
+N2O4       | Nitrogen Oxide                     | cr    | N-029
+N2O4       | Nitrogen Oxide                     | l     | N-030
+N2O4       | Nitrogen Oxide                     | cr,l  | N-031
+N2O4       | Nitrogen Oxide                     | g     | N-032
+N2O5       | Nitrogen Oxide                     | g     | N-033
+N3         | Azide                              | g     | N-034
+N4Si3      | Silicon Nitride, Alpha             | cr    | N-035
+N5P3       | Phosphorus Nitride                 | cr    | N-036
+Na         | Sodium                             | ref   | Na-001
+Na         | Sodium                             | cr    | Na-002
+Na         | Sodium                             | l     | Na-003
+Na         | Sodium                             | cr,l  | Na-004
+Na         | Sodium                             | g     | Na-005
+Na+        | Sodium, Ion                        | g     | Na-006
+Na-        | Sodium, Ion                        | g     | Na-007
+NaO        | Sodium Oxide                       | g     | Na-008
+NaO-       | Sodium Oxide, Ion                  | g     | Na-009
+NaO2       | Sodium Superoxide                  | cr    | Na-010
+Na2        | Sodium                             | g     | Na-011
+Na2O       | Sodium Oxide                       | cr    | Na-012
+Na2O       | Sodium Oxide                       | l     | Na-013
+Na2O       | Sodium Oxide                       | cr,l  | Na-014
+Na2O2      | Sodium Peroxide                    | cr    | Na-015
+Na2O3Si    | Sodium Silicate                    | cr    | Na-016
+Na2O3Si    | Sodium Silicate                    | l     | Na-017
+Na2O3Si    | Sodium Silicate                    | cr,l  | Na-018
+Na2O4S     | Sodium Sulfate, Delta              | cr    | Na-019
+Na2O4S     | Sodium Sulfate, I                  | cr    | Na-020
+Na2O4S     | Sodium Sulfate, III                | cr    | Na-021
+Na2O4S     | Sodium Sulfate, IV                 | cr    | Na-022
+Na2O4S     | Sodium Sulfate, V                  | cr    | Na-023
+Na2O4S     | Sodium Sulfate                     | l     | Na-024
+Na2O4S     | Sodium Sulfate                     | cr,l  | Na-025
+Na2O4S     | Sodium Sulfate                     | g     | Na-026
+Na2O4W     | Sodium Tungsten Oxide              | cr    | Na-027
+Na2O5Si2   | Sodium Silicate                    | cr    | Na-028
+Na2O5Si2   | Sodium Silicate                    | l     | Na-029
+Na2O5Si2   | Sodium Silicate                    | cr,l  | Na-030
+Na2S       | Sodium Sulfide                     | cr    | Na-031
+Na2S       | Sodium Sulfide                     | l     | Na-032
+Na2S       | Sodium Sulfide                     | cr,l  | Na-033
+Na2S2      | Sodium Sulfide, Beta               | cr    | Na-034
+Na2S2      | Sodium Sulfide                     | l     | Na-035
+Na2S2      | Sodium Sulfide                     | cr,l  | Na-036
+Nb         | Niobium                            | ref   | Nb-001
+Nb         | Niobium                            | cr    | Nb-002
+Nb         | Niobium                            | l     | Nb-003
+Nb         | Niobium                            | cr,l  | Nb-004
+Nb         | Niobium                            | g     | Nb-005
+Nb+        | Niobium, Ion                       | g     | Nb-006
+Nb-        | Niobium, Ion                       | g     | Nb-007
+NbO        | Niobium Oxide                      | cr    | Nb-008
+NbO        | Niobium Oxide                      | l     | Nb-009
+NbO        | Niobium Oxide                      | cr,l  | Nb-010
+NbO        | Niobium Oxide                      | g     | Nb-011
+NbO2       | Niobium Oxide                      | cr    | Nb-012
+NbO2       | Niobium Oxide                      | l     | Nb-013
+NbO2       | Niobium Oxide                      | cr,l  | Nb-014
+NbO2       | Niobium Oxide                      | g     | Nb-015
+Nb2O5      | Niobium Oxide                      | cr    | Nb-016
+Nb2O5      | Niobium Oxide                      | l     | Nb-017
+Nb2O5      | Niobium Oxide                      | cr,l  | Nb-018
+Ne         | Neon                               | ref   | Ne-001
+Ne+        | Neon, Ion                          | g     | Ne-002
+Ni         | Nickel                             | ref   | Ni-001
+Ni         | Nickel                             | cr    | Ni-002
+Ni         | Nickel                             | l     | Ni-003
+Ni         | Nickel                             | cr,l  | Ni-004
+Ni         | Nickel                             | g     | Ni-005
+Ni+        | Nickel, Ion                        | g     | Ni-006
+Ni-        | Nickel, Ion                        | g     | Ni-007
+NiS        | Nickel Sulfide                     | cr    | Ni-008
+NiS        | Nickel Sulfide                     | l     | Ni-009
+NiS        | Nickel Sulfide                     | cr,l  | Ni-010
+NiS        | Nickel Sulfide                     | g     | Ni-011
+NiS2       | Nickel Sulfide                     | cr    | Ni-012
+NiS2       | Nickel Sulfide                     | l     | Ni-013
+NiS2       | Nickel Sulfide                     | cr,l  | Ni-014
+Ni3S2      | Nickel Sulfide                     | cr    | Ni-015
+Ni3S2      | Nickel Sulfide                     | l     | Ni-016
+Ni3S2      | Nickel Sulfide                     | cr,l  | Ni-017
+Ni3S4      | Nickel Sulfide                     | cr    | Ni-018
+O          | Oxygen                             | g     | O-001
+O+         | Oxygen, Ion                        | g     | O-002
+O-         | Oxygen, Ion                        | g     | O-003
+OP         | Phosphorus Oxide                   | g     | O-004
+OPb        | Lead Oxide, Red                    | cr    | O-005
+OPb        | Lead Oxide, Yellow                 | cr    | O-006
+OPb        | Lead Oxide                         | l     | O-007
+OPb        | Lead Oxide                         | cr,l  | O-008
+OPb        | Lead Oxide                         | g     | O-009
+OS         | Sulfur Oxide                       | g     | O-010
+OS2        | Sulfur Oxide                       | g     | O-011
+OSi        | Silicon Oxide                      | g     | O-012
+OSr        | Strontium Oxide                    | cr    | O-013
+OSr        | Strontium Oxide                    | l     | O-014
+OSr        | Strontium Oxide                    | cr,l  | O-015
+OSr        | Strontium Oxide                    | g     | O-016
+OTa        | Tantalum Oxide                     | g     | O-017
+OTi        | Titanium Oxide, Alpha              | cr    | O-018
+OTi        | Titanium Oxide, Beta               | cr    | O-019
+OTi        | Titanium Oxide                     | l     | O-020
+OTi        | Titanium Oxide                     | cr,l  | O-021
+OTi        | Titanium Oxide                     | g     | O-022
+OV         | Vanadium Oxide                     | cr    | O-023
+OV         | Vanadium Oxide                     | l     | O-024
+OV         | Vanadium Oxide                     | cr,l  | O-025
+OV         | Vanadium Oxide                     | g     | O-026
+OW         | Tungsten Oxide                     | g     | O-027
+OZr        | Zirconium Oxide                    | g     | O-028
+O2         | Oxygen                             | ref   | O-029
+O2+        | Oxygen, Ion                        | g     | O-030
+O2-        | Oxygen, Ion                        | g     | O-031
+O2P        | Phosphorus Oxide                   | g     | O-032
+O2Pb       | Lead Oxide                         | cr    | O-033
+O2S        | Sulfur Dioxide                     | g     | O-034
+O2Si       | Silicon Oxide, Cristobalite, High  | cr    | O-035
+O2Si       | Silicon Oxide, Cristobalite, Low   | cr    | O-036
+O2Si       | Silicon Oxide, Quartz              | cr    | O-037
+O2Si       | Silicon Oxide                      | l     | O-038
+O2Si       | Silicon Oxide                      | cr,l  | O-039
+O2Si       | Silicon Oxide                      | g     | O-040
+O2Ta       | Tantalum Oxide                     | g     | O-041
+O2Ti       | Titanium Oxide, Anatase            | cr    | O-042
+O2Ti       | Titanium Oxide, Rutile             | cr    | O-043
+O2Ti       | Titanium Oxide                     | l     | O-044
+O2Ti       | Titanium Oxide                     | cr,l  | O-045
+O2Ti       | Titanium Oxide                     | g     | O-046
+O2W        | Tungsten Oxide                     | cr    | O-047
+O2W        | Tungsten Oxide                     | g     | O-048
+O2.72W     | Tungsten Oxide                     | cr    | O-049
+O2.90W     | Tungsten Oxide                     | cr    | O-050
+O2.96W     | Tungsten Oxide                     | cr    | O-051
+O2Zr       | Zirconium Oxide                    | cr    | O-052
+O2Zr       | Zirconium Oxide                    | l     | O-053
+O2Zr       | Zirconium Oxide                    | cr,l  | O-054
+O2Zr       | Zirconium Oxide                    | g     | O-055
+O3         | Ozone                              | g     | O-056
+O3PbSi     | Lead Silicate                      | cr    | O-057
+O3S        | Sulfur Trioxide                    | g     | O-058
+O3Ti2      | Titanium Oxide                     | cr    | O-059
+O3Ti2      | Titanium Oxide                     | l     | O-060
+O3Ti2      | Titanium Oxide                     | cr,l  | O-061
+O3V2       | Vanadium Oxide                     | cr    | O-062
+O3V2       | Vanadium Oxide                     | l     | O-063
+O3V2       | Vanadium Oxide                     | cr,l  | O-064
+O3W        | Tungsten Oxide                     | cr    | O-065
+O3W        | Tungsten Oxide                     | l     | O-066
+O3W        | Tungsten Oxide                     | cr,l  | O-067
+O3W        | Tungsten Oxide                     | g     | O-068
+O4Pb2Si    | Lead Silicate                      | cr    | O-069
+O4Pb3      | Lead Oxide                         | cr    | O-070
+O4SZn      | Zinc Sulfate                       | cr    | O-071
+O4SiZr     | Zirconium Silicate                 | cr    | O-072
+O4V2       | Vanadium Oxide                     | cr    | O-073
+O4V2       | Vanadium Oxide                     | l     | O-074
+O4V2       | Vanadium Oxide                     | cr,l  | O-075
+O2V        | Vanadium Oxide                     | g     | O-076
+O5Ta2      | Tantalum Oxide                     | cr    | O-077
+O5Ta2      | Tantalum Oxide                     | l     | O-078
+O5Ta2      | Tantalum Oxide                     | cr,l  | O-079
+O5Ti3      | Titanium Oxide, Alpha              | cr    | O-080
+O5Ti3      | Titanium Oxide, Beta               | cr    | O-081
+O5Ti3      | Titanium Oxide                     | l     | O-082
+O5Ti3      | Titanium Oxide                     | cr,l  | O-083
+O5V2       | Vanadium Oxide                     | cr    | O-084
+O5V2       | Vanadium Oxide                     | l     | O-085
+O5V2       | Vanadium Oxide                     | cr,l  | O-086
+O6P4       | Phosphorus Oxide                   | g     | O-087
+O6W2       | Tungsten Oxide                     | g     | O-088
+O7Ti4      | Titanium Oxide                     | cr    | O-089
+O7Ti4      | Titanium Oxide                     | l     | O-090
+O7Ti4      | Titanium Oxide                     | cr,l  | O-091
+O8W3       | Tungsten Oxide                     | g     | O-092
+O9W3       | Tungsten Oxide                     | g     | O-093
+O10P4      | Phosphorus Oxide                   | cr    | O-094
+O10P4      | Phosphorus Oxide                   | g     | O-095
+O12W4      | Tungsten Oxide                     | g     | O-096
+P          | Phosphorus                         | ref   | P-001
+P          | Phosphorus, White                  | cr    | P-002
+P          | Phosphorus                         | l     | P-003
+P          | Phosphorus                         | cr,l  | P-004
+P          | Phosphorus, Red, IV                | cr    | P-005
+P          | Phosphorus, Red, V                 | cr    | P-006
+P          | Phosphorus, Black                  | cr    | P-007
+P          | Phosphorus                         | g     | P-008
+P+         | Phosphorus, Ion                    | g     | P-009
+P-         | Phosphorus, Ion                    | g     | P-010
+PS         | Phosphorus Sulfide                 | g     | P-011
+P2         | Phosphorus                         | g     | P-012
+P4         | Phosphorus                         | g     | P-013
+P4S3       | Phosphorus Sulfide                 | cr    | P-014
+P4S3       | Phosphorus Sulfide                 | l     | P-015
+P4S3       | Phosphorus Sulfide                 | cr,l  | P-016
+P4S3       | Phosphorus Sulfide                 | g     | P-017
+Pb         | Lead                               | ref   | Pb-001
+Pb         | Lead                               | cr    | Pb-002
+Pb         | Lead                               | l     | Pb-003
+Pb         | Lead                               | cr,l  | Pb-004
+Pb         | Lead                               | g     | Pb-005
+Pb+        | Lead, Ion                          | g     | Pb-006
+Pb-        | Lead, Ion                          | g     | Pb-007
+PbS        | Lead Sulfide                       | cr    | Pb-008
+PbS        | Lead Sulfide                       | l     | Pb-009
+PbS        | Lead Sulfide                       | cr,l  | Pb-010
+PbS        | Lead Sulfide                       | g     | Pb-011
+Pb2        | Lead                               | g     | Pb-012
+Rb         | Rubidium                           | ref   | Rb-001
+Rb         | Rubidium                           | cr    | Rb-002
+Rb         | Rubidium                           | l     | Rb-003
+Rb         | Rubidium                           | cr,l  | Rb-004
+Rb         | Rubidium                           | g     | Rb-005
+Rb+        | Rubidium, Ion                      | g     | Rb-006
+Rb-        | Rubidium, Ion                      | g     | Rb-007
+Rb2        | Rubidium                           | g     | Rb-008
+Rn         | Radon                              | ref   | Rn-001
+S          | Sulfur, Orthorhombic               | cr    | S-002
+S          | Sulfur, Monoclinic                 | cr    | S-003
+S          | Sulfur                             | l     | S-004
+S          | Sulfur                             | cr,l  | S-005
+S          | Sulfur                             | g     | S-006
+S+         | Sulfur, Ion                        | g     | S-007
+S-         | Sulfur, Ion                        | g     | S-008
+SSi        | Silicon Sulfide                    | g     | S-009
+SSr        | Strontium Sulfide                  | cr    | S-010
+SSr        | Strontium Sulfide                  | g     | S-011
+S2         | Sulfur                             | g     | S-012
+S2Si       | Silicon Sulfide                    | cr    | S-013
+S2Si       | Silicon Sulfide                    | l     | S-014
+S2Si       | Silicon Sulfide                    | cr,l  | S-015
+S3         | Sulfur                             | g     | S-016
+S4         | Sulfur                             | g     | S-017
+S5         | Sulfur                             | g     | S-018
+S6         | Sulfur                             | g     | S-019
+S7         | Sulfur                             | g     | S-020
+S8         | Sulfur                             | g     | S-021
+Si         | Silicon                            | ref   | Si-001
+Si         | Silicon                            | cr    | Si-002
+Si         | Silicon                            | l     | Si-003
+Si         | Silicon                            | cr,l  | Si-004
+Si         | Silicon                            | g     | Si-005
+Si+        | Silicon, Ion                       | g     | Si-006
+Si-        | Silicon, Ion                       | g     | Si-007
+Si2        | Silicon                            | g     | Si-008
+Si3        | Silicon                            | g     | Si-009
+Sr         | Strontium                          | ref   | Sr-001
+Sr         | Strontium, Alpha                   | cr    | Sr-002
+Sr         | Strontium, Beta                    | cr    | Sr-003
+Sr         | Strontium                          | l     | Sr-004
+Sr         | Strontium                          | cr,l  | Sr-005
+Sr         | Strontium                          | g     | Sr-006
+Sr+        | Strontium, Ion                     | g     | Sr-007
+Ta         | Tantalum                           | ref   | Ta-001
+Ta         | Tantalum                           | cr    | Ta-002
+Ta         | Tantalum                           | l     | Ta-003
+Ta         | Tantalum                           | cr,l  | Ta-004
+Ta         | Tantalum                           | g     | Ta-005
+Ta+        | Tantalum, Ion                      | g     | Ta-006
+Ta-        | Tantalum, Ion                      | g     | Ta-007
+Ti         | Titanium                           | ref   | Ti-001
+Ti         | Titanium, Alpha                    | cr    | Ti-002
+Ti         | Titanium, Beta                     | cr    | Ti-003
+Ti         | Titanium                           | l     | Ti-004
+Ti         | Titanium                           | cr,l  | Ti-005
+Ti         | Titanium                           | g     | Ti-006
+Ti+        | Titanium, Ion                      | g     | Ti-007
+Ti-        | Titanium, Ion                      | g     | Ti-008
+V          | Vanadium                           | ref   | V-001
+V          | Vanadium                           | cr    | V-002
+V          | Vanadium                           | l     | V-003
+V          | Vanadium                           | cr,l  | V-004
+V          | Vanadium                           | g     | V-005
+V+         | Vanadium, Ion                      | g     | V-006
+V-         | Vanadium, Ion                      | g     | V-007
+W          | Tungsten                           | ref   | W-001
+W          | Tungsten                           | cr    | W-002
+W          | Tungsten                           | l     | W-003
+W          | Tungsten                           | cr,l  | W-004
+W          | Tungsten                           | g     | W-005
+W+         | Tungsten, Ion                      | g     | W-006
+W-         | Tungsten, Ion                      | g     | W-007
+Xe         | Xenon                              | ref   | Xe-001
+Xe+        | Xenon, Ion                         | g     | Xe-002
+Zn         | Zinc                               | ref   | Zn-001
+Zn         | Zinc                               | cr    | Zn-002
+Zn         | Zinc                               | l     | Zn-003
+Zn         | Zinc                               | cr,l  | Zn-004
+Zn         | Zinc                               | g     | Zn-005
+Zn+        | Zinc, Ion                          | g     | Zn-006
+Zn-        | Zinc, Ion                          | g     | Zn-007
+Zr         | Zirconium                          | ref   | Zr-001
+Zr         | Zirconium, Alpha                   | cr    | Zr-002
+Zr         | Zirconium, Beta                    | cr    | Zr-003
+Zr         | Zirconium                          | l     | Zr-004
+Zr         | Zirconium                          | cr,l  | Zr-005
+Zr         | Zirconium                          | g     | Zr-006
+Zr+        | Zirconium, Ion                     | g     | Zr-007
+Zr-        | Zirconium, Ion                     | g     | Zr-008
