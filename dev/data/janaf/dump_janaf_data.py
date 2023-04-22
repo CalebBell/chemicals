@@ -212,7 +212,7 @@ class Janafdb(object):
         # in the JANAF database.
         __file__
         janaf_index =os.path.join(dirname, 'JANAF_index.txt')
-        self.db = pd.read_csv(janaf_index, delimiter='|')
+        self.db = pd.read_csv(janaf_index, delimiter='|', header=None)
         # Name the columns and trim whitespace off the text fields.
         self.db.columns = ['formula', 'name', 'phase', 'filename']
         self.db["formula"] = self.db["formula"].map(str.strip)
@@ -445,7 +445,7 @@ for CAS, row in metadata_table.iterrows():
         p = db.getphasedata(formula=formula, name=name, phase=state)
     except Exception as e:
         print(['Failed', CAS, formula, name, state], e)
-        #p = db.getphasedata(formula=formula, name=name, phase=state)
+        p = db.getphasedata(formula=formula, name=name, phase=state)
         continue
     Hf_298 = float(p.DeltaH([298.15])[0])*1000.0
     Gf_298 = float(p.DeltaG([298.15])[0])*1000.0
