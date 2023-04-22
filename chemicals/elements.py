@@ -112,14 +112,145 @@ for i, CAS in zip(homonuclear_elements, homonuclear_elements_CASs):
 cids = [783, 23987, 3028194, 5460467, 5462311, 5462310, 222, 962, 14917, 23935, 5360545, 5462224, 5359268, 5461123, 24404, 402, 313, 23968, 5462222, 5460341, 23952, 23963, 23990, 23976, 23930, 23925, 104730, 935, 23978, 23994, 5360835, 6326954, 5359596, 6326970, 260, 5416, 5357696, 5359327, 23993, 23995, 23936, 23932, 23957, 23950, 23948, 23938, 23954, 23973, 5359967, 5352426, 5354495, 6327182, 24841, 23991, 5354618, 5355457, 23926, 23974, 23942, 23934, 23944, 23951, 23981, 23982, 23958, 23912, 23988, 23980, 23961, 23992, 23929, 23986, 23956, 23964, 23947, 23937, 23924, 23939, 23985, 23931, 5359464, 5352425, 5359367, 6328143, 5460479, 24857, 6328145, 6328144, 23965, 23960, 23945, 23989, 23933, 23940, 23966, 23979, 23971, 23997, 23913, 23998, 23943, 24822, 31192, 56951715, 56951718, 56951717, 56951713, 56951714, 56951716, None, None, None, None, None, None, None, None, None]
 
 # https://periodictable.com/Properties/A/AllotropeNames.html
+
+# Shows reference state https://janaf.nist.gov/tables/P-001.html
+# https://janaf.nist.gov/tables/Br-038.html
 allotropes = {}
+allotropes['N'] = {
+    'dinitrogen': '7727-37-9',
+    'atomic nitrogen': '17778-88-0', 
+    'trinitrogen': '12596-60-0',
+}
+
+allotropes['H'] = {
+    'dihydrogen': '1333-74-0',
+    'atomic hydrogen': '12385-13-6', 
+}
+allotropes['F'] = {
+    'difluorine': '7782-41-4',
+    'atomic fluorine': '14762-94-8', 
+}
+allotropes['I'] = {
+    'diiodine': '7553-56-2',
+    'atomic iodine': '14362-44-8', 
+}
+allotropes['Br'] = {
+    'dibromine': '7726-95-6',
+    'atomic bromine': '10097-32-2', 
+}
+allotropes['Cl'] = {
+    'dichlorine': '7782-50-5',
+    'atomic chlorine': '22537-15-1', 
+}
+
+
 allotropes['C'] = {
     'diamond': '7782-40-3',
     'graphite': '7782-42-5',
-    'carbon black': '7440-44-0',
+    'atomic carbon': '7440-44-0', # also carbon black
+}
+allotropes['Po'] = {
+    'alpha polonium': '7440-08-6',
+    'beta polonium': '7440-08-6', 
+}
+allotropes['Sn'] = {
+    'white tin': '7440-31-5', # beta-tin
+    'gray tin': '7440-31-5',  # alpha-tin
+    # unfortunately sources report the same CAS
+    # There are also gamma-tin and sigma-tin at high pressures
+}
+allotropes['Se'] = {
+    'gray selenium': '7782-49-2', # most stable at STP, chiral hexagonal crystal lattice
+    'red gamma selenium': '7782-49-2', # monocrystaline puckered cyclooctaselenium (Se8) rings
+    'red beta selenium': '7782-49-2', # monocrystaline puckered cyclooctaselenium (Se8) rings
+    'amorphous black selenium': '7782-49-2', # amorphous
+    'amorphous red selenium': '7782-49-2', # amorphous
+}
+allotropes['As'] = {
+    'gray arsenic': '7440-38-2', # most stable form
+    'yellow arsenic': '7440-38-2', 
+    'black arsenic': '7440-38-2', 
 }
 
-allotropic_standard_states = {'C': 'graphite',
+allotropes['P'] = {
+    'alpha white phosphorus': '12185-10-3', # most stable form at room Body-centred cubic or Triclinic also heard yellow phosphorus
+    'beta white phosphorus': '12185-10-3', #  Triclinic also heard yellow phosphorus
+    'red phosphorus': '7723-14-0',
+    'violet phosphorus': '7723-14-0', # Monoclinic
+    'black phosphorus': '7723-14-0', # Orthorhombic
+    'diphosphorus': '12185-09-0', # gas
+}
+
+allotropes['Sb'] = {
+    'white antimony': '7440-36-0', # most stable form
+    'yellow antimony': '7440-36-0', # metastable
+    'black antimony': '7440-36-0', # metastable
+    'explosive antimony': '7440-36-0', # eep
+}
+
+allotropes['S'] = {
+    'atomic sulfur': '7704-34-9',
+
+    'alpha S8 sulfur': '10544-50-0', # orthorhombic  most common
+    'beta S8 sulfur': '10544-50-0', # orthorhombicform from alpha when raised to 95.3 °C
+    'gamma S8 sulfur': '10544-50-0', # orthorhombic  nacreous sulfur or mother of pearl sulfur
+
+    'disulfur': '23550-45-0', # most common component of sulfur vapour above 720 °C
+    'trisulfur': '12597-03-4', # vapor species 10% at 440 °C
+    'tetrasulfur': '19269-85-3', # gas only not characterized
+    'pentasulfur': '12597-10-3', # gas only not characterized
+
+    'cyclo-S6': '13798-23-7', # solid ring form
+
+    'alpha S7 sulfur': '21459-04-1', # solid ring
+    'beta S7 sulfur': '21459-04-1', # solid ring
+    'gamma S7 sulfur': '21459-04-1', # solid ring 
+    'delta S7 sulfur': '21459-04-1', # solid ring
+}
+
+allotropes['O'] = {
+    'dioxygen': '7782-44-7',
+    'atomic oxygen': '17778-80-2', 
+    'ozone': '10028-15-6',
+    'cyclic ozone': '153851-84-4', # theorized wikipedia only and chemspider
+    'tetraoxygen': '852461-27-9', # cyclotetraoxygen D2d structure form
+    'Octaoxygen': '176740-46-8', # wikidata for CAS, also called ε-oxygen or red oxygen, 600 K & 16 GPa and higher
+}
+
+# https://janaf.nist.gov/tables/B-001.html
+allotropes['B'] = {
+    'alpha rhombohedral boron': '7440-42-8',
+    'beta rhombohedral boron': '7440-42-8', # most stable
+    'beta tetragonal boron': '7440-42-8',
+
+    'alpha tetragonal boron': '7440-42-8',
+    'gamma orthorhombic boron': '7440-42-8',
+
+    'powder boron': '7440-42-8',
+    'glassy boron': '7440-42-8',
+
+    'diboron': '14452-61-0', # not sure actually exists but is in common chemistry
+
+}
+
+# For each element that has allotropes, the allotrope which is used as a reference state at STP
+allotropic_standard_states = {'H': 'dihydrogen',
+                              'N': 'dinitrogen',
+                              'O': 'dioxygen',
+                              'F': 'difluorine',
+                              'I': 'diiodine',
+                              'Br': 'dibromine',
+                              'Cl': 'dichlorine',
+
+                              'C': 'graphite',  # consistent with NBS/JANAF
+                              'Po': 'alpha polonium',
+                              'Sb': 'white antimony',
+                              'Sn': 'white tin', # consistent with NBS/JANAF
+                              'P': 'alpha white phosphorus', # consistent with NBS/JANAF
+                              'S': 'alpha S8 sulfur', # JANAF consistent 298.15 K then switches to beta then gas
+                              'Se': 'gray selenium',
+                              'As': 'gray arsenic',
+                              'B': 'beta rhombohedral boron',
 }
 
 
@@ -134,6 +265,7 @@ for i, ele in enumerate(periodic_table):
         phases[i] = 'g'
 '''
 phases = ['g', 'g', 's', 's', 's', 's', 'g', 'g', 'g', 'g', 's', 's', 's', 's', 's', 's', 'g', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's']
+
 
 '''# From CRC Table:
 from chemicals.heat_capacity import CRC_standard_data
