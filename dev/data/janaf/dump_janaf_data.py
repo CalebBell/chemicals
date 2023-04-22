@@ -426,7 +426,7 @@ Cpls_dict = {}
 Cpls_values_dict = {}
 Tl_values_dict = {}
 
-bad_states = set(['l,g'])
+bad_states = set(['l,g', 'cr,l'])
 
 for CAS, row in metadata_table.iterrows():
     if CAS in bad_CASs:
@@ -448,12 +448,13 @@ for CAS, row in metadata_table.iterrows():
     if ' bar' in name.lower():
         # bad waters
         continue
+    
 
     names_dict[CAS] = name
     formulas_dict[CAS] = formula
     
-    
-#     print(CAS, formula, name, state)
+    if state not in ('l', 'g'):
+        print(CAS, formula, name, state)
     try:
         p = db.getphasedata(formula=formula, name=name, phase=state)
     except Exception as e:

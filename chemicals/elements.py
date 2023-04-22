@@ -175,6 +175,7 @@ allotropes['As'] = {
 allotropes['P'] = {
     'alpha white phosphorus': '12185-10-3', # most stable form at room Body-centred cubic or Triclinic also heard yellow phosphorus
     'beta white phosphorus': '12185-10-3', #  Triclinic also heard yellow phosphorus
+
     'red phosphorus': '7723-14-0',
     'violet phosphorus': '7723-14-0', # Monoclinic
     'black phosphorus': '7723-14-0', # Orthorhombic
