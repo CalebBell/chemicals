@@ -74,3 +74,6 @@ dev/data/common_chemistry_complete.tsv
 
 dev/predictions/psi4
 .hypothesis
+
+dev/data/janaf/JANAF_Cache
+dev/data/janaf/janaf.nist.gov
