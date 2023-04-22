@@ -343,7 +343,8 @@ class Janafdb(object):
         if formula is not None:
             formulasearch = self.db['formula'] == formula
         if name is not None:
-            namesearch = self.db['name'].str.lower().str.contains(name.lower(), regex=False)
+            namesearch = self.db['name'].str.lower() == name.lower()
+            # namesearch = self.db['name'].str.lower().str.equals(name.lower(), regex=False)
         if phase is not None:
             phasesearch = self.db['phase'] == phase
         if filename is not None:
@@ -440,6 +441,13 @@ for CAS, row in metadata_table.iterrows():
     if state in bad_states:
         continue
     
+    if name == 'Nitrous Acid, Cis':
+        # Same CAS as Nitrous Acid, Trans but that one is more stable
+        continue
+    if CAS == '7664-39-3' and formula != 'HF':
+        # H2F2 to H7F7 as well not sure why they are there
+        continue
+    
 #     print(CAS, formula, name, state)
     try:
         p = db.getphasedata(formula=formula, name=name, phase=state)
@@ -471,6 +479,7 @@ for CAS, row in metadata_table.iterrows():
         Gfgs_dict[CAS] = Gf_298
         S0gs_dict[CAS] = S0_298
         Cpgs_dict[CAS] = Cp_298
+        assert CAS not in Cpgs_values_dict, CAS
         Cpgs_values_dict[CAS] = Cps
         Tg_values_dict[CAS] = Ts_Cp
     elif state == 'l':
@@ -478,6 +487,7 @@ for CAS, row in metadata_table.iterrows():
         Gfls_dict[CAS] = Gf_298
         S0ls_dict[CAS] = S0_298
         Cpls_dict[CAS] = Cp_298
+        assert CAS not in Cpls_values_dict, CAS
         Cpls_values_dict[CAS] = Cps
         Tl_values_dict[CAS] = Ts_Cp
     assert  298.15 in p.rawdata['T'].tolist()
