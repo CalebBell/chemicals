@@ -115,50 +115,61 @@ cids = [783, 23987, 3028194, 5460467, 5462311, 5462310, 222, 962, 14917, 23935, 
 
 # Shows reference state https://janaf.nist.gov/tables/P-001.html
 # https://janaf.nist.gov/tables/Br-038.html
+
+# format: (name, count, phase, stp_ref, smiles, inchi, inchi_key, closest_CAS, unique_CAS_maybe_fake,)
+
 allotropes = {}
-allotropes['N'] = {
-    'dinitrogen': '7727-37-9',
-    'atomic nitrogen': '17778-88-0', 
-    'trinitrogen': '12596-60-0',
-}
+allotropes['N'] = [
+    ('dinitrogen', 2, 'g', True, 'N#N', 'N2/c1-2', 'IJGRMHOSHXDMSA-UHFFFAOYSA-N', '7727-37-9', '7727-37-9'),
+    ('atomic nitrogen', 1, 'g', False, '[N]', 'N', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', '17778-88-0', '17778-88-0'),
+    ('linear trinitrogen', 3, 'g', False, '[N-]=[N+]=[N]', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', '12596-60-0', '12596-60-0'),
+    ('cyclic trinitrogen', 3, 'g', False, 'N1=N[N]1', 'RLXSTAGCZQYHDL-UHFFFAOYSA-N', '12596-60-0', '2099958000-00-0'),
+]
+allotropes['H'] = [
+    ('dihydrogen', 2, 'g', True, '[HH]', 'H2/h1H', 'UFHFLCQGNIYNRP-UHFFFAOYSA-N', '1333-74-0', '1333-74-0'),
+    ('atomic hydrogen', 1, 'g', False, '[H]', 'H', 'YZCKVEUIGOORGS-UHFFFAOYSA-N', '12385-13-6', '12385-13-6')
+]
 
-allotropes['H'] = {
-    'dihydrogen': '1333-74-0',
-    'atomic hydrogen': '12385-13-6', 
-}
-allotropes['F'] = {
-    'difluorine': '7782-41-4',
-    'atomic fluorine': '14762-94-8', 
-}
-allotropes['I'] = {
-    'diiodine': '7553-56-2',
-    'atomic iodine': '14362-44-8', 
-}
-allotropes['Br'] = {
-    'dibromine': '7726-95-6',
-    'atomic bromine': '10097-32-2', 
-}
-allotropes['Cl'] = {
-    'dichlorine': '7782-50-5',
-    'atomic chlorine': '22537-15-1', 
-}
+allotropes['F'] = [
+    ('difluorine', 2, 'g', True, 'FF', 'F2/c1-2', 'PXGOKWXKJXAPGV-UHFFFAOYSA-N', '7782-41-4', '7782-41-4'),
+    ('atomic fluorine', 1, 'g', False, '[F]', 'F', 'YCKRFDGAMUMZLT-UHFFFAOYSA-N', '14762-94-8', '14762-94-8')
+]
+
+allotropes['I'] = [
+    ('diiodine', 2, 's', True, 'II', 'I2/c1-2', 'PNDPGZBMCMUPRI-UHFFFAOYSA-N', '7553-56-2', '7553-56-2'),
+    ('atomic iodine', 1, 'g', False, '[I]', 'I', 'ZCYVEMRRCGMTRW-UHFFFAOYSA-N', '14362-44-8', '14362-44-8'),
+]
+
+allotropes['Br'] = [
+    ('dibromine', 2, 'l', True, 'BrBr', 'InChI=1S/Br2/c1-2', 'GDTBXPJZTBHREO-UHFFFAOYSA-N', '7726-95-6', '7726-95-6'),
+    ('atomic bromine', 1, 'g', False, '[Br]', 'Br', 'WKBOTKDWSSQWDR-UHFFFAOYSA-N', '10097-32-2', '10097-32-2')
+]
+
+allotropes['Cl'] = [
+    ('dichlorine', 2, 'g', True, 'ClCl', 'Cl2/c1-2', 'KZBUYRJDOAKODT-UHFFFAOYSA-N', '7782-50-5', '7782-50-5'),
+    ('atomic chlorine', 1, 'g', False, '[Cl]', 'Cl', 'ZAMOUSCENKQFHK-UHFFFAOYSA-N', '22537-15-1', '22537-15-1')
+]
+
+allotropes['C'] = [
+    ('diamond', 1, 's', False, 'C', 'CH4/h1H4', 'VNWKTOKETHGBQD-UHFFFAOYSA-N', '7782-40-3', '7782-40-3'),
+    ('graphite', 1, 's', True, 'C', 'CH4/h1H4', 'VNWKTOKETHGBQD-UHFFFAOYSA-N', '7782-42-5', '7782-42-5'),
+    ('atomic carbon', 1, 's', False, 'C', 'CH4/h1H4', 'VNWKTOKETHGBQD-UHFFFAOYSA-N', '7440-44-0', '7440-44-0'),# also carbon black
+]
 
 
-allotropes['C'] = {
-    'diamond': '7782-40-3',
-    'graphite': '7782-42-5',
-    'atomic carbon': '7440-44-0', # also carbon black
-}
-allotropes['Po'] = {
-    'alpha polonium': '7440-08-6',
-    'beta polonium': '7440-08-6', 
-}
-allotropes['Sn'] = {
-    'white tin': '7440-31-5', # beta-tin
-    'gray tin': '7440-31-5',  # alpha-tin
+allotropes['Po'] = [
+    ('alpha polonium', 1, 's', True, '[Po]', 'Po', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', '7440-08-6', '2099953000-00-0'),
+    ('beta polonium', 1, 's', True, '[Po]', 'Po', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', '7440-08-6', '2099937000-00-0'),
+]
+
+allotropes['Sn'] = [
     # unfortunately sources report the same CAS
-    # There are also gamma-tin and sigma-tin at high pressures
-}
+    ('white tin', 1, 's', True, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099932000-00-0')
+    ('gray tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099916000-00-0')
+    ('gamma tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099911000-00-0') # not common
+    ('sigma tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099898000-00-0') # not common
+]
+
 allotropes['Se'] = {
     'gray selenium': '7782-49-2', # most stable at STP, chiral hexagonal crystal lattice
     'red gamma selenium': '7782-49-2', # monocrystaline puckered cyclooctaselenium (Se8) rings
