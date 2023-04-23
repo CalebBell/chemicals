@@ -161,12 +161,12 @@ def test_Gharagheizi_Hsub_data():
 
 
 def test_Yaws_Tb_data():
-    tot = Tb_data_Yaws.sum()
+    tot = Tb_data_Yaws.sum()['Tb']
     assert_close(tot, 6631287.51)
     assert Tb_data_Yaws.shape == (13461, 1)
 
 def test_Tm_ON_data():
-    tot = Tm_ON_data.sum()
+    tot = Tm_ON_data.sum()['Tm']
     assert_close(tot, 4059989.425)
 
     assert Tm_ON_data.shape == (11549, 1)

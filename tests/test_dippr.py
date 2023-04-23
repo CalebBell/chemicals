@@ -22,7 +22,7 @@ SOFTWARE.
 """
 
 from fluids.numerics import assert_close, assert_close1d
-from scipy.misc import derivative
+from fluids.numerics import derivative
 from scipy.integrate import quad
 import pytest
 
