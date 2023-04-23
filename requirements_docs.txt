@@ -3,7 +3,7 @@ scipy
 numpydoc
 pint
 nbsphinx
-fluids>=1.0.12
+fluids>=1.0.23
 IPython
 ipython
 numba
