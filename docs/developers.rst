@@ -145,7 +145,7 @@ On UNIX/Mac OS/WSL, the notebook results can be regenerated with the following s
 
 Continuous Integration
 ----------------------
-Travis and Appveyor are presently used. They test only code in the `release` branch. Some tests, like those that download data from the internet, are not ran by design on their platforms. The same goes for testing `numba` online - getting an up to date version of numba is challenging.
+Github Actions is presently used. They test only code in the `release` branch. Some tests, like those that download data from the internet, are not ran by design on their platforms. The same goes for testing `numba` online - getting an up to date version of numba is challenging.
 
 Load Speed
 ----------

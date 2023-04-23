@@ -23,9 +23,6 @@ Chemicals
 .. image:: https://badges.gitter.im/CalebBell/chemicals.svg
    :alt: Join the chat at https://gitter.im/CalebBell/chemicals
    :target: https://gitter.im/CalebBell/chemicals
-.. image:: http://img.shields.io/appveyor/ci/calebbell/chemicals.svg
-   :target: https://ci.appveyor.com/project/calebbell/chemicals/branch/release
-   :alt: Build_status
 .. image:: https://zenodo.org/badge/264697738.svg
    :alt: Zenodo
    :target: https://zenodo.org/badge/latestdoi/264697738
