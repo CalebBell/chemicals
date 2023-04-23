@@ -56,7 +56,7 @@ for p in paths:
 
 
 
-os.system('%s generate_sqlite_database.py' %(sys.executable))
+os.system('%s "%s/dev/generate_sqlite_database.py"' %(sys.executable, main_dir))
 
 
 import pytest
