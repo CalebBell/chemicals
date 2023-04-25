@@ -1349,6 +1349,8 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
     .. [1] Design Institute for Physical Properties, 1996. DIPPR Project 801
        DIPPR/AIChE
     '''
+    if T > Tc:
+        T = Tc
     if order == 0:
         tau = 1-T/Tc
         return A + B*tau**0.35 + C*tau**(2/3.) + D*tau + E*tau**(4/3.)

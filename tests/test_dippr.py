@@ -222,6 +222,11 @@ def test_EQ116_more():
     with pytest.raises(Exception):
         EQ116(20., *coeffs, order=1E100)
 
+    # above Tc check
+
+    res = EQ116(2000, 269.75, 242.0, 202.1021, 310.6035, -45.2615, 142.0821)
+    assert res.imag == 0.0
+
 def test_EQ107_more():
     # T derivative
     coeffs = (33363., 26790., 2610.5, 8896., 1169.)
