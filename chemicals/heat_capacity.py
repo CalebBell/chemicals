@@ -2327,6 +2327,8 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
     Tr = T/Tc
+    if Tr >= 1.0:
+        Tr = (1-1e-15) # TODO limit
     return R*(a1*log(1.0-Tr) + a2/(1.0-Tr) + a3 + Tr*(Tr*(Tr*a6 + a5) + a4))
 
 
