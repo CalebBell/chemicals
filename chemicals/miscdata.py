@@ -55,6 +55,7 @@ register_df_source(folder, 'wikidata_properties.tsv', sparsify=True, int_CAS=Tru
 register_df_source(folder, 'webbook_constants.tsv', sparsify=True, int_CAS=True)
 register_df_source(folder, 'common_chemistry_data.tsv', sparsify=True, int_CAS=True)
 
+# Common database IDs
 JOBACK = 'JOBACK'
 WIKIDATA = 'WIKIDATA'
 WEBBOOK = 'WEBBOOK'
@@ -62,6 +63,41 @@ COMMON_CHEMISTRY = 'COMMON_CHEMISTRY'
 PSI4_2022A = 'PSI4_2022A'
 CHEMSEP = 'CHEMSEP'
 JANAF = 'JANAF'
+
+# metadata about othe type of data being read in
+
+EXPERIMENTAL = 'EXPERIMENTAL' # The quantity was measured directly or the standard means of measuring the quantity was performed
+PREDICTED = 'PREDICTED' # A published or unpublished estimation method to guess the value
+DEFINED = 'DEFINED' # e.g. enthalpy of formation of oxygen is 0
+PROCESSED = 'PROCESSED' # Values that came from something that took in other values 
+
+EXPERIMENTAL_PRIMARY = 'EXPERIMENTAL_PRIMARY' # published the experimental data for the first time
+EXPERIMENTAL_COMPILATION = 'EXPERIMENTAL_COMPILATION' # a paper that isn't publishing experimental data for the first time but putting multiple chemical values together
+EXPERIMENTAL_REVIEW = 'EXPERIMENTAL_REVIEW' # A paper that looks at multiple single property values published in the literature for the same chemical and recommends one (potentially averaing them to get a new value)
+EXPERIMENTAL_COMPILATION_SECONDARY = 'EXPERIMENTAL_COMPILATION_SECONDARY'# A paper that reproduces compilled data from another source
+
+PREDICTED_GC = 'PREDICTED_GC'
+PREDICTED_CSP = 'PREDICTED_CSP'
+PREDICTED_MM = 'PREDICTED_MM' # molecular modeling
+PREDICTED_QM = 'PREDICTED_QM' # quantum mechanics calc
+
+# The definition of PROCESSED is that software was used, or a complex database (wikidata, common chemistry) involved
+
+PROCESSED_EXPERIMENTAL = 'PROCESSED_EXPERIMENTAL' # Processed values that are all derived from experiments
+PROCESSED_PREDICTED = 'PROCESSED_PREDICTED' # Processed values that are all derived from predictions
+PROCESSED_EXPERIMENTAL_PREDICTED = 'PROCESSED_EXPERIMENTAL_PREDICTED' # Processed values that are derived experiments and or predictions may have no real data for a chemical
+
+PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY = 'PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY' # same, but haven't seen original output only someone's republication
+PROCESSED_EXPERIMENTAL_SECONDARY = 'PROCESSED_EXPERIMENTAL_SECONDARY' # same, but haven't seen original output only someone's republication
+PROCESSED_PREDICTED_SECONDARY = 'PROCESSED_PREDICTED_SECONDARY' # same, but haven't seen original output only someone's republication
+
+
+data_source_categories = [EXPERIMENTAL, PREDICTED, DEFINED, PROCESSED]
+experimental_data_source_categories = [EXPERIMENTAL_PRIMARY, EXPERIMENTAL_COMPILATION, EXPERIMENTAL_REVIEW, EXPERIMENTAL_COMPILATION_SECONDARY]
+predicted_data_source_categories = [PREDICTED_GC, PREDICTED_CSP, PREDICTED_MM, PREDICTED_QM]
+
+processed_data_source_categories = [PROCESSED_EXPERIMENTAL, PROCESSED_PREDICTED, PROCESSED_EXPERIMENTAL_PREDICTED, 
+                                    PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY, PROCESSED_EXPERIMENTAL_SECONDARY, PROCESSED_PREDICTED_SECONDARY]
 
 
 _VDI_dict_loaded = False
@@ -108,45 +144,6 @@ else:
         _load_miscdata()
         _load_VDI_saturation_dict()
 
-### VDI Saturation
-
-# Created with the following code. Don't delete! Updates may be necessary.
-#from chemicals.utils import to_num, rho_to_Vm
-#import copy
-#
-#emptydict = {"Name": None, "MW": None, "Tc": None, "T": [], "P": [],
-#             "Density (l)": [], "Density (g)": [], "Hvap": [], "Cp (l)": [],
-#            "Cp (g)": [], "Mu (l)": [], "Mu (g)": [], "K (l)": [], "K (g)": [],
-#            "Pr (l)": [], "Pr (g)": [], "sigma": [], "Beta": [],
-#            "Volume (l)": [], "Volume (g)": []}
-#VDI_saturation_dict = {}
-#with open(os.path.join(folder, 'VDI Saturation Compounds Data.csv')) as f:
-#    next(f)
-#    for line in f:
-#        values = to_num(line.strip('\n').split('\t'))
-#        (CASRN, _name, _MW, _Tc, T, P, rhol, rhog, Hvap, cpl, cpg, mul, mug, kl, kg, prl, prg, sigma, Beta) = values
-#        newdict = (VDI_saturation_dict[CASRN] if CASRN in VDI_saturation_dict else copy.deepcopy(emptydict))
-#        newdict["Name"] = _name
-#        newdict["MW"] = _MW
-#        newdict["Tc"] = _Tc
-#        newdict["T"].append(T)
-#        newdict["P"].append(P)
-#        newdict["Density (l)"].append(rhol)
-#        newdict["Density (g)"].append(rhog)  # Not actually used
-#        newdict["Hvap"].append(Hvap)
-#        newdict["Cp (l)"].append(cpl)  # Molar
-#        newdict["Cp (g)"].append(cpg)  # Molar
-#        newdict["Mu (l)"].append(mul)
-#        newdict["Mu (g)"].append(mug)
-#        newdict["K (l)"].append(kl)
-#        newdict["K (g)"].append(kg)
-#        newdict["Pr (l)"].append(prl)
-#        newdict["Pr (g)"].append(prl)
-#        newdict["sigma"].append(sigma)
-#        newdict["Beta"].append(Beta)
-#        newdict["Volume (l)"].append(rho_to_Vm(rhol, _MW))
-#        newdict["Volume (g)"].append(rho_to_Vm(rhog, _MW))
-#        VDI_saturation_dict[CASRN] = newdict
 
 @mark_numba_incompatible
 def lookup_VDI_tabular_data(CASRN, prop):
