@@ -36,6 +36,7 @@ Critical Temperature
 .. autofunction:: chemicals.critical.Tc
 .. autofunction:: chemicals.critical.Tc_methods
 .. autodata:: chemicals.critical.Tc_all_methods
+.. autodata:: chemicals.critical.Tc_all_method_types
 
 Critical Pressure
 -----------------
@@ -235,6 +236,22 @@ else: # pragma: no cover
 
 Tc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tc` for the actual references'''
+
+Tc_all_method_types = {
+    IUPAC: miscdata.EXPERIMENTAL_REVIEW,
+    MATTHEWS: miscdata.EXPERIMENTAL_COMPILATION,
+    CRC: miscdata.PROCESSED_EXPERIMENTAL,
+    PD: miscdata.EXPERIMENTAL_COMPILATION_SECONDARY,
+    miscdata.WEBBOOK: miscdata.PROCESSED_EXPERIMENTAL,
+    
+    PSRK: miscdata.PROCESSED_EXPERIMENTAL_PREDICTED,
+    PINAMARTINES: miscdata.PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY,
+    YAWS: miscdata.PROCESSED_EXPERIMENTAL_PREDICTED,
+    
+    WILSON_JASPERSON: miscdata.PREDICTED_GC,
+    miscdata.JOBACK: miscdata.PREDICTED_GC,
+}
+
 
 @mark_numba_incompatible
 def Tc_methods(CASRN):
