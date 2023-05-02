@@ -480,6 +480,9 @@ for CAS, row in metadata_table.iterrows():
     if CAS == '7664-39-3' and formula != 'HF':
         # H2F2 to H7F7 as well not sure why they are there
         continue
+    if name == 'Iron Carbonyl':
+        # Incorrectly has liquid and solid data, cannot use it
+        continue
     if ' bar' in name.lower():
         # bad waters
         continue
@@ -525,24 +528,30 @@ for CAS, row in metadata_table.iterrows():
         S0gs_dict[CAS] = S0_298
         Cpgs_dict[CAS] = Cp_298
         assert CAS not in Cpgs_values_dict, CAS
-        Cpgs_values_dict[CAS] = Cps
-        Tg_values_dict[CAS] = Ts_Cp
+        if len(Ts_Cp) == len(set(Ts_Cp)) or True:
+            # Skip duplicate T values as the table isn't really single phase
+            Cpgs_values_dict[CAS] = Cps
+            Tg_values_dict[CAS] = Ts_Cp
     elif state == 'l':
         Hfls_dict[CAS] = Hf_298
         Gfls_dict[CAS] = Gf_298
         S0ls_dict[CAS] = S0_298
         Cpls_dict[CAS] = Cp_298
         assert CAS not in Cpls_values_dict, CAS
-        Cpls_values_dict[CAS] = Cps
-        Tl_values_dict[CAS] = Ts_Cp
+        if len(Ts_Cp) == len(set(Ts_Cp)) or True:
+            # Skip duplicate T values as the table isn't really single phase
+            Cpls_values_dict[CAS] = Cps
+            Tl_values_dict[CAS] = Ts_Cp
     elif state == 'cr' and (solid_key in solid_CAS_trans or is_cr_unique) or is_graphite:
         Hfss_dict[CAS] = Hf_298
         Gfss_dict[CAS] = Gf_298
         S0ss_dict[CAS] = S0_298
         Cpss_dict[CAS] = Cp_298
         assert CAS not in Cpss_values_dict, CAS
-        Cpss_values_dict[CAS] = Cps
-        Ts_values_dict[CAS] = Ts_Cp
+        if len(Ts_Cp) == len(set(Ts_Cp)) or True:
+            # Skip duplicate T values as the table isn't really single phase
+            Cpss_values_dict[CAS] = Cps
+            Ts_values_dict[CAS] = Ts_Cp
         
         if is_graphite:
             graphite_CAS = '7782-42-5'
