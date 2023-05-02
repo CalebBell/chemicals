@@ -7,7 +7,6 @@ from joblib import Parallel, delayed
 folder = os.path.join(os.path.dirname(__file__), '..', '..', 'chemicals', 'Critical Properties')
 
 pubchem_db.autoload_main_db()
-f = open(os.path.join(folder, 'omega_Psat_Tc_predictions.tsv'), 'w')
 
 dump_oder = ['omega',]
 keys = ['CAS', 'omega']
@@ -40,6 +39,8 @@ def generate_line(CASi):
             line[i] = ''
         elif v == '':
             pass
+        elif i == 0:
+            line[i] = str(v) # CAS
         elif isinstance(v, (int, float)):
             line[i] = '{:.8g}'.format(v)
     to_write = '\t'.join(line) + '\n'
@@ -56,6 +57,6 @@ retVals = Parallel()(delayed(generate_line)(CASi) for CASi in sorted(pubchem_db.
 for l in retVals:
     if l is not False:
         lines.append(l)
-
+f = open(os.path.join(folder, 'omega_Psat_Tc_predictions.tsv'), 'w')
 f.writelines(lines)
 f.close()
