@@ -25,6 +25,12 @@ def generate_line(CASi):
         return False
     #print(Tc_val, Psat_07, Pc_val)
     omega = omega_definition(Psat_07, Pc_val)
+
+    # Add some basic limits for omega
+    if omega > 3.0:
+        omega = 3.0
+    if omega < -2.0:
+        omega = -2.0
     
     values = [omega]
     line = values
