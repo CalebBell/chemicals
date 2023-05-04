@@ -443,11 +443,11 @@ def EQ105_fitting_jacobian(Ts, A, B, C, D):
             x1 = x0**D
             x2 = x1 + 1.0
             x3 = A*B**(-x1 - 1.0)
-            x4 = x1*x3*log(B)
+            x4 = x1*x3*trunc_log(B)
             r[0] = B**(-x2)
             r[1] = -x2*x3/B
             r[2] = -D*Ts[i]*x4/(C*C*x0)
-            r[3] = -x4*log(x0)
+            r[3] = -x4*trunc_log(x0)
     return out
 
 def EQ106_fitting_jacobian(Ts, Tc, A, B, C, D, E):
