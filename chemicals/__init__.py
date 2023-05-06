@@ -78,7 +78,7 @@ if not fluids.numerics.is_micropython:
                'interface', 'permittivity', 'thermal_conductivity', 'combustion',
                'volume', 'rachford_rice', 'flash_basic', 'identifiers', 'safety',
                'iapws', 'air', 'molecular_geometry']
-    
+
     __all__.extend(exceptions.__all__)
     __all__.extend(critical.__all__)
     __all__.extend(utils.__all__)
@@ -111,18 +111,18 @@ if not fluids.numerics.is_micropython:
     __all__.extend(iapws.__all__)
     __all__.extend(air.__all__)
     __all__.extend(molecular_geometry.__all__)
-    
+
     submodules = [critical, utils, elements, dipole, dippr, temperature, miscdata,
                   environment, refractivity, solubility, lennard_jones,
                   vapor_pressure, virial, phase_change, triple, acentric, viscosity,
                   interface, permittivity, thermal_conductivity, combustion,
                   heat_capacity, reaction, volume, rachford_rice, flash_basic, identifiers, safety,
                   iapws, air, molecular_geometry]
-    
-    
+
+
     chemicals_dir = utils.source_path
-    
-    
+
+
     def complete_lazy_loading():
         critical._load_critical_data()
         dipole._load_dipole_data()
@@ -150,7 +150,7 @@ if not fluids.numerics.is_micropython:
             identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
         except:
             pass
-    
+
     def remove_missing(values, CASs):
         values_found, CASs_found = [], []
         for i in range(len(values)):
@@ -186,7 +186,7 @@ if not fluids.numerics.is_micropython:
                     else:
                         counts[p] = set(prop_CASs)
         return {k: len(v) for k, v in counts.items()}
-    
+
     def memory_usage(finish_loading=True):
         if finish_loading:
             complete_lazy_loading()
@@ -195,13 +195,13 @@ if not fluids.numerics.is_micropython:
         for name, df in data_reader.df_sources.items():
             names.append(name)
             usages.append(df.memory_usage().values.sum())
-        
+
         names = [x for _, x in sorted(zip(usages, names))]
         usages.sort()
         for name, use in zip(names, usages):
             print(f'{name} : {use/1024**2:3f} MB')
         print(f'Total usage: {sum(usages)/1024**2:3f} MB')
-                
+
     global vectorized, numba, units, numba_vectorized
     if PY37:
         def __getattr__(name):

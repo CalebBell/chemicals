@@ -70,10 +70,10 @@ Numerical Notes
 For the two-phase problem, there are the following ways of computing the vapor
 and liquid mole fractions once the vapor fraction and liquid fraction has
 been computed:
-    
+
 
 The most commonly shown expression is:
-    
+
 
 .. math::
     x_i = \frac{z_i}{1 + \frac{V}{F}(K_i-1)}
@@ -81,7 +81,7 @@ The most commonly shown expression is:
 This can cause numerical issues when :math:`K_i` is near 1. It also shows
 issues near :math:`\frac{V}{F}(K_i-1) = -1`.
 
-Another expression which avoids the second issue is 
+Another expression which avoids the second issue is
 
 .. math::
     x_i = \frac{z_i}{\frac{L}{F} + (1 - \frac{L}{F})K_i}
@@ -90,11 +90,11 @@ Much like the other expression above this numerical issues but at different
 conditions: :math:`\frac{L}{F} = 1` and :math:`\frac{L}{F} = -(1 - \frac{L}{F})K_i`.
 
 One more expression using both liquid and vapor fraction is:
-    
+
 .. math::
     x_i = \frac{z_i}{K_i\frac{V}{F} + \frac{L}{F} }
-    
-This expression only has one problematic area: :math:`K_i\frac{V}{F} = \frac{L}{F}`. 
+
+This expression only has one problematic area: :math:`K_i\frac{V}{F} = \frac{L}{F}`.
 Preferably, this is computed with a fused-multiply-add operation.
 
 Another expression which flips the K value into the liquid form and swaps the
@@ -106,14 +106,14 @@ vapor fraction for the liquid fraction in-line is as follows
 
 This also has numerical problems when :math:`-\frac{\frac{L}{F}}{K_i} = \frac{V}{F}`.
 
-Even when computing a solution with high precision such as with `mpmath`, 
+Even when computing a solution with high precision such as with `mpmath`,
 the resulting compositions and phase fractions may fail basic tests. In the
 following case, a nasty problem has a low-composition but relatively volatile
 last component. Mathematically, :math:`1 = \frac{\frac{L}{F} x_i + \frac{V}{F} y_i}{z_i}`.
-This is true for all components except the last one in this case, where 
+This is true for all components except the last one in this case, where
 significant error exists.
 
->>> zs = [0.004632150100959984, 0.019748784459594933, 0.0037494212674659875, 0.0050492815033649835, 7.049818284201636e-05, 0.019252941309184937, 0.022923068733233923, 0.02751809363371991, 0.044055273670258854, 0.026348159124199914, 0.029384949788372902, 0.022368938441593926, 0.03876345111451487, 0.03440715821883388, 0.04220510198067186, 0.04109191458414686, 0.031180945124537895, 0.024703227642798916, 0.010618543295340965, 0.043262442161003854, 0.006774922650311977, 0.02418090788262392, 0.033168278052077886, 0.03325881573680989, 0.027794535589044905, 0.00302091746847699, 0.013693571363003955, 0.043274465132840854, 0.02431371852108292, 0.004119055065872986, 0.03314056562191489, 0.03926511182895087, 0.0305068048046159, 0.014495317922126952, 0.03603737707409988, 0.04346278949361786, 0.019715052322446934, 0.028565255195219907, 0.023343683279902924, 0.026532427286078915, 2.0833722372767433e-06] 
+>>> zs = [0.004632150100959984, 0.019748784459594933, 0.0037494212674659875, 0.0050492815033649835, 7.049818284201636e-05, 0.019252941309184937, 0.022923068733233923, 0.02751809363371991, 0.044055273670258854, 0.026348159124199914, 0.029384949788372902, 0.022368938441593926, 0.03876345111451487, 0.03440715821883388, 0.04220510198067186, 0.04109191458414686, 0.031180945124537895, 0.024703227642798916, 0.010618543295340965, 0.043262442161003854, 0.006774922650311977, 0.02418090788262392, 0.033168278052077886, 0.03325881573680989, 0.027794535589044905, 0.00302091746847699, 0.013693571363003955, 0.043274465132840854, 0.02431371852108292, 0.004119055065872986, 0.03314056562191489, 0.03926511182895087, 0.0305068048046159, 0.014495317922126952, 0.03603737707409988, 0.04346278949361786, 0.019715052322446934, 0.028565255195219907, 0.023343683279902924, 0.026532427286078915, 2.0833722372767433e-06]
 >>> Ks = [0.000312001984979, 0.478348350355814, 0.057460349529956, 0.142866526725442, 0.186076915390803, 1.67832923245552, 0.010784509466239, 0.037204384948088, 0.005359146955631, 2.41896552551221, 0.020514598049597, 0.104545054017411, 2.37825397780443, 0.176463709057649, 0.000474240879865, 0.004738042026669, 0.02556030236928, 0.00300089652604, 0.010614774675069, 1.75142303167203, 1.47213647779132, 0.035773024794854, 4.15016401471676, 0.024475125100923, 0.00206952065986, 2.09173484409107, 0.06290795470216, 0.001537212006245, 1.16935817509767, 0.001830422812888, 0.058398776367331, 0.516860928072656, 1.03039372722559, 0.460775800103578, 0.10980302936483, 0.009883724220094, 0.021938589630783, 0.983011657214417, 0.01978995396409, 0.204144939961852, 14.0521979447538]
 >>> LF, VF, xs, ys = Rachford_Rice_solution_mpmath(zs=zs, Ks=Ks)
 >>> (LF*xs[-1] + VF*ys[-1])/zs[-1]
@@ -944,39 +944,39 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
     return float(V_over_F), xs.tolist(), ys.tolist() # numba: delete
 
 def Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VF_r, VF_e, zs_k_minus_1_r, zs_k_minus_1_e,
-                                                   zs_k_minus_1_r_2_r, zs_k_minus_1_r_2_e, 
+                                                   zs_k_minus_1_r_2_r, zs_k_minus_1_r_2_e,
                                                    Km1r, Km1e, VF_min_r, VF_min_e, VF_max_r, VF_max_e):
     plain_errr, plain_erre, plan_diffr, plan_diffe = 0.0, 0.0, 0.0, 0.0
-    
+
     for i in range(len(zs_k_minus_1_r)):
         denr, dene = mul_dd(VF_r, VF_e, Km1r[i], Km1e[i])
         denr, dene = add_dd(1.0, 0.0, denr, dene)
         VF_kim1_1_invr, VF_kim1_1_inve = div_dd(1.0, 0.0, denr, dene)
         tmpr, tmpe = mul_dd(zs_k_minus_1_r[i], zs_k_minus_1_e[i], VF_kim1_1_invr, VF_kim1_1_inve)
-        
+
         # Add the error to the summation variables
         plain_errr, plain_erre = add_dd(plain_errr, plain_erre, tmpr, tmpe)
-        
+
         tmpr, tmpe = mul_dd(VF_kim1_1_invr, VF_kim1_1_inve, VF_kim1_1_invr, VF_kim1_1_inve)
         tmpr, tmpe = mul_dd(zs_k_minus_1_r_2_r[i], zs_k_minus_1_r_2_e[i], tmpr, tmpe)
-        
+
         # Add the error to the derivative variables
         plan_diffr, plan_diffe = add_dd(plan_diffr, plan_diffe, tmpr, tmpe)
-    
+
     # err = (V_over_F - V_over_F_min)*(V_over_F_max - V_over_F)*plain_err
     errr, erre = add_dd(VF_r, VF_e, -VF_min_r, -VF_min_e)
     tmpr, tmpe = add_dd(VF_max_r, VF_max_e, -VF_r, -VF_e)
     errr, erre = mul_dd(errr, erre, tmpr, tmpe)
     errr, erre = mul_dd(errr, erre, plain_errr, plain_erre)
-    
+
     fprimer, fprimee = add_dd(-VF_r, -VF_e, VF_max_r, VF_max_e)
     fprimer, fprimee = mul_dd(plan_diffr, plan_diffe, fprimer, fprimee)
-    
+
     tmpr, tmpe = add_dd(VF_r, VF_e, -VF_min_r, -VF_min_e)
     # This line finishes plan_diff*(-VF_r + VF_max_r)*(VF_r - VF_min_r)
     fprimer, fprimee = mul_dd(tmpr, tmpe, fprimer, fprimee)
-    
-    
+
+
     tmpr, tmpe = add_dd(-VF_r, -VF_e, VF_max_r, VF_max_e)
     tmpr, tmpe = mul_dd(tmpr, tmpe, plain_errr, plain_erre)
     # This line finishes adding + plain_err*(-VF_r + VF_max_r)
@@ -999,7 +999,7 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_min
         plain_err += num0*VF_kim1_1_inv
         plan_diff += num1*VF_kim1_1_inv*VF_kim1_1_inv
     err = (V_over_F - V_over_F_min)*(V_over_F_max - V_over_F)*plain_err
-    fprime = (plan_diff*(-V_over_F + V_over_F_max)*(V_over_F - V_over_F_min) 
+    fprime = (plan_diff*(-V_over_F + V_over_F_max)*(V_over_F - V_over_F_min)
               + plain_err*(-V_over_F + V_over_F_max)
               + plain_err*(-V_over_F + V_over_F_min))
     # print(err, V_over_F)
@@ -1016,10 +1016,10 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     .. math::
         \left(\frac{V}{F} - \alpha_L\right)\left(\alpha_R - \frac{V}{F}\right)
         \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
-        
+
     .. math::
         \alpha_L = - \frac{1}{K_{max} - 1}
-    
+
     .. math::
         \alpha_R = \frac{1}{1 - K_{min}}
 
@@ -1061,8 +1061,8 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
 
     References
     ----------
-    .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the 
-       Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992): 
+    .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the
+       Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992):
        303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
     '''
     N = len(Ks)
@@ -1096,24 +1096,24 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
         K_minus_1[i] = Kim1
         zs_k_minus_1[i] = zs[i]*Kim1
         zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
-    
+
     # Right the boundaries, the derivative goes very large and microscopic steps are made and the newton solver switches
     # The boundaries need to be handled with bisection-style solvers
     # The 1e-15 tolerance is able to be found with the 10*epsilon limits.
     low, high = V_over_F_min*one_10_epsilon_larger, V_over_F_max*one_10_epsilon_smaller
     V_over_F = newton(Rachford_Rice_err_fprime_Leibovici_Neoschil, x0, xtol=1e-15, ytol=1e-5, fprime=True, high=high,
                         low=low, bisection=True, args=(zs_k_minus_1, zs_k_minus_1_2, K_minus_1, V_over_F_min_LN, V_over_F_max))
-    
+
     # For maximum accuracy, the equation should be re-solved to obtain 16 digits
     # of precision for the liquid fraction
-    # Fortunately, we have an extremely good guess. 
+    # Fortunately, we have an extremely good guess.
     # We can re-use the same arrays.
     for i in range(N):
         Kim1 = 1.0/Ks[i] - 1.0
         K_minus_1[i] = Kim1
         zs_k_minus_1[i] = zs[i]*Kim1
         zs_k_minus_1_2[i] = -zs_k_minus_1[i]*K_minus_1[i]
-    
+
     # Translate the limits, noting that Kmin and Kmax are their inverses
     # and they trade places.
     x0 = 1.0 - V_over_F
@@ -1134,25 +1134,25 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
             xs[i] = zs[i]/(LF + (1.0 - LF)*Ks[i])
         else:
             xs[i] = zs[i]/(1. + V_over_F*K_minus_1)
-        
+
         # xs[i] = zs[i]/(Ks[i]*V_over_F + LF)
         # xs[i] = zs[i]/fma(Ks[i],V_over_F, LF)
-            
-    # The following trick can ensure the compositions sum to 1; small precision 
+
+    # The following trick can ensure the compositions sum to 1; small precision
     # gain but sometimes a large error can still exist.
     i_max_x = xs.index(max(xs))# numba: delete
-    
+
 #    max_x = 0  # numba: uncomment
 #    i_max_x = 0 # numba: uncomment
 #    for i in range(N): # numba: uncomment
 #        if xs[i] > max_x: # numba: uncomment
 #            max_x = xs[i] # numba: uncomment
 #            i_max_x = i # numba: uncomment
-    
-    
+
+
     x_sum = sum(xs)
     xs[i_max_x] = xs[i_max_x]  + (1.0-x_sum)
-    
+
     for i in range(N):
         ys[i] = xs[i]*Ks[i]
     return LF, V_over_F, xs, ys
@@ -1161,7 +1161,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
 @mark_numba_uncacheable
 def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     r'''Solves the objective function of the Rachford-Rice flash equation as
-    modified by Leibovici and Neoschil, using double-double precision math 
+    modified by Leibovici and Neoschil, using double-double precision math
     for maximum accuracy. For most cases, this function will return
     bit-for-bit accurate results; but there are pathological inputs where
     error still occurs.
@@ -1169,10 +1169,10 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     .. math::
         \left(\frac{V}{F} - \alpha_L\right)\left(\alpha_R - \frac{V}{F}\right)
         \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
-        
+
     .. math::
         \alpha_L = - \frac{1}{K_{max} - 1}
-    
+
     .. math::
         \alpha_R = \frac{1}{1 - K_{min}}
 
@@ -1214,8 +1214,8 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
 
     References
     ----------
-    .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the 
-       Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992): 
+    .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the
+       Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992):
        303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
     '''
     N = len(Ks)
@@ -1232,17 +1232,17 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
-    
+
     numr, nume = add_dd(Kmax, 0, -Kmin, 0)
     numr, nume = mul_dd(numr, nume, z_of_Kmax, 0)
     tmpr, tmpe = add_dd(1.0, 0.0, -Kmin, 0.0)
     numr, nume = add_dd(numr, nume, -tmpr, -tmpe)
-    
+
     denr, dene = add_dd(1.0, 0, -Kmin, 0)
     tmpr, tmpe = add_dd(Kmax, 0.0, -1.0, 0.0)
     denr, dene = mul_dd(denr, dene, tmpr, tmpe)
     VFminr, VFmine = div_dd(numr, nume, denr, dene)
-    
+
     denr, dene = add_dd(Kmax, 0, -1.0, 0.0)
     VFminLNr, VFminLNe = div_dd(-1.0, 0.0, denr, dene)
 
@@ -1258,7 +1258,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
             x0, _, _ = Rachford_Rice_solution_LN2(zs, Ks)
         except:
             x0 = 0.5*(VFminr + VFmaxr)
-    
+
 
 
     # Pre-compute as much as we can to speedup the slower solve of the
@@ -1275,21 +1275,21 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         Kim1r, Kim1e = add_dd(Ks[i], 0.0, -1.0, 0.0)
         K_minus_1r[i] = Kim1r
         K_minus_1e[i] = Kim1e
-        
+
         z_k_minus_1r, z_k_minus_1e = mul_dd(zs[i], 0.0, Kim1r, Kim1e)
 
         zs_k_minus_1r[i] = z_k_minus_1r
         zs_k_minus_1e[i] = z_k_minus_1e
-        
+
         z_k_minus_1_2r, z_k_minus_1_2e = mul_dd(z_k_minus_1r, z_k_minus_1e, -Kim1r, -Kim1e)
         zs_k_minus_1_2r[i] = z_k_minus_1_2r
         zs_k_minus_1_2e[i] = z_k_minus_1_2e
     VFr = x0
     VFe = 0.0
-    
+
     VF_minr, VF_mine = VFminr, VFmine
     VF_maxr, VF_maxe = VFmaxr, VFmaxe
-    
+
     for it in range(100):
         errr, erre, fprimer, fprimee = Rachford_Rice_err_fprime_Leibovici_Neoschil_dd(VFr, VFe,
                                                                 zs_k_minus_1r, zs_k_minus_1e, zs_k_minus_1_2r, zs_k_minus_1_2e,
@@ -1298,7 +1298,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
             VF_minr, VF_mine = VFr, VFe
         else:
             VF_maxr, VF_maxe = VFr, VFe
-        
+
         stepe, stepr = div_dd(errr, erre, fprimer, fprimee)
         VFr, VFe = add_dd(VFr, VFe, -stepe, -stepr)
 
@@ -1306,16 +1306,16 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         if lt_dd(VFr, VFe, VF_minr, VF_mine) or gt_dd(VFr, VFe, VF_maxr, VF_maxe):
             VFr, VFe = add_dd(VF_minr, VF_mine, VF_maxr, VF_maxe)
             VFr, VFe = mul_dd(0.5, 0.0, VFr, VFe)
-        
+
         if abs(errr) < 1e-25:
             break
     # if it > 30:
     #     print(f'zs={zs}')
     #     print(f'Ks={Ks}')
     #     1/0
-        
+
     LFr, LFe = add_dd(1.0, 0.0, -VFr, -VFe)
-    
+
     xs = zs_k_minus_1_2r
     ys = zs_k_minus_1_2e
     for i in range(N):
@@ -1333,7 +1333,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
         denr, dene = mul_dd(K_minus_1r, K_minus_1e, VFr, VFe)
         denr, dene = add_dd(1.0, 0, denr, dene)
         xir, xie = div_dd(zs[i], 0.0, denr, dene)
-    
+
         xs[i] = xir
         yir, yie = mul_dd(xir, xie, Ks[i], 0.0)
         ys[i] = yir
@@ -1345,12 +1345,12 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
     double-double math. This increases the range in which the
     calculation can be performed accurately but does not totally eliminate
     error.
-    
+
     .. math::
         \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
-        
+
     The analytical solution for a binary system is:
-        
+
     .. math::
         \frac{V}{F} = \frac{- K_{0} z_{0} - K_{1} z_{1} + z_{0} + z_{1}}
         {K_{0} K_{1} z_{0} + K_{0} K_{1} z_{1} - K_{0} z_{0} - K_{0} z_{1}
@@ -1381,14 +1381,14 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
     --------
     This system with large volatility difference and a trace of a component
     shows a correct calculation. Try it out with other solvers for bad results!
-    
+
     >>> Rachford_Rice_solution_binary_dd(zs=[1E-27, 1.0], Ks=[1000000000000,0.1])
     (1.000000000001, -1.0000000000009988e-12, [9.0000000000009e-13, 0.9999999999991], [0.90000000000009, 0.09999999999991001])
-    
+
     Note the limitations of this solver can be explored by comparing against
     :obj:`Rachford_Rice_solution_mpmath`. For example, with `z0` of 1e-28
     in the above example error creeps back in.
-    
+
     '''
     if len(zs) != 2:
         raise ValueError("This solution method works on two components only")
@@ -1400,14 +1400,14 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
     l = 2
     xs = [0.0]*l
     ys = [0.0]*l
-    
+
     z0z1r, z0z1e = add_dd(z0, 0.0, z1, 0.0)
     K0z0r, K0z0e = mul_noerrors_dd(K0, z0)
     K1z1r, K1z1e = mul_noerrors_dd(K1, z1)
-    
+
     tempr, tempe = add_dd(z0z1r, z0z1e, -K0z0r, -K0z0e)
     t0r, t0e = add_dd(tempr, tempe, -K1z1r, -K1z1e)
-    
+
     tempr, tempe = mul_dd(K1, 0.0, K0z0r, K0z0e)
     denr, dene = add_dd(t0r, t0e, tempr, tempe)
     tempr, tempe = mul_dd(K0, 0.0, K1z1r, K1z1e)
@@ -1418,7 +1418,7 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
     denr, dene = add_dd(denr, dene, -tempr, -tempe)
     V_over_Fr, V_over_Fe = div_dd(t0r, t0e, denr, dene)
     L_over_Fr, L_over_Fe = add_dd(1.0, 0.0, -V_over_Fr, -V_over_Fe)
-    
+
     # Compute x0
     denr, dene = add_dd(K0, 0.0, -1.0, 0.0)
     denr, dene = mul_dd(V_over_Fr, V_over_Fe, denr, dene)
@@ -1435,7 +1435,7 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
     # Compute y0 and y1
     y0r, y0e = mul_dd(x0r, x0e, K0, 0.0)
     y1r, y1e = mul_dd(x1r, x1e, K1, 0.0)
-    
+
     xs[0] = x0r
     xs[1] = x1r
     ys[0] = y0r
@@ -1445,9 +1445,9 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
 
 @mark_numba_incompatible
 def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
-    r'''Solves the the Rachford-Rice flash equation using numerical 
+    r'''Solves the the Rachford-Rice flash equation using numerical
     root-finding to a high precision using the `mpmath` library.
-    
+
     .. math::
         \sum_i \frac{z_i(K_i-1)}{1 + \frac{V}{F}(K_i-1)} = 0
 
@@ -1458,7 +1458,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     Ks : list[float]
         Equilibrium K-values, [-]
     dps : int, optional
-        Number of decimal places to use in the intermediate values of the 
+        Number of decimal places to use in the intermediate values of the
         calculation, [-]
     tol : float, optional
         The tolerance of the solver used in `mpmath`, [-]
@@ -1478,8 +1478,8 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     -----
     This function is written solely for development purposes with the aim
     of returning bit-accurate solutions.
-    
-    Note that the liquid fraction is also returned; it is insufficient to 
+
+    Note that the liquid fraction is also returned; it is insufficient to
     compute it as :math:`\frac{L}{F} = 1 - \frac{V}{F}`.
 
     Examples
@@ -1518,9 +1518,9 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
         return Rachford_Rice_err_fprime
 
     zs_orig, Ks_orig = zs, Ks
-    
+
     solve_order = 1 # 1 for newton, 0 for secant - development only, should always return the correct answer
-    
+
     Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
     for i in range(N):
         if zs[i] > 0.0:
@@ -1533,7 +1533,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))
 
     z_of_Kmax, Kmin, Kmax = mpf(z_of_Kmax), mpf(Kmin), mpf(Kmax)
-    
+
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1- Kmin))/((1- Kmin)*(Kmax- 1))
     V_over_F_max = 1/(1 - Kmin)
 
@@ -1546,7 +1546,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     Ks_minus_1 = [Ki - 1 for Ki in Ks_mp]
 
     zs_k_minus_1 = [zs_mp[i]*Ks_minus_1[i] for i in range(N)]
-    
+
     zs_k_minus_1_2 = [0.0]*N
     for i in range(N):
         zs_k_minus_1_2[i] = -zs_k_minus_1[i]*Ks_minus_1[i]
@@ -1555,7 +1555,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
         objf = make_objf(zs_k_minus_1, Ks_minus_1)
     elif solve_order == 1:
         objf = make_objf_der(zs_k_minus_1, zs_k_minus_1_2, Ks_minus_1)
-    
+
     guess = None
     try:
         # Try to obtain an initial guess for speed and convergence from the
@@ -1604,7 +1604,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     for i in range(N):
         x_calc = zs_mp[i]/(1 + V_over_F*Ks_minus_1[i])
         y_calc = x_calc*Ks_mp[i]
-        
+
         # This printed value should be 1. Once the values are converted to
         # floating-point, this may no longer be true!
         # print((LF*x_calc + V_over_F*y_calc)/zs[i])
@@ -1767,7 +1767,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         guess = 0.5*(V_over_F_min + V_over_F_max)
         guess = -log((V_over_F_max-guess)/(guess-V_over_F_min))
     # Should always converge - no poles
-    
+
     # The function cannot be evaluated in some regions due to a zero division however
     # ci should be the minimum
     if V_over_F_max > 0.0:
@@ -1778,7 +1778,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s"%(Ks))  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     solver_high = -log((V_over_F_max-near_high)/(near_high-V_over_F_min))
-    
+
     if V_over_F_min < 0.0:
         near_low = V_over_F_min*one_epsilon_smaller
     elif V_over_F_min > 0.0:
@@ -1794,7 +1794,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     V_over_F = newton(Rachford_Rice_err_LN2, guess, fprime=True, fprime2=True, xtol=1.48e-12, low=solver_low, high=solver_high, bisection=True, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: delete
 #    V_over_F = halley(Rachford_Rice_err_LN2, guess, xtol=1e-10, args=(zs, cis_ys, x0, V_over_F_min, N)) # numba: uncomment
     V_over_F = (V_over_F_min + (V_over_F_max - V_over_F_min)/(1.0 + exp(-V_over_F)))
-    
+
     if 1-1e-4 < V_over_F < 1+1e-4:
         # Re-calculate while inverting phase compositions and inverting the K values
         # This is necessary for the correct calculation for x compositions when the
@@ -1804,7 +1804,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
             Ks_inv[i] = 1.0/Ks[i]
         LF, xs, ys = Rachford_Rice_solution_LN2(zs, Ks_inv, guess=1.0-V_over_F)
         return V_over_F, ys, xs
-        
+
     else:
         xs = [0.0]*N
         for i in range(N):

@@ -90,7 +90,7 @@ Tt_all_methods = (STAVELEY, miscdata.WEBBOOK, MELTING)
 
 @mark_numba_incompatible
 def Tt_methods(CASRN):
-    """Return all methods available to obtain the triple temperature for the 
+    """Return all methods available to obtain the triple temperature for the
     desired chemical.
 
     Parameters
@@ -142,12 +142,12 @@ def Tt(CASRN, method=None):
     Median difference between melting points and triple points is 0.02 K.
     Accordingly, this should be more than good enough for engineering
     applications.
-    
+
     The data in [1]_ is originally on the ITS-68 temperature scale, but was
     converted to ITS-90. The numbers were rounded to 6 decimal places
     arbitrarily and the coversion was performed with this library.
-    
-    
+
+
 
     Examples
     --------

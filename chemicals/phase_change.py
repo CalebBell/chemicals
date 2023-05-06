@@ -247,7 +247,7 @@ else:
 
 ### Boiling Point at 1 atm
 
-Tb_all_methods = (CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY, 
+Tb_all_methods = (CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
                   miscdata.WEBBOOK, YAWS, miscdata.WIKIDATA, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tb` for the actual references'''
 
@@ -304,7 +304,7 @@ def Tb(CASRN, method=None):
           as published in [1]_.
         * 'CRC_INORG', a compillation of data on
           inorganic as published in [1]_.
-        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental
           and averaged values
         * 'WIKIDATA', data from the Wikidata project [3]_
         * 'COMMON_CHEMISTRY', a project from the CAS [4]_
@@ -349,7 +349,7 @@ def Tb(CASRN, method=None):
 
 ### Melting Point
 
-Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY, 
+Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
                   miscdata.WEBBOOK, miscdata.WIKIDATA, miscdata.JOBACK)
 '''Tuple of method name keys. See the `Tm` for the actual references'''
 
@@ -412,7 +412,7 @@ def Tm(CASRN, method=None):
           as published in [2]_.
         * 'CRC_INORG', a compillation of data on
           inorganic as published in [2]_.
-        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental
           and averaged values
         * 'WIKIDATA', data from the Wikidata project [3]_
         * 'COMMON_CHEMISTRY', a project from the CAS [4]_
@@ -538,7 +538,7 @@ def Pitzer(T, Tc, omega):
     Hvap. This cites [2]_.
 
     The recommended range is 0.6 to 1 Tr. Users should expect up to 5% error.
-    This function converges to zero at `Tc`. If Tc is larger than T, 
+    This function converges to zero at `Tc`. If Tc is larger than T,
     0 is returned as the model would return complex numbers.
 
     The original article has been reviewed and found to have a set of tabulated
@@ -624,7 +624,7 @@ def SMK(T, Tc, omega):
     A sample problem in the article has been verified. The numerical result
     presented by the author requires high numerical accuracy to obtain.
 
-    This function converges to zero at `Tc`. If Tc is larger than T, 
+    This function converges to zero at `Tc`. If Tc is larger than T,
     0 is returned as the model would return complex numbers.
 
     Examples
@@ -714,7 +714,7 @@ def MK(T, Tc, omega):
     Its results match with other functions however.
 
     Has poor behavior for low-temperature use.
-    This function converges to zero at `Tc`. If Tc is larger than T, 
+    This function converges to zero at `Tc`. If Tc is larger than T,
     0 is returned as the model would return complex numbers.
 
     Examples
@@ -788,7 +788,7 @@ def Velasco(T, Tc, omega):
     vaporization values at 0.7Tr, from 121 fluids in REFPROP 9.1.
     A value in the article was read to be similar, but slightly too low from
     that calculated here.
-    This function converges to zero at `Tc`. If Tc is larger than T, 
+    This function converges to zero at `Tc`. If Tc is larger than T,
     0 is returned as the model would return complex numbers.
 
     Examples
@@ -1223,17 +1223,17 @@ def PPDS12(T, Tc, A, B, C, D, E):
     Examples
     --------
     Example from [1]_:
-    
+
     >>> PPDS12(300.0, 591.75, 4.60584, 13.97224, -10.592315, 2.120205, 4.277128)
     37948.76862035925
-    
-    Example from [2]_ for benzene; note the coefficients from [2]_ predict 
+
+    Example from [2]_ for benzene; note the coefficients from [2]_ predict
     enthalpy of vaporization in kJ/mol, so the output must be adjusted. The same
     effect can be obtained by multiplying each of the coefficients by 1000.
-    
+
     >>> 1000.0*PPDS12(300.0, 562.05, 0.00171484, 0.0258604, -0.0243564, 0.00740881, 0.00680068)
     33662.4258030
-    
+
     References
     ----------
     .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
@@ -1257,7 +1257,7 @@ Hfus_all_methods = (CRC, miscdata.WEBBOOK, miscdata.WIKIDATA, miscdata.JOBACK)
 
 @mark_numba_incompatible
 def Hfus_methods(CASRN):
-    """Return all methods available to obtain the heat of fusion for the 
+    """Return all methods available to obtain the heat of fusion for the
     desired chemical.
 
     Parameters
@@ -1278,7 +1278,7 @@ def Hfus_methods(CASRN):
     return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
 
 @mark_numba_incompatible
-def Hfus(CASRN, method=None): 
+def Hfus(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's heat of fusion.
     Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -1308,7 +1308,7 @@ def Hfus(CASRN, method=None):
 
         * 'CRC', a compillation of data on organics and inorganics as published
           in [1]_.
-        * 'WEBBOOK', a NIST resource [4]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [4]_ containing mostly experimental
           and averaged values
         * 'WIKIDATA', data from the Wikidata project [2]_
         * 'JOBACK', an estimation method for organic substances in [3]_

@@ -139,7 +139,7 @@ def dipole_moment(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'CCCBDB', 'MULLER', or
-        'POLING', 'PSI4_2022A'. All valid values are also held in the list 
+        'POLING', 'PSI4_2022A'. All valid values are also held in the list
         `dipole_all_methods`.
 
     Notes
@@ -151,8 +151,8 @@ def dipole_moment(CASRN, method=None):
         * 'MULLER', a collection of data in a
           group-contribution scheme in [2]_.
         * 'POLING', in the appendix in [3].
-        * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum 
-          chemistry software, with initialized positions from rdkit's EmbedMolecule 
+        * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum
+          chemistry software, with initialized positions from rdkit's EmbedMolecule
           method, the basis set 6-31G** and the method mp2 [4]_.
 
     This function returns dipole moment in units of Debye. This is actually
@@ -183,8 +183,8 @@ def dipole_moment(CASRN, method=None):
        New York: McGraw-Hill Professional, 2000.
     .. [4] Turney, Justin M., Andrew C. Simmonett, Robert M. Parrish, Edward G.
        Hohenstein, Francesco A. Evangelista, Justin T. Fermann, Benjamin J.
-       Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure 
-       Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65. 
+       Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure
+       Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65.
        https://doi.org/10.1002/wcms.93.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:

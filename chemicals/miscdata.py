@@ -69,7 +69,7 @@ JANAF = 'JANAF'
 EXPERIMENTAL = 'EXPERIMENTAL' # The quantity was measured directly or the standard means of measuring the quantity was performed
 PREDICTED = 'PREDICTED' # A published or unpublished estimation method to guess the value
 DEFINED = 'DEFINED' # e.g. enthalpy of formation of oxygen is 0
-PROCESSED = 'PROCESSED' # Values that came from something that took in other values 
+PROCESSED = 'PROCESSED' # Values that came from something that took in other values
 
 EXPERIMENTAL_PRIMARY = 'EXPERIMENTAL_PRIMARY' # published the experimental data for the first time
 EXPERIMENTAL_COMPILATION = 'EXPERIMENTAL_COMPILATION' # a paper that isn't publishing experimental data for the first time but putting multiple chemical values together
@@ -96,7 +96,7 @@ data_source_categories = [EXPERIMENTAL, PREDICTED, DEFINED, PROCESSED]
 experimental_data_source_categories = [EXPERIMENTAL_PRIMARY, EXPERIMENTAL_COMPILATION, EXPERIMENTAL_REVIEW, EXPERIMENTAL_COMPILATION_SECONDARY]
 predicted_data_source_categories = [PREDICTED_GC, PREDICTED_CSP, PREDICTED_MM, PREDICTED_QM]
 
-processed_data_source_categories = [PROCESSED_EXPERIMENTAL, PROCESSED_PREDICTED, PROCESSED_EXPERIMENTAL_PREDICTED, 
+processed_data_source_categories = [PROCESSED_EXPERIMENTAL, PROCESSED_PREDICTED, PROCESSED_EXPERIMENTAL_PREDICTED,
                                     PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY, PROCESSED_EXPERIMENTAL_SECONDARY, PROCESSED_PREDICTED_SECONDARY]
 
 
@@ -130,8 +130,8 @@ def _load_miscdata():
 
 if PY37:
     def __getattr__(name):
-        if name in ('CRC_inorganic_data', 'CRC_organic_data', 
-                    'joback_predictions', 'wikidata_data', 'webbook_data', 
+        if name in ('CRC_inorganic_data', 'CRC_organic_data',
+                    'joback_predictions', 'wikidata_data', 'webbook_data',
                     'common_chemistry_data'):
             _load_miscdata()
             return globals()[name]

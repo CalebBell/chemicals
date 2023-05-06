@@ -235,8 +235,8 @@ def sigma_IAPWS(T):
     This function is valid from the triple temperature to the critical
     temperature. No effects for pressure are included in the formulation.
     Test values are from IAPWS 2010 book.
-    
-    The equation is valid from the triple point to the critical point, 
+
+    The equation is valid from the triple point to the critical point,
     647.096 K; but [1]_ also recommends its use down to -25°C.
 
     If a value larger than the critical temperature is input, 0.0 is returned.
@@ -301,11 +301,11 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
     literature values perfectly.
     Form of function returns imaginary results when T > Tc; 0 is returned
     if this is the case.
-    
+
     When fitting parameters to this function, it is easy to end up with a
-    fit that returns negative surface tension near but not quite at the 
+    fit that returns negative surface tension near but not quite at the
     critical point.
-    
+
 
 
     Examples
@@ -335,7 +335,7 @@ def PPDS14(T, Tc, a0, a1, a2):
     r'''Calculates air-liquid surface tension  using the [1]_
     emperical (parameter-regressed) method, called the PPDS 14 equation for
     surface tension.
-    
+
     .. math::
         \sigma = a_0 \tau^{a_1}(1 + a_2 \tau)
 
@@ -361,8 +361,8 @@ def PPDS14(T, Tc, a0, a1, a2):
     -----
     If Tc is larger than T, 0 is returned as the model would return complex
     numbers.
-    
-    If this model is fit with `a0` and `a2` as positive values, it is 
+
+    If this model is fit with `a0` and `a2` as positive values, it is
     guaranteed to predict only positive values of `sigma` right up to the
     critical point. However, `a2` is often fit to be a negative value.
 
@@ -375,12 +375,12 @@ def PPDS14(T, Tc, a0, a1, a2):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/PPDS14.htm.
-    .. [2] Frenkel, Michael, Robert D. Chirico, Vladimir Diky, Xinjian Yan, 
+    .. [2] Frenkel, Michael, Robert D. Chirico, Vladimir Diky, Xinjian Yan,
        Qian Dong, and Chris Muzny. "ThermoData Engine (TDE):  Software
-       Implementation of the Dynamic Data Evaluation Concept." Journal of 
-       Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38. 
+       Implementation of the Dynamic Data Evaluation Concept." Journal of
+       Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38.
        https://doi.org/10.1021/ci050067b.
     '''
     tau = 1.0 - T/Tc
@@ -391,7 +391,7 @@ def PPDS14(T, Tc, a0, a1, a2):
 def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     r'''Calculates air-liquid surface tension using the Watson [1]_
     emperical (parameter-regressed) method developed by NIST.
-    
+
     .. math::
         \sigma = \exp\left[a_{1} + \ln(1 - T_r)\left(
         a_2 + a_3T_r + a_4T_r^2 + a_5T_r^3 \right)\right]
@@ -422,13 +422,13 @@ def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     -----
     This expression is also used for enthalpy of vaporization in [1]_.
     The coefficients from NIST TDE for enthalpy of vaporization are kJ/mol.
-    
+
     This model is coded to return 0 values at Tr >= 1. It is otherwise not
     possible to evaluate this expression at Tr = 1, as log(0) is undefined
     (although the limit shows the expression converges to 0).
-    
+
     This equation does not have any term forcing it to become near-zero
-    at the critical point, but it cannot be fit so as to produce negative 
+    at the critical point, but it cannot be fit so as to produce negative
     values.
 
     Examples
@@ -440,7 +440,7 @@ def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/HVPExpansion-SurfaceTension.htm
     '''
     Tr = T/Tc
@@ -452,7 +452,7 @@ def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
 def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     r'''Calculates air-liquid surface tension using the IST expansion [1]_
     emperical (parameter-regressed) method developed by NIST.
-    
+
     .. math::
         \sigma = \sum_i a_i\left(1 - \frac{T}{T_c} \right)^i
 
@@ -481,7 +481,7 @@ def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     Notes
     -----
     This equation hsa a term term forcing it to become zero
-    at the critical point, but it can easily be fit so as to produce negative 
+    at the critical point, but it can easily be fit so as to produce negative
     values at any reduced temperature.
 
     Examples
@@ -493,7 +493,7 @@ def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/ISTExpansion-SurfaceTension.htm
     '''
     tau = 1.0 - T/Tc
@@ -535,7 +535,7 @@ def Somayajulu(T, Tc, A, B, C):
     Form of function returns imaginary results when T > Tc; 0.0 is returned
     if this is the case. Function is claimed valid from the triple to the
     critical point. Results can be evaluated beneath the triple point.
-    
+
     This function can be accidentally fit to return negative
     values of surface tension.
 
@@ -583,8 +583,8 @@ def Jasper(T, a, b):
     -----
     Internal units are mN/m, and degrees Celcius.
     This function has been checked against several references.
-    
-    As this is a linear model, negative values of surface tension will 
+
+    As this is a linear model, negative values of surface tension will
     eventually arise. 0 is returned in these cases.
 
     Examples
@@ -1129,7 +1129,7 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
 
 
 def sigma_Gharagheizi_1(T, Tc, MW, omega):
-    r'''Calculates air-liquid surface tension using the 
+    r'''Calculates air-liquid surface tension using the
     equation 4 derived in [1]_ by gene expression programming.
 
     .. math::
@@ -1164,15 +1164,15 @@ def sigma_Gharagheizi_1(T, Tc, MW, omega):
     Examples
     --------
     Methane at 93 K, point from [1]_'s supporting material:
-    
+
     >>> sigma_Gharagheizi_1(T=95, Tc=190.564, MW=16.04, omega=0.012)
     0.0110389739
 
     References
     ----------
     .. [1] Gharagheizi, Farhad, Ali Eslamimanesh, Mehdi Sattari, Amir H. Mohammadi,
-       and Dominique Richon. "Development of Corresponding States Model for 
-       Estimation of the Surface Tension of Chemical Compounds." AIChE Journal 59, 
+       and Dominique Richon. "Development of Corresponding States Model for
+       Estimation of the Surface Tension of Chemical Compounds." AIChE Journal 59,
        no. 2 (2013): 613-21. https://doi.org/10.1002/aic.13824.
     '''
     # Equation 4
@@ -1183,7 +1183,7 @@ def sigma_Gharagheizi_1(T, Tc, MW, omega):
     return sigma
 
 def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
-    r'''Calculates air-liquid surface tension using the 
+    r'''Calculates air-liquid surface tension using the
     equation 6 derived in [1]_ by gene expression programming.
 
     .. math::
@@ -1191,8 +1191,8 @@ def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
         \left(\frac{T_c}{\text{K}}\right)^{1/3}(1-T_r)^{11/9}
         \left[7.728729T_{br} + 2.476318\left(T_{br}^3 + \frac{V_{c}}{\text{m}^3 /\text{kmol}}\right)
         \right]
-        
-        
+
+
     Parameters
     ----------
     T : float
@@ -1215,22 +1215,22 @@ def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
 
     Notes
     -----
-    This expression gives does converge to 0 at the critical point. 
+    This expression gives does converge to 0 at the critical point.
     If Tc is larger than T, 0 is returned as the model would return complex
     numbers.
 
     Examples
     --------
     Methane at 93 K, point from [1]_'s supporting material:
-    
+
     >>> sigma_Gharagheizi_2(T=95, Tb=111.66, Tc=190.564, Pc=45.99e5, Vc=0.0986e-3)
     0.01674894057
 
     References
     ----------
     .. [1] Gharagheizi, Farhad, Ali Eslamimanesh, Mehdi Sattari, Amir H. Mohammadi,
-       and Dominique Richon. "Development of Corresponding States Model for 
-       Estimation of the Surface Tension of Chemical Compounds." AIChE Journal 59, 
+       and Dominique Richon. "Development of Corresponding States Model for
+       Estimation of the Surface Tension of Chemical Compounds." AIChE Journal 59,
        no. 2 (2013): 613-21. https://doi.org/10.1002/aic.13824.
     '''
     # Equation 6
@@ -1274,7 +1274,7 @@ def API10A32(T, Tc, K_W):
     and that it will give higher errors at pressures above 500 psi.
     [1]_ claims this has an average error of 10.7%.
 
-    This function converges to zero at `Tc`. If Tc is larger than T, 
+    This function converges to zero at `Tc`. If Tc is larger than T,
     0 is returned as the model would return complex numbers.
 
 

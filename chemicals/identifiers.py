@@ -331,11 +331,11 @@ class ChemicalMetadataDB(object):
         '''
         if not self.elements:
             return None
-        
+
         InChI_key_index, CAS_index, pubchem_index = self.InChI_key_index, self.CAS_index, self.pubchem_index
         smiles_index, InChI_index, formula_index = self.smiles_index, self.InChI_index, self.formula_index
         name_index = self.name_index
-        
+
         for ele in periodic_table:
             CAS = int(ele.CAS.replace('-', '')) # Store as int for easier lookup
             ele_lower_name = ele.name.lower()

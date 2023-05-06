@@ -140,7 +140,7 @@ def _load_combustion_data():
     combustdb_mon = data_source('Travis_Kessler_Combustdb_MON.tsv')
     combustdb_predictions = data_source('Travis_Kessler_Combustdb_predictions.tsv')
     dahmen_marquardt_iqt = data_source('Dahmen_Marquardt_ignition_delay_IQT.tsv')
-    
+
     RON_sources = {
         FLORIAN_LIMING: florian_liming_ron_experimental,
         COMBUSTDB: combustdb_ron,
@@ -204,7 +204,7 @@ def RON_methods(CASRN):
 
 @mark_numba_incompatible
 def RON(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's research octane 
+    r'''This function handles the retrieval of a chemical's research octane
     number (RON). Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
@@ -251,13 +251,13 @@ def RON(CASRN, method=None):
        https://doi.org/10.1016/j.jaecs.2020.100018.
     .. [2] Kessler, Travis. CombustDB. Python. 2019. UMass Lowell Energy and
        Combustion Research Laboratory, 2021. https://github.com/ecrl/combustdb.
-    .. [3] Lehn, Florian vom, Benedict Brosius, Rafal Broda, Liming Cai, and 
+    .. [3] Lehn, Florian vom, Benedict Brosius, Rafal Broda, Liming Cai, and
        Heinz Pitsch. "Using Machine Learning with Target-Specific Feature Sets
-       for Structure-Property Relationship Modeling of Octane Numbers and 
-       Octane Sensitivity." Fuel 281 (December 1, 2020): 118772. 
+       for Structure-Property Relationship Modeling of Octane Numbers and
+       Octane Sensitivity." Fuel 281 (December 1, 2020): 118772.
        https://doi.org/10.1016/j.fuel.2020.118772.
     .. [4] Kessler, Travis, and John Hunter Mack. "ECNet: Large Scale Machine
-       Learning Projects for Fuel Property Prediction." Journal of Open Source 
+       Learning Projects for Fuel Property Prediction." Journal of Open Source
        Software 2, no. 17 (2017): 401.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -299,7 +299,7 @@ def MON_methods(CASRN):
 
 @mark_numba_incompatible
 def MON(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's motor octane 
+    r'''This function handles the retrieval of a chemical's motor octane
     number (MON). Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
@@ -346,13 +346,13 @@ def MON(CASRN, method=None):
        https://doi.org/10.1016/j.jaecs.2020.100018.
     .. [2] Kessler, Travis. CombustDB. Python. 2019. UMass Lowell Energy and
        Combustion Research Laboratory, 2021. https://github.com/ecrl/combustdb.
-    .. [3] Lehn, Florian vom, Benedict Brosius, Rafal Broda, Liming Cai, and 
+    .. [3] Lehn, Florian vom, Benedict Brosius, Rafal Broda, Liming Cai, and
        Heinz Pitsch. "Using Machine Learning with Target-Specific Feature Sets
-       for Structure-Property Relationship Modeling of Octane Numbers and 
-       Octane Sensitivity." Fuel 281 (December 1, 2020): 118772. 
+       for Structure-Property Relationship Modeling of Octane Numbers and
+       Octane Sensitivity." Fuel 281 (December 1, 2020): 118772.
        https://doi.org/10.1016/j.fuel.2020.118772.
     .. [4] Kessler, Travis, and John Hunter Mack. "ECNet: Large Scale Machine
-       Learning Projects for Fuel Property Prediction." Journal of Open Source 
+       Learning Projects for Fuel Property Prediction." Journal of Open Source
        Software 2, no. 17 (2017): 401.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -425,8 +425,8 @@ def ignition_delay(CASRN, method=None):
 
         * 'DAHMEN_MARQUARDT', the experimental values compiled in [1]_;
           all timings come from the IQT tester device
-          
-          
+
+
     Note that different measurement devices can give different results.
 
     Examples
@@ -452,7 +452,7 @@ def ignition_delay(CASRN, method=None):
 def AKI(RON, MON):
     r'''This function calculates the anti knock index (AKI) of a fuel, also
     known as (R+M)/2 and by DON [1]_.
-    
+
     .. math::
         \text{AKI} = 0.5\text{RON} + 0.5\text{MON}
 
@@ -480,14 +480,14 @@ def AKI(RON, MON):
 
     References
     ----------
-    .. [1] McKinsey. "Octane." Accessed April 18, 2022. 
+    .. [1] McKinsey. "Octane." Accessed April 18, 2022.
        http://www.mckinseyenergyinsights.com/resources/refinery-reference-desk/octane/.
     '''
     return 0.5*(RON + MON)
 
 def octane_sensitivity(RON, MON):
     r'''This function calculates the octane sensitivity of a fuel [1]_.
-    
+
     .. math::
         \text{OS} = \text{RON} - \text{MON}
 
@@ -527,7 +527,7 @@ def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
 
     .. math::
         \text{RON} = 120.77 - \frac{425.48}{\tau_{ID}}
-        
+
     In the above equation, ignition delay is in ms.
 
     Parameters
@@ -552,10 +552,10 @@ def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
 
     References
     ----------
-    .. [1] Perez, Peter L., and André L. Boehman. "Experimental 
+    .. [1] Perez, Peter L., and André L. Boehman. "Experimental
        Investigation of the Autoignition Behavior of Surrogate Gasoline
        Fuels in a Constant-Volume Combustion Bomb Apparatus and Its
-       Relevance to HCCI Combustion." Energy & Fuels 26, no. 10 
+       Relevance to HCCI Combustion." Energy & Fuels 26, no. 10
        (October 18, 2012): 6106-17. https://doi.org/10.1021/ef300503b.
     '''
     ignition_delay *= 1e3 # convert from seconds to ms
@@ -567,7 +567,7 @@ def Perez_Boehman_MON_from_ignition_delay(ignition_delay):
 
     .. math::
         \text{MON} = 109.93 - \frac{374.73}{\tau_{ID}}
-        
+
     In the above equation, ignition delay is in ms.
 
     Parameters
@@ -592,10 +592,10 @@ def Perez_Boehman_MON_from_ignition_delay(ignition_delay):
 
     References
     ----------
-    .. [1] Perez, Peter L., and André L. Boehman. "Experimental 
+    .. [1] Perez, Peter L., and André L. Boehman. "Experimental
        Investigation of the Autoignition Behavior of Surrogate Gasoline
        Fuels in a Constant-Volume Combustion Bomb Apparatus and Its
-       Relevance to HCCI Combustion." Energy & Fuels 26, no. 10 
+       Relevance to HCCI Combustion." Energy & Fuels 26, no. 10
        (October 18, 2012): 6106-17. https://doi.org/10.1021/ef300503b.
     '''
     ignition_delay *= 1e3 # convert from seconds to ms
@@ -604,14 +604,14 @@ def Perez_Boehman_MON_from_ignition_delay(ignition_delay):
 def IDT_to_DCN(IDT):
     r'''This function converts the ignition delay
     time [1]_ into a derived cetane number.
-    
+
     If the ignition delay time is between 3.1 and 6.5 ms:
-    
+
     .. math::
         \text{DCN} = 4.46 + \frac{186.6}{\text{IDT}}
-        
+
     Otherwise:
-    
+
     .. math::
         \text{DCN} = \left(83.99(\text{IDT} - 1.512)^{-0.658} \right) + 3.547
 
@@ -633,16 +633,16 @@ def IDT_to_DCN(IDT):
     --------
     >>> IDT_to_DCN(4e-3)
     51.11
-    
+
     References
     ----------
-    .. [1] Al Ibrahim, Emad, and Aamir Farooq. "Prediction of the Derived 
+    .. [1] Al Ibrahim, Emad, and Aamir Farooq. "Prediction of the Derived
        Cetane Number and Carbon/Hydrogen Ratio from Infrared Spectroscopic
        Data." Energy & Fuels 35, no. 9 (May 6, 2021): 8141–52.
        https://doi.org/10.1021/acs.energyfuels.0c03899.
     .. [2] Dahmen, Manuel, and Wolfgang Marquardt. "A Novel Group Contribution
        Method for the Prediction of the Derived Cetane Number of Oxygenated
-       Hydrocarbons." Energy & Fuels 29, no. 9 (September 17, 2015): 5781–5801. 
+       Hydrocarbons." Energy & Fuels 29, no. 9 (September 17, 2015): 5781–5801.
        https://doi.org/10.1021/acs.energyfuels.5b01032.
     '''
     IDT *= 1000.0

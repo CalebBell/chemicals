@@ -402,7 +402,7 @@ def Hfg(CASRN, method=None):
         * 'ATCT_G', the Active Thermochemical Tables version 1.112 (600 values) [1]_
         * 'TRC', from a 1994 compilation (1750 values) [2]_
         * 'CRC', from the CRC handbook (1360 values) [3]_
-        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [6]_ containing mostly experimental
           and averaged values
         * 'JANAF', the 1998 JANAF values online
         * 'JOBACK', an estimation method for organic substances in [5]_
@@ -513,7 +513,7 @@ def S0s(CASRN, method=None):
     Sources are:
 
         * 'CRC' [1]_ from the CRC handbook (1360 values)
-        * 'WEBBOOK', a NIST resource [2]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [2]_ containing mostly experimental
           and averaged values
 
     Examples
@@ -678,7 +678,7 @@ def S0g(CASRN, method=None):
 
         * 'CRC', from the CRC handbook (520 values)
         * 'YAWS', a large compillation of values, mostly estimated (4890 values)
-        * 'WEBBOOK', a NIST resource [3]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [3]_ containing mostly experimental
           and averaged values
 
     Examples
@@ -970,7 +970,7 @@ def stoichiometric_matrix(atomss, reactants):
     elements = list(elements)
     elements.sort() # Ensure reproducibility
     n_elements = len(elements)
-    
+
 
     matrix = [[0]*n_compounds for _ in range(n_elements)]
     element_to_row = {ele: matrix[idx] for idx, ele in enumerate(elements)}

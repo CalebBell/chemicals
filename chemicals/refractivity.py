@@ -402,10 +402,10 @@ def TDE_RIXExpansion(T, Bs, Cs, wavelength=589.26e-9):
 
     .. math::
         n(T, \lambda) = \sum_{i=0}^{i} B_i t^i + \sum_j C_j w^j
-    
+
     .. math::
         t = T - 298.15
-        
+
     .. math::
         w = WL\times 10^{9} - 589.26
 
@@ -440,7 +440,7 @@ def TDE_RIXExpansion(T, Bs, Cs, wavelength=589.26e-9):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-RefractiveIndex/RIXExpansion.htm.
     '''
     t = T - 298.15

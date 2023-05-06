@@ -252,10 +252,10 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     r'''Calculates saturation liquid volume, using the critical properties
     and fitted coefficients from [1]_. This is also known as the PPDS equation
     10 or PPDS10.
-    
+
     .. math::
         \rho_{mass} = \rho_{c} + a\tau^{0.35} +  b \tau^{2/3} + c\tau + d\tau^{4/3}
-    
+
     Parameters
     ----------
     T : float
@@ -299,10 +299,10 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
 def TDE_VDNS_rho(T, Tc, rhoc, a1, a2, a3, a4, MW=None):
     r'''Calculates saturation liquid volume, using the critical properties
     and fitted coefficients in the TDE VDNW form from [1]_.
-    
+
     .. math::
         \rho_{mass} = \rho_{c} + a\tau^{0.35} +  b \tau + c\tau^2 + d\tau^3
-    
+
     Parameters
     ----------
     T : float
@@ -325,17 +325,17 @@ def TDE_VDNS_rho(T, Tc, rhoc, a1, a2, a3, a4, MW=None):
     Returns
     -------
     Vs : float
-        Saturation liquid molar volume or density, 
+        Saturation liquid molar volume or density,
         [m^3/mol if MW given; kg/m^3 otherwise]
 
     Examples
     --------
     >>> TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
     947.4906064903
-    
+
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-DensityLG/VDNSExpansion.htm.
     '''
     tau = 1.0 - T/Tc
@@ -345,10 +345,10 @@ def TDE_VDNS_rho(T, Tc, rhoc, a1, a2, a3, a4, MW=None):
 def PPDS17(T, Tc, a0, a1, a2, MW=None):
     r'''Calculates saturation liquid volume, using the critical temperature
     and fitted coefficients in the PPDS17 form in [1]_.
-    
+
     .. math::
         \rho_{mass} = \frac{1}{a_0(a_1 + a_2\tau)^{\left(1 + \tau^{2/7} \right)}}
-    
+
     Parameters
     ----------
     T : float
@@ -367,19 +367,19 @@ def PPDS17(T, Tc, a0, a1, a2, MW=None):
     Returns
     -------
     Vs : float
-        Saturation liquid molar volume or density, 
+        Saturation liquid molar volume or density,
         [m^3/mol if MW given; kg/m^3 otherwise]
 
     Examples
     --------
     Coefficients for the liquid density of benzene from [1]_ at 300 K:
-    
+
     >>> PPDS17(300, 562.05, a0=0.0115508, a1=0.281004, a2=-0.00635447)
     871.520087707
-    
+
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-DensityLG/PPDS17.htm.
     '''
     tau = 1.0 - T/Tc
@@ -508,7 +508,7 @@ def Rackett(T, Tc, Pc, Zc):
     return R*Tc/Pc*Zc**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
 def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
-    r'''Calculates saturation liquid volume, using the Rackett equation form 
+    r'''Calculates saturation liquid volume, using the Rackett equation form
     and a known or estimated critical temperature and density as well
     as fit parameters `b` and `n`.
 
@@ -516,15 +516,15 @@ def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
 
     .. math::
         \rho_{sat} = \rho_c b^{-\left(1 - \frac{T}{T_c}\right)^n}
-    
+
     The density is then converted to a specific volume by taking its inverse.
-    
+
     Note that the units of this equation in some sources are kg/m^3, g/mL in others,
     and m^3/mol in others. If the units for the coefficients are in molar units,
     do NOT provide `MW` or an incorrect value will be returned. If the units
     are mass units and `MW` is not provided, the output will have the same
     units as `rhoc`.
-    
+
     Parameters
     ----------
     T : float
@@ -539,7 +539,7 @@ def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
         Fit parameter, [-]
     MW : float, optional
         Molecular weight, [g/mol]
-        
+
     Returns
     -------
     Vs : float
@@ -551,30 +551,30 @@ def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
     Examples
     --------
     Input sample from NIST (naphthalene) (m^3/kg):
-        
+
     >>> Rackett_fit(T=400.0, Tc=748.402, rhoc=314.629, b=0.257033, n=0.280338)
     0.00106174320755
-    
+
     Parameters in Yaws form (butane) (note the 1000 multiplier on `rhoc`, called `A`
     in Yaws) (m^3/kg):
-        
+
     >>> Rackett_fit(T=298.15, Tc=425.18, rhoc=0.2283*1000, b=0.2724, n=0.2863)
     0.00174520519958
-    
+
     Same Yaws point, with MW provided:
-        
+
     >>> Rackett_fit(T=298.15, Tc=425.18, rhoc=0.2283*1000, b=0.2724, n=0.2863, MW=58.123)
     0.00010143656181
 
     References
     ----------
     .. [1] Frenkel, Michael, Robert D. Chirico, Vladimir Diky, Xinjian Yan,
-       Qian Dong, and Chris Muzny. "ThermoData Engine (TDE): Software 
-       Implementation of the Dynamic Data Evaluation Concept." Journal of 
-       Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38. 
+       Qian Dong, and Chris Muzny. "ThermoData Engine (TDE): Software
+       Implementation of the Dynamic Data Evaluation Concept." Journal of
+       Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38.
        https://doi.org/10.1021/ci050067b.
-    .. [2] Yaws, Carl L. "Liquid Density of the Elements: A Comprehensive 
-       Tabulation for All the Important Elements from Ag to Zr." Chemical 
+    .. [2] Yaws, Carl L. "Liquid Density of the Elements: A Comprehensive
+       Tabulation for All the Important Elements from Ag to Zr." Chemical
        Engineering 114, no. 12 (2007): 44-47.
     '''
     rho_calc = rhoc*b**(-(1.0 - T/Tc)**n)
@@ -1008,7 +1008,7 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
     x0 = (1.0 + m*(1.0 - sqrt(Tr)))
     alpha_SRK = x0*x0
     tau = 1. - Tr/alpha_SRK
-    
+
     tau_cbrt = tau**(1/3.)
     rho0 = 1. + tau_cbrt*(1.169 + 1.818*tau_cbrt) - 2.658*tau + 2.161*tau*tau_cbrt
     V0 = 1./rho0

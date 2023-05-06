@@ -180,7 +180,7 @@ def _load_critical_data():
         miscdata.JOBACK: miscdata.joback_predictions,
         WILSON_JASPERSON: critical_data_WilsonJasperson,
     }
-    
+
     _add_Zc_to_df(miscdata.joback_predictions)
     _add_Zc_to_df(miscdata.webbook_data)
 
@@ -243,11 +243,11 @@ Tc_all_method_types = {
     CRC: miscdata.PROCESSED_EXPERIMENTAL,
     PD: miscdata.EXPERIMENTAL_COMPILATION_SECONDARY,
     miscdata.WEBBOOK: miscdata.PROCESSED_EXPERIMENTAL,
-    
+
     PSRK: miscdata.PROCESSED_EXPERIMENTAL_PREDICTED,
     PINAMARTINES: miscdata.PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY,
     YAWS: miscdata.PROCESSED_EXPERIMENTAL_PREDICTED,
-    
+
     WILSON_JASPERSON: miscdata.PREDICTED_GC,
     miscdata.JOBACK: miscdata.PREDICTED_GC,
 }
@@ -255,7 +255,7 @@ Tc_all_method_types = {
 
 @mark_numba_incompatible
 def Tc_methods(CASRN):
-    """Return all methods available to obtain the critical temperature for the 
+    """Return all methods available to obtain the critical temperature for the
     desired chemical.
 
     Parameters
@@ -298,7 +298,7 @@ def Tc(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
-        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON', 
+        'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON',
         'JOBACK'.
         All valid values are also held in the list `Tc_all_methods`.
 
@@ -319,7 +319,7 @@ def Tc(CASRN, method=None):
           data published in [16]_
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
-        * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [19]_
         * 'WILSON_JASPERSON', an estimation method in [21]_
@@ -412,13 +412,13 @@ def Tc(CASRN, method=None):
        Properties from Group-Contributions." Chemical Engineering
        Communications 57, no. 1-6 (July 1, 1987): 233-43.
        doi:10.1080/00986448708960487.
-    .. [20] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+    .. [20] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use
        of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
-       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518.
        https://doi.org/10.1002/aic.17518.
-    .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc, 
-       Estimation Based on Zero, First and Second Order Methods." In 
+    .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc,
+       Estimation Based on Zero, First and Second Order Methods." In
        Proceedings of the AIChE Spring Meeting, 21, 1996.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -435,7 +435,7 @@ Pc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES
 
 @mark_numba_incompatible
 def Pc_methods(CASRN):
-    """Return all methods available to obtain the critical pressure for the 
+    """Return all methods available to obtain the critical pressure for the
     desired chemical.
 
     Parameters
@@ -503,7 +503,7 @@ def Pc(CASRN, method=None):
           data published in [16]_
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [17]_.
-        * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [18]_ containing mostly experimental
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [19]_
         * 'PINAMARTINES', a series of values in the supporting material of [20]_
@@ -591,13 +591,13 @@ def Pc(CASRN, method=None):
        Properties from Group-Contributions." Chemical Engineering
        Communications 57, no. 1-6 (July 1, 1987): 233-43.
        doi:10.1080/00986448708960487.
-    .. [20] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+    .. [20] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use
        of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
-       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518.
        https://doi.org/10.1002/aic.17518.
-    .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc, 
-       Estimation Based on Zero, First and Second Order Methods." In 
+    .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc,
+       Estimation Based on Zero, First and Second Order Methods." In
        Proceedings of the AIChE Spring Meeting, 21, 1996.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -681,7 +681,7 @@ def Vc(CASRN, method=None):
           estimated data published in [15]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [16]_.
-        * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [18]_
         * 'FEDORS', an estimation methid in [20]_
@@ -765,12 +765,12 @@ def Vc(CASRN, method=None):
        Properties from Group-Contributions." Chemical Engineering
        Communications 57, no. 1-6 (July 1, 1987): 233-43.
        doi:10.1080/00986448708960487.
-    .. [19] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+    .. [19] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use
        of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
-       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518.
        https://doi.org/10.1002/aic.17518.
-    .. [20] Fedors, R. F. "A Method to Estimate Critical Volumes." AIChE 
+    .. [20] Fedors, R. F. "A Method to Estimate Critical Volumes." AIChE
        Journal 25, no. 1 (1979): 202-202. https://doi.org/10.1002/aic.690250129.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -787,7 +787,7 @@ Zc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YA
 
 @mark_numba_incompatible
 def Zc_methods(CASRN):
-    """Return all methods available to obtain the critical compressibility for 
+    """Return all methods available to obtain the critical compressibility for
     the desired chemical.
 
     Parameters
@@ -854,7 +854,7 @@ def Zc(CASRN, method=None):
           estimated data published in [15]_.
         * 'YAWS', a large compillation of data from a
           variety of sources; no data points are sourced in the work of [16]_.
-        * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental 
+        * 'WEBBOOK', a NIST resource [17]_ containing mostly experimental
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [18]_
         * 'PINAMARTINES', a series of values in the supporting material of [19]_
@@ -937,10 +937,10 @@ def Zc(CASRN, method=None):
        Properties from Group-Contributions." Chemical Engineering
        Communications 57, no. 1-6 (July 1, 1987): 233-43.
        doi:10.1080/00986448708960487.
-    .. [19] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use 
+    .. [19] Piña-Martinez, Andrés, Romain Privat, and Jean-Noël Jaubert. "Use
        of 300,000 Pseudo-Experimental Data over 1800 Pure Fluids to Assess the
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
-       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518. 
+       Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518.
        https://doi.org/10.1002/aic.17518.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -1106,13 +1106,13 @@ def Tb_Tc_relationship(Tb=None, Tc=None, fit='Perry8E'):
     fit : str, optional
         One of 'Perry8E', 'Chemicals2021FitInorganic',
         'Chemicals2021FitElements', 'Chemicals2021FitBinary',
-        'Chemicals2021FitTernary', Chemicals2021FitOrganic', 
+        'Chemicals2021FitTernary', Chemicals2021FitOrganic',
         'Chemicals2021FitBr',
         'Chemicals2021FitC', 'Chemicals2021FitCl',
-        'Chemicals2021FitF', 'Chemicals2021FitI', 
+        'Chemicals2021FitF', 'Chemicals2021FitI',
         'Chemicals2021FitN', 'Chemicals2021FitO', '
         'Chemicals2021FitSi'.
-        
+
     Returns
     -------
     Tc or Tb : float
@@ -1121,10 +1121,10 @@ def Tb_Tc_relationship(Tb=None, Tc=None, fit='Perry8E'):
     Notes
     -----
     `Chemicals2021FitBinary` applies for inorganic compounds with two types of
-    atoms; `Chemicals2021FitTernary` for three; and the various models 
+    atoms; `Chemicals2021FitTernary` for three; and the various models
     `Chemicals2021FitO`, `Chemicals2021FitC`, etc apply for inorganic compounds
     with those elements in them.
-    
+
     The quality of this relationship is low, but if no further information is
     available it can be used to obtain an approximate value.
 
@@ -1132,7 +1132,7 @@ def Tb_Tc_relationship(Tb=None, Tc=None, fit='Perry8E'):
     --------
     Tetrabromosilane has a known boiling point of 427.15 K and a critical
     temperature of 663.0 K.
-    
+
     >>> Tb_Tc_relationship(Tb=427.15, fit='Perry8E')
     700.526
     >>> Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitBr')
@@ -1143,15 +1143,15 @@ def Tb_Tc_relationship(Tb=None, Tc=None, fit='Perry8E'):
     669.7712
     >>> Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitInorganic')
     686.0029
-    
+
     The performance of the fits is fairly representative. However, because this
-    method should only be used on compounds that don't have experimental 
+    method should only be used on compounds that don't have experimental
     critical points measured, many of the worst outlier chemicals have already
     been measured and the performance may be better than expected.
-    
+
     It is recommended to use the methods `Chemicals2021FitElements`,
     `Chemicals2021FitBinary`, and `Chemicals2021FitTernary`.
-    
+
     References
     ----------
     .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,

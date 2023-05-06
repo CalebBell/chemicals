@@ -160,7 +160,7 @@ def object_data(obj):
         d = obj.__dict__.copy()
     except:
         d = {}
-    
+
     for base in obj.__class__.__mro__[:-1]:
         try:
             slots = base.__slots__
@@ -208,14 +208,14 @@ def recursive_copy(obj):
 
     # We need to handle the copy on some object types
     # that we don't want to import, so use their class names as a good proxy
-    
+
     obj_class_name = obj_type.__name__
-    
+
     if obj_class_name == 'array':
         return obj.__copy__() # mutable
     elif obj_class_name in immutable_class_types:
         return obj
-    
+
     if hasattr(obj, '__copy__'):
         # Allow objects to provide their own hooks and wash our hands of them
         return obj.__copy__()
@@ -1085,9 +1085,9 @@ def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
         return (-V*V*1000.0*dP_dV*Cp/(Cv*MW))**0.5
 
 def molar_velocity_to_velocity(v_molar, MW):
-    r'''Calculate the mass-based velocity (m/s) from the molar velocity of 
+    r'''Calculate the mass-based velocity (m/s) from the molar velocity of
     the fluid.
-    
+
     .. math::
         v = \frac{v_{molar}\sqrt{1000}}{\sqrt{\text{MW}}}
 
@@ -1112,9 +1112,9 @@ def molar_velocity_to_velocity(v_molar, MW):
     return sqrt(1000)*v_molar/sqrt(MW)
 
 def velocity_to_molar_velocity(v, MW):
-    r'''Calculate the molar velocity from the mass-based (m/s) velocity of 
+    r'''Calculate the molar velocity from the mass-based (m/s) velocity of
     the fluid.
-    
+
     .. math::
         v_{molar} = \frac{v \sqrt{\text{MW}}}{\sqrt{1000}}
 
@@ -1212,10 +1212,10 @@ def isentropic_exponent(Cp, Cv):
     --------
     >>> isentropic_exponent(33.6, 25.27)
     1.329639889196676
-    
+
     Notes
     -----
-    For real gases, there are more complexities and formulas. Each of the 
+    For real gases, there are more complexities and formulas. Each of the
     formulas reverts to this formula in the case of an ideal gas.
 
     See Also
@@ -1249,7 +1249,7 @@ def isentropic_exponent_PV(Cp, Cv, Vm, P, dP_dV_T):
     P : float
         Pressure [Pa]
     dP_dV_T : float
-        Derivative of `P` with respect to `V` (at constant temperature), 
+        Derivative of `P` with respect to `V` (at constant temperature),
         [Pa*mol/m^3]
 
     Returns
@@ -1260,7 +1260,7 @@ def isentropic_exponent_PV(Cp, Cv, Vm, P, dP_dV_T):
     Examples
     --------
     Isentropic exponent of air according to Lemmon (2000) at 1000 bar and 300 K:
-        
+
     >>> isentropic_exponent_PV(Cp=38.36583283578205, Cv=23.98081290153672, Vm=4.730885141495376e-05, P=100000000.0, dP_dV_T=-5417785576072.434)
     4.100576762582646
 
@@ -1272,12 +1272,12 @@ def isentropic_exponent_PV(Cp, Cv, Vm, P, dP_dV_T):
 
     References
     ----------
-    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational 
-       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022): 
+    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational
+       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022):
        100897.
-    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of 
+    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of
        Real Gases and Application for the Air at Temperatures from 150 K to 450
-       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99. 
+       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99.
        https://doi.org/10.1007/BF01176874.
     '''
     return -Vm*Cp*dP_dV_T/(P*Cv)
@@ -1288,7 +1288,7 @@ def isentropic_exponent_PT(Cp, P, dV_dT_P):
 
     .. math::
         k = \frac{1}{1 - \frac{P}{C_p}\left(\frac{\partial V}{\partial T}\right)_P}
-        
+
     Parameters
     ----------
     Cp : float
@@ -1296,7 +1296,7 @@ def isentropic_exponent_PT(Cp, P, dV_dT_P):
     P : float
         Pressure [Pa]
     dV_dT_P : float
-        Derivative of `V` with respect to `T` (at constant pressure), 
+        Derivative of `V` with respect to `T` (at constant pressure),
         [m^3/(mol*K)]
 
     Returns
@@ -1307,7 +1307,7 @@ def isentropic_exponent_PT(Cp, P, dV_dT_P):
     Examples
     --------
     Isentropic exponent of air according to Lemmon (2000) at 1000 bar and 300 K:
-        
+
     >>> isentropic_exponent_PT(Cp=38.36583283578205, P=100000000.0, dV_dT_P=9.407705210161724e-08)
     1.32487270350443
 
@@ -1319,12 +1319,12 @@ def isentropic_exponent_PT(Cp, P, dV_dT_P):
 
     References
     ----------
-    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational 
-       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022): 
+    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational
+       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022):
        100897.
-    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of 
+    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of
        Real Gases and Application for the Air at Temperatures from 150 K to 450
-       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99. 
+       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99.
        https://doi.org/10.1007/BF01176874.
     '''
     return -Cp/(P*dV_dT_P - Cp) # Avoids a division
@@ -1345,7 +1345,7 @@ def isentropic_exponent_TV(Cv, Vm, dP_dT_V):
     Vm : float
         Molar volume, [m^3/mol]
     dP_dT_V : float
-        Derivative of `P` with respect to `T` (at constant volume), 
+        Derivative of `P` with respect to `T` (at constant volume),
         [Pa/K]
 
     Returns
@@ -1356,7 +1356,7 @@ def isentropic_exponent_TV(Cv, Vm, dP_dT_V):
     Examples
     --------
     Isentropic exponent of air according to Lemmon (2000) at 1000 bar and 300 K:
-        
+
     >>> isentropic_exponent_TV(Cv=23.98081290153672, Vm=4.730885141495376e-05, dP_dT_V=509689.2959155567)
     2.005504495083
 
@@ -1368,12 +1368,12 @@ def isentropic_exponent_TV(Cv, Vm, dP_dT_V):
 
     References
     ----------
-    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational 
-       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022): 
+    .. [1] Pini, Matteo. "NiceProp: An Interactive Python-Based Educational
+       Tool for Non-Ideal Compressible Fluid Dynamics." SoftwareX 17 (2022):
        100897.
-    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of 
+    .. [2] Kouremenos, D. A., and K. A. Antonopoulos. "Isentropic Exponents of
        Real Gases and Application for the Air at Temperatures from 150 K to 450
-       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99. 
+       K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99.
        https://doi.org/10.1007/BF01176874.
     '''
     return 1.0 + Vm*dP_dT_V/Cv
@@ -1766,8 +1766,8 @@ def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
     .. math::
 
         \left(\frac{\partial n F}{\partial n_i}\right) =
-        \left(\frac{\partial F}{\partial x_i}\right)+ F 
-        - \sum_j x_j \left(\frac{\partial F}{\partial x_j}\right) 
+        \left(\frac{\partial F}{\partial x_i}\right)+ F
+        - \sum_j x_j \left(\frac{\partial F}{\partial x_j}\right)
 
 
     Parameters
@@ -2600,7 +2600,7 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
 
 def radius_of_gyration(MW, A, B, C, planar=False):
     r'''Calculates the radius of gyration of a molecule using the DIPPR
-    definition. The parameters `A`, `B`, and `C` must be obtained from 
+    definition. The parameters `A`, `B`, and `C` must be obtained from
     either vibrational scpectra and analysis or quantum chemistry calculations
     of programs such as `psi <https://psicode.org/>`.
 
@@ -2608,7 +2608,7 @@ def radius_of_gyration(MW, A, B, C, planar=False):
 
     .. math::
         R_g = \sqrt{\sqrt{AB}\frac{N_A}{\text{MW}}}
-        
+
     For non-planar molecules with three moments of inertia,
 
     .. math::
@@ -2640,22 +2640,22 @@ def radius_of_gyration(MW, A, B, C, planar=False):
     Examples
     --------
     Example calcultion in [1]_ for hydrazine (optimized with HF/6-31G model):
-        
+
     >>> radius_of_gyration(MW=32.00452, planar=False, A=5.692E-47, B=3.367E-46, C=3.681E-46)
     1.50581642e-10
-    
+
     The same calculation was performed with `psi` and somewhat different parameters obtained
-    
+
     >>> radius_of_gyration(MW=32.00452, planar=False, A=6.345205205562681e-47, B=3.2663291891213418e-46, C=3.4321304373822523e-46)
     1.507895671e-10
-    
+
     A planar molecule, bromosilane, has two principle moments of inertia
     in [2]_. They are 2.80700 cm^-1 and 0.14416 cm^-1. These can be converted to
     MHz as follows:
-    
-    These can then be converted to units of AMU*Angstrom^2, and from there 
+
+    These can then be converted to units of AMU*Angstrom^2, and from there
     to kg*m^2.
-    
+
     >>> A, B = 2.80700, 0.14416
     >>> from scipy.constants import atomic_mass, c, angstrom
     >>> A, B = A*c*1e-4, B*c*1e-4 # from cm^-1 to MHz
@@ -2663,17 +2663,17 @@ def radius_of_gyration(MW, A, B, C, planar=False):
     >>> A, B = [i*atomic_mass*angstrom**2 for i in (A, B)] # amu*angstrom^2 to kg*m^2
     >>> radius_of_gyration(A=A, B=B, planar=True, MW=111.01, C=0)
     4.8859099776e-11
-    
-    
+
+
     Alternatively, doing the conversion all in one:
-        
+
     >>> A, B = 2.80700, 0.14416
     >>> from scipy.constants import c, h, pi
     >>> A, B = A*c*100, B*c*100 # from cm^-1 to Hz
-    >>> A, B = [h/(8*pi**2)/i for i in (A, B)] # from Hz to kg*m^2 
+    >>> A, B = [h/(8*pi**2)/i for i in (A, B)] # from Hz to kg*m^2
     >>> radius_of_gyration(A=A, B=B, planar=True, MW=111.01, C=0)
     4.885909296e-11
-    
+
     This is also nicely documented on this page: https://cccbdb.nist.gov/convertmomint.asp
     which was unfortunately found by the author after figuring it out the hard way.
 
@@ -2682,7 +2682,7 @@ def radius_of_gyration(MW, A, B, C, planar=False):
     ----------
     .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        8E. McGraw-Hill Professional, 2007.
-    .. [2] Johnson III, Russell D. "NIST 101. Computational Chemistry 
+    .. [2] Johnson III, Russell D. "NIST 101. Computational Chemistry
        Comparison and Benchmark Database," 1999. https://cccbdb.nist.gov
     '''
     if planar:

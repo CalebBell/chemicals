@@ -219,13 +219,13 @@ def PPDS8(T, Tc, a0, a1, a2, a3):
     Examples
     --------
     Sample coefficients for benzene in [1]_, at 500 K:
-        
+
     >>> PPDS8(T=500.0, Tc=562.05, a0=0.0641126, a1=0.61057, a2=-1.72442, a3=3.94394)
     0.08536381765218425
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondSatL/PPDS8.htm
     '''
     tau = 1.0 - T/Tc
@@ -263,13 +263,13 @@ def PPDS3(T, Tc, a1, a2, a3):
     Examples
     --------
     Sample coefficients for pentane in [1]_, at 400 K:
-        
+
     >>> PPDS3(T=400.0, Tc=470.008, a1=11.6366, a2=25.1191, a3=-7.21674)
     0.0251734811601927
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondG/PPDS3-ThermCondGas.htm
     '''
     Tr = T/Tc
@@ -278,7 +278,7 @@ def PPDS3(T, Tc, a1, a2, a3):
     return sqrt(Tr)/tot
 
 def Chemsep_16(T, A, B, C, D, E):
-    r'''Calculate the thermal conductivity of a low-pressure liquid using the 
+    r'''Calculate the thermal conductivity of a low-pressure liquid using the
     5-term `T` exponential polynomial found in ChemSep.
 
     .. math::
@@ -311,13 +311,13 @@ def Chemsep_16(T, A, B, C, D, E):
     --------
     Sample coefficients for liquid thermal conductivity of n-hexane in [1]_, at
     300 K:
-        
+
     >>> Chemsep_16(300.0, -0.12682, -1.5015, -1.0467, -0.00088709, -9.3679E-07)
     0.11924904787869
 
     References
     ----------
-    .. [1] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on 
+    .. [1] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on
        Demand Norderstedt, Germany, 2000.
     '''
     return A + trunc_exp(B/T + C + D*T + E*T*T)
@@ -696,7 +696,7 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
         x2 = Pc*rho/rhoc2
         xi_bar = x2*drho_dP
         xi_bar_ref = x2*drho_dP_Tr
-        
+
         dchi = (xi_bar - xi_bar_ref*T_ref/T)
         if dchi < 0.0:
             kc = 0.0
@@ -706,13 +706,13 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
                 kc = 0.0
             else:
                 xi_qd = xi*qd_inv
-    
+
                 term0 = qd/xi + (1.0/3.0)*xi_qd*xi_qd*(rhoc*rhoc/(rho*rho))
                 Omega_bar0 = 2.0*pi_inv*(1.0 - exp(-1.0/term0))
-    
+
                 Omega_bar = 2.0*pi_inv*((Cp - Cv)/Cp*atan(xi_qd) + Cv/Cp*xi_qd)
                 k = 1.380658E-23 # J/K
-    
+
                 # Mu should still be in Pa*s
                 kc = rho*Cp*k*R0*T/(6.0*pi*xi*mu)*(Omega_bar - Omega_bar0)
                 kc *= 1e3 # Convert to mW/m/K, same as others

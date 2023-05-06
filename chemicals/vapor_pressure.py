@@ -125,7 +125,7 @@ attribute of this module.
 
 .. data:: Psat_data_Alcock_elements
 
-    Coefficients for the DIPPR 101 equation :obj:`chemicals.dippr.EQ101`, 
+    Coefficients for the DIPPR 101 equation :obj:`chemicals.dippr.EQ101`,
     published in [5]_ and converted to provide base SI units (and use the
     natural logarithm).
 
@@ -141,7 +141,7 @@ attribute of this module.
     Eighth Edition. McGraw-Hill Professional, 2007.
 .. [5] Alcock, C. B., V. P. Itkin, and M. K. Horrigan. "Vapour Pressure
     Equations for the Metallic Elements: 298-2500K." Canadian Metallurgical
-    Quarterly 23, no. 3 (July 1, 1984): 309-13. 
+    Quarterly 23, no. 3 (July 1, 1984): 309-13.
     https://doi.org/10.1179/cmq.1984.23.3.309.
 
 The structure of each dataframe is shown below:
@@ -274,17 +274,17 @@ else:
 
 
 def TDE_PVExpansion(T, a1, a2, a3, a4=0.0, a5=0.0, a6=0.0, a7=0.0, a8=0.0):
-    r'''Calculates vapor pressure or sublimation pressure of a chemical using 
+    r'''Calculates vapor pressure or sublimation pressure of a chemical using
     the PVExpansion equation for vapor pressure or sublimation pressure.
-    Parameters `a1`, `a2`, `a3`, `a4`, `a5`, `a6`, `a7`, and `a8` 
+    Parameters `a1`, `a2`, `a3`, `a4`, `a5`, `a6`, `a7`, and `a8`
     are chemical-dependent. Parameters
-    can be found in various sources; however units of the coefficients used 
+    can be found in various sources; however units of the coefficients used
     vary.
 
     .. math::
-        \log P^{\text{sat}} = a_1 + \frac{a_2}{T} + a_3\ln(T) + a_4T + a_5T^2 
+        \log P^{\text{sat}} = a_1 + \frac{a_2}{T} + a_3\ln(T) + a_4T + a_5T^2
         + \frac{a_6}{T^2} + a_7 T^6 + \frac{a_8}{T^4}
-        
+
     Parameters
     ----------
     T : float
@@ -319,10 +319,10 @@ def TDE_PVExpansion(T, a1, a2, a3, a4=0.0, a5=0.0, a6=0.0, a7=0.0, a8=0.0):
     Examples
     --------
     Coefficients for sublimation pressure from [1]_:
-    
+
     >>> TDE_PVExpansion(T=273.16, a1=23.7969+log(1000), a2=-11422, a3=0.177978)
     4.06220657398e-05
-    
+
     References
     ----------
     .. [1] "ThermoData Engine (TDE103a V10.1) User’s Guide."
@@ -335,7 +335,7 @@ def Yaws_Psat(T, A, B, C, D, E):
     r'''Calculates vapor pressure of a chemical using the Yaws equation for
     vapor pressure.
     Parameters `A`, `B`, `C`, `D`, and `E` are chemical-dependent. Parameters
-    can be found in numerous sources; however units of the coefficients used 
+    can be found in numerous sources; however units of the coefficients used
     vary.
 
     .. math::
@@ -376,14 +376,14 @@ def Yaws_Psat(T, A, B, C, D, E):
     --------
     Acetone, coefficients from [1]_, at 400 K and with the conversion of `A`
     to obtain a result in Pa:
-        
+
     >>> Yaws_Psat(T=400.0, A=28.588 + log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6)
     708657.089106
-    
+
     Coefficients for benzene from [2]_ at 400 K; that source outputs vapor
     pressure in kPa. That style of coefficients can be converted to `Pa`
     by adding `3` to `A`.
-    
+
     >>> Yaws_Psat(T=400.0, A=39.7918+3, B=-2965.83, C=-12.073, D=0.0033269, E=1.58609e-6)
     352443.191026
 
@@ -401,15 +401,15 @@ def Yaws_Psat(T, A, B, C, D, E):
     return 10.0**exponent
 
 def dYaws_Psat_dT(T, A, B, C, D, E):
-    r'''Calculates the first temperature derivative of vapor pressure of a 
+    r'''Calculates the first temperature derivative of vapor pressure of a
     chemical using the Yaws equation for vapor pressure.
     Parameters `A`, `B`, `C`, `D`, and `E` are chemical-dependent. Parameters
-    can be found in numerous sources; however units of the coefficients used 
+    can be found in numerous sources; however units of the coefficients used
     vary.
 
     .. math::
         \frac{\partial  P^{\text{sat}} }{\partial T} = 10^{A + \frac{B}{T}
-        + \frac{C \log{\left(T \right)}}{\log{\left(10 \right)}} + D T 
+        + \frac{C \log{\left(T \right)}}{\log{\left(10 \right)}} + D T
         + E T^{2}} \left(- \frac{B}{T^{2}} + \frac{C}{T \log{\left(10 \right)}}
         + D + 2 E T\right) \log{\left(10 \right)}
 
@@ -437,7 +437,7 @@ def dYaws_Psat_dT(T, A, B, C, D, E):
     Examples
     --------
     Benzene:
-        
+
     >>> dYaws_Psat_dT(T=400.0, A=42.7918, B=-2965.83, C=-12.073, D=0.0033269, E=1.58609e-6)
     8134.87548930
     '''
@@ -448,18 +448,18 @@ def dYaws_Psat_dT(T, A, B, C, D, E):
     return 10.0**(A + B*x2 + D*T + E*x1 + x3*log(T))*x0*(-B/x1 + D + 2.0*E*T + x2*x3)
 
 def d2Yaws_Psat_dT2(T, A, B, C, D, E):
-    r'''Calculates the second temperature derivative of vapor pressure of a 
+    r'''Calculates the second temperature derivative of vapor pressure of a
     chemical using the Yaws equation for vapor pressure.
     Parameters `A`, `B`, `C`, `D`, and `E` are chemical-dependent. Parameters
-    can be found in numerous sources; however units of the coefficients used 
+    can be found in numerous sources; however units of the coefficients used
     vary.
 
     .. math::
-        \frac{\partial^2 P^{\text{sat}} }{\partial T^2} = 10^{A + \frac{B}{T} 
-        + \frac{C \log{\left(T \right)}}{\log{\left(10 \right)}} + D T 
-        + E T^{2}} \left(\frac{2 B}{T^{3}} - \frac{C}{T^{2} \log{\left(10 
-        \right)}} + 2 E + \left(- \frac{B}{T^{2}} + \frac{C}{T \log{\left(10 
-        \right)}} + D + 2 E T\right)^{2} \log{\left(10 \right)}\right) 
+        \frac{\partial^2 P^{\text{sat}} }{\partial T^2} = 10^{A + \frac{B}{T}
+        + \frac{C \log{\left(T \right)}}{\log{\left(10 \right)}} + D T
+        + E T^{2}} \left(\frac{2 B}{T^{3}} - \frac{C}{T^{2} \log{\left(10
+        \right)}} + 2 E + \left(- \frac{B}{T^{2}} + \frac{C}{T \log{\left(10
+        \right)}} + D + 2 E T\right)^{2} \log{\left(10 \right)}\right)
         \log{\left(10 \right)}
 
     Parameters
@@ -486,7 +486,7 @@ def d2Yaws_Psat_dT2(T, A, B, C, D, E):
     Examples
     --------
     Benzene:
-        
+
     >>> d2Yaws_Psat_dT2(T=400.0, A=42.7918, B=-2965.83, C=-12.073, D=0.0033269, E=1.58609e-6)
     141.7181045862
     '''
@@ -500,8 +500,8 @@ def d2Yaws_Psat_dT2(T, A, B, C, D, E):
     return 10.0**(A + B*x1 + D*T + E*x2 + x3*log(T))*x0*(2.0*B*x1*x1*x1 + x0*x6*x6 - x3*x5 + x4)
 
 def Yaws_Psat_fitting_jacobian(Ts, A, B, C, D, E):
-    r'''Compute and return the Jacobian of the property predicted by 
-    the Yaws vapor pressure equation with respect to all the coefficients. This is 
+    r'''Compute and return the Jacobian of the property predicted by
+    the Yaws vapor pressure equation with respect to all the coefficients. This is
     used in fitting parameters for chemicals.
 
     Parameters
@@ -865,7 +865,7 @@ def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
 def DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2):
     r'''Calculates the first three DIPPR101 coefficients `A`, `B`, and `C`
     from a known vapor pressure and its first and second temperature derivative.
-    
+
     If the second derivative is infinity as is the case in some vapor pressure
     models at the critical point, only the `A` and `C` coefficients are fit,
     using the first derivative an the actual value of vapor pressure.
@@ -1070,7 +1070,7 @@ def dTRC_Antoine_extended_dT(T, Tc, to, A, B, C, n, E, F):
     x2 = E/Tc**8
     x3 = F/Tc**12
     x4 = f*(-x1/Tc)**n
-    return (-10**(A - B/x0 + x1**12*x3 + x1**8*x2 + x4)*(-B/x0**2 + n*x4/x1 
+    return (-10**(A - B/x0 + x1**12*x3 + x1**8*x2 + x4)*(-B/x0**2 + n*x4/x1
                   + 12.0*x1**11*x3 + 8.0*x1**7*x2)*ln10)
 
 def d2TRC_Antoine_extended_dT2(T, Tc, to, A, B, C, n, E, F):
@@ -1371,7 +1371,7 @@ def d2Wagner_original_dT2(T, Tc, Pc, a, b, c, d):
 def Wagner_original_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
     r'''Calculates the jacobian of the Wagner (3, 6) vapor pressure equation
     for use in fitting these parameters when experimental values are known.
-    
+
     Requires critical temperature and pressure as well as four coefficients
     specific to each chemical.
 
@@ -1413,7 +1413,7 @@ def Wagner_original_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
 def Wagner_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
     r'''Calculates the jacobian of the Wagner (2.5, 5) vapor pressure equation
     for use in fitting these parameters when experimental values are known.
-    
+
     Requires critical temperature and pressure as well as four coefficients
     specific to each chemical.
 
@@ -1455,7 +1455,7 @@ def Wagner_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
 def Antoine_fitting_jacobian(Ts, A, B, C, base=10.0):
     r'''Calculates the jacobian of the Antoine vapor pressure equation
     for use in fitting these parameters when experimental values are known.
-    
+
     Requires three coefficients specific to each chemical.
 
     Parameters
@@ -1497,10 +1497,10 @@ def Antoine_fitting_jacobian(Ts, A, B, C, base=10.0):
     return out
 
 def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
-    r'''Calculates the jacobian of the TRC Antoine extended vapor pressure 
-    equation for use in fitting these parameters when experimental values are 
+    r'''Calculates the jacobian of the TRC Antoine extended vapor pressure
+    equation for use in fitting these parameters when experimental values are
     known.
-    
+
     Requires 7 coefficients specific to each chemical.
 
     Parameters
@@ -1542,9 +1542,9 @@ def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
     Tc_inv4 = Tc_inv2*Tc_inv2
     Tc_n8 = Tc_inv4*Tc_inv4
     Tc_n12 = Tc_n8*Tc_inv4
-    
+
     v0 = - to - c0
-    
+
     for i in range(N):
         row = out[i]
         T = Ts[i]

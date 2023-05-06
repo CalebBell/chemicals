@@ -1955,13 +1955,13 @@ def lemmon2000_T(P, rho):
     # to a quadratic. Choose 1 atm as the pressure instead of using the theoretical
     # virial coefficient as that pressure range is more common
     B2, B1, B0 = -4.269819117654342e-11, 1.174790062327561e-07, -4.6404598566915656e-05
-    
+
     V = 1.0/rho
     x0 = B1*P
     x1 = P*P
     x2 = 4.0*B2*x1
     try:
-        T = -(lemmon2000_air_R + x0 - sqrt(-B0*x2 + B1*B1*x1 + lemmon2000_air_R2 
+        T = -(lemmon2000_air_R + x0 - sqrt(-B0*x2 + B1*B1*x1 + lemmon2000_air_R2
                             + 2.0*lemmon2000_air_R*x0 + V*x2))/(2.0*B2*P)
     except:
         # For T ~= 2000 K, 100 MPa; and 10 MPa and 130 K there are small regions

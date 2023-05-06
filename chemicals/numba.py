@@ -61,7 +61,7 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
      'critical.Chueh_Prausnitz_Vc',
      'thermal_conductivity.Lindsay_Bromley',
      'thermal_conductivity.DIPPR9I',
-     
+
      'virial.Z_from_virial_density_form',
 
      'virial.CVirial_Liu_Xiang_vec',
@@ -102,20 +102,20 @@ to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
      'virial.d2CVirial_mixture_Orentlicher_Prausnitz_dTdzs',
      'virial.dV_dzs_virial',
      'virial.d2V_dzizjs_virial',
-     
+
      'vapor_pressure.Wagner_fitting_jacobian',
      'vapor_pressure.Wagner_original_fitting_jacobian',
      'vapor_pressure.Antoine_fitting_jacobian',
      'vapor_pressure.TRC_Antoine_extended_fitting_jacobian',
      'vapor_pressure.Yaws_Psat_fitting_jacobian',
-     
+
      'dippr.EQ102_fitting_jacobian',
      'dippr.EQ101_fitting_jacobian',
      'dippr.EQ106_fitting_jacobian',
      'dippr.EQ105_fitting_jacobian',
      'dippr.EQ107_fitting_jacobian',
      'dippr.EQ102',
-     
+
      'viscosity.mu_Yaws_fitting_jacobian',
      ]
 

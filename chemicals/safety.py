@@ -432,7 +432,7 @@ def TWA_methods(CASRN):
         data = Ontario_exposure_limits_dict[CASRN]
         if (data["TWA (ppm)"] or data["TWA (mg/m^3)"]): return [ONTARIO]
     return []
-    
+
 @mark_numba_incompatible
 def TWA(CASRN, method=None):
     """Return the Time-Weighted Average exposure
@@ -742,8 +742,8 @@ def Carcinogen(CASRN, method=None):
     .. [1] International Agency for Research on Cancer. Agents Classified by
        the IARC Monographs, Volumes 1-115. Lyon, France: IARC; 2020 Available
        from: http://monographs.iarc.fr/ENG/Classification/
-    .. [2] NTP (National Toxicology Program). 2021. Report on Carcinogens, 
-       Fifteenth Edition.; Research Triangle Park, NC: U.S. Department of 
+    .. [2] NTP (National Toxicology Program). 2021. Report on Carcinogens,
+       Fifteenth Edition.; Research Triangle Park, NC: U.S. Department of
        Health and Human Services, Public Health Service.
        https://doi.org/10.22427/NTP-OTHER-1003
     '''
@@ -806,7 +806,7 @@ def T_flash(CASRN, method=None):
     285.15
     >>> T_flash('111-69-3', method='WIKIDATA')
     365.92778
-    
+
     Parameters
     ----------
     CASRN : str

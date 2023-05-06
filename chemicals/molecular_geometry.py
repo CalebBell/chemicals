@@ -76,7 +76,7 @@ def _load_RG_data():
     linear_sources = {
         PSI4_2022A: linear_data_psi4_2022a,
     }
-    
+
 if PY37:
     def __getattr__(name):
         if name in ('radius_of_gyration_data_psi4_2022a',
@@ -147,8 +147,8 @@ def RG(CASRN, method=None):
     -----
     The available sources are as follows:
 
-        * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum 
-          chemistry software, with initialized positions from rdkit's EmbedMolecule 
+        * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum
+          chemistry software, with initialized positions from rdkit's EmbedMolecule
           method, the basis set 6-31G** and the method mp2 [1]_.
         * 'CHEMSEP', from the databank included and distributed with the licence
           notice ChemSep v8.1 pure component data - Copyright (c) Harry Kooijman
@@ -164,10 +164,10 @@ def RG(CASRN, method=None):
     ----------
     .. [1] Turney, Justin M., Andrew C. Simmonett, Robert M. Parrish, Edward G.
        Hohenstein, Francesco A. Evangelista, Justin T. Fermann, Benjamin J.
-       Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure 
-       Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65. 
+       Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure
+       Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65.
        https://doi.org/10.1002/wcms.93.
-    .. [2] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on 
+    .. [2] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on
        Demand Norderstedt, Germany, 2000.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -236,10 +236,10 @@ def linear(CASRN, method=None):
     -----
     The available sources are as follows:
 
-        * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum 
-          chemistry software, with initialized positions from rdkit's EmbedMolecule 
+        * 'PSI4_2022A', values computed using the Psi4 version 1.3.2 quantum
+          chemistry software, with initialized positions from rdkit's EmbedMolecule
           method, the basis set 6-31G** and the method mp2 [1]_.
-          
+
     .. warning::
         This function does not yet have a reliable data source.
 
@@ -252,8 +252,8 @@ def linear(CASRN, method=None):
     ----------
     .. [1] Turney, Justin M., Andrew C. Simmonett, Robert M. Parrish, Edward G.
        Hohenstein, Francesco A. Evangelista, Justin T. Fermann, Benjamin J.
-       Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure 
-       Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65. 
+       Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure
+       Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65.
        https://doi.org/10.1002/wcms.93.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:

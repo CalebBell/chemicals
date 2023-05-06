@@ -49,7 +49,7 @@ try:
     int8_dtype = np.dtype(np.int8)
     float_dtype_ids = set([id(float64_dtype), id(float32_dtype)])
     int_dtype_ids = set([id(int64_dtype), id(int32_dtype), id(int16_dtype), id(int8_dtype)])
-    
+
 except:
     pass
 from chemicals.identifiers import CAS_to_int
@@ -81,7 +81,7 @@ def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs=None,
     if csv_kwargs is None: csv_kwargs = {}
     load_cmds[name] = (folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS)
 
-'''The following flags will strip out the excess memory usage of redundant 
+'''The following flags will strip out the excess memory usage of redundant
 chemical metadata information.
 '''
 try:
@@ -114,26 +114,26 @@ def load_df(key):
 
     if int_CAS and df.index.dtype is object_dtype:
         # If the index is already an int, leave it be
-        '''Most CAS numbers fit in 32 bits. Not all of them do though, for 
+        '''Most CAS numbers fit in 32 bits. Not all of them do though, for
         example https://commonchemistry.cas.org/detail?cas_rn=2222298-66-8
         or 2627558-64-7
-        
-        The maximum value of an unsigned 32 bit integer is 4294967295. 
+
+        The maximum value of an unsigned 32 bit integer is 4294967295.
         For 64 bit it is 18446744073709551615.
-        
+
         It would be possible to remove the check digit of the CAS number,
         which would allow all 10-digit current CAS format integers to fit
-        into an unsigned 32 bit integer. 
+        into an unsigned 32 bit integer.
         https://www.cas.org/support/documentation/chemical-substances/faqs
         CAS says they are only "up to ten digits". However, before 2008 all
         CAS numbers were "up to nine digits"; and they are already 25% of the
         way through 10 digits. It is only a matter of time before they add
-        another digit. At their current rate this will be in 2036, but it will 
+        another digit. At their current rate this will be in 2036, but it will
         likely be well before that. Therefore, it does not justify removing
         the check digit.
         '''
         df.index = pd.Index([CAS_to_int(s) for s in df.index], dtype=int64_dtype, name=df.index.name)
-        
+
     df_sources[key] = df
 
 def data_source(key):
@@ -232,7 +232,7 @@ CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 
 
 CONSTANT_DATABASE_NAME_TO_IDX = {k: i for i, k in enumerate(CONSTANT_DATABASE_COLUMNS)}
 CONSTANTS_CURSOR = None
-    
+
 DATABASE_CONSTANTS_CACHE = {}
 def cached_constant_lookup(CASi, prop):
     if CONSTANTS_CURSOR is None: init_constants_db()

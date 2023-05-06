@@ -798,7 +798,7 @@ def mu_Yaws(T, A, B, C=0.0, D=0.0):
 
     References
     ----------
-    .. [1] Yaws, Carl L. Thermophysical Properties of Chemicals and 
+    .. [1] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. 2 edition. Amsterdam Boston: Gulf
        Professional Publishing, 2014.
     '''
@@ -812,7 +812,7 @@ def dmu_Yaws_dT(T, A, B, C=0.0, D=0.0):
     the 4-term Yaws polynomial form. Requires input coefficients.
 
     .. math::
-        \frac{\partial \mu}{\partial T} = 10^{A + \frac{B}{T} + T \left(C 
+        \frac{\partial \mu}{\partial T} = 10^{A + \frac{B}{T} + T \left(C
         + D T\right)} \left(- \frac{B}{T^{2}} + C + 2 D T\right)
         \log{\left(10 \right)}
 
@@ -847,8 +847,8 @@ def dmu_Yaws_dT(T, A, B, C=0.0, D=0.0):
     return 10.0**(A + B_T + T*(C + x0))*(-B_T/T + C + 2.0*x0)*2.302585092994046
 
 def mu_Yaws_fitting_jacobian(Ts, A, B, C, D):
-    r'''Compute and return the Jacobian of the property predicted by 
-    the Yaws viscosity equation with respect to all the coefficients. This is 
+    r'''Compute and return the Jacobian of the property predicted by
+    the Yaws viscosity equation with respect to all the coefficients. This is
     used in fitting parameters for chemicals.
 
     Parameters
@@ -1062,13 +1062,13 @@ def mu_TDE(T, A, B, C, D):
     Examples
     --------
     Coefficients for isooctane at 400 K, as shown in [1]_.
-    
+
     >>> mu_TDE(400.0, -14.0878, 3500.26, -678132.0, 6.17706e7)
     0.0001822175281438
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscositySatL/ViscosityL.htm.
     '''
     T_inv = 1.0/T
@@ -1106,13 +1106,13 @@ def PPDS5(T, Tc, a0, a1, a2):
     Examples
     --------
     Sample coefficients for n-pentane in [1]_, at 350 K:
-        
+
     >>> PPDS5(T=350.0, Tc=470.008, a0=1.08003e-5, a1=0.19583, a2=0.811897)
     8.096643275836e-06
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscosityG/PPDS5-ViscosityGas.htm.
     '''
     Tr = T/Tc

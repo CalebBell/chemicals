@@ -133,7 +133,7 @@ attribute of this module.
 .. data:: zabransky_dicts
 
     Complicated fits covering different cases and with different forms from [2]_.
-    
+
 .. data:: Cp_dict_characteristic_temperatures_adjusted_psi4_2022a
 
     Theoretically calculated chatacteristic temperatures from vibrational
@@ -339,7 +339,7 @@ class ZabranskySpline(object):
         '''
         return (Zabransky_cubic_integral_over_T(Tb, *self.coeffs)
                 - Zabransky_cubic_integral_over_T(Ta, *self.coeffs))
-    
+
     force_calculate_integral_over_T = calculate_integral_over_T
     force_calculate_integral = calculate_integral
     force_calculate = calculate
@@ -904,8 +904,8 @@ def _load_Cp_data():
                     else:
                         phase_models = [ShomateRange(tuple(Cp_dat[i][2:]), Cp_dat[i][0], Cp_dat[i][1]) for i in range(len(Cp_dat))]
                         d[CAS] = PiecewiseHeatCapacity(phase_models)
-            
-        
+
+
     _Cp_data_loaded = True
 
 if PY37:
@@ -1061,11 +1061,11 @@ def PPDS2(T, Ts, C_low, C_inf, a1, a2, a3, a4, a5):
     r'''Calculates the ideal-gas heat capacity using the [1]_
     emperical (parameter-regressed) method, called the PPDS 2 equation for
     heat capacity.
-    
+
     .. math::
         \frac{C_p^0}{R} = C_{low} + (C_\inf - C_{low})y^2\left(1 + (y-1)
         \left[\sum_{i=0}^4 a_i y^i\right]\right)
-        
+
     .. math::
         y = \frac{T}{T + T_s}
 
@@ -1107,7 +1107,7 @@ def PPDS2(T, Ts, C_low, C_inf, a1, a2, a3, a4, a5):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-Cp0/PPDS2Cp0.htm.
     '''
     y = T/(T + Ts)
@@ -1119,7 +1119,7 @@ def PPDS15(T, Tc, a0, a1, a2, a3, a4, a5):
     r'''Calculates the saturation liquid heat capacity using the [1]_
     emperical (parameter-regressed) method, called the PPDS 15 equation for
     heat capacity.
-    
+
     .. math::
         \frac{C_{p,l}}{R} = \frac{a_0}{\tau} + a_1 + a_2\tau + a_3\tau^2
         + a_4\tau^3 + a_5\tau^4
@@ -1158,10 +1158,10 @@ def PPDS15(T, Tc, a0, a1, a2, a3, a4, a5):
 
     >>> PPDS15(T=400.0, Tc=562.05, a0=0.198892, a1=24.1389, a2=-20.2301, a3=5.72481, a4=4.43613e-7, a5=-3.10751e-7)
     161.8983143509
-    
+
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/PPDS15-Csat.htm.
     '''
     tau = 1.0 - T/Tc
@@ -1171,10 +1171,10 @@ def PPDS15(T, Tc, a0, a1, a2, a3, a4, a5):
 def TDE_CSExpansion(T, Tc, b, a1, a2=0.0, a3=0.0, a4=0.0):
     r'''Calculates the saturation liquid heat capacity using the [1]_
     CSExpansion method from NIST's TDE:
-    
+
     .. math::
         C_{p,l}= \frac{b}{\tau} + a_1 + a_2T + a_3 T^2 + a_4 T^3
-        
+
     Parameters
     ----------
     T : float
@@ -1206,10 +1206,10 @@ def TDE_CSExpansion(T, Tc, b, a1, a2=0.0, a3=0.0, a4=0.0):
 
     >>> TDE_CSExpansion(550.0, 778.0, 0.626549, 120.705, 0.255987, 0.000381027, -3.03077e-7)
     328.472042686
-    
+
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide." 
+    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/CSExpansion.htm
     '''
     tau = 1.0 - T/Tc
@@ -1890,14 +1890,14 @@ def Shomate(T, A, B, C, D, E):
     Notes
     -----
     Analytical integrals are available for this expression. In some sources
-    such as [1]_, the equation is written with temperature in units of 
+    such as [1]_, the equation is written with temperature in units of
     kilokelvin. The coefficients can be easily adjusted to be in the proper
     SI form.
 
     Examples
     --------
     Coefficients for water vapor from [1]_:
-    
+
     >>> water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
     >>> Shomate(500, *water_low_gas_coeffs)
     35.21836175
@@ -1914,7 +1914,7 @@ def Shomate_integral(T, A, B, C, D, E):
     The difference in enthalpy with respect to 0 K is given by:
 
     .. math::
-        {H(T) - H^{0}} = A T + \frac{B T^{2}}{2} + \frac{C T^{3}}{3} 
+        {H(T) - H^{0}} = A T + \frac{B T^{2}}{2} + \frac{C T^{3}}{3}
         + \frac{D T^{4}}{4} - \frac{E}{T}
 
     Parameters
@@ -1943,7 +1943,7 @@ def Shomate_integral(T, A, B, C, D, E):
     Examples
     --------
     Coefficients for water vapor from [1]_:
-    
+
     >>> water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
     >>> Shomate_integral(500, *water_low_gas_coeffs)
     15979.2447
@@ -1957,11 +1957,11 @@ def Shomate_integral(T, A, B, C, D, E):
 
 def Shomate_integral_over_T(T, A, B, C, D, E):
     r'''Integrates the heat capacity over T using the model developed in
-    [1]_. 
+    [1]_.
     The difference in entropy with respect to 0 K is given by:
 
     .. math::
-        s(T) = A \log{\left(T \right)} + B T + \frac{C T^{2}}{2} 
+        s(T) = A \log{\left(T \right)} + B T + \frac{C T^{2}}{2}
         + \frac{D T^{3}}{3} - \frac{E}{2 T^{2}}
 
     Parameters
@@ -1990,7 +1990,7 @@ def Shomate_integral_over_T(T, A, B, C, D, E):
     Examples
     --------
     Coefficients for water vapor from [1]_:
-    
+
     >>> water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
     >>> Shomate_integral_over_T(500, *water_low_gas_coeffs)
     191.00554
@@ -2784,14 +2784,14 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
 def Cpg_statistical_mechanics(T, thetas, linear=False):
     r'''Calculates the ideal-gas heat capacity using of a molecule using
     its characteristic temperatures, themselves calculated from each of the
-    frequencies of vibration of the molecule. These can be obtained from 
+    frequencies of vibration of the molecule. These can be obtained from
     spectra or quantum mechanical calculations.
-    
+
     .. math::
         \frac{C_p^{0}}{R} =  \frac{C_p^{0}}{R} \text{rotational}
         + \frac{C_p^{0}}{R} \text{translational}
         + \frac{C_p^{0}}{R} \text{vibrational}
-        
+
     .. math::
        \frac{C_p^{0}}{R} \text{rotational} = 2.5
 
@@ -2803,11 +2803,11 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
        \left(\frac{\theta_i}{T}\right)^2
        \left[\frac{\exp(\theta_i/T)}
        {\left(\exp(\theta_i/T)-1\right)^2}\right]
-       
+
     In the above equation, :math:`delta` is 1 if the molecule is linear
     otherwise 0.
-       
-       
+
+
     Parameters
     ----------
     T : float
@@ -2823,8 +2823,8 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
     Notes
     -----
     This equation implies that there is a maximum heat capacity for an ideal
-    gas, and all diatomic or larger gases 
-    
+    gas, and all diatomic or larger gases
+
     Monoatomic gases have a simple heat capacity of 2.5R, the lower limit for
     ideal gas heat capacity. This function does not cover that type of a gas.
     At very low temperatures hydrogen behaves like a monoatomic gas as well.
@@ -2832,7 +2832,7 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
     Examples
     --------
     Sample calculation in [1]_ for ammonia:
-        
+
     >>> thetas = [1360, 2330, 2330, 4800, 4880, 4880]
     >>> Cpg_statistical_mechanics(300.0, thetas)
     35.55983440173097
@@ -2846,11 +2846,11 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
     # linear molecules have 1 R
     # nonlinear have 1.5 R
     # https://github.com/psi4/psi4/blob/7636787c5a3adac3b85493d3922663b7a5fcdea8/psi4/driver/qcdb/vib.py#L935
-    
+
     # 2.5 is always a fixed translational heat capacity
     Cp_R = 2.5 + (1.0 if linear else 1.5)
     tmp = 0.0
-    
+
     # The limit for this term as T approaches 0 is zero
     # The limit for this term as T approaches infinity is 1 per term!
     if T > 0.0:
@@ -2869,23 +2869,23 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
                 if val > 1.0:
                     val = 1.0
                 tmp += val
-    
+
     Cp_R += tmp
     return Cp_R*R
 
 def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
-    r'''Calculates the integral of ideal-gas heat capacity using of a molecule 
+    r'''Calculates the integral of ideal-gas heat capacity using of a molecule
     using its characteristic temperatures.
-    
+
     .. math::
         \int {C_p^{0}} =  2.5RT + RT \text{ if linear else } 1.5RT
         + \int C_p^{0}\text{vibrational}
-        
+
 
     .. math::
        \int {C_p^{0}} \text{vibrational} = R\sum_{i=1}^{3n_A-6+\delta}
        \frac{\theta_i}{\exp(\theta_i/T)-1}
-              
+
     Parameters
     ----------
     T : float
@@ -2902,7 +2902,7 @@ def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
     -----
 
     Examples
-    --------        
+    --------
     >>> thetas = [1360, 2330, 2330, 4800, 4880, 4880]
     >>> Cpg_statistical_mechanics_integral(300.0, thetas)
     10116.6053294
@@ -2922,18 +2922,18 @@ def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
 def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
     r'''Calculates the integral over T of ideal-gas heat capacity using of a
      molecule  using its characteristic temperatures.
-    
+
     .. math::
-        \int \frac{C_p^{0}}{T} =  2.5R\log(T) + 1R\log(T) 
+        \int \frac{C_p^{0}}{T} =  2.5R\log(T) + 1R\log(T)
         \text{ if linear else } 1.5R\log(T)
         + \int \frac{C_p^{0}}{T}\text{vibrational}
-        
+
 
     .. math::
        \int \frac{C_p^{0}}{T} \text{vibrational} = \sum_{i=1}^{3n_A-6+\delta}
-       \frac{\theta_i}{T\exp(\theta_i/T)-T} - \log(\exp(\theta_i/T)-1) 
+       \frac{\theta_i}{T\exp(\theta_i/T)-T} - \log(\exp(\theta_i/T)-1)
        + \theta_i/T
-       
+
     Parameters
     ----------
     T : float
@@ -2951,7 +2951,7 @@ def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
     -----
 
     Examples
-    --------        
+    --------
     >>> thetas = [1360, 2330, 2330, 4800, 4880, 4880]
     >>> Cpg_statistical_mechanics_integral_over_T(300.0, thetas)
     190.25658088
@@ -2971,17 +2971,17 @@ def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
 def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
     r'''Convert a vibrational frequency in units of 1/cm to a characteristic
     temperature for use in calculating heat capacity.
-    
+
     .. math::
         \theta = \frac{100\cdot h\cdot c\cdot \text{scale}}{k}
-        
+
     Parameters
     ----------
     frequency : float
         Vibrational frequency, [1/cm]
     scale : float
-        A scale factor used to adjust the frequency for differences in 
-        experimental vs. calculated values, [-] 
+        A scale factor used to adjust the frequency for differences in
+        experimental vs. calculated values, [-]
 
     Returns
     -------
@@ -2990,16 +2990,16 @@ def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
 
     Notes
     -----
-    
+
     In the equation, `k` is Boltzmann's constant, `c` is the speed of light,
     and `h` is the Planck constant.
-    
+
     A scale factor for the MP2/6-31G** method recommended by NIST is  0.9365.
     Using this scale factor will not improve results in all cases however.
 
     Examples
     --------
-    
+
     >>> vibration_frequency_cm_to_characteristic_temperature(667)
     959.6641613636505
     '''

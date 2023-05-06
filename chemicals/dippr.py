@@ -59,7 +59,7 @@ Jacobians (for fitting)
 from __future__ import division
 
 __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
-           'EQ114', 'EQ115', 'EQ116', 'EQ127', 
+           'EQ114', 'EQ115', 'EQ116', 'EQ127',
            'EQ101_fitting_jacobian', 'EQ102_fitting_jacobian',
            'EQ106_fitting_jacobian', 'EQ105_fitting_jacobian',
            'EQ107_fitting_jacobian',
@@ -339,7 +339,7 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
         raise ValueError(order_not_found_msg)
 
 def EQ101_fitting_jacobian(Ts, A, B, C, D, E):
-    r'''Compute and return the Jacobian of the property predicted by 
+    r'''Compute and return the Jacobian of the property predicted by
     DIPPR Equation # 101 with respect to all the coefficients. This is used in
     fitting parameters for chemicals.
 
@@ -375,7 +375,7 @@ def EQ101_fitting_jacobian(Ts, A, B, C, D, E):
     return out
 
 def EQ102_fitting_jacobian(Ts, A, B, C, D):
-    r'''Compute and return the Jacobian of the property predicted by 
+    r'''Compute and return the Jacobian of the property predicted by
     DIPPR Equation # 102 with respect to all the coefficients. This is used in
     fitting parameters for chemicals.
 
@@ -411,7 +411,7 @@ def EQ102_fitting_jacobian(Ts, A, B, C, D):
     return out
 
 def EQ105_fitting_jacobian(Ts, A, B, C, D):
-    r'''Compute and return the Jacobian of the property predicted by 
+    r'''Compute and return the Jacobian of the property predicted by
     DIPPR Equation # 105 with respect to all the coefficients. This is used in
     fitting parameters for chemicals.
 
@@ -435,7 +435,7 @@ def EQ105_fitting_jacobian(Ts, A, B, C, D):
     for i in range(N):
         r = out[i]
         x0 = 1.0 - Ts[i]/C
-        
+
         if D < 1.0 and x0 < 0.0:
             r[0] = 1.0/B
             r[1] = -A/(B*B)
@@ -453,7 +453,7 @@ def EQ105_fitting_jacobian(Ts, A, B, C, D):
     return out
 
 def EQ106_fitting_jacobian(Ts, Tc, A, B, C, D, E):
-    r'''Compute and return the Jacobian of the property predicted by 
+    r'''Compute and return the Jacobian of the property predicted by
     DIPPR Equation # 106 with respect to all the coefficients. This is used in
     fitting parameters for chemicals.
 
@@ -491,7 +491,7 @@ def EQ106_fitting_jacobian(Ts, Tc, A, B, C, D, E):
     return out
 
 def EQ107_fitting_jacobian(Ts, A, B, C, D, E):
-    r'''Compute and return the Jacobian of the property predicted by 
+    r'''Compute and return the Jacobian of the property predicted by
     DIPPR Equation # 107 with respect to all the coefficients. This is used in
     fitting parameters for chemicals.
 
@@ -849,7 +849,7 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
 def EQ106_AB(T, Tc, val, der):
     r'''Calculate the coefficients `A` and `B` of the DIPPR Equation #106 using
     the value of the function and its derivative at a specific point.
-    
+
     .. math::
         A = val \left(\frac{1}{Tc} \left(- T + Tc\right)\right)^{- \frac{der}{val} \left(T - Tc\right)}
 
@@ -866,7 +866,7 @@ def EQ106_AB(T, Tc, val, der):
         Property value [constant-specific]
     der : float
         First temperature derivative of property value [constant-specific/K]
-    
+
     Returns
     -------
     A : float
@@ -879,7 +879,7 @@ def EQ106_AB(T, Tc, val, der):
 
     Examples
     --------
-    
+
     >>> val = EQ106(300, 647.096, A=0.17766, B=2.567)
     >>> der = EQ106(300, 647.096, A=0.17766, B=2.567, order=1)
     >>> EQ106_AB(300, 647.096, val, der)
@@ -892,7 +892,7 @@ def EQ106_AB(T, Tc, val, der):
     T, Tc, A, B, val, der = symbols('T, Tc, A, B, val, der')
     Tr = T/Tc
     expr = A*(1 - Tr)**B
-    
+
     Eq0 = Eq(expr, val)
     Eq1 = Eq(diff(expr, T), der)
     s = solve([Eq0, Eq1], [A, B])
@@ -903,33 +903,33 @@ def EQ106_AB(T, Tc, val, der):
     return (A, B)
 
 def EQ106_ABC(T, Tc, val, der, der2):
-    r'''Calculate the coefficients `A`, `B`, and `C` of the DIPPR Equation #106 
+    r'''Calculate the coefficients `A`, `B`, and `C` of the DIPPR Equation #106
     using, the value of the function and its first and second derivative at a
     specific point.
-    
+
     .. math::
         A = val \left(\frac{1}{Tc} \left(- T + Tc\right)\right)^{\frac{1}{val^{2}
-        \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} + 2\right)} 
+        \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} + 2\right)}
          \left(T \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )}
-        + 1\right) \left(- T der^{2} + T der_{2} val + Tc der^{2} - Tc der_{2} 
-        val + der val\right) - T \left(- T der^{2} + T der_{2} val + Tc der^{2} 
+        + 1\right) \left(- T der^{2} + T der_{2} val + Tc der^{2} - Tc der_{2}
+        val + der val\right) - T \left(- T der^{2} + T der_{2} val + Tc der^{2}
         - Tc der_{2} val + der val\right) - Tc \left(- T der^{2} + T der_{2} val
-        + Tc der^{2} - Tc der_{2} val + der val\right) \log{\left (\frac{1}{Tc} 
-        \left(- T + Tc\right) \right )} - der val \left(T - Tc\right) 
-        \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} 
+        + Tc der^{2} - Tc der_{2} val + der val\right) \log{\left (\frac{1}{Tc}
+        \left(- T + Tc\right) \right )} - der val \left(T - Tc\right)
+        \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )}
         + 2\right)\right)}
-        
+
     .. math::
         B = \frac{1}{val^{2} \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right)
-        \right )} + 2\right)} \left(- T \left(\log{\left (\frac{1}{Tc} 
+        \right )} + 2\right)} \left(- T \left(\log{\left (\frac{1}{Tc}
         \left(- T + Tc\right) \right )} + 1\right) \left(- T der^{2} + T der_{2}
         val + Tc der^{2} - Tc der_{2} val + der val\right) + Tc \left(- T der^{2}
-        + T der_{2} val + Tc der^{2} - Tc der_{2} val + der val\right) 
+        + T der_{2} val + Tc der^{2} - Tc der_{2} val + der val\right)
         \log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} + der val
         \left(T - Tc\right) \left(\log{\left (\frac{1}{Tc} \left(- T + Tc\right) \right )} + 2\right)\right)
-        
+
     .. math::
-        C = \frac{Tc \left(- T der^{2} + T der_{2} val + Tc der^{2} - Tc der_{2} 
+        C = \frac{Tc \left(- T der^{2} + T der_{2} val + Tc der^{2} - Tc der_{2}
         val + der val\right)}{val^{2} \left(\log{\left (\frac{1}{Tc}
         \left(- T + Tc\right) \right )} + 2\right)}
 
@@ -945,7 +945,7 @@ def EQ106_ABC(T, Tc, val, der, der2):
         First temperature derivative of property value [constant-specific/K]
     der2 : float
         Second temperature derivative of property value [constant-specific/K^2]
-    
+
     Returns
     -------
     A : float
@@ -954,13 +954,13 @@ def EQ106_ABC(T, Tc, val, der, der2):
         Parameter for the equation [-]
     C : float
         Parameter for the equation [-]
-    
+
     Notes
     -----
 
     Examples
     --------
-    
+
     >>> val = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01)
     >>> der = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01, order=1)
     >>> der2 = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01, order=2)
@@ -973,7 +973,7 @@ def EQ106_ABC(T, Tc, val, der, der2):
     T, Tc, A, B, C, val, der, der2 = symbols('T, Tc, A, B, C, val, der, der2')
     Tr = T/Tc
     expr = A*(1 - Tr)**(B + C*Tr)
-    
+
     Eq0 = Eq(expr, val)
     Eq1 = Eq(diff(expr, T), der)
     Eq2 = Eq(diff(expr, T, 2), der2)

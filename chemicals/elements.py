@@ -176,16 +176,16 @@ allotropes['Se'] = [
     ('gray selenium', 1, 's', True, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2', '7782-49-2'),
 
     # monocrystaline puckered cyclooctaselenium (Se8) rings
-    ('red gamma selenium', 8, 's', False, '[Se]1[Se][Se][Se][Se][Se][Se][Se]1', 'Se8/c1-2-4-6-8-7-5-3-1', 
+    ('red gamma selenium', 8, 's', False, '[Se]1[Se][Se][Se][Se][Se][Se][Se]1', 'Se8/c1-2-4-6-8-7-5-3-1',
                     'JWMKWLJGSKAGLH-UHFFFAOYSA-N', '12597-33-0', '2099893000-00-0'),
 
     # monocrystaline puckered cyclooctaselenium (Se8) rings
-    ('red beta selenium', 8, 's', False, '[Se]1[Se][Se][Se][Se][Se][Se][Se]1', 'Se8/c1-2-4-6-8-7-5-3-1', 
+    ('red beta selenium', 8, 's', False, '[Se]1[Se][Se][Se][Se][Se][Se][Se]1', 'Se8/c1-2-4-6-8-7-5-3-1',
                     'JWMKWLJGSKAGLH-UHFFFAOYSA-N', '12597-33-0', '2099877000-00-0'),
 
-    ('amorphous black selenium', 1, 's', False, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2', 
+    ('amorphous black selenium', 1, 's', False, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2',
                 '2099872000-00-0'),  # amorphous, up to 1000 atoms per ring
-    ('amorphous red selenium', 1, 's', False, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2', 
+    ('amorphous red selenium', 1, 's', False, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2',
                 '2099856000-00-0'),  # amorphous
 ]
 
@@ -215,7 +215,7 @@ allotropes['Sb'] = [
     ('yellow antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099759000-00-0'),# metastable
     ('black antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099754000-00-0'),# metastable
     ('explosive antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099738000-00-0'),# eep
-    
+
 ]
 
 allotropes['S'] = [
@@ -252,7 +252,7 @@ allotropes['O'] = [
     ('atomic oxygen', 1, 'g', False, '[O]', 'O', 'QVGXLLKOCUKJST-UHFFFAOYSA-N', '17778-80-2', '17778-80-2'),
     ('ozone', 3, 'g', False, '[O-][O+]=O', 'O3/c1-3-2', 'CBENFWSGALASAD-UHFFFAOYSA-N', '10028-15-6', '10028-15-6'),
 
-    # theorized wikipedia only and chemspider   
+    # theorized wikipedia only and chemspider
     ('cyclic ozone', 3, 'g', False, 'o1oo1', '1S/O3/c1-2-3-1', 'XQOAKYYZMDCSIA-UHFFFAOYSA-N', '153851-84-4', '153851-84-4'),
 
     # Don't have structures for these
@@ -1252,11 +1252,11 @@ def nested_formula_parser(formula, check=True):
     if formula_token_matcher_rational is None:
         formula_token_matcher_rational = re.compile(formula_token_matcher_rational_re_str)
         bracketed_charge_re = re.compile(bracketed_charge_re_str)
-    
+
     # Handle subscripts - these are found in wikipedia.
     # Benchmarking shows a call to translate is faster than checking if it is needed.
     formula = formula.translate(translate_subscripts)
-    
+
     formula = formula.replace('[', '').replace(']', '')
     charge_splits = bracketed_charge_re.split(formula)
     if len(charge_splits) > 1:
@@ -1426,23 +1426,23 @@ def index_hydrogen_deficiency(atoms):
     Notes
     -----
     The calculation is according to:
-        
+
     .. math::
         \text{IDH} = 0.5\left(2C + 2 + N - H -X + 0O \right)
-        
+
     where `X` is the number of halogen atoms. The number of oxygen atoms does
     not impact this calculation.
 
     Examples
     --------
     Agelastatin A:
-    
+
     >>> index_hydrogen_deficiency({'C': 12, 'H': 13, 'Br': 1, 'N': 4, 'O': 3})
     8.0
-    
+
     References
     ----------
-    .. [1] Brown, William H., and Thomas Poon. Introduction to Organic 
+    .. [1] Brown, William H., and Thomas Poon. Introduction to Organic
        Chemistry. 4th edition. Hoboken, NJ: Wiley, 2010.
     '''
     if not set(atoms.keys()).issubset(allowable_atoms_index_hydrogen_deficiency):
@@ -1452,7 +1452,7 @@ def index_hydrogen_deficiency(atoms):
     halogen_count = 0
     for atom in halogens:
         halogen_count += atoms.get(atom, 0)
-        
+
     # Oxygen is OK also, does not alter the calculation
     IDH = 0.5*(2*atoms.get('C', 0) + 2 - atoms.get('H', 0) - halogen_count + atoms.get('N', 0))
     return IDH

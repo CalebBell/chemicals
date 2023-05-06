@@ -288,7 +288,7 @@ def use_mpmath_backend():
     fluids.numerics.log = mp.log
     fluids.numerics.trunc_exp = mp.exp
     fluids.numerics.trunc_log = mp.log
-    
+
     return mp
 
 def reset_backend():
@@ -2998,11 +2998,11 @@ def iapws97_rho(T, P, use_95_boundary=False):
 def iapws97_rho_extrapolated(T, P, use_95_boundary=False):
     # Intended to extend the range using first derivatives
     # for use in iapws-95 solver.
-    out_of_range = (T < 273.15 
+    out_of_range = (T < 273.15
                     or T > 2273.15
                     or P > 100e6
                     or (T > 1073.15 and 50e6 <= P <= 100e6))
-    
+
     if not out_of_range:
         return iapws97_rho(T, P, use_95_boundary)
     if T > 2273.15 and P < 50E6:
@@ -6689,7 +6689,7 @@ def iapws95_rho(T, P):
     -----
     There is a sudden transition at the saturation pressure between liquid and
     vapor density, by design.
-    
+
     This solution is iterative due to the nature of the equation.
     The solution procedure begins with IAPWS-97's explicit equations as an
     initial guess, extrapolating when out of range. If the temperature is under
@@ -6710,7 +6710,7 @@ def iapws95_rho(T, P):
 
     >>> iapws95_rho(T=5000.0, P=1e9)
     326.79451662743
-    
+
     See Also
     --------
     iapws95_rhol_sat
@@ -6988,14 +6988,14 @@ def iapws11_Psub(T):
     Notes
     -----
     The triple temperature is 273.16 K, and triple pressure 611.657 Pa.
-    
-    
+
+
     The coefficients are as follows:
-        
+
     ais = [-0.212144006E2, 0.273203819E2, -0.610598130E1]
-    
+
     bis = [0.333333333E-2, 0.120666667E1, 0.170333333E1]
-    
+
     The equation is valid from 50 K to the triple temperature.
 
     Examples

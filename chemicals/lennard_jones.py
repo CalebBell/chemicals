@@ -362,7 +362,7 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
     4.23738
     >>> molecular_diameter('7727-37-9')
     3.798
-    
+
     Parameters
     ----------
     CASRN : str, optional
