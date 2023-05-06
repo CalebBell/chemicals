@@ -166,7 +166,7 @@ if PY37:
                     'S0g_sources', 'S0l_sources', 'S0s_sources'):
             _load_reaction_data()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))
 else:
     if can_load_data:
         _load_reaction_data()
@@ -1039,7 +1039,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
         from fractions import Fraction
         max_denominator = 10**rounding
         fs = [Fraction(x).limit_denominator(max_denominator=max_denominator) for x in d]
-        all_denominators = set([i.denominator for i in fs])
+        all_denominators = {i.denominator for i in fs}
         if 1 in all_denominators:
             all_denominators.remove(1)
 

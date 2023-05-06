@@ -265,7 +265,7 @@ if PY37:
                     'Psat_data_Alcock_elements', 'Psat_values_Alcock_elements'):
             load_vapor_pressure_dfs()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))
 else:
     if can_load_data:
         load_vapor_pressure_dfs()

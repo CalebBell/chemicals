@@ -258,7 +258,7 @@ if PY37:
                     'mu_values_PPDS_7', 'mu_data_VDI_PPDS_8', 'mu_values_PPDS_8'):
             _load_mu_data()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))
 else:
     if can_load_data:
         _load_mu_data()
@@ -2824,16 +2824,16 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
 
         if visc < scale_min*(1.-1E-7) or visc > scale_max*(1.+1E-7):
             raise ValueError('Viscosity conversion is outside the limits of the '
-                            '%s scale; given value is %s, but the range of the '
-                            'scale is from %s to %s. Set `extrapolate` to True '
-                            'to perform the conversion anyway.' %(scale, visc, scale_min, scale_max))
+                            '{} scale; given value is {}, but the range of the '
+                            'scale is from {} to {}. Set `extrapolate` to True '
+                            'to perform the conversion anyway.'.format(scale, visc, scale_min, scale_max))
 
     def range_check_linear(val, c, tmin, scale):
         if val < tmin:
             raise ValueError('Viscosity conversion is outside the limits of the '
-                            '%s scale; given value is %s, but the minimum time '
-                            'for this scale is %s s. Set `extrapolate` to True '
-                            'to perform the conversion anyway.' %(scale, val, tmin))
+                            '{} scale; given value is {}, but the minimum time '
+                            'for this scale is {} s. Set `extrapolate` to True '
+                            'to perform the conversion anyway.'.format(scale, val, tmin))
 
     old_scale = old_scale.lower().replace('degrees', '').replace('seconds', '').strip()
     new_scale = new_scale.lower().replace('degrees', '').replace('seconds', '').strip()
@@ -2857,7 +2857,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         val = c*val # convert from seconds to centistokes
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
-        raise ValueError('Scale "%s" not recognized - allowable values are any of %s.' %(old_scale, keys))
+        raise ValueError('Scale "{}" not recognized - allowable values are any of {}.'.format(old_scale, keys))
 
     # Convert to desired scale
     if new_scale == 'kinematic viscosity':
@@ -2875,7 +2875,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
             range_check_linear(val, c, tmin, new_scale)
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
-        raise ValueError('Scale "%s" not recognized - allowable values are any of %s.' %(new_scale, keys))
+        raise ValueError('Scale "{}" not recognized - allowable values are any of {}.'.format(new_scale, keys))
     return float(val)
 
 

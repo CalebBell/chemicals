@@ -79,7 +79,7 @@ if PY37:
         if name in ('triple_data_Staveley', 'Tt_sources', 'Pt_sources'):
             _load_triple_data()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))
 else:
     if can_load_data:
         _load_triple_data()

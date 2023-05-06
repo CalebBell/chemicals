@@ -139,7 +139,7 @@ if PY37:
         elif name in ('logP_data_CRC', 'logP_data_Syrres'):
             _load_logP_data()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))
 else:  # pragma: no cover
     if can_load_data:
         _load_GWP_ODP_data()

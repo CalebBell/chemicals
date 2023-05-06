@@ -265,7 +265,6 @@ def _load_safety_data():
     global DIPPR_SERAT_data, NTP_data, IARC_data, Tflash_sources
     global Tautoignition_sources, LFL_sources, UFL_sources, _safety_data_loaded
     import json
-    from io import open
     file = os_path_join(folder, 'Ontario Exposure Limits.json')
     with open(file, 'r') as stream:
         Ontario_exposure_limits_dict = json.load(stream)
@@ -292,7 +291,7 @@ if PY37:
                     'DIPPR_SERAT_data'):
             _load_safety_data()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))
 else: # pragma: no cover
     if can_load_data:
         _load_safety_data()
@@ -473,7 +472,7 @@ def TWA(CASRN, method=None):
             value = data["TWA (mg/m^3)"]
             if value: return value, 'mg/m^3'
     else:
-        raise ValueError('Invalid method: %s, allowed methods are %s' %(
+        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
                          method, TWA_all_methods))
 
 @mark_numba_incompatible
@@ -543,7 +542,7 @@ def STEL(CASRN, method=None):
             value = data["STEL (mg/m^3)"]
             if value: return value, 'mg/m^3'
     else:
-        raise ValueError('Invalid method: %s, allowed methods are %s' %(
+        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
                          method, TWA_all_methods))
 
 @mark_numba_incompatible
@@ -606,7 +605,7 @@ def Ceiling(CASRN, method=None):
             value = data["Ceiling (mg/m^3)"]
             if value: return value, 'mg/m^3'
     else:
-        raise ValueError('Invalid method: %s, allowed methods are %s' %(
+        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
                          method, list(Ontario_exposure_limits_dict)))
 
 @mark_numba_incompatible
@@ -660,7 +659,7 @@ def Skin(CASRN, method=None):
         if CASRN in Ontario_exposure_limits_dict:
             return Ontario_exposure_limits_dict[CASRN]["Skin"]
     else:
-        raise ValueError('Invalid method: %s, allowed methods are %s' %(
+        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
                          method, TWA_all_methods))
 
 ### Carcinogen functions
@@ -759,7 +758,7 @@ def Carcinogen(CASRN, method=None):
         if CASRN in NTP_data.index:
             return NTP_codes[NTP_data.at[CASRN, 'Listing']]
     else:
-        raise ValueError('Invalid method: %s, allowed methods are %s' %(
+        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
                        method, Carcinogen_all_methods))
     return UNLISTED
 

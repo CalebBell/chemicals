@@ -397,6 +397,7 @@ class PeriodicTable:
        G R Hutchison. "Open Babel: An open chemical toolbox." J. Cheminf.
        (2011), 3, 33. DOI:10.1186/1758-2946-3-33
     """
+
     __slots__ = ('_number_to_elements', '_symbol_to_elements',
                  '_name_to_elements', '_CAS_to_elements', '_indexes')
     def __init__(self, elements):
@@ -504,6 +505,7 @@ class Element:
         Standard absolute entropy of the element in its standard state (1 bar,
         298.15 K), [J/mol/K]
     """
+
     __slots__ = ['number', 'symbol', 'name', 'CAS', 'MW', 'AReneg', 'rcov',
                  'rvdw', 'maxbonds', 'elneg', 'ionization', 'elaffinity',
                  'period', 'group',
@@ -581,7 +583,7 @@ class Element:
     @property
     def smiles(self):
         r'''The SMILES identification string of the element.'''
-        return '[%s]' %(self.symbol,)
+        return '[{}]'.format(self.symbol)
 
     @property
     def InChI(self):
@@ -1268,8 +1270,8 @@ def nested_formula_parser(formula, check=True):
     tokens = formula_token_matcher_rational.findall(formula)
     # The set of letters in the tokens should match the set of letters
     if check:
-        token_letters = set([j for i in tokens for j in i if j in letter_set])
-        formula_letters = set(i for i in formula if i in letter_set)
+        token_letters = {j for i in tokens for j in i if j in letter_set}
+        formula_letters = {i for i in formula if i in letter_set}
         if formula_letters != token_letters:
             raise ValueError('Input may not be a formula; extra letters were detected')
 

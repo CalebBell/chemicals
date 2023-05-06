@@ -202,7 +202,6 @@ __all__ = ['heat_capacity_gas_methods',
 import os
 from cmath import exp as cexp
 from cmath import log as clog
-from io import open
 from math import expm1
 
 from fluids.constants import R, c, h, k
@@ -249,7 +248,7 @@ PERRY151 = "Perry's Table 2-151"
 heat_capacity_solid_methods = (PERRY151, CRCSTD, LASTOVKA_S)
 
 ### Heat capacity classes
-class ZabranskySpline(object):
+class ZabranskySpline:
     r'''
     Implementation of the cubic spline method presented in [1]_ for
     calculating the heat capacity of a chemical.
@@ -273,6 +272,7 @@ class ZabranskySpline(object):
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
+
     try:
         IS_NUMBA
     except:
@@ -350,7 +350,7 @@ try:
 except:
     pass
 
-class ShomateRange(object):
+class ShomateRange:
     r'''
     Implementation of a range of the Shomate equation presented in [1]_ for
     calculating the heat capacity of a chemical.
@@ -370,6 +370,7 @@ class ShomateRange(object):
     .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
+
     try:
         IS_NUMBA
     except:
@@ -410,7 +411,7 @@ except:
     pass
 
 
-class ZabranskyQuasipolynomial(object):
+class ZabranskyQuasipolynomial:
     r'''
     Quasi-polynomial object for calculating the heat capacity of a chemical.
     Implements the enthalpy and entropy integrals as well.
@@ -436,6 +437,7 @@ class ZabranskyQuasipolynomial(object):
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
+
     try:
         IS_NUMBA
     except:
@@ -513,7 +515,7 @@ except:
     pass
 
 
-class PiecewiseHeatCapacity(object):
+class PiecewiseHeatCapacity:
     r"""
     Create a PiecewiseHeatCapacity object for calculating heat capacity and the
     enthalpy and entropy integrals using piecewise models.
@@ -524,6 +526,7 @@ class PiecewiseHeatCapacity(object):
         Piecewise heat capacity objects, [-]
 
     """
+
     # Dev note - not possible to jitclass this as the model types are not explicit
     __slots__ = ('models', 'Tmin', 'Tmax')
 
@@ -550,7 +553,7 @@ class PiecewiseHeatCapacity(object):
             If the temperature in not within the domain of any of the models
             (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
 
-        See also
+        See Also
         --------
         PiecewiseHeatCapacity.force_calculate
 
@@ -580,7 +583,7 @@ class PiecewiseHeatCapacity(object):
         any of the models (i.e if Tmin <= T <= Tmax cannot be satisfied by any
         of the models).
 
-        See also
+        See Also
         --------
         PiecewiseHeatCapacity.calculate
 
@@ -615,7 +618,7 @@ class PiecewiseHeatCapacity(object):
         -----
         Analytically integrates piecewise through all models.
 
-        See also
+        See Also
         --------
         PiecewiseHeatCapacity.force_calculate_integral
 
@@ -653,7 +656,7 @@ class PiecewiseHeatCapacity(object):
         when temperature is not within the domain of any of the models
         (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
 
-        See also
+        See Also
         --------
         PiecewiseHeatCapacity.calculate_integral
 
@@ -695,7 +698,7 @@ class PiecewiseHeatCapacity(object):
             If the temperature in not within the domain of any of the models
             (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
 
-        See also
+        See Also
         --------
         PiecewiseHeatCapacity.force_calculate_integral_over_T
 
@@ -727,7 +730,7 @@ class PiecewiseHeatCapacity(object):
         when temperature is not within the domain of any of the models
         (i.e if Tmin <= T <= Tmax cannot be satisfied by any of the models).
 
-        See also
+        See Also
         --------
         PiecewiseHeatCapacity.calculate_integral_over_T
 
@@ -918,7 +921,7 @@ if PY37:
                     'Cp_dict_JANAF_liquid', 'Cp_dict_JANAF_gas', 'Cp_dict_JANAF_solid'):
             _load_Cp_data()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))
 else:
     if can_load_data:
         _load_Cp_data()

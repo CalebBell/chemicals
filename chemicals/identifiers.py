@@ -69,7 +69,6 @@ __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
            'get_pubchem_db', 'CAS_to_int', 'sorted_CAS_key', 'int_to_CAS']
 
 import os
-from io import open
 
 from chemicals.elements import (charge_from_formula, homonuclear_elements_CASs_set,
                                 periodic_table, serialize_formula)
@@ -215,7 +214,7 @@ def sorted_CAS_key(CASs):
     int_CASs = [CAS_to_int(i) for i in CASs]
     return tuple(CAS for _, CAS in sorted(zip(int_CASs, CASs)))
 
-class ChemicalMetadata(object):
+class ChemicalMetadata:
     """Class for storing metadata on chemicals.
 
     Attributes
@@ -247,11 +246,11 @@ class ChemicalMetadata(object):
     CAS : int
         CAS number of the compound; stored as an int for memory efficiency, [-]
     """
+
     __slots__ = ('pubchemid', 'formula', 'MW', 'smiles', 'InChI', 'InChI_key',
                  'iupac_name', 'common_name', 'synonyms', 'CAS', '_charge')
     def __repr__(self):
-        return ('<ChemicalMetadata, name=%s, formula=%s, smiles=%s, MW=%g>'
-                %(self.common_name, self.formula, self.smiles, self.MW))
+        return ('<ChemicalMetadata, name={}, formula={}, smiles={}, MW={:g}>'.format(self.common_name, self.formula, self.smiles, self.MW))
 
     @property
     def charge(self):
@@ -287,13 +286,14 @@ class ChemicalMetadata(object):
         self.synonyms = synonyms
 
 
-class ChemicalMetadataDB(object):
+class ChemicalMetadataDB:
     '''Object which holds the main database of chemical metadata.
 
     .. warning:: To allow the `chemicals` to grow and improve, the details of
        this class may change in the future without notice!
 
     '''
+
     loaded_main_db = False
     def __init__(self,
                  elements=True,
@@ -768,7 +768,7 @@ def dippr_compounds():
         dippr_compounds.update(f.read().split('\n'))
     return dippr_compounds
 
-class CommonMixtureMetadata(object):
+class CommonMixtureMetadata:
     """Class for storing metadata on predefined chemical mixtures.
 
     Attributes
@@ -791,11 +791,11 @@ class CommonMixtureMetadata(object):
         List of synonyms of the mixture which can also be used to look it up,
         [-]
     """
+
     __slots__ = ['name', 'CASs', 'N', 'source', 'names', 'ws', 'zs',
                  'synonyms']
     def __repr__(self):
-        return ('<MixtureMetadata, name=%s, N=%s, CASs=%s, ws=%s, zs=%s>'
-                %(self.name, self.N, self.CASs, self.ws, self.zs))
+        return ('<MixtureMetadata, name={}, N={}, CASs={}, ws={}, zs={}>'.format(self.name, self.N, self.CASs, self.ws, self.zs))
 
     def __init__(self, name, CASs, N, source, names, ws, zs,
                  synonyms):
@@ -962,7 +962,7 @@ if PY37:
         elif name == 'common_mixtures' or name == 'common_mixtures_by_synonym':
             load_mixture_composition()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))  # pragma: no cover
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))  # pragma: no cover
 else:  # pragma: no cover
     if can_load_data:
         get_pubchem_db()

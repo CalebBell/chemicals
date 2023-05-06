@@ -200,23 +200,23 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
            'iapws95_rho', 'iapws95_P', 'iapws95_T', 'iapws97_rho_extrapolated',
            'iapws97_rho', 'iapws97_P', 'iapws97_T', 'iapws95_Psat', 'iapws95_dPsat_dT',
            'iapws95_Tsat', 'iapws92_rhol_sat', 'iapws92_rhog_sat', 'iapws95_rhol_sat',
-	'iapws95_rhog_sat', 'iapws95_saturation', 'iapws95_A0', 'iapws95_dA0_dtau',
-	'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3', 'iapws95_A0_tau_derivatives',
+    'iapws95_rhog_sat', 'iapws95_saturation', 'iapws95_A0', 'iapws95_dA0_dtau',
+    'iapws95_d2A0_dtau2', 'iapws95_d3A0_dtau3', 'iapws95_A0_tau_derivatives',
     'iapws95_Ar', 'iapws95_d3Ar_ddeltadtau2', 'iapws95_d3Ar_ddelta2dtau',
-	'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3',
-	'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2', 'iapws95_d2Ar_ddeltadtau',
-	'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc', 'iapws95_R',
+    'iapws95_dAr_ddelta', 'iapws95_d2Ar_ddelta2', 'iapws95_d3Ar_ddelta3',
+    'iapws95_dAr_dtau', 'iapws95_d2Ar_dtau2', 'iapws95_d2Ar_ddeltadtau',
+    'iapws95_MW', 'iapws95_Pc', 'iapws95_Tc', 'iapws95_rhoc', 'iapws95_R',
     'iapws97_R', 'iapws97_G_region1', 'iapws95_drhol_sat_dT',
-	'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
-	'iapws97_dG_dtau_region1', 'iapws97_d2G_dtau2_region1',
-	'iapws97_d2G_dpidtau_region1', 'iapws97_Gr_region2',
-	'iapws97_dGr_dpi_region2', 'iapws97_d2Gr_dpi2_region2',
-	'iapws97_dGr_dtau_region2', 'iapws97_d2Gr_dtau2_region2',
-	'iapws97_d2Gr_dpidtau_region2', 'iapws97_G0_region2',
-	'iapws97_dG0_dtau_region2', 'iapws97_d2G0_dtau2_region2',
-	'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_dpi2_region5',
+    'iapws97_dG_dpi_region1', 'iapws97_d2G_dpi2_region1',
+    'iapws97_dG_dtau_region1', 'iapws97_d2G_dtau2_region1',
+    'iapws97_d2G_dpidtau_region1', 'iapws97_Gr_region2',
+    'iapws97_dGr_dpi_region2', 'iapws97_d2Gr_dpi2_region2',
+    'iapws97_dGr_dtau_region2', 'iapws97_d2Gr_dtau2_region2',
+    'iapws97_d2Gr_dpidtau_region2', 'iapws97_G0_region2',
+    'iapws97_dG0_dtau_region2', 'iapws97_d2G0_dtau2_region2',
+    'iapws97_Gr_region5', 'iapws97_dGr_dpi_region5', 'iapws97_d2Gr_dpi2_region5',
     'iapws95_d4Ar_ddelta2dtau2',
-	'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_dtau2_region5',
+    'iapws97_dGr_dtau_region5', 'iapws97_d2Gr_dtau2_region5',
            'iapws97_d2Gr_dpidtau_region5', 'iapws97_G0_region5',
            'iapws97_dG0_dtau_region5', 'iapws97_d2G0_dtau2_region5', 'iapws97_A_region3',
            'iapws97_dA_ddelta_region3', 'iapws97_d2A_ddelta2_region3',
@@ -331,7 +331,8 @@ def iapws97_boundary_2_3_reverse(P):
 def iapws97_boundary_3uv(P):
     '''
     >>> iapws97_boundary_3uv(22.3E6)
-    647.7996121480069'''
+    647.7996121480069
+    '''
     return (P*(P*(2.867916822636969863e-21*P - 2.228141349037550121e-13)
                + 8.905796021353068107e-6) + 528.1996462630620499)
 #    P = P/1E6
@@ -351,7 +352,8 @@ def iapws97_boundary_3ef(P):
 def iapws97_boundary_3cd(P):
     '''
     >>> iapws97_boundary_3cd(25E6)
-    649.3659208321279'''
+    649.3659208321279
+    '''
     return (P*(P*(1.59090746562728991e-22*P - 1.2728354929587799e-14)
                + 2.78233532206914969e-6) + 585.27696669634895)
 #    P = P/1E6
@@ -372,7 +374,8 @@ def iapws97_boundary_3gh(P):
 def iapws97_boundary_3ij(P):
     '''
     >>> iapws97_boundary_3ij(25E6)
-    660.7865756716819'''
+    660.7865756716819
+    '''
     return (P*(P*(P*(5.15308185433081825e-29*P - 5.87071076864458977e-21)
                   + 2.60763050899561981e-13) - 6.16179320924617007e-7) + 584.814781649163024)
 #    P = P/1E6
@@ -382,7 +385,8 @@ def iapws97_boundary_3ij(P):
 def iapws97_boundary_3jk(P):
     '''
     >>> iapws97_boundary_3jk(25E6)
-    668.1915358826951'''
+    668.1915358826951
+    '''
     return (P*(P*(P*(1.37897492684193974e-28*P - 1.57391839848015003e-20)
                   + 6.97072596851896056e-13) - 7.70600270141674947e-6) + 617.229772068439047)
 #    P = P/1E6
@@ -392,7 +396,8 @@ def iapws97_boundary_3jk(P):
 def iapws97_boundary_3mn(P):
     '''
     >>> iapws97_boundary_3mn(22.8E6)
-    649.6054132953997'''
+    649.6054132953997
+    '''
     return (P*(P*(1.92871054508107992e-21*P - 1.58365725441647998e-13)
                + 7.61978122720127966e-6) + 535.339483742384004)
 #    P = P/1E6
@@ -402,7 +407,8 @@ def iapws97_boundary_3mn(P):
 def iapws97_boundary_3qu(P):
     '''
     >>> iapws97_boundary_3qu(22E6)
-    645.6355027340121'''
+    645.6355027340121
+    '''
     return (P*(P*(1.22240301070144985e-21*P - 1.02020639611015996e-13)
                + 5.29062258221221963e-6) + 565.60364823912596)
 #    P = P/1E6
@@ -435,7 +441,8 @@ def iapws97_boundary_3wx(logP_MPa, logP_MPa_inv):
 def iapws97_boundary_3ab(logP_MPa, logP_MPa_inv):
     '''
     >>> iapws97_boundary_3ab(log(40), 1/log(40))
-    693.0341408296053'''
+    693.0341408296053
+    '''
     return (logP_MPa*(21.3144632222113017*logP_MPa - 187.661219490113012)
             + 1547.93642129415002 - logP_MPa_inv*(1918.87498864292002 - 918.419702359447001*logP_MPa_inv))
 #    T = sum([nis3ab[i]*logP_MPa**Iis3ab[i] for i in range(5)])
@@ -444,7 +451,8 @@ def iapws97_boundary_3ab(logP_MPa, logP_MPa_inv):
 def iapws97_boundary_3op(logP_MPa, logP_MPa_inv):
     '''
     >>> iapws97_boundary_3op(log(22.8), 1/log(22.8))
-    650.010694314133'''
+    650.010694314133
+    '''
     return (logP_MPa*(64.2859598466067013*logP_MPa - 332.500170441277987)
             + 969.461372400213008 + logP_MPa_inv*(773.845935768222034 - 1523.13732937084001*logP_MPa_inv))
 #    T = sum([nis3op[i]*logP_MPa**Iis3op[i] for i in range(5)])

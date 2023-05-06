@@ -169,7 +169,7 @@ if PY37:
                     'ignition_delay_sources'):
             _load_combustion_data()
             return globals()[name]
-        raise AttributeError("module %s has no attribute %s" %(__name__, name))
+        raise AttributeError("module {} has no attribute {}".format(__name__, name))
 else:
     if can_load_data:
         _load_combustion_data()
@@ -1211,7 +1211,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
                          "not %s" %(method))
     return CombustionData(stoichiometry, HHV, Hf, MW)
 
-class CombustionData(object):
+class CombustionData:
     r"""
     Return a CombustionData object (a named tuple) that contains the stoichiometry
     coefficients of the reactants and products, the lower and higher
@@ -1243,7 +1243,7 @@ class CombustionData(object):
         return LHV_from_HHV(self.HHV, self.stoichiometry.get('H2O', 0.))
 
     def __repr__(self):
-        return 'CombustionData(stoichiometry=%s, HHV=%s, Hf=%s, MW=%s)' % (
+        return 'CombustionData(stoichiometry={}, HHV={}, Hf={}, MW={})'.format(
                     self.stoichiometry, self.HHV, self.Hf, self.MW)
 
 

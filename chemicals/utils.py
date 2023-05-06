@@ -201,7 +201,7 @@ def recursive_copy(obj):
     elif obj_type is range:
         return range(obj.start, obj.stop, obj.step)
     elif obj_type is set:
-        return set([recursive_copy(v) for v in obj])
+        return {recursive_copy(v) for v in obj}
     elif obj_type is frozenset:
         return frozenset([recursive_copy(v) for v in obj])
 

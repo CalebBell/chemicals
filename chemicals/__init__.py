@@ -217,6 +217,6 @@ if not fluids.numerics.is_micropython:
             if name == 'numba_vectorized':
                 import chemicals.numba_vectorized as numba_vectorized
                 return numba_vectorized
-            raise AttributeError("module %s has no attribute %s" %(__name__, name))
+            raise AttributeError("module {} has no attribute {}".format(__name__, name))
     else:
         from . import vectorized

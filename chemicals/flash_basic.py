@@ -658,7 +658,7 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
             try:
                 T_dew = brenth(to_solve, T_MAX, T_low_guess)
             except NotBoundedError:
-                raise Exception("Bisecting solver could not find a solution between %g K and %g K" %(T_MAX, T_low_guess))
+                raise Exception("Bisecting solver could not find a solution between {:g} K and {:g} K".format(T_MAX, T_low_guess))
         return flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=T_dew, P=P)
 
     elif P is not None and VF == 0:
@@ -690,7 +690,7 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
             try:
                 T_bubble = brenth(to_solve, T_MAX, T_low_guess)
             except NotBoundedError:
-                raise Exception("Bisecting solver could not find a solution between %g K and %g K" %(T_MAX, T_low_guess))
+                raise Exception("Bisecting solver could not find a solution between {:g} K and {:g} K".format(T_MAX, T_low_guess))
 
         return flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=T_bubble, P=P)
     elif P is not None and VF is not None:
