@@ -969,10 +969,7 @@ def is_combustible(CAS, atoms, reactive=True):
         return False
     elif 'C' in atoms and atoms['C'] > 0:
         return True
-    elif 'H' in atoms and atoms['H'] > 0:
-        return True
-    else:
-        return False
+    return bool('H' in atoms and atoms['H'] > 0)
 
 @mark_numba_incompatible
 def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
