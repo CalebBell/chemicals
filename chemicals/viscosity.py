@@ -258,7 +258,7 @@ if PY37:
                     'mu_values_PPDS_7', 'mu_data_VDI_PPDS_8', 'mu_values_PPDS_8'):
             _load_mu_data()
             return globals()[name]
-        raise AttributeError("module {} has no attribute {}".format(__name__, name))
+        raise AttributeError(f"module {__name__} has no attribute {name}")
 else:
     if can_load_data:
         _load_mu_data()
@@ -2857,7 +2857,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         val = c*val # convert from seconds to centistokes
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
-        raise ValueError('Scale "{}" not recognized - allowable values are any of {}.'.format(old_scale, keys))
+        raise ValueError(f'Scale "{old_scale}" not recognized - allowable values are any of {keys}.')
 
     # Convert to desired scale
     if new_scale == 'kinematic viscosity':
@@ -2875,7 +2875,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
             range_check_linear(val, c, tmin, new_scale)
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
-        raise ValueError('Scale "{}" not recognized - allowable values are any of {}.'.format(new_scale, keys))
+        raise ValueError(f'Scale "{new_scale}" not recognized - allowable values are any of {keys}.')
     return float(val)
 
 

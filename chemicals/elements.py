@@ -583,7 +583,7 @@ class Element:
     @property
     def smiles(self):
         r'''The SMILES identification string of the element.'''
-        return '[{}]'.format(self.symbol)
+        return f'[{self.symbol}]'
 
     @property
     def InChI(self):

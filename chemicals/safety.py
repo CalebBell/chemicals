@@ -291,7 +291,7 @@ if PY37:
                     'DIPPR_SERAT_data'):
             _load_safety_data()
             return globals()[name]
-        raise AttributeError("module {} has no attribute {}".format(__name__, name))
+        raise AttributeError(f"module {__name__} has no attribute {name}")
 else: # pragma: no cover
     if can_load_data:
         _load_safety_data()

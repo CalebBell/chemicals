@@ -166,7 +166,7 @@ if PY37:
                     'S0g_sources', 'S0l_sources', 'S0s_sources'):
             _load_reaction_data()
             return globals()[name]
-        raise AttributeError("module {} has no attribute {}".format(__name__, name))
+        raise AttributeError(f"module {__name__} has no attribute {name}")
 else:
     if can_load_data:
         _load_reaction_data()

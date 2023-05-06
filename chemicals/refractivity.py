@@ -96,7 +96,7 @@ if PY37:
         if name in ('RI_data_CRC_organic', 'RI_sources'):
             _load_RI_data()
             return globals()[name]
-        raise AttributeError("module {} has no attribute {}".format(__name__, name))
+        raise AttributeError(f"module {__name__} has no attribute {name}")
 else:
     if can_load_data:
         _load_RI_data()
@@ -449,7 +449,7 @@ def TDE_RIXExpansion(T, Bs, Cs, wavelength=589.26e-9):
         n_D += horner(Cs, w)
     return n_D
 
-ICUMSA_1974_brix = list([float(i) for i in range(96)])
+ICUMSA_1974_brix = [float(i) for i in range(96)]
 ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175,
                    1.34325, 1.34477, 1.34629, 1.34782, 1.34937, 1.35093, 1.35250,
                    1.35408, 1.35568, 1.35729, 1.35891, 1.36054, 1.36218, 1.36384,

@@ -921,7 +921,7 @@ if PY37:
                     'Cp_dict_JANAF_liquid', 'Cp_dict_JANAF_gas', 'Cp_dict_JANAF_solid'):
             _load_Cp_data()
             return globals()[name]
-        raise AttributeError("module {} has no attribute {}".format(__name__, name))
+        raise AttributeError(f"module {__name__} has no attribute {name}")
 else:
     if can_load_data:
         _load_Cp_data()

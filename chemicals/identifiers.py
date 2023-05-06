@@ -250,7 +250,7 @@ class ChemicalMetadata:
     __slots__ = ('pubchemid', 'formula', 'MW', 'smiles', 'InChI', 'InChI_key',
                  'iupac_name', 'common_name', 'synonyms', 'CAS', '_charge')
     def __repr__(self):
-        return ('<ChemicalMetadata, name={}, formula={}, smiles={}, MW={:g}>'.format(self.common_name, self.formula, self.smiles, self.MW))
+        return (f'<ChemicalMetadata, name={self.common_name}, formula={self.formula}, smiles={self.smiles}, MW={self.MW:g}>')
 
     @property
     def charge(self):
@@ -795,7 +795,7 @@ class CommonMixtureMetadata:
     __slots__ = ['name', 'CASs', 'N', 'source', 'names', 'ws', 'zs',
                  'synonyms']
     def __repr__(self):
-        return ('<MixtureMetadata, name={}, N={}, CASs={}, ws={}, zs={}>'.format(self.name, self.N, self.CASs, self.ws, self.zs))
+        return (f'<MixtureMetadata, name={self.name}, N={self.N}, CASs={self.CASs}, ws={self.ws}, zs={self.zs}>')
 
     def __init__(self, name, CASs, N, source, names, ws, zs,
                  synonyms):
@@ -962,7 +962,7 @@ if PY37:
         elif name == 'common_mixtures' or name == 'common_mixtures_by_synonym':
             load_mixture_composition()
             return globals()[name]
-        raise AttributeError("module {} has no attribute {}".format(__name__, name))  # pragma: no cover
+        raise AttributeError(f"module {__name__} has no attribute {name}")  # pragma: no cover
 else:  # pragma: no cover
     if can_load_data:
         get_pubchem_db()

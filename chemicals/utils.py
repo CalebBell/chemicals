@@ -182,7 +182,7 @@ def recursive_copy(obj):
     elif obj_type is tuple:
         return tuple(recursive_copy(v) for v in obj)
     elif obj_type is list:
-        return list([recursive_copy(v) for v in obj])
+        return [recursive_copy(v) for v in obj]
     elif obj_type is dict:
         d = {}
         for k, v in obj.items():

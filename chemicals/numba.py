@@ -153,13 +153,13 @@ def transform():
 if PY37:
     def __getattr__(name):
         if name == '__path__' or busy:
-            raise AttributeError("module {} has no attribute {}".format(__name__, name))
+            raise AttributeError(f"module {__name__} has no attribute {name}")
         gdct = globals()
         gdct['busy'] = True
         transform()
         del gdct['__getattr__'], gdct['busy']
         try: return gdct[name]
         except KeyError:
-            raise AttributeError("module {} has no attribute {}".format(__name__, name))
+            raise AttributeError(f"module {__name__} has no attribute {name}")
 else:
     transform()

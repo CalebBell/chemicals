@@ -226,7 +226,7 @@ if PY37:
                     'omega_sources'):
             _load_critical_data()
             return globals()[name]
-        raise AttributeError("module {} has no attribute {}".format(__name__, name))
+        raise AttributeError(f"module {__name__} has no attribute {name}")
 else: # pragma: no cover
     if can_load_data:
         _load_critical_data()
