@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -90,7 +89,6 @@ Henry's Law for Air in Water
 .. autofunction:: chemicals.air.iapws04_dHenry_air_dT
 
 """
-from __future__ import division
 
 from math import exp, log, sqrt
 
@@ -129,28 +127,28 @@ __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
 TAU_MAX_EXP_87 = 0.4207493606569795
 
 lemmon2000_air_R = 8.314510
-'''Molar gas constant in Jlemmon2000_air_R/(mol*K) used in the the Lemmon (2000) EOS for dry air'''
+"""Molar gas constant in Jlemmon2000_air_R/(mol*K) used in the the Lemmon (2000) EOS for dry air"""
 lemmon2000_air_R2 = lemmon2000_air_R*lemmon2000_air_R
 lemmon2000_air_R_inv = 1.0/lemmon2000_air_R
 
 lemmon2000_air_T_reducing = 132.6312
-'''Reducing temperature in K for the Lemmon (2000) EOS for dry air'''
+"""Reducing temperature in K for the Lemmon (2000) EOS for dry air"""
 lemmon2000_air_P_reducing = 3.78502E6
-'''Reducing pressure in Pa for the Lemmon (2000) EOS for dry air'''
+"""Reducing pressure in Pa for the Lemmon (2000) EOS for dry air"""
 
 lemmon2000_air_rho_reducing = 10447.7
-'''Reducing molar density in mol/m^3 for the Lemmon (2000) EOS for dry air'''
+"""Reducing molar density in mol/m^3 for the Lemmon (2000) EOS for dry air"""
 
 lemmon2000_air_rho_reducing_inv = 1.0/lemmon2000_air_rho_reducing
 
 lemmon2000_air_MW = 28.9586
-'''Molecular weight of air in g/mol for the Lemmon (2000) EOS for dry air'''
+"""Molecular weight of air in g/mol for the Lemmon (2000) EOS for dry air"""
 
 lemmon2000_air_P_max = 2000E6
-'''Maximum pressure in Pa valid for the Lemmon (2000) EOS for dry air'''
+"""Maximum pressure in Pa valid for the Lemmon (2000) EOS for dry air"""
 
 lemmon2000_air_T_max = 2000.
-'''Maximum temperature in K valid for the Lemmon (2000) EOS for dry air'''
+"""Maximum temperature in K valid for the Lemmon (2000) EOS for dry air"""
 
 def lemmon2000_air_A0(tau, delta):
     r'''Calculates the ideal gas Helmholtz energy of air according to Lemmon
@@ -175,7 +173,6 @@ def lemmon2000_air_A0(tau, delta):
 
     Notes
     -----
-
     The coefficients are as follows:
 
     Ns = [0.605719400E-7, -0.210274769E-4, -0.158860716E-3, -13.841928076,
@@ -2146,7 +2143,6 @@ def TEOS10_BAW_derivatives(T):
 
     Notes
     -----
-
     The coefficients are as follows:
 
     cis = [0.665687E2, -0.238834E3, -0.176755E3]

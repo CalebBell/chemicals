@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -73,25 +72,25 @@ import re
 from chemicals.utils import mark_numba_incompatible
 
 CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7440-42-8', '7440-44-0', '7727-37-9', '7782-44-7', '7782-41-4', '7440-01-9', '7440-23-5', '7439-95-4', '7429-90-5', '7440-21-3', '7723-14-0', '7704-34-9', '7782-50-5', '7440-37-1', '7440-09-7', '7440-70-2', '7440-20-2', '7440-32-6', '7440-62-2', '7440-47-3', '7439-96-5', '7439-89-6', '7440-48-4', '7440-02-0', '7440-50-8', '7440-66-6', '7440-55-3', '7440-56-4', '7440-38-2', '7782-49-2', '7726-95-6', '7439-90-9', '7440-17-7', '7440-24-6', '7440-65-5', '7440-67-7', '7440-03-1', '7439-98-7', '7440-26-8', '7440-18-8', '7440-16-6', '7440-05-3', '7440-22-4', '7440-43-9', '7440-74-6', '7440-31-5', '7440-36-0', '13494-80-9', '7553-56-2', '7440-63-3', '7440-46-2', '7440-39-3', '7439-91-0', '7440-45-1', '7440-10-0', '7440-00-8', '7440-12-2', '7440-19-9', '7440-53-1', '7440-54-2', '7440-27-9', '7429-91-6', '7440-60-0', '7440-52-0', '7440-30-4', '7440-64-4', '7439-94-3', '7440-58-6', '7440-25-7', '7440-33-7', '7440-15-5', '7440-04-2', '7439-88-5', '7440-06-4', '7440-57-5', '7439-97-6', '7440-28-0', '7439-92-1', '7440-69-9', '7440-08-6', '7440-68-8', '10043-92-2', '7440-73-5', '7440-14-4', '7440-34-8', '7440-29-1', '7440-13-3', '7440-61-1', '7439-99-8', '7440-07-5', '7440-35-9', '7440-51-9', '7440-40-6', '7440-71-3', '7429-92-7', '7440-72-4', '7440-11-1', '10028-14-5', '22537-19-5', '53850-36-5', '53850-35-4', '54038-81-2', '54037-14-8', '54037-57-9', '54038-01-6', '54083-77-1', '54386-24-2', '54084-26-3', '54084-70-7', '54085-16-4', '54085-64-2', '54100-71-9', '54101-14-3', '54144-19-3']
-'''Standard CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118.'''
+"""Standard CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118."""
 
 CAS_by_number = list(CAS_by_number_standard)
-'''CAS numbers of the monatomic elements, indexed by atomic numbers off-by-one up to 118.'''
+"""CAS numbers of the monatomic elements, indexed by atomic numbers off-by-one up to 118."""
 
 periods = [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-'''Periods of the elements, indexed by atomic numbers off-by-one up to 118.'''
+"""Periods of the elements, indexed by atomic numbers off-by-one up to 118."""
 
 groups = [1, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 2, 13, 14, 15, 16, 17, 18, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1, 2, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1, 2, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-'''Groups of the elements, indexed by atomic numbers off-by-one up to 118.
-Lanthanides and Actinides are set to None.'''
+"""Groups of the elements, indexed by atomic numbers off-by-one up to 118.
+Lanthanides and Actinides are set to None."""
 
 s_block = [1, 2, 3, 4, 11, 12, 19, 20, 37, 38, 55, 56, 87, 88]
 d_block = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 72, 73, 74, 75, 76, 77, 78, 79, 80, 104, 105, 106, 107, 108, 109, 110, 111, 112]
 f_block = [57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103] # 57, 89 are sometimes placed in the d block
 p_block = [5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 31, 32, 33, 34, 35, 36, 49, 50, 51, 52, 53, 54, 81, 82, 83, 84, 85, 86, 113, 114, 115, 116, 117, 118]
 blocks = {'s': s_block, 'd': d_block, 'f': f_block, 'p': p_block}
-'''Blocks of the elements, stored in a dictionary with four keys and lists.
-Indexed by atomic numbers off-by-one up to 118.'''
+"""Blocks of the elements, stored in a dictionary with four keys and lists.
+Indexed by atomic numbers off-by-one up to 118."""
 
 InChI_keys = ['YZCKVEUIGOORGS-UHFFFAOYSA-N', 'SWQJXJOGLNCZEY-UHFFFAOYSA-N', 'WHXSMMKQMYFTQS-UHFFFAOYSA-N', 'ATBAMAFKBVZNFJ-UHFFFAOYSA-N', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', 'OKTJSMMVPCPJKN-UHFFFAOYSA-N', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', 'QVGXLLKOCUKJST-UHFFFAOYSA-N', 'YCKRFDGAMUMZLT-UHFFFAOYSA-N', 'GKAOGPIIYCISHV-UHFFFAOYSA-N', 'KEAYESYHFKHZAL-UHFFFAOYSA-N', 'FYYHWMGAXLPEAU-UHFFFAOYSA-N', 'XAGFODPZIPBFFR-UHFFFAOYSA-N', 'XUIMIQQOPSSXEZ-UHFFFAOYSA-N', 'OAICVXFJPJFONN-UHFFFAOYSA-N', 'NINIDFKCEFEMDL-UHFFFAOYSA-N', 'ZAMOUSCENKQFHK-UHFFFAOYSA-N', 'XKRFYHLGVUSROY-UHFFFAOYSA-N', 'ZLMJMSJWJFRBEC-UHFFFAOYSA-N', 'OYPRJOBELJOOCE-UHFFFAOYSA-N', 'SIXSYDAISGFNSX-UHFFFAOYSA-N', 'RTAQQCXQSZGOHL-UHFFFAOYSA-N', 'LEONUFNNVUYDNQ-UHFFFAOYSA-N', 'VYZAMTAEIAYCRO-UHFFFAOYSA-N', 'PWHULOQIROXLJO-UHFFFAOYSA-N', 'XEEYBQQBJWHFJM-UHFFFAOYSA-N', 'GUTLYIVDDKVIGB-UHFFFAOYSA-N', 'PXHVJJICTQNCMI-UHFFFAOYSA-N', 'RYGMFSIKBFXOCR-UHFFFAOYSA-N', 'HCHKCACWOHOZIP-UHFFFAOYSA-N', 'GYHNNYVSQQEPJS-UHFFFAOYSA-N', 'GNPVGFCGXDBREM-UHFFFAOYSA-N', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', 'WKBOTKDWSSQWDR-UHFFFAOYSA-N', 'DNNSSWSSYDEUBZ-UHFFFAOYSA-N', 'IGLNJRXAVVLDKE-UHFFFAOYSA-N', 'CIOAGBVUUVVLOB-UHFFFAOYSA-N', 'VWQVUPCCIRVNHF-UHFFFAOYSA-N', 'QCWXUUIWCKQGHC-UHFFFAOYSA-N', 'GUCVJGMIXFAOAE-UHFFFAOYSA-N', 'ZOKXTWBITQBERF-UHFFFAOYSA-N', 'GKLVYJBZJHMRIY-UHFFFAOYSA-N', 'KJTLSVCANCCWHF-UHFFFAOYSA-N', 'MHOVAHRLVXNVSD-UHFFFAOYSA-N', 'KDLHZDBZIXYQEI-UHFFFAOYSA-N', 'BQCADISMDOOEFD-UHFFFAOYSA-N', 'BDOSMKKIYDKNTQ-UHFFFAOYSA-N', 'APFVFJFRJDLVQX-UHFFFAOYSA-N', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', 'WATWJIUSRGPENY-UHFFFAOYSA-N', 'PORWMNRCUJJQNO-UHFFFAOYSA-N', 'ZCYVEMRRCGMTRW-UHFFFAOYSA-N', 'FHNFHKCVQCLJFQ-UHFFFAOYSA-N', 'TVFDJXOCXUVLDH-UHFFFAOYSA-N', 'DSAJWYNOEDNPEQ-UHFFFAOYSA-N', 'FZLIPJUXYLNCLC-UHFFFAOYSA-N', 'GWXLDORMOJMVQZ-UHFFFAOYSA-N', 'PUDIUYLPXJFUGB-UHFFFAOYSA-N', 'QEFYFXOXNSNQGX-UHFFFAOYSA-N', 'VQMWBBYLQSCNPO-UHFFFAOYSA-N', 'KZUNJOHGWZRPMI-UHFFFAOYSA-N', 'OGPBJKLSAFTDLK-UHFFFAOYSA-N', 'UIWYJDYFSGRHKR-UHFFFAOYSA-N', 'GZCRRIHWUXGPOV-UHFFFAOYSA-N', 'KBQHZAAAGSGFKK-UHFFFAOYSA-N', 'KJZYNXUDTRRSPN-UHFFFAOYSA-N', 'UYAHIZSMUZPPFV-UHFFFAOYSA-N', 'FRNOGLGSGLTDKL-UHFFFAOYSA-N', 'NAWDYIZEMPQZHO-UHFFFAOYSA-N', 'OHSVLFRHMCKCQY-UHFFFAOYSA-N', 'VBJZVLUMGGDVMO-UHFFFAOYSA-N', 'GUVRBAGPIYLISA-UHFFFAOYSA-N', 'WFKWXMTUELFFGS-UHFFFAOYSA-N', 'WUAPFZMCVAUBPE-UHFFFAOYSA-N', 'SYQBFIAQOQZEGI-UHFFFAOYSA-N', 'GKOZUEZYRPOHIO-UHFFFAOYSA-N', 'BASFCYQUMIYNBI-UHFFFAOYSA-N', 'PCHJSUWPFVWCPO-UHFFFAOYSA-N', 'QSHDDOUJBYECFT-UHFFFAOYSA-N', 'BKVIYDNLLOSFOA-UHFFFAOYSA-N', 'WABPQHHGFIMREM-UHFFFAOYSA-N', 'JCXGWMGPZLAOME-UHFFFAOYSA-N', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', 'RYXHOMYVWAEKHL-UHFFFAOYSA-N', 'SYUHGPGVQRZVTB-UHFFFAOYSA-N', 'KLMCZVJOEAUDNE-UHFFFAOYSA-N', 'HCWPIIXVSYCSAN-UHFFFAOYSA-N', 'QQINRWTZWGJFDB-UHFFFAOYSA-N', 'ZSLUVFAKFWKJRC-UHFFFAOYSA-N', 'XLROVYAPLOFLNU-UHFFFAOYSA-N', 'JFALSRSLKYAFGM-UHFFFAOYSA-N', 'LFNLGNPSGWYGGD-UHFFFAOYSA-N', 'OYEHPCDNVJXUIW-UHFFFAOYSA-N', 'LXQXZNRPTYVCNG-UHFFFAOYSA-N', 'NIWWFAAXEMMFMS-UHFFFAOYSA-N', 'PWVKJRSRVJTHTR-UHFFFAOYSA-N', 'HGLDOAKPQXAFKI-UHFFFAOYSA-N', 'CKBRQZNRCSJHFT-UHFFFAOYSA-N', 'MIORUQGGZCBUGO-UHFFFAOYSA-N', 'MQVSLOYRCXQRPM-UHFFFAOYSA-N', 'ORQBXQOJMQIAOY-UHFFFAOYSA-N', 'CNQCVBJFEGMYDW-UHFFFAOYSA-N', 'YGPLJIIQQIDVFJ-UHFFFAOYSA-N', 'PUKKTGLVJQVIOF-UHFFFAOYSA-N', 'VAOUCABZIBBBJH-UHFFFAOYSA-N', 'INOXRQQPOOCQPH-UHFFFAOYSA-N', 'OBDWMWVOVYJOMI-UHFFFAOYSA-N', 'VAJSJTKWMRUWBF-UHFFFAOYSA-N', 'NCBMSFCPDGXTHD-UHFFFAOYSA-N', 'LJROPTGWFUZRDB-UHFFFAOYSA-N', 'NOTIIDSZELDPOP-UHFFFAOYSA-N', 'KUGNSLWRKGRKGS-UHFFFAOYSA-N', 'WIHJCBVMYKIGOT-UHFFFAOYSA-N', 'QDXZEHQJHSHEQF-UHFFFAOYSA-N', 'ONFASNXETZOODS-UHFFFAOYSA-N', 'INMSAURDCVBGHH-UHFFFAOYSA-N', 'GOANEQIZDYDFCO-UHFFFAOYSA-N']
 # Big problem: Atoms like N2, O2 point to only the singlet
@@ -305,7 +304,7 @@ allotropic_standard_states = {'H': 'dihydrogen',
 }
 
 
-'''
+"""
 liquids = ['Hg', 'Br']
 gases = ['He', 'Ne', 'Ar', 'Kr', 'Xe', 'Rn', 'F', 'Cl', 'H', 'O', 'N']
 phases = ['s' for i in periodic_table]
@@ -314,11 +313,11 @@ for i, ele in enumerate(periodic_table):
         phases[i] = 'l'
     elif ele.symbol in gases:
         phases[i] = 'g'
-'''
+"""
 phases = ['g', 'g', 's', 's', 's', 's', 'g', 'g', 'g', 'g', 's', 's', 's', 's', 's', 's', 'g', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's']
 
 
-'''# From CRC Table:
+"""# From CRC Table:
 from chemicals.heat_capacity import CRC_standard_data
 S0s = []
 Hfs = []
@@ -364,7 +363,7 @@ for ele in periodic_table:
 for Hf, ele in zip(Hfs, periodic_table):
     if Hf != 0 and Hf is not None:
         print(Hf, ele.name, ele.CAS)
-'''
+"""
 
 # Note that atoms like Br2, I2, O2, N2 have values of S for two atoms not one
 S0s = [130.7, 126.2, 29.1, 9.5, 5.9, 5.7, 191.6, 205.2, 202.8, 146.3, 51.3, 32.7, 28.3, 18.8, 41.1, 32.1, 223.1, 154.8, 64.7, 41.6, 34.6, 30.7, 28.9, 23.8, 32.0, 27.3, 30.0, 29.9, 33.2, 41.6, 40.8, 31.1, 35.1, 42.4, 152.2, 164.1, 76.8, 55.0, 44.4, 39.0, 36.4, 28.7, None, 28.5, 31.5, 37.6, 42.6, 51.8, 57.8, 51.18, 45.7, 49.7, 116.1, 169.7, 85.2, 62.5, 56.9, 72.0, 73.2, 71.5, None, 69.6, 77.8, 68.1, 73.2, 75.6, 75.3, 73.2, 74.0, 59.9, 51.0, 43.6, 41.5, 32.6, 36.9, 32.6, 35.5, 41.6, 47.4, 75.9, 64.2, 64.8, 56.7, None, None, 176.2, 95.4, 71.0, 56.5, 51.8, 51.9, 50.2, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
@@ -720,8 +719,8 @@ openbabel_element_data = [
 [118, "Og", 0.00, 1.60, 1.60, 2.00,  6,        294, 0.00,       0,          0, 0.99, 0.00, 0.06, "Oganesson"],
 ]
 element_list = []
-'''Load the data from OpenBabel, and store it as both a
-list of elements first, and then as an instance of Periodic Table.'''
+"""Load the data from OpenBabel, and store it as both a
+list of elements first, and then as an instance of Periodic Table."""
 for values in openbabel_element_data:
     number, symbol, AReneg, rcov, _, rvdw, maxbonds, MW, elneg, ionization, elaffinity, _, _, _, name = values
     AReneg = None if AReneg == 0 else AReneg
@@ -746,7 +745,7 @@ for values in openbabel_element_data:
     element_list.append(ele)
 
 periodic_table = PeriodicTable(element_list)
-'''Single instance of the PeriodicTable class. Use this, not the PeriodicTable
+"""Single instance of the PeriodicTable class. Use this, not the PeriodicTable
 class directly.
 
 A brief overview of using the periodic table and its elements:
@@ -785,7 +784,7 @@ True
 23940
 >>> periodic_table.Bi.InChI_key
 'JCXGWMGPZLAOME-UHFFFAOYSA-N'
-'''
+"""
 del openbabel_element_data
 
 @mark_numba_incompatible
@@ -1031,7 +1030,7 @@ def atom_matrix(atomss, atom_IDs=None):
     [[4, 1, 0.0, 0.0], [6, 2, 0.0, 0.0], [0.0, 0.0, 2, 0.0], [0.0, 0.0, 0.0, 2], [2, 0.0, 0.0, 1], [0.0, 1, 0.0, 2]]
     '''
     if atom_IDs is None:
-        ans = set([])
+        ans = set()
         for atoms in atomss:
             for i in atoms.keys():
                 ans.add(i)

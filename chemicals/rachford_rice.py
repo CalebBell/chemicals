@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -121,7 +120,6 @@ significant error exists.
 
 """
 
-from __future__ import division
 
 __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution', 'Rachford_Rice_polynomial',
@@ -2084,7 +2082,7 @@ flash_inner_loop_all_methods = (FLASH_INNER_ANALYTICAL,
                                 FLASH_INNER_NUMPY, FLASH_INNER_LJA,
                                 FLASH_INNER_POLY, FLASH_INNER_LN2,
                                 FLASH_INNER_LN)
-'''Tuple of method name keys. See the `flash_inner_loop` for the actual references'''
+"""Tuple of method name keys. See the `flash_inner_loop` for the actual references"""
 
 def flash_inner_loop_methods(N):
     """Return all methods able to solve the Rachford-Rice equation

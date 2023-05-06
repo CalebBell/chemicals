@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
@@ -235,7 +234,7 @@ else: # pragma: no cover
 ### Critical point functions
 
 Tc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
-'''Tuple of method name keys. See the `Tc` for the actual references'''
+"""Tuple of method name keys. See the `Tc` for the actual references"""
 
 Tc_all_method_types = {
     IUPAC: miscdata.EXPERIMENTAL_REVIEW,
@@ -431,7 +430,7 @@ def Tc(CASRN, method=None):
         return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
 
 Pc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
-'''Tuple of method name keys. See the `Pc` for the actual references'''
+"""Tuple of method name keys. See the `Pc` for the actual references"""
 
 @mark_numba_incompatible
 def Pc_methods(CASRN):
@@ -610,7 +609,7 @@ def Pc(CASRN, method=None):
         return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
 
 Vc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, FEDORS, miscdata.JOBACK)
-'''Tuple of method name keys. See the `Vc` for the actual references'''
+"""Tuple of method name keys. See the `Vc` for the actual references"""
 
 @mark_numba_incompatible
 def Vc_methods(CASRN):
@@ -783,7 +782,7 @@ def Vc(CASRN, method=None):
         return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc')
 
 Zc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
-'''Tuple of method name keys. See the `Zc` for the actual references'''
+"""Tuple of method name keys. See the `Zc` for the actual references"""
 
 @mark_numba_incompatible
 def Zc_methods(CASRN):

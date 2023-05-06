@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -124,7 +123,6 @@ attribute of this module.
 
 """
 
-from __future__ import division
 
 __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid',
@@ -456,24 +454,24 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
 #             [-2.27492629730878, -9.82240510197603, -12.033872950579, -11.0321960061126, -10.325505114704],
 #             [10.2631854662709, 12.1358413791395, 9.19494865194302, 6.1678099993336, 4.66861294457414],
 #             [1.97815050331519, -5.54349664571295, -2.16866274479712, -0.965458722086812, -0.503243546373828]]
-    '''Unoptimized (but editable) code; the below is generated with sympy
+    """Unoptimized (but editable) code; the below is generated with sympy
     Ls = [2.443221E-3, 1.323095E-2, 6.770357E-3, -3.454586E-3, 4.096266E-4]
     lambda0 = 0
     for i, L in enumerate(Ls):
         lambda0 += L/Tr**i
     lambda0 = Tr**0.5/lambda0
-    '''
+    """
     lambda0 = sqrt(Tr)/(Tr_inv*(Tr_inv*(Tr_inv*(0.0004096266*Tr_inv - 0.003454586)
                         + 0.006770357) + 0.01323095) + 0.002443221)
 
-    '''Unoptimized (but editable) code; the below is generated with sympy
+    """Unoptimized (but editable) code; the below is generated with sympy
     tot1 = 0
     for i, Ljs in enumerate(Lijs):
         tot2 = 0
         for j, L in enumerate(Ljs):
             tot2 += L*(rhor - 1.)**j
         tot1 += (1./Tr -1.)**i*tot2
-    '''
+    """
     x0 = rhor - 1.0
     x1 = (Tr_inv - 1.0)
     x12 = x1*x1
@@ -518,9 +516,9 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
             else:
                 tot1 = (rhor*(rhor*(rhor*(rhor*(4.66861294457414 - 0.503243546373828*rhor) - 10.325505114704)
                             + 9.8895256507892) + 0.595748562571649) + 1.11999926419994)
-            '''Original code:
+            """Original code:
             zeta_drho_dP_Tr = 1./sum([Aijs[i][j]*rhor**i for i in range(6)])
-            '''
+            """
             zeta_drho_dP_Tr = 1./tot1
         else:
             zeta_drho_dP_Tr = drho_dP_Tr*68521.73913043478#22.064E6/322.0
@@ -1781,7 +1779,6 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     .. [2] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
     '''
-
     Tr = T/Tc
     if Tr > 2.0:
         Tr = 2.0

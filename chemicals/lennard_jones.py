@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -143,7 +142,7 @@ else:
 
 Stockmayer_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
                           TEEGOTOSTEWARD1, BSLB, BSLM)
-'''Tuple of method name keys. See the `Stockmayer` for the actual references'''
+"""Tuple of method name keys. See the `Stockmayer` for the actual references"""
 
 @mark_numba_incompatible
 def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
@@ -291,7 +290,7 @@ SILVALIUMACEDO = 'Silva, Liu, and Macedo (1998) critical relation with Tc, Pc'
 molecular_diameter_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD4, SILVALIUMACEDO,
                                   BSLC2, TEEGOTOSTEWARD3, STIELTHODOSMD, FLYNN,
                                   BSLC1, BSLB, BSLM)
-'''Tuple of method name keys. See the `molecular_diameter` for the actual references'''
+"""Tuple of method name keys. See the `molecular_diameter` for the actual references"""
 
 @mark_numba_incompatible
 def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,

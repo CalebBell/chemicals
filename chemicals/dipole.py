@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
@@ -91,7 +90,7 @@ else: # pragma: no cover
 # %% Dipole moment functions
 
 dipole_moment_all_methods = (CCCBDB, MULLER, POLING, PSI4_2022A)
-'''Tuple of method name keys. See the `dipole` for the actual references'''
+"""Tuple of method name keys. See the `dipole` for the actual references"""
 
 @mark_numba_incompatible
 def dipole_moment_methods(CASRN):

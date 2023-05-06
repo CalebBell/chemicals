@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -185,7 +184,6 @@ IAPWS-95 Residual Terms
 .. autofunction:: chemicals.iapws.iapws95_d4Ar_ddelta2dtau2
 
 """
-from __future__ import division
 
 from math import exp, log, sqrt
 
@@ -243,33 +241,33 @@ __all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
            ]
 
 iapws95_R = 461.51805
-'''Specific gas constant in J/(kg*K) according to IAPWS-95'''
+"""Specific gas constant in J/(kg*K) according to IAPWS-95"""
 
 iapws97_R = 461.526
-'''Specific gas constant in J/(kg*K) according to IAPWS-97'''
+"""Specific gas constant in J/(kg*K) according to IAPWS-97"""
 
 
 iapws95_MW = 18.015268
-'''Molecular weight of water in g/mol according to IAPWS-95, also used in IAPWS-97'''
+"""Molecular weight of water in g/mol according to IAPWS-95, also used in IAPWS-97"""
 
 iapws95_Pc = 22064000.0
-'''Critical pressure of water in Pa according to IAPWS-95, also used in IAPWS-97'''
+"""Critical pressure of water in Pa according to IAPWS-95, also used in IAPWS-97"""
 
 iapws95_Tc = 647.096
-'''Critical temperature of water in K according to IAPWS-95, also used in IAPWS-97'''
+"""Critical temperature of water in K according to IAPWS-95, also used in IAPWS-97"""
 
 iapws95_Tc_inv = 1.0 / iapws95_Tc
 
 
 iapws95_rhoc = 322.0
-'''Critical density of water in kg/m^3 according to IAPWS-95, also used in IAPWS-97'''
+"""Critical density of water in kg/m^3 according to IAPWS-95, also used in IAPWS-97"""
 
 iapws95_rhoc_inv = 1.0 / iapws95_rhoc
 
 iapws95_R_rhoc_inv2 = iapws95_R*iapws95_rhoc_inv*iapws95_rhoc_inv
 
 iapws95_Tt = 273.16
-'''Triple temperature of water in K according to IAPWS'''
+"""Triple temperature of water in K according to IAPWS"""
 
 def use_mpmath_backend():
     import mpmath as mp
@@ -453,7 +451,7 @@ def iapws97_boundary_3op(logP_MPa, logP_MPa_inv):
 #    return T
 
 
-region3_boundary_doc = '''
+region3_boundary_doc = """
 Calculates the transition temperature for a region 3 PT backwards equation
 transition.
 
@@ -469,9 +467,9 @@ T_trans : float
 
 Examples
 --------
-'''
+"""
 
-region3_logboundary_doc = '''
+region3_logboundary_doc = """
 Calculates the transition temperature for a region 3 PT backwards equation
 transition (for one of "wx", "ab", or "op"; the others do not use a log fit).
 The parameters are provided in the specific units for speed savings only.
@@ -490,7 +488,7 @@ T_trans : float
 
 Examples
 --------
-'''
+"""
 
 
 try:
@@ -2734,7 +2732,7 @@ def iapws97_region3_z(T, P):
     V *= V*0.0038
     return 1.0/V
 
-region3_backwards_PT_doc = '''
+region3_backwards_PT_doc = """
 Calculate the mass density water in one of the 26 region 3
 backwards regions of the IAPWS-97 standard.
 
@@ -2755,7 +2753,7 @@ Notes
 Significant discontinuities exist between each region.
 These functions are automatically generated and are not to be edited directly.
 
-'''
+"""
 try:
     for _ in (iapws97_region3_a, iapws97_region3_b, iapws97_region3_c, iapws97_region3_d,
               iapws97_region3_e, iapws97_region3_f, iapws97_region3_g, iapws97_region3_h,
@@ -6746,7 +6744,7 @@ def iapws95_rho(T, P):
 
     rho_old = 100000.0 #
     # Adding iterations check did not slow anything down.
-    '''# Points can be debugged with the following code.
+    """# Points can be debugged with the following code.
     import matplotlib.pyplot as plt
 
     from chemicals.iapws import iapws95_rho_err
@@ -6755,7 +6753,7 @@ def iapws95_rho(T, P):
     errs = [abs(iapws95_rho_err(rho, T, P)[0]) for rho in rhos]
     plt.semilogy(rhos, errs)
     plt.show()
-    '''
+    """
     iterations = 0
     #  or abs(err*P_inv) > 1e-13
     # (abs(rho_old - rho) > abs(1e-13*rho)) hand-tuned for maximum precision achievable

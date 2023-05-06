@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021, 2022 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -111,7 +110,6 @@ Third Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.CVirial_Orbey_Vera_mat
 """
 
-from __future__ import division
 
 __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'BVirial_Pitzer_Curl_vec', 'BVirial_Pitzer_Curl_mat',
@@ -2321,7 +2319,6 @@ def BVirial_Xiang(T, Tc, Pc, Vc, omega):
 
     Examples
     --------
-
     >>> BVirial_Xiang(388.26, 647.1, 22050000.0, 5.543076e-05, 0.344)
     (-0.0004799570, 4.6778266e-06, -7.0157656e-08, 1.4137862e-09)
 
@@ -2558,7 +2555,6 @@ def BVirial_Meng(T, Tc, Pc, Vc, omega, a=0.0):
 
     Examples
     --------
-
     >>> BVirial_Meng(388.26, 647.1, 22050000.0, 5.543076e-05, 0.344)
     (-0.00032436028, 2.47004e-06, -3.132e-08, 5.8e-10)
 
@@ -4442,7 +4438,6 @@ def dV_dzs_virial(B, C, V, dB_dzs, dC_dzs, dV_dzs=None):
 
     Notes
     -----
-
     This expression was derived with SymPy as follows:
 
     >>> from sympy import * # doctest: +SKIP
@@ -4505,7 +4500,6 @@ def d2V_dzizjs_virial(B, C, V, dB_dzs, dC_dzs, dV_dzs, d2B_dzizjs, d2C_dzizjs,
 
     Notes
     -----
-
     This expression was derived with SymPy as follows:
 
     >>> from sympy import * # doctest: +SKIP

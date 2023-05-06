@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -172,7 +171,6 @@ The structure of each dataframe is shown below:
 
 """
 
-from __future__ import division
 
 __all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9', 'dPPDS9_dT',
 'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
@@ -545,7 +543,6 @@ def mu_air_lemmon(T, rho):
 
     Notes
     -----
-
     The coefficients are:
 
     Ni = [10.72, 1.122, 0.002019, -8.876, -0.02916]
@@ -1854,7 +1851,7 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
             tot += ys[j]*phiij
         mu += ys[i]*mus[i]/tot
     return mu
-    ''' # Alternate variant which may be able to be faster in parallel
+    """ # Alternate variant which may be able to be faster in parallel
     N = len(ys)
     mu_root_invs = [0.0]*N
     mu_roots = [0.0]*N
@@ -1889,7 +1886,7 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
     for i in range(N):
         mu += ys[i]*mus[i]/tots[i]
     return mu
-    '''
+    """
 
 def Wilke_large(ys, mus, MWs):
     r'''Calculates viscosity of a gas mixture according to

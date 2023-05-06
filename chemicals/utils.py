@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -141,17 +140,17 @@ except:
 
 
 empty_dict = {}
-immutable_types = set([type(None), bool, int, float, complex, str, bytes,
+immutable_types = {type(None), bool, int, float, complex, str, bytes,
                        # dictionary views are read-only, kinda unexpected
                       type(empty_dict.keys()), type(empty_dict.items()), type(empty_dict.values()),
-                      ])
+                      }
 try:
     numpy_immutable_types = [np.bool_, np.byte, np.ubyte, np.short, np.ushort, np.intc, np.uintc, np.int_, np.uint, np.longlong, np.ulonglong, np.half, np.float16, np.single, np.double, np.longdouble, np.csingle, np.cdouble, np.clongdouble]
     immutable_types.update(numpy_immutable_types)
 except:
     pass
 
-immutable_class_types = set(['Fraction', 'Decimal'])
+immutable_class_types = {'Fraction', 'Decimal'}
 
 @mark_numba_incompatible
 def object_data(obj):
@@ -250,7 +249,6 @@ def hash_any_primitive(v):
 
     Examples
     --------
-
     hash_any_primitive([1,2,3,4,5])
 
     hash_any_primitive({'a': [1,2,3], 'b': []})
@@ -2353,7 +2351,7 @@ def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
     if (set(IDs1) == set(IDs2)) and (len(IDs1) == len(IDs2)):
             cmps = IDs1
     else:
-        cmps = sorted(list(set((IDs1 + IDs2))))
+        cmps = sorted(list(set(IDs1 + IDs2)))
     mole = flow1 + flow2
     moles = []
     for cmp in cmps:
@@ -2412,7 +2410,7 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
     if (set(IDs1) == set(IDs2)) and (len(IDs1) == len(IDs2)):
         cmps = IDs1
     else:
-        cmps = sorted(list(set((IDs1 + IDs2))))
+        cmps = sorted(list(set(IDs1 + IDs2)))
 
     ns = []
     for ID in cmps:
@@ -2550,7 +2548,7 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
     F_known_inv = 1.0/F_known
     MW_known = sum([F*MW*F_known_inv for F, MW in zip(F_knowns, MWs_known)])
 
-    if not any([i is not None for i in ws]):
+    if not any(i is not None for i in ws):
         # Only flow rates or mole fractions!
         zs_spec = sum([zi for zi in zs if zi is not None])
         F_act = F_known/(1.0 - zs_spec)

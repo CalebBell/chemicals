@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -867,12 +866,12 @@ def _load_Cp_data():
     #                                        "Lin": Lin, "Quadinv": Quadinv,
     #                                        "Quad": Quad, "Tmin": Tmin,
     #                                        "Tmax": Tmax, "Error": err}}
-    '''
+    """
     Read in a dict of 2481 thermodynamic property sets of different phases from:
     Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
     Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     Warning: 11 duplicated chemicals are present and currently clobbered.
-    '''
+    """
     import json
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
         Cp_dict_PerryI = json.loads(f.read())
@@ -2990,7 +2989,6 @@ def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
 
     Notes
     -----
-
     In the equation, `k` is Boltzmann's constant, `c` is the speed of light,
     and `h` is the Planck constant.
 
@@ -2999,7 +2997,6 @@ def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
 
     Examples
     --------
-
     >>> vibration_frequency_cm_to_characteristic_temperature(667)
     959.6641613636505
     '''

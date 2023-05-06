@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
@@ -179,7 +178,7 @@ else:
 # has dippr standard heats of formation, about 55% of the database
 
 Hfs_all_methods = (CRC, miscdata.WEBBOOK)
-'''Tuple of method name keys. See the `Hfs` for the actual references'''
+"""Tuple of method name keys. See the `Hfs` for the actual references"""
 
 @mark_numba_incompatible
 def Hfs_methods(CASRN):
@@ -260,7 +259,7 @@ def Hfs(CASRN, method=None):
         return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
 
 Hfl_all_methods = (ATCT_L, CRC, miscdata.WEBBOOK, miscdata.JANAF)
-'''Tuple of method name keys. See the `Hfl` for the actual references'''
+"""Tuple of method name keys. See the `Hfl` for the actual references"""
 
 @mark_numba_incompatible
 def Hfl_methods(CASRN):
@@ -347,7 +346,7 @@ def Hfl(CASRN, method=None):
         return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
 
 Hfg_all_methods = (ATCT_G, TRC, CRC, miscdata.WEBBOOK, miscdata.JANAF, YAWS, miscdata.JOBACK)
-'''Tuple of method name keys. See the `Hfg` for the actual references'''
+"""Tuple of method name keys. See the `Hfg` for the actual references"""
 
 @mark_numba_incompatible
 def Hfg_methods(CASRN):
@@ -459,7 +458,7 @@ def Hfg(CASRN, method=None):
         return retrieve_any_from_df_dict(Hfg_sources, CASRN, 'Hfg')
 
 S0s_all_methods = (CRC, miscdata.WEBBOOK)
-'''Tuple of method name keys. See the `S0s` for the actual references'''
+"""Tuple of method name keys. See the `S0s` for the actual references"""
 
 @mark_numba_incompatible
 def S0s_methods(CASRN):
@@ -542,7 +541,7 @@ def S0s(CASRN, method=None):
         return retrieve_any_from_df_dict(S0s_sources, CASRN, 'S0s')
 
 S0l_all_methods = (CRC, miscdata.WEBBOOK, miscdata.JANAF)
-'''Tuple of method name keys. See the `S0l` for the actual references'''
+"""Tuple of method name keys. See the `S0l` for the actual references"""
 
 @mark_numba_incompatible
 def S0l_methods(CASRN):
@@ -622,7 +621,7 @@ def S0l(CASRN, method=None):
         return retrieve_any_from_df_dict(S0l_sources, CASRN, 'S0l')
 
 S0g_all_methods = (CRC, miscdata.WEBBOOK, miscdata.JANAF, YAWS)
-'''Tuple of method name keys. See the `S0g` for the actual references'''
+"""Tuple of method name keys. See the `S0g` for the actual references"""
 
 @mark_numba_incompatible
 def S0g_methods(CASRN):

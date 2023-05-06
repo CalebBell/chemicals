@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -64,7 +63,6 @@ a certain database or not. The following chemical groups are available.
 .. autofunction:: chemicals.identifiers.dippr_compounds
 """
 
-from __future__ import division
 
 __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
            'mixture_from_any', 'cryogenics', 'inerts', 'dippr_compounds', 'IDs_to_CASs',
@@ -631,10 +629,10 @@ def _search_chemical(ID, autoload):
     ID = ID.strip()
     ID_lower = ID.lower()
     if ID in periodic_table:
-        '''Special handling for homonuclear elements. Search '1'> H, 'H'> H, monotomic CAS > H
+        """Special handling for homonuclear elements. Search '1'> H, 'H'> H, monotomic CAS > H
         but "Hydrogen"> H2.
         pubchem_db does not contain atomic numbers, so searching in the periodic table is necessary.
-        '''
+        """
         if (ID in periodic_table._symbol_to_elements or ID in periodic_table._number_to_elements
             or ID in periodic_table._CAS_to_elements):
             obj = pubchem_db.search_CAS(periodic_table[ID].CAS)

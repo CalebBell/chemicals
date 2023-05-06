@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
@@ -177,7 +176,7 @@ else:
 
 
 RON_all_methods = (FLORIAN_LIMING, COMBUSTDB, FLORIAN_LIMING_ANN, COMBUSTDB_PREDICTIONS)
-'''Tuple of method name keys. See the `RON` for the actual references'''
+"""Tuple of method name keys. See the `RON` for the actual references"""
 
 @mark_numba_incompatible
 def RON_methods(CASRN):
@@ -272,7 +271,7 @@ def RON(CASRN, method=None):
 
 
 MON_all_methods = (FLORIAN_LIMING, COMBUSTDB, FLORIAN_LIMING_ANN, COMBUSTDB_PREDICTIONS)
-'''Tuple of method name keys. See the `MON` for the actual references'''
+"""Tuple of method name keys. See the `MON` for the actual references"""
 
 @mark_numba_incompatible
 def MON_methods(CASRN):
@@ -367,7 +366,7 @@ def MON(CASRN, method=None):
 
 
 ignition_delay_all_methods = (DAHMEN_MARQUARDT,)
-'''Tuple of method name keys. See the `ignition_delay` for the actual references'''
+"""Tuple of method name keys. See the `ignition_delay` for the actual references"""
 
 @mark_numba_incompatible
 def ignition_delay_methods(CASRN):
@@ -1510,23 +1509,23 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
             N_O2_required_air = n_O2_required*(1.0 + O2_excess)- z_fuel_O2*n_fuel
             n_air = N_O2_required_air/zs_air[O2_index]
         elif n_air is not None:
-            '''from sympy import *
+            """from sympy import *
             O2, n_fuel, O2_per_mole_fuel, n_O2_air, z_fuel_O2 = symbols('O2, n_fuel, O2_per_mole_fuel, n_O2_air, z_fuel_O2')
             Eq1 = Eq(O2/n_fuel, O2_per_mole_fuel)
             Eq2 = Eq(O2, n_O2_air + z_fuel_O2*n_fuel)
-            solve([Eq1, Eq2], [n_fuel, O2])'''
+            solve([Eq1, Eq2], [n_fuel, O2])"""
             comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
             O2_per_mole_fuel = (-comb_ans['O2'] + zs_fuel[O2_index])*(1.0 + O2_excess)
             n_O2_air = zs_air[O2_index]*n_air
             n_fuel = n_O2_air/(O2_per_mole_fuel - z_fuel_O2)
         elif n_out is not None:
-            '''from sympy import *
+            """from sympy import *
             n_air, n_fuel, n_out, n_delta, O2_coeff, O2_excess, z_air_O2, z_fuel_O2 = symbols('n_air, n_fuel, n_out, n_delta, O2_coeff, O2_excess, z_air_O2, z_fuel_O2')
             n_O2_in = n_air*z_air_O2 + z_fuel_O2*n_fuel
             Eq1 = Eq(O2_excess, n_O2_in/(n_fuel*O2_coeff) - 1)
             Eq2 = Eq(n_out, n_air + (n_delta)*n_fuel + n_fuel)
-            solve([Eq1, Eq2], [n_fuel, n_air])'''
+            solve([Eq1, Eq2], [n_fuel, n_air])"""
             comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
             stoic_comb_products = combustion_products_to_list(comb_ans, CASs)
@@ -1561,18 +1560,18 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
 
             # Following two equations solved using SymPy
             if frac_out_O2 is not None:
-                '''from sympy import *
+                """from sympy import *
                 from sympy.abc import *
                 frac_goal, n_air, n_fixed, z_O2, O2_burnt = symbols('frac_goal, n_air, n_fixed, z_O2, O2_burnt')
                 solve(Eq(frac_goal, (z_O2*n_air-O2_burnt)/((n_fixed+n_air)-O2_burnt)), n_air)
-                '''
+                """
                 n_air = (n_O2_stoic*frac_out_O2 - n_O2_stoic - frac_out_O2*n_fixed_products)/(frac_out_O2 - z_air_O2)
             elif frac_out_O2_dry is not None:
-                '''from sympy import *
+                """from sympy import *
                 from sympy.abc import *
                 frac_goal, n_air, n_fixed, z_O2, n_O2_stoic, z_H20 = symbols('frac_goal, n_air, n_fixed, z_O2, n_O2_stoic, z_H20')
                 solve(Eq(frac_goal, (z_O2*n_air-n_O2_stoic)/((n_fixed+n_air)-n_O2_stoic -n_air*z_H20)), n_air)
-                '''
+                """
                 n_fixed_products -= stoic_comb_products[H2O_index]
                 n_air = ((-frac_out_O2_dry*n_O2_stoic + frac_out_O2_dry*n_fixed_products + n_O2_stoic)
                          /(frac_out_O2_dry*z_air_H20 - frac_out_O2_dry + z_air_O2))
@@ -1586,50 +1585,50 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
                 n_delta += v
 
             if frac_out_O2 is not None and n_air is not None:
-                '''from sympy import *
+                """from sympy import *
                 from sympy.abc import *
                 frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff = symbols('frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff')
                 n_unburnt_O2 = n_air*z_O2 - n_fuel*O2_coeff
                 n_out = n_air + coeff*n_fuel
                 solve(Eq(frac_goal, n_unburnt_O2/n_out), n_fuel)
-                '''
+                """
                 n_fuel = n_air*(-frac_out_O2 + z_air_O2)/(O2_burnt_n_fuel + n_delta*frac_out_O2)
             elif frac_out_O2_dry is not None and n_air is not None:
-                '''from sympy import *
+                """from sympy import *
                 from sympy.abc import *
                 frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff, H2O_coeff, z_H2O = symbols('frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff, H2O_coeff, z_H2O')
                 n_unburnt_O2 = n_air*z_O2 - n_fuel*O2_coeff
                 n_out = n_air + coeff*n_fuel
                 n_H2O = n_air*z_H2O + H2O_coeff*n_fuel
-                solve(Eq(frac_goal, n_unburnt_O2/(n_out-n_H2O)), n_fuel)'''
+                solve(Eq(frac_goal, n_unburnt_O2/(n_out-n_H2O)), n_fuel)"""
                 n_fuel = n_air*(frac_out_O2_dry*z_air_H20 - frac_out_O2_dry + z_air_O2)/(-H2O_from_fuel_n*frac_out_O2_dry + O2_burnt_n_fuel + n_delta*frac_out_O2_dry)
             elif frac_out_O2 is not None and n_out is not None:
-                '''from sympy import *
+                """from sympy import *
                 frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff, n_out = symbols('frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff, n_out')
                 n_unburnt_O2 = n_air*z_O2 - n_fuel*O2_coeff
                 Eq1 = Eq(frac_goal, n_unburnt_O2/n_out)
                 Eq2 = Eq(n_out, n_air + coeff*n_fuel)
-                solve([Eq1, Eq2], [n_fuel, n_air])'''
+                solve([Eq1, Eq2], [n_fuel, n_air])"""
                 n_fuel = -n_out*(frac_out_O2 - z_air_O2)/(O2_burnt_n_fuel + n_delta*z_air_O2)
                 n_air = n_out*(O2_burnt_n_fuel + n_delta*frac_out_O2)/(O2_burnt_n_fuel + n_delta*z_air_O2)
             elif frac_out_O2_dry is not None and n_out is not None:
-                '''from sympy import *
+                """from sympy import *
                 frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff, n_out, z_H2O, H2O_coeff = symbols('frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff, n_out, z_H2O, H2O_coeff')
                 n_unburnt_O2 = n_air*z_O2 - n_fuel*O2_coeff
                 n_H2O = n_air*z_H2O + H2O_coeff*n_fuel
                 Eq1 = Eq(frac_goal, n_unburnt_O2/(n_out-n_H2O))
                 Eq2 = Eq(n_out, n_air + coeff*n_fuel)
-                solve([Eq1, Eq2], [n_fuel, n_air])'''
+                solve([Eq1, Eq2], [n_fuel, n_air])"""
                 n_fuel = n_out*(frac_out_O2_dry*z_air_H20 - frac_out_O2_dry + z_air_O2)/(-H2O_from_fuel_n*frac_out_O2_dry + O2_burnt_n_fuel + n_delta*frac_out_O2_dry*z_air_H20 + n_delta*z_air_O2)
                 n_air = n_out*(-H2O_from_fuel_n*frac_out_O2_dry + O2_burnt_n_fuel + n_delta*frac_out_O2_dry)/(-H2O_from_fuel_n*frac_out_O2_dry + O2_burnt_n_fuel + n_delta*(frac_out_O2_dry*z_air_H20 + z_air_O2))
 
     # Case of two fuels known - one n out
     if n_out is not None and (n_fuel is None or n_air is None):
-        '''from sympy import *
+        """from sympy import *
         from sympy.abc import *
         frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff, n_out = symbols('frac_goal, n_air, z_O2, n_fuel, coeff, O2_coeff, n_out')
         solve(Eq(n_out, n_air + coeff*n_fuel), n_fuel)
-        solve(Eq(n_out, n_air + coeff*n_fuel), n_air)'''
+        solve(Eq(n_out, n_air + coeff*n_fuel), n_air)"""
         comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                combustion_stoichiometries=combustion_stoichiometries)
         n_delta = 0.0
@@ -1755,11 +1754,11 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
         extra_specs['n_air'] = n_air2
         extra_specs['zs_air'] = zs_air2
         if O2_excess is not None:
-            '''from sympy import *
+            """from sympy import *
             O2_excess, excess_sub, O2_air, O2_in_third, O2_fixed, z_fuel_O2, n_fuel, O2_coeff, O2_demand_third = symbols('O2_excess, excess_sub, O2_air, O2_in_third, O2_fixed, z_fuel_O2, n_fuel, O2_coeff, O2_demand_third')
             Eq1 = Eq(O2_excess, (O2_air + O2_in_third + z_fuel_O2*n_fuel)/(O2_demand_third + n_fuel*O2_coeff) - 1)
             Eq2 = Eq(excess_sub, (O2_fixed +z_fuel_O2*n_fuel)/(n_fuel*O2_coeff) - 1)
-            solve([Eq1, Eq2], [excess_sub, n_fuel])'''
+            solve([Eq1, Eq2], [excess_sub, n_fuel])"""
             comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
             O2_burnt_n_fuel = O2_coeff = -comb_ans['O2'] + z_fuel_O2
@@ -1932,7 +1931,6 @@ def combustion_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
 
     Examples
     --------
-
     >>> zs_air = [0.79, 0.205, 0, 0, 0, 0.0045, 0.0005]
     >>> zs_fuel = [0.025, 0.025, 0.85, 0.07, 0.029, 0.0005, 0.0005]
     >>> zs_third = [0.1, 0.005, 0.5, 0.39, 0, 0.005, 0]

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -173,7 +172,6 @@ The structure of each dataframe is shown below:
 
 """
 
-from __future__ import division
 
 __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
 'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic',

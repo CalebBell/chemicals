@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -56,7 +55,6 @@ array([591.75, 647.14])
 
 """
 
-from __future__ import division
 
 from fluids.numerics import FakePackage
 from fluids.numerics import numpy as np

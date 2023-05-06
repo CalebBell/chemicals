@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2022 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -94,7 +93,7 @@ else:
 #  Refractive index functions
 
 RG_all_methods = (PSI4_2022A, CHEMSEP)
-'''Tuple of method name keys. See the `RG` for the actual references'''
+"""Tuple of method name keys. See the `RG` for the actual references"""
 
 @mark_numba_incompatible
 def RG_methods(CASRN):
@@ -183,7 +182,7 @@ def RG(CASRN, method=None):
 
 
 linear_all_methods = (PSI4_2022A,)
-'''Tuple of method name keys. See the `linear` for the actual references'''
+"""Tuple of method name keys. See the `linear` for the actual references"""
 
 @mark_numba_incompatible
 def linear_methods(CASRN):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -60,7 +59,7 @@ from chemicals.data_reader import (list_available_methods_from_df_dict,
 from chemicals.utils import log, log10, mark_numba_incompatible
 
 omega_all_methods = ('PSRK', 'PD', 'YAWS', critical.ACENTRIC_DEFINITION)
-'''Tuple of method name keys. See the `omega` for the actual references'''
+"""Tuple of method name keys. See the `omega` for the actual references"""
 
 @mark_numba_incompatible
 def omega_methods(CASRN):

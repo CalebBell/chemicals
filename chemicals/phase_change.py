@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -249,7 +248,7 @@ else:
 
 Tb_all_methods = (CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
                   miscdata.WEBBOOK, YAWS, miscdata.WIKIDATA, miscdata.JOBACK)
-'''Tuple of method name keys. See the `Tb` for the actual references'''
+"""Tuple of method name keys. See the `Tb` for the actual references"""
 
 @mark_numba_incompatible
 def Tb_methods(CASRN):
@@ -351,7 +350,7 @@ def Tb(CASRN, method=None):
 
 Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
                   miscdata.WEBBOOK, miscdata.WIKIDATA, miscdata.JOBACK)
-'''Tuple of method name keys. See the `Tm` for the actual references'''
+"""Tuple of method name keys. See the `Tm` for the actual references"""
 
 @mark_numba_incompatible
 def Tm_methods(CASRN):
@@ -1253,7 +1252,7 @@ def PPDS12(T, Tc, A, B, C, D, E):
 ### Heat of Fusion
 
 Hfus_all_methods = (CRC, miscdata.WEBBOOK, miscdata.WIKIDATA, miscdata.JOBACK)
-'''Tuple of method name keys. See the `Hfus` for the actual references'''
+"""Tuple of method name keys. See the `Hfus` for the actual references"""
 
 @mark_numba_incompatible
 def Hfus_methods(CASRN):

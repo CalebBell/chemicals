@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -165,7 +164,6 @@ The structure of each dataframe is shown below:
     In [8]: chemicals.vapor_pressure.Psat_data_Alcock_elements
 """
 
-from __future__ import division
 
 __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'Wagner_original',  'dWagner_original_dT', 'd2Wagner_original_dT2',
@@ -850,7 +848,6 @@ def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
-
     log_base_inv = 1.0/log(base)
     Psat_inv = 1.0/Psat
     # The expression from SymPy is as follows

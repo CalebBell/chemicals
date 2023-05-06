@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -133,7 +132,6 @@ The structure of each dataframe is shown below:
 """
 
 
-from __future__ import division
 
 __all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
            'Brock_Bird', 'Pitzer_sigma', 'Sastri_Rao', 'Zuo_Stenby',

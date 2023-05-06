@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -48,7 +47,6 @@ Equilibrium Constants
 
 """
 
-from __future__ import division
 
 from math import exp, log
 
@@ -256,7 +254,7 @@ def Wilson_K_value(T, P, Tc, Pc, omega):
        Journal of Chemical Engineering, December 1, 1976.
        https://doi.org/10.1002/cjce.5450540620.
     '''
-    return Pc/P*exp((5.37*(1.0 + omega)*(1.0 - Tc/T)))
+    return Pc/P*exp(5.37*(1.0 + omega)*(1.0 - Tc/T))
 
 
 def PR_water_K_value(T, P, Tc, Pc):
@@ -407,7 +405,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
         T_inv = 1.0/T
         Ks = [0.0]*N
         for i in range(N):
-            Ks[i] = P_inv*Pcs[i]*exp((5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]*T_inv)))
+            Ks[i] = P_inv*Pcs[i]*exp(5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]*T_inv))
 #        all_under_1, all_over_1 = True, True
 #        for K in Ks:
 #            if K < 1.0:
@@ -425,7 +423,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
         P_bubble = 0.0
         T_inv = 1.0/T
         for i in range(N):
-            v = zs[i]*Pcs[i]*exp((5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]*T_inv)))
+            v = zs[i]*Pcs[i]*exp(5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]*T_inv))
             P_bubble += v
             ys[i] = v
         P_inv = 1.0/P_bubble
@@ -437,7 +435,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
         P_dew = 0.
         T_inv = 1.0/T
         for i in range(N):
-            v = zs[i]/(Pcs[i]*exp((5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]*T_inv))))
+            v = zs[i]/(Pcs[i]*exp(5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]*T_inv)))
             P_dew += v
             xs[i] = v
         P_dew = 1./P_dew
@@ -451,12 +449,12 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
         T_inv = 1.0/T
         K_Ps = [0.0]*N
         for i in range(N):
-            K_P = Pcs[i]*exp((5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]*T_inv)))
+            K_P = Pcs[i]*exp(5.37*(1.0 + omegas[i])*(1.0 - Tcs[i]*T_inv))
             P_bubble += zs[i]*K_P
             P_dew += zs[i]/K_P
             K_Ps[i] = K_P
         P_dew = 1./P_dew
-        '''Rachford-Rice esque solution in terms of pressure.
+        """Rachford-Rice esque solution in terms of pressure.
         from sympy import *
         N = 1
         cmps = range(N)
@@ -467,7 +465,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
         for i in cmps:
             tot += zs[i]*(Ks_P[i]/P - 1)/(1 + VF*(Ks_P[i]/P - 1))
         cse([tot, diff(tot, P)], optimizations='basic')
-        '''
+        """
         P_guess = P_bubble + VF*(P_dew - P_bubble) # Linear interpolation
         P_calc = newton(err_Wilson_TVF, P_guess, fprime=True, bisection=True,
                    low=P_dew, high=P_bubble, args=(N, VF, zs, K_Ps))

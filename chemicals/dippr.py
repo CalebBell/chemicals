@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -56,7 +55,6 @@ Jacobians (for fitting)
 
 """
 
-from __future__ import division
 
 __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
            'EQ114', 'EQ115', 'EQ116', 'EQ127',
@@ -879,15 +877,13 @@ def EQ106_AB(T, Tc, val, der):
 
     Examples
     --------
-
     >>> val = EQ106(300, 647.096, A=0.17766, B=2.567)
     >>> der = EQ106(300, 647.096, A=0.17766, B=2.567, order=1)
     >>> EQ106_AB(300, 647.096, val, der)
     (0.17766, 2.567)
 
     '''
-
-    '''# Derived with:
+    """# Derived with:
     from sympy import *
     T, Tc, A, B, val, der = symbols('T, Tc, A, B, val, der')
     Tr = T/Tc
@@ -896,7 +892,7 @@ def EQ106_AB(T, Tc, val, der):
     Eq0 = Eq(expr, val)
     Eq1 = Eq(diff(expr, T), der)
     s = solve([Eq0, Eq1], [A, B])
-    '''
+    """
     x0 = T - Tc
     x1 = der*x0/val
     A, B = val*(-x0/Tc)**(-x1), x1
@@ -960,7 +956,6 @@ def EQ106_ABC(T, Tc, val, der, der2):
 
     Examples
     --------
-
     >>> val = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01)
     >>> der = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01, order=1)
     >>> der2 = EQ106(300, 647.096, A=0.17766, B=2.567, C=-0.01, order=2)
@@ -968,7 +963,7 @@ def EQ106_ABC(T, Tc, val, der, der2):
     (0.17766, 2.567, -0.01)
 
     '''
-    '''# Broken in recent versions of SymPy, SymPy 1.1 is good
+    """# Broken in recent versions of SymPy, SymPy 1.1 is good
     from sympy import *
     T, Tc, A, B, C, val, der, der2 = symbols('T, Tc, A, B, C, val, der, der2')
     Tr = T/Tc
@@ -978,7 +973,7 @@ def EQ106_ABC(T, Tc, val, der, der2):
     Eq1 = Eq(diff(expr, T), der)
     Eq2 = Eq(diff(expr, T, 2), der2)
     s = solve([Eq0, Eq1, Eq2], [A, B, C])
-    '''
+    """
     x0 = T - Tc
     x1 = -x0/Tc
     x2 = log(x1)

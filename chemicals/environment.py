@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
@@ -84,7 +83,7 @@ IPCC_2014_100YR_GWP = 'IPCC (2014) 100yr'
 GWP_all_methods = (IPCC_2014_100YR_GWP, IPCC_2014_20YR_GWP,
                    IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP,
                    IPCC_1995_100YR_GWP)
-'''Tuple of method name keys. See the `GWP` for the actual references'''
+"""Tuple of method name keys. See the `GWP` for the actual references"""
 
 
 _GWP_ODP_data_loaded = False
@@ -280,7 +279,7 @@ ODP1STR = 'ODP1 string'
 ODP1LOG = 'ODP1 logarithmic average'
 ODP_all_methods = (ODP2MAX, ODP1MAX, ODP2LOG, ODP1LOG,
                    ODP2MIN, ODP1MIN, ODP2STR, ODP1STR)
-'''Tuple of method name keys. See the `ODP` for the actual references'''
+"""Tuple of method name keys. See the `ODP` for the actual references"""
 
 @mark_numba_incompatible
 def ODP_methods(CASRN):
@@ -381,7 +380,7 @@ def ODP(CASRN, method=None):
 SYRRES = 'SYRRES'
 CRC = 'CRC'
 logP_all_methods = (SYRRES, CRC, miscdata.WIKIDATA)
-'''Tuple of method name keys. See the `logP` for the actual references'''
+"""Tuple of method name keys. See the `logP` for the actual references"""
 
 @mark_numba_incompatible
 def logP_methods(CASRN):

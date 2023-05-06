@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -86,7 +85,7 @@ else:
         _load_triple_data()
 
 Tt_all_methods = (STAVELEY, miscdata.WEBBOOK, MELTING)
-'''Tuple of method name keys. See the `Tt` for the actual references'''
+"""Tuple of method name keys. See the `Tt` for the actual references"""
 
 @mark_numba_incompatible
 def Tt_methods(CASRN):
@@ -183,7 +182,7 @@ def Tt(CASRN, method=None):
         return Tm(CASRN)
 
 Pt_all_methods = (STAVELEY, miscdata.WEBBOOK)
-'''Tuple of method name keys. See the `Pt` for the actual references'''
+"""Tuple of method name keys. See the `Pt` for the actual references"""
 
 @mark_numba_incompatible
 def Pt_methods(CASRN):

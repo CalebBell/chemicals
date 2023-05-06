@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -47,8 +46,8 @@ try:
     int32_dtype = np.dtype(np.int32)
     int16_dtype = np.dtype(np.int16)
     int8_dtype = np.dtype(np.int8)
-    float_dtype_ids = set([id(float64_dtype), id(float32_dtype)])
-    int_dtype_ids = set([id(int64_dtype), id(int32_dtype), id(int16_dtype), id(int8_dtype)])
+    float_dtype_ids = {id(float64_dtype), id(float32_dtype)}
+    int_dtype_ids = {id(int64_dtype), id(int32_dtype), id(int16_dtype), id(int8_dtype)}
 
 except:
     pass
@@ -81,17 +80,17 @@ def register_df_source(folder, name, sep='\t', index_col=0, csv_kwargs=None,
     if csv_kwargs is None: csv_kwargs = {}
     load_cmds[name] = (folder, name, sep, index_col, csv_kwargs, postload, sparsify, int_CAS)
 
-'''The following flags will strip out the excess memory usage of redundant
+"""The following flags will strip out the excess memory usage of redundant
 chemical metadata information.
-'''
+"""
 try:
     low_mem = bool(int(os.environ.get('CHEDL_LOW_MEMORY', '0')))
 except:
     low_mem = False
 
-spurious_columns = set(['name', 'formula', 'MW', 'InChI', 'InChI_key', 'Chemical',
+spurious_columns = {'name', 'formula', 'MW', 'InChI', 'InChI_key', 'Chemical',
                     'Data Type', 'Uncertainty', 'Fluid', 'Name', 'Names', 'Name ',
-                    'Formula', 'Formula '])
+                    'Formula', 'Formula '}
 
 def load_df(key):
     global pd
@@ -114,7 +113,7 @@ def load_df(key):
 
     if int_CAS and df.index.dtype is object_dtype:
         # If the index is already an int, leave it be
-        '''Most CAS numbers fit in 32 bits. Not all of them do though, for
+        """Most CAS numbers fit in 32 bits. Not all of them do though, for
         example https://commonchemistry.cas.org/detail?cas_rn=2222298-66-8
         or 2627558-64-7
 
@@ -131,7 +130,7 @@ def load_df(key):
         another digit. At their current rate this will be in 2036, but it will
         likely be well before that. Therefore, it does not justify removing
         the check digit.
-        '''
+        """
         df.index = pd.Index([CAS_to_int(s) for s in df.index], dtype=int64_dtype, name=df.index.name)
 
     df_sources[key] = df

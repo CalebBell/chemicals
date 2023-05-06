@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -56,7 +55,6 @@ attribute of this module.
 
 """
 
-from __future__ import division
 
 __all__ = ['permittivity_IAPWS', 'permittivity_CRC']
 

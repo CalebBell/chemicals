@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -392,16 +391,16 @@ else: # pragma: no cover
 
 ONTARIO = 'Ontario Limits'
 TWA_all_methods = (ONTARIO,)
-'''Tuple of method name keys. See the :obj:`TWA` for the actual references'''
+"""Tuple of method name keys. See the :obj:`TWA` for the actual references"""
 
 STEL_all_methods = (ONTARIO,)
-'''Tuple of method name keys. See the :obj:`STEL` for the actual references'''
+"""Tuple of method name keys. See the :obj:`STEL` for the actual references"""
 
 Ceiling_all_methods = (ONTARIO,)
-'''Tuple of method name keys. See the :obj:`Ceiling` for the actual references'''
+"""Tuple of method name keys. See the :obj:`Ceiling` for the actual references"""
 
 Skin_all_methods = (ONTARIO,)
-'''Tuple of method name keys. See the :obj:`Skin` for the actual references'''
+"""Tuple of method name keys. See the :obj:`Skin` for the actual references"""
 
 @mark_numba_incompatible
 def TWA_methods(CASRN):
@@ -672,7 +671,7 @@ UNLISTED = 'Unlisted'
 COMBINED = 'Combined'
 
 Carcinogen_all_methods = (IARC, NTP)
-'''Tuple of method name keys. See the :obj:`Carcinogen` for the actual references'''
+"""Tuple of method name keys. See the :obj:`Carcinogen` for the actual references"""
 
 @mark_numba_incompatible
 def Carcinogen_methods(CASRN):
@@ -769,7 +768,7 @@ def Carcinogen(CASRN, method=None):
 
 
 T_flash_all_methods = (IEC, NFPA, SERAT, miscdata.WIKIDATA)
-'''Tuple of method name keys. See the :obj:`T_flash` for the actual references'''
+"""Tuple of method name keys. See the :obj:`T_flash` for the actual references"""
 
 @mark_numba_incompatible
 def T_flash_methods(CASRN):
@@ -863,7 +862,7 @@ def T_flash(CASRN, method=None):
 
 
 T_autoignition_all_methods = (IEC, NFPA, miscdata.WIKIDATA)
-'''Tuple of method name keys. See the :obj:`T_autoignition` for the actual references'''
+"""Tuple of method name keys. See the :obj:`T_autoignition` for the actual references"""
 
 @mark_numba_incompatible
 def T_autoignition_methods(CASRN):
@@ -950,7 +949,7 @@ def T_autoignition(CASRN, method=None):
 
 
 LFL_all_methods = (IEC, NFPA, miscdata.WIKIDATA, SUZUKI, CROWLLOUVAR)
-'''Tuple of method name keys. See the :obj:`LFL` for the actual references'''
+"""Tuple of method name keys. See the :obj:`LFL` for the actual references"""
 
 @mark_numba_incompatible
 def LFL_methods(Hc=None, atoms=None, CASRN=''):
@@ -1063,7 +1062,7 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
         return retrieve_from_df_dict(LFL_sources, CASRN, 'LFL', method)
 
 UFL_all_methods = (IEC, NFPA, miscdata.WIKIDATA, SUZUKI, CROWLLOUVAR)
-'''Tuple of method name keys. See the :obj:`UFL` for the actual references'''
+"""Tuple of method name keys. See the :obj:`UFL` for the actual references"""
 
 @mark_numba_incompatible
 def UFL_methods(Hc=None, atoms=None, CASRN=''):
