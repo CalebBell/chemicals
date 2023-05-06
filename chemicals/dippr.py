@@ -447,7 +447,9 @@ def EQ105_fitting_jacobian(Ts, A, B, C, D):
             r[0] = B**(-x2)
             r[1] = -x2*x3/B
             r[2] = -D*Ts[i]*x4/(C*C*x0)
-            r[3] = -x4*trunc_log(x0)
+            if x4 != 0.0:
+                if x0 > 0:
+                    r[3] = -x4*trunc_log(x0)
     return out
 
 def EQ106_fitting_jacobian(Ts, Tc, A, B, C, D, E):
@@ -670,7 +672,10 @@ def EQ105(T, A, B, C, D, order=0):
         if D < 1.0 and problematic < 0.0:
             # Handle the case of a negative D exponent with a (1. - T/C) under 0 which would yield a complex number
             problematic = 0.0
-        ans = A*B**(-(1. + problematic**D))
+        problematic2 = problematic**D
+        if abs(problematic2.imag) > 0.0:
+            problematic2 = 0.0
+        ans = A*B**(-(1. + problematic2))
         return ans
     elif order == 1:
         x0 = 1.0/C

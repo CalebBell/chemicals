@@ -84,6 +84,11 @@ def test_EQ105_more():
     kwargs = {'T': 195.0, 'A': 7247.0, 'B': 0.418, 'C': 5.2, 'D': 0.24, 'order': 0}
     assert_close(EQ105(**kwargs), 17337.32057416268)
 
+    # Another complex case
+
+    assert_close(EQ105(169.85, A=7.157684578729118e-05, B=1.0000001796982911, C=1.0,  D=(1+1e-7)), 7.157683292505661e-05)
+
+
 
 def test_EQ106_more():
     d1_analytical = EQ106(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1)
@@ -418,6 +423,26 @@ def test_EQ105_fitting():
                  derivative(lambda D: EQ105(T, A, B, C, D), D, dx=D*1e-5)]
     der_analytical = EQ105_fitting_jacobian([T], A, B, C, D)
     assert_close1d(der_analytical, [der_num])
+
+    # Case with a numerical error that was fixed with an if statement
+    T, A, B, C, D = 169.85, 1.0, 1.0, 1.0, 1.0
+    tol=1e-7
+    der_num = [derivative(lambda A: EQ105(T, A, B, C, D), A, dx=A*tol),
+                 derivative(lambda B: EQ105(T, A, B, C, D), B, dx=B*tol),
+                 derivative(lambda C: EQ105(T, A, B, C, D), C, dx=C*tol),
+                 derivative(lambda D: EQ105(T, A, B, C, D), D, dx=D*tol)]
+    der_analytical = EQ105_fitting_jacobian([T], A, B, C, D)
+    assert_close1d(der_analytical, [der_num])
+
+
+    # Another numerical issue
+    T, A, B, C, D = 169.85, 7.157684578729118e-05, 1.0000001796982911, 1.0,1.0
+    der_num = [derivative(lambda A: EQ105(T, A, B, C, D), A, dx=A*tol),
+                 derivative(lambda B: EQ105(T, A, B, C, D), B, dx=B*tol),
+                 derivative(lambda C: EQ105(T, A, B, C, D), C, dx=C*tol),
+                 derivative(lambda D: EQ105(T, A, B, C, D), D, dx=D*tol)]
+    der_analytical = EQ105_fitting_jacobian([T], A, B, C, D)
+    assert_close1d(der_analytical, [der_num], rtol=1e-3)
 
 
 def test_EQ106_fitting():
