@@ -2062,10 +2062,7 @@ def none_and_length_check(all_inputs, length=None):
     '''
     if not length:
         length = len(all_inputs[0])
-    for things in all_inputs:
-        if None in things or len(things) != length:
-            return False
-    return True
+    return all(not (None in things or len(things) != length) for things in all_inputs)
 
 
 

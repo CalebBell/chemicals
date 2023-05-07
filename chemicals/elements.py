@@ -424,9 +424,7 @@ class PeriodicTable:
                          name_to_elements, CAS_to_elements)
 
     def __contains__(self, key):
-        for i in self._indexes:
-            if key in i: return True
-        return False
+        return any(key in i for i in self._indexes)
 
     def __len__(self):
         return 118

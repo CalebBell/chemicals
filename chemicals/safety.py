@@ -268,7 +268,7 @@ def _load_safety_data():
     global Tautoignition_sources, LFL_sources, UFL_sources, _safety_data_loaded
     import json
     file = os_path_join(folder, 'Ontario Exposure Limits.json')
-    with open(file, 'r') as stream:
+    with open(file) as stream:
         Ontario_exposure_limits_dict = json.load(stream)
     NFPA_2008_data = data_source('NFPA 497 2008.tsv')
     IEC_2010_data = data_source('IS IEC 60079-20-1 2010.tsv')

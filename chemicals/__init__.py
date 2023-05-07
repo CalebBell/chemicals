@@ -30,10 +30,11 @@ from math import isnan
 if not fluids.numerics.is_micropython:
 
     from . import (
-        acentric, 
+        acentric,
         air,
         combustion,
         critical,
+        data_reader,
         dipole,
         dippr,
         elements,
@@ -62,41 +63,40 @@ if not fluids.numerics.is_micropython:
         virial,
         viscosity,
         volume,
-        data_reader,
     )
     from .acentric import *  # noqa: F403
     from .air import *  # noqa: F403
     from .combustion import *  # noqa: F403
     from .critical import *  # noqa: F403
     from .dipole import *  # noqa: F403
-    from .dippr import * # noqa: F403
-    from .elements import * # noqa: F403
-    from .environment import * # noqa: F403
-    from .exceptions import * # noqa: F403
-    from .flash_basic import * # noqa: F403
-    from .heat_capacity import * # noqa: F403
-    from .iapws import * # noqa: F403
-    from .identifiers import * # noqa: F403
-    from .interface import * # noqa: F403
-    from .lennard_jones import * # noqa: F403
-    from .miscdata import * # noqa: F403
-    from .molecular_geometry import * # noqa: F403
-    from .permittivity import * # noqa: F403
-    from .phase_change import * # noqa: F403
-    from .rachford_rice import * # noqa: F403
-    from .reaction import * # noqa: F403
-    from .refractivity import * # noqa: F403
-    from .safety import * # noqa: F403
-    from .solubility import * # noqa: F403
-    from .temperature import * # noqa: F403
-    from .thermal_conductivity import * # noqa: F403
-    from .triple import * # noqa: F403
-    from .utils import * # noqa: F403
-    from .utils import PY37 
-    from .vapor_pressure import * # noqa: F403
-    from .virial import * # noqa: F403
-    from .viscosity import * # noqa: F403
-    from .volume import * # noqa: F403
+    from .dippr import *  # noqa: F403
+    from .elements import *  # noqa: F403
+    from .environment import *  # noqa: F403
+    from .exceptions import *  # noqa: F403
+    from .flash_basic import *  # noqa: F403
+    from .heat_capacity import *  # noqa: F403
+    from .iapws import *  # noqa: F403
+    from .identifiers import *  # noqa: F403
+    from .interface import *  # noqa: F403
+    from .lennard_jones import *  # noqa: F403
+    from .miscdata import *  # noqa: F403
+    from .molecular_geometry import *  # noqa: F403
+    from .permittivity import *  # noqa: F403
+    from .phase_change import *  # noqa: F403
+    from .rachford_rice import *  # noqa: F403
+    from .reaction import *  # noqa: F403
+    from .refractivity import *  # noqa: F403
+    from .safety import *  # noqa: F403
+    from .solubility import *  # noqa: F403
+    from .temperature import *  # noqa: F403
+    from .thermal_conductivity import *  # noqa: F403
+    from .triple import *  # noqa: F403
+    from .utils import *  # noqa: F403
+    from .utils import PY37
+    from .vapor_pressure import *  # noqa: F403
+    from .virial import *  # noqa: F403
+    from .viscosity import *  # noqa: F403
+    from .volume import *  # noqa: F403
     __all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr',
                'temperature', 'miscdata', 'environment', 'refractivity', 'solubility',
                'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial',
