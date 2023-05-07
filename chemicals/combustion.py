@@ -438,7 +438,7 @@ def ignition_delay(CASRN, method=None):
     ----------
     .. [1] Dahmen, Manuel, and Wolfgang Marquardt. "A Novel Group Contribution Method
        for the Prediction of the Derived Cetane Number of Oxygenated Hydrocarbons."
-       Energy & Fuels 29, no. 9 (September 17, 2015): 5781–5801.
+       Energy & Fuels 29, no. 9 (September 17, 2015): 5781-5801.
        https://doi.org/10.1021/acs.energyfuels.5b01032.
 
     '''
@@ -638,11 +638,11 @@ def IDT_to_DCN(IDT):
     ----------
     .. [1] Al Ibrahim, Emad, and Aamir Farooq. "Prediction of the Derived
        Cetane Number and Carbon/Hydrogen Ratio from Infrared Spectroscopic
-       Data." Energy & Fuels 35, no. 9 (May 6, 2021): 8141–52.
+       Data." Energy & Fuels 35, no. 9 (May 6, 2021): 8141-52.
        https://doi.org/10.1021/acs.energyfuels.0c03899.
     .. [2] Dahmen, Manuel, and Wolfgang Marquardt. "A Novel Group Contribution
        Method for the Prediction of the Derived Cetane Number of Oxygenated
-       Hydrocarbons." Energy & Fuels 29, no. 9 (September 17, 2015): 5781–5801.
+       Hydrocarbons." Energy & Fuels 29, no. 9 (September 17, 2015): 5781-5801.
        https://doi.org/10.1021/acs.energyfuels.5b01032.
     '''
     IDT *= 1000.0
@@ -1052,7 +1052,7 @@ def HHV_modified_Dulong(mass_fractions):
 
     References
     ----------
-    .. [1] Green, D. W. Waste management. In Perry’s Chemical Engineers’ Handbook,
+    .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
        9 ed.; McGraw-Hill Education, 2018
 
     """
@@ -1178,7 +1178,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
 
     References
     ----------
-    .. [1] Green, D. W. Waste management. In Perry’s Chemical Engineers’ Handbook,
+    .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
        9 ed.; McGraw-Hill Education, 2018
 
     """

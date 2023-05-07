@@ -331,7 +331,7 @@ def TDE_VDNS_rho(T, Tc, rhoc, a1, a2, a3, a4, MW=None):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-DensityLG/VDNSExpansion.htm.
     '''
     tau = 1.0 - T/Tc
@@ -375,7 +375,7 @@ def PPDS17(T, Tc, a0, a1, a2, MW=None):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-DensityLG/PPDS17.htm.
     '''
     tau = 1.0 - T/Tc
@@ -565,7 +565,7 @@ def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
     References
     ----------
     .. [1] Frenkel, Michael, Robert D. Chirico, Vladimir Diky, Xinjian Yan,
-       Qian Dong, and Chris Muzny. "ThermoData Engine (TDE): Software
+       Qian Dong, and Chris Muzny. "ThermoData Engine (TDE): Software
        Implementation of the Dynamic Data Evaluation Concept." Journal of
        Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38.
        https://doi.org/10.1021/ci050067b.

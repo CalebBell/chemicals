@@ -137,7 +137,7 @@ def omega(CASRN, method=None):
     .. [2] Horstmann, Sven, Anna Jabłoniec, Jörg Krafczyk, Kai Fischer, and
        Jürgen Gmehling. "PSRK Group Contribution Equation of State:
        Comprehensive Revision and Extension IV, Including Critical Constants
-       and Α-Function Parameters for 1000 Components." Fluid Phase Equilibria
+       and A-Function Parameters for 1000 Components." Fluid Phase Equilibria
        227, no. 2 (January 25, 2005): 157-64. doi:10.1016/j.fluid.2004.11.002.
     .. [3] Passut, Charles A., and Ronald P. Danner. "Acentric Factor. A
        Valuable Correlating Parameter for the Properties of Hydrocarbons."

@@ -398,12 +398,12 @@ def Tc(CASRN, method=None):
     .. [15] Horstmann, Sven, Anna Jabłoniec, Jörg Krafczyk, Kai Fischer, and
        Jürgen Gmehling. "PSRK Group Contribution Equation of State:
        Comprehensive Revision and Extension IV, Including Critical Constants
-       and Α-Function Parameters for 1000 Components." Fluid Phase Equilibria
+       and A-Function Parameters for 1000 Components." Fluid Phase Equilibria
        227, no. 2 (January 25, 2005): 157-64. doi:10.1016/j.fluid.2004.11.002.
     .. [16] Passut, Charles A., and Ronald P. Danner. "Acentric Factor. A
        Valuable Correlating Parameter for the Properties of Hydrocarbons."
        Industrial & Engineering Chemistry Process Design and Development 12,
-       no. 3 (July 1, 1973): 365–68. doi:10.1021/i260047a026.
+       no. 3 (July 1, 1973): 365-68. doi:10.1021/i260047a026.
     .. [17] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
@@ -577,12 +577,12 @@ def Pc(CASRN, method=None):
     .. [15] Horstmann, Sven, Anna Jabłoniec, Jörg Krafczyk, Kai Fischer, and
        Jürgen Gmehling. "PSRK Group Contribution Equation of State:
        Comprehensive Revision and Extension IV, Including Critical Constants
-       and Α-Function Parameters for 1000 Components." Fluid Phase Equilibria
+       and A-Function Parameters for 1000 Components." Fluid Phase Equilibria
        227, no. 2 (January 25, 2005): 157-64. doi:10.1016/j.fluid.2004.11.002.
     .. [16] Passut, Charles A., and Ronald P. Danner. "Acentric Factor. A
        Valuable Correlating Parameter for the Properties of Hydrocarbons."
        Industrial & Engineering Chemistry Process Design and Development 12,
-       no. 3 (July 1, 1973): 365–68. doi:10.1021/i260047a026.
+       no. 3 (July 1, 1973): 365-68. doi:10.1021/i260047a026.
     .. [17] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
@@ -755,7 +755,7 @@ def Vc(CASRN, method=None):
     .. [15] Horstmann, Sven, Anna Jabłoniec, Jörg Krafczyk, Kai Fischer, and
        Jürgen Gmehling. "PSRK Group Contribution Equation of State:
        Comprehensive Revision and Extension IV, Including Critical Constants
-       and Α-Function Parameters for 1000 Components." Fluid Phase Equilibria
+       and A-Function Parameters for 1000 Components." Fluid Phase Equilibria
        227, no. 2 (January 25, 2005): 157-64. doi:10.1016/j.fluid.2004.11.002.
     .. [16] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
@@ -927,7 +927,7 @@ def Zc(CASRN, method=None):
     .. [15] Horstmann, Sven, Anna Jabłoniec, Jörg Krafczyk, Kai Fischer, and
        Jürgen Gmehling. "PSRK Group Contribution Equation of State:
        Comprehensive Revision and Extension IV, Including Critical Constants
-       and Α-Function Parameters for 1000 Components." Fluid Phase Equilibria
+       and A-Function Parameters for 1000 Components." Fluid Phase Equilibria
        227, no. 2 (January 25, 2005): 157-64. doi:10.1016/j.fluid.2004.11.002.
     .. [16] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional

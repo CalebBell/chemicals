@@ -591,7 +591,7 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
 
     References
     ----------
-    .. [1] Kandula, Vamshi Krishna, John C. Telotte, and F. Carl Knopf. "It’s
+    .. [1] Kandula, Vamshi Krishna, John C. Telotte, and F. Carl Knopf. "It`s
        Not as Easy as It Looks: Revisiting Peng—Robinson Equation of State
        Convergence Issues for Dew Point, Bubble Point and Flash Calculations."
        International Journal of Mechanical Engineering Education 41, no. 3

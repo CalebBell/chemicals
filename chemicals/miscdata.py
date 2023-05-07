@@ -103,7 +103,7 @@ def _load_VDI_saturation_dict():
     """Read in a dict of assorted chemical properties at saturation for 58
     industrially important chemicals, from:
 
-    Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
+    Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
     This listing is the successor to that in:
     Schlunder, Ernst U, and International Center for Heat and Mass Transfer.
     Heat Exchanger Design Handbook. Washington: Hemisphere Pub. Corp., 1983.
@@ -184,7 +184,7 @@ def lookup_VDI_tabular_data(CASRN, prop):
 
     References
     ----------
-    .. [1] Gesellschaft, VDI, ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
+    .. [1] Gesellschaft, VDI, ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
     '''
     if not _VDI_dict_loaded: _load_VDI_saturation_dict()
     try:

@@ -321,7 +321,7 @@ def TDE_PVExpansion(T, a1, a2, a3, a4=0.0, a5=0.0, a6=0.0, a7=0.0, a8=0.0):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103a V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103a V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-PhaseBoundaryLG/PVExpansion.htm
     '''
     T2 = T*T
@@ -388,7 +388,7 @@ def Yaws_Psat(T, A, B, C, D, E):
     .. [1] Yaws, Carl L. Chemical Properties Handbook: Physical, Thermodynamic,
        Environmental, Transport, Safety, and Health Related Properties for
        Organic and Inorganic Chemicals. McGraw-Hill, 2001.
-    .. [2] "ThermoData Engine (TDE103a V10.1) User’s Guide."
+    .. [2] "ThermoData Engine (TDE103a V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103a/Eqns-Pure-PhaseBoundaryLG/Yaws-VaporPressure.htm.
     '''
     exponent = (A + B/T + C*log10(T) + T*(D + E*T))

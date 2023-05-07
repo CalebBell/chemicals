@@ -1106,7 +1106,7 @@ def PPDS2(T, Ts, C_low, C_inf, a1, a2, a3, a4, a5):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-Cp0/PPDS2Cp0.htm.
     '''
     y = T/(T + Ts)
@@ -1160,7 +1160,7 @@ def PPDS15(T, Tc, a0, a1, a2, a3, a4, a5):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/PPDS15-Csat.htm.
     '''
     tau = 1.0 - T/Tc
@@ -1208,7 +1208,7 @@ def TDE_CSExpansion(T, Tc, b, a1, a2=0.0, a3=0.0, a4=0.0):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/CSExpansion.htm
     '''
     tau = 1.0 - T/Tc

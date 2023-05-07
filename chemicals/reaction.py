@@ -433,7 +433,7 @@ def Hfg(CASRN, method=None):
        Wagner. "Active Thermochemical Tables: Thermochemistry for the 21st
        Century." Journal of Physics: Conference Series 16, no. 1
        (January 1, 2005): 561. doi:10.1088/1742-6596/16/1/078.
-    .. [2] Frenkelʹ, M. L, Texas Engineering Experiment Station, and
+    .. [2] Frenkel`, M. L, Texas Engineering Experiment Station, and
        Thermodynamics Research Center. Thermodynamics of Organic Compounds in
        the Gas State. College Station, Tex.: Thermodynamics Research Center,
        1994.

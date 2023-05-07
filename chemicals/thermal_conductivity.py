@@ -220,7 +220,7 @@ def PPDS8(T, Tc, a0, a1, a2, a3):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondSatL/PPDS8.htm
     '''
     tau = 1.0 - T/Tc
@@ -264,7 +264,7 @@ def PPDS3(T, Tc, a1, a2, a3):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondG/PPDS3-ThermCondGas.htm
     '''
     Tr = T/Tc
@@ -1377,7 +1377,7 @@ def DIPPR9I(zs, Vms, ks):
     References
     ----------
     .. [1] Li, C. C. "Thermal Conductivity of Liquid Mixtures." AIChE Journal
-       22, no. 5 (1976): 927–30. https://doi.org/10.1002/aic.690220520.
+       22, no. 5 (1976): 927-30. https://doi.org/10.1002/aic.690220520.
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     '''

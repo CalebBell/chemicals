@@ -1062,7 +1062,7 @@ def mu_TDE(T, A, B, C, D):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscositySatL/ViscosityL.htm.
     '''
     T_inv = 1.0/T
@@ -1106,7 +1106,7 @@ def PPDS5(T, Tc, a0, a1, a2):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscosityG/PPDS5-ViscosityGas.htm.
     '''
     Tr = T/Tc
@@ -2527,7 +2527,7 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     References
     ----------
     .. [1] ASTM D2270-10(2016) Standard Practice for Calculating Viscosity
-       Index from Kinematic Viscosity at 40 °C and 100 °C, ASTM International,
+       Index from Kinematic Viscosity at 40 °C and 100 °C, ASTM International,
        West Conshohocken, PA, 2016, http://dx.doi.org/10.1520/D2270-10R16
     '''
     nu_40, nu_100 = nu_40*1E6, nu_100*1E6  # m^2/s to mm^2/s

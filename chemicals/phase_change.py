@@ -1023,7 +1023,7 @@ def Vetere(Tb, Tc, Pc, F=1.0):
     ----------
     .. [1] Vetere, Alessandro. "Methods to Predict the Vaporization Enthalpies
        at the Normal Boiling Temperature of Pure Compounds Revisited."
-       Fluid Phase Equilibria 106, no. 1-2 (May 1, 1995): 1–10.
+       Fluid Phase Equilibria 106, no. 1-2 (May 1, 1995): 1-10.
        doi:10.1016/0378-3812(94)02627-D.
     .. [2] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        Eighth Edition. McGraw-Hill Professional, 2007.
@@ -1083,7 +1083,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     References
     ----------
     .. [1] Watson, KM. "Thermodynamics of the Liquid State." Industrial &
-       Engineering Chemistry 35, no. 4 (1943): 398–406.
+       Engineering Chemistry 35, no. 4 (1943): 398-406.
     .. [2] Martin, Joseph J., and John B. Edwards. "Correlation of Latent Heats
        of Vaporization.” AIChE Journal 11, no. 2 (1965): 331-33.
        https://doi.org/10.1002/aic.690110226.

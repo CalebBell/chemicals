@@ -1247,7 +1247,7 @@ def LFL_ISO_10156_2017(zs, LFLs, CASs):
 
     References
     ----------
-    .. [1] Standardization, International Organization for. ISO 10156: 2017 :
+    .. [1] Standardization, International Organization for. ISO 10156: 2017 :
        Gas Cylinders - Gases and Gas Mixtures - Determination of Fire Potential
        and Oxidizing Ability for the Selection of Cylinder Valve Outlets, 2017.
     '''
@@ -1563,7 +1563,7 @@ def NFPA_30_classification(T_flash, Tb=None, Psat_100F=None):
     Parameters
     ----------
     T_flash : float
-        Flash point (closed‐cup method, adjusted for sea level), [K]
+        Flash point (closed-cup method, adjusted for sea level), [K]
     Tb : float, optional
         Normal boiling point (needed to classify IA and IB liquids), [K]
     Psat_100F : float, optional

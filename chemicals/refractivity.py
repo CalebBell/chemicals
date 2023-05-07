@@ -441,7 +441,7 @@ def TDE_RIXExpansion(T, Bs, Cs, wavelength=589.26e-9):
 
     References
     ----------
-    .. [1] "ThermoData Engine (TDE103b V10.1) User’s Guide."
+    .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-RefractiveIndex/RIXExpansion.htm.
     '''
     t = T - 298.15

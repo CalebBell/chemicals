@@ -740,7 +740,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
         in the solver (Newton-Raphson is used) or not (secant is used), [-]
     fprime2 : bool, optional
         Whether or not to use the second derivative of the objective function
-        in the solver (parabolic Halley’s method is used if True) or not, [-]
+        in the solver (parabolic Halley`s method is used if True) or not, [-]
     guess : float, optional
         Optional initial guess for vapor fraction, [-]
 
@@ -780,7 +780,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
     attempt 50 iterations before giving up.
 
     In all benchmarks attempted, secant method provides better performance than
-    Newton-Raphson or parabolic Halley’s method. This may not be generally
+    Newton-Raphson or parabolic Halley`s method. This may not be generally
     true; but it is for Python and SciPy's implementation. They are implemented
     for benchmarking purposes.
 
@@ -2695,7 +2695,7 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
        SPE Journal 15, no. 02 (June 1, 2010): 313-25.
        https://doi.org/10.2118/117752-PA.
     .. [2] Li, Zhidong, and Abbas Firoozabadi. "Initialization of Phase
-       Fractions in Rachford–Rice Equations for Robust and Efficient
+       Fractions in Rachford-Rice Equations for Robust and Efficient
        Three-Phase Split Calculation." Fluid Phase Equilibria 332 (October 25,
        2012): 21-27. https://doi.org/10.1016/j.fluid.2012.06.021.
     .. [3] Gao, Ran, Xiaolong Yin, and Zhiping Li. "Hybrid Newton-Successive
