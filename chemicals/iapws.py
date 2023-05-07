@@ -6155,8 +6155,7 @@ def iapws95_dPsat_dT(T):
             Psat = exp(val)*iapws95_Pc
             dPsat_dT = Psat*a*der
             return dPsat_dT, Psat
-    else:
-        raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
+    raise ValueError("Temperature range must be between 273.15 K to 647.096 K")
 
 
 def iapws95_Psat(T):
