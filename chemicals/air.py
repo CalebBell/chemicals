@@ -94,8 +94,7 @@ from math import exp, log, sqrt
 
 from fluids.numerics import horner_and_der3
 
-from chemicals.iapws import (iapws92_dPsat_dT, iapws92_Psat, iapws95_Tc,
-                             iapws95_Tc_inv)
+from chemicals.iapws import iapws92_dPsat_dT, iapws92_Psat, iapws95_Tc, iapws95_Tc_inv
 
 __all__ = ['lemmon2000_air_A0', 'lemmon2000_air_dA0_dtau',
            'lemmon2000_air_d2A0_dtau2', 'lemmon2000_air_d3A0_dtau3',

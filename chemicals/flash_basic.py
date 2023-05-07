@@ -50,8 +50,7 @@ Equilibrium Constants
 
 from math import exp, log
 
-from fluids.numerics import (NotBoundedError, brenth, newton,
-                             oscillation_checker, secant)
+from fluids.numerics import NotBoundedError, brenth, newton, oscillation_checker, secant
 
 from chemicals.rachford_rice import flash_inner_loop
 from chemicals.utils import mark_numba_uncacheable

@@ -184,9 +184,7 @@ from fluids.constants import R, root_two
 from fluids.numerics import implementation_optimize_tck, np, splev
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import (PY37, can_load_data, exp, log, mark_numba_incompatible, mixing_simple,
-                             os_path_join, source_path,
-                             sqrt)
+from chemicals.utils import PY37, can_load_data, exp, log, mark_numba_incompatible, mixing_simple, os_path_join, source_path, sqrt
 
 folder = os_path_join(source_path, 'Density')
 

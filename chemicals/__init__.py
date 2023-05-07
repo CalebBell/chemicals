@@ -31,12 +31,39 @@ from math import isnan
 if not fluids.numerics.is_micropython:
 
     from . import (
-        acentric, air, combustion, critical, dipole, dippr, elements,
-        environment, exceptions, flash_basic, heat_capacity, iapws,
-        identifiers, interface, lennard_jones, miscdata, molecular_geometry,
-        permittivity, phase_change, rachford_rice, reaction, refractivity,
-        safety, solubility, temperature, thermal_conductivity, triple, utils,
-        vapor_pressure, virial, viscosity, volume)
+        acentric,
+        air,
+        combustion,
+        critical,
+        dipole,
+        dippr,
+        elements,
+        environment,
+        exceptions,
+        flash_basic,
+        heat_capacity,
+        iapws,
+        identifiers,
+        interface,
+        lennard_jones,
+        miscdata,
+        molecular_geometry,
+        permittivity,
+        phase_change,
+        rachford_rice,
+        reaction,
+        refractivity,
+        safety,
+        solubility,
+        temperature,
+        thermal_conductivity,
+        triple,
+        utils,
+        vapor_pressure,
+        virial,
+        viscosity,
+        volume,
+    )
     from .acentric import *
     from .air import *
     from .combustion import *

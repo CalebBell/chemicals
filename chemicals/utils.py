@@ -50,17 +50,47 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 import os
 import sys
 from math import (  # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
-    acos, acosh, asin, asinh, atan, atan2, atanh, ceil, copysign, cos, cosh,
-    degrees, e, exp, fabs, floor, fmod, frexp, isinf, isnan, ldexp, log, log10,
-    modf, pi, pow, radians, sin, sinh, sqrt, tan, tanh, trunc)
-
-from fluids.numerics import numpy as np
-from fluids.numerics import trunc_log
+    acos,
+    acosh,
+    asin,
+    asinh,
+    atan,
+    atan2,
+    atanh,
+    ceil,
+    copysign,
+    cos,
+    cosh,
+    degrees,
+    e,
+    exp,
+    fabs,
+    floor,
+    fmod,
+    frexp,
+    isinf,
+    isnan,
+    ldexp,
+    log,
+    log10,
+    modf,
+    pi,
+    pow,
+    radians,
+    sin,
+    sinh,
+    sqrt,
+    tan,
+    tanh,
+    trunc,
+)
 
 # __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma',
 # Obtained from SciPy 0.19 (2014 CODATA)
 # Included here so calculations are consistent across SciPy versions
 from fluids.constants import N_A, R
+from fluids.numerics import numpy as np
+from fluids.numerics import trunc_log
 
 __all__.extend(['PY37'])
 version_components = sys.version.split('.')

@@ -93,15 +93,17 @@ __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
 
 
 from fluids.constants import k
+
 from chemicals import data_reader as dr
-from chemicals.data_reader import (data_source, database_constant_lookup,
-                                   list_available_methods_from_df_dict,
-                                   register_df_source,
-                                   retrieve_any_from_df_dict,
-                                   retrieve_from_df_dict)
-from chemicals.utils import (PY37, can_load_data, exp, log,
-                             mark_numba_incompatible, os_path_join, sin,
-                             source_path)
+from chemicals.data_reader import (
+    data_source,
+    database_constant_lookup,
+    list_available_methods_from_df_dict,
+    register_df_source,
+    retrieve_any_from_df_dict,
+    retrieve_from_df_dict,
+)
+from chemicals.utils import PY37, can_load_data, exp, log, mark_numba_incompatible, os_path_join, sin, source_path
 
 #  Register data sources and lazy load them
 

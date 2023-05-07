@@ -132,18 +132,37 @@ __all__ = ['Rachford_Rice_flash_error',
            'Rachford_Rice_solution_Leibovici_Neoschil',
            'Rachford_Rice_solution_Leibovici_Neoschil_dd']
 
-from fluids.numerics import (IS_PYPY, NotBoundedError, add_dd, brenth, div_dd,
-                             gt_dd, halley, horner, horner_and_der, lt_dd,
-                             mul_dd, mul_noerrors_dd, newton, newton_system)
-from fluids.numerics import numpy as np
 from fluids.numerics import (
-    one_10_epsilon_larger, one_10_epsilon_smaller, one_epsilon_larger,
-    one_epsilon_smaller, py_solve, roots_cubic, roots_quartic, secant,
-    solve_2_direct, solve_3_direct, solve_4_direct)
+    IS_PYPY,
+    NotBoundedError,
+    add_dd,
+    brenth,
+    div_dd,
+    gt_dd,
+    halley,
+    horner,
+    horner_and_der,
+    lt_dd,
+    mul_dd,
+    mul_noerrors_dd,
+    newton,
+    newton_system,
+    one_10_epsilon_larger,
+    one_10_epsilon_smaller,
+    one_epsilon_larger,
+    one_epsilon_smaller,
+    py_solve,
+    roots_cubic,
+    roots_quartic,
+    secant,
+    solve_2_direct,
+    solve_3_direct,
+    solve_4_direct,
+)
+from fluids.numerics import numpy as np
 
 from chemicals.exceptions import PhaseCountReducedError
-from chemicals.utils import (exp, log, mark_numba_incompatible,
-                             mark_numba_uncacheable)
+from chemicals.utils import exp, log, mark_numba_incompatible, mark_numba_uncacheable
 
 try:
     from itertools import combinations

@@ -52,10 +52,7 @@ __all__ = ['omega', 'LK_omega', 'Stiel_polar_factor',
 
 from chemicals import critical
 from chemicals import data_reader as dr
-from chemicals.data_reader import (list_available_methods_from_df_dict,
-                                   database_constant_lookup,
-                                   retrieve_any_from_df_dict,
-                                   retrieve_from_df_dict)
+from chemicals.data_reader import database_constant_lookup, list_available_methods_from_df_dict, retrieve_any_from_df_dict, retrieve_from_df_dict
 from chemicals.utils import log, log10, mark_numba_incompatible
 
 omega_all_methods = ('PSRK', 'PD', 'YAWS', critical.ACENTRIC_DEFINITION)

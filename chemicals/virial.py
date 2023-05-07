@@ -156,7 +156,8 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
 from cmath import sqrt as csqrt
 
 from fluids.constants import R, R_inv
-from fluids.numerics import numpy as np, roots_cubic, cbrt
+from fluids.numerics import cbrt, roots_cubic
+from fluids.numerics import numpy as np
 
 from chemicals.utils import exp, log, sqrt
 

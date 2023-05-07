@@ -53,9 +53,9 @@ __all__ = ['solubility_parameter',
 
 
 from fluids.constants import R, R_inv, atm
+from fluids.numerics import trunc_exp
 
 from chemicals.utils import exp, log, sqrt
-from fluids.numerics import trunc_exp
 
 
 def solubility_parameter(T, Hvapm, Vml):

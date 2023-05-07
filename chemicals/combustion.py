@@ -74,17 +74,18 @@ Lookup Functions
 """
 
 from fluids.numerics import normalize
+
 from chemicals import data_reader as dr
-from chemicals.data_reader import (data_source, database_constant_lookup,
-                                   list_available_methods_from_df_dict,
-                                   register_df_source,
-                                   retrieve_any_from_df_dict,
-                                   retrieve_from_df_dict)
-from chemicals.elements import (mass_fractions, molecular_weight,
-                                simple_formula_parser)
-from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
-                             os_path_join, property_mass_to_molar,
-                             property_molar_to_mass, source_path)
+from chemicals.data_reader import (
+    data_source,
+    database_constant_lookup,
+    list_available_methods_from_df_dict,
+    register_df_source,
+    retrieve_any_from_df_dict,
+    retrieve_from_df_dict,
+)
+from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, property_mass_to_molar, property_molar_to_mass, source_path
 
 __all__ = ('combustion_stoichiometry',
            'CombustionData',

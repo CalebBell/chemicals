@@ -132,13 +132,15 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
 
 from chemicals import data_reader as dr
 from chemicals import miscdata
-from chemicals.data_reader import (data_source, database_constant_lookup,
-                                   list_available_methods_from_df_dict,
-                                   register_df_source,
-                                   retrieve_any_from_df_dict,
-                                   retrieve_from_df_dict)
-from chemicals.utils import (PY37, R, can_load_data, mark_numba_incompatible,
-                             normalize, os_path_join, source_path)
+from chemicals.data_reader import (
+    data_source,
+    database_constant_lookup,
+    list_available_methods_from_df_dict,
+    register_df_source,
+    retrieve_any_from_df_dict,
+    retrieve_from_df_dict,
+)
+from chemicals.utils import PY37, R, can_load_data, mark_numba_incompatible, normalize, os_path_join, source_path
 
 ### Utilities
 

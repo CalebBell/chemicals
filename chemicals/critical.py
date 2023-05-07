@@ -99,16 +99,18 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
 
 
 from fluids.constants import N_A, R, R_inv
+
 from chemicals import data_reader as dr
 from chemicals import miscdata
-from chemicals.data_reader import (data_source,
-                                   list_available_methods_from_df_dict,
-                                   register_df_source, database_constant_lookup,
-                                   retrieve_any_from_df_dict,
-                                   retrieve_from_df_dict)
-from chemicals.utils import (
-    PY37, can_load_data, log, mark_numba_incompatible, os_path_join,
-    source_path)
+from chemicals.data_reader import (
+    data_source,
+    database_constant_lookup,
+    list_available_methods_from_df_dict,
+    register_df_source,
+    retrieve_any_from_df_dict,
+    retrieve_from_df_dict,
+)
+from chemicals.utils import PY37, can_load_data, log, mark_numba_incompatible, os_path_join, source_path
 
 folder = os_path_join(source_path, 'Critical Properties')
 IUPAC = 'IUPAC'

@@ -41,8 +41,7 @@ except ImportError: # pragma: no cover
     raise ImportError('The unit handling in fluids requires the installation '
                       'of the package pint, available on pypi or from '
                       'https://github.com/hgrecco/pint')
-from fluids.units import (variable_output_wrapper, wrap_numpydoc_obj,
-                          wraps_numpydoc)
+from fluids.units import variable_output_wrapper, wrap_numpydoc_obj, wraps_numpydoc
 
 __pint_wrapped_functions = {}
 

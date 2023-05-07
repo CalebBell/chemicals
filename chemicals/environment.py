@@ -56,12 +56,17 @@ __all__ = ['GWP', 'ODP', 'logP',
 from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (
-    data_source, list_available_methods_from_df, database_constant_lookup,
-    list_available_methods_from_df_dict, register_df_source,
-    retrieve_any_from_df, retrieve_any_from_df_dict, retrieve_from_df,
-    retrieve_from_df_dict)
-from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
-                             os_path_join, source_path)
+    data_source,
+    database_constant_lookup,
+    list_available_methods_from_df,
+    list_available_methods_from_df_dict,
+    register_df_source,
+    retrieve_any_from_df,
+    retrieve_any_from_df_dict,
+    retrieve_from_df,
+    retrieve_from_df_dict,
+)
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
 
 ### Register data sources and lazy load them
 folder = os_path_join(source_path, 'Environment')

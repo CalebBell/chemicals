@@ -205,14 +205,11 @@ from cmath import log as clog
 from math import expm1
 
 from fluids.constants import R, c, h, k
-from fluids.numerics import brenth
+from fluids.numerics import brenth, polylog2, secant
 from fluids.numerics import numpy as np
-from fluids.numerics import polylog2, secant
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import (PY37, can_load_data, exp, log,
-                             mark_numba_uncacheable, os_path_join,
-                             source_path, to_num)
+from chemicals.utils import PY37, can_load_data, exp, log, mark_numba_uncacheable, os_path_join, source_path, to_num
 
 ### Methods introduced in this module
 

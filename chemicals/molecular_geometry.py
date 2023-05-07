@@ -42,14 +42,16 @@ __all__ = ['RG', 'RG_methods', 'RG_all_methods',
            'linear', 'linear_methods', 'linear_all_methods']
 
 from chemicals import data_reader as dr
-from chemicals.data_reader import (data_source, database_constant_lookup,
-                                   list_available_methods_from_df_dict,
-                                   register_df_source,
-                                   retrieve_any_from_df_dict,
-                                   retrieve_from_df_dict)
+from chemicals.data_reader import (
+    data_source,
+    database_constant_lookup,
+    list_available_methods_from_df_dict,
+    register_df_source,
+    retrieve_any_from_df_dict,
+    retrieve_from_df_dict,
+)
 from chemicals.miscdata import CHEMSEP, PSI4_2022A
-from chemicals.utils import (PY37, can_load_data, mark_numba_incompatible,
-                             os_path_join, source_path)
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
 
 # Register data sources and lazy load them
 
