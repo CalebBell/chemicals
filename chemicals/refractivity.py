@@ -73,7 +73,8 @@ from chemicals.data_reader import (
     retrieve_any_from_df_dict,
     retrieve_from_df_dict,
 )
-from chemicals.utils import PY37, can_load_data, isnan, mark_numba_incompatible, os_path_join, source_path, sqrt
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+from fluids.numerics import sqrt, isnan
 
 # Register data sources and lazy load them
 

@@ -134,7 +134,6 @@ __all__ = ['Rachford_Rice_flash_error',
 
 from fluids.numerics import (
     IS_PYPY,
-    NotBoundedError,
     add_dd,
     brenth,
     div_dd,
@@ -158,11 +157,12 @@ from fluids.numerics import (
     solve_2_direct,
     solve_3_direct,
     solve_4_direct,
+    exp, log
 )
 from fluids.numerics import numpy as np
 
 from chemicals.exceptions import PhaseCountReducedError
-from chemicals.utils import exp, log, mark_numba_incompatible, mark_numba_uncacheable
+from chemicals.utils import  mark_numba_incompatible, mark_numba_uncacheable
 
 try:
     from itertools import combinations

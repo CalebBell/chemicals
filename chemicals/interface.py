@@ -147,7 +147,8 @@ from fluids.constants import N_A, k, root_two
 from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import PY37, can_load_data, exp, log, mark_numba_incompatible, os_path_join, source_path, sqrt
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+from fluids.numerics import exp, log, sqrt
 
 folder = os_path_join(source_path, 'Interface')
 

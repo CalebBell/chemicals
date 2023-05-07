@@ -186,7 +186,9 @@ from fluids.numerics import numpy as np
 from fluids.numerics import trunc_exp
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import PY37, can_load_data, exp, log, log10, mark_numba_incompatible, os_path_join, source_path, sqrt
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+from math import log10
+from fluids.numerics import exp, log, sqrt
 
 folder = os_path_join(source_path, 'Vapor Pressure')
 

@@ -48,7 +48,7 @@ Equilibrium Constants
 """
 
 
-from math import exp, log
+from fluids.numerics import exp, log
 
 from fluids.numerics import NotBoundedError, brenth, newton, oscillation_checker, secant
 

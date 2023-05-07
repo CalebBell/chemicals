@@ -184,7 +184,9 @@ from fluids.numerics import interp, secant, trunc_exp
 from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import PY37, acos, atan, can_load_data, exp, log, mark_numba_incompatible, os_path_join, sin, source_path, sqrt, tan
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+from fluids.numerics import exp, log, sin, sqrt
+from math import acos, atan, tan
 
 folder = os_path_join(source_path, 'Viscosity')
 

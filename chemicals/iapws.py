@@ -185,9 +185,7 @@ IAPWS-95 Residual Terms
 
 """
 
-from math import exp, log, sqrt
-
-from fluids.numerics import broyden2, cbrt, horner, horner_and_der, newton, newton_system, solve_2_direct, translate_bound_f_jac, trunc_exp
+from fluids.numerics import broyden2, exp, log, sqrt, cbrt, horner, horner_and_der, newton, newton_system, solve_2_direct, translate_bound_f_jac, trunc_exp
 
 from chemicals.utils import mark_numba_uncacheable
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS

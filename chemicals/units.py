@@ -22,20 +22,13 @@ SOFTWARE.
 
 
 __all__ = ['u']
-import collections
-import functools
-import inspect
-import re
 import types
 
-import numpy as np
 
 import chemicals
 
 try:
-    import pint
     from pint import _DEFAULT_REGISTRY as u
-    from pint import DimensionalityError
 
 except ImportError: # pragma: no cover
     raise ImportError('The unit handling in fluids requires the installation '

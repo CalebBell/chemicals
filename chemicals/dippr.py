@@ -68,7 +68,8 @@ from cmath import sqrt as csqrt
 
 from fluids.numerics import hyp2f1, trunc_exp, trunc_log
 
-from chemicals.utils import atan, atanh, cosh, exp, log, sinh, sqrt, tanh
+from fluids.numerics import exp, log, sqrt
+from math import atan, tanh, atanh, cosh, sinh
 
 order_not_found_msg = ('Only the actual property calculation, first temperature '
                        'derivative, first temperature integral, and first '

@@ -95,8 +95,8 @@ from chemicals.data_reader import (
     retrieve_any_from_df_dict,
     retrieve_from_df_dict,
 )
-from chemicals.utils import PY37, can_load_data, ceil, log10, mark_numba_incompatible, os_path_join, source_path
-
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+from math import log10, ceil
 # %% Register data sources and lazy load them
 CRC = 'CRC'
 YAWS = 'YAWS'

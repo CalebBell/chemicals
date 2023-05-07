@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import os
 
 import fluids
 
@@ -92,7 +91,7 @@ if not fluids.numerics.is_micropython:
     from .thermal_conductivity import *
     from .triple import *
     from .utils import *
-    from .utils import PY37, mark_numba_incompatible
+    from .utils import PY37
     from .vapor_pressure import *
     from .virial import *
     from .viscosity import *
@@ -246,4 +245,4 @@ if not fluids.numerics.is_micropython:
                 return numba_vectorized
             raise AttributeError(f"module {__name__} has no attribute {name}")
     else:
-        from . import vectorized
+        pass

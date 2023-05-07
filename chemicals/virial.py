@@ -153,13 +153,12 @@ __all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
            'Meng_Duan_2005_virial_CSP_kijs', 'Lee_Kesler_virial_CSP_Vcijs',
            'dV_dzs_virial', 'd2V_dzizjs_virial']
 
-from cmath import sqrt as csqrt
 
 from fluids.constants import R, R_inv
 from fluids.numerics import cbrt, roots_cubic
 from fluids.numerics import numpy as np
 
-from chemicals.utils import exp, log, sqrt
+from fluids.numerics import exp, log, sqrt
 
 
 def B_to_Z(B, T, P):
