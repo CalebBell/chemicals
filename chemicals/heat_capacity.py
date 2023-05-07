@@ -271,7 +271,7 @@ class ZabranskySpline:
     '''
 
     try:
-        IS_NUMBA
+        IS_NUMBA  # type: ignore # noqa: F821
     except:
         __slots__ = ('coeffs', 'Tmin', 'Tmax')
 
@@ -340,10 +340,10 @@ class ZabranskySpline:
     force_calculate_integral = calculate_integral
     force_calculate = calculate
 try:
-    if IS_NUMBA:
-        ZabranskySpline = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 4)),
-                ('Tmin', numba.float64),
-                ('Tmax', numba.float64)])(ZabranskySpline)
+    if IS_NUMBA:  # type: ignore # noqa: F821
+        ZabranskySpline = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 4)),  # type: ignore # noqa: F821
+                ('Tmin', numba.float64),  # type: ignore # noqa: F821
+                ('Tmax', numba.float64)])(ZabranskySpline)  # type: ignore # noqa: F821
 except:
     pass
 
@@ -369,7 +369,7 @@ class ShomateRange:
     '''
 
     try:
-        IS_NUMBA
+        IS_NUMBA  # type: ignore # noqa: F821
     except:
         __slots__ = ('coeffs', 'Tmin', 'Tmax')
     def __init__(self, coeffs, Tmin, Tmax):
@@ -400,10 +400,10 @@ class ShomateRange:
     force_calculate_integral = calculate_integral
     force_calculate = calculate
 try:
-    if IS_NUMBA:
-        ShomateRange = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 5)),
-                ('Tmin', numba.float64),
-                ('Tmax', numba.float64)])(ShomateRange)
+    if IS_NUMBA:  # type: ignore # noqa: F821
+        ShomateRange = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 5)),  # type: ignore # noqa: F821
+                ('Tmin', numba.float64),  # type: ignore # noqa: F821
+                ('Tmax', numba.float64)])(ShomateRange)  # type: ignore # noqa: F821
 except:
     pass
 
@@ -436,7 +436,7 @@ class ZabranskyQuasipolynomial:
     '''
 
     try:
-        IS_NUMBA
+        IS_NUMBA  # type: ignore # noqa: F821
     except:
         __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax')
 
@@ -503,11 +503,11 @@ class ZabranskyQuasipolynomial:
         return (Zabransky_quasi_polynomial_integral_over_T(Tb, self.Tc, *self.coeffs)
                - Zabransky_quasi_polynomial_integral_over_T(Ta, self.Tc, *self.coeffs))
 try:
-    if IS_NUMBA:
-        ZabranskyQuasipolynomial = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 6)),
-            ('Tc', numba.float64),
-            ('Tmin', numba.float64),
-            ('Tmax', numba.float64)])(ZabranskyQuasipolynomial)
+    if IS_NUMBA:  # type: ignore # noqa: F821
+        ZabranskyQuasipolynomial = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 6)),  # type: ignore # noqa: F821
+            ('Tc', numba.float64),  # type: ignore # noqa: F821
+            ('Tmin', numba.float64),  # type: ignore # noqa: F821
+            ('Tmax', numba.float64)])(ZabranskyQuasipolynomial)  # type: ignore # noqa: F821
 except:
     pass
 
