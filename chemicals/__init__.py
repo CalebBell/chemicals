@@ -62,6 +62,7 @@ if not fluids.numerics.is_micropython:
         virial,
         viscosity,
         volume,
+        data_reader,
     )
     from .acentric import *
     from .air import *
