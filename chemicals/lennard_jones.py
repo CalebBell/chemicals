@@ -93,6 +93,7 @@ __all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
 
 
 from fluids.constants import k
+from fluids.numerics import exp, log, sin
 
 from chemicals import data_reader as dr
 from chemicals.data_reader import (
@@ -103,8 +104,7 @@ from chemicals.data_reader import (
     retrieve_any_from_df_dict,
     retrieve_from_df_dict,
 )
-from chemicals.utils import PY37, can_load_data,  mark_numba_incompatible, os_path_join, source_path
-from fluids.numerics import exp, log, sin
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
 
 #  Register data sources and lazy load them
 

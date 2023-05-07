@@ -133,6 +133,7 @@ __all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm',
 
 
 from fluids.constants import N_A, R, pi
+from fluids.numerics import log
 from fluids.numerics import numpy as np
 
 from chemicals import data_reader as dr
@@ -146,7 +147,6 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
-from fluids.numerics import log
 
 ###  Register data sources and lazy load them
 

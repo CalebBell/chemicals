@@ -59,10 +59,10 @@ attribute of this module.
 __all__ = ['permittivity_IAPWS', 'permittivity_CRC']
 
 from fluids.numerics import numpy as np
+from fluids.numerics import sqrt
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
-from fluids.numerics import sqrt
 
 folder = os_path_join(source_path, 'Electrolytes')
 register_df_source(folder, 'Permittivity (Dielectric Constant) of Liquids.tsv')

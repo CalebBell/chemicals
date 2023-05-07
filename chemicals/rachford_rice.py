@@ -137,10 +137,12 @@ from fluids.numerics import (
     add_dd,
     brenth,
     div_dd,
+    exp,
     gt_dd,
     halley,
     horner,
     horner_and_der,
+    log,
     lt_dd,
     mul_dd,
     mul_noerrors_dd,
@@ -157,12 +159,11 @@ from fluids.numerics import (
     solve_2_direct,
     solve_3_direct,
     solve_4_direct,
-    exp, log
 )
 from fluids.numerics import numpy as np
 
 from chemicals.exceptions import PhaseCountReducedError
-from chemicals.utils import  mark_numba_incompatible, mark_numba_uncacheable
+from chemicals.utils import mark_numba_incompatible, mark_numba_uncacheable
 
 try:
     from itertools import combinations

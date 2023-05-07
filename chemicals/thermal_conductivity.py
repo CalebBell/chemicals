@@ -132,14 +132,14 @@ __all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
 'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
 'Wassiljewa_Herning_Zipperer', 'k_air_lemmon', 'Chemsep_16']
 
+from math import atan
+
 from fluids.constants import N_A, R, R_inv, k, pi
-from fluids.numerics import bisplev, implementation_optimize_tck, trunc_exp
+from fluids.numerics import bisplev, exp, implementation_optimize_tck, log, sqrt, trunc_exp
 from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import PY37, can_load_data,  mark_numba_incompatible, os_path_join, source_path
-from fluids.numerics import exp, log, sqrt
-from math import atan
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
 from chemicals.viscosity import Herning_Zipperer
 
 folder = os_path_join(source_path, 'Thermal Conductivity')

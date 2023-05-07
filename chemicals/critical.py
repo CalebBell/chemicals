@@ -99,6 +99,7 @@ __all__ = ['Tc', 'Pc', 'Vc', 'Zc',
 
 
 from fluids.constants import N_A, R, R_inv
+from fluids.numerics import log
 
 from chemicals import data_reader as dr
 from chemicals import miscdata
@@ -111,7 +112,6 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
-from fluids.numerics import log
 
 folder = os_path_join(source_path, 'Critical Properties')
 IUPAC = 'IUPAC'

@@ -65,11 +65,9 @@ __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
 
 from cmath import log as clog
 from cmath import sqrt as csqrt
+from math import atan, atanh, cosh, sinh, tanh
 
-from fluids.numerics import hyp2f1, trunc_exp, trunc_log
-
-from fluids.numerics import exp, log, sqrt
-from math import atan, tanh, atanh, cosh, sinh
+from fluids.numerics import exp, hyp2f1, log, sqrt, trunc_exp, trunc_log
 
 order_not_found_msg = ('Only the actual property calculation, first temperature '
                        'derivative, first temperature integral, and first '

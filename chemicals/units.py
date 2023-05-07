@@ -24,7 +24,6 @@ SOFTWARE.
 __all__ = ['u']
 import types
 
-
 import chemicals
 
 try:

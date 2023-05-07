@@ -90,7 +90,7 @@ Henry's Law for Air in Water
 
 """
 
-from fluids.numerics import horner_and_der3, exp, log, sqrt
+from fluids.numerics import exp, horner_and_der3, log, sqrt
 
 from chemicals.iapws import iapws92_dPsat_dT, iapws92_Psat, iapws95_Tc, iapws95_Tc_inv
 

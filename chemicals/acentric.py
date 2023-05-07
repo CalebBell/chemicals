@@ -50,12 +50,14 @@ Correlations
 __all__ = ['omega', 'LK_omega', 'Stiel_polar_factor',
            'omega_methods', 'omega_all_methods', 'omega_definition']
 
+from math import log10
+
+from fluids.numerics import log
+
 from chemicals import critical
 from chemicals import data_reader as dr
 from chemicals.data_reader import database_constant_lookup, list_available_methods_from_df_dict, retrieve_any_from_df_dict, retrieve_from_df_dict
 from chemicals.utils import mark_numba_incompatible
-from fluids.numerics import log
-from math import log10
 
 omega_all_methods = ('PSRK', 'PD', 'YAWS', critical.ACENTRIC_DEFINITION)
 """Tuple of method name keys. See the `omega` for the actual references"""

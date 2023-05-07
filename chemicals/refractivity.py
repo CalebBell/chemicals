@@ -61,7 +61,7 @@ __all__ = ['RI', 'RI_methods', 'RI_all_methods',
            'brix_to_RI', 'TDE_RIXExpansion']
 
 from fluids.constants import N_A, pi
-from fluids.numerics import horner, interp
+from fluids.numerics import horner, interp, isnan, sqrt
 
 from chemicals import data_reader as dr
 from chemicals import miscdata
@@ -74,7 +74,6 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
-from fluids.numerics import sqrt, isnan
 
 # Register data sources and lazy load them
 

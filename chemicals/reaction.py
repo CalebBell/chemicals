@@ -85,6 +85,8 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
            'balance_stoichiometry', 'stoichiometric_matrix']
 
+from math import ceil, log10
+
 from chemicals import data_reader as dr
 from chemicals import heat_capacity, miscdata
 from chemicals.data_reader import (
@@ -96,7 +98,7 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
-from math import log10, ceil
+
 # %% Register data sources and lazy load them
 CRC = 'CRC'
 YAWS = 'YAWS'

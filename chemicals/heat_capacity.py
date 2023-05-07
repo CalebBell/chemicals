@@ -205,7 +205,7 @@ from cmath import log as clog
 from math import expm1
 
 from fluids.constants import R, c, h, k
-from fluids.numerics import brenth, polylog2, secant, exp, log
+from fluids.numerics import brenth, exp, log, polylog2, secant
 from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
