@@ -233,16 +233,16 @@ if not fluids.numerics.is_micropython:
         def __getattr__(name):
             global vectorized, numba, units, numba_vectorized
             if name == 'vectorized':
-                import chemicals.vectorized as vectorized
+                from chemicals import vectorized
                 return vectorized
             if name == 'numba':
-                import chemicals.numba as numba
+                from chemicals import numba
                 return numba
             if name == 'units':
-                import chemicals.units as units
+                from chemicals import units
                 return units
             if name == 'numba_vectorized':
-                import chemicals.numba_vectorized as numba_vectorized
+                from chemicals import numba_vectorized
                 return numba_vectorized
             raise AttributeError(f"module {__name__} has no attribute {name}")
     else:
