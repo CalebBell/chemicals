@@ -34,6 +34,7 @@ from chemicals.phase_change import (Hvap_data_CRC, Hfus_data_CRC,
                                     phase_change_data_Alibakhshi_Cs,
                                     phase_change_data_VDI_PPDS_4)
 from chemicals.miscdata import CRC_inorganic_data, CRC_organic_data
+from chemicals.miscdata import heos_data
 
 
 def test_Watson():
@@ -236,10 +237,10 @@ def test_Tb():
 
 
     w_methods = Tb_methods('7732-18-5')
-    assert w_methods == ['CRC_INORG', 'COMMON_CHEMISTRY', 'WEBBOOK', 'YAWS', 'WIKIDATA']
+    assert w_methods == ['HEOS', 'CRC_INORG', 'COMMON_CHEMISTRY', 'WEBBOOK', 'YAWS', 'WIKIDATA']
 
     Tbs = [Tb('7732-18-5', method=i) for i in w_methods]
-    assert_close1d(Tbs, [373.124, 373.15, 373.17, 373.15, 373.1339])
+    assert_close1d(Tbs, [373.124295848, 373.124, 373.15, 373.17, 373.15, 373.1339])
 
 
 @pytest.mark.slow

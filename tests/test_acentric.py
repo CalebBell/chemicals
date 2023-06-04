@@ -27,12 +27,13 @@ import pandas as pd
 from chemicals.acentric import LK_omega, Stiel_polar_factor, omega, omega_definition, omega_methods
 from chemicals.critical import critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws, ACENTRIC_DEFINITION
 from chemicals.identifiers import int_to_CAS
+from chemicals.miscdata import heos_data
 
 
 @pytest.mark.fuzz
 @pytest.mark.slow
 def test_acentric_fuzz():
-    sources = [critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws]
+    sources = [critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws, heos_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -41,10 +42,10 @@ def test_acentric_fuzz():
 
     # Use the default method for each chemical in this file
     omegas = [omega(i) for i in CASs] # This is quite slow
-    assert len([i for i in omegas if i is not None]) == 6306
+    assert len([i for i in omegas if i is not None]) == 6319
 
     omegas_default_sum = sum(abs(i) for i in omegas if i is not None)
-    assert_close(omegas_default_sum, 3244.876299999988)
+    assert_close(omegas_default_sum, 3251.3456239999887)
 
 def test_acentric_main():
     omega_calc = omega('629-92-5', method='PSRK')
@@ -58,7 +59,7 @@ def test_acentric_main():
     assert_close(omega_calc, 0.852, rtol=1e-13)
 
     methods = omega_methods('74-98-6')
-    assert methods == ['PSRK', 'PD', 'YAWS', ACENTRIC_DEFINITION]
+    assert methods == ['HEOS', 'PSRK', 'PD', 'YAWS', ACENTRIC_DEFINITION]
 
     # Error handling
     assert None == omega(CASRN='BADCAS')

@@ -26,6 +26,7 @@ import pytest
 import pandas as pd
 from chemicals.triple import Pt, Pt_methods, Tt, Tt_methods
 from chemicals.triple import triple_data_Staveley
+from chemicals.miscdata import heos_data
 
 
 def test_data():
@@ -43,15 +44,15 @@ def test_data():
 
 def test_Tt():
     Tt1_calc = Tt('7664-41-7')
-    Tt1 = 195.491545
+    Tt1 = 195.49
     Tt2_calc = Tt('74-82-8', method='MELTING')
     Tt2 = 90.75
     Tt3_calc = Tt('74-82-8')
-    Tt3 = 90.698
+    Tt3 = 90.6941
     assert_close1d([Tt1_calc, Tt2_calc, Tt3_calc], [Tt1, Tt2, Tt3])
 
     m = Tt_methods('7439-90-9')
-    assert m == ['STAVELEY', 'WEBBOOK', 'MELTING']
+    assert m == ['HEOS', 'STAVELEY', 'WEBBOOK', 'MELTING']
     assert None == Tt('72433223439-90-9')
     with pytest.raises(Exception):
         Tt('74-82-8', method='BADMETHOD')
@@ -59,7 +60,7 @@ def test_Tt():
 
 @pytest.mark.slow
 def test_Tt_fuzz():
-    Tt_sum = sum([Tt(i) for i in triple_data_Staveley.index])
+    Tt_sum = sum([Tt(i, method='STAVELEY') for i in triple_data_Staveley.index])
     assert_close(Tt_sum, 31253.97552)
     
     # These will change a lot
@@ -69,13 +70,13 @@ def test_Tt_fuzz():
 
 def test_Pt():
     Pt1_calc = Pt('7664-41-7')
-    Pt1 = 6079.5
+    Pt1 = 6053.38683212
     assert_close(Pt1_calc, Pt1)
     
     assert_close(Pt('7664-41-7', 'WEBBOOK'), 6060)
 
     m = Pt_methods('7664-41-7')
-    assert m == ['STAVELEY', 'WEBBOOK']
+    assert m == ['HEOS', 'STAVELEY', 'WEBBOOK']
     assert None == Pt('72433223439-90-9')
     with pytest.raises(Exception):
         Pt('74-82-8', method='BADMETHOD')
@@ -83,4 +84,4 @@ def test_Pt():
 @pytest.mark.slow
 def test_Pt_fuzz():
     Pt_sum = sum([Pt(i) for i in triple_data_Staveley.index if pd.notnull(triple_data_Staveley.at[i, 'Pt'])])
-    assert_close(Pt_sum, 1886624.8374376972)
+    assert_close(Pt_sum, 1888849.188360006)

@@ -82,7 +82,9 @@ df = pd.DataFrame(prop_array_T, columns=props, index=CASs_ints)
 df.sort_index(inplace=True)
 
 from sqlalchemy import create_engine
+print('going to dump to database now')
 engine = create_engine('sqlite:///../chemicals/Misc/default.sqlite', echo=False)
 if os.path.exists("../chemicals/Misc/default.sqlite"):
     os.remove("../chemicals/Misc/default.sqlite")
+print('calling pandas to_sql')
 df.to_sql('constants', con=engine)

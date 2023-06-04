@@ -25,8 +25,16 @@ import pytest
 from fluids.numerics import assert_close, assert_close1d
 
 from chemicals.miscdata import lookup_VDI_tabular_data
-from chemicals.miscdata import VDI_saturation_dict, CRC_inorganic_data, CRC_organic_data
+from chemicals.miscdata import VDI_saturation_dict, CRC_inorganic_data, CRC_organic_data, heos_data
 
+def test_heos_data():
+    values = 145
+    assert len(heos_data['Tc']) >= values
+    assert len(heos_data['Pc']) >= values
+    assert len(heos_data['Vc']) >= values
+    assert len(heos_data['omega']) >= values
+    assert len(heos_data['Tt']) >= values
+    assert len(heos_data['Pt']) >= values
 
 ### CRC Inorganic compounds
 
