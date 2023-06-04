@@ -71,6 +71,7 @@ def _load_triple_data():
     triple_data_Staveley = data_source('Staveley 1981.tsv')
     _triple_data_loaded = True
     Tt_sources = {
+        miscdata.HEOS: miscdata.heos_data,
         STAVELEY: triple_data_Staveley,
         miscdata.WEBBOOK: miscdata.webbook_data,
     }
@@ -86,7 +87,7 @@ else:
     if can_load_data:
         _load_triple_data()
 
-Tt_all_methods = (STAVELEY, miscdata.WEBBOOK, MELTING)
+Tt_all_methods = (miscdata.HEOS, STAVELEY, miscdata.WEBBOOK, MELTING)
 """Tuple of method name keys. See the `Tt` for the actual references"""
 
 @mark_numba_incompatible
@@ -183,7 +184,7 @@ def Tt(CASRN, method=None):
         if Tt: return Tt
         return Tm(CASRN)
 
-Pt_all_methods = (STAVELEY, miscdata.WEBBOOK)
+Pt_all_methods = (miscdata.HEOS, STAVELEY, miscdata.WEBBOOK)
 """Tuple of method name keys. See the `Pt` for the actual references"""
 
 @mark_numba_incompatible

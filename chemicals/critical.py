@@ -171,6 +171,7 @@ def _load_critical_data():
     critical_data_omega_Psat_Tc = data_source('omega_Psat_Tc_predictions.tsv')
     _critical_data_loaded = True
     Tc_sources = {
+        miscdata.HEOS: miscdata.heos_data,
         IUPAC: critical_data_IUPAC,
         MATTHEWS: critical_data_Matthews,
         CRC: critical_data_CRC,
@@ -185,10 +186,12 @@ def _load_critical_data():
 
     _add_Zc_to_df(miscdata.joback_predictions)
     _add_Zc_to_df(miscdata.webbook_data)
+    _add_Zc_to_df(miscdata.heos_data)
 
     # Create copies just incase new dfs need to be added later
     Pc_sources = Tc_sources.copy()
     Vc_sources =  {
+        miscdata.HEOS: miscdata.heos_data,
         IUPAC: critical_data_IUPAC,
         MATTHEWS: critical_data_Matthews,
         CRC: critical_data_CRC,
@@ -200,6 +203,7 @@ def _load_critical_data():
         FEDORS: critical_data_Fedors,
         }
     Zc_sources =  {
+        miscdata.HEOS: miscdata.heos_data,
         IUPAC: critical_data_IUPAC,
         MATTHEWS: critical_data_Matthews,
         CRC: critical_data_CRC,
@@ -211,6 +215,7 @@ def _load_critical_data():
         }
 
     omega_sources = {
+        miscdata.HEOS: miscdata.heos_data,
         PSRK: critical_data_PSRKR4,
         PD: critical_data_PassutDanner,
         YAWS: critical_data_Yaws,
@@ -236,10 +241,11 @@ else: # pragma: no cover
 
 ### Critical point functions
 
-Tc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
+Tc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
 """Tuple of method name keys. See the `Tc` for the actual references"""
 
 Tc_all_method_types = {
+    miscdata.HEOS: miscdata.EXPERIMENTAL_REVIEW,
     IUPAC: miscdata.EXPERIMENTAL_REVIEW,
     MATTHEWS: miscdata.EXPERIMENTAL_COMPILATION,
     CRC: miscdata.PROCESSED_EXPERIMENTAL,
@@ -432,7 +438,7 @@ def Tc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
 
-Pc_all_methods = (IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
+Pc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
 """Tuple of method name keys. See the `Pc` for the actual references"""
 
 @mark_numba_incompatible
@@ -454,6 +460,7 @@ def Pc_methods(CASRN):
     --------
     Pc
     """
+    if not _critical_data_loaded: _load_critical_data()
     return list_available_methods_from_df_dict(Pc_sources, CASRN, 'Pc')
 
 @mark_numba_incompatible
@@ -611,7 +618,7 @@ def Pc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
 
-Vc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, FEDORS, miscdata.JOBACK)
+Vc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, FEDORS, miscdata.JOBACK)
 """Tuple of method name keys. See the `Vc` for the actual references"""
 
 @mark_numba_incompatible
@@ -784,7 +791,7 @@ def Vc(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc')
 
-Zc_all_methods = (IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
+Zc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 """Tuple of method name keys. See the `Zc` for the actual references"""
 
 @mark_numba_incompatible

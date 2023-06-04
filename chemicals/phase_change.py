@@ -182,6 +182,7 @@ def _load_phase_change_constants():
     Hsub_data_Gharagheizi = data_source('Ghazerati Appendix Sublimation Enthalpy.tsv')
     _phase_change_const_loaded = True
     Tb_sources = {
+        miscdata.HEOS: miscdata.heos_data,
         CRC_ORG: miscdata.CRC_organic_data,
         CRC_INORG: miscdata.CRC_inorganic_data,
         miscdata.COMMON_CHEMISTRY: miscdata.common_chemistry_data,
@@ -249,7 +250,7 @@ else:
 
 ### Boiling Point at 1 atm
 
-Tb_all_methods = (CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
+Tb_all_methods = (miscdata.HEOS, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
                   miscdata.WEBBOOK, YAWS, miscdata.WIKIDATA, miscdata.JOBACK)
 """Tuple of method name keys. See the `Tb` for the actual references"""
 

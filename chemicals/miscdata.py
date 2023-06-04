@@ -46,6 +46,7 @@ from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_pat
 folder = os_path_join(source_path, 'Misc')
 
 ### CRC Handbook general tables
+register_df_source(folder, 'heos_constants.tsv')
 register_df_source(folder, 'Physical Constants of Inorganic Compounds.csv')
 register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
 register_df_source(folder, 'joback_predictions.tsv', int_CAS=True)
@@ -61,6 +62,7 @@ COMMON_CHEMISTRY = 'COMMON_CHEMISTRY'
 PSI4_2022A = 'PSI4_2022A'
 CHEMSEP = 'CHEMSEP'
 JANAF = 'JANAF'
+HEOS = 'HEOS'
 
 # metadata about othe type of data being read in
 
@@ -117,7 +119,8 @@ def _load_VDI_saturation_dict():
 
 _miscdata_loaded = False
 def _load_miscdata():
-    global CRC_inorganic_data, CRC_organic_data, joback_predictions, wikidata_data, webbook_data, common_chemistry_data, _miscdata_loaded
+    global CRC_inorganic_data, CRC_organic_data, joback_predictions, wikidata_data, webbook_data, common_chemistry_data, heos_data, _miscdata_loaded
+    heos_data = data_source('heos_constants.tsv')
     CRC_inorganic_data = data_source('Physical Constants of Inorganic Compounds.csv')
     CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
     joback_predictions = data_source('joback_predictions.tsv')
@@ -128,7 +131,7 @@ def _load_miscdata():
 
 if PY37:
     def __getattr__(name):
-        if name in ('CRC_inorganic_data', 'CRC_organic_data',
+        if name in ('CRC_inorganic_data', 'CRC_organic_data', 'heos_data',
                     'joback_predictions', 'wikidata_data', 'webbook_data',
                     'common_chemistry_data'):
             _load_miscdata()
