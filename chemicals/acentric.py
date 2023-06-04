@@ -97,7 +97,7 @@ def omega(CASRN, method=None):
     Examples
     --------
     >>> omega(CASRN='64-17-5')
-    0.635
+    0.646
 
     Parameters
     ----------
@@ -112,7 +112,7 @@ def omega(CASRN, method=None):
     Other Parameters
     ----------------
     method : string, optional
-        The method name to use. Accepted methods are 'PSRK', 'PD', or 'YAWS'.
+        The method name to use. Accepted methods are 'HEOS', 'PSRK', 'PD', or 'YAWS'.
         All valid values are also held in the variable `omega_all_methods`.
 
     Notes
@@ -128,6 +128,9 @@ def omega(CASRN, method=None):
         * 'ACENTRIC_DEFINITION', the precalculated results using the
           `VaporPressure` object of Thermo and the critical properties of
           `chemicals`.
+        * 'HEOS', a series of values from the NIST REFPROP Database for
+          Highly Accurate Properties of Industrially Important Fluids
+          (and other high-precision fundamental equations of state)
 
     See Also
     --------
@@ -151,6 +154,10 @@ def omega(CASRN, method=None):
     .. [4] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
+    .. [5] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+       "The NIST REFPROP Database for Highly Accurate Properties of Industrially
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'omega')

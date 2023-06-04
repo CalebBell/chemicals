@@ -14,4 +14,4 @@
 
 ### Changed
 - Code cleanup with ruff (experiment)
-    
+- Add {critical, triple, boiling} data from REFPROP and other high-precision EOSs. This is the preferred method where available.

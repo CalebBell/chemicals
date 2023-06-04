@@ -44,7 +44,7 @@ Inputs do not need to be numpy arrays; they can be any iterable:
 
 >>> import chemicals.vectorized
 >>> chemicals.vectorized.Tc(['108-88-3', '7732-18-5'])
-array([591.75, 647.14])
+array([591.75 , 647.096])
 
 
 It is possible to switch back and forth between the namespaces with a subsequent

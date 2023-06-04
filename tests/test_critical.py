@@ -24,7 +24,7 @@ SOFTWARE.
 import pytest
 import pandas as pd
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.miscdata import webbook_data
+from chemicals.miscdata import webbook_data, heos_data
 from chemicals import int_to_CAS, data_reader
 from chemicals.critical import (Chueh_Prausnitz_Tc, Chueh_Prausnitz_Vc, Grieves_Thodos, Grigoras,
                                 Hekayati_Raeissi, Ihmels, Li, Meissner, Mersmann_Kind_predictor, Pc,
@@ -197,7 +197,7 @@ def test_Tc_all_values(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC,
                critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
-               critical_data_PinaMartines, webbook_data]
+               critical_data_PinaMartines, webbook_data, heos_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -207,13 +207,13 @@ def test_Tc_all_values(with_database):
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_close(Tcs_default_sum, 6246040.066122223)
+    assert_close(Tcs_default_sum, 6249017.387222222)
 
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Tc(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
     Tc_val = Tc(CASRN='64-17-5')
-    assert_close(514.0, Tc_val)
+    assert_close(514.71, Tc_val)
     assert type(Tc_val) is float
 
     assert_close(516.2, Tc(CASRN='64-17-5', method='PSRK'))
@@ -239,7 +239,7 @@ def test_Tc(with_database):
 def test_Pc(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
 
-    assert_close(6137000.0, Pc(CASRN='64-17-5'))
+    assert_close(6268000.0, Pc(CASRN='64-17-5'))
 
     assert_close(22048321.0, Pc(CASRN='7732-18-5', method='PSRK'))
 
@@ -260,7 +260,7 @@ def test_Pc_all_values(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
                critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
-               critical_data_PinaMartines, webbook_data]
+               critical_data_PinaMartines, webbook_data, heos_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -270,12 +270,12 @@ def test_Pc_all_values(with_database):
     # Use the default method for each chemical in this file
     Pcs = [Pc(i) for i in CASs]
     Pcs_default_sum = pd.Series(Pcs).sum()
-    assert_close(Pcs_default_sum, 64602001266.18326)
+    assert_close(Pcs_default_sum, 64624155187.18326)
 
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Vc(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
-    assert_close(0.000168, Vc(CASRN='64-17-5'))
+    assert_close(0.000168634064081, Vc(CASRN='64-17-5'))
 
     assert_close(5.600e-05, Vc(CASRN='7732-18-5', method='PSRK'))
 
@@ -295,7 +295,7 @@ def test_Vc_all_values(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
                critical_data_PSRKR4, critical_data_Yaws, critical_data_PinaMartines,
-               webbook_data]
+               webbook_data, heos_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -305,12 +305,12 @@ def test_Vc_all_values(with_database):
     # Use the default method for each chemical in this file
     Vcs = [Vc(i) for i in CASs]
     Vcs_default_sum = pd.Series(Vcs).sum()
-    assert_close(Vcs_default_sum, 4.955859233439)
+    assert_close(Vcs_default_sum, 4.959032875713007)
 
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Zc(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
-    assert_close(0.241, Zc(CASRN='64-17-5'))
+    assert_close(0.24698893835371977, Zc(CASRN='64-17-5'))
 
     assert_close(0.22941602891834947, Zc(CASRN='7732-18-5', method='PSRK'))
 
@@ -330,7 +330,7 @@ def test_Zc_all_values(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
     sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
                critical_data_PSRKR4, critical_data_PinaMartines,
-               critical_data_Yaws, webbook_data]
+               critical_data_Yaws, webbook_data, heos_data]
     CASs = set()
     for k in sources:
         for i in k.index:
@@ -340,7 +340,7 @@ def test_Zc_all_values(with_database):
     # Use the default method for each chemical in this file
     Zcs = [Zc(i) for i in CASs]
     Zcs_default_sum = pd.Series(Zcs).sum()
-    assert_close(Zcs_default_sum, 1999.3018781772432, 1e-6)
+    assert_close(Zcs_default_sum, 2001.0365327433638, 1e-6)
 
 
 

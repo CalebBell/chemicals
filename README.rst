@@ -1,4 +1,4 @@
-=========
+x=========
 Chemicals
 =========
 
@@ -116,11 +116,11 @@ chemical properties is done by CASRN:
     >>> Tm(CAS_water)   # Melting point [K]
     273.15
     >>> Tc(CAS_water)   # Critical temperature [K]
-    647.14
+    647.096
     >>> Pc(CAS_water)   # Critical pressure [Pa]
-    22048320.0
+    22064000.0
     >>> Vc(CAS_water)   # Critical volume [m^3/mol]
-    5.600e-05
+    5.59480372671e-05
     >>> Hfus(CAS_water) # Heat of fusion [J/mol]
     6010.0
     >>> Hfs('101-81-5')  # Solid heat of formation of Diphenylmethane, [J/mol] 
@@ -155,7 +155,7 @@ To view all available methods for a given chemical, just use the functions with
     
     >>> from chemicals import Tb_methods
     >>> Tb_methods(CAS_water)
-    ['CRC_INORG', 'COMMON_CHEMISTRY', 'WEBBOOK', 'YAWS', 'WIKIDATA']
+    ['HEOS', 'CRC_INORG', 'COMMON_CHEMISTRY', 'WEBBOOK', 'YAWS', 'WIKIDATA']
 
 The databanks can also be accessed through their respective module:
 

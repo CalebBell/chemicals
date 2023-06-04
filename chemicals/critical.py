@@ -1,5 +1,5 @@
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
-Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
+Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 Copyright (C) 2020 Yoel Rene Cortes-Pena <yoelcortes@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -307,7 +307,7 @@ def Tc(CASRN, method=None):
     method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
         'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON',
-        'JOBACK'.
+        'JOBACK', 'HEOS'.
         All valid values are also held in the list `Tc_all_methods`.
 
     Notes
@@ -332,11 +332,14 @@ def Tc(CASRN, method=None):
         * 'JOBACK', an estimation method for organic substances in [19]_
         * 'WILSON_JASPERSON', an estimation method in [21]_
         * 'PINAMARTINES', a series of values in the supporting material of [20]_
+        * 'HEOS', a series of values from the NIST REFPROP Database for
+          Highly Accurate Properties of Industrially Important Fluids
+          (and other high-precision fundamental equations of state)
 
     Examples
     --------
     >>> Tc(CASRN='64-17-5')
-    514.0
+    514.71
 
     See Also
     --------
@@ -428,6 +431,10 @@ def Tc(CASRN, method=None):
     .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc,
        Estimation Based on Zero, First and Second Order Methods." In
        Proceedings of the AIChE Spring Meeting, 21, 1996.
+    .. [22] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+       "The NIST REFPROP Database for Highly Accurate Properties of Industrially
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'Tc')
@@ -475,7 +482,7 @@ def Pc(CASRN, method=None):
     Examples
     --------
     >>> Pc(CASRN='64-17-5')
-    6137000.0
+    6268000.0
 
     Parameters
     ----------
@@ -492,7 +499,7 @@ def Pc(CASRN, method=None):
     method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
         'PD', 'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON',
-        'JOBACK'.
+        'JOBACK', 'HEOS'.
         All valid values are also held in the list `Pc_all_methods`.
 
     Notes
@@ -517,6 +524,9 @@ def Pc(CASRN, method=None):
         * 'JOBACK', an estimation method for organic substances in [19]_
         * 'PINAMARTINES', a series of values in the supporting material of [20]_
         * 'WILSON_JASPERSON', an estimation method in [21]_
+        * 'HEOS', a series of values from the NIST REFPROP Database for
+          Highly Accurate Properties of Industrially Important Fluids
+          (and other high-precision fundamental equations of state)
 
     See Also
     --------
@@ -608,6 +618,10 @@ def Pc(CASRN, method=None):
     .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc,
        Estimation Based on Zero, First and Second Order Methods." In
        Proceedings of the AIChE Spring Meeting, 21, 1996.
+    .. [22] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+       "The NIST REFPROP Database for Highly Accurate Properties of Industrially
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'Pc')
@@ -656,7 +670,7 @@ def Vc(CASRN, method=None):
     Examples
     --------
     >>> Vc(CASRN='64-17-5')
-    0.000168
+    0.000168634064081
 
     Parameters
     ----------
@@ -672,7 +686,7 @@ def Vc(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS', 'CRC',
-        'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'FEDORS', 'JOBACK'.
+        'WEBBOOK', 'PSRK', 'PINAMARTINES', 'YAWS', 'FEDORS', 'JOBACK', 'HEOS'.
         All valid values are also held in the list `Vc_all_methods`.
 
     Notes
@@ -695,6 +709,9 @@ def Vc(CASRN, method=None):
         * 'JOBACK', an estimation method for organic substances in [18]_
         * 'FEDORS', an estimation methid in [20]_
         * 'PINAMARTINES', a series of values in the supporting material of [19]_
+        * 'HEOS', a series of values from the NIST REFPROP Database for
+          Highly Accurate Properties of Industrially Important Fluids
+          (and other high-precision fundamental equations of state)
 
     See Also
     --------
@@ -781,6 +798,10 @@ def Vc(CASRN, method=None):
        https://doi.org/10.1002/aic.17518.
     .. [20] Fedors, R. F. "A Method to Estimate Critical Volumes." AIChE
        Journal 25, no. 1 (1979): 202-202. https://doi.org/10.1002/aic.690250129.
+    .. [21] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+       "The NIST REFPROP Database for Highly Accurate Properties of Industrially
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'Vc')
@@ -829,7 +850,7 @@ def Zc(CASRN, method=None):
     Examples
     --------
     >>> Zc(CASRN='64-17-5')
-    0.241
+    0.247
 
     Parameters
     ----------
@@ -845,7 +866,7 @@ def Zc(CASRN, method=None):
     ----------------
     method : string, optional
         The method name to use. Accepted methods are 'IUPAC', 'MATTHEWS',
-        'CRC', 'PSRK', and 'YAWS'. All valid values are also held
+        'CRC', 'PSRK', 'YAWS', 'HEOS'. All valid values are also held
         in `Zc_all_methods`.
 
     Notes
@@ -867,6 +888,9 @@ def Zc(CASRN, method=None):
           and averaged values
         * 'JOBACK', an estimation method for organic substances in [18]_
         * 'PINAMARTINES', a series of values in the supporting material of [19]_
+        * 'HEOS', a series of values from the NIST REFPROP Database for
+          Highly Accurate Properties of Industrially Important Fluids
+          (and other high-precision fundamental equations of state)
 
     See Also
     --------
@@ -951,6 +975,10 @@ def Zc(CASRN, method=None):
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
        Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518.
        https://doi.org/10.1002/aic.17518.
+    .. [20] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+       "The NIST REFPROP Database for Highly Accurate Properties of Industrially
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'Zc')
@@ -1632,7 +1660,7 @@ def third_property(CASRN=None, T=False, P=False, V=False):
     Decamethyltetrasiloxane [141-62-8]
 
     >>> third_property('141-62-8', V=True)
-    0.0010920041152263375
+    0.001135732
 
     Succinic acid [110-15-6]
 

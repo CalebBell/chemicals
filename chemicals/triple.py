@@ -121,7 +121,7 @@ def Tt(CASRN, method=None):
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
-    Returns data from [1]_ or [2]_, or a chemical's melting point if available.
+    Returns data from [1]_, [2]_ or [3]_, or a chemical's melting point if available.
 
     Parameters
     ----------
@@ -147,7 +147,7 @@ def Tt(CASRN, method=None):
 
     The data in [1]_ is originally on the ITS-68 temperature scale, but was
     converted to ITS-90. The numbers were rounded to 6 decimal places
-    arbitrarily and the coversion was performed with this library.
+    arbitrarily and the conversion was performed with this library.
 
 
 
@@ -169,6 +169,10 @@ def Tt(CASRN, method=None):
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [3] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+       "The NIST REFPROP Database for Highly Accurate Properties of Industrially
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'Tt')
@@ -215,7 +219,7 @@ def Pt(CASRN, method=None):
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
-    Returns data from [1]_ or [2]_.
+    Returns data from [1]_, [2]_, or [3]_.
 
     This function does not implement it but it is also possible to calculate
     the vapor pressure at the triple temperature from a vapor pressure
@@ -246,7 +250,7 @@ def Pt(CASRN, method=None):
     Ammonia
 
     >>> Pt('7664-41-7')
-    6079.5
+    6053.386
 
     See Also
     --------
@@ -259,6 +263,10 @@ def Pt(CASRN, method=None):
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
+    .. [3] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+       "The NIST REFPROP Database for Highly Accurate Properties of Industrially
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'Pt')
