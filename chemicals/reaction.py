@@ -75,6 +75,7 @@ Chemical Reactions
 ------------------
 .. autofunction:: chemicals.reaction.balance_stoichiometry
 .. autofunction:: chemicals.reaction.stoichiometric_matrix
+.. autofunction:: chemicals.reaction.standard_formation_reaction
 """
 
 __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
@@ -83,12 +84,13 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'Hfl_all_methods', 'Hfg_all_methods', 'Hfs_all_methods',
            'S0l_all_methods', 'S0g_all_methods', 'S0s_all_methods',
            'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
-           'balance_stoichiometry', 'stoichiometric_matrix']
+           'balance_stoichiometry', 'stoichiometric_matrix', 'standard_formation_reaction']
 
 from math import ceil, log10
 
 from chemicals import data_reader as dr
 from chemicals import heat_capacity, miscdata
+from chemicals.elements import periodic_table, simple_formula_parser
 from chemicals.data_reader import (
     data_source,
     database_constant_lookup,
@@ -1074,3 +1076,63 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
         return d
 
 
+def standard_formation_reaction(atoms):
+    r'''This function calculates the standard reaction to reduce a chemical
+    compound to its standard state elements. Any hydrogen in the compound
+    is transformed to H2; oxygen to O2; carbon to graphite (single C), calcium
+    to Ca, etc.
+
+    Parameters
+    ----------
+    atoms : dict[(str, float)]
+        A dictionary of (element, element_count) pairs for the reacting
+        compound, [-]
+
+    Returns
+    -------
+    reactant_coeff : float
+        The coefficient of the reactant; for compounds like CO that do not
+        divide evenly, this will be something other than 1 [-]
+    elemental_counts : list[float]
+        Balanced coefficients of each of the products, [-]
+    product_atomss : list[dict[(str, float)]]
+        A list of dictionaries of the elements produced, and how many atoms
+        of each element are in one unit of the element in its
+        standard form. Each dictionary contains a single key:value, with the key
+        being the element and the value being either 1 or 2 depending on the
+        standard state [-]
+
+    Examples
+    --------
+    Methane
+
+    >>> standard_formation_reaction({'C': 1, 'H': 4})
+    (1.0, [1.0, 2.0], [{'C': 1}, {'H': 2}])
+
+    Carbon monoxide
+
+    >>> standard_formation_reaction({'C': 1, 'O': 1})
+    (2.0, [2.0, 1.0], [{'C': 1}, {'O': 2}])
+
+    Methylamine
+
+    >>> standard_formation_reaction({'C': 1, 'H': 5, 'N': 1})
+    (2.0, [2.0, 5.0, 1.0], [{'C': 1}, {'H': 2}, {'N': 2}])
+    
+    '''
+
+    product_atomss = []
+    reactants = []
+    for atom in atoms:
+        ele = periodic_table[atom]
+        ele_atoms = simple_formula_parser(ele.formula_standard)
+        product_atomss.append(ele_atoms)
+        reactants.append(True)
+    
+    atoms_to_process = product_atomss + [atoms]
+    reactants.append(False)
+    matrix = stoichiometric_matrix(atoms_to_process, reactants)
+    coeffs = balance_stoichiometry(matrix)
+    reactant_coeff = coeffs[-1]
+    elemental_counts = coeffs[:-1]
+    return reactant_coeff, elemental_counts, product_atomss

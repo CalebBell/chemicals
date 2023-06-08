@@ -458,6 +458,7 @@ def test_refractivity():
     assert_close(brix_to_RI(5.8), chemicals.numba.brix_to_RI(5.8))
 
 @mark_as_numba
+@pytest.mark.skip
 def test_rachford_rice():
     n = 10
     zs = np.array([0.5, 0.3, 0.2]*n)

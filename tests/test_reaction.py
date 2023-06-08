@@ -28,7 +28,8 @@ import pandas as pd
 from chemicals.reaction import (Gibbs_formation, Hf_basis_converter, Hfg, Hfg_all_methods,
                                 Hfg_methods, Hfl, Hfl_methods, Hfs, Hfs_methods, S0g,
                                 S0g_all_methods, S0g_methods, S0l, S0l_methods, S0s, S0s_methods,
-                                balance_stoichiometry, entropy_formation, stoichiometric_matrix)
+                                balance_stoichiometry, entropy_formation, stoichiometric_matrix,
+                                standard_formation_reaction)
 from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data
 from chemicals.reaction import Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, Hfg_S0g_YAWS_data
 
@@ -206,3 +207,29 @@ def test_balance_stoichiometry():
 def test_stoichiometric_matrix():
     res = stoichiometric_matrix([{'Mg': 1, 'O': 1}, {'Mg': 1}, {'O': 2}], [True, False, False])
     assert_close2d([[1, -1, 0], [1, 0, -2]], res)
+
+
+def test_standard_formation_reaction():
+    reactant_coeff, coeff_test, reactant_atomss_test = standard_formation_reaction({'C': 3, 'H': 8})
+    assert coeff_test == [3.0, 4.0]
+    assert reactant_atomss_test == [{'C': 1}, {'H': 2}]
+
+    reactant_coeff, coeff_test, reactant_atomss_test = standard_formation_reaction({'C': 3, 'H': 7, 'N': 1, 'O': 2, 'S': 1})
+    assert coeff_test == [6.0, 7.0, 1.0, 2.0, 2.0]
+    assert reactant_atomss_test == [{'C': 1}, {'H': 2}, {'N': 2}, {'O': 2}, {'S': 1}]
+
+    reactant_coeff, coeff_test, reactant_atomss_test = standard_formation_reaction({'C': 6, 'H': 7, 'B': 1, 'O': 2})
+    assert coeff_test == [12.0, 7.0, 2.0, 2.0]
+    assert reactant_atomss_test == [{'C': 1}, {'H': 2}, {'B': 1}, {'O': 2}]
+
+    reactant_coeff, coeff_test, reactant_atomss_test = standard_formation_reaction({'C': 4, 'H': 12, 'Si': 1})
+    assert coeff_test == [4.0, 6.0, 1.0]
+    assert reactant_atomss_test ==  [{'C': 1}, {'H': 2}, {'Si': 1}]
+
+    reactant_coeff, coeff_test, reactant_atomss_test = standard_formation_reaction({'C': 12, 'H': 10, 'Cl': 1, 'P': 1})
+    assert coeff_test == [24.0, 10.0, 1.0, 2.0]
+    assert reactant_atomss_test ==  [{'C': 1}, {'H': 2}, {'Cl': 2}, {'P': 1}]
+
+    reactant_coeff, coeff_test, reactant_atomss_test = standard_formation_reaction({'C': 2, 'H': 4, 'Br': 1, 'F': 1})
+    assert coeff_test == [4.0, 4.0, 1.0, 1.0]
+    assert reactant_atomss_test == [{'C': 1}, {'H': 2}, {'Br': 2}, {'F': 2}]
