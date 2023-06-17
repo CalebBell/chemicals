@@ -118,6 +118,14 @@ def test_REFPROP():
     assert_close(REFPROP_sigma(647.096, 647.096, -0.1306, 2.471, 0.2151, 1.233), 0, atol=1e-12)
     assert_close(REFPROP_sigma(700.0, 647.096, -0.1306, 2.471, 0.2151, 1.233), 0, atol=1e-12)
 
+    # check the correlation can be used with a sigma but not a `n`
+    kwargs = {'sigma0': 0.3990499999999977, 'n0': 1.0000000000000073, 
+            'sigma1': 0.14400000000000238, 'n1': 0.0, 
+            'sigma2': 0.0, 'n2': 0.0, 'Tc': 1735.0}
+
+    res= REFPROP_sigma(T=300., **kwargs)
+    assert_close(res, 0.47404999999999997)
+
 def test_Somayajulu():
     sigma = Somayajulu(300, 647.126, 232.713514, -140.18645, -4.890098)
     assert_close(sigma, 0.07166386387996757)
