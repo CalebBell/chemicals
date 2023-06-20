@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -22,42 +21,80 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
 import numpy as np
-from chemicals.utils import (API_to_SG, Cp_minus_Cv, Joule_Thomson, Parachor, SG, SG_to_API,
-                             Vfs_to_zs, Vm_to_rho, Watson_K, Z, d2ns_to_dn2_partials,
-                             d2xs_to_d2xsn1, dns_to_dn_partials, dxs_to_dn_partials, dxs_to_dns,
-                             dxs_to_dxsn1, isentropic_exponent, isentropic_exponent_PT,
-                             isentropic_exponent_PV, isentropic_exponent_TV, isobaric_expansion,
-                             isothermal_compressibility, mix_component_flows,
-                             mix_multiple_component_flows, mixing_logarithmic, mixing_power,
-                             mixing_simple, molar_velocity_to_velocity, none_and_length_check,
-                             normalize, phase_identification_parameter,
-                             phase_identification_parameter_phase, property_mass_to_molar,
-                             property_molar_to_mass, radius_of_gyration, remove_zeros, rho_to_Vm,
-                             solve_flow_composition_mix, speed_of_sound, to_num, v_molar_to_v,
-                             v_to_v_molar, vapor_mass_quality, velocity_to_molar_velocity, ws_to_zs,
-                             zs_to_Vfs, zs_to_ws)
-from chemicals.utils import recursive_copy, hash_any_primitive
+import pytest
 from fluids.numerics import assert_close, assert_close1d, assert_close2d
+
+from chemicals.utils import (
+    SG,
+    API_to_SG,
+    Cp_minus_Cv,
+    Joule_Thomson,
+    Parachor,
+    SG_to_API,
+    Vfs_to_zs,
+    Vm_to_rho,
+    Watson_K,
+    Z,
+    d2ns_to_dn2_partials,
+    d2xs_to_d2xsn1,
+    dns_to_dn_partials,
+    dxs_to_dn_partials,
+    dxs_to_dns,
+    dxs_to_dxsn1,
+    hash_any_primitive,
+    isentropic_exponent,
+    isentropic_exponent_PT,
+    isentropic_exponent_PV,
+    isentropic_exponent_TV,
+    isobaric_expansion,
+    isothermal_compressibility,
+    mix_component_flows,
+    mix_multiple_component_flows,
+    mixing_logarithmic,
+    mixing_power,
+    mixing_simple,
+    molar_velocity_to_velocity,
+    none_and_length_check,
+    normalize,
+    phase_identification_parameter,
+    phase_identification_parameter_phase,
+    property_mass_to_molar,
+    property_molar_to_mass,
+    radius_of_gyration,
+    recursive_copy,
+    remove_zeros,
+    rho_to_Vm,
+    solve_flow_composition_mix,
+    speed_of_sound,
+    to_num,
+    v_molar_to_v,
+    v_to_v_molar,
+    vapor_mass_quality,
+    velocity_to_molar_velocity,
+    ws_to_zs,
+    zs_to_Vfs,
+    zs_to_ws,
+)
+
 
 def test_recursive_copy():
     import array
+    from copy import deepcopy
     from decimal import Decimal
     from fractions import Fraction
-    from copy import deepcopy
 
-    test_cases = [None, 
-                  True, False, 
+    test_cases = [None,
+                  True, False,
                  -1, 0, 1, 2, 2000, 2**65,
                   -1.1234, 0, 2e200, float("nan"),
                   1j, 1.1234j, 1234132+123.234j, -12341-1234j,
                   'a', 'b', 'asdfsdfasdf', 'asdf asdfadf',
                   Decimal(2),Fraction(2.34),
                  ]
-    
+
     numpy_test_cases = [ np.complex128(1), np.complex64(1), np.float16(1),
-                        np.float32(1), np.float64(1), np.int16(1), np.int32(1), np.int64(1), 
+                        np.float32(1), np.float64(1), np.int16(1), np.int32(1), np.int64(1),
                         np.int8(1), np.longlong(1), np.uint16(1), np.uint32(1), np.uint64(1),
                         np.uint8(1), np.ulonglong(1),]
     try:
@@ -70,41 +107,41 @@ def test_recursive_copy():
     except:
         # not supported on windows https://github.com/cupy/cupy/issues/2916
         pass
-    
+
     tuple_cases = [(12,21,34,3, None, -1, 'asd', 1j),
                    (12., (123.352, None, 4, (123.352, None, 4), [123]), ),
                    tuple(),
                    tuple(range(129)),
                   ]
-    
+
     list_cases = [[2,21,34,3, None, -1, 'asd', 1j],
                    [12., (123.352, None, 4, (123.352, None, 4), [123]), ],
                    list(),
                    list(range(129)),
-        
+
     ]
-    
-    set_cases = [set([1,2,'a', 1j, np.float32(1)]),
+
+    set_cases = [{1,2,'a', 1j, np.float32(1)},
     ]
-    
+
     frozenset_cases = [frozenset([1,2,'a', 1j, np.float32(1)]),
     ]
-    
+
     numpy_cases = [np.arange(13),
                    np.arange(13, dtype=int),
                    np.arange(13, dtype=np.uint32),
                    np.arange(13, dtype=np.float32),
                    np.arange(13, dtype=np.float16),
                   ]
-    
+
     other_cases = [
     ]
-    
-    
-    byte_cases = [b'asdfasd', b'1232', 
+
+
+    byte_cases = [b'asdfasd', b'1232',
                   bytes.fromhex('2Ef0 F1f2  '),
                  ]
-    
+
     test_cases += numpy_test_cases
     test_cases += tuple_cases
     test_cases += list_cases
@@ -113,42 +150,42 @@ def test_recursive_copy():
     test_cases += set_cases
     test_cases += frozenset_cases
     test_cases += byte_cases
-    
-    
-    
-    
+
+
+
+
     for case in test_cases:
         implemented_copy = recursive_copy(case)
         original_copy = deepcopy(case)
         assert type(implemented_copy) == type(original_copy)
         assert hash_any_primitive(implemented_copy) == hash_any_primitive(original_copy)
-    
-    
+
+
     unhashable_cases = [range(10),
                         range(1,2,10),
                         range(1,29,10),
                         bytearray([0,1,3,2]),
                         array.array('l', [-11111111, 22222222, -33333333, 44444444]),
                        ]
-    
-    
+
+
     for case in unhashable_cases:
         implemented_copy = recursive_copy(case)
         original_copy = deepcopy(case)
         assert type(implemented_copy) == type(original_copy)
         assert id(implemented_copy) != case
-    
-    
+
+
     read_only_cases = [{'a': 3, 'b': 5}.items(),]
-    
+
     for case in read_only_cases:
         implemented_copy = recursive_copy(case)
         assert type(implemented_copy) == type(case)
         assert implemented_copy is case
-    
-    
-    # numpy case with object arrays    
-    original = np.array([set([2**66]), set([2**67])])
+
+
+    # numpy case with object arrays
+    original = np.array([{2**66}, {2**67}])
     copy = recursive_copy(original)
     original[1].add(1)
     assert len(copy[1]) == 1
@@ -175,48 +212,48 @@ def test_remove_zeros():
 
 
 def test_none_and_length_check():
-    assert True == none_and_length_check([[1,2,3]])
+    assert True is none_and_length_check([[1, 2, 3]])
 
-    assert True == none_and_length_check(([1, 1], [1, 1], [1, 30], [10,0]), length=2)
-    assert True == none_and_length_check(([1, 1], [1, 1], [1, 30], [10,0]))
+    assert True is none_and_length_check(([1, 1], [1, 1], [1, 30], [10, 0]), length=2)
+    assert True is none_and_length_check(([1, 1], [1, 1], [1, 30], [10, 0]))
 
-    assert False == none_and_length_check(([1, 1], [None, 1], [1, 30], [10,0]), length=2)
-    assert False == none_and_length_check(([None, 1], [1, 1], [1, 30], [10,0]))
-    assert False == none_and_length_check(([1, 1], [None, 1], [1, None], [10,0]), length=2)
-    assert False == none_and_length_check(([None, 1], [1, 1], [1, 30], [None,0]))
+    assert False is none_and_length_check(([1, 1], [None, 1], [1, 30], [10, 0]), length=2)
+    assert False is none_and_length_check(([None, 1], [1, 1], [1, 30], [10, 0]))
+    assert False is none_and_length_check(([1, 1], [None, 1], [1, None], [10, 0]), length=2)
+    assert False is none_and_length_check(([None, 1], [1, 1], [1, 30], [None, 0]))
 
-    assert False == none_and_length_check(([1, 1, 1], [1, 1], [1, 30], [10,0]), length=2)
-    assert False == none_and_length_check(([1, 1], [1, 1, 1], [1, 30], [10,0]))
-    assert False == none_and_length_check(([1, 1, 1], [1, 1], [1, 30, 1], [10,0]), length=2)
-    assert False == none_and_length_check(([1, 1], [1, 1, 1], [1, 30], [10,0, 1]))
-    assert False == none_and_length_check(([1, 1, 1], [1, 1, 1], [1, 30, 1], [10,0]), length=3)
-    assert False == none_and_length_check(([1, 1], [1, 1, 1], [1, 30, 1], [10,0, 1]))
+    assert False is none_and_length_check(([1, 1, 1], [1, 1], [1, 30], [10, 0]), length=2)
+    assert False is none_and_length_check(([1, 1], [1, 1, 1], [1, 30], [10, 0]))
+    assert False is none_and_length_check(([1, 1, 1], [1, 1], [1, 30, 1], [10, 0]), length=2)
+    assert False is none_and_length_check(([1, 1], [1, 1, 1], [1, 30], [10, 0, 1]))
+    assert False is none_and_length_check(([1, 1, 1], [1, 1, 1], [1, 30, 1], [10, 0]), length=3)
+    assert False is none_and_length_check(([1, 1], [1, 1, 1], [1, 30, 1], [10, 0, 1]))
 
-    assert True == none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=8)
-    assert True == none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]))
+    assert True is none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=8)
+    assert True is none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]))
 
-    assert False == none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=9)
-    assert False == none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=7)
-    assert False == none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, None]), length=8)
-    assert False == none_and_length_check(([1, 1, None, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=8)
+    assert False is none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=9)
+    assert False is none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=7)
+    assert False is none_and_length_check(([1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, None]), length=8)
+    assert False is none_and_length_check(([1, 1, None, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=8)
 
     # Test list input instead of tuples
-    assert True == none_and_length_check([[1, 1], [1, 1], [1, 30], [10,0]], length=2)
-    assert True == none_and_length_check([[1, 1], [1, 1], [1, 30], [10,0]])
+    assert True is none_and_length_check([[1, 1], [1, 1], [1, 30], [10, 0]], length=2)
+    assert True is none_and_length_check([[1, 1], [1, 1], [1, 30], [10, 0]])
 
-    assert True == none_and_length_check([[1, 1], [1, 1], [1, 30], [10,0]], length=2)
-    assert True == none_and_length_check([[1, 1], [1, 1], [1, 30], [10,0]])
+    assert True is none_and_length_check([[1, 1], [1, 1], [1, 30], [10, 0]], length=2)
+    assert True is none_and_length_check([[1, 1], [1, 1], [1, 30], [10, 0]])
 
     # Test with numpy arrays
-    assert True == none_and_length_check((np.array([1, 1, 1, 1, 1, 1, 1, 1]), np.array([1, 1, 1, 1, 1, 1, 1, 1]), [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=8)
-    assert False == none_and_length_check((np.array([1, 1, 1, 1, 1, 1, 1]), np.array([1, 1, 1, 1, 1, 1, 1, 1]), [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=8)
-    assert False == none_and_length_check((np.array([1, 1, 1, 1, 1, 1, 1, 7]), np.array([1, 1, 1, 1, 1, 1, 1, 1]), [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=7)
-    assert True == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]]))
+    assert True is none_and_length_check((np.array([1, 1, 1, 1, 1, 1, 1, 1]), np.array([1, 1, 1, 1, 1, 1, 1, 1]), [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=8)
+    assert False is none_and_length_check((np.array([1, 1, 1, 1, 1, 1, 1]), np.array([1, 1, 1, 1, 1, 1, 1, 1]), [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=8)
+    assert False is none_and_length_check((np.array([1, 1, 1, 1, 1, 1, 1, 7]), np.array([1, 1, 1, 1, 1, 1, 1, 1]), [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]), length=7)
+    assert True is none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10, 0]]))
 
-    assert True == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]]))
-    assert True == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]]), length=2)
-    assert False == none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10,0]], dtype=object), length=3)
-    assert False == none_and_length_check(np.array([[1, 1], [1, 1, 10], [1, 30], [10,0]], dtype=object), length=3)
+    assert True is none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10, 0]]))
+    assert True is none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10, 0]]), length=2)
+    assert False is none_and_length_check(np.array([[1, 1], [1, 1], [1, 30], [10, 0]], dtype=object), length=3)
+    assert False is none_and_length_check(np.array([[1, 1], [1, 1, 10], [1, 30], [10, 0]], dtype=object), length=3)
 
 
 def test_property_molar_to_mass():
@@ -278,10 +315,10 @@ def test_rho_to_Vm():
 def test_isentropic_exponent():
     k = isentropic_exponent(33.6, 25.27)
     assert_close(k, 1.329639889196676)
-    
+
     k = isentropic_exponent_TV(Cv=23.98081290153672, Vm=4.730885141495376e-05, dP_dT_V=509689.2959155567)
     assert_close(k, 2.005504495083913, rtol=1e-14)
-    
+
     k = isentropic_exponent_PT(Cp=38.36583283578205, P=100000000.0, dV_dT_P=9.407705210161724e-08)
     assert_close(k, 1.32487270350443, rtol=1e-14)
 
@@ -298,13 +335,13 @@ def test_mixing_simple():
     prop = mixing_simple([0.1, 0.9], [0.01, 0.02])
     assert_close(prop, 0.019)
 
-    assert None == mixing_simple([0.01, 0.02], [0.1])
+    assert None is mixing_simple([0.01, 0.02], [0.1])
 
 def test_mixing_logarithmic():
     prop = mixing_logarithmic([0.1, 0.9], [0.01, 0.02])
     assert_close(prop, 0.01866065983073615)
 
-    assert None == mixing_logarithmic([0.01, 0.02], [0.1])
+    assert None is mixing_logarithmic([0.01, 0.02], [0.1])
 
 def test_normalize():
     fractions_calc = normalize([3, 2, 1])
@@ -469,7 +506,7 @@ def test_solve_flow_composition_mix():
 @pytest.mark.slow
 def test_solve_flow_composition_mix_fuzz():
     # Solve a large-scale problem
-    from random import uniform, randint
+    from random import randint, uniform
     N = 1000
     Fs = [3600]
     zs = [None]
@@ -489,7 +526,7 @@ def test_solve_flow_composition_mix_fuzz():
     Fs_calc, zs_calc, ws_calc = solve_flow_composition_mix(Fs, zs, ws, MWs)
 
 
-    '''
+    """
     For 4 mass specs, 16 calcs; for 15 mass specs, 225 mw multipliy calcs; numerical solver is
     needed.
 
@@ -525,18 +562,18 @@ def test_solve_flow_composition_mix_fuzz():
      F6: -w6*(F1*MW1 + Ft*MW2*x2 + Ft*MW3*x3 + Ft*MW4*x4 + Ft*MW5*x5)/(MW6*(w6 + w7 + w8 + w9 - 1)),
      F9: -w9*(F1*MW1 + Ft*MW2*x2 + Ft*MW3*x3 + Ft*MW4*x4 + Ft*MW5*x5)/(MW9*(w6 + w7 + w8 + w9 - 1)),
      F8: -w8*(F1*MW1 + Ft*MW2*x2 + Ft*MW3*x3 + Ft*MW4*x4 + Ft*MW5*x5)/(MW8*(w6 + w7 + w8 + w9 - 1))}
-    '''
+    """
 
 
 def test_dxs_to_dns():
     ans = dxs_to_dns([-0.0028, -0.00719, -0.00859], [0.7, 0.2, 0.1])
     assert_close1d(ans, [0.001457, -0.0029330000000000003, -0.004333])
-    
+
     out = [0.0]*3
     ans = dxs_to_dns([-0.0028, -0.00719, -0.00859], [0.7, 0.2, 0.1], out)
     assert_close1d(ans, [0.001457, -0.0029330000000000003, -0.004333])
     assert out is ans
-    
+
 def test_dns_to_dn_partials():
     ans = dns_to_dn_partials([0.001459, -0.002939, -0.004334], -0.0016567)
     assert_close1d(ans, [-0.0001977000000000001, -0.0045957, -0.0059907])
@@ -549,7 +586,7 @@ def test_dns_to_dn_partials():
 def test_dxs_to_dn_partials():
     ans = dxs_to_dn_partials([-0.0026404, -0.00719, -0.00859], [0.7, 0.2, 0.1], -0.0016567)
     assert_close1d(ans, [-0.00015182, -0.00470142, -0.00610142])
-    
+
     out = [0.0]*3
     ans = dxs_to_dn_partials([-0.0026404, -0.00719, -0.00859], [0.7, 0.2, 0.1], -0.0016567, out)
     assert_close1d(ans, [-0.00015182, -0.00470142, -0.00610142])
@@ -598,16 +635,16 @@ def test_hash_any_primitive():
     a = {'a': 1, 'b': 2}
     b = {'b': 2, 'a': 1}
     assert hash_any_primitive(a) == hash_any_primitive(b)
-    
-    
+
+
 def test_radius_of_gyration():
     assert_close(radius_of_gyration(MW=32.00452, planar=False, A=6.345205205562681e-47, B=3.2663291891213418e-46, C=3.4321304373822523e-46),
                  1.507895671067054e-10, rtol=1e-13)
-    
+
     calc = radius_of_gyration(A=9.972482951577335e-47, B=1.941784104125803e-45, planar=True, MW=111.01, C=0)
     assert_close(calc, 4.8859099776532495e-11, rtol=1e-13)
-    
-    
+
+
 def test_molar_velocity():
     assert_close(molar_velocity_to_velocity(46.537593457316525, 67.152), 179.5868138460819, rtol=1e-12)
 

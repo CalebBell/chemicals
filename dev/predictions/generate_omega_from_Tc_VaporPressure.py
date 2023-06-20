@@ -1,8 +1,10 @@
 import os
-from thermo import Chemical
-from chemicals import Tc, Pc, omega_definition
-from chemicals.identifiers import pubchem_db
+
 from joblib import Parallel, delayed
+from thermo import Chemical
+
+from chemicals import Pc, Tc, omega_definition
+from chemicals.identifiers import pubchem_db
 
 folder = os.path.join(os.path.dirname(__file__), '..', '..', 'chemicals', 'Critical Properties')
 
@@ -30,7 +32,7 @@ def generate_line(CASi):
         omega = 3.0
     if omega < -2.0:
         omega = -2.0
-    
+
     values = [omega]
     line = values
     line.insert(0, CASi)
@@ -42,11 +44,11 @@ def generate_line(CASi):
         elif i == 0:
             line[i] = str(v) # CAS
         elif isinstance(v, (int, float)):
-            line[i] = '{:.8g}'.format(v)
+            line[i] = f'{v:.8g}'
     to_write = '\t'.join(line) + '\n'
     return to_write
-    
-    
+
+
 #retVals = []
 #for CASi in sorted(pubchem_db.CAS_index):
 #    retVals.append(generate_line(CASi))

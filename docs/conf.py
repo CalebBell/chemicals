@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # thermo documentation build configuration file, created by
 # sphinx-quickstart on Sat Jan  2 17:15:23 2016.
@@ -14,7 +13,6 @@
 
 import os
 import time
-
 
 #import sys
 #from mock import Mock as MagicMock
@@ -80,19 +78,20 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Chemicals'
+project = 'Chemicals'
 import datetime
 
 build_date = datetime.datetime.utcfromtimestamp(
     int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))
 )
-copyright = u'2016 - %s, Caleb Bell, Yoel Rene Cortes-Pena, and contributors' %build_date.year
+copyright = '2016 - %s, Caleb Bell, Yoel Rene Cortes-Pena, and contributors' %build_date.year
 
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 import chemicals
+
 #
 version = chemicals.__version__
 # The full version, including alpha/beta/rc tags.
@@ -239,8 +238,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'chemicals.tex', u'chemicals Documentation',
-   u'Caleb Bell and contributors', 'manual'),
+  ('index', 'chemicals.tex', 'chemicals Documentation',
+   'Caleb Bell and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -269,8 +268,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'chemicals', u'chemicals Documentation',
-     [u'Caleb Bell and contributors'], 1)
+    ('index', 'chemicals', 'chemicals Documentation',
+     ['Caleb Bell and contributors'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -283,8 +282,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'chemicals', u'chemicals Documentation',
-   u'Caleb Bell and contributors', 'chemicals', 'One line description of project.',
+  ('index', 'chemicals', 'chemicals Documentation',
+   'Caleb Bell and contributors', 'chemicals', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -310,7 +309,7 @@ autosummary_generate = True
 katex_css_path = \
     'https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css'
 katex_js_path = 'katex.min.js'
-katex_autorender_path = 'auto-render.min.js'    
+katex_autorender_path = 'auto-render.min.js'
 katex_prerender = True
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
@@ -320,7 +319,9 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        'fluids': ('https://fluids.readthedocs.io/', None)}
 
 from sphinx.ext.autodoc import between
+
 import chemicals
+
 try:
     import chemicals.numba
 except:

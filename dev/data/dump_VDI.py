@@ -1,7 +1,8 @@
-import os, json
 import copy
-import pandas as pd
-from chemicals.utils import to_num, Vm_to_rho, rho_to_Vm
+import json
+import os
+
+from chemicals.utils import rho_to_Vm, to_num
 
 emptydict = {"Name":None, "MW":None, "Tc":None, "T":[], "P":[], "Density (l)":[],
              "Density (g)":[], "Hvap":[], "Cp (l)":[], "Cp (g)":[],

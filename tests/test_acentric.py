@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,11 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fluids.numerics import assert_close
-import pytest
 import pandas as pd
+import pytest
+from fluids.numerics import assert_close
+
 from chemicals.acentric import LK_omega, Stiel_polar_factor, omega, omega_definition, omega_methods
-from chemicals.critical import critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws, ACENTRIC_DEFINITION
+from chemicals.critical import ACENTRIC_DEFINITION, critical_data_PassutDanner, critical_data_PSRKR4, critical_data_Yaws
 from chemicals.identifiers import int_to_CAS
 from chemicals.miscdata import heos_data
 
@@ -62,7 +62,7 @@ def test_acentric_main():
     assert methods == ['HEOS', 'PSRK', 'PD', 'YAWS', ACENTRIC_DEFINITION]
 
     # Error handling
-    assert None == omega(CASRN='BADCAS')
+    assert None is omega(CASRN='BADCAS')
 
 @pytest.mark.skip_types
 def test_acentric_main_bad_methods():

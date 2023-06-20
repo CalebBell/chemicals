@@ -1,9 +1,9 @@
-import pandas as pd
-import os
-import warnings
-from chemicals.identifiers import check_CAS
 import json
+import os
 
+import pandas as pd
+
+from chemicals.identifiers import check_CAS
 
 dirname = os.path.dirname(os.path.abspath(__file__))
 
@@ -16,10 +16,10 @@ for CAS in metadata_table.index.values.tolist():
         assert check_CAS(CAS)
     except:
         bad_CASs.add(CAS)
-        # print(CAS) 
-        
-'''This section is from the thermochem project:
-With changes to export the data. 
+        # print(CAS)
+
+"""This section is from the thermochem project:
+With changes to export the data.
 
 
 Copyright (c) 2007-2008 by the respective authors (see AUTHORS file).
@@ -53,8 +53,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''
-   
+"""
+
 """
 This module gets thermodynamic data from the JANAF database.
 Files are downloaded from the NIST servers as needed and then cached locally.
@@ -66,10 +66,11 @@ Funding by NASA
 
 import os
 import sys
+from textwrap import dedent
+
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
-from textwrap import dedent
 
 try:
     # Python 3
@@ -84,14 +85,14 @@ try:
 except ImportError:
     # Python 3
     from io import StringIO
-    
+
 # Universal gas constant R
 R = 8.314472
 # Reference temp
 Tr = 298.15 # K
 
 
-class JanafPhase(object):
+class JanafPhase:
     """
     Class which is created by Janafdb for a specific phase.
 
@@ -174,31 +175,32 @@ class JanafPhase(object):
                               self.rawdata['log(Kf)'].iloc[good_indices])
 
     def __str__(self):
-        rep = super(JanafPhase, self).__str__()
+        rep = super().__str__()
         rep += "\n  "
         rep += self.description
-        rep += "\n    Cp(%0.2f) = %0.3f J/mol/K" % (Tr, self.cp(Tr))
-        rep += "\n    S(%0.2f) = %0.3f J/mol/K" % (Tr, self.S(Tr))
-        rep += "\n    [G-H(%0.2f)]/%0.2f = %0.3f J/mol/K" % (Tr, Tr, self.gef(Tr))
-        rep += "\n    H-H(%0.2f) = %0.3f J/mol/K" % (Tr, self.hef(Tr))
-        rep += "\n    Delta_fH(%0.2f) = %0.3f kJ/mol" % (Tr, self.DeltaH(Tr))
-        rep += "\n    Delta_fG(%0.2f) = %0.3f kJ/mol" % (Tr, self.DeltaG(Tr))
-        rep += "\n    log(Kf((%0.2f)) = %0.3f" % (Tr, self.logKf(Tr))
+        rep += f"\n    Cp({Tr:0.2f}) = {self.cp(Tr):0.3f} J/mol/K"
+        rep += f"\n    S({Tr:0.2f}) = {self.S(Tr):0.3f} J/mol/K"
+        rep += f"\n    [G-H({Tr:0.2f})]/{Tr:0.2f} = {self.gef(Tr):0.3f} J/mol/K"
+        rep += f"\n    H-H({Tr:0.2f}) = {self.hef(Tr):0.3f} J/mol/K"
+        rep += f"\n    Delta_fH({Tr:0.2f}) = {self.DeltaH(Tr):0.3f} kJ/mol"
+        rep += f"\n    Delta_fG({Tr:0.2f}) = {self.DeltaG(Tr):0.3f} kJ/mol"
+        rep += f"\n    log(Kf(({Tr:0.2f})) = {self.logKf(Tr):0.3f}"
         return rep
 
 
-class Janafdb(object):
+class Janafdb:
     """
     Class that reads the NIST JANAF tables for thermodynamic data.
 
     Data is initially read from the web servers, and then cached.
 
     Examples
-    ---------
+    --------
     >>> rutile = Janafdb().getphasedata(name='Rutile')
 
     To load thermodynamic constants for TiO2, rutile.
     """
+
     VALIDPHASETYPES = ['cr', 'l', 'cr,l', 'g', 'ref', 'cd', 'fl', 'am', 'vit',
                        'mon', 'pol', 'sln', 'aq', 'sat']
     JANAF_URL = "https://janaf.nist.gov/tables/%s.txt"
@@ -208,7 +210,6 @@ class Janafdb(object):
         We have an index file which can be used to build the url for all phases
         on the NIST site.
         """
-
         # Read the index file which tells us the filenames for all the phases
         # in the JANAF database.
         __file__
@@ -261,7 +262,6 @@ class Janafdb(object):
         >>> print(len(s))
         88
         """
-
         formulasearch = self.db['formula'].str.contains(searchstr)
         namesearch = self.db['name'].str.contains(searchstr)
 
@@ -327,7 +327,6 @@ class Janafdb(object):
             Delta_fG(298.15) = -251.429 kJ/mol
             log(Kf((298.15)) = 44.049
         """
-
         # Check that the phase type requested is valid.
         if phase is not None:
             phase = phase.lower()
@@ -385,7 +384,7 @@ class Janafdb(object):
         )
         if cache and os.path.exists(cachedfilename):
             # Yes it was cached, so let's read it into memory.
-            with open(cachedfilename, 'r') as f:
+            with open(cachedfilename) as f:
                 textdata = f.read()
         else:
             # No it was not cached so let's get it from the web.
@@ -434,7 +433,7 @@ Cpss_dict = {}
 Cpss_values_dict = {}
 Ts_values_dict = {}
 
-bad_states = set(['l,g', 'cr,l'])
+bad_states = {'l,g', 'cr,l'}
 
 solid_CAS_trans = {
 # (CAS, name, state) -> Fake CAS
@@ -464,16 +463,16 @@ for CAS, row in metadata_table.iterrows():
     state = row['State']
     is_cr_unique = cr_CAS_counter[CAS] == 1
     is_graphite = CAS == '7440-44-0' and state == 'ref'
-    
-    solid_key = (CAS, name, state) 
-    
+
+    solid_key = (CAS, name, state)
+
     if solid_key in solid_CAS_trans:
         CAS = solid_CAS_trans[solid_key]
         # print('changed!')
 
     if state in bad_states and not is_graphite:
         continue
-    
+
     if name == 'Nitrous Acid, Cis':
         # Same CAS as Nitrous Acid, Trans but that one is more stable
         continue
@@ -486,17 +485,17 @@ for CAS, row in metadata_table.iterrows():
     if ' bar' in name.lower():
         # bad waters
         continue
-    
+
 
     names_dict[CAS] = name
     formulas_dict[CAS] = formula
-    
+
     if state not in ('l', 'g'):
         pass
         # print(CAS, formula, name, state)
     if state == 'cr' and not is_cr_unique :
         print([CAS, formula, name, state])
-        
+
     try:
         p = db.getphasedata(formula=formula, name=name, phase=state)
     except Exception as e:
@@ -517,7 +516,7 @@ for CAS, row in metadata_table.iterrows():
             Cps_Cps.append(Cpi)
     Ts = Ts_Cp
     Cps = Cps_Cps
-    
+
     assert not isnan(Hf_298)
     assert not isnan(Gf_298)
     assert not isnan(S0_298)
@@ -552,7 +551,7 @@ for CAS, row in metadata_table.iterrows():
             # Skip duplicate T values as the table isn't really single phase
             Cpss_values_dict[CAS] = Cps
             Ts_values_dict[CAS] = Ts_Cp
-        
+
         if is_graphite:
             graphite_CAS = '7782-42-5'
             Hfss_dict[graphite_CAS] = Hf_298
@@ -561,12 +560,13 @@ for CAS, row in metadata_table.iterrows():
             Cpss_dict[graphite_CAS] = Cp_298
             Cpss_values_dict[graphite_CAS] = Cps
             Ts_values_dict[graphite_CAS] = Ts_Cp
-            
+
     assert  298.15 in p.rawdata['T'].tolist()
 
 
 # Format a file and dump it
 import natsort
+
 CASs = list(natsort.natsorted(list(set(metadata_table.index.values.tolist()))))
 keys = ['CAS', 'Chemical', 'formula', 'Hfl','Gfl', 'S0l','Cpl', 'Hfg', 'Gfg', 'S0g', 'Cpg']
 lines = ['\t'.join(keys) + '\n']
@@ -579,9 +579,9 @@ for CAS in CASs:
     parts = [CAS] + [str(d.get(CAS, '')) for d in search_dicts]
     line = '\t'.join(parts) + '\n'
     lines.append(line)
-    
+
     # print(line)
-    
+
 dump_csv_path = os.path.join(dirname, '..', '..', '..', 'chemicals', 'Reactions', 'JANAF_1998.tsv')
 print(dump_csv_path)
 f = open(dump_csv_path, 'w')
@@ -593,7 +593,7 @@ f.close()
 # for CAS in CASs:
 #     if CAS in Cpls_dict:
 #         print(formulas_dict[CAS], names_dict[CAS], CAS)
-#     
+#
 # print('gases found')
 # print('-'*100)
 # for CAS in CASs:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -22,26 +21,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from math import exp, log10
+
 import numpy as np
 import pytest
-from chemicals.air import (TEOS10_BAW_derivatives, TEOS10_CAAW_derivatives, TEOS10_CAWW_derivatives,
-                           iapws04_Henry_air, iapws04_dHenry_air_dT, lemmon2000_P, lemmon2000_T,
-                           lemmon2000_air_A0, lemmon2000_air_Ar, lemmon2000_air_P_bubble,
-                           lemmon2000_air_P_dew, lemmon2000_air_d2A0_dtau2,
-                           lemmon2000_air_d2Ar_ddelta2, lemmon2000_air_d2Ar_ddeltadtau,
-                           lemmon2000_air_d2Ar_dtau2, lemmon2000_air_d3A0_dtau3,
-                           lemmon2000_air_d3Ar_ddelta2dtau, lemmon2000_air_d3Ar_ddelta3,
-                           lemmon2000_air_d3Ar_ddeltadtau2, lemmon2000_air_d3Ar_dtau3,
-                           lemmon2000_air_d4A0_dtau4, lemmon2000_air_d4Ar_ddelta2dtau2,
-                           lemmon2000_air_d4Ar_ddelta3dtau, lemmon2000_air_d4Ar_ddelta4,
-                           lemmon2000_air_d4Ar_ddeltadtau3, lemmon2000_air_d4Ar_dtau4,
-                           lemmon2000_air_dA0_dtau, lemmon2000_air_dAr_ddelta,
-                           lemmon2000_air_dAr_dtau, lemmon2000_air_rho_bubble,
-                           lemmon2000_air_rho_dew, lemmon2000_rho)
-from math import exp, log10
 from fluids.numerics import assert_close, assert_close1d, derivative, linspace, logspace
 
-from chemicals.air import TAU_MAX_EXP_87
+from chemicals.air import (
+    TAU_MAX_EXP_87,
+    TEOS10_BAW_derivatives,
+    TEOS10_CAAW_derivatives,
+    TEOS10_CAWW_derivatives,
+    iapws04_dHenry_air_dT,
+    iapws04_Henry_air,
+    lemmon2000_air_A0,
+    lemmon2000_air_Ar,
+    lemmon2000_air_d2A0_dtau2,
+    lemmon2000_air_d2Ar_ddelta2,
+    lemmon2000_air_d2Ar_ddeltadtau,
+    lemmon2000_air_d2Ar_dtau2,
+    lemmon2000_air_d3A0_dtau3,
+    lemmon2000_air_d3Ar_ddelta2dtau,
+    lemmon2000_air_d3Ar_ddelta3,
+    lemmon2000_air_d3Ar_ddeltadtau2,
+    lemmon2000_air_d3Ar_dtau3,
+    lemmon2000_air_d4A0_dtau4,
+    lemmon2000_air_d4Ar_ddelta2dtau2,
+    lemmon2000_air_d4Ar_ddelta3dtau,
+    lemmon2000_air_d4Ar_ddelta4,
+    lemmon2000_air_d4Ar_ddeltadtau3,
+    lemmon2000_air_d4Ar_dtau4,
+    lemmon2000_air_dA0_dtau,
+    lemmon2000_air_dAr_ddelta,
+    lemmon2000_air_dAr_dtau,
+    lemmon2000_air_P_bubble,
+    lemmon2000_air_P_dew,
+    lemmon2000_air_rho_bubble,
+    lemmon2000_air_rho_dew,
+    lemmon2000_P,
+    lemmon2000_rho,
+    lemmon2000_T,
+)
 
 
 def func_vs_naive_tester(func, func_naive, T_min=1.0, T_max=5000.0, rho_min=1e-5, rho_max=50000.0, N=400, Tc=132.6312, rhoc=10447.7):
@@ -406,16 +426,15 @@ def test_lemmon2000_P():
     assert_close(lemmon2000_P(300.0, 40.10292351061862), 1e5, rtol=1e-14)
 
 def test_lemmon2000_T():
-    
     '''B coefficients can be derived as follows:
     # Equation form
     from sympy import *
     P, V, R, T, B0, B1, B2, B3 = symbols('P, V, R, T, B0, B1, B2, B3')
-    
+
     B = B0 + B1*T + B2*T*T #+ B3*T*T*T
     Eq0 = Eq(P*V/(R*T), 1 + B*P/(R*T))
     print(cse(solve(Eq0, T)[0], optimizations='basic'))
-    
+
     # Plot
     from fluids.numerics import horner
     import chemicals
@@ -430,25 +449,24 @@ def test_lemmon2000_T():
             Z = P*o.V()/(R*T)
             B = R*T*(Z - 1.0)/P
             Bs.append(B)
-    
+
         coeffs = np.polyfit(Ts, Bs, 2).tolist()
         Bs_calc = [horner(coeffs, T) for T in Ts]
         import matplotlib.pyplot as plt
-    
+
         plt.plot(Ts, Bs, 'g', label='B good P=%s' %(P))
         plt.plot(Ts, Bs_calc, 'r', label='B fit P=%s' %(P))
     plt.legend()
     plt.show()
     print(coeffs)
-    
+
 
     '''
-    
     # Catch a case the B estimator goes into the liquid region
     T = 143.93790965391196
     rho = lemmon2000_rho(T, 9011018.251664797)
     assert_close(lemmon2000_T(9011018.251664797, rho), T, rtol=1e-11)
-    
+
     # Case where ideal-gas estimation necessary
     T = 2000.0
     rho = lemmon2000_rho(T, 1e8)

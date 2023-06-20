@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -24,12 +23,22 @@ SOFTWARE.
 import pytest
 from fluids.numerics import assert_close, assert_close1d, assert_close2d
 
-from chemicals.elements import (atom_fractions, atom_matrix, atoms_to_Hill, charge_from_formula,
-                                index_hydrogen_deficiency, mass_fractions,
-                                mixture_atomic_composition_ordered, molecular_weight,
-                                nested_formula_parser, serialize_formula, similarity_variable,
-                                simple_formula_parser)
-from chemicals.elements import periodic_table
+from chemicals.elements import (
+    atom_fractions,
+    atom_matrix,
+    atoms_to_Hill,
+    charge_from_formula,
+    index_hydrogen_deficiency,
+    mass_fractions,
+    mixture_atomic_composition_ordered,
+    molecular_weight,
+    nested_formula_parser,
+    periodic_table,
+    serialize_formula,
+    similarity_variable,
+    simple_formula_parser,
+)
+
 
 def test_molecular_weight():
     MW_calc = molecular_weight({'H': 12, 'C': 20, 'O': 5})
@@ -76,7 +85,7 @@ def test_similarity_variable():
 
 
 def test_elements_data():
-    tots_calc = [sum([getattr(i, att) for i in periodic_table if not getattr(i, att) is None]) for att in
+    tots_calc = [sum([getattr(i, att) for i in periodic_table if getattr(i, att) is not None]) for att in
     ['number', 'MW', 'period', 'group', 'AReneg', 'rcov', 'rvdw', 'maxbonds', 'elneg', 'ionization', 'elaffinity', 'electrons', 'protons']]
     tots_exp = [7021, 17285.2137652, 620, 895, 109.91, 144.3100000000001, 179.4300000000001, 94, 163.27000000000007, 816.4238999999999, 67.50297235000001, 7021, 7021]
     assert_close1d(tots_calc, tots_exp)
@@ -101,7 +110,7 @@ def test_misc_elements():
 
     assert periodic_table.H.CAS_standard != periodic_table.H.CAS
 
-    assert not 'BadElement' in periodic_table
+    assert 'BadElement' not in periodic_table
 
     periodic_table.H.formula_standard == 'H2'
     periodic_table.N.formula_standard == 'N2'
@@ -155,8 +164,8 @@ def test_misc_elements():
     assert (periodic_table.N.CAS, periodic_table.N.CAS_standard) == ('17778-88-0', '7727-37-9')
     assert (periodic_table.F.CAS, periodic_table.F.CAS_standard) == ('14762-94-8', '7782-41-4')
     assert (periodic_table.Cl.CAS, periodic_table.Cl.CAS_standard) == ('22537-15-1', '7782-50-5')
-    
-    
+
+
     assert periodic_table.Os.neutrons == 114
     assert periodic_table.Bi.neutrons == 126
 
@@ -196,7 +205,7 @@ def test_nested_formula_parser():
 
     res = nested_formula_parser('Pd(NH3)4.0001Na(NH3H2)2+2')
     assert res == {'Pd': 1, 'N': 6.0001, 'H': 22.0003, 'Na': 1}
-    
+
     assert nested_formula_parser('C₁₇H₂₀N₄O₆') == {'C': 17, 'H': 20, 'N': 4, 'O': 6}
 
 def test_charge_from_formula():
@@ -262,8 +271,8 @@ def test_atom_matrix():
 
     OCH = atom_matrix(atomss, ['O', 'C', 'H'])
     assert_close2d(OCH, OCH_expect, rtol=1e-12)
-    
-    
+
+
 def test_index_hydrogen_deficiency():
     assert 2 == index_hydrogen_deficiency({'C': 6, 'H': 10})
     assert 4 == index_hydrogen_deficiency({'C': 6, 'H': 6})
@@ -278,13 +287,13 @@ def test_index_hydrogen_deficiency():
 
 
 def test_allotrope_data():
-    from chemicals.identifiers import check_CAS
     from chemicals.elements import allotropes
+    from chemicals.identifiers import check_CAS
 
-    all_unique_CASs = set([])
+    all_unique_CASs = set()
     processed_allotropes = 0
     for key, tropes in allotropes.items():
-        
+
         standard_state_set = 0
         for value in tropes:
             name, count, phase, stp_ref, smiles, inchi, inchi_key, closest_CAS, unique_CAS_maybe_fake = value
@@ -292,17 +301,17 @@ def test_allotrope_data():
             all_unique_CASs.add(unique_CAS_maybe_fake)
             if stp_ref:
                 standard_state_set += 1
-            
+
             assert check_CAS(closest_CAS)
             assert check_CAS(unique_CAS_maybe_fake)
-            
+
             assert type(count) is int
-            
+
             assert phase in ('l', 's', 'g')
 
             assert inchi_key.count('-') == 2
             assert len(inchi_key) == 27
-            
+
         assert standard_state_set == 1
 
     assert len(all_unique_CASs) == processed_allotropes

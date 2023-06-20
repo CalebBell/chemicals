@@ -169,9 +169,9 @@ def Tt(CASRN, method=None):
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    .. [3] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+    .. [3] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden.
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
-       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -263,9 +263,9 @@ def Pt(CASRN, method=None):
        21, no. 3 (March 1981): 131-144. doi:10.1016/0011-2275(81)90264-2.
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    .. [3] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+    .. [3] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden.
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
-       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:

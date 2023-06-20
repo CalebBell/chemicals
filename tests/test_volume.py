@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -23,15 +22,36 @@ SOFTWARE.
 """
 
 import pytest
-from chemicals.volume import (Amgat, Bhirud_normal, COSTALD, COSTALD_compressed, COSTALD_mixture,
-                              CRC_inorganic, Campbell_Thodos, Goodman, PPDS17, Rackett,
-                              Rackett_mixture, SNM0, TDE_VDNS_rho, Townsend_Hales, Yamada_Gunn,
-                              ideal_gas)
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.volume import (rho_data_COSTALD, rho_data_SNM0, rho_data_Perry_8E_105_l, rho_data_CRC_inorg_l,
-                              rho_data_VDI_PPDS_2, rho_data_CRC_inorg_l_const, rho_data_CRC_inorg_s_const,
-                              rho_data_CRC_virial)
+
 from chemicals.utils import Vm_to_rho
+from chemicals.volume import (
+    COSTALD,
+    PPDS17,
+    SNM0,
+    Amgat,
+    Bhirud_normal,
+    Campbell_Thodos,
+    COSTALD_compressed,
+    COSTALD_mixture,
+    CRC_inorganic,
+    Goodman,
+    Rackett,
+    Rackett_mixture,
+    TDE_VDNS_rho,
+    Townsend_Hales,
+    Yamada_Gunn,
+    ideal_gas,
+    rho_data_COSTALD,
+    rho_data_CRC_inorg_l,
+    rho_data_CRC_inorg_l_const,
+    rho_data_CRC_inorg_s_const,
+    rho_data_CRC_virial,
+    rho_data_Perry_8E_105_l,
+    rho_data_SNM0,
+    rho_data_VDI_PPDS_2,
+)
+
 
 def Yen_Woods_saturation():
     V1_calc = Yen_Woods_saturation(300, 647.14, 55.45E-6, 0.245)
@@ -151,7 +171,7 @@ def test_VDI_PPDS_2_data():
     Note this table needed to have Tc and MW added to it as well, from the same
     source.
     """
-    tots_calc = [rho_data_VDI_PPDS_2[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'rhoc']]
+    tots_calc = [rho_data_VDI_PPDS_2[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'Tc', 'rhoc']]
     tots = [208878.27130000002, 117504.59450000001, 202008.99950000001, 85280.333600000013, 150142.28, 97269]
     assert_close1d(tots_calc, tots)
 
@@ -205,13 +225,13 @@ def test_COSTALD_mixture():
 def test_TDE_VDNS_rho():
     rho = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
     assert_close(947.4906064903166, rho, rtol=1e-13)
-    
+
     V = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931, MW=154.2078)
     assert_close(0.00016275390905585302, V, rtol=1e-13)
 
 def test_PPDS17():
     rho_mass = PPDS17(300, 562.05, a0=0.0115508, a1=0.281004, a2=-0.00635447)
     assert_close(rho_mass, 871.5200877071184, rtol=1e-13)
-    
+
     Vl = PPDS17(300, 562.05, a0=0.0115508, a1=0.281004, a2=-0.00635447, MW=78.11184)
     assert_close(Vl, 8.96271251825123e-05, rtol=1e-13)

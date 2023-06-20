@@ -54,11 +54,10 @@ from math import log10
 
 from fluids.numerics import log
 
-from chemicals import critical
+from chemicals import critical, miscdata
 from chemicals import data_reader as dr
 from chemicals.data_reader import database_constant_lookup, list_available_methods_from_df_dict, retrieve_any_from_df_dict, retrieve_from_df_dict
 from chemicals.utils import mark_numba_incompatible
-from chemicals import miscdata
 
 omega_all_methods = (miscdata.HEOS, 'PSRK', 'PD', 'YAWS', critical.ACENTRIC_DEFINITION)
 """Tuple of method name keys. See the `omega` for the actual references"""
@@ -154,9 +153,9 @@ def omega(CASRN, method=None):
     .. [4] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
        Publishing, 2014.
-    .. [5] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+    .. [5] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden.
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
-       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:

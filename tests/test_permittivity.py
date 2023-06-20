@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -22,8 +21,9 @@ SOFTWARE.
 """
 
 from fluids.numerics import assert_close1d
-from chemicals.permittivity import permittivity_IAPWS
-from chemicals.permittivity import permittivity_data_CRC
+
+from chemicals.permittivity import permittivity_data_CRC, permittivity_IAPWS
+
 
 def test_permittivity_data():
     assert permittivity_data_CRC.shape == (1303, 9)

@@ -11,7 +11,7 @@ def pytest_ignore_collect(path):
     if 'benchmark' in path or 'manual_runner' in path or 'make_test_stubs' in path or 'plot' in path or 'prerelease' in path or 'conf.py' in path:
         return True
     if 'dev' in path:
-        return True 
+        return True
     if 'conf.py' in path:
         return True
 #    if 'numba' in path:
@@ -32,4 +32,4 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     os.environ["CHEDL_LOW_MEMORY"] = config.getoption("--enable-low-memory")
-    
+

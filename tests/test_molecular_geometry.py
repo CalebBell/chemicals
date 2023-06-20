@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2022 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,8 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fluids.numerics import assert_close
 import pytest
+from fluids.numerics import assert_close
+
 from chemicals import molecular_geometry
 from chemicals.molecular_geometry import RG, RG_methods, linear, linear_methods
 
@@ -45,7 +45,7 @@ def test_RG():
 
 
 def test_linear():
-    assert linear(CASRN='64-17-5') == False
-    
-    
+    assert linear(CASRN='64-17-5') is False
+
+
     assert linear_methods(CASRN='64-17-5')  == ['PSI4_2022A']

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,15 +20,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fluids.numerics import assert_close, assert_close1d
-from fluids.numerics import derivative
-from scipy.integrate import quad
 import pytest
+from fluids.numerics import assert_close, assert_close1d, derivative
+from scipy.integrate import quad
 
-from chemicals.dippr import (EQ100, EQ101, EQ101_fitting_jacobian, EQ102, EQ102_fitting_jacobian,
-                             EQ104, EQ105, EQ105_fitting_jacobian, EQ106, EQ106_AB, EQ106_ABC,
-                             EQ106_fitting_jacobian, EQ107, EQ107_fitting_jacobian, EQ114, EQ115,
-                             EQ116, EQ127)
+from chemicals.dippr import (
+    EQ100,
+    EQ101,
+    EQ102,
+    EQ104,
+    EQ105,
+    EQ106,
+    EQ106_AB,
+    EQ106_ABC,
+    EQ107,
+    EQ114,
+    EQ115,
+    EQ116,
+    EQ127,
+    EQ101_fitting_jacobian,
+    EQ102_fitting_jacobian,
+    EQ105_fitting_jacobian,
+    EQ106_fitting_jacobian,
+    EQ107_fitting_jacobian,
+)
+
 
 def test_Eqs():
     a = EQ100(300, 276370., -2090.1, 8.125, -0.014116, 0.0000093701)
@@ -78,8 +93,8 @@ def test_EQ105_more():
 
     d3 = EQ105(300, 0.70824, 0.26411, 507.6, 0.27537, order=3)
     assert_close(derivative(lambda T: EQ105(T, 0.70824, 0.26411, 507.6, 0.27537, order=2), 300, dx=1e-3), d3)
-    
-    
+
+
     # avoid complex numbers
     kwargs = {'T': 195.0, 'A': 7247.0, 'B': 0.418, 'C': 5.2, 'D': 0.24, 'order': 0}
     assert_close(EQ105(**kwargs), 17337.32057416268)
@@ -105,15 +120,15 @@ def test_EQ106_more():
     d3_numerical = derivative(lambda T: EQ106(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=2), 300.0, dx=1e-4)
     assert_close(d3_analytical, -5.524739890945817e-09, rtol=1e-13)
     assert_close(d3_analytical, d3_numerical, rtol=1e-8)
-    
+
     # check that this regression set of points does not produce an error
     overflow_kwargs = {'T': 304.747, 'Tc': 405.4, 'A': 56.743647419038744, 'B': -75.36242555958763,
                    'C': -141.1028969227863, 'D': -254.76349199392695, 'E': -442.5916844036474, 'order': 0}
     EQ106(**overflow_kwargs)
-    
+
     # Point exactly on the critical point that was an error, needed an if statement.
     assert 0.0 == EQ106(T=473.2, Tc=473.2, **{'A': 4761730.0, 'B': -11.5565, 'C': 30.6629, 'D': -31.89366, 'E': 12.67797})
-    
+
     # Point above critical point, just set it to zero as the two properties used work
     assert 0.0 == EQ106(647.097, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
 
@@ -122,7 +137,7 @@ def test_EQ106_AB_and_ABC():
     Tmin, Tc, A, B = 194.0, 592.5, 0.056, 1.32
     C = -0.01
     Tmax = 590.0
-    
+
     kwargs = {'T': 590.0, 'Tc': 592.5, 'val': 4.106957515154657e-05, 'der': -2.1684735680016856e-05}
 
     res = EQ106_AB(**kwargs)
@@ -193,7 +208,7 @@ def test_EQ115_more():
     d3_numerical = derivative(lambda T: EQ115(T, *args, order=2), 300.0, dx=1e-2)
     assert_close(d3_analytical, 0.0007252940633608988, rtol=1e-13)
     assert_close(d3_analytical, d3_numerical)
-    
+
     # Check case avoid overflow
     kwargs = {'T': 400.05, 'A': 1.0, 'B': 1.0, 'C': 1.0, 'D': 1.0, 'E': 1.0, 'order': 0}
     EQ115(**kwargs)
@@ -259,7 +274,7 @@ def test_EQ107_more():
 
     with pytest.raises(Exception):
         EQ107(20., *coeffs, order=1E100)
-    
+
     # Case that requires overflow handling
     EQ107(**{'T': 377.77777777777777, 'A': 1539249.2020718465, 'B': -46807441.804555826, 'C': -409401.9169728528, 'D': -2164118.45731599, 'E': 339.5030595758336, 'order': 0})
 
@@ -318,7 +333,7 @@ def test_EQ102_more():
 #
     with pytest.raises(Exception):
         EQ102(20., *coeffs, order=1E100)
-        
+
     # No overflow
     EQ102(T = 194.6, A = 0.0, B = 4000.0, C = 0.75, D = 0.0, order = 0)
 
@@ -386,7 +401,7 @@ def test_EQ101_fitting():
                  derivative(lambda D: EQ101(T, A, B, C, D, E), D, dx=D*1e-5),
                  derivative(lambda E: EQ101(T, A, B, C, D, E), E, dx=E*1e-5),
               ]
-    
+
     der_expect = [[3537.44834545549, 11.791494484851635, 20176.835877810598, 318370351.0909941, 7563.831703366002]]
     der_analytical = EQ101_fitting_jacobian([T], A, B, C, D, E)
     assert_close1d(der_analytical, [der_num])
@@ -453,12 +468,12 @@ def test_EQ106_fitting():
                  derivative(lambda D: EQ106(T, Tc, A, B, C, D, E), D, dx=D*1e-5),
                  derivative(lambda E: EQ106(T, Tc, A, B, C, D, E), E, dx=E*1e-5),
               ]
-        
+
     der_expect = [[0.4007741423076755, -0.04435095583995359, -0.020561534535812425, -0.009532527415937865, -0.004419372434354963]]
     der_analytical = EQ106_fitting_jacobian([T], Tc, A, B, C, D, E)
     assert_close1d(der_analytical, [der_num])
     assert_close1d(der_analytical, der_expect, rtol=1e-13)
-    
+
     # Test case with errors
     EQ106_fitting_jacobian(Ts=[466.],Tc = 466.0, A = 47700.0, B = 0.37, C = 0.0, D = 0.0, E = 0.0)
 
@@ -470,7 +485,7 @@ def test_EQ107_fitting():
                  derivative(lambda D: EQ107(T, A, B, C, D, E), D, dx=D*1e-5, order=3),
                  derivative(lambda E: EQ107(T, A, B, C, D, E), E, dx=E*1e-5),
               ]
-    
+
     der_expect = [[1.0, 3.7138247806865474e-07, -7.197214038362036e-05, 0.00758947296962729, -0.42452325330497365]]
     der_analytical = EQ107_fitting_jacobian([T], A, B, C, D, E)
     assert_close1d(der_analytical, [der_num])

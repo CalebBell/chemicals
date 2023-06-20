@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -23,10 +22,10 @@ SOFTWARE.
 """
 
 import pytest
-from chemicals.flash_basic import (K_value, PR_water_K_value, Wilson_K_value, flash_Tb_Tc_Pc,
-                                   flash_ideal, flash_wilson)
-from chemicals.vapor_pressure import Ambrose_Walton, Antoine
 from fluids.numerics import assert_close, assert_close1d
+
+from chemicals.flash_basic import K_value, PR_water_K_value, Wilson_K_value, flash_ideal, flash_Tb_Tc_Pc, flash_wilson
+from chemicals.vapor_pressure import Ambrose_Walton, Antoine
 
 
 def test_K_value():

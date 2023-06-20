@@ -181,7 +181,7 @@ else:
     if can_load_data:
         _load_k_data()
 
-pi_inv = 1.0/pi # todo move to fluids.constants
+pi_inv = 1.0/pi # TODO move to fluids.constants
 
 def PPDS8(T, Tc, a0, a1, a2, a3):
     r'''Calculate the thermal conductivity of a liquid using the 4-term

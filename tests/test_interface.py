@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,18 +20,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
 import numpy as np
+import pytest
 from fluids.numerics import assert_close, assert_close1d
+
+from chemicals.interface import (
+    API10A32,
+    PPDS14,
+    Aleem,
+    Brock_Bird,
+    Diguilio_Teja,
+    Hakim_Steinberg_Stiel,
+    ISTExpansion,
+    Jasper,
+    Mersmann_Kind_sigma,
+    Meybodi_Daryasafar_Karimi,
+    Miqueu,
+    Pitzer_sigma,
+    REFPROP_sigma,
+    Sastri_Rao,
+    Somayajulu,
+    Watson_sigma,
+    Weinaug_Katz,
+    Winterfeld_Scriven_Davis,
+    Zuo_Stenby,
+    sigma_data_Jasper_Lange,
+    sigma_data_Mulero_Cachadina,
+    sigma_data_Somayajulu,
+    sigma_data_Somayajulu2,
+    sigma_data_VDI_PPDS_11,
+    sigma_Gharagheizi_1,
+    sigma_Gharagheizi_2,
+    sigma_IAPWS,
+)
 from chemicals.utils import rho_to_Vm
-from chemicals.interface import (API10A32, Aleem, Brock_Bird, Diguilio_Teja, Hakim_Steinberg_Stiel,
-                                 ISTExpansion, Jasper, Mersmann_Kind_sigma,
-                                 Meybodi_Daryasafar_Karimi, Miqueu, PPDS14, Pitzer_sigma,
-                                 REFPROP_sigma, Sastri_Rao, Somayajulu, Watson_sigma, Weinaug_Katz,
-                                 Winterfeld_Scriven_Davis, Zuo_Stenby, sigma_Gharagheizi_1,
-                                 sigma_Gharagheizi_2, sigma_IAPWS)
-from chemicals.interface import (sigma_data_Mulero_Cachadina, sigma_data_Jasper_Lange, sigma_data_Somayajulu,
-                                 sigma_data_VDI_PPDS_11, sigma_data_Somayajulu2)
+
 
 def test_sigma_IAPWS():
     assert_close(sigma_IAPWS(300.), 0.07168596252716256, rtol=1e-13)
@@ -119,8 +141,8 @@ def test_REFPROP():
     assert_close(REFPROP_sigma(700.0, 647.096, -0.1306, 2.471, 0.2151, 1.233), 0, atol=1e-12)
 
     # check the correlation can be used with a sigma but not a `n`
-    kwargs = {'sigma0': 0.3990499999999977, 'n0': 1.0000000000000073, 
-            'sigma1': 0.14400000000000238, 'n1': 0.0, 
+    kwargs = {'sigma0': 0.3990499999999977, 'n0': 1.0000000000000073,
+            'sigma1': 0.14400000000000238, 'n1': 0.0,
             'sigma2': 0.0, 'n2': 0.0, 'Tc': 1735.0}
 
     # We can force both sigma and n parameters to go together by ignoring
@@ -131,7 +153,7 @@ def test_REFPROP():
 def test_Somayajulu():
     sigma = Somayajulu(300, 647.126, 232.713514, -140.18645, -4.890098)
     assert_close(sigma, 0.07166386387996757)
-    
+
     assert 0 == Somayajulu(647.13, 647.126, 232.713514, -140.18645, -4.890098)
     assert_close(0, Somayajulu(647.126, 647.126, 232.713514, -140.18645, -4.890098), atol=1e-13)
 
@@ -145,27 +167,27 @@ def test_Jasper():
 def test_data():
     tot = sum([sigma_data_Mulero_Cachadina[i].sum() for i in sigma_data_Mulero_Cachadina.columns[1:]])
     assert_close(tot, 114350.07371931802)
-    
-    for col in (u'sigma0', u'n0', u'sigma1', u'n1', u'sigma2',u'n2',
-                u'Tc', u'Tmin',u'Tmax'):
+
+    for col in ('sigma0', 'n0', 'sigma1', 'n1', 'sigma2','n2',
+                'Tc', 'Tmin','Tmax'):
             assert col in sigma_data_Mulero_Cachadina.columns
     assert len(sigma_data_Mulero_Cachadina) == 115
 
     tot = sum([sigma_data_Jasper_Lange[i].sum() for i in sigma_data_Jasper_Lange.columns[1:]])
     assert_close(tot, 343153.38953333395)
 
-    assert np.all(sigma_data_Jasper_Lange.columns == [u'Name', u'a', u'b', u'Tmin', u'Tmax'])
+    assert np.all(sigma_data_Jasper_Lange.columns == ['Name', 'a', 'b', 'Tmin', 'Tmax'])
     assert len(sigma_data_Jasper_Lange) == 522
 
     tot = sum([sigma_data_Somayajulu[i].sum() for i in sigma_data_Somayajulu.columns[1:]])
     assert_close(tot, 38941.199955999997)
 
-    assert np.all(sigma_data_Somayajulu.columns == [u'Chemical', u'Tt', u'Tc', u'A', u'B', u'C'])
+    assert np.all(sigma_data_Somayajulu.columns == ['Chemical', 'Tt', 'Tc', 'A', 'B', 'C'])
     assert len(sigma_data_Somayajulu) == 64
 
     tot = sum([sigma_data_Somayajulu2[i].sum() for i in sigma_data_Somayajulu2.columns[1:]])
     assert_close(tot, 39471.356771000006)
-    assert np.all(sigma_data_Somayajulu2.columns == [u'Chemical', u'Tt', u'Tc', u'A', u'B', u'C'])
+    assert np.all(sigma_data_Somayajulu2.columns == ['Chemical', 'Tt', 'Tc', 'A', 'B', 'C'])
     assert len(sigma_data_Somayajulu) == 64
 
 def test_VDI_PPDS_11_data():
@@ -173,7 +195,7 @@ def test_VDI_PPDS_11_data():
     assert len(sigma_data_VDI_PPDS_11) == 272
 
     # Doing the sums on the arrays is faster but much uglier. Worth it?
-    tots_calc = [sigma_data_VDI_PPDS_11[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc', u'Tm']]
+    tots_calc = [sigma_data_VDI_PPDS_11[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tc', 'Tm']]
     tots = [18.495069999999998, 336.69950000000006, 6.5941200000000002, 7.7347200000000003, 6.4262199999999998, 150142.28, 56917.699999999997]
     for calc, fixed in zip(tots_calc, tots):
         assert_close(calc, fixed)
@@ -235,17 +257,17 @@ def test_API10A32():
 def test_PPDS14():
     sigma = PPDS14(T=280, Tc=562.05, a0=0.0786269, a1=1.28646, a2=-0.112304)
     assert_close(sigma, 0.030559764256249854, rtol=1e-14)
-    
+
     assert 0 == PPDS14(T=600, Tc=562.05, a0=0.0786269, a1=1.28646, a2=-0.112304)
-    
+
 def test_Watson_sigma():
     sigma = Watson_sigma(T=350.0, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
     assert_close(sigma, 0.013834092660564925, rtol=1e-14)
-    
+
     # Test a couple calls very near to Tc
     Watson_sigma(T=543.835999999, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
     Watson_sigma(T=543.839999999999, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
-    
+
     assert 0 == Watson_sigma(T=543.836, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
     assert 0 == Watson_sigma(T=600, Tc=543.836, a1=-3.02417, a2=1.21792, a3=-5.26877e-9, a4=5.62659e-9, a5=-2.27553e-9)
 
@@ -256,16 +278,16 @@ def test_Watson_sigma():
 def test_ISTExpansion():
     sigma = ISTExpansion(T=400.0, Tc=776.0, a1=0.037545, a2=0.0363288)
     assert_close(sigma, 0.02672100905515996, rtol=1e-13)
-    
+
     sigma = ISTExpansion(T=400.0, Tc=776.0, a1=0.037545, a2=0.0363288, a3=1e-4, a4=1e-3, a5=1e-4)
     assert_close(sigma, 0.02679017489704166, rtol=1e-15)
-    
+
     assert 0 == ISTExpansion(T=777.0, Tc=776.0, a1=0.037545, a2=0.0363288)
-    
+
     # Point near Tc but with really high values
     ISTExpansion(T=775.999999, Tc=776.0, a1=1e20, a2=0.0363288)
-    
-    
+
+
 def test_sigma_Gharagheizi_1():
     # point from article supporting material exactly matches
     sigma_methane1 = sigma_Gharagheizi_1(T=93.1500015258789, Tc=190.564, MW=16.04246, omega=0.0115478)
@@ -275,10 +297,10 @@ def test_sigma_Gharagheizi_1():
 
     assert 0.0 == sigma_Gharagheizi_1(T=190.56, Tc=190.564, MW=16.04, omega=0.012)
     assert 0.0 == sigma_Gharagheizi_1(T=400.0, Tc=190.564, MW=16.04, omega=0.012)
-    
+
 def test_sigma_Gharagheizi_2():
     # point from article supporting material exactly matches
-    
+
     sigma_methane1 = sigma_Gharagheizi_2(T=93.1500015258789, Tb=111.66, Tc=190.564, Pc=45.99*1e5, Vc=0.0986e-3)
     assert_close(sigma_methane1, 0.0171460800730683, rtol=1e-13)
 

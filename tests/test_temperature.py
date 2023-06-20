@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,11 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
-from chemicals.temperature import (ITS90_68_difference, T_converter, Ts_27, Ts_48, Ts_68, Ts_76,
-                                   diffs_27, diffs_48, diffs_68, diffs_76)
 import numpy as np
+import pytest
 from fluids.numerics import assert_close, assert_close1d, linspace
+
+from chemicals.temperature import ITS90_68_difference, T_converter, Ts_27, Ts_48, Ts_68, Ts_76, diffs_27, diffs_48, diffs_68, diffs_76
 
 
 def test_data():

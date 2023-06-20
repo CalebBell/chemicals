@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -18,12 +17,13 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+'''
 
-from __future__ import division
 from fluids.numerics import assert_close
-from chemicals.units import (LHV_from_HHV, Lastovka_solid_integral_over_T, Rackett_fit,
-                             speed_of_sound, u)
+
+from chemicals.units import Lastovka_solid_integral_over_T, LHV_from_HHV, Rackett_fit, speed_of_sound, u
+
 
 def assert_pint_allclose(value, magnitude, units, rtol=1e-7, atol=0):
     assert_close(value.to_base_units().magnitude, magnitude, rtol=rtol, atol=atol)

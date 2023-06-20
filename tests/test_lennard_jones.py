@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -22,24 +21,39 @@ SOFTWARE.
 """
 
 import pytest
-from fluids.numerics import assert_close, assert_close1d
-from chemicals.lennard_jones import (Stockmayer, Stockmayer_all_methods, Stockmayer_methods, T_star,
-                                     collision_integral_Kim_Monroe,
-                                     collision_integral_Neufeld_Janzen_Aziz,
-                                     epsilon_Bird_Stewart_Lightfoot_boiling,
-                                     epsilon_Bird_Stewart_Lightfoot_critical,
-                                     epsilon_Bird_Stewart_Lightfoot_melting, epsilon_Flynn,
-                                     epsilon_Stiel_Thodos, epsilon_Tee_Gotoh_Steward_1,
-                                     epsilon_Tee_Gotoh_Steward_2, molecular_diameter,
-                                     molecular_diameter_all_methods, molecular_diameter_methods,
-                                     sigma_Bird_Stewart_Lightfoot_boiling,
-                                     sigma_Bird_Stewart_Lightfoot_critical_1,
-                                     sigma_Bird_Stewart_Lightfoot_critical_2,
-                                     sigma_Bird_Stewart_Lightfoot_melting, sigma_Flynn,
-                                     sigma_Silva_Liu_Macedo, sigma_Stiel_Thodos,
-                                     sigma_Tee_Gotoh_Steward_1, sigma_Tee_Gotoh_Steward_2)
-from chemicals.lennard_jones import LJ_data_Magalhaes, LJ_data_Poling, POLING
 from fluids.constants import k
+from fluids.numerics import assert_close, assert_close1d
+
+from chemicals.lennard_jones import (
+    POLING,
+    LJ_data_Magalhaes,
+    LJ_data_Poling,
+    Stockmayer,
+    Stockmayer_all_methods,
+    Stockmayer_methods,
+    T_star,
+    collision_integral_Kim_Monroe,
+    collision_integral_Neufeld_Janzen_Aziz,
+    epsilon_Bird_Stewart_Lightfoot_boiling,
+    epsilon_Bird_Stewart_Lightfoot_critical,
+    epsilon_Bird_Stewart_Lightfoot_melting,
+    epsilon_Flynn,
+    epsilon_Stiel_Thodos,
+    epsilon_Tee_Gotoh_Steward_1,
+    epsilon_Tee_Gotoh_Steward_2,
+    molecular_diameter,
+    molecular_diameter_all_methods,
+    molecular_diameter_methods,
+    sigma_Bird_Stewart_Lightfoot_boiling,
+    sigma_Bird_Stewart_Lightfoot_critical_1,
+    sigma_Bird_Stewart_Lightfoot_critical_2,
+    sigma_Bird_Stewart_Lightfoot_melting,
+    sigma_Flynn,
+    sigma_Silva_Liu_Macedo,
+    sigma_Stiel_Thodos,
+    sigma_Tee_Gotoh_Steward_1,
+    sigma_Tee_Gotoh_Steward_2,
+)
 
 
 def test_LJ_data():
@@ -104,10 +118,10 @@ def test_stockmayer_all_lookups():
     # Use the default method for each chemical in this file
     Stockmayers = sum([Stockmayer(CASRN=i) for i in LJ_data_Magalhaes.index])
     assert_close(Stockmayers, 187099.82029999999)
-    
+
     Stockmayers = sum([Stockmayer(CASRN=i, method=POLING) for i in LJ_data_Poling.index])
     assert_close(Stockmayers, 24742.62)
-    
+
 
 def test_stockmayer_function():
 
@@ -121,7 +135,7 @@ def test_stockmayer_function():
     assert_close1d(values_calc, values)
 
     # Error handling
-    assert None == Stockmayer(CASRN='BADCAS')
+    assert None is Stockmayer(CASRN='BADCAS')
 
     with pytest.raises(Exception):
         Stockmayer(CASRN='98-01-1', method='BADMETHOD')
@@ -148,7 +162,7 @@ def test_molecular_diameter_function():
     assert_close1d(values_calc, values)
 
     # Error handling
-    assert None == molecular_diameter(CASRN='BADCAS')
+    assert None is molecular_diameter(CASRN='BADCAS')
 
     with pytest.raises(Exception):
         molecular_diameter(CASRN='98-01-1', method='BADMETHOD')

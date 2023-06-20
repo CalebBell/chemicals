@@ -1,7 +1,6 @@
-import pandas as pd
 import os
-import warnings
 
+import pandas as pd
 
 # download all the data
 #os.system('wget -m https://janaf.nist.gov/ -e robots=off')

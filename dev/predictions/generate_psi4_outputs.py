@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 '''Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2022 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -18,19 +17,21 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.'''
+SOFTWARE.
+'''
 
 import os
+from random import shuffle
+from subprocess import PIPE, Popen
+
+from joblib import Parallel, delayed
 from rdkit import Chem
 from rdkit.Chem import AllChem
- 
-from chemicals import *
 from thermo import *
-from rdkit import Chem
+
+from chemicals import *
 from chemicals.identifiers import pubchem_db
-from joblib import Parallel, delayed
-from subprocess import Popen, PIPE
-from random import shuffle
+
 
 def is_psi4_fast(metadata):
     try:
@@ -48,7 +49,7 @@ def rdkit_atom_position_as_xyz(rdkit_atom):
     line = "{} {} {} {}"
     conformer = rdkit_atom.GetOwningMol().GetConformer()
     position = conformer.GetAtomPosition(rdkit_atom.GetIdx())
-    
+
     return f"{rdkit_atom.GetSymbol()} {position.x} {position.y} {position.z}\n\n"
     return line
 
@@ -84,7 +85,7 @@ molecule themol
 
 
     remainder = """
-set T 298.15    
+set T 298.15
 set P 101325
 set basis 6-31G**
 #set basis 6-311++G(3df,3pd)
@@ -94,11 +95,11 @@ optimize( "mp2" )
 freq('mp2',molecule=themol)
     """
     atoms = mol_Hs.GetAtoms()
-    
+
     for atom in atoms:
         molxyz += rdkit_atom_position_as_xyz(atom)
     molxyz += "}\n"
- 
+
     f = open(dest, 'w')
     f.write(molxyz)
     f.write(remainder)
@@ -109,10 +110,10 @@ freq('mp2',molecule=themol)
 def call_psi4(CAS):
         file_in = os.path.join(working_folder, "%s.dat" %(CAS))
         file_out = os.path.join(working_folder, "%s.out" %(CAS))
-        
+
         run = True
         if os.path.exists(file_out):
-            output_file = open(file_out, 'r')
+            output_file = open(file_out)
             output_lines = output_file.readlines()
             output_file.close()
             for l in output_lines[-5:]:
@@ -127,12 +128,12 @@ def call_psi4(CAS):
         if run:
             process = Popen(['psi4',file_in, file_out, '-n', '1'], stdout=PIPE, stderr=PIPE)
             stdout, stderr = process.communicate()
-        
+
         if os.path.exists(file_out):
-            output_file = open(file_out, 'r')
+            output_file = open(file_out)
             output_lines = output_file.readlines()
             output_file.close()
-            
+
             # Remove nonreproducible lines
             output_lines = [i for i in output_lines if 'Psi4 started on' not in i]
             output_lines = [i for i in output_lines if 'Process ID' not in i]
@@ -143,8 +144,8 @@ def call_psi4(CAS):
             output_lines = [i for i in output_lines if '	user time' not in i]
             output_lines = [i for i in output_lines if '	system time' not in i]
             output_lines = [i for i in output_lines if '	total time' not in i]
-            
-            
+
+
             output_file = open(file_out, 'w')
             output_file.writelines(output_lines)
             output_file.close()
@@ -166,6 +167,6 @@ for metadata in pubchem_db.CAS_index.values():
         write_input(mol, dest)
         to_process.append(metadata.CASs)
 shuffle(to_process)
-        
+
         #psi4 50-00-0.dat 50-00-0.out -n 1
 retVals = Parallel(n_jobs=7, verbose=100, backend='threading')(delayed(call_psi4)(CAS) for CAS in sorted(to_process))

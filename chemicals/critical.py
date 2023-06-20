@@ -431,9 +431,9 @@ def Tc(CASRN, method=None):
     .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc,
        Estimation Based on Zero, First and Second Order Methods." In
        Proceedings of the AIChE Spring Meeting, 21, 1996.
-    .. [22] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+    .. [22] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden.
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
-       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -618,9 +618,9 @@ def Pc(CASRN, method=None):
     .. [21] Wilson, G. M., and L. V. Jasperson. "Critical Constants Tc, Pc,
        Estimation Based on Zero, First and Second Order Methods." In
        Proceedings of the AIChE Spring Meeting, 21, 1996.
-    .. [22] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+    .. [22] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden.
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
-       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -798,9 +798,9 @@ def Vc(CASRN, method=None):
        https://doi.org/10.1002/aic.17518.
     .. [20] Fedors, R. F. "A Method to Estimate Critical Volumes." AIChE
        Journal 25, no. 1 (1979): 202-202. https://doi.org/10.1002/aic.690250129.
-    .. [21] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+    .. [21] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden.
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
-       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -975,9 +975,9 @@ def Zc(CASRN, method=None):
        Performance of Four Cubic Equations of State: SRK, PR, Tc-RK, and
        Tc-PR." AIChE Journal n/a, no. n/a (n.d.): e17518.
        https://doi.org/10.1002/aic.17518.
-    .. [20] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+    .. [20] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden.
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
-       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:

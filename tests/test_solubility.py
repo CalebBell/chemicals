@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -22,10 +21,20 @@ SOFTWARE.
 """
 
 import pytest
-from chemicals.solubility import (Henry_converter, Henry_pressure, Henry_pressure_mixture,
-                                  Tm_depression_eutectic, solubility_eutectic, solubility_parameter,
-                                  Henry_constants, dHenry_constants_dT, d2Henry_constants_dT2)
 from fluids.numerics import assert_close, assert_close1d
+
+from chemicals.solubility import (
+    Henry_constants,
+    Henry_converter,
+    Henry_pressure,
+    Henry_pressure_mixture,
+    Tm_depression_eutectic,
+    d2Henry_constants_dT2,
+    dHenry_constants_dT,
+    solubility_eutectic,
+    solubility_parameter,
+)
+
 
 def test_solubility():
     # From [1]_, matching examples 1 and 2.
@@ -46,11 +55,24 @@ def test_solubility_parameter():
     assert delta == solubility_parameter(298.2, 26403.3, 0.000116055)
     assert_close(delta, 14357.681538173534)
 
-    assert None == solubility_parameter(T=3500.2, Hvapm=26403.3, Vml=0.000116055)
+    assert None is solubility_parameter(T=3500.2, Hvapm=26403.3, Vml=0.000116055)
 
 
 def test_Henry_converter():
-    from chemicals.solubility import (HENRY_SCALES_HCP, HENRY_SCALES_HCP_MOLALITY , HENRY_SCALES_HCC, HENRY_SCALES_HBP_SI, HENRY_SCALES_HBP, HENRY_SCALES_HXP, HENRY_SCALES_BUNSEN, HENRY_SCALES_KHPX, HENRY_SCALES_KHPC_SI, HENRY_SCALES_KHPC, HENRY_SCALES_KHCC, HENRY_SCALES_SI)
+    from chemicals.solubility import (
+        HENRY_SCALES_BUNSEN,
+        HENRY_SCALES_HBP,
+        HENRY_SCALES_HBP_SI,
+        HENRY_SCALES_HCC,
+        HENRY_SCALES_HCP,
+        HENRY_SCALES_HCP_MOLALITY,
+        HENRY_SCALES_HXP,
+        HENRY_SCALES_KHCC,
+        HENRY_SCALES_KHPC,
+        HENRY_SCALES_KHPC_SI,
+        HENRY_SCALES_KHPX,
+        HENRY_SCALES_SI,
+    )
     test_values = [1.2E-05, 0.0012159, 0.0297475, 1.20361E-08, 0.00121956,
                    2.19707E-05, 0.0272532, 45515.2, 83333.3, 0.822436, 33.6163,
                    4611823929.1419935]

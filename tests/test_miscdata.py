@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -24,8 +23,8 @@ SOFTWARE.
 import pytest
 from fluids.numerics import assert_close, assert_close1d
 
-from chemicals.miscdata import lookup_VDI_tabular_data
-from chemicals.miscdata import VDI_saturation_dict, CRC_inorganic_data, CRC_organic_data, heos_data
+from chemicals.miscdata import CRC_inorganic_data, CRC_organic_data, VDI_saturation_dict, heos_data, lookup_VDI_tabular_data
+
 
 def test_heos_data():
     values = 145

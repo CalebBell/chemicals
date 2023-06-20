@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -22,19 +21,38 @@ SOFTWARE.
 """
 
 import pytest
-
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.phase_change import (Alibakhshi, Chen, Clapeyron, Hfus, Hfus_methods, Liu, MK,
-                                    PPDS12, Pitzer, Riedel, SMK, Tb, Tb_methods, Tm, Tm_methods,
-                                    Velasco, Vetere, Watson)
-from chemicals.phase_change import (Hvap_data_CRC, Hfus_data_CRC,
-                                    Hvap_data_Gharagheizi, Hsub_data_Gharagheizi,
-                                    Tb_data_Yaws, Tm_ON_data,
-                                    phase_change_data_Perrys2_150,
-                                    phase_change_data_Alibakhshi_Cs,
-                                    phase_change_data_VDI_PPDS_4)
+
 from chemicals.miscdata import CRC_inorganic_data, CRC_organic_data
-from chemicals.miscdata import heos_data
+from chemicals.phase_change import (
+    MK,
+    PPDS12,
+    SMK,
+    Alibakhshi,
+    Chen,
+    Clapeyron,
+    Hfus,
+    Hfus_data_CRC,
+    Hfus_methods,
+    Hsub_data_Gharagheizi,
+    Hvap_data_CRC,
+    Hvap_data_Gharagheizi,
+    Liu,
+    Pitzer,
+    Riedel,
+    Tb,
+    Tb_data_Yaws,
+    Tb_methods,
+    Tm,
+    Tm_methods,
+    Tm_ON_data,
+    Velasco,
+    Vetere,
+    Watson,
+    phase_change_data_Alibakhshi_Cs,
+    phase_change_data_Perrys2_150,
+    phase_change_data_VDI_PPDS_4,
+)
 
 
 def test_Watson():
@@ -179,7 +197,7 @@ def test_Perrys2_150_data():
     # C1 is divided by 1000, to give units of J/mol instead of J/kmol
     # Terephthalic acid removed, was a constant value only.
 
-    tots_calc = [phase_change_data_Perrys2_150[i].abs().sum() for i in [u'Tc', u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
+    tots_calc = [phase_change_data_Perrys2_150[i].abs().sum() for i in ['Tc', 'C1', 'C2', 'C3', 'C4', 'Tmin', 'Tmax']]
     tots = [189407.42499999999, 18617223.739999998, 174.34494000000001, 112.51209900000001, 63.894040000000004, 70810.849999999991, 189407.005]
     assert_close1d(tots_calc, tots)
 
@@ -187,7 +205,7 @@ def test_Perrys2_150_data():
 
 
 def test_Alibakhshi_Cs_data():
-    tots_calc = [phase_change_data_Alibakhshi_Cs[i].abs().sum() for i in [u'C']]
+    tots_calc = [phase_change_data_Alibakhshi_Cs[i].abs().sum() for i in ['C']]
     tots = [28154.361500000003]
     assert_close1d(tots_calc, tots)
 
@@ -196,7 +214,7 @@ def test_Alibakhshi_Cs_data():
 
 def test_VDI_PPDS_4_data():
     """I believe there are no errors here."""
-    tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E', u'Tc']]
+    tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tc']]
     tots = [1974.2929800000002, 2653.9399000000003, 2022.530649, 943.25633100000005, 3124.9258610000002, 150142.28]
     assert_close1d(tots_calc, tots)
 
@@ -232,7 +250,7 @@ def test_Tb():
     with pytest.raises(Exception):
         Tb('993-50-0', method='BADMETHOD')
 
-    assert None == Tb('9923443-50-0')
+    assert None is Tb('9923443-50-0')
     assert [] == Tb_methods('9923443-50-0')
 
 

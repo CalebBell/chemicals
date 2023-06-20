@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL).
 
 Utilities for process modeling. Copyright (C) 2016, Caleb Bell
@@ -18,15 +17,30 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import pytest
-from chemicals.combustion import (AKI, HHV_modified_Dulong, HHV_stoichiometry, IDT_to_DCN,
-                                  LHV_from_HHV, MON, MON_methods,
-                                  Perez_Boehman_MON_from_ignition_delay,
-                                  Perez_Boehman_RON_from_ignition_delay, RON, RON_methods,
-                                  air_fuel_ratio_solver, combustion_data, combustion_spec_solver,
-                                  combustion_stoichiometry, fuel_air_spec_solver, ignition_delay,
-                                  octane_sensitivity)
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.combustion import fuel_air_third_spec_solver, is_combustible
+
+from chemicals.combustion import (
+    AKI,
+    MON,
+    RON,
+    HHV_modified_Dulong,
+    HHV_stoichiometry,
+    IDT_to_DCN,
+    LHV_from_HHV,
+    MON_methods,
+    Perez_Boehman_MON_from_ignition_delay,
+    Perez_Boehman_RON_from_ignition_delay,
+    RON_methods,
+    air_fuel_ratio_solver,
+    combustion_data,
+    combustion_spec_solver,
+    combustion_stoichiometry,
+    fuel_air_spec_solver,
+    fuel_air_third_spec_solver,
+    ignition_delay,
+    is_combustible,
+    octane_sensitivity,
+)
 
 
 def test_combustion_stoichiometry():
@@ -114,8 +128,8 @@ def test_HHV_stoichiometry():
                                                 'Br2': 30881, 'I2': 62416, 'HCl': -92172, 'HF': -272710,
                                                 'P4O10': -3009941, 'O2': 0.0, 'N2': 0.0})
     assert_close(H_calc, H_custom)
-    
-    
+
+
     assert HHV_stoichiometry({'Ar': 1}, Hf=0) == 0.0
 
 
@@ -320,7 +334,7 @@ def test_fuel_air_third_spec_solver():
 
 def test_RON_MON_data():
     from chemicals.combustion import florian_liming_ron_experimental
-    
+
     RON_sum = florian_liming_ron_experimental['RON'].sum()
     assert_close(RON_sum, 23619.699999999997)
 
@@ -329,47 +343,47 @@ def test_MON():
     assert_close(MON(CASRN='592-76-7', method='FLORIAN_LIMING'), 50.7)
     assert_close(MON(CASRN='592-76-7', method='FLORIAN_LIMING_ANN'), 50.5)
     assert_close(MON(CASRN='592-76-7', method='COMBUSTDB_PREDICTIONS'), 52.520763, atol=.1)
-    
+
     for m in MON_methods('142-82-5'):
         print( MON(CASRN='142-82-5', method=m), m)
     #     assert MON(CASRN='142-82-5', method=m) == 0
-    
+
 def test_RON():
     assert_close(RON(CASRN='592-76-7', method='COMBUSTDB'), 54.5)
     assert_close(RON(CASRN='592-76-7', method='FLORIAN_LIMING'), 54.5)
     assert_close(RON(CASRN='64-17-5', method='FLORIAN_LIMING_ANN'), 105.8, atol=.1)
     assert_close(RON(CASRN='78-93-3', method='COMBUSTDB_PREDICTIONS'), 105.80111)
-    
-    
+
+
     # Force the predictions?
     for m in RON_methods('540-84-1'):
         print( RON(CASRN='540-84-1', method=m), m)
     #     assert RON(CASRN='540-84-1', method=m) == 100
-    
-    
-    
+
+
+
 def test_Perez_Boehman_RON_from_ignition_delay():
     assert_close(Perez_Boehman_RON_from_ignition_delay(1/150), 56.948)
-    
+
 def test_Perez_Boehman_MON_from_ignition_delay():
     assert_close(Perez_Boehman_MON_from_ignition_delay(1/150), 53.7205)
-    
+
 def test_octane_sensitivity():
     assert octane_sensitivity(10, 5) == 5
-    
+
 def test_IDT_to_DCN():
     assert_close(IDT_to_DCN(3.2e-3), 62.772499999999994, rtol=1e-12)
     assert_close(IDT_to_DCN(3.0e-3), 68.20985154830585, rtol=1e-12)
-    
+
     # The edges don't ome together, not suitable for inversing
     IDT_to_DCN(3.1e-3*(1+1e-14))/IDT_to_DCN(3.1e-3*(1-1e-14))
-    
+
     IDT_to_DCN(6.5e-3*(1+1e-14))/IDT_to_DCN(6.5e-3*(1-1e-14))
 
 
 def test_ignition_delay():
     assert_close(ignition_delay(CASRN='110-54-3'), 0.0043)
-    
-    
+
+
 def test_AKI():
     assert_close(AKI(RON=90, MON=74), 82.0, rtol=1e-13)

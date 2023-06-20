@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,22 +20,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import numpy as np
-from fluids.numerics import assert_close, derivative, assert_close1d, jacobian, assert_close2d
-from chemicals.vapor_pressure import (Ambrose_Walton, Antoine, Antoine_AB_coeffs_from_point,
-                                      Antoine_coeffs_from_point, Antoine_fitting_jacobian,
-                                      DIPPR101_ABC_coeffs_from_point, Edalat, Lee_Kesler,
-                                      Psat_IAPWS, Psub_Clapeyron, Sanjari, TDE_PVExpansion,
-                                      TRC_Antoine_extended, TRC_Antoine_extended_fitting_jacobian,
-                                      Tsat_IAPWS, Wagner, Wagner_fitting_jacobian, Wagner_original,
-                                      Wagner_original_fitting_jacobian, Yaws_Psat,
-                                      Yaws_Psat_fitting_jacobian, boiling_critical_relation,
-                                      d2Antoine_dT2, d2TRC_Antoine_extended_dT2, d2Wagner_dT2,
-                                      d2Wagner_original_dT2, d2Yaws_Psat_dT2, dAntoine_dT,
-                                      dPsat_IAPWS_dT, dTRC_Antoine_extended_dT, dWagner_dT,
-                                      dWagner_original_dT, dYaws_Psat_dT)
-from chemicals.vapor_pressure import Psat_data_WagnerMcGarry, Psat_data_AntoinePoling, Psat_data_WagnerPoling, Psat_data_AntoineExtended, Psat_data_Perrys2_8, Psat_data_VDI_PPDS_3
 from math import e, exp, log, log10
+
+import numpy as np
+from fluids.numerics import assert_close, assert_close1d, assert_close2d, derivative, jacobian
+
+from chemicals.vapor_pressure import (
+    Ambrose_Walton,
+    Antoine,
+    Antoine_AB_coeffs_from_point,
+    Antoine_coeffs_from_point,
+    Antoine_fitting_jacobian,
+    DIPPR101_ABC_coeffs_from_point,
+    Edalat,
+    Lee_Kesler,
+    Psat_data_AntoineExtended,
+    Psat_data_AntoinePoling,
+    Psat_data_Perrys2_8,
+    Psat_data_VDI_PPDS_3,
+    Psat_data_WagnerMcGarry,
+    Psat_data_WagnerPoling,
+    Psat_IAPWS,
+    Psub_Clapeyron,
+    Sanjari,
+    TDE_PVExpansion,
+    TRC_Antoine_extended,
+    TRC_Antoine_extended_fitting_jacobian,
+    Tsat_IAPWS,
+    Wagner,
+    Wagner_fitting_jacobian,
+    Wagner_original,
+    Wagner_original_fitting_jacobian,
+    Yaws_Psat,
+    Yaws_Psat_fitting_jacobian,
+    boiling_critical_relation,
+    d2Antoine_dT2,
+    d2TRC_Antoine_extended_dT2,
+    d2Wagner_dT2,
+    d2Wagner_original_dT2,
+    d2Yaws_Psat_dT2,
+    dAntoine_dT,
+    dPsat_IAPWS_dT,
+    dTRC_Antoine_extended_dT,
+    dWagner_dT,
+    dWagner_original_dT,
+    dYaws_Psat_dT,
+)
 
 ### Regression equations
 
@@ -68,7 +97,7 @@ def test_Wagner_original():
 
     for T in (0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307):
         assert d2Wagner_original_dT2(T, 190.53, 4596420., -6.00435, 1.1885, -0.834082, -1.22833) == 0.0
-        
+
     over_kwargs = {'T': 657.9000000000001, 'Tc': 657.9, 'Pc': 2806700.0, 'a': -8.11413, 'b': 1.77697, 'c': -4.4396, 'd': -1.47477}
     assert_close(Wagner_original(**over_kwargs), over_kwargs['Pc'], rtol=1e-12)
 
@@ -95,8 +124,8 @@ def test_Wagner():
 
     for T in (0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307):
         assert d2Wagner_dT2(T, 190.551, 4599200, -6.02242, 1.26652, -0.5707, -1.366) == 0.0
-        
-        
+
+
     high_T_kwargs = {'T': 449.05000000000007, 'Tc': 449.05, 'Pc': 5990000.0, 'a': -7.49333, 'b': 1.78753, 'c': -4.04253, 'd': 8.50574}
     assert_close(Wagner(**high_T_kwargs), high_T_kwargs['Pc'], rtol=1e-13)
 
@@ -130,8 +159,8 @@ def test_TRC_Antoine_extended():
 
     for T in [0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307] + near_bad_Ts:
         assert d2TRC_Antoine_extended_dT2(T, 227.51, -120., 8.95894, 510.595, -15.95, 2.41377, -93.74, 7425.9) == 0.0
-        
-    
+
+
     for T in near_bad_Ts:
         assert 0 == TRC_Antoine_extended(T=T, Tc=227.51, to=-120., A=8.95894,  B=510.595, C=-15.95, n=2.41377, E=-93.74, F=7425.9)
 
@@ -206,7 +235,7 @@ def test_test_Antoine_AB():
     AB = Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=exp(1))
     assert_close(A, AB[0])
     assert_close(B, AB[1])
-    
+
     # Nasty overflow point
     kwargs = {'T': 159.10000000000002, 'Psat': 0.0007352199499947608, 'dPsat_dT': 0.004770694513544764, 'base': 2.718281828459045}
     AB = Antoine_AB_coeffs_from_point(**kwargs)
@@ -245,7 +274,7 @@ def test_DIPPR101_ABC_coeffs_from_point():
     d2Psat_dT2 = d2Wagner_original_dT2(T, Tc, Pc, a, b, c, d)
     dPsat_dT = dWagner_original_dT(T, Tc, Pc, a, b, c, d)
     Psat = Wagner_original(T, Tc, Pc, a, b, c, d)
-    
+
     A, B, C = DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, float('inf'))
     assert EQ101(Tc*2, A, B, C) > EQ101(Tc, A, B, C)
     assert EQ101(Tc*20, A, B, C) > EQ101(Tc*10, A, B, C)
@@ -291,7 +320,7 @@ def test_VDI_PPDS_3_data():
     Average temperature deviation
     0.144% vs tabulated values.
     """
-    tots_calc = [Psat_data_VDI_PPDS_3[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'Tc', u'Pc', u'Tm']]
+    tots_calc = [Psat_data_VDI_PPDS_3[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'Tc', 'Pc', 'Tm']]
     tots = [2171.4607300000002, 694.38631999999996, 931.3604499999999, 919.88944000000004, 150225.16000000003, 1265565000, 56957.849999999991]
     assert_close1d(tots_calc, tots)
 
@@ -322,8 +351,8 @@ def test_Ambrose_Walton():
     # Their result is 0.1329 bar.
     Psat = Ambrose_Walton(347.25, 617.15, 36.09E5, 0.304)
     assert_close(Psat, 13278.878504306222)
-    
-    
+
+
     # Add limit on omega with this test
     low_T_kwargs = {'T': 0.010000000000218279, 'Tc': 4287.0, 'Pc': 19252000.0, 'omega': -0.7998}
     Psat = Ambrose_Walton(**low_T_kwargs)
@@ -393,24 +422,24 @@ def test_Wagner_original_fitting_jacobian():
      derivative(lambda b: Wagner_original(T, Tc, Pc, a, b, c, d), b, dx=b*1e-5),
      derivative(lambda c: Wagner_original(T, Tc, Pc, a, b, c, d), c, dx=c*1e-5),
      derivative(lambda d: Wagner_original(T, Tc, Pc, a, b, c, d), d, dx=d*1e-5)]
-    
+
     der_expect = [[6.38493817686558e-10, 5.67321421625625e-10, 3.9796661447548854e-10, 1.9583105182859243e-10]]
     der_analytical = Wagner_original_fitting_jacobian([T], Tc, Pc, a, b, c, d)
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
     assert_close1d(der_analytical, [der_num], rtol=1e-7)
-    
+
 def test_Wagner_fitting_jacobian():
     T, Tc, Pc, a, b, c, d = 100.0, 475.03, 2980000.0, -8.32915, 2.37044, -3.75113, -4.6033
     der_num = [derivative(lambda a: Wagner(T, Tc, Pc, a, b, c, d), a, dx=a*1e-5),
      derivative(lambda b: Wagner(T, Tc, Pc, a, b, c, d), b, dx=b*1e-5),
      derivative(lambda c: Wagner(T, Tc, Pc, a, b, c, d), c, dx=c*1e-5),
      derivative(lambda d: Wagner(T, Tc, Pc, a, b, c, d), d, dx=d*1e-5)]
-    
+
     der_expect = [[5.1791400515036586e-11, 4.601825445175529e-11, 3.633081272138977e-11, 2.0120443215711467e-11]]
     der_analytical = Wagner_fitting_jacobian([T], Tc, Pc, a, b, c, d)
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
     assert_close1d(der_analytical, [der_num], rtol=1e-7)
-    
+
 def test_Antoine_fitting_jacobian():
 
     T, A, B, C = 100.0, 8.7687, 395.744, -6.469
@@ -421,7 +450,7 @@ def test_Antoine_fitting_jacobian():
     der_analytical = Antoine_fitting_jacobian([T], A, B, C)
     assert_close1d(der_analytical, [der_num], rtol=1e-7)
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
-    
+
     # Zero point
     T, A, B, C = 30, 3.45604+5, 1044.038, -53.893
     der_num = [derivative(lambda A: Antoine(T, A, B, C), A, dx=A*1e-5),
@@ -434,15 +463,15 @@ def test_Antoine_fitting_jacobian():
 
 def test_Yaws_Psat():
     assert_close(Yaws_Psat(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6), 708657.0891069275, rtol=1e-14)
-    
+
     dPsat_analytical = dYaws_Psat_dT(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6)
     assert_close(dPsat_analytical, 15728.182983674578, rtol=1e-13)
-    
+
     dPsat_num = derivative(lambda T: Yaws_Psat(T=T, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6),
                400.0, dx=400.0*1e-6)
-    
+
     assert_close(dPsat_num, dPsat_analytical, rtol=1e-9)
-    
+
     d2Psat_analytical = d2Yaws_Psat_dT2(T=400.0, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6)
     assert_close(d2Psat_analytical, 264.6651867661574, rtol=1e-13)
     d2Psat_num = derivative(lambda T: dYaws_Psat_dT(T=T, A=28.588+ log10(101325/760), B=-2469, C=-7.351, D=2.8025E-10, E=2.7361E-6),
@@ -456,13 +485,13 @@ def test_Yaws_Psat():
          derivative(lambda C: Yaws_Psat(T, A, B, C, D, E), C, dx=C*1e-5),
          derivative(lambda D: Yaws_Psat(T, A, B, C, D, E), D, dx=D*3e-4), # This derivative is not tight but sympy checks it out
          derivative(lambda E: Yaws_Psat(T, A, B, C, D, E), E, dx=E*1e-5),]
-    
+
     der_expect = [[1631743.2494221947, 4079.3581235554866, 4245893.825440976, 652697299.7688779, 261078919907.55115]]
     der_analytical = Yaws_Psat_fitting_jacobian([T], A, B, C, D, E)
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
     assert_close1d(der_analytical, [der_num], rtol=1e-6)
-    
-    
+
+
     # Overflow catch
     Yaws_Psat(T=20000.0, A=39.7918+3, B=-2965.83, C=-12.073, D=0.0033269, E=1.58609e-6)
 
@@ -471,28 +500,28 @@ def test_Yaws_Psat():
 
 def test_TDE_PVExpansion():
     assert_close(TDE_PVExpansion(T=273.16, a1=23.7969+log(1000), a2=-11422, a3=0.177978), 4.062206573980815e-05, rtol=1e-14)
-    
+
     # overflow
     TDE_PVExpansion(**{'T': 203.65, 'a1': 1.0, 'a2': 1.0, 'a3': 1.0, 'a4': 0.0, 'a5': 1.0, 'a6': 0, 'a7': 0, 'a8': 0})
-    
-    
+
+
 def test_TRC_Antoine_extended_fitting_jacobian():
     T, Tc = 180.0, 227.51
     args_in = [-120., 8.95894, 510.595, -15.95, 2.41377, -93.74, 7425.9]
     TRC_Antoine_extended(T, Tc, *args_in)
-    
+
     def to_jac(args):
         return TRC_Antoine_extended(T, Tc, *args)
-    
+
     jac_num = jacobian(to_jac, args_in, scalar=True, perturbation=1e-6)
     jac_analytical = TRC_Antoine_extended_fitting_jacobian([T], Tc, *args_in)
     jac_expect = [[-363.615682458313, 1626355.201995779, -9913.777519023339, 30855.99044392394, -8683.023631650121, 0.0612020261205086, 1.1872467742453418e-05]]
     jac_sympy = [[-363.615682458313801, 1626355.20199577895, -9913.77751902333938, 30855.9904439239311, -8683.02363165013643, 0.0612020261205090756, 0.0000118724677424535564]]
-    
+
     assert_close2d([jac_num], jac_analytical, rtol=4e-3)
     assert_close2d(jac_analytical, jac_expect, rtol=1e-12)
     assert_close2d(jac_analytical, jac_sympy, rtol=1e-13)
-    
+
     T = 120
     # x = 0
     jac_num = jacobian(to_jac, args_in, scalar=True, perturbation=1e-8)
@@ -502,7 +531,7 @@ def test_TRC_Antoine_extended_fitting_jacobian():
     assert_close2d([jac_num], jac_analytical, rtol=1e-6)
     assert_close2d(jac_analytical, jac_analytical_expect, rtol=1e-12)
     assert_close2d(jac_analytical, jac_sympy_medium, rtol=1e-13)
-    
+
     T = 10
     # Hard zeros
     jac_analytical = TRC_Antoine_extended_fitting_jacobian([T], Tc, *args_in)
@@ -526,5 +555,5 @@ def test_TRC_Antoine_extended_fitting_jacobian():
            322.65, 322.85, 322.95, 322.95, 323.35, 323.55, 324.65, 324.75,
            324.85, 324.85, 325.15, 327.05, 327.15, 327.2 , 327.25, 327.35,
            328.22, 328.75, 328.85, 333.73, 338.95]), np.float64(508.1), np.float64(67.0), np.float64(8.94), np.float64(1130.0), np.float64(-44.0), np.float64(2.5), np.float64(333.0), np.float64(-24950.0))
-        
+
     TRC_Antoine_extended_fitting_jacobian(*args)

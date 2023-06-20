@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,17 +20,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fluids.numerics import assert_close, assert_close1d, assert_close2d
-import pytest
 import pandas as pd
+import pytest
+from fluids.numerics import assert_close, assert_close1d, assert_close2d
 
-from chemicals.reaction import (Gibbs_formation, Hf_basis_converter, Hfg, Hfg_all_methods,
-                                Hfg_methods, Hfl, Hfl_methods, Hfs, Hfs_methods, S0g,
-                                S0g_all_methods, S0g_methods, S0l, S0l_methods, S0s, S0s_methods,
-                                balance_stoichiometry, entropy_formation, stoichiometric_matrix,
-                                standard_formation_reaction)
-from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data
-from chemicals.reaction import Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, Hfg_S0g_YAWS_data
+from chemicals.heat_capacity import CRC_standard_data, TRC_gas_data
+from chemicals.reaction import (
+    Gibbs_formation,
+    Hf_basis_converter,
+    Hfg,
+    Hfg_all_methods,
+    Hfg_API_TDB_data,
+    Hfg_ATcT_data,
+    Hfg_methods,
+    Hfg_S0g_YAWS_data,
+    Hfl,
+    Hfl_ATcT_data,
+    Hfl_methods,
+    Hfs,
+    Hfs_methods,
+    S0g,
+    S0g_all_methods,
+    S0g_methods,
+    S0l,
+    S0l_methods,
+    S0s,
+    S0s_methods,
+    balance_stoichiometry,
+    entropy_formation,
+    standard_formation_reaction,
+    stoichiometric_matrix,
+)
+
 
 def test_API_TDB_data():
     assert Hfg_API_TDB_data['Hfg'].abs().sum() == 101711260
@@ -56,7 +76,7 @@ def test_Hfg_API_TDB_data():
 
     assert Hfg_methods('7732-18-5') == ['ATCT_G', 'CRC', 'API_TDB_G', 'WEBBOOK', 'TRC', 'JANAF', 'YAWS']
 
-    assert None == Hfg('98-00-1')
+    assert None is Hfg('98-00-1')
 
     with pytest.raises(Exception):
         Hfg('98-00-0', method='BADMETHOD')
@@ -72,7 +92,7 @@ def test_Hfl():
     assert_close1d(Hfs, [-238400.0]*2)
 
     assert Hfl_methods('67-56-1') == ['ATCT_L', 'CRC', 'WEBBOOK']
-    assert None == Hfl('98-00-1')
+    assert None is Hfl('98-00-1')
 
     tot = sum([abs(Hfl(i)) for i in Hfl_ATcT_data.index])
     assert_close(tot, 6819443.0)
@@ -187,7 +207,7 @@ def test_entropy_formation():
 
 def test_balance_stoichiometry():
     test_cases = [
-    [[{'Hg': 1, 'O': 1}, {u'Hg': 1}, {'O': 2}], [True, False, False], [2.0, 2.0, 1.0]],
+    [[{'Hg': 1, 'O': 1}, {'Hg': 1}, {'O': 2}], [True, False, False], [2.0, 2.0, 1.0]],
     [[{'Cl': 2}, {'C': 3, 'H': 6}, {'C': 3, 'Cl': 1, 'H': 5}, {'Cl': 1, 'H': 1}],
       [True, True, False, False, False],
       [1, 1, 1, 1]],

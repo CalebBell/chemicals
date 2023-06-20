@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL).
 
 Utilities for process modeling. Copyright (C) 2016, Caleb Bell
@@ -18,28 +17,55 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from math import log, log10
+
 import numpy as np
 import pytest
-from math import log10, log
 from fluids.constants import R, h, k
 from fluids.numerics import assert_close, assert_close1d, linspace, logspace
-from chemicals.heat_capacity import (Cpg_statistical_mechanics, Cpg_statistical_mechanics_integral,
-                                     Cpg_statistical_mechanics_integral_over_T, Dadgostar_Shaw,
-                                     Lastovka_Shaw, Lastovka_Shaw_T_for_Hm, Lastovka_Shaw_T_for_Sm,
-                                     Lastovka_Shaw_integral, Lastovka_Shaw_integral_over_T,
-                                     Lastovka_solid, Lastovka_solid_integral,
-                                     Lastovka_solid_integral_over_T, PPDS15, PPDS2, Rowlinson_Bondi,
-                                     Rowlinson_Poling, Shomate, Shomate_integral,
-                                     Shomate_integral_over_T, TDE_CSExpansion, TRCCp,
-                                     TRCCp_integral, TRCCp_integral_over_T,
-                                     ZabranskyQuasipolynomial, ZabranskySpline, Zabransky_cubic,
-                                     Zabransky_cubic_integral, Zabransky_cubic_integral_over_T,
-                                     Zabransky_quasi_polynomial,
-                                     Zabransky_quasi_polynomial_integral,
-                                     Zabransky_quasi_polynomial_integral_over_T,
-                                     vibration_frequency_cm_to_characteristic_temperature)
-from chemicals.heat_capacity import TRC_gas_data, CRC_standard_data, Cp_data_Poling
-from chemicals.heat_capacity import zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s, PiecewiseHeatCapacity
+
+from chemicals.heat_capacity import (
+    PPDS2,
+    PPDS15,
+    Cp_data_Poling,
+    Cpg_statistical_mechanics,
+    Cpg_statistical_mechanics_integral,
+    Cpg_statistical_mechanics_integral_over_T,
+    CRC_standard_data,
+    Dadgostar_Shaw,
+    Lastovka_Shaw,
+    Lastovka_Shaw_integral,
+    Lastovka_Shaw_integral_over_T,
+    Lastovka_Shaw_T_for_Hm,
+    Lastovka_Shaw_T_for_Sm,
+    Lastovka_solid,
+    Lastovka_solid_integral,
+    Lastovka_solid_integral_over_T,
+    PiecewiseHeatCapacity,
+    Rowlinson_Bondi,
+    Rowlinson_Poling,
+    Shomate,
+    Shomate_integral,
+    Shomate_integral_over_T,
+    TDE_CSExpansion,
+    TRC_gas_data,
+    TRCCp,
+    TRCCp_integral,
+    TRCCp_integral_over_T,
+    Zabransky_cubic,
+    Zabransky_cubic_integral,
+    Zabransky_cubic_integral_over_T,
+    Zabransky_quasi_polynomial,
+    Zabransky_quasi_polynomial_integral,
+    Zabransky_quasi_polynomial_integral_over_T,
+    ZabranskyQuasipolynomial,
+    ZabranskySpline,
+    vibration_frequency_cm_to_characteristic_temperature,
+    zabransky_dict_const_s,
+    zabransky_dict_iso_s,
+    zabransky_dict_sat_s,
+)
+
 
 def test_heat_capacity_CSP():
     # Example is for cis-2-butene at 350K from Poling. It is not consistent with
@@ -106,22 +132,22 @@ def test_Shomate_single():
     from scipy.integrate import quad
     water_low_gas_coeffs = [30.09200, 6.832514/1e3, 6.793435/1e6, -2.534480/1e9, 0.082139*1e6]
     assert_close(Shomate(500, *water_low_gas_coeffs), 35.21836175, rtol=1e-12)
-    
+
     assert_close(Shomate_integral(500, *water_low_gas_coeffs), 15979.244791666666, rtol=1e-12)
-    
-    
-    
+
+
+
     assert_close(Shomate_integral_over_T(500, *water_low_gas_coeffs), 191.00554193938726, rtol=1e-12)
-    
+
     over_T_test_expect = Shomate_integral_over_T(500, *water_low_gas_coeffs) - Shomate_integral_over_T(300, *water_low_gas_coeffs)
     over_T_calc = quad(lambda T: Shomate(T, *water_low_gas_coeffs)/T, 300, 500)[0]
     assert_close(over_T_test_expect, over_T_calc)
-    
+
     enthalpy_calc = quad(lambda T: Shomate(T, *water_low_gas_coeffs), 400, 500)[0]
     enthalpy_expect = Shomate_integral(500, *water_low_gas_coeffs) - Shomate_integral(400, *water_low_gas_coeffs)
-    
+
     assert_close(enthalpy_calc, enthalpy_expect, rtol=1e-7)
-    
+
 def test_Lastovka_Shaw():
     # C64H52S2 (M = 885.2 alpha = 0.1333 mol/g
     # From figure 22, part b
@@ -214,7 +240,7 @@ def test_Lastovka_Shaw_T_for_Hm_fuzz():
 #                        raise ValueError("Could not converge with unexpected error")
 
 def test_CRC_standard_data():
-    tots_calc = [CRC_standard_data[i].abs().sum() for i in [u'Hfs', u'Gfs', u'S0s', u'Cps', u'Hfl', u'Gfl', u'S0l', 'Cpl', u'Hfg', u'Gfg', u'S0g', u'Cpg']]
+    tots_calc = [CRC_standard_data[i].abs().sum() for i in ['Hfs', 'Gfs', 'S0s', 'Cps', 'Hfl', 'Gfl', 'S0l', 'Cpl', 'Hfg', 'Gfg', 'S0g', 'Cpg']]
     tots = [628580900.0, 306298700.0, 68541.800000000003, 56554.400000000001, 265782700.0, 23685900.0, 61274.0, 88464.399999999994, 392946600.0, 121270700.0, 141558.29999999999, 33903.300000000003]
     assert_close1d(tots_calc, tots)
 
@@ -259,12 +285,14 @@ def test_TRCCp_integral_over_T():
     assert_close(dS, 23.4427894111345)
 
 def test_Zabransky_dicts():
-    from chemicals.heat_capacity import (zabransky_dict_sat_s,
-                                         zabransky_dict_sat_p,
-                                         zabransky_dict_const_s,
-                                         zabransky_dict_const_p,
-                                         zabransky_dict_iso_s,
-                                         zabransky_dict_iso_p)
+    from chemicals.heat_capacity import (
+        zabransky_dict_const_p,
+        zabransky_dict_const_s,
+        zabransky_dict_iso_p,
+        zabransky_dict_iso_s,
+        zabransky_dict_sat_p,
+        zabransky_dict_sat_s,
+    )
     quasi_dicts = [zabransky_dict_sat_p, zabransky_dict_const_p, zabransky_dict_iso_p]
     spline_dicts = [zabransky_dict_sat_s, zabransky_dict_const_s, zabransky_dict_iso_s]
 
@@ -373,16 +401,16 @@ def test_zabransky_dict_types():
     for d in (zabransky_dict_sat_s, zabransky_dict_iso_s, zabransky_dict_const_s):
         for v in d.values():
             assert type(v) is PiecewiseHeatCapacity
-            
-            
+
+
 def test_PPDS2():
     Cp = PPDS2(T=350.0, Ts=462.493, C_low=4.54115, C_inf=9.96847, a1=-103.419, a2=695.484, a3=-2006.1, a4=2476.84, a5=-1186.47)
     assert_close(Cp, 136.46338956689826, rtol=1e-13)
-    
+
 def test_PPDS15():
     Cp = PPDS15(T=400.0, Tc=562.05, a0=0.198892, a1=24.1389, a2=-20.2301, a3=5.72481, a4=4.43613e-7, a5=-3.10751e-7)
     assert_close(Cp, 161.89831435090065, rtol=1e-14)
-    
+
 def test_TDE_CSExpansion():
     Cp = TDE_CSExpansion(550.0, 778.0, 0.626549, 120.705, 0.255987, 0.000381027, -3.03077e-7)
     assert_close(Cp, 328.4720426864035, rtol=1e-14)
@@ -394,34 +422,34 @@ def test_piece_wise_heat_capacity():
             self.value = value
             self.Tmin = Tmin
             self.Tmax = Tmax
-        
+
         def calculate_integral(self, Ta, Tb):
             return self.value * (Tb - Ta)
-        
+
         def calculate_integral_over_T(self, Ta, Tb):
             return self.value * log(Tb/Ta)
-    
+
     models = [HeatCapacity(1, 200, 250), HeatCapacity(1, 250, 300), HeatCapacity(1, 300, 350)]
-    
+
     Cp = PiecewiseHeatCapacity(models)
     # Trivial
     assert_close(0., Cp.force_calculate_integral(298.15, 298.15))
     assert_close(0., Cp.force_calculate_integral_over_T(298.15, 298.15))
-    
+
     # Within bounds
     H_TminTmax = sum([i.calculate_integral(i.Tmin, i.Tmax) for i in models])
     S_TminTmax = sum([i.calculate_integral_over_T(i.Tmin, i.Tmax) for i in models])
     assert_close(H_TminTmax, Cp.force_calculate_integral(Cp.Tmin, Cp.Tmax))
     assert_close(S_TminTmax, Cp.force_calculate_integral_over_T(Cp.Tmin, Cp.Tmax))
-    
+
     # Left to center
     assert_close(models[0].calculate_integral(100, 250), Cp.force_calculate_integral(100, 250))
     assert_close(models[0].calculate_integral_over_T(100, 250), Cp.force_calculate_integral_over_T(100, 250))
-    
+
     # Center to right
     assert_close(models[-1].calculate_integral(300, 400), Cp.force_calculate_integral(300, 400))
     assert_close(models[-1].calculate_integral_over_T(300, 400), Cp.force_calculate_integral_over_T(300, 400))
-    
+
     # Across both sides
     H = (models[0].calculate_integral(100, 200)
          + H_TminTmax
@@ -431,42 +459,42 @@ def test_piece_wise_heat_capacity():
          +models[-1].calculate_integral_over_T(350, 400))
     assert_close(H, Cp.force_calculate_integral(100, 400))
     assert_close(S, Cp.force_calculate_integral_over_T(100, 400))
-    
-    
+
+
 def test_Cpg_statistical_mechanics():
     thetas = [1360, 2330, 2330, 4800, 4880, 4880]
     Cp_from_spectra = Cpg_statistical_mechanics(300.0,thetas)
     assert_close(Cp_from_spectra, 35.55983440173097, rtol=1e-12)
-    
+
     test = Cpg_statistical_mechanics(300.0,thetas, linear=True)
     assert_close(test, 35.55983440173097-R/2, rtol=1e-12)
-    
+
     # Test the high limit
     assert_close(Cpg_statistical_mechanics(1e100, thetas)/R, 10, rtol=1e-14)
-    
+
     # Test there is a check to ensure at high temperatures numerical error does not make the value too high
-    
+
     assert_close(Cpg_statistical_mechanics(1e10, thetas)/R, 9.99999999999993, rtol=1e-14)
-    
+
     #Test the use of expm1 at high temperatures
     assert_close(Cpg_statistical_mechanics(1e11, thetas)/R, 10, rtol=1e-15)
-    
+
     # Low temperatures
-    
+
     assert 4 == Cpg_statistical_mechanics(1, thetas)/R
     assert 4 == Cpg_statistical_mechanics(10, thetas)/R
     assert 4 == Cpg_statistical_mechanics(0, thetas)/R
     assert 4 == Cpg_statistical_mechanics(1e-10, thetas)/R
 
     # Other Perry's sample from software as Hz
-    v_scaled = [3.24, 4.97, 4.97, 9.90, 10.26, 10.26] # divided by 10^13, 
+    v_scaled = [3.24, 4.97, 4.97, 9.90, 10.26, 10.26] # divided by 10^13,
     v_scaled_Hz = [vj*1e13 for vj in v_scaled]
     thetas_comp = [h*vj/k for vj in v_scaled_Hz]
-    
+
     Cp_perry_stat = Cpg_statistical_mechanics(300.0,thetas_comp)
     assert_close(Cp_perry_stat, 34.89647856513431, rtol=1e-12)
-    
-    
+
+
     thetas_caleb_psi4_mp2_631G = [1615.6879, 2486.5201, 2486.6163, 5128.4685, 5353.9398, 5354.6923]
     thetas_caleb_psi4_mp2_6311ppG3df3pd = [1472.1887, 2385.2593, 2385.3405, 5084.3735, 5296.0091, 5296.3665]
 
@@ -477,72 +505,72 @@ def test_Cpg_statistical_mechanics():
 
 def test_Cpg_statistical_mechanics_integral():
     thetas = [1360, 2330, 2330, 4800, 4880, 4880]
-    
+
     # numerical = quad(Cpg_statistical_mechanics, 399, 400, args=(thetas,))[0]
     analytical = Cpg_statistical_mechanics_integral(400, thetas)-Cpg_statistical_mechanics_integral(399, thetas)
     assert_close(38.371249200803504, analytical, rtol=1e-13)
-    
+
 
     # numerical = quad(Cpg_statistical_mechanics, 1, 400, args=(thetas,))[0]
     analytical = Cpg_statistical_mechanics_integral(400, thetas)-Cpg_statistical_mechanics_integral(1, thetas)
     assert_close(13775.685078010132, analytical, rtol=1e-13)
-    
+
     # numerical = quad(Cpg_statistical_mechanics, 0, 400, args=(thetas,))[0]
     analytical = Cpg_statistical_mechanics_integral(400, thetas)-Cpg_statistical_mechanics_integral(0, thetas)
     assert_close(13808.942928482746, analytical, rtol=1e-13)
-    
+
     # numerical = quad(Cpg_statistical_mechanics, 0, 1e-10, args=(thetas,))[0]
     analytical = Cpg_statistical_mechanics_integral(1e-10, thetas)-Cpg_statistical_mechanics_integral(0, thetas)
     assert_close(3.325785047261296e-09, analytical, rtol=1e-13)
-    
+
     # numerical = quad(Cpg_statistical_mechanics, 1000, 2000, args=(thetas,))[0]
     analytical = Cpg_statistical_mechanics_integral(2000, thetas)-Cpg_statistical_mechanics_integral(1000, thetas)
     assert_close(65130.40200286856, analytical, rtol=1e-13)
-    
+
     # numerical = quad(Cpg_statistical_mechanics, 1e9, 2e9, args=(thetas,))[0]
     analytical = Cpg_statistical_mechanics_integral(2e9, thetas)-Cpg_statistical_mechanics_integral(1e9, thetas)
     assert_close(83144626181.50354, analytical, rtol=1e-13)
 
     val = Cpg_statistical_mechanics_integral(1e100, thetas)
     assert val > 0
-    
+
     # numerical = quad(Cpg_statistical_mechanics, 1e100, 2e100, args=(thetas,))[0]
     analytical = Cpg_statistical_mechanics_integral(2e100, thetas)-Cpg_statistical_mechanics_integral(1e100, thetas)
     assert_close(8.31446261815324e+101, analytical, rtol=1e-13)
 
 def test_Cpg_statistical_mechanics_integral_over_T():
     thetas = [1360, 2330, 2330, 4800, 4880, 4880]
-    
+
     # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 399, 400)[0]
     analytical = Cpg_statistical_mechanics_integral_over_T(400, thetas)-Cpg_statistical_mechanics_integral_over_T(399, thetas)
     assert_close(0.09604821735794644, analytical, rtol=1e-13)
-    
+
     # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1e-2, 1)[0]
     analytical = Cpg_statistical_mechanics_integral_over_T(1, thetas)-Cpg_statistical_mechanics_integral_over_T(1e-2, thetas)
     assert_close(153.15806144652714, analytical, rtol=1e-13)
-    
+
     # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1e-2, 10)[0]
     analytical = Cpg_statistical_mechanics_integral_over_T(10, thetas)-Cpg_statistical_mechanics_integral_over_T(1e-2, thetas)
     assert_close(229.73709216979074, analytical, rtol=1e-13)
-    
+
     # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1e-20, 1e-10)[0]
     analytical = Cpg_statistical_mechanics_integral_over_T(1e-10, thetas)-Cpg_statistical_mechanics_integral_over_T(1e-20, thetas)
     assert_close(765.7903072326358, analytical, rtol=1e-13)
-    
+
     # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1000, 2000)[0]
     analytical = Cpg_statistical_mechanics_integral_over_T(2000, thetas)-Cpg_statistical_mechanics_integral_over_T(1000, thetas)
     assert_close(44.506610727671244, analytical, rtol=1e-13)
-    
+
     # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1e9, 2e9)[0]
     analytical = Cpg_statistical_mechanics_integral_over_T(2e9, thetas)-Cpg_statistical_mechanics_integral_over_T(1e9, thetas)
     assert_close(57.6314632164183, analytical, rtol=1e-13)
-    
+
     # numerical = quad(lambda T: Cpg_statistical_mechanics(T, thetas)/T, 1, 400)[0]
     analytical = Cpg_statistical_mechanics_integral_over_T(400, thetas)-Cpg_statistical_mechanics_integral_over_T(1, thetas)
     assert_close(200.85926489512875, analytical, rtol=1e-13)
-    
 
-    
+
+
 def test_vibration_frequency_cm_to_characteristic_temperature():
     T = vibration_frequency_cm_to_characteristic_temperature(667)
     assert_close(T, 959.6641613636505, rtol=1e-13)

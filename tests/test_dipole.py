@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,8 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fluids.numerics import assert_close
 import pytest
+from fluids.numerics import assert_close
+
 from chemicals import dipole
 from chemicals.dipole import dipole_moment, dipole_moment_methods
 
@@ -54,8 +54,8 @@ def test_dipole():
 
     with pytest.raises(Exception):
         dipole_moment(CASRN='78-78-4', method='FAIL')
-        
-    
+
+
     # Just test one thing with psi4
     # git can track everything
     val = dipole_moment(CASRN='64-17-5', method='PSI4_2022A')

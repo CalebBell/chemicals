@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,23 +20,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
 import pandas as pd
+import pytest
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.miscdata import webbook_data, heos_data
-from chemicals import int_to_CAS, data_reader
-from chemicals.critical import (Chueh_Prausnitz_Tc, Chueh_Prausnitz_Vc, Grieves_Thodos, Grigoras,
-                                Hekayati_Raeissi, Ihmels, Li, Meissner, Mersmann_Kind_predictor, Pc,
-                                Pc_methods, Tb_Tc_relationship, Tc, Tc_methods, Vc, Vc_methods, Zc,
-                                Zc_methods, critical_surface, critical_surface_methods,
-                                modified_Wilson_Tc, modified_Wilson_Vc, third_property)
-from chemicals.critical import (critical_data_IUPAC,
-                                critical_data_Matthews,
-                                critical_data_CRC,
-                                critical_data_PSRKR4,
-                                critical_data_Yaws,
-                                critical_data_PassutDanner,
-                                critical_data_PinaMartines)
+
+from chemicals import data_reader, int_to_CAS
+from chemicals.critical import (
+    Chueh_Prausnitz_Tc,
+    Chueh_Prausnitz_Vc,
+    Grieves_Thodos,
+    Grigoras,
+    Hekayati_Raeissi,
+    Ihmels,
+    Li,
+    Meissner,
+    Mersmann_Kind_predictor,
+    Pc,
+    Pc_methods,
+    Tb_Tc_relationship,
+    Tc,
+    Tc_methods,
+    Vc,
+    Vc_methods,
+    Zc,
+    Zc_methods,
+    critical_data_CRC,
+    critical_data_IUPAC,
+    critical_data_Matthews,
+    critical_data_PassutDanner,
+    critical_data_PinaMartines,
+    critical_data_PSRKR4,
+    critical_data_Yaws,
+    critical_surface,
+    critical_surface_methods,
+    modified_Wilson_Tc,
+    modified_Wilson_Vc,
+    third_property,
+)
+from chemicals.miscdata import heos_data, webbook_data
 
 
 def test_data_IUPAC():
@@ -189,7 +209,7 @@ def test_relationships():
     assert [] == critical_surface_methods(Tc=100)
 
 
-# 
+#
 
 @pytest.mark.slow
 @pytest.mark.parametrize("with_database", [True, False])
@@ -249,7 +269,7 @@ def test_Pc(with_database):
     assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON']
 
     # Error handling
-    assert None == Pc(CASRN='BADCAS')
+    assert None is Pc(CASRN='BADCAS')
     with pytest.raises(Exception):
         Pc(CASRN='98-01-1', method='BADMETHOD')
 
@@ -258,7 +278,7 @@ def test_Pc(with_database):
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Pc_all_values(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC,
                critical_data_PSRKR4, critical_data_PassutDanner, critical_data_Yaws,
                critical_data_PinaMartines, webbook_data, heos_data]
     CASs = set()
@@ -285,7 +305,7 @@ def test_Vc(with_database):
     assert methods == ['PSRK', 'PINAMARTINES', 'YAWS', 'FEDORS']
 
     # Error handling
-    assert None == Vc(CASRN='BADCAS')
+    assert None is Vc(CASRN='BADCAS')
     with pytest.raises(Exception):
         Vc(CASRN='98-01-1', method='BADMETHOD')
 
@@ -293,7 +313,7 @@ def test_Vc(with_database):
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Vc_all_values(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC,
                critical_data_PSRKR4, critical_data_Yaws, critical_data_PinaMartines,
                webbook_data, heos_data]
     CASs = set()
@@ -320,7 +340,7 @@ def test_Zc(with_database):
     assert methods == ['PSRK', 'PINAMARTINES', 'YAWS']
 
     # Error handling
-    assert None == Zc(CASRN='BADCAS')
+    assert None is Zc(CASRN='BADCAS')
     with pytest.raises(Exception):
         Zc(CASRN='98-01-1', method='BADMETHOD')
 
@@ -328,7 +348,7 @@ def test_Zc(with_database):
 @pytest.mark.slow
 def test_Zc_all_values(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
-    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, 
+    sources = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC,
                critical_data_PSRKR4, critical_data_PinaMartines,
                critical_data_Yaws, webbook_data, heos_data]
     CASs = set()
@@ -497,7 +517,7 @@ def test_Tb_Tc_relationship():
     assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitCl'), 665.4997)
     assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitF'), 671.9069499999999)
     assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitO'),688.99295)
-    
+
     with pytest.raises(ValueError):
         Tb_Tc_relationship(Tb=427.15, fit='BAD')
     with pytest.raises(ValueError):

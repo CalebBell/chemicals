@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,10 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from __future__ import division
+from fluids.numerics import assert_close1d
+
 import chemicals
 import chemicals.vectorized
-from fluids.numerics import assert_close1d
+
 
 def test_Tc_multi():
     Tcs_simple = [chemicals.critical.Tc(i) for i in ['108-88-3', '7732-18-5']]

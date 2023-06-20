@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016-2020, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,17 +20,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pandas as pd
-from math import isnan
-import pytest
-from chemicals.identifiers import (CAS_from_any, CAS_to_int, IDs_to_CASs, check_CAS,
-                                   dippr_compounds, int_to_CAS, mixture_from_any, search_chemical,
-                                   sorted_CAS_key)
-from chemicals.elements import periodic_table, nested_formula_parser, serialize_formula, molecular_weight
 import os
-from chemicals.identifiers import ChemicalMetadataDB, folder, pubchem_db
-from chemicals.identifiers import common_mixtures
+from math import isnan
+
+import pandas as pd
+import pytest
 from fluids.numerics import assert_close
+
+from chemicals.elements import molecular_weight, nested_formula_parser, periodic_table, serialize_formula
+from chemicals.identifiers import (
+    CAS_from_any,
+    CAS_to_int,
+    ChemicalMetadataDB,
+    IDs_to_CASs,
+    check_CAS,
+    common_mixtures,
+    dippr_compounds,
+    folder,
+    int_to_CAS,
+    mixture_from_any,
+    pubchem_db,
+    search_chemical,
+    sorted_CAS_key,
+)
 
 # Force the whole db to load
 try:
@@ -172,7 +183,7 @@ def test_inorganic_db():
 
     # Try ro check formula lookups
     for formula, d in  db.formula_index.items():
-        if formula in set(['H2MgO2', 'F2N2']):
+        if formula in {'H2MgO2', 'F2N2'}:
             # Formulas which are not unique by design
             continue
         assert CAS_from_any(formula) == d.CASs
@@ -205,7 +216,7 @@ def test_mixture_from_any():
     with pytest.raises(Exception):
         mixture_from_any('NOTAMIXTURE')
 
-    for name in ['Air', 'air', u'Air', ['air']]:
+    for name in ['Air', 'air', 'Air', ['air']]:
         assert mixture_from_any(name) == common_mixtures['Air']
 
     names = ['R-401A ', ' R-401A ', 'R401A ', 'r401a', 'r-401A', 'refrigerant-401A', 'refrigerant 401A']
@@ -213,7 +224,7 @@ def test_mixture_from_any():
         assert mixture_from_any(name) == common_mixtures['R401A']
 
     assert mixture_from_any('R512A') == common_mixtures['R512A']
-    assert mixture_from_any([u'air']) == common_mixtures['Air']
+    assert mixture_from_any(['air']) == common_mixtures['Air']
 
 def test_IDs_to_CASs():
     expect = ['811-97-2', '75-37-6']
@@ -322,7 +333,7 @@ def test_periodic_table_variants():
                 assert CAS_from_any(i) == periodic_table[i].CAS
             except:
                 failed_CASs.append(periodic_table[i].name)
-    assert set(['Chlorine', 'Fluorine', 'Hydrogen', 'Nitrogen', 'Oxygen', 'Bromine', 'Iodine']) == set(failed_CASs)
+    assert {'Chlorine', 'Fluorine', 'Hydrogen', 'Nitrogen', 'Oxygen', 'Bromine', 'Iodine'} == set(failed_CASs)
 
 
 
@@ -342,7 +353,7 @@ def test_periodic_table_variants():
     fail = 0
     for CAS, d in periodic_table._CAS_to_elements.items():
 
-        if d.PubChem != None:
+        if d.PubChem is not None:
             assert CAS_from_any('PubChem=' + str(d.PubChem)) == CAS
         else:
             fail += 1
@@ -408,8 +419,7 @@ def test_db_vs_ChemSep():
     EVEN THAT HAS BEEN REDUCED By 80% by using cElementTree instead of
     ElementTree.
     """
-
-    import xml.etree.cElementTree as ET
+    import xml.etree.ElementTree as ET
     folder = os.path.join(os.path.dirname(__file__), '..', 'chemicals', 'Misc')
 
     tree = ET.parse(os.path.join(folder, 'ChemSep8.32.xml'))

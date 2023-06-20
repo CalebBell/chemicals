@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2020 Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,22 +20,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from __future__ import division
-from chemicals import (Bahadori_liquid, Bhirud_normal, COSTALD_mixture, Campbell_Thodos,
-                       Chueh_Prausnitz_Tc, Chueh_Prausnitz_Vc, DIPPR9H, Filippov, Grieves_Thodos,
-                       Henry_converter, Li, Lucas_gas, Rachford_Rice_flash_error,
-                       Rachford_Rice_solution2, Rachford_Rice_solutionN,
-                       Rachford_Rice_solution_polynomial, Rackett_mixture, SNM0, Vfs_to_zs,
-                       Winterfeld_Scriven_Davis, brix_to_RI, d2xs_to_dxdn_partials,
-                       dns_to_dn_partials, dxs_to_dn_partials, dxs_to_dns, flash_inner_loop,
-                       modified_Wilson_Tc, modified_Wilson_Vc, normalize, ws_to_zs, zs_to_Vfs,
-                       zs_to_ws)
-import chemicals.vectorized
 from random import random
-from fluids.numerics import assert_close, assert_close1d, assert_close2d
+
 import pytest
+from fluids.numerics import assert_close, assert_close1d, assert_close2d
+
+import chemicals.vectorized
+from chemicals import (
+    DIPPR9H,
+    SNM0,
+    Bahadori_liquid,
+    Bhirud_normal,
+    Campbell_Thodos,
+    Chueh_Prausnitz_Tc,
+    Chueh_Prausnitz_Vc,
+    COSTALD_mixture,
+    Filippov,
+    Grieves_Thodos,
+    Henry_converter,
+    Li,
+    Lucas_gas,
+    Rachford_Rice_flash_error,
+    Rachford_Rice_solution2,
+    Rachford_Rice_solution_polynomial,
+    Rachford_Rice_solutionN,
+    Rackett_mixture,
+    Vfs_to_zs,
+    Winterfeld_Scriven_Davis,
+    brix_to_RI,
+    d2xs_to_dxdn_partials,
+    dns_to_dn_partials,
+    dxs_to_dn_partials,
+    dxs_to_dns,
+    flash_inner_loop,
+    modified_Wilson_Tc,
+    modified_Wilson_Vc,
+    normalize,
+    ws_to_zs,
+    zs_to_Vfs,
+    zs_to_ws,
+)
+
 try:
     import numba
+
     import chemicals.numba
     import chemicals.numba_vectorized
 except:
@@ -75,7 +102,7 @@ def test_numba_vectorized_basics():
     vectorized = chemicals.numba_vectorized.EQ102(np.array([301.0, 302.3]), 1.7096E-8, 1.1146, 0, 0, 0)
     scalar = [chemicals.EQ102(T, 1.7096E-8, 1.1146, 0, 0, 0) for T in [301.0, 302.3]]
     assert_close1d(vectorized, scalar, rtol=1e-13)
-    
+
     args = (276370., -2090.1, 8.125, -0.014116, 0.0000093701, 0, 0, 0)
     vectorized = chemicals.numba_vectorized.EQ100(np.array([300]), *args)
     scalar = chemicals.EQ100(300, *args)
@@ -478,7 +505,7 @@ def test_rachford_rice():
     assert_close(VF, VF_new, rtol=1e-14)
     assert_close1d(xs, xs_new, rtol=1e-14)
     assert_close1d(ys, ys_new, rtol=1e-14)
-    
+
     LF_new, VF_new, xs_new, ys_new = chemicals.numba.Rachford_Rice_solution_Leibovici_Neoschil_dd(zs=zs, Ks=Ks)
     assert_close(VF, VF_new, rtol=1e-14)
     assert_close1d(xs, xs_new, rtol=1e-14)
@@ -499,7 +526,7 @@ def test_rachford_rice():
     # test_flash_solution_algorithms(chemicals.numba.flash_inner_loop, array=True)
     # test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_LN2, array=True)
     # test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution, array=True)
-    
+
     # f = lambda zs, Ks, guess=None: chemicals.numba.Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess)[1:]
     # test_flash_solution_algorithms(f, array=True)
     # test_flash_solution_algorithms(chemicals.numba.Rachford_Rice_solution_numpy, array=True) # Does not currently pass
@@ -584,7 +611,7 @@ def test_fitting_jacobians():
     der_expect = [[6.38493817686558e-10, 5.67321421625625e-10, 3.9796661447548854e-10, 1.9583105182859243e-10]]
     der_analytical = chemicals.numba.Wagner_original_fitting_jacobian(np.array([T]), Tc, Pc, a, b, c, d)
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
-    
+
     T, Tc, Pc, a, b, c, d = 100.0, 475.03, 2980000.0, -8.32915, 2.37044, -3.75113, -4.6033
     der_expect = [[5.1791400515036586e-11, 4.601825445175529e-11, 3.633081272138977e-11, 2.0120443215711467e-11]]
     der_analytical = chemicals.numba.Wagner_fitting_jacobian(np.array([T]), Tc, Pc, a, b, c, d)
@@ -594,7 +621,7 @@ def test_fitting_jacobians():
     der_expect = [[3537.44834545549, 11.791494484851635, 20176.835877810598, 318370351.0909941, 7563.831703366002]]
     der_analytical = chemicals.numba.EQ101_fitting_jacobian(np.array([T]), A, B, C, D, E)
     assert_close1d(der_analytical, der_expect, rtol=1e-13)
-    
+
     T, A, B, C, D = 300.0, 2e-6, 0.42, 900.0, -4e4
     der_expect = [[3.08662207669995, 3.521084181393621e-05, -5.787416393812407e-09, -1.9291387979374693e-11]]
     der_analytical = chemicals.numba.EQ102_fitting_jacobian(np.array([T]), A, B, C, D)

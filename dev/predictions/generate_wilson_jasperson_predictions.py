@@ -1,8 +1,10 @@
 import os
-from thermo import Wilson_Jasperson
-from chemicals.identifiers import pubchem_db
-from chemicals import Tb
+
 from rdkit import Chem
+from thermo import Wilson_Jasperson
+
+from chemicals import Tb
+from chemicals.identifiers import pubchem_db
 
 folder = os.path.join(os.path.dirname(__file__), '..', '..', 'chemicals', 'Critical Properties')
 nan = float("nan")
@@ -38,17 +40,17 @@ def generate_line(CASi):
             elif v == '':
                 pass
             elif isinstance(v, (int, float)):
-                line[i] = '{:.8g}'.format(v)
+                line[i] = f'{v:.8g}'
         to_write = '\t'.join(line) + '\n'
         return to_write
     return False
-    
-    
+
+
 for CASi in sorted(pubchem_db.CAS_index):
     ans = generate_line(CASi)
     if ans is not False:
         lines.append(ans)
-    
+
 #retVals = Parallel()(delayed(generate_line)(CASi) for CASi in sorted(pubchem_db.CAS_index))
 #for l in retVals:
 #    if l is not False:

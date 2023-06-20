@@ -90,7 +90,6 @@ from math import ceil, log10
 
 from chemicals import data_reader as dr
 from chemicals import heat_capacity, miscdata
-from chemicals.elements import periodic_table, simple_formula_parser
 from chemicals.data_reader import (
     data_source,
     database_constant_lookup,
@@ -99,6 +98,7 @@ from chemicals.data_reader import (
     retrieve_any_from_df_dict,
     retrieve_from_df_dict,
 )
+from chemicals.elements import periodic_table, simple_formula_parser
 from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
 
 # %% Register data sources and lazy load them
@@ -1118,9 +1118,8 @@ def standard_formation_reaction(atoms):
 
     >>> standard_formation_reaction({'C': 1, 'H': 5, 'N': 1})
     (2.0, [2.0, 5.0, 1.0], [{'C': 1}, {'H': 2}, {'N': 2}])
-    
-    '''
 
+    '''
     product_atomss = []
     reactants = []
     for atom in atoms:
@@ -1128,7 +1127,7 @@ def standard_formation_reaction(atoms):
         ele_atoms = simple_formula_parser(ele.formula_standard)
         product_atomss.append(ele_atoms)
         reactants.append(True)
-    
+
     atoms_to_process = product_atomss + [atoms]
     reactants.append(False)
     matrix = stoichiometric_matrix(atoms_to_process, reactants)

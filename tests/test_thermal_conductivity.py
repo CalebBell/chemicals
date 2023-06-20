@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -23,16 +22,43 @@ SOFTWARE.
 
 import pytest
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.thermal_conductivity import (Bahadori_gas, Bahadori_liquid, Chemsep_16, Chung,
-                                            Chung_dense, DIPPR9B, DIPPR9G, DIPPR9H, DIPPR9I,
-                                            Eli_Hanley, Eli_Hanley_dense, Eucken, Eucken_modified,
-                                            Filippov, Gharagheizi_gas, Gharagheizi_liquid,
-                                            Lakshmi_Prasad, Lindsay_Bromley, Missenard, Nicola,
-                                            Nicola_original, PPDS3, PPDS8, Sato_Riedel,
-                                            Sheffy_Johnson, Stiel_Thodos_dense,
-                                            Wassiljewa_Herning_Zipperer, k_IAPWS, k_air_lemmon,
-                                            kl_Mersmann_Kind)
-from chemicals.thermal_conductivity import k_data_Perrys_8E_2_314, k_data_Perrys_8E_2_315, k_data_VDI_PPDS_10, k_data_VDI_PPDS_9
+
+from chemicals.thermal_conductivity import (
+    DIPPR9B,
+    DIPPR9G,
+    DIPPR9H,
+    DIPPR9I,
+    PPDS3,
+    PPDS8,
+    Bahadori_gas,
+    Bahadori_liquid,
+    Chemsep_16,
+    Chung,
+    Chung_dense,
+    Eli_Hanley,
+    Eli_Hanley_dense,
+    Eucken,
+    Eucken_modified,
+    Filippov,
+    Gharagheizi_gas,
+    Gharagheizi_liquid,
+    Lakshmi_Prasad,
+    Lindsay_Bromley,
+    Missenard,
+    Nicola,
+    Nicola_original,
+    Sato_Riedel,
+    Sheffy_Johnson,
+    Stiel_Thodos_dense,
+    Wassiljewa_Herning_Zipperer,
+    k_air_lemmon,
+    k_data_Perrys_8E_2_314,
+    k_data_Perrys_8E_2_315,
+    k_data_VDI_PPDS_9,
+    k_data_VDI_PPDS_10,
+    k_IAPWS,
+    kl_Mersmann_Kind,
+)
 
 
 def test_k_IAPWS():
@@ -81,10 +107,10 @@ def test_k_air_lemmon():
     k_near_crit = k_air_lemmon(132.64, 10400, 2137.078854678728, 35.24316159996235, 0.07417878614315769, 0.00035919027241528256, 1.7762253265868595e-05)
     assert 0.0756231 == round(k_near_crit, 7)
     assert_close(k_near_crit, 0.07562307234760142, rtol=1e-13)
-    
+
     # Random point found that was causing issues
     kwargs_problematic = {'T': 300, 'rho': 5000.0, 'Cp': 34.650910964354516,
-                      'Cv': 21.576284320940534, 'drho_dP': 0.00038766674876690075, 
+                      'Cv': 21.576284320940534, 'drho_dP': 0.00038766674876690075,
                       'drho_dP_Tr': 0.0004713577861638539, 'mu': 2.1324097850144885e-05}
     assert_close(k_air_lemmon(**kwargs_problematic), 0.0326062305718951, rtol=1e-13)
 
@@ -93,7 +119,7 @@ def test_k_air_lemmon():
 def test_Perrys2_314_data():
     # In perry's, only 102 is used. No chemicals are missing.
     # Tmaxs all match to 5E-4. Tmins match to 1E-3.
-    tots_calc = [k_data_Perrys_8E_2_314[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
+    tots_calc = [k_data_Perrys_8E_2_314[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'Tmin', 'Tmax']]
     tots = [48935634.823768869, 297.41545078799999, 421906466448.71423, 232863514627157.62, 125020.26000000001, 347743.42000000004]
     assert_close(tots_calc, tots)
 
@@ -105,7 +131,7 @@ def test_Perrys2_315_data():
     # All perry's use #100.
     # Tmins all match at 5E-4.
     # Tmaxs all match at 2E-3.
-    tots_calc = [k_data_Perrys_8E_2_315[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'C5', u'Tmin', u'Tmax']]
+    tots_calc = [k_data_Perrys_8E_2_315[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'C5', 'Tmin', 'Tmax']]
     tots = [82.001667499999996, 0.19894598900000002, 0.0065330144999999999, 0.00046928630199999995, 1.0268010799999999e-07, 70996.369999999995, 138833.41]
     assert_close1d(tots_calc, tots)
 
@@ -123,8 +149,7 @@ def test_VDI_PPDS_10_data():
 
     These have been checked - it appears the tabulated data is just incorrect.
     """
-
-    tots_calc = [k_data_VDI_PPDS_10[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
+    tots_calc = [k_data_VDI_PPDS_10[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E']]
     tots = [2.2974640014599998, 0.015556001460000001, 1.9897655000000001e-05, 6.7747269999999993e-09, 2.3260109999999999e-12]
     assert_close1d(tots_calc, tots)
 
@@ -139,7 +164,7 @@ def test_VDI_PPDS_9_data():
 
     These have been checked - it appears the tabulated data is just incorrect.
     """
-    tots_calc = [k_data_VDI_PPDS_9[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
+    tots_calc = [k_data_VDI_PPDS_9[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E']]
     tots = [63.458699999999993, 0.14461469999999998, 0.00042270770000000005, 1.7062660000000002e-06, 3.2715370000000003e-09]
     assert_close1d(tots_calc, tots)
 
@@ -289,15 +314,15 @@ def test_Wassiljewa_Herning_Zipperer():
 def test_DIPPR9I():
     k = DIPPR9I(zs=[.682, .318], Vms=[1.723e-2, 7.338e-2], ks=[.6037, .1628])
     assert_close(k, 0.25397430656658937, rtol=1e-13)
-    
+
 def test_PPDS8():
     assert_close(PPDS8(T=500.0, Tc=562.05, a0=0.0641126, a1=0.61057, a2=-1.72442, a3=3.94394), 0.08536381765218425, rtol=1e-13)
-    
-    
+
+
 def test_PPDS3():
     assert_close(PPDS3(T=400.0, Tc=470.008, a1=11.6366, a2=25.1191, a3=-7.21674), 0.0251734811601927, rtol=1e-13)
-    
-    
+
+
 def test_Chemsep_16():
     k = Chemsep_16(300.0, -0.12682, -1.5015, -1.0467, -0.00088709, -9.3679E-07)
     assert_close(k, 0.11924904787869492, rtol=1e-14)

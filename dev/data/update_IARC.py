@@ -61,8 +61,8 @@ for _, r in df.iterrows():
                 years.append(Year)
 for i in range(len(groups)):
     groups[i] = IARC_str_to_ints[groups[i]]
-                
-                
+
+
 df = pd.DataFrame({'description': descriptions, 'group': groups, 'volumes': volumes,
                   'year': years}, index=CASRNs)
 df.fillna('', inplace=True)

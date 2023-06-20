@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2022, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -22,7 +21,8 @@ SOFTWARE.
 """
 
 import os
-import xml.etree.cElementTree as ET
+import xml.etree.ElementTree as ET
+
 folder = os.path.join(os.path.dirname(__file__), '..','..', 'chemicals', 'Misc')
 
 tree = ET.parse(os.path.join(folder, 'ChemSep8.30.xml'))
@@ -56,10 +56,10 @@ for CAS, RG in radius_of_gyrations.items():
         elif v == '':
             pass
         elif isinstance(v, (int, float)):
-            line[i] = '{:.8g}'.format(v)
+            line[i] = f'{v:.8g}'
     to_write = '\t'.join(line) + '\n'
     lines.append(to_write)
 
-f = open('../../chemicals/Misc/chemsep_radius_of_gyrations.tsv', 'w') 
+f = open('../../chemicals/Misc/chemsep_radius_of_gyrations.tsv', 'w')
 f.writelines(lines)
 f.close()

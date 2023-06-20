@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,12 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fluids.numerics import assert_close, assert_close1d
-import pytest
 import pandas as pd
-from chemicals.triple import Pt, Pt_methods, Tt, Tt_methods
-from chemicals.triple import triple_data_Staveley
-from chemicals.miscdata import heos_data
+import pytest
+from fluids.numerics import assert_close, assert_close1d
+
+from chemicals.triple import Pt, Pt_methods, Tt, Tt_methods, triple_data_Staveley
 
 
 def test_data():
@@ -53,7 +51,7 @@ def test_Tt():
 
     m = Tt_methods('7439-90-9')
     assert m == ['HEOS', 'STAVELEY', 'WEBBOOK', 'MELTING']
-    assert None == Tt('72433223439-90-9')
+    assert None is Tt('72433223439-90-9')
     with pytest.raises(Exception):
         Tt('74-82-8', method='BADMETHOD')
 
@@ -62,7 +60,7 @@ def test_Tt():
 def test_Tt_fuzz():
     Tt_sum = sum([Tt(i, method='STAVELEY') for i in triple_data_Staveley.index])
     assert_close(Tt_sum, 31253.97552)
-    
+
     # These will change a lot
     Tt_sum2 = pd.Series([Tt(i, method='MELTING') for i in triple_data_Staveley.index]).sum()
     assert Tt_sum2 >= 28778.196
@@ -72,12 +70,12 @@ def test_Pt():
     Pt1_calc = Pt('7664-41-7')
     Pt1 = 6053.38683212
     assert_close(Pt1_calc, Pt1)
-    
+
     assert_close(Pt('7664-41-7', 'WEBBOOK'), 6060)
 
     m = Pt_methods('7664-41-7')
     assert m == ['HEOS', 'STAVELEY', 'WEBBOOK']
-    assert None == Pt('72433223439-90-9')
+    assert None is Pt('72433223439-90-9')
     with pytest.raises(Exception):
         Pt('74-82-8', method='BADMETHOD')
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,12 +20,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from fluids.numerics import assert_close, assert_close1d
 import pytest
-from chemicals.refractivity import (RI, RI_IAPWS, RI_from_molar_refractivity, RI_methods,
-                                    RI_to_brix, TDE_RIXExpansion, brix_to_RI,
-                                    molar_refractivity_from_RI, polarizability_from_RI)
-from chemicals.refractivity import RI_data_CRC_organic
+from fluids.numerics import assert_close, assert_close1d
+
+from chemicals.refractivity import (
+    RI,
+    RI_IAPWS,
+    RI_data_CRC_organic,
+    RI_from_molar_refractivity,
+    RI_methods,
+    RI_to_brix,
+    TDE_RIXExpansion,
+    brix_to_RI,
+    molar_refractivity_from_RI,
+    polarizability_from_RI,
+)
+
 
 def test_refractivity_CRC():
     assert_close(RI_data_CRC_organic['RI'].sum(), 6602.78821)
@@ -37,7 +46,7 @@ def test_refractivity_CRC():
 def test_refractivity_all_answers():
     vals = [RI(i) for i in  RI_data_CRC_organic.index.values]
     RI_sum = sum([v[0] for v in vals])
-    T_sum = sum([v[1] for v in vals if not (v[1] is None)])
+    T_sum = sum([v[1] for v in vals if v[1] is not None])
     assert len(vals) == 4490
     assert type(vals[0][0]) is float
     assert type(vals[0][1]) is float
@@ -61,7 +70,7 @@ def test_refractivity_general():
 
 
     assert RI("60-35-5") == (1.4278, None)
-    
+
     assert RI(CASRN='74-82-8', method='CRC') == (None, None)
 
 

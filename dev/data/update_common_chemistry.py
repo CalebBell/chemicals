@@ -1,16 +1,20 @@
-import lxml.html
-import os, json, re, requests, appdirs
-from joblib import Parallel, delayed
+import json
+import os
+import re
 
+import appdirs
+import lxml.html
+import natsort
+import requests
 from fluids.constants import torr
 from fluids.core import C2K
 from fluids.numerics import mean
-
-from chemicals import serialize_formula, rho_to_Vm, molecular_weight, nested_formula_parser
-from chemicals.identifiers import CAS_to_int, int_to_CAS
+from joblib import Parallel, delayed
 from rdkit import Chem
 from rdkit.Chem.rdMolDescriptors import CalcMolFormula
-import natsort
+
+from chemicals import molecular_weight, nested_formula_parser, rho_to_Vm, serialize_formula
+from chemicals.identifiers import CAS_to_int, int_to_CAS
 
 folder = os.path.dirname(__file__)
 
@@ -22,10 +26,10 @@ common_chemistry_cache_dir = os.path.join(cache_dir, 'common_chemistry')
 if not os.path.exists(common_chemistry_cache_dir):
     os.mkdir(common_chemistry_cache_dir)
 
-'''The following file contains ~60% of the CASs in the common CAS database.
+"""The following file contains ~60% of the CASs in the common CAS database.
 It is unknown what the remaining CASs are, but it would be nice to include
 them as well.
-'''
+"""
 CASs_process = open(os.path.join(folder, 'common_chemistry_CASs.tsv')).readlines()
 CASs_process = [i.strip() for i in CASs_process]
 
@@ -34,10 +38,9 @@ def remove_html(text):
     '''
     Examples
     --------
-    
     >>> remove_html('Boric acid (H<sub>3</sub>BO<sub>3</sub>), trimethyl ester')
     'Boric acid (H3BO3), trimethyl ester'
-    
+
     '''
     if '<' in text:
         return lxml.html.fromstring(text).text_content()
@@ -83,7 +86,7 @@ def pressure_if_present(s):
     return pres
 
 def process_temperataure(s):
-    '''Process a string containing either a 
+    '''Process a string containing either a
     melting point or a boiling point. These often have
     a pressure attatched.
     '''
@@ -120,15 +123,15 @@ def process_density(s):
         bits = number_range.split(s)
         low, high = bits[1], bits[3]
         start = mean([float(v) for v in (low, high)])
-        
+
     temp = temperature_if_present(s)
     P = pressure_if_present(s)
     rho = float(start)*1000
 #     print(rho, temp, P)
     return rho, temp, P
-    
-    
-cases = [('250-257 °C', (526.65, None)), 
+
+
+cases = [('250-257 °C', (526.65, None)),
          ('-50 °C', (223.14999999999998, None)),
         ('100 °C', (373.15, None))]
 for t_str, expect in cases:
@@ -153,8 +156,8 @@ def MW_from_smiles(smiles):
                 return MW
     except:
         print(smiles, type(smiles))
-        
-base_url = '''https://rboq1qukh0.execute-api.us-east-2.amazonaws.com/default/detail?cas_rn='''
+
+base_url = """https://rboq1qukh0.execute-api.us-east-2.amazonaws.com/default/detail?cas_rn="""
 
 def common_chemistry_data(CASRN):
     '''Load the chemical data for the specified CAS.
@@ -163,7 +166,7 @@ def common_chemistry_data(CASRN):
     cache_loc = os.path.join(common_chemistry_cache_dir, CASRN)
     cached = False
     if os.path.exists(cache_loc):
-        f = open(cache_loc, 'r')
+        f = open(cache_loc)
         json_data = json.loads(f.read())
         f.close()
     else:
@@ -181,13 +184,13 @@ def common_chemistry_data(CASRN):
     inchi = json_data['inchi'] if json_data['inchi']  else None
     inchiKey = json_data['inchiKey'] if json_data['inchiKey']  else None
     smiles = json_data['canonicalSmile'] if json_data['canonicalSmile']  else None
-    formula = remove_html(json_data['molecularFormula']) if json_data['molecularFormula']  else None 
+    formula = remove_html(json_data['molecularFormula']) if json_data['molecularFormula']  else None
     MW = float(json_data['molecularMass']) if json_data['molecularMass'] else None
     #if MW is None:
         #MW = MW_from_smiles(smiles)
-        
+
     Tm, Tb, TbP, rho, rhoT, rhoP = None, None, None, None, None, None
-    
+
     for prop in json_data['experimentalProperties']:
         orig_prop_val = prop['property']
         prop_val = orig_prop_val # remove_html
@@ -210,8 +213,8 @@ def common_chemistry_data(CASRN):
             'formula': formula, 'inchi': inchi, 'inchiKey': inchiKey, 'smiles': smiles,
            'Tm': Tm, 'Tb': Tb, 'TbP': TbP, 'rho': rho, 'rhoT': rhoT, 'rhoP': rhoP, 'MW': MW,
            }
-'''Load and process the data into dictionaries in-memory.
-'''
+"""Load and process the data into dictionaries in-memory.
+"""
 processed_data = Parallel(n_jobs=16, batch_size=10000, verbose=60)(delayed(common_chemistry_data)(c) for c in CASs_process)
 print('Loaded %d chemicals from specified CAS list' %(len(processed_data)))
 
@@ -225,8 +228,8 @@ for dat in processed_data:
 print('%d chemicals have at least one experimental property' %(len(chemical_data)))
 
 
-'''Make a full dump of the parsed data for future use.
-'''
+"""Make a full dump of the parsed data for future use.
+"""
 keys = ['CAS', 'name', 'formula', 'MW', 'smiles', 'inchi', 'inchiKey', 'Tm', 'Tb', 'TbP', 'rho', 'rhoT', 'rhoP']
 lines = ['\t'.join(keys) + '\n']
 CASs_iter = [v['CASs'] for v in chemical_data.values()]
@@ -245,7 +248,7 @@ for CASs in CASs_iter:
         elif v == '':
             pass
         elif isinstance(v, (int, float)):
-            values[i] = '{:.8g}'.format(v)
+            values[i] = f'{v:.8g}'
         elif type(v) is str:
             pass
         else:
@@ -265,12 +268,12 @@ print('Complete data dump complete')
 
 
 
-'''Process the mass densities into molar volumes. Note that the phase of the density
+"""Process the mass densities into molar volumes. Note that the phase of the density
 is not specified, so if it cannot be deduced from the melting and boiling point,
 just ignore the data unfortunately.
 
 Do not take gas densities as they are not needed.
-'''
+"""
 missed_rho = 0
 for dat in chemical_data.values():
     rho, Tm, Tb, TbP, rhoT, rhoP, MW = dat['rho'], dat['Tm'], dat['Tb'], dat['TbP'], dat['rhoT'], dat['rhoP'], dat['MW']
@@ -281,7 +284,7 @@ for dat in chemical_data.values():
         continue
 
     Vm = rho_to_Vm(rho=rho, MW=MW)
-        
+
     # If we are solid, easy
     if rhoT is not None and Tm is not None and rhoT < Tm:
         dat['Vms'] = Vm
@@ -297,7 +300,7 @@ for dat in chemical_data.values():
         # We are very likely a solid as the substance melts above room temperature
         dat['Vms'] = Vm
         continue
-        
+
     # 15 degree liquid
     if Tm is not None and Tb is not None and Tm <= 288.15 and Tb > 310:
         # We are very likely a liquid
@@ -310,20 +313,20 @@ for dat in chemical_data.values():
         continue
     missed_rho += 1
 #     print(rho, Tm, Tb, TbP, rhoT, rhoP, dat['CAS'])
-    
+
 print('Identified phases of densities for most compounds but could not identify %s' %(missed_rho))
 
 for dat in chemical_data.values():
-    '''If we have a boiling point more than 10 kPa outside of the appropriate range, drop it.
-    
+    """If we have a boiling point more than 10 kPa outside of the appropriate range, drop it.
+
     If the boiling point is less than the melting point, drop it - data error.
-    '''
+    """
     if dat['TbP'] is not None and not (90000 < dat['TbP'] < 110000):
         dat['Tb'] = None
-        
+
     if dat['Tb'] is not None and dat['Tm'] is not None and dat['Tb'] <= dat['Tm']:
         dat['Tb'] = None
-    
+
 
 keys = ['CAS', 'Tm', 'Tb', 'Vms', 'Vml']
 lines = ['\t'.join(keys) + '\n']
@@ -341,7 +344,7 @@ for CASs in CASs_iter:
         elif v == '':
             pass
         elif isinstance(v, (int, float)):
-            values[i] = '{:.8g}'.format(v)
+            values[i] = f'{v:.8g}'
         elif type(v) is str:
             pass
         else:

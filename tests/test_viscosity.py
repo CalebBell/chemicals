@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 r"""Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, 2017, 2018, 2019, 2020 Caleb Bell
 <Caleb.Andrew.Bell@gmail.com>
@@ -22,23 +21,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from random import uniform
-import pytest
 from math import log, log10
+from random import uniform
+
+import pytest
+from fluids.constants import atm, foot, lb, psi
+from fluids.core import F2K, R2K
 from fluids.numerics import assert_close, assert_close1d, derivative
-from fluids.constants import psi, atm, foot, lb
-from fluids.core import R2K, F2K
-from chemicals.utils import normalize, mixing_simple
-from chemicals.viscosity import (Brokaw, Herning_Zipperer, Letsou_Stiel, Lorentz_Bray_Clarke, Lucas,
-                                 Lucas_gas, PPDS5, PPDS9, Przedziecki_Sridhar, Stiel_Thodos,
-                                 Twu_1985, Viswanath_Natarajan_2, Viswanath_Natarajan_2_exponential,
-                                 Viswanath_Natarajan_3, Wilke, Wilke_large, Wilke_prefactored,
-                                 Wilke_prefactors, Yoon_Thodos, dPPDS9_dT, dmu_Yaws_dT, mu_IAPWS,
-                                 mu_TDE, mu_Yaws, mu_Yaws_fitting_jacobian, mu_air_lemmon,
-                                 viscosity_converter, viscosity_gas_Gharagheizi, viscosity_index)
-from chemicals.viscosity import (mu_data_Dutt_Prasad, mu_data_VN3, mu_data_VN2,
-                                 mu_data_VN2E, mu_data_Perrys_8E_2_313, mu_data_Perrys_8E_2_312,
-                                 mu_data_VDI_PPDS_7, mu_data_VDI_PPDS_8)
+
+from chemicals.utils import mixing_simple, normalize
+from chemicals.viscosity import (
+    PPDS5,
+    PPDS9,
+    Brokaw,
+    Herning_Zipperer,
+    Letsou_Stiel,
+    Lorentz_Bray_Clarke,
+    Lucas,
+    Lucas_gas,
+    Przedziecki_Sridhar,
+    Stiel_Thodos,
+    Twu_1985,
+    Viswanath_Natarajan_2,
+    Viswanath_Natarajan_2_exponential,
+    Viswanath_Natarajan_3,
+    Wilke,
+    Wilke_large,
+    Wilke_prefactored,
+    Wilke_prefactors,
+    Yoon_Thodos,
+    dmu_Yaws_dT,
+    dPPDS9_dT,
+    mu_air_lemmon,
+    mu_data_Dutt_Prasad,
+    mu_data_Perrys_8E_2_312,
+    mu_data_Perrys_8E_2_313,
+    mu_data_VDI_PPDS_7,
+    mu_data_VDI_PPDS_8,
+    mu_data_VN2,
+    mu_data_VN2E,
+    mu_data_VN3,
+    mu_IAPWS,
+    mu_TDE,
+    mu_Yaws,
+    mu_Yaws_fitting_jacobian,
+    viscosity_converter,
+    viscosity_gas_Gharagheizi,
+    viscosity_index,
+)
 
 ### Check data integrity
 
@@ -76,7 +106,7 @@ def test_VN2_data():
 def test_Perrys2_313_data():
     # All values calculated at Tmin and Tmax check out to at least 5E-3 precision
     # The rounding has some effect, but it is not worrying.
-    tots_calc = [mu_data_Perrys_8E_2_313[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'C5', u'Tmin', u'Tmax']]
+    tots_calc = [mu_data_Perrys_8E_2_313[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'C5', 'Tmin', 'Tmax']]
     tots = [9166.6971369999992, 615425.94497999991, 1125.5317557875198, 9.054869390623603e+34, 402.21244000000002, 72467.140000000014, 136954.85999999999]
     assert_close1d(tots_calc, tots)
 
@@ -89,7 +119,7 @@ def test_Perrys2_312_data():
     # ~1E-5 Pa*S, but listed values are ~1E-10 to 1E-12. Unsure of the cause.
     # All coumpounds match at 1E-3 for Tmin.
 
-    tots_calc = [mu_data_Perrys_8E_2_312[i].abs().sum() for i in [u'C1', u'C2', u'C3', u'C4', u'Tmin', u'Tmax']]
+    tots_calc = [mu_data_Perrys_8E_2_312[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'Tmin', 'Tmax']]
     tots = [0.00019683902626010103, 250.10520100000002, 65862.829200000007, 191286, 74802.639999999999, 355064.37]
     assert_close1d(tots_calc, tots)
 
@@ -97,7 +127,7 @@ def test_Perrys2_312_data():
 
 
 def test_VDI_PPDS_7_data():
-    tots_calc = [mu_data_VDI_PPDS_7[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
+    tots_calc = [mu_data_VDI_PPDS_7[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E']]
     tots = [507.14607000000001, 1680.7624099999998, 165461.14259999999, 46770.887000000002, 0.057384780000000003]
     assert_close1d(tots_calc, tots)
 
@@ -107,7 +137,7 @@ def test_VDI_PPDS_8_data():
     # Coefficients for water are incorrect - obtained an average deviation of 150%!
     assert mu_data_VDI_PPDS_8.shape == (274, 6)
 
-    tots_calc = [mu_data_VDI_PPDS_8[i].abs().sum() for i in [u'A', u'B', u'C', u'D', u'E']]
+    tots_calc = [mu_data_VDI_PPDS_8[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E']]
     tots = [0.00032879559999999999, 9.5561339999999995e-06, 2.8377710000000001e-09, 2.8713399999999998e-12, 2.8409200000000004e-15]
     assert_close1d(tots_calc, tots)
 
@@ -305,7 +335,7 @@ def test_viscosity_index():
     assert_close(192.9975428057893, viscosity_index(1000E-6, 100E-6)) # Custom
     assert 193 == viscosity_index(1000E-6, 100E-6, rounding=True) # custom, rounded
     assert 92 == viscosity_index(73.3E-6, 8.86E-6, rounding=True)
-    assert None == viscosity_index(3E-6, 1.5E-6)
+    assert None is viscosity_index(3e-06, 1.5e-06)
 
 
 def test_Lorentz_Bray_Clarke():
@@ -517,27 +547,27 @@ def test_mu_air_lemmon():
     assert round(mu_air_lemmon(200.0, 10e3), 10) == 21.1392e-6
     assert round(mu_air_lemmon(300.0, 5e3), 10) == 21.3241e-6
     assert round(mu_air_lemmon(132.64, 10.4e3), 10) == 17.7623e-6
-    
-    
+
+
 def test_mu_Yaws():
     assert_close(mu_Yaws(300.0, -6.4406-log10(1000), 1117.6, 0.0137, -0.000015465), 0.00100666120816515, rtol=1e-14)
-    
+
     d = dmu_Yaws_dT(300.0, -9.4406, 1117.6, 0.0137, -0.000015465)
     d_num = derivative(lambda T: mu_Yaws(T,  -9.4406, 1117.6, 0.0137, -0.000015465), 300.0, dx=300.0*1e-7)
     assert_close(d, d_num)
-    
-    
+
+
     T, A, B, C, D = 300.0, -9.4406, 1117.6, 0.0137, -0.000015465
     der_num = [derivative(lambda A: mu_Yaws(T, A, B, C, D), A, dx=A*1e-5),
          derivative(lambda B: mu_Yaws(T, A, B, C, D), B, dx=B*1e-5),
          derivative(lambda C: mu_Yaws(T, A, B, C, D), C, dx=C*1e-5),
          derivative(lambda D: mu_Yaws(T, A, B, C, D), D, dx=D*1e-5)]
-    
+
     der_expect = [[0.0023179230916164487, 7.726410305388163e-06, 0.6953769274849346, 208.61307824548038]]
     der_analytical = mu_Yaws_fitting_jacobian([T], A, B, C, D)
     assert_close1d(der_expect, der_analytical, rtol=1e-13)
     assert_close1d(der_analytical, [der_num], rtol=1e-7)
-    
+
     # Point where overflow would occur
     kwargs = {'T': 489.2, 'A': 1.0, 'B': 1.0, 'C': 1.0, 'D': 1.0}
     mu_Yaws(**kwargs)
@@ -545,6 +575,6 @@ def test_mu_Yaws():
 
 def test_mu_TDE():
     assert_close(mu_TDE(400.0, -14.0878, 3500.26, -678132.0, 6.17706e7), 0.00018221752814389364, rtol=1e-12)
-    
+
 def test_PPDS5():
     assert_close(PPDS5(T=350.0, Tc=470.008, a0=1.08003e-5, a1=0.19583, a2=0.811897), 8.096643275836458e-06, rtol=1e-13)

@@ -1,30 +1,33 @@
+import requests
 from wikidata.client import Client
 from wikidata.datavalue import DatavalueError
-import requests
+
 client = Client()
 
-from joblib import Parallel, delayed
-from fluids.numerics import mean
-from fluids import C2K, R2K, F2K
-from time import time
-from chemicals.safety import mgm3_to_ppmv
-from chemicals.identifiers import CAS_to_int
-from chemicals import molecular_weight, nested_formula_parser
 import os
+from time import time
 
-'''These are the propertiese and string representations we will retrieve'''
-properties = {'P2101': 'Tm', 
-              'P2102': 'Tb', 
+from fluids import C2K, F2K, R2K
+from fluids.numerics import mean
+from joblib import Parallel, delayed
+
+from chemicals import molecular_weight, nested_formula_parser
+from chemicals.identifiers import CAS_to_int
+from chemicals.safety import mgm3_to_ppmv
+
+"""These are the propertiese and string representations we will retrieve"""
+properties = {'P2101': 'Tm',
+              'P2102': 'Tb',
               'P1109': 'RI',
               'P2066': 'Hfus',
               'P2116': 'Hvap',
               #'P2054': 'rho',
-              'P2202': 'LFL', 
+              'P2202': 'LFL',
               'P2203': 'UFL',
               'P2128': 'T_flash',
               'P2199': 'T_autoignition',
               'P3078': 'Hf', # Standard state only
-              'P3071': 'S0', 
+              'P3071': 'S0',
               'P2993': 'logP',
              }
 
@@ -79,10 +82,10 @@ def value_to_SI(value, unit, value_key, MW):
     if value_key in ('S0',):
         if unit is J_mol_K_item:
             return value
-    '''Need to add more units or fix an item in wikidata when this happens'''
+    """Need to add more units or fix an item in wikidata when this happens"""
     print(value, unit, value_key)
     raise NoUnitsError('No Units')
-    
+
 subscripts = '₀₁₂₃₄₅₆₇₈₉'
 numbers = '0123456789'
 translate_subscripts = str.maketrans(subscripts, numbers)
@@ -92,17 +95,17 @@ translate_subscripts = str.maketrans(subscripts, numbers)
 chemical_IDs = set()
 start = time()
 # There isn't a need to restrict to our search to chemicals specifically; anything with a CAS will do. Some chemicals aren't mapped as chemicals.
-'''
+"""
         {?cmpnd wdt:P279 wd:Q11173 .} UNION
         {?cmpnd wdt:P31 wd:Q11173 .} UNION
         {?cmpnd wdt:P31 wd:Q11344 .}
-        
-'''
+
+"""
 wikidata_url = 'https://query.wikidata.org/sparql'
-query = '''
+query = """
 SELECT * WHERE {
-  {?cmpnd wdt:P231 ?cas .} 
-'''
+  {?cmpnd wdt:P231 ?cas .}
+"""
 prop_keys = list(properties.keys())
 for i in range(len(prop_keys)-1):
     query += '  {?cmpnd wdt:%s ?property_vaue .} UNION\n' %(prop_keys[i])
@@ -118,7 +121,7 @@ for d in data['results']['bindings']:
 chemical_IDs.update(found_IDs)
 # print(chemical_IDs)
 # print(list(chemical_IDs)[-1], type(list(chemical_IDs)[-1]))
-print('Identified %s chemicals in %s seconds' %(len(chemical_IDs), (time() - start) ))# 9344
+print(f'Identified {len(chemical_IDs)} chemicals in {time() - start} seconds')# 9344
 
 
 
@@ -132,17 +135,17 @@ def process_single(quantity, value_key, MW):
     return value
 
 # Silver, iron, copper, arsenic, gold all have time decode errors
-bad_IDs = set(['Q1090', 'Q677', 'Q753', 'Q871', 'Q897'])
-bad_IDs = set([])
+bad_IDs = {'Q1090', 'Q677', 'Q753', 'Q871', 'Q897'}
+bad_IDs = set()
 chemical_data = {}
 print('Processing %d Chemicals' %(len(chemical_IDs)))
 
 processed_items = 0
 def retrieve_chemical_data(ID):
     global processed_items
-    
+
     entity = client.get(ID, load=True)
-    
+
     name = str(entity.label)
     CAS = entity[CAS_item]
     formula = entity.get(formula_item, None)
@@ -163,10 +166,10 @@ def retrieve_chemical_data(ID):
         MW = None
     assert  type(CAS_to_int(CAS)) is int
     # print('CAs', type(CAS), CAS_to_int(CAS), type(CAS_to_int(CAS)), 'hi')
-    dat = {'CAS': CAS_to_int(CAS), 'name': name, 'MW': MW, 
-                          'formula': formula, 'smiles': smiles, 
+    dat = {'CAS': CAS_to_int(CAS), 'name': name, 'MW': MW,
+                          'formula': formula, 'smiles': smiles,
                           'inchi': inchi, 'inchikey': inchikey}
-    
+
     for tn, ti in zip(wiki_prop_IDs, wiki_prop_items):
         prop_key = properties[tn]
         value = None
@@ -202,12 +205,12 @@ def retrieve_chemical_data(ID):
     if (processed_items %100) == 0:
         print('Processed %d items' %(processed_items))
     return dat
-        
+
 res =Parallel(n_jobs=16, prefer="threads")(delayed(retrieve_chemical_data)(c) for c in list(sorted(chemical_IDs)[0:max_chemicals]))
 for d in res:
     chemical_data[d['CAS']] = d
 
-print("Processed %s items in %s seconds" %(len(chemical_data), (time() - start)))
+print(f"Processed {len(chemical_data)} items in {time() - start} seconds")
 
 
 
@@ -227,7 +230,7 @@ for CAS in sorted(chemical_data.keys()):
         elif v == '':
             pass
         elif isinstance(v, (int, float)):
-            values[i] = '{:.8g}'.format(v)
+            values[i] = f'{v:.8g}'
         elif type(v) is str:
             pass
         else:

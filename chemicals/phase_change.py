@@ -343,9 +343,9 @@ def Tb(CASRN, method=None):
        doi:10.1080/00986448708960487.
     .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    .. [7] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden. 
+    .. [7] Huber, Marcia L., Eric W. Lemmon, Ian H. Bell, and Mark O. McLinden.
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
-       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42 
+       Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:

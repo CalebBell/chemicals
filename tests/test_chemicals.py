@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2021, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -22,6 +21,7 @@ SOFTWARE.
 """
 
 import chemicals
+
 
 def test_all_methods_accessible():
     all_methods = [i for i in dir(chemicals) if 'all_methods' in i]

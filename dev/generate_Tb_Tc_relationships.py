@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2021, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,11 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from thermo import *
-from chemicals import *
 import numpy as np
+from thermo import *
 
-from chemicals.critical import critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PassutDanner
+from chemicals import *
+from chemicals.critical import critical_data_CRC, critical_data_IUPAC, critical_data_Matthews, critical_data_PassutDanner
+
 dfs = [critical_data_IUPAC, critical_data_Matthews, critical_data_CRC, critical_data_PassutDanner]
 inorganic_Tc_CASs = []
 for d in dfs:

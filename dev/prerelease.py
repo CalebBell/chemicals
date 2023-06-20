@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2022, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,14 +20,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from datetime import datetime
-import os, sys
+import os
 import shutil
+import sys
+from datetime import datetime
+
 
 def set_file_modification_time(filename, mtime):
     atime = os.stat(filename).st_atime
     os.utime(filename, times=(atime, mtime.timestamp()))
-    
+
 now = datetime.now()
 
 main_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -56,9 +57,10 @@ for p in paths:
 
 
 
-os.system('%s "%s/dev/generate_sqlite_database.py"' %(sys.executable, main_dir))
+os.system(f'{sys.executable} "{main_dir}/dev/generate_sqlite_database.py"')
 
 
 import pytest
+
 os.chdir(main_dir)
 pytest.main(["--doctest-glob='*.rst'", "--doctest-modules", "--nbval", "-n", "8", "--dist", "loadscope", "-v"])

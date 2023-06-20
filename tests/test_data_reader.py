@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2021, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,11 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+import numpy as np
 import pytest
 
-from chemicals.identifiers import check_CAS, int_to_CAS, CAS_to_int
-import numpy as np
 import chemicals
+from chemicals.identifiers import CAS_to_int, check_CAS, int_to_CAS
+
 
 @pytest.mark.slow
 def test_CAS_numbers_valid_and_unique():
@@ -37,7 +37,7 @@ def test_CAS_numbers_valid_and_unique():
         else:
             already_int = False
         assert df.index.is_unique
-        
+
         if already_int:
             for CAS in df.index.values.tolist():
                 assert CAS < 9223372036854775807
@@ -49,7 +49,7 @@ def test_CAS_numbers_valid_and_unique():
                 CAS_int = CAS_to_int(CAS)
                 # Check that the CAS number fits in a 64 bit int
                 assert CAS_int < 9223372036854775807
-        
+
     # Check that the name is CAS
     for k, df in chemicals.data_reader.df_sources.items():
         assert df.index.name == 'CAS'

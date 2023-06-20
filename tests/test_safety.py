@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chemical Engineering Design Library (ChEDL). Utilities for process modeling.
 Copyright (C) 2016, Caleb Bell <Caleb.Andrew.Bell@gmail.com>
 
@@ -21,19 +20,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
 import pandas as pd
+import pytest
 from fluids.core import F2K
-from chemicals.safety import (Carcinogen, Carcinogen_methods, Crowl_Louvar_LFL, Crowl_Louvar_UFL,
-                              IARC_codes, LFL, LFL_ISO_10156_2017, LFL_all_methods, LFL_methods,
-                              NFPA_30_classification, NTP_codes, Skin, Suzuki_LFL, Suzuki_UFL,
-                              T_autoignition, T_autoignition_methods, T_flash, T_flash_all_methods,
-                              T_flash_methods, UFL, UFL_all_methods, UFL_methods, fire_mixing,
-                              mgm3_to_ppmv, ppmv_to_mgm3)
-from chemicals.utils import normalize
 from fluids.numerics import assert_close, assert_close1d
-from chemicals.safety import (NFPA_2008_data, IEC_2010_data, DIPPR_SERAT_data,
-                              NTP_data, IARC_data, SERAT)
+
+from chemicals.safety import (
+    LFL,
+    LFL_ISO_10156_2017,
+    SERAT,
+    UFL,
+    Carcinogen,
+    Carcinogen_methods,
+    Crowl_Louvar_LFL,
+    Crowl_Louvar_UFL,
+    DIPPR_SERAT_data,
+    IARC_codes,
+    IARC_data,
+    IEC_2010_data,
+    LFL_all_methods,
+    LFL_methods,
+    NFPA_30_classification,
+    NFPA_2008_data,
+    NTP_codes,
+    NTP_data,
+    Skin,
+    Suzuki_LFL,
+    Suzuki_UFL,
+    T_autoignition,
+    T_autoignition_methods,
+    T_flash,
+    T_flash_all_methods,
+    T_flash_methods,
+    UFL_all_methods,
+    UFL_methods,
+    fire_mixing,
+    mgm3_to_ppmv,
+    ppmv_to_mgm3,
+)
+from chemicals.utils import normalize
 
 SUZUKI = 'Suzuki (1994)'
 CROWLLOUVAR = 'Crowl and Louvar (2001)'
@@ -155,7 +180,7 @@ def test_safety_atom_predictions():
                     0.011899610558199915, 0.011899610558199915,
                     0.09548611111111112])
 
-    assert Crowl_Louvar_LFL({'H': 14, 'C': 0}) == None
+    assert Crowl_Louvar_LFL({'H': 14, 'C': 0}) is None
 
     # Pentane, 7.8 % LFL in literature
     UFL1 = Crowl_Louvar_UFL({'H': 12, 'C': 5})
@@ -167,7 +192,7 @@ def test_safety_atom_predictions():
 
     assert_close1d([UFL1, UFL2, UFL3, UFL4], [0.08955987717502559, 0.07572479446127219, 0.07572479446127219, 0.607638888888889])
 
-    assert Crowl_Louvar_UFL({'H': 14, 'C': 0}) == None
+    assert Crowl_Louvar_UFL({'H': 14, 'C': 0}) is None
 
 
 
@@ -204,7 +229,7 @@ def test_Tflash():
     methods = T_flash_methods('110-54-3')
     assert methods == list(T_flash_all_methods)
 
-    assert None == T_flash(CASRN='132451235-2151234-1234123')
+    assert None is T_flash(CASRN='132451235-2151234-1234123')
 
     with pytest.raises(Exception):
         T_flash(CASRN='8006-61-9', method='BADMETHOD')
@@ -248,7 +273,7 @@ def test_Tautoignition():
     tot_default = pd.Series([T_autoignition(i) for i in CASs]).sum()
     assert_close(tot_default, 229841.29999999993)
 
-    assert None == T_autoignition(CASRN='132451235-2151234-1234123')
+    assert None is T_autoignition(CASRN='132451235-2151234-1234123')
 
     with pytest.raises(Exception):
         T_autoignition(CASRN='8006-61-9', method='BADMETHOD')
@@ -278,7 +303,7 @@ def test_LFL():
     tot_default = pd.Series([LFL(CASRN=i) for i in CASs]).sum()
     assert_close(tot_default, 7.0637)
 
-    assert None == LFL(CASRN='132451235-2151234-1234123')
+    assert None is LFL(CASRN='132451235-2151234-1234123')
 
     with pytest.raises(Exception):
         LFL(CASRN='8006-61-9', method='BADMETHOD')
@@ -335,7 +360,7 @@ def test_UFL():
     tot_default = pd.Series([UFL(CASRN=i) for i in CASs]).sum()
     assert_close(tot_default, 46.364000000000004)
 
-    assert None == UFL(CASRN='132451235-2151234-1234123')
+    assert None is UFL(CASRN='132451235-2151234-1234123')
 
     with pytest.raises(Exception):
         UFL(CASRN='8006-61-9', method='BADMETHOD')

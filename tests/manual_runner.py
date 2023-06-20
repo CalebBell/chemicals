@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import sys
+
 try:
     import test_acentric
 except:
     print('run this from the tests directory')
-    exit()
+    sys.exit()
 import test_combustion
 import test_critical
 import test_dipole
