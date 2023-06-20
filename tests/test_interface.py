@@ -123,8 +123,10 @@ def test_REFPROP():
             'sigma1': 0.14400000000000238, 'n1': 0.0, 
             'sigma2': 0.0, 'n2': 0.0, 'Tc': 1735.0}
 
+    # We can force both sigma and n parameters to go together by ignoring
+    # the contribution of one or the other if both are not 0
     res= REFPROP_sigma(T=300., **kwargs)
-    assert_close(res, 0.47404999999999997)
+    assert_close(res, 0.3300499999999976)
 
 def test_Somayajulu():
     sigma = Somayajulu(300, 647.126, 232.713514, -140.18645, -4.890098)

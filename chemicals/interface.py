@@ -324,6 +324,10 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
     tau = 1.0 - Tr
     if tau <= 0.0:
         return 0.0
+    if n1 == 0.0 and sigma1 != 0.0:
+        sigma1 = 0.0
+    if n2 == 0.0 and sigma2 != 0.0:
+        sigma2 = 0.0
     sigma = sigma0*(tau)**n0 + sigma1*(tau)**n1 + sigma2*(tau)**n2
     return sigma
 
