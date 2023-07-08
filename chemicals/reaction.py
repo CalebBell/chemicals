@@ -77,6 +77,7 @@ Chemical Reactions
 .. autofunction:: chemicals.reaction.stoichiometric_matrix
 .. autofunction:: chemicals.reaction.stoichiometry_mass_to_molar
 .. autofunction:: chemicals.reaction.stoichiometry_molar_to_mass
+.. autofunction:: chemicals.reaction.stoichiometry_MW_error
 .. autofunction:: chemicals.reaction.standard_formation_reaction
 """
 
@@ -88,7 +89,7 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
            'balance_stoichiometry', 'stoichiometric_matrix',
            'stoichiometry_molar_to_mass', 'stoichiometry_mass_to_molar',
-           'standard_formation_reaction']
+           'standard_formation_reaction', 'stoichiometry_MW_error']
 
 from math import ceil, log10
 
@@ -1135,6 +1136,43 @@ def stoichiometry_mass_to_molar(mass_coefficients, MWs):
     '''
     return [c/MW for c, MW in zip(mass_coefficients, MWs)]
 
+def stoichiometry_MW_error(coefficients, MWs, reactants):
+    r'''This function calculates the molecular weight imbalance
+    of a reaction given the coefficients and molecular weights of
+    the involved components, and their statuses as reactants or product.
+
+    Parameters
+    ----------
+    coefficients : list[float]
+        Molar balanced stoichiometric coefficients; all numbers are positive, [-]
+    MWs : list[float]
+        Molecular weights of all species in reaction ordered in
+        the same way as the coefficients, [g/mol]
+    reactants : list[bool]
+        List of booleans indicating whether each chemical is a reactant (True)
+        or a product (False), [-]
+
+    Returns
+    -------
+    MW_error : float
+        The molecular weight error, [g/mol]
+
+    Notes
+    -----
+    A very small value may be returned for a properly balanced
+    equation because of floating-point error.
+
+    >>> stoichiometry_MW_error([4.0, 5.0, 4.0, 6.0], [17.03052, 31.9988, 30.0061, 18.01528], [True, True, False, False])
+    0.0
+    '''
+    reactant_MW = 0.0
+    product_MW = 0.0
+    for coeff, MW, stat in zip(coefficients, MWs, reactants):
+        if stat:
+            reactant_MW += coeff*MW
+        else:
+            product_MW += coeff*MW
+    return reactant_MW - product_MW
 
 def standard_formation_reaction(atoms):
     r'''This function calculates the standard reaction to reduce a chemical
