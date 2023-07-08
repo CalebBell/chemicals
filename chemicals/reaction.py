@@ -75,6 +75,8 @@ Chemical Reactions
 ------------------
 .. autofunction:: chemicals.reaction.balance_stoichiometry
 .. autofunction:: chemicals.reaction.stoichiometric_matrix
+.. autofunction:: chemicals.reaction.stoichiometry_mass_to_molar
+.. autofunction:: chemicals.reaction.stoichiometry_molar_to_mass
 .. autofunction:: chemicals.reaction.standard_formation_reaction
 """
 
@@ -84,7 +86,9 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'Hfl_all_methods', 'Hfg_all_methods', 'Hfs_all_methods',
            'S0l_all_methods', 'S0g_all_methods', 'S0s_all_methods',
            'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
-           'balance_stoichiometry', 'stoichiometric_matrix', 'standard_formation_reaction']
+           'balance_stoichiometry', 'stoichiometric_matrix',
+           'stoichiometry_molar_to_mass', 'stoichiometry_mass_to_molar',
+           'standard_formation_reaction']
 
 from math import ceil, log10
 
@@ -1074,6 +1078,62 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     else:
         d = [round(i, rounding + int(ceil(log10(abs(i))))) for i in d]
         return d
+
+def stoichiometry_molar_to_mass(coefficients, MWs):
+    r'''This function translates molar stoichiometric
+    coefficients (most commonly used) into less commonly
+    used mass-based stoichiometric coefficients.
+
+    Parameters
+    ----------
+    coefficients : list[float]
+        Molar balanced stoichiometric coefficients; all numbers are positive, [-]
+    MWs : list[float]
+        Molecular weights of all species in reaction ordered in
+        the same way as the coefficients, [g/mol]
+
+    Returns
+    -------
+    mass_coefficients : list[float]
+        Mass-based balanced coefficients; all numbers are positive, [-]
+
+    Notes
+    -----
+    Note that mass-based reactions are usually not normalized to integers.
+    Mass-based coefficients are used with components that don't have well defined formulas.
+
+    Calculate the mass based coefficients for the reaction 4 NH3 + 5 O2 = 4 NO + 6 H2O:
+
+    >>> matrix = stoichiometric_matrix([{'N': 1, 'H': 3}, {'O': 2}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}], [True, True, False, False])
+    >>> coeffs = balance_stoichiometry(matrix)
+    >>> stoichiometry_molar_to_mass(coeffs, [17.03052, 31.9988, 30.0061, 18.01528])
+    [68.12208, 159.994, 120.0244, 108.09168]
+    '''
+    return [c*MW for c, MW in zip(coefficients, MWs)]
+
+def stoichiometry_mass_to_molar(mass_coefficients, MWs):
+    r'''This function translates mass stoichiometric coefficients into the 
+    more commonly used mole-based stoichiometric coefficients.
+
+    Parameters
+    ----------
+    mass_coefficients : list[float]
+        Mass-based balanced coefficients; all numbers are positive, [-]
+    MWs : list[float]
+        Molecular weights of all species in reaction ordered in
+        the same way as the coefficients, [g/mol]
+
+    Returns
+    -------
+    coefficients : list[float]
+        Molar balanced stoichiometric coefficients; all numbers are positive, [-]
+
+    Notes
+    -----
+    >>> stoichiometry_mass_to_molar([68.12208, 159.994, 120.0244, 108.09168], [17.03052, 31.9988, 30.0061, 18.01528])
+    [4.0, 5.0, 4.0, 6.0]
+    '''
+    return [c/MW for c, MW in zip(mass_coefficients, MWs)]
 
 
 def standard_formation_reaction(atoms):
