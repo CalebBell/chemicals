@@ -245,3 +245,11 @@ def test_Tait():
     assert_close(Tait(P=101325, P_ref=101325, rho_ref=784.85, B=79337060.0, C=0.099102),
                  Tait(P=1.0, P_ref=101325, rho_ref=784.85, B=79337060.0, C=0.099102),
                  rtol=0)
+
+def test_Tait_molar():
+    Vm = Tait_molar(P=1e8, P_ref=101325.0, V_ref=4.0825e-05, B=79337060.0, C=0.099102)
+    assert_close(Vm, 3.753053240223695e-05, rtol=1e-13)
+
+    assert_close(Tait_molar(P=101325, P_ref=101325, V_ref=4.0825e-05, B=79337060.0, C=0.099102),
+                 Tait_molar(P=1.0, P_ref=101325, V_ref=4.0825e-05, B=79337060.0, C=0.099102),
+                 rtol=0)

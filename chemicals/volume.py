@@ -1150,14 +1150,14 @@ def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
     return Vs*(1.0 - C*log((B + P)/(B + Psat)))
 
 def Tait(P, P_ref, rho_ref, B, C):
-    r'''Calculates compressed-liquid volume using the Tait
+    r'''Calculates compressed-liquid mass density using the Tait
     model [1]_ and fit coefficients
     `B` and `C` and the reference (usually saturation) liquid
     density. `B` and `C` are normally temperature dependent but it
     is assumed they are constant (or calculated earlier) in this
     function
 
-    The molar volume of the compressed liquid is given by:
+    The mass density of the compressed liquid is given by:
 
     .. math::
         \rho = \frac{\rho_{ref}}{1 - C \ln \frac{B+P}{B + P_{ref}}}
@@ -1186,7 +1186,7 @@ def Tait(P, P_ref, rho_ref, B, C):
     Notes
     -----
     If `P` is set to be lower than `P_ref`, it is adjusted to
-    have the same value as `P_ref` (saturation condition)
+    have the same value as `P_ref` (saturation condition).
 
     Examples
     --------
@@ -1207,6 +1207,57 @@ def Tait(P, P_ref, rho_ref, B, C):
     return rho_ref/(1.0 - C*log((B+P)/(B+P_ref) ))
 
 def Tait_molar(P, P_ref, V_ref, B, C):
+    r'''Calculates compressed-liquid volume using the Tait
+    model [1]_ and fit coefficients
+    `B` and `C` and the reference (usually saturation) liquid
+    density. `B` and `C` are normally temperature dependent but it
+    is assumed they are constant (or calculated earlier) in this
+    function
+
+    The molar volume of the compressed liquid is given by:
+
+    .. math::
+        V_m = V_{ref}\cdot {1 - C \ln \frac{B+P}{B + P_{ref}}}
+
+    Parameters
+    ----------
+    P : float
+        Pressure of fluid [Pa]
+    P_ref : float
+        Pressure of the fluid at the reference density; normally
+        saturation at higher pressures and either 1 atm or 1 MPa
+        at low enough temperatures the saturation pressure
+        stops being an important factor, [Pa]
+    V_ref : float
+        The molar volume of the fluid at the reference condition, [m^3/mol]
+    B : float
+        Fit coefficient, [Pa]
+    C : float
+        Fit coefficient, [-]
+
+    Returns
+    -------
+    V_dense : float
+        High-pressure liquid volume, [m^3/mol]
+
+    Notes
+    -----
+    If `P` is set to be lower than `P_ref`, it is adjusted to
+    have the same value as `P_ref` (saturation condition).
+
+    Examples
+    --------
+    Coefficients for methanol from the CRC Handbook [1]_ at 300 K and
+    1E8 Pa.
+
+    >>> Tait_molar(P=1e8, P_ref=101325.0, V_ref=4.0825e-05, B=79337060.0, C=0.099102)
+    3.75305e-05
+
+    References
+    ----------
+    .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+       Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+    '''
     if P < P_ref:
         P = P_ref
     return V_ref*(1.0  - C*log((B + P)/(B + P_ref) ))
