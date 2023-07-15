@@ -1220,7 +1220,7 @@ def Tait_molar(P, P_ref, V_ref, B, C):
     The molar volume of the compressed liquid is given by:
 
     .. math::
-        V_m = V_{ref}\cdot {1 - C \ln \frac{B+P}{B + P_{ref}}}
+        V_m = V_{ref}\cdot \left({1 - C \ln \frac{B+P}{B + P_{ref}}}\right)
 
     Parameters
     ----------
