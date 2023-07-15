@@ -78,6 +78,11 @@ Pure Component Liquid Fit Correlations
 .. autofunction:: chemicals.volume.TDE_VDNS_rho
 .. autofunction:: chemicals.volume.PPDS17
 
+Pure Component High-Pressure Liquid Fit Correlations
+----------------------------------------------------
+.. autofunction:: chemicals.volume.Tait
+.. autofunction:: chemicals.volume.Tait_molar
+
 Pure Component Solid Fit Correlations
 -------------------------------------
 .. autofunction:: chemicals.volume.CRC_inorganic
@@ -177,6 +182,7 @@ __all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 
 'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic',
 'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture',
 'ideal_gas', 'Goodman', 'Rackett_fit', 'TDE_VDNS_rho', 'PPDS17',
+'Tait', 'Tait_molar',
 ]
 
 
@@ -1142,6 +1148,68 @@ def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
     tau13 = tau**(1.0/3.0)
     B = Pc*(-1.0 + a*tau13 + b*tau13*tau13 + d*tau + e*tau*tau13)
     return Vs*(1.0 - C*log((B + P)/(B + Psat)))
+
+def Tait(P, P_ref, rho_ref, B, C):
+    r'''Calculates compressed-liquid volume using the Tait
+    model [1]_ and fit coefficients
+    `B` and `C` and the reference (usually saturation) liquid
+    density. `B` and `C` are normally temperature dependent but it
+    is assumed they are constant (or calculated earlier) in this
+    function
+
+    The molar volume of the compressed liquid is given by:
+
+    .. math::
+        \rho = \frac{\rho_{ref}}{1 - C \ln \frac{B+P}{B + P_{ref}}}
+
+    Parameters
+    ----------
+    P : float
+        Pressure of fluid [Pa]
+    P_ref : float
+        Pressure of the fluid at the reference density; normally
+        saturation at higher pressures and either 1 atm or 1 MPa
+        at low enough temperatures the saturation pressure
+        stops being an important factor, [Pa]
+    rho_ref : float
+        The mass density of the fluid at the reference condition, [kg/m^3]
+    B : float
+        Fit coefficient, [Pa]
+    C : float
+        Fit coefficient, [-]
+
+    Returns
+    -------
+    rho : float
+        High-pressure liquid mass density, [kg/m^3]
+
+    Notes
+    -----
+    If `P` is set to be lower than `P_ref`, it is adjusted to
+    have the same value as `P_ref` (saturation condition)
+
+    Examples
+    --------
+    Coefficients for methanol from the CRC Handbook [1]_ at 300 K and
+    1E8 Pa.
+
+    >>> Tait(P=1e8, P_ref=101325, rho_ref=784.85, B=79337060.0, C=0.099102)
+    853.744916
+
+    References
+    ----------
+    .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
+       Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+    '''
+    if P < P_ref:
+        # The model is not fit on pressures below saturation and cannot extrapolate there
+        return rho_ref
+    return rho_ref/(1.0 - C*log((B+P)/(B+P_ref) ))
+
+def Tait_molar(P, P_ref, V_ref, B, C):
+    if P < P_ref:
+        P = P_ref
+    return V_ref*(1.0  - C*log((B + P)/(B + P_ref) ))
 
 
 ### Liquid Mixtures

@@ -50,6 +50,8 @@ from chemicals.volume import (
     rho_data_Perry_8E_105_l,
     rho_data_SNM0,
     rho_data_VDI_PPDS_2,
+    Tait,
+    Tait_molar,
 )
 
 
@@ -235,3 +237,11 @@ def test_PPDS17():
 
     Vl = PPDS17(300, 562.05, a0=0.0115508, a1=0.281004, a2=-0.00635447, MW=78.11184)
     assert_close(Vl, 8.96271251825123e-05, rtol=1e-13)
+
+def test_Tait():
+    rho = Tait(P=1e8, P_ref=101325, rho_ref=784.85, B=79337060.0, C=0.099102)
+    assert_close(rho, 853.744916448087, rtol=1e-13)
+
+    assert_close(Tait(P=101325, P_ref=101325, rho_ref=784.85, B=79337060.0, C=0.099102),
+                 Tait(P=1.0, P_ref=101325, rho_ref=784.85, B=79337060.0, C=0.099102),
+                 rtol=0)
