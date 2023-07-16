@@ -1188,6 +1188,9 @@ def Tait(P, P_ref, rho_ref, B, C):
     If `P` is set to be lower than `P_ref`, it is adjusted to
     have the same value as `P_ref` (saturation condition).
 
+    If B becomes negative and higher than
+    `P_ref`, the logarithm will become undefined.
+
     Examples
     --------
     Coefficients for methanol from the CRC Handbook [1]_ at 300 K and
