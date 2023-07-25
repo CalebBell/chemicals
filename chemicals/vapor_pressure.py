@@ -128,6 +128,12 @@ attribute of this module.
     published in [5]_ and converted to provide base SI units (and use the
     natural logarithm).
 
+.. data:: Psub_data_Alcock_elements
+
+    Coefficients for the DIPPR 101 equation :obj:`chemicals.dippr.EQ101`,
+    published in [5]_ and converted to provide base SI units (and use the
+    natural logarithm). Note this is a sublimation pressure data set.
+
 .. [1] McGarry, Jack. "Correlation and Prediction of the Vapor Pressures of
     Pure Liquids over Large Pressure Ranges." Industrial & Engineering
     Chemistry Process Design and Development 22, no. 2 (April 1, 1983):
@@ -162,6 +168,8 @@ The structure of each dataframe is shown below:
     In [7]: chemicals.vapor_pressure.Psat_data_VDI_PPDS_3
 
     In [8]: chemicals.vapor_pressure.Psat_data_Alcock_elements
+
+    In [9]: chemicals.vapor_pressure.Psub_data_Alcock_elements
 """
 
 
@@ -197,6 +205,9 @@ register_df_source(folder, 'Alcock_Itkin_Horrigan_metalic_elements.tsv',
                    csv_kwargs={'dtype':{'Tmin': float, 'Tmax': float, 'A': float,
                             'B': float, 'C': float, 'D': float, 'E': float}})
 
+register_df_source(folder, 'Alcock_Itkin_Horrigan_metalic_elements_sublimation.tsv',
+                   csv_kwargs={'dtype':{'Tmin': float, 'Tmax': float, 'A': float,
+                            'B': float, 'C': float, 'D': float}}, index_col=1)
 
 register_df_source(folder, 'Wagner Original McGarry.tsv', csv_kwargs={
         'dtype': {'A': float, 'B': float, 'C': float, 'D': float,
@@ -220,7 +231,7 @@ def load_vapor_pressure_dfs():
     global Psat_data_WagnerMcGarry, Psat_values_WagnerMcGarry, Psat_data_AntoinePoling, Psat_values_AntoinePoling
     global Psat_data_WagnerPoling, Psat_values_WagnerPoling, Psat_data_AntoineExtended, Psat_values_AntoineExtended
     global Psat_data_Perrys2_8, Psat_values_Perrys2_8, Psat_data_VDI_PPDS_3, Psat_values_VDI_PPDS_3
-    global Psat_data_Alcock_elements, Psat_values_Alcock_elements
+    global Psat_data_Alcock_elements, Psat_values_Alcock_elements, Psub_data_Alcock_elements, Psub_values_Alcock_elements
     global _vapor_pressure_dfs_loaded
     if _vapor_pressure_dfs_loaded:
         return
@@ -235,6 +246,9 @@ def load_vapor_pressure_dfs():
 
     Psat_data_Alcock_elements = data_source('Alcock_Itkin_Horrigan_metalic_elements.tsv')
     Psat_values_Alcock_elements = np.array(Psat_data_Alcock_elements.values[:, 1:], dtype=float)
+
+    Psub_data_Alcock_elements = data_source('Alcock_Itkin_Horrigan_metalic_elements_sublimation.tsv')
+    Psub_values_Alcock_elements = np.array(Psub_data_Alcock_elements.values[:, 1:], dtype=float)
 
     # 20928 bytes for df; 7488 bytes for numpy
     Psat_data_WagnerPoling = data_source('Wagner Collection Poling.tsv')
@@ -260,7 +274,8 @@ if PY37:
                     'Psat_values_AntoinePoling', 'Psat_data_WagnerPoling', 'Psat_values_WagnerPoling',
                     'Psat_data_AntoineExtended', 'Psat_values_AntoineExtended', 'Psat_data_Perrys2_8',
                     'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3',
-                    'Psat_data_Alcock_elements', 'Psat_values_Alcock_elements'):
+                    'Psat_data_Alcock_elements', 'Psat_values_Alcock_elements',
+                    'Psub_data_Alcock_elements', 'Psub_values_Alcock_elements', ):
             load_vapor_pressure_dfs()
             return globals()[name]
         raise AttributeError(f"module {__name__} has no attribute {name}")
