@@ -201,29 +201,29 @@ def test_dippr_correlations():
     orders = (0, 1, -1, -1j)
     args = (20, 33.19, 66.653, 6765.9, -123.63, 478.27)
     for i in orders:
-        assert_close(chemicals.numba.EQ114(*args, order=i), chemicals.numba.EQ114(*args, order=i), rtol=1e-13)
+        assert_close(chemicals.numba.EQ114(*args, order=i), chemicals.EQ114(*args, order=i), rtol=1e-13)
 
     args = (300, 276370., -2090.1, 8.125, -0.014116, 0.0000093701)
     for i in orders:
-        assert_close(chemicals.numba.EQ100(*args, order=i), chemicals.numba.EQ100(*args, order=i), rtol=1e-13)
+        assert_close(chemicals.numba.EQ100(*args, order=i), chemicals.EQ100(*args, order=i), rtol=1e-13)
 
     # EQ102 -  numba-scipy does not support complex numbers so this does not work in numba
 
     args = (300., 647.096, 17.863, 58.606, -95.396, 213.89, -141.26)
     for i in orders:
-        assert_close(chemicals.numba.EQ116(*args, order=i), chemicals.numba.EQ116(*args, order=i), rtol=1e-13)
+        assert_close(chemicals.numba.EQ116(*args, order=i), chemicals.EQ116(*args, order=i), rtol=1e-13)
 
     args = (20., 3.3258E4, 3.6199E4, 1.2057E3, 1.5373E7, 3.2122E3, -1.5318E7, 3.2122E3)
     for i in orders:
-        assert_close(chemicals.numba.EQ127(*args, order=i), chemicals.numba.EQ127(*args, order=i), rtol=1e-13)
+        assert_close(chemicals.numba.EQ127(*args, order=i), chemicals.EQ127(*args, order=i), rtol=1e-13)
 
     args = (300., 33363., 26790., 2610.5, 8896., 1169)
     for i in orders:
-        assert_close(chemicals.numba.EQ107(*args, order=i), chemicals.numba.EQ107(*args, order=i), rtol=1e-13)
+        assert_close(chemicals.numba.EQ107(*args, order=i), chemicals.EQ107(*args, order=i), rtol=1e-13)
 
-        args = (300.0, 0.02222, -26.38, -16750000, -3.894E19, 3.133E21)
+    args = (300.0, 0.02222, -26.38, -16750000, -3.894E19, 3.133E21)
     for i in orders:
-        assert_close(chemicals.numba.EQ104(*args, order=i), chemicals.numba.EQ104(*args, order=i), rtol=1e-13)
+        assert_close(chemicals.numba.EQ104(*args, order=i), chemicals.EQ104(*args, order=i), rtol=1e-13)
 
 @mark_as_numba
 def test_thermal_conductivity_misc():
