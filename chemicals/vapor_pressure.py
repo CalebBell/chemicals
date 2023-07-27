@@ -138,7 +138,7 @@ attribute of this module.
 
     Standard Antoine equation coefficients for sublimation pressure,
     as documented in the function
-    :obj:`Antoine` and with data for ~300 fluids from [6]_.
+    :obj:`Antoine` and with data for ~1000 solids from [6]_, [7]_, and [8]_.
     Coefficients were altered to be in units of Pa and Kelvin with the
     exponential instead of base-10 power.
 
@@ -158,6 +158,12 @@ attribute of this module.
     https://doi.org/10.1179/cmq.1984.23.3.309.
 .. [6] Hall, K. R. Vapor Pressure and Antoine Constants for Hydrocarbons, 
    and S, Se, Te, and Halogen Containing Organic Compounds. Springer, 1999.
+.. [7] Dykyj, J., and K. R. Hall. "Vapor Pressure and Antoine Constants for
+    Oxygen Containing Organic Compounds". 2000.
+.. [8] Hall, K. R. Vapor Pressure and Antoine Constants for Nitrogen 
+   Containing Organic Compounds. Springer, 2001.
+
+
 
 The structure of each dataframe is shown below:
 
@@ -217,7 +223,7 @@ register_df_source(folder, 'Alcock_Itkin_Horrigan_metalic_elements.tsv',
                    csv_kwargs={'dtype':{'Tmin': float, 'Tmax': float, 'A': float,
                             'B': float, 'C': float, 'D': float, 'E': float}})
 
-register_df_source(folder, 'Landolt_antoine_sublimation_V20A.tsv',
+register_df_source(folder, 'Landolt_antoine_sublimation_V20.tsv',
                    csv_kwargs={'dtype':{'Tmin': float, 'Tmax': float, 'A': float,
                             'B': float, 'C': float}})
 
@@ -283,7 +289,7 @@ def load_vapor_pressure_dfs():
     Psat_data_VDI_PPDS_3 = data_source('VDI PPDS Boiling temperatures at different pressures.tsv')
     Psat_values_VDI_PPDS_3 = np.array(Psat_data_VDI_PPDS_3.values[:, 1:], dtype=float)
 
-    Psub_data_Landolt_Antoine = data_source('Landolt_antoine_sublimation_V20A.tsv')
+    Psub_data_Landolt_Antoine = data_source('Landolt_antoine_sublimation_V20.tsv')
     Psub_values_Landolt_Antoine = np.array(Psub_data_Landolt_Antoine.values[:, 1:], dtype=float)
 
     _vapor_pressure_dfs_loaded = True
