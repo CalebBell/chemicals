@@ -142,6 +142,14 @@ attribute of this module.
     Coefficients were altered to be in units of Pa and Kelvin with the
     exponential instead of base-10 power.
 
+.. data:: Psat_data_Landolt_Antoine
+
+    Standard Antoine equation coefficients for vapor pressure,
+    as documented in the function
+    :obj:`Antoine` and with data for ~6000 liquids from [6]_, [7]_, and [8]_.
+    Coefficients were altered to be in units of Pa and Kelvin with the
+    exponential instead of base-10 power.
+
 .. [1] McGarry, Jack. "Correlation and Prediction of the Vapor Pressures of
     Pure Liquids over Large Pressure Ranges." Industrial & Engineering
     Chemistry Process Design and Development 22, no. 2 (April 1, 1983):
@@ -188,6 +196,8 @@ The structure of each dataframe is shown below:
     In [9]: chemicals.vapor_pressure.Psub_data_Alcock_elements
 
     In [10]: chemicals.vapor_pressure.Psub_data_Landolt_Antoine
+
+    In [11]: chemicals.vapor_pressure.Psat_data_Landolt_Antoine
 """
 
 
@@ -227,6 +237,10 @@ register_df_source(folder, 'Landolt_antoine_sublimation_V20.tsv',
                    csv_kwargs={'dtype':{'Tmin': float, 'Tmax': float, 'A': float,
                             'B': float, 'C': float}})
 
+register_df_source(folder, 'Landolt_antoine_V20.tsv',
+                   csv_kwargs={'dtype':{'Tmin': float, 'Tmax': float, 'A': float,
+                            'B': float, 'C': float}})
+
 register_df_source(folder, 'Alcock_Itkin_Horrigan_metalic_elements_sublimation.tsv',
                    csv_kwargs={'dtype':{'Tmin': float, 'Tmax': float, 'A': float,
                             'B': float, 'C': float, 'D': float}}, index_col=1)
@@ -255,6 +269,7 @@ def load_vapor_pressure_dfs():
     global Psat_data_Perrys2_8, Psat_values_Perrys2_8, Psat_data_VDI_PPDS_3, Psat_values_VDI_PPDS_3
     global Psat_data_Alcock_elements, Psat_values_Alcock_elements, Psub_data_Alcock_elements, Psub_values_Alcock_elements
     global Psub_values_Landolt_Antoine, Psub_data_Landolt_Antoine
+    global Psat_values_Landolt_Antoine, Psat_data_Landolt_Antoine
     global _vapor_pressure_dfs_loaded
     if _vapor_pressure_dfs_loaded:
         return
@@ -292,6 +307,9 @@ def load_vapor_pressure_dfs():
     Psub_data_Landolt_Antoine = data_source('Landolt_antoine_sublimation_V20.tsv')
     Psub_values_Landolt_Antoine = np.array(Psub_data_Landolt_Antoine.values[:, 1:], dtype=float)
 
+    Psat_data_Landolt_Antoine = data_source('Landolt_antoine_V20.tsv')
+    Psat_values_Landolt_Antoine = np.array(Psat_data_Landolt_Antoine.values[:, 1:], dtype=float)
+
     _vapor_pressure_dfs_loaded = True
 
 if PY37:
@@ -302,7 +320,8 @@ if PY37:
                     'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3',
                     'Psat_data_Alcock_elements', 'Psat_values_Alcock_elements',
                     'Psub_data_Alcock_elements', 'Psub_values_Alcock_elements', 
-                    'Landolt_data_sublimation_Antoine', 'Psub_values_Landolt_Antoine'):
+                    'Landolt_data_sublimation_Antoine', 'Psub_values_Landolt_Antoine',
+                    'Psat_data_Landolt_Antoine', 'Psat_values_Landolt_Antoine'):
             load_vapor_pressure_dfs()
             return globals()[name]
         raise AttributeError(f"module {__name__} has no attribute {name}")

@@ -69,7 +69,9 @@ try:
 except:
     numba = None
 import numpy as np
+import os
 
+jit_disabled = os.environ.get('NUMBA_DISABLE_JIT') == '1'
 
 def swap_funcs_and_test(names, substitutions, test):
     '''
@@ -628,6 +630,7 @@ def test_fitting_jacobians():
     assert_close1d(der_analytical, der_expect, rtol=1e-13)
 
 
+@pytest.mark.skipif(jit_disabled, reason='NUMBA JIT is disabled')
 @mark_as_numba
 def test_lazy_loading():
     # Numba interfers with to_num
