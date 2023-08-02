@@ -2826,6 +2826,8 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
 
     Monoatomic gases have a simple heat capacity of 2.5R, the lower limit for
     ideal gas heat capacity. This function does not cover that type of a gas.
+    The specific gases that are monoatomic are helium, neon, argon, krypton, xenon, radon.
+    
     At very low temperatures hydrogen behaves like a monoatomic gas as well.
 
     Examples

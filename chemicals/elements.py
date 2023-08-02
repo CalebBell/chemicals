@@ -197,11 +197,12 @@ allotropes['As'] = [
 
 
 allotropes['P'] = [
-    # most stable form at room Body-centred cubic or Triclinic also heard yellow phosphorus
+    # most stable form at room Body-centred cubic or Triclinic also heard yellow phosphorus; CAS is tetraphosphorus
     ('alpha white phosphorus', 4, 's', True, 'P12P3P1P23', 'P4/c1-2-3(1)4(1)2', 'OBSZRRSYVTXPNB-UHFFFAOYSA-N', '12185-10-3', '2099819000-00-0'),
     #  Triclinic also heard yellow phosphorus
     ('beta white phosphorus', 4, 's', False, 'P12P3P1P23', 'P4/c1-2-3(1)4(1)2', 'OBSZRRSYVTXPNB-UHFFFAOYSA-N', '12185-10-3', '2099814000-00-0'),
 
+    # CAS is phosphorus
     ('red phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099796000-00-0'),
     ('violet phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099791000-00-0'), # Monoclinic
     ('black phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099775000-00-0'), # Orthorhombic
@@ -214,7 +215,6 @@ allotropes['Sb'] = [
     ('yellow antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099759000-00-0'),# metastable
     ('black antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099754000-00-0'),# metastable
     ('explosive antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099738000-00-0'),# eep
-
 ]
 
 allotropes['S'] = [
@@ -281,6 +281,16 @@ allotropes['Zr'] = [
     ('beta zirconium', 1, 's', True, '[Zr]', 'Zr', 'QCWXUUIWCKQGHC-UHFFFAOYSA-N', '7440-67-7', '2099576000-00-0'),
 ]
 
+allotropes['Ti'] = [
+    # format: (name, count, phase, stp_ref, smiles, inchi, inchi_key, closest_CAS, unique_CAS_maybe_fake,)
+    ('alpha titanium', 1, 's', True, '[Ti]', 'Ti', 'RTAQQCXQSZGOHL-UHFFFAOYSA-N', '7440-67-7', '2099571000-00-0'),
+    ('beta titanium', 1, 's', False, '[Ti]', 'Ti', 'RTAQQCXQSZGOHL-UHFFFAOYSA-N', '7440-67-7', '2099555000-00-0'),
+]
+
+solid_allotrope_map = {
+    '7440-32-6': {'T_transitions': [0, 1166], 'CASs_transitions': ['2099571000-00-0', '2099555000-00-0'], 'all_CASs': ['2099555000-00-0', '2099571000-00-0']}
+}
+
 # For each element that has allotropes, the allotrope which is used as a reference state at STP
 allotropic_standard_states = {'H': 'dihydrogen',
                               'N': 'dinitrogen',
@@ -300,6 +310,7 @@ allotropic_standard_states = {'H': 'dihydrogen',
                               'As': 'gray arsenic',
                               'B': 'beta rhombohedral boron',
 
+                              'Ti': 'alpha titanium',
                               'Zr': 'beta zirconium',
 }
 
