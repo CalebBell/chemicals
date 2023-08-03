@@ -288,8 +288,10 @@ allotropes['Ti'] = [
 ]
 
 solid_allotrope_map = {
-    '7440-32-6': {'T_transitions': [0, 1166], 'CASs_transitions': ['2099571000-00-0', '2099555000-00-0'], 'all_CASs': ['2099555000-00-0', '2099571000-00-0']}
+    '7440-32-6': {'T_transitions': [1166], 'CASs_transitions': ['2099571000-00-0', '2099555000-00-0'], 'all_CASs': ['2099555000-00-0', '2099571000-00-0']}
 }
+
+allotrope_CAS_to_name = {v[8]: v[0] for t in allotropes.values() for v in t}
 
 # For each element that has allotropes, the allotrope which is used as a reference state at STP
 allotropic_standard_states = {'H': 'dihydrogen',
