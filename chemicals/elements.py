@@ -128,7 +128,6 @@ allotropes['H'] = [
     ('dihydrogen', 2, 'g', True, '[HH]', 'H2/h1H', 'UFHFLCQGNIYNRP-UHFFFAOYSA-N', '1333-74-0', '1333-74-0'),
     ('atomic hydrogen', 1, 'g', False, '[H]', 'H', 'YZCKVEUIGOORGS-UHFFFAOYSA-N', '12385-13-6', '12385-13-6')
 ]
-
 allotropes['F'] = [
     ('difluorine', 2, 'g', True, 'FF', 'F2/c1-2', 'PXGOKWXKJXAPGV-UHFFFAOYSA-N', '7782-41-4', '7782-41-4'),
     ('atomic fluorine', 1, 'g', False, '[F]', 'F', 'YCKRFDGAMUMZLT-UHFFFAOYSA-N', '14762-94-8', '14762-94-8')
@@ -254,10 +253,18 @@ allotropes['O'] = [
     # theorized wikipedia only and chemspider
     ('cyclic ozone', 3, 'g', False, 'o1oo1', '1S/O3/c1-2-3-1', 'XQOAKYYZMDCSIA-UHFFFAOYSA-N', '153851-84-4', '153851-84-4'),
 
+    ('alpha oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099550000-00-0'),
+    ('beta oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099539000-00-0'),
+    ('gamma oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099534000-00-0'),
+    ('delta oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099518000-00-0'), # orange high pressure
+    ('epsilon oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099513000-00-0'), # red high pressure
+    ('zeta oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099495000-00-0'), # metallic high pressure
+
     # Don't have structures for these
 #     'tetraoxygen': '852461-27-9', # cyclotetraoxygen D2d structure form
 #     'Octaoxygen': '176740-46-8', # wikidata for CAS, also called ε-oxygen or red oxygen, 600 K & 16 GPa and higher
 ]
+
 
 # https://janaf.nist.gov/tables/B-001.html
 allotropes['B'] = [
@@ -288,7 +295,10 @@ allotropes['Ti'] = [
 ]
 
 solid_allotrope_map = {
-    '7440-32-6': {'T_transitions': [1166], 'CASs_transitions': ['2099571000-00-0', '2099555000-00-0'], 'all_CASs': ['2099555000-00-0', '2099571000-00-0']}
+    '7440-32-6': {'T_transitions': [1166], 'CASs_transitions': ['2099571000-00-0', '2099555000-00-0'], 'all_CASs': ['2099555000-00-0', '2099571000-00-0']},
+    '7782-44-7': {'T_transitions': [23.876, 43.7964], 'H_transitions': [0.0, 742], #Freiman, Yu. A., and H. J. Jodl. “Solid Oxygen.” Physics Reports 401, no. 1 (November 1, 2004): 1–228. https://doi.org/10.1016/j.physrep.2004.06.002.
+                 'CASs_transitions': ['2099550000-00-0', '2099539000-00-0', '2099534000-00-0'], 
+                         'all_CASs': ['2099550000-00-0', '2099539000-00-0', '2099534000-00-0']},
 }
 
 allotrope_CAS_to_name = {v[8]: v[0] for t in allotropes.values() for v in t}

@@ -43,12 +43,12 @@
 2099576000-00-0	formula	Zr	name	beta zirconium
 2099571000-00-0	formula	Ti	name	alpha titanium
 2099555000-00-0	formula	Ti	name	beta titanium
-2099550000-00-0				
-2099539000-00-0				
-2099534000-00-0				
-2099518000-00-0				
-2099513000-00-0				
-2099495000-00-0				
+2099550000-00-0	formula	O2	name	alpha oxygen
+2099539000-00-0	formula	O2	name	beta oxygen
+2099534000-00-0	formula	O2	name	gamma oxygen
+2099518000-00-0	formula	O2	name	delta oxygen
+2099513000-00-0	formula	O2	name	epsilon oxygen
+2099495000-00-0	formula	O2	name	zeta oxygen
 2099490000-00-0				
 2099479000-00-0				
 2099474000-00-0				
