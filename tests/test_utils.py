@@ -637,6 +637,15 @@ def test_hash_any_primitive():
     assert hash_any_primitive(a) == hash_any_primitive(b)
 
 
+    assert hash_any_primitive([]) == hash_any_primitive([])
+
+    assert hash_any_primitive([1,2]) == hash_any_primitive([1,2])
+
+    assert not hash_any_primitive([1,2]) == hash_any_primitive([1,2,3])
+
+    assert not hash_any_primitive([1,2,4]) == hash_any_primitive([1,2,3])
+
+
 def test_radius_of_gyration():
     assert_close(radius_of_gyration(MW=32.00452, planar=False, A=6.345205205562681e-47, B=3.2663291891213418e-46, C=3.4321304373822523e-46),
                  1.507895671067054e-10, rtol=1e-13)

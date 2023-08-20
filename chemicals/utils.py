@@ -253,25 +253,33 @@ def hash_any_primitive(v):
 
     hash_any_primitive({'a': [1,2,3], 'b': []})
     '''
-    if isinstance(v, list):
+    t = type(v)
+    if t is list:
         if len(v) and isinstance(v[0], list):
             if len(v[0]) and isinstance(v[0][0], list):
+                # 3d
                 v = tuple(tuple(hash_any_primitive(j) for j in i) for i in v)
             else:
+                # 2d
                 v = tuple(hash_any_primitive(i) for i in v)
         else:
-            v = tuple(hash_any_primitive(i) for i in v)
-    elif isinstance(v, dict):
-        temp_hash = set()
+            # likely a 1d list
+            v = tuple(i if type(i) in immutable_types else hash_any_primitive(i) for i in v)
+    elif t is dict:
+        temp_hash = []
+        # Do not want to order this at all
         for key, value in v.items():
-            temp_hash.add(hash((key, hash_any_primitive(value))))
+            # Do not bother hashing the value if it's immutable as it will be hashed with the tuple
+            value_hash = value if type(value) in immutable_types else hash_any_primitive(value)
+            key_value_hash = hash((key, value_hash))
+            temp_hash.append(key_value_hash)
         v = hash(frozenset(temp_hash))
-    elif isinstance(v, set):
+    elif t is set:
         # Should only contain hashable items
         v = frozenset(v)
-    elif isinstance(v, tuple):
-        v = tuple(hash_any_primitive(i) for i in v)
-    elif isinstance(v, ndarray):
+    elif t is tuple:
+        v = tuple(i if type(i) in immutable_types else hash_any_primitive(i) for i in v)
+    elif t is ndarray:
         v = hash(v.data.tobytes())
     return hash(v)
 
