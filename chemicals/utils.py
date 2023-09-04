@@ -140,7 +140,7 @@ except:
 
 
 empty_dict = {}
-immutable_types = {type(None), bool, int, float, complex, str, bytes,
+immutable_types = {type(None), bool, int, float, complex, str, bytes,type,
                        # dictionary views are read-only, kinda unexpected
                       type(empty_dict.keys()), type(empty_dict.items()), type(empty_dict.values()),
                       }

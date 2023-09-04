@@ -87,6 +87,9 @@ def test_recursive_copy():
 
     test_cases = [None,
                   True, False,
+                  float,
+                  int,
+                  str,
                  -1, 0, 1, 2, 2000, 2**65,
                   -1.1234, 0, 2e200, float("nan"),
                   1j, 1.1234j, 1234132+123.234j, -12341-1234j,
