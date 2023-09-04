@@ -83,6 +83,7 @@ def test_recursive_copy():
     from copy import deepcopy
     from decimal import Decimal
     from fractions import Fraction
+    from collections import namedtuple
 
     test_cases = [None,
                   True, False,
@@ -108,10 +109,20 @@ def test_recursive_copy():
         # not supported on windows https://github.com/cupy/cupy/issues/2916
         pass
 
+
+    InnerTuple = namedtuple('InnerTuple', ['a', 'b'])
+    OuterTuple = namedtuple('OuterTuple', ['x', 'y'])
+    named_tuple_1 = InnerTuple(1, (2, 3, 4))
+    named_tuple_2 = OuterTuple(InnerTuple(1, (2, 3, 4)), 'abc')
+    named_tuple_3 = OuterTuple(InnerTuple('asdfas', (2, '125dsaf', 4)), frozenset([0]))
+
     tuple_cases = [(12,21,34,3, None, -1, 'asd', 1j),
                    (12., (123.352, None, 4, (123.352, None, 4), [123]), ),
                    tuple(),
                    tuple(range(129)),
+                   named_tuple_1,
+                   named_tuple_2,
+                   named_tuple_3
                   ]
 
     list_cases = [[2,21,34,3, None, -1, 'asd', 1j],

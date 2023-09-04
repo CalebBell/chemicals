@@ -218,6 +218,10 @@ def recursive_copy(obj):
     if hasattr(obj, '__copy__'):
         # Allow objects to provide their own hooks and wash our hands of them
         return obj.__copy__()
+    
+    # Is it a named tuple
+    if hasattr(obj, '_fields') and hasattr(obj, '_asdict') and obj_type.__mro__[1] is tuple:
+        return obj_type(*(recursive_copy(v) for v in obj))
     raise ValueError(f"No copy function implemented for type {obj_type}")
 
 @mark_numba_incompatible
