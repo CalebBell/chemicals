@@ -932,12 +932,13 @@ def combustion_products_mixture(atoms_list, zs, reactivities=None, CASs=None,
     # Attempted to use a .copy() on a base dict but that was slower
     products = {}
     has_reactivities = reactivities is not None
+    missing_combustion_stoichiometries = not combustion_stoichiometries
     for i, (atoms, zs_i) in enumerate(zip(atoms_list, zs)):
         if has_reactivities and not reactivities[i]:
             products[CASs[i]] = zs_i
         else:
             ans = (combustion_stoichiometry(atoms, missing_handling=missing_handling)
-                   if not combustion_stoichiometries else combustion_stoichiometries[i])
+                   if missing_combustion_stoichiometries else combustion_stoichiometries[i])
             for key, val in ans.items():
                 if key in products:
                     products[key] += val*zs_i
@@ -970,9 +971,9 @@ def is_combustible(CAS, atoms, reactive=True):
         return False
     if CAS in unreactive_CASs:
         return False
-    elif 'C' in atoms and atoms['C'] > 0:
+    elif 'C' in atoms and atoms['C'] > 0.0:
         return True
-    return bool('H' in atoms and atoms['H'] > 0)
+    return bool('H' in atoms and atoms['H'] > 0.0)
 
 @mark_numba_incompatible
 def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
@@ -1481,7 +1482,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
     cmps = range(N)
 
     if reactivities is None:
-        reactivities = [True for i in zs_air]
+        reactivities = [True]*len(zs_air)
     combustibilities = [is_combustible(CASs[i], atomss[i], reactivities[i]) for i in cmps]
 
     O2_index = CASs.index(O2_CAS)
