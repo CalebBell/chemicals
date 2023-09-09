@@ -716,6 +716,7 @@ combustion_products_to_CASs = {
 'I2': '7553-56-2',
 'N2': '7727-37-9',
 'O2': '7782-44-7',
+'Ar': '7440-37-1',
 'P4O10': '16752-60-6',
 'SO2': '7446-09-5'}
 
@@ -728,7 +729,8 @@ unreactive_CASs = {
     '7664-39-3': 'HF',
     '7726-95-6': 'Br2',
     '7727-37-9': 'N2',
-    '7732-18-5': 'H2O'}
+    '7732-18-5': 'H2O',
+    '7440-37-1': 'Ar'}
 
 O2_CAS = '7782-44-7'
 H2O_CAS = '7732-18-5'
@@ -1482,11 +1484,6 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
         reactivities = [True for i in zs_air]
     combustibilities = [is_combustible(CASs[i], atomss[i], reactivities[i]) for i in cmps]
 
-    for i in combustibilities:
-        if zs_air[i] > TRACE_FRACTION_IN_AIR:
-            pass
-
-
     O2_index = CASs.index(O2_CAS)
     H2O_index = CASs.index(H2O_CAS)
 
@@ -1644,9 +1641,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
     # Compute all other properties from the air and fuel flow rate
     results = {'n_fuel': n_fuel, 'n_air': n_air}
     if n_fuel is not None and n_air is not None:
-        ns_to_combust = []
-        for zi_air, zi_fuel in zip(zs_air, zs_fuel):
-            ns_to_combust.append(zi_air*n_air + zi_fuel*n_fuel)
+        ns_to_combust = [zi_air*n_air + zi_fuel*n_fuel for zi_air, zi_fuel in zip(zs_air, zs_fuel)]
 
         comb_ans = combustion_products_mixture(atomss, ns_to_combust, reactivities=reactivities, CASs=CASs,
                                                combustion_stoichiometries=combustion_stoichiometries)
