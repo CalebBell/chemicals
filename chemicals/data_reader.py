@@ -252,7 +252,7 @@ def cached_constant_lookup(CASi, prop):
 def init_constants_db():
     global CONSTANTS_CURSOR
     import sqlite3
-    conn = sqlite3.connect(path_join(source_path, 'Misc', 'default.sqlite'))
+    conn = sqlite3.connect(path_join(source_path, 'Misc', 'default.sqlite'), check_same_thread=False)
     CONSTANTS_CURSOR = conn.cursor()
 
 def database_constant_lookup(CASi, prop):
