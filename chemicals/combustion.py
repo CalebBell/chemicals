@@ -941,7 +941,11 @@ def combustion_products_mixture(atoms_list, zs, reactivities=None, CASs=None,
                    if missing_combustion_stoichiometries else combustion_stoichiometries[i])
             for key, val in ans.items():
                 if key in products:
-                    products[key] += val*zs_i
+                    delta = val*zs_i
+                    if delta != 0.0 and (abs((delta + products[key])/delta) < 4e-15):
+                        products[key] = 0.0
+                    else:
+                        products[key] += delta
                 else:
                     products[key] = val*zs_i
     return products

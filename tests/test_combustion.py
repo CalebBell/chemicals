@@ -40,6 +40,7 @@ from chemicals.combustion import (
     ignition_delay,
     is_combustible,
     octane_sensitivity,
+    combustion_products_mixture,
 )
 
 
@@ -387,3 +388,14 @@ def test_ignition_delay():
 
 def test_AKI():
     assert_close(AKI(RON=90, MON=74), 82.0, rtol=1e-13)
+
+
+def test_combustion_products_mixture():
+    # Case where numerically the combustion amounts were going negative
+    atomss = [{'N': 2}, {'O': 2}, {'Ar': 1}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'C': 1, 'H': 4}, {'C': 2, 'H': 6}]
+    ns_to_combust = [10620.767245335102, 2854.1540390358546, 135.18529443867303, 0.0, 7.631427911860575, 1427.0770195179275, 0.0]
+    reactivities= [True, True, True, True, True, True, True]
+    CASs = ['7727-37-9', '7782-44-7', '7440-37-1', '124-38-9', '7732-18-5', '74-82-8', '74-84-0']
+    combustion_stoichiometries = [{'N2': 1.0}, {'O2': 1.0}, {'Ar': 1}, {'CO2': 1}, {'H2O': 1.0}, {'CO2': 1, 'O2': -2.0, 'H2O': 2.0}, {'CO2': 2, 'O2': -3.5, 'H2O': 3.0}]
+    res = combustion_products_mixture(atomss, ns_to_combust, reactivities, CASs, combustion_stoichiometries=combustion_stoichiometries)
+    assert res['O2'] == 0.0
