@@ -75,6 +75,8 @@ from chemicals.utils import (
     ws_to_zs,
     zs_to_Vfs,
     zs_to_ws,
+    ms_to_ns,
+    ns_to_ms,
 )
 
 
@@ -672,3 +674,12 @@ def test_molar_velocity():
     assert_close(molar_velocity_to_velocity(46.537593457316525, 67.152), 179.5868138460819, rtol=1e-12)
 
     assert_close(velocity_to_molar_velocity(179.5868138460819, 67.152), 46.537593457316525, rtol=1e-12)
+
+def test_ms_to_ns():
+    ans = ms_to_ns([0.00033915944387075575, 0.005163034654211768, 0.002485711001895458],[18.01528, 16.04246, 142.28168])
+    assert_close1d(ans, [0.018826209965693327, 0.3218355946788565, 0.0174703517831351])
+
+
+def test_ns_to_ms():
+    ans = ns_to_ms([0.018826209965693327, 0.3218355946788565, 0.0174703517831351], [18.01528, 16.04246, 142.28168])
+    assert_close1d(ans, [0.00033915944387075575, 0.005163034654211768, 0.002485711001895458])

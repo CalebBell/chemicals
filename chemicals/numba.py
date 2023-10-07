@@ -24,6 +24,7 @@ busy = False
 __all__ = []
 
 to_change = ['utils.zs_to_ws', 'utils.ws_to_zs', 'utils.zs_to_Vfs',
+     'utils.ms_to_ns', 'utils.ns_to_ms',
      'utils.dxs_to_dxsn1', 'utils.dxs_to_dns', 'utils.dns_to_dn_partials',
      'utils.dxs_to_dn_partials', 'utils.dxs_to_dxsn1',
      'utils.d2xs_to_dxdn_partials', 'viscosity.Lorentz_Bray_Clarke',

@@ -36,7 +36,9 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'isentropic_exponent', 'isentropic_exponent_TV', 'isentropic_exponent_PT', 'isentropic_exponent_PV',
 'Vm_to_rho', 'rho_to_Vm',
 'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs',
-'Vfs_to_zs', 'none_and_length_check', 'normalize', 'remove_zeros',
+'Vfs_to_zs',
+'ms_to_ns', 'ns_to_ms',
+ 'none_and_length_check', 'normalize', 'remove_zeros',
  'mixing_simple',
 'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar',
 'SG_to_API', 'API_to_SG', 'API_to_rho', 'rho_to_API', 'SG',   'Watson_K',
@@ -1665,6 +1667,74 @@ def Vfs_to_zs(Vfs, Vms):
     for i in range(N):
         zs[i] *= tot
     return zs
+
+def ms_to_ns(ms, MWs):
+    r'''Converts a list of mass flow rates to mole flow rates. Requires molecular
+    weights for all species.
+
+    .. math::
+        n_i = \frac{1000 m_i}{MW_i}
+
+    Parameters
+    ----------
+    ms : iterable
+        Mass flow rates [kg/s]
+    MWs : iterable
+        Molecular weights [g/mol]
+
+    Returns
+    -------
+    ns : iterable
+        Mole flow rates [mol/s]
+
+    Notes
+    -----
+    Does not check that inputs are of the same length.
+
+    Examples
+    --------
+    >>> ms_to_ns([4, 5], [24, 45])
+    [166.666, 111.111]
+    '''
+    N = len(ms)
+    ns = [0.0]*N
+    for i in range(N):
+        ns[i] = 1e3*ms[i]/MWs[i]
+    return ns
+
+def ns_to_ms(ns, MWs):
+    r'''Converts a list of mole flow rates to mass flow rates. Requires molecular
+    weights for all species.
+
+    .. math::
+        m_i = \frac{n_i \times MW_i}{1000}
+
+    Parameters
+    ----------
+    ns : iterable
+        Mole flow rates [mol/s]
+    MWs : iterable
+        Molecular weights [g/mol]
+
+    Returns
+    -------
+    ms : iterable
+        Mass flow rates [kg/s]
+
+    Notes
+    -----
+    Does not check that inputs are of the same length.
+
+    Examples
+    --------
+    >>> ns_to_ms([166.6666666666, 111.1111111111], [24, 45])
+    [4.0, 5.0]
+    '''
+    N = len(ns)
+    ms = [0.0]*N
+    for i in range(N):
+        ms[i] = ns[i]*MWs[i]*1e-3
+    return ms
 
 
 def dxs_to_dns(dxs, xs, dns=None):
