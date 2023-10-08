@@ -38,6 +38,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs',
 'Vfs_to_zs',
 'ms_to_ns', 'ns_to_ms', 'ns_to_Qls', 'Qls_to_ns',
+'Qls_to_ms', 'ms_to_Qls',
  'none_and_length_check', 'normalize', 'remove_zeros',
  'mixing_simple',
 'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar',
@@ -1006,6 +1007,7 @@ def Cp_minus_Cv(T, dP_dT, dP_dV):
         C_p - C_v= -T\left(\frac{\partial V}{\partial T}\right)_P^2/\left(
         \frac{\partial V}{\partial P}\right)_T
 
+    .. math::
         C_p - C_v = T\left(\frac{\partial P}{\partial T}\right)
         \left(\frac{\partial V}{\partial T}\right)
 
@@ -1494,6 +1496,7 @@ def zs_to_ws(zs, MWs):
     .. math::
         w_i = \frac{z_i MW_i}{MW_{avg}}
 
+    .. math::
         MW_{avg} = \sum_i z_i MW_i
 
     Parameters
@@ -1707,7 +1710,7 @@ def ns_to_ms(ns, MWs):
     weights for all species.
 
     .. math::
-        m_i = \frac{n_i \times MW_i}{1000}
+        m_i = \frac{n_i MW_i}{1000}
 
     Parameters
     ----------
@@ -1741,7 +1744,7 @@ def ns_to_Qls(ns, Vmls):
     flow rates. Requires standard liquid molar volumes for all species.
 
     .. math::
-        {Ql}_i = n_i \times {Vml}_i
+        {Ql}_i = n_i {Vml}_i
 
     Parameters
     ----------
@@ -1775,7 +1778,7 @@ def Qls_to_ns(Qls, Vmls):
     to mole flow rates. Requires standard liquid molar volumes for all species.
 
     .. math::
-        n_i = \frac{Ql_i}{Vml_i}
+        n_i = \frac{{Ql}_i}{{Vml}_i}
 
     Parameters
     ----------
@@ -1803,6 +1806,80 @@ def Qls_to_ns(Qls, Vmls):
     for i in range(N):
         ns[i] = Qls[i]/Vmls[i]
     return ns
+
+def ms_to_Qls(ms, MWs, Vmls):
+    r'''Converts a list of mass flow rates to standard liquid volume 
+    flow rates. Requires molecular weights and standard molar liquid 
+    volumes for all species.
+
+    .. math::
+        {Ql}_i = \frac{1000 m_i {Vml}_i}{MW_i}
+
+    Parameters
+    ----------
+    ms : iterable
+        Mass flow rates [kg/s]
+    MWs : iterable
+        Molecular weights [g/mol]
+    Vmls : iterable
+        Standard liquid molar volumes [m^3/mol]
+
+    Returns
+    -------
+    Qls : iterable
+        Standard liquid volume flow rates [m^3/s]
+
+    Notes
+    -----
+    Does not check that inputs are of the same length.
+
+    Examples
+    --------
+    >>> ms_to_Qls([4.0, 5.0], [24, 45], [1e-4, 2e-4])
+    [0.0166666666, 0.0222222222]
+    '''
+    N = len(ms)
+    Qls = [0.0]*N
+    for i in range(N):
+        Qls[i] = 1e3*ms[i]/MWs[i]*Vmls[i]
+    return Qls
+
+def Qls_to_ms(Qls, MWs, Vmls):
+    r'''Converts a list of standard liquid volume flow rates to mass
+    flow rates. Requires molecular weights and standard liquid molar
+    volumes for all species.
+
+    .. math::
+        m_i = \frac{{Ql}_i {MW}_i}{1000 {Vml}_i}
+
+    Parameters
+    ----------
+    Qls : iterable
+        Standard liquid volume flow rates [m^3/s]
+    MWs : iterable
+        Molecular weights [g/mol]
+    Vmls : iterable
+        Molar volumes in the liquid phase [m^3/mol]
+
+    Returns
+    -------
+    ms : iterable
+        Mass flow rates [kg/s]
+
+    Notes
+    -----
+    Does not check that inputs are of the same length.
+
+    Examples
+    --------
+    >>> Qls_to_ms([1.666666666e-02, 1.11111111e-01], [24, 45], [1e-4, 2e-4])
+    [4.0, 25.0]
+    '''
+    N = len(Qls)
+    ms = [0.0]*N
+    for i in range(N):
+        ms[i] = 1e-3*Qls[i]*MWs[i]/Vmls[i]
+    return ms
 
 def dxs_to_dns(dxs, xs, dns=None):
     r'''Convert the mole fraction derivatives of a quantity (calculated so
