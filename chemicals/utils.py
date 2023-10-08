@@ -37,7 +37,7 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
 'Vm_to_rho', 'rho_to_Vm',
 'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs',
 'Vfs_to_zs',
-'ms_to_ns', 'ns_to_ms',
+'ms_to_ns', 'ns_to_ms', 'ns_to_Qls', 'Qls_to_ns',
  'none_and_length_check', 'normalize', 'remove_zeros',
  'mixing_simple',
 'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar',
@@ -1736,6 +1736,73 @@ def ns_to_ms(ns, MWs):
         ms[i] = ns[i]*MWs[i]*1e-3
     return ms
 
+def ns_to_Qls(ns, Vmls):
+    r'''Converts a list of mole flow rates to standard liquid volume 
+    flow rates. Requires standard liquid molar volumes for all species.
+
+    .. math::
+        {Ql}_i = n_i \times {Vml}_i
+
+    Parameters
+    ----------
+    ns : iterable
+        Mole flow rates [mol/s]
+    Vmls : iterable
+        Standard molar liquid volumes of each component [m^3/mol]
+
+    Returns
+    -------
+    Qls : iterable
+        Standard liquid volume flow rates [m^3/s]
+
+    Notes
+    -----
+    Does not check that inputs are of the same length.
+
+    Examples
+    --------
+    >>> ns_to_Qls([2.0, 3.0], [1e-4, 2e-4])
+    [2e-4, 6e-4]
+    '''
+    N = len(ns)
+    Qls = [0.0]*N
+    for i in range(N):
+        Qls[i] = ns[i] * Vmls[i]
+    return Qls
+
+def Qls_to_ns(Qls, Vmls):
+    r'''Converts a list of standard liquid volume flow rates 
+    to mole flow rates. Requires standard liquid molar volumes for all species.
+
+    .. math::
+        n_i = \frac{Ql_i}{Vml_i}
+
+    Parameters
+    ----------
+    Qls : iterable
+        Standard liquid volume flow rates [m^3/s]
+    Vmls : iterable
+        Standard liquid molar volumes of each component [m^3/mol]
+
+    Returns
+    -------
+    ns : iterable
+        Mole flow rates [mol/s]
+
+    Notes
+    -----
+    Does not check that inputs are of the same length.
+
+    Examples
+    --------
+    >>> Qls_to_ns([2e-4, 6e-4], [1e-4, 2e-4])
+    [2.0, 3.0]
+    '''
+    N = len(Qls)
+    ns = [0.0]*N
+    for i in range(N):
+        ns[i] = Qls[i]/Vmls[i]
+    return ns
 
 def dxs_to_dns(dxs, xs, dns=None):
     r'''Convert the mole fraction derivatives of a quantity (calculated so
