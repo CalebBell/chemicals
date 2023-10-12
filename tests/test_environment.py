@@ -45,6 +45,8 @@ from chemicals.environment import (
     logP_data_CRC,
     logP_data_Syrres,
     logP_methods,
+    IPCC_2021_20YR_GWP, IPCC_2021_100YR_GWP, IPCC_2021_500YR_GWP, IPCC_2021_GWPs,
+    GTP, GTP_methods, GTP_all_methods, IPCC_2014_20YR_GTP, IPCC_2014_50YR_GTP, IPCC_2014_100YR_GTP, IPCC_2021_50YR_GTP, IPCC_2021_100YR_GTP,
 )
 
 
@@ -70,7 +72,11 @@ def test_only_removed_GWPs():
 
 def test_GWP():
     GWP1_calc = GWP(CASRN='74-82-8')
+    assert_close(GWP1_calc, 81.2) # methane 20 year
+
+    GWP1_calc = GWP(CASRN='74-82-8', method='IPCC (2014) 20yr')
     assert_close(GWP1_calc, 84.0) # methane 20 year
+
     GWP2_calc = GWP(CASRN='74-82-8', method='IPCC (1995) 100yr')
     assert_close(GWP2_calc, 21.0)
 
@@ -83,6 +89,9 @@ def test_GWP():
     assert GWP('7732-18-5', method=None) is None
     assert GWP_methods('14882353275-98-3') == []
     assert type(GWP(CASRN='74-82-8')) is float
+
+    assert_close(GWP(CASRN='74-82-8', method='IPCC (2021) 500yr'), 7.95)
+    assert_close(GWP(CASRN='74-82-8', method='IPCC (2021) 100yr'), 27.9)
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -106,6 +115,14 @@ def test_GWP_all_values():
     sum_2014_100 = sum([GWP(i, method=IPCC_2014_100YR_GWP) for i in IPCC_2014_GWPs.index])
     assert_close(sum_2014_100, 402141.69451)
 
+    sum_2021_20 = sum([GWP(i, method=IPCC_2021_20YR_GWP) for i in IPCC_2021_GWPs.index])
+    assert_close(sum_2021_20, 617406.6410000003)
+
+    sum_2021_100 = sum([GWP(i, method=IPCC_2021_100YR_GWP) for i in IPCC_2021_GWPs.index])
+    assert_close(sum_2021_100, 504313.68200000003)
+
+    sum_2021_500 = sum([GWP(i, method=IPCC_2021_500YR_GWP) for i in IPCC_2021_GWPs.index])
+    assert_close(sum_2021_500, 415507.3559999999)
 
 def test_logP_data():
     tot = np.abs(logP_data_CRC['logP']).sum()
@@ -169,3 +186,15 @@ def test_ODP_all_values():
 
     dat = [77.641999999999996, 64.140000000000001, 63.10509761272651, 47.809027930358717, 58.521999999999998, 42.734000000000002, 54.342000000000006, 38.280000000000001]
     assert_close1d(dat_calc, dat, rtol=1e-12)
+
+def test_GTP_stuff():
+    assert_close(GTP('10024-97-2', method=IPCC_2021_50YR_GTP), 290)
+    assert_close(GTP('10024-97-2', method=IPCC_2021_100YR_GTP), 233)
+
+    assert_close(GTP('10024-97-2', method=IPCC_2014_20YR_GTP), 277)
+    assert_close(GTP('10024-97-2', method=IPCC_2014_50YR_GTP), 282.0)
+    assert_close(GTP('10024-97-2', method=IPCC_2014_100YR_GTP), 234.0)
+
+    assert frozenset(GTP_methods('10024-97-2')) == frozenset(GTP_all_methods)
+
+    assert GTP('50-00-0') is None
