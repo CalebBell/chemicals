@@ -412,7 +412,7 @@ def GTP(CASRN, method=None):
     if method:
         if method in _IPCC_2021_GTP_keys_by_method:
             key, df = _IPCC_2021_GTP_keys_by_method[method], IPCC_2021_GWPs
-        if method in _IPCC_2014_GTP_keys_by_method:
+        elif method in _IPCC_2014_GTP_keys_by_method:
             key, df = _IPCC_2014_GTP_keys_by_method[method], IPCC_2014_GWPs
         return retrieve_from_df(df, CASRN, key)
     else:
