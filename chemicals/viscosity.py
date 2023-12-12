@@ -1203,7 +1203,7 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
     Vc : float
         Critical volume of the fluid [m^3/mol]
     Vm : float
-        Molar volume of the fluid at temperature [K]
+        Molar volume of the fluid at temperature [m^3]
     omega : float
         Acentric factor of compound
     MW : float
