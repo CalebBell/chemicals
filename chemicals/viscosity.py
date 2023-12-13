@@ -1136,7 +1136,7 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     T : float
         Temperature of fluid [K]
     MW : float
-        Molwcular weight of fluid [g/mol]
+        Molecular weight of fluid [g/mol]
     Tc : float
         Critical temperature of the fluid [K]
     Pc : float
@@ -1203,11 +1203,11 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
     Vc : float
         Critical volume of the fluid [m^3/mol]
     Vm : float
-        Molar volume of the fluid at temperature [K]
+        Molar volume of the fluid at temperature [m^3]
     omega : float
         Acentric factor of compound
     MW : float
-        Molwcular weight of fluid [g/mol]
+        Molecular weight of fluid [g/mol]
 
     Returns
     -------
@@ -1343,7 +1343,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
     Pc : float
         Critical pressure of the fluid [Pa]
     MW : float
-        Molwcular weight of fluid [g/mol]
+        Molecular weight of fluid [g/mol]
 
     Returns
     -------
@@ -1408,7 +1408,7 @@ def Stiel_Thodos(T, Tc, Pc, MW):
     Pc : float
         Critical pressure of the fluid [Pa]
     MW : float
-        Molwcular weight of fluid [g/mol]
+        Molecular weight of fluid [g/mol]
 
     Returns
     -------
@@ -1560,7 +1560,7 @@ def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
     Pc : float
         Critical pressure of the fluid [Pa]
     MW : float
-        Molwcular weight of fluid [g/mol]
+        Molecular weight of fluid [g/mol]
 
     Returns
     -------
@@ -2261,7 +2261,7 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
     zs : list[float]
         Mole fractions of chemicals in the fluid, [-]
     MWs : list[float]
-        Molwcular weights of chemicals in the fluid [g/mol]
+        Molecular weights of chemicals in the fluid [g/mol]
     Tcs : float
         Critical temperatures of chemicals in the fluid [K]
     Pcs : float

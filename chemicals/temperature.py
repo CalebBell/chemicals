@@ -330,7 +330,7 @@ def T_converter(T, current, desired):
     ITS-68 conversion is valid from 14 K to 4300 K.
     ITS-48 conversion is valid from 93.15 K to 4273.15 K
     ITS-76 conversion is valid from 5 K to 27 K.
-    ITS-27 is valid from 903.15 K to 4273.15 k.
+    ITS-27 is valid from 903.15 K to 4273.15 K.
 
     Parameters
     ----------
