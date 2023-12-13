@@ -503,8 +503,8 @@ class Element:
         Pauling electronegativity, [-]
     ionization : float
         Ionization potential, [eV]
-    ionization : float
-        elaffinity affinity, [eV]
+    elaffinity : float
+        Electron affinity, [eV]
     protons : int
         Number of protons, [-]
     electrons : int
