@@ -155,27 +155,79 @@ except:
 
 immutable_class_types = {'Fraction', 'Decimal'}
 
-@mark_numba_incompatible
-def object_data(obj):
-    # Always returns a new dictionary
+object_data_type_cache = {}
+def create_object_data_function(instance):
+    t = type(instance)
     try:
-        d = obj.__dict__.copy()
+        return object_data_type_cache[t]
     except:
-        d = {}
-
-    for base in obj.__class__.__mro__[:-1]:
+        pass
+    has_d = hasattr(instance, '__dict__')
+    slots = []
+    for base in instance.__class__.__mro__[:-1]:
         try:
-            slots = base.__slots__
+            slots.extend(base.__slots__)
         except:
             continue
-        for s in slots:
-            if s == '__dict__':
-                continue
-            try:
-                d[s] = getattr(obj, s)
-            except:
-                pass
-    return d
+    # remove duplicates
+    slots_set = set(slots)
+    try:
+        slots_set.remove('__dict__')
+    except:
+        pass
+    slots = tuple(slots_set)
+
+    if has_d and slots:
+        def specialized_object_data(obj, slots=slots):
+            d = obj.__dict__.copy()
+            for s in slots:
+                try:
+                    d[s] = getattr(obj, s)
+                except:
+                    pass
+            return d
+    elif has_d:
+        def specialized_object_data(obj):
+            return obj.__dict__.copy()
+    else:
+        def specialized_object_data(obj, slots=slots):
+            d = {}
+            for s in slots:
+                try:
+                    d[s] = getattr(obj, s)
+                except:
+                    pass
+            return d
+
+    object_data_type_cache[t] = specialized_object_data
+    return specialized_object_data
+
+@mark_numba_incompatible
+def object_data(obj):
+    t = type(obj)
+    try:
+        return object_data_type_cache[t](obj)
+    except:
+        return create_object_data_function(obj)(obj)
+    # Always returns a new dictionary
+    # try:
+    #     d = obj.__dict__.copy()
+    # except:
+    #     d = {}
+
+    # for base in obj.__class__.__mro__[:-1]:
+    #     try:
+    #         slots = base.__slots__
+    #     except:
+    #         continue
+    #     for s in slots:
+    #         if s == '__dict__':
+    #             continue
+    #         try:
+    #             d[s] = getattr(obj, s)
+    #         except:
+    #             pass
+    # return d
 
 @mark_numba_incompatible
 def recursive_copy(obj):
