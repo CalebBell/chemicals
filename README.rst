@@ -191,7 +191,7 @@ C               -43
 Tmin            273
 Tmax            473
 Name: 7732-18-5, dtype: object
->>> A, B, C = antoine_coefficients['A'], antoine_coefficients['B'], antoine_coefficients['C']
+>>> A, B, C = float(antoine_coefficients['A']), float(antoine_coefficients['B']), float(antoine_coefficients['C'])
 >>> T = 373.15 # Temperature [K]
 >>> Antoine(T, A, B, C) # Vapor pressure [Pa]
 101047.2535
@@ -254,5 +254,5 @@ Citation
 
 To cite chemicals in publications use:
 
-    Caleb Bell, Yoel Rene Cortes-Pena, and Contributors (2016-2023). Chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
+    Caleb Bell, Yoel Rene Cortes-Pena, and Contributors (2016-2024). Chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
     https://github.com/CalebBell/chemicals.

@@ -703,7 +703,7 @@ def Viswanath_Natarajan_2_exponential(T, C, D):
     Calculation of the AARD of the fit (1% is the value stated in [1]_.:
 
     >>> mu_calc = [Viswanath_Natarajan_2_exponential(T, 4900800, -3.8075) for T in Ts]
-    >>> np.mean([abs((mu - mu_i*1000)/mu) for mu, mu_i in zip(mus, mu_calc)])
+    >>> float(np.mean([abs((mu - mu_i*1000)/mu) for mu, mu_i in zip(mus, mu_calc)]))
     0.010467928813061298
 
     References

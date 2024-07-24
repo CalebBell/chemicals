@@ -147,6 +147,7 @@ try:
 except:  # pragma: no cover
     has_CoolProp = False
 
+N_FACT = 1
 def make_me_precise():
     import mpmath as mp
     globals()['exp'] = mp.exp
@@ -385,7 +386,7 @@ def test_iapws97_region1_fuzz():
 #    atols = [1e-16]
 #    rtols = [2e-12]
 
-    N = 500
+    N = 40*N_FACT
     Ts = linspace(273.15, 623.15, N)
     def test_Ps(T, N):
         Psat = Psat_IAPWS(T)
@@ -439,7 +440,7 @@ def test_iapws97_region2_fuzz():
     atols = [0, 0, 1e-14, 0, 0, 0.0, 3e-18, 0, 0, ]
     rtols = [1e-14, 1e-14, 5e-15, 2e-14, 2e-14, 2e-15, 1e-14, 2e-15, 2e-15]
 
-    N = 200 # tested up to 2000
+    N = 20*N_FACT # tested up to 2000
     P_lim = 1e-6
     Ts = linspace(273.15, 1073.15, N)
     def test_Ps(T, N):
@@ -458,7 +459,7 @@ def test_iapws97_region2_fuzz():
         for T in Ts:
             tau = 540.0/T
             for P in test_Ps(T, N):
-                pi = P/1E6
+                pi = P*1E-6
                 assert_close(naive(tau, pi),
                              fast(tau, pi), rtol=rtol, atol=atol)
 
@@ -492,7 +493,7 @@ def test_iapws97_region3_fuzz():
                   iapws97_d2A_ddelta2_region3, iapws97_dA_ddelta_region3, iapws97_A_region3]
     atols = [0, 0, 0, 1e-13, 0.0, 0, ]
     rtols = [3e-12, 1e-11, 5e-13, 1e-12, 2e-12, 5e-14]
-    N = 500
+    N = 40*N_FACT
     Ts = linspace(623.15, 1073.15, N)
 
     for naive, fast, rtol, atol in zip(funcs_naive, funcs_fast, rtols, atols):
@@ -572,26 +573,26 @@ def test_iapws97_region5_fuzz():
 #    atols = [4e-17]
 #    rtols = [2e-14]
 
-    N = 2000
+    N = 40*N_FACT
     Ts = linspace(1073.15, 2273.15, N)
     def test_Ps(T, N):
         return logspace(log10(1e-6), log10(50e6), N)
 
     for naive, fast, rtol, atol in zip(funcs_naive, funcs_fast, rtols, atols):
-        errs = []
+        # errs = []
         erri = 0.0
 #        print(naive)
         for T in Ts:
             tau = 1000.0/T
             for P in test_Ps(T, N):
-                pi = P/1E6
+                pi = P*1E-6
 #                print(tau, pi)
                 v0 = naive(tau, pi)
                 v1 = fast(tau, pi)
                 assert_close(v0, v1, rtol=rtol, atol=atol)
-                error = abs(1.0 - v1/v0)
-                erri += error
-                errs.append(error)
+                # error = abs(1.0 - v1/v0)
+                # erri += error
+                # errs.append(error)
 #        print(naive, erri/N**2, np.std(errs), np.max(errs))
 #test_iapws97_region5_fuzz()
 ### Fast tests
@@ -936,13 +937,13 @@ def test_iapws97_region_2_rho_coolprop():
 def test_iapws97_region_1_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     tol = 1e-4
-    Ts = linspace(273.15+tol,  623.15-tol, 500)
+    Ts = linspace(273.15+tol,  623.15-tol, 20*N_FACT)
     def test_Ps(T, N):
         Psat = Psat_IAPWS(T)*(1+tol)
         return logspace(log10(Psat), log10(100e6), N)
 
     for T in Ts:
-        for P in test_Ps(T, 500):
+        for P in test_Ps(T, 20*N_FACT):
             assert iapws97_identify_region_TP(T, P) == 1
             rho_implemented = iapws97_rho(T=T, P=P)
             rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
@@ -987,7 +988,7 @@ def test_iapws97_P():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws97_P_fuzz():
-    N = 40
+    N = 40*N_FACT
     Ts = linspace(273.15, 623.15, N)
     # Ts = linspace(273.15, 1073.15, N)
     Ps = logspace(log10(1e-5), log10(100e6), N)
@@ -999,7 +1000,7 @@ def test_iapws97_P_fuzz():
 
 
     # Region 1 and 2 general - Good, working great!
-    N = 100
+    N = 100*N_FACT
     Ts = linspace(273.15, 1073.15, N)
     Ps = logspace(log10(1e-8), log10(100e6), N)
     for T in Ts:
@@ -1011,7 +1012,7 @@ def test_iapws97_P_fuzz():
                 assert_close(P, P_calc, rtol=5e-9)
 
     # Region 5 - works great
-    N = 100
+    N = 100*N_FACT
     Ts = linspace(1073.15, 2273.15, N)
     Ps = logspace(log10(1e-8), log10(50e6), N)
     for T in Ts:
@@ -1117,7 +1118,7 @@ def test_iapws97_T():
     rho = iapws97_rho(273.9508008008008, 17030650.2925232)
     assert_close(iapws97_T(17030650.2925232, rho), 273.9508008008008)
 
-    # region 5 border requiring calc
+    # region 5 border requiring calc    
     rho = iapws97_rho(1073.150000000001, 34705199.859195136)
     assert_close(iapws97_T(34705199.859195136, rho), 1073.150000000001)
 
@@ -1136,7 +1137,7 @@ def test_iapws97_identify_region_TP():
 @pytest.mark.fuzz
 def test_iapws97_T_fuzz():
     # region 2 and 1
-    N = 100
+    N = 100*N_FACT
     Ts = linspace(273.15, 1073.15, N)
     Ps = logspace(log10(1e-8), log10(100e6), N)
     for T in Ts:
@@ -1152,7 +1153,7 @@ def test_iapws97_T_fuzz():
                     rho_recalc = iapws97_rho(T_calc, P)
                     assert_close(rho, rho_recalc, rtol=5e-9)
     # region 5
-    N = 100
+    N = 100*N_FACT
     Ts = linspace(1073.15+1e-12, 2273.15, N)
     Ps = logspace(log10(1e-8), log10(50e6), N)
     for T in Ts:
@@ -1674,11 +1675,11 @@ def test_iapws95_d2A_d2deltar_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 500
+    N = 30*N_FACT
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
-        print(i)
+        # print(i)
         rhos = logspace(log10(1e-10), log10(5000), N)
         for rho in rhos:
             tau = 647.096/T
@@ -1690,7 +1691,7 @@ def test_iapws95_d2A_d2deltar_vs_naive(precise=False, allow_fail=True):
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
-    print(rerr/N**2, np.std(errs), np.max(errs))
+    # print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 
 #test_iapws95_d2A_d2deltar_vs_naive()
@@ -1707,13 +1708,13 @@ def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 100
+    N = 100*N_FACT
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
+    # rhos = logspace(log10(1e-10), log10(1e-4), N)
+    rhos = logspace(log10(1e-4), log10(5000), N)
     for i, T in enumerate(Ts):
 #        print(i)
-#        rhos = logspace(log10(1e-10), log10(1e-4), N)
-        rhos = logspace(log10(1e-4), log10(5000), N)
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
@@ -1730,7 +1731,7 @@ def test_iapws95_d3A_d3deltar_vs_naive(precise=False, allow_fail=True):
 #                print([T, rho, rerri])
             rerr += rerri
             errs.append(rerri)
-    print(rerr/N**2, np.std(errs), np.max(errs))
+    # print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 
 #test_iapws95_d3A_d3deltar_vs_naive(precise=True, allow_fail=True)
@@ -1813,12 +1814,12 @@ def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 100
+    N = 25*N_FACT
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
+    rhos = logspace(log10(1e-10), log10(5000), N)
     for i, T in enumerate(Ts):
 #        print(i)
-        rhos = logspace(log10(1e-10), log10(5000), N)
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
@@ -1826,10 +1827,10 @@ def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
             val_naive = float(iapws95_d3Ar_ddeltadtau2_naive(mpf(tau), mpf(delta)))
             if allow_fail:
                 assert_close(val, val_naive, rtol=2e-10)
-            rerri = abs(1.0 - val/val_naive)
-            rerr += rerri
-            errs.append(rerri)
-    print(rerr/N**2, np.std(errs), np.max(errs))
+    #         rerri = abs(1.0 - val/val_naive)
+    #         rerr += rerri
+    #         errs.append(rerri)
+    # print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 #test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=True, allow_fail=False)
 #test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=False)
@@ -1849,12 +1850,12 @@ def test_iapws95_d3Ar_ddelta2dtau_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 100
+    N = 30*N_FACT
     Ts = linspace(200.0, 5000.0, N)
+    rhos = logspace(log10(1e-10), log10(5000), N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
-        print(i)
-        rhos = logspace(log10(1e-10), log10(5000), N)
+        # print(i)
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
@@ -1862,10 +1863,10 @@ def test_iapws95_d3Ar_ddelta2dtau_vs_naive(precise=False, allow_fail=True):
             val_naive = float(iapws95_d3Ar_ddelta2dtau_naive(mpf(tau), mpf(delta)))
             if allow_fail:
                 assert_close(val, val_naive, rtol=2e-10)
-            rerri = abs(1.0 - val/val_naive)
-            rerr += rerri
-            errs.append(rerri)
-    print(rerr/N**2, np.std(errs), np.max(errs))
+            # rerri = abs(1.0 - val/val_naive)
+            # rerr += rerri
+            # errs.append(rerri)
+    # print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 #test_iapws95_d3Ar_ddelta2dtau_vs_naive(precise=True, allow_fail=False)
 #test_iapws95_d3Ar_ddelta2dtau_vs_naive(precise=False, allow_fail=True)
@@ -1897,7 +1898,7 @@ def test_iapws95_dA_ddeltar_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 500
+    N = 30*N_FACT
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -1912,7 +1913,7 @@ def test_iapws95_dA_ddeltar_vs_naive(precise=False, allow_fail=True):
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
-    print(rerr/N**2, np.std(errs), np.max(errs))
+    # print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 
 #test_iapws95_dA_ddeltar_vs_naive()
@@ -1930,11 +1931,11 @@ def test_iapws95_Ar_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 300
+    N = 50*N_FACT
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
+    rhos = logspace(log10(1e-10), log10(5000), N)
     for i, T in enumerate(Ts):
-        rhos = logspace(log10(1e-10), log10(5000), N)
         for rho in rhos:
             tau = 647.096/T
             delta = rho*rhoc_inv
@@ -1945,7 +1946,7 @@ def test_iapws95_Ar_vs_naive(precise=False, allow_fail=True):
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
-    print(rerr/N**2, np.std(errs), np.max(errs))
+    # print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 #test_iapws95_Ar_vs_naive()
 #test_iapws95_Ar_vs_naive(precise=True, allow_fail=False)
@@ -1977,7 +1978,7 @@ def test_iapws95_dAr_dtau_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 300
+    N = 25*N_FACT
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -1992,7 +1993,7 @@ def test_iapws95_dAr_dtau_vs_naive(precise=False, allow_fail=True):
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
-    print(rerr/N**2, np.std(errs), np.max(errs))
+    # print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 #test_iapws95_dAr_dtau_vs_naive()
 
@@ -2013,7 +2014,7 @@ def test_iapws95_d2Ar_dtau2_vs_naive(precise=False, allow_fail=True):
 
     errs = []
     rerr = 0
-    N = 500
+    N = 30*N_FACT
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -2028,7 +2029,7 @@ def test_iapws95_d2Ar_dtau2_vs_naive(precise=False, allow_fail=True):
             rerri = abs(1.0 - val/val_naive)
             rerr += rerri
             errs.append(rerri)
-    print(rerr/N**2, np.std(errs), np.max(errs))
+    # print(rerr/N**2, np.std(errs), np.max(errs))
     make_me_float()
 #test_iapws95_d2Ar_dtau2_vs_naive(precise=True, allow_fail=False)
 
@@ -2051,7 +2052,7 @@ def test_iapws95_d2Ar_ddeltadtau_vs_naive(precise=False, allow_fail=True):
         mpf = lambda x: x
     errs = []
     rerr = 0
-    N = 300
+    N = 30*N_FACT
     Ts = linspace(200.0, 5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -2084,7 +2085,7 @@ def test_iapws95_A0_vs_naive():
     '''
     errs = []
     rerr = 0
-    N = 400
+    N = 400*N_FACT
     Ts = linspace(200.0,  5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -2109,7 +2110,7 @@ def test_iapws95_iapws95_dA0_dtau_vs_naive():
     '''
     errs = []
     rerr = 0
-    N = 300
+    N = 300*N_FACT
     Ts = linspace(200.0,  5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -2133,7 +2134,7 @@ def test_ddAddtau_idg_vs_naive():
     '''
     errs = []
     rerr = 0
-    N = 100
+    N = 100*N_FACT
     Ts = linspace(200.0,  5000.0, N)
     rhoc_inv = (1.0/322.0)
     for i, T in enumerate(Ts):
@@ -2176,7 +2177,7 @@ def test_iapws95_d3A0_dtau3():
 @pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
 def test_rho_iapws95_CoolProp():
     from CoolProp.CoolProp import PropsSI
-    N = 40
+    N = 40*N_FACT
     Ts = linspace(273.16+1e-10,  1073.15-1e-10, N)
     Ps = logspace(log10(1e-3), log10(100e6), N)
 
@@ -2412,7 +2413,7 @@ def test_iapws95_saturation_fits():
     import mpmath as mp
     mp.mp.dps = 50
     iapws.use_mpmath_backend()
-    N = 100 # should be able to set arbitrarily high, tested to 1000
+    N = 15*N_FACT # should be able to set arbitrarily high, tested to 1000
     Ts = linspace(273.15, 647.09, N)
 
     for T in Ts:

@@ -1062,7 +1062,7 @@ def PPDS2(T, Ts, C_low, C_inf, a1, a2, a3, a4, a5):
     heat capacity.
 
     .. math::
-        \frac{C_p^0}{R} = C_{low} + (C_\inf - C_{low})y^2\left(1 + (y-1)
+        \frac{C_p^0}{R} = C_{low} + (C_\infty - C_{low})y^2\left(1 + (y-1)
         \left[\sum_{i=0}^4 a_i y^i\right]\right)
 
     .. math::
@@ -1626,7 +1626,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
     Examples
     --------
     >>> Lastovka_Shaw_T_for_Sm(Sm=112.80, MW=72.151, similarity_variable=0.2356)
-    603.4298291570276
+    603.429829157
 
     References
     ----------

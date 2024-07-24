@@ -159,6 +159,8 @@ from fluids.numerics import (
     solve_2_direct,
     solve_3_direct,
     solve_4_direct,
+    newton_generic,
+    secant_generic,
 )
 from fluids.numerics import numpy as np
 
@@ -1607,13 +1609,13 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
         # Requiring a low ytol seems to guarantee a correct solution
         if solve_order == 0:
             p1 = 0.4*V_over_F_min + 0.6*V_over_F_max
-            V_over_F = secant(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, x1=p1)
+            V_over_F = secant_generic(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, x1=p1)
         elif solve_order == 1:
             try:
-                V_over_F = newton(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, fprime=True)
+                V_over_F = newton_generic(objf, guess, low=V_over_F_min, high=V_over_F_max, xtol=tol, maxiter=1000, ytol=1e-50, fprime=True)
             except:
                 # Should happen only just barely because of numerical issues calculating the bounds
-                V_over_F = newton(objf, guess, xtol=tol, maxiter=1000, ytol=1e-50, fprime=True)
+                V_over_F = newton_generic(objf, guess, xtol=tol, maxiter=1000, ytol=1e-50, fprime=True)
 
     xs = [0]*N
     ys = [0]*N

@@ -397,6 +397,7 @@ def test_BVirial_Tsonopoulos_extended_calculus():
 
     T, Tc, Pc, omega, R = symbols('T, Tc, Pc, omega, R')
     Tr = T/Tc
+    # Attempted to optimize things - the integrate expressions for B)c and B1c are the slowest.
     B0 = Rational(1445, 10000) - Rational(33,100)/Tr - Rational(1385,10000)/Tr**2 - Rational(121,10000)/Tr**3 - Rational(607,1000000)/Tr**8
     B1 = Rational(637,10000) + Rational(331,1000)/Tr**2 - Rational(423,1000)/Tr**3 - Rational(8,1000)/Tr**8
     B2 = 1/Tr**6

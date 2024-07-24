@@ -326,3 +326,13 @@ def test_PPDS3():
 def test_Chemsep_16():
     k = Chemsep_16(300.0, -0.12682, -1.5015, -1.0467, -0.00088709, -9.3679E-07)
     assert_close(k, 0.11924904787869492, rtol=1e-14)
+
+    # Surface tension case from chemsep
+    A = -0.040703
+    B = -6.9523
+    C = -2.3114
+    D = -0.0055565
+    E = 5.7595e-06
+    for T in (193, 193.15, 200):
+        k = Chemsep_16(T, A, B, C, D, E)
+        assert k == 0

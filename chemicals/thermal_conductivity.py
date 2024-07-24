@@ -303,6 +303,8 @@ def Chemsep_16(T, A, B, C, D, E):
 
     Notes
     -----
+    This correlation is also used by ChemSep for surface tension. Calculation of
+    negative values is prevented and those are set to 0.
 
     Examples
     --------
@@ -317,7 +319,10 @@ def Chemsep_16(T, A, B, C, D, E):
     .. [1] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on
        Demand Norderstedt, Germany, 2000.
     '''
-    return A + trunc_exp(B/T + C + D*T + E*T*T)
+    prop = A + trunc_exp(B/T + C + D*T + E*T*T)
+    if prop < 0.0:
+        prop = 0.0
+    return prop
 
 
 def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):

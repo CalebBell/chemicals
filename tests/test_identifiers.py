@@ -65,7 +65,7 @@ def test_dippr_2016_matched_meta():
     names = df2['Name'].tolist()
     CASs = df2['CASN'].tolist()
     for i, CAS in enumerate(CASs):
-        if CAS in ['16462-44-5', '75899-69-3']:
+        if CAS in ('16462-44-5', '75899-69-3'):
             # CELLOBIOSE (not the latest CAS, now is 528-50-7)
             # TRIPROPYLENE GLYCOL MONOETHYL ETHER (cannot find structure)
             continue
@@ -75,8 +75,6 @@ def test_dippr_2016_matched_meta():
         except:
             pass
         assert CAS_from_any(CAS) == CAS
-
-    # TODO names?
 
 
 @pytest.mark.slow
