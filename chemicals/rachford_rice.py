@@ -147,6 +147,7 @@ from fluids.numerics import (
     mul_dd,
     mul_noerrors_dd,
     newton,
+    newton_generic,
     newton_system,
     one_10_epsilon_larger,
     one_10_epsilon_smaller,
@@ -156,11 +157,10 @@ from fluids.numerics import (
     roots_cubic,
     roots_quartic,
     secant,
+    secant_generic,
     solve_2_direct,
     solve_3_direct,
     solve_4_direct,
-    newton_generic,
-    secant_generic,
 )
 from fluids.numerics import numpy as np
 
@@ -449,7 +449,7 @@ def Rachford_Rice_polynomial(zs, Ks):
 
 #    if N > 2:
     c = 0.0
-    for i in range(0, N):
+    for i in range(N):
         c += (1.0 - zs[i])*Cs_inv[i]
     coeffs[1] = c
     #coeffs.append(c)
@@ -461,7 +461,7 @@ def Rachford_Rice_polynomial(zs, Ks):
     #                 for v in range(N-1, 2, -1)])
 
     c = 0.0
-    for i in range(0, N):
+    for i in range(N):
         C_sumprod = 1.0
         for j, C in enumerate(Cs_inv):
             if j != i:
@@ -564,7 +564,7 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
 #        if Ks[i] < Kmin: # numba: uncomment
 #            Kmin = Ks[i] # numba: uncomment
     if Kmin > 1.0 or Kmax < 1.0:
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax - 1.))
@@ -828,7 +828,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
             if Ks[i] < Kmin:
                 Kmin = Ks[i]
     if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
     V_over_F_max = 1./(1.-Kmin)
@@ -921,7 +921,7 @@ def Rachford_Rice_solution_numpy(zs, Ks, guess=None):
             if Ks[i] < Kmin:
                 Kmin = Ks[i]
     if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.-Kmin))/((1.-Kmin)*(Kmax-1.))
@@ -1095,7 +1095,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
             if Ks[i] < Kmin:
                 Kmin = Ks[i]
     if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     V_over_F_min = ((Kmax-Kmin)*z_of_Kmax - (1.- Kmin))/((1.- Kmin)*(Kmax- 1.))
     V_over_F_min_LN = -1.0/(Kmax-1) # There is a special lower limit to use for this method
@@ -1250,7 +1250,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
             if Ks[i] < Kmin:
                 Kmin = Ks[i]
     if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
     numr, nume = add_dd(Kmax, 0, -Kmin, 0)
@@ -1415,7 +1415,7 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
     z0, z1 = zs
     K0, K1 = Ks
     if (K0 < 1.0 and K1 < 1.0) or (K0 > 1.0 and K1 > 1.0):
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #                raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     l = 2
     xs = [0.0]*l
@@ -1550,7 +1550,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
             if Ks[i] < Kmin:
                 Kmin = Ks[i]
     if Kmin > 1.0 or Kmax < 1.0:
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")
 
     z_of_Kmax, Kmin, Kmax = mpf(z_of_Kmax), mpf(Kmin), mpf(Kmax)
 
@@ -1759,7 +1759,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
             if Ks[i] < Kmin:
                 Kmin = Ks[i]
     if Kmin > 1.0*(1-1e-15) or Kmax < 1.0*(1+1e-15):
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
     one_m_Kmin = 1.0 - Kmin
@@ -1795,7 +1795,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     else:
         near_high = V_over_F_max*one_epsilon_larger
     if (near_high-V_over_F_min) == 0.0:
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s"%(Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     solver_high = -log((V_over_F_max-near_high)/(near_high-V_over_F_min))
 
@@ -1807,7 +1807,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
         # V_over_F_min equals zero case, cannot evaluate there
         near_low = min(1e-20, V_over_F_max*1e-15)
     if (near_low-V_over_F_min) == 0.0:
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s"%(Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     solver_low = -log((V_over_F_max-near_low)/(near_low-V_over_F_min))
 
@@ -1924,7 +1924,7 @@ def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
     kn = Ks_sorted[-1]
 
     if kn > 1.0*(1-1e-15) or k1 < 1.0*(1+1e-15):
-        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+        raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
     x_max = (1. - kn)/(k1 - kn)
@@ -2223,7 +2223,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
                 if K_high and K_low:
                     break
         if not K_low or not K_high:
-            raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" %(Ks)) # numba: delete
+            raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}") # numba: delete
 #            raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
 
         for zi in zs:
@@ -2274,7 +2274,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
             z1, z2 = zs
             K1, K2 = Ks
             if (K1 < 1.0 and K2 < 1.0) or (K1 > 1.0 and K2 > 1.0):
-                raise PhaseCountReducedError("For provided K values, there is no positive-composition solution; Ks=%s" % (Ks))  # numba: delete
+                raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #                raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
             z1z2 = z1 + z2
             K1z1 = K1*z1

@@ -1195,7 +1195,7 @@ def Tait(P, P_ref, rho_ref, B, C):
     --------
     Coefficients for methanol from the CRC Handbook [1]_ at 300 K and
     1E8 Pa.
-    
+
     >>> B_coeffs = [649718000.0, -4345830.0, 13072.2, -20.029200000000003, 0.0120566]
     >>> C_coeffs = [0.115068, -5.322e-05]
     >>> T = 300

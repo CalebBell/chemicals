@@ -228,7 +228,6 @@ if not fluids.numerics.is_micropython:
             print(f'{name} : {use/1024**2:3f} MB')
         print(f'Total usage: {sum(usages)/1024**2:3f} MB')
 
-    global vectorized, numba, units, numba_vectorized
     if PY37:
         def __getattr__(name):
             global vectorized, numba, units, numba_vectorized

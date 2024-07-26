@@ -149,10 +149,9 @@ def retrieve_from_df_dict(df_dict, index, key, method):
     try:
         df = df_dict[method]
     except KeyError:
-        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
-                method, list(df_dict)))
+        raise ValueError(f'Invalid method: {method}, allowed methods are {list(df_dict)}')
     except TypeError: # pragma: no cover
-        raise TypeError("Method must be a string, not a %s object" %(type(method).__name__))
+        raise TypeError(f"Method must be a string, not a {type(method).__name__} object")
     return retrieve_from_df(df, index, key)
 
 def retrieve_any_from_df_dict(df_dict, index, key):

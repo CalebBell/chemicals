@@ -474,8 +474,7 @@ def TWA(CASRN, method=None):
             value = data["TWA (mg/m^3)"]
             if value: return value, 'mg/m^3'
     else:
-        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
-                         method, TWA_all_methods))
+        raise ValueError(f'Invalid method: {method}, allowed methods are {TWA_all_methods}')
 
 @mark_numba_incompatible
 def STEL_methods(CASRN):
@@ -544,8 +543,7 @@ def STEL(CASRN, method=None):
             value = data["STEL (mg/m^3)"]
             if value: return value, 'mg/m^3'
     else:
-        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
-                         method, TWA_all_methods))
+        raise ValueError(f'Invalid method: {method}, allowed methods are {TWA_all_methods}')
 
 @mark_numba_incompatible
 def Ceiling_methods(CASRN):
@@ -607,8 +605,7 @@ def Ceiling(CASRN, method=None):
             value = data["Ceiling (mg/m^3)"]
             if value: return value, 'mg/m^3'
     else:
-        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
-                         method, list(Ontario_exposure_limits_dict)))
+        raise ValueError(f'Invalid method: {method}, allowed methods are {list(Ontario_exposure_limits_dict)}')
 
 @mark_numba_incompatible
 def Skin_methods(CASRN):
@@ -661,8 +658,7 @@ def Skin(CASRN, method=None):
         if CASRN in Ontario_exposure_limits_dict:
             return Ontario_exposure_limits_dict[CASRN]["Skin"]
     else:
-        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
-                         method, TWA_all_methods))
+        raise ValueError(f'Invalid method: {method}, allowed methods are {TWA_all_methods}')
 
 ### Carcinogen functions
 
@@ -760,8 +756,7 @@ def Carcinogen(CASRN, method=None):
         if CASRN in NTP_data.index:
             return NTP_codes[NTP_data.at[CASRN, 'Listing']]
     else:
-        raise ValueError('Invalid method: {}, allowed methods are {}'.format(
-                       method, Carcinogen_all_methods))
+        raise ValueError(f'Invalid method: {method}, allowed methods are {Carcinogen_all_methods}')
     return UNLISTED
 
 
@@ -1483,7 +1478,7 @@ def Crowl_Louvar_LFL(atoms):
        (February 1, 1938): 1-26. doi:10.1021/cr60071a001
     '''
     nC, nH, nO = 0, 0, 0
-    if 'C' in atoms and atoms['C']:
+    if atoms.get('C'):
         nC = atoms['C']
     else:
         return None
@@ -1536,7 +1531,7 @@ def Crowl_Louvar_UFL(atoms):
        (February 1, 1938): 1-26. doi:10.1021/cr60071a001
     '''
     nC, nH, nO = 0, 0, 0
-    if 'C' in atoms and atoms['C']:
+    if atoms.get('C'):
         nC = atoms['C']
     else:
         return None

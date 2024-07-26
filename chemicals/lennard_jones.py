@@ -1152,9 +1152,9 @@ def collision_integral_Neufeld_Janzen_Aziz(T_star, l=1, s=1):
     else:
         raise ValueError('Input values of l and s are not supported')
     omega = A/T_star**B + C*exp(-D*T_star) + E*exp(-F*T_star)
-    if (l == 1 and (s == 1 or s == 2)) or (s == 3 and l == 3):
+    if (l == 1 and (s in (1, 2))) or (s == 3 and l == 3):
         omega += G*exp(-H*T_star)
-    if not (l == 1  and (s == 1 or s == 2)):
+    if not (l == 1  and (s in (1, 2))):
         omega += R*T_star**B*sin(S*T_star**W - P)
     return omega
 
