@@ -273,7 +273,7 @@ def recursive_copy(obj):
     if hasattr(obj, '__copy__'):
         # Allow objects to provide their own hooks and wash our hands of them
         return obj.__copy__()
-    
+
     # Is it a named tuple
     if hasattr(obj, '_fields') and hasattr(obj, '_asdict') and obj_type.__mro__[1] is tuple:
         return obj_type(*(recursive_copy(v) for v in obj))
@@ -1792,7 +1792,7 @@ def ns_to_ms(ns, MWs):
     return ms
 
 def ns_to_Qls(ns, Vmls):
-    r'''Converts a list of mole flow rates to standard liquid volume 
+    r'''Converts a list of mole flow rates to standard liquid volume
     flow rates. Requires standard liquid molar volumes for all species.
 
     .. math::
@@ -1826,7 +1826,7 @@ def ns_to_Qls(ns, Vmls):
     return Qls
 
 def Qls_to_ns(Qls, Vmls):
-    r'''Converts a list of standard liquid volume flow rates 
+    r'''Converts a list of standard liquid volume flow rates
     to mole flow rates. Requires standard liquid molar volumes for all species.
 
     .. math::
@@ -1860,8 +1860,8 @@ def Qls_to_ns(Qls, Vmls):
     return ns
 
 def ms_to_Qls(ms, MWs, Vmls):
-    r'''Converts a list of mass flow rates to standard liquid volume 
-    flow rates. Requires molecular weights and standard molar liquid 
+    r'''Converts a list of mass flow rates to standard liquid volume
+    flow rates. Requires molecular weights and standard molar liquid
     volumes for all species.
 
     .. math::

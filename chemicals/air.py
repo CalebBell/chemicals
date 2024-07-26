@@ -1881,7 +1881,7 @@ def lemmon2000_rho(T, P):
 
     rho = P/(lemmon2000_air_R*T) # ideal gas guess
 
-    rho_old = 100000.0 #
+    rho_old = 100000.0
     iterations = 0
     while iterations < 2 or ((abs(rho_old - rho) > abs(1e-13*rho)) and iterations < 100):
         err, derr = lemmon2000_rho_err(rho, T, P)

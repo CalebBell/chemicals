@@ -164,11 +164,11 @@ attribute of this module.
     Equations for the Metallic Elements: 298-2500K." Canadian Metallurgical
     Quarterly 23, no. 3 (July 1, 1984): 309-13.
     https://doi.org/10.1179/cmq.1984.23.3.309.
-.. [6] Hall, K. R. Vapor Pressure and Antoine Constants for Hydrocarbons, 
+.. [6] Hall, K. R. Vapor Pressure and Antoine Constants for Hydrocarbons,
    and S, Se, Te, and Halogen Containing Organic Compounds. Springer, 1999.
 .. [7] Dykyj, J., and K. R. Hall. "Vapor Pressure and Antoine Constants for
     Oxygen Containing Organic Compounds". 2000.
-.. [8] Hall, K. R. Vapor Pressure and Antoine Constants for Nitrogen 
+.. [8] Hall, K. R. Vapor Pressure and Antoine Constants for Nitrogen
    Containing Organic Compounds. Springer, 2001.
 
 
@@ -319,7 +319,7 @@ if PY37:
                     'Psat_data_AntoineExtended', 'Psat_values_AntoineExtended', 'Psat_data_Perrys2_8',
                     'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3',
                     'Psat_data_Alcock_elements', 'Psat_values_Alcock_elements',
-                    'Psub_data_Alcock_elements', 'Psub_values_Alcock_elements', 
+                    'Psub_data_Alcock_elements', 'Psub_values_Alcock_elements',
                     'Landolt_data_sublimation_Antoine', 'Psub_values_Landolt_Antoine',
                     'Psat_data_Landolt_Antoine', 'Psat_values_Landolt_Antoine'):
             load_vapor_pressure_dfs()

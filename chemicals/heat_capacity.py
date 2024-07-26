@@ -563,7 +563,7 @@ class PiecewiseHeatCapacity:
         if T >= self.Tmin:
             for model in self.models:
                 if T <= model.Tmax: return model.calculate(T)
-        raise ValueError("no valid model at T=%g K" % T)
+        raise ValueError(f"no valid model at T={T:g} K")
 
     def force_calculate(self, T):
         r'''
@@ -626,8 +626,8 @@ class PiecewiseHeatCapacity:
 
         '''
         if Tb < Ta: return -self.calculate_integral(Tb, Ta)
-        if Ta < self.Tmin: raise ValueError("no valid model at T=%g K" % Ta)
-        elif Tb > self.Tmax: raise ValueError("no valid model at T=%g K" % Tb)
+        if Ta < self.Tmin: raise ValueError(f"no valid model at T={Ta:g} K")
+        elif Tb > self.Tmax: raise ValueError(f"no valid model at T={Tb:g} K")
         return self.force_calculate_integral(Ta, Tb)
 
     def force_calculate_integral(self, Ta, Tb):
@@ -2827,7 +2827,7 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
     Monoatomic gases have a simple heat capacity of 2.5R, the lower limit for
     ideal gas heat capacity. This function does not cover that type of a gas.
     The specific gases that are monoatomic are helium, neon, argon, krypton, xenon, radon.
-    
+
     At very low temperatures hydrogen behaves like a monoatomic gas as well.
 
     Examples

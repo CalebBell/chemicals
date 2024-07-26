@@ -1113,7 +1113,7 @@ def stoichiometry_molar_to_mass(coefficients, MWs):
     return [c*MW for c, MW in zip(coefficients, MWs)]
 
 def stoichiometry_mass_to_molar(mass_coefficients, MWs):
-    r'''This function translates mass stoichiometric coefficients into the 
+    r'''This function translates mass stoichiometric coefficients into the
     more commonly used mole-based stoichiometric coefficients.
 
     Parameters

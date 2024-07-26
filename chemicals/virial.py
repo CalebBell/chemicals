@@ -2015,7 +2015,7 @@ def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type='',
     else:
         raise ValueError('Only orders -2, -1, 0, 1, 2 and 3 are supported.')
     if a == 0 and b == 0 and species_type != '':
-        if species_type == 'simple' or species_type == 'normal':
+        if species_type in ('simple', 'normal'):
             a, b = 0, 0
         elif species_type == 'methyl alcohol':
             a, b = 0.0878, 0.0525

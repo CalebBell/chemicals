@@ -2583,7 +2583,6 @@ viscosity_scales['engler'] = (Engler_degrees, Engler_nu)
 Barbey_degrees = [6200.0, 2420.0, 1440.0, 838.0, 618.0, 483.0, 404.0, 348.0, 307.0, 195.0, 144.0, 114.0, 95.0, 70.8, 56.4, 47.0, 40.3, 35.2, 31.3, 28.2, 18.7, 14.1, 11.3, 9.4, 7.05, 5.64, 4.7, 4.03, 3.52, 3.13, 2.82, 2.5, 1.4]
 Barbey_nu = SSU_nu
 viscosity_scales['barbey'] = (Barbey_degrees, Barbey_nu)
-#
 PC7_PC7 = [40.0, 46.0, 52.5, 66.0, 79.0, 92.0, 106.0, 120.0, 135.0, 149.0]
 PC7_nu = [43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0]
 viscosity_scales['parlin cup #7'] = (PC7_PC7, PC7_nu)
@@ -2823,16 +2822,16 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
 
         if visc < scale_min*(1.-1E-7) or visc > scale_max*(1.+1E-7):
             raise ValueError('Viscosity conversion is outside the limits of the '
-                            '{} scale; given value is {}, but the range of the '
-                            'scale is from {} to {}. Set `extrapolate` to True '
-                            'to perform the conversion anyway.'.format(scale, visc, scale_min, scale_max))
+                            f'{scale} scale; given value is {visc}, but the range of the '
+                            f'scale is from {scale_min} to {scale_max}. Set `extrapolate` to True '
+                            'to perform the conversion anyway.')
 
     def range_check_linear(val, c, tmin, scale):
         if val < tmin:
             raise ValueError('Viscosity conversion is outside the limits of the '
-                            '{} scale; given value is {}, but the minimum time '
-                            'for this scale is {} s. Set `extrapolate` to True '
-                            'to perform the conversion anyway.'.format(scale, val, tmin))
+                            f'{scale} scale; given value is {val}, but the minimum time '
+                            f'for this scale is {tmin} s. Set `extrapolate` to True '
+                            'to perform the conversion anyway.')
 
     old_scale = old_scale.lower().replace('degrees', '').replace('seconds', '').strip()
     new_scale = new_scale.lower().replace('degrees', '').replace('seconds', '').strip()

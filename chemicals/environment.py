@@ -107,7 +107,7 @@ IPCC_2021_100YR_GTP = 'IPCC (2021) 100yr'
 
 GWP_all_methods = (IPCC_2014_100YR_GWP, IPCC_2014_20YR_GWP,
                    IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP,
-                   IPCC_1995_100YR_GWP, 
+                   IPCC_1995_100YR_GWP,
                    IPCC_2021_20YR_GWP, IPCC_2021_100YR_GWP, IPCC_2021_500YR_GWP)
 """Tuple of method name keys. See the `GWP` for the actual references"""
 
@@ -320,9 +320,9 @@ def GWP(CASRN, method=None):
        Other Weak Atmospheric Absorbers." Reviews of Geophysics 58, no. 3
        (2020): e2019RG000691. https://doi.org/10.1029/2019RG000691.
     .. [4] Masson-Delmotte, Valérie, Panmao Zhai, Anna Pirani, Sarah L. Connors,
-       Clotilde Péan, Sophie Berger, Nada Caud, Yang Chen, Leah Goldfarb, and Melissa 
+       Clotilde Péan, Sophie Berger, Nada Caud, Yang Chen, Leah Goldfarb, and Melissa
        I. Gomis. "Climate Change 2021: The Physical Science Basis." Contribution of
-       Working Group I to the Sixth Assessment Report of the Intergovernmental 
+       Working Group I to the Sixth Assessment Report of the Intergovernmental
        Panel on Climate Change 2 (2021): 24.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -352,7 +352,7 @@ def GWP(CASRN, method=None):
 @mark_numba_incompatible
 def GTP(CASRN, method=None):
     r'''This function handles the retrieval of a chemical's Global Temperature
-    Potential, relative to CO2. Lookup is based on CASRNs. 
+    Potential, relative to CO2. Lookup is based on CASRNs.
 
     There are two sources of data:
 
@@ -400,9 +400,9 @@ def GTP(CASRN, method=None):
        Anthropogenic and Natural Radiative Forcing." 2013.
        https://www.ipcc.ch/site/assets/uploads/2018/02/WG1AR5_Chapter08_FINAL.pdf
     .. [2] Masson-Delmotte, Valérie, Panmao Zhai, Anna Pirani, Sarah L. Connors,
-       Clotilde Péan, Sophie Berger, Nada Caud, Yang Chen, Leah Goldfarb, and Melissa 
+       Clotilde Péan, Sophie Berger, Nada Caud, Yang Chen, Leah Goldfarb, and Melissa
        I. Gomis. "Climate Change 2021: The Physical Science Basis." Contribution of
-       Working Group I to the Sixth Assessment Report of the Intergovernmental 
+       Working Group I to the Sixth Assessment Report of the Intergovernmental
        Panel on Climate Change 2 (2021): 24.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:

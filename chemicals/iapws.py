@@ -6745,7 +6745,7 @@ def iapws95_rho(T, P):
             if rho < rho_low:
                 rho = rho_low
 
-    rho_old = 100000.0 #
+    rho_old = 100000.0
     # Adding iterations check did not slow anything down.
     """# Points can be debugged with the following code.
     import matplotlib.pyplot as plt

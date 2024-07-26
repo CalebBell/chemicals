@@ -659,7 +659,7 @@ def as_atoms(formula):
         atoms = formula
     else:
         raise ValueError("atoms must be either a string or dictionary, "
-                        "not a %s object" %(type(formula).__name__))
+                        f"not a {type(formula).__name__} object")
     return atoms
 
 DULONG = 'Dulong'
@@ -1070,8 +1070,8 @@ def HHV_modified_Dulong(mass_fractions):
     O = mass_fractions.get('O', 0.)
     S = mass_fractions.get('S', 0.)
     if O > 0.105:
-        raise ValueError("Dulong's formula is only valid at 10 wt. %% Oxygen "
-                         "or less (%s given)" %(O))
+        raise ValueError("Dulong's formula is only valid at 10 wt. % Oxygen "
+                         f"or less ({O} given)")
     return - (338.*C  + 1428.*(H - O/8.)+ 95.*S)
 
 def LHV_from_HHV(HHV, N_H2O):
@@ -1215,7 +1215,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         HHV = HHV_stoichiometry(stoichiometry, Hf)
     else:
         raise ValueError("method must be either 'Stoichiometric' or 'Dulong', "
-                         "not %s" %(method))
+                         f"not {method}")
     return CombustionData(stoichiometry, HHV, Hf, MW)
 
 class CombustionData:
@@ -1250,8 +1250,7 @@ class CombustionData:
         return LHV_from_HHV(self.HHV, self.stoichiometry.get('H2O', 0.))
 
     def __repr__(self):
-        return 'CombustionData(stoichiometry={}, HHV={}, Hf={}, MW={})'.format(
-                    self.stoichiometry, self.HHV, self.Hf, self.MW)
+        return f'CombustionData(stoichiometry={self.stoichiometry}, HHV={self.HHV}, Hf={self.Hf}, MW={self.MW})'
 
 
 def air_fuel_ratio_solver(ratio, Vm_air, Vm_fuel, MW_air, MW_fuel,
@@ -1583,7 +1582,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
             O2_burnt_n_fuel = -comb_ans['O2']
             H2O_from_fuel_n = comb_ans['H2O']
             n_delta = 0.0
-            for k, v in comb_ans.items():
+            for v in comb_ans.values():
                 n_delta += v
 
             if frac_out_O2 is not None and n_air is not None:
@@ -1634,7 +1633,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
         comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                combustion_stoichiometries=combustion_stoichiometries)
         n_delta = 0.0
-        for k, v in comb_ans.items():
+        for v in comb_ans.values():
             n_delta += v
 
         if n_fuel is not None:

@@ -84,7 +84,7 @@ variable_output_unit_funcs = {
 
 unwrapped_objects = frozenset(['PeriodicTable'])
 for name in dir(chemicals):
-    if name == '__getattr__' or name == '__test__':
+    if name in ('__getattr__', '__test__'):
         continue
     obj = getattr(chemicals, name)
     if isinstance(obj, types.FunctionType):

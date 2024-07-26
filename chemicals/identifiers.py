@@ -648,7 +648,7 @@ def _search_chemical(ID, autoload):
 
         if not autoload:
             return search_chemical(ID, autoload=True)
-        raise ValueError('A valid CAS number (%s) was recognized, but is not in the database' %(ID))
+        raise ValueError(f'A valid CAS number ({ID}) was recognized, but is not in the database')
 
 
 
@@ -667,7 +667,7 @@ def _search_chemical(ID, autoload):
             else:
                 if not autoload:
                     return search_chemical(ID, autoload=True)
-                raise ValueError('A valid InChI name (%s) was recognized, but it is not in the database' %(inchi_search))
+                raise ValueError(f'A valid InChI name ({inchi_search}) was recognized, but it is not in the database')
         if ID_lower[0:9] == 'inchikey=':
             inchi_key_lookup = pubchem_db.search_InChI_key(ID[9:], autoload)
             if inchi_key_lookup:
@@ -676,7 +676,7 @@ def _search_chemical(ID, autoload):
                 if not autoload:
                     obj = search_chemical(ID, autoload=True)
                     return obj
-                raise ValueError('A valid InChI Key (%s) was recognized, but it is not in the database' %(inchi_key_lookup))
+                raise ValueError(f'A valid InChI Key ({inchi_key_lookup}) was recognized, but it is not in the database')
     if ID_len > 8:
         if ID_lower[0:8] == 'pubchem=':
             pubchem_lookup = pubchem_db.search_pubchem(ID[8:], autoload)
@@ -686,7 +686,7 @@ def _search_chemical(ID, autoload):
             else:
                 if not autoload:
                     return search_chemical(ID, autoload=True)
-                raise ValueError('A PubChem integer (%s) identifier was recognized, but it is not in the database.' %(ID[8:]))
+                raise ValueError(f'A PubChem integer ({ID[8:]}) identifier was recognized, but it is not in the database.')
     if ID_len > 7:
         if ID_lower[0:7] == 'smiles=':
             smiles_lookup = pubchem_db.search_smiles(ID[7:], autoload)
@@ -695,7 +695,7 @@ def _search_chemical(ID, autoload):
             else:
                 if not autoload:
                     return search_chemical(ID, autoload=True)
-                raise ValueError('A SMILES identifier (%s) was recognized, but it is not in the database.' %(ID[7:]))
+                raise ValueError(f'A SMILES identifier ({ID[7:]}) was recognized, but it is not in the database.')
 
     # Try the smiles lookup anyway
     # Parsing SMILES is an option, but this is faster
@@ -726,7 +726,7 @@ def _search_chemical(ID, autoload):
             if name_lookup:
                 return name_lookup
 
-    if ID[-1] == ')' and '(' in ID:#
+    if ID[-1] == ')' and '(' in ID:
         # Try to match in the form 'water (H2O)'
         first_identifier, second_identifier = ID[0:-1].split('(', 1)
         try:
@@ -741,7 +741,7 @@ def _search_chemical(ID, autoload):
     if not autoload:
         return _search_chemical(ID, autoload=True)
 
-    raise ValueError('Chemical name (%s) not recognized' %(ID))
+    raise ValueError(f'Chemical name ({ID}) not recognized')
 
 
 
@@ -957,7 +957,7 @@ if PY37:
     def __getattr__(name):
         if name == 'pubchem_db':
             return get_pubchem_db()
-        elif name == 'common_mixtures' or name == 'common_mixtures_by_synonym':
+        elif name in ('common_mixtures', 'common_mixtures_by_synonym'):
             load_mixture_composition()
             return globals()[name]
         raise AttributeError(f"module {__name__} has no attribute {name}")  # pragma: no cover

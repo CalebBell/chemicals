@@ -297,7 +297,7 @@ allotropes['Ti'] = [
 solid_allotrope_map = {
     '7440-32-6': {'T_transitions': [1166], 'CASs_transitions': ['2099571000-00-0', '2099555000-00-0'], 'all_CASs': ['2099555000-00-0', '2099571000-00-0']},
     '7782-44-7': {'T_transitions': [23.876, 43.7964], 'H_transitions': [0.0, 742], #Freiman, Yu. A., and H. J. Jodl. “Solid Oxygen.” Physics Reports 401, no. 1 (November 1, 2004): 1–228. https://doi.org/10.1016/j.physrep.2004.06.002.
-                 'CASs_transitions': ['2099550000-00-0', '2099539000-00-0', '2099534000-00-0'], 
+                 'CASs_transitions': ['2099550000-00-0', '2099539000-00-0', '2099534000-00-0'],
                          'all_CASs': ['2099550000-00-0', '2099539000-00-0', '2099534000-00-0']},
 }
 
@@ -458,12 +458,12 @@ class PeriodicTable:
     def __getitem__(self, key):
         for i in self._indexes:
             if key in i: return i[key]
-        raise KeyError("'%s' is not in the periodic table" %(key))
+        raise KeyError(f"'{key}' is not in the periodic table")
 
     def __getattr__(self, key):
         for i in self._indexes:
             if key in i: return i[key]
-        raise AttributeError("'%s' is not in the periodic table" %(key))
+        raise AttributeError(f"'{key}' is not in the periodic table")
 
 
 class Element:
