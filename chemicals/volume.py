@@ -1199,7 +1199,7 @@ def Tait(P, P_ref, rho_ref, B, C):
     >>> B_coeffs = [649718000.0, -4345830.0, 13072.2, -20.029200000000003, 0.0120566]
     >>> C_coeffs = [0.115068, -5.322e-05]
     >>> T = 300
-    >>> Tait(P=1e8, P_ref=101325, rho_ref=784.85, B=np.polyval(B_coeffs[::-1], T), C=np.polyval(C_coeffs[::-1], T))
+    >>> Tait(P=1e8, P_ref=101325, rho_ref=784.85, B=float(np.polyval(B_coeffs[::-1], T)), C=float(np.polyval(C_coeffs[::-1], T)))
     853.744916
 
     References
