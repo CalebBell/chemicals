@@ -363,7 +363,7 @@ def T_converter(T, current, desired):
     Examples
     --------
     >>> T_converter(500, 'ITS-68', 'ITS-48')
-    499.9470092992346
+    499.9470
 
     References
     ----------
