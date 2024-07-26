@@ -920,7 +920,6 @@ def get_pubchem_db():
     return pubchem_db
 
 mixture_composition_loaded = False
-global common_mixtures_by_synonym, common_mixtures
 
 @mark_numba_incompatible
 def load_mixture_composition():
