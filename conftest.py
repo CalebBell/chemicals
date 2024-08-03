@@ -21,7 +21,7 @@ def pytest_ignore_collect(path):
 #        return True
     if 'setup' in path:
         return True
-    if ver_tup <= (3, 6) or ver_tup >= (3, 13) or is_pypy or is_x86_or_x86_64:
+    if ver_tup <= (3, 6) or ver_tup >= (3, 13) or is_pypy or not is_x86_or_x86_64:
         # numba does not yet run under pypy, numba support 3.6 to 3.9 for now
         if 'numba' in path:
             return True
