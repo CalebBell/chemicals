@@ -1513,7 +1513,7 @@ def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm, cyclic_ali
 
 @mark_numba_uncacheable
 def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
-                           factor=1.0, cyclic_aliphatic=None, term_A=None):
+                           factor=1.0, cyclic_aliphatic=False, term_A=None):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
     the temperature which has a specified `Hm`, as is required in PH flashes,
     as shown in [1]_.
@@ -1586,7 +1586,7 @@ def Lastovka_Shaw_T_for_Sm_err(T, MW, similarity_variable, S_ref, Sm, cyclic_ali
 
 @mark_numba_uncacheable
 def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
-                           factor=1.0, cyclic_aliphatic=None, term_A=None):
+                           factor=1.0, cyclic_aliphatic=False, term_A=None):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
     the temperature which has a specified `Sm`, as is required in PS flashes,
     as shown in [1]_.

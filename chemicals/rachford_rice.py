@@ -2411,6 +2411,7 @@ def Rachford_Rice_flash2_f_jac(betas, zs, Ks):
     return [F0, F1], [[dF0_dy, dF0_dz], [dF0_dz, dF1_dz]] # numba: delete
 
 def Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=False):
+    # print([ns, betas, Ks, limit_betas])
     if limit_betas:
         for beta in betas:
             if beta < 0.0 or beta > 1.0:

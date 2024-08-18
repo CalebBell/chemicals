@@ -1098,7 +1098,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
        https://doi.org/10.1002/aic.690110226.
     '''
     Tr = T/Tc
-    if Tr > 1.0:
+    if Tr >= 1.0:
         return 0.0
     Trefr = T_ref/Tc
     H2 = Hvap_ref*((1.0 - Tr)/(1.0 - Trefr))**exponent

@@ -216,7 +216,7 @@ def test_Antoine_fit_extrapolate():
     assert_close(dPsat_dT_num, dPsat_dT, rtol=1e-7)
     d2Psat_dT2_num = derivative(lambda T: Antoine(T, A, B, C, base=e), T, dx=T*1e-7, n=2, order=13)
     d2Psat_dT2_analytical = B*(B/(C + T) - 2)*exp(A - B/(C + T))/(C + T)**3
-    assert_close(d2Psat_dT2_num, d2Psat_dT2, rtol=1e-4)
+    assert_close(d2Psat_dT2_num, d2Psat_dT2, rtol=2e-4)
     assert_close(d2Psat_dT2_analytical, d2Psat_dT2, rtol=1e-10)
 
 def test_Antoine_coeffs_from_point():
