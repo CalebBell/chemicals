@@ -1,0 +1,12 @@
+sympy
+fluids>=1.0.26
+pytest
+pytest-cov
+pint
+IPython
+sphinx
+mpmath
+fuzzywuzzy
+pytz
+wheel
+joblib
