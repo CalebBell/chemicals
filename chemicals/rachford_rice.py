@@ -1635,6 +1635,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
 
 
 def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
+    # print(y)
     x1 = exp(-y)
     x3 = 1.0/(x1 + 1.0)
     x0x3 = x0*x3
@@ -1656,7 +1657,7 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
         x7 = zix5*x5x1x6
         dF0 += x7
         ddF0 += x7*(t51 + x5x1x6 + x5x1x6)
-    # print(F0, y)
+    # print(F0, -dF0, ddF0, y)
     return F0, -dF0, ddF0
 
 @mark_numba_uncacheable
@@ -1791,18 +1792,18 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     # The function cannot be evaluated in some regions due to a zero division however
     # ci should be the minimum
     if V_over_F_max > 0.0:
-        near_high = V_over_F_max*one_epsilon_smaller
+        near_high = V_over_F_max*one_10_epsilon_smaller
     else:
-        near_high = V_over_F_max*one_epsilon_larger
+        near_high = V_over_F_max*one_10_epsilon_larger
     if (near_high-V_over_F_min) == 0.0:
         raise PhaseCountReducedError(f"For provided K values, there is no positive-composition solution; Ks={Ks}")  # numba: delete
 #        raise PhaseCountReducedError("For provided K values, there is no positive-composition solution") # numba: uncomment
     solver_high = -log((V_over_F_max-near_high)/(near_high-V_over_F_min))
 
     if V_over_F_min < 0.0:
-        near_low = V_over_F_min*one_epsilon_smaller
+        near_low = V_over_F_min*one_10_epsilon_smaller
     elif V_over_F_min > 0.0:
-        near_low = V_over_F_min*one_epsilon_larger
+        near_low = V_over_F_min*one_10_epsilon_larger
     else:
         # V_over_F_min equals zero case, cannot evaluate there
         near_low = min(1e-20, V_over_F_max*1e-15)
