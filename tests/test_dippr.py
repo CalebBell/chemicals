@@ -168,7 +168,7 @@ def test_EQ101_more():
 def test_EQ127_more():
     # T derivative
     coeffs = (3.3258E4, 3.6199E4, 1.2057E3, 1.5373E7, 3.2122E3, -1.5318E7, 3.2122E3)
-    diff_1T = derivative(EQ127, 50,  dx=1E-3, order=21, args=coeffs)
+    diff_1T = derivative(EQ127, 50,  dx=1E-3, order=7, args=coeffs)
     diff_1T_analytical = EQ127(50., *coeffs, order=1)
     assert_close(diff_1T, diff_1T_analytical, rtol=1E-3)
     assert_close(diff_1T, 0.000313581049006, rtol=1E-4)
@@ -218,7 +218,7 @@ def test_EQ115_more():
 def test_EQ116_more():
     # T derivative
     coeffs = (647.096, 17.863, 58.606, -95.396, 213.89, -141.26)
-    diff_1T = derivative(EQ116, 50,  dx=1E-3, order=21, args=coeffs)
+    diff_1T = derivative(EQ116, 50,  dx=1E-3, order=7, args=coeffs)
     diff_1T_analytical = EQ116(50., *coeffs, order=1)
     assert_close(diff_1T, diff_1T_analytical, rtol=1E-3)
     assert_close(diff_1T_analytical, 0.020379262711650914)
@@ -250,7 +250,7 @@ def test_EQ116_more():
 def test_EQ107_more():
     # T derivative
     coeffs = (33363., 26790., 2610.5, 8896., 1169.)
-    diff_1T = derivative(EQ107, 250,  dx=1E-3, order=21, args=coeffs)
+    diff_1T = derivative(EQ107, 250,  dx=1E-3, order=7, args=coeffs)
     diff_1T_analytical = EQ107(250., *coeffs, order=1)
     assert_close(diff_1T, diff_1T_analytical, rtol=1E-3)
     assert_close(diff_1T_analytical, 1.985822265543943)
@@ -282,7 +282,7 @@ def test_EQ107_more():
 def test_EQ114_more():
     # T derivative
     coeffs = (33.19, 66.653, 6765.9, -123.63, 478.27)
-    diff_1T = derivative(EQ114, 20,  dx=1E-3, order=21, args=coeffs)
+    diff_1T = derivative(EQ114, 20,  dx=1E-3, order=7, args=coeffs)
     diff_1T_analytical = EQ114(20., *coeffs, order=1)
     assert_close(diff_1T, diff_1T_analytical, rtol=1E-3)
     assert_close(diff_1T, 1135.38618941)
@@ -310,7 +310,7 @@ def test_EQ114_more():
 def test_EQ102_more():
     # T derivative
     coeffs = (1.7096E-8, 1.1146, 1.1, 2.1)
-    diff_1T = derivative(EQ102, 250,  dx=1E-3, order=21, args=coeffs)
+    diff_1T = derivative(EQ102, 250,  dx=1E-3, order=7, args=coeffs)
     diff_1T_analytical = EQ102(250., *coeffs, order=1)
     assert_close(diff_1T, diff_1T_analytical, rtol=1E-3)
     assert_close(diff_1T, 3.5861274167602139e-08)
@@ -341,7 +341,7 @@ def test_EQ102_more():
 def test_EQ100_more():
     # T derivative
     coeffs = (276370., -2090.1, 8.125, -0.014116, 0.0000093701)
-    diff_1T = derivative(EQ100, 250,  dx=1E-3, order=21, args=coeffs)
+    diff_1T = derivative(EQ100, 250,  dx=1E-3, order=7, args=coeffs)
     diff_1T_analytical = EQ100(250., *coeffs, order=1)
     assert_close(diff_1T, diff_1T_analytical, rtol=1E-3)
     assert_close(diff_1T, -88.7187500531)
@@ -369,7 +369,7 @@ def test_EQ100_more():
 def test_EQ104_more():
     # T derivative
     coeffs = (0.02222, -26.38, -16750000, -3.894E19, 3.133E21)
-    diff_1T = derivative(EQ104, 250,  dx=1E-3, order=21, args=coeffs)
+    diff_1T = derivative(EQ104, 250,  dx=1E-3, order=7, args=coeffs)
     diff_1T_analytical = EQ104(250., *coeffs, order=1)
     assert_close(diff_1T, diff_1T_analytical, rtol=1E-3)
     assert_close(diff_1T, 0.0653824814073)
