@@ -72,10 +72,20 @@ from fluids.numerics import exp, hyp2f1, log, sqrt, trunc_exp, trunc_log
 order_not_found_msg = ('Only the actual property calculation, first temperature '
                        'derivative, first temperature integral, and first '
                        'temperature integral over temperature are supported '
-                       'with order=  0, 1, -1, or -1j respectively')
+                       'with order=  0, 1, -1, or -10 respectively')
 
 order_not_found_pos_only_msg = ('Only the actual property calculation, and'
                                 'temperature derivative(s) are supported')
+
+# Form of an enum
+BASE_CALTULATION = 0
+DERIVATIVE_CALCULATION = 1
+SECOND_DERIVATIVE_CALCULATION = 2
+THIRD_DERIVATIVE_CALCULATION = 3
+FOURTH_DERIVATIVE_CALCULATION = 3
+INTEGRAL_CALCULATION = -1
+INTEGRAL_OVER_T_CALCULATION = -10
+
 
 def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     r'''DIPPR Equation # 100. Used in calculating the molar heat capacities
@@ -97,7 +107,7 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -106,7 +116,7 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -145,7 +155,7 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
         return B + T*(2.0*C + T*(3.0*D + T*(4.0*E + T*(5.0*F + 6.0*G*T))))
     elif order == -1:
         return T*(A + T*(B*0.5 + T*(C*(1.0/3.0) + T*(D*0.25 + T*(E*0.2 + T*(F*(1.0/6.0) + G*T*(1.0/7.0)))))))
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         return A*log(T) + T*(B + T*(C*0.5 + T*(D*(1.0/3.0) + T*(E*0.25 + T*(F*0.2 + G*T*(1.0/6.0))))))
     else:
         raise ValueError(order_not_found_msg)
@@ -254,7 +264,7 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -263,7 +273,7 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -326,7 +336,7 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
         x10 = x5/(C - x0) # numba: delete
         x11 = x5/(C + x0) # numba: delete
         return float((hyp2f1_term1*x10 - hyp2f1_term2*x11).real) # numba: delete
-    elif order == -1j: # numba: delete
+    elif order == INTEGRAL_OVER_T_CALCULATION: # numba: delete
         return float((2*A*T**(2+B)*hyp2f1(1.0, 2.0+B, 3.0+B, -2*T/(C - csqrt(C*C - 4*D)))/( # numba: delete
                 (2+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D)) -2*A*T**(2+B)*hyp2f1( # numba: delete
                 1.0, 2.0+B, 3.0+B, -2*T/(C + csqrt(C*C - 4*D)))/((2+B)*(C + csqrt( # numba: delete
@@ -545,7 +555,7 @@ def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -554,7 +564,7 @@ def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -595,7 +605,7 @@ def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
         return (-B + (-3*C + (-8*D - 9*E/T)/(T4*T))/T2)/T2
     elif order == -1:
         return A*T + B*log(T) - (28*C*T**6 + 8*D*T + 7*E)/(56*T**8)
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         return A*log(T) - (72*B*T**8 + 24*C*T**6 + 9*D*T + 8*E)/(72*T**9)
     else:
         raise ValueError(order_not_found_msg)
@@ -1007,7 +1017,7 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -1016,7 +1026,7 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -1071,7 +1081,7 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
                 - 2*D*E**2/(T**3*cosh(E/T)**2))
     elif order == -1:
         return A*T + B*C/tanh(C/T) - D*E*tanh(E/T)
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         return (A*log(T) + B*C/tanh(C/T)/T - B*log(sinh(C/T))
                 - D*E*tanh(E/T)/T + D*log(cosh(E/T)))
     else:
@@ -1102,7 +1112,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -1111,7 +1121,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -1182,7 +1192,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
                 + T**4*(C**2 + 6*C*D + 6*D**2)/(12*Tc**3) - T**3*(A*D + C**2
                 + 3*C*D + 2*D**2)/(3*Tc**2) + T**2*(2*A*C + 2*A*D + C**2 + 2*C*D
                 + D**2)/(2*Tc) + T*(-2*A*C - A*D + B - C**2/3 - C*D/2 - D**2/5))
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         return (-A**2*clog(T + (-60*A**2*Tc + 60*A*C*Tc + 30*A*D*Tc - 30*B*Tc
                 + 10*C**2*Tc + 15*C*D*Tc + 6*D**2*Tc)/(60*A**2 - 60*A*C
                 - 30*A*D + 30*B - 10*C**2 - 15*C*D - 6*D**2)).real
@@ -1305,7 +1315,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -1314,7 +1324,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -1360,7 +1370,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         return (A*T - 20*B*Tc*(-T/Tc + 1)**(27/20)/27
                 - 3*C*Tc*(-T/Tc + 1)**(5/3)/5 + D*(-T**2/(2*Tc) + T)
                 - 3*E*Tc*(-T/Tc + 1)**(7/3)/7)
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         # 3x increase in speed - cse via sympy
         x0 = log(T)
         x1 = 0.5*x0
@@ -1437,7 +1447,7 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -1446,7 +1456,7 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -1513,7 +1523,7 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
     elif order == -1:
         return (A*T + B*C**2/(C*exp(C/T) - C) + D*E**2/(E*exp(E/T) - E)
                 + F*G**2/(G*exp(G/T) - G))
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         return (A*log(T) + B*C**2*(1/(C*T*exp(C/T) - C*T) + 1/(C*T)
                 - log(exp(C/T) - 1)/C**2) + D*E**2*(1/(E*T*exp(E/T) - E*T)
                 + 1/(E*T) - log(exp(E/T) - 1)/E**2)
@@ -1524,15 +1534,15 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
 
 
 dippr_eq_supported_orders = {
-EQ100: (0, 1, -1, -1j),
+EQ100: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 EQ101: (0, 1, 2, 3),
-EQ102: (0, 1, -1, -1j),
-EQ104: (0, 1, -1, -1j),
+EQ102: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
+EQ104: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 EQ105: (0, 1, 2, 3),
 EQ106: (0, 1, 2, 3),
-EQ107: (0, 1, -1, -1j),
-EQ114: (0, 1, -1, -1j),
+EQ107: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
+EQ114: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 EQ115: (0, 1, 2, 3),
-EQ116: (0, 1, -1, -1j),
-EQ127: (0, 1, -1, -1j),
+EQ116: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
+EQ127: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 }

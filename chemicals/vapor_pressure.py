@@ -2181,6 +2181,8 @@ def Ambrose_Walton(T, Tc, Pc, omega):
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
+    if T > Tc:
+        T = Tc
     Tr = T/Tc
     tau = 1.0 - Tr
     tau15 = tau*sqrt(tau)
@@ -2334,7 +2336,7 @@ def Edalat(T, Tc, Pc, omega):
     c = -0.8747 - 7.8874*omega
     d = 1./(-0.4893 - 0.9912*omega + 3.1551*omega*omega)
     b = 1.5737 - 1.0540*omega - 4.4365E-3*d
-    tau_15 = tau**1.5
+    tau_15 = sqrt(tau)*tau
     tau3 = tau_15*tau_15
     lnPr = (a*tau + b*tau_15 + c*tau3 + d*tau3*tau3)/(1.-tau)
     return exp(lnPr)*Pc

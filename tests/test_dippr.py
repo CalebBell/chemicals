@@ -43,6 +43,7 @@ from chemicals.dippr import (
     EQ105_fitting_jacobian,
     EQ106_fitting_jacobian,
     EQ107_fitting_jacobian,
+    INTEGRAL_OVER_T_CALCULATION,
 )
 
 
@@ -181,8 +182,8 @@ def test_EQ127_more():
     assert_close(numerical_1T, 997740.00147014)
 
     # Integral over T
-    T_int_50 = EQ127(50., *coeffs, order=-1j)
-    T_int_20 = EQ127(20., *coeffs, order=-1j)
+    T_int_50 = EQ127(50., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
+    T_int_20 = EQ127(20., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
 
     to_int = lambda T :EQ127(T, *coeffs)/T
     numerical_1_over_T = quad(to_int, 20, 50)[0]
@@ -231,8 +232,8 @@ def test_EQ116_more():
     assert_close(int_50 - int_20, 1636.962423782701)
 
     # Integral over T
-    T_int_50 = EQ116(50., *coeffs, order=-1j)
-    T_int_20 = EQ116(20., *coeffs, order=-1j)
+    T_int_50 = EQ116(50., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
+    T_int_20 = EQ116(20., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
 
     to_int = lambda T :EQ116(T, *coeffs)/T
     numerical_1_over_T = quad(to_int, 20, 50)[0]
@@ -263,8 +264,8 @@ def test_EQ107_more():
     assert_close(numerical_1T, 1000890.0)
 
     # Integral over T
-    T_int_50 = EQ107(50., *coeffs, order=-1j)
-    T_int_20 = EQ107(20., *coeffs, order=-1j)
+    T_int_50 = EQ107(50., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
+    T_int_20 = EQ107(20., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
 
     to_int = lambda T :EQ107(T, *coeffs)/T
     numerical_1_over_T = quad(to_int, 20, 50)[0]
@@ -295,8 +296,8 @@ def test_EQ114_more():
     assert_close(int_50 - int_20, 295697.48978888744)
 
 #     Integral over T
-    T_int_50 = EQ114(30., *coeffs, order=-1j)
-    T_int_20 = EQ114(20., *coeffs, order=-1j)
+    T_int_50 = EQ114(30., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
+    T_int_20 = EQ114(20., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
 
     to_int = lambda T :EQ114(T, *coeffs)/T
     numerical_1_over_T = quad(to_int, 20, 30)[0]
@@ -323,8 +324,8 @@ def test_EQ102_more():
     assert_close(int_250 - int_220, 0.00022428562125110119)
 
 #     Integral over T
-    T_int_250 = EQ102(250., *coeffs, order=-1j)
-    T_int_220 = EQ102(220., *coeffs, order=-1j)
+    T_int_250 = EQ102(250., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
+    T_int_220 = EQ102(220., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
 
     to_int = lambda T :EQ102(T, *coeffs)/T
     numerical_1_over_T = quad(to_int, 220, 250)[0]
@@ -354,8 +355,8 @@ def test_EQ100_more():
     assert_close(int_250 - int_220, 2381304.7021859996)
 
 #     Integral over T
-    T_int_250 = EQ100(250., *coeffs, order=-1j)
-    T_int_220 = EQ100(220., *coeffs, order=-1j)
+    T_int_250 = EQ100(250., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
+    T_int_220 = EQ100(220., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
 
     to_int = lambda T :EQ100(T, *coeffs)/T
     numerical_1_over_T = quad(to_int, 220, 250)[0]
@@ -382,8 +383,8 @@ def test_EQ104_more():
     assert_close(int_250 - int_220, -127.91851427119406)
 
 #     Integral over T
-    T_int_250 = EQ104(250., *coeffs, order=-1j)
-    T_int_220 = EQ104(220., *coeffs, order=-1j)
+    T_int_250 = EQ104(250., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
+    T_int_220 = EQ104(220., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
 
     to_int = lambda T :EQ104(T, *coeffs)/T
     numerical_1_over_T = quad(to_int, 220, 250)[0]
