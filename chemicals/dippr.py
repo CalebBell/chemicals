@@ -67,7 +67,7 @@ from cmath import log as clog
 from cmath import sqrt as csqrt
 from math import atan, atanh, cosh, sinh, tanh
 
-from fluids.numerics import exp, hyp2f1, log, sqrt, trunc_exp, trunc_log
+from fluids.numerics import exp, hyp2f1, log, sqrt, trunc_exp, trunc_log, cbrt
 
 order_not_found_msg = ('Only the actual property calculation, first temperature '
                        'derivative, first temperature integral, and first '
@@ -679,7 +679,7 @@ def EQ105(T, A, B, C, D, order=0):
             # Handle the case of a negative D exponent with a (1. - T/C) under 0 which would yield a complex number
             problematic = 0.0
         problematic2 = problematic**D
-        if abs(problematic2.imag) > 0.0:
+        if abs(problematic2.imag) > 0.0: # This check should be removable - unless D is imaginary
             problematic2 = 0.0
         ans = A*B**(-(1. + problematic2))
         return ans
@@ -1360,36 +1360,44 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
     if T > Tc:
         T = Tc
     if order == 0:
-        tau = 1-T/Tc
-        return A + B*tau**0.35 + C*tau**(2/3.) + D*tau + E*tau**(4/3.)
+        tau = 1.0-T/Tc
+        cbrt_tau = cbrt(tau)
+        return A + B*tau**0.35 + D*tau + C*cbrt_tau*cbrt_tau + E*tau*cbrt_tau
     elif order == 1:
-        return (-7*B/(20*Tc*(-T/Tc + 1)**(13/20))
-                - 2*C/(3*Tc*(-T/Tc + 1)**(1/3))
-                - D/Tc - 4*E*(-T/Tc + 1)**(1/3)/(3*Tc))
+        tau = 1.0-T/Tc
+        cbrt_tau = cbrt(tau)
+        return (-0.35*B/((tau)**(0.65))
+                - (2.0/3.0)*C/(cbrt_tau)
+                - D - (4.0/3.0)*E*cbrt_tau)/Tc 
     elif order == -1:
-        return (A*T - 20*B*Tc*(-T/Tc + 1)**(27/20)/27
-                - 3*C*Tc*(-T/Tc + 1)**(5/3)/5 + D*(-T**2/(2*Tc) + T)
-                - 3*E*Tc*(-T/Tc + 1)**(7/3)/7)
+        tau = 1.0-T/Tc
+        cbrt_tau = cbrt(tau)
+        cbrt_tau2 = cbrt_tau*cbrt_tau
+        cbrt_tau3 = cbrt_tau*cbrt_tau2
+        return (A*T - (20.0/27)*B*Tc*(tau)**(1.35)
+               + D*(-T*T/(2.0*Tc) + T)
+               + cbrt_tau3*cbrt_tau2*(- 3.0/5.0*C*Tc
+                - 3.0/7.0*E*Tc*cbrt_tau2))
     elif order == INTEGRAL_OVER_T_CALCULATION:
         # 3x increase in speed - cse via sympy
         x0 = log(T)
         x1 = 0.5*x0
-        x2 = 1/Tc
+        x2 = 1.0/Tc
         x3 = T*x2
         x4 = -x3 + 1
         x5 = 1.5*C
-        x6 = x4**0.333333333333333
+        x6 = cbrt(x4)
         x7 = 2*B
         x8 = x4**0.05
-        x9 = log(-x6 + 1)
-        x10 = sqrt(3)
-        x11 = x10*atan(x10*(2*x6 + 1)/3)
-        x12 = sqrt(5)
+        x9 = log(-x6 + 1.0)
+        x10 = 1.7320508075688772
+        x11 = x10*atan(x10*((2/3.0)*x6 + 1.0/3.0))
+        x12 = 2.23606797749979
         x13 = 0.5*x12
         x14 = x13 + 0.5
         x15 = B*x14
         x16 = sqrt(x13 + 2.5)
-        x17 = 2*x8
+        x17 = 2.0*x8
         x18 = -x17
         x19 = -x13
         x20 = x19 + 0.5
@@ -1400,27 +1408,27 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         x25 = x12 + 1
         x26 = 4*x8
         x27 = -x26
-        x28 = sqrt(10)*B/sqrt(x12 + 5)
-        x29 = 2*x12
-        x30 = sqrt(x29 + 10)
-        x31 = 1/x30
-        x32 = -x12 + 1
+        x28 = 3.1622776601683795*B/sqrt(x12 + 5.0)
+        x29 = 2.0*x12
+        x30 = sqrt(x29 + 10.0)
+        x31 = 1.0/x30
+        x32 = 1.0 - x12 
         x33 = 0.5*B*x22
         x34 = -x2*(T - Tc)
-        x35 = 2*x34**0.1
-        x36 = x35 + 2
+        x35 = 2.0*x34**0.1
+        x36 = x35 + 2.0
         x37 = x34**0.05
         x38 = x30*x37
         x39 = 0.5*B*x16
-        x40 = x37*sqrt(-x29 + 10)
+        x40 = x37*sqrt(-x29 + 10.0)
         x41 = 0.25*x12
         x42 = B*(-x41 + 0.25)
         x43 = x12*x37
-        x44 = x35 + x37 + 2
+        x44 = x35 + x37 + 2.0
         x45 = B*(x41 + 0.25)
         x46 = -x43
-        x47 = x35 - x37 + 2
-        return A*x0 + 2.85714285714286*B*x4**0.35 - C*x1 + C*x11 + D*x0 - D*x3 - E*x1 - E*x11 + 0.75*E*x4**1.33333333333333 + 3*E*x6 + 1.5*E*x9 - x15*atan(x14*(x16 + x17)) + x15*atan(x14*(x16 + x18)) - x21*atan(x20*(x17 + x22)) + x21*atan(x20*(x18 + x22)) + x23*atan(x24*(x25 + x26)) - x23*atan(x24*(x25 + x27)) - x28*atan(x31*(x26 + x32)) + x28*atan(x31*(x27 + x32)) - x33*log(x36 - x38) + x33*log(x36 + x38) + x39*log(x36 - x40) - x39*log(x36 + x40) + x4**0.666666666666667*x5 - x42*log(x43 + x44) + x42*log(x46 + x47) + x45*log(x43 + x47) - x45*log(x44 + x46) + x5*x9 + x7*atan(x8) - x7*atanh(x8)
+        x47 = x35 - x37 + 2.0
+        return A*x0 + 2.85714285714286*B*x4**0.35 - C*x1 + C*x11 + D*x0 - D*x3 - E*x1 - E*x11 + 0.75*E*x4**1.33333333333333 + 3.0*E*x6 + 1.5*E*x9 - x15*atan(x14*(x16 + x17)) + x15*atan(x14*(x16 + x18)) - x21*atan(x20*(x17 + x22)) + x21*atan(x20*(x18 + x22)) + x23*atan(x24*(x25 + x26)) - x23*atan(x24*(x25 + x27)) - x28*atan(x31*(x26 + x32)) + x28*atan(x31*(x27 + x32)) - x33*log(x36 - x38) + x33*log(x36 + x38) + x39*log(x36 - x40) - x39*log(x36 + x40) + x4**0.666666666666667*x5 - x42*log(x43 + x44) + x42*log(x46 + x47) + x45*log(x43 + x47) - x45*log(x44 + x46) + x5*x9 + x7*atan(x8) - x7*atanh(x8)
     else:
         raise ValueError(order_not_found_msg)
 
