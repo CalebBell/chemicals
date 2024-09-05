@@ -1359,19 +1359,15 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
     '''
     if T > Tc:
         T = Tc
+    tau = 1.0-T/Tc
+    cbrt_tau = cbrt(tau)
     if order == 0:
-        tau = 1.0-T/Tc
-        cbrt_tau = cbrt(tau)
         return A + B*tau**0.35 + D*tau + C*cbrt_tau*cbrt_tau + E*tau*cbrt_tau
     elif order == 1:
-        tau = 1.0-T/Tc
-        cbrt_tau = cbrt(tau)
         return (-0.35*B/((tau)**(0.65))
                 - (2.0/3.0)*C/(cbrt_tau)
                 - D - (4.0/3.0)*E*cbrt_tau)/Tc 
     elif order == -1:
-        tau = 1.0-T/Tc
-        cbrt_tau = cbrt(tau)
         cbrt_tau2 = cbrt_tau*cbrt_tau
         cbrt_tau3 = cbrt_tau*cbrt_tau2
         return (A*T - (20.0/27)*B*Tc*(tau)**(1.35)
@@ -1384,7 +1380,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         x1 = 0.5*x0
         x2 = 1.0/Tc
         x3 = T*x2
-        x4 = -x3 + 1
+        x4 = -x3 + 1.0
         x5 = 1.5*C
         x6 = cbrt(x4)
         x7 = 2*B
