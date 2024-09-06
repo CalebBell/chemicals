@@ -237,8 +237,8 @@ def test_EQ116_more():
 
     to_int = lambda T :EQ116(T, *coeffs)/T
     numerical_1_over_T = quad(to_int, 20, 50)[0]
-    assert_close(T_int_50 - T_int_20, numerical_1_over_T)
     assert_close(T_int_50 - T_int_20, 49.95109104018752)
+    assert_close(T_int_50 - T_int_20, numerical_1_over_T)
 
     with pytest.raises(Exception):
         EQ116(20., *coeffs, order=1E100)

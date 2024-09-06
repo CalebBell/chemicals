@@ -200,7 +200,7 @@ def test_mixing_simple():
 
 @mark_as_numba
 def test_dippr_correlations():
-    orders = (0, 1, -1, -1j)
+    orders = (0, 1, -1, -10)
     args = (20, 33.19, 66.653, 6765.9, -123.63, 478.27)
     for i in orders:
         assert_close(chemicals.numba.EQ114(*args, order=i), chemicals.EQ114(*args, order=i), rtol=1e-13)

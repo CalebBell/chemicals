@@ -200,8 +200,6 @@ __all__ = ['heat_capacity_gas_methods',
            'vibration_frequency_cm_to_characteristic_temperature',
            ]
 import os
-from cmath import exp as cexp
-from cmath import log as clog
 from math import expm1
 
 from fluids.constants import R, c, h, k
@@ -1495,15 +1493,13 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
     B22 = 4.35656721
     C21 = 2897.01927
     C22 = 5987.80407
-    S = (term_A*clog(T) + (-B11 - B12*a)*clog(cexp((-C11 - C12*a)*T_inv) - 1.)
-        + (-B11*C11 - B11*C12*a - B12*C11*a - B12*C12*a2)/(T*cexp((-C11
+    S = (term_A*log(T) + (-B11 - B12*a)*log(abs(exp((-C11 - C12*a)*T_inv) - 1.))
+        + (-B11*C11 - B11*C12*a - B12*C11*a - B12*C12*a2)/(T*exp((-C11
         - C12*a)*T_inv) - T) - (B11*C11 + B11*C12*a + B12*C11*a + B12*C12*a2)*T_inv)
-    S += ((-B21 - B22*a)*clog(cexp((-C21 - C22*a)*T_inv) - 1.) + (-B21*C21 - B21*C22*a
-        - B22*C21*a - B22*C22*a2)/(T*cexp((-C21 - C22*a)*T_inv) - T) - (B21*C21
+    S += ((-B21 - B22*a)*log(abs(exp((-C21 - C22*a)*T_inv) - 1.)) + (-B21*C21 - B21*C22*a
+        - B22*C21*a - B22*C22*a2)/(T*exp((-C21 - C22*a)*T_inv) - T) - (B21*C21
         + B21*C22*a + B22*C21*a + B22*C22*a2)*T_inv)
-    # There is a non-real component, but it is only a function of similariy
-    # variable and so will always cancel out.
-    return S.real*1000. if MW is None else S.real*MW
+    return S*1000. if MW is None else S*MW
 
 def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm, cyclic_aliphatic, term_A):
     H1 = Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic, MW, term_A)
@@ -1513,7 +1509,7 @@ def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm, cyclic_ali
 
 @mark_numba_uncacheable
 def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
-                           factor=1.0, cyclic_aliphatic=False, term_A=None):
+                           factor=1.0, cyclic_aliphatic=False):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
     the temperature which has a specified `Hm`, as is required in PH flashes,
     as shown in [1]_.
@@ -1533,8 +1529,6 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
         method, [-]
     cyclic_aliphatic: bool, optional
         Whether or not chemical is cyclic aliphatic, [-]
-    term_A : float, optional
-        Term A in Lastovka-Shaw equation, [J/g]
 
     Returns
     -------
@@ -1564,7 +1558,7 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
     '''
     Hm /= factor
     a = similarity_variable
-    if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
+    term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
     H_ref = Lastovka_Shaw_integral(T_ref, similarity_variable, cyclic_aliphatic, MW, term_A)
     args = (MW, a, H_ref, Hm, cyclic_aliphatic, term_A)
     try:
@@ -1586,7 +1580,7 @@ def Lastovka_Shaw_T_for_Sm_err(T, MW, similarity_variable, S_ref, Sm, cyclic_ali
 
 @mark_numba_uncacheable
 def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
-                           factor=1.0, cyclic_aliphatic=False, term_A=None):
+                           factor=1.0, cyclic_aliphatic=False):
     r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
     the temperature which has a specified `Sm`, as is required in PS flashes,
     as shown in [1]_.
@@ -1606,8 +1600,6 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
         method, [-]
     cyclic_aliphatic: bool, optional
         Whether or not chemical is cyclic aliphatic, [-]
-    term_A : float, optional
-        Term A in Lastovka-Shaw equation, [J/g]
 
     Returns
     -------
@@ -1637,7 +1629,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
     '''
     Sm /= factor
     a = similarity_variable
-    if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
+    term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
     S_ref = Lastovka_Shaw_integral_over_T(T_ref, a, cyclic_aliphatic, MW, term_A)
     args = (MW, a, S_ref, Sm, cyclic_aliphatic, term_A)
     try:
@@ -2139,7 +2131,7 @@ def Dadgostar_Shaw_terms(similarity_variable):
             a21*a + a22*a2,
             a31*a + a32*a2)
 
-def Dadgostar_Shaw(T, similarity_variable, MW=None, terms=None):
+def Dadgostar_Shaw(T, similarity_variable, MW=None):
     r'''Calculate liquid constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
 
@@ -2155,8 +2147,6 @@ def Dadgostar_Shaw(T, similarity_variable, MW=None, terms=None):
         similarity variable as defined in [1]_, [mol/g]
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
-    terms : float, optional
-        Terms in Dadgostar-Shaw equation as computed by :obj:`Dadgostar_Shaw_terms`
 
     Returns
     -------
@@ -2184,11 +2174,11 @@ def Dadgostar_Shaw(T, similarity_variable, MW=None, terms=None):
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
     '''
-    first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
-    Cp = (first + second*T + third*T**2)
+    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
+    Cp = (first + second*T + third*T*T)
     return Cp*1000. if MW is None else Cp*MW
 
-def Dadgostar_Shaw_integral(T, similarity_variable, MW=None, terms=None):
+def Dadgostar_Shaw_integral(T, similarity_variable, MW=None):
     r'''Calculate the integral of liquid constant-pressure heat capacity
     with the similarity variable concept and method as shown in [1]_.
 
@@ -2233,11 +2223,11 @@ def Dadgostar_Shaw_integral(T, similarity_variable, MW=None, terms=None):
 
     '''
     T2 = T*T
-    first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
+    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
     H = T2*T/3.*third + T2*0.5*second + T*first
     return H*1000. if MW is None else H*MW
 
-def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None, terms=None):
+def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
     r'''Calculate the integral of liquid constant-pressure heat capacity
     with the similarity variable concept and method as shown in [1]_.
 
@@ -2281,7 +2271,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None, terms=None):
        211-226. doi:10.1016/j.fluid.2011.09.015.
 
     '''
-    first, second, third = terms or Dadgostar_Shaw_terms(similarity_variable)
+    first, second, third = Dadgostar_Shaw_terms(similarity_variable)
     S = T*T*0.5*third + T*second + first*log(T)
     return S*1000. if MW is None else S*MW
 
@@ -2660,9 +2650,9 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     theta_div_T = theta/T
     exp_term = exp(theta_div_T)
     a = similarity_variable
-    Cp = a*(3.0*(A1 + A2*a)*R*(theta_div_T)**2*exp_term/(exp_term-1)**2
+    Cp = a*(3.0*(A1 + A2*a)*R*(theta_div_T)*theta_div_T*exp_term/((exp_term-1.0)*(exp_term-1.0))
           + (C1 + C2*a)*T
-          + (D1 + D2*a)*T**2)
+          + (D1 + D2*a)*T*T)
     return Cp*1000. if MW is None else Cp*MW
 
 def Lastovka_solid_integral(T, similarity_variable, MW=None):
@@ -2716,7 +2706,7 @@ def Lastovka_solid_integral(T, similarity_variable, MW=None):
     D2 = -0.000123
     a = similarity_variable
     T2 = T*T
-    H = a*(T*T2*(D1 + D2*a)/3.
+    H = a*(T*T2*(D1 + D2*a)*(1.0/3.0)
            + 0.5*T2*(C1 + C2*a)
            + 3.0*R*theta*(A1 + A2*a)/(exp(theta/T) - 1.))
     return H*1000. if MW is None else H*MW
@@ -2775,9 +2765,9 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
     exp_theta_T = exp(theta/T)
     A_term = (A1 + A2*a)
     S = a*(-3.0*R*A_term*log(exp_theta_T - 1.)
-           + 0.5*T**2*(D1 + D2*a)
+           + 0.5*T*T*(D1 + D2*a)
            + T*(C1 + C2*a)
-           + 3.0*R*theta*A_term*(1/(T*exp_theta_T - T) + 1/T))
+           + 3.0*R*theta*A_term*(1/(T*exp_theta_T - T) + 1.0/T))
     return S*1000. if MW is None else S*MW
 
 def Cpg_statistical_mechanics(T, thetas, linear=False):
