@@ -2043,28 +2043,30 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
     cmps = range(len(ys))
     MDs = molecular_diameters
     Tsts = [T/Stockmayer_i for Stockmayer_i in Stockmayers]
-    Tstrs = [i**0.5 for i in Tsts]
-    Aij = [[0.0]*N for j in cmps]
-    phiij =[[0.0]*N for j in cmps]
+    Tstrs = [sqrt(i) for i in Tsts]
+    rt_mus = [sqrt(mu) for mu in mus]
+    MW_45 = [MWi**0.45 for MWi in MWs]
+    term0s = [1.0/sqrt(1.0 + Tsts[j] + 0.25*MDs[j]*MDs[j]) for j in range(N)]
 
+    tot = 0.0
     for i in cmps:
+        inner_sum = 0.0
+        x1 = 1.0/(sqrt(1.0 + Tsts[i] + (0.25*MDs[i]*MDs[i])))
         for j in cmps:
-            Sij = (1.0 +Tstrs[i]*Tstrs[j] + (MDs[i]*MDs[j])/4.)/(
-                    1.0 + Tsts[i] + (0.25*MDs[i]*MDs[i]))**0.5/(1.0 + Tsts[j]
-                    + (0.25*MDs[j]*MDs[j]))**0.5
+            # possible to optimize 3 of the divs out but still left with 6 and 4 sqrt
             if MDs[i] <= 0.1 and MDs[j] <= 0.1:
                 Sij = 1.0
+            else:
+                Sij = (1.0 + Tstrs[i]*Tstrs[j] + 0.25*MDs[i]*MDs[j])*x1*term0s[j]
             Mij = MWs[i]/MWs[j]
-            Mij45 = Mij**0.45
-
-            mij = (4./((1.0 + 1.0/Mij)*(1.0 + Mij)))**0.25
-
-            Aij[i][j] = mij*Mij**-0.5*(1.0 + (Mij - Mij45)/(2.0*(1.0 + Mij)
-                + (1.0 + Mij45)*mij**-0.5/(1.0 + mij)))
-
-            phiij[i][j] = (mus[i]/mus[j])**0.5*Sij*Aij[i][j]
-
-    return sum([ys[i]*mus[i]/sum([ys[j]*phiij[i][j] for j in cmps]) for i in cmps])
+            Mij45 = MW_45[i]/MW_45[j]
+            mij = sqrt(sqrt(4./((1.0 + 1.0/Mij)*(1.0 + Mij))))
+            Aij = mij/sqrt(Mij)*(1.0 + (Mij - Mij45)/(2.0*(1.0 + Mij)
+                + (1.0 + Mij45)/(sqrt(mij)*(1.0 + mij))))
+            phiij = (rt_mus[i]/rt_mus[j])*Sij*Aij
+            inner_sum += ys[j]*phiij
+        tot += ys[i]*mus[i]/inner_sum
+    return tot
 
 ### Petroleum liquids
 

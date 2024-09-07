@@ -233,8 +233,7 @@ def test_CSP_gas():
     kg3 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='nonlinear')
     assert_close1d([kg1, kg2, kg3], [0.01813208676438415, 0.023736881470903245, 0.018625352738307743])
 
-    with pytest.raises(ValueError):
-        DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='FAIL')
+    assert_close(DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='FAIL'), DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92))
 
 
     kg = Chung(T=373.15, MW=72.151, Tc=460.4, omega=0.227, Cvm=135.9, mu=8.77E-6)

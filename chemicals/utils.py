@@ -63,7 +63,7 @@ from math import (  # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
 # Included here so calculations are consistent across SciPy versions
 from fluids.constants import N_A, R
 from fluids.numerics import numpy as np
-from fluids.numerics import trunc_log
+from fluids.numerics import trunc_log, trunc_exp, cbrt
 
 __all__.extend(['PY37'])
 version_components = sys.version.split('.')
@@ -2441,22 +2441,16 @@ def mixing_simple(fracs, props):
 
     Notes
     -----
-    Returns None if there is an error, normally if one of the properties is
-    missing or if they are not the same length as the fractions.
 
     Examples
     --------
     >>> mixing_simple([0.1, 0.9], [0.01, 0.02])
     0.019000000000000003
     '''
-    try:
-        tot = 0.0
-        for i in range(len(fracs)):
-            tot += fracs[i]*props[i]
-        return tot
-#        return sum([fracs[i]*props[i] for i in range(len(fracs))])
-    except:
-        return None
+    tot = 0.0
+    for i in range(len(fracs)):
+        tot += fracs[i]*props[i]
+    return tot
 
 
 def mixing_logarithmic(fracs, props):
@@ -2489,17 +2483,14 @@ def mixing_logarithmic(fracs, props):
     >>> mixing_logarithmic([0.1, 0.9], [0.01, 0.02])
     0.01866065983073615
     '''
-    try:
-        tot = 0.0
-        for i in range(len(fracs)):
-            tot += fracs[i]*trunc_log(props[i])
-        return exp(tot)
-    except:
-        return None
+    tot = 0.0
+    for i in range(len(fracs)):
+        tot += fracs[i]*trunc_log(props[i])
+    return trunc_exp(tot)
 
 def mixing_power(fracs, props, r):
     r'''Power law mixing rule for any property, with a variable exponent
-    `r` as input. Optimiezd routines are available for r=-4,-3,-2,-1,1,2,3,4.
+    `r` as input. Optimiezd routines are available for common powers.
 
     .. math::
         \text{prop}_{mix}^r = \sum_i z_i \left(\text{prop}_i \right)^{r}
@@ -2546,8 +2537,8 @@ def mixing_power(fracs, props, r):
     prop = 0.0
     if r == -4.0:
         for i in range(N):
-            x = props[i]*props[i]
-            prop += fracs[i]/(x*x)
+            prop_i_squared = props[i]*props[i]
+            prop += fracs[i]/(prop_i_squared*prop_i_squared)
         return prop**(1.0/r)
     elif r == -3.0:
         for i in range(N):
@@ -2575,11 +2566,159 @@ def mixing_power(fracs, props, r):
         return prop**(1.0/3.0)
     elif r == 4.0:
         for i in range(N):
-            x = props[i]*props[i]
-            prop += fracs[i]*(x*x)
+            prop_i_squared = props[i]*props[i]
+            prop += fracs[i]*(prop_i_squared*prop_i_squared)
         return sqrt(sqrt(prop))
+    elif r == 1/3:
+        for i in range(N):
+            prop += fracs[i] * cbrt(props[i])
+        return prop * prop * prop
+    elif r == -1/3:
+        for i in range(N):
+            prop += fracs[i] / cbrt(props[i])
+        return 1.0 / (prop * prop * prop)
+    elif r == 2/3:
+        for i in range(N):
+            prop += fracs[i] * cbrt(props[i] * props[i])
+        return prop * sqrt(prop)
+    elif r == -2/3:
+        for i in range(N):
+            prop += fracs[i] / cbrt(props[i] * props[i])
+        return 1.0 / (prop * sqrt(prop))
+    elif r == 4/3:
+        for i in range(N):
+            prop += fracs[i] * (props[i] * cbrt(props[i]))
+        rt_prop = sqrt(prop)
+        return sqrt(rt_prop)*rt_prop
+    elif r == -4/3:
+        for i in range(N):
+            prop += fracs[i]/(props[i] * cbrt(props[i]))
+        rt_prop = sqrt(prop)
+        return 1.0/(sqrt(rt_prop)*rt_prop)
+        
+    elif r == 0.5:
+        for i in range(N):
+            prop += fracs[i] * sqrt(props[i])
+        return prop*prop   
+    elif r == -0.5:
+        for i in range(N):
+            prop += fracs[i] / sqrt(props[i])
+        return 1.0 / (prop*prop)
+    elif r == 1.5:
+        for i in range(N):
+            prop += fracs[i]*(props[i]*props[i])
+        return prop**(2.0/3.0)
+    elif r == -1.5:
+        for i in range(N):
+            prop += fracs[i] / (props[i]*sqrt(props[i]))
+        return prop**(-2.0/3.0)
+    elif r == 0.25:
+        for i in range(N):
+            prop += fracs[i] * sqrt(sqrt(props[i]))
+        prop2 = prop*prop
+        return prop2*prop2
+    elif r == -0.25:
+        for i in range(N):
+            prop += fracs[i] / sqrt(sqrt(props[i]))
+        prop2 = prop*prop
+        return 1.0 / (prop2*prop2)
+    elif r == 0.75:
+        for i in range(N):
+            rt_prop_i = sqrt(props[i])
+            prop += fracs[i] * (sqrt(rt_prop_i)*rt_prop_i)
+        return prop ** (4/3)
+    elif r == -0.75:
+        for i in range(N):
+            rt_prop_i = sqrt(props[i])
+            prop += fracs[i] / (sqrt(rt_prop_i)*rt_prop_i)
+        return (prop ** (-4/3))
+    elif r == -0.125:
+        for i in range(N):
+            prop += fracs[i] / sqrt(sqrt(sqrt(props[i])))
+        prop *= prop
+        prop *= prop
+        return 1.0 / (prop*prop)
+    elif r == 0.125:
+        for i in range(N):
+            prop += fracs[i] * sqrt(sqrt(sqrt(props[i])))
+        prop *= prop
+        prop *= prop
+        return prop*prop
+    elif r == 0.875:
+        for i in range(N):
+            rt_prop = sqrt(props[i])
+            qtrt_prop = sqrt(rt_prop)
+            eight_rt_prop = sqrt(qtrt_prop)
+            prop += fracs[i] * (rt_prop*qtrt_prop*eight_rt_prop)
+        return prop ** (8/7)
+    elif r == -0.875:
+        for i in range(N):
+            rt_prop = sqrt(props[i])
+            qtrt_prop = sqrt(rt_prop)
+            eight_rt_prop = sqrt(qtrt_prop)
+            prop += fracs[i] /(rt_prop*qtrt_prop*eight_rt_prop)
+        return prop ** (-8/7)
+    elif r == 0.375:
+        for i in range(N):
+            qtrt_prop = sqrt(sqrt(props[i]))
+            eight_rt_prop = sqrt(qtrt_prop)
+            prop += fracs[i] * (qtrt_prop*eight_rt_prop)
+        return prop ** (1.0/0.375)
+    elif r == -0.375:
+        for i in range(N):
+            qtrt_prop = sqrt(sqrt(props[i]))
+            eight_rt_prop = sqrt(qtrt_prop)
+            prop += fracs[i] /(qtrt_prop*eight_rt_prop)
+        return prop ** (-1.0/0.375)
+    elif r == 0.625:
+        for i in range(N):
+            rt_prop = sqrt(props[i])
+            qtrt_prop = sqrt(rt_prop)
+            eight_rt_prop = sqrt(qtrt_prop)
+            prop += fracs[i] * (rt_prop*eight_rt_prop)
+        return prop ** (1.0/0.625)
+    elif r == -0.625:
+        for i in range(N):
+            rt_prop = sqrt(props[i])
+            qtrt_prop = sqrt(rt_prop)
+            eight_rt_prop = sqrt(qtrt_prop)
+            prop += fracs[i] /(rt_prop*eight_rt_prop)
+        return prop ** (-1.0/0.625)
 
-    for i in range(len(fracs)):
+    elif r == 5.0/3.0:
+        for i in range(N):
+            cbrt_prop = cbrt(props[i])
+            prop += fracs[i] * (props[i]* cbrt_prop*cbrt_prop)
+        return prop**(1.0/(5/3.0))
+    elif r == -5.0/3.0:
+        for i in range(N):
+            cbrt_prop = cbrt(props[i])
+            prop += fracs[i] /(props[i]* cbrt_prop*cbrt_prop)
+        return prop**(-1.0/(5.0/3.0))
+    elif r == 1.0/6.0:
+        for i in range(N):
+            prop += fracs[i] * sqrt(cbrt(props[i]))
+        prop *= prop
+        return prop*prop*prop
+    elif r == 5/6:
+        for i in range(N):
+            prop_sqrt = sqrt(props[i])
+            prop_1_6 = cbrt(prop_sqrt)
+            prop += fracs[i] * (prop_sqrt*prop_1_6*prop_1_6)
+        return prop ** (6.0/5.0)
+    elif r == -1.0/6.0:
+        for i in range(N):
+            prop += fracs[i] / sqrt(cbrt(props[i]))
+        prop *= prop
+        return 1.0/(prop*prop*prop)
+    elif r == -5/6:
+        for i in range(N):
+            prop_sqrt = sqrt(props[i])
+            prop_1_6 = cbrt(prop_sqrt)
+            prop += fracs[i] /(prop_sqrt*prop_1_6*prop_1_6)
+        return prop ** (-6.0/5.0)
+
+    for i in range(N):
         prop += fracs[i]*(props[i]**r)
     return prop**(1.0/r)
 

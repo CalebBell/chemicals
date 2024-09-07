@@ -1442,7 +1442,7 @@ def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
         Tb += Tbs[i]*xs[i]
         sigmar += sigmas_Tb[i]*xs[i]
     if T > Tc:
-        raise ValueError('T > Tc according to Kays rule - model is not valid in this range.')
+        return 0.0
     Tst = (Tc/T - 1.)/(Tc/Tb - 1.0)
     return 1.002855*Tst**1.118091*(T/Tb)*sigmar
 

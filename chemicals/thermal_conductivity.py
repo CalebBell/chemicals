@@ -1619,13 +1619,11 @@ def DIPPR9B(T, MW, Cvm, mu, Tc=None, chemtype=None):
     Cvm = Cvm*1000.  # J/g/K to J/kmol/K
     if chemtype == 'monoatomic':
         return 2.5*mu*Cvm/MW
-    elif chemtype == 'linear' or chemtype is None:
-        Tr = T/Tc
-        return mu/MW*(1.30*Cvm + 14644 - 2928.80/Tr)
     elif chemtype == 'nonlinear':
         return mu/MW*(1.15*Cvm + 16903.36)
-    else:
-        raise ValueError('Specified chemical type is not an option')
+    # elif chemtype == 'linear' or chemtype is None:
+    Tr = T/Tc
+    return mu/MW*(1.30*Cvm + 14644 - 2928.80/Tr)
 
 
 def Chung(T, MW, Tc, omega, Cvm, mu):

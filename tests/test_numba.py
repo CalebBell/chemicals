@@ -334,9 +334,7 @@ def test_interface_misc():
     assert_close(chemicals.Diguilio_Teja(T=298.15, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs),
     chemicals.numba.Diguilio_Teja(T=298.15, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs), rtol=1e-12)
 
-    # Exception is correctly raised with numba
-    with pytest.raises(ValueError):
-        chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs)
+    assert_close(chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs), 0)
 
 
 @mark_as_numba

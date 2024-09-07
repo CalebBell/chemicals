@@ -233,12 +233,11 @@ def test_Diguilio_Teja():
     sigma = Diguilio_Teja(T=298.15, xs=[0.1606, 0.8394], sigmas_Tb=[0.01424, 0.02530], Tbs=[309.21, 312.95], Tcs=[469.7, 508.0])
     assert_close(sigma, 0.025716823875045505)
 
-#    with pytest.raises(Exception):
-#        Diguilio_Teja(T=298.15, xs=[0.1606, 0.8394, 0.118], sigmas_Tb=[0.01424, 0.02530], Tbs=[309.21, 312.95], Tcs=[469.7, 508.0])
-
-    with pytest.raises(Exception):
-         Diguilio_Teja(T=501.85, xs=[0.1606, 0.8394], sigmas_Tb=[0.01424, 0.02530], Tbs=[309.21, 312.95], Tcs=[469.7, 508.0])
-
+    # Check that as the model's critical temperature is approached we hit 0, and then return 0 after
+    assert_close(Diguilio_Teja(T=501.8490199999, xs=[0.1606, 0.8394], sigmas_Tb=[0.01424, 0.02530], Tbs=[309.21, 312.95],
+              Tcs=[469.7, 508.0]), 0.0, atol=1e-10)
+    assert_close(Diguilio_Teja(T=600, xs=[0.1606, 0.8394], sigmas_Tb=[0.01424, 0.02530], Tbs=[309.21, 312.95],
+              Tcs=[469.7, 508.0]), 0.0, atol=1e-10)
 
 
 def test_Meybodi_Daryasafar_Karimi():
