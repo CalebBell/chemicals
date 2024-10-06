@@ -2597,7 +2597,6 @@ def RRN_new_betas(betas, d_betas, damping, ns, Ks, *args):
         is_valid = Rachford_Rice_valid_solution_naive(ns, betas_test, Ks, limit_betas=limit_betas)
         if is_valid:
             break
-
         damping = 0.5*damping
         for i in range(N):
             betas_test[i] = betas[i] + d_betas[i]*damping
@@ -2783,8 +2782,9 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
     ys = [0.0]*N
     zs = [0.0]*N
     z_tot = 0.0
+    factor = 1.0 - beta_y - beta_z
     for i in range(N):
-        xi = ns[i]/(1. + beta_y*(Ks_y[i] - 1.0) + beta_z*(Ks_z[i] - 1.0))
+        xi = ns[i]/(factor + beta_y*Ks_y[i] + beta_z*Ks_z[i])
         xs[i] = xi
         ys[i] = xi*Ks_y[i]
         zs[i] = xi*Ks_z[i]
