@@ -867,7 +867,7 @@ def test_Rachford_Rice_solution2():
 
 
     # example 1 Li and Firoozabadi 2012: Initialization of phase fractions in Rachford-Rice equations for robust and efficient three-phase split calculation
-    zs = [0.47, 0.126754033873246, 0.123759275876241, 0.190491864809508, 5.352678894647322e-2, 3.546803696453197e-2]
+    zs = normalize([0.47, 0.126754033873246, 0.123759275876241, 0.190491864809508, 5.352678894647322e-2, 3.546803696453197e-2])
     Ks_y = [0.886975564280731, 183.729456216368, 28.8439229979536, 0.762796901964099, 6.805250689498878e-2, 0.345376016039736]
     Ks_z = [1.85133355509695, 0.567851997436811, 0.291644844783998, 0.182989507250403, 8.745408265736165e-2, 0.623957189693138]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=.7, beta_z=.2)
@@ -875,7 +875,7 @@ def test_Rachford_Rice_solution2():
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.7151778078967964, 0.06609909166404299], n=n_composition_fuzz)
 
     # example 2 Li and Firoozabadi 2012: Initialization of phase fractions in Rachford-Rice equations for robust and efficient three-phase split calculation
-    zs = [0.66731, 0.09575, 0.03540, 0.04452, 0.08589, 0.04470, 0.02643]
+    zs = normalize([0.66731, 0.09575, 0.03540, 0.04452, 0.08589, 0.04470, 0.02643])
     Ks_y = [1.40089114681102, 2.41359153035331, 0.684675481993755, 0.192706323169157, 1.344316808771735e-2, 2.913379631601974e-4, 9.614643893437818e-8]
     Ks_z = [1.42336619958799, 1.56360101270076, 0.805778846552492, 0.437918929556065, 0.136423337258229, 2.241151325196582e-2, 3.114699395928320e-4]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=1e-3)
@@ -883,7 +883,7 @@ def test_Rachford_Rice_solution2():
     validate_RR_convergence(zs, [Ks_y, Ks_z], [0.3886026201178722, 1.1532086735243752e-05], n=n_composition_fuzz)
 
     # example 3 Li and Firoozabadi 2012: Initialization of phase fractions in Rachford-Rice equations for robust and efficient three-phase split calculation
-    zs = [0.466 , 0.127710667872289 , 0.124693307875307 , 0.191929538808070 , 5.393076494606923e-2 , 3.573572096426427e-2]
+    zs = normalize([0.466 , 0.127710667872289 , 0.124693307875307 , 0.191929538808070 , 5.393076494606923e-2 , 3.573572096426427e-2])
     Ks_y = [0.367489928755904 , 91.9551101941298 , 17.6437660816506 , 0.523968443113866 , 5.444380423358842e-2, 0.192716832533260 ]
     Ks_z = [1.45983188593810, 0.627700554178016, 0.405472131110146, 0.291902855037650, 0.172272959622522, 0.704057279260822]
     ans = Rachford_Rice_solution2(zs, Ks_y, Ks_z, beta_y=.3, beta_z=.01)

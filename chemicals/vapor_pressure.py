@@ -2397,6 +2397,8 @@ def Psub_Clapeyron(T, Tt, Pt, Hsub_t):
        Cosmochimica Acta 71, no. 1 (January 1, 2007): 36-45.
        https://doi.org/10.1016/j.gca.2006.08.034.
     '''
-    return Pt*exp(Hsub_t*(T - Tt)/(R*T*Tt))
+    ans = Pt*exp(Hsub_t*(T - Tt)/(R*T*Tt))
+    # Truncation to avoid issues in later calculations
+    return max(ans, 1e-200)
 
 
