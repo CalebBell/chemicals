@@ -84,9 +84,8 @@ def test_Bhirud_normal():
     V2 = 0.00021992874232614203
     assert_close1d([V1_calc, V2_calc], [V1, V2])
 
-    # Test above Tc, where interpolation table fails
-    with pytest.raises(Exception):
-        Bhirud_normal(500, 469.7, 33.7E5, 0.252)
+    # test extrapolation is simply a truncation to Tc
+    assert_close(Bhirud_normal(500, 469.7, 33.7E5, 0.252), Bhirud_normal(469.7, 469.7, 33.7E5, 0.252))
 
 def test_COSTALD():
     V1_calc = COSTALD(298, 647.13, 55.95E-6, 0.3449)

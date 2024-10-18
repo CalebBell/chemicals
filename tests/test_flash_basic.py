@@ -264,6 +264,8 @@ def test_flash_ideal_Ambrose_Walton():
     Psat_funcs = []
     for i in range(4):
         def Psat_func(T, Tc=Tcs[i], Pc=Pcs[i], omega=omegas[i]):
+            if T > Tc:
+                raise ValueError("Supercritical")
             return Ambrose_Walton(T, Tc, Pc, omega)
         Psat_funcs.append(Psat_func)
 

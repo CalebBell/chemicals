@@ -748,13 +748,14 @@ def Bhirud_normal(T, Tc, Pc, omega):
        doi:10.1002/aic.690240630
     '''
     Tr = T/Tc
+    if Tr > 1.0:
+        Tr = 1.0
+        T = Tc
     if Tr <= 0.98:
         lnU0 = Tr*(Tr*(Tr*(Tr*(Tr*(75.1088*Tr - 256.671) + 355.805) - 255.719)
                + 102.615) - 24.076) + 1.39644
         lnU1 = Tr*(Tr*(Tr*(Tr*(Tr*(176.737*Tr - 728.227) + 1231.43) - 1091.453)
                + 533.38) - 135.7437) + 13.4412
-    elif Tr > 1.0:
-        raise ValueError('Critical phase, correlation does not apply')
     else:
         lnU0 = float(splev(Tr, Bhirud_normal_lnU0_tck))
         lnU1 = float(splev(Tr, Bhirud_normal_lnU1_tck))

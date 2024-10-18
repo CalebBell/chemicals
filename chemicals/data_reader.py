@@ -51,6 +51,10 @@ try:
 
 except:
     pass
+try:
+    import threading
+except:
+    pass
 from chemicals.identifiers import CAS_to_int
 from chemicals.utils import source_path
 
@@ -231,28 +235,40 @@ CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 
 CONSTANT_DATABASE_NAME_TO_IDX = {k: i for i, k in enumerate(CONSTANT_DATABASE_COLUMNS)}
 CONSTANTS_CURSOR = None
 
+thread_local_storage = threading.local()
+
 DATABASE_CONSTANTS_CACHE = {}
+
 def cached_constant_lookup(CASi, prop):
-    if CONSTANTS_CURSOR is None: init_constants_db()
+    '''Look up a constant property for a compound, either from cache or the database.'''
+    if not hasattr(thread_local_storage, 'cursor'):
+        init_constants_db()
+
+    # Check if the result is cached
     if CASi in DATABASE_CONSTANTS_CACHE:
         result = DATABASE_CONSTANTS_CACHE[CASi]
     else:
-        # Fetch and store the whole row
-        CONSTANTS_CURSOR.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
-        result = CONSTANTS_CURSOR.fetchone()
+        # Fetch the whole row from the database
+        thread_local_storage.cursor.execute("SELECT * FROM constants WHERE `index`=?", (str(CASi),))
+        result = thread_local_storage.cursor.fetchone()
         DATABASE_CONSTANTS_CACHE[CASi] = result
+
     if result is None:
-        # Result the value, and whether the compound was in the index
-        return result, False
-    else:
-        prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
-        return result[prop_idx], True
+        return result, False  # Return result and indicate the compound was not found
+
+    # Retrieve the value for the specified property
+    prop_idx = CONSTANT_DATABASE_NAME_TO_IDX[prop]
+    return result[prop_idx], True
 
 def init_constants_db():
-    global CONSTANTS_CURSOR
-    import sqlite3
-    conn = sqlite3.connect(path_join(source_path, 'Misc', 'default.sqlite'), check_same_thread=False)
-    CONSTANTS_CURSOR = conn.cursor()
+    '''Initialize the database connection and cursor for the current thread if not already done.'''
+    if not hasattr(thread_local_storage, 'conn'):
+        # Create a new connection and cursor for the thread
+        thread_local_storage.conn = sqlite3.connect(
+            path_join(source_path, 'Misc', 'default.sqlite'),
+            check_same_thread=False
+        )
+        thread_local_storage.cursor = thread_local_storage.conn.cursor()
 
 def database_constant_lookup(CASi, prop):
     if type(CASi) is str: # Assume it must be either an int or string

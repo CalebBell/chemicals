@@ -67,15 +67,25 @@ from cmath import log as clog
 from cmath import sqrt as csqrt
 from math import atan, atanh, cosh, sinh, tanh
 
-from fluids.numerics import exp, hyp2f1, log, sqrt, trunc_exp, trunc_log
+from fluids.numerics import exp, hyp2f1, log, sqrt, trunc_exp, trunc_log, cbrt
 
 order_not_found_msg = ('Only the actual property calculation, first temperature '
                        'derivative, first temperature integral, and first '
                        'temperature integral over temperature are supported '
-                       'with order=  0, 1, -1, or -1j respectively')
+                       'with order=  0, 1, -1, or -10 respectively')
 
 order_not_found_pos_only_msg = ('Only the actual property calculation, and'
                                 'temperature derivative(s) are supported')
+
+# Form of an enum
+BASE_CALTULATION = 0
+DERIVATIVE_CALCULATION = 1
+SECOND_DERIVATIVE_CALCULATION = 2
+THIRD_DERIVATIVE_CALCULATION = 3
+FOURTH_DERIVATIVE_CALCULATION = 3
+INTEGRAL_CALCULATION = -1
+INTEGRAL_OVER_T_CALCULATION = -10
+
 
 def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     r'''DIPPR Equation # 100. Used in calculating the molar heat capacities
@@ -97,7 +107,7 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -106,7 +116,7 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -145,7 +155,7 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
         return B + T*(2.0*C + T*(3.0*D + T*(4.0*E + T*(5.0*F + 6.0*G*T))))
     elif order == -1:
         return T*(A + T*(B*0.5 + T*(C*(1.0/3.0) + T*(D*0.25 + T*(E*0.2 + T*(F*(1.0/6.0) + G*T*(1.0/7.0)))))))
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         return A*log(T) + T*(B + T*(C*0.5 + T*(D*(1.0/3.0) + T*(E*0.25 + T*(F*0.2 + G*T*(1.0/6.0))))))
     else:
         raise ValueError(order_not_found_msg)
@@ -254,7 +264,7 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -263,7 +273,7 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -326,7 +336,7 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
         x10 = x5/(C - x0) # numba: delete
         x11 = x5/(C + x0) # numba: delete
         return float((hyp2f1_term1*x10 - hyp2f1_term2*x11).real) # numba: delete
-    elif order == -1j: # numba: delete
+    elif order == INTEGRAL_OVER_T_CALCULATION: # numba: delete
         return float((2*A*T**(2+B)*hyp2f1(1.0, 2.0+B, 3.0+B, -2*T/(C - csqrt(C*C - 4*D)))/( # numba: delete
                 (2+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D)) -2*A*T**(2+B)*hyp2f1( # numba: delete
                 1.0, 2.0+B, 3.0+B, -2*T/(C + csqrt(C*C - 4*D)))/((2+B)*(C + csqrt( # numba: delete
@@ -545,7 +555,7 @@ def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -554,7 +564,7 @@ def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -595,7 +605,7 @@ def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
         return (-B + (-3*C + (-8*D - 9*E/T)/(T4*T))/T2)/T2
     elif order == -1:
         return A*T + B*log(T) - (28*C*T**6 + 8*D*T + 7*E)/(56*T**8)
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         return A*log(T) - (72*B*T**8 + 24*C*T**6 + 9*D*T + 8*E)/(72*T**9)
     else:
         raise ValueError(order_not_found_msg)
@@ -669,7 +679,7 @@ def EQ105(T, A, B, C, D, order=0):
             # Handle the case of a negative D exponent with a (1. - T/C) under 0 which would yield a complex number
             problematic = 0.0
         problematic2 = problematic**D
-        if abs(problematic2.imag) > 0.0:
+        if abs(problematic2.imag) > 0.0: # This check should be removable - unless D is imaginary
             problematic2 = 0.0
         ans = A*B**(-(1. + problematic2))
         return ans
@@ -1007,7 +1017,7 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -1016,7 +1026,7 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -1071,7 +1081,7 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
                 - 2*D*E**2/(T**3*cosh(E/T)**2))
     elif order == -1:
         return A*T + B*C/tanh(C/T) - D*E*tanh(E/T)
-    elif order == -1j:
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         return (A*log(T) + B*C/tanh(C/T)/T - B*log(sinh(C/T))
                 - D*E*tanh(E/T)/T + D*log(cosh(E/T)))
     else:
@@ -1102,7 +1112,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -1111,7 +1121,7 @@ def EQ114(T, Tc, A, B, C, D, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -1170,31 +1180,47 @@ def EQ114(T, Tc, A, B, C, D, order=0):
     '''
     if order == 0:
         t = 1.-T/Tc
-        return (A**2./t + B - 2.*A*C*t - A*D*t**2. - C**2.*t**3./3.
-                - C*D*t**4./2. - D**2*t**5./5.)
+        return A*A/t + 1.0*B + t*(-2.0*A*C + t*(-1.0*A*D + t*(-(1.0/3.0)*C*C + t*(-0.5*C*D - 0.2*D*D*t))))
+        # return (A*A/t + B - 2.*A*C*t - A*D*t*t - (1.0/3.0)*C*C*t**3.
+        #         - 0.5*C*D*t**4 - 0.2*D*D*t**5)
     elif order == 1:
-        return (A**2/(Tc*(-T/Tc + 1)**2) + 2*A*C/Tc + 2*A*D*(-T/Tc + 1)/Tc
-                + C**2*(-T/Tc + 1)**2/Tc + 2*C*D*(-T/Tc + 1)**3/Tc
-                + D**2*(-T/Tc + 1)**4/Tc)
+        t = 1.-T/Tc
+        return (A*A/(t*t) + 2.0*A*C + t*(2*A*D + t*(C*C + t*(2*C*D + D*D*t))))/Tc
     elif order == -1:
-        return (-A**2*Tc*clog(T - Tc).real + D**2*T**6/(30*Tc**5)
-                - T**5*(C*D + 2*D**2)/(10*Tc**4)
-                + T**4*(C**2 + 6*C*D + 6*D**2)/(12*Tc**3) - T**3*(A*D + C**2
-                + 3*C*D + 2*D**2)/(3*Tc**2) + T**2*(2*A*C + 2*A*D + C**2 + 2*C*D
-                + D**2)/(2*Tc) + T*(-2*A*C - A*D + B - C**2/3 - C*D/2 - D**2/5))
-    elif order == -1j:
-        return (-A**2*clog(T + (-60*A**2*Tc + 60*A*C*Tc + 30*A*D*Tc - 30*B*Tc
-                + 10*C**2*Tc + 15*C*D*Tc + 6*D**2*Tc)/(60*A**2 - 60*A*C
-                - 30*A*D + 30*B - 10*C**2 - 15*C*D - 6*D**2)).real
-                + D**2*T**5/(25*Tc**5) - T**4*(C*D + 2*D**2)/(8*Tc**4)
-                + T**3*(C**2 + 6*C*D + 6*D**2)/(9*Tc**3) - T**2*(A*D + C**2
-                + 3*C*D + 2*D**2)/(2*Tc**2) + T*(2*A*C + 2*A*D + C**2 + 2*C*D
-                + D**2)/Tc + (30*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2
-                - 15*C*D - 6*D**2)*clog(T + (-30*A**2*Tc + 60*A*C*Tc
-                + 30*A*D*Tc - 30*B*Tc + 10*C**2*Tc + 15*C*D*Tc + 6*D**2*Tc
-                + Tc*(30*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2 - 15*C*D
-                - 6*D**2))/(60*A**2 - 60*A*C - 30*A*D + 30*B - 10*C**2
-                - 15*C*D - 6*D**2)).real/30)
+        x0 = D*D
+        x1 = 2.0*D
+        x2 = C*C
+        x3 = C*D
+        x4 = 6.0*x0
+        x5 = A*D
+        x6 = A*C
+        T2 = T*T
+        T3 = T2*T
+        Tc2 = Tc*Tc
+        Tc3 = Tc2*Tc
+        return (-A*A*Tc*log(abs(T - Tc)) - D*T2*T3*(C + x1)/(10.0*Tc2*Tc2) + T3*T3*x0/(30.0*Tc2*Tc3) 
+                + T2*T2*(x2 + 6.0*x3 + x4)/(12.0*Tc3) - T3*(2.0*x0 + x2 + 3.0*x3 + x5)/(3.0*Tc2) 
+                + T2*(C*x1 + x0 + x2 + 2.0*x5 + 2.0*x6)/(2.0*Tc) 
+                - T*(-30.0*B + 10.0*x2 + 15.0*x3 + x4 + 30.0*x5 + 60.0*x6)*(1.0/30))
+    elif order == INTEGRAL_OVER_T_CALCULATION:
+        x0 = A*A
+        x1 = D*D
+        x2 = 2.0*D
+        x3 = C*C
+        x4 = C*D
+        x5 = 6.0*x1
+        x6 = A*D
+        x7 = A*C
+        T2 = T*T
+        T3 = T2*T
+        Tc2 = Tc*Tc
+        Tc3 = Tc2*Tc
+        return (-D*T2*T2*(C + x2)/(8.0*Tc2*Tc2)
+                 + T2*T3*x1/(25.0*Tc2*Tc3) + T3*(x3 + 6.0*x4 + x5)/(9.0*Tc3) 
+                 - T2*(2.0*x1 + x3 + 3.0*x4 + x6)/(2.0*Tc2) 
+                 + T*(C*x2 + x1 + x3 + 2.0*x6 + 2.0*x7)/Tc 
+                 - x0*log(abs(T - Tc)) 
+                 - (-30.0*B - 30.0*x0 + 10.0*x3 + 15.0*x4 + x5 + 30.0*x6 + 60.0*x7)*log(T)*(1.0/30.0))
     else:
         raise ValueError(order_not_found_msg)
 
@@ -1305,7 +1331,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -1314,7 +1340,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -1349,37 +1375,41 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
     '''
     if T > Tc:
         T = Tc
+    tau = 1.0-T/Tc
+    cbrt_tau = cbrt(tau)
     if order == 0:
-        tau = 1-T/Tc
-        return A + B*tau**0.35 + C*tau**(2/3.) + D*tau + E*tau**(4/3.)
+        return A + B*tau**0.35 + D*tau + C*cbrt_tau*cbrt_tau + E*tau*cbrt_tau
     elif order == 1:
-        return (-7*B/(20*Tc*(-T/Tc + 1)**(13/20))
-                - 2*C/(3*Tc*(-T/Tc + 1)**(1/3))
-                - D/Tc - 4*E*(-T/Tc + 1)**(1/3)/(3*Tc))
+        return (-0.35*B/((tau)**(0.65))
+                - (2.0/3.0)*C/(cbrt_tau)
+                - D - (4.0/3.0)*E*cbrt_tau)/Tc 
     elif order == -1:
-        return (A*T - 20*B*Tc*(-T/Tc + 1)**(27/20)/27
-                - 3*C*Tc*(-T/Tc + 1)**(5/3)/5 + D*(-T**2/(2*Tc) + T)
-                - 3*E*Tc*(-T/Tc + 1)**(7/3)/7)
-    elif order == -1j:
+        cbrt_tau2 = cbrt_tau*cbrt_tau
+        cbrt_tau3 = cbrt_tau*cbrt_tau2
+        return (A*T - (20.0/27)*B*Tc*(tau)**(1.35)
+               + D*(-T*T/(2.0*Tc) + T)
+               + cbrt_tau3*cbrt_tau2*(- 3.0/5.0*C*Tc
+                - 3.0/7.0*E*Tc*cbrt_tau2))
+    elif order == INTEGRAL_OVER_T_CALCULATION:
         # 3x increase in speed - cse via sympy
         x0 = log(T)
         x1 = 0.5*x0
-        x2 = 1/Tc
+        x2 = 1.0/Tc
         x3 = T*x2
-        x4 = -x3 + 1
+        x4 = -x3 + 1.0
         x5 = 1.5*C
-        x6 = x4**0.333333333333333
+        x6 = cbrt(x4)
         x7 = 2*B
         x8 = x4**0.05
-        x9 = log(-x6 + 1)
-        x10 = sqrt(3)
-        x11 = x10*atan(x10*(2*x6 + 1)/3)
-        x12 = sqrt(5)
+        x9 = log(-x6 + 1.0)
+        x10 = 1.7320508075688772
+        x11 = x10*atan(x10*((2/3.0)*x6 + 1.0/3.0))
+        x12 = 2.23606797749979
         x13 = 0.5*x12
         x14 = x13 + 0.5
         x15 = B*x14
         x16 = sqrt(x13 + 2.5)
-        x17 = 2*x8
+        x17 = 2.0*x8
         x18 = -x17
         x19 = -x13
         x20 = x19 + 0.5
@@ -1390,27 +1420,27 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         x25 = x12 + 1
         x26 = 4*x8
         x27 = -x26
-        x28 = sqrt(10)*B/sqrt(x12 + 5)
-        x29 = 2*x12
-        x30 = sqrt(x29 + 10)
-        x31 = 1/x30
-        x32 = -x12 + 1
+        x28 = 3.1622776601683795*B/sqrt(x12 + 5.0)
+        x29 = 2.0*x12
+        x30 = sqrt(x29 + 10.0)
+        x31 = 1.0/x30
+        x32 = 1.0 - x12 
         x33 = 0.5*B*x22
         x34 = -x2*(T - Tc)
-        x35 = 2*x34**0.1
-        x36 = x35 + 2
+        x35 = 2.0*x34**0.1
+        x36 = x35 + 2.0
         x37 = x34**0.05
         x38 = x30*x37
         x39 = 0.5*B*x16
-        x40 = x37*sqrt(-x29 + 10)
+        x40 = x37*sqrt(-x29 + 10.0)
         x41 = 0.25*x12
         x42 = B*(-x41 + 0.25)
         x43 = x12*x37
-        x44 = x35 + x37 + 2
+        x44 = x35 + x37 + 2.0
         x45 = B*(x41 + 0.25)
         x46 = -x43
-        x47 = x35 - x37 + 2
-        return A*x0 + 2.85714285714286*B*x4**0.35 - C*x1 + C*x11 + D*x0 - D*x3 - E*x1 - E*x11 + 0.75*E*x4**1.33333333333333 + 3*E*x6 + 1.5*E*x9 - x15*atan(x14*(x16 + x17)) + x15*atan(x14*(x16 + x18)) - x21*atan(x20*(x17 + x22)) + x21*atan(x20*(x18 + x22)) + x23*atan(x24*(x25 + x26)) - x23*atan(x24*(x25 + x27)) - x28*atan(x31*(x26 + x32)) + x28*atan(x31*(x27 + x32)) - x33*log(x36 - x38) + x33*log(x36 + x38) + x39*log(x36 - x40) - x39*log(x36 + x40) + x4**0.666666666666667*x5 - x42*log(x43 + x44) + x42*log(x46 + x47) + x45*log(x43 + x47) - x45*log(x44 + x46) + x5*x9 + x7*atan(x8) - x7*atanh(x8)
+        x47 = x35 - x37 + 2.0
+        return A*x0 + 2.85714285714286*B*x4**0.35 - C*x1 + C*x11 + D*x0 - D*x3 - E*x1 - E*x11 + 0.75*E*x4**1.33333333333333 + 3.0*E*x6 + 1.5*E*x9 - x15*atan(x14*(x16 + x17)) + x15*atan(x14*(x16 + x18)) - x21*atan(x20*(x17 + x22)) + x21*atan(x20*(x18 + x22)) + x23*atan(x24*(x25 + x26)) - x23*atan(x24*(x25 + x27)) - x28*atan(x31*(x26 + x32)) + x28*atan(x31*(x27 + x32)) - x33*log(x36 - x38) + x33*log(x36 + x38) + x39*log(x36 - x40) - x39*log(x36 + x40) + x4**0.666666666666667*x5 - x42*log(x43 + x44) + x42*log(x46 + x47) + x45*log(x43 + x47) - x45*log(x44 + x46) + x5*x9 + x7*atan(x8) - x7*atanh(x8)
     else:
         raise ValueError(order_not_found_msg)
 
@@ -1437,7 +1467,7 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
         -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -1j, the indefinite integral of the property
+        is returned; and for -10, the indefinite integral of the property
         divided by temperature with respect to temperature is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
@@ -1446,7 +1476,7 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
     -------
     Y : float
         Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == -1j, unchanged from default]
+                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
 
     Notes
     -----
@@ -1497,42 +1527,59 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
        DIPPR/AIChE
     '''
     if order == 0:
-        return (A+B*((C/T)**2*exp(C/T)/(exp(C/T) - 1)**2) +
-            D*((E/T)**2*exp(E/T)/(exp(E/T)-1)**2) +
-            F*((G/T)**2*exp(G/T)/(exp(G/T)-1)**2))
+        T_inv = 1.0/T
+        x0 = T_inv*T_inv
+        x2 = exp(C*T_inv)
+        x3 = exp(E*T_inv)
+        x4 = exp(G*T_inv)
+        x5 = x2 - 1.0
+        x6 = x3 - 1.0
+        x7 = x4 - 1.0
+        return A + B*C*C*x0*x2/(x5*x5) + D*E*E*x0*x3/(x6*x6) + F*G*G*x0*x4/(x7*x7)
     elif order == 1:
-        return (-B*C**3*exp(C/T)/(T**4*(exp(C/T) - 1)**2)
-                + 2*B*C**3*exp(2*C/T)/(T**4*(exp(C/T) - 1)**3)
-                - 2*B*C**2*exp(C/T)/(T**3*(exp(C/T) - 1)**2)
-                - D*E**3*exp(E/T)/(T**4*(exp(E/T) - 1)**2)
-                + 2*D*E**3*exp(2*E/T)/(T**4*(exp(E/T) - 1)**3)
-                - 2*D*E**2*exp(E/T)/(T**3*(exp(E/T) - 1)**2)
-                - F*G**3*exp(G/T)/(T**4*(exp(G/T) - 1)**2)
-                + 2*F*G**3*exp(2*G/T)/(T**4*(exp(G/T) - 1)**3)
-                - 2*F*G**2*exp(G/T)/(T**3*(exp(G/T) - 1)**2))
+        x0 = 1/T
+        x1 = C*x0
+        x2 = exp(x1)
+        x3 = 1.0/(x2 - 1)
+        x4 = x2*x3*x3
+        x5 = E*x0
+        x6 = exp(x5)
+        x7 = 1.0/(x6 - 1)
+        x8 = x6*x7*x7
+        x9 = G*x0
+        x10 = exp(x9)
+        x11 = 1.0/(x10 - 1)
+        x12 = x10*x11*x11
+        x13 = C*C*C
+        x14 = E*E*E
+        x15 = G*G*G
+        return (-2.0*B*C*C*x4 - B*x0*x13*x4 + 2.0*B*x0*x13*exp(2.0*x1)*x3*x3*x3 - 2.0*D*E*E*x8
+                 - D*x0*x14*x8 + 2.0*D*x0*x14*exp(2.0*x5)*x7*x7*x7 - 2.0*F*G*G*x12 
+                 - F*x0*x12*x15 + 2.0*F*x0*x15*exp(2.0*x9)*x11*x11*x11)*x0*x0*x0
     elif order == -1:
-        return (A*T + B*C**2/(C*exp(C/T) - C) + D*E**2/(E*exp(E/T) - E)
-                + F*G**2/(G*exp(G/T) - G))
-    elif order == -1j:
-        return (A*log(T) + B*C**2*(1/(C*T*exp(C/T) - C*T) + 1/(C*T)
-                - log(exp(C/T) - 1)/C**2) + D*E**2*(1/(E*T*exp(E/T) - E*T)
-                + 1/(E*T) - log(exp(E/T) - 1)/E**2)
-                + F*G**2*(1/(G*T*exp(G/T) - G*T) + 1/(G*T) - log(exp(G/T)
-                - 1)/G**2))
+        T_inv = 1.0/T
+        return (A*T + B*C*C/(C*exp(C*T_inv) - C) + D*E*E/(E*exp(E*T_inv) - E)
+                + F*G*G/(G*exp(G*T_inv) - G))
+    elif order == INTEGRAL_OVER_T_CALCULATION:
+        x0 = 1.0/T
+        x1 = exp(C*x0) - 1.0
+        x2 = exp(E*x0) - 1.0
+        x3 = exp(G*x0) - 1.0
+        return A*log(T) + B*C*(x0 + x0/x1 - log(x1)/C) + D*E*(x0 + x0/x2 - log(x2)/E) + F*G*(x0 + x0/x3 - log(x3)/G)
     else:
         raise ValueError(order_not_found_msg)
 
 
 dippr_eq_supported_orders = {
-EQ100: (0, 1, -1, -1j),
+EQ100: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 EQ101: (0, 1, 2, 3),
-EQ102: (0, 1, -1, -1j),
-EQ104: (0, 1, -1, -1j),
+EQ102: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
+EQ104: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 EQ105: (0, 1, 2, 3),
 EQ106: (0, 1, 2, 3),
-EQ107: (0, 1, -1, -1j),
-EQ114: (0, 1, -1, -1j),
+EQ107: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
+EQ114: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 EQ115: (0, 1, 2, 3),
-EQ116: (0, 1, -1, -1j),
-EQ127: (0, 1, -1, -1j),
+EQ116: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
+EQ127: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 }

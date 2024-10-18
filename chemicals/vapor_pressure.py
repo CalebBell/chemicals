@@ -126,13 +126,22 @@ attribute of this module.
 
     Coefficients for the DIPPR 101 equation :obj:`chemicals.dippr.EQ101`,
     published in [5]_ and converted to provide base SI units (and use the
-    natural logarithm).
+    natural logarithm). The conversions are as follows (original paper -> chemicals's `EQ101`):
+
+    - A -> A * ln(10)
+    - B -> B * ln(10)
+    - C -> C (logarithm base-10 conversion cancels out, so C remains unchanged)
+    - D -> 1e-3 * D * ln(10)
+    - E is set to 1
 
 .. data:: Psub_data_Alcock_elements
 
     Coefficients for the DIPPR 101 equation :obj:`chemicals.dippr.EQ101`,
     published in [5]_ and converted to provide base SI units (and use the
     natural logarithm). Note this is a sublimation pressure data set.
+    Note that the `E` parameter in the :obj:`chemicals.dippr.EQ101` is 1
+    for all chemicals, not the default of that function which is 0.0 and means
+    the `D` parameter is not used.
 
 .. data:: Psub_data_Landolt_Antoine
 
@@ -2181,6 +2190,8 @@ def Ambrose_Walton(T, Tc, Pc, omega):
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     '''
+    if T > Tc:
+        T = Tc
     Tr = T/Tc
     tau = 1.0 - Tr
     tau15 = tau*sqrt(tau)
@@ -2334,7 +2345,7 @@ def Edalat(T, Tc, Pc, omega):
     c = -0.8747 - 7.8874*omega
     d = 1./(-0.4893 - 0.9912*omega + 3.1551*omega*omega)
     b = 1.5737 - 1.0540*omega - 4.4365E-3*d
-    tau_15 = tau**1.5
+    tau_15 = sqrt(tau)*tau
     tau3 = tau_15*tau_15
     lnPr = (a*tau + b*tau_15 + c*tau3 + d*tau3*tau3)/(1.-tau)
     return exp(lnPr)*Pc
@@ -2395,6 +2406,8 @@ def Psub_Clapeyron(T, Tt, Pt, Hsub_t):
        Cosmochimica Acta 71, no. 1 (January 1, 2007): 36-45.
        https://doi.org/10.1016/j.gca.2006.08.034.
     '''
-    return Pt*exp(Hsub_t*(T - Tt)/(R*T*Tt))
+    ans = Pt*exp(Hsub_t*(T - Tt)/(R*T*Tt))
+    # Truncation to avoid issues in later calculations
+    return max(ans, 1e-200)
 
 

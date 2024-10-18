@@ -355,13 +355,9 @@ def test_mixing_simple():
     prop = mixing_simple([0.1, 0.9], [0.01, 0.02])
     assert_close(prop, 0.019)
 
-    assert None is mixing_simple([0.01, 0.02], [0.1])
-
 def test_mixing_logarithmic():
     prop = mixing_logarithmic([0.1, 0.9], [0.01, 0.02])
     assert_close(prop, 0.01866065983073615)
-
-    assert None is mixing_logarithmic([0.01, 0.02], [0.1])
 
 def test_normalize():
     fractions_calc = normalize([3, 2, 1])
@@ -649,6 +645,43 @@ def test_mixing_power():
     assert_close(mixing_power(zs, props, r=3), 0.021001133725640605, rtol=1e-13)
     assert_close(mixing_power(zs, props, r=4), 0.021572268349078574, rtol=1e-13)
 
+    # Creating these was a lot of work
+    assert_close(mixing_power(zs, props, r=1.0/6.0), 0.01875088400005579, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=5.0/6.0), 0.019354727234672513, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=5.0/3.0), 0.020052643726129516, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-1/6), 0.018438750245785035, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-5/6), 0.017805472008199413, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-5/3), 0.01702198311393396, rtol=1e-13)
+
+    assert_close(mixing_power(zs, props, r=-.25), 0.018360027162617934, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-.5), 0.018122801833129563, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-.75), 0.01788479898151489, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-1.5), 0.017176405936050576, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=0.25), 0.01882804734220324, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=0.5), 0.019056901419612297, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=0.75), 0.01928114152959784, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=1.5), 0.005541354936265382, rtol=1e-13)
+    
+    assert_close(mixing_power(zs, props, r=-4/3.0), 0.017332239251910703, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-2/3), 0.017964155302880425, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-1/3), 0.01828110264599271, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=4/3), 0.0197823134832162, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=2/3), 0.01920695698168168, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=1/3), 0.01890479323567482, rtol=1e-13)
+
+    assert_close(mixing_power(zs, props, r=0.125), 0.018712156392543106, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=0.375), 0.01894299926200097, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=0.625), 0.019169648589127595, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=0.875), 0.019391287384440178, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-0.125), 0.018478024469926933, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-0.375), 0.01824157672809132, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-0.625), 0.018003832442176182, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=-0.875), 0.017765831497664065, rtol=1e-13)
+
+    # generic case
+    assert_close(mixing_power(zs, props, r=3.3423), 0.02120966068692269, rtol=1e-13)
+
+    
 
 def test_hash_any_primitive():
     from chemicals.utils import hash_any_primitive

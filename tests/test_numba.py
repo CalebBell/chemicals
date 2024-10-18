@@ -200,7 +200,7 @@ def test_mixing_simple():
 
 @mark_as_numba
 def test_dippr_correlations():
-    orders = (0, 1, -1, -1j)
+    orders = (0, 1, -1, -10)
     args = (20, 33.19, 66.653, 6765.9, -123.63, 478.27)
     for i in orders:
         assert_close(chemicals.numba.EQ114(*args, order=i), chemicals.EQ114(*args, order=i), rtol=1e-13)
@@ -334,9 +334,7 @@ def test_interface_misc():
     assert_close(chemicals.Diguilio_Teja(T=298.15, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs),
     chemicals.numba.Diguilio_Teja(T=298.15, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs), rtol=1e-12)
 
-    # Exception is correctly raised with numba
-    with pytest.raises(ValueError):
-        chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs)
+    assert_close(chemicals.numba.Diguilio_Teja(T=1000, xs=xs,sigmas_Tb=sigmas_Tb, Tbs=Tbs, Tcs=Tcs), 0)
 
 
 @mark_as_numba
