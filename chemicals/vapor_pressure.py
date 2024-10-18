@@ -126,13 +126,22 @@ attribute of this module.
 
     Coefficients for the DIPPR 101 equation :obj:`chemicals.dippr.EQ101`,
     published in [5]_ and converted to provide base SI units (and use the
-    natural logarithm).
+    natural logarithm). The conversions are as follows (original paper -> chemicals's `EQ101`):
+
+    - A -> A * ln(10)
+    - B -> B * ln(10)
+    - C -> C (logarithm base-10 conversion cancels out, so C remains unchanged)
+    - D -> 1e-3 * D * ln(10)
+    - E is set to 1
 
 .. data:: Psub_data_Alcock_elements
 
     Coefficients for the DIPPR 101 equation :obj:`chemicals.dippr.EQ101`,
     published in [5]_ and converted to provide base SI units (and use the
     natural logarithm). Note this is a sublimation pressure data set.
+    Note that the `E` parameter in the :obj:`chemicals.dippr.EQ101` is 1
+    for all chemicals, not the default of that function which is 0.0 and means
+    the `D` parameter is not used.
 
 .. data:: Psub_data_Landolt_Antoine
 
