@@ -172,6 +172,7 @@ if not fluids.numerics.is_micropython:
         volume._load_rho_data()
         molecular_geometry._load_RG_data()
         combustion._load_combustion_data()
+        solubility._load_solubility_data()
         try:
             identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
         except:
@@ -201,7 +202,7 @@ if not fluids.numerics.is_micropython:
                      'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
                      'RI', 'Hfus', 'Stockmayer', 'molecular_diameter'
                      'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY',
-                     'linear']
+                     'linear', 'HANSEN_DELTA_D', 'HANSEN_DELTA_P', 'HANSEN_DELTA_H']
         for df in data_reader.df_sources.values():
             for p in properties:
                 if p in df.columns:

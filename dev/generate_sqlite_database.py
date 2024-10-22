@@ -46,7 +46,8 @@ funcs = [MW, Tt, Tm, Tb, Tc, Pt, Pc, Vc,
                      Hfs, Hfl, Hfg, S0s, S0l, S0g,
                      Hfus,  Stockmayer, molecular_diameter,
                      dipole_moment, logP, RG, RON, MON, ignition_delay, linear,
-                     GWP, ODP, RI, RIT, GTP]
+                     GWP, ODP, RI, RIT, GTP, 
+                     hansen_delta_d, hansen_delta_p, hansen_delta_h]
 props = [f.__name__ for f in funcs]
 CASs = []
 prop_array = [[] for _ in range(len(props))]
