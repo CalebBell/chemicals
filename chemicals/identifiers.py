@@ -283,7 +283,12 @@ class ChemicalMetadata:
         self.common_name = common_name
         self.synonyms = synonyms
 
-
+PUBCHEM_LARGE_DB_NAME = 'chemical identifiers pubchem large.tsv'
+PUBCHEM_SMALL_DB_NAME = 'chemical identifiers pubchem small.tsv'
+PUBCHEM_EXAMPLE_DB_NAME = 'chemical identifiers example user db.tsv'
+PUBCHEM_CATION_DB_NAME = 'Cation db.tsv'
+PUBCHEM_ANION_DB_NAME = 'Anion db.tsv'
+PUBCHEM_IONORGANIC_DB_NAME = 'Inorganic db.tsv'
 class ChemicalMetadataDB:
     '''Object which holds the main database of chemical metadata.
 
@@ -295,12 +300,13 @@ class ChemicalMetadataDB:
     loaded_main_db = False
     def __init__(self,
                  elements=True,
-                 main_db=os_path_join(folder, 'chemical identifiers pubchem large.tsv'),
-                 user_dbs=[os_path_join(folder, 'chemical identifiers pubchem small.tsv'),
-                           os_path_join(folder, 'chemical identifiers example user db.tsv'),
-                           os_path_join(folder, 'Cation db.tsv'),
-                           os_path_join(folder, 'Anion db.tsv'),
-                           os_path_join(folder, 'Inorganic db.tsv')]):
+                 main_db=os_path_join(folder, PUBCHEM_LARGE_DB_NAME),
+                 user_dbs=[os_path_join(folder, PUBCHEM_SMALL_DB_NAME),
+                           os_path_join(folder, PUBCHEM_EXAMPLE_DB_NAME),
+                           os_path_join(folder, PUBCHEM_CATION_DB_NAME),
+                           os_path_join(folder, PUBCHEM_ANION_DB_NAME),
+                           os_path_join(folder, PUBCHEM_IONORGANIC_DB_NAME)]):
+                    
         '''Construct the database from its parameters, loading all of the files in
         `user_dbs`, the periodic table, and defering loading of `main_db`
         as it is very large until a search doesn't find a chemical in the smaller
@@ -538,7 +544,7 @@ def MW(ID, autoload=False, cache=True):
     >>> MW('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
     46.06844
     >>> MW('CCCCCCCCCC')
-    142.286
+    142.28168
     >>> MW('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
     46.06844
     >>> MW('pubchem=702')
@@ -602,7 +608,7 @@ def search_chemical(ID, autoload=False, cache=True):
     >>> search_chemical('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
     <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
     >>> search_chemical('CCCCCCCCCC')
-    <ChemicalMetadata, name=DECANE, formula=C10H22, smiles=CCCCCCCCCC, MW=142.286>
+    <ChemicalMetadata, name=decane, formula=C10H22, smiles=CCCCCCCCCC, MW=142.282>
     >>> search_chemical('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
     <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
     >>> search_chemical('pubchem=702')

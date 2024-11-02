@@ -157,7 +157,7 @@ Some sample queries illustrating the topic:
 >>> search_chemical('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
 <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
 >>> search_chemical('CCCCCCCCCC')
-<ChemicalMetadata, name=DECANE, formula=C10H22, smiles=CCCCCCCCCC, MW=142.286>
+<ChemicalMetadata, name=decane, formula=C10H22, smiles=CCCCCCCCCC, MW=142.282>
 >>> search_chemical('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
 <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
 >>> search_chemical('pubchem=702')

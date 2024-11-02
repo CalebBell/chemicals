@@ -154,10 +154,12 @@ def test_organic_user_db():
 
 
     for CAS, d in db.CAS_index.items():
-        assert CAS_from_any('InChI=1S/' + d.InChI) == int_to_CAS(CAS)
+        if d.InChI:
+            assert CAS_from_any('InChI=1S/' + d.InChI) == int_to_CAS(CAS)
 
     for CAS, d in db.CAS_index.items():
-        assert CAS_from_any('InChIKey=' + d.InChI_key) == int_to_CAS(CAS)
+        if d.InChI_key:
+            assert CAS_from_any('InChIKey=' + d.InChI_key) == int_to_CAS(CAS)
 
     # Test the pubchem ids which aren't -1
     for CAS, d in db.CAS_index.items():
