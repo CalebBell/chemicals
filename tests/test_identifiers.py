@@ -548,6 +548,15 @@ def test_issue_45_chemicals():
     assert chemical.iupac_name == 'dichlorosilane'
     assert chemical.common_name == 'dichlorosilane'
 
+    chemical = search_chemical('chlorosilane')
+    assert chemical.pubchemid == 61622
+    assert chemical.CAS == 13465786 
+    assert chemical.formula == 'ClH3Si'
+    assert_close(chemical.MW, 66.56232)
+    assert chemical.smiles == '[SiH3]Cl'
+    assert chemical.iupac_name == 'chlorosilane'
+    assert chemical.common_name == 'chlorosilane'
+
 def test_acetylene():
     chemical = search_chemical('acetylene')
     assert chemical.pubchemid == 6326
@@ -559,7 +568,7 @@ def test_acetylene():
     assert chemical.InChI_key == 'HSFWRNGVRCDJHI-UHFFFAOYSA-N'
     assert chemical.common_name == 'acetylene'
     assert chemical.iupac_name == 'ethyne'
-    
+
 def test_water():
     chemical = search_chemical('water')
     assert chemical.pubchemid == 962
