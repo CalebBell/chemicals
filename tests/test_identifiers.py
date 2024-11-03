@@ -521,7 +521,7 @@ def test_issue_28_thermo():
     assert issue_28.formula == 'BH4Li'
     assert issue_28.common_name == 'lithium borohydride'
     assert_close(molecular_weight(nested_formula_parser(issue_28.formula)), issue_28.MW)
-
+    assert issue_28.pubchemid == 4148881
     with pytest.raises(Exception):
         search_chemical('pubchem=20722760')
 
