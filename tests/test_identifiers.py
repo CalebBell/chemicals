@@ -557,7 +557,16 @@ def test_issue_45_chemicals():
     assert chemical.iupac_name == 'chlorosilane'
     assert chemical.common_name == 'chlorosilane'
 
-def test_acetylene():
+def test_sodium_borohydride():
+   chemical = search_chemical('sodium borohydride')
+   assert chemical.pubchemid == 4311764
+   assert chemical.CAS == 16940662
+   assert chemical.formula == 'BH4Na' 
+   assert_close(chemical.MW, 37.83253)
+   assert chemical.smiles == '[BH4-].[Na+]'
+   assert chemical.common_name == 'sodium borohydride'
+   
+   def test_acetylene():
     chemical = search_chemical('acetylene')
     assert chemical.pubchemid == 6326
     assert chemical.CAS == 74862
