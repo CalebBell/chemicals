@@ -558,6 +558,23 @@ def test_acetylene():
     assert chemical.InChI == 'C2H2/c1-2/h1-2H'
     assert chemical.InChI_key == 'HSFWRNGVRCDJHI-UHFFFAOYSA-N'
     assert chemical.common_name == 'acetylene'
+    assert chemical.iupac_name == 'ethyne'
+    
+def test_water():
+    chemical = search_chemical('water')
+    assert chemical.pubchemid == 962
+    assert chemical.CAS == 7732185
+    assert chemical.formula == 'H2O'
+    assert_close(chemical.MW, 18.01528)
+    assert chemical.smiles == 'O'
+    assert chemical.InChI == 'H2O/h1H2'
+    assert chemical.InChI_key == 'XLYOFNOQVPJJNP-UHFFFAOYSA-N'
+    assert chemical.iupac_name == 'oxidane'
+    assert chemical.common_name == 'water'
+    
+    # Check that the problematic string with wrong separators isn't in synonyms, https://github.com/CalebBell/chemicals/issues/29
+    bad_string = 'caustic soda liquid;aquafina;distilled water;hydrogen oxide (h2o);ultrexii ultrapure;'
+    assert bad_string not in chemical.synonyms
 
 
 def test_CAS_from_any():
