@@ -448,6 +448,25 @@ def test_search_chemical_2024_update_metadata_ion_names():
     assert search_chemical('24959-67-9').common_name == "bromide"
     assert search_chemical('3812-32-6').common_name == "carbonate"
 
+    # maybe these will be changed in the future but it's what CAS says for now
+
+    assert search_chemical('14701-22-5').common_name == "Ni2+"
+    assert search_chemical('15158-11-9').common_name == "Cu2+"
+    assert search_chemical('16065-83-1').common_name == "Cr3+"
+    assert search_chemical('16065-91-1').common_name == "Au3+"
+    assert search_chemical('16096-89-2').common_name == "La3+"
+    assert search_chemical('17341-24-1').common_name == "Li1+"
+    assert search_chemical('18923-26-7').common_name == "Ce3+"
+    assert search_chemical('18923-27-8').common_name == "Yb3+"
+    assert search_chemical('22537-40-2').common_name == "Y3+"
+    assert search_chemical('22537-48-0').common_name == "Cd2+"
+    assert search_chemical('22541-12-4').common_name == "Ba2+"
+    assert search_chemical('22541-18-0').common_name == "Eu3+"
+    assert search_chemical('22541-19-1').common_name == "Gd3+"
+    assert search_chemical('22541-53-3').common_name == "Co2+"
+    assert search_chemical('22541-63-5').common_name == "Co3+"
+
+    
 def test_search_chemical_2024_update_metadata_ion_synonyms():
     # CAS: 14701-21-4 (silver ion)
     assert "FOIXSVOLVBLSDH-UHFFFAOYSA-N" not in search_chemical('14701-21-4').synonyms
