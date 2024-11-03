@@ -624,7 +624,19 @@ def test_issue_45_chemicals():
     assert chemical.formula == "C5H9NNaO4"
     assert chemical.pubchemid is not None
 
-    
+def test_diborane():
+   # Test basic name lookup
+   chemical = search_chemical("diborane")
+   assert chemical.pubchemid == 12544637
+   assert chemical.CAS == 19287457
+   assert chemical.formula == "B2H6"
+   assert chemical.smiles == "B.B"
+   # Test alternate names
+   chemical = search_chemical("borane")
+   assert chemical.CAS == 19287457
+   chemical = search_chemical("Diboron hexahydride") 
+   assert chemical.CAS == 19287457
+
 def test_sodium_borohydride():
    chemical = search_chemical('sodium borohydride')
    assert chemical.pubchemid == 4311764
