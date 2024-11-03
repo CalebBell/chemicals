@@ -466,7 +466,7 @@ def test_search_chemical_2024_update_metadata_ion_names():
     assert search_chemical('22541-53-3').common_name == "Co2+"
     assert search_chemical('22541-63-5').common_name == "Co3+"
 
-    
+
 def test_search_chemical_2024_update_metadata_ion_synonyms():
     # CAS: 14701-21-4 (silver ion)
     assert "FOIXSVOLVBLSDH-UHFFFAOYSA-N" not in search_chemical('14701-21-4').synonyms
@@ -515,6 +515,15 @@ def test_search_chemical_2024_update_metadata_ion_synonyms():
     # CAS: 25215-10-5 (guanidinium)
     assert "GUANIDINIUM" not in search_chemical('25215-10-5').synonyms
     assert "ZRALSGWEFCBTJO-UHFFFAOYSA-O" not in search_chemical('25215-10-5').synonyms
+
+def test_issue_28_thermo():
+    issue_28 = search_chemical('16949-15-8')
+    assert issue_28.formula == 'BH4Li'
+    assert issue_28.common_name == 'lithium borohydride'
+    assert_close(molecular_weight(nested_formula_parser(issue_28.formula)), issue_28.MW)
+
+    with pytest.raises(Exception):
+        search_chemical('pubchem=20722760')
 
 def test_CAS_from_any():
     assert CAS_from_any('7732-18-5 ') == '7732-18-5'
