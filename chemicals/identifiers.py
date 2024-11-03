@@ -379,7 +379,7 @@ class ChemicalMetadataDB:
             (pubchemid, CAS, formula, MW, smiles, InChI, InChI_key, iupac_name, common_name) = values[0:9]
             CAS = int(CAS.replace('-', '')) # Store as int for easier lookup
 
-            synonyms = values[7:]
+            synonyms = values[7:] # include iupac name and common name in this without having to duplicate the names in the file
             pubchemid = int(pubchemid)
 
             obj = ChemicalMetadata(pubchemid, CAS, formula, float(MW), smiles,
