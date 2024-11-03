@@ -525,6 +525,30 @@ def test_issue_28_thermo():
     with pytest.raises(Exception):
         search_chemical('pubchem=20722760')
 
+
+def test_issue_45_chemicals():
+    chemical = search_chemical('trichlorosilane')
+    assert chemical.pubchemid == 24811
+    assert chemical.CAS == 10025782
+    assert chemical.formula == 'Cl3HSi'
+    assert_close(chemical.MW, 135.45244)
+    assert chemical.smiles == 'Cl[SiH](Cl)Cl'
+    assert chemical.InChI == 'Cl3HSi/c1-4(2)3/h4H'
+    assert chemical.InChI_key == 'ZDHXKXAHOVTTAH-UHFFFAOYSA-N'
+    assert chemical.iupac_name == 'trichlorosilane'
+    assert chemical.common_name == 'trichlorosilane'
+    chemical = search_chemical('dichlorosilane')
+    assert chemical.pubchemid == 61330
+    assert chemical.CAS == 4109960
+    assert chemical.formula == 'Cl2H2Si'
+    assert_close(chemical.MW, 101.00738)
+    assert chemical.smiles == 'Cl[SiH2]Cl'
+    assert chemical.InChI == 'Cl2H2Si/c1-3-2/h3H2'
+    assert chemical.InChI_key == 'MROCJMGDEKINLD-UHFFFAOYSA-N'
+    assert chemical.iupac_name == 'dichlorosilane'
+    assert chemical.common_name == 'dichlorosilane'
+
+    
 def test_CAS_from_any():
     assert CAS_from_any('7732-18-5 ') == '7732-18-5'
     assert CAS_from_any('   7732  -18-5 ') == '7732-18-5'
