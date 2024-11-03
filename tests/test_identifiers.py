@@ -557,6 +557,74 @@ def test_issue_45_chemicals():
     assert chemical.iupac_name == 'chlorosilane'
     assert chemical.common_name == 'chlorosilane'
 
+
+    # Vanadium oxytrichloride
+    chemical = search_chemical("vanadium oxytrichloride")
+    assert chemical.CAS == 7727186
+    assert chemical.formula == "Cl3OV"
+    assert chemical.pubchemid is not None
+    
+    # Methyldichlorosilane 
+    chemical = search_chemical("methyldichlorosilane")
+    assert chemical.CAS == 75547
+    assert chemical.formula == "CH4Cl2Si"
+    assert chemical.pubchemid is not None
+    
+    # Trimethoxysilane
+    chemical = search_chemical("trimethoxysilane")
+    assert chemical.CAS == 2487903
+    assert chemical.formula == "C3H10O3Si"
+    assert chemical.pubchemid is not None
+    
+    # 2-hydroxybut-3-enenitrile
+    chemical = search_chemical("2-hydroxybut-3-enenitrile")
+    assert chemical.CAS == 5809596
+    assert chemical.formula == "C4H5NO"
+    assert chemical.pubchemid is not None
+    
+    # Chlorodimethylsilane
+    chemical = search_chemical("chlorodimethylsilane")
+    assert chemical.CAS == 1066359
+    assert chemical.formula == "C2H7ClSi"
+    assert chemical.pubchemid is not None
+    
+    # Dimethylsilane
+    chemical = search_chemical("dimethylsilane")
+    assert chemical.CAS == 1111746
+    assert chemical.formula == "C2H8Si"
+    assert chemical.pubchemid is not None
+    
+    # Methylsilane
+    chemical = search_chemical("methylsilane")
+    assert chemical.CAS == 992949
+    assert chemical.formula == "CH6Si"
+    assert chemical.pubchemid is not None
+    
+    # Trimethylsilane
+    chemical = search_chemical("trimethylsilane")
+    assert chemical.CAS == 993077
+    assert chemical.formula == "C3H10Si"
+    assert chemical.pubchemid is not None
+    
+    # Silylsilane
+    chemical = search_chemical("silylsilane")
+    assert chemical.CAS == 1590870
+    assert chemical.formula == "H6Si2"
+    assert chemical.pubchemid is not None
+    
+    # Disilylsilane
+    chemical = search_chemical("disilylsilane")
+    assert chemical.CAS == 7783268
+    assert chemical.formula == "H8Si3"
+    assert chemical.pubchemid is not None
+    
+    # Monosodium glutamate
+    chemical = search_chemical("monosodium glutamate")
+    assert chemical.CAS == 142472
+    assert chemical.formula == "C5H9NNaO4"
+    assert chemical.pubchemid is not None
+
+    
 def test_sodium_borohydride():
    chemical = search_chemical('sodium borohydride')
    assert chemical.pubchemid == 4311764
