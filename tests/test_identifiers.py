@@ -77,6 +77,30 @@ def test_dippr_2016_matched_meta():
         assert CAS_from_any(CAS) == CAS
 
 
+    excluded_cas = {
+        '16462-44-5',  # CELLOBIOSE
+        '75899-69-3',  # TRIPROPYLENE GLYCOL MONOETHYL ETHER: can't find a structure
+        '132259-10-0', # AIR: not a pure chemical
+        '51177-04-9',  # COBALT CARBIDE: can't find a source
+        '142-47-2',    # MONOSODIUM GLUTAMATE: https://commonchemistry.cas.org/detail?cas_rn=142-47-2&search=Monosodium%20glutamate I'm pretty sure
+        '14762-55-1',  # HELIUM-3 : need isotope work
+        '1314-80-3',   # PHOSPHORUS PENTASULFIDE: can't find a source
+        '6303-21-5',   # HYPOPHOSPHOROUS ACID: can't find a source
+        '26762-93-6',  # m-DIISOPROPYLBENZENE HYDROPEROXIDE: can't find a source
+        '30025-38-8',  # DIPROPYLENE GLYCOL MONOETHYL ETHER: can't find a source
+        '19295-81-9'   # 1,2-BENZENEDICARBOXYLIC ACID, HEPTYL, NONYL ESTER: can't find a source
+    }
+    
+    for _, row in df2.iterrows():
+        cas = row['CASN']
+        if cas in excluded_cas or pd.isna(cas):
+            continue
+        formula = row['Formula']
+        db_chem = search_chemical(cas)
+        assert serialize_formula(formula) == serialize_formula(db_chem.formula)
+
+
+
 @pytest.mark.slow
 def test_Matthews_critical_names():
     from chemicals.critical import critical_data_Matthews
