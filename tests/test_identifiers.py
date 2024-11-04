@@ -65,7 +65,7 @@ def test_dippr_2016_matched_meta():
     names = df2['Name'].tolist()
     CASs = df2['CASN'].tolist()
     for i, CAS in enumerate(CASs):
-        if CAS in ('16462-44-5', '75899-69-3'):
+        if CAS in ('16462-44-5', '75899-69-3', '132259-10-0'):
             # CELLOBIOSE (not the latest CAS, now is 528-50-7)
             # TRIPROPYLENE GLYCOL MONOETHYL ETHER (cannot find structure)
             continue
@@ -674,6 +674,12 @@ def test_water():
     bad_string = 'caustic soda liquid;aquafina;distilled water;hydrogen oxide (h2o);ultrexii ultrapure;'
     assert bad_string not in chemical.synonyms
 
+def test_absence_of_air_as_a_compound():
+    # this compound has a CAS of air, but it's nonsense https://pubchem.ncbi.nlm.nih.gov/compound/195130
+    with pytest.raises(Exception):
+        chemical = search_chemical('132259-10-0')
+
+        
 
 def test_CAS_from_any():
     assert CAS_from_any('7732-18-5 ') == '7732-18-5'
@@ -867,6 +873,9 @@ def test_db_vs_ChemSep():
             elif formula is None and tag == 'StructureFormula':
                 formula = i.attrib['value']
 
+        if CAS == '132259-10-0':
+            # CAS for Air
+            continue
 #        CAS = [i.attrib['value'] if  ][0]
 #        name = [i.attrib['value'] for i in child if i.tag ][0]
 #        smiles = [i.attrib['value'] for i in child if i.tag == ]
