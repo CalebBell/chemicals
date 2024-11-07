@@ -38,6 +38,7 @@ Fit Correlations
 .. autofunction:: chemicals.vapor_pressure.TRC_Antoine_extended
 .. autofunction:: chemicals.vapor_pressure.Yaws_Psat
 .. autofunction:: chemicals.vapor_pressure.TDE_PVExpansion
+.. autofunction:: chemicals.vapor_pressure.Arrhenius_extrapolation
 
 Fit Correlation Derivatives
 ---------------------------
@@ -51,6 +52,10 @@ Fit Correlation Derivatives
 .. autofunction:: chemicals.vapor_pressure.d2TRC_Antoine_extended_dT2
 .. autofunction:: chemicals.vapor_pressure.dYaws_Psat_dT
 .. autofunction:: chemicals.vapor_pressure.d2Yaws_Psat_dT2
+.. autofunction:: chemicals.vapor_pressure.dArrhenius_extrapolation_dT
+.. autofunction:: chemicals.vapor_pressure.d2Arrhenius_extrapolation_dT2
+.. autofunction:: chemicals.vapor_pressure.d3Arrhenius_extrapolation_dT3
+
 
 Jacobians (for fitting)
 -----------------------
@@ -84,6 +89,7 @@ Analytical Fit Equations
 .. autofunction:: chemicals.vapor_pressure.Antoine_coeffs_from_point
 .. autofunction:: chemicals.vapor_pressure.Antoine_AB_coeffs_from_point
 .. autofunction:: chemicals.vapor_pressure.DIPPR101_ABC_coeffs_from_point
+.. autofunction:: chemicals.vapor_pressure.Arrhenius_parameters
 
 
 Fit Coefficients
@@ -222,7 +228,7 @@ __all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
            'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
            'Wagner_fitting_jacobian', 'Yaws_Psat_fitting_jacobian',
            'Antoine_fitting_jacobian', 'TRC_Antoine_extended_fitting_jacobian',
-           'TDE_PVExpansion']
+           'TDE_PVExpansion', 'Arrhenius_extrapolation', 'Arrhenius_parameters']
 
 from math import isinf, log10
 
@@ -2411,3 +2417,198 @@ def Psub_Clapeyron(T, Tt, Pt, Hsub_t):
     return max(ans, 1e-200)
 
 
+def Arrhenius_parameters(T, P, dP_dT):
+    r'''Calculates parameters for Arrhenius-style vapor pressure extrapolation. This
+    converts a vapor pressure and its temperature derivative into a slope suitable
+    for extrapolation in ln(P) vs 1/T coordinates.
+    
+    .. math::
+        \text{slope} = -T^2\frac{d \ln P}{dT} = -\frac{T^2}{P}\frac{dP}{dT}
+        
+    Parameters
+    ----------
+    T : float
+        Temperature point for extrapolation [K]
+    P : float
+        Pressure at the temperature point [Pa] 
+    dP_dT : float
+        Temperature derivative of pressure at the temperature point [Pa/K]
+        
+    Returns
+    -------
+    T : float
+        Temperature point [K]
+    P : float
+        Pressure at temperature point [Pa] 
+    slope : float
+        Slope d(ln P)/d(1/T) at the temperature point
+    
+    Notes
+    -----
+    Useful for extrapolating vapor pressures via the Clausius-Clapeyron relation.
+    The slope represents the negative of enthalpy of vaporization divided by the 
+    gas constant.
+    
+    Examples
+    --------
+    >>> Arrhenius_parameters(400.0, 1E5, 1E3)
+    (400.0, 100000.0, -1600.0)
+    
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    return (T, P, -T*T*dP_dT/P)
+
+def Arrhenius_extrapolation(T, T_ref, P_ref, slope):
+    r'''Calculates extrapolated vapor pressure using Arrhenius-style extrapolation
+    in ln(P) vs 1/T coordinates. This form of extrapolation is appropriate for 
+    vapor pressures following the Clausius-Clapeyron relation.
+    
+    .. math::
+        \ln P = \ln P_{ref} + \text{slope}\left(\frac{1}{T} - \frac{1}{T_{ref}}\right)
+
+    Parameters
+    ----------
+    T : float
+        Temperature to extrapolate to [K]
+    T_ref : float
+        Reference temperature point [K]
+    P_ref : float
+        Pressure at reference point [Pa]
+    slope : float
+        Slope d(ln P)/d(1/T) at reference point
+        
+    Returns
+    -------
+    P : float
+        Extrapolated vapor pressure [Pa]
+    
+    Notes
+    -----
+    
+    Examples
+    --------
+    >>> Arrhenius_extrapolation(300.0, 400.0, 1E5, -1600)
+    26359.713811
+    
+    References
+    ----------
+    .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
+       New York: McGraw-Hill Professional, 2000.
+    '''
+    return P_ref*exp(slope*(1.0/T - 1.0/T_ref))
+
+
+
+def dArrhenius_extrapolation_dT(T, T_ref, P_ref, slope):
+    r'''Calculates the first temperature derivative of vapor pressure using the 
+    Arrhenius-style vapor pressure extrapolation in ln(P) vs 1/T coordinates.
+
+    .. math::
+        \frac{\partial P}{\partial T} = -\frac{P_{ref} \cdot \text{slope} \cdot 
+        e^{\text{slope}(1/T - 1/T_{ref})}}{T^2}
+
+    Parameters
+    ----------
+    T : float
+        Temperature to evaluate derivative at [K]
+    T_ref : float
+        Reference temperature point [K]
+    P_ref : float
+        Pressure at reference point [Pa]
+    slope : float
+        Slope d(ln P)/d(1/T) at reference point
+
+    Returns
+    -------
+    dP_dT : float
+        First temperature derivative of vapor pressure [Pa/K]
+
+    Notes
+    -----
+    This derivative is useful for numerical solutions and for evaluating the 
+    rate of change of vapor pressure with temperature.
+
+    Examples
+    --------
+    >>> dArrhenius_extrapolation_dT(300.0, 400.0, 1E5, -1600)
+    468.617134427
+    '''    
+    return -P_ref*slope*exp(slope*(1.0/T - 1.0/T_ref))/(T*T)
+
+def d2Arrhenius_extrapolation_dT2(T, T_ref, P_ref, slope):
+    r'''Calculates the second temperature derivative of vapor pressure using the
+    Arrhenius-style vapor pressure extrapolation in ln(P) vs 1/T coordinates.
+
+    .. math::
+        \frac{\partial^2 P}{\partial T^2} = \frac{P_{ref} \cdot \text{slope} \cdot 
+        e^{\text{slope}(1/T - 1/T_{ref})}(\text{slope} + 2T)}{T^4}
+
+    Parameters
+    ----------
+    T : float
+        Temperature to evaluate derivative at [K]
+    T_ref : float
+        Reference temperature point [K]
+    P_ref : float
+        Pressure at reference point [Pa]
+    slope : float
+        Slope d(ln P)/d(1/T) at reference point
+
+    Returns
+    -------
+    d2P_dT2 : float
+        Second temperature derivative of vapor pressure [Pa/K^2]
+
+    Notes
+    -----
+    This derivative is useful for numerical solutions requiring higher-order 
+    derivatives and for analyzing the curvature of vapor pressure with temperature.
+
+    Examples
+    --------
+    >>> d2Arrhenius_extrapolation_dT2(300.0, 400.0, 1E5, -1600)
+    5.206857049199541
+    '''
+    e = exp(slope*(1.0/T - 1.0/T_ref))
+    return P_ref*slope*e*(slope + 2.0*T)/(T*T*T*T)
+
+def d3Arrhenius_extrapolation_dT3(T, T_ref, P_ref, slope):
+    r'''Calculates the third temperature derivative of vapor pressure using the
+    Arrhenius-style vapor pressure extrapolation in ln(P) vs 1/T coordinates.
+
+    .. math::
+        \frac{\partial^3 P}{\partial T^3} = -\frac{P_{ref} \cdot \text{slope} \cdot 
+        e^{\text{slope}(1/T - 1/T_{ref})}(\text{slope}^2 + 6\cdot\text{slope}T + 6T^2)}{T^6}
+
+    Parameters
+    ----------
+    T : float
+        Temperature to evaluate derivative at [K]
+    T_ref : float
+        Reference temperature point [K]
+    P_ref : float
+        Pressure at reference point [Pa]
+    slope : float
+        Slope d(ln P)/d(1/T) at reference point
+
+    Returns
+    -------
+    d3P_dT3 : float
+        Third temperature derivative of vapor pressure [Pa/K^3]
+
+    Notes
+    -----
+    This derivative provides additional detail for numerical solutions requiring 
+    higher-order derivatives and for analyzing the rate of change of vapor pressure 
+    curvature.
+
+    Examples
+    --------
+    >>> d3Arrhenius_extrapolation_dT3(300.0, 400.0, 1E5, -1600)
+    0.012727872786932212
+    '''
+    e = exp(slope*(1.0/T - 1.0/T_ref))
+    return -P_ref*slope*e*(slope*slope + 6.0*slope*T + 6.0*T*T)/(T*T*T*T*T*T)

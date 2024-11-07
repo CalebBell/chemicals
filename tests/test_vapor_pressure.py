@@ -65,6 +65,11 @@ from chemicals.vapor_pressure import (
     dWagner_dT,
     dWagner_original_dT,
     dYaws_Psat_dT,
+    Arrhenius_parameters,
+    Arrhenius_extrapolation,
+    dArrhenius_extrapolation_dT, 
+    d2Arrhenius_extrapolation_dT2, 
+    d3Arrhenius_extrapolation_dT3,
 )
 
 ### Regression equations
@@ -557,3 +562,38 @@ def test_TRC_Antoine_extended_fitting_jacobian():
            328.22, 328.75, 328.85, 333.73, 338.95]), np.float64(508.1), np.float64(67.0), np.float64(8.94), np.float64(1130.0), np.float64(-44.0), np.float64(2.5), np.float64(333.0), np.float64(-24950.0))
 
     TRC_Antoine_extended_fitting_jacobian(*args)
+
+
+
+def test_Arrhenius_parameters():
+    T, P, dP_dT = 400.0, 1E5, 1E3
+    result = Arrhenius_parameters(T, P, dP_dT)
+    expect = (400.0, 100000.0, -1600.0)
+    assert_close1d(result, expect, rtol=1e-13)
+
+def test_Arrhenius_extrapolation():
+    result = Arrhenius_extrapolation(300.0, 400.0, 1E5, -1600)
+    assert_close(result, 26359.71381157267, rtol=1e-12)
+
+
+def test_Arrhenius_extrapolation_derivatives():
+    # Test conditions
+    T, T_ref, P_ref, slope = 300.0, 400.0, 1E5, -1600
+    
+    # First derivative test
+    dP_dT_analytical = dArrhenius_extrapolation_dT(T, T_ref, P_ref, slope)
+    assert_close(dP_dT_analytical, 468.61713442795866, rtol=1e-13)
+    dP_dT_numerical = derivative(lambda T: Arrhenius_extrapolation(T, T_ref, P_ref, slope), T, dx=T*1e-6)
+    assert_close(dP_dT_analytical, dP_dT_numerical, rtol=1e-8)
+
+    # Second derivative test
+    d2P_dT2_analytical = d2Arrhenius_extrapolation_dT2(T, T_ref, P_ref, slope)
+    assert_close(d2P_dT2_analytical, 5.206857049199541, rtol=1e-13)
+    d2P_dT2_numerical = derivative(lambda T: dArrhenius_extrapolation_dT(T, T_ref, P_ref, slope), T, dx=T*1e-6)
+    assert_close(d2P_dT2_analytical, d2P_dT2_numerical, rtol=1e-8)
+    
+    # Third derivative test
+    d3P_dT3_analytical = d3Arrhenius_extrapolation_dT3(T, T_ref, P_ref, slope)
+    assert_close(d3P_dT3_analytical, 0.012727872786932212, rtol=1e-13)
+    d3P_dT3_numerical = derivative(lambda T: d2Arrhenius_extrapolation_dT2(T, T_ref, P_ref, slope), T, dx=T*1e-6)
+    assert_close(d3P_dT3_analytical, d3P_dT3_numerical, rtol=1e-8)
