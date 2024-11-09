@@ -125,7 +125,7 @@ There are a number of different support chemical identifiers as well.
 
 >>> from chemicals.identifiers import pubchem_db
 >>> len(list(i for i in pubchem_db if i.formula == 'C9H8O4'))
-20
+23
 
 **Chemical name** - Anyone can call a chemical by any name, so predictably names are a mess. A large number of names were retrieved from PubChem, and form the basis for searches by name in Chemicals. Only one chemical hit will be found for each name search. There is an effort by IUPAC to systematically generate names for each chemical structure, called `OPSIN <https://opsin.ch.cam.ac.uk/>`_. Most chemicals in Chemicals have a correct, associated IUPAC name retrieved from PubChem. There are in the range of a million names that can be looked by in Chemicals.
 
