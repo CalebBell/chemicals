@@ -205,7 +205,7 @@ def test_inorganic_db():
     for CAS, d in  db.CAS_index.items():
         assert CAS_from_any(d.CASs) == d.CASs
 
-    # Try ro check formula lookups
+    # Try to check formula lookups
     for formula, d in  db.formula_index.items():
         if formula in {'H2MgO2', 'F2N2'}:
             # Formulas which are not unique by design
