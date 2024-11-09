@@ -26,7 +26,7 @@ from math import isnan
 import pandas as pd
 import pytest
 from fluids.numerics import assert_close
-
+from chemicals.miscdata import heos_data
 from chemicals.elements import molecular_weight, nested_formula_parser, periodic_table, serialize_formula
 from chemicals.identifiers import (
     CAS_from_any,
@@ -947,7 +947,10 @@ def test_db_vs_ChemSep():
     # is it 'CCCCC=C' or 'C=CCCCC'?
 # test_db_vs_ChemSep()
 
-
+def test_heos_data_CASs():
+    for CAS in heos_data.index.tolist():
+        obj = search_chemical(CAS)
+        assert obj.CASs == CAS
 
 
 def test_CAS2int():
