@@ -771,6 +771,12 @@ def test_CAS_from_any():
         CAS_from_any('Cellulose')
 
 
+    assert CAS_from_any('99685-  96-8') == '99685-96-8'
+    assert CAS_from_any('99685-  96-    8') == '99685-96-8'
+    assert CAS_from_any('    99685-96-8') == '99685-96-8'
+    assert CAS_from_any('    99685  -  96    -    8   ') == '99685-96-8'
+
+
 def test_periodic_table_variants():
     """Do a lookup in the periodic table and compare vs CAS_from_any."""
     ids = [periodic_table._CAS_to_elements, periodic_table._name_to_elements, periodic_table._symbol_to_elements]

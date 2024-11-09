@@ -731,6 +731,11 @@ def _search_chemical(ID, autoload):
             name_lookup = pubchem_db.search_name(name2, autoload)
             if name_lookup:
                 return name_lookup
+            # if we have a CAS number with an accidental space
+            if check_CAS(name2):
+                CAS_lookup = pubchem_db.search_CAS(name2, autoload)
+                if CAS_lookup:
+                    return CAS_lookup
 
     if ID[-1] == ')' and '(' in ID:
         # Try to match in the form 'water (H2O)'
