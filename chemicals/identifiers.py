@@ -394,6 +394,7 @@ class ChemicalMetadataDB:
             self.InChI_key_index[InChI_key] = obj
             for name in synonyms:
                 self.name_index[name] = obj
+                self.name_index[name.lower()] = obj
             self.formula_index[obj.formula] = obj
 
         f.close()
