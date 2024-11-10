@@ -316,7 +316,7 @@ katex_prerender = True
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        'numpy': ('http://docs.scipy.org/doc/numpy', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net', None),
+                       'matplotlib': ('http://matplotlib.org/stable/', None),
                        'fluids': ('https://fluids.readthedocs.io/', None)}
 
 from sphinx.ext.autodoc import between

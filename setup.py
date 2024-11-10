@@ -59,10 +59,10 @@ setup(
   name = 'chemicals',
   packages = ['chemicals'],
   license='MIT',
-  version = '1.2.0',
+  version = '1.3.0',
   description = 'Chemical properties component of Chemical Engineering Design Library (ChEDL)',
   author = 'Caleb Bell',
-  install_requires=['fluids>=1.0.26', "scipy>=1.6.0", 'numpy', 'pandas'],
+  install_requires=['fluids>=1.0.27', "scipy>=1.6.0", 'numpy', 'pandas'],
   extras_require = {
       'Coverage documentation':  ['wsgiref>=0.1.2', 'coverage>=4.0.3']
   },
@@ -70,7 +70,7 @@ setup(
   platforms=["Windows", "Linux", "Mac OS", "Unix"],
   author_email = 'Caleb.Andrew.Bell@gmail.com',
   url = 'https://github.com/CalebBell/chemicals',
-  download_url = 'https://github.com/CalebBell/chemicals/tarball/1.2.0',
+  download_url = 'https://github.com/CalebBell/chemicals/tarball/1.3.0',
   keywords = ['chemical engineering', 'chemistry', 'mechanical engineering',
   'thermodynamics', 'databases', 'cheminformatics', 'engineering','viscosity',
   'density', 'heat capacity', 'thermal conductivity', 'surface tension',

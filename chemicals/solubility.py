@@ -28,6 +28,18 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 .. contents:: :local:
 
+Hansen Solubility Parameters
+----------------------------
+.. autofunction:: chemicals.solubility.hansen_delta_d
+.. autofunction:: chemicals.solubility.hansen_delta_d_methods
+.. autodata:: chemicals.solubility.hansen_delta_d_all_methods
+.. autofunction:: chemicals.solubility.hansen_delta_p
+.. autofunction:: chemicals.solubility.hansen_delta_p_methods
+.. autodata:: chemicals.solubility.hansen_delta_p_all_methods
+.. autofunction:: chemicals.solubility.hansen_delta_h
+.. autofunction:: chemicals.solubility.hansen_delta_h_methods
+.. autodata:: chemicals.solubility.hansen_delta_h_all_methods
+
 Henry's Law
 ------------
 .. autofunction:: chemicals.solubility.Henry_pressure
@@ -49,12 +61,341 @@ Utility functions
 __all__ = ['solubility_parameter',
            'solubility_eutectic', 'Tm_depression_eutectic',
            'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture',
-           'Henry_constants', 'dHenry_constants_dT', 'd2Henry_constants_dT2']
+           'Henry_constants', 'dHenry_constants_dT', 'd2Henry_constants_dT2',
+           'hansen_delta_d', 'hansen_delta_d_methods', 'hansen_delta_d_all_methods',
+           'hansen_delta_p', 'hansen_delta_p_methods', 'hansen_delta_p_all_methods',
+           'hansen_delta_h', 'hansen_delta_h_methods', 'hansen_delta_h_all_methods']
 
 
 from fluids.constants import R, R_inv, atm
 from fluids.numerics import exp, log, sqrt, trunc_exp
 
+from chemicals import data_reader as dr
+from chemicals.data_reader import (
+    data_source,
+    database_constant_lookup,
+    list_available_methods_from_df_dict,
+    register_df_source,
+    retrieve_any_from_df_dict,
+    retrieve_from_df_dict,
+)
+from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+
+folder = os_path_join(source_path, 'Misc')
+register_df_source(folder, 'alshehri_hansen_solubility_parameters.tsv')
+register_df_source(folder, 'hspipy_hansen_solubility_parameters.tsv')
+register_df_source(folder, 'schrier_hansen_solubility_parameters.tsv')
+register_df_source(folder, 'ruben_manuel_hansen_solubility_parameters.tsv')
+
+ALSHERI_HANSEN = 'ALSHERI_HANSEN'
+HSPIPY = 'HSPIPY'
+WDR_SCHRIER = 'WDR_SCHRIER'
+MANUEL_RUBEN_2022 = 'MANUEL_RUBEN_2022'
+
+hansen_delta_h_all_methods = hansen_delta_p_all_methods = hansen_delta_d_all_methods = (MANUEL_RUBEN_2022, ALSHERI_HANSEN, HSPIPY, WDR_SCHRIER)
+"""Tuple of method name keys. See the `hansen_delta_d` for the actual references"""
+
+_solubility_data_loaded = False
+
+@mark_numba_incompatible
+def _load_solubility_data():
+    global alsheri_hansen_data, hspipy_data, wdr_schrier_data, manuel_ruben_2022_data
+    global solubility_sources, _solubility_data_loaded
+
+    alsheri_hansen_data = data_source('alshehri_hansen_solubility_parameters.tsv')
+    hspipy_data = data_source('hspipy_hansen_solubility_parameters.tsv')
+    wdr_schrier_data = data_source('schrier_hansen_solubility_parameters.tsv')
+    manuel_ruben_2022_data = data_source('ruben_manuel_hansen_solubility_parameters.tsv')
+    # Set up sources for lookup
+    solubility_sources = {
+        MANUEL_RUBEN_2022: manuel_ruben_2022_data,
+        ALSHERI_HANSEN: alsheri_hansen_data,
+        HSPIPY: hspipy_data,
+        WDR_SCHRIER: wdr_schrier_data,
+    }
+    _solubility_data_loaded = True
+
+if PY37:
+    def __getattr__(name):
+        if name in ('alsheri_hansen_data', 'hspipy_data', 'wdr_schrier_data', 'manuel_ruben_2022_data', 'solubility_sources'):
+            if not _solubility_data_loaded:
+                _load_solubility_data()
+            return globals()[name]
+        raise AttributeError(f"module {__name__} has no attribute {name}")
+else:
+    if can_load_data:
+        _load_solubility_data()
+
+
+@mark_numba_incompatible
+def hansen_delta_d_methods(CASRN):
+    """Return all methods available to obtain the Hansen solubility dispersive parameter
+    (δD) for the desired chemical.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the δD with the given inputs.
+
+    See Also
+    --------
+    hansen_delta_d
+    """
+    if not _solubility_data_loaded: 
+        _load_solubility_data()
+    return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_D')
+
+@mark_numba_incompatible
+def hansen_delta_d(CASRN, method=None):
+    r'''This function handles the retrieval of a chemical's Hansen dispersive
+    parameter (δD). Lookup is based on CASRNs. Will automatically select a data
+    source to use if no method is provided; returns None if the data is not
+    available.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN [-]
+
+    Returns
+    -------
+    delta_d : float
+        Hansen dispersive parameter, [Pa^0.5]
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined in the variable,
+        `hansen_delta_d_all_methods`.
+
+    Notes
+    -----
+    The available sources are as follows:
+
+        * 'ALSHERI_HANSEN', based on the work of [1]_.
+        * 'HSPIPY', based on [4]_.
+        * 'WDR_SCHRIER', from [3]_.
+        * 'MANUEL_RUBEN_2022', from [2]_.
+
+    Examples
+    --------
+    >>> hansen_delta_d('64-17-5')
+    15800.0
+
+    See Also
+    --------
+    hansen_delta_d_methods
+
+    References
+    ----------
+    .. [1] Alshehri, Abdulelah S., Anjan K. Tula, Fengqi You, and Rafiqul Gani.
+       "Next Generation Pure Component Property Estimation Models: With and 
+       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022): 
+       e17469. https://doi.org/10.1002/aic.17469.
+    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte. 
+       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship 
+       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6 
+       (May 24, 2022): 185. https://doi.org/10.1007/s42452-022-04959-4.
+    .. [3] Joshua Schrier, "Hansen Solubility Parameters" from the Wolfram Data
+       Repository (2020).
+    .. [4] Alejandro Gutierrez, "HSPiPy". 
+       GitHub Repository, https://github.com/Gnpd/HSPiPy.
+    '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_D')
+        if found: 
+            return val
+    if not _solubility_data_loaded: 
+        _load_solubility_data()
+    if method:
+        return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_D', method)
+    else:
+        return retrieve_any_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_D')
+
+@mark_numba_incompatible
+def hansen_delta_p_methods(CASRN):
+    """Return all methods available to obtain the Hansen solubility polar parameter
+    (δP) for the desired chemical.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the δP with the given inputs.
+
+    See Also
+    --------
+    hansen_delta_p
+    """
+    if not _solubility_data_loaded: 
+        _load_solubility_data()
+    return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_P')
+
+@mark_numba_incompatible
+def hansen_delta_p(CASRN, method=None):
+    r'''This function handles the retrieval of a chemical's Hansen polar
+    parameter (δP). Lookup is based on CASRNs. Will automatically select a data
+    source to use if no method is provided; returns None if the data is not
+    available.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN [-]
+
+    Returns
+    -------
+    delta_p : float
+        Hansen polar parameter, [Pa^0.5]
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined in the variable,
+        `hansen_delta_p_all_methods`.
+
+    Notes
+    -----
+    The available sources are as follows:
+
+        * 'ALSHERI_HANSEN', based on the work of [1]_.
+        * 'HSPIPY', based on [4]_.
+        * 'WDR_SCHRIER', from [3]_.
+        * 'MANUEL_RUBEN_2022', from [2]_.
+
+    Examples
+    --------
+    >>> hansen_delta_p('64-17-5')
+    8800.0
+
+    See Also
+    --------
+    hansen_delta_p_methods
+
+    References
+    ----------
+    .. [1] Alshehri, Abdulelah S., Anjan K. Tula, Fengqi You, and Rafiqul Gani.
+       "Next Generation Pure Component Property Estimation Models: With and 
+       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022): 
+       e17469. https://doi.org/10.1002/aic.17469.
+    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte. 
+       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship 
+       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6 
+       (May 24, 2022): 185. https://doi.org/10.1007/s42452-022-04959-4.
+    .. [3] Joshua Schrier, "Hansen Solubility Parameters" from the Wolfram Data
+       Repository (2020).
+    .. [4] Alejandro Gutierrez, "HSPiPy". 
+       GitHub Repository, https://github.com/Gnpd/HSPiPy.
+    '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_P')
+        if found: 
+            return val
+    if not _solubility_data_loaded: 
+        _load_solubility_data()
+    if method:
+        return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_P', method)
+    else:
+        return retrieve_any_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_P')
+
+@mark_numba_incompatible
+def hansen_delta_h_methods(CASRN):
+    """Return all methods available to obtain the Hansen solubility hydrogen bonding parameter
+    (δH) for the desired chemical.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN, [-]
+
+    Returns
+    -------
+    methods : list[str]
+        Methods which can be used to obtain the δH with the given inputs.
+
+    See Also
+    --------
+    hansen_delta_h
+    """
+    if not _solubility_data_loaded: 
+        _load_solubility_data()
+    return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_H')
+
+@mark_numba_incompatible
+def hansen_delta_h(CASRN, method=None):
+    r'''This function handles the retrieval of a chemical's Hansen hydrogen bonding
+    parameter (δH). Lookup is based on CASRNs. Will automatically select a data
+    source to use if no method is provided; returns None if the data is not
+    available.
+
+    Parameters
+    ----------
+    CASRN : str
+        CASRN [-]
+
+    Returns
+    -------
+    delta_h : float
+        Hansen hydrogen bonding parameter, [Pa^0.5]
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined in the variable,
+        `hansen_delta_h_all_methods`.
+
+    Notes
+    -----
+    The available sources are as follows:
+
+        * 'ALSHERI_HANSEN', based on the work of [1]_.
+        * 'HSPIPY', based on [4]_.
+        * 'WDR_SCHRIER', from [3]_.
+        * 'MANUEL_RUBEN_2022', from [2]_.
+
+    Examples
+    --------
+    >>> hansen_delta_h('64-17-5')
+    19400.0
+
+    See Also
+    --------
+    hansen_delta_h_methods
+
+    References
+    ----------
+    .. [1] Alshehri, Abdulelah S., Anjan K. Tula, Fengqi You, and Rafiqul Gani.
+       "Next Generation Pure Component Property Estimation Models: With and 
+       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022): 
+       e17469. https://doi.org/10.1002/aic.17469.
+    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte. 
+       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship 
+       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6 
+       (May 24, 2022): 185. https://doi.org/10.1007/s42452-022-04959-4.
+    .. [3] Joshua Schrier, "Hansen Solubility Parameters" from the Wolfram Data
+       Repository (2020).
+    .. [4] Alejandro Gutierrez, "HSPiPy". 
+       GitHub Repository, https://github.com/Gnpd/HSPiPy.
+    '''
+    if dr.USE_CONSTANTS_DATABASE and method is None:
+        val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_H')
+        if found: 
+            return val
+    if not _solubility_data_loaded: 
+        _load_solubility_data()
+    if method:
+        return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_H', method)
+    else:
+        return retrieve_any_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_H')
 
 def solubility_parameter(T, Hvapm, Vml):
     r'''This function handles the calculation of a chemical's solubility

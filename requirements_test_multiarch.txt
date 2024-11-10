@@ -1,5 +1,5 @@
 sympy
-fluids>=1.0.26
+fluids>=1.0.27
 pytest
 pytest-cov
 pint

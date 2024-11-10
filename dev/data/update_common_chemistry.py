@@ -26,6 +26,10 @@ common_chemistry_cache_dir = os.path.join(cache_dir, 'common_chemistry')
 if not os.path.exists(common_chemistry_cache_dir):
     os.mkdir(common_chemistry_cache_dir)
 
+mol_cache_dir = os.path.join(cache_dir, 'common_chemistry', 'mol')
+if not os.path.exists(mol_cache_dir):
+    os.makedirs(mol_cache_dir)
+
 """The following file contains ~60% of the CASs in the common CAS database.
 It is unknown what the remaining CASs are, but it would be nice to include
 them as well.
@@ -158,6 +162,7 @@ def MW_from_smiles(smiles):
         print(smiles, type(smiles))
 
 base_url = """https://rboq1qukh0.execute-api.us-east-2.amazonaws.com/default/detail?cas_rn="""
+mol_base_url = """https://rboq1qukh0.execute-api.us-east-2.amazonaws.com/default/export?uri=substance%2Fpt%2F"""
 
 def common_chemistry_data(CASRN):
     '''Load the chemical data for the specified CAS.
@@ -179,6 +184,16 @@ def common_chemistry_data(CASRN):
 
     if 'message' in json_data and 'Detail not found' == json_data['message']:
         return None
+
+    # used in metadata processing
+    if json_data.get('hasMolfile', False):
+        mol_cache_loc = os.path.join(mol_cache_dir, f"{CASRN}.mol")
+        if not os.path.exists(mol_cache_loc):
+            cas_no_dashes = CASRN.replace('-', '')
+            r = requests.get(mol_base_url + cas_no_dashes)
+            if r.status_code == 200:
+                with open(mol_cache_loc, 'w') as f:
+                    f.write(r.text)
 
     synonyms = [remove_html(k) for k in json_data['synonyms']]
     inchi = json_data['inchi'] if json_data['inchi']  else None

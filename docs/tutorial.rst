@@ -125,7 +125,7 @@ There are a number of different support chemical identifiers as well.
 
 >>> from chemicals.identifiers import pubchem_db
 >>> len(list(i for i in pubchem_db if i.formula == 'C9H8O4'))
-20
+23
 
 **Chemical name** - Anyone can call a chemical by any name, so predictably names are a mess. A large number of names were retrieved from PubChem, and form the basis for searches by name in Chemicals. Only one chemical hit will be found for each name search. There is an effort by IUPAC to systematically generate names for each chemical structure, called `OPSIN <https://opsin.ch.cam.ac.uk/>`_. Most chemicals in Chemicals have a correct, associated IUPAC name retrieved from PubChem. There are in the range of a million names that can be looked by in Chemicals.
 
@@ -157,7 +157,7 @@ Some sample queries illustrating the topic:
 >>> search_chemical('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
 <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
 >>> search_chemical('CCCCCCCCCC')
-<ChemicalMetadata, name=DECANE, formula=C10H22, smiles=CCCCCCCCCC, MW=142.286>
+<ChemicalMetadata, name=decane, formula=C10H22, smiles=CCCCCCCCCC, MW=142.282>
 >>> search_chemical('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
 <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
 >>> search_chemical('pubchem=702')
@@ -172,6 +172,6 @@ Each of those queries returns a :obj:`ChemicalMetadata <chemicals.identifiers.Ch
 >>> (water.pubchemid, water.formula, water.smiles, water.InChI, water.InChI_key, water.CASs)
 (962, 'H2O', 'O', 'H2O/h1H2', 'XLYOFNOQVPJJNP-UHFFFAOYSA-N', '7732-18-5')
 >>> water.common_name, water.iupac_name, len(water.synonyms)
-('water', 'oxidane', 89)
+('water', 'oxidane', 259)
 
 

@@ -26,7 +26,7 @@ from math import isnan
 import pandas as pd
 import pytest
 from fluids.numerics import assert_close
-
+from chemicals.miscdata import heos_data
 from chemicals.elements import molecular_weight, nested_formula_parser, periodic_table, serialize_formula
 from chemicals.identifiers import (
     CAS_from_any,
@@ -65,7 +65,7 @@ def test_dippr_2016_matched_meta():
     names = df2['Name'].tolist()
     CASs = df2['CASN'].tolist()
     for i, CAS in enumerate(CASs):
-        if CAS in ('16462-44-5', '75899-69-3'):
+        if CAS in ('16462-44-5', '75899-69-3', '132259-10-0'):
             # CELLOBIOSE (not the latest CAS, now is 528-50-7)
             # TRIPROPYLENE GLYCOL MONOETHYL ETHER (cannot find structure)
             continue
@@ -75,6 +75,30 @@ def test_dippr_2016_matched_meta():
         except:
             pass
         assert CAS_from_any(CAS) == CAS
+
+
+    excluded_cas = {
+        '16462-44-5',  # CELLOBIOSE
+        '75899-69-3',  # TRIPROPYLENE GLYCOL MONOETHYL ETHER: can't find a structure
+        '132259-10-0', # AIR: not a pure chemical
+        '51177-04-9',  # COBALT CARBIDE: can't find a source
+        '142-47-2',    # MONOSODIUM GLUTAMATE: https://commonchemistry.cas.org/detail?cas_rn=142-47-2&search=Monosodium%20glutamate I'm pretty sure
+        '14762-55-1',  # HELIUM-3 : need isotope work
+        '1314-80-3',   # PHOSPHORUS PENTASULFIDE: can't find a source
+        '6303-21-5',   # HYPOPHOSPHOROUS ACID: can't find a source
+        '26762-93-6',  # m-DIISOPROPYLBENZENE HYDROPEROXIDE: can't find a source
+        '30025-38-8',  # DIPROPYLENE GLYCOL MONOETHYL ETHER: can't find a source
+        '19295-81-9'   # 1,2-BENZENEDICARBOXYLIC ACID, HEPTYL, NONYL ESTER: can't find a source
+    }
+    
+    for _, row in df2.iterrows():
+        cas = row['CASN']
+        if cas in excluded_cas or pd.isna(cas):
+            continue
+        formula = row['Formula']
+        db_chem = search_chemical(cas)
+        assert serialize_formula(formula) == serialize_formula(db_chem.formula)
+
 
 
 @pytest.mark.slow
@@ -154,10 +178,12 @@ def test_organic_user_db():
 
 
     for CAS, d in db.CAS_index.items():
-        assert CAS_from_any('InChI=1S/' + d.InChI) == int_to_CAS(CAS)
+        if d.InChI:
+            assert CAS_from_any('InChI=1S/' + d.InChI) == int_to_CAS(CAS)
 
     for CAS, d in db.CAS_index.items():
-        assert CAS_from_any('InChIKey=' + d.InChI_key) == int_to_CAS(CAS)
+        if d.InChI_key:
+            assert CAS_from_any('InChIKey=' + d.InChI_key) == int_to_CAS(CAS)
 
     # Test the pubchem ids which aren't -1
     for CAS, d in db.CAS_index.items():
@@ -179,7 +205,7 @@ def test_inorganic_db():
     for CAS, d in  db.CAS_index.items():
         assert CAS_from_any(d.CASs) == d.CASs
 
-    # Try ro check formula lookups
+    # Try to check formula lookups
     for formula, d in  db.formula_index.items():
         if formula in {'H2MgO2', 'F2N2'}:
             # Formulas which are not unique by design
@@ -244,6 +270,723 @@ def test_search_chemical():
 
     assert search_chemical('water').charge == 0
 
+def test_search_chemical_2024_update_metadata_organic_names():
+    assert search_chemical('112-95-8').common_name == "eicosane"
+    assert search_chemical('103554-13-8').common_name == "naphthalene, 2-hexyldecahydro-"
+    assert search_chemical('105-76-0').common_name == "dibutyl maleate"
+    assert search_chemical('107-83-5').common_name == "2-Methylpentane"
+    assert search_chemical('1120-25-8').common_name == "methyl palmitoleate"
+    assert search_chemical('132739-31-2').common_name == "dipropylene glycol mono-tert-butyl ether"
+    assert search_chemical('142-16-5').common_name == "bis(2-ethylhexyl) maleate"
+    assert search_chemical('147-81-9').common_name == "arabinose"
+    assert search_chemical('15922-78-8').common_name == "sodium pyrithione"
+    assert search_chemical('163702-07-6').common_name == "methyl nonafluorobutyl ether"
+    assert search_chemical('16587-32-9').common_name == "benzo[b]thiophene, 2-propyl-"
+    assert search_chemical('25498-49-1').common_name == "tripropylene glycol monomethyl ether"
+    assert search_chemical('30025-38-8').common_name == "dipropylene glycol monoethyl ether"
+    assert search_chemical('3458-28-4').common_name == "mannose"
+    assert search_chemical('34590-94-8').common_name == "dipropylene glycol monomethyl ether"
+    assert search_chemical('463-72-9').common_name == "carbamic chloride"
+    assert search_chemical('498-23-7').common_name == "citraconic acid"
+    assert search_chemical('50-99-7').common_name == "glucose"
+    assert search_chemical('528-50-7').common_name == "cellobiose"
+    assert search_chemical('57-48-7').common_name == "fructose"
+    assert search_chemical('59-23-4').common_name == "galactose"
+    assert search_chemical('75-28-5').common_name == "isobutane"
+    assert search_chemical('75-94-5').common_name == "vinyltrichlorosilane"
+    assert search_chemical('87-99-0').common_name == "xylitol"
+    assert search_chemical('88917-22-0').common_name == "dipropylene glycol methyl ether acetate"
+    assert search_chemical('9005-53-2').common_name == "lignin"
+
+    assert search_chemical('C30').common_name == 'triacontane'
+    assert search_chemical('n-C30').common_name == 'triacontane'
+    assert search_chemical('nC30').common_name == 'triacontane'
+
+def test_search_chemical_2024_update_metadata_organic_synonyms():
+    # CAS: 74-98-6 (propane)
+    assert "74-98-6" not in search_chemical('74-98-6').synonyms
+    assert "PROPANE" not in search_chemical('74-98-6').synonyms
+    assert "R 280" in search_chemical('74-98-6').synonyms
+
+    # CAS: 74-82-8 (methane)
+    assert "74-82-8" not in search_chemical('74-82-8').synonyms
+
+    # CAS: 74-84-0 (ethane)
+    assert "74-84-0" not in search_chemical('74-84-0').synonyms
+    assert "ETHANE" not in search_chemical('74-84-0').synonyms
+    assert "R 170 (HYDROCARBON)" not in search_chemical('74-84-0').synonyms
+    assert "R 170 (hydrocarbon)" in search_chemical('74-84-0').synonyms
+
+    # CAS: 7194-86-7 (nonatriacontane)
+    assert "7194-86-7" not in search_chemical('7194-86-7').synonyms
+    assert "SNXOSZZZNFRFNZ-UHFFFAOYSA-N" not in search_chemical('7194-86-7').synonyms
+
+    # CAS: 7194-85-6 (octatriacontane)
+    assert "7194-85-6" not in search_chemical('7194-85-6').synonyms
+    assert "BVKCQBBZBGYNOP-UHFFFAOYSA-N" not in search_chemical('7194-85-6').synonyms
+    assert "N-OCTATRIACONTANE" not in search_chemical('7194-85-6').synonyms
+    assert "Octatriacontane" not in search_chemical('7194-85-6').synonyms
+    assert "n-octatriacontane" in search_chemical('7194-85-6').synonyms
+
+    # CAS: 638-67-5 (tricosane)
+    assert "638-67-5" not in search_chemical('638-67-5').synonyms
+    assert "TRICOSANE" not in search_chemical('638-67-5').synonyms
+
+    # CAS: 638-68-6 (triacontane)
+    assert "638-68-6" not in search_chemical('638-68-6').synonyms
+    assert "TRIACONTANE" not in search_chemical('638-68-6').synonyms
+
+    # CAS: 646-31-1 (tetracosane)
+    assert "646-31-1" not in search_chemical('646-31-1').synonyms
+    assert "TETRACOSANE" not in search_chemical('646-31-1').synonyms
+
+    # CAS: 629-97-0 (docosane)
+    assert "629-97-0" not in search_chemical('629-97-0').synonyms
+    assert "DOCOSANE" not in search_chemical('629-97-0').synonyms
+    assert "PARAFOL 22-95" not in search_chemical('629-97-0').synonyms
+    assert "parafol 22-95" in search_chemical('629-97-0').synonyms
+
+    # CAS: 57-48-7 (fructose)
+    assert "D-Fructose" not in search_chemical('57-48-7').synonyms
+    assert "d-fructose" in search_chemical('57-48-7').synonyms
+
+    # CAS: 110-54-3 (hexane)
+    assert "110-54-3" not in search_chemical('110-54-3').synonyms
+    assert "HEXANE" not in search_chemical('110-54-3').synonyms
+
+def test_search_chemical_2024_update_metadata_inorganic_names():
+    # Testing for name updates on common inorganic compounds
+    assert search_chemical('10025-74-8').common_name == "dysprosium chloride"
+    assert search_chemical('10034-96-5').common_name == "manganese sulfate monohydrate"
+    assert search_chemical('10043-01-3').common_name == "aluminum sulfate"
+    assert search_chemical('10043-52-4').common_name == "calcium chloride"
+    assert search_chemical('10102-44-0').common_name == "nitrogen dioxide"
+    assert search_chemical('10361-37-2').common_name == "barium chloride"
+    assert search_chemical('12018-01-8').common_name == "chromium oxide"
+    assert search_chemical('12136-45-7').common_name == "potassium oxide"
+    assert search_chemical('1313-82-2').common_name == "disodium sulfide"
+    assert search_chemical('13709-49-4').common_name == "yttrium fluoride"
+    assert search_chemical('21645-51-2').common_name == "aluminum hydroxide"
+    assert search_chemical('10043-52-4').common_name == "calcium chloride"
+    assert search_chemical('7791-12-0').common_name == "thallium monochloride"
+    assert search_chemical('7785-87-7').common_name == "manganese sulfate"
+    assert search_chemical('10099-59-9').common_name == "lanthanum nitrate"
+    assert search_chemical('14457-87-5').common_name == "cerium bromide"
+
+
+def test_search_chemical_2024_update_metadata_inorganic_synonyms():
+    # Testing synonym updates for select inorganic chemicals
+
+    # CAS: 10025-73-7 (chromium chloride (CrCl3))
+    assert "CHROMIC CHLORIDE (CRCL3)" not in search_chemical('10025-73-7').synonyms
+    assert "CHROMIUM TRICHLORIDE (CRCL3)" not in search_chemical('10025-73-7').synonyms
+    assert "chromium chloride (CrCl3)" in search_chemical('10025-73-7').synonyms
+
+    # CAS: 10031-25-1 (chromium bromide (CrBr3))
+    assert "UZDWIWGMKWZEPE-UHFFFAOYSA-K" not in search_chemical('10031-25-1').synonyms
+    assert "chromium bromide (CrBr3)" in search_chemical('10031-25-1').synonyms
+
+    # CAS: 10043-01-3 (aluminum sulfate)
+    assert "ALUMINUM SULFATE" not in search_chemical('10043-01-3').synonyms
+    assert "aluminum sulfate" in search_chemical('10043-01-3').synonyms
+
+    # CAS: 10102-44-0 (nitrogen dioxide)
+    assert "nitrogen oxide (NO2)" in search_chemical('10102-44-0').synonyms
+
+    # CAS: 10257-55-3 (calcium sulfite)
+    assert "CALCIUM SULFITE (1:1)" not in search_chemical('10257-55-3').synonyms
+    assert "sulfurous acid, calcium salt (1:1)" in search_chemical('10257-55-3').synonyms
+
+    # CAS: 12045-63-5 (titanium diboride)
+    assert "Titanium boride (TiB2)" not in search_chemical('12045-63-5').synonyms
+    assert "titanium diboride" in search_chemical('12045-63-5').synonyms
+
+    # CAS: 12136-45-7 (potassium oxide)
+    assert "potassium oxide (K2O)" in search_chemical('12136-45-7').synonyms
+    assert "CHWRSCGUEQEHOH-UHFFFAOYSA-N" not in search_chemical('12136-45-7').synonyms
+
+    # CAS: 13765-26-9 (gadolinium fluoride)
+    assert "Gadolinium fluoride (GdF3)" not in search_chemical('13765-26-9').synonyms
+    assert "gadolinium fluoride (GdF3)" in search_chemical('13765-26-9').synonyms
+
+    # CAS: 20427-58-1 (zinc hydroxide)
+    assert "ZINC HYDROXIDE" not in search_chemical('20427-58-1').synonyms
+    assert "zinc hydroxide (Zn(OH)2)" in search_chemical('20427-58-1').synonyms
+
+
+    # CAS: 7757-79-1 (potassium nitrate)
+    assert "nitric acid potassium salt (1:1)" in search_chemical('7757-79-1').synonyms
+    assert "POTASSIUM NITRATE" not in search_chemical('7757-79-1').synonyms
+
+    # CAS: 7646-85-7 (zinc chloride)
+    assert "zinc chloride (ZnCl2)" in search_chemical('7646-85-7').synonyms
+
+    # CAS: 7789-40-4 (thallium bromide (TlBr))
+    assert "thallium bromide (TlBr)" in search_chemical('7789-40-4').synonyms
+
+    # CAS: 7784-30-7 (aluminum phosphate)
+    assert "ALUMINIUM PHOSPHATE" not in search_chemical('7784-30-7').synonyms
+
+
+def test_search_chemical_2024_update_metadata_ion_names():
+    assert search_chemical('51-92-3').common_name == "tetramethylammonium"
+    assert search_chemical('11062-77-4').common_name == "superoxide"
+    assert search_chemical('12184-88-2').common_name == "hydride"
+    assert search_chemical('13408-62-3').common_name == "ferricyanide"
+    assert search_chemical('13408-63-4').common_name == "ferrocyanide"
+    assert search_chemical('13907-47-6').common_name == "dichromate"
+    assert search_chemical('13981-20-9').common_name == "metavanadate"
+    assert search_chemical('14000-31-8').common_name == "pyrophosphate"
+    assert search_chemical('14124-67-5').common_name == "selenite"
+    assert search_chemical('14124-68-6').common_name == "selenate"
+    assert search_chemical('14127-68-5').common_name == "triphosphate"
+    assert search_chemical('14265-44-2').common_name == "phosphate"
+    assert search_chemical('14265-45-3').common_name == "sulfite"
+    assert search_chemical('14280-30-9').common_name == "hydroxide"
+    assert search_chemical('14333-13-2').common_name == "permanganate"
+    assert search_chemical('14333-24-5').common_name == "perrhenate"
+    assert search_chemical('14337-12-3').common_name == "tetrachloroaurate"
+    assert search_chemical('14343-69-2').common_name == "azide"
+    assert search_chemical('14380-62-2').common_name == "hypobromite"
+    assert search_chemical('14797-55-8').common_name == "nitrate"
+    assert search_chemical('14797-65-0').common_name == "nitrite"
+    assert search_chemical('14808-79-8').common_name == "sulfate"
+    assert search_chemical('14866-68-3').common_name == "chlorate"
+    assert search_chemical('14900-04-0').common_name == "triiodide"
+    assert search_chemical('14996-02-2').common_name == "hydrogen sulfate"
+    assert search_chemical('14998-27-7').common_name == "chlorite"
+    assert search_chemical('15181-46-1').common_name == "bisulfite"
+    assert search_chemical('15454-31-6').common_name == "iodate"
+    assert search_chemical('15541-45-4').common_name == "bromate"
+    assert search_chemical('15584-04-0').common_name == "arsenate"
+    assert search_chemical('16833-27-5').common_name == "oxide"
+    assert search_chemical('16887-00-6').common_name == "chloride"
+    assert search_chemical('16971-29-2').common_name == "borohydride"
+    assert search_chemical('16984-48-8').common_name == "fluoride"
+    assert search_chemical('17084-08-1').common_name == "fluorosilicate"
+    assert search_chemical('17306-35-3').common_name == "arsenenite"
+    assert search_chemical('18851-77-9').common_name == "nitride"
+    assert search_chemical('20461-54-5').common_name == "iodide"
+    assert search_chemical('20561-39-1').common_name == "astatide"
+    assert search_chemical('23134-05-6').common_name == "disulfite"
+    assert search_chemical('24959-67-9').common_name == "bromide"
+    assert search_chemical('3812-32-6').common_name == "carbonate"
+
+    # maybe these will be changed in the future but it's what CAS says for now
+
+    assert search_chemical('14701-22-5').common_name == "Ni2+"
+    assert search_chemical('15158-11-9').common_name == "Cu2+"
+    assert search_chemical('16065-83-1').common_name == "Cr3+"
+    assert search_chemical('16065-91-1').common_name == "Au3+"
+    assert search_chemical('16096-89-2').common_name == "La3+"
+    assert search_chemical('17341-24-1').common_name == "Li1+"
+    assert search_chemical('18923-26-7').common_name == "Ce3+"
+    assert search_chemical('18923-27-8').common_name == "Yb3+"
+    assert search_chemical('22537-40-2').common_name == "Y3+"
+    assert search_chemical('22537-48-0').common_name == "Cd2+"
+    assert search_chemical('22541-12-4').common_name == "Ba2+"
+    assert search_chemical('22541-18-0').common_name == "Eu3+"
+    assert search_chemical('22541-19-1').common_name == "Gd3+"
+    assert search_chemical('22541-53-3').common_name == "Co2+"
+    assert search_chemical('22541-63-5').common_name == "Co3+"
+
+
+def test_search_chemical_2024_update_metadata_ion_synonyms():
+    # CAS: 14701-21-4 (silver ion)
+    assert "FOIXSVOLVBLSDH-UHFFFAOYSA-N" not in search_chemical('14701-21-4').synonyms
+    assert "SILVER ION" not in search_chemical('14701-21-4').synonyms
+    assert "Silver(1+) ion" not in search_chemical('14701-21-4').synonyms
+    assert "silver, ion (Ag1+)" in search_chemical('14701-21-4').synonyms
+
+    # CAS: 15158-11-9 (copper(II) ion)
+    assert "Copper(2+)" not in search_chemical('15158-11-9').synonyms
+    assert "Copper(II) cation" not in search_chemical('15158-11-9').synonyms
+    assert "Cupric ion" not in search_chemical('15158-11-9').synonyms
+    assert "copper, ion (Cu2+)" in search_chemical('15158-11-9').synonyms
+
+    # CAS: 17493-86-6 (copper(I) ion)
+    assert "VMQMZMRVKUZKQL-UHFFFAOYSA-N" not in search_chemical('17493-86-6').synonyms
+    assert "Cuprous ion" not in search_chemical('17493-86-6').synonyms
+    assert "copper, ion (Cu1+)" in search_chemical('17493-86-6').synonyms
+
+    # CAS: 11062-77-4 (superoxide)
+    assert "HYPEROXIDE" not in search_chemical('11062-77-4').synonyms
+    assert "Superoxide radical anion" not in search_chemical('11062-77-4').synonyms
+    assert "superoxide (8CI,9CI)" in search_chemical('11062-77-4').synonyms
+
+    # CAS: 16833-27-5 (oxide)
+    assert "Oxygen(2-)" not in search_chemical('16833-27-5').synonyms
+
+    # CAS: 16984-48-8 (fluoride)
+    assert "FLUORINE ION(F1-)" not in search_chemical('16984-48-8').synonyms
+    assert "Fluoride ion" not in search_chemical('16984-48-8').synonyms
+
+    # CAS: 18496-25-8 (sulfide)
+    assert "SULFUR, ION (S2-)" not in search_chemical('18496-25-8').synonyms
+    assert "Sulfide(2-)" not in search_chemical('18496-25-8').synonyms
+    assert "Sulphide" not in search_chemical('18496-25-8').synonyms
+    assert "UCKMPCXJQFINFW-UHFFFAOYSA-N" not in search_chemical('18496-25-8').synonyms
+
+    # CAS: 14913-52-1 (neodymium ion)
+    assert "Neodymium(3+)" not in search_chemical('14913-52-1').synonyms
+    assert "neodymium, ion (Nd3+)" in search_chemical('14913-52-1').synonyms
+
+    # CAS: 15543-40-5 (zirconium ion)
+    assert "ZR4+" not in search_chemical('15543-40-5').synonyms
+    assert "Zirconium(4+)" not in search_chemical('15543-40-5').synonyms
+    assert "zirconium, ion (Zr4+)" in search_chemical('15543-40-5').synonyms
+
+    # CAS: 25215-10-5 (guanidinium)
+    assert "GUANIDINIUM" not in search_chemical('25215-10-5').synonyms
+    assert "ZRALSGWEFCBTJO-UHFFFAOYSA-O" not in search_chemical('25215-10-5').synonyms
+
+def test_synonym_formula_capitalization_inorganic():
+    # Possible synonyms will be added/removed - just remove the test if that happens.
+    # Obviously check to make sure it was actually added/removed from the database though
+
+    # Test that formulas in synonyms are properly capitalized
+    
+    # Aluminum phosphate and related compounds
+    assert "aluminum phosphate (al(po4))" not in search_chemical('7784-30-7').synonyms
+    assert "aluminum phosphate (Al(PO4))" in search_chemical('7784-30-7').synonyms
+    
+    # Sodium compounds
+    assert "sodium borate (na2(bo2)2)" not in search_chemical('7775-19-1').synonyms
+    assert "sodium borate (Na2(BO2)2)" in search_chemical('7775-19-1').synonyms
+    assert "sodium diphosphate (na4(p2o7))" not in search_chemical('7722-88-5').synonyms
+    assert "sodium diphosphate (Na4(P2O7))" in search_chemical('7722-88-5').synonyms
+    
+    # Deuterium compounds
+    assert "chloro((2)h)" not in search_chemical('7698-05-7').synonyms
+    assert "chloro((2)H)" in search_chemical('7698-05-7').synonyms
+    
+    # Phosphorus compounds
+    assert "[p(o)oh]" not in search_chemical('6303-21-5').synonyms
+    assert "[P(O)OH]" in search_chemical('6303-21-5').synonyms
+    
+    # Lead compounds
+    assert "lead orthophosphate (pb3(po4)2)" not in search_chemical('7446-27-7').synonyms
+    assert "lead orthophosphate (Pb3(PO4)2)" in search_chemical('7446-27-7').synonyms
+    
+    # Metal cyanides
+    assert "cobalt cyanide (co(cn)2)" not in search_chemical('542-84-7').synonyms
+    assert "copper cyanide (cu(cn))" not in search_chemical('544-92-3').synonyms
+    assert "copper cyanide (Cu(CN))" in search_chemical('544-92-3').synonyms
+    
+    # Mercury compounds
+    assert "mercury thiocyanate (hg(scn)2)" not in search_chemical('592-85-8').synonyms
+    assert "mercury thiocyanate (Hg(SCN)2)" in search_chemical('592-85-8').synonyms
+    
+    # Silver compounds
+    assert "silver cyanide (ag(cn))" not in search_chemical('506-64-9').synonyms
+    assert "silver cyanide (Ag2(CN)2)" in search_chemical('506-64-9').synonyms
+    
+    # Iron compounds
+    assert "ferrous hydroxide (fe(oh)2)" not in search_chemical('18624-44-7').synonyms
+    assert "ferrous hydroxide (Fe(OH)2)" in search_chemical('18624-44-7').synonyms
+    assert "iron phosphate (fe3(po4)2)" not in search_chemical('14940-41-1').synonyms
+    assert "iron phosphate (Fe3(PO4)2)" in search_chemical('14940-41-1').synonyms
+    
+    # Lithium compounds
+    assert "lithium azide (li(n3))" not in search_chemical('19597-69-4').synonyms
+    assert "lithium azide (Li(N3))" in search_chemical('19597-69-4').synonyms
+    
+    # Cobalt compounds
+    assert "cobalt nitrate (co(no3)3)" not in search_chemical('15520-84-0').synonyms
+    assert "cobalt nitrate (Co(NO3)3)" in search_chemical('15520-84-0').synonyms
+    
+    # Silicon compounds
+    assert "sodium fluosilicate (na2(sif6))" not in search_chemical('16893-85-9').synonyms
+    assert "sodium fluosilicate (Na2(SiF6))" in search_chemical('16893-85-9').synonyms
+    assert "talc (mg3h2(sio3)4)" not in search_chemical('14807-96-6').synonyms
+    
+    # Nickel compounds
+    assert "nickel selenate (ni(seo4))" not in search_chemical('15060-62-5').synonyms
+    assert "nickel selenate (Ni(SeO4))" in search_chemical('15060-62-5').synonyms
+    
+    # Strontium compounds
+    assert "strontium thiosulfate (sr(s2o3))" not in search_chemical('15123-90-7').synonyms
+    assert "strontium thiosulfate (Sr(S2O3))" in search_chemical('15123-90-7').synonyms
+    
+    # Manganese compounds
+    assert "manganese molybdate(VI) (mnna(po4))" not in search_chemical('14013-15-1').synonyms
+    assert "manganese molybdate(VI) (MnNa(PO4))" in search_chemical('14013-15-1').synonyms
+    assert "manganese carbonyl (mn2(co)10)" not in search_chemical('10170-69-1').synonyms
+    assert "manganese carbonyl (Mn2(CO)10)" in search_chemical('10170-69-1').synonyms
+    
+    # Zinc compounds
+    assert "willemite (zn2(sio4))" not in search_chemical('14374-77-7').synonyms
+    assert "willemite (Zn2(SiO4))" in search_chemical('14374-77-7').synonyms
+    
+    # Hafnium compounds
+    assert "hafnium silicate (hf(sio4))" not in search_chemical('13870-13-8').synonyms
+    assert "hafnium silicate (Hf(SiO4))" in search_chemical('13870-13-8').synonyms
+    
+    # Phosphorus compounds
+    assert "(p(oh)3)" not in search_chemical('13598-36-2').synonyms
+    assert "(P(OH)3)" in search_chemical('13598-36-2').synonyms
+    
+    # Tungsten compounds
+    assert "silver tungstate(VI) (ag2(wo4))" not in search_chemical('13465-93-5').synonyms
+    assert "silver tungstate(VI) (Ag2(WO4))" in search_chemical('13465-93-5').synonyms
+    
+    # Dysprosium compounds
+    assert "dysprosium nitrate (dy(no3)3)" not in search_chemical('10143-38-1').synonyms
+    assert "dysprosium nitrate (Dy(NO3)3)" in search_chemical('10143-38-1').synonyms
+    
+    # Cadmium compounds
+    assert "cadmium nitrate (cd(no3)2) tetrahydrate" not in search_chemical('10022-68-1').synonyms
+    assert "cadmium nitrate (Cd(NO3)2) tetrahydrate" in search_chemical('10022-68-1').synonyms
+
+def test_synonym_formula_capitalization_anions():
+    # Superoxide
+    assert "Oxygen anion (O2-)" not in search_chemical('11062-77-4').synonyms
+    assert "Oxygen anion radical (O2-)" not in search_chemical('11062-77-4').synonyms
+    assert "Oxygen ion (O2-)" not in search_chemical('11062-77-4').synonyms
+    assert "Superoxide ion (O2-)" not in search_chemical('11062-77-4').synonyms
+    assert "oxygen anion (O2-)" in search_chemical('11062-77-4').synonyms
+    assert "oxygen anion radical (O2-)" in search_chemical('11062-77-4').synonyms
+    assert "oxygen ion (O2-)" in search_chemical('11062-77-4').synonyms
+    assert "superoxide ion (O2-)" in search_chemical('11062-77-4').synonyms
+    
+    # Oxide
+    assert "Oxide (O2-)" not in search_chemical('16833-27-5').synonyms
+    assert "Oxygen, ion (O2-)" not in search_chemical('16833-27-5').synonyms
+    assert "Oxygen, ion(O2-)" not in search_chemical('16833-27-5').synonyms
+    assert "oxide (O2-)" in search_chemical('16833-27-5').synonyms
+    assert "oxygen, ion (O2-)" in search_chemical('16833-27-5').synonyms
+    assert "oxygen, ion(O2-)" in search_chemical('16833-27-5').synonyms
+    
+    # Azide
+    assert "Azide (N3-)" not in search_chemical('14343-69-2').synonyms
+    assert "Nitrogen ion (N3-)" not in search_chemical('14343-69-2').synonyms
+    assert "Trinitrogen ion (N3-)" not in search_chemical('14343-69-2').synonyms
+    assert "azide (N3-)" in search_chemical('14343-69-2').synonyms
+    assert "nitrogen ion (N3-)" in search_chemical('14343-69-2').synonyms
+    assert "trinitrogen ion (N3-)" in search_chemical('14343-69-2').synonyms
+    
+    # Tribromide
+    assert "Bromide (Br3-)" not in search_chemical('14522-80-6').synonyms
+    assert "bromide (Br3-)" in search_chemical('14522-80-6').synonyms
+    
+    # Nitrate
+    assert "Nitrate (No3-)" not in search_chemical('14797-55-8').synonyms
+    assert "nitrate (No3-)" in search_chemical('14797-55-8').synonyms
+    
+    # Nitride
+    assert "Ammonia, ion (N3-)" not in search_chemical('18851-77-9').synonyms
+    assert "Nitrogen, ion (N3-)" not in search_chemical('18851-77-9').synonyms
+    assert "ammonia, ion (N3-)" in search_chemical('18851-77-9').synonyms
+    assert "nitrogen, ion (N3-)" in search_chemical('18851-77-9').synonyms
+    
+    # Fluoride
+    assert "Fluoride ion (F-)" not in search_chemical('16984-48-8').synonyms
+    assert "Fluoride ion(F-)" not in search_chemical('16984-48-8').synonyms
+    assert "Fluorine ion(F1-)" not in search_chemical('16984-48-8').synonyms
+    assert "fluoride ion (F-)" in search_chemical('16984-48-8').synonyms
+    assert "fluoride ion(F-)" in search_chemical('16984-48-8').synonyms
+    assert "fluorine ion(F1-)" in search_chemical('16984-48-8').synonyms
+
+def test_synonym_formula_capitalization_cations():
+    # Mercury(2+)
+    assert "Mercury (Hg2+)" not in search_chemical('14302-87-5').synonyms
+    assert "Mercury cation (Hg2+)" not in search_chemical('14302-87-5').synonyms
+    assert "Mercury ion (Hg2+)" not in search_chemical('14302-87-5').synonyms
+    assert "mercury (Hg2+)" in search_chemical('14302-87-5').synonyms
+    assert "mercury cation (Hg2+)" in search_chemical('14302-87-5').synonyms
+    assert "mercury ion (Hg2+)" in search_chemical('14302-87-5').synonyms
+
+    # Lead(2+)
+    assert "Lead (Pb2+)" not in search_chemical('14280-50-3').synonyms
+    assert "Lead ion (Pb2+)" not in search_chemical('14280-50-3').synonyms
+    assert "lead (Pb2+)" in search_chemical('14280-50-3').synonyms
+    assert "lead ion (Pb2+)" in search_chemical('14280-50-3').synonyms
+
+    # Silver(1+)
+    assert "Silver ion (Ag+)" not in search_chemical('14701-21-4').synonyms
+    assert "silver ion (Ag+)" in search_chemical('14701-21-4').synonyms
+
+    # Copper(2+)
+    assert "Copper ion (Cu++)" not in search_chemical('15158-11-9').synonyms
+    assert "Cupric ion (Cu2+)" not in search_chemical('15158-11-9').synonyms
+    assert "copper ion (Cu++)" in search_chemical('15158-11-9').synonyms
+    assert "cupric ion (Cu2+)" in search_chemical('15158-11-9').synonyms
+
+    # Manganese(2+)
+    assert "Manganese (Mn2+)" not in search_chemical('16397-91-4').synonyms
+    assert "Manganese Ion (Mn2+)" not in search_chemical('16397-91-4').synonyms
+    assert "Manganese cation (Mn2+)" not in search_chemical('16397-91-4').synonyms
+    assert "manganese (Mn2+)" in search_chemical('16397-91-4').synonyms
+    assert "manganese cation (Mn2+)" in search_chemical('16397-91-4').synonyms
+    assert "manganese ion (Mn2+)" in search_chemical('16397-91-4').synonyms
+
+    # Erbium(3+)
+    assert "Erbium (Er3+)" not in search_chemical('18472-30-5').synonyms
+    assert "erbium (Er3+)" in search_chemical('18472-30-5').synonyms
+
+    # Cerium(3+)
+    assert "Cerium (Ce3+)" not in search_chemical('18923-26-7').synonyms
+    assert "cerium (Ce3+)" in search_chemical('18923-26-7').synonyms
+
+    # Iron(3+)
+    assert "Iron (Fe3+)" not in search_chemical('20074-52-6').synonyms
+    assert "Iron, ion (Fe3+) (8CI,9CI)" not in search_chemical('20074-52-6').synonyms
+    assert "iron (Fe3+)" in search_chemical('20074-52-6').synonyms
+    assert "iron, ion (Fe3+) (8CI,9CI)" in search_chemical('20074-52-6').synonyms
+
+    # Gold(1+)
+    assert "Gold (Au1+)" not in search_chemical('20681-14-5').synonyms
+    assert "gold (Au1+)" in search_chemical('20681-14-5').synonyms
+
+    # Potassium(1+)
+    assert "Potassium (K+)" not in search_chemical('24203-36-9').synonyms
+    assert "Potassium ion (K+)" not in search_chemical('24203-36-9').synonyms
+    assert "Potassium ion (K1+)" not in search_chemical('24203-36-9').synonyms
+    assert "Potassium, ion (K1+) (8CI,9CI)" not in search_chemical('24203-36-9').synonyms
+    assert "potassium (K+)" in search_chemical('24203-36-9').synonyms
+    assert "potassium ion (K+)" in search_chemical('24203-36-9').synonyms
+    assert "potassium ion (K1+)" in search_chemical('24203-36-9').synonyms
+    assert "potassium, ion (K1+) (8CI,9CI)" in search_chemical('24203-36-9').synonyms
+
+def test_synonym_formula_capitalization_organic():
+    # N-[(Phenylmethoxy)carbonyl]glycyl-L-leucine
+    assert "N-(N-((Phenylmethoxy)carbonyl)glycyl)-l-leucine" not in search_chemical('1421-69-8').synonyms
+    assert "N-(N-((phenylmethoxy)carbonyl)glycyl)-l-leucine" in search_chemical('1421-69-8').synonyms
+
+    # Diisopropyl phosphite
+    assert "isopropyl phosphite ((c3h7o)2(ho)p)" not in search_chemical('1809-20-7').synonyms
+    assert "isopropyl phosphite ((C3H7O)2(HO)P)" in search_chemical('1809-20-7').synonyms
+
+    # Fulminic acid
+    assert "[c(h)no]" not in search_chemical('506-85-4').synonyms
+    assert "[ch(no)]" not in search_chemical('506-85-4').synonyms
+    assert "[C(H)NO]" in search_chemical('506-85-4').synonyms
+    assert "[CH(NO)]" in search_chemical('506-85-4').synonyms
+
+    # N-(tert-Butyloxycarbonyl)-D-methionine
+    assert "N-boc-(d)-methionine" not in search_chemical('5241-66-7').synonyms
+    assert "N-boc-(D)-methionine" in search_chemical('5241-66-7').synonyms
+
+    # D-Penicillamine disulfide
+    assert "3,3′-dithiobis[d-valine]" not in search_chemical('20902-45-8').synonyms
+    assert "3,3′-dithiobis[D-valine]" in search_chemical('20902-45-8').synonyms
+
+    # Stannous stearate
+    assert "tin stearate (sn(c18h35o2)2)" not in search_chemical('6994-59-8').synonyms
+    assert "tin stearate (Sn(C18H35O2)2)" in search_chemical('6994-59-8').synonyms
+
+    # Loratadine
+    assert "11-[N-(ethoxycarbonyl)-4-piperidylidene]-8-chloro-6,11-dihydro-5H-benzo-[5,6]cyclohepta[1,2-b]pyridine" not in search_chemical('79794-75-5').synonyms
+    assert "11-[N-(ethoxycarbonyl)-4-piperidylidene]-8-chloro-6,11-dihydro-5h-benzo-[5,6]cyclohepta[1,2-b]pyridine" in search_chemical('79794-75-5').synonyms
+
+def test_avoiding_homopolymers_copolymers_polymer_fragments():
+    # these can take the place of a regular chemical, very bad
+    assert search_chemical('oxetane').CASs == '503-30-0'
+    assert search_chemical('hex-1-ene').CASs == '592-41-6'
+    assert search_chemical('benzene-1,4-dicarbonitrile').CASs == '623-26-7'
+    assert search_chemical('1,3-dioxolane').CASs == '646-06-0'
+    assert search_chemical('4-methylpent-1-ene').CASs == '691-37-2'
+    assert search_chemical('1,6-diisocyanatohexane').CASs == '822-06-0'
+    assert search_chemical('ethenyl-dimethyl-phenylsilane').CASs == '1125-26-4'
+    assert search_chemical('1,4-dioxane-2,3-dione').CASs == '3524-70-7'
+    assert search_chemical('buta-1,3-diene').CASs == '106-99-0'
+    assert search_chemical('prop-1-ene').CASs == '115-07-1'
+    assert search_chemical('oxacyclohexadecan-2-one').CASs == '106-02-5'
+    assert search_chemical('propanal').CASs == '123-38-6'
+    assert search_chemical('cyclooctene').CASs == '931-88-4'
+    assert search_chemical('1-chloro-1,2,2-trifluoroethene').CASs == '79-38-9'
+    assert search_chemical('oxolan-2-one').CASs == '96-48-0'
+    assert search_chemical('1-isocyanato-4-[(4-isocyanatophenyl)methyl]benzene').CASs == '101-68-8'
+    assert search_chemical('ethenyl(trimethyl)silane').CASs == '754-05-2'
+    assert search_chemical('1,5-cyclooctadiene').CASs == '111-78-4'
+    assert search_chemical('1,2,3,4,5-pentadeuterio-6-(1,2,2-trideuterioethenyl)benzene').CASs == '19361-62-7'
+    assert search_chemical('Tributyltin fluoride').CASs == '1983-10-4'
+    assert search_chemical('503-30-0').CASs == '503-30-0'
+    assert search_chemical('592-41-6').CASs == '592-41-6'
+    assert search_chemical('623-26-7').CASs == '623-26-7'
+    assert search_chemical('646-06-0').CASs == '646-06-0'
+    assert search_chemical('691-37-2').CASs == '691-37-2'
+    assert search_chemical('822-06-0').CASs == '822-06-0'
+    assert search_chemical('1125-26-4').CASs == '1125-26-4'
+    assert search_chemical('3524-70-7').CASs == '3524-70-7'
+    assert search_chemical('106-99-0').CASs == '106-99-0'
+    assert search_chemical('115-07-1').CASs == '115-07-1'
+    assert search_chemical('106-02-5').CASs == '106-02-5'
+    assert search_chemical('123-38-6').CASs == '123-38-6'
+    assert search_chemical('931-88-4').CASs == '931-88-4'
+    assert search_chemical('79-38-9').CASs == '79-38-9'
+    assert search_chemical('96-48-0').CASs == '96-48-0'
+    assert search_chemical('101-68-8').CASs == '101-68-8'
+    assert search_chemical('754-05-2').CASs == '754-05-2'
+    assert search_chemical('111-78-4').CASs == '111-78-4'
+    assert search_chemical('19361-62-7').CASs == '19361-62-7'
+    assert search_chemical('1983-10-4').CASs == '1983-10-4'
+
+
+def test_issue_28_thermo():
+    issue_28 = search_chemical('16949-15-8')
+    assert issue_28.formula == 'BH4Li'
+    assert issue_28.common_name == 'lithium borohydride'
+    assert_close(molecular_weight(nested_formula_parser(issue_28.formula)), issue_28.MW)
+    assert issue_28.pubchemid == 4148881
+    with pytest.raises(Exception):
+        search_chemical('pubchem=20722760')
+
+
+def test_issue_45_chemicals():
+    chemical = search_chemical('trichlorosilane')
+    assert chemical.pubchemid == 24811
+    assert chemical.CAS == 10025782
+    assert chemical.formula == 'Cl3HSi'
+    assert_close(chemical.MW, 135.45244)
+    assert chemical.smiles == 'Cl[SiH](Cl)Cl'
+    assert chemical.InChI == 'Cl3HSi/c1-4(2)3/h4H'
+    assert chemical.InChI_key == 'ZDHXKXAHOVTTAH-UHFFFAOYSA-N'
+    assert chemical.iupac_name == 'trichlorosilane'
+    assert chemical.common_name == 'trichlorosilane'
+    chemical = search_chemical('dichlorosilane')
+    assert chemical.pubchemid == 61330
+    assert chemical.CAS == 4109960
+    assert chemical.formula == 'Cl2H2Si'
+    assert_close(chemical.MW, 101.00738)
+    assert chemical.smiles == 'Cl[SiH2]Cl'
+    assert chemical.InChI == 'Cl2H2Si/c1-3-2/h3H2'
+    assert chemical.InChI_key == 'MROCJMGDEKINLD-UHFFFAOYSA-N'
+    assert chemical.iupac_name == 'dichlorosilane'
+    assert chemical.common_name == 'dichlorosilane'
+
+    chemical = search_chemical('chlorosilane')
+    assert chemical.pubchemid == 61622
+    assert chemical.CAS == 13465786 
+    assert chemical.formula == 'ClH3Si'
+    assert_close(chemical.MW, 66.56232)
+    assert chemical.smiles == '[SiH3]Cl'
+    assert chemical.iupac_name == 'chlorosilane'
+    assert chemical.common_name == 'chlorosilane'
+
+
+    # Vanadium oxytrichloride
+    chemical = search_chemical("vanadium oxytrichloride")
+    assert chemical.CAS == 7727186
+    assert chemical.formula == "Cl3OV"
+    assert chemical.pubchemid is not None
+    
+    # Methyldichlorosilane 
+    chemical = search_chemical("methyldichlorosilane")
+    assert chemical.CAS == 75547
+    assert chemical.formula == "CH4Cl2Si"
+    assert chemical.pubchemid is not None
+    
+    # Trimethoxysilane
+    chemical = search_chemical("trimethoxysilane")
+    assert chemical.CAS == 2487903
+    assert chemical.formula == "C3H10O3Si"
+    assert chemical.pubchemid is not None
+    
+    # 2-hydroxybut-3-enenitrile
+    chemical = search_chemical("2-hydroxybut-3-enenitrile")
+    assert chemical.CAS == 5809596
+    assert chemical.formula == "C4H5NO"
+    assert chemical.pubchemid is not None
+    
+    # Chlorodimethylsilane
+    chemical = search_chemical("chlorodimethylsilane")
+    assert chemical.CAS == 1066359
+    assert chemical.formula == "C2H7ClSi"
+    assert chemical.pubchemid is not None
+    
+    # Dimethylsilane
+    chemical = search_chemical("dimethylsilane")
+    assert chemical.CAS == 1111746
+    assert chemical.formula == "C2H8Si"
+    assert chemical.pubchemid is not None
+    
+    # Methylsilane
+    chemical = search_chemical("methylsilane")
+    assert chemical.CAS == 992949
+    assert chemical.formula == "CH6Si"
+    assert chemical.pubchemid is not None
+    
+    # Trimethylsilane
+    chemical = search_chemical("trimethylsilane")
+    assert chemical.CAS == 993077
+    assert chemical.formula == "C3H10Si"
+    assert chemical.pubchemid is not None
+    
+    # Silylsilane
+    chemical = search_chemical("silylsilane")
+    assert chemical.CAS == 1590870
+    assert chemical.formula == "H6Si2"
+    assert chemical.pubchemid is not None
+    
+    # Disilylsilane
+    chemical = search_chemical("disilylsilane")
+    assert chemical.CAS == 7783268
+    assert chemical.formula == "H8Si3"
+    assert chemical.pubchemid is not None
+    
+    # Monosodium glutamate
+    chemical = search_chemical("monosodium glutamate")
+    assert chemical.CAS == 142472
+    assert chemical.formula == "C5H9NNaO4"
+    assert chemical.pubchemid is not None
+
+def test_diborane():
+   # Test basic name lookup
+   chemical = search_chemical("diborane")
+   assert chemical.pubchemid == 12544637
+   assert chemical.CAS == 19287457
+   assert chemical.formula == "B2H6"
+   assert chemical.smiles == "B.B"
+   # Test alternate names
+   chemical = search_chemical("borane")
+   assert chemical.CAS == 19287457
+   chemical = search_chemical("Diboron hexahydride") 
+   assert chemical.CAS == 19287457
+
+def test_sodium_borohydride():
+   chemical = search_chemical('sodium borohydride')
+   assert chemical.pubchemid == 4311764
+   assert chemical.CAS == 16940662
+   assert chemical.formula == 'BH4Na' 
+   assert_close(chemical.MW, 37.83253)
+   assert chemical.smiles == '[BH4-].[Na+]'
+   assert chemical.common_name == 'sodium borohydride'
+   
+   def test_acetylene():
+    chemical = search_chemical('acetylene')
+    assert chemical.pubchemid == 6326
+    assert chemical.CAS == 74862
+    assert chemical.formula == 'C2H2'
+    assert_close(chemical.MW, 26.03728)
+    assert chemical.smiles == 'C#C'
+    assert chemical.InChI == 'C2H2/c1-2/h1-2H'
+    assert chemical.InChI_key == 'HSFWRNGVRCDJHI-UHFFFAOYSA-N'
+    assert chemical.common_name == 'acetylene'
+    assert chemical.iupac_name == 'ethyne'
+
+def test_water():
+    chemical = search_chemical('water')
+    assert chemical.pubchemid == 962
+    assert chemical.CAS == 7732185
+    assert chemical.formula == 'H2O'
+    assert_close(chemical.MW, 18.01528)
+    assert chemical.smiles == 'O'
+    assert chemical.InChI == 'H2O/h1H2'
+    assert chemical.InChI_key == 'XLYOFNOQVPJJNP-UHFFFAOYSA-N'
+    assert chemical.iupac_name == 'oxidane'
+    assert chemical.common_name == 'water'
+    
+    # Check that the problematic string with wrong separators isn't in synonyms, https://github.com/CalebBell/chemicals/issues/29
+    bad_string = 'caustic soda liquid;aquafina;distilled water;hydrogen oxide (h2o);ultrexii ultrapure;'
+    assert bad_string not in chemical.synonyms
+
+def test_absence_of_air_as_a_compound():
+    # this compound has a CAS of air, but it's nonsense https://pubchem.ncbi.nlm.nih.gov/compound/195130
+    with pytest.raises(Exception):
+        chemical = search_chemical('132259-10-0')
+
+        
 
 def test_CAS_from_any():
     assert CAS_from_any('7732-18-5 ') == '7732-18-5'
@@ -309,6 +1052,12 @@ def test_CAS_from_any():
     with pytest.raises(Exception):
         # This was parsed as Cerium for a little while
         CAS_from_any('Cellulose')
+
+
+    assert CAS_from_any('99685-  96-8') == '99685-96-8'
+    assert CAS_from_any('99685-  96-    8') == '99685-96-8'
+    assert CAS_from_any('    99685-96-8') == '99685-96-8'
+    assert CAS_from_any('    99685  -  96    -    8   ') == '99685-96-8'
 
 
 def test_periodic_table_variants():
@@ -437,6 +1186,9 @@ def test_db_vs_ChemSep():
             elif formula is None and tag == 'StructureFormula':
                 formula = i.attrib['value']
 
+        if CAS == '132259-10-0':
+            # CAS for Air
+            continue
 #        CAS = [i.attrib['value'] if  ][0]
 #        name = [i.attrib['value'] for i in child if i.tag ][0]
 #        smiles = [i.attrib['value'] for i in child if i.tag == ]
@@ -484,7 +1236,10 @@ def test_db_vs_ChemSep():
     # is it 'CCCCC=C' or 'C=CCCCC'?
 # test_db_vs_ChemSep()
 
-
+def test_heos_data_CASs():
+    for CAS in heos_data.index.tolist():
+        obj = search_chemical(CAS)
+        assert obj.CASs == CAS
 
 
 def test_CAS2int():

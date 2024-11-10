@@ -157,6 +157,7 @@ _critical_data_loaded = False
 def _load_critical_data():
     global critical_data_IUPAC, critical_data_Matthews, critical_data_CRC
     global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner, critical_data_PinaMartines
+    global critical_data_WilsonJasperson, critical_data_Fedors, critical_data_omega_Psat_Tc
     global Tc_sources, Pc_sources, Vc_sources, Zc_sources, omega_sources
     global _critical_data_loaded
     critical_data_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')

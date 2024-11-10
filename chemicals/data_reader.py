@@ -53,6 +53,7 @@ except:
     pass
 try:
     import threading
+    import sqlite3
 except:
     pass
 from chemicals.identifiers import CAS_to_int
@@ -228,7 +229,7 @@ CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 
 'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
 'Hfus', 'Stockmayer', 'molecular_diameter',
 'dipole_moment', 'logP', 'RG', 'RON', 'MON', 'ignition_delay', 'linear',
-'GWP', 'ODP', 'RI', 'RIT', 'GTP']
+'GWP', 'ODP', 'RI', 'RIT', 'GTP', 'HANSEN_DELTA_D', 'HANSEN_DELTA_P', 'HANSEN_DELTA_H']
 
 
 
