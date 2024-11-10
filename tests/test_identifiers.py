@@ -380,15 +380,15 @@ def test_search_chemical_2024_update_metadata_inorganic_synonyms():
     # CAS: 10025-73-7 (chromium chloride (CrCl3))
     assert "CHROMIC CHLORIDE (CRCL3)" not in search_chemical('10025-73-7').synonyms
     assert "CHROMIUM TRICHLORIDE (CRCL3)" not in search_chemical('10025-73-7').synonyms
-    assert "Chromium chloride (CrCl3)" in search_chemical('10025-73-7').synonyms
+    assert "chromium chloride (CrCl3)" in search_chemical('10025-73-7').synonyms
 
     # CAS: 10031-25-1 (chromium bromide (CrBr3))
     assert "UZDWIWGMKWZEPE-UHFFFAOYSA-K" not in search_chemical('10031-25-1').synonyms
-    assert "Chromium bromide (CrBr3)" in search_chemical('10031-25-1').synonyms
+    assert "chromium bromide (CrBr3)" in search_chemical('10031-25-1').synonyms
 
     # CAS: 10043-01-3 (aluminum sulfate)
     assert "ALUMINUM SULFATE" not in search_chemical('10043-01-3').synonyms
-    assert "Aluminum sulfate" in search_chemical('10043-01-3').synonyms
+    assert "aluminum sulfate" in search_chemical('10043-01-3').synonyms
 
     # CAS: 10102-44-0 (nitrogen dioxide)
     assert "nitrogen oxide (NO2)" in search_chemical('10102-44-0').synonyms
@@ -399,7 +399,7 @@ def test_search_chemical_2024_update_metadata_inorganic_synonyms():
 
     # CAS: 12045-63-5 (titanium diboride)
     assert "Titanium boride (TiB2)" not in search_chemical('12045-63-5').synonyms
-    assert "Titanium diboride" in search_chemical('12045-63-5').synonyms
+    assert "titanium diboride" in search_chemical('12045-63-5').synonyms
 
     # CAS: 12136-45-7 (potassium oxide)
     assert "potassium oxide (K2O)" in search_chemical('12136-45-7').synonyms
