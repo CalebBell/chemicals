@@ -326,7 +326,7 @@ def test_search_chemical_2024_update_metadata_organic_synonyms():
     assert "BVKCQBBZBGYNOP-UHFFFAOYSA-N" not in search_chemical('7194-85-6').synonyms
     assert "N-OCTATRIACONTANE" not in search_chemical('7194-85-6').synonyms
     assert "Octatriacontane" not in search_chemical('7194-85-6').synonyms
-    assert "n-Octatriacontane" in search_chemical('7194-85-6').synonyms
+    assert "n-octatriacontane" in search_chemical('7194-85-6').synonyms
 
     # CAS: 638-67-5 (tricosane)
     assert "638-67-5" not in search_chemical('638-67-5').synonyms
@@ -344,11 +344,11 @@ def test_search_chemical_2024_update_metadata_organic_synonyms():
     assert "629-97-0" not in search_chemical('629-97-0').synonyms
     assert "DOCOSANE" not in search_chemical('629-97-0').synonyms
     assert "PARAFOL 22-95" not in search_chemical('629-97-0').synonyms
-    assert "Parafol 22-95" in search_chemical('629-97-0').synonyms
+    assert "parafol 22-95" in search_chemical('629-97-0').synonyms
 
     # CAS: 57-48-7 (fructose)
     assert "D-Fructose" not in search_chemical('57-48-7').synonyms
-    assert "d-Fructose" in search_chemical('57-48-7').synonyms
+    assert "d-fructose" in search_chemical('57-48-7').synonyms
 
     # CAS: 110-54-3 (hexane)
     assert "110-54-3" not in search_chemical('110-54-3').synonyms
