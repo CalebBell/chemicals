@@ -779,6 +779,49 @@ def test_synonym_formula_capitalization_organic():
     assert "11-[N-(ethoxycarbonyl)-4-piperidylidene]-8-chloro-6,11-dihydro-5H-benzo-[5,6]cyclohepta[1,2-b]pyridine" not in search_chemical('79794-75-5').synonyms
     assert "11-[N-(ethoxycarbonyl)-4-piperidylidene]-8-chloro-6,11-dihydro-5h-benzo-[5,6]cyclohepta[1,2-b]pyridine" in search_chemical('79794-75-5').synonyms
 
+def test_avoiding_homopolymers_copolymers_polymer_fragments():
+    # these can take the place of a regular chemical, very bad
+    assert search_chemical('oxetane').CASs == '503-30-0'
+    assert search_chemical('hex-1-ene').CASs == '592-41-6'
+    assert search_chemical('benzene-1,4-dicarbonitrile').CASs == '623-26-7'
+    assert search_chemical('1,3-dioxolane').CASs == '646-06-0'
+    assert search_chemical('4-methylpent-1-ene').CASs == '691-37-2'
+    assert search_chemical('1,6-diisocyanatohexane').CASs == '822-06-0'
+    assert search_chemical('ethenyl-dimethyl-phenylsilane').CASs == '1125-26-4'
+    assert search_chemical('1,4-dioxane-2,3-dione').CASs == '3524-70-7'
+    assert search_chemical('buta-1,3-diene').CASs == '106-99-0'
+    assert search_chemical('prop-1-ene').CASs == '115-07-1'
+    assert search_chemical('oxacyclohexadecan-2-one').CASs == '106-02-5'
+    assert search_chemical('propanal').CASs == '123-38-6'
+    assert search_chemical('cyclooctene').CASs == '931-88-4'
+    assert search_chemical('1-chloro-1,2,2-trifluoroethene').CASs == '79-38-9'
+    assert search_chemical('oxolan-2-one').CASs == '96-48-0'
+    assert search_chemical('1-isocyanato-4-[(4-isocyanatophenyl)methyl]benzene').CASs == '101-68-8'
+    assert search_chemical('ethenyl(trimethyl)silane').CASs == '754-05-2'
+    assert search_chemical('1,5-cyclooctadiene').CASs == '111-78-4'
+    assert search_chemical('1,2,3,4,5-pentadeuterio-6-(1,2,2-trideuterioethenyl)benzene').CASs == '19361-62-7'
+    assert search_chemical('Tributyltin fluoride').CASs == '1983-10-4'
+    assert search_chemical('503-30-0').CASs == '503-30-0'
+    assert search_chemical('592-41-6').CASs == '592-41-6'
+    assert search_chemical('623-26-7').CASs == '623-26-7'
+    assert search_chemical('646-06-0').CASs == '646-06-0'
+    assert search_chemical('691-37-2').CASs == '691-37-2'
+    assert search_chemical('822-06-0').CASs == '822-06-0'
+    assert search_chemical('1125-26-4').CASs == '1125-26-4'
+    assert search_chemical('3524-70-7').CASs == '3524-70-7'
+    assert search_chemical('106-99-0').CASs == '106-99-0'
+    assert search_chemical('115-07-1').CASs == '115-07-1'
+    assert search_chemical('106-02-5').CASs == '106-02-5'
+    assert search_chemical('123-38-6').CASs == '123-38-6'
+    assert search_chemical('931-88-4').CASs == '931-88-4'
+    assert search_chemical('79-38-9').CASs == '79-38-9'
+    assert search_chemical('96-48-0').CASs == '96-48-0'
+    assert search_chemical('101-68-8').CASs == '101-68-8'
+    assert search_chemical('754-05-2').CASs == '754-05-2'
+    assert search_chemical('111-78-4').CASs == '111-78-4'
+    assert search_chemical('19361-62-7').CASs == '19361-62-7'
+    assert search_chemical('1983-10-4').CASs == '1983-10-4'
+
 
 def test_issue_28_thermo():
     issue_28 = search_chemical('16949-15-8')
