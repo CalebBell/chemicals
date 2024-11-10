@@ -10,6 +10,11 @@
 
 ### Fixed
 
+## [1.3.1] - 2024-11-10
+
+### Changed
+- Added Dipalmitin back as synonym for 502-52-3
+
 ## [1.3.0] - 2024-11-10
 
 ### Changed
