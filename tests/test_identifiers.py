@@ -540,6 +540,246 @@ def test_search_chemical_2024_update_metadata_ion_synonyms():
     assert "GUANIDINIUM" not in search_chemical('25215-10-5').synonyms
     assert "ZRALSGWEFCBTJO-UHFFFAOYSA-O" not in search_chemical('25215-10-5').synonyms
 
+def test_synonym_formula_capitalization_inorganic():
+    # Possible synonyms will be added/removed - just remove the test if that happens.
+    # Obviously check to make sure it was actually added/removed from the database though
+
+    # Test that formulas in synonyms are properly capitalized
+    
+    # Aluminum phosphate and related compounds
+    assert "aluminum phosphate (al(po4))" not in search_chemical('7784-30-7').synonyms
+    assert "aluminum phosphate (Al(PO4))" in search_chemical('7784-30-7').synonyms
+    
+    # Sodium compounds
+    assert "sodium borate (na2(bo2)2)" not in search_chemical('7775-19-1').synonyms
+    assert "sodium borate (Na2(BO2)2)" in search_chemical('7775-19-1').synonyms
+    assert "sodium diphosphate (na4(p2o7))" not in search_chemical('7722-88-5').synonyms
+    assert "sodium diphosphate (Na4(P2O7))" in search_chemical('7722-88-5').synonyms
+    
+    # Deuterium compounds
+    assert "chloro((2)h)" not in search_chemical('7698-05-7').synonyms
+    assert "chloro((2)H)" in search_chemical('7698-05-7').synonyms
+    
+    # Phosphorus compounds
+    assert "[p(o)oh]" not in search_chemical('6303-21-5').synonyms
+    assert "[P(O)OH]" in search_chemical('6303-21-5').synonyms
+    
+    # Lead compounds
+    assert "lead orthophosphate (pb3(po4)2)" not in search_chemical('7446-27-7').synonyms
+    assert "lead orthophosphate (Pb3(PO4)2)" in search_chemical('7446-27-7').synonyms
+    
+    # Metal cyanides
+    assert "cobalt cyanide (co(cn)2)" not in search_chemical('542-84-7').synonyms
+    assert "copper cyanide (cu(cn))" not in search_chemical('544-92-3').synonyms
+    assert "copper cyanide (Cu(CN))" in search_chemical('544-92-3').synonyms
+    
+    # Mercury compounds
+    assert "mercury thiocyanate (hg(scn)2)" not in search_chemical('592-85-8').synonyms
+    assert "mercury thiocyanate (Hg(SCN)2)" in search_chemical('592-85-8').synonyms
+    
+    # Silver compounds
+    assert "silver cyanide (ag(cn))" not in search_chemical('506-64-9').synonyms
+    assert "silver cyanide (Ag2(CN)2)" in search_chemical('506-64-9').synonyms
+    
+    # Iron compounds
+    assert "ferrous hydroxide (fe(oh)2)" not in search_chemical('18624-44-7').synonyms
+    assert "ferrous hydroxide (Fe(OH)2)" in search_chemical('18624-44-7').synonyms
+    assert "iron phosphate (fe3(po4)2)" not in search_chemical('14940-41-1').synonyms
+    assert "iron phosphate (Fe3(PO4)2)" in search_chemical('14940-41-1').synonyms
+    
+    # Lithium compounds
+    assert "lithium azide (li(n3))" not in search_chemical('19597-69-4').synonyms
+    assert "lithium azide (Li(N3))" in search_chemical('19597-69-4').synonyms
+    
+    # Cobalt compounds
+    assert "cobalt nitrate (co(no3)3)" not in search_chemical('15520-84-0').synonyms
+    assert "cobalt nitrate (Co(NO3)3)" in search_chemical('15520-84-0').synonyms
+    
+    # Silicon compounds
+    assert "sodium fluosilicate (na2(sif6))" not in search_chemical('16893-85-9').synonyms
+    assert "sodium fluosilicate (Na2(SiF6))" in search_chemical('16893-85-9').synonyms
+    assert "talc (mg3h2(sio3)4)" not in search_chemical('14807-96-6').synonyms
+    
+    # Nickel compounds
+    assert "nickel selenate (ni(seo4))" not in search_chemical('15060-62-5').synonyms
+    assert "nickel selenate (Ni(SeO4))" in search_chemical('15060-62-5').synonyms
+    
+    # Strontium compounds
+    assert "strontium thiosulfate (sr(s2o3))" not in search_chemical('15123-90-7').synonyms
+    assert "strontium thiosulfate (Sr(S2O3))" in search_chemical('15123-90-7').synonyms
+    
+    # Manganese compounds
+    assert "manganese molybdate(VI) (mnna(po4))" not in search_chemical('14013-15-1').synonyms
+    assert "manganese molybdate(VI) (MnNa(PO4))" in search_chemical('14013-15-1').synonyms
+    assert "manganese carbonyl (mn2(co)10)" not in search_chemical('10170-69-1').synonyms
+    assert "manganese carbonyl (Mn2(CO)10)" in search_chemical('10170-69-1').synonyms
+    
+    # Zinc compounds
+    assert "willemite (zn2(sio4))" not in search_chemical('14374-77-7').synonyms
+    assert "willemite (Zn2(SiO4))" in search_chemical('14374-77-7').synonyms
+    
+    # Hafnium compounds
+    assert "hafnium silicate (hf(sio4))" not in search_chemical('13870-13-8').synonyms
+    assert "hafnium silicate (Hf(SiO4))" in search_chemical('13870-13-8').synonyms
+    
+    # Phosphorus compounds
+    assert "(p(oh)3)" not in search_chemical('13598-36-2').synonyms
+    assert "(P(OH)3)" in search_chemical('13598-36-2').synonyms
+    
+    # Tungsten compounds
+    assert "silver tungstate(VI) (ag2(wo4))" not in search_chemical('13465-93-5').synonyms
+    assert "silver tungstate(VI) (Ag2(WO4))" in search_chemical('13465-93-5').synonyms
+    
+    # Dysprosium compounds
+    assert "dysprosium nitrate (dy(no3)3)" not in search_chemical('10143-38-1').synonyms
+    assert "dysprosium nitrate (Dy(NO3)3)" in search_chemical('10143-38-1').synonyms
+    
+    # Cadmium compounds
+    assert "cadmium nitrate (cd(no3)2) tetrahydrate" not in search_chemical('10022-68-1').synonyms
+    assert "cadmium nitrate (Cd(NO3)2) tetrahydrate" in search_chemical('10022-68-1').synonyms
+
+def test_synonym_formula_capitalization_anions():
+    # Superoxide
+    assert "Oxygen anion (O2-)" not in search_chemical('11062-77-4').synonyms
+    assert "Oxygen anion radical (O2-)" not in search_chemical('11062-77-4').synonyms
+    assert "Oxygen ion (O2-)" not in search_chemical('11062-77-4').synonyms
+    assert "Superoxide ion (O2-)" not in search_chemical('11062-77-4').synonyms
+    assert "oxygen anion (O2-)" in search_chemical('11062-77-4').synonyms
+    assert "oxygen anion radical (O2-)" in search_chemical('11062-77-4').synonyms
+    assert "oxygen ion (O2-)" in search_chemical('11062-77-4').synonyms
+    assert "superoxide ion (O2-)" in search_chemical('11062-77-4').synonyms
+    
+    # Oxide
+    assert "Oxide (O2-)" not in search_chemical('16833-27-5').synonyms
+    assert "Oxygen, ion (O2-)" not in search_chemical('16833-27-5').synonyms
+    assert "Oxygen, ion(O2-)" not in search_chemical('16833-27-5').synonyms
+    assert "oxide (O2-)" in search_chemical('16833-27-5').synonyms
+    assert "oxygen, ion (O2-)" in search_chemical('16833-27-5').synonyms
+    assert "oxygen, ion(O2-)" in search_chemical('16833-27-5').synonyms
+    
+    # Azide
+    assert "Azide (N3-)" not in search_chemical('14343-69-2').synonyms
+    assert "Nitrogen ion (N3-)" not in search_chemical('14343-69-2').synonyms
+    assert "Trinitrogen ion (N3-)" not in search_chemical('14343-69-2').synonyms
+    assert "azide (N3-)" in search_chemical('14343-69-2').synonyms
+    assert "nitrogen ion (N3-)" in search_chemical('14343-69-2').synonyms
+    assert "trinitrogen ion (N3-)" in search_chemical('14343-69-2').synonyms
+    
+    # Tribromide
+    assert "Bromide (Br3-)" not in search_chemical('14522-80-6').synonyms
+    assert "bromide (Br3-)" in search_chemical('14522-80-6').synonyms
+    
+    # Nitrate
+    assert "Nitrate (No3-)" not in search_chemical('14797-55-8').synonyms
+    assert "nitrate (No3-)" in search_chemical('14797-55-8').synonyms
+    
+    # Nitride
+    assert "Ammonia, ion (N3-)" not in search_chemical('18851-77-9').synonyms
+    assert "Nitrogen, ion (N3-)" not in search_chemical('18851-77-9').synonyms
+    assert "ammonia, ion (N3-)" in search_chemical('18851-77-9').synonyms
+    assert "nitrogen, ion (N3-)" in search_chemical('18851-77-9').synonyms
+    
+    # Fluoride
+    assert "Fluoride ion (F-)" not in search_chemical('16984-48-8').synonyms
+    assert "Fluoride ion(F-)" not in search_chemical('16984-48-8').synonyms
+    assert "Fluorine ion(F1-)" not in search_chemical('16984-48-8').synonyms
+    assert "fluoride ion (F-)" in search_chemical('16984-48-8').synonyms
+    assert "fluoride ion(F-)" in search_chemical('16984-48-8').synonyms
+    assert "fluorine ion(F1-)" in search_chemical('16984-48-8').synonyms
+
+def test_synonym_formula_capitalization_cations():
+    # Mercury(2+)
+    assert "Mercury (Hg2+)" not in search_chemical('14302-87-5').synonyms
+    assert "Mercury cation (Hg2+)" not in search_chemical('14302-87-5').synonyms
+    assert "Mercury ion (Hg2+)" not in search_chemical('14302-87-5').synonyms
+    assert "mercury (Hg2+)" in search_chemical('14302-87-5').synonyms
+    assert "mercury cation (Hg2+)" in search_chemical('14302-87-5').synonyms
+    assert "mercury ion (Hg2+)" in search_chemical('14302-87-5').synonyms
+
+    # Lead(2+)
+    assert "Lead (Pb2+)" not in search_chemical('14280-50-3').synonyms
+    assert "Lead ion (Pb2+)" not in search_chemical('14280-50-3').synonyms
+    assert "lead (Pb2+)" in search_chemical('14280-50-3').synonyms
+    assert "lead ion (Pb2+)" in search_chemical('14280-50-3').synonyms
+
+    # Silver(1+)
+    assert "Silver ion (Ag+)" not in search_chemical('14701-21-4').synonyms
+    assert "silver ion (Ag+)" in search_chemical('14701-21-4').synonyms
+
+    # Copper(2+)
+    assert "Copper ion (Cu++)" not in search_chemical('15158-11-9').synonyms
+    assert "Cupric ion (Cu2+)" not in search_chemical('15158-11-9').synonyms
+    assert "copper ion (Cu++)" in search_chemical('15158-11-9').synonyms
+    assert "cupric ion (Cu2+)" in search_chemical('15158-11-9').synonyms
+
+    # Manganese(2+)
+    assert "Manganese (Mn2+)" not in search_chemical('16397-91-4').synonyms
+    assert "Manganese Ion (Mn2+)" not in search_chemical('16397-91-4').synonyms
+    assert "Manganese cation (Mn2+)" not in search_chemical('16397-91-4').synonyms
+    assert "manganese (Mn2+)" in search_chemical('16397-91-4').synonyms
+    assert "manganese cation (Mn2+)" in search_chemical('16397-91-4').synonyms
+    assert "manganese ion (Mn2+)" in search_chemical('16397-91-4').synonyms
+
+    # Erbium(3+)
+    assert "Erbium (Er3+)" not in search_chemical('18472-30-5').synonyms
+    assert "erbium (Er3+)" in search_chemical('18472-30-5').synonyms
+
+    # Cerium(3+)
+    assert "Cerium (Ce3+)" not in search_chemical('18923-26-7').synonyms
+    assert "cerium (Ce3+)" in search_chemical('18923-26-7').synonyms
+
+    # Iron(3+)
+    assert "Iron (Fe3+)" not in search_chemical('20074-52-6').synonyms
+    assert "Iron, ion (Fe3+) (8CI,9CI)" not in search_chemical('20074-52-6').synonyms
+    assert "iron (Fe3+)" in search_chemical('20074-52-6').synonyms
+    assert "iron, ion (Fe3+) (8CI,9CI)" in search_chemical('20074-52-6').synonyms
+
+    # Gold(1+)
+    assert "Gold (Au1+)" not in search_chemical('20681-14-5').synonyms
+    assert "gold (Au1+)" in search_chemical('20681-14-5').synonyms
+
+    # Potassium(1+)
+    assert "Potassium (K+)" not in search_chemical('24203-36-9').synonyms
+    assert "Potassium ion (K+)" not in search_chemical('24203-36-9').synonyms
+    assert "Potassium ion (K1+)" not in search_chemical('24203-36-9').synonyms
+    assert "Potassium, ion (K1+) (8CI,9CI)" not in search_chemical('24203-36-9').synonyms
+    assert "potassium (K+)" in search_chemical('24203-36-9').synonyms
+    assert "potassium ion (K+)" in search_chemical('24203-36-9').synonyms
+    assert "potassium ion (K1+)" in search_chemical('24203-36-9').synonyms
+    assert "potassium, ion (K1+) (8CI,9CI)" in search_chemical('24203-36-9').synonyms
+
+def test_synonym_formula_capitalization_organic():
+    # N-[(Phenylmethoxy)carbonyl]glycyl-L-leucine
+    assert "N-(N-((Phenylmethoxy)carbonyl)glycyl)-l-leucine" not in search_chemical('1421-69-8').synonyms
+    assert "N-(N-((phenylmethoxy)carbonyl)glycyl)-l-leucine" in search_chemical('1421-69-8').synonyms
+
+    # Diisopropyl phosphite
+    assert "isopropyl phosphite ((c3h7o)2(ho)p)" not in search_chemical('1809-20-7').synonyms
+    assert "isopropyl phosphite ((C3H7O)2(HO)P)" in search_chemical('1809-20-7').synonyms
+
+    # Fulminic acid
+    assert "[c(h)no]" not in search_chemical('506-85-4').synonyms
+    assert "[ch(no)]" not in search_chemical('506-85-4').synonyms
+    assert "[C(H)NO]" in search_chemical('506-85-4').synonyms
+    assert "[CH(NO)]" in search_chemical('506-85-4').synonyms
+
+    # N-(tert-Butyloxycarbonyl)-D-methionine
+    assert "N-boc-(d)-methionine" not in search_chemical('5241-66-7').synonyms
+    assert "N-boc-(D)-methionine" in search_chemical('5241-66-7').synonyms
+
+    # D-Penicillamine disulfide
+    assert "3,3′-dithiobis[d-valine]" not in search_chemical('20902-45-8').synonyms
+    assert "3,3′-dithiobis[D-valine]" in search_chemical('20902-45-8').synonyms
+
+    # Stannous stearate
+    assert "tin stearate (sn(c18h35o2)2)" not in search_chemical('6994-59-8').synonyms
+    assert "tin stearate (Sn(C18H35O2)2)" in search_chemical('6994-59-8').synonyms
+
+    # Loratadine
+    assert "11-[N-(ethoxycarbonyl)-4-piperidylidene]-8-chloro-6,11-dihydro-5H-benzo-[5,6]cyclohepta[1,2-b]pyridine" not in search_chemical('79794-75-5').synonyms
+    assert "11-[N-(ethoxycarbonyl)-4-piperidylidene]-8-chloro-6,11-dihydro-5h-benzo-[5,6]cyclohepta[1,2-b]pyridine" in search_chemical('79794-75-5').synonyms
+
+
 def test_issue_28_thermo():
     issue_28 = search_chemical('16949-15-8')
     assert issue_28.formula == 'BH4Li'
