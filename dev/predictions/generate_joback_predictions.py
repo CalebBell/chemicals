@@ -8,14 +8,14 @@ from chemicals.identifiers import pubchem_db
 
 folder = os.path.join(os.path.dirname(__file__), '..', '..', 'chemicals', 'Misc')
 
-pubchem_db.autoload_main_db()
 f = open(os.path.join(folder, 'joback_predictions.tsv'), 'w')
 from rdkit import Chem
-
+pubchem_db.finish_loading()
 dump_oder = ['Tm', 'Hfus', 'Hvap','Tb', 'Tc', 'Pc', 'Vc', 'Hf']
 keys = ['CAS', 'Tm', 'Hfus', 'Hvap','Tb', 'Tc', 'Pc', 'Vc', 'Hfg', 'Cpg0', 'Cpg1', 'Cpg2', 'Cpg3', 'mul0', 'mul1']
 lines = ['\t'.join(keys) + '\n']
 def generate_line(CASi):
+    pubchem_db.finish_loading() # needed for multiprocessing?
     chem_info = pubchem_db.CAS_index[CASi]
     mol = Chem.MolFromSmiles(chem_info.smiles)
     if mol is None:
@@ -42,6 +42,8 @@ def generate_line(CASi):
         for i, v in enumerate(line):
             if v is None:
                 line[i] = ''
+            elif i == 0:  # CAS number - keep as is
+                line[i] = str(v)
             elif v == '':
                 pass
             elif isinstance(v, (int, float)):
