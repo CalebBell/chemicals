@@ -54,7 +54,7 @@ def generate_line(CASi):
 
 
 
-retVals = Parallel()(delayed(generate_line)(CASi) for CASi in sorted(pubchem_db.CAS_index))
+retVals = Parallel(n_jobs=16, batch_size=500, backend='multiprocessing')(delayed(generate_line)(CASi) for CASi in sorted(pubchem_db.CAS_index))
 for l in retVals:
     if l is not False:
         lines.append(l)
