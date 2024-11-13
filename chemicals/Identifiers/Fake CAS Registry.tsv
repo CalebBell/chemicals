@@ -49,9 +49,9 @@
 2099518000-00-0	formula	O2	name	delta oxygen
 2099513000-00-0	formula	O2	name	epsilon oxygen
 2099495000-00-0	formula	O2	name	zeta oxygen
-2099490000-00-0				
-2099479000-00-0				
-2099474000-00-0				
+2099490000-00-0	formula	H2	name	para hydrogen
+2099479000-00-0	formula	H2	name	ortho hydrogen
+2099474000-00-0	formula	H2	name	normal hydrogen
 2099458000-00-0				
 2099453000-00-0				
 2099437000-00-0				

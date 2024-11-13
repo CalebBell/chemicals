@@ -25,6 +25,7 @@ from math import isnan
 
 import pandas as pd
 import pytest
+import re
 from fluids.numerics import assert_close
 from chemicals.miscdata import heos_data
 from chemicals.elements import molecular_weight, nested_formula_parser, periodic_table, serialize_formula
@@ -57,6 +58,13 @@ def test_dippr_list():
     for i in dippr_set:
         assert check_CAS(i)
 
+
+def clean_dippr_spreadsheet_name(name):
+    """
+    Removes the _YEARReview pattern from chemical names.
+    """
+    pattern = r'_\d{4}Review$'
+    return re.sub(pattern, '', name)
 
 @pytest.mark.slow
 @pytest.mark.online
@@ -98,8 +106,23 @@ def test_dippr_2016_matched_meta():
         formula = row['Formula']
         db_chem = search_chemical(cas)
         assert serialize_formula(formula) == serialize_formula(db_chem.formula)
+    
+    CASs_names_do_not_match = set(['2958-75-0', '1008-17-9', '103554-13-8', '3055-14-9', '74338-98-0', '163702-07-6', '355-37-3', '13465-77-5', '577-11-7', '14868-53-2', '70807-90-8', '10049-60-2', '371-78-8', '7331-52-4', '132259-10-0', '7723-14-0', '7784-30-7', '2141-58-4', '2141-59-5', '1634-09-9', '12075-68-2', '16747-50-5', '871-28-3', '2876-53-1', '1190-76-7', '2366-36-1', '6362-80-7', '768-00-3', '767-99-7', '66325-11-9', '6145-31-9', '2150-02-9', '10441-57-3', '5451-92-3', '6163-64-0', '13286-92-5', '628-87-5', '7327-60-8', '1333-74-0', '5756-43-4', '14290-92-7', '94023-15-1', '38433-80-6', '78448-33-6', '57-88-5', '1185-39-3', '21282-97-3', '1589-47-5', '132739-31-2', '2039-93-2', '7439-15-8', '1961-96-2', '694-92-8', '15403-89-1', '94-60-0', '26762-93-6', '4454-05-1', '616-02-4', '2432-74-8', '94-60-0', '13511-13-2', '78024-33-6', '1691-17-4', '37143-54-7', '77-68-9', '54839-24-6', '29911-27-1', '2465-32-9', '15798-64-8', '39972-78-6', '106-20-7', '75899-69-3', '42448-85-1', '19295-81-9', '65185-88-8', '19177-04-9', '106538-38-9', '112-47-0', '66032-51-7', '112-47-0', '17851-27-3', '51526-06-8', '51655-57-3', '1191-87-3', '1243297-10-0', '22663-61-2', '565-48-0', '58797-58-3', '32970-45-9', '33021-02-2', '4565-32-6', '6165-55-5', '14814-09-6', '3006-96-0', '108-59-8', '35112-74-4', '24615-84-7', '111-91-1', '95-96-5', '3228-03-3', '3228-02-2', '628-08-0', '6737-11-7', '3822-68-2', '16587-40-9', '544-02-5', '52458-04-5', '100524-60-5', '7784-34-1', '2471-08-1', '7351-61-3', '99-75-2', '1551-32-2', '17890-53-8', '64001-06-5', '15507-13-8', '60956-33-4', '99172-63-1', '837-08-1', '34885-03-5', '7403-22-7', '1196-81-2', '26158-99-6', '23305-64-8', '25961-89-1', '13349-10-5', '10410-35-2', '3603-45-0', '2530-83-8', '122-52-1', '2752-17-2', '871518-84-2', '857237-25-3', '15890-40-1', '1559-81-5', '13556-58-6', '31283-14-4', '1964-45-0', '13463-40-6', '148462-57-1', '79808-30-3', '21482-12-2', '132739-31-2'])
+    
+    # Not investigated
+    names_lead_to_different_CAS = {'2687-91-4', '117-81-7', '1345-25-1', '7803-62-5', '118-93-4', '706-31-0', '16462-44-5', '3319-31-1', '873-66-5', '1344-28-1', '18328-90-0', '7726-95-6', '16219-75-3', '21460-36-6', '7722-76-1', '872-50-4', '4050-45-7'}
 
-
+    for _, row in df2.iterrows():
+        cas = row['CASN']
+        if cas in CASs_names_do_not_match or pd.isna(cas):
+            continue
+        name = clean_dippr_spreadsheet_name(row['Name'])
+        if not name:
+            continue
+        # check we find a chemical anyway TODO check the CAS matches
+        db_chem = search_chemical(name)
+        if cas not in names_lead_to_different_CAS:
+            assert db_chem.CASs == cas
 
 @pytest.mark.slow
 def test_Matthews_critical_names():
@@ -981,6 +1004,94 @@ def test_water():
     bad_string = 'caustic soda liquid;aquafina;distilled water;hydrogen oxide (h2o);ultrexii ultrapure;'
     assert bad_string not in chemical.synonyms
 
+def test_parahydrogen():
+    chemical = search_chemical('parahydrogen')
+    assert chemical.pubchemid == -1
+    assert chemical.CASs == '2099490000-00-0'
+    assert chemical.formula == 'H2'
+    assert_close(chemical.MW, 2.01588)  # molecular weight of H2
+    assert chemical.smiles == ''
+    assert chemical.InChI == ''
+    assert chemical.InChI_key == ''
+    assert chemical.common_name == 'parahydrogen'
+    assert chemical.iupac_name == 'parahydrogen'
+    # Test some key synonyms
+    assert search_chemical('p-H2') is chemical
+    assert search_chemical('pH2') is chemical
+    assert search_chemical('para-hydrogen') is chemical
+
+def test_orthohydrogen():
+    chemical = search_chemical('orthohydrogen')
+    assert chemical.pubchemid == -1
+    assert chemical.CASs == '2099479000-00-0'
+    assert chemical.formula == 'H2'
+    assert_close(chemical.MW, 2.01588)
+    assert chemical.smiles == ''
+    assert chemical.InChI == ''
+    assert chemical.InChI_key == ''
+    assert chemical.common_name == 'orthohydrogen'
+    assert chemical.iupac_name == 'orthohydrogen'
+    # Test some key synonyms
+    assert search_chemical('o-H2') is chemical
+    assert search_chemical('ortho-H2') is chemical
+    assert search_chemical('ortho-hydrogen') is chemical
+
+def test_normal_hydrogen():
+    chemical = search_chemical('normal hydrogen')
+    assert chemical.pubchemid == -1
+    assert chemical.CASs == '2099474000-00-0'
+    assert chemical.formula == 'H2'
+    assert_close(chemical.MW, 2.01588)
+    assert chemical.smiles == ''
+    assert chemical.InChI == ''
+    assert chemical.InChI_key == ''
+    assert chemical.common_name == 'normal hydrogen'
+    assert chemical.iupac_name == 'normal hydrogen'
+    # Test some key synonyms
+    assert search_chemical('n-H2') is chemical
+    assert search_chemical('nH2') is chemical
+    assert '75:25 ortho:para hydrogen mixture' in chemical.synonyms
+
+
+def test_equilibrium_hydrogen():
+    chemical = search_chemical('hydrogen')
+    assert chemical.pubchemid == 783
+    assert chemical.CASs == '1333-74-0'
+    assert chemical.formula == 'H2'
+    assert_close(chemical.MW, 2.01588)
+    assert chemical.smiles == '[HH]'
+    assert chemical.InChI == 'H2/h1H'
+    assert chemical.InChI_key == 'UFHFLCQGNIYNRP-UHFFFAOYSA-N'
+    assert chemical.common_name == 'hydrogen'
+    assert chemical.iupac_name == 'molecular hydrogen'
+    # Test some key synonyms from the provided list
+    assert search_chemical('dihydrogen') is chemical
+    assert search_chemical('hydrogen molecule') is chemical
+    assert search_chemical('equilibrium hydrogen') is chemical
+
+def test_atomic_hydrogen():
+    chemical = search_chemical('atomic hydrogen')
+    # Test basic properties
+    assert chemical.pubchemid == 5362549
+    assert chemical.CASs == '12385-13-6'
+    assert chemical.formula == 'H'
+    assert_close(chemical.MW, 1.00794)
+    assert chemical.smiles == '[H]'
+    assert chemical.InChI == 'H'
+    assert chemical.InChI_key == 'YZCKVEUIGOORGS-UHFFFAOYSA-N'
+    assert chemical.common_name == 'atomic hydrogen'
+    assert chemical.iupac_name == 'atomic hydrogen'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'hydrogen atom',
+        'protium',
+        'monatomic hydrogen'
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '12385-13-6', f"Failed to find atomic hydrogen using term: {term}"
+
 def test_absence_of_air_as_a_compound():
     # this compound has a CAS of air, but it's nonsense https://pubchem.ncbi.nlm.nih.gov/compound/195130
     with pytest.raises(Exception):
@@ -1240,6 +1351,8 @@ def test_heos_data_CASs():
     for CAS in heos_data.index.tolist():
         obj = search_chemical(CAS)
         assert obj.CASs == CAS
+    for CAS, name in zip(heos_data.index.tolist(), heos_data['name'].tolist()):
+        assert search_chemical(name).CASs == CAS
 
 
 def test_CAS2int():
