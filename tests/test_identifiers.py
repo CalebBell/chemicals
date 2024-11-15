@@ -28,6 +28,7 @@ import pytest
 import re
 from fluids.numerics import assert_close
 from chemicals.miscdata import heos_data
+from chemicals.heat_capacity import Cp_data_Poling
 from chemicals.elements import molecular_weight, nested_formula_parser, periodic_table, serialize_formula
 from chemicals.identifiers import (
     CAS_from_any,
@@ -43,6 +44,7 @@ from chemicals.identifiers import (
     pubchem_db,
     search_chemical,
     sorted_CAS_key,
+    FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS,
 )
 
 # Force the whole db to load
@@ -1092,6 +1094,71 @@ def test_atomic_hydrogen():
         found_chemical = search_chemical(term)
         assert found_chemical.CASs == '12385-13-6', f"Failed to find atomic hydrogen using term: {term}"
 
+def test_equilibrium_deuterium():
+    chemical = search_chemical('deuterium')
+    assert chemical.pubchemid == 24523
+    assert chemical.CASs == '7782-39-0'
+    assert chemical.formula == 'D2'
+    assert_close(chemical.MW, 4.028204)
+    assert chemical.smiles == '[2H][2H]'
+    assert chemical.InChI == 'H2/h1H/i1+1D'
+    assert chemical.InChI_key == 'UFHFLCQGNIYNRP-VVKOMZTBSA-N'
+    assert chemical.common_name == 'deuterium'
+    assert chemical.iupac_name == 'deuterium'
+    # Test some key synonyms
+    assert search_chemical('dideuterium') is chemical
+    assert search_chemical('deuterium molecule') is chemical
+    assert search_chemical('heavy hydrogen') is chemical
+    assert search_chemical('hydrogen-2') is chemical
+
+def test_paradeuterium():
+    chemical = search_chemical('paradeuterium')
+    assert chemical.pubchemid == -1
+    assert chemical.CASs == '2099458000-00-0'
+    assert chemical.formula == 'D2'
+    assert_close(chemical.MW, 4.028204)  # molecular weight of D2
+    assert chemical.smiles == ''
+    assert chemical.InChI == ''
+    assert chemical.InChI_key == ''
+    assert chemical.common_name == 'paradeuterium'
+    assert chemical.iupac_name == 'paradeuterium'
+    # Test some key synonyms
+    assert search_chemical('p-D2') is chemical
+    assert search_chemical('pD2') is chemical
+    assert search_chemical('para-deuterium') is chemical
+
+def test_orthodeuterium():
+    chemical = search_chemical('orthodeuterium')
+    assert chemical.pubchemid == -1
+    assert chemical.CASs == '2099453000-00-0'
+    assert chemical.formula == 'D2'
+    assert_close(chemical.MW, 4.028204)
+    assert chemical.smiles == ''
+    assert chemical.InChI == ''
+    assert chemical.InChI_key == ''
+    assert chemical.common_name == 'orthodeuterium'
+    assert chemical.iupac_name == 'orthodeuterium'
+    # Test some key synonyms
+    assert search_chemical('o-D2') is chemical
+    assert search_chemical('ortho-D2') is chemical
+    assert search_chemical('ortho-deuterium') is chemical
+
+def test_normal_deuterium():
+    chemical = search_chemical('normal deuterium')
+    assert chemical.pubchemid == -1
+    assert chemical.CASs == '2099437000-00-0'
+    assert chemical.formula == 'D2'
+    assert_close(chemical.MW, 4.028204)
+    assert chemical.smiles == ''
+    assert chemical.InChI == ''
+    assert chemical.InChI_key == ''
+    assert chemical.common_name == 'normal deuterium'
+    assert chemical.iupac_name == 'normal deuterium'
+    # Test some key synonyms
+    assert search_chemical('n-D2') is chemical
+    assert search_chemical('nD2') is chemical
+    assert '2:1 ortho:para deuterium mixture' in chemical.synonyms
+
 def test_absence_of_air_as_a_compound():
     # this compound has a CAS of air, but it's nonsense https://pubchem.ncbi.nlm.nih.gov/compound/195130
     with pytest.raises(Exception):
@@ -1248,7 +1315,8 @@ def test_periodic_table_variants():
     assert search_chemical(search_chemical('monatomic hydrogen').CASs).formula == 'H'
     assert search_chemical(search_chemical('monatomic chlorine').CASs).formula == 'Cl'
 
-
+def test_nested_brackets_with_chemical_with_brackets():
+    assert search_chemical('1-(1-methylethyl)-4- methylbenzene (p-cymene)').CASs =='99-87-6'
 
 def test_fake_CAS_numbers():
     """File generated with :
@@ -1378,3 +1446,56 @@ def test_sorted_CAS_key():
     invalid_CAS_test = sorted_CAS_key(['7732-8-5', '641', '108-88-3', '98-00-0'])
     assert invalid_CAS_expect == invalid_CAS_test
 
+
+
+def test_formula_search_exceptions():
+    """
+    Test that FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS contains exactly the 
+    formulas that need special handling due to SMILES/formula interpretation conflicts.
+    """
+    actual_conflicts = set()
+    for chemical in pubchem_db.CAS_index.values():
+        if not chemical.formula:
+            continue
+        formula = chemical.formula
+        
+        try:
+            # Skip single elements as they're handled by periodic table
+            if formula in periodic_table:
+                continue
+            
+            # Find both interpretations
+            formula_result = pubchem_db.search_formula(formula)
+            smiles_result = pubchem_db.search_smiles(formula)
+            
+            # If both exist and are different, we have a conflict
+            if (formula_result and smiles_result and 
+                formula_result.CAS != smiles_result.CAS):
+                actual_conflicts.add(formula)
+                
+        except Exception:
+            continue
+    
+    # Test that our exceptions list matches the actual conflicts
+    assert FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS == actual_conflicts, \
+        f"""FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS needs updating:
+        Missing: {actual_conflicts - FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS}
+        Unnecessary: {FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS - actual_conflicts}"""
+    
+    # Verify each exception actually needs special handling
+    for formula in FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS:
+        formula_result = pubchem_db.search_formula(formula)
+        smiles_result = pubchem_db.search_smiles(formula)
+        
+        assert formula_result is not None, \
+            f"Exception '{formula}' has no valid formula interpretation"
+        assert smiles_result is not None, \
+            f"Exception '{formula}' has no valid SMILES interpretation"
+        assert formula_result.CAS != smiles_result.CAS, \
+            f"Exception '{formula}' has same interpretation for formula and SMILES"
+
+def test_Poling_databank_lookup_names():
+    for CAS, name in zip(Cp_data_Poling.index.tolist(), Cp_data_Poling['Chemical'].tolist()):
+        assert search_chemical(CAS).CASs == CAS
+    for CAS, name in zip(Cp_data_Poling.index.tolist(), Cp_data_Poling['Chemical'].tolist()):
+        assert search_chemical(name).CASs == CAS

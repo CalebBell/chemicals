@@ -559,6 +559,12 @@ def MW(ID, autoload=False, cache=True):
 chemical_search_cache = {}
 chemical_search_cache_max_size = 200
 
+FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS = {
+    'CO',  # Carbon monoxide vs methanol
+    'CS',  # Carbon monosulfide vs methanethiol
+    'NO',  # Nitric oxide vs hydroxylamine
+    'CNO'  # NCO radical vs n-methylhydroxylamine
+}
 @mark_numba_incompatible
 def search_chemical(ID, autoload=False, cache=True):
     """Looks up metadata about a chemical by searching and testing for the input
@@ -704,9 +710,9 @@ def _search_chemical(ID, autoload):
                     return search_chemical(ID, autoload=True)
                 raise ValueError(f'A SMILES identifier ({ID[7:]}) was recognized, but it is not in the database.')
 
-    # Try the smiles lookup anyway
-    # Parsing SMILES is an option, but this is faster
-    # Pybel API also prints messages to console on failure
+    # Try the smiles lookup by default for all except a few hardcoded cases that the smiles/smarts intersect
+    if ID in FORMULA_SEARCH_BEFORE_SMILES_EXCEPTIONS:
+        return pubchem_db.search_formula(ID, autoload)
     smiles_lookup = pubchem_db.search_smiles(ID, autoload)
     if smiles_lookup:
         return smiles_lookup
@@ -740,13 +746,16 @@ def _search_chemical(ID, autoload):
 
     if ID[-1] == ')' and '(' in ID:
         # Try to match in the form 'water (H2O)'
-        first_identifier, second_identifier = ID[0:-1].split('(', 1)
+        # first_identifier, second_identifier = ID[0:-1].split('(', 1)
+        last_open = ID.rindex('(')
+        first_identifier = ID[:last_open].strip()
+        second_identifier = ID[last_open + 1:].rstrip(')')
+
         try:
             CAS1 = search_chemical(first_identifier, autoload)
             CAS2 = search_chemical(second_identifier, autoload)
             if CAS1 == CAS2:
-                CAS = CAS1
-                return CAS
+                return CAS1
         except:
             pass
 

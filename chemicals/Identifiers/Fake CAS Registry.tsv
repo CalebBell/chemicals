@@ -52,9 +52,9 @@
 2099490000-00-0	formula	H2	name	para hydrogen
 2099479000-00-0	formula	H2	name	ortho hydrogen
 2099474000-00-0	formula	H2	name	normal hydrogen
-2099458000-00-0				
-2099453000-00-0				
-2099437000-00-0				
+2099458000-00-0	formula	D2	name	para deuterium
+2099453000-00-0	formula	D2	name	ortho deuterium
+2099437000-00-0	formula	D2	name	normal deuterium
 2099432000-00-0				
 2099416000-00-0				
 2099411000-00-0				

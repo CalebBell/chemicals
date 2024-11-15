@@ -797,7 +797,7 @@ None	Pentaethoxyuranium 	sat	III	257.5	400	233.039	-160.56	46.6049	-4.31516	0	0	
 598-75-4 	3-Methyl-2-butanol 	C	II	138.7	250	6.44755	17.9599	-11.4498	2.75689	0	0	0	0	0	0	
 598-75-4 	3-Methyl-2-butanol 	C	IV	190.3	370.7	0	0	0	0	8131.06	935.374	-962.465	7723.83	952.807	5235.69	556.1
 598-75-4 	3-Methyl-2-butanol 	C	IV	250	370.7	202.052	-216.765	82.4401	-9.76177	0	0	0	0	0	0	
-605-39-0 	2,2⬘-Dimethyl-1,1⬘-biphenyl 	sat	II	272.6	398.4	35.0429	-8.64834	4.06938	-0.361494	0	0	0	0	0	0	
+605-39-0 	2,2⬘-Dimethyl-1,1`-biphenyl 	sat	II	272.6	398.4	35.0429	-8.64834	4.06938	-0.361494	0	0	0	0	0	0	
 608-93-5	Pentachlorobenzene	sat	IV	367.5	436.9	0	0	0	0	-3.15305	1.38377	25.1433	1.79613	0	0	790
 608-93-5	Pentachlorobenzene	sat	IV	367.5	436.9	28.8437	-0.641595	0.300225	0	0	0	0	0	0	0	
 611-32-5 	8-Methylquinoline 	sat	IV	282.8	700	11.297	5.44617	-0.0750232	0	0	0	0	0	0	0	
@@ -992,7 +992,7 @@ None	Pentaethoxyuranium 	sat	III	257.5	400	233.039	-160.56	46.6049	-4.31516	0	0	
 1759-53-1 	Cyclopropane carboxylic acid 	C	II	293	458	0	0	0	0	-0.000274214	0.00000000046694	-1.5501	40.2602	-0.00073885	0.00000000451977	671
 1759-53-1 	Cyclopropane carboxylic acid 	sat	III	293	458	-1.55	6	0	0	0	0	0	0	0	0	
 1766-41-2	Pentacontafluorotetracosane	p	VI	480	500	138.198	11.9195	0	0	0	0	0	0	0	0	
-1812-51-7 	2-Ethyl-1,1⬘-biphenyl 	sat	II	274.6	440.4	30.3193	-4.33476	2.89671	-0.253954	0	0	0	0	0	0	
+1812-51-7 	2-Ethyl-1,1`-biphenyl 	sat	II	274.6	440.4	30.3193	-4.33476	2.89671	-0.253954	0	0	0	0	0	0	
 1842-05-3	1,1-Dichloro-1,2-difluoroethane	p	III	173.5	307.6	1.74233	-1.09581	0.464319	0	0	0	0	0	0	0	
 1867-91-0	2,3-Bis关共1-oxohexadecyl兲oxy兴propyl ester 共Z兲-9-octadecenoic acid 	p	V	323	523.2	132.789	20.4905	0.547847	0	0	0	0	0	0	0	
 1888-71-7	1,1,2,3,3,3-Hexachloro-1-propene	p	IV	290	500	0	0	0	0	-1.94837	0.620432	23.4905	1.52963	0	0	680
@@ -1198,7 +1198,7 @@ None	Pentaethoxyuranium 	sat	III	257.5	400	233.039	-160.56	46.6049	-4.31516	0	0	
 50361-05-2	共E兲-共2-Chloroethenyl兲arsonous dichloride	p	IV	274.8	330.1	48.8424	-18.3803	3.19521	0	0	0	0	0	0	0	
 54953-79-6 	Tetrahydro-5,5-dimethyl-2H-1,3-oxazin-2-one 	p	V	390	500	4.9948	11.7242	0	0	0	0	0	0	0	0	
 58482-38-5	Diethyl关1,1⬘-oxybis共ethane兲兴zinc	p	III	174.1	310	31.493	5.213	0	0	0	0	0	0	0	0	
-58743-76-3	4⬘-Propyl关1,1⬘-biphenyl兴-4-carbonitrile	p	III	340	380	23.8269	7.27961	0	0	0	0	0	0	0	0	
+58743-76-3	4⬘-Propyl关1,1`-biphenyl兴-4-carbonitrile	p	III	340	380	23.8269	7.27961	0	0	0	0	0	0	0	0	
 58879-21-3	trans-关1,1⬘-Bicyclohexyl兴-2-ol	sat	III	328.3	337.7	-10.0473	18.5635	0	0	0	0	0	0	0	0	
 60138-13-8	2,3-Bis关共1-oxotetradecyl兲oxy兴propyl ester hexadecanoic acid 	p	V	333	523.3	144.283	9.26419	1.213	0	0	0	0	0	0	0	
 61203-99-4 	4-共trans-4-Propylcyclohexyl兲benzonitrile	p	II	319.6	335	22351.9	-19972.9	5961.05	-592.876	0	0	0	0	0	0	
