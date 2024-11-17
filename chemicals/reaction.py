@@ -1035,6 +1035,11 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     .. [2] URAVNOTE, NOVOODKRITI PARADOKSI V. TEORIJI, and ENJA KEMIJSKIH
        REAKCIJ. "New Discovered Paradoxes in Theory of Balancing Chemical
        Reactions." Materiali in Tehnologije 45, no. 6 (2011): 503-22.
+    .. [3] Risteski, Ice B. "A New Approach to Balancing Chemical Equations."
+       SIAM Problems & Solutions, 2007, 1-10.
+    .. [4] Smith, William R., and Ronald W. Missen. "Using Mathematica and 
+       Maple To Obtain Chemical Equations." Journal of Chemical Education
+       74, no. 11 (November 1, 1997): 1369. https://doi.org/10.1021/ed074p1369.
     '''
     import scipy.linalg
     done = scipy.linalg.null_space(matrix)
@@ -1050,8 +1055,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
         max_denominator = 10**rounding
         fs = [Fraction(x).limit_denominator(max_denominator=max_denominator) for x in d]
         all_denominators = {i.denominator for i in fs}
-        if 1 in all_denominators:
-            all_denominators.remove(1)
+        all_denominators.discard(1)
 
         for den in sorted(list(all_denominators), reverse=True):
             fs = [num*den for num in fs]

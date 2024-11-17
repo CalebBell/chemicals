@@ -22,7 +22,7 @@ SOFTWARE.
 
 import pandas as pd
 import pytest
-from fluids.numerics import assert_close, assert_close1d, assert_close2d
+from fluids.numerics import assert_close, assert_close1d, assert_close2d, numpy as np
 
 from chemicals.heat_capacity import CRC_standard_data, TRC_gas_data
 from chemicals.reaction import (
@@ -204,7 +204,12 @@ def test_entropy_formation():
     assert_close(Sf, -44.427301693778304)
 
 
+def check_reaction_balance(matrix, products_calc, atol=1e-13):
+    """Check that coefficients satisfy the stoichiometric matrix equation within tolerance."""
+    result = np.array(matrix) @ np.array(products_calc)
+    assert_close1d(result, [0.0]*len(result), atol=atol)
 
+    
 def test_balance_stoichiometry():
     test_cases = [
     [[{'Hg': 1, 'O': 1}, {'Hg': 1}, {'O': 2}], [True, False, False], [2.0, 2.0, 1.0]],
@@ -218,10 +223,115 @@ def test_balance_stoichiometry():
     [[{'N': 1, 'H': 3}, {'O': 2}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}], [True, True, False, False], [4.0, 5.0, 4.0, 6.0]],
     [[{'O': 2}, {'H': 2, 'O': 1}, {'C': 1, 'O': 2}, {'C': 6, 'H': 14}], [True, False, False, True], [19.0, 14.0, 12.0, 2.0]],
 
+    # Examples from
+    #Smith, William R., and Ronald W. Missen. “Using Mathematica and Maple To Obtain Chemical Equations.” Journal of Chemical Education 74, no. 11 (November 1, 1997): 1369. https://doi.org/10.1021/ed074p1369.
+
+    # Complex redox system test case
+    # [Cr(N2H4CO)6]4[Cr(CN)6]3 + KMnO4 + H2SO4 → K2Cr2O7 + MnSO4 + CO2 + KNO3 + K2SO4 + H2O
+    [[
+        # B = [Cr(N2H4CO)6]4[Cr(CN)6]3
+        {'Cr': 7, 'N': 66, 'H': 96, 'C': 42, 'O': 24},
+        # KMnO4
+        {'K': 1, 'Mn': 1, 'O': 4},
+        # H2SO4
+        {'H': 2, 'S': 1, 'O': 4},
+        # K2Cr2O7
+        {'K': 2, 'Cr': 2, 'O': 7},
+        # MnSO4
+        {'Mn': 1, 'S': 1, 'O': 4},
+        # CO2
+        {'C': 1, 'O': 2},
+        # KNO3
+        {'K': 1, 'N': 1, 'O': 3},
+        # K2SO4
+        {'K': 2, 'S': 1, 'O': 4},
+        # H2O
+        {'H': 2, 'O': 1}
+    ],
+    [True, True, True, False, False, False, False, False, False],
+    [10.0, 1176.0, 1399.0, 35.0, 1176.0, 420.0, 660.0, 223.0, 1879.0]],  # Expected coefficients
+
+    # Reaction 1: H+ + OH- = H2O
+    [
+        [
+            {'H': 1, 'p': 1},          # H+
+            {'H': 1, 'O': 1, 'p': -1}, # OH-
+            {'H': 2, 'O': 1}           # H2O
+        ],
+        [True, True, False],
+        [1.0, 1.0, 1.0]
+    ],
+
+    # Reaction 2: OH- + NO+ = NO2- + H+
+    [
+        [
+            {'H': 1, 'O': 1, 'p': -1}, # OH-
+            {'N': 1, 'O': 1, 'p': 1},  # NO+
+            {'N': 1, 'O': 2, 'p': -1}, # NO2-
+            {'H': 1, 'p': 1}           # H+
+        ],
+        [True, True, False, False],
+        [1.0, 1.0, 1.0, 1.0]
+    ],
+
+    # Reaction 3: 2OH- + 2NO+ = N2O3 + H+
+    [
+        [
+            {'H': 1, 'O': 1, 'p': -1}, # OH-
+            {'N': 1, 'O': 1, 'p': 1},  # NO+
+            {'N': 2, 'O': 3},          # N2O3
+            {'H': 1, 'p': 1}           # H+
+        ],
+        [True, True, False, False],
+        [1.0, 2.0, 1.0, 1.0]
+    ],
+
+    # Reaction 4: OH- + NO+ = HNO2
+    [
+        [
+            {'H': 1, 'O': 1, 'p': -1}, # OH-
+            {'N': 1, 'O': 1, 'p': 1},  # NO+
+            {'H': 1, 'N': 1, 'O': 2}   # HNO2
+        ],
+        [True, True, False],
+        [1.0, 1.0, 1.0]
+    ],
+
+    # Reaction 5: OH- + NO+ + Tl+ = TlNO2 + H+
+    [
+        [
+            {'H': 1, 'O': 1, 'p': -1}, # OH-
+            {'N': 1, 'O': 1, 'p': 1},  # NO+
+            {'Tl': 1, 'p': 1},         # Tl+
+            {'Tl': 1, 'N': 1, 'O': 2}, # TlNO2
+            {'H': 1, 'p': 1}           # H+
+        ],
+        [True, True, True, False, False],
+        [1.0, 1.0, 1.0, 1.0, 1.0]
+    ],
+
+    # Herndon, William C. “On Balancing Chemical Equations: Past and Present.” Journal of Chemical Education 74, no. 11 (November 1997): 1359. https://doi.org/10.1021/ed074p1359.
+    [
+        [
+            {'H': 1, 'p': 1},             # H+
+            {'p': -1},                    # e-
+            {'Fe': 1, 'Cl': 3},           # FeCl3
+            {'H': 1, 'I': 1, 'O': 3},     # HIO3
+            {'Fe': 1, 'I': 2},            # FeI2
+            {'H': 1, 'Cl': 1},            # HCl
+            {'H': 2, 'O': 1}              # H2O
+        ],
+        [True, True, True, True, False, False, False],
+        [13.0, 13.0, 1.0, 2.0, 1.0, 3.0, 6.0]
+    ],
+
     ]
 
     for atomss, statuses, products in test_cases:
-        assert_close1d(balance_stoichiometry(stoichiometric_matrix(atomss, statuses)), products)
+        matrix = stoichiometric_matrix(atomss, statuses)
+        products_calc = balance_stoichiometry(matrix)
+        check_reaction_balance(matrix, products_calc)
+        assert_close1d(products_calc, products)
 
 
 def test_stoichiometric_matrix():
