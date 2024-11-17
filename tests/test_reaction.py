@@ -325,6 +325,68 @@ def test_balance_stoichiometry():
         [13.0, 13.0, 1.0, 2.0, 1.0, 3.0, 6.0]
     ],
 
+    # from http://myweb.astate.edu/mdraganj/BalanceEqn.html
+
+    # C3H8 + O2 = CO2 + H2O
+    [[{'C': 3, 'H': 8}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [1.0, 5.0, 3.0, 4.0]],
+
+    # Al2(SO3)3 + NaOH = Na2SO3 + Al(OH)3
+    [[{'Al': 2, 'S': 3, 'O': 9}, {'Na': 1, 'O': 1, 'H': 1}, {'Na': 2, 'S': 1, 'O': 3}, {'Al': 1, 'O': 3, 'H': 3}],
+    [True, True, False, False],
+    [1.0, 6.0, 3.0, 2.0]],
+
+    # Al2O3 + Fe = Fe3O4 + Al
+    [[{'Al': 2, 'O': 3}, {'Fe': 1}, {'Fe': 3, 'O': 4}, {'Al': 1}],
+    [True, True, False, False],
+    [4.0, 9.0, 3.0, 8.0]],
+    
+    # KClO3 = KCl + O2
+    [[{'K': 1, 'Cl': 1, 'O': 3}, {'K': 1, 'Cl': 1}, {'O': 2}],
+    [True, False, False],
+    [2.0, 2.0, 3.0]],
+
+    # NH4NO3 = N2O + H2O
+    [[{'N': 2, 'H': 4, 'O': 3}, {'N': 2, 'O': 1}, {'H': 2, 'O': 1}],
+    [True, False, False],
+    [1.0, 1.0, 2.0]],
+
+    # NaHCO3 = Na2CO3 + H2O + CO2
+    [[{'Na': 1, 'H': 1, 'C': 1, 'O': 3}, {'Na': 2, 'C': 1, 'O': 3}, {'H': 2, 'O': 1}, {'C': 1, 'O': 2}],
+    [True, False, False, False],
+    [2.0, 1.0, 1.0, 1.0]],
+
+    # P4O10 + H2O = H3PO4
+    [[{'P': 4, 'O': 10}, {'H': 2, 'O': 1}, {'H': 3, 'P': 1, 'O': 4}],
+    [True, True, False],
+    [1.0, 6.0, 4.0]],
+
+    # Be2C + H2O = Be(OH)2 + CH4
+    [[{'Be': 2, 'C': 1}, {'H': 2, 'O': 1}, {'Be': 1, 'O': 2, 'H': 2}, {'C': 1, 'H': 4}],
+    [True, True, False, False],
+    [1.0, 4.0, 2.0, 1.0]],
+
+    # Al + H2SO4 = Al2(SO4)3 + H2
+    [[{'Al': 1}, {'H': 2, 'S': 1, 'O': 4}, {'Al': 2, 'S': 3, 'O': 12}, {'H': 2}],
+    [True, True, False, False],
+    [2.0, 3.0, 1.0, 3.0]],
+
+    # S + HNO3 = H2SO4 + NO2 + H2O
+    [[{'S': 1}, {'H': 1, 'N': 1, 'O': 3}, {'H': 2, 'S': 1, 'O': 4}, {'N': 1, 'O': 2}, {'H': 2, 'O': 1}],
+    [True, True, False, False, False],
+    [1.0, 6.0, 1.0, 6.0, 2.0]],
+
+    # NH3 + CuO = Cu + N2 + H2O
+    [[{'N': 1, 'H': 3}, {'Cu': 1, 'O': 1}, {'Cu': 1}, {'N': 2}, {'H': 2, 'O': 1}],
+    [True, True, False, False, False],
+    [2.0, 3.0, 3.0, 1.0, 3.0]],
+
+    # Cu + HNO3 = Cu(NO3)2 + NO + H2O
+    [[{'Cu': 1}, {'H': 1, 'N': 1, 'O': 3}, {'Cu': 1, 'N': 2, 'O': 6}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}],
+    [True, True, False, False, False],
+    [3.0, 8.0, 3.0, 2.0, 4.0]],
+
     ]
 
     for atomss, statuses, products in test_cases:
