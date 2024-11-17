@@ -1089,7 +1089,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
 #                raise ValueError("Could not find integer coefficients (%s, %s)" %(i, j))
 #        return d_as_int
     else:
-        d = [round(i, rounding + int(ceil(log10(abs(i))))) for i in d]
+        d = [round_to_significant(v, rounding) for v in d]
         return d
 
 def stoichiometry_molar_to_mass(coefficients, MWs):
