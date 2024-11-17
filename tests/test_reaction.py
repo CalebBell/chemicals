@@ -709,6 +709,257 @@ def test_balance_stoichiometry():
     [True, False, False, False],
     [2.0, 1.0, 2.0, 13.0]],
 
+
+    # POCl3 + H2O = H3PO4 + HCl
+    [[{'P': 1, 'O': 1, 'Cl': 3}, {'H': 2, 'O': 1}, {'H': 3, 'P': 1, 'O': 4}, {'H': 1, 'Cl': 1}],
+    [True, True, False, False],
+    [1.0, 3.0, 1.0, 3.0]],
+
+    # C2H5OH + O2 = CO + H2O
+    [[{'C': 2, 'H': 6, 'O': 1}, {'O': 2}, {'C': 1, 'O': 1}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [1.0, 2.0, 2.0, 3.0]],
+
+    # UO2 + HF = UF4 + H2O
+    [[{'U': 1, 'O': 2}, {'H': 1, 'F': 1}, {'U': 1, 'F': 4}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [1.0, 4.0, 1.0, 2.0]],
+
+    # Ag2S + KCN = KAg(CN)2 + K2S
+    [[{'Ag': 2, 'S': 1}, {'K': 1, 'C': 1, 'N': 1}, {'K': 1, 'Ag': 1, 'C': 2, 'N': 2}, {'K': 2, 'S': 1}],
+    [True, True, False, False],
+    [1.0, 4.0, 2.0, 1.0]],
+
+    # C + SiO2 + Cl2 = SiCl4 + CO
+    [[{'C': 1}, {'Si': 1, 'O': 2}, {'Cl': 2}, {'Si': 1, 'Cl': 4}, {'C': 1, 'O': 1}],
+    [True, True, True, False, False],
+    [2.0, 1.0, 2.0, 1.0, 2.0]],
+
+    # PCl3 + H2O = H3PO3 + HCl
+    [[{'P': 1, 'Cl': 3}, {'H': 2, 'O': 1}, {'H': 3, 'P': 1, 'O': 3}, {'H': 1, 'Cl': 1}],
+    [True, True, False, False],
+    [1.0, 3.0, 1.0, 3.0]],
+
+    # H3PO4 + (NH4)2MoO4 + HNO3 = (NH4)3PO4(MoO3)12 + NH4NO3 + H2O
+    [[{'H': 3, 'P': 1, 'O': 4}, {'N': 2, 'H': 8, 'Mo': 1, 'O': 4}, {'H': 1, 'N': 1, 'O': 3}, {'N': 3, 'H': 12, 'P': 1, 'O': 40, 'Mo': 12}, {'N': 2, 'H': 4, 'O': 3}, {'H': 2, 'O': 1}],
+    [True, True, True, False, False, False],
+    [1.0, 12.0, 21.0, 1.0, 21.0, 12.0]],
+
+    # MnO2 + HCl = MnCl2 + H2O + Cl2
+    [[{'Mn': 1, 'O': 2}, {'H': 1, 'Cl': 1}, {'Mn': 1, 'Cl': 2}, {'H': 2, 'O': 1}, {'Cl': 2}],
+    [True, True, False, False, False],
+    [1.0, 4.0, 1.0, 2.0, 1.0]],
+
+    # Fe2O3 + C = CO + Fe
+    [[{'Fe': 2, 'O': 3}, {'C': 1}, {'C': 1, 'O': 1}, {'Fe': 1}],
+    [True, True, False, False],
+    [1.0, 3.0, 3.0, 2.0]],
+
+    # PCl5 + P2O5 = POCl3
+    [[{'P': 1, 'Cl': 5}, {'P': 2, 'O': 5}, {'P': 1, 'O': 1, 'Cl': 3}],
+    [True, True, False],
+    [3.0, 1.0, 5.0]],
+
+    # FeO + H3PO4 = Fe3(PO4)2 + H2O
+    [[{'Fe': 1, 'O': 1}, {'H': 3, 'P': 1, 'O': 4}, {'Fe': 3, 'P': 2, 'O': 8}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [3.0, 2.0, 1.0, 3.0]],
+
+    # Ca(NO3)2 = CaO + NO2 + O2
+    [[{'Ca': 1, 'N': 2, 'O': 6}, {'Ca': 1, 'O': 1}, {'N': 1, 'O': 2}, {'O': 2}],
+    [True, False, False, False],
+    [2.0, 2.0, 4.0, 1.0]],
+
+    # Fe + O2 = Fe2O3
+    [[{'Fe': 1}, {'O': 2}, {'Fe': 2, 'O': 3}],
+    [True, True, False],
+    [4.0, 3.0, 2.0]],
+
+    # Fe2O3 + H2 = Fe + H2O
+    [[{'Fe': 2, 'O': 3}, {'H': 2}, {'Fe': 1}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [1.0, 3.0, 2.0, 3.0]],
+
+    # FeSO4 + K3Fe(CN)6 = Fe3(Fe(CN)6)2 + K2SO4
+    [[{'Fe': 1, 'S': 1, 'O': 4}, {'K': 3, 'Fe': 1, 'C': 6, 'N': 6}, {'Fe': 5, 'C': 12, 'N': 12}, {'K': 2, 'S': 1, 'O': 4}],
+    [True, True, False, False],
+    [3.0, 2.0, 1.0, 3.0]],
+
+    # NH3 + O2 = HNO2 + H2O
+    [[{'N': 1, 'H': 3}, {'O': 2}, {'H': 1, 'N': 1, 'O': 2}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [2.0, 3.0, 2.0, 2.0]],
+
+    # Al + O2 = Al2O3
+    [[{'Al': 1}, {'O': 2}, {'Al': 2, 'O': 3}],
+    [True, True, False],
+    [4.0, 3.0, 2.0]],
+
+    # BaCl2 + Al2(SO4)3 = BaSO4 + AlCl3
+    [[{'Ba': 1, 'Cl': 2}, {'Al': 2, 'S': 3, 'O': 12}, {'Ba': 1, 'S': 1, 'O': 4}, {'Al': 1, 'Cl': 3}],
+    [True, True, False, False],
+    [3.0, 1.0, 3.0, 2.0]],
+
+    # Fe2(SO4)3 + Ba(NO3)2 = BaSO4 + Fe(NO3)3
+    [[{'Fe': 2, 'S': 3, 'O': 12}, {'Ba': 1, 'N': 2, 'O': 6}, {'Ba': 1, 'S': 1, 'O': 4}, {'Fe': 1, 'N': 3, 'O': 9}],
+    [True, True, False, False],
+    [1.0, 3.0, 3.0, 2.0]],
+
+    # Au2S3 + H2 = Au + H2S
+    [[{'Au': 2, 'S': 3}, {'H': 2}, {'Au': 1}, {'H': 2, 'S': 1}],
+    [True, True, False, False],
+    [1.0, 3.0, 2.0, 3.0]],
+
+    # Au + HCl + HNO3 = AuCl3 + NO + H2O
+    [[{'Au': 1}, {'H': 1, 'Cl': 1}, {'H': 1, 'N': 1, 'O': 3}, {'Au': 1, 'Cl': 3}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}],
+    [True, True, True, False, False, False],
+    [1.0, 3.0, 1.0, 1.0, 1.0, 2.0]],
+
+    # NiS + O2 = NiO + SO2
+    [[{'Ni': 1, 'S': 1}, {'O': 2}, {'Ni': 1, 'O': 1}, {'S': 1, 'O': 2}],
+    [True, True, False, False],
+    [2.0, 3.0, 2.0, 2.0]],
+
+    # Al + FeO = Al2O3 + Fe
+    [[{'Al': 1}, {'Fe': 1, 'O': 1}, {'Al': 2, 'O': 3}, {'Fe': 1}],
+    [True, True, False, False],
+    [2.0, 3.0, 1.0, 3.0]],
+
+    # C2H5OH + O2 = CO2 + H2O
+    [[{'C': 2, 'H': 6, 'O': 1}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [1.0, 3.0, 2.0, 3.0]],
+
+    # Na2O2 + H2O = NaOH + O2
+    [[{'Na': 2, 'O': 2}, {'H': 2, 'O': 1}, {'Na': 1, 'O': 1, 'H': 1}, {'O': 2}],
+    [True, True, False, False],
+    [2.0, 2.0, 4.0, 1.0]],
+
+    # Fe2O3 + CO = Fe + CO2
+    [[{'Fe': 2, 'O': 3}, {'C': 1, 'O': 1}, {'Fe': 1}, {'C': 1, 'O': 2}],
+    [True, True, False, False],
+    [1.0, 3.0, 2.0, 3.0]],
+
+    # Pb(NO3)2 = PbO + NO2 + O2
+    [[{'Pb': 1, 'N': 2, 'O': 6}, {'Pb': 1, 'O': 1}, {'N': 1, 'O': 2}, {'O': 2}],
+    [True, False, False, False],
+    [2.0, 2.0, 4.0, 1.0]],
+
+    # Al2(SO4)3 + Ca(OH)2 = CaSO4 + Al(OH)3
+    [[{'Al': 2, 'S': 3, 'O': 12}, {'Ca': 1, 'O': 2, 'H': 2}, {'Ca': 1, 'S': 1, 'O': 4}, {'Al': 1, 'O': 3, 'H': 3}],
+    [True, True, False, False],
+    [1.0, 3.0, 3.0, 2.0]],
+
+    # Au2O3 = Au + O2
+    [[{'Au': 2, 'O': 3}, {'Au': 1}, {'O': 2}],
+    [True, False, False],
+    [2.0, 4.0, 3.0]],
+
+    # Ca3(PO4)2 + H2SO4 = CaSO4 + H3PO4
+    [[{'Ca': 3, 'P': 2, 'O': 8}, {'H': 2, 'S': 1, 'O': 4}, {'Ca': 1, 'S': 1, 'O': 4}, {'H': 3, 'P': 1, 'O': 4}],
+    [True, True, False, False],
+    [1.0, 3.0, 3.0, 2.0]],
+
+    # SiCl4 + H2O = H4SiO4 + HCl
+    [[{'Si': 1, 'Cl': 4}, {'H': 2, 'O': 1}, {'H': 4, 'Si': 1, 'O': 4}, {'H': 1, 'Cl': 1}],
+    [True, True, False, False],
+    [1.0, 4.0, 1.0, 4.0]],
+
+    # Ca + AlCl3 = CaCl2 + Al
+    [[{'Ca': 1}, {'Al': 1, 'Cl': 3}, {'Ca': 1, 'Cl': 2}, {'Al': 1}],
+    [True, True, False, False],
+    [3.0, 2.0, 3.0, 2.0]],
+
+    # FeCl3 + Ca(OH)2 = CaCl2 + Fe(OH)3
+    [[{'Fe': 1, 'Cl': 3}, {'Ca': 1, 'O': 2, 'H': 2}, {'Ca': 1, 'Cl': 2}, {'Fe': 1, 'O': 3, 'H': 3}],
+    [True, True, False, False],
+    [2.0, 3.0, 3.0, 2.0]],
+
+    # Al2O3 + C + N2 = AlN + CO
+    [[{'Al': 2, 'O': 3}, {'C': 1}, {'N': 2}, {'Al': 1, 'N': 1}, {'C': 1, 'O': 1}],
+    [True, True, True, False, False],
+    [1.0, 3.0, 1.0, 2.0, 3.0]],
+
+    # NO + NaOH = NaNO2 + H2O + N2O
+    [[{'N': 1, 'O': 1}, {'Na': 1, 'O': 1, 'H': 1}, {'Na': 1, 'N': 1, 'O': 2}, {'H': 2, 'O': 1}, {'N': 2, 'O': 1}],
+    [True, True, False, False, False],
+    [4.0, 2.0, 2.0, 1.0, 1.0]],
+
+    # Pb3O4 + HNO3 = Pb(NO3)2 + PbO2 + H2O
+    [[{'Pb': 3, 'O': 4}, {'H': 1, 'N': 1, 'O': 3}, {'Pb': 1, 'N': 2, 'O': 6}, {'Pb': 1, 'O': 2}, {'H': 2, 'O': 1}],
+    [True, True, False, False, False],
+    [1.0, 4.0, 2.0, 1.0, 2.0]],
+
+    # CuSO4 + KCN = CuCN + K2SO4 + C2N2
+    [[{'Cu': 1, 'S': 1, 'O': 4}, {'K': 1, 'C': 1, 'N': 1}, {'Cu': 1, 'C': 1, 'N': 1}, {'K': 2, 'S': 1, 'O': 4}, {'C': 2, 'N': 2}],
+    [True, True, False, False, False],
+    [2.0, 4.0, 2.0, 2.0, 1.0]],
+
+    # KO2 + CO2 = K2CO3 + O2
+    [[{'K': 1, 'O': 2}, {'C': 1, 'O': 2}, {'K': 2, 'C': 1, 'O': 3}, {'O': 2}],
+    [True, True, False, False],
+    [4.0, 2.0, 2.0, 3.0]],
+
+    # P4O6 = P4 + P2O4
+    [[{'P': 4, 'O': 6}, {'P': 4}, {'P': 2, 'O': 4}],
+    [True, False, False],
+    [4.0, 1.0, 6.0]],
+
+    # P4O10 + H2O = H3PO4
+    [[{'P': 4, 'O': 10}, {'H': 2, 'O': 1}, {'H': 3, 'P': 1, 'O': 4}],
+    [True, True, False],
+    [1.0, 6.0, 4.0]],
+
+    # Al + KOH + H2O = KAlO2 + H2
+    [[{'Al': 1}, {'K': 1, 'O': 1, 'H': 1}, {'H': 2, 'O': 1}, {'K': 1, 'Al': 1, 'O': 2}, {'H': 2}],
+    [True, True, True, False, False],
+    [2.0, 2.0, 2.0, 2.0, 3.0]],
+
+    # Fe + H2O + O2 = Fe2O3(H2O)
+    [[{'Fe': 1}, {'H': 2, 'O': 1}, {'O': 2}, {'Fe': 2, 'O': 4, 'H': 2}],
+    [True, True, True, False],
+    [4.0, 2.0, 3.0, 2.0]],
+
+    # H3PO4 + HCl = PCl5 + H2O
+    [[{'H': 3, 'P': 1, 'O': 4}, {'H': 1, 'Cl': 1}, {'P': 1, 'Cl': 5}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [1.0, 5.0, 1.0, 4.0]],
+
+    # MnO2 + KOH + O2 = K2MnO4 + H2O
+    [[{'Mn': 1, 'O': 2}, {'K': 1, 'O': 1, 'H': 1}, {'O': 2}, {'K': 2, 'Mn': 1, 'O': 4}, {'H': 2, 'O': 1}],
+    [True, True, True, False, False],
+    [2.0, 4.0, 1.0, 2.0, 2.0]],
+
+    # K2CO3 + C + N2 = KCN + CO
+    [[{'K': 2, 'C': 1, 'O': 3}, {'C': 1}, {'N': 2}, {'K': 1, 'C': 1, 'N': 1}, {'C': 1, 'O': 1}],
+    [True, True, True, False, False],
+    [1.0, 4.0, 1.0, 2.0, 3.0]],
+
+    # PCl5 + H2O = H3PO4 + HCl
+    [[{'P': 1, 'Cl': 5}, {'H': 2, 'O': 1}, {'H': 3, 'P': 1, 'O': 4}, {'H': 1, 'Cl': 1}],
+    [True, True, False, False],
+    [1.0, 4.0, 1.0, 5.0]],
+
+    # P4O6 + H2O = H3PO3
+    [[{'P': 4, 'O': 6}, {'H': 2, 'O': 1}, {'H': 3, 'P': 1, 'O': 3}],
+    [True, True, False],
+    [1.0, 6.0, 4.0]],
+
+    # Al(OH)3 + H2SO4 = Al2(SO4)3 + H2O
+    [[{'Al': 1, 'O': 3, 'H': 3}, {'H': 2, 'S': 1, 'O': 4}, {'Al': 2, 'S': 3, 'O': 12}, {'H': 2, 'O': 1}],
+    [True, True, False, False],
+    [2.0, 3.0, 1.0, 6.0]],
+
+    # Fe2(SO4)3 + KOH = K2SO4 + Fe(OH)3
+    [[{'Fe': 2, 'S': 3, 'O': 12}, {'K': 1, 'O': 1, 'H': 1}, {'K': 2, 'S': 1, 'O': 4}, {'Fe': 1, 'O': 3, 'H': 3}],
+    [True, True, False, False],
+    [1.0, 6.0, 3.0, 2.0]],
+
+    # Bi(NO3)3 + H2S = Bi2S3 + HNO3
+    [[{'Bi': 1, 'N': 3, 'O': 9}, {'H': 2, 'S': 1}, {'Bi': 2, 'S': 3}, {'H': 1, 'N': 1, 'O': 3}],
+    [True, True, False, False],
+    [2.0, 3.0, 1.0, 6.0]],
+
     ]
 
     for atomss, statuses, products in test_cases:
