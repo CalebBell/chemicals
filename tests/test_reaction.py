@@ -341,7 +341,7 @@ def test_balance_stoichiometry():
     [[{'Al': 2, 'O': 3}, {'Fe': 1}, {'Fe': 3, 'O': 4}, {'Al': 1}],
     [True, True, False, False],
     [4.0, 9.0, 3.0, 8.0]],
-    
+
     # KClO3 = KCl + O2
     [[{'K': 1, 'Cl': 1, 'O': 3}, {'K': 1, 'Cl': 1}, {'O': 2}],
     [True, False, False],
@@ -386,6 +386,23 @@ def test_balance_stoichiometry():
     [[{'Cu': 1}, {'H': 1, 'N': 1, 'O': 3}, {'Cu': 1, 'N': 2, 'O': 6}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}],
     [True, True, False, False, False],
     [3.0, 8.0, 3.0, 2.0, 4.0]],
+
+    # from https://www.chembuddy.com/balancing-stoichiometry-questions-balancing-questions
+
+    # K4Fe(CN)6 + KMnO4 + H2SO4 = KHSO4 + Fe2(SO4)3 + MnSO4 + HNO3 + CO2 + H2O
+    [[{'K': 4, 'Fe': 1, 'C': 6, 'N': 6}, {'K': 1, 'Mn': 1, 'O': 4}, {'H': 2, 'S': 1, 'O': 4}, {'K': 1, 'H': 1, 'S': 1, 'O': 4}, {'Fe': 2, 'S': 3, 'O': 12}, {'Mn': 1, 'S': 1, 'O': 4}, {'H': 1, 'N': 1, 'O': 3}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}],
+    [True, True, True, False, False, False, False, False, False],
+    [10.0, 122.0, 299.0, 162.0, 5.0, 122.0, 60.0, 60.0, 188.0]],
+
+    # K3Fe(SCN)6 + Na2Cr2O7 + H2SO4 = Fe(NO3)3 + Cr2(SO4)3 + CO2 + H2O + Na2SO4 + KNO3
+    [[{'K': 3, 'Fe': 1, 'S': 6, 'C': 6, 'N': 6}, {'Na': 2, 'Cr': 2, 'O': 7}, {'H': 2, 'S': 1, 'O': 4}, {'Fe': 1, 'N': 3, 'O': 9}, {'Cr': 2, 'S': 3, 'O': 12}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'Na': 2, 'S': 1, 'O': 4}, {'K': 1, 'N': 1, 'O': 3}],
+    [True, True, True, False, False, False, False, False, False],
+    [1.0, 16.0, 58.0, 1.0, 16.0, 6.0, 58.0, 16.0, 3.0]],
+
+    # K4Fe(SCN)6 + K2Cr2O7 + H2SO4 = Fe2(SO4)3 + Cr2(SO4)3 + CO2 + H2O + K2SO4 + KNO3
+    [[{'K': 4, 'Fe': 1, 'S': 6, 'C': 6, 'N': 6}, {'K': 2, 'Cr': 2, 'O': 7}, {'H': 2, 'S': 1, 'O': 4}, {'Fe': 2, 'S': 3, 'O': 12}, {'Cr': 2, 'S': 3, 'O': 12}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'K': 2, 'S': 1, 'O': 4}, {'K': 1, 'N': 1, 'O': 3}],
+    [True, True, True, False, False, False, False, False, False],
+    [6.0, 97.0, 355.0, 3.0, 97.0, 36.0, 355.0, 91.0, 36.0]],
 
     ]
 
