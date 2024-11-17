@@ -91,7 +91,7 @@ __all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
            'stoichiometry_molar_to_mass', 'stoichiometry_mass_to_molar',
            'standard_formation_reaction', 'stoichiometry_MW_error']
 
-from math import ceil, log10
+from math import ceil, log10, floor
 
 from chemicals import data_reader as dr
 from chemicals import heat_capacity, miscdata
@@ -992,6 +992,14 @@ def stoichiometric_matrix(atomss, reactants):
                 element_to_row[k][i] = -v
     return matrix
 
+def round_to_significant(x, significant_digits):
+    if x == 0:
+        return 0.0
+    
+    magnitude = floor(log10(abs(x)))
+    scale = 10 ** (significant_digits - 1 - magnitude)
+    return round(x * scale) / scale
+
 def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     r'''This function balances a chemical reaction.
 
@@ -1055,7 +1063,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
         max_denominator = 10**rounding
         fs = [Fraction(x).limit_denominator(max_denominator=max_denominator) for x in d]
         all_denominators = {i.denominator for i in fs}
-        all_denominators.discard(1)
+        all_denominators.discard(Fraction(1))
 
         for den in sorted(list(all_denominators), reverse=True):
             fs = [num*den for num in fs]

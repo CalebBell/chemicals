@@ -50,6 +50,7 @@ from chemicals.reaction import (
     entropy_formation,
     standard_formation_reaction,
     stoichiometric_matrix,
+    round_to_significant,
 )
 
 
@@ -209,7 +210,20 @@ def check_reaction_balance(matrix, products_calc, atol=1e-13):
     result = np.array(matrix) @ np.array(products_calc)
     assert_close1d(result, [0.0]*len(result), atol=atol)
 
-    
+# def test_balance_stoichiometry_ill_conditioned():
+#     test_cases = [
+#         # C100000H200000N + O2 = CO2 + H2O + NO2
+#         [[{'C': 100000, 'H': 200000, 'N': 1}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'N': 1, 'O': 2}],
+#         [True, True, False, False, False],
+#         [5.5322455442586566e+17, 8.298423638960436e+22, 5.532245544336663e+22, 5.532245544336663e+22, 5.5322455442586566e+17]],
+#     ]
+#     for atomss, statuses, products in test_cases:
+#         matrix = stoichiometric_matrix(atomss, statuses)
+#         products_calc = balance_stoichiometry(matrix)
+#         check_reaction_balance(matrix, products_calc)
+#         assert_close1d(products_calc, products)
+
+
 def test_balance_stoichiometry():
     test_cases = [
     [[{'Hg': 1, 'O': 1}, {'Hg': 1}, {'O': 2}], [True, False, False], [2.0, 2.0, 1.0]],
@@ -1712,6 +1726,106 @@ def test_balance_stoichiometry():
         products_calc = balance_stoichiometry(matrix)
         check_reaction_balance(matrix, products_calc)
         assert_close1d(products_calc, products)
+
+
+def test_round_to_significant():
+    """Test the round_to_significant function with various cases. TODO: Move to fluids.numerics."""
+    # Test cases as (input, significant_digits, expected_output)
+    test_cases = [
+        (1234.567, 3, 1230.0),           # Normal positive number rounding
+        (0.004567, 2, 0.0046),           # Small positive number
+        (-9876.543, 4, -9877.0),         # Negative number rounding
+        (1.2345e5, 2, 1.2e5),            # Scientific notation input
+        (1.2345e-3, 3, 0.00123),         # Small number in scientific notation
+        (0.0, 3, 0.0),                   # Zero input
+        (999.999, 2, 1000.0),            # Rounding up to next order of magnitude
+        (0.0001234, 2, 0.00012),         # Small positive number near zero
+        (-0.0009876, 3, -0.000988),      # Small negative number near zero
+        (123456789.0, 5, 123460000.0),   # Large number rounding
+        (1.0, 1, 1.0),                   # Simple case with one significant digit
+        (-1.0, 1, -1.0),                 # Simple negative number
+        (0.12345, 3, 0.123),             # Decimal number rounding
+        (-0.12345, 3, -0.123),           # Negative decimal number rounding
+        (999.5, 3, 1000.0),              # Rounding with carryover
+        (-0.0054321, 2, -0.0054),        # Small negative number with rounding down
+
+        # Rounding to 5 significant digits
+        (123456.789123, 5, 123460.0),        # Normal positive number
+        (-987654.321987, 5, -987650.0),      # Normal negative number
+        (0.000123456789, 5, 0.00012346),     # Small positive number
+        (-0.000987654321, 5, -0.00098765),   # Small negative number
+        (1234567890.12345, 5, 1234600000.0), # Large positive number
+        (-9876543210.54321, 5, -9876500000.0), # Large negative number
+        (1.23456789123e5, 5, 1.2346e5),      # Scientific notation positive
+        (-9.87654321987e-3, 5, -0.0098765),  # Scientific notation negative
+        (99999.9999999, 5, 100000.0),        # Rounding up
+        (-99999.9999999, 5, -100000.0),      # Rounding up negative
+
+        # Rounding to 6 significant digits
+        (123456.789123, 6, 123457.0),
+        (-987654.321987, 6, -987654.0),
+        (0.000123456789, 6, 0.000123457),
+        (-0.000987654321, 6, -0.000987654),
+        (1234567890.12345, 6, 1234570000.0),
+        (-9876543210.54321, 6, -9876540000.0),
+        (1.23456789123e5, 6, 1.23457e5),
+        (-9.87654321987e-3, 6, -0.00987654),
+        (123456.1234567, 6, 123456.0),
+        (-123456.1234567, 6, -123456.0),
+
+        # Rounding to 7 significant digits
+        (123456.789123, 7, 123456.8),
+        (-987654.321987, 7, -987654.3),
+        (0.000123456789, 7, 0.0001234568),
+        (-0.000987654321, 7, -0.0009876543),
+        (1234567890.12345, 7, 1234568000.0),
+        (-9876543210.54321, 7, -9876543000.0),
+        (1.23456789123e5, 7, 1.234568e5),
+        (-9.87654321987e-3, 7, -0.009876543),
+        (123456.7890123, 7, 123456.8),
+        (-123456.7890123, 7, -123456.8),
+
+        # Rounding to 8 significant digits
+        (123456.789123, 8, 123456.79),
+        (-987654.321987, 8, -987654.32),
+        (0.000123456789, 8, 0.00012345679),
+        (-0.000987654321, 8, -0.00098765432),
+        (1234567890.12345, 8, 1234567900.0),
+        (-9876543210.54321, 8, -9876543200.0),
+        (1.23456789123e5, 8, 1.2345679e5),
+        (-9.87654321987e-3, 8, -0.0098765432),
+        (1234567.8901234, 8, 1234567.9),
+        (-1234567.8901234, 8, -1234567.9),
+
+        # Rounding to 9 significant digits
+        (123456.789123, 9, 123456.789),
+        (-987654.321987, 9, -987654.322),
+        (0.000123456789, 9, 0.000123456789),
+        (-0.000987654321, 9, -0.000987654321),
+        (1234567890.12345, 9, 1234567890.0),
+        (-9876543210.54321, 9, -9876543210.0),
+        (1.23456789123e5, 9, 1.23456789e5),
+        (-9.87654321987e-3, 9, -0.00987654322),
+        (12345678.9012345, 9, 12345678.9),
+        (-12345678.9012345, 9, -12345678.9),
+
+        # Rounding to 10 significant digits
+        (123456.789123, 10, 123456.7891),
+        (-987654.321987, 10, -987654.3220),
+        (0.000123456789, 10, 0.0001234567890),
+        (-0.000987654321, 10, -0.0009876543210),
+        (1234567890.12345, 10, 1234567890.0),
+        (-9876543210.54321, 10, -9876543211.0),
+        (1.23456789123e5, 10, 1.234567891e5),
+        (-9.87654321987e-3, 10, -0.009876543220),
+        (123456789.012345, 10, 123456789.0),
+        (-123456789.012345, 10, -123456789.0),    
+    ]
+
+    # Perform tests
+    for i, (x, significant_digits, expected) in enumerate(test_cases):
+        result = round_to_significant(x, significant_digits)
+        assert result == expected
 
 
 def test_stoichiometric_matrix():
