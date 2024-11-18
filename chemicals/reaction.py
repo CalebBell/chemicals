@@ -1046,11 +1046,11 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     .. [3] Risteski, Ice B. "A New Approach to Balancing Chemical Equations."
        SIAM Problems & Solutions, 2007, 1-10.
     .. [4] Smith, William R., and Ronald W. Missen. "Using Mathematica and 
-       Maple To Obtain Chemical Equations." Journal of Chemical Education
-       74, no. 11 (November 1, 1997): 1369. https://doi.org/10.1021/ed074p1369.
+        Maple To Obtain Chemical Equations." Journal of Chemical Education
+        74, no. 11 (November 1, 1997): 1369. https://doi.org/10.1021/ed074p1369.
     '''
     import scipy.linalg
-    done = scipy.linalg.null_space(matrix)
+    done = scipy.linalg.null_space(matrix, rcond=10**-rounding)
     if len(done[0]) > 1:
         raise ValueError("No solution")
     d = done[:, 0].tolist()
