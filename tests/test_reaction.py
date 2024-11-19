@@ -210,88 +210,96 @@ def check_reaction_balance(matrix, products_calc, atol=1e-13):
     result = np.array(matrix) @ np.array(products_calc)
     assert_close1d(result, [0.0]*len(result), atol=atol)
 
-def test_balance_stoichiometry_ill_conditioned():
-    test_cases = [
-        # C100000H200000N + O2 = CO2 + H2O + NO2
+ill_conditioned_stoich_test_cases = [
+    (
         [[{'C': 100000, 'H': 200000, 'N': 1}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'N': 1, 'O': 2}],
-        [True, True, False, False, False],
-        [1, 150001, 100000, 100000, 1]],
-
-        # C100000000H200000000N + O2 = CO2 + H2O + NO2
+         [True, True, False, False, False],
+         [1, 150001, 100000, 100000, 1]],
+        "C100000H200000N + O2 = CO2 + H2O + NO2"
+    ),
+    (
         [[{'C': 100000000, 'H': 200000000, 'N': 1}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'N': 1, 'O': 2}],
-        [True, True, False, False, False],
-        [1, 150000001, 100000000, 100000000, 1]],
-
-        # C50000H100000O25000 + O2 = CO2 + H2O
+         [True, True, False, False, False],
+         [1, 150000001, 100000000, 100000000, 1]],
+        "C100000000H200000000N + O2 = CO2 + H2O + NO2"
+    ),
+    (
         [[{'C': 50000, 'H': 100000, 'O': 25000}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}],
-        [True, True, False, False],
-        [1.0, 62500.0, 50000.0, 50000.0]],
-
-        # Fe1000(CN)2000 + H2O2 = Fe2O3 + HCN + H2O
+         [True, True, False, False],
+         [1.0, 62500.0, 50000.0, 50000.0]],
+        "C50000H100000O25000 + O2 = CO2 + H2O"
+    ),
+    (
         [[{'Fe': 1000, 'C': 2000, 'N': 2000}, {'H': 2, 'O': 2}, {'Fe': 2, 'O': 3}, {'H': 1, 'C': 1, 'N': 1}, {'H': 2, 'O': 1}],
-        [True, True, False, False, False],
-        [1.0, 500.0, 500.0, 2000.0, -500.0]],
-
-        # Au1000Cu1000 + HNO3 = Au + Cu(NO3)2 + NO + H2O
+         [True, True, False, False, False],
+         [1.0, 500.0, 500.0, 2000.0, -500.0]],
+        "Fe1000(CN)2000 + H2O2 = Fe2O3 + HCN + H2O"
+    ),
+    (
         [[{'Au': 1000, 'Cu': 1000}, {'H': 1, 'N': 1, 'O': 3}, {'Au': 1}, {'Cu': 1, 'N': 2, 'O': 6}, {'N': 1, 'O': 1}, {'H': 2, 'O': 1}],
-        [True, True, False, False, False, False],
-        [3, 8000, 3000, 3000, 2000, 4000]],
-
-        # H100000(SO4)50000 = SO3 + H2O
+         [True, True, False, False, False, False],
+         [3, 8000, 3000, 3000, 2000, 4000]],
+        "Au1000Cu1000 + HNO3 = Au + Cu(NO3)2 + NO + H2O"
+    ),
+    (
         [[{'H': 100000, 'S': 50000, 'O': 200000}, {'S': 1, 'O': 3}, {'H': 2, 'O': 1}],
-        [True, False, False],
-        [1.0, 50000.0, 50000.0]],
-
-        # C50000H100000N10000O20000S1000 + O2 = CO2 + H2O + NO2 + SO2
+         [True, False, False],
+         [1.0, 50000.0, 50000.0]],
+        "H100000(SO4)50000 = SO3 + H2O"
+    ),
+    (
         [[{'C': 50000, 'H': 100000, 'N': 10000, 'O': 20000, 'S': 1000}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'N': 1, 'O': 2}, {'S': 1, 'O': 2}],
-        [True, True, False, False, False, False],
-        [1.0, 76000.0, 50000.0, 50000.0, 10000.0, 1000.0]],
-
-        # PG5 combustion
+         [True, True, False, False, False, False],
+         [1.0, 76000.0, 50000.0, 50000.0, 10000.0, 1000.0]],
+        "C50000H100000N10000O20000S1000 + O2 = CO2 + H2O + NO2 + SO2"
+    ),
+    (
         [[{'C': 12594, 'H': 25422, 'O': 5004}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}],
-        [True, True, False, False],
-        [2.0, 32895.0, 25188.0, 25422.0]],
-
-        # Y chromosome DNA combustion reaction:            
-        # C597000000H744000002N225000000O390000001P60000000 + O2 = CO2 + H2O + NO2 + P4O10
+         [True, True, False, False],
+         [2.0, 32895.0, 25188.0, 25422.0]],
+        "PG5 combustion"
+    ),
+    (
         [[{'C': 597000000, 'H': 744000002, 'N': 225000000, 'O': 390000001, 'P': 60000000}, {'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'N': 1, 'O': 2}, {'P': 4, 'O': 10}],
-        [True, True, False, False, False, False],
-        [1.0, 888000000.0, 597000000.0, 372000001.0, 225000000.0, 15000000.0]],
-
-        # Y chromosome with hydrogen peroxide
-        # C597000000H744000002N225000000O390000001P60000000 + H2O2 = CO2 + H2O + N2 + P2O5
+         [True, True, False, False, False, False],
+         [1.0, 888000000.0, 597000000.0, 372000001.0, 225000000.0, 15000000.0]],
+        "Y chromosome DNA combustion: C597000000H744000002N225000000O390000001P60000000 + O2 = CO2 + H2O + NO2 + P4O10"
+    ),
+    (
         [[{'C': 597000000, 'H': 744000002, 'N': 225000000, 'O': 390000001, 'P': 60000000}, {'H': 2, 'O': 2}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'N': 2}, {'P': 2, 'O': 5}],
-        [True, True, False, False, False, False],
-        [1.0, 1326000000.0, 597000000.0, 1698000000.0, 112500000.0, 30000000.0]],
-
-        # Y chromosome with sulfuric acid
-        # C597000000H744000002N225000000O390000001P60000000 + H2SO4 = CO2 + H2O + NO2 + HPO4 + SO2
+         [True, True, False, False, False, False],
+         [1.0, 1326000000.0, 597000000.0, 1698000000.0, 112500000.0, 30000000.0]],
+        "Y chromosome with H2O2: C597000000H744000002N225000000O390000001P60000000 + H2O2 = CO2 + H2O + N2 + P2O5"
+    ),
+    (
         [[{'C': 597000000, 'H': 744000002, 'N': 225000000, 'O': 390000001, 'P': 60000000}, {'H': 2, 'S': 1, 'O': 4}, {'C': 1, 'O': 2}, {'H': 2, 'O': 1}, {'N': 1, 'O': 2}, {'H': 1, 'P': 1, 'O': 4}, {'S': 1, 'O': 2}],
-        [True, True, False, False, False, False, False],
-        [1.0, 1836000000.0, 597000000.0, 2178000000.0, 225000000.0, 60000000.0, 1836000000.0]],
-
-        # C597000000H744000002N225000000O390000001P60000000 + O2 = CO + H2O + NO2 + P4O10
-        # Y chromosome incomplete combustion
+         [True, True, False, False, False, False, False],
+         [1.0, 1836000000.0, 597000000.0, 2178000000.0, 225000000.0, 60000000.0, 1836000000.0]],
+        "Y chromosome with H2SO4: C597000000H744000002N225000000O390000001P60000000 + H2SO4 = CO2 + H2O + NO2 + HPO4 + SO2"
+    ),
+    (
         [[{'C': 597000000, 'H': 744000002, 'N': 225000000, 'O': 390000001, 'P': 60000000}, {'O': 2}, {'C': 1, 'O': 1}, {'H': 2, 'O': 1}, {'N': 1, 'O': 2}, {'P': 4, 'O': 10}],
-        [True, True, False, False, False, False],
-        [1.0, 589500000.0, 597000000.0, 372000001.0, 225000000.0, 15000000.0]],
-
-        # Y chromosome chlorination
-        # C597000000H744000002N225000000O390000001P60000000 + Cl2 = CCl4 + HCl + NCl3 + PCl5 + O2
+         [True, True, False, False, False, False],
+         [1.0, 589500000.0, 597000000.0, 372000001.0, 225000000.0, 15000000.0]],
+        "Y chromosome incomplete combustion: C597000000H744000002N225000000O390000001P60000000 + O2 = CO + H2O + NO2 + P4O10"
+    ),
+    (
         [[{'C': 597000000, 'H': 744000002, 'N': 225000000, 'O': 390000001, 'P': 60000000}, {'Cl': 2}, {'C': 1, 'Cl': 4}, {'H': 1, 'Cl': 1}, {'N': 1, 'Cl': 3}, {'P': 1, 'Cl': 5}, {'O': 2}],
-        [True, True, False, False, False, False, False],
-        [2.0, 4107000002.0, 1194000000.0, 1488000004.0, 450000000.0, 120000000.0, 390000001.0]],
+         [True, True, False, False, False, False, False],
+         [2.0, 4107000002.0, 1194000000.0, 1488000004.0, 450000000.0, 120000000.0, 390000001.0]],
+        "Y chromosome chlorination: C597000000H744000002N225000000O390000001P60000000 + Cl2 = CCl4 + HCl + NCl3 + PCl5 + O2"
+    )
+]
+@pytest.mark.parametrize("test_case,test_name", ill_conditioned_stoich_test_cases)
+def test_balance_stoichiometry_ill_conditioned(test_case, test_name):
+    """Test stoichiometry balancing for ill-conditioned reactions."""
+    atomss, statuses, products = test_case
+    matrix = stoichiometric_matrix(atomss, statuses)
+    products_calc = balance_stoichiometry(matrix, rounding=11)
+    assert_close1d(products_calc, products)
+    check_reaction_balance(matrix, products_calc)
 
-
-    ]
-    for atomss, statuses, products in test_cases:
-        matrix = stoichiometric_matrix(atomss, statuses)
-        products_calc = balance_stoichiometry(matrix, rounding=11)
-        check_reaction_balance(matrix, products_calc)
-        assert_close1d(products_calc, products)
-
-def test_balance_stoichiometry():
-    test_cases = [
+stoich_test_cases = [
     [[{'Hg': 1, 'O': 1}, {'Hg': 1}, {'O': 2}], [True, False, False], [2.0, 2.0, 1.0]],
     [[{'Cl': 2}, {'C': 3, 'H': 6}, {'C': 3, 'Cl': 1, 'H': 5}, {'Cl': 1, 'H': 1}],
       [True, True, False, False, False],
@@ -1785,16 +1793,19 @@ def test_balance_stoichiometry():
     [True, True, False, False],
     [1.0, 1.0, 1.0, 2.0]],
 
-    ]
+]
+
+@pytest.mark.parametrize("test_case", stoich_test_cases)
+def test_balance_stoichiometry(test_case):
+    atomss, statuses, products = test_case
     for settings in [{'rounding': 9, 'allow_fractional': False},
                      {'rounding': 16, 'allow_fractional': True}]:
-        for atomss, statuses, products in test_cases:
-            matrix = stoichiometric_matrix(atomss, statuses)
-            products_calc = balance_stoichiometry(matrix, **settings)
-            check_reaction_balance(matrix, products_calc, atol=1e-12)
-            if not settings['allow_fractional']:
-                # when we allow fractions we stil have valid ratios but they do not match the hardcoded answers
-                assert_close1d(products_calc, products)
+        matrix = stoichiometric_matrix(atomss, statuses)
+        products_calc = balance_stoichiometry(matrix, **settings)
+        if not settings['allow_fractional']:
+            # when we allow fractions we stil have valid ratios but they do not match the hardcoded answers
+            assert_close1d(products_calc, products)
+        check_reaction_balance(matrix, products_calc, atol=1e-12)
 
 
 def test_round_to_significant():
