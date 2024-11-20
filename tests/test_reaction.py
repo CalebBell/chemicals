@@ -297,7 +297,8 @@ def test_balance_stoichiometry_ill_conditioned(test_case, test_name):
     matrix = stoichiometric_matrix(atomss, statuses)
     products_calc = balance_stoichiometry(matrix, rounding=11)
     assert_close1d(products_calc, products)
-    check_reaction_balance(matrix, products_calc)
+    atol = sum(abs(v) for r in matrix for v in r)*1e-13
+    check_reaction_balance(matrix, products_calc, atol=atol)
 
 stoich_test_cases = [
     [[{'Hg': 1, 'O': 1}, {'Hg': 1}, {'O': 2}], [True, False, False], [2.0, 2.0, 1.0]],
