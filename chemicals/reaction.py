@@ -995,10 +995,41 @@ def stoichiometric_matrix(atomss, reactants):
 def round_to_significant(x, significant_digits):
     if x == 0:
         return 0.0
-    
     magnitude = floor(log10(abs(x)))
     scale = 10 ** (significant_digits - 1 - magnitude)
     return round(x * scale) / scale
+
+def check_reaction_balance(matrix, coeffs, atol=1e-13):
+    """Check that coefficients satisfy the stoichiometric matrix equation within tolerance."""
+    result = [sum(coeff * row[i] for i, coeff in enumerate(coeffs)) 
+              for row in matrix]
+    return all(abs(x) <= atol for x in result)
+
+def floats_to_ints(float_list, matrix, max_denominator=1000):
+    """
+    Convert a list of floats to integers until we find a solution that balances.
+    All floats are one or larger. The chemical equation is assumed to be reasonable.
+    The SVD has already solved the problem, but there is a little numerical noise
+    we need to clean up.
+    
+    Parameters:
+    - float_list: List of floats to convert
+    - matrix: Stoichiometric matrix to verify balance
+    - max_denominator: Maximum scaling factor to consider
+    
+    Returns:
+    - A list of integers scaled from the original floats
+    """
+    for D in range(1, max_denominator + 1):
+        # Calculate rounded integers
+        # in practice this works extremely well and rarely goes above 10
+        # it is extremely fast compared to a Fraction/Decimal approach
+        rounded = [int(round(D * x)) for x in float_list]
+        # Check if these coefficients actually balance the reaction
+        if check_reaction_balance(matrix, rounded):
+            return rounded
+    return float_list  # If we still can't find a solution, return original floats
+
 
 def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     r'''This function balances a chemical reaction.
@@ -1008,6 +1039,15 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     matrix : list[list[float]]
         Chemical reaction matrix for further processing; rows contain element
          counts of each compound, and the columns represent each chemical, [-]
+    rounding : int
+        Roughly the number of digits of rounding to apply to the answer. As matrix
+        routines are used, there is some noise; if this number is too high, the
+        coefficients may become very large numberes, which are still in a correct
+        ratio to each other, but are extremely ugly, [-]
+    allow_fractional : bool
+        Whether or not to allow the answers to be fractions, or to force them to
+        integers. Setting this to True speeds up the calculation, and allows
+        setting rounding arbitrarily high, [-]
 
     Returns
     -------
@@ -1033,6 +1073,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
 
     This algorithm may suffer from floating point issues. If you believe there
     is an error in the result, please report your reaction to the developers.
+    This function has a comprehensive test suite and extra test cases can be added to it.
 
     References
     ----------
@@ -1050,47 +1091,17 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
        74, no. 11 (November 1, 1997): 1369. https://doi.org/10.1021/ed074p1369.
     '''
     import scipy.linalg
-    done = scipy.linalg.null_space(matrix)
+    done = scipy.linalg.null_space(matrix, rcond=None)
     if len(done[0]) > 1:
         raise ValueError("No solution")
     d = done[:, 0].tolist()
-
-    min_value_inv = 1.0/min(d)
+    min_value_inv = 1.0/min(d, key=abs)
     d = [i*min_value_inv for i in d]
-
+    d = [round_to_significant(v, rounding) for v in d]
     if not allow_fractional:
-        from fractions import Fraction
-        max_denominator = 10**rounding
-        fs = [Fraction(x).limit_denominator(max_denominator=max_denominator) for x in d]
-        all_denominators = {i.denominator for i in fs}
-        all_denominators.discard(Fraction(1))
-
-        for den in sorted(list(all_denominators), reverse=True):
-            fs = [num*den for num in fs]
-            if all(i.denominator == 1 for i in fs):
-                break
-
-        # May have gone too far
-        return [float(i) for i in fs]
-#        done = False
-#        for i in range(100):
-#            for c in d:
-#                ratio = c.as_integer_ratio()[1]
-#                if ratio != 1:
-#                    d = [di*ratio for di in d]
-#                    break
-#                done = True
-#            if done:
-#                break
-#
-#        d_as_int = [int(i) for i in d]
-#        for i, j in zip(d, d_as_int):
-#            if i != j:
-#                raise ValueError("Could not find integer coefficients (%s, %s)" %(i, j))
-#        return d_as_int
-    else:
-        d = [round_to_significant(v, rounding) for v in d]
-        return d
+        d = floats_to_ints(d, matrix)
+    d = [float(v) for v in d]
+    return d
 
 def stoichiometry_molar_to_mass(coefficients, MWs):
     r'''This function translates molar stoichiometric
