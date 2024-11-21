@@ -65,13 +65,13 @@ def test_conversion():
                 T = T_converter(Ti, scale1, scale2)
                 assert_close(T_converter(T, scale2, scale1), Ti)
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         T_converter(10, 'ITS-27', 'ITS-48')
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         T_converter(10, 'FAIL', 'ITS-48')
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         T_converter(10, 'ITS-76', 'FAIL')
 
 
@@ -137,16 +137,16 @@ def test_critical_points():
     assert_close(T2, T2_68_90)
 
 def test_edge_cases():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         T_converter(4.9, 'ITS-76', 'ITS-90')  # Below ITS-76 minimum
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         T_converter(27.1, 'ITS-76', 'ITS-90')  # Above ITS-76 maximum
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         T_converter(13.9, 'ITS-68', 'ITS-90')  # Below ITS-68 minimum
 
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         T_converter(4300.1, 'ITS-68', 'ITS-90')  # Above ITS-68 maximum
 
 def test_linear_conversion_points():

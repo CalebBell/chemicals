@@ -441,42 +441,39 @@ def T_converter(T, current, desired):
     '''
     def range_check(T, Tmin, Tmax):
         if T < Tmin or T > Tmax:
-            raise Exception('Temperature conversion is outside one or both scales')
-    try:
-        if current == 'ITS-90':
-            pass
-        elif current == 'ITS-68':
-            range_check(T, 13.999, 4300.0001)
-            T = T68_to_T90(T)
-        elif current == 'ITS-76':
-            range_check(T, 4.9999, 27.0001)
-            T = T76_to_T90(T)
-        elif current == 'ITS-48':
-            range_check(T, 93.149999, 4273.15001)
-            T = T48_to_T90(T)
-        elif current == 'ITS-27':
-            range_check(T, 903.15, 4273.15)
-            T = T27_to_T90(T)
-        else:
-            raise Exception('Current scale not supported')
-        # T should be in ITS-90 now
+            raise ValueError('Temperature conversion is outside one or both scales')
+    if current == 'ITS-90':
+        pass
+    elif current == 'ITS-68':
+        range_check(T, 13.999, 4300.0001)
+        T = T68_to_T90(T)
+    elif current == 'ITS-76':
+        range_check(T, 4.9999, 27.0001)
+        T = T76_to_T90(T)
+    elif current == 'ITS-48':
+        range_check(T, 93.149999, 4273.15001)
+        T = T48_to_T90(T)
+    elif current == 'ITS-27':
+        range_check(T, 903.15, 4273.15)
+        T = T27_to_T90(T)
+    else:
+        raise ValueError('Current scale not supported')
+    # T should be in ITS-90 now
 
-        if desired == 'ITS-90':
-            pass
-        elif desired == 'ITS-68':
-            range_check(T, 13.999, 4300.0001)
-            T = T90_to_T68(T)
-        elif desired == 'ITS-76':
-            range_check(T, 4.9999, 27.0001)
-            T = T90_to_T76(T)
-        elif desired == 'ITS-48':
-            range_check(T, 93.149999, 4273.15001)
-            T = T90_to_T48(T)
-        elif desired == 'ITS-27':
-            range_check(T, 903.15, 4273.15)
-            T = T90_to_T27(T)
-        else:
-            raise Exception('Desired scale not supported')
-    except ValueError:
-        raise Exception('Temperature could not be converted to desired scale')
+    if desired == 'ITS-90':
+        pass
+    elif desired == 'ITS-68':
+        range_check(T, 13.999, 4300.0001)
+        T = T90_to_T68(T)
+    elif desired == 'ITS-76':
+        range_check(T, 4.9999, 27.0001)
+        T = T90_to_T76(T)
+    elif desired == 'ITS-48':
+        range_check(T, 93.149999, 4273.15001)
+        T = T90_to_T48(T)
+    elif desired == 'ITS-27':
+        range_check(T, 903.15, 4273.15)
+        T = T90_to_T27(T)
+    else:
+        raise ValueError('Desired scale not supported')
     return float(T)
