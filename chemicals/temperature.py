@@ -400,7 +400,6 @@ def polish_conversion(T_initial, forward_calculator, backward_calculator):
         ytol=T_initial*1e-15,
         require_eval=False,
         require_xtol=False,
-        maxiter=3,
         x1=initial_conversion * (1 + 1e-6),
         args=(T_initial, backward_calculator)
     )
