@@ -2739,8 +2739,8 @@ def polish_conversion(T_initial, forward_calculator, backward_calculator):
     T_polished = secant(
         func=errf,
         x0=initial_conversion,
-        xtol=1e-13,
-        ytol=T_initial*1e-15,
+        xtol=1e-12,
+        maxiter=10,
         require_eval=False,
         require_xtol=False,
         x1=initial_conversion * (1 + 1e-6),
@@ -2838,7 +2838,7 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
     if not _created_viscosity_converters:
         _create_viscosity_converters()
     def range_check(visc, scale):
-        scale_min, scale_max, nu_min, nu_max = viscosity_converter_limits[scale]
+        scale_min, scale_max, kinemaric_viscosity_min, kinemaric_viscosity_max = viscosity_converter_limits[scale]
 
         if visc < scale_min*(1.-1E-7) or visc > scale_max*(1.+1E-7):
             raise ValueError('Viscosity conversion is outside the limits of the '
@@ -2858,39 +2858,39 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
 
     # Convert to kinematic viscosity
     if old_scale == 'kinematic viscosity':
-        val = 1E6*val # convert to centistokes, the basis of the functions
+        kinematic_viscosity = 1E6*val # convert to centistokes, the basis of the functions
     elif old_scale == 'saybolt universal':
         if not extrapolate:
             range_check(val, old_scale)
         to_solve = lambda nu: Saybolt_universal_eq(nu) - val
-        val = secant(to_solve, 1)
+        kinematic_viscosity = secant(to_solve, 1)
     elif old_scale in viscosity_converters_to_nu:
         if not extrapolate:
             range_check(val, old_scale)
-        val = exp(viscosity_converters_to_nu[old_scale](log(val)))
+        kinematic_viscosity = exp(viscosity_converters_to_nu[old_scale](log(val)))
     elif old_scale in viscosity_scales_linear:
         c, tmin = viscosity_scales_linear[old_scale]
         if not extrapolate:
             range_check_linear(val, c, tmin, old_scale)
-        val = c*val # convert from seconds to centistokes
+        kinematic_viscosity = c*val # convert from seconds to centistokes
     else:
         keys = sorted(set(list(viscosity_scales.keys()) + list(viscosity_scales_linear.keys())))
         raise ValueError(f'Scale "{old_scale}" not recognized - allowable values are any of {keys}.')
 
     # Convert to desired scale
     if new_scale == 'kinematic viscosity':
-        val = 1E-6*val # convert to m^2/s
+        val = 1E-6*kinematic_viscosity # convert to m^2/s
     elif new_scale == 'saybolt universal':
-        val = Saybolt_universal_eq(val)
+        val = Saybolt_universal_eq(kinematic_viscosity)
     elif new_scale in viscosity_converters_from_nu:
         forward = lambda x: exp(viscosity_converters_from_nu[new_scale](log(x)))
         backward = lambda x: exp(viscosity_converters_to_nu[new_scale](log(x)))
-        val = polish_conversion(val, forward, backward)
+        val = polish_conversion(kinematic_viscosity, forward, backward)
         if not extrapolate:
             range_check(val, new_scale)
     elif new_scale in viscosity_scales_linear:
         c, tmin = viscosity_scales_linear[new_scale]
-        val = val/c # convert from centistokes to seconds
+        val = kinematic_viscosity/c # convert from centistokes to seconds
         if not extrapolate:
             range_check_linear(val, c, tmin, new_scale)
     else:

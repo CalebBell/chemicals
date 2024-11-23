@@ -21,8 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from math import log, log10
+from math import log, log10, exp
 from random import uniform
+from random import Random
 
 import pytest
 from fluids.constants import atm, foot, lb, psi
@@ -68,6 +69,9 @@ from chemicals.viscosity import (
     viscosity_converter,
     viscosity_gas_Gharagheizi,
     viscosity_index,
+    viscosity_scales, 
+    viscosity_scales_linear, 
+    viscosity_converter_limits,
 )
 
 ### Check data integrity
@@ -614,6 +618,58 @@ def test_viscosity_converter_linear_ones():
     assert_close(viscosity_converter(40, 'scott', 'kinematic viscosity'), 6.4e-05)
     assert_close(viscosity_converter(30, 'westinghouse', 'kinematic viscosity'), 0.000102)
     assert_close(viscosity_converter(60, 'westinghouse', 'kinematic viscosity'), 0.000204)
+
+def test_roundtrip_viscosity_conversions():
+    '''Test roundtrip conversions between viscosity scales using random points
+    in valid overlapping ranges, accounting for scale differences.'''
+    viscosity_converter(35, 'american can', 'kinematic viscosity')
+    # Get all scales that can be tested
+    tabulated_scales = set(viscosity_scales.keys()) - {'kinematic viscosity'}
+    linear_scales = set(viscosity_scales_linear.keys())
+    all_scales = tabulated_scales | linear_scales
+    
+    ranges = {}
+    # For linear scales, use the minimum time and a reasonable maximum
+    # for scale, (coef, min_time) in viscosity_scales_linear.items():
+    # linear_subset = {'caspers tin plate', 'american can', 'parlin cup #30', 'a&w crucible', 'astm 0.20'}
+    # for scale, (coef, min_time) in ((s, viscosity_scales_linear[s]) for s in linear_subset):
+    #         # Use 10x minimum time as a reasonable maximum
+    #     ranges[scale] = (min_time, min_time * 10)
+    
+    # For tabulated scales, use the limits from viscosity_converter_limits instead of the linear scales
+    for scale in tabulated_scales:
+        scale_min, scale_max, nu_min, nu_max = viscosity_converter_limits[scale]
+        ranges[scale] = (scale_min, scale_max)
+    
+    rng = Random(0)
+    pts = 3
+    scales = sorted(ranges.keys())
+    for i, scale1 in enumerate(scales):
+        for scale2 in scales[i+1:]:
+            # Convert range limits to kinematic viscosity for comparison
+            scale1_nu_min = viscosity_converter(ranges[scale1][0], scale1, 'kinematic viscosity', extrapolate=True)
+            scale1_nu_max = viscosity_converter(ranges[scale1][1], scale1, 'kinematic viscosity', extrapolate=True)
+            scale2_nu_min = viscosity_converter(ranges[scale2][0], scale2, 'kinematic viscosity', extrapolate=True)
+            scale2_nu_max = viscosity_converter(ranges[scale2][1], scale2, 'kinematic viscosity', extrapolate=True)
+            
+            # Find overlapping range in kinematic viscosity, leaving room for the polishing
+            min_nu = max(scale1_nu_min, scale2_nu_min)*1.1
+            max_nu = min(scale1_nu_max, scale2_nu_max)*0.9
+            
+            if min_nu >= max_nu:
+                continue
+            
+            # Generate test points in kinematic viscosity space
+            # Use log-uniform distribution since viscosity ranges are often logarithmic
+            log_min = log(min_nu)
+            log_max = log(max_nu)
+            test_nus = [exp(rng.uniform(log_min, log_max)) for _ in range(pts)]
+            
+            for nu in test_nus:
+                in_scale_1 = viscosity_converter(nu,'kinematic viscosity', scale1)
+                in_scale_2 = viscosity_converter(in_scale_1, scale1, scale2)
+                roundtrip = viscosity_converter(in_scale_2, scale2, scale1)
+                assert_close(in_scale_1, roundtrip, rtol=1e-9)
 
 @pytest.mark.slow
 @pytest.mark.fuzz
