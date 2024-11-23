@@ -2730,6 +2730,24 @@ viscosity_scales_linear = {
     'zahn cup #5': (23.6, 12)
 }
 
+def errf(T_other, initial_T, backward_calculator):
+    return backward_calculator(T_other) - initial_T
+
+def polish_conversion(T_initial, forward_calculator, backward_calculator):
+    # Get initial guess from direct conversion
+    initial_conversion = forward_calculator(T_initial)
+    T_polished = secant(
+        func=errf,
+        x0=initial_conversion,
+        xtol=1e-13,
+        ytol=T_initial*1e-15,
+        require_eval=False,
+        require_xtol=False,
+        x1=initial_conversion * (1 + 1e-6),
+        args=(T_initial, backward_calculator)
+    )
+    return T_polished
+
 
 def Saybolt_universal_eq(nu):
     return (4.6324*nu + (1E5 + 3264.*nu)/(nu*(nu*(1.646*nu + 23.97)
@@ -2865,7 +2883,9 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
     elif new_scale == 'saybolt universal':
         val = Saybolt_universal_eq(val)
     elif new_scale in viscosity_converters_from_nu:
-        val = exp(viscosity_converters_from_nu[new_scale](log(val)))
+        forward = lambda x: exp(viscosity_converters_from_nu[new_scale](log(x)))
+        backward = lambda x: exp(viscosity_converters_to_nu[new_scale](log(x)))
+        val = polish_conversion(val, forward, backward)
         if not extrapolate:
             range_check(val, new_scale)
     elif new_scale in viscosity_scales_linear:

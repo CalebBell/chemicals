@@ -392,17 +392,17 @@ def test_viscosity_converter():
 
     visc = viscosity_converter(8.78, 'engler', 'parlin cup #7')
     assert type(visc) is float
-    assert_close(visc, 52.45389001785669)
+    assert_close(visc, 52.45389001785669, rtol=2e-5)
 
     visc = viscosity_converter(5.91, 'engler', 'parlin cup #7', True)
     assert type(visc) is float
-    assert_close(visc, 39.96017612902695)
+    assert_close(visc, 39.96017612902695, rtol=2e-5)
 
     with pytest.raises(Exception):
         # limit is 5.92, but even that fails due to float conversion
         viscosity_converter(5.91, 'engler', 'parlin cup #7', extrapolate=False)
 
-    viscosity_converter(5.919999, 'engler', 'parlin cup #7')
+    viscosity_converter(5.919999999, 'engler', 'parlin cup #7')
     with pytest.raises(Exception):
         # too little
         viscosity_converter(5.91999, 'engler', 'parlin cup #7')
