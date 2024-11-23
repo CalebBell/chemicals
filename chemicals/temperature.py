@@ -380,9 +380,11 @@ def ITS90_68_difference(T):
 
 T_scales = ['ITS-90', 'ITS-68', 'ITS-27', 'ITS-48', 'ITS-76']
 
-def range_check(T, Tmin, Tmax):
-    if T < Tmin or T > Tmax:
-        raise ValueError('Temperature conversion is outside one or both scales')
+def range_check(T, Tmin, Tmax, scale):
+    if T < Tmin:
+        raise ValueError(f"Temperature {T!r} K is below minimum {Tmin!r} K for {scale} scale")
+    if T > Tmax:
+        raise ValueError(f"Temperature {T!r} K is above maximum {Tmax!r} K for {scale} scale")
 
 def errf(T_other, initial_T, backward_calculator):
     return backward_calculator(T_other) - initial_T
@@ -457,36 +459,34 @@ def T_converter(T, current, desired):
     if current == 'ITS-90':
         pass
     elif current == 'ITS-68':
-        range_check(T, 13.999, 4300.0001)
+        range_check(T, 13.999, 4300.0001, 'ITS-68')
         T = T68_to_T90(T)
     elif current == 'ITS-76':
-        range_check(T, 4.9999, 27.0001)
+        range_check(T, 4.9999, 27.0001, 'ITS-76')
         T = T76_to_T90(T)
     elif current == 'ITS-48':
-        range_check(T, 93.149999, 4273.15001)
+        range_check(T, 93.149999, 4273.15001, 'ITS-48')
         T = T48_to_T90(T)
     elif current == 'ITS-27':
-        range_check(T, 903.15, 4273.15)
+        range_check(T, 903.15, 4273.15, 'ITS-27')
         T = T27_to_T90(T)
     else:
-        raise ValueError('Current scale not supported')
-    # T in ITS-90 now
+        raise ValueError(f"Unknown temperature scale: {current}")
     if desired == 'ITS-90':
         pass
+    elif desired == 'ITS-68':
+        range_check(T, 13.999, 4300.0001, 'ITS-68')
+        T = polish_conversion(T, T90_to_T68, T68_to_T90)
+    elif desired == 'ITS-76':
+        range_check(T, 4.9999, 27.0001, 'ITS-76')
+        T = polish_conversion(T, T90_to_T76, T76_to_T90)
+    elif desired == 'ITS-48':
+        range_check(T, 93.149999, 4273.15001, 'ITS-48')
+        T = polish_conversion(T, T90_to_T48, T48_to_T90)
+    elif desired == 'ITS-27':
+        range_check(T, 903.15, 4273.15, 'ITS-27')
+        T = polish_conversion(T, T90_to_T27, T27_to_T90)
     else:
-        if desired == 'ITS-68':
-            range_check(T, 13.999, 4300.0001)
-            forward, backward = T90_to_T68, T68_to_T90
-        elif desired == 'ITS-76':
-            range_check(T, 4.9999, 27.0001)
-            forward, backward = T90_to_T76, T76_to_T90
-        elif desired == 'ITS-48':
-            range_check(T, 93.149999, 4273.15001)
-            forward, backward = T90_to_T48, T48_to_T90
-        elif desired == 'ITS-27':
-            range_check(T, 903.15, 4273.15)
-            forward, backward = T90_to_T27, T27_to_T90
-        else:
-            raise ValueError('Desired scale not supported')
-        T = polish_conversion(T, forward, backward)
+        raise ValueError(f"Unknown temperature scale: {desired}")
+
     return float(T)
