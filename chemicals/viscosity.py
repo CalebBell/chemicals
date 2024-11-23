@@ -3072,9 +3072,8 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
     Some of those scales are converted linearly; the rest use tabulated data
     and splines.
 
-    Because the conversion is performed by spline functions, a re-conversion
-    of a value will not yield exactly the original value. However, it is quite
-    close.
+    The conversion uses cubic spline interpolation and is reversible to
+    nearly machine precision.
 
     The method 'Saybolt universal' has a special formula implemented for its
     conversion, from [4]_. It is designed for maximum backwards compatibility
