@@ -23,7 +23,7 @@ SOFTWARE.
 import numpy as np
 import pytest
 from fluids.numerics import assert_close, assert_close1d, linspace
-
+from random import Random
 from chemicals.temperature import ITS90_68_difference, T_converter, Ts_27, Ts_48, Ts_68, Ts_76, diffs_27, diffs_48, diffs_68, diffs_76
 
 
@@ -37,8 +37,6 @@ def test_data():
 
 
 def test_conversion():
-    # TODO actually test data points instead of covering everything in a slow test
-
     T2 = T_converter(500, 'ITS-68', 'ITS-48')
     assert_close(T2, 499.9470092992346)
 
@@ -201,3 +199,135 @@ def test_linear_conversion_points():
     assert_close(T_converter(3599.15, 'ITS-27', 'ITS-90'), 3578.81025784)
     assert_close(T_converter(3936.15, 'ITS-27', 'ITS-90'), 3909.07648984)
     assert_close(T_converter(4273.15, 'ITS-27', 'ITS-90'), 4238.05)
+
+
+    # Random T90 -> ITS-76 points and round trips
+    assert_close(T_converter(13.435713414167, 'ITS-90', 'ITS-76'), 13.436758011396)
+    assert_close(T_converter(T_converter(13.435713414167, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 13.435713414167)
+    assert_close(T_converter(14.320405585456, 'ITS-90', 'ITS-76'), 14.321565696878)
+    assert_close(T_converter(T_converter(14.320405585456, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 14.320405585456)
+    assert_close(T_converter(14.626918647779, 'ITS-90', 'ITS-76'), 14.628146618509)
+    assert_close(T_converter(T_converter(14.626918647779, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 14.626918647779)
+    assert_close(T_converter(16.987430025932, 'ITS-90', 'ITS-76'), 16.989027641309)
+    assert_close(T_converter(T_converter(16.987430025932, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 16.987430025932)
+    assert_close(T_converter(17.073897086401, 'ITS-90', 'ITS-76'), 17.075513283896)
+    assert_close(T_converter(T_converter(17.073897086401, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 17.073897086401)
+    assert_close(T_converter(18.260794273576, 'ITS-90', 'ITS-76'), 18.262647665938)
+    assert_close(T_converter(T_converter(18.260794273576, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 18.260794273576)
+    assert_close(T_converter(19.209670487466, 'ITS-90', 'ITS-76'), 19.211708200102)
+    assert_close(T_converter(T_converter(19.209670487466, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 19.209670487466)
+    assert_close(T_converter(20.734166060193, 'ITS-90', 'ITS-76'), 20.736593177144)
+    assert_close(T_converter(T_converter(20.734166060193, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 20.734166060193)
+    assert_close(T_converter(24.619006017206, 'ITS-90', 'ITS-76'), 24.622383782420)
+    assert_close(T_converter(T_converter(24.619006017206, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 24.619006017206)
+    assert_close(T_converter(26.200580731023, 'ITS-90', 'ITS-76'), 26.204440144401)
+    assert_close(T_converter(T_converter(26.200580731023, 'ITS-90', 'ITS-76'), 'ITS-76','ITS-90'), 26.200580731023)
+
+    # Random T90 -> ITS-68 points and round trips
+    assert_close(T_converter(100.656051429236, 'ITS-90', 'ITS-68'), 100.647040261164)
+    assert_close(T_converter(T_converter(100.656051429236, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 100.656051429236)
+    assert_close(T_converter(318.460545436143, 'ITS-90', 'ITS-68'), 318.472077466932)
+    assert_close(T_converter(T_converter(318.460545436143, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 318.460545436143)
+    assert_close(T_converter(387.436178520803, 'ITS-90', 'ITS-68'), 387.464674690384)
+    assert_close(T_converter(T_converter(387.436178520803, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 387.436178520803)
+    assert_close(T_converter(2280.843626060949, 'ITS-90', 'ITS-68'), 2281.571645701955)
+    assert_close(T_converter(T_converter(2280.843626060949, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 2280.843626060949)
+    assert_close(T_converter(2448.638988848594, 'ITS-90', 'ITS-68'), 2449.477910998919)
+    assert_close(T_converter(T_converter(2448.638988848594, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 2448.638988848594)
+    assert_close(T_converter(3349.179834571059, 'ITS-90', 'ITS-68'), 3350.750661627371)
+    assert_close(T_converter(T_converter(3349.179834571059, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 3349.179834571059)
+    assert_close(T_converter(3407.333513222301, 'ITS-90', 'ITS-68'), 3408.961984805847)
+    assert_close(T_converter(T_converter(3407.333513222301, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 3407.333513222301)
+    assert_close(T_converter(3582.608658018462, 'ITS-90', 'ITS-68'), 3584.401939925675)
+    assert_close(T_converter(T_converter(3582.608658018462, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 3582.608658018462)
+    assert_close(T_converter(3742.872067385867, 'ITS-90', 'ITS-68'), 3744.837138119218)
+    assert_close(T_converter(T_converter(3742.872067385867, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 3742.872067385867)
+    assert_close(T_converter(3981.107191722345, 'ITS-90', 'ITS-68'), 3983.328923919461)
+    assert_close(T_converter(T_converter(3981.107191722345, 'ITS-90', 'ITS-68'), 'ITS-68','ITS-90'), 3981.107191722345)
+
+    # Random T90 -> ITS-48 points and round trips
+    assert_close(T_converter(587.537100132141, 'ITS-90', 'ITS-48'), 587.501584795817)
+    assert_close(T_converter(T_converter(587.537100132141, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 587.537100132141)
+    assert_close(T_converter(692.366741369814, 'ITS-90', 'ITS-48'), 692.344588159499)
+    assert_close(T_converter(T_converter(692.366741369814, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 692.366741369814)
+    assert_close(T_converter(1826.436909160389, 'ITS-90', 'ITS-48'), 1824.585952661900)
+    assert_close(T_converter(T_converter(1826.436909160389, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 1826.436909160389)
+    assert_close(T_converter(2022.133734217255, 'ITS-90', 'ITS-48'), 2019.973788475658)
+    assert_close(T_converter(T_converter(2022.133734217255, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 2022.133734217255)
+    assert_close(T_converter(2274.475984915300, 'ITS-90', 'ITS-48'), 2271.978485162272)
+    assert_close(T_converter(T_converter(2274.475984915300, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 2274.475984915300)
+    assert_close(T_converter(2768.019869149050, 'ITS-90', 'ITS-48'), 2764.644373694928)
+    assert_close(T_converter(T_converter(2768.019869149050, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 2768.019869149050)
+    assert_close(T_converter(3355.761956877384, 'ITS-90', 'ITS-48'), 3351.203345457763)
+    assert_close(T_converter(T_converter(3355.761956877384, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 3355.761956877384)
+    assert_close(T_converter(3433.632798425905, 'ITS-90', 'ITS-48'), 3428.931655843199)
+    assert_close(T_converter(T_converter(3433.632798425905, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 3433.632798425905)
+    assert_close(T_converter(4041.866073267261, 'ITS-90', 'ITS-48'), 4035.688458555037)
+    assert_close(T_converter(T_converter(4041.866073267261, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 4041.866073267261)
+    assert_close(T_converter(4183.774670532954, 'ITS-90', 'ITS-48'), 4177.164252155940)
+    assert_close(T_converter(T_converter(4183.774670532954, 'ITS-90', 'ITS-48'), 'ITS-48','ITS-90'), 4183.774670532954)
+
+    # Random T90 -> ITS-27 points and round trips
+    assert_close(T_converter(966.471627470517, 'ITS-90', 'ITS-27'), 965.716314921189)
+    assert_close(T_converter(T_converter(966.471627470517, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 966.471627470517)
+    assert_close(T_converter(1794.702412792593, 'ITS-90', 'ITS-27'), 1795.361363571567)
+    assert_close(T_converter(T_converter(1794.702412792593, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 1794.702412792593)
+    assert_close(T_converter(2440.376619569769, 'ITS-90', 'ITS-27'), 2445.677432276432)
+    assert_close(T_converter(T_converter(2440.376619569769, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 2440.376619569769)
+    assert_close(T_converter(2818.772407687345, 'ITS-90', 'ITS-27'), 2827.963374114178)
+    assert_close(T_converter(T_converter(2818.772407687345, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 2818.772407687345)
+    assert_close(T_converter(2965.912585574560, 'ITS-90', 'ITS-27'), 2976.958286576851)
+    assert_close(T_converter(T_converter(2965.912585574560, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 2965.912585574560)
+    assert_close(T_converter(2982.217569467931, 'ITS-90', 'ITS-27'), 2993.459134966685)
+    assert_close(T_converter(T_converter(2982.217569467931, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 2982.217569467931)
+    assert_close(T_converter(2984.581625145705, 'ITS-90', 'ITS-27'), 2995.851378838990)
+    assert_close(T_converter(T_converter(2984.581625145705, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 2984.581625145705)
+    assert_close(T_converter(3200.884407978739, 'ITS-90', 'ITS-27'), 3215.114723062496)
+    assert_close(T_converter(T_converter(3200.884407978739, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 3200.884407978739)
+    assert_close(T_converter(3512.317533393310, 'ITS-90', 'ITS-27'), 3531.550641197200)
+    assert_close(T_converter(T_converter(3512.317533393310, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 3512.317533393310)
+    assert_close(T_converter(4083.581024594283, 'ITS-90', 'ITS-27'), 4114.606650574897)
+    assert_close(T_converter(T_converter(4083.581024594283, 'ITS-90', 'ITS-27'), 'ITS-27','ITS-90'), 4083.581024594283)
+
+
+def test_roundtrip_conversions():
+    """Test roundtrip conversions between all temperature scales using random points
+    in valid overlapping ranges, accounting for differences between scales."""
+    
+    # Calculate the maximum differences for each scale to ITS-90
+    multiplier =(1+0.2) # safety factor
+    max_diff_27 = max(abs(min(diffs_27)), abs(max(diffs_27)))*multiplier
+    max_diff_48 = max(abs(min(diffs_48)), abs(max(diffs_48)))*multiplier
+    max_diff_68 = max(abs(min(diffs_68)), abs(max(diffs_68)))*multiplier
+    max_diff_76 = max(abs(min(diffs_76)), abs(max(diffs_76)))*multiplier
+    
+    # Adjust ranges to account for these differences
+    scales = ['ITS-68', 'ITS-48', 'ITS-76', 'ITS-27']
+    ranges = {
+        'ITS-68': (14.0 + max_diff_68, 4300.0 - max_diff_68),
+        'ITS-48': (93.15 + max_diff_48, 4273.15 - max_diff_48),
+        'ITS-76': (5.0 + max_diff_76, 27.0 - max_diff_76),
+        'ITS-27': (903.15 + max_diff_27, 4273.15 - max_diff_27)
+    }
+    
+    rng = Random(0)
+    pts = 50
+
+    for scale1 in scales:
+        for scale2 in scales:
+            if scale1 >= scale2:  # Skip redundant combinations
+                continue
+                
+            min_temp = max(ranges[scale1][0], ranges[scale2][0])
+            max_temp = min(ranges[scale1][1], ranges[scale2][1])
+            
+            if min_temp >= max_temp:
+                continue
+                
+            test_points = [rng.uniform(min_temp, max_temp) for _ in range(pts)]
+            for val in test_points:
+                # Test both directions
+                result1 = T_converter(T_converter(val, scale1, scale2), scale2, scale1)
+                result2 = T_converter(T_converter(val, scale2, scale1), scale1, scale2)
+                assert_close(result1, val, rtol=1e-13)
+                assert_close(result2, val, rtol=1e-13)

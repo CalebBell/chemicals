@@ -36,7 +36,7 @@ Conversion functions
 
 """
 
-from fluids.numerics import splev, implementation_optimize_tck
+from fluids.numerics import splev, implementation_optimize_tck, secant
 __all__ = ['T_converter', 'T_scales', 'ITS90_68_difference', 'Ts_68',
 'diffs_68', 'Ts_48', 'diffs_48', 'Ts_76', 'diffs_76', 'Ts_27', 'diffs_27']
 
@@ -380,6 +380,29 @@ def ITS90_68_difference(T):
 
 T_scales = ['ITS-90', 'ITS-68', 'ITS-27', 'ITS-48', 'ITS-76']
 
+def range_check(T, Tmin, Tmax):
+    if T < Tmin or T > Tmax:
+        raise ValueError('Temperature conversion is outside one or both scales')
+
+def errf(T_other, initial_T, backward_calculator):
+    return backward_calculator(T_other) - initial_T
+
+def polish_conversion(T_initial, forward_calculator, backward_calculator):
+    # Get initial guess from direct conversion
+    initial_conversion = forward_calculator(T_initial)
+    # Solve it, normally finishes on the first iteration (3 evals)
+    T_polished = secant(
+        func=errf,
+        x0=initial_conversion,
+        xtol=1e-13,
+        ytol=T_initial*1e-15,
+        require_eval=False,
+        require_xtol=False,
+        maxiter=3,
+        x1=initial_conversion * (1 + 1e-6),
+        args=(T_initial, backward_calculator)
+    )
+    return T_polished
 
 def T_converter(T, current, desired):
     r'''Converts the a temperature reading made in any of the scales
@@ -388,7 +411,8 @@ def T_converter(T, current, desired):
     instance, 'ITS-76' is purely for low temperatures, and 5 K on it has no
     conversion to 'ITS-90' or any other scale. Both a conversion to ITS-90 and
     to the desired scale must be possible for the conversion to occur.
-    The conversion uses cubic spline interpolation.
+    The conversion uses cubic spline interpolation and is reversible to
+    a very high precision.
 
     ITS-68 conversion is valid from 14 K to 4300 K.
     ITS-48 conversion is valid from 93.15 K to 4273.15 K
@@ -413,15 +437,6 @@ def T_converter(T, current, desired):
 
     Notes
     -----
-    Because the conversion is performed by spline functions, a re-conversion
-    of a value will not yield exactly the original value. However, it is quite
-    close.
-
-    The use of splines is quite quick (20 micro seconds/calculation). While
-    just a spline for one-way conversion could be used, a numerical solver
-    would have to be used to obtain an exact result for the reverse conversion.
-    This was found to take approximately 1 ms/calculation, depending on the
-    region.
 
     Examples
     --------
@@ -439,9 +454,6 @@ def T_converter(T, current, desired):
        Temperature Scale of 1990 (Technical Report)." Pure and Applied
        Chemistry 64, no. 10 (1992): 1545-1562. doi:10.1351/pac199264101545.
     '''
-    def range_check(T, Tmin, Tmax):
-        if T < Tmin or T > Tmax:
-            raise ValueError('Temperature conversion is outside one or both scales')
     if current == 'ITS-90':
         pass
     elif current == 'ITS-68':
@@ -458,22 +470,23 @@ def T_converter(T, current, desired):
         T = T27_to_T90(T)
     else:
         raise ValueError('Current scale not supported')
-    # T should be in ITS-90 now
-
+    # T in ITS-90 now
     if desired == 'ITS-90':
         pass
-    elif desired == 'ITS-68':
-        range_check(T, 13.999, 4300.0001)
-        T = T90_to_T68(T)
-    elif desired == 'ITS-76':
-        range_check(T, 4.9999, 27.0001)
-        T = T90_to_T76(T)
-    elif desired == 'ITS-48':
-        range_check(T, 93.149999, 4273.15001)
-        T = T90_to_T48(T)
-    elif desired == 'ITS-27':
-        range_check(T, 903.15, 4273.15)
-        T = T90_to_T27(T)
     else:
-        raise ValueError('Desired scale not supported')
+        if desired == 'ITS-68':
+            range_check(T, 13.999, 4300.0001)
+            forward, backward = T90_to_T68, T68_to_T90
+        elif desired == 'ITS-76':
+            range_check(T, 4.9999, 27.0001)
+            forward, backward = T90_to_T76, T76_to_T90
+        elif desired == 'ITS-48':
+            range_check(T, 93.149999, 4273.15001)
+            forward, backward = T90_to_T48, T48_to_T90
+        elif desired == 'ITS-27':
+            range_check(T, 903.15, 4273.15)
+            forward, backward = T90_to_T27, T27_to_T90
+        else:
+            raise ValueError('Desired scale not supported')
+        T = polish_conversion(T, forward, backward)
     return float(T)
