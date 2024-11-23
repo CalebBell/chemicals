@@ -629,12 +629,11 @@ def test_roundtrip_viscosity_conversions():
     all_scales = tabulated_scales | linear_scales
     
     ranges = {}
-    # For linear scales, use the minimum time and a reasonable maximum
-    # for scale, (coef, min_time) in viscosity_scales_linear.items():
-    # linear_subset = {'caspers tin plate', 'american can', 'parlin cup #30', 'a&w crucible', 'astm 0.20'}
-    # for scale, (coef, min_time) in ((s, viscosity_scales_linear[s]) for s in linear_subset):
-    #         # Use 10x minimum time as a reasonable maximum
-    #     ranges[scale] = (min_time, min_time * 10)
+    # For linear scales, use the minimum time and a reasonable maximum; test only a few scales as they're all the same
+    linear_subset = {'caspers tin plate', 'american can', 'parlin cup #30', 'a&w crucible', 'astm 0.20'}
+    for scale, (coef, min_time) in ((s, viscosity_scales_linear[s]) for s in linear_subset):
+        # Use 10x minimum time as a reasonable maximum
+        ranges[scale] = (min_time, min_time * 10)
     
     # For tabulated scales, use the limits from viscosity_converter_limits instead of the linear scales
     for scale in tabulated_scales:
