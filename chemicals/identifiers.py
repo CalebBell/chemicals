@@ -248,7 +248,46 @@ class ChemicalMetadata:
 
     __slots__ = ('pubchemid', 'formula', 'MW', 'smiles', 'InChI', 'InChI_key',
                  'iupac_name', 'common_name', 'synonyms', 'CAS', '_charge')
+
     def __repr__(self):
+        return (f"ChemicalMetadata(pubchemid={self.pubchemid!r}, "
+                f"CAS={self.CAS!r}, "
+                f"formula={self.formula!r}, "
+                f"MW={self.MW!r}, "
+                f"smiles={self.smiles!r}, "
+                f"InChI={self.InChI!r}, "
+                f"InChI_key={self.InChI_key!r}, "
+                f"iupac_name={self.iupac_name!r}, "
+                f"common_name={self.common_name!r}, "
+                f"synonyms={self.synonyms!r})")
+
+    def __eq__(self, other):
+        if self is other:
+            return True
+        return (self.pubchemid == other.pubchemid and
+                self.CAS == other.CAS and
+                self.formula == other.formula and
+                self.MW == other.MW and
+                self.smiles == other.smiles and
+                self.InChI == other.InChI and
+                self.InChI_key == other.InChI_key and
+                self.iupac_name == other.iupac_name and
+                self.common_name == other.common_name and
+                self.synonyms == other.synonyms)
+
+    def __hash__(self):
+        return hash((self.pubchemid,
+                    self.CAS,
+                    self.formula,
+                    self.MW,
+                    self.smiles, 
+                    self.InChI,
+                    self.InChI_key,
+                    self.iupac_name,
+                    self.common_name,
+                    tuple(self.synonyms)))
+
+    def __str__(self):
         return (f'<ChemicalMetadata, name={self.common_name}, formula={self.formula}, smiles={self.smiles}, MW={self.MW:g}>')
 
     @property
@@ -743,17 +782,17 @@ def search_chemical(ID, autoload=False, cache=True):
 
     Examples
     --------
-    >>> search_chemical('water')
+    >>> print(search_chemical('water'))
     <ChemicalMetadata, name=water, formula=H2O, smiles=O, MW=18.0153>
-    >>> search_chemical('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
+    >>> print(search_chemical('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3'))
     <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
-    >>> search_chemical('CCCCCCCCCC')
+    >>> print(search_chemical('CCCCCCCCCC'))
     <ChemicalMetadata, name=decane, formula=C10H22, smiles=CCCCCCCCCC, MW=142.282>
-    >>> search_chemical('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
+    >>> print(search_chemical('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N'))
     <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
-    >>> search_chemical('pubchem=702')
+    >>> print(search_chemical('pubchem=702'))
     <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
-    >>> search_chemical('O') # only elements can be specified by symbol
+    >>> print(search_chemical('O')) # only elements can be specified by symbol
     <ChemicalMetadata, name=oxygen, formula=O, smiles=[O], MW=15.9994>
     """
     if cache and ID in chemical_search_cache:

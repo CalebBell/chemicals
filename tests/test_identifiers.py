@@ -34,6 +34,7 @@ from chemicals.identifiers import (
     CAS_from_any,
     CAS_to_int,
     ChemicalMetadataDB,
+    ChemicalMetadata,
     IDs_to_CASs,
     check_CAS,
     common_mixtures,
@@ -1447,6 +1448,73 @@ def test_sorted_CAS_key():
     assert invalid_CAS_expect == invalid_CAS_test
 
 
+
+def test_ChemicalMetadata_basics():
+    from copy import deepcopy
+    import pickle
+    obj = ChemicalMetadata(pubchemid=712, CAS=50000, formula='CH2O', MW=30.02598, smiles='C=O', InChI='CH2O/c1-2/h1H2', 
+                    InChI_key='WSFSSNUMVMOOMR-UHFFFAOYSA-N', iupac_name='methanal', common_name='formaldehyde', 
+                    synonyms=['methanal', 'formaldehyde', 'formalin', 'methanal', 'methylene oxide'])
+    assert eval(obj.__repr__()) == obj
+    assert hash(eval(obj.__repr__())) == hash(obj)
+
+    # Test equality with identical object
+    assert obj == obj
+    
+    # Test hash consistency
+    assert hash(obj) == hash(obj)
+    
+    # Test deepcopy
+    obj_copy = deepcopy(obj)
+    assert obj == obj_copy
+    assert hash(obj) == hash(obj_copy)
+    
+    # Test pickling
+    obj_pickle = pickle.loads(pickle.dumps(obj))
+    assert obj_pickle == obj
+    assert hash(obj_pickle) == hash(obj)
+
+    # Test hash consistency after accessing computed property
+    hash_before = hash(obj)
+    _ = obj.charge
+    hash_after = hash(obj)
+    assert hash_before == hash_after
+
+
+def test_ChemicalMetadata_inequality():
+    base_obj = ChemicalMetadata(
+        pubchemid=712, 
+        CAS=50000, 
+        formula='CH2O', 
+        MW=30.02598, 
+        smiles='C=O', 
+        InChI='CH2O/c1-2/h1H2', 
+        InChI_key='WSFSSNUMVMOOMR-UHFFFAOYSA-N', 
+        iupac_name='methanal', 
+        common_name='formaldehyde', 
+        synonyms=['methanal', 'formaldehyde']
+    )
+    
+    # Test inequality with modified attributes
+    modifications = {
+        'pubchemid': 713,
+        'CAS': 50001,
+        'formula': 'CH3O',
+        'MW': 30.02599,
+        'smiles': 'CO',
+        'InChI': 'different_inchi',
+        'InChI_key': 'different_key',
+        'iupac_name': 'different_name',
+        'common_name': 'different_common_name',
+        'synonyms': ['different', 'synonyms']
+    }
+    
+    for attr, new_value in modifications.items():
+        kwargs = {k: getattr(base_obj, k) for k in base_obj.__slots__ if k != '_charge'}
+        kwargs[attr] = new_value
+        different_obj = ChemicalMetadata(**kwargs)
+        assert base_obj != different_obj
+        assert hash(base_obj) != hash(different_obj)
 
 def test_formula_search_exceptions():
     """
