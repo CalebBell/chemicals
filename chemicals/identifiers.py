@@ -72,6 +72,7 @@ import os
 
 from chemicals.elements import charge_from_formula, homonuclear_elements_CASs_set, periodic_table, serialize_formula
 from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path, to_num
+import sqlite3
 
 folder = os_path_join(source_path, 'Identifiers')
 
@@ -402,7 +403,7 @@ class ChemicalMetadataDB:
     def __iter__(self):
         if not self.finished_loading:
             self.autoload_main_db()
-        return iter(i for i in self.InChI_key_index.values())
+        return iter(i for i in self.CAS_index.values())
 
     @property
     def finished_loading(self):
@@ -472,6 +473,138 @@ class ChemicalMetadataDB:
         '''Search for a chemical by its serialized formula.
         '''
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
+
+
+class ChemicalMetadataDiskDB:
+    """SQLite-backed version of ChemicalMetadataDB"""
+    
+    def __init__(self, db_path=os_path_join(folder, 'metadata.db')):
+        """Initialize connection to the SQLite database
+        
+        Parameters
+        ----------
+        db_path : str or Path
+            Path to the SQLite database file
+        """
+        self.db_path = db_path
+        self._conn = sqlite3.connect(db_path)
+        self._conn.row_factory = sqlite3.Row  # Allow column name access
+        
+    def _row_to_metadata(self, row):
+        """Convert a database row to a ChemicalMetadata object"""
+        if row is None:
+            return None
+            
+        synonyms = [row['iupac_name'], row['common_name']]
+        if row['raw_synonyms']:
+            synonyms.extend(row['raw_synonyms'].split('\t'))
+        
+        return ChemicalMetadata(
+            pubchemid=row['pubchemid'],
+            CAS=row['cas'],
+            formula=row['formula'],
+            MW=row['mw'],
+            smiles=row['smiles'],
+            InChI=row['inchi'],
+            InChI_key=row['inchi_key'],
+            iupac_name=row['iupac_name'],
+            common_name=row['common_name'],
+            synonyms=synonyms
+        )
+    
+    def search_pubchem(self, pubchem, autoload=True):
+        """Search for a chemical by its pubchem number"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE pubchemid = ?",
+            (int(pubchem),)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_CAS(self, CAS, autoload=True):
+        """Search for a chemical by its CAS number"""
+        if isinstance(CAS, str):
+            CAS = int(CAS.replace('-', ''))
+        
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE cas = ?",
+            (CAS,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_smiles(self, smiles, autoload=True):
+        """Search for a chemical by its SMILES string"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE smiles = ?",
+            (smiles,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_InChI(self, InChI, autoload=True):
+        """Search for a chemical by its InChI string"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE inchi = ?",
+            (InChI,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_InChI_key(self, InChI_key, autoload=True):
+        """Search for a chemical by its InChI key"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE inchi_key = ?",
+            (InChI_key,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_name(self, name, autoload=True):
+        """Search for a chemical by its name"""
+        cur = self._conn.cursor()
+        cur.execute("""
+            SELECT c.* FROM chemicals c
+            JOIN chemical_synonyms cs ON c.cas = cs.cas
+            WHERE cs.synonym = ?
+        """, (name,))
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_formula(self, formula, autoload=True):
+        """Search for a chemical by its formula"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE formula = ?",
+            (formula,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def __iter__(self):
+        """Iterate over all chemicals in the database"""
+        cur = self._conn.cursor()
+        cur.execute("SELECT * FROM chemicals")
+        while True:
+            batch = cur.fetchmany(1000)  # Process in batches for memory efficiency
+            if not batch:
+                break
+            for row in batch:
+                yield self._row_to_metadata(row)
+    
+    def __len__(self):
+        """Return the total number of chemicals in the database"""
+        cur = self._conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM chemicals")
+        return cur.fetchone()[0]
+    
+    @property
+    def finished_loading(self):
+        """Always returns True as database is pre-loaded"""
+        return True
+
+    def close(self):
+        """Explicitly close the database connection"""
+        self._conn.close()
+
 
 @mark_numba_incompatible
 def CAS_from_any(ID, autoload=False, cache=True):
@@ -936,7 +1069,8 @@ def get_pubchem_db():
     if _pubchem_db_loaded:  # pragma: no cover
         return pubchem_db
     else:
-        pubchem_db = ChemicalMetadataDB()
+        # pubchem_db = ChemicalMetadataDB()
+        pubchem_db = ChemicalMetadataDiskDB()
     _pubchem_db_loaded = True
     return pubchem_db
 
