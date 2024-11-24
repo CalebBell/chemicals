@@ -235,8 +235,10 @@ CONSTANT_DATABASE_COLUMNS = ['index', 'MW', 'Tt', 'Tm', 'Tb', 'Tc', 'Pt', 'Pc', 
 
 CONSTANT_DATABASE_NAME_TO_IDX = {k: i for i, k in enumerate(CONSTANT_DATABASE_COLUMNS)}
 CONSTANTS_CURSOR = None
-
-thread_local_storage = threading.local()
+try:
+    thread_local_storage = threading.local()
+except:
+    pass
 
 DATABASE_CONSTANTS_CACHE = {}
 
