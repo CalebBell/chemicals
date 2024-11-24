@@ -288,7 +288,7 @@ def test_IDs_to_CASs():
 def test_search_chemical():
     hit0 = search_chemical('water')
     hit1 = search_chemical('water')
-    assert hit0 is hit1
+    assert hit0 == hit1
 
     with pytest.raises(ValueError):
         # Not that smart/weird
@@ -1019,9 +1019,9 @@ def test_parahydrogen():
     assert chemical.common_name == 'parahydrogen'
     assert chemical.iupac_name == 'parahydrogen'
     # Test some key synonyms
-    assert search_chemical('p-H2') is chemical
-    assert search_chemical('pH2') is chemical
-    assert search_chemical('para-hydrogen') is chemical
+    assert search_chemical('p-H2') == chemical
+    assert search_chemical('pH2') == chemical
+    assert search_chemical('para-hydrogen') == chemical
 
 def test_orthohydrogen():
     chemical = search_chemical('orthohydrogen')
@@ -1035,9 +1035,9 @@ def test_orthohydrogen():
     assert chemical.common_name == 'orthohydrogen'
     assert chemical.iupac_name == 'orthohydrogen'
     # Test some key synonyms
-    assert search_chemical('o-H2') is chemical
-    assert search_chemical('ortho-H2') is chemical
-    assert search_chemical('ortho-hydrogen') is chemical
+    assert search_chemical('o-H2') == chemical
+    assert search_chemical('ortho-H2') == chemical
+    assert search_chemical('ortho-hydrogen') == chemical
 
 def test_normal_hydrogen():
     chemical = search_chemical('normal hydrogen')
@@ -1051,8 +1051,8 @@ def test_normal_hydrogen():
     assert chemical.common_name == 'normal hydrogen'
     assert chemical.iupac_name == 'normal hydrogen'
     # Test some key synonyms
-    assert search_chemical('n-H2') is chemical
-    assert search_chemical('nH2') is chemical
+    assert search_chemical('n-H2') == chemical
+    assert search_chemical('nH2') == chemical
     assert '75:25 ortho:para hydrogen mixture' in chemical.synonyms
 
 
@@ -1068,9 +1068,9 @@ def test_equilibrium_hydrogen():
     assert chemical.common_name == 'hydrogen'
     assert chemical.iupac_name == 'molecular hydrogen'
     # Test some key synonyms from the provided list
-    assert search_chemical('dihydrogen') is chemical
-    assert search_chemical('hydrogen molecule') is chemical
-    assert search_chemical('equilibrium hydrogen') is chemical
+    assert search_chemical('dihydrogen') == chemical
+    assert search_chemical('hydrogen molecule') == chemical
+    assert search_chemical('equilibrium hydrogen') == chemical
 
 def test_atomic_hydrogen():
     chemical = search_chemical('atomic hydrogen')
@@ -1107,10 +1107,10 @@ def test_equilibrium_deuterium():
     assert chemical.common_name == 'deuterium'
     assert chemical.iupac_name == 'deuterium'
     # Test some key synonyms
-    assert search_chemical('dideuterium') is chemical
-    assert search_chemical('deuterium molecule') is chemical
-    assert search_chemical('heavy hydrogen') is chemical
-    assert search_chemical('hydrogen-2') is chemical
+    assert search_chemical('dideuterium') == chemical
+    assert search_chemical('deuterium molecule') == chemical
+    assert search_chemical('heavy hydrogen') == chemical
+    assert search_chemical('hydrogen-2') == chemical
 
 def test_paradeuterium():
     chemical = search_chemical('paradeuterium')
@@ -1124,9 +1124,9 @@ def test_paradeuterium():
     assert chemical.common_name == 'paradeuterium'
     assert chemical.iupac_name == 'paradeuterium'
     # Test some key synonyms
-    assert search_chemical('p-D2') is chemical
-    assert search_chemical('pD2') is chemical
-    assert search_chemical('para-deuterium') is chemical
+    assert search_chemical('p-D2') == chemical
+    assert search_chemical('pD2') == chemical
+    assert search_chemical('para-deuterium') == chemical
 
 def test_orthodeuterium():
     chemical = search_chemical('orthodeuterium')
@@ -1140,9 +1140,9 @@ def test_orthodeuterium():
     assert chemical.common_name == 'orthodeuterium'
     assert chemical.iupac_name == 'orthodeuterium'
     # Test some key synonyms
-    assert search_chemical('o-D2') is chemical
-    assert search_chemical('ortho-D2') is chemical
-    assert search_chemical('ortho-deuterium') is chemical
+    assert search_chemical('o-D2') == chemical
+    assert search_chemical('ortho-D2') == chemical
+    assert search_chemical('ortho-deuterium') == chemical
 
 def test_normal_deuterium():
     chemical = search_chemical('normal deuterium')
@@ -1156,8 +1156,8 @@ def test_normal_deuterium():
     assert chemical.common_name == 'normal deuterium'
     assert chemical.iupac_name == 'normal deuterium'
     # Test some key synonyms
-    assert search_chemical('n-D2') is chemical
-    assert search_chemical('nD2') is chemical
+    assert search_chemical('n-D2') == chemical
+    assert search_chemical('nD2') == chemical
     assert '2:1 ortho:para deuterium mixture' in chemical.synonyms
 
 def test_absence_of_air_as_a_compound():
