@@ -152,17 +152,17 @@ inputs may be specified as
 
 Some sample queries illustrating the topic:
 
->>> search_chemical('water')
+>>> print(search_chemical('water'))
 <ChemicalMetadata, name=water, formula=H2O, smiles=O, MW=18.0153>
->>> search_chemical('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3')
+>>> print(search_chemical('InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3'))
 <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
->>> search_chemical('CCCCCCCCCC')
+>>> print(search_chemical('CCCCCCCCCC'))
 <ChemicalMetadata, name=decane, formula=C10H22, smiles=CCCCCCCCCC, MW=142.282>
->>> search_chemical('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N')
+>>> print(search_chemical('InChIKey=LFQSCWFLJHTTHZ-UHFFFAOYSA-N'))
 <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
->>> search_chemical('pubchem=702')
+>>> print(search_chemical('pubchem=702'))
 <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
->>> search_chemical('O') # only elements can be specified by symbol
+>>> print(search_chemical('O')) # only elements can be specified by symbol
 <ChemicalMetadata, name=oxygen, formula=O, smiles=[O], MW=15.9994>
 
 
