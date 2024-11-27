@@ -262,45 +262,25 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
         Parameter for the equation; chemical and property specific [-]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
-        for 1, the first derivative of the property is returned, for
-        -1, the indefinite integral of the property with respect to temperature
-        is returned; and for -10, the indefinite integral of the property
-        divided by temperature with respect to temperature is returned. No
+        for 1, the first derivative of the property is returned. No
         other integrals or derivatives are implemented, and an exception will
         be raised if any other order is given.
 
     Returns
     -------
     Y : float
-        Property [constant-specific; if order == 1, property/K; if order == -1,
-                  property*K; if order == INTEGRAL_OVER_T_CALCULATION, unchanged from default]
+        Property [constant-specific; if order == 1, property/K;
+                  property*K]
 
     Notes
     -----
-    The derivative with respect to T, integral with respect to T, and integral
-    over T with respect to T are computed as follows. The first derivative is
-    easily computed; the two integrals required Rubi to perform the integration.
+    The derivative with respect to T is computed as follows.
 
     .. math::
         \frac{d Y}{dT} = \frac{A B T^{B}}{T \left(\frac{C}{T} + \frac{D}{T^{2}}
         + 1\right)} + \frac{A T^{B} \left(\frac{C}{T^{2}} + \frac{2 D}{T^{3}}
         \right)}{\left(\frac{C}{T} + \frac{D}{T^{2}} + 1\right)^{2}}
 
-    .. math::
-        \int Y dT = - \frac{2 A T^{B + 3} \operatorname{hyp2f1}{\left (1,B + 3,
-        B + 4,- \frac{2 T}{C - \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 3\right)
-        \left(C + \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}} + \frac{2 A
-        T^{B + 3} \operatorname{hyp2f1}{\left (1,B + 3,B + 4,- \frac{2 T}{C
-        + \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 3\right) \left(C
-        - \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}}
-
-    .. math::
-        \int \frac{Y}{T} dT = - \frac{2 A T^{B + 2} \operatorname{hyp2f1}{\left
-        (1,B + 2,B + 3,- \frac{2 T}{C + \sqrt{C^{2} - 4 D}} \right )}}{\left(B
-        + 2\right) \left(C + \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}}
-        + \frac{2 A T^{B + 2} \operatorname{hyp2f1}{\left (1,B + 2,B + 3,
-        - \frac{2 T}{C - \sqrt{C^{2} - 4 D}} \right )}}{\left(B + 2\right)
-        \left(C - \sqrt{C^{2} - 4 D}\right) \sqrt{C^{2} - 4 D}}
 
     Examples
     --------
@@ -316,31 +296,15 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
     '''
     if order == 0:
         easy = A/(1. + C/T + D/(T*T))
+        if easy == 0.0:
+            return easy
         try:
             return easy*T**B
-        except:
+        except OverflowError:
             return 1e308
     elif order == 1:
         return (A*B*T**B/(T*(C/T + D/T**2 + 1))
                 + A*T**B*(C/T**2 + 2*D/T**3)/(C/T + D/T**2 + 1)**2)
-    elif order == -1: # numba: delete
-        # numba-scipy does not support complex numbers so this does not work in numba
-        # imaginary part is 0
-        # Hours spend trying to make hyp2f1 use real inputs only: 3
-        c0 = 3.0 + B # numba: delete
-        x0 = csqrt(C*C - 4.0*D) # numba: delete
-        arg3_hyp = (-2.0*T/(C - x0)) # numba: delete
-        hyp2f1_term1 = hyp2f1(1.0, c0, 4.0+B, arg3_hyp) # numba: delete
-        hyp2f1_term2 = hyp2f1_term1.real - hyp2f1_term1.imag*1.0j# numba: delete
-        x5 = 2.0*A*T**(c0)/(c0*x0) # numba: delete
-        x10 = x5/(C - x0) # numba: delete
-        x11 = x5/(C + x0) # numba: delete
-        return float((hyp2f1_term1*x10 - hyp2f1_term2*x11).real) # numba: delete
-    elif order == INTEGRAL_OVER_T_CALCULATION: # numba: delete
-        return float((2*A*T**(2+B)*hyp2f1(1.0, 2.0+B, 3.0+B, -2*T/(C - csqrt(C*C - 4*D)))/( # numba: delete
-                (2+B)*(C - csqrt(C*C-4*D))*csqrt(C*C-4*D)) -2*A*T**(2+B)*hyp2f1( # numba: delete
-                1.0, 2.0+B, 3.0+B, -2*T/(C + csqrt(C*C - 4*D)))/((2+B)*(C + csqrt( # numba: delete
-                C*C-4*D))*csqrt(C*C-4*D))).real) # numba: delete
     else:
         raise ValueError(order_not_found_msg)
 

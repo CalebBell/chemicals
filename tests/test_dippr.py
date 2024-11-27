@@ -316,28 +316,25 @@ def test_EQ102_more():
     assert_close(diff_1T, diff_1T_analytical, rtol=1E-3)
     assert_close(diff_1T, 3.5861274167602139e-08)
 
-    # Integral
-    int_250 = EQ102(250., *coeffs, order=-1)
-    int_220 = EQ102(220., *coeffs, order=-1)
-    numerical_1T = quad(EQ102, 220, 250, args=coeffs)[0]
-    assert_close(int_250 - int_220, numerical_1T)
-    assert_close(int_250 - int_220, 0.00022428562125110119)
-
-#     Integral over T
-    T_int_250 = EQ102(250., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
-    T_int_220 = EQ102(220., *coeffs, order=INTEGRAL_OVER_T_CALCULATION)
-
-    to_int = lambda T :EQ102(T, *coeffs)/T
-    numerical_1_over_T = quad(to_int, 220, 250)[0]
-    assert_close(T_int_250 - T_int_220, numerical_1_over_T)
-    assert_close(T_int_250 - T_int_220, 9.5425212178091671e-07)
-#
     with pytest.raises(Exception):
         EQ102(20., *coeffs, order=1E100)
 
     # No overflow
     EQ102(T = 194.6, A = 0.0, B = 4000.0, C = 0.75, D = 0.0, order = 0)
-
+    # Large exponent with small T
+    result2 = EQ102(T=0.1, A=1.0, B=1000.0, C=0.0, D=0.0, order=0)
+    # Very large T with moderate exponent
+    result3 = EQ102(T=1e308, A=1.0, B=2.0, C=0.0, D=0.0, order=0)
+    # Large A coefficient with large exponent
+    result4 = EQ102(T=100.0, A=1e200, B=50.0, C=0.0, D=0.0, order=0)
+    # Small T with large D coefficient
+    result5 = EQ102(T=0.5, A=1.0, B=2.0, C=0.0, D=1e200, order=0)
+    # Combination of large values
+    result6 = EQ102(T=1e100, A=1e100, B=100.0, C=1e50, D=1e50, order=0)
+    # Near-zero T with moderate parameters
+    result7 = EQ102(T=1e-100, A=1.0, B=2.0, C=1.0, D=1.0, order=0)
+    # Large negative exponent
+    result8 = EQ102(T=2.0, A=1.0, B=-1000.0, C=0.0, D=0.0, order=0)
 
 def test_EQ100_more():
     # T derivative
