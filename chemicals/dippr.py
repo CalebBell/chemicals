@@ -300,7 +300,7 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
             return easy
         try:
             return easy*T**B
-        except OverflowError:
+        except:
             return 1e308
     elif order == 1:
         return (A*B*T**B/(T*(C/T + D/T**2 + 1))
@@ -1537,7 +1537,7 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
 dippr_eq_supported_orders = {
 EQ100: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 EQ101: (0, 1, 2, 3),
-EQ102: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
+EQ102: (0, 1),
 EQ104: (0, 1, -1, INTEGRAL_OVER_T_CALCULATION),
 EQ105: (0, 1, 2, 3),
 EQ106: (0, 1, 2, 3),
