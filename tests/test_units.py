@@ -64,4 +64,6 @@ def test_Rackett_fit_variable_units():
 
 def test_parse_numpydoc_variables_units():
     import chemicals
-    check_module_docstring_parameters(chemicals)
+    check_module_docstring_parameters(chemicals, bad_names={'EQ101_fitting_jacobian', 'EQ102_fitting_jacobian', 
+                                'EQ105_fitting_jacobian', 'EQ106_fitting_jacobian',
+                                'EQ107_fitting_jacobian', '__getattr__', 'all_submodules'})

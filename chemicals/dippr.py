@@ -278,8 +278,14 @@ def EQ102(T, A, B, C=0.0, D=0.0, order=0):
     ----------
     T : float
         Temperature, [K]
-    A-D : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        Numerator coefficient, no default [varies]
+    B : float
+        Temperature exponent, no default [-]
+    C : float, optional
+        First denominator coefficient, default=0 [K]
+    D : float, optional
+        Second denominator coefficient, default=0 [K^2]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned. No
