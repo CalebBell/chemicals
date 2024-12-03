@@ -1163,7 +1163,7 @@ def DIPPR9G(T, P, Tc, Pc, kl):
         Temperature of fluid [K]
     P : float
         Pressure of fluid [Pa]
-    Tc: float
+    Tc : float
         Critical point of fluid [K]
     Pc : float
         Critical pressure of the fluid [Pa]
@@ -1578,14 +1578,16 @@ def DIPPR9B(T, MW, Cvm, mu, Tc=None, chemtype=None):
     ----------
     T : float
         Temperature of the fluid [K]
-    Tc : float
-        Critical temperature of the fluid [K]
     MW : float
         Molwcular weight of fluid [g/mol]
     Cvm : float
         Molar heat capacity at constant volume of fluid, [J/mol/K]
     mu : float
         Viscosity of gas, [Pa*s]
+    Tc : float
+        Critical temperature of the fluid [K]
+    chemtype : str, optional
+        One of 'monoatomic', 'nonlinear', None, [-]
 
     Returns
     -------

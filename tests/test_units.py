@@ -23,6 +23,7 @@ SOFTWARE.
 from fluids.numerics import assert_close
 
 from chemicals.units import Lastovka_solid_integral_over_T, LHV_from_HHV, Rackett_fit, speed_of_sound, u
+from fluids.units import check_module_docstring_parameters
 
 
 def assert_pint_allclose(value, magnitude, units, rtol=1e-7, atol=0):
@@ -61,3 +62,6 @@ def test_Rackett_fit_variable_units():
     assert_pint_allclose(Vm, 0.001745205199588548, {'[length]': 3, '[mass]': -1})
 
 
+def test_parse_numpydoc_variables_units():
+    import chemicals
+    check_module_docstring_parameters(chemicals)

@@ -814,7 +814,7 @@ def Antoine_coeffs_from_point(T, Psat, dPsat_dT, d2Psat_dT2, base=10.0):
         First temperature derivative of vapor pressure at specified `T` [Pa/K]
     d2Psat_dT2 : float
         Second temperature derivative of vapor pressure at specified `T` [Pa/K^2]
-    Base : float, optional
+    base : float, optional
         Base of logarithm; 10 by default
 
     Returns
@@ -881,7 +881,7 @@ def Antoine_AB_coeffs_from_point(T, Psat, dPsat_dT, base=10.0):
         Vapor pressure at specified `T` [Pa]
     dPsat_dT : float
         First temperature derivative of vapor pressure at specified `T` [Pa/K]
-    Base : float, optional
+    base : float, optional
         Base of logarithm; 10 by default
 
     Returns
@@ -1982,7 +1982,7 @@ def Tsat_IAPWS(P):
 
     Parameters
     ----------
-    Psat : float
+    P : float
         Vapor pressure at T [Pa]
 
     Returns

@@ -1404,7 +1404,7 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
 
     Parameters
     ----------
-    xs: list
+    xs : list
         Mole fractions of each component
     T : float
         Temperature of fluid [K]

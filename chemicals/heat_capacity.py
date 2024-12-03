@@ -2190,8 +2190,6 @@ def Dadgostar_Shaw_integral(T, similarity_variable, MW=None):
         similarity variable as defined in [1]_, [mol/g]
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
-    terms : float, optional
-        Terms in Dadgostar-Shaw equation as computed by :obj:`Dadgostar_Shaw_terms`
 
     Returns
     -------
@@ -2239,8 +2237,6 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
         similarity variable as defined in [1]_, [mol/g]
     MW : float, optional
         Molecular weight of the pure compound or mixture average, [g/mol]
-    terms : float, optional
-        Terms in Dadgostar-Shaw equation as computed by :obj:`Dadgostar_Shaw_terms`
 
     Returns
     -------
@@ -2803,6 +2799,8 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
         Temperature of fluid [K]
     thetas : list[float]
         Characteristic temperatures, [K]
+    linear : bool, optional
+        Whether the molecule is linear or not, [-]
 
     Returns
     -------
@@ -2883,6 +2881,8 @@ def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
         Temperature of fluid [K]
     thetas : list[float]
         Characteristic temperatures, [K]
+    linear : bool, optional
+        Whether the molecule is linear or not, [-]
 
     Returns
     -------
@@ -2931,6 +2931,8 @@ def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
         Temperature of fluid [K]
     thetas : list[float]
         Characteristic temperatures, [K]
+    linear : bool, optional
+        Whether the molecule is linear or not, [-]
 
     Returns
     -------
@@ -2959,7 +2961,7 @@ def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
     return S_R*R
 
 
-def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
+def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1.0):
     r'''Convert a vibrational frequency in units of 1/cm to a characteristic
     temperature for use in calculating heat capacity.
 
@@ -2970,7 +2972,7 @@ def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1):
     ----------
     frequency : float
         Vibrational frequency, [1/cm]
-    scale : float
+    scale : float, optional
         A scale factor used to adjust the frequency for differences in
         experimental vs. calculated values, [-]
 

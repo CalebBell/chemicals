@@ -101,8 +101,20 @@ def EQ100(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
     ----------
     T : float
         Temperature, [K]
-    A-G : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float, optional
+        Zero-order coefficient, default=0 [-]
+    B : float, optional
+        First-order coefficient, default=0 [1/K]
+    C : float, optional
+        Second-order coefficient, default=0 [1/K^2]
+    D : float, optional
+        Third-order coefficient, default=0 [1/K^3]
+    E : float, optional
+        Fourth-order coefficient, default=0 [1/K^4]
+    F : float, optional
+        Fifth-order coefficient, default=0 [1/K^5]
+    G : float, optional
+        Sixth-order coefficient, default=0 [1/K^6]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for

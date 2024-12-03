@@ -282,7 +282,7 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
         Second emperical coefficient of a fluid.
     n1 : float, optional
         Second emperical exponent of a fluid.
-    sigma1 : float, optional
+    sigma2 : float, optional
         Third emperical coefficient of a fluid.
     n2 : float, optional
         Third emperical exponent of a fluid.
@@ -1467,7 +1467,7 @@ def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
         low pressures, [m^3/mol]
     xs : list[float]
         Mole fractions of all components in liquid phase, [-]
-    xs : list[float]
+    ys : list[float]
         Mole fractions of all components in gas phase, [-]
 
     Returns

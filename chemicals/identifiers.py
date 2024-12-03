@@ -127,7 +127,7 @@ def check_CAS(CASRN):
         return False
 
 @mark_numba_incompatible
-def CAS_to_int(i):
+def CAS_to_int(CASRN):
     r'''Converts CAS number of a compounds from a string to an int. This is
     helpful when storing large amounts of CAS numbers, as their strings take up
     more memory than their numerical representational. All CAS numbers fit into
@@ -153,10 +153,10 @@ def CAS_to_int(i):
     >>> CAS_to_int('7704-34-9')
     7704349
     '''
-    return int(i.replace('-', ''))
+    return int(CASRN.replace('-', ''))
 
 @mark_numba_incompatible
-def int_to_CAS(i):
+def int_to_CAS(CASRN):
     r'''Converts CAS number of a compounds from an int to an string. This is
     helpful when dealing with int CAS numbers.
 
@@ -180,8 +180,8 @@ def int_to_CAS(i):
     >>> int_to_CAS(7704349)
     '7704-34-9'
     '''
-    i = str(i)
-    return i[:-3]+'-'+i[-3:-1]+'-'+i[-1]
+    CASRN = str(CASRN)
+    return CASRN[:-3]+'-'+CASRN[-3:-1]+'-'+CASRN[-1]
 
 @mark_numba_incompatible
 def sorted_CAS_key(CASs):
@@ -458,7 +458,8 @@ class ChemicalMetadataDB:
     def autoload_main_db(self):
         '''Load the main database when needed.
         '''
-        self.load(self.main_db)
+        if os.path.exists(self.main_db):
+            self.load(self.main_db)
         for db in self.user_dbs:
             self.load(db)
         self.load_elements()
@@ -728,7 +729,7 @@ def _search_chemical(ID, autoload):
                 if not autoload:
                     obj = search_chemical(ID, autoload=True)
                     return obj
-                raise ValueError(f'A valid InChI Key ({inchi_key_lookup}) was recognized, but it is not in the database')
+                raise ValueError(f'A valid InChI Key ({ID[9:]}) was recognized, but it is not in the database')
     if ID_len > 8:
         if ID_lower[0:8] == 'pubchem=':
             pubchem_lookup = pubchem_db.search_pubchem(ID[8:], autoload)
