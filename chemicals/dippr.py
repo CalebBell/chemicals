@@ -188,8 +188,16 @@ def EQ101(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     ----------
     T : float
         Temperature, [K]
-    A-E : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        First coefficient [-]
+    B : float  
+        Second coefficient [K]
+    C : float, optional
+        Third coefficient, default=0 [-]
+    D : float, optional
+        Fourth coefficient, default=0 [-]
+    E : float, optional
+        Fifth coefficient (often an integer), default=0 [-]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for `n`, the `nth` derivative of the property is returned. No
