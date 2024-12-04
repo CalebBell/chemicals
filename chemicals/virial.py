@@ -235,7 +235,7 @@ def B_from_Z(Z, T, P):
     return (Z - 1.0)*R*T/P
 
 
-def Z_from_virial_density_form(T, P, *args):
+def Z_from_virial_density_form(T, P, coeffs=None):
     r'''Calculates the compressibility factor of a gas given its temperature,
     pressure, and molar density-form virial coefficients. Any number of
     coefficients is supported.
@@ -250,9 +250,12 @@ def Z_from_virial_density_form(T, P, *args):
         Temperature, [K]
     P : float
         Pressure, [Pa]
-    B to Z : float, optional
-        Virial coefficients, [various]
-
+    coeffs : list[float], optional
+        Sequence of virial coefficients [m³/mol^n], where n is the position:
+        - First coefficient (n=1): Second virial coefficient B [m³/mol]
+        - Second coefficient (n=2): Third virial coefficient C [m³/mol²]
+        - Third coefficient (n=3): Fourth virial coefficient D [m³/mol³]
+    
     Returns
     -------
     Z : float
@@ -276,7 +279,7 @@ def Z_from_virial_density_form(T, P, *args):
 
     Examples
     --------
-    >>> Z_from_virial_density_form(300, 122057.233762653, 1E-4, 1E-5, 1E-6, 1E-7)
+    >>> Z_from_virial_density_form(300, 122057.233762653, [1E-4, 1E-5, 1E-6, 1E-7])
     1.28434940526
 
     References
@@ -287,9 +290,11 @@ def Z_from_virial_density_form(T, P, *args):
     .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering.
        Butterworth-Heinemann, 1985.
     '''
-    l = len(args)
-    if l == 1 or l==2 and args[1] == 0.0:
-        B = args[0]
+    if coeffs is None:
+        return 1.0
+    l = len(coeffs)
+    if l == 1 or l==2 and coeffs[1] == 0.0:
+        B = coeffs[0]
         determining_factor = 4.0*B*P + R*T
         if determining_factor < 0.0:
             Pmin = -0.25*R*T/(B)
@@ -298,7 +303,7 @@ def Z_from_virial_density_form(T, P, *args):
         return 1.0/2. + 0.5*sqrt((determining_factor)/(R*T))
 #        return ((R*T*(4*args[0]*P + R*T))**0.5 + R*T)/(2*P)
     if l == 2:
-        B, C = args[0], args[1]
+        B, C = coeffs[0], coeffs[1]
         sln = roots_cubic(-P/(R*T), 1.0, B, C)
         # print(sln)
         V = sln[0].real
@@ -309,7 +314,7 @@ def Z_from_virial_density_form(T, P, *args):
     arr = [1.0]*size # numba: delete
     arr[-1] = -P/R/T
     for i in range(l):
-        arr[-3-i] = args[i]
+        arr[-3-i] = coeffs[i]
     solns = np.roots(arr)
     for rho in solns:
         if abs(rho.imag) < 1e-12 and rho.real > 0.0:
@@ -317,7 +322,7 @@ def Z_from_virial_density_form(T, P, *args):
     raise ValueError("Could not find real root")
 
 
-def Z_from_virial_pressure_form(P, *args):
+def Z_from_virial_pressure_form(P, coeffs=None):
     r'''Calculates the compressibility factor of a gas given its pressure, and
     pressure-form virial coefficients. Any number of coefficients is supported.
 
@@ -328,8 +333,12 @@ def Z_from_virial_pressure_form(P, *args):
     ----------
     P : float
         Pressure, [Pa]
-    B to Z : float, optional
-        Pressure form Virial coefficients, [various]
+    coeffs : list[float], optional
+        List of pressure-form virial coefficients [1/Pa^n], where n is the index+1:
+        coeffs[0]: Second virial coefficient B' [1/Pa]
+        coeffs[1]: Third virial coefficient C' [1/Pa²]
+        coeffs[2]: Fourth virial coefficient D' [1/Pa³]
+        If None, returns ideal gas compressibility of 1.
 
     Returns
     -------
@@ -355,7 +364,7 @@ def Z_from_virial_pressure_form(P, *args):
 
     Examples
     --------
-    >>> Z_from_virial_pressure_form(102919.99946855308, 4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19)
+    >>> Z_from_virial_pressure_form(102919.99946855308, [4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19])
     1.00283753944
 
     References
@@ -366,10 +375,12 @@ def Z_from_virial_pressure_form(P, *args):
     .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering.
        Butterworth-Heinemann, 1985.
     '''
+    if coeffs is None:
+        return 1.0
     tot = 0.0
     fact = 1.0
-    for i in range(len(args)):
-        tot += args[i]*fact
+    for i in range(len(coeffs)):
+        tot += coeffs[i]*fact
         fact *= P
     return 1.0 + P*tot
 

@@ -1251,8 +1251,14 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
         Critical temperature, [K]
     Pc : float
         Critical pressure, [Pa]
-    a, b, c, d : floats
-        Parameters for wagner equation. Specific to each chemical. [-]
+    a : float
+        Linear tau coefficient, [-]
+    b : float
+        1.5 power tau coefficient, [-]
+    c : float
+        Cubic power tau coefficient, [-]
+    d : float
+        6 power tau coefficient, [-]
 
     Returns
     -------
@@ -1322,8 +1328,14 @@ def dWagner_original_dT(T, Tc, Pc, a, b, c, d):
         Critical temperature, [K]
     Pc : float
         Critical pressure, [Pa]
-    a, b, c, d : floats
-        Parameters for wagner equation. Specific to each chemical. [-]
+    a : float
+        Linear tau coefficient, [-]
+    b : float
+        1.5 power tau coefficient, [-]
+    c : float
+        Cubic power tau coefficient, [-]
+    d : float
+        6 power tau coefficient, [-]
 
     Returns
     -------
@@ -1391,8 +1403,14 @@ def d2Wagner_original_dT2(T, Tc, Pc, a, b, c, d):
         Critical temperature, [K]
     Pc : float
         Critical pressure, [Pa]
-    a, b, c, d : floats
-        Parameters for wagner equation. Specific to each chemical. [-]
+    a : float
+        Linear tau coefficient, [-]
+    b : float
+        1.5 power tau coefficient, [-]
+    c : float
+        Cubic power tau coefficient, [-]
+    d : float
+        6 power tau coefficient, [-]
 
     Returns
     -------
@@ -1454,8 +1472,14 @@ def Wagner_original_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
         Critical temperature, [K]
     Pc : float
         Critical pressure, [Pa]
-    a, b, c, d : floats
-        Parameters for wagner equation. Specific to each chemical. [-]
+    a : float
+        Linear tau coefficient, [-]
+    b : float
+        1.5 power tau coefficient, [-]
+    c : float
+        Cubic power tau coefficient, [-]
+    d : float
+        6 power tau coefficient, [-]
 
     Returns
     -------
@@ -1496,8 +1520,14 @@ def Wagner_fitting_jacobian(Ts, Tc, Pc, a, b, c, d):
         Critical temperature, [K]
     Pc : float
         Critical pressure, [Pa]
-    a, b, c, d : floats
-        Parameters for wagner equation. Specific to each chemical. [-]
+    a : float
+        Linear tau coefficient, [-]
+    b : float
+        1.5 power tau coefficient, [-]
+    c : float
+        2.5 power tau coefficient, [-]
+    d : float
+        5 power tau coefficient, [-]
 
     Returns
     -------
@@ -1670,8 +1700,14 @@ def Wagner(T, Tc, Pc, a, b, c, d):
         Critical temperature, [K]
     Pc : float
         Critical pressure, [Pa]
-    a, b, c, d : floats
-        Parameters for wagner equation. Specific to each chemical. [-]
+    a : float
+        Linear tau coefficient, [-]
+    b : float
+        1.5 power tau coefficient, [-]
+    c : float
+        2.5 power tau coefficient, [-]
+    d : float
+        5 power tau coefficient, [-]
 
     Returns
     -------
@@ -1736,8 +1772,14 @@ def dWagner_dT(T, Tc, Pc, a, b, c, d):
         Critical temperature, [K]
     Pc : float
         Critical pressure, [Pa]
-    a, b, c, d : floats
-        Parameters for wagner equation. Specific to each chemical. [-]
+    a : float
+        Linear tau coefficient, [-]
+    b : float
+        1.5 power tau coefficient, [-]
+    c : float
+        2.5 power tau coefficient, [-]
+    d : float
+        5 power tau coefficient, [-]
 
     Returns
     -------
@@ -1801,8 +1843,14 @@ def d2Wagner_dT2(T, Tc, Pc, a, b, c, d):
         Critical temperature, [K]
     Pc : float
         Critical pressure, [Pa]
-    a, b, c, d : floats
-        Parameters for wagner equation. Specific to each chemical. [-]
+    a : float
+        Linear tau coefficient, [-]
+    b : float
+        1.5 power tau coefficient, [-]
+    c : float
+        2.5 power tau coefficient, [-]
+    d : float
+        5 power tau coefficient, [-]
 
     Returns
     -------

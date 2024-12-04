@@ -465,7 +465,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
         Heat of melting at the melting temperature of the solute [J/mol]
     Cpl : float, optional
         Molar heat capacity of the solute as a liquid [J/mol/K]
-    Cps: float, optional
+    Cps : float, optional
         Molar heat capacity of the solute as a solid [J/mol/K]
     gamma : float, optional
         Activity coefficient of the solute as a liquid [-]
@@ -517,7 +517,7 @@ def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
         Mole fraction of the solute [-]
     M : float, optional
         Molality [mol/kg]
-    MW: float, optional
+    MW : float, optional
         Molecular weight of the solvent [g/mol]
 
     Returns
@@ -594,6 +594,10 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
         String representing the scale that `val` is in originally.
     new_scale : str
         String representing the scale that `val` should be converted to.
+    rhom : float, optional
+        The molar density of the fluid [mol/m^3]
+    MW : float, optional
+        The molecular weight of the fluid [g/mol]
 
     Returns
     -------
@@ -722,14 +726,24 @@ def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
 
     .. math::
         H_{12} = \exp\left(A_{12} + \frac{B_{12}}{T} + C_{12}\ln(T) + D_{12}T
-         + \frac{E_{12}}{T^2} \right)
+         + \frac{E_{12}}{T^2} + F T^2\right)
 
     Parameters
     ----------
     T : float
         Temperature, [K]
-    A-F : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        Constant term on exponential, [-]
+    B : float, optional
+        Inverse temperature term on exponential, [K]
+    C : float, optional
+        Logarithmic term on exponential, [-]
+    D : float, optional
+        Linear term on exponential, [1/K]
+    E : float, optional
+        Inverse quadratic temperature term on exponential, [K]
+    F : float, optional
+        Quadratic temperature term on exponential, [1/K^2]
 
     Returns
     -------

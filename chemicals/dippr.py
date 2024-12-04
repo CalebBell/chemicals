@@ -539,8 +539,16 @@ def EQ104(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     ----------
     T : float
         Temperature, [K]
-    A-E : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        Constant coefficient [varies]
+    B : float
+        Temperature coefficient [K]
+    C : float, optional
+        Cubic temperature coefficient, default=0 [K^3]
+    D : float, optional
+        Power of 8 temperature coefficient, default=0 [K^8]
+    E : float, optional
+        Power of 9 temperature coefficient, default=0 [K^9]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
@@ -613,8 +621,14 @@ def EQ105(T, A, B, C, D, order=0):
     ----------
     T : float
         Temperature, [K]
-    A-D : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        Multiplicative factor, [units]
+    B : float
+        Denominator power, [-]
+    C : float
+        Temperature denominator, [K]
+    D : float
+        Exponent for 1 - T/Tc usually, [-]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, 2, and 3, that derivative of the property is returned; No
@@ -716,8 +730,16 @@ def EQ106(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
         Temperature, [K]
     Tc : float
         Critical temperature, [K]
-    A-D : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        Multiplier, [various]
+    B : float
+        Tau exponent constant term, [-]
+    C : float, optional
+        Tau exponent linear term, [-]
+    D : float, optional
+        Tau exponent quadratic term, [-]
+    E : float, optional
+        Tau exponent cubic term, [-]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, 2, and 3, that derivative of the property is returned; No
@@ -1001,8 +1023,16 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
     ----------
     T : float
         Temperature, [K]
-    A-E : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float, optional
+        Constant property term, [J/(mol*K)]
+    B : float, optional
+        First hyperbolic term multiplier, [J/(mol*K)]
+    C : float, optional
+        First hyperbolic temperature denominator, [K]
+    D : float, optional
+        Second hyperbolic term multiplier, [J/(mol*K)]
+    E : float, optional
+        Second hyperbolic temperature denominator, [K]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
@@ -1096,8 +1126,14 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         Temperature, [K]
     Tc : float
         Critical temperature, [K]
-    A-D : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        First coefficient, [-]
+    B : float
+        Second coefficient, [-]
+    C : float
+        Third coefficient, [-]
+    D : float
+        Fourth coefficient, [-]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
@@ -1227,8 +1263,16 @@ def EQ115(T, A, B, C=0, D=0, E=0, order=0):
     ----------
     T : float
         Temperature, [K]
-    A-E : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        First coefficient, [-]
+    B : float
+        Second coefficient, [K]
+    C : float
+        Third coefficient, [-]
+    D : float
+        Fourth coefficient, [1/K^2]
+    E : float
+        Fifth coefficient, [K^2]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, 2, and 3, that derivative of the property is returned; No
@@ -1315,8 +1359,16 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         Temperature, [K]
     Tc : float
         Critical temperature, [K]
-    A-E : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        First coefficient, [units]
+    B : float
+        Second coefficient, [units]
+    C : float
+        Third coefficient, [units]
+    D : float
+        Fourth coefficient, [units]
+    E : float
+        Fifth coefficient, [units]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for
@@ -1451,8 +1503,20 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
     ----------
     T : float
         Temperature, [K]
-    A-G : float
-        Parameter for the equation; chemical and property specific [-]
+    A : float
+        Constant property term, [J/(mol*K)]
+    B : float
+        First exponential term multiplier, [J/(mol*K)]
+    C : float
+        First exponential temperature denominator, [K]
+    D : float
+        Second exponential term multiplier, [J/(mol*K)]
+    E : float
+        Second exponential temperature denominator, [K]
+    F : float
+        Third exponential term multiplier, [J/(mol*K)]
+    G : float
+        Third exponential temperature denominator, [K]
     order : int, optional
         Order of the calculation. 0 for the calculation of the result itself;
         for 1, the first derivative of the property is returned, for

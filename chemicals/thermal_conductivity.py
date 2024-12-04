@@ -597,8 +597,6 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
         Molar constant pressure heat capacity of air, [J/mol/K]
     Cv : float, optional
         Molar constant volume heat capacity of air, [J/mol/K]
-    mu : float, optional
-        Viscosity of air, [Pa*s]
     drho_dP : float, optional
         Partial derivative of density with respect to pressure at constant
         temperature, [mol/m^3/Pa]
@@ -606,6 +604,8 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
         Partial derivative of density with respect to pressure at constant
         temperature (at the reference temperature (265.262 K) and the actual
         density of air), [mol/m^3/Pa]
+    mu : float, optional
+        Viscosity of air, [Pa*s]
 
     Returns
     -------
@@ -1233,7 +1233,7 @@ def Missenard(T, P, Tc, Pc, kl):
         Temperature of fluid [K]
     P : float
         Pressure of fluid [Pa]
-    Tc: float
+    Tc : float
         Critical point of fluid [K]
     Pc : float
         Critical pressure of the fluid [Pa]
@@ -1838,7 +1838,7 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
     ----------
     T : float
         Temperature of the fluid [K]
-    MW: float
+    MW : float
         Molecular weight of the fluid [g/mol]
     Tb : float
         Boiling temperature of the fluid [K]

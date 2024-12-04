@@ -566,6 +566,12 @@ def MW(ID, autoload=False, cache=True):
     ----------
     ID : str
         One of the name formats described by `search_chemical`
+    autoload : bool, optional
+        Whether to load new chemical databanks during the search if a hit is
+        not immediately found, [-]
+    cache : bool, optional
+        Whether or not to cache the search for faster lookup in subsequent
+        queries, [-]
 
     Returns
     -------

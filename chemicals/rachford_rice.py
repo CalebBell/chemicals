@@ -1871,6 +1871,8 @@ def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
         Overall mole fractions of all species, [-]
     Ks : list[float]
         Equilibrium K-values, [-]
+    guess : float, optional
+        Guess at solution, must be valid, [-]
 
     Returns
     -------
@@ -2159,6 +2161,13 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         Overall mole fractions of all species, [-]
     Ks : list[float]
         Equilibrium K-values, [-]
+    method : string, optional
+        The method name to use. Accepted methods are 'Analytical',
+        'Rachford-Rice (Secant)', 'Rachford-Rice (Newton-Raphson)',
+        'Rachford-Rice (Halley)', 'Rachford-Rice (NumPy)',
+        'Leibovici and Nichita 2', 'Rachford-Rice (polynomial)', and
+        'Li-Johns-Ahmadi'. All valid values are also held
+        in the list `flash_inner_loop_methods`.
     guess : float, optional
         Optional initial guess for vapor fraction, [-]
     check : bool, optional
@@ -2173,16 +2182,6 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         Mole fractions of each species in the liquid phase, [-]
     ys : list[float]
         Mole fractions of each species in the vapor phase, [-]
-
-    Other Parameters
-    ----------------
-    method : string, optional
-        The method name to use. Accepted methods are 'Analytical',
-        'Rachford-Rice (Secant)', 'Rachford-Rice (Newton-Raphson)',
-        'Rachford-Rice (Halley)', 'Rachford-Rice (NumPy)',
-        'Leibovici and Nichita 2', 'Rachford-Rice (polynomial)', and
-        'Li-Johns-Ahmadi'. All valid values are also held
-        in the list `flash_inner_loop_methods`.
 
     Notes
     -----

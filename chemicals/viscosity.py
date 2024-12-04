@@ -1275,7 +1275,7 @@ def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
         Temperature of fluid [K]
     P : float
         Pressure of fluid [Pa]
-    Tc: float
+    Tc : float
         Critical point of fluid [K]
     Pc : float
         Critical pressure of the fluid [Pa]
@@ -1476,12 +1476,14 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
     ----------
     T : float
         Temperature of fluid [K]
-    Tc: float
+    Tc : float
         Critical point of fluid [K]
     Pc : float
         Critical pressure of the fluid [Pa]
     Zc : float
         Critical compressibility of the fluid [Pa]
+    MW : float
+        Molecular weight of fluid [g/mol]
     dipole : float
         Dipole moment of fluid [debye]
     CASRN : str, optional

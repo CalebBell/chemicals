@@ -934,8 +934,16 @@ def Poling(T, a, b, c, d, e):
     ----------
     T : float
         Temperature, [K]
-    a,b,c,d,e : float
-        Regressed coefficients.
+    a : float
+        Constant coefficient, [-]
+    b : float
+        Linear coefficient, [-]
+    c : float
+        Quadratic coefficient, [-]
+    d : float
+        Cubic coefficient, [-]
+    e : float
+        Quintic coefficient, [=]
 
     Returns
     -------
@@ -965,7 +973,7 @@ def Poling(T, a, b, c, d, e):
     References
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
-           New York: McGraw-Hill Professional, 2000.
+       New York: McGraw-Hill Professional, 2000.
 
     """
     return R*(T*(T*(T*(T*e + d) + c) + b) + a)
@@ -980,8 +988,16 @@ def Poling_integral(T, a, b, c, d, e):
     ----------
     T : float
         Temperature, [K]
-    a,b,c,d,e : float
-        Regressed coefficients.
+    a : float
+        Constant coefficient, [-]
+    b : float
+        Linear coefficient, [-]
+    c : float
+        Quadratic coefficient, [-]
+    d : float
+        Cubic coefficient, [-]
+    e : float
+        Quintic coefficient, [=]
 
     Returns
     -------
@@ -1022,8 +1038,16 @@ def Poling_integral_over_T(T, a, b, c, d, e):
     ----------
     T : float
         Temperature, [K]
-    a,b,c,d,e : float
-        Regressed coefficients.
+    a : float
+        Constant coefficient, [-]
+    b : float
+        Linear coefficient, [-]
+    c : float
+        Quadratic coefficient, [-]
+    d : float
+        Cubic coefficient, [-]
+    e : float
+        Quintic coefficient, [=]
 
     Returns
     -------
@@ -1220,7 +1244,7 @@ def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     ----------
     similarity_variable : float
         Similarity variable as defined in [1]_, [mol/g]
-    cyclic_aliphatic: bool, optional
+    cyclic_aliphatic : bool, optional
         Whether or not chemical is cyclic aliphatic, [-]
 
     Returns
@@ -1281,7 +1305,7 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
         Temperature of gas [K]
     similarity_variable : float
         Similarity variable as defined in [1]_, [mol/g]
-    cyclic_aliphatic: bool, optional
+    cyclic_aliphatic : bool, optional
         Whether or not chemical is cyclic aliphatic, [-]
     MW : float, optional
         Molecular weight, [g/mol]
@@ -1379,7 +1403,9 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
     ----------
     T : float
         Temperature of gas [K]
-    cyclic_aliphatic: bool, optional
+    similarity_variable : float
+        Similarity variable as defined in [1]_, [mol/g]
+    cyclic_aliphatic : bool, optional
         Whether or not chemical is cyclic aliphatic, [-]
     MW : float, optional
         Molecular weight, [g/mol]
@@ -1445,7 +1471,7 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
         Temperature of gas [K]
     similarity_variable : float
         Similarity variable as defined in [1]_, [mol/g]
-    cyclic_aliphatic: bool, optional
+    cyclic_aliphatic : bool, optional
         Whether or not chemical is cyclic aliphatic, [-]
     MW : float, optional
         Molecular weight, [g/mol]
@@ -1527,7 +1553,7 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
     factor : float, optional
         A factor to increase or decrease the predicted value of the
         method, [-]
-    cyclic_aliphatic: bool, optional
+    cyclic_aliphatic : bool, optional
         Whether or not chemical is cyclic aliphatic, [-]
 
     Returns
@@ -1598,7 +1624,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
     factor : float, optional
         A factor to increase or decrease the predicted value of the
         method, [-]
-    cyclic_aliphatic: bool, optional
+    cyclic_aliphatic : bool, optional
         Whether or not chemical is cyclic aliphatic, [-]
 
     Returns
@@ -1660,13 +1686,27 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     ----------
     T : float
         Temperature [K]
-    a1-a7 : float
-        Coefficients
+    a0 : float
+        Constant coefficient, [-]
+    a1 : float
+        a1 coefficient, [K^2]
+    a2 : float
+        a2 coefficient, [K]
+    a3 : float
+        a3 coefficient, [-]
+    a4 : float
+        a4 coefficient, [-]
+    a5 : float
+        a5 coefficient, [K^2]
+    a6 : float
+        a6 coefficient, [K]
+    a7 : float
+        a6 coefficient, [K]
 
     Returns
     -------
     Cp : float
-        Ideal gas heat capacity , [J/mol/K]
+        Ideal gas heat capacity, [J/mol/K]
 
     Notes
     -----
@@ -1718,8 +1758,22 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
     ----------
     T : float
         Temperature [K]
-    a1-a7 : float
-        Coefficients
+    a0 : float
+        Constant coefficient, [-]
+    a1 : float
+        a1 coefficient, [K^2]
+    a2 : float
+        a2 coefficient, [K]
+    a3 : float
+        a3 coefficient, [-]
+    a4 : float
+        a4 coefficient, [-]
+    a5 : float
+        a5 coefficient, [K^2]
+    a6 : float
+        a6 coefficient, [K]
+    a7 : float
+        a6 coefficient, [K]
     I : float, optional
         Integral offset
 
@@ -1791,8 +1845,22 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
     ----------
     T : float
         Temperature [K]
-    a1-a7 : float
-        Coefficients
+    a0 : float
+        Constant coefficient, [-]
+    a1 : float
+        a1 coefficient, [K^2]
+    a2 : float
+        a2 coefficient, [K]
+    a3 : float
+        a3 coefficient, [-]
+    a4 : float
+        a4 coefficient, [-]
+    a5 : float
+        a5 coefficient, [K^2]
+    a6 : float
+        a6 coefficient, [K]
+    a7 : float
+        a6 coefficient, [K]
     J : float, optional
         Integral offset
 
@@ -2284,8 +2352,18 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
         Temperature [K]
     Tc : float
         Critical temperature of fluid, [K]
-    a1-a6 : float
-        Coefficients
+    a1 : float
+        First coefficient, [-]
+    a2 : float
+        Second coefficient, [-]
+    a3 : float
+        Third coefficient, [-]
+    a4 : float
+        Fourth coefficient, [-]
+    a5 : float
+        Fifth coefficient, [-]
+    a6 : float
+        Sixth coefficient, [-]
 
     Returns
     -------
@@ -2325,8 +2403,20 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     ----------
     T : float
         Temperature [K]
-    a1-a6 : float
-        Coefficients
+    Tc : float
+        Critical temperature of fluid, [K]
+    a1 : float
+        First coefficient, [-]
+    a2 : float
+        Second coefficient, [-]
+    a3 : float
+        Third coefficient, [-]
+    a4 : float
+        Fourth coefficient, [-]
+    a5 : float
+        Fifth coefficient, [-]
+    a6 : float
+        Sixth coefficient, [-]
 
     Returns
     -------
@@ -2367,8 +2457,20 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     ----------
     T : float
         Temperature [K]
-    a1-a6 : float
-        Coefficients
+    Tc : float
+        Critical temperature of fluid, [K]
+    a1 : float
+        First coefficient, [-]
+    a2 : float
+        Second coefficient, [-]
+    a3 : float
+        Third coefficient, [-]
+    a4 : float
+        Fourth coefficient, [-]
+    a5 : float
+        Fifth coefficient, [-]
+    a6 : float
+        Sixth coefficient, [-]
 
     Returns
     -------

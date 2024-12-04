@@ -752,6 +752,8 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
         Critical temperature of fluid [K]
     Pc : float
         Critical pressure of fluid [Pa]
+    chemicaltype : str, optional
+        One of 'alcohol', 'acid', or None
 
     Returns
     -------
@@ -1204,8 +1206,6 @@ def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
         Critical temperature of fluid [K]
     Pc : float
         Critical pressure of fluid [Pa]
-    MW : float
-        Molecular weight [g/mol]
     Vc : float
         Critical volume of fluid [m^3/mol]
 

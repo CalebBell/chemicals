@@ -190,8 +190,7 @@ from fluids.numerics import broyden2, cbrt, exp, horner, horner_and_der, log, ne
 from chemicals.utils import mark_numba_uncacheable
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
 
-__all__ = ['iapws97_boundary_2_3', 'iapws97_boundary_2_3_reverse',
-           'iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
+__all__ = ['iapws97_identify_region_TP', 'iapws97_region_3', 'iapws97_region3_rho',
            'iapws97_region1_rho', 'iapws97_region2_rho', 'iapws97_region5_rho',
            'iapws95_rho', 'iapws95_P', 'iapws95_T', 'iapws97_rho_extrapolated',
            'iapws97_rho', 'iapws97_P', 'iapws97_T', 'iapws95_Psat', 'iapws95_dPsat_dT',
@@ -6240,7 +6239,7 @@ def iapws95_Psat(T):
 
 Psat_235 = 22.849568234070716 # iapws95_Psat(235)
 
-def iapws95_Tsat(P):
+def iapws95_Tsat(Psat):
     r'''Compute the saturation temperature of the IAPWS-95 equation.
     The range of the fit is 235 K to 647.096 K, the critical point.
 
@@ -6271,18 +6270,18 @@ def iapws95_Tsat(P):
     >>> iapws95_Tsat(iapws95_Psat(400.0))
     400.0
     '''
-    if P > iapws95_Pc:
+    if Psat > iapws95_Pc:
         raise ValueError("Pressure higher than critical pressure")
-    elif P < 22.849568234070716: # iapws95_Psat(235)
+    elif Psat < 22.849568234070716: # iapws95_Psat(235)
         raise ValueError("Pressure lower than correlation")
-    T = Tsat_IAPWS(P)
+    T = Tsat_IAPWS(Psat)
     if T < 235.0:
         T = 235.0
     dT = 100.0
     # Very well-behaved solver, no issues found.
     while abs(dT) > 1e-10:
-        dPsat_dT, Psat = iapws95_dPsat_dT(T)
-        err = Psat - P
+        dPsat_dT, Psat_new = iapws95_dPsat_dT(T)
+        err = Psat_new - Psat
         dT = -err/dPsat_dT
         T = T + dT
     return T

@@ -1077,7 +1077,7 @@ def collision_integral_Neufeld_Janzen_Aziz(T_star, l=1, s=1):
 
     Parameters
     ----------
-    Tstar : float
+    T_star : float
         Reduced temperature of the fluid [-]
     l : int
         term
@@ -1227,11 +1227,11 @@ def collision_integral_Kim_Monroe(T_star, l=1, s=1):
 
     Parameters
     ----------
-    Tstar : float
+    T_star : float
         Reduced temperature of the fluid [-]
-    l : int
+    l : int, optional
         term
-    s : int
+    s : int, optional
         term
 
     Returns
@@ -1286,6 +1286,8 @@ def T_star(T, epsilon_k=None, epsilon=None):
 
     Parameters
     ----------
+    T : float
+        Temperature, [K]
     epsilon_k : float, optional
         Lennard-Jones depth of potential-energy minimum over k, [K]
     epsilon : float, optional

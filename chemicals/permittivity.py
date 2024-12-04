@@ -91,8 +91,21 @@ def permittivity_CRC(T, a, b, c, d):
 
     Parameters
     ----------
-    a,b,c,d : float
-        Regressed coefficients.
+    T : float
+        Temperature of fluid, [K]
+    a : float
+        Constant coefficient, [-]
+    b : float
+        Constant coefficient, [1/K]
+    c : float
+        Constant coefficient, [1/K^2]
+    d : float
+        Constant coefficient, [1/K^3]
+
+    Returns
+    -------
+    epsilon : float
+        Relative permittivity of fluid at T, [-]
 
     Notes
     -----

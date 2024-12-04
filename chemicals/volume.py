@@ -266,8 +266,14 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
         Critical temperature of fluid [K]
     rhoc : float
         Critical density of fluid [kg/m^3]
-    a,b,c,d : float
-        Fitted coefficients [-]
+    a : float
+        First coefficient, [kg/m^3]
+    b : float
+        Second coefficient, [kg/m^3]
+    c : float
+        Third coefficient, [kg/m^3]
+    d : float
+        Fourth coefficient, [kg/m^3]
     MW : float, optional
         Molecular weight of chemical [g/mol]
 
@@ -1324,7 +1330,7 @@ def Rackett_mixture(T, xs, MWs, Tcs, Pcs, Zrs):
     ----------
     T : float
         Temperature of liquid [K]
-    xs: list
+    xs : list
         Mole fractions of each component, []
     MWs : list
         Molecular weights of each component [g/mol]

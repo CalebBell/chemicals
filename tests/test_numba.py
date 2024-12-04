@@ -339,7 +339,7 @@ def test_interface_misc():
 
 @mark_as_numba
 def test_virial():
-    Z = chemicals.numba.Z_from_virial_pressure_form(102919.99946855308, 4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19)
+    Z = chemicals.numba.Z_from_virial_pressure_form(102919.99946855308, [4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19])
     assert_close(Z, 1.00283753944, rtol=1e-13)
 
 #    # Takes 8 seconds to compile. Fun!

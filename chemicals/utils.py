@@ -764,10 +764,10 @@ def Watson_K(Tb, SG):
 
     Parameters
     ----------
-    SG : float
-        Specific gravity of the fluid at 60 degrees Farenheight [-]
     Tb : float
         Average normal boiling point, [K]
+    SG : float
+        Specific gravity of the fluid at 60 degrees Farenheight [-]
 
     Returns
     -------
@@ -983,7 +983,7 @@ def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=Non
         Derivative of `P` with respect to `T`, [Pa/K]
     dP_dV : float, optional
         Derivative of `P` with respect to `V`, [Pa*mol/m^3]
-    d2P_dV2 : float, optionsl
+    d2P_dV2 : float, optional
         Second derivative of `P` with respect to `V`, [Pa*mol^2/m^6]
 
     Returns
@@ -1640,7 +1640,7 @@ def zs_to_Vfs(zs, Vms):
     ----------
     zs : iterable
         Mole fractions [-]
-    VMs : iterable
+    Vms : iterable
         Molar volumes of species [m^3/mol]
 
     Returns
@@ -1688,7 +1688,7 @@ def Vfs_to_zs(Vfs, Vms):
     ----------
     Vfs : iterable
         Molar volume fractions [-]
-    VMs : iterable
+    Vms : iterable
         Molar volumes of species [m^3/mol]
 
     Returns
@@ -2283,7 +2283,7 @@ def d2xs_to_d2xsn1(d2xs):
 
     Parameters
     ----------
-    second : list[float]
+    d2xs : list[float]
         Second of a quantity with respect to mole fraction (not summing to
         1), [prop]
 
@@ -2431,7 +2431,7 @@ def mixing_simple(fracs, props):
     ----------
     fracs : array-like
         Fractions of a mixture
-    props: array-like
+    props : array-like
         Properties
 
     Returns
@@ -2464,7 +2464,7 @@ def mixing_logarithmic(fracs, props):
     ----------
     fracs : array-like
         Fractions of a mixture
-    props: array-like
+    props : array-like
         Properties
 
     Returns
