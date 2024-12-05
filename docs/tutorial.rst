@@ -172,6 +172,6 @@ Each of those queries returns a :obj:`ChemicalMetadata <chemicals.identifiers.Ch
 >>> (water.pubchemid, water.formula, water.smiles, water.InChI, water.InChI_key, water.CASs)
 (962, 'H2O', 'O', 'H2O/h1H2', 'XLYOFNOQVPJJNP-UHFFFAOYSA-N', '7732-18-5')
 >>> water.common_name, water.iupac_name, len(water.synonyms)
-('water', 'oxidane', 259)
+('water', 'oxidane', 260)
 
 

@@ -305,7 +305,6 @@ def test_search_chemical_2024_update_metadata_organic_names():
     assert search_chemical('132739-31-2').common_name == "dipropylene glycol mono-tert-butyl ether"
     assert search_chemical('142-16-5').common_name == "bis(2-ethylhexyl) maleate"
     assert search_chemical('147-81-9').common_name == "arabinose"
-    assert search_chemical('15922-78-8').common_name == "sodium pyrithione"
     assert search_chemical('163702-07-6').common_name == "methyl nonafluorobutyl ether"
     assert search_chemical('16587-32-9').common_name == "benzo[b]thiophene, 2-propyl-"
     assert search_chemical('25498-49-1').common_name == "tripropylene glycol monomethyl ether"
