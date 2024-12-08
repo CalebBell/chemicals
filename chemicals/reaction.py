@@ -1067,7 +1067,6 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     >>> balance_stoichiometry(matrix, allow_fractional=True)
     [1.0, 1.25, 1.0, 1.5]
 
-    This algorithm relies on `scipy`.
     The behavior of this function for inputs which do not have a unique
     solution is undefined.
 
@@ -1090,11 +1089,14 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
        Maple To Obtain Chemical Equations." Journal of Chemical Education
        74, no. 11 (November 1, 1997): 1369. https://doi.org/10.1021/ed074p1369.
     '''
-    import scipy.linalg
-    done = scipy.linalg.null_space(matrix, rcond=None)
-    if len(done[0]) > 1:
-        raise ValueError("No solution")
-    d = done[:, 0].tolist()
+    from fluids.numerics import null_space
+    null_vectors = null_space(matrix, rcond=None)
+    
+    if not null_vectors or len(null_vectors[0]) == 0:
+        raise ValueError("No solution found")
+    
+    # Take the first null vector (assuming unique solution)
+    d = [row[0] for row in null_vectors]
     min_value_inv = 1.0/min(d, key=abs)
     d = [i*min_value_inv for i in d]
     d = [round_to_significant(v, rounding) for v in d]
