@@ -115,7 +115,7 @@ setup(
   version = '1.3.2',
   description = 'Chemical properties component of Chemical Engineering Design Library (ChEDL)',
   author = 'Caleb Bell',
-  install_requires=['fluids>=1.0.27', "scipy>=1.6.0", 'numpy', 'pandas'],
+  install_requires=['fluids>=1.1.0', "scipy>=1.6.0", 'numpy', 'pandas'],
   extras_require = {
       'Coverage documentation':  ['wsgiref>=0.1.2', 'coverage>=4.0.3']
   },
