@@ -118,7 +118,7 @@ def test_dippr_2016_matched_meta():
     
     # Not investigated
     names_lead_to_different_CAS = {'13598-36-2', # https://commonchemistry.cas.org/detail?cas_rn=10294-56-1  https://commonchemistry.cas.org/detail?cas_rn=13598-36-2
-                            
+                            '14808-60-7', # I used silica not quartz
                     '2687-91-4', '117-81-7', '1345-25-1', '7803-62-5', '118-93-4', '706-31-0', '16462-44-5', '3319-31-1', '873-66-5', '1344-28-1', '18328-90-0', '7726-95-6', '16219-75-3', '21460-36-6', '7722-76-1', '872-50-4', '4050-45-7'}
 
     for _, row in df2.iterrows():
@@ -132,6 +132,48 @@ def test_dippr_2016_matched_meta():
         db_chem = search_chemical(name)
         if cas not in names_lead_to_different_CAS:
             assert db_chem.CASs == cas, name
+
+def test_silica():
+    chemical = search_chemical('silica')
+    # Test basic properties
+    assert chemical.pubchemid == 24261
+    assert chemical.CASs == '7631-86-9'
+    assert chemical.formula == 'O2Si'
+    assert_close(chemical.MW, 60.0843)
+    assert chemical.smiles == 'O=[Si]=O'
+    assert chemical.InChI == 'O2Si/c1-3-2'
+    assert chemical.InChI_key == 'VYPSYNLAJGMNEJ-UHFFFAOYSA-N'
+    assert chemical.common_name == 'silica'
+    assert chemical.iupac_name == 'dioxosilane'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'silicon dioxide',
+        'SiO2',
+        'silicon(IV) oxide',
+        'silicon oxide',
+        'silicic anhydride',
+        'silica, amorphous',
+        'synthetic amorphous silica',
+        'silicon dioxide (amorphous)'
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '7631-86-9', f"Failed to find silica using term: {term}"
+    
+    identifier_searches = {
+        'formula': 'O2Si',
+        'smiles': 'O=[Si]=O',
+        'inchi': 'InChI=1S/O2Si/c1-3-2',
+        'inchikey': 'InChIKey=VYPSYNLAJGMNEJ-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=24261',
+        'cas': '7631-86-9'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '7631-86-9', f"Failed to find silica using {search_type}: {identifier}"
+
 
 @pytest.mark.slow
 def test_Matthews_critical_names():
