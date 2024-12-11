@@ -28,8 +28,6 @@ import shutil
 from pathlib import Path
 import tempfile
 
-class bdist_wheel_light(bdist_wheel):
-    description = "Build a light wheel package without large data files"
     
 class bdist_wheel_light(bdist_wheel):
     description = "Build a light wheel package without large data files"
@@ -44,6 +42,8 @@ class bdist_wheel_light(bdist_wheel):
             'Identifiers/dippr_2014.csv',
             'Misc/ChemSep8.32.xml',
             'Identifiers/chemical identifiers pubchem large.tsv',
+            'Identifiers/chemical identifiers pubchem small.tsv',
+            'Identifiers/chemical identifiers example user db.tsv',
         ]
         
         # Create temporary directory

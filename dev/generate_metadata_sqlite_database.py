@@ -128,8 +128,8 @@ def dump_to_db(chemical_db, db_path='chemicals.db'):
     cur.execute("BEGIN TRANSACTION")
     
     # try:
-    for chemical in chemical_db:
-    # for chemical in small_dbs:
+    # for chemical in chemical_db:
+    for chemical in small_dbs:
         add_chemical(cur, chemical)
     # except Exception as e:
     #     conn.rollback()
