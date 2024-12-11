@@ -163,7 +163,7 @@ Some sample queries illustrating the topic:
 >>> print(search_chemical('pubchem=702'))
 <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
 >>> print(search_chemical('O')) # only elements can be specified by symbol
-<ChemicalMetadata, name=oxygen, formula=O, smiles=[O], MW=15.9994>
+<ChemicalMetadata, name=atomic oxygen, formula=O, smiles=[O], MW=15.9994>
 
 
 Each of those queries returns a :obj:`ChemicalMetadata <chemicals.identifiers.ChemicalMetadata>` object. The object holds the chemical metadata. It is an almost unbearable task to assemble a chemical property database. Making a database of chemical metadata is only slightly easier. The chemical metadata database doesn't have any information whatsoever about about any chemical properties; only information about the chemical structure and those identifiers mentioned above. Each of those identifiers is an attribute of the returned object.
@@ -172,6 +172,6 @@ Each of those queries returns a :obj:`ChemicalMetadata <chemicals.identifiers.Ch
 >>> (water.pubchemid, water.formula, water.smiles, water.InChI, water.InChI_key, water.CASs)
 (962, 'H2O', 'O', 'H2O/h1H2', 'XLYOFNOQVPJJNP-UHFFFAOYSA-N', '7732-18-5')
 >>> water.common_name, water.iupac_name, len(water.synonyms)
-('water', 'oxidane', 260)
+('water', 'oxidane', 259)
 
 

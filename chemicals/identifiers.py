@@ -70,7 +70,7 @@ __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
 
 import os
 
-from chemicals.elements import charge_from_formula, homonuclear_elements_CASs_set, periodic_table, serialize_formula
+from chemicals.elements import charge_from_formula, homonuclear_elements_CASs_set, periodic_table, serialize_formula, nested_formula_parser
 from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path, to_num
 
 folder = os_path_join(source_path, 'Identifiers')
@@ -328,6 +328,58 @@ PUBCHEM_EXAMPLE_DB_NAME = 'chemical identifiers example user db.tsv'
 PUBCHEM_CATION_DB_NAME = 'Cation db.tsv'
 PUBCHEM_ANION_DB_NAME = 'Anion db.tsv'
 PUBCHEM_IONORGANIC_DB_NAME = 'Inorganic db.tsv'
+
+# Preference file constants
+ANION_PREFERENCES_FILE = 'anion_preferences.json'
+CATION_PREFERENCES_FILE = 'cation_preferences.json'
+INORGANIC_PREFERENCES_FILE = 'inorganic_preferences.json'
+ORGANIC_PREFERENCES_FILE = 'organic_preferences.json'
+
+def load_chemical_preferences():
+    """Loads preferred and unpreferred CAS numbers from preference files in the 
+    Identifiers folder.
+        
+    Returns
+    -------
+    preferred_CAS : set
+        Set of preferred CAS numbers from all loaded files
+    unpreferred_CAS : set 
+        Set of unpreferred CAS numbers from all loaded files
+        
+    Notes
+    -----
+
+    Each file should contain 'preferred_cas' and 'unpreferred_cas' lists.
+    Missing files are skipped silently.
+    
+    Examples
+    --------
+    >>> preferred, unpreferred = load_chemical_preferences()
+    """
+    import json
+    preferred_CAS = set()
+    unpreferred_CAS = set()
+    
+    # Files to load
+    files = [
+        ANION_PREFERENCES_FILE,
+        CATION_PREFERENCES_FILE, 
+        INORGANIC_PREFERENCES_FILE,
+        ORGANIC_PREFERENCES_FILE
+    ]
+    
+    # Load each file and update the sets
+    for filename in files:
+        pref_file = os.path.join(folder, filename)
+        if os.path.exists(pref_file):
+            with open(pref_file) as f:
+                preferences = json.load(f)
+                preferred_CAS.update(preferences.get('preferred_cas', []))
+                unpreferred_CAS.update(preferences.get('unpreferred_cas', []))
+    
+    return preferred_CAS, unpreferred_CAS
+
+
 class ChemicalMetadataDB:
     '''Object which holds the main database of chemical metadata.
 
@@ -378,19 +430,25 @@ class ChemicalMetadataDB:
         name_index = self.name_index
 
         for ele in periodic_table:
+            if ele.CAS in homonuclear_elements_CASs_set:
+                continue
             CAS = int(ele.CAS.replace('-', '')) # Store as int for easier lookup
             ele_lower_name = ele.name.lower()
+            obj_old = CAS_index.get(CAS, None)
+            synonyms = [ele_lower_name]
+
             obj = ChemicalMetadata(pubchemid=ele.PubChem, CAS=CAS,
                                    formula=ele.symbol, MW=ele.MW, smiles=ele.smiles,
                                    InChI=ele.InChI, InChI_key=ele.InChI_key,
                                    iupac_name=ele_lower_name,
                                    common_name=ele_lower_name,
-                                   synonyms=[ele_lower_name])
+                                   synonyms=synonyms)
+            if obj_old is not None:
+                synonyms = obj_old.synonyms
 
 
             if obj.InChI_key in InChI_key_index:
                 if ele.CAS not in homonuclear_elements_CASs_set:
-                    obj_old = InChI_key_index[obj.InChI_key]
                     for name in obj_old.synonyms:
                         name_index[name] = obj
 
@@ -400,11 +458,9 @@ class ChemicalMetadataDB:
             smiles_index[obj.smiles] = obj
             InChI_index[obj.InChI] = obj
             if ele.CAS in homonuclear_elements_CASs_set:
-                for name in obj.synonyms:
-                    name_index['monatomic ' + name] = obj
-            else:
-                for name in obj.synonyms:
-                    name_index[name] = obj
+                name_index['monatomic ' + ele_lower_name] = obj
+            for name in synonyms:
+                name_index[name] = obj
             formula_index[obj.formula] = obj
 
 
@@ -441,7 +497,7 @@ class ChemicalMetadataDB:
     def __iter__(self):
         if not self.finished_loading:
             self.autoload_main_db()
-        return iter(i for i in self.InChI_key_index.values())
+        return iter(i for i in self.CAS_index.values())
 
     @property
     def finished_loading(self):
@@ -512,6 +568,219 @@ class ChemicalMetadataDB:
         '''Search for a chemical by its serialized formula.
         '''
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
+import sqlite3
+class ChemicalMetadataDiskDB:
+    """SQLite-backed version of ChemicalMetadataDB with preferred ordering support"""
+    
+    def __init__(self, db_path=os_path_join(folder, 'metadata.db')):
+        """Initialize connection to the SQLite database
+        
+        Parameters
+        ----------
+        db_path : str or Path
+            Path to the SQLite database file
+        """
+        self.db_path = db_path
+        self._conn = sqlite3.connect(db_path)
+        self._conn.row_factory = sqlite3.Row  # Allow column name access
+        
+    def _row_to_metadata(self, row):
+        """Convert a database row to a ChemicalMetadata object"""
+        if row is None:
+            return None
+            
+        synonyms = [row['iupac_name'], row['common_name']]
+        if row['raw_synonyms']:
+            synonyms.extend(row['raw_synonyms'].split('\t'))
+        
+        return ChemicalMetadata(
+            pubchemid=row['pubchemid'],
+            CAS=row['cas'],
+            formula=row['formula'],
+            MW=row['mw'],
+            smiles=row['smiles'],
+            InChI=row['inchi'],
+            InChI_key=row['inchi_key'],
+            iupac_name=row['iupac_name'],
+            common_name=row['common_name'],
+            synonyms=synonyms
+        )
+    
+    def search_pubchem(self, pubchem, autoload=True):
+        """Search for a chemical by its pubchem number"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE pubchemid = ? ORDER BY preferred DESC LIMIT 1",
+            (int(pubchem),)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_CAS(self, CAS, autoload=True):
+        """Search for a chemical by its CAS number"""
+        if isinstance(CAS, str):
+            CAS = int(CAS.replace('-', ''))
+        
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE cas = ? ORDER BY preferred DESC LIMIT 1",
+            (CAS,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_smiles(self, smiles, autoload=True):
+        """Search for a chemical by its SMILES string"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE smiles = ? ORDER BY preferred DESC LIMIT 1",
+            (smiles,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_InChI(self, InChI, autoload=True):
+        """Search for a chemical by its InChI string"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE inchi = ? ORDER BY preferred DESC LIMIT 1",
+            (InChI,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_InChI_key(self, InChI_key, autoload=True):
+        """Search for a chemical by its InChI key"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE inchi_key = ? ORDER BY preferred DESC LIMIT 1",
+            (InChI_key,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_name(self, name, autoload=True):
+        """Search for a chemical by its name"""
+        cur = self._conn.cursor()
+        cur.execute("""
+            SELECT c.* FROM chemicals c
+            JOIN chemical_synonyms cs ON c.cas = cs.cas
+            WHERE cs.synonym = ?
+            ORDER BY c.preferred DESC LIMIT 1
+        """, (name,))
+        return self._row_to_metadata(cur.fetchone())
+    
+    def search_formula(self, formula, autoload=True):
+        """Search for a chemical by its formula"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE formula = ? ORDER BY preferred DESC LIMIT 1",
+            (formula,)
+        )
+        return self._row_to_metadata(cur.fetchone())
+    
+    def __iter__(self):
+        """Iterate over all chemicals in the database"""
+        cur = self._conn.cursor()
+        cur.execute("SELECT * FROM chemicals ORDER BY preferred DESC")
+        while True:
+            batch = cur.fetchmany(1000)  # Process in batches for memory efficiency
+            if not batch:
+                break
+            for row in batch:
+                yield self._row_to_metadata(row)
+    
+    def __len__(self):
+        """Return the total number of chemicals in the database"""
+        cur = self._conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM chemicals")
+        return cur.fetchone()[0]
+
+    @property
+    def CAS_index(self):
+        """Build and return a dictionary mapping CAS numbers to ChemicalMetadata objects.
+        
+        Returns
+        -------
+        dict
+            Dictionary with CAS numbers (integers) as keys and ChemicalMetadata objects as values
+        """
+        cur = self._conn.cursor()
+        cur.execute("SELECT * FROM chemicals ORDER BY preferred DESC")
+        cas_dict = {}
+        for row in cur:
+            metadata = self._row_to_metadata(row)
+            if metadata.CAS not in cas_dict:  # Only keep the most preferred entry for each CAS
+                cas_dict[metadata.CAS] = metadata
+        return cas_dict
+
+
+    @property
+    def smiles_index(self):
+        """Build and return a dictionary mapping SMILES strings to ChemicalMetadata objects.
+        
+        Returns
+        -------
+        dict
+            Dictionary with SMILES strings as keys and ChemicalMetadata objects as values
+        """
+        cur = self._conn.cursor()
+        cur.execute("SELECT * FROM chemicals ORDER BY preferred DESC")
+        smiles_dict = {}
+        for row in cur:
+            metadata = self._row_to_metadata(row)
+            if metadata.smiles and metadata.smiles not in smiles_dict:  # Only keep the most preferred entry
+                smiles_dict[metadata.smiles] = metadata
+        return smiles_dict
+
+    @property
+    def InChI_index(self):
+        """Build and return a dictionary mapping InChI strings to ChemicalMetadata objects.
+        
+        Returns
+        -------
+        dict
+            Dictionary with InChI strings as keys and ChemicalMetadata objects as values
+        """
+        cur = self._conn.cursor()
+        cur.execute("SELECT * FROM chemicals ORDER BY preferred DESC")
+        inchi_dict = {}
+        for row in cur:
+            metadata = self._row_to_metadata(row)
+            if metadata.InChI and metadata.InChI not in inchi_dict:  # Only keep the most preferred entry
+                inchi_dict[metadata.InChI] = metadata
+        return inchi_dict
+
+    @property
+    def InChI_key_index(self):
+        """Build and return a dictionary mapping InChI keys to ChemicalMetadata objects.
+        
+        Returns
+        -------
+        dict
+            Dictionary with InChI keys as keys and ChemicalMetadata objects as values
+        """
+        cur = self._conn.cursor()
+        cur.execute("SELECT * FROM chemicals ORDER BY preferred DESC")
+        inchi_key_dict = {}
+        for row in cur:
+            metadata = self._row_to_metadata(row)
+            if metadata.InChI_key and metadata.InChI_key not in inchi_key_dict:  # Only keep the most preferred entry
+                inchi_key_dict[metadata.InChI_key] = metadata
+        return inchi_key_dict
+
+    def search_pubchem(self, pubchem, autoload=True):
+        """Search for a chemical by its pubchem number"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE pubchemid = ? ORDER BY preferred DESC LIMIT 1",
+            (int(pubchem),)
+        )
+        return self._row_to_metadata(cur.fetchone())
+            
+    @property
+    def finished_loading(self):
+        """Always returns True as database is pre-loaded"""
+        return True
+
+    def close(self):
+        """Explicitly close the database connection"""
+        self._conn.close()
 
 @mark_numba_incompatible
 def CAS_from_any(ID, autoload=False, cache=True):
@@ -764,9 +1033,15 @@ def _search_chemical(ID, autoload):
         return smiles_lookup
 
     try:
-        formula_query = pubchem_db.search_formula(serialize_formula(ID), autoload)
+        serialized_formula = serialize_formula(ID)
+        formula_query = pubchem_db.search_formula(serialized_formula, autoload)
         if formula_query and type(formula_query) == ChemicalMetadata:
-            return formula_query
+            try:
+                # If we found something after serializing the formula, check it is in fact a formula we were given
+                # nested_formula_parser(ID, check=True)
+                return formula_query
+            except:
+                pass
     except:
         pass
 
@@ -983,6 +1258,7 @@ def get_pubchem_db():
         return pubchem_db
     else:
         pubchem_db = ChemicalMetadataDB()
+        # pubchem_db = ChemicalMetadataDiskDB()
     _pubchem_db_loaded = True
     return pubchem_db
 

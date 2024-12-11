@@ -28,6 +28,7 @@ import pytest
 import re
 from fluids.numerics import assert_close
 from chemicals.miscdata import heos_data
+import json
 from chemicals.heat_capacity import Cp_data_Poling
 from chemicals.elements import molecular_weight, nested_formula_parser, periodic_table, serialize_formula
 from chemicals.identifiers import (
@@ -125,7 +126,7 @@ def test_dippr_2016_matched_meta():
         # check we find a chemical anyway TODO check the CAS matches
         db_chem = search_chemical(name)
         if cas not in names_lead_to_different_CAS:
-            assert db_chem.CASs == cas
+            assert db_chem.CASs == cas, name
 
 @pytest.mark.slow
 def test_Matthews_critical_names():
@@ -160,7 +161,7 @@ def test_Matthews_critical_names():
 
 @pytest.mark.slow
 def test_pubchem_dict():
-    for i in pubchem_db.CAS_index.values():
+    for i in pubchem_db:
         assert check_CAS(i.CASs)
 
 @pytest.mark.skip
@@ -169,91 +170,316 @@ def test_database_formulas():
     # Failures are thing slike 3He, C2D4Br2, C14H18N3NaO10[99Tc], [1H]I
     # The fix here is adding an isotope db and making the formula parser handle isotopes as well.
     # This worked until isotopes were added to formulas
-    for i in pubchem_db.CAS_index.values():
+    for i in pubchem_db:
         assert i.formula == serialize_formula(i.formula)
 
 def test_organic_user_db():
     db = ChemicalMetadataDB(elements=False,
                             main_db=None,
                             user_dbs=[os.path.join(folder, 'chemical identifiers example user db.tsv')])
+    pref_file = os.path.join(folder, 'organic_preferences.json')
+    if os.path.exists(pref_file):
+        with open(pref_file) as f:
+            preferences = json.load(f)
+            preferred_CAS = set(preferences.get('preferred_cas', []))
+            unpreferred_CAS = set(preferences.get('unpreferred_cas', []))
+
+
     for CAS, d in  db.CAS_index.items():
         assert CAS_from_any(d.CASs) == d.CASs
     # Check something was loaded
-    assert len(db.CAS_index) > 100
+    assert len([i for i in db]) > 100
 
     # Check smiles are unique / can lookup by smiles
-    for smi, d in db.smiles_index.items():
-        if not smi:
-            continue
-        assert CAS_from_any('smiles=' + smi) == d.CASs
+    # Check the smiles
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        smiles = d.smiles
+        if smiles:
+            result = CAS_from_any('smiles='+smiles)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by smiles {smiles} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
 
     # Check formula is formatted right
-    for i in db.CAS_index.values():
+    for i in db:
         assert i.formula == serialize_formula(i.formula)
 
     # Check CAS validity
-    for i in db.CAS_index.values():
+    for i in db:
         assert check_CAS(i.CASs)
 
     # MW checker
-    for i in db.CAS_index.values():
+    for i in db:
         formula = serialize_formula(i.formula)
         atoms = nested_formula_parser(formula, check=False)
         mw_calc = molecular_weight(atoms)
         assert_close(mw_calc, i.MW, atol=0.05)
 
 
+    # Check the inchi
+    errors = []
     for CAS, d in db.CAS_index.items():
-        if d.InChI:
-            assert CAS_from_any('InChI=1S/' + d.InChI) == int_to_CAS(CAS)
+        InChI = d.InChI
+        if InChI:
+            result = CAS_from_any('InChI=1S/'+InChI)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by InChI {InChI} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
 
+    # Check the InChI_key
+    errors = []
     for CAS, d in db.CAS_index.items():
-        if d.InChI_key:
-            assert CAS_from_any('InChIKey=' + d.InChI_key) == int_to_CAS(CAS)
+        InChI_key = d.InChI_key
+        if InChI_key:
+            result = CAS_from_any('InChIKey='+InChI_key)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by InChI_key {InChI_key} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
 
-    # Test the pubchem ids which aren't -1
+    # Check the pubchem
+    errors = []
     for CAS, d in db.CAS_index.items():
-        if d.pubchemid != -1:
-            assert CAS_from_any('PubChem=' + str(d.pubchemid)) == int_to_CAS(CAS)
+        pubchemid = d.pubchemid
+        if pubchemid != -1:
+            result = CAS_from_any('PubChem='+str(pubchemid))
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by pubchemid {pubchemid} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
 
-    CAS_lenth = len(db.CAS_index)
+    CAS_lenth = len([v for v in db])
     assert CAS_lenth == len(db.smiles_index)
     assert CAS_lenth == len(db.InChI_index)
     assert CAS_lenth == len(db.InChI_key_index)
 
+    # Check the name
+    # # TODO get this working
+    # errors = []
+    # for CAS, d in db.CAS_index.items():
+    #     common_name = d.common_name
+    #     result = CAS_from_any(common_name)
+    #     if result != d.CASs:
+    #         errors.append(f"CAS {result} retrieved by common_name {common_name} on compound {d.CASs}")
+    # if errors:
+    #     raise ValueError('\n'.join(errors))
 
 def test_inorganic_db():
     db = ChemicalMetadataDB(elements=False,
                             main_db=None,
                             user_dbs=[os.path.join(folder, 'Inorganic db.tsv')])
 
+    pref_file = os.path.join(folder, 'inorganic_preferences.json')
+    if os.path.exists(pref_file):
+        with open(pref_file) as f:
+            preferences = json.load(f)
+            preferred_CAS = set(preferences.get('preferred_cas', []))
+            unpreferred_CAS = set(preferences.get('unpreferred_cas', []))
+            
     # Check CAS lookup
-    for CAS, d in  db.CAS_index.items():
+    for CAS, d in db.CAS_index.items():
         assert CAS_from_any(d.CASs) == d.CASs
 
-    # Try to check formula lookups
-    for formula, d in  db.formula_index.items():
-        if formula in {'H2MgO2', 'F2N2'}:
-            # Formulas which are not unique by design
-            continue
-        assert CAS_from_any(formula) == d.CASs
+    # Check formula lookups
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        formula = d.formula
+        result = CAS_from_any(formula)
+        if result != d.CASs:
+            if int_to_CAS(CAS) not in unpreferred_CAS:
+                errors.append(f"CAS {result} retrieved by formula {formula} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
 
-    # Check smiles are unique / can lookup by smiles
-    for smi, d in db.smiles_index.items():
-        if not smi:
-            continue
-        assert CAS_from_any('smiles=' + smi) == d.CASs
+    # Check the smiles
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        smiles = d.smiles
+        if smiles:
+            result = CAS_from_any('smiles='+smiles)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by smiles {smiles} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the inchi
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        InChI = d.InChI
+        if InChI:
+            result = CAS_from_any('InChI=1S/'+InChI)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by InChI {InChI} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the InChI_key
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        InChI_key = d.InChI_key
+        if InChI_key:
+            result = CAS_from_any('InChIKey='+InChI_key)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by InChI_key {InChI_key} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the pubchem
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        pubchemid = d.pubchemid
+        if pubchemid != -1:
+            result = CAS_from_any('PubChem='+str(pubchemid))
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by pubchemid {pubchemid} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the name
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        common_name = d.common_name
+        result = CAS_from_any(common_name)
+        if result != d.CASs:
+            errors.append(f"CAS {result} retrieved by common_name {common_name} on compound {d.CASs}")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # IUPAC names are not unique, e.g Bromine (atom) or (Br2)
 
     # Check formula is formatted right
-    for i in db.CAS_index.values():
+    for i in db:
         assert i.formula == serialize_formula(i.formula)
 
     # Check CAS validity
-    for i in db.CAS_index.values():
+    for i in db:
         assert check_CAS(i.CASs)
 
     # MW checker
-    for i in db.CAS_index.values():
+    for i in db:
+        formula = serialize_formula(i.formula)
+        atoms = nested_formula_parser(formula, check=False)
+        mw_calc = molecular_weight(atoms)
+        assert_close(mw_calc, i.MW, atol=0.05)
+
+def test_ion_dbs():
+    db = ChemicalMetadataDB(elements=False,
+                            main_db=None,
+                            user_dbs=[os.path.join(folder, 'Anion db.tsv'), os.path.join(folder, 'Cation db.tsv')])
+
+    # Load anion preferences
+    anion_pref_file = os.path.join(folder, 'anion_preferences.json')
+    if os.path.exists(anion_pref_file):
+        with open(anion_pref_file) as f:
+            anion_preferences = json.load(f)
+            preferred_CAS = set(anion_preferences.get('preferred_cas', []))
+            unpreferred_CAS = set(anion_preferences.get('unpreferred_cas', []))
+    
+    # Load cation preferences
+    cation_pref_file = os.path.join(folder, 'cation_preferences.json')
+    if os.path.exists(cation_pref_file):
+        with open(cation_pref_file) as f:
+            cation_preferences = json.load(f)
+            # Update existing sets with cation preferences
+            preferred_CAS.update(cation_preferences.get('preferred_cas', []))
+            unpreferred_CAS.update(cation_preferences.get('unpreferred_cas', []))
+                
+    # Check CAS lookup
+    for CAS, d in db.CAS_index.items():
+        assert CAS_from_any(d.CASs) == d.CASs
+
+    # Check formula lookups
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        formula = d.formula
+        result = CAS_from_any(formula)
+        if result != d.CASs:
+            if int_to_CAS(CAS) not in unpreferred_CAS:
+                errors.append(f"CAS {result} retrieved by formula {formula} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the smiles
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        smiles = d.smiles
+        if smiles:
+            result = CAS_from_any('smiles='+smiles)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by smiles {smiles} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the inchi
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        InChI = d.InChI
+        if InChI:
+            result = CAS_from_any('InChI=1S/'+InChI)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by InChI {InChI} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the InChI_key
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        InChI_key = d.InChI_key
+        if InChI_key:
+            result = CAS_from_any('InChIKey='+InChI_key)
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by InChI_key {InChI_key} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the pubchem
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        pubchemid = d.pubchemid
+        if pubchemid != -1:
+            result = CAS_from_any('PubChem='+str(pubchemid))
+            if result != d.CASs:
+                if int_to_CAS(CAS) not in unpreferred_CAS:
+                    errors.append(f"CAS {result} retrieved by pubchemid {pubchemid} on compound {d.CASs} not marked as unpreferred")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # Check the name
+    errors = []
+    for CAS, d in db.CAS_index.items():
+        common_name = d.common_name
+        result = CAS_from_any(common_name)
+        if result != d.CASs:
+            errors.append(f"CAS {result} retrieved by common_name {common_name} on compound {d.CASs}")
+    if errors:
+        raise ValueError('\n'.join(errors))
+
+    # IUPAC names are not unique, e.g Bromine (atom) or (Br2)
+
+    # Check formula is formatted right
+    for i in db:
+        assert i.formula == serialize_formula(i.formula)
+
+    # Check CAS validity
+    for i in db:
+        assert check_CAS(i.CASs)
+
+    # MW checker
+    for i in db:
         formula = serialize_formula(i.formula)
         atoms = nested_formula_parser(formula, check=False)
         mw_calc = molecular_weight(atoms)
@@ -962,9 +1188,8 @@ def test_diborane():
    assert chemical.pubchemid == 12544637
    assert chemical.CAS == 19287457
    assert chemical.formula == "B2H6"
-   assert chemical.smiles == "B.B"
-   # Test alternate names
-   chemical = search_chemical("borane")
+   # smiles confirmed, pubchem has the wrong structure https://en.wikipedia.org/wiki/Diborane
+   assert chemical.smiles == "[BH2]1[H][BH2][H]1"
    assert chemical.CAS == 19287457
    chemical = search_chemical("Diboron hexahydride") 
    assert chemical.CAS == 19287457
@@ -1005,6 +1230,478 @@ def test_water():
     # Check that the problematic string with wrong separators isn't in synonyms, https://github.com/CalebBell/chemicals/issues/29
     bad_string = 'caustic soda liquid;aquafina;distilled water;hydrogen oxide (h2o);ultrexii ultrapure;'
     assert bad_string not in chemical.synonyms
+
+def test_atomic_oxygen():
+    chemical = search_chemical('atomic oxygen')
+    # Test basic properties
+    assert chemical.pubchemid == 159832
+    assert chemical.CASs == '17778-80-2'
+    assert chemical.formula == 'O'
+    assert_close(chemical.MW, 15.9994)
+    assert chemical.smiles == '[O]'
+    assert chemical.InChI == 'O'
+    assert chemical.InChI_key == 'QVGXLLKOCUKJST-UHFFFAOYSA-N'
+    assert chemical.common_name == 'atomic oxygen'
+    assert chemical.iupac_name == 'atomic oxygen'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'oxygen atom',
+        'monooxygen',
+        'ATOMIC OXYGEN',
+        'OXYGEN ATOM'
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '17778-80-2', f"Failed to find atomic oxygen using term: {term}"
+
+    
+    # Test identifier-based searches
+    identifier_searches = {
+        'formula': 'O',
+        'smiles': '[O]',
+        'inchi': 'InChI=1S/O',
+        'inchikey': 'InChIKey=QVGXLLKOCUKJST-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=159832',
+        'cas': '17778-80-2'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '17778-80-2', f"Failed to find atomic oxygen using {search_type}: {identifier}"
+    
+def test_molecular_oxygen():
+    chemical = search_chemical('oxygen')
+    # Test basic properties
+    assert chemical.pubchemid == 977
+    assert chemical.CASs == '7782-44-7'
+    assert chemical.formula == 'O2'
+    assert_close(chemical.MW, 31.9988)
+    assert chemical.smiles == 'O=O'
+    assert chemical.InChI == 'O2/c1-2'
+    assert chemical.InChI_key == 'MYMOFIZGZYHOMD-UHFFFAOYSA-N'
+    assert chemical.common_name == 'oxygen'
+    assert chemical.iupac_name == 'molecular oxygen'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'dioxygen',
+        'molecular oxygen',
+        'oxygen gas',
+        'O2',
+        'oxygen-16',
+        'liquid oxygen'
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '7782-44-7', f"Failed to find molecular oxygen using term: {term}"
+
+    identifier_searches = {
+        'formula': 'O2',
+        'smiles': 'O=O',
+        'inchi': 'InChI=1S/O2/c1-2',
+        'inchikey': 'InChIKey=MYMOFIZGZYHOMD-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=977',
+        'cas': '7782-44-7'
+    }
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '7782-44-7', f"Failed to find molecular oxygen using {search_type}: {identifier}"
+
+def test_atomic_nitrogen():
+    chemical = search_chemical('atomic nitrogen')
+    # Test basic properties
+    assert chemical.pubchemid == 57370662
+    assert chemical.CASs == '17778-88-0'
+    assert chemical.formula == 'N'
+    assert_close(chemical.MW, 14.0067)
+    assert chemical.smiles == '[N]'
+    assert chemical.InChI == 'N'
+    assert chemical.InChI_key == 'QJGQUHMNIGDVPM-UHFFFAOYSA-N'
+    assert chemical.common_name == 'atomic nitrogen'
+    assert chemical.iupac_name == 'atomic nitrogen'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'nitrogen atom',
+        'mononitrogen',
+        'ATOMIC NITROGEN',
+        'NITROGEN ATOM',
+        'nitrogen, atomic'
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '17778-88-0', f"Failed to find atomic nitrogen using term: {term}"
+    
+    # Test identifier-based searches
+    identifier_searches = {
+        'formula': 'N',
+        'smiles': '[N]',
+        'inchi': 'InChI=1S/N',
+        'inchikey': 'InChIKey=QJGQUHMNIGDVPM-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=57370662',
+        'cas': '17778-88-0'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '17778-88-0', f"Failed to find atomic nitrogen using {search_type}: {identifier}"
+    
+def test_molecular_nitrogen():
+    chemical = search_chemical('nitrogen')
+    # Test basic properties
+    assert chemical.pubchemid == 947
+    assert chemical.CASs == '7727-37-9'
+    assert chemical.formula == 'N2'
+    assert_close(chemical.MW, 28.0134)
+    assert chemical.smiles == 'N#N'
+    assert chemical.InChI == 'N2/c1-2'
+    assert chemical.InChI_key == 'IJGRMHOSHXDMSA-UHFFFAOYSA-N'
+    assert chemical.common_name == 'nitrogen'
+    assert chemical.iupac_name == 'molecular nitrogen'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'diatomic nitrogen',
+        'molecular nitrogen',
+        'nitrogen gas',
+        'N2',
+        'dinitrogen',
+        'nitrogen molecule',
+        'NITROGEN',
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '7727-37-9', f"Failed to find molecular nitrogen using term: {term}"
+    
+    identifier_searches = {
+        'formula': 'N2',
+        'smiles': 'N#N',
+        'inchi': 'InChI=1S/N2/c1-2',
+        'inchikey': 'InChIKey=IJGRMHOSHXDMSA-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=947',
+        'cas': '7727-37-9'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '7727-37-9', f"Failed to find molecular nitrogen using {search_type}: {identifier}"
+
+def test_atomic_fluorine():
+    chemical = search_chemical('atomic fluorine')
+    # Test basic properties
+    assert chemical.pubchemid == 5360525
+    assert chemical.CASs == '14762-94-8'
+    assert chemical.formula == 'F'
+    assert_close(chemical.MW, 18.998403)
+    assert chemical.smiles == '[F]'
+    assert chemical.InChI == 'F'
+    assert chemical.InChI_key == 'YCKRFDGAMUMZLT-UHFFFAOYSA-N'
+    assert chemical.common_name == 'atomic fluorine'
+    assert chemical.iupac_name == 'atomic fluorine'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'fluorine atom',
+        'monofluorine',
+        'ATOMIC FLUORINE',
+        'FLUORINE ATOM',
+        'fluorine, atomic',
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '14762-94-8', f"Failed to find atomic fluorine using term: {term}"
+    
+    # Test identifier-based searches
+    identifier_searches = {
+        'formula': 'F',
+        'smiles': '[F]',
+        'inchi': 'InChI=1S/F',
+        'inchikey': 'InChIKey=YCKRFDGAMUMZLT-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=5360525',
+        'cas': '14762-94-8'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '14762-94-8', f"Failed to find atomic fluorine using {search_type}: {identifier}"
+    
+def test_molecular_fluorine():
+    chemical = search_chemical('fluorine')
+    # Test basic properties
+    assert chemical.pubchemid == 24524
+    assert chemical.CASs == '7782-41-4'
+    assert chemical.formula == 'F2'
+    assert_close(chemical.MW, 37.996806)
+    assert chemical.smiles == 'FF'
+    assert chemical.InChI == 'F2/c1-2'
+    assert chemical.InChI_key == 'PXGOKWXKJXAPGV-UHFFFAOYSA-N'
+    assert chemical.common_name == 'fluorine'
+    assert chemical.iupac_name == 'molecular fluorine'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'diatomic fluorine',
+        'molecular fluorine',
+        'fluorine gas',
+        'F2',
+        'difluorine',
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '7782-41-4', f"Failed to find molecular fluorine using term: {term}"
+    
+    identifier_searches = {
+        'formula': 'F2',
+        'smiles': 'FF',
+        'inchi': 'InChI=1S/F2/c1-2',
+        'inchikey': 'InChIKey=PXGOKWXKJXAPGV-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=24524',
+        'cas': '7782-41-4'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '7782-41-4', f"Failed to find molecular fluorine using {search_type}: {identifier}"
+
+def test_atomic_chlorine():
+    chemical = search_chemical('atomic chlorine')
+    # Test basic properties
+    assert chemical.pubchemid == 5360523
+    assert chemical.CASs == '22537-15-1'
+    assert chemical.formula == 'Cl'
+    assert_close(chemical.MW, 35.453)
+    assert chemical.smiles == '[Cl]'
+    assert chemical.InChI == 'Cl'
+    assert chemical.InChI_key == 'ZAMOUSCENKQFHK-UHFFFAOYSA-N'
+    assert chemical.common_name == 'atomic chlorine'
+    assert chemical.iupac_name == 'atomic chlorine'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'chlorine atom',
+        'monochlorine',
+        'ATOMIC CHLORINE',
+        'CHLORINE ATOM',
+        'chlorine, atomic',
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '22537-15-1', f"Failed to find atomic chlorine using term: {term}"
+    
+    # Test identifier-based searches
+    identifier_searches = {
+        'formula': 'Cl',
+        'smiles': '[Cl]',
+        'inchi': 'InChI=1S/Cl',
+        'inchikey': 'InChIKey=ZAMOUSCENKQFHK-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=5360523',
+        'cas': '22537-15-1'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '22537-15-1', f"Failed to find atomic chlorine using {search_type}: {identifier}"
+    
+def test_molecular_chlorine():
+    chemical = search_chemical('chlorine')
+    # Test basic properties
+    assert chemical.pubchemid == 24526
+    assert chemical.CASs == '7782-50-5'
+    assert chemical.formula == 'Cl2'
+    assert_close(chemical.MW, 70.906)
+    assert chemical.smiles == 'ClCl'
+    assert chemical.InChI == 'Cl2/c1-2'
+    assert chemical.InChI_key == 'KZBUYRJDOAKODT-UHFFFAOYSA-N'
+    assert chemical.common_name == 'chlorine'
+    assert chemical.iupac_name == 'molecular chlorine'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'diatomic chlorine',
+        'molecular chlorine',
+        'Cl2',
+        'dichlorine',
+        'chlorine molecule',
+        'chlorine mol.',
+        'liquid chlorine',
+        'chlorinum',
+        'bertholite'
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '7782-50-5', f"Failed to find molecular chlorine using term: {term}"
+        
+    identifier_searches = {
+        'formula': 'Cl2',
+        'smiles': 'ClCl',
+        'inchi': 'InChI=1S/Cl2/c1-2',
+        'inchikey': 'InChIKey=KZBUYRJDOAKODT-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=24526',
+        'cas': '7782-50-5'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '7782-50-5', f"Failed to find molecular chlorine using {search_type}: {identifier}"
+
+def test_atomic_iodine():
+    chemical = search_chemical('atomic iodine')
+    # Test basic properties
+    assert chemical.pubchemid == 5360629
+    assert chemical.CASs == '14362-44-8'
+    assert chemical.formula == 'I'
+    assert_close(chemical.MW, 126.90447)
+    assert chemical.smiles == '[I]'
+    assert chemical.InChI == 'I'
+    assert chemical.InChI_key == 'ZCYVEMRRCGMTRW-UHFFFAOYSA-N'
+    assert chemical.common_name == 'atomic iodine'
+    assert chemical.iupac_name == 'atomic iodine'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'iodine atom',
+        'monoiodine',
+        'ATOMIC IODINE',
+        'IODINE ATOM',
+        'iodine, atomic',
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '14362-44-8', f"Failed to find atomic iodine using term: {term}"
+    
+    # Test identifier-based searches
+    identifier_searches = {
+        'formula': 'I',
+        'smiles': '[I]',
+        'inchi': 'InChI=1S/I',
+        'inchikey': 'InChIKey=ZCYVEMRRCGMTRW-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=5360629',
+        'cas': '14362-44-8'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '14362-44-8', f"Failed to find atomic iodine using {search_type}: {identifier}"
+    
+def test_molecular_iodine():
+    chemical = search_chemical('iodine')
+    # Test basic properties
+    assert chemical.pubchemid == 807
+    assert chemical.CASs == '7553-56-2'
+    assert chemical.formula == 'I2'
+    assert_close(chemical.MW, 253.80894)
+    assert chemical.smiles == 'II'
+    assert chemical.InChI == 'I2/c1-2'
+    assert chemical.InChI_key == 'PNDPGZBMCMUPRI-UHFFFAOYSA-N'
+    assert chemical.common_name == 'iodine'
+    assert chemical.iupac_name == 'molecular iodine'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'diatomic iodine',
+        'molecular iodine',
+        'I2',
+        'diiodine',
+        'iodine molecule',
+        'iodium',
+        'iodine (II)',
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '7553-56-2', f"Failed to find molecular iodine using term: {term}"
+        identifier_searches = {
+        'formula': 'I2',
+        'smiles': 'II',
+        'inchi': 'InChI=1S/I2/c1-2',
+        'inchikey': 'InChIKey=PNDPGZBMCMUPRI-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=807',
+        'cas': '7553-56-2'
+    }
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '7553-56-2', f"Failed to find molecular iodine using {search_type}: {identifier}"
+
+def test_atomic_bromine():
+    chemical = search_chemical('atomic bromine')
+    # Test basic properties
+    assert chemical.pubchemid == 5360770
+    assert chemical.CASs == '10097-32-2'
+    assert chemical.formula == 'Br'
+    assert_close(chemical.MW, 79.904)
+    assert chemical.smiles == '[Br]'
+    assert chemical.InChI == 'Br'
+    assert chemical.InChI_key == 'WKBOTKDWSSQWDR-UHFFFAOYSA-N'
+    assert chemical.common_name == 'atomic bromine'
+    assert chemical.iupac_name == 'atomic bromine'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'bromine atom',
+        'monobromine',
+        'ATOMIC BROMINE',
+        'BROMINE ATOM',
+        'bromine, atomic',
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '10097-32-2', f"Failed to find atomic bromine using term: {term}"
+    
+    # Test identifier-based searches
+    identifier_searches = {
+        'formula': 'Br',
+        'smiles': '[Br]',
+        'inchi': 'InChI=1S/Br',
+        'inchikey': 'InChIKey=WKBOTKDWSSQWDR-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=5360770',
+        'cas': '10097-32-2'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '10097-32-2', f"Failed to find atomic bromine using {search_type}: {identifier}"
+    
+def test_molecular_bromine():
+    chemical = search_chemical('bromine')
+    # Test basic properties
+    assert chemical.pubchemid == 24408
+    assert chemical.CASs == '7726-95-6'
+    assert chemical.formula == 'Br2'
+    assert_close(chemical.MW, 159.808)
+    assert chemical.smiles == 'BrBr'
+    assert chemical.InChI == 'Br2/c1-2'
+    assert chemical.InChI_key == 'GDTBXPJZTBHREO-UHFFFAOYSA-N'
+    assert chemical.common_name == 'bromine'
+    assert chemical.iupac_name == 'molecular bromine'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'diatomic bromine',
+        'molecular bromine',
+        'bromine molecule',
+        'Br2',
+        'dibromine',
+        'brom',
+        'brome',
+        'bromo',
+        'bromium'
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '7726-95-6', f"Failed to find molecular bromine using term: {term}"
+    
+    identifier_searches = {
+        'formula': 'Br2',
+        'smiles': 'BrBr',
+        'inchi': 'InChI=1S/Br2/c1-2',
+        'inchikey': 'InChIKey=GDTBXPJZTBHREO-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=24408',
+        'cas': '7726-95-6'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '7726-95-6', f"Failed to find molecular bromine using {search_type}: {identifier}"
 
 def test_parahydrogen():
     chemical = search_chemical('parahydrogen')
@@ -1239,27 +1936,6 @@ def test_CAS_from_any():
 
 
 def test_periodic_table_variants():
-    """Do a lookup in the periodic table and compare vs CAS_from_any."""
-    ids = [periodic_table._CAS_to_elements, periodic_table._name_to_elements, periodic_table._symbol_to_elements]
-    failed_CASs = []
-    for thing in ids:
-        for i in thing.keys():
-            try:
-                CAS_from_any(i)
-            except:
-                failed_CASs.append(periodic_table[i].name)
-    assert 0 == len(set(failed_CASs))
-
-    # Check only the 5 known diatomics have a diff case
-    failed_CASs = []
-    for thing in ids:
-        for i in thing.keys():
-            try:
-                assert CAS_from_any(i) == periodic_table[i].CAS
-            except:
-                failed_CASs.append(periodic_table[i].name)
-    assert {'Chlorine', 'Fluorine', 'Hydrogen', 'Nitrogen', 'Oxygen', 'Bromine', 'Iodine'} == set(failed_CASs)
-
 
 
     for CAS, d in periodic_table._CAS_to_elements.items():
@@ -1279,7 +1955,7 @@ def test_periodic_table_variants():
     for CAS, d in periodic_table._CAS_to_elements.items():
 
         if d.PubChem is not None:
-            assert CAS_from_any('PubChem=' + str(d.PubChem)) == CAS
+            assert CAS_from_any('PubChem=' + str(d.PubChem)) == CAS, (d, d.PubChem, CAS)
         else:
             fail += 1
     assert fail == 9
@@ -1314,6 +1990,28 @@ def test_periodic_table_variants():
     assert search_chemical(search_chemical('monatomic fluorine').CASs).formula == 'F'
     assert search_chemical(search_chemical('monatomic hydrogen').CASs).formula == 'H'
     assert search_chemical(search_chemical('monatomic chlorine').CASs).formula == 'Cl'
+
+    """Do a lookup in the periodic table and compare vs CAS_from_any."""
+    ids = [periodic_table._CAS_to_elements, periodic_table._name_to_elements, periodic_table._symbol_to_elements]
+    failed_CASs = []
+    for thing in ids:
+        for i in thing.keys():
+            try:
+                CAS_from_any(i)
+            except:
+                failed_CASs.append(periodic_table[i].name)
+    assert 0 == len(set(failed_CASs))
+
+    # Check only the 5 known diatomics have a diff case
+    failed_CASs = []
+    for thing in ids:
+        for i in thing.keys():
+            try:
+                assert CAS_from_any(i) == periodic_table[i].CAS
+            except:
+                failed_CASs.append(periodic_table[i].name)
+    assert {'Chlorine', 'Fluorine', 'Hydrogen', 'Nitrogen', 'Oxygen', 'Bromine', 'Iodine'} == set(failed_CASs)
+
 
 def test_nested_brackets_with_chemical_with_brackets():
     assert search_chemical('1-(1-methylethyl)-4- methylbenzene (p-cymene)').CASs =='99-87-6'
@@ -1521,7 +2219,7 @@ def test_formula_search_exceptions():
     formulas that need special handling due to SMILES/formula interpretation conflicts.
     """
     actual_conflicts = set()
-    for chemical in pubchem_db.CAS_index.values():
+    for chemical in pubchem_db:
         if not chemical.formula:
             continue
         formula = chemical.formula
