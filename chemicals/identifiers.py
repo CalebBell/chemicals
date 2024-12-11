@@ -446,19 +446,11 @@ class ChemicalMetadataDB:
             if obj_old is not None:
                 synonyms = obj_old.synonyms
 
-
-            if obj.InChI_key in InChI_key_index:
-                if ele.CAS not in homonuclear_elements_CASs_set:
-                    for name in obj_old.synonyms:
-                        name_index[name] = obj
-
             InChI_key_index[obj.InChI_key] = obj
             CAS_index[obj.CAS] = obj
             pubchem_index[obj.pubchemid] = obj
             smiles_index[obj.smiles] = obj
             InChI_index[obj.InChI] = obj
-            if ele.CAS in homonuclear_elements_CASs_set:
-                name_index['monatomic ' + ele_lower_name] = obj
             for name in synonyms:
                 name_index[name] = obj
             formula_index[obj.formula] = obj
@@ -936,7 +928,7 @@ def search_chemical(ID, autoload=False, cache=True):
     >>> print(search_chemical('pubchem=702'))
     <ChemicalMetadata, name=ethanol, formula=C2H6O, smiles=CCO, MW=46.0684>
     >>> print(search_chemical('O')) # only elements can be specified by symbol
-    <ChemicalMetadata, name=oxygen, formula=O, smiles=[O], MW=15.9994>
+    <ChemicalMetadata, name=atomic oxygen, formula=O, smiles=[O], MW=15.9994>
     """
     if cache and ID in chemical_search_cache:
         return chemical_search_cache[ID]
