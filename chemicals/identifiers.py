@@ -445,6 +445,7 @@ class ChemicalMetadataDB:
                                    synonyms=synonyms)
             if obj_old is not None:
                 synonyms = obj_old.synonyms
+                obj.synonyms = synonyms
 
             InChI_key_index[obj.InChI_key] = obj
             CAS_index[obj.CAS] = obj

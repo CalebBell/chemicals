@@ -1856,6 +1856,50 @@ def test_normal_deuterium():
     assert search_chemical('nD2') == chemical
     assert '2:1 ortho:para deuterium mixture' in chemical.synonyms
 
+def test_helium():
+    chemical = search_chemical('helium')
+    # Test basic properties
+    assert chemical.pubchemid == 23987
+    assert chemical.CASs == '7440-59-7'
+    assert chemical.formula == 'He'
+    assert_close(chemical.MW, 4.002602)
+    assert chemical.smiles == '[He]'
+    assert chemical.InChI == 'He'
+    assert chemical.InChI_key == 'SWQJXJOGLNCZEY-UHFFFAOYSA-N'
+    assert chemical.common_name == 'helium'
+    assert chemical.iupac_name == 'helium'
+    
+    # Test the most likely search terms a user would try
+    common_searches = [
+        'helium',
+        'atomic helium',
+        'helium-4',
+        'p-helium',
+        'o-helium',
+        'helio',
+        '[He]',
+        '494798-31-1',
+    ]
+    for term in common_searches:
+        found_chemical = search_chemical(term)
+        assert found_chemical.CASs == '7440-59-7', f"Failed to find helium using term: {term}"
+    
+    # Test identifier-based searches
+    identifier_searches = {
+        'formula': 'He',
+        'smiles': '[He]',
+        'inchi': 'InChI=1S/He',
+        'inchikey': 'InChIKey=SWQJXJOGLNCZEY-UHFFFAOYSA-N',
+        'pubchem': 'pubchem=23987',
+        'cas': '7440-59-7'
+    }
+    
+    for search_type, identifier in identifier_searches.items():
+        found_chemical = search_chemical(identifier)
+        assert found_chemical.CASs == '7440-59-7', f"Failed to find helium using {search_type}: {identifier}"
+    
+
+        
 def test_absence_of_air_as_a_compound():
     # this compound has a CAS of air, but it's nonsense https://pubchem.ncbi.nlm.nih.gov/compound/195130
     with pytest.raises(Exception):
