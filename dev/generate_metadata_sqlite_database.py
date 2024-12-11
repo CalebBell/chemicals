@@ -49,7 +49,7 @@ def initialize_db(db_path):
         CREATE INDEX pubchemid_idx ON chemicals(pubchemid);
         CREATE INDEX inchi_key_idx ON chemicals(inchi_key);
         CREATE INDEX formula_preferred_idx ON chemicals(formula, preferred DESC);
-        
+
         -- Normalized synonym lookup table
         CREATE TABLE chemical_synonyms (
             cas INTEGER,
@@ -118,6 +118,9 @@ def force_insert_synonyms(cur, chemical):
 
 def dump_to_db(chemical_db, db_path='chemicals.db'):
     """Dump a ChemicalMetadataDB instance to SQLite database"""
+    small_dbs = ChemicalMetadataDB(elements=True, main_db=os.path.join(folder, PUBCHEM_SMALL_DB_NAME), 
+                                    user_dbs=[os.path.join(folder, n) for n in [PUBCHEM_CATION_DB_NAME, PUBCHEM_ANION_DB_NAME,
+                                            PUBCHEM_IONORGANIC_DB_NAME, PUBCHEM_EXAMPLE_DB_NAME]])
     conn = initialize_db(db_path)
     cur = conn.cursor()
     
@@ -126,6 +129,7 @@ def dump_to_db(chemical_db, db_path='chemicals.db'):
     
     # try:
     for chemical in chemical_db:
+    # for chemical in small_dbs:
         add_chemical(cur, chemical)
     # except Exception as e:
     #     conn.rollback()
@@ -134,9 +138,6 @@ def dump_to_db(chemical_db, db_path='chemicals.db'):
         # conn.close()
 
     # 2. Force insert synonyms from combined small DBs
-    small_dbs = ChemicalMetadataDB(elements=True, main_db=os.path.join(folder, PUBCHEM_SMALL_DB_NAME), 
-                                    user_dbs=[os.path.join(folder, n) for n in [PUBCHEM_CATION_DB_NAME, PUBCHEM_ANION_DB_NAME,
-                                            PUBCHEM_IONORGANIC_DB_NAME, PUBCHEM_EXAMPLE_DB_NAME]])
     for chemical in small_dbs:
         force_insert_synonyms(cur, chemical)
     
