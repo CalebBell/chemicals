@@ -48,6 +48,7 @@ def initialize_db(db_path):
         CREATE INDEX inchi_idx ON chemicals(inchi);
         CREATE INDEX pubchemid_idx ON chemicals(pubchemid);
         CREATE INDEX inchi_key_idx ON chemicals(inchi_key);
+        CREATE INDEX formula_preferred_idx ON chemicals(formula, preferred DESC);
         
         -- Normalized synonym lookup table
         CREATE TABLE chemical_synonyms (
