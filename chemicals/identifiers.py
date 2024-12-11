@@ -581,7 +581,7 @@ class ChemicalMetadataDiskDB:
         """Convert a database row to a ChemicalMetadata object"""
         if row is None:
             return None
-            
+        
         synonyms = [row['iupac_name'], row['common_name']]
         if row['raw_synonyms']:
             synonyms.extend(row['raw_synonyms'].split('\t'))
@@ -667,6 +667,16 @@ class ChemicalMetadataDiskDB:
         )
         return self._row_to_metadata(cur.fetchone())
     
+    def search_pubchem(self, pubchem, autoload=True):
+        """Search for a chemical by its pubchem number"""
+        cur = self._conn.cursor()
+        cur.execute(
+            "SELECT * FROM chemicals WHERE pubchemid = ? ORDER BY preferred DESC LIMIT 1",
+            (int(pubchem),)
+        )
+        return self._row_to_metadata(cur.fetchone())
+            
+
     def __iter__(self):
         """Iterate over all chemicals in the database"""
         cur = self._conn.cursor()
@@ -757,15 +767,6 @@ class ChemicalMetadataDiskDB:
                 inchi_key_dict[metadata.InChI_key] = metadata
         return inchi_key_dict
 
-    def search_pubchem(self, pubchem, autoload=True):
-        """Search for a chemical by its pubchem number"""
-        cur = self._conn.cursor()
-        cur.execute(
-            "SELECT * FROM chemicals WHERE pubchemid = ? ORDER BY preferred DESC LIMIT 1",
-            (int(pubchem),)
-        )
-        return self._row_to_metadata(cur.fetchone())
-            
     @property
     def finished_loading(self):
         """Always returns True as database is pre-loaded"""
