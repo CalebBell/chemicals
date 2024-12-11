@@ -1250,8 +1250,8 @@ def get_pubchem_db():
     if _pubchem_db_loaded:  # pragma: no cover
         return pubchem_db
     else:
-        # pubchem_db = ChemicalMetadataDB()
-        pubchem_db = ChemicalMetadataDiskDB()
+        pubchem_db = ChemicalMetadataDB()
+        # pubchem_db = ChemicalMetadataDiskDB()
     _pubchem_db_loaded = True
     return pubchem_db
 

@@ -2,7 +2,17 @@ import os
 import sqlite3
 import json
 from pathlib import Path
-from chemicals.identifiers import load_chemical_preferences
+from chemicals.identifiers import (
+    load_chemical_preferences,
+    ChemicalMetadataDB,
+    folder,
+    PUBCHEM_LARGE_DB_NAME,
+    PUBCHEM_SMALL_DB_NAME,
+    PUBCHEM_CATION_DB_NAME,
+    PUBCHEM_ANION_DB_NAME,
+    PUBCHEM_IONORGANIC_DB_NAME,
+    PUBCHEM_EXAMPLE_DB_NAME
+)
 preferred = load_chemical_preferences()[0]
 
 
@@ -89,6 +99,22 @@ def add_chemical(cur, chemical):
     )
     chemicals_added.add(chemical.CASs)
 
+def force_insert_synonyms(cur, chemical):
+    """Force insert synonyms from a chemical, overwriting existing ones if necessary"""
+    synonyms = [(chemical.CAS, syn) for syn in chemical.synonyms]
+    for syn in chemical.synonyms:
+        if syn.lower() != syn:
+            synonyms.append((chemical.CAS, syn.lower()))
+    
+    for cas, syn in synonyms:
+        cur.execute("DELETE FROM chemical_synonyms WHERE synonym = ?", (syn,))
+
+    # Insert new synonyms
+    cur.executemany(
+        "INSERT OR REPLACE INTO chemical_synonyms (cas, synonym) VALUES (?, ?)",
+        synonyms
+    )
+
 def dump_to_db(chemical_db, db_path='chemicals.db'):
     """Dump a ChemicalMetadataDB instance to SQLite database"""
     conn = initialize_db(db_path)
@@ -97,15 +123,31 @@ def dump_to_db(chemical_db, db_path='chemicals.db'):
     # Use a transaction for faster bulk insert
     cur.execute("BEGIN TRANSACTION")
     
-    try:
-        for chemical in chemical_db:
-            add_chemical(cur, chemical)
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        raise e
-    finally:
-        conn.close()
+    # try:
+    for chemical in chemical_db:
+        add_chemical(cur, chemical)
+    # except Exception as e:
+    #     conn.rollback()
+    #     raise e
+    # finally:
+        # conn.close()
+
+    # 2. Force insert synonyms from combined small DBs
+    small_dbs = ChemicalMetadataDB(elements=True, main_db=os.path.join(folder, PUBCHEM_SMALL_DB_NAME), 
+                                    user_dbs=[os.path.join(folder, n) for n in [PUBCHEM_CATION_DB_NAME, PUBCHEM_ANION_DB_NAME,
+                                            PUBCHEM_IONORGANIC_DB_NAME, PUBCHEM_EXAMPLE_DB_NAME]])
+    for chemical in small_dbs:
+        force_insert_synonyms(cur, chemical)
+    
+    # 3. Force insert synonyms from other DBs only
+    other_dbs = ChemicalMetadataDB(elements=True, main_db=None, 
+                                    user_dbs=[os.path.join(folder, n) for n in [PUBCHEM_EXAMPLE_DB_NAME, PUBCHEM_IONORGANIC_DB_NAME, PUBCHEM_CATION_DB_NAME, PUBCHEM_ANION_DB_NAME]])
+    for chemical in other_dbs:
+        force_insert_synonyms(cur, chemical)
+    conn.commit()
+    conn.close()
+        
+
 
 def verify_db(db_path):
     """Print database statistics and verify integrity"""
