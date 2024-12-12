@@ -2512,7 +2512,7 @@ def viscosity_index(nu_40, nu_100, rounding=False):
 
     Returns
     -------
-    VI: float
+    VI : float
         Viscosity index [-]
 
     Notes
