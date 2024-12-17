@@ -81,6 +81,7 @@ from chemicals.utils import (
     Qls_to_ns,
     Qls_to_ms,
     ms_to_Qls,
+    rho_to_Baume_light, Baume_light_to_rho, SG_to_Baume_light, Baume_light_to_SG, rho_to_Baume_heavy, Baume_heavy_to_rho, SG_to_Baume_heavy, Baume_heavy_to_SG,
 )
 
 
@@ -739,3 +740,30 @@ def test_ms_to_Qls():
 def test_Qls_to_ms():
     ans = Qls_to_ms([3.405135210129374e-07, 1.885565470149901e-05, 3.4208426220155466e-06], [18.01528, 16.04246, 142.28168], [1.8087205105724903e-05, 5.858784737690099e-05, 0.00019580845677748954])
     assert_close1d(ans, [0.00033915944387075575, 0.005163034654211768, 0.002485711001895458])
+
+
+def test_Baume_light_roundtrip():
+    # Test rho conversion round trip
+    rho = 820.0
+    Be = rho_to_Baume_light(rho)
+    rho2 = Baume_light_to_rho(Be)
+    assert_close(rho, rho2)
+    
+    # Test SG conversion round trip
+    SG = 0.8209
+    Be = SG_to_Baume_light(SG) 
+    SG2 = Baume_light_to_SG(Be)
+    assert_close(SG, SG2)
+
+def test_Baume_heavy_roundtrip():
+    # Test rho conversion round trip
+    rho = 1200.0
+    Be = rho_to_Baume_heavy(rho)
+    rho2 = Baume_heavy_to_rho(Be)
+    assert_close(rho, rho2)
+    
+    # Test SG conversion round trip
+    SG = 1.2012
+    Be = SG_to_Baume_heavy(SG)
+    SG2 = Baume_heavy_to_SG(Be)
+    assert_close(SG, SG2)

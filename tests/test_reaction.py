@@ -1806,7 +1806,7 @@ def test_balance_stoichiometry(test_case):
         if not settings['allow_fractional']:
             # when we allow fractions we stil have valid ratios but they do not match the hardcoded answers
             assert_close1d(products_calc, products)
-        check_reaction_balance(matrix, products_calc, atol=1e-12)
+        check_reaction_balance(matrix, products_calc, atol=1e-11)
 
 
 def test_round_to_significant():

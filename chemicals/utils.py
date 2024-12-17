@@ -48,7 +48,10 @@ __all__ = ['isobaric_expansion', 'isothermal_compressibility',
  'vapor_mass_quality', 'mix_component_flows',
 'mix_multiple_component_flows', 'mix_component_partial_flows',
 'solve_flow_composition_mix', 'radius_of_gyration',
-'v_to_v_molar', 'v_molar_to_v', 'molar_velocity_to_velocity', 'velocity_to_molar_velocity']
+'v_to_v_molar', 'v_molar_to_v', 'molar_velocity_to_velocity', 'velocity_to_molar_velocity',
+'Baume_heavy_to_SG', 'SG_to_Baume_heavy', 'Baume_light_to_SG', 'SG_to_Baume_light', 
+'Baume_heavy_to_rho', 'rho_to_Baume_heavy', 'Baume_light_to_rho', 'rho_to_Baume_light' 
+]
 
 import os
 import sys
@@ -716,6 +719,285 @@ def API_to_SG(API):
     '''
     return 141.5/(API + 131.5)
 
+def rho_to_Baume_light(rho, rho_ref=999.0170824078306):
+    r'''Calculates degrees Baumé of a liquid lighter than water given its mass density,
+    as shown in [1]_.
+    
+    .. math::
+        \text{Degrees Baumé} = \frac{140}{\text{SG}} - 130 = \frac{140\rho_{ref}}{\rho} - 130
+    
+    Parameters
+    ----------
+    rho : float
+        Mass density of the fluid at 60 degrees Fahrenheit [kg/m^3]
+    rho_ref : float, optional
+        Density of the reference substance, [kg/m^3]
+        
+    Returns
+    -------
+    Baume : float
+        Degrees Baumé of the fluid [-]
+        
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+    Only valid for liquids lighter than water.
+    
+    Examples
+    --------
+    >>> rho_to_Baume_light(820)
+    40.563
+    
+    References
+    ----------
+    .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
+       Tulsa, OK, 2004.
+    '''
+    return 140*rho_ref/rho - 130
+
+def Baume_light_to_rho(Baume, rho_ref=999.0170824078306):
+    r'''Calculates mass density of a liquid lighter than water given its degrees Baumé,
+    as shown in [1]_.
+    
+    .. math::
+        \rho~60^\circ\text{F} = \frac{140\rho_{ref}}{130 + \text{Degrees Baumé}}
+    
+    Parameters
+    ----------
+    Baume : float
+        Degrees Baumé of the fluid [-]
+    rho_ref : float, optional
+        Density of the reference substance, [kg/m^3]
+        
+    Returns
+    -------
+    rho : float
+        Mass density the fluid at 60 degrees Fahrenheit [kg/m^3]
+        
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+    Only valid for liquids lighter than water.
+    
+    Examples
+    --------
+    >>> Baume_light_to_rho(40.7317)
+    819.194
+    
+    References
+    ----------
+    .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
+       Tulsa, OK, 2004.
+    '''
+    return (140*rho_ref)/(130 + Baume)
+
+def rho_to_Baume_heavy(rho, rho_ref=999.0170824078306):
+    r'''Calculates degrees Baumé of a liquid heavier than water given its mass density,
+    as shown in [1]_.
+    
+    .. math::
+        \text{Degrees Baumé} = 145 - \frac{145}{\text{SG}} = 145 - \frac{145\rho_{ref}}{\rho}
+    
+    Parameters
+    ----------
+    rho : float
+        Mass density the fluid at 60 degrees Fahrenheit [kg/m^3]
+    rho_ref : float, optional
+        Density of the reference substance, [kg/m^3]
+        
+    Returns
+    -------
+    Baume : float
+        Degrees Baumé of the fluid [-]
+        
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+    Only valid for liquids heavier than water.
+    
+    Examples
+    --------
+    >>> rho_to_Baume_heavy(1200)
+    24.285
+    
+    References
+    ----------
+    .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
+       Tulsa, OK, 2004.
+    '''
+    return 145 - 145*rho_ref/rho
+
+def Baume_heavy_to_rho(Baume, rho_ref=999.0170824078306):
+    r'''Calculates mass density of a liquid heavier than water given its degrees Baumé,
+    as shown in [1]_.
+    
+    .. math::
+        \rho~60^\circ\text{F} = \frac{145\rho_{ref}}{145 - \text{Degrees Baumé}}
+    
+    Parameters
+    ----------
+    Baume : float
+        Degrees Baumé of the fluid [-]
+    rho_ref : float, optional
+        Density of the reference substance, [kg/m^3]
+        
+    Returns
+    -------
+    rho : float
+        Mass density the fluid at 60 degrees Fahrenheit [kg/m^3]
+        
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+    Only valid for liquids heavier than water.
+    
+    Examples
+    --------
+    >>> Baume_heavy_to_rho(23.75)
+    1194.70
+    
+    References
+    ----------
+    .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
+       Tulsa, OK, 2004.
+    '''
+    return (145*rho_ref)/(145 - Baume)
+
+def SG_to_Baume_light(SG):
+    r'''Calculates degrees Baumé of a liquid lighter than water given its specific gravity,
+    as shown in [1]_.
+    
+    .. math::
+        \text{Degrees Baumé} = \frac{140}{\text{SG}} - 130
+    
+    Parameters
+    ----------
+    SG : float
+        Specific gravity of the fluid at 60 degrees Fahrenheit [-]
+        
+    Returns
+    -------
+    Baume : float
+        Degrees Baumé of the fluid [-]
+        
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+    Only valid for liquids lighter than water.
+    
+    Examples
+    --------
+    >>> SG_to_Baume_light(0.8209)
+    40.544
+    
+    References
+    ----------
+    .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
+       Tulsa, OK, 2004.
+    '''
+    return 140/SG - 130
+
+def Baume_light_to_SG(Baume):
+    r'''Calculates specific gravity of a liquid lighter than water given its degrees Baumé,
+    as shown in [1]_.
+    
+    .. math::
+        \text{SG at}~60^\circ\text{F} = \frac{140}{130 + \text{Degrees Baumé}}
+    
+    Parameters
+    ----------
+    Baume : float
+        Degrees Baumé of the fluid [-]
+        
+    Returns
+    -------
+    SG : float
+        Specific gravity of the fluid at 60 degrees Fahrenheit [-]
+        
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+    Only valid for liquids lighter than water.
+    
+    Examples
+    --------
+    >>> Baume_light_to_SG(40.7317)
+    0.82
+    
+    References
+    ----------
+    .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
+       Tulsa, OK, 2004.
+    '''
+    return 140/(130 + Baume)
+
+def SG_to_Baume_heavy(SG):
+    r'''Calculates degrees Baumé of a liquid heavier than water given its specific gravity,
+    as shown in [1]_.
+    
+    .. math::
+        \text{Degrees Baumé} = 145 - \frac{145}{\text{SG}}
+    
+    Parameters
+    ----------
+    SG : float
+        Specific gravity of the fluid at 60 degrees Fahrenheit [-]
+        
+    Returns
+    -------
+    Baume : float
+        Degrees Baumé of the fluid [-]
+        
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+    Only valid for liquids heavier than water.
+    
+    Examples
+    --------
+    >>> SG_to_Baume_heavy(1.2012)
+    24.28
+    
+    References
+    ----------
+    .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
+       Tulsa, OK, 2004.
+    '''
+    return 145 - 145/SG
+
+def Baume_heavy_to_SG(Baume):
+    r'''Calculates specific gravity of a liquid heavier than water given its degrees Baumé,
+    as shown in [1]_.
+    
+    .. math::
+        \text{SG at}~60^\circ\text{F} = \frac{145}{145 - \text{Degrees Baumé}}
+    
+    Parameters
+    ----------
+    Baume : float
+        Degrees Baumé of the fluid [-]
+        
+    Returns
+    -------
+    SG : float
+        Specific gravity of the fluid at 60 degrees Fahrenheit [-]
+        
+    Notes
+    -----
+    Defined only at 60 degrees Fahrenheit.
+    Only valid for liquids heavier than water.
+    
+    Examples
+    --------
+    >>> Baume_heavy_to_SG(23.75)
+    1.19
+    
+    References
+    ----------
+    .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
+       Tulsa, OK, 2004.
+    '''
+    return 145/(145 - Baume)
 
 def SG(rho, rho_ref=999.0170824078306):
     r'''Calculates the specific gravity of a substance with respect to another

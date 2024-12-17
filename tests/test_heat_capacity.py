@@ -583,3 +583,4 @@ def test_vibration_frequency_cm_to_characteristic_temperature():
 
     Cp = Cpg_statistical_mechanics(298.15, things)
     assert_close(Cp, 46.27123343052294, rtol=1e-12)
+
