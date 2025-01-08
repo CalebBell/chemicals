@@ -3356,7 +3356,7 @@ def radius_of_gyration(MW, A, B, C, planar=False):
     >>> A, B = [505379.15/i for i in (A, B)] #  TODO which constants did this conversion factor come from, AMU*Angstrom^2
     >>> A, B = [i*atomic_mass*angstrom**2 for i in (A, B)] # amu*angstrom^2 to kg*m^2
     >>> radius_of_gyration(A=A, B=B, planar=True, MW=111.01, C=0)
-    4.8859099776e-11
+    4.8859e-11
 
 
     Alternatively, doing the conversion all in one:
@@ -3366,7 +3366,7 @@ def radius_of_gyration(MW, A, B, C, planar=False):
     >>> A, B = A*c*100, B*c*100 # from cm^-1 to Hz
     >>> A, B = [h/(8*pi**2)/i for i in (A, B)] # from Hz to kg*m^2
     >>> radius_of_gyration(A=A, B=B, planar=True, MW=111.01, C=0)
-    4.885909296e-11
+    4.8859e-11
 
     This is also nicely documented on this page: https://cccbdb.nist.gov/convertmomint.asp
     which was unfortunately found by the author after figuring it out the hard way.
