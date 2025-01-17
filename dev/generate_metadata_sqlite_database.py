@@ -118,8 +118,11 @@ def force_insert_synonyms(cur, chemical):
 
 def dump_to_db(chemical_db, db_path='chemicals.db'):
     """Dump a ChemicalMetadataDB instance to SQLite database"""
-    small_dbs = ChemicalMetadataDB(elements=True, main_db=os.path.join(folder, PUBCHEM_SMALL_DB_NAME), 
-                                    user_dbs=[os.path.join(folder, n) for n in [PUBCHEM_CATION_DB_NAME, PUBCHEM_ANION_DB_NAME,
+    # small_dbs = ChemicalMetadataDB(elements=True, main_db=os.path.join(folder, PUBCHEM_SMALL_DB_NAME), 
+    #                                 user_dbs=[os.path.join(folder, n) for n in [PUBCHEM_CATION_DB_NAME, PUBCHEM_ANION_DB_NAME,
+    #                                         PUBCHEM_IONORGANIC_DB_NAME, PUBCHEM_EXAMPLE_DB_NAME]])
+    small_dbs = ChemicalMetadataDB(elements=True, main_db=os.path.join(folder, PUBCHEM_LARGE_DB_NAME), 
+                                    user_dbs=[os.path.join(folder, n) for n in [PUBCHEM_SMALL_DB_NAME, PUBCHEM_CATION_DB_NAME, PUBCHEM_ANION_DB_NAME,
                                             PUBCHEM_IONORGANIC_DB_NAME, PUBCHEM_EXAMPLE_DB_NAME]])
     conn = initialize_db(db_path)
     cur = conn.cursor()
