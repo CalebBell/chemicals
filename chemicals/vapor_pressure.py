@@ -1453,6 +1453,8 @@ def d2Wagner_original_dT2(T, Tc, Pc, a, b, c, d):
     x5 = c*tau2
     x6 = d*tau2*tau3
     x7 = (a*(1.0/6.0) + x2*(1.0/6.0) + 0.25*x4 + 0.5*x5 + x6)
+    if T == Tc:
+        return float("inf")
     return (Pc*T_inv*T_inv*(2.0*(a + 1.5*x4 + 3.0*x5 + 6.0*x6) + 36.0*x7*x7
                    + (0.75*b/tau_rt + 6.0*c*tau + 30.0*d*tau2*tau2)*Tr
                    + 2.0*x1*T_inv)*exp_term)
@@ -1886,6 +1888,8 @@ def d2Wagner_dT2(T, Tc, Pc, a, b, c, d):
     if exp_term == 0.0:
         # Avoid nan issues
         return 0.0
+    if T == Tc:
+        return float("inf")
     return (Pc*T_inv*(2.0*T_inv*(a + 1.5*x5 + 2.5*x6 + 5.0*x7) + 25.0*T_inv*(a*(1.0/5.0) + x3*(1.0/5.0)
             + 0.3*x5 + 0.5*x6 + x7)**2 + (0.75*b/tau_rt + 3.75*c*tau_rt
             + 20.0*d*tau*tau2)/Tc + 2.0*x2*T_inv*T_inv)*exp_term)
