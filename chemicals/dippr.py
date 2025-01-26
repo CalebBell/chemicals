@@ -44,6 +44,9 @@ Equations
 .. autofunction:: chemicals.dippr.EQ115
 .. autofunction:: chemicals.dippr.EQ116
 .. autofunction:: chemicals.dippr.EQ127
+.. autofunction:: chemicals.dippr.EQ100_reciprocal
+.. autofunction:: chemicals.dippr.EQ105_reciprocal
+.. autofunction:: chemicals.dippr.EQ106_reciprocal
 
 Jacobians (for fitting)
 -----------------------
@@ -61,7 +64,8 @@ __all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
            'EQ101_fitting_jacobian', 'EQ102_fitting_jacobian',
            'EQ106_fitting_jacobian', 'EQ105_fitting_jacobian',
            'EQ107_fitting_jacobian',
-           'EQ106_AB', 'EQ106_ABC']
+           'EQ106_AB', 'EQ106_ABC',
+           'EQ100_reciprocal', 'EQ105_reciprocal', 'EQ106_reciprocal']
 
 from cmath import log as clog
 from cmath import sqrt as csqrt
@@ -1622,6 +1626,191 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
         return A*log(T) + B*C*(x0 + x0/x1 - log(x1)/C) + D*E*(x0 + x0/x2 - log(x2)/E) + F*G*(x0 + x0/x3 - log(x3)/G)
     else:
         raise ValueError(order_not_found_msg)
+
+
+def EQ100_reciprocal(T, A=0, B=0, C=0, D=0, E=0, F=0, G=0, order=0):
+    r'''DIPPR Equation #100 reciprocal variant for temperature-dependent properties.
+    All parameters default to zero. As this is a straightforward polynomial,
+    no restrictions on parameters apply.
+
+    .. math::
+        Y = \frac{1}{A + BT + CT^2 + DT^3 + ET^4 + FT^5 + GT^6}
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    A : float, optional
+        Zero-order coefficient, default=0 [-]
+    B : float, optional
+        First-order coefficient, default=0 [1/K]
+    C : float, optional
+        Second-order coefficient, default=0 [1/K^2]
+    D : float, optional
+        Third-order coefficient, default=0 [1/K^3]
+    E : float, optional
+        Fourth-order coefficient, default=0 [1/K^4]
+    F : float, optional
+        Fifth-order coefficient, default=0 [1/K^5]
+    G : float, optional
+        Sixth-order coefficient, default=0 [1/K^6]
+    order : int, optional
+        Order of the calculation. 0 for the calculation of the result itself;
+        for 1 or 2, that derivative of the property is returned.
+
+    Returns
+    -------
+    Y : float
+        Property [constant-specific]
+
+    Examples
+    --------
+    >>> EQ100_reciprocal(300, 1, 2, 3)
+    3.6954778e-06
+    '''
+    if order == 0:
+        return 1.0/(A + T*(B + T*(C + T*(D + T*(E + T*(F + G*T))))))
+    elif order == 1:
+        x0 = A + T*(B + T*(C + T*(D + T*(E + T*(F + G*T)))))
+        x1 = B + T*(2.0*C + T*(3.0*D + T*(4.0*E + T*(5.0*F + 6.0*G*T))))
+        return -x1/(x0*x0)
+    elif order == 2:
+        x0 = A + T*(B + T*(C + T*(D + T*(E + T*(F + G*T)))))
+        x1 = B + T*(2.0*C + T*(3.0*D + T*(4.0*E + T*(5.0*F + 6.0*G*T))))
+        x2 = 2.0*C + T*(6.0*D + T*(12.0*E + T*(20.0*F + 30.0*G*T)))
+        return (2.0*x1*x1/(x0*x0*x0) - x2/(x0*x0))
+    else:
+        raise ValueError("Only orders 0, 1, and 2 are supported")
+
+def EQ105_reciprocal(T, A, B, C, D, order=0):
+    r'''DIPPR Equation #105 reciprocal variant. Often used in calculating liquid
+    molar volume. All 4 parameters are required. C is sometimes the fluid's
+    critical temperature.
+
+    .. math::
+        Y = \frac{B^{1 + \left(1-\frac{T}{C}\right)^D}}{A}
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    A : float
+        Multiplicative factor, [units]
+    B : float
+        Denominator power, [-]
+    C : float
+        Temperature denominator, [K]
+    D : float
+        Exponent for 1 - T/C usually, [-]
+    order : int, optional
+        Order of the calculation. 0 for the calculation of the result itself;
+        for 1 or 2, that derivative of the property is returned.
+
+    Returns
+    -------
+    Y : float
+        Property [constant-specific]
+
+    Examples
+    --------
+    >>> EQ105_reciprocal(300., 0.70824, 0.26411, 507.6, 0.27537)
+    0.1316972
+    '''
+    if order == 0:
+        problematic = (1. - T/C)
+        if D < 1.0 and problematic < 0.0:
+            # Handle the case of a negative D exponent with a (1. - T/C) under 0 which would yield a complex number
+            problematic = 0.0
+        problematic2 = problematic**D
+        if abs(problematic2.imag) > 0.0: # This check should be removable - unless D is imaginary
+            problematic2 = 0.0
+        ans = B**((1. + problematic2))/A
+        return ans
+    elif order == 1:
+        x0 = C - T
+        x1 = (x0/C)**D
+        return -B**(x1 + 1)*D*x1*log(B)/(A*x0)
+    elif order == 2:
+        x0 = C - T
+        x1 = (x0/C)**D
+        x2 = D*x1*log(B)
+        return B**(x1 + 1)*x2*(D + x2 - 1)/(A*x0**2)    
+    else:
+        raise ValueError("Only orders 0, 1, or 2 are supported for EQ105_reciprocal")
+
+def EQ106_reciprocal(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
+    r'''DIPPR Equation #106 reciprocal variant. Often used in calculating liquid surface 
+    tension and heat of vaporization. Only parameters A and B are required.
+
+    .. math::
+        Y = \frac{1}{A(1-T_r)^{B + C T_r + D T_r^2 + E T_r^3}}
+
+    Parameters
+    ----------
+    T : float
+        Temperature, [K]
+    Tc : float
+        Critical temperature, [K]
+    A : float
+        Multiplier, [various]
+    B : float
+        Tau exponent constant term, [-]
+    C : float, optional
+        Tau exponent linear term, [-]
+    D : float, optional
+        Tau exponent quadratic term, [-]
+    E : float, optional
+        Tau exponent cubic term, [-]
+    order : int, optional
+        Order of the calculation. 0 for the calculation of the result itself;
+        for 1 or 2, that derivative of the property is returned.
+
+    Returns
+    -------
+    Y : float
+        Property [constant-specific]
+
+    Examples
+    --------
+    >>> EQ106_reciprocal(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
+    13.82839
+    '''
+    if order == 0:
+        Tr = T/Tc
+        tau = (1.0 - Tr)
+        if tau <= 0.0:
+            return float('inf')
+        power = (B + Tr*(C + Tr*(D + E*Tr)))
+        try:
+            return 1.0/(A*tau**power)
+        except:
+            return float('inf')
+    elif order == 1:
+        x0 = Tc**3
+        x1 = 1/x0
+        x2 = T - Tc
+        x3 = -x2/Tc
+        x4 = C*Tc**2
+        x5 = T**2
+        x6 = D*Tc
+        x7 = B*x0 + E*T**3 + T*x4 + x5*x6
+        return -x1*(x2*(3*E*x5 + 2*T*x6 + x4)*log(x3) + x7)/(A*x2*x3**(x1*x7))
+    elif order == 2:
+        x0 = T - Tc
+        x1 = -x0/Tc
+        x2 = Tc**3
+        x3 = C*Tc**2
+        x4 = T**2
+        x5 = D*Tc
+        x6 = B*x2 + E*T**3 + T*x3 + x4*x5
+        x7 = log(x1)
+        x8 = T*x5
+        x9 = E*x4
+        x10 = x7*(x3 + 2*x8 + 3*x9)
+        x11 = x0*x10 + x6
+        return (-x0*x2*(2*x0*x7*(3*E*T + x5) + x10 + 2*x3 + 4*x8 + 6*x9) + x11**2 + x11*x2)/(A*Tc**6*x0**2*x1**(x6/x2))
+    else:
+        raise ValueError("Only orders 0, 1, and 2 are supported")
 
 
 dippr_eq_supported_orders = {

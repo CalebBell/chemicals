@@ -24,6 +24,8 @@ import pytest
 from fluids.constants import k
 from fluids.numerics import assert_close, assert_close1d
 
+from unittest.mock import patch
+from chemicals import lennard_jones
 from chemicals.lennard_jones import (
     POLING,
     LJ_data_Magalhaes,
@@ -139,6 +141,46 @@ def test_stockmayer_function():
 
     with pytest.raises(Exception):
         Stockmayer(CASRN='98-01-1', method='BADMETHOD')
+
+
+def test_molecular_diameter_no_CAS():
+    # Mocking the database lookup function to ensure it's not called
+    with patch('chemicals.lennard_jones.database_constant_lookup') as mock_db_lookup:
+        result = molecular_diameter(Tc=560.1, Pc=4550000)
+        mock_db_lookup.assert_not_called()
+        assert result is not None, "Function should calculate a value without CASRN"
+
+    # Without CASRN and required parameters, should return None
+    result = molecular_diameter()
+    assert result is None, "Function should return None if no parameters provided"
+
+    # CASRN lookup fails, no fallback data provided
+    with patch('chemicals.lennard_jones.database_constant_lookup', return_value=(None, False)) as mock_db_lookup:
+        result = molecular_diameter(CASRN='9999999-99-9')
+        assert result is None, "Function should return None if CASRN is not found and no data is provided"
+
+
+
+
+def test_stockmayer_no_CAS():
+    # Mocking the database lookup function to ensure it's not called
+    with patch('chemicals.lennard_jones.database_constant_lookup') as mock_db_lookup:
+        result = Stockmayer(Tm=178.075, Tb=341.87, Tc=507.6, Zc=0.2638, omega=0.2975)
+        mock_db_lookup.assert_not_called()
+        assert result is not None, "Function should calculate a value without CASRN"
+
+    # Without CASRN and required parameters, should return None
+    result = Stockmayer()
+    assert result is None, "Function should return None if no parameters provided"
+
+    # CASRN lookup fails, no fallback data provided
+    with patch('chemicals.lennard_jones.database_constant_lookup', return_value=(None, False)) as mock_db_lookup:
+        result = Stockmayer()
+        assert result is None, "Function should return None if CASRN is not found and no data is provided"
+
+
+
+
 
 @pytest.mark.slow
 @pytest.mark.fuzz

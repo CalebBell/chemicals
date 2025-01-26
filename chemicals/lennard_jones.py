@@ -253,10 +253,10 @@ def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
        Ranges of Temperature and Density." The Journal of Supercritical Fluids
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
-    if dr.USE_CONSTANTS_DATABASE and method is None:
+    if CASRN and dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'Stockmayer')
         if found: return val
-    if not _LJ_data_loaded: _load_LJ_data()
+    if CASRN and not _LJ_data_loaded: _load_LJ_data()
     if method is not None:
         if method == FLYNN:
             return epsilon_Flynn(Tc)
@@ -272,10 +272,13 @@ def Stockmayer(CASRN='', Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
             return epsilon_Tee_Gotoh_Steward_1(Tc)
         elif method == TEEGOTOSTEWARD2:
             return epsilon_Tee_Gotoh_Steward_2(Tc, omega)
-        else:
+        elif CASRN:
             return retrieve_from_df_dict(LJ_sources, CASRN, 'Stockmayer', method)
     else:
-        epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'Stockmayer')
+        if CASRN:
+            epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'Stockmayer')
+        else:
+            epsilon = None
         if epsilon is not None: return epsilon
         if Tc:
             if omega: return epsilon_Tee_Gotoh_Steward_2(Tc, omega)
@@ -413,10 +416,10 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
        Ranges of Temperature and Density." The Journal of Supercritical Fluids
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
     '''
-    if dr.USE_CONSTANTS_DATABASE and method is None:
+    if CASRN and dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'molecular_diameter')
         if found: return val
-    if not _LJ_data_loaded: _load_LJ_data()
+    if CASRN and not _LJ_data_loaded: _load_LJ_data()
     if method is not None:
         if method == FLYNN:
             return sigma_Flynn(Vc)
@@ -436,10 +439,13 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
             return sigma_Stiel_Thodos(Vc, Zc)
         elif method == TEEGOTOSTEWARD4:
             return sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega)
-        else:
+        elif CASRN:
             return retrieve_from_df_dict(LJ_sources, CASRN, 'molecular_diameter', method)
     else:
-        epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'molecular_diameter')
+        if CASRN:
+            epsilon = retrieve_any_from_df_dict(LJ_sources, CASRN, 'molecular_diameter')
+        else:
+            epsilon = None
         if epsilon is not None: return epsilon
         if Tc:
             if Pc:

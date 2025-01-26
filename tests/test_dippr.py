@@ -489,3 +489,89 @@ def test_EQ107_fitting():
     assert_close1d(der_analytical, [der_num])
     assert_close1d(der_analytical, der_expect, rtol=1e-13)
 
+
+
+import pytest
+from fluids.numerics import assert_close, derivative
+
+from chemicals.dippr import (
+    EQ100_reciprocal,
+    EQ105_reciprocal,
+    EQ106_reciprocal,
+)
+
+def test_EQ100_reciprocal():
+    # Base value test
+    a = EQ100_reciprocal(300, 276370., -2090.1, 8.125, -0.014116, 0.0000093701)
+    assert_close(a, 1.0/75355.81, rtol=1e-13)
+
+    # First derivative test
+    d1_analytical = EQ100_reciprocal(250., 276370., -2090.1, 8.125, -0.014116, 0.0000093701, order=1)
+    d1_numerical = derivative(lambda T: EQ100_reciprocal(T, 276370., -2090.1, 8.125, -0.014116, 0.0000093701), 
+                            250., dx=1e-3)
+    assert_close(d1_analytical, d1_numerical, rtol=1e-6)
+
+    # Second derivative test
+    d2_analytical = EQ100_reciprocal(250., 276370., -2090.1, 8.125, -0.014116, 0.0000093701, order=2)
+    d2_numerical = derivative(lambda T: EQ100_reciprocal(T, 276370., -2090.1, 8.125, -0.014116, 0.0000093701, order=1), 
+                            250., dx=1e-3)
+    assert_close(d2_analytical, d2_numerical, rtol=1e-6)
+
+    # Invalid order test
+    with pytest.raises(ValueError):
+        EQ100_reciprocal(300., 276370., -2090.1, 8.125, -0.014116, 0.0000093701, order=3)
+
+def test_EQ105_reciprocal():
+    # Base value test
+    a = EQ105_reciprocal(300., 0.70824, 0.26411, 507.6, 0.27537)
+    assert_close(a, 1.0/7.593170096339236, rtol=1e-13)
+
+    # First derivative test
+    d1_analytical = EQ105_reciprocal(300., 0.70824, 0.26411, 507.6, 0.27537, order=1)
+    d1_numerical = derivative(lambda T: EQ105_reciprocal(T, 0.70824, 0.26411, 507.6, 0.27537), 
+                            300., dx=1e-3)
+    assert_close(d1_analytical, d1_numerical, rtol=1e-6)
+
+    # Second derivative test
+    d2_analytical = EQ105_reciprocal(300., 0.70824, 0.26411, 507.6, 0.27537, order=2)
+    d2_numerical = derivative(lambda T: EQ105_reciprocal(T, 0.70824, 0.26411, 507.6, 0.27537, order=1), 
+                            300., dx=1e-3)
+    assert_close(d2_analytical, d2_numerical, rtol=1e-6)
+
+    # Complex number avoidance test
+    kwargs = {'T': 195.0, 'A': 7247.0, 'B': 0.418, 'C': 5.2, 'D': 0.24, 'order': 0}
+    result = EQ105_reciprocal(**kwargs)
+    assert_close(result, 1.0/17337.32057416268, rtol=1e-13)
+
+    # Invalid order test
+    with pytest.raises(ValueError):
+        EQ105_reciprocal(300., 0.70824, 0.26411, 507.6, 0.27537, order=3)
+
+def test_EQ106_reciprocal():
+    # Base value test
+    a = EQ106_reciprocal(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
+    assert_close(a, 1.0/0.07231499373541, rtol=1e-13)
+
+    # First derivative test
+    d1_analytical = EQ106_reciprocal(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1)
+    d1_numerical = derivative(lambda T: EQ106_reciprocal(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699), 
+                            300., dx=1e-3)
+    assert_close(d1_analytical, d1_numerical, rtol=1e-6)
+
+    # Second derivative test
+    d2_analytical = EQ106_reciprocal(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=2)
+    d2_numerical = derivative(lambda T: EQ106_reciprocal(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1), 
+                            300., dx=1e-3)
+    assert_close(d2_analytical, d2_numerical, rtol=1e-6)
+
+    # Test at critical point
+    result = EQ106_reciprocal(647.096, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
+    assert result == float('inf')
+
+    # Test above critical point
+    result = EQ106_reciprocal(648.0, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
+    assert result == float('inf')
+
+    # Invalid order test
+    with pytest.raises(ValueError):
+        EQ106_reciprocal(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=3)
