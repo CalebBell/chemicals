@@ -314,7 +314,7 @@ def test_Zabransky_dicts():
 
     sums = [[108141.20000000004, 153049.59999999992, 16980025.79560638],
             [15739.999999999998, 22191.1, 60581.66851630001],
-            [224541.90000000066, 292777.19999999995, 146374456.06770968]]
+            [223632.70000000065, 291814.8999999999, 146374405.8581997]]
     get_Tmin_sum = lambda z_splines: sum_([i.Tmin for i in z_splines])
     get_Tmax_sum = lambda z_splines: sum_([i.Tmax for i in z_splines])
     get_coeffs_sum = lambda z_splines: sum_([sum_([abs_(j) for j in i.coeffs]) for i in z_splines])

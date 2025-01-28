@@ -133,7 +133,6 @@ None	Pentaethoxyuranium 	sat	III	257.5	400	233.039	-160.56	46.6049	-4.31516	0	0	
 75-89-8	2,2,2-Trifluoroethanol	p	III	298.1	308.1	4.42059	5.68885	0	0	0	0	0	0	0	0	
 75-98-9 	2,2-Dimethylpropanoic acid 	p	III	309	440.6	0	0	0	0	-4.43164	0.315844	-6.81471	71.777	-34.7331	6.00125	633
 75-98-9 	2,2-Dimethylpropanoic acid 	p	III	309	440.6	-0.234695	7.92693	0	0	0	0	0	0	0	0	
-75-98-9	2,2-Dimethylpropanoic acid 	p	V	313	319	8.14714	5.2435	0	0	0	0	0	0	0	0	
 75-98-9 	2,2-Dimethylpropanoic acid 	sat	III	309	440.6	-0.234695	7.92693	0	0	0	0	0	0	0	0	
 76-83-5	1,1⬘,1⬙-共Chloromethylidene兲trisbenzene	p	IV	276	412.5	3395.95	171.517	-56.765	7.58072	0	0	0	0	0	0	
 77-74-7 	3-Methyl-3-pentanol 	p	III	278.1	373.1	-177.174	135.946	-24.7416	1.04013	0	0	0	0	0	0	
@@ -191,7 +190,6 @@ None	Pentaethoxyuranium 	sat	III	257.5	400	233.039	-160.56	46.6049	-4.31516	0	0	
 93-58-3 	Methyl benzoate 	p	II	262.5	530	31.3157	-9.24588	3.27286	-0.25544	0	0	0	0	0	0	
 93-58-3 	Methyl benzoate 	p	III	530	660	-400.811	235.354	-42.8781	2.64713	0	0	0	0	0	0	
 93-58-3 	Methyl benzoate 	p	IV	262.5	660	0	0	0	0	-2.43109	0.0479879	17.0716	15.1705	6.23913	0.81829	702
-93-58-3	Methyl benzoate	p	IV	298.1	345.2	12.8992	4.53187	0	0	0	0	0	0	0	0	
 93-58-3 	Methyl benzoate 	sat	II	262.5	530	31.3645	-9.31931	3.30512	-0.259816	0	0	0	0	0	0	
 93-58-3 	Methyl benzoate 	sat	III	530	660	-283.651	168.991	-30.3384	1.85612	0	0	0	0	0	0	
 93-89-0 	Ethyl benzoate 	p	II	292.7	580	33.303	-8.49742	3.13799	-0.23629	0	0	0	0	0	0	
@@ -572,7 +570,6 @@ None	Pentaethoxyuranium 	sat	III	257.5	400	233.039	-160.56	46.6049	-4.31516	0	0	
 121-43-7	Trimethyl ester boric acid (H3BO3 )	p	V	249.6	353.1	15.1339	2.65342	0	0	0	0	0	0	0	0	
 121-44-8 	N , N-Diethylethanamine 	p	V	293.1	343.1	0.832716	8.59132	0	0	0	0	0	0	0	0	
 121-46-0 	Bicyclo关2.2.1兴hepta-2,5-diene 	p	IV	259.1	351.8	-56.0036	67.0922	-21.4898	2.45353	0	0	0	0	0	0	
-121-46-0	Bicyclo关2.2.1兴hepta-2,5-diene	p	IV	298.1	298.1	19.3878	0	0	0	0	0	0	0	0	0	
 121-73-3 	1-Chloro-3-nitrobenzene 	p	III	329.6	350	16.0475	3.05668	0	0	0	0	0	0	0	0	
 122-32-7 	1,2,3-Propanetriyl ester 共9Z兲-9-octadecenoic acid 	p	IV	333.1	453.1	150.839	21.299	0	0	0	0	0	0	0	0	
 122-39-4	N-Phenylbenzenamine	p	V	326.1	340.5	-19.2922	17.5651	0	0	0	0	0	0	0	0	
