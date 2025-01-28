@@ -102,7 +102,7 @@ jobs:
       run: |
         # Taken from scipy
         sudo apt-get update
-        sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev
+        sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev libjpeg-dev zlib1g-dev libtiff-dev libfreetype6-dev liblcms2-dev libwebp-dev
     - name: Install dependencies
       run: |
         python -c "import platform; print(platform.platform()); print(platform.architecture())"

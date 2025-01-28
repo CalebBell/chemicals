@@ -57,7 +57,9 @@ extensions = [
     'matplotlib.sphinxext.plot_directive',
     'sphinxcontrib.katex',
     'sphinx_sitemap',
-    ]
+    'sphinxcontrib.googleanalytics'
+]
+googleanalytics_id = 'G-JLXVLC6XDM'
 
 #     'sphinx.ext.napoleon'
 
