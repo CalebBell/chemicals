@@ -235,7 +235,7 @@ def B_from_Z(Z, T, P):
     return (Z - 1.0)*R*T/P
 
 
-def Z_from_virial_density_form(T, P, coeffs=None):
+def Z_from_virial_density_form(T, P, coeffs=tuple()):
     r'''Calculates the compressibility factor of a gas given its temperature,
     pressure, and molar density-form virial coefficients. Any number of
     coefficients is supported.
@@ -250,7 +250,7 @@ def Z_from_virial_density_form(T, P, coeffs=None):
         Temperature, [K]
     P : float
         Pressure, [Pa]
-    coeffs : list[float], optional
+    coeffs : tuple[float], optional
         Sequence of virial coefficients [m³/mol^n], where n is the position:
         - First coefficient (n=1): Second virial coefficient B [m³/mol]
         - Second coefficient (n=2): Third virial coefficient C [m³/mol²]
@@ -322,7 +322,7 @@ def Z_from_virial_density_form(T, P, coeffs=None):
     raise ValueError("Could not find real root")
 
 
-def Z_from_virial_pressure_form(P, coeffs=None):
+def Z_from_virial_pressure_form(P, coeffs=tuple()):
     r'''Calculates the compressibility factor of a gas given its pressure, and
     pressure-form virial coefficients. Any number of coefficients is supported.
 
@@ -333,8 +333,8 @@ def Z_from_virial_pressure_form(P, coeffs=None):
     ----------
     P : float
         Pressure, [Pa]
-    coeffs : list[float], optional
-        List of pressure-form virial coefficients [1/Pa^n], where n is the index+1:
+    coeffs : tuple[float]
+        Tuple of pressure-form virial coefficients [1/Pa^n], where n is the index+1:
         coeffs[0]: Second virial coefficient B' [1/Pa]
         coeffs[1]: Third virial coefficient C' [1/Pa²]
         coeffs[2]: Fourth virial coefficient D' [1/Pa³]
@@ -364,7 +364,7 @@ def Z_from_virial_pressure_form(P, coeffs=None):
 
     Examples
     --------
-    >>> Z_from_virial_pressure_form(102919.99946855308, [4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19])
+    >>> Z_from_virial_pressure_form(102919.99946855308, (4.032286555169439e-09, 1.6197059494442215e-13, 6.483855042486911e-19))
     1.00283753944
 
     References
@@ -375,7 +375,7 @@ def Z_from_virial_pressure_form(P, coeffs=None):
     .. [2] Walas, Stanley M. Phase Equilibria in Chemical Engineering.
        Butterworth-Heinemann, 1985.
     '''
-    if coeffs is None:
+    if not coeffs:
         return 1.0
     tot = 0.0
     fact = 1.0
