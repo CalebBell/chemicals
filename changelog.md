@@ -10,6 +10,27 @@
 
 ### Fixed
 
+## [1.3.3] - 2025-03-16
+
+### Added
+
+- Added Baumé scale conversion function: 8 new functions Baume_heavy_to_SG, SG_to_Baume_heavy, Baume_light_to_SG, SG_to_Baume_light, Baume_heavy_to_rho, rho_to_Baume_heavy, Baume_light_to_rho, rho_to_Baume_light
+- Handle division by zero at Wagner T == Tc condition - return mathmatically correct result, infinity
+- Updated several Joback predictions following correction of one SMARTS pattern
+- Fix four duplicate/inconsistent entries in Zabransky which was previously being handled accidentally by overwritting data due to duplicates in the original source material - now the better data is intentionally loaded
+- Misc chemical metadata updates
+
+### Changed
+- Chemical Metadata work
+
+
+## [1.3.2] - 2024-12-08
+
+### Changed
+- Chemical Metadata work
+- Improved performance of T_converter and viscosity_converter, which previously build splines on the fly; they now have already-built conversion routines
+
+
 ## [1.3.1] - 2024-11-10
 
 ### Changed

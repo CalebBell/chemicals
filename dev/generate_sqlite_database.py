@@ -29,6 +29,7 @@ from thermo import *
 from chemicals import *
 from chemicals import data_reader
 from chemicals.identifiers import pubchem_db
+from chemicals.utils import source_path
 
 pubchem_db.finish_loading()
 
@@ -86,8 +87,9 @@ df.sort_index(inplace=True)
 from sqlalchemy import create_engine
 
 print('going to dump to database now')
-engine = create_engine('sqlite:///../chemicals/Misc/default.sqlite', echo=False)
-if os.path.exists("../chemicals/Misc/default.sqlite"):
-    os.remove("../chemicals/Misc/default.sqlite")
+db_dest = os.path.join(source_path, 'Misc', 'default.sqlite')
+if os.path.exists(db_dest):
+    os.remove(db_dest)
+engine = create_engine('sqlite:///' + db_dest, echo=False)
 print('calling pandas to_sql')
 df.to_sql('constants', con=engine)
