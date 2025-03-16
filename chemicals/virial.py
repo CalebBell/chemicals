@@ -279,7 +279,7 @@ def Z_from_virial_density_form(T, P, coeffs=tuple()):
 
     Examples
     --------
-    >>> Z_from_virial_density_form(300, 122057.233762653, [1E-4, 1E-5, 1E-6, 1E-7])
+    >>> Z_from_virial_density_form(300, 122057.233762653, (1E-4, 1E-5, 1E-6, 1E-7))
     1.28434940526
 
     References

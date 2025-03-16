@@ -18,7 +18,6 @@
 - Handle division by zero at Wagner T == Tc condition - return mathmatically correct result, infinity
 - Updated several Joback predictions following correction of one SMARTS pattern
 - Fix four duplicate/inconsistent entries in Zabransky which was previously being handled accidentally by overwritting data due to duplicates in the original source material - now the better data is intentionally loaded
-- Misc chemical metadata updates
 
 ### Changed
 - Chemical Metadata work
