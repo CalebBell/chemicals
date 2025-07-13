@@ -765,7 +765,7 @@ register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Su
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, TRC_gas_values
-    global CRC_standard_data, Cp_dict_PerryI, cp_dict_Perry_Table_153_FirstEqn, cp_dict_Perry_Table_153_SecondEqn
+    global CRC_standard_data, Cp_dict_PerryI, Cp_dict_Perry_Table_153_FirstEqn, Cp_dict_Perry_Table_153_SecondEqn
     global WebBook_Shomate_liquids, WebBook_Shomate_gases, WebBook_Shomate_solids, WebBook_Shomate_coefficients
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
@@ -879,10 +879,10 @@ def _load_Cp_data():
         Cp_dict_PerryI = json.loads(f.read())
 
     with open(os.path.join(folder, 'Perry_Table_2-153_First_eqn.json')) as f:
-        cp_dict_Perry_Table_153_FirstEqn = json.loads(f.read())
+        Cp_dict_Perry_Table_153_FirstEqn = json.loads(f.read())
 
     with open(os.path.join(folder, 'Perry_Table_2-153_Second_eqn.json')) as f:
-        cp_dict_Perry_Table_153_SecondEqn = json.loads(f.read())
+        Cp_dict_Perry_Table_153_SecondEqn = json.loads(f.read())
 
     with open(os.path.join(folder, 'psi4_unadjusted_characteristic_temperatures.json')) as f:
         Cp_dict_characteristic_temperatures_psi4_2022a = json.loads(f.read())
@@ -918,7 +918,7 @@ def _load_Cp_data():
 if PY37:
     def __getattr__(name):
         if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
-                    'Cp_dict_PerryI', 'cp_dict_Perry_Table_153_FirstEqn', 'cp_dict_Perry_Table_153_SecondEqn',
+                    'Cp_dict_PerryI', 'Cp_dict_Perry_Table_153_FirstEqn', 'Cp_dict_Perry_Table_153_SecondEqn',
                     'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
