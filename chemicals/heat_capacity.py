@@ -174,6 +174,10 @@ attribute of this module.
 
     In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
 
+    In [9]: chemicals.heat_capacity.Cp_dict_Perry_Table_153_FirstEqn['75-07-0']
+
+    In [10]: chemicals.heat_capacity.Cp_dict_Perry_Table_153_SecondEqn['7664-41-7']
+
 """
 
 __all__ = ['heat_capacity_gas_methods',
@@ -761,7 +765,7 @@ register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Su
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, TRC_gas_values
-    global CRC_standard_data, Cp_dict_PerryI
+    global CRC_standard_data, Cp_dict_PerryI, cp_dict_Perry_Table_153_FirstEqn, cp_dict_Perry_Table_153_SecondEqn
     global WebBook_Shomate_liquids, WebBook_Shomate_gases, WebBook_Shomate_solids, WebBook_Shomate_coefficients
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
@@ -874,6 +878,12 @@ def _load_Cp_data():
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
         Cp_dict_PerryI = json.loads(f.read())
 
+    with open(os.path.join(folder, 'Perrys Table 2-153 First Eqn.json')) as f:
+        cp_dict_Perry_Table_153_FirstEqn = json.loads(f.read())
+
+    with open(os.path.join(folder, 'Perrys Table 2-153 Second Eqn.json')) as f:
+        cp_dict_Perry_Table_153_SecondEqn = json.loads(f.read())
+
     with open(os.path.join(folder, 'psi4_unadjusted_characteristic_temperatures.json')) as f:
         Cp_dict_characteristic_temperatures_psi4_2022a = json.loads(f.read())
 
@@ -908,7 +918,8 @@ def _load_Cp_data():
 if PY37:
     def __getattr__(name):
         if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
-                    'Cp_dict_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
+                    'Cp_dict_PerryI', 'cp_dict_Perry_Table_153_FirstEqn', 'cp_dict_Perry_Table_153_SecondEqn',
+                    'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
                     'WebBook_Shomate_liquids', 'WebBook_Shomate_gases', 'WebBook_Shomate_solids',
