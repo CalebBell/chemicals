@@ -878,10 +878,10 @@ def _load_Cp_data():
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
         Cp_dict_PerryI = json.loads(f.read())
 
-    with open(os.path.join(folder, 'Perrys Table 2-153 First Eqn.json')) as f:
+    with open(os.path.join(folder, 'Perry_Table_2-153_First_eqn.json')) as f:
         cp_dict_Perry_Table_153_FirstEqn = json.loads(f.read())
 
-    with open(os.path.join(folder, 'Perrys Table 2-153 Second Eqn.json')) as f:
+    with open(os.path.join(folder, 'Perry_Table_2-153_Second_eqn.json')) as f:
         cp_dict_Perry_Table_153_SecondEqn = json.loads(f.read())
 
     with open(os.path.join(folder, 'psi4_unadjusted_characteristic_temperatures.json')) as f:
