@@ -762,16 +762,22 @@ register_df_source(folder, 'TRC Thermodynamics of Organic Compounds in the Gas S
 
 register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
 
+### Register the new data sources from Perry's Chemical Engineers' Handbook edition 8 Table 2-151
+register_df_source(folder, 'Perry_Table_2-153_DIPPR_100.tsv')
+register_df_source(folder, 'Perry_Table_2-153_DIPPR_114.tsv')
+
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, TRC_gas_values
-    global CRC_standard_data, Cp_dict_PerryI, Cp_dict_Perry_Table_153_FirstEqn, Cp_dict_Perry_Table_153_SecondEqn
+    global CRC_standard_data, Cp_dict_PerryI, Cp_dict_Perry_Table_153_DIPPR_100, Cp_dict_Perry_Table_153_DIPPR_114
     global WebBook_Shomate_liquids, WebBook_Shomate_gases, WebBook_Shomate_solids, WebBook_Shomate_coefficients
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
     global Cp_dict_characteristic_temperatures_adjusted_psi4_2022a, Cp_dict_characteristic_temperatures_psi4_2022a
     global Cp_dict_JANAF_liquid, Cp_dict_JANAF_gas, Cp_dict_JANAF_solid
+    global Cp_dict_DIPPR100, Cp_dict_DIPPR114
+    
     Cp_data_Poling = data_source('PolingDatabank.tsv')
     TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
     CRC_standard_data = data_source('CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
@@ -779,6 +785,20 @@ def _load_Cp_data():
     TRC_gas_values = np.array(TRC_gas_data.values[:, 1:], dtype=float)
     Cp_values_Poling = np.array(Cp_data_Poling.values[:, 1:], dtype=float)
 
+    from chemicals.data_reader import data_source, to_num
+    # Load DIPPR 100 table
+    for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPRR_100.tsv'), encoding='utf-8'):
+        if line.startswith('CAS'): continue  # skip header
+        CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t'))
+        coeffs = (A, B, C, D, E)
+        Cp_dict_DIPPR100[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
+
+    # Load DIPPR 114 table
+    for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPRR_114.tsv'), encoding='utf-8'):
+        if line.startswith('CAS'): continue  # skip header
+        CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t'))
+        coeffs = (A, B, C, D, E)
+        Cp_dict_DIPPR114[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
     # Read in a dict of heat capacities of irnorganic and elemental solids.
     # These are in section 2, table 151 in:
     # Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
@@ -878,12 +898,6 @@ def _load_Cp_data():
     with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
         Cp_dict_PerryI = json.loads(f.read())
 
-    with open(os.path.join(folder, 'Perry_Table_2-153_First_eqn.json')) as f:
-        Cp_dict_Perry_Table_153_FirstEqn = json.loads(f.read())
-
-    with open(os.path.join(folder, 'Perry_Table_2-153_Second_eqn.json')) as f:
-        Cp_dict_Perry_Table_153_SecondEqn = json.loads(f.read())
-
     with open(os.path.join(folder, 'psi4_unadjusted_characteristic_temperatures.json')) as f:
         Cp_dict_characteristic_temperatures_psi4_2022a = json.loads(f.read())
 
@@ -918,7 +932,8 @@ def _load_Cp_data():
 if PY37:
     def __getattr__(name):
         if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
-                    'Cp_dict_PerryI', 'Cp_dict_Perry_Table_153_FirstEqn', 'Cp_dict_Perry_Table_153_SecondEqn',
+                    'Cp_dict_PerryI', 'Cp_dict_Perry_Table_153_DIPPR_100', 'Cp_dict_Perry_Table_153_DIPPR_114',
+                    'Cp_dict_DIPPR100', 'Cp_dict_DIPPR114',
                     'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
