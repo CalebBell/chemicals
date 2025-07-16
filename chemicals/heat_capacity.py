@@ -785,20 +785,23 @@ def _load_Cp_data():
     TRC_gas_values = np.array(TRC_gas_data.values[:, 1:], dtype=float)
     Cp_values_Poling = np.array(Cp_data_Poling.values[:, 1:], dtype=float)
 
-    from chemicals.data_reader import data_source, to_num
+    Cp_dict_Perry_Table_153_100 = {}
+    Cp_dict_Perry_Table_153_114 = {}
+
     # Load DIPPR 100 table
-    for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPRR_100.tsv'), encoding='utf-8'):
+    for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPPR_100.tsv'), encoding='utf-8'):
         if line.startswith('CAS'): continue  # skip header
-        CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t'))
+        CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t')[:9])
         coeffs = (A, B, C, D, E)
         Cp_dict_Perry_Table_153_100[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
 
     # Load DIPPR 114 table
-    for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPRR_114.tsv'), encoding='utf-8'):
+    for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPPR_114.tsv'), encoding='utf-8'):
         if line.startswith('CAS'): continue  # skip header
-        CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t'))
+        CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t')[:9])
         coeffs = (A, B, C, D, E)
         Cp_dict_Perry_Table_153_114[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
+    
     # Read in a dict of heat capacities of irnorganic and elemental solids.
     # These are in section 2, table 151 in:
     # Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
