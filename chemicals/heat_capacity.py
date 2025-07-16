@@ -769,15 +769,15 @@ register_df_source(folder, 'Perry_Table_2-153_DIPPR_114.tsv')
 _Cp_data_loaded = False
 def _load_Cp_data():
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, TRC_gas_values
-    global CRC_standard_data, Cp_dict_PerryI, Cp_dict_Perry_Table_153_DIPPR_100, Cp_dict_Perry_Table_153_DIPPR_114
+    global CRC_standard_data, Cp_dict_PerryI 
     global WebBook_Shomate_liquids, WebBook_Shomate_gases, WebBook_Shomate_solids, WebBook_Shomate_coefficients
     global zabransky_dict_sat_s, zabransky_dict_sat_p, zabransky_dict_const_s
     global zabransky_dict_const_p, zabransky_dict_iso_s, zabransky_dict_iso_p
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
     global Cp_dict_characteristic_temperatures_adjusted_psi4_2022a, Cp_dict_characteristic_temperatures_psi4_2022a
     global Cp_dict_JANAF_liquid, Cp_dict_JANAF_gas, Cp_dict_JANAF_solid
-    global Cp_dict_DIPPR100, Cp_dict_DIPPR114
-    
+    global Cp_dict_Perry_Table_153_100, Cp_dict_Perry_Table_153_114
+
     Cp_data_Poling = data_source('PolingDatabank.tsv')
     TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
     CRC_standard_data = data_source('CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
@@ -791,14 +791,14 @@ def _load_Cp_data():
         if line.startswith('CAS'): continue  # skip header
         CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t'))
         coeffs = (A, B, C, D, E)
-        Cp_dict_DIPPR100[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
+        Cp_dict_Perry_Table_153_100[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
 
     # Load DIPPR 114 table
     for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPRR_114.tsv'), encoding='utf-8'):
         if line.startswith('CAS'): continue  # skip header
         CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t'))
         coeffs = (A, B, C, D, E)
-        Cp_dict_DIPPR114[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
+        Cp_dict_Perry_Table_153_114[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
     # Read in a dict of heat capacities of irnorganic and elemental solids.
     # These are in section 2, table 151 in:
     # Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
@@ -932,8 +932,8 @@ def _load_Cp_data():
 if PY37:
     def __getattr__(name):
         if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
-                    'Cp_dict_PerryI', 'Cp_dict_Perry_Table_153_DIPPR_100', 'Cp_dict_Perry_Table_153_DIPPR_114',
-                    'Cp_dict_DIPPR100', 'Cp_dict_DIPPR114',
+                    'Cp_dict_PerryI', 
+                    'Cp_dict_Perry_Table_153_100', 'Cp_dict_Perry_Table_153_114',
                     'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
