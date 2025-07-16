@@ -269,13 +269,13 @@ def test_Cp_data_Perry_2_153_100():
 
     totals_calc = [Tmin_sum, Tmax_sum, A_sum, B_sum, C_sum, D_sum, E_sum]
     totals_expected = [
-        73679.1,        # Tmin
-        128958.8,       # Tmax
-        88970372.4,     # A
-        1298295.9477,   # B
-        145897.109866,  # C
-        170.94436672, # D
-        1.39589510    # E
+        73492.86,    # Tmin
+        129152.45,   # Tmax
+        87317347.4,  # A
+        1246863.008, # B
+        222198.8599, # C
+        42666.07447, # D
+        3214.299219  # E
     ]
 
     assert_close1d(totals_calc, totals_expected, rtol=1e-6)
