@@ -28,8 +28,8 @@ from chemicals.heat_capacity import (
     PPDS2,
     PPDS15,
     Cp_data_Poling,
-    Cp_dict_Perry_Table_153_100,
-    Cp_dict_Perry_Table_153_114,
+    Cp_data_Perry_Table_153_100,
+    Cp_data_Perry_Table_153_114,
     Cpg_statistical_mechanics,
     Cpg_statistical_mechanics_integral,
     Cpg_statistical_mechanics_integral_over_T,
@@ -256,57 +256,19 @@ def test_Cp_data_Poling():
 
     assert Cp_data_Poling.shape == (367, 10)
 
-def test_Cp_data_Perry_2_153_100():
-    from chemicals.heat_capacity import Cp_dict_Perry_Table_153_100
+def test_Perry_2_153_100():
+    tots_calc = [Cp_data_Perry_Table_153_100[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax']]
+    tots = [87317347.4, 1246863.008, 222198.8599, 42666.07447, 3214.299219, 73492.86, 129152.45]
+    assert_close1d(tots_calc, tots)
 
-    A_sum = sum(abs(d['coeffs'][0]) for d in Cp_dict_Perry_Table_153_100.values())
-    B_sum = sum(abs(d['coeffs'][1]) for d in Cp_dict_Perry_Table_153_100.values())
-    C_sum = sum(abs(d['coeffs'][2]) for d in Cp_dict_Perry_Table_153_100.values())
-    D_sum = sum(abs(d['coeffs'][3]) for d in Cp_dict_Perry_Table_153_100.values())
-    E_sum = sum(abs(d['coeffs'][4]) for d in Cp_dict_Perry_Table_153_100.values())
-    Tmin_sum = sum(abs(d['Tmin']) for d in Cp_dict_Perry_Table_153_100.values())
-    Tmax_sum = sum(abs(d['Tmax']) for d in Cp_dict_Perry_Table_153_100.values())
+    assert Cp_data_Perry_Table_153_100.shape == (333, 8)
 
-    totals_calc = [Tmin_sum, Tmax_sum, A_sum, B_sum, C_sum, D_sum, E_sum]
-    totals_expected = [
-        73492.86,    # Tmin
-        129152.45,   # Tmax
-        87317347.4,  # A
-        1246863.008, # B
-        222198.8599, # C
-        42666.07447, # D
-        3214.299219  # E
-    ]
+def test_Perry_2_153_114():
+    tots_calc = [Cp_data_Perry_Table_153_114[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax']]
+    tots = [163596.44, 1467113.84, 6536.04862, 15987.24, 0.0, 1773.05, 4495.13]
+    assert_close1d(tots_calc, tots)
 
-    assert_close1d(totals_calc, totals_expected, rtol=1e-6)
-
-    assert len(Cp_dict_Perry_Table_153_100) == 333
-
-def test_Cp_data_Perry_2_153_114():
-    from chemicals.heat_capacity import Cp_dict_Perry_Table_153_114
-
-    A_sum = sum(abs(d['coeffs'][0]) for d in Cp_dict_Perry_Table_153_114.values())
-    B_sum = sum(abs(d['coeffs'][1]) for d in Cp_dict_Perry_Table_153_114.values())
-    C_sum = sum(abs(d['coeffs'][2]) for d in Cp_dict_Perry_Table_153_114.values())
-    D_sum = sum(abs(d['coeffs'][3]) for d in Cp_dict_Perry_Table_153_114.values())
-    E_sum = sum(abs(d['coeffs'][4]) for d in Cp_dict_Perry_Table_153_114.values())
-    Tmin_sum = sum(abs(d['Tmin']) for d in Cp_dict_Perry_Table_153_114.values())
-    Tmax_sum = sum(abs(d['Tmax']) for d in Cp_dict_Perry_Table_153_114.values())
-
-    totals_calc = [Tmin_sum, Tmax_sum, A_sum, B_sum, C_sum, D_sum, E_sum]
-    totals_expected = [
-        1773.05,        # Tmin
-        4495.13,       # Tmax
-        163596.44,     # A
-        1467113.84,   # B
-        6536.04862,  # C
-        15987.24, # D
-        0.0    # E
-    ]
-
-    assert_close1d(totals_calc, totals_expected, rtol=1e-6)
-
-    assert len(Cp_dict_Perry_Table_153_114) == 13
+    assert Cp_data_Perry_Table_153_114.shape == (13, 8)
 
 def test_TRC_gas_data():
     tots_calc = [TRC_gas_data[i].abs().sum() for i in ['Tmin', 'Tmax', 'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'I', 'J', 'Hfg']]

@@ -143,6 +143,17 @@ attribute of this module.
     Theoretically calculated chatacteristic temperatures from vibrational
     frequencies using psi4, adjusted using a recommended coefficient
 
+.. data:: Cp_data_Perry_Table_153_100
+  
+    A collection of 333 compound coefficient sets for heat capacity of liquids at various temperatures.
+    The coefficients are in the form of a polynomial of degree 5, which supports the DIPPR equation
+    100 from [5]_. The coefficients are in units of J/mol/K.
+
+.. data:: Cp_data_Perry_Table_153_114
+
+    A collection of 13 compound coefficient sets for heat capacity of liquids at various temperatures.
+    The coefficients are in the form of a polynomial of degree 5, which supports the DIPPR equation
+    114 from [5]_. The coefficients are in units of J/mol/K.
 
 .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
     in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
@@ -174,9 +185,9 @@ attribute of this module.
 
     In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
 
-    In [9]: chemicals.heat_capacity.Cp_dict_Perry_Table_153_FirstEqn['75-07-0']
+    In [9]: chemicals.heat_capacity.Cp_data_Perry_Table_153_100['75-07-0']
 
-    In [10]: chemicals.heat_capacity.Cp_dict_Perry_Table_153_SecondEqn['7664-41-7']
+    In [10]: chemicals.heat_capacity.Cp_data_Perry_Table_153_114['7664-41-7']
 
 """
 
@@ -776,7 +787,8 @@ def _load_Cp_data():
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
     global Cp_dict_characteristic_temperatures_adjusted_psi4_2022a, Cp_dict_characteristic_temperatures_psi4_2022a
     global Cp_dict_JANAF_liquid, Cp_dict_JANAF_gas, Cp_dict_JANAF_solid
-    global Cp_dict_Perry_Table_153_100, Cp_dict_Perry_Table_153_114
+    global Cp_data_Perry_Table_153_100, Cp_values_Perry_Table_153_100
+    global Cp_data_Perry_Table_153_114, Cp_values_Perry_Table_153_114
 
     Cp_data_Poling = data_source('PolingDatabank.tsv')
     TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
@@ -785,23 +797,12 @@ def _load_Cp_data():
     TRC_gas_values = np.array(TRC_gas_data.values[:, 1:], dtype=float)
     Cp_values_Poling = np.array(Cp_data_Poling.values[:, 1:], dtype=float)
 
-    Cp_dict_Perry_Table_153_100 = {}
-    Cp_dict_Perry_Table_153_114 = {}
+    Cp_data_Perry_Table_153_100 = data_source('Perry_Table_2-153_DIPPR_100.tsv')
+    Cp_values_Perry_Table_153_100 = np.array(Cp_data_Perry_Table_153_100.values[:, 1:], dtype=float)
 
-    # Load DIPPR 100 table
-    for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPPR_100.tsv'), encoding='utf-8'):
-        if line.startswith('CAS'): continue  # skip header
-        CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t')[:9])
-        coeffs = (A, B, C, D, E)
-        Cp_dict_Perry_Table_153_100[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
+    Cp_data_Perry_Table_153_114 = data_source('Perry_Table_2-153_DIPPR_114.tsv')
+    Cp_values_Perry_Table_153_114 = np.array(Cp_data_Perry_Table_153_114.values[:, 1:], dtype=float)
 
-    # Load DIPPR 114 table
-    for line in open(os.path.join(folder, 'Perry_Table_2-153_DIPPR_114.tsv'), encoding='utf-8'):
-        if line.startswith('CAS'): continue  # skip header
-        CAS, name, A, B, C, D, E, Tmin, Tmax = to_num(line.strip().split('\t')[:9])
-        coeffs = (A, B, C, D, E)
-        Cp_dict_Perry_Table_153_114[CAS] = {'coeffs': coeffs, 'Tmin': Tmin, 'Tmax': Tmax}
-    
     # Read in a dict of heat capacities of irnorganic and elemental solids.
     # These are in section 2, table 151 in:
     # Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
@@ -936,7 +937,8 @@ if PY37:
     def __getattr__(name):
         if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
                     'Cp_dict_PerryI', 
-                    'Cp_dict_Perry_Table_153_100', 'Cp_dict_Perry_Table_153_114',
+                    'Cp_data_Perry_Table_153_100', 'Cp_values_Perry_Table_153_100',
+                    'Cp_data_Perry_Table_153_114', 'Cp_values_Perry_Table_153_114',
                     'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
                     'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
                     'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
