@@ -147,13 +147,13 @@ attribute of this module.
   
     A collection of 333 compound coefficient sets for heat capacity of liquids at various temperatures.
     The coefficients are in the form of a polynomial of degree 5, which supports the DIPPR equation
-    100 from [5]_. The coefficients are in units of J/mol/K.
+    100 from [5]_. The coefficients are in units of J/kmol/K.
 
 .. data:: Cp_data_Perry_Table_153_114
 
     A collection of 13 compound coefficient sets for heat capacity of liquids at various temperatures.
     The coefficients are in the form of a polynomial of degree 5, which supports the DIPPR equation
-    114 from [5]_. The coefficients are in units of J/mol/K.
+    114 from [5]_. The coefficients are in units of J/kmol/K.
 
 .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
     in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
