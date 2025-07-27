@@ -461,9 +461,9 @@ def Yaws_Psat(T, A, B, C, D, E):
 
     References
     ----------
-    .. [1] Yaws, Carl L. Chemical Properties Handbook: Physical, Thermodynamic,
-       Environmental, Transport, Safety, and Health Related Properties for
-       Organic and Inorganic Chemicals. McGraw-Hill, 2001.
+    .. [1] Yaws, Carl L. Thermophysical Properties of Chemicals and
+       Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
+       Publishing, 2014.
     .. [2] "ThermoData Engine (TDE103a V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103a/Eqns-Pure-PhaseBoundaryLG/Yaws-VaporPressure.htm.
     '''
@@ -699,8 +699,9 @@ def Antoine(T, A, B, C, base=10.0):
        New York: McGraw-Hill Professional, 2000.
     .. [2] Antoine, C. 1888. Tensions des Vapeurs: Nouvelle Relation Entre les
        Tensions et les Tempé. Compt.Rend. 107:681-684.
-    .. [3] Yaws, Carl L. The Yaws Handbook of Vapor Pressure: Antoine
-       Coefficients. 1 edition. Houston, Tex: Gulf Publishing Company, 2007.
+    .. [3] Yaws, Carl L. Thermophysical Properties of Chemicals and
+       Hydrocarbons, Second Edition. Amsterdam Boston: Gulf Professional
+       Publishing, 2014.
     '''
     T_C = T + C
     if T_C <= 0.0:

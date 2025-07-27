@@ -533,7 +533,7 @@ class Element:
                  'InChI_key', 'PubChem', 'phase', 'Hf', 'S0']
 
     def __repr__(self):
-        return "<Element %s (%s), number %d, MW=%s>" %(self.name, self.symbol, self.number, self.MW)
+        return "<Element %s (%s), number %d, MW=%g>" %(self.name, self.symbol, self.number, self.MW)
 
     def __init__(self, number, symbol, name, MW, CAS, AReneg, rcov, rvdw,
                  maxbonds, elneg, ionization, elaffinity, period, group,
@@ -541,7 +541,7 @@ class Element:
         self.number = number
         self.symbol = symbol
         self.name = name
-        self.MW = MW
+        self.MW = float(MW)
         self.CAS = CAS
 
         self.period = period
@@ -774,7 +774,7 @@ class directly.
 A brief overview of using the periodic table and its elements:
 
 >>> periodic_table.Na
-<Element Sodium (Na), number 11, MW=22.98977>
+<Element Sodium (Na), number 11, MW=22.9898>
 >>> periodic_table.U.MW
 238.02891
 >>> periodic_table['Th'].CAS

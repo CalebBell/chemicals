@@ -228,9 +228,9 @@ def test_flash_Tb_Tc_Pc():
 
     for (T, P, VF, xs, ys), kw in zip(pts_expect, kwargs):
         ans = flash_Tb_Tc_Pc(zs=zs, Tcs=Tcs, Pcs=Pcs, Tbs=Tbs, **kw)
-        assert_close1d([ans[0], ans[1], ans[2]], [T, P, VF], atol=1e-9)
-        assert_close1d(ans[3], xs)
-        assert_close1d(ans[4], ys)
+        assert_close1d([ans[0], ans[1], ans[2]], [T, P, VF], atol=1e-5)
+        assert_close1d(ans[3], xs, rtol=1e-5)
+        assert_close1d(ans[4], ys, rtol=1e-5)
 
     with pytest.raises(Exception):
         flash_Tb_Tc_Pc(zs=zs, Tcs=Tcs, Pcs=Pcs, Tbs=Tbs, T=300)

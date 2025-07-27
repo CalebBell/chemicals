@@ -48,7 +48,7 @@ Equilibrium Constants
 """
 
 
-from fluids.numerics import NotBoundedError, brenth, exp, log, newton, oscillation_checker, secant
+from fluids.numerics import brenth, exp, log, newton, secant
 
 from chemicals.rachford_rice import flash_inner_loop
 from chemicals.utils import mark_numba_uncacheable
@@ -589,7 +589,7 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
 
     References
     ----------
-    .. [1] Kandula, Vamshi Krishna, John C. Telotte, and F. Carl Knopf. "It`s
+    .. [1] Kandula, Vamshi Krishna, John C. Telotte, and F. Carl Knopf. "It's
        Not as Easy as It Looks: Revisiting Peng—Robinson Equation of State
        Convergence Issues for Dew Point, Bubble Point and Flash Calculations."
        International Journal of Mechanical Engineering Education 41, no. 3
@@ -602,7 +602,6 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
     if T is not None and P is not None:
         Ks = [Pcs[i]**((1.0/T - 1.0/Tbs[i])/(1.0/Tcs[i] - 1.0/Tbs[i]))/P for i in cmps]
         return (T, P) + flash_inner_loop(zs=zs, Ks=Ks, check=True)
-
 
     if T is not None and VF == 0:
         P_bubble = 0.0
@@ -625,11 +624,10 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
             T_calc, P_calc, VF_calc, xs, ys = flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=T, P=P)
             info[:] = T_calc, P_calc, VF_calc, xs, ys
             return VF_calc - VF
-        P = brenth(err, P_low, P_high)
+        P = secant(err, x0=0.5*(P_low + P_high), low=P_low, high=P_high, bisection=True)
         return tuple(info)
 
     elif P is not None and VF == 1:
-        checker = oscillation_checker()
         def to_solve(T_guess):
             T_guess = abs(T_guess)
             P_dew = 0.
@@ -637,58 +635,39 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
                 P_dew += zs[i]/( Pcs[i]**((1.0/T_guess - 1.0/Tbs[i])/(1.0/Tcs[i] - 1.0/Tbs[i])) )
             P_dew = 1./P_dew
             err = P_dew - P
-            if checker(T_guess, err):
-                raise ValueError("Oscillation")
-#            print(T_guess, err)
             return err
 
         Tc_pseudo = sum([Tcs[i]*zs[i] for i in cmps])
         T_guess = 0.666*Tc_pseudo
         try:
-            T_dew = abs(secant(to_solve, T_guess, maxiter=50, ytol=1e-2)) # , high=Tc_pseudo*3
+            T_dew = abs(secant(to_solve, T_guess, maxiter=50, ytol=1e-2, additional_guesses=True))
         except:
             T_dew = None
         if T_dew is None or T_dew > T_MAX*5.0:
-            # Went insanely high T, bound it with brenth
+            # Got stuck in a region floats don't change (exponential) or converged to a falses solution at high T
             T_low_guess = sum([.1*Tcs[i]*zs[i] for i in cmps])
-            checker = oscillation_checker(both_sides=True, minimum_progress=.05)
-            try:
-                T_dew = brenth(to_solve, T_MAX, T_low_guess)
-            except NotBoundedError:
-                raise Exception(f"Bisecting solver could not find a solution between {T_MAX:g} K and {T_low_guess:g} K")
+            T_dew = abs(secant(to_solve, T_guess, low=T_low_guess, high=T_MAX, bisection=True, maxiter=50, ytol=1e-2, additional_guesses=True))
         return flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=T_dew, P=P)
 
     elif P is not None and VF == 0:
-        checker = oscillation_checker()
         def to_solve(T_guess):
             T_guess = abs(T_guess)
             P_bubble = 0.0
             for i in cmps:
                 P_bubble += zs[i]*Pcs[i]**((1.0/T_guess - 1.0/Tbs[i])/(1.0/Tcs[i] - 1.0/Tbs[i]))
-
             err = P_bubble - P
-            if checker(T_guess, err):
-                raise ValueError("Oscillation")
-
-#            print(T_guess, err)
             return err
         # 2/3 average critical point
         Tc_pseudo = sum([Tcs[i]*zs[i] for i in cmps])
         T_guess = 0.55*Tc_pseudo
         try:
             T_bubble = abs(secant(to_solve, T_guess, maxiter=50, ytol=1e-2)) # , high=Tc_pseudo*4
-        except Exception as e:
-#            print(e)
-            checker = oscillation_checker(both_sides=True, minimum_progress=.05)
+        except:
             T_bubble = None
         if T_bubble is None or T_bubble > T_MAX*5.0:
-            # Went insanely high T (or could not converge because went too high), bound it with brenth
+            # Went insanely high T (or could not converge because went too high), bound it
             T_low_guess = 0.1*Tc_pseudo
-            try:
-                T_bubble = brenth(to_solve, T_MAX, T_low_guess)
-            except NotBoundedError:
-                raise Exception(f"Bisecting solver could not find a solution between {T_MAX:g} K and {T_low_guess:g} K")
-
+            T_bubble = abs(secant(to_solve, T_guess, low=T_low_guess, high=T_MAX, maxiter=50, ytol=1e-2, bisection=True)) # , high=Tc_pseudo*4
         return flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=T_bubble, P=P)
     elif P is not None and VF is not None:
         T_low = flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, P=P, VF=1)[0]
@@ -698,7 +677,7 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
             T_calc, P_calc, VF_calc, xs, ys = flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=T, P=P)
             info[:] = T_calc, P_calc, VF_calc, xs, ys
             return VF_calc - VF
-        P = brenth(err, T_low, T_high)
+        P = secant(err, x0=0.5*(T_low + T_high), low=T_low, high=T_high, bisection=True, xtol=1e-10)
         return tuple(info)
     else:
         raise ValueError("Provide two of P, T, and VF")

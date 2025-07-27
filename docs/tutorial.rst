@@ -70,7 +70,7 @@ Chemicals contains a periodic table.
 
 >>> from chemicals import *
 >>> periodic_table.Na
-<Element Sodium (Na), number 11, MW=22.98977>
+<Element Sodium (Na), number 11, MW=22.9898>
 >>> periodic_table.U.MW
 238.02891
 >>> periodic_table['Th'].CAS

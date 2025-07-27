@@ -2450,6 +2450,7 @@ def test_rhog_sat_IAPWS95_vs_saturation():
 @pytest.mark.slow
 @pytest.mark.iapws
 @pytest.mark.fuzz
+@pytest.mark.mpmath
 def test_rhog_sat_IAPWS95_vs_saturation2():
     Ts = [260.0, 400.0, 600.0, 630.0, 645]
     import mpmath as mp
