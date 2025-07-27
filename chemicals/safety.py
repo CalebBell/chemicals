@@ -90,6 +90,7 @@ Lower Flammability Limit
 ------------------------
 .. autofunction:: chemicals.safety.LFL
 .. autofunction:: chemicals.safety.LFL_methods
+.. autofunction:: chemicals.safety.LFL_estimate
 .. autodata:: chemicals.safety.LFL_all_methods
 .. autofunction:: chemicals.safety.Suzuki_LFL
 .. autofunction:: chemicals.safety.Crowl_Louvar_LFL
@@ -99,6 +100,7 @@ Upper Flammability Limit
 ------------------------
 .. autofunction:: chemicals.safety.UFL
 .. autofunction:: chemicals.safety.UFL_methods
+.. autofunction:: chemicals.safety.UFL_estimate
 .. autodata:: chemicals.safety.UFL_all_methods
 .. autofunction:: chemicals.safety.Suzuki_UFL
 .. autofunction:: chemicals.safety.Crowl_Louvar_UFL
@@ -119,6 +121,7 @@ __all__ = ('ppmv_to_mgm3', 'mgm3_to_ppmv',
            'NTP_codes', 'IARC_codes',
            'Skin_all_methods',  'Ceiling_all_methods', 'STEL_all_methods',
            'TWA_all_methods',
+           'LFL_estimate', 'UFL_estimate',
            'TWA_methods', 'TWA', 'STEL', 'STEL_methods', 'Ceiling', 'Ceiling_methods',
            'Skin', 'Skin_methods', 'Carcinogen_methods', 'Carcinogen_all_methods',
            'Carcinogen', 'T_flash_all_methods', 'T_flash_methods',
@@ -985,6 +988,50 @@ def LFL_methods(Hc=None, atoms=None, CASRN=''):
     return methods
 
 @mark_numba_incompatible
+def LFL_estimate(Hc=None, atoms=None, method=None):
+    r'''This function handles the estimation of a chemical's Lower Flammability Limit
+    based on heat of combustion or atomic composition. Will automatically
+    select an estimation method if no Method is provided; returns None if the
+    estimation cannot be performed.
+
+    Parameters
+    ----------
+    Hc : float, optional
+        Heat of combustion of gas [J/mol].
+    atoms : dict, optional
+        Dictionary of atoms and atom counts.
+
+    Returns
+    -------
+    LFL : float
+        Lower flammability limit of the gas in an atmosphere at STP, [mole fraction].
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined in the variable,
+        `LFL_all_methods`.
+
+    Notes
+    -----
+    If the heat of combustion is provided, the estimation method :obj:`Suzuki_LFL` can be used.
+    If the atoms of the molecule are available, the method :obj:`Crowl_Louvar_LFL` can be used.
+    '''
+    if not method:
+        if Hc == 0.0:
+            return None
+        if Hc is not None:
+            return Suzuki_LFL(Hc)
+        elif atoms is not None:
+            return Crowl_Louvar_LFL(atoms)
+        return None
+    elif method == SUZUKI:
+        return Suzuki_LFL(Hc)
+    elif method == CROWLLOUVAR:
+        return Crowl_Louvar_LFL(atoms)
+    return None
+
+@mark_numba_incompatible
 def LFL(Hc=None, atoms=None, CASRN='', method=None):
     r'''This function handles the retrieval or calculation of a chemical's
     Lower Flammability Limit. Lookup is based on CASRNs. Will automatically
@@ -1029,9 +1076,9 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
 
     References
     ----------
-    .. [1] IEC. “IEC 60079-20-1:2010 Explosive atmospheres - Part 20-1:
+    .. [1] IEC. "IEC 60079-20-1:2010 Explosive atmospheres - Part 20-1:
        Material characteristics for gas and vapour classification - Test
-       methods and data.” https://webstore.iec.ch/publication/635. See also
+       methods and data." https://webstore.iec.ch/publication/635. See also
        https://law.resource.org/pub/in/bis/S05/is.iec.60079.20.1.2010.pdf
     .. [2] National Fire Protection Association. NFPA 497: Recommended
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
@@ -1045,15 +1092,10 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     if not method:
         LFL = retrieve_any_from_df_dict(LFL_sources, CASRN, 'LFL')
         if not LFL:
-            if Hc == 0.0:
-                return None
-            if Hc: LFL = Suzuki_LFL(Hc)
-            elif atoms: LFL = Crowl_Louvar_LFL(atoms)
+            LFL = LFL_estimate(Hc, atoms)
         return LFL
-    elif method == SUZUKI:
-        return Suzuki_LFL(Hc)
-    elif method == CROWLLOUVAR:
-        return Crowl_Louvar_LFL(atoms)
+    elif method in [SUZUKI, CROWLLOUVAR]:
+        return LFL_estimate(Hc, atoms, method)
     else:
         return retrieve_from_df_dict(LFL_sources, CASRN, 'LFL', method)
 
@@ -1096,6 +1138,49 @@ def UFL_methods(Hc=None, atoms=None, CASRN=''):
     if atoms is not None:
         methods.append(CROWLLOUVAR)
     return methods
+
+
+@mark_numba_incompatible
+def UFL_estimate(Hc=None, atoms=None, method=None):
+    r'''This function handles the estimation of a chemical's Upper Flammability Limit
+    based on heat of combustion or atomic composition. Will automatically
+    select an estimation method if no Method is provided; returns None if the
+    estimation cannot be performed.
+
+    Parameters
+    ----------
+    Hc : float, optional
+        Heat of combustion of gas [J/mol]
+    atoms : dict, optional
+        Dictionary of atoms and atom counts
+
+    Returns
+    -------
+    UFL : float
+        Upper flammability limit of the gas in an atmosphere at STP, [mole fraction]
+
+    Other Parameters
+    ----------------
+    method : string, optional
+        A string for the method name to use, as defined in the variable,
+        `UFL_all_methods`.
+
+    Notes
+    -----
+    If the heat of combustion is provided, the estimation method :obj:`Suzuki_UFL` can be used.
+    If the atoms of the molecule are available, the method :obj:`Crowl_Louvar_UFL` can be used.
+    '''
+    if not method:
+        if Hc is not None:
+            return Suzuki_UFL(Hc)
+        elif atoms is not None:
+            return Crowl_Louvar_UFL(atoms)
+        return None
+    elif method == SUZUKI:
+        return Suzuki_UFL(Hc)
+    elif method == CROWLLOUVAR:
+        return Crowl_Louvar_UFL(atoms)
+    return None
 
 @mark_numba_incompatible
 def UFL(Hc=None, atoms=None, CASRN='', method=None):
@@ -1145,9 +1230,9 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
 
     References
     ----------
-    .. [1] IEC. “IEC 60079-20-1:2010 Explosive atmospheres - Part 20-1:
+    .. [1] IEC. "IEC 60079-20-1:2010 Explosive atmospheres - Part 20-1:
        Material characteristics for gas and vapour classification - Test
-       methods and data.” https://webstore.iec.ch/publication/635. See also
+       methods and data." https://webstore.iec.ch/publication/635. See also
        https://law.resource.org/pub/in/bis/S05/is.iec.60079.20.1.2010.pdf
     .. [2] National Fire Protection Association. NFPA 497: Recommended
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
@@ -1161,13 +1246,10 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
     if not method:
         UFL = retrieve_any_from_df_dict(UFL_sources, CASRN, 'UFL')
         if not UFL:
-            if Hc is not None: UFL = Suzuki_UFL(Hc)
-            elif atoms is not None: UFL = Crowl_Louvar_UFL(atoms)
+            UFL = UFL_estimate(Hc, atoms)
         return UFL
-    elif method == SUZUKI:
-        return Suzuki_UFL(Hc)
-    elif method == CROWLLOUVAR:
-        return Crowl_Louvar_UFL(atoms)
+    elif method in [SUZUKI, CROWLLOUVAR]:
+        return UFL_estimate(Hc, atoms, method)
     else:
         return retrieve_from_df_dict(UFL_sources, CASRN, 'UFL', method)
 
@@ -1246,7 +1328,6 @@ def LFL_ISO_10156_2017(zs, LFLs, CASs):
        Gas Cylinders - Gases and Gas Mixtures - Determination of Fire Potential
        and Oxidizing Ability for the Selection of Cylinder Valve Outlets, 2017.
     '''
-    N = len(zs)
     has_inerts = False
     for CAS in CASs:
         if CAS in ISO_10156_2017_Kks:
@@ -1545,12 +1626,12 @@ def NFPA_30_classification(T_flash, Tb=None, Psat_100F=None):
     r'''Classify a chemical's flammability/combustibility according
     to the NFPA 30 standard Flammable and Combustible Liquids Code.
 
-    Class IA: Flash Point < 73°F; Boiling Point < 100°F
-    Class IB: Flash Point < 73°F; 100°F <= Boiling Point
-    Class IC: 73°F <= Flash Point < 100°F
-    Class II: 100°F <= Flash Point < 140°F
-    Class IIIA: 140°F <= Flash Point < 200°F
-    Class IIIB: 200°F <= Flash Point
+    * Class IA: Flash Point < 73°F; Boiling Point < 100°F
+    * Class IB: Flash Point < 73°F; 100°F <= Boiling Point
+    * Class IC: 73°F <= Flash Point < 100°F
+    * Class II: 100°F <= Flash Point < 140°F
+    * Class IIIA: 140°F <= Flash Point < 200°F
+    * Class IIIB: 200°F <= Flash Point
 
     Class I liquids are designated as flammable; class II and II
     liquids are designated as combustible.

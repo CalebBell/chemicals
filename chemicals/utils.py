@@ -60,7 +60,7 @@ from math import (  # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
     pi,
     sqrt,
 )
-
+import types
 # __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma',
 # Obtained from SciPy 0.19 (2014 CODATA)
 # Included here so calculations are consistent across SciPy versions
@@ -146,17 +146,38 @@ except:
 
 
 empty_dict = {}
-immutable_types = {type(None), bool, int, float, complex, str, bytes,type,
+direct_immutable_types = {type(None), bool, int, float, complex, str, bytes,type, range, frozenset,
                        # dictionary views are read-only, kinda unexpected
                       type(empty_dict.keys()), type(empty_dict.items()), type(empty_dict.values()),
+                        types.FunctionType, types.MethodType, types.BuiltinFunctionType, types.BuiltinMethodType,
+                      types.MappingProxyType, type(str.upper),
                       }
 try:
     numpy_immutable_types = [np.bool_, np.byte, np.ubyte, np.short, np.ushort, np.intc, np.uintc, np.int_, np.uint, np.longlong, np.ulonglong, np.half, np.float16, np.single, np.double, np.longdouble, np.csingle, np.cdouble, np.clongdouble]
-    immutable_types.update(numpy_immutable_types)
+    direct_immutable_types.update(numpy_immutable_types)
 except:
     pass
 
-immutable_class_types = {'Fraction', 'Decimal'}
+direct_mutable_types = frozenset([
+    list, dict, set, 
+    bytearray, 
+    memoryview,
+])
+
+# ones we don't want to import and put in `immutable_types` for performance reasons
+immutable_class_types = {
+    # Basic standard library immutable classes
+    'Fraction', 'Decimal',
+    # Date and time related
+    'datetime', 'date', 'time', 'timedelta', 'timezone',
+    # Other standard library immutables
+    'Pattern',  # Regular expression pattern
+    'UUID',
+    # Range is a special type
+    'range',
+    # Enum types
+    'Enum', 'IntEnum', 'Flag', 'IntFlag',
+}
 
 object_data_type_cache = {}
 def create_object_data_function(instance):
@@ -235,7 +256,7 @@ def object_data(obj):
 @mark_numba_incompatible
 def recursive_copy(obj):
     obj_type = type(obj)
-    if obj_type in immutable_types:
+    if obj_type in direct_immutable_types:
         return obj
     elif obj_type is tuple:
         return tuple(recursive_copy(v) for v in obj)
@@ -282,6 +303,7 @@ def recursive_copy(obj):
         return obj_type(*(recursive_copy(v) for v in obj))
     raise ValueError(f"No copy function implemented for type {obj_type}")
 
+
 @mark_numba_incompatible
 def hash_any_primitive(v):
     '''Method to hash a primitive - with basic support for lists and
@@ -315,6 +337,7 @@ def hash_any_primitive(v):
 
     hash_any_primitive({'a': [1,2,3], 'b': []})
     '''
+    # original_v = v
     t = type(v)
     if t is list:
         if len(v) and isinstance(v[0], list):
@@ -326,24 +349,26 @@ def hash_any_primitive(v):
                 v = tuple(hash_any_primitive(i) for i in v)
         else:
             # likely a 1d list
-            v = tuple(i if type(i) in immutable_types else hash_any_primitive(i) for i in v)
+            v = tuple(i if type(i) in direct_immutable_types else hash_any_primitive(i) for i in v)
     elif t is dict:
         temp_hash = []
         # Do not want to order this at all
         for key, value in v.items():
             # Do not bother hashing the value if it's immutable as it will be hashed with the tuple
-            value_hash = value if type(value) in immutable_types else hash_any_primitive(value)
+            value_hash = value if type(value) in direct_immutable_types else hash_any_primitive(value)
             key_value_hash = hash((key, value_hash))
             temp_hash.append(key_value_hash)
-        v = hash(frozenset(temp_hash))
+        v = frozenset(temp_hash)
     elif t is set:
         # Should only contain hashable items
         v = frozenset(v)
     elif t is tuple:
-        v = tuple(i if type(i) in immutable_types else hash_any_primitive(i) for i in v)
+        v = tuple(i if type(i) in direct_immutable_types else hash_any_primitive(i) for i in v)
     elif t is ndarray:
-        v = hash(v.data.tobytes())
-    return hash(v)
+        v = v.data.tobytes()
+    hash_value = hash(v)
+    # print(f"Hashing: type={t.__name__}, value={original_v}, hash_value={hash_value}")
+    return hash_value
 
 def Parachor(MW, rhol, rhog, sigma):
     r'''Calculate Parachor for a pure species, using its density in the

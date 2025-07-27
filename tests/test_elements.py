@@ -98,7 +98,7 @@ def test_misc_elements():
 
     assert periodic_table['Fm'].InChI_key == 'MIORUQGGZCBUGO-UHFFFAOYSA-N'
 
-    assert periodic_table.Na is periodic_table['Na']
+    assert periodic_table.Na == periodic_table['Na']
 
     assert len(periodic_table) == 118
 

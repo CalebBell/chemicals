@@ -59,13 +59,13 @@ It is convenient to tag some chemicals with labels like "refrigerant", or in
 a certain database or not. The following chemical groups are available.
 
 .. autodata:: chemicals.identifiers.cryogenics
-.. autodata:: chemicals.identifiers.inerts
+.. autodata:: chemicals.identifiers.common_commercial_gases
 .. autofunction:: chemicals.identifiers.dippr_compounds
 """
 
 
 __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
-           'mixture_from_any', 'cryogenics', 'inerts', 'dippr_compounds', 'IDs_to_CASs',
+           'mixture_from_any', 'cryogenics', 'common_commercial_gases', 'dippr_compounds', 'IDs_to_CASs',
            'get_pubchem_db', 'CAS_to_int', 'sorted_CAS_key', 'int_to_CAS']
 
 import os
@@ -1225,13 +1225,23 @@ def IDs_to_CASs(IDs):
                 return [CAS_from_any(IDs)]
     return [CAS_from_any(ID) for ID in IDs]
 
-cryogenics = {'132259-10-0': 'Air', '7440-37-1': 'Argon', '630-08-0':
-'carbon monoxide', '7782-39-0': 'deuterium', '7782-41-4': 'fluorine',
-'7440-59-7': 'helium', '1333-74-0': 'hydrogen', '7439-90-9': 'krypton',
-'74-82-8': 'methane', '7440-01-9': 'neon', '7727-37-9': 'nitrogen',
-'7782-44-7': 'oxygen', '7440-63-3': 'xenon'}
+cryogenics = {
+  '132259-10-0': 'Air',
+  '7440-37-1':  'Argon',
+  '630-08-0':   'carbon monoxide',
+  '7782-39-0':  'deuterium',
+  '7782-41-4':  'fluorine',
+  '7440-59-7':  'helium',
+  '1333-74-0':  'hydrogen',
+  '7439-90-9':  'krypton',
+  '74-82-8':    'methane',
+  '7440-01-9':  'neon',
+  '7727-37-9':  'nitrogen',
+  '7782-44-7':  'oxygen',
+  '7440-63-3':  'xenon'
+}
 
-inerts = {"7440-37-1": "Argon", "124-38-9": "Carbon Dioxide", "7440-59-7":
+common_commercial_gases = {"7440-37-1": "Argon", "124-38-9": "Carbon Dioxide", "7440-59-7":
       "Helium", "7440-01-9": "Neon", "7727-37-9": "Nitrogen",
       "7440-63-3": "Xenon", "10102-43-9": "Nitric Oxide", "10102-44-0":
       "Nitrogen Dioxide", "7782-44-7": "Oxygen", "132259-10-0": "Air",

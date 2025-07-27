@@ -24,7 +24,11 @@ SOFTWARE.
 import numpy as np
 import pytest
 from fluids.numerics import assert_close, assert_close1d, assert_close2d
-
+import pytest
+import types
+import decimal
+import fractions
+import collections
 from chemicals.utils import (
     SG,
     API_to_SG,
@@ -81,7 +85,7 @@ from chemicals.utils import (
     Qls_to_ns,
     Qls_to_ms,
     ms_to_Qls,
-    rho_to_Baume_light, Baume_light_to_rho, SG_to_Baume_light, Baume_light_to_SG, rho_to_Baume_heavy, Baume_heavy_to_rho, SG_to_Baume_heavy, Baume_heavy_to_SG,
+    rho_to_Baume_light, Baume_light_to_rho, SG_to_Baume_light, Baume_light_to_SG, rho_to_Baume_heavy, Baume_heavy_to_rho, SG_to_Baume_heavy, Baume_heavy_to_SG
 )
 
 
@@ -684,21 +688,6 @@ def test_mixing_power():
 
     
 
-def test_hash_any_primitive():
-    from chemicals.utils import hash_any_primitive
-    a = {'a': 1, 'b': 2}
-    b = {'b': 2, 'a': 1}
-    assert hash_any_primitive(a) == hash_any_primitive(b)
-
-
-    assert hash_any_primitive([]) == hash_any_primitive([])
-
-    assert hash_any_primitive([1,2]) == hash_any_primitive([1,2])
-
-    assert not hash_any_primitive([1,2]) == hash_any_primitive([1,2,3])
-
-    assert not hash_any_primitive([1,2,4]) == hash_any_primitive([1,2,3])
-
 
 def test_radius_of_gyration():
     assert_close(radius_of_gyration(MW=32.00452, planar=False, A=6.345205205562681e-47, B=3.2663291891213418e-46, C=3.4321304373822523e-46),
@@ -767,3 +756,19 @@ def test_Baume_heavy_roundtrip():
     Be = SG_to_Baume_heavy(SG)
     SG2 = Baume_heavy_to_SG(Be)
     assert_close(SG, SG2)
+
+    
+def test_hash_any_primitive():
+    from chemicals.utils import hash_any_primitive
+    a = {'a': 1, 'b': 2}
+    b = {'b': 2, 'a': 1}
+    assert hash_any_primitive(a) == hash_any_primitive(b)
+
+
+    assert hash_any_primitive([]) == hash_any_primitive([])
+
+    assert hash_any_primitive([1,2]) == hash_any_primitive([1,2])
+
+    assert not hash_any_primitive([1,2]) == hash_any_primitive([1,2,3])
+
+    assert not hash_any_primitive([1,2,4]) == hash_any_primitive([1,2,3])
