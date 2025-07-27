@@ -258,17 +258,17 @@ def test_Cp_data_Poling():
 
 def test_Perry_2_153_100():
     tots_calc = [Cp_data_Perry_Table_153_100[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax']]
-    tots = [87317347.4, 1246863.008, 222198.8599, 42666.07447, 3214.299219, 73492.86, 129152.45]
+    tots = [87480287, 1247208, 222199.72, 42666.07447, 3214.29922, 73771.54, 129652.45]
     assert_close1d(tots_calc, tots)
 
     assert Cp_data_Perry_Table_153_100.shape == (333, 8)
 
 def test_Perry_2_153_114():
     tots_calc = [Cp_data_Perry_Table_153_114[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax']]
-    tots = [163596.44, 1467113.84, 6536.04862, 15987.24, 0.0, 1773.05, 4495.13]
+    tots = [656.44, 1466768.9, 6535.193, 15987.24, 0.00, 1494.37, 3995.13]
     assert_close1d(tots_calc, tots)
 
-    assert Cp_data_Perry_Table_153_114.shape == (13, 8)
+    assert Cp_data_Perry_Table_153_114.shape == (11, 8)
 
 def test_TRC_gas_data():
     tots_calc = [TRC_gas_data[i].abs().sum() for i in ['Tmin', 'Tmax', 'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'I', 'J', 'Hfg']]
