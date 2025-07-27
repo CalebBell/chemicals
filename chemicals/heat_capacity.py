@@ -151,7 +151,7 @@ attribute of this module.
 
 .. data:: Cp_data_Perry_Table_153_114
 
-    A collection of 13 compound coefficient sets for heat capacity of liquids at various temperatures.
+    A collection of 11 compound coefficient sets for heat capacity of liquids at various temperatures.
     The coefficients are in the form of a polynomial of degree 5, which supports the DIPPR equation
     114 from [5]_. The coefficients are in units of J/kmol/K.
 
