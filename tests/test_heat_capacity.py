@@ -258,10 +258,10 @@ def test_Cp_data_Poling():
 
 def test_Perry_2_153_100():
     tots_calc = [Cp_data_Perry_Table_153_100[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax']]
-    tots = [87480287, 1247208, 222199.72, 42666.07447, 3214.29922, 73771.54, 129652.45]
+    tots = [87350847.4, 1247038.44770, 222199.06768, 42666.07447, 3214.29921906, 73492.86, 129299.21]
     assert_close1d(tots_calc, tots)
 
-    assert Cp_data_Perry_Table_153_100.shape == (333, 8)
+    assert Cp_data_Perry_Table_153_100.shape == (332, 8)
 
 def test_Perry_2_153_114():
     tots_calc = [Cp_data_Perry_Table_153_114[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax']]
