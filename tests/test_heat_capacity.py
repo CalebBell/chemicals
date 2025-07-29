@@ -28,6 +28,8 @@ from chemicals.heat_capacity import (
     PPDS2,
     PPDS15,
     Cp_data_Poling,
+    Cp_data_Perry_Table_153_100,
+    Cp_data_Perry_Table_153_114,
     Cpg_statistical_mechanics,
     Cpg_statistical_mechanics_integral,
     Cpg_statistical_mechanics_integral_over_T,
@@ -254,6 +256,19 @@ def test_Cp_data_Poling():
 
     assert Cp_data_Poling.shape == (367, 10)
 
+def test_Perry_2_153_100():
+    tots_calc = [Cp_data_Perry_Table_153_100[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax']]
+    tots = [87350847.4, 1247038.44770, 222199.06768, 42666.07447, 3214.29921906, 73492.86, 129299.21]
+    assert_close1d(tots_calc, tots)
+
+    assert Cp_data_Perry_Table_153_100.shape == (332, 8)
+
+def test_Perry_2_153_114():
+    tots_calc = [Cp_data_Perry_Table_153_114[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tmin', 'Tmax']]
+    tots = [656.44, 1466768.9, 6535.193, 15987.24, 0.00, 1494.37, 3995.13]
+    assert_close1d(tots_calc, tots)
+
+    assert Cp_data_Perry_Table_153_114.shape == (11, 8)
 
 def test_TRC_gas_data():
     tots_calc = [TRC_gas_data[i].abs().sum() for i in ['Tmin', 'Tmax', 'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'I', 'J', 'Hfg']]
