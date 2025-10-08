@@ -119,7 +119,7 @@ def Tt_methods(CASRN):
 
 @mark_numba_incompatible
 def Tt(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's triple temperature.
+    r"""This function handles the retrieval of a chemical's triple temperature.
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
@@ -175,7 +175,7 @@ def Tt(CASRN, method=None):
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
        Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Tt")
         if found: return val
@@ -217,7 +217,7 @@ def Pt_methods(CASRN):
 
 @mark_numba_incompatible
 def Pt(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's triple pressure.
+    r"""This function handles the retrieval of a chemical's triple pressure.
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
@@ -269,7 +269,7 @@ def Pt(CASRN, method=None):
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
        Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Pt")
         if found: return val

@@ -297,7 +297,7 @@ def Tc_methods(CASRN):
 
 @mark_numba_incompatible
 def Tc(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's critical
+    r"""This function handles the retrieval of a chemical's critical
     temperature. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
@@ -447,7 +447,7 @@ def Tc(CASRN, method=None):
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
        Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Tc")
         if found: return val
@@ -484,7 +484,7 @@ def Pc_methods(CASRN):
 
 @mark_numba_incompatible
 def Pc(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's critical
+    r"""This function handles the retrieval of a chemical's critical
     pressure. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
@@ -634,7 +634,7 @@ def Pc(CASRN, method=None):
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
        Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Pc")
         if found: return val
@@ -671,7 +671,7 @@ def Vc_methods(CASRN):
 
 @mark_numba_incompatible
 def Vc(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's critical
+    r"""This function handles the retrieval of a chemical's critical
     volume. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
@@ -814,7 +814,7 @@ def Vc(CASRN, method=None):
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
        Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Vc")
         if found: return val
@@ -851,7 +851,7 @@ def Zc_methods(CASRN):
 
 @mark_numba_incompatible
 def Zc(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's critical
+    r"""This function handles the retrieval of a chemical's critical
     compressibility. Lookup is based on CASRNs. Will automatically select a
     data source to use if no method is provided; returns None if the data is
     not available.
@@ -991,7 +991,7 @@ def Zc(CASRN, method=None):
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
        Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Zc")
         if found: return val
@@ -1047,7 +1047,7 @@ rcovs_regressed =  {
 @mark_numba_incompatible
 def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
                             covalent_radii=rcovs_Mersmann_Kind):
-    r'''Predicts the critical molar volume of a chemical based only on its
+    r"""Predicts the critical molar volume of a chemical based only on its
     atomic composition according to [1]_ and [2]_. This is a crude approach,
     but provides very reasonable
     estimates in practice. Optionally, the `coeff` used and the `power` in the
@@ -1122,7 +1122,7 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
        Thermal Properties of Pure Liquids, of Critical Data, and of Vapor
        Pressure." Industrial & Engineering Chemistry Research, January 31,
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
-    '''
+    """
     H_RADIUS_COV = covalent_radii["H"]
     tot = 0
     atom_count = 0
@@ -1255,7 +1255,7 @@ def _assert_two_critical_properties_provided(Tc, Pc, Vc):
         raise ValueError("Two and only two of Tc, Pc, and Vc must be provided")
 
 def Ihmels(Tc=None, Pc=None, Vc=None):
-    r'''Most recent, and most recommended method of estimating critical
+    r"""Most recent, and most recommended method of estimating critical
     properties from each other. Two of the three properties are required.
     This model uses the "critical surface", a general plot of Tc vs Pc vs Vc.
     The model used 421 organic compounds to derive equation.
@@ -1299,7 +1299,7 @@ def Ihmels(Tc=None, Pc=None, Vc=None):
     .. [1] Ihmels, E. Christian. "The Critical Surface." Journal of Chemical
        & Engineering Data 55, no. 9 (September 9, 2010): 3474-80.
        doi:10.1021/je100167w.
-    '''
+    """
     _assert_two_critical_properties_provided(Tc, Pc, Vc)
     if Tc is not None and Vc is not None:
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
@@ -1318,7 +1318,7 @@ def Ihmels(Tc=None, Pc=None, Vc=None):
         return Tc_calc
 
 def Meissner(Tc=None, Pc=None, Vc=None):
-    r'''Old (1942) relationship for estimating critical
+    r"""Old (1942) relationship for estimating critical
     properties from each other. Two of the three properties are required.
     This model uses the "critical surface", a general plot of Tc vs Pc vs Vc.
     The model used 42 organic and inorganic compounds to derive the equation.
@@ -1362,7 +1362,7 @@ def Meissner(Tc=None, Pc=None, Vc=None):
     .. [1] Meissner, H. P., and E. M. Redding. "Prediction of Critical
            Constants." Industrial & Engineering Chemistry 34, no. 5
            (May 1, 1942): 521-26. doi:10.1021/ie50389a003.
-    '''
+    """
     _assert_two_critical_properties_provided(Tc, Pc, Vc)
     if Tc and Vc:
         Vc = Vc*1E6
@@ -1381,7 +1381,7 @@ def Meissner(Tc=None, Pc=None, Vc=None):
         return Tc
 
 def Grigoras(Tc=None, Pc=None, Vc=None):
-    r'''Relatively recent (1990) relationship for estimating critical
+    r"""Relatively recent (1990) relationship for estimating critical
     properties from each other. Two of the three properties are required.
     This model uses the "critical surface", a general plot of Tc vs Pc vs Vc.
     The model used 137 organic and inorganic compounds to derive the equation.
@@ -1427,7 +1427,7 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
            Critical Volume and Related Properties." Journal of Computational
            Chemistry 11, no. 4 (May 1, 1990): 493-510.
            doi:10.1002/jcc.540110408
-    '''
+    """
     _assert_two_critical_properties_provided(Tc, Pc, Vc)
     if Tc and Vc:
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
@@ -1446,7 +1446,7 @@ def Grigoras(Tc=None, Pc=None, Vc=None):
         return Tc
 
 def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
-    r'''Estimation model for missing critical constants of a fluid
+    r"""Estimation model for missing critical constants of a fluid
     according to [1]_. Based on the molecular weight and saturation
     molar volume of a fluid, and requires one of `Tc` or `Pc`.
     Optionally, `Vc` can be provided to increase the accuracy of
@@ -1491,7 +1491,7 @@ def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
     .. [1] Hekayati, Javad, and Sona Raeissi. "Estimation of the Critical
        Properties of Compounds Using Volume-Based Thermodynamics." AIChE Journal
        n/a, no. n/a (n.d.): e17004. https://doi.org/10.1002/aic.17004.
-    '''
+    """
     if Tc is None and Pc is None:
         raise ValueError("One of `Tc` or `Pc` are required.")
     if Pc is not None:
@@ -1709,7 +1709,7 @@ def third_property(CASRN=None, T=False, P=False, V=False):
 ### Crtical Temperature of Mixtures - Estimation routines
 
 def Li(zs, Tcs, Vcs):
-    r'''Calculates critical temperature of a mixture according to
+    r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_. Better than simple mixing rules.
 
     .. math::
@@ -1760,7 +1760,7 @@ def Li(zs, Tcs, Vcs):
     .. [1] Li, C. C. "Critical Temperature Estimation for Simple Mixtures."
        The Canadian Journal of Chemical Engineering 49, no. 5
        (October 1, 1971): 709-10. doi:10.1002/cjce.5450490529.
-    '''
+    """
     N = len(zs)
     denominator_inv = 0.0
     for i in range(N):
@@ -1772,7 +1772,7 @@ def Li(zs, Tcs, Vcs):
     return Tcm
 
 def Chueh_Prausnitz_Tc(zs, Tcs, Vcs, taus):
-    r'''Calculates critical temperature of a mixture according to
+    r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_.
 
     .. math::
@@ -1825,7 +1825,7 @@ def Chueh_Prausnitz_Tc(zs, Tcs, Vcs, taus):
        "Prediction of True Critical Temperature of Multi-Component Mixtures:
        Extending Fast Estimation Methods." Fluid Phase Equilibria 392
        (April 25, 2015): 104-26. doi:10.1016/j.fluid.2015.02.001.
-    '''
+    """
     N = len(zs)
     denominator_inv = 0.0
     zi_Vc_23s = [0.0]*N
@@ -1843,7 +1843,7 @@ def Chueh_Prausnitz_Tc(zs, Tcs, Vcs, taus):
     return Tcm
 
 def Grieves_Thodos(zs, Tcs, Aijs):
-    r'''Calculates critical temperature of a mixture according to
+    r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_.
 
     .. math::
@@ -1890,7 +1890,7 @@ def Grieves_Thodos(zs, Tcs, Aijs):
        "Prediction of True Critical Temperature of Multi-Component Mixtures:
        Extending Fast Estimation Methods." Fluid Phase Equilibria 392
        (April 25, 2015): 104-26. doi:10.1016/j.fluid.2015.02.001.
-    '''
+    """
     N = len(zs)
     Tcm = 0.0
     for i in range(N):
@@ -1902,7 +1902,7 @@ def Grieves_Thodos(zs, Tcs, Aijs):
     return Tcm
 
 def modified_Wilson_Tc(zs, Tcs, Aijs):
-    r'''Calculates critical temperature of a mixture according to
+    r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_. Equation
 
     .. math::
@@ -1954,7 +1954,7 @@ def modified_Wilson_Tc(zs, Tcs, Aijs):
        "Prediction of True Critical Temperature of Multi-Component Mixtures:
        Extending Fast Estimation Methods." Fluid Phase Equilibria 392
        (April 25, 2015): 104-26. doi:10.1016/j.fluid.2015.02.001.
-    '''
+    """
     N = len(zs)
     Tcm = 0.0
     for i in range(N):
@@ -1971,7 +1971,7 @@ def modified_Wilson_Tc(zs, Tcs, Aijs):
 
 ### Crtical Volume of Mixtures
 def Chueh_Prausnitz_Vc(zs, Vcs, nus):
-    r'''Calculates critical volume of a mixture according to
+    r"""Calculates critical volume of a mixture according to
     mixing rules in [1]_ with an interaction parameter.
 
     .. math::
@@ -2015,7 +2015,7 @@ def Chueh_Prausnitz_Vc(zs, Vcs, nus):
        "Prediction of True Critical Volume of Multi-Component Mixtures:
        Extending Fast Estimation Methods." Fluid Phase Equilibria 386
        (January 25, 2015): 13-29. doi:10.1016/j.fluid.2014.11.008.
-    '''
+    """
     N = len(zs)
     denominator_inv = 0.0
     zi_Vc_23s = [0.0]*N
@@ -2037,7 +2037,7 @@ def Chueh_Prausnitz_Vc(zs, Vcs, nus):
 
 
 def modified_Wilson_Vc(zs, Vcs, Aijs):
-    r'''Calculates critical volume of a mixture according to
+    r"""Calculates critical volume of a mixture according to
     mixing rules in [1]_ with parameters. Equation
 
     .. math::
@@ -2090,7 +2090,7 @@ def modified_Wilson_Vc(zs, Vcs, Aijs):
        "Prediction of True Critical Temperature of Multi-Component Mixtures:
        Extending Fast Estimation Methods." Fluid Phase Equilibria 392
        (April 25, 2015): 104-26. doi:10.1016/j.fluid.2015.02.001.
-    '''
+    """
     N = len(zs)
     Vcm = 0.0
     for i in range(N):

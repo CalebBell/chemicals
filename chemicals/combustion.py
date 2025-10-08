@@ -205,7 +205,7 @@ def RON_methods(CASRN):
 
 @mark_numba_incompatible
 def RON(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's research octane
+    r"""This function handles the retrieval of a chemical's research octane
     number (RON). Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
@@ -260,7 +260,7 @@ def RON(CASRN, method=None):
     .. [4] Kessler, Travis, and John Hunter Mack. "ECNet: Large Scale Machine
        Learning Projects for Fuel Property Prediction." Journal of Open Source
        Software 2, no. 17 (2017): 401.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "RON")
         if found: return val
@@ -300,7 +300,7 @@ def MON_methods(CASRN):
 
 @mark_numba_incompatible
 def MON(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's motor octane
+    r"""This function handles the retrieval of a chemical's motor octane
     number (MON). Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
@@ -355,7 +355,7 @@ def MON(CASRN, method=None):
     .. [4] Kessler, Travis, and John Hunter Mack. "ECNet: Large Scale Machine
        Learning Projects for Fuel Property Prediction." Journal of Open Source
        Software 2, no. 17 (2017): 401.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "MON")
         if found: return val
@@ -398,7 +398,7 @@ def ignition_delay_methods(CASRN):
 
 @mark_numba_incompatible
 def ignition_delay(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's ignition delay time (IDT).
+    r"""This function handles the retrieval of a chemical's ignition delay time (IDT).
     Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
@@ -442,7 +442,7 @@ def ignition_delay(CASRN, method=None):
        Energy & Fuels 29, no. 9 (September 17, 2015): 5781-5801.
        https://doi.org/10.1021/acs.energyfuels.5b01032.
 
-    '''
+    """
     if not _combustion_data_loaded: _load_combustion_data()
     if method:
         value = retrieve_from_df_dict(ignition_delay_sources, CASRN, "IGNITION_DELAY", method)
@@ -451,7 +451,7 @@ def ignition_delay(CASRN, method=None):
     return value
 
 def AKI(RON, MON):
-    r'''This function calculates the anti knock index (AKI) of a fuel, also
+    r"""This function calculates the anti knock index (AKI) of a fuel, also
     known as (R+M)/2 and by DON [1]_.
 
     .. math::
@@ -483,11 +483,11 @@ def AKI(RON, MON):
     ----------
     .. [1] McKinsey. "Octane." Accessed April 18, 2022.
        http://www.mckinseyenergyinsights.com/resources/refinery-reference-desk/octane/.
-    '''
+    """
     return 0.5*(RON + MON)
 
 def octane_sensitivity(RON, MON):
-    r'''This function calculates the octane sensitivity of a fuel [1]_.
+    r"""This function calculates the octane sensitivity of a fuel [1]_.
 
     .. math::
         \text{OS} = \text{RON} - \text{MON}
@@ -519,11 +519,11 @@ def octane_sensitivity(RON, MON):
        Spark-Ignition Engine Applications." Applications in Energy and
        Combustion Science 5 (March 1, 2021): 100018.
        https://doi.org/10.1016/j.jaecs.2020.100018.
-    '''
+    """
     return RON - MON
 
 def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
-    r'''Esimates the research octane number (RON) from a known
+    r"""Esimates the research octane number (RON) from a known
     ignition delay, as shown in [1]_.
 
     .. math::
@@ -558,12 +558,12 @@ def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
        Fuels in a Constant-Volume Combustion Bomb Apparatus and Its
        Relevance to HCCI Combustion." Energy & Fuels 26, no. 10
        (October 18, 2012): 6106-17. https://doi.org/10.1021/ef300503b.
-    '''
+    """
     ignition_delay *= 1e3 # convert from seconds to ms
     return 120.77 - 425.48/ignition_delay
 
 def Perez_Boehman_MON_from_ignition_delay(ignition_delay):
-    r'''Esimates the motor octane number (MON) from a known
+    r"""Esimates the motor octane number (MON) from a known
     ignition delay, as shown in [1]_.
 
     .. math::
@@ -598,12 +598,12 @@ def Perez_Boehman_MON_from_ignition_delay(ignition_delay):
        Fuels in a Constant-Volume Combustion Bomb Apparatus and Its
        Relevance to HCCI Combustion." Energy & Fuels 26, no. 10
        (October 18, 2012): 6106-17. https://doi.org/10.1021/ef300503b.
-    '''
+    """
     ignition_delay *= 1e3 # convert from seconds to ms
     return 109.93 - 374.73/ignition_delay
 
 def IDT_to_DCN(IDT):
-    r'''This function converts the ignition delay
+    r"""This function converts the ignition delay
     time [1]_ into a derived cetane number.
 
     If the ignition delay time is between 3.1 and 6.5 ms:
@@ -645,7 +645,7 @@ def IDT_to_DCN(IDT):
        Method for the Prediction of the Derived Cetane Number of Oxygenated
        Hydrocarbons." Energy & Fuels 29, no. 9 (September 17, 2015): 5781-5801.
        https://doi.org/10.1021/acs.energyfuels.5b01032.
-    '''
+    """
     IDT *= 1000.0
     if 3.1 < IDT < 6.5:
         return 4.46 + (186.6/IDT)

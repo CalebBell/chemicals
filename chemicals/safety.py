@@ -816,7 +816,7 @@ def T_flash_methods(CASRN):
 
 @mark_numba_incompatible
 def T_flash(CASRN, method=None):
-    r'''
+    r"""
     This function handles the retrieval or calculation of a chemical's
     flash point. Lookup is based on CASRNs. No predictive methods are currently
     implemented. Will automatically select a data source to use if no method
@@ -873,7 +873,7 @@ def T_flash(CASRN, method=None):
        Flash Points Using Normal Boiling Points." Fluid Phase Equilibria 449
        (October 15, 2017): 52-59. doi:10.1016/j.fluid.2017.06.008.
     .. [4] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "T_flash")
         if found: return val
@@ -1057,7 +1057,7 @@ def LFL_estimate(Hc=None, atoms=None, method=None):
 
 @mark_numba_incompatible
 def LFL(Hc=None, atoms=None, CASRN="", method=None):
-    r'''This function handles the retrieval or calculation of a chemical's
+    r"""This function handles the retrieval or calculation of a chemical's
     Lower Flammability Limit. Lookup is based on CASRNs. Will automatically
     select a data source to use if no Method is provided; returns None if the
     data is not available.
@@ -1108,7 +1108,7 @@ def LFL(Hc=None, atoms=None, CASRN="", method=None):
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
     .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "LFL")
         if found: return val
@@ -1208,7 +1208,7 @@ def UFL_estimate(Hc=None, atoms=None, method=None):
 
 @mark_numba_incompatible
 def UFL(Hc=None, atoms=None, CASRN="", method=None):
-    r'''This function handles the retrieval or calculation of a chemical's
+    r"""This function handles the retrieval or calculation of a chemical's
     Upper Flammability Limit. Lookup is based on CASRNs. Two predictive methods
     are currently implemented. Will automatically select a data source to use
     if no Method is provided; returns None if the data is not available.
@@ -1262,7 +1262,7 @@ def UFL(Hc=None, atoms=None, CASRN="", method=None):
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
     .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "UFL")
         if found: return val
@@ -1439,7 +1439,7 @@ def fire_mixing(ys, FLs):
     return 1.0/tot
 
 def Suzuki_LFL(Hc):
-    r'''Calculates lower flammability limit, using the Suzuki [1]_ correlation.
+    r"""Calculates lower flammability limit, using the Suzuki [1]_ correlation.
     Uses heat of combustion only.
 
     The lower flammability limit of a gas is air is:
@@ -1485,14 +1485,14 @@ def Suzuki_LFL(Hc):
        Flammability Limits and Standard Enthalpies of Combustion of Organic
        Compounds." Fire and Materials 18, no. 5 (September 1, 1994): 333-36.
        doi:10.1002/fam.810180509.
-    '''
+    """
     Hc = Hc/1E6
     LFL = -3.42/Hc + 0.569*Hc + 0.0538*Hc*Hc + 1.80
     return LFL/100.
 
 
 def Suzuki_UFL(Hc):
-    r'''Calculates upper flammability limit, using the Suzuki [1]_ correlation.
+    r"""Calculates upper flammability limit, using the Suzuki [1]_ correlation.
     Uses heat of combustion only.
     The upper flammability limit of a gas is air is:
 
@@ -1535,14 +1535,14 @@ def Suzuki_UFL(Hc):
        between Upper Flammability Limits and Thermochemical Properties of
        Organic Compounds." Fire and Materials 18, no. 6 (November 1, 1994):
        393-97. doi:10.1002/fam.810180608.
-    '''
+    """
     Hc = Hc/1E6
     UFL = 6.3*Hc + 0.567*Hc*Hc + 23.5
     return UFL/100.
 
 @mark_numba_incompatible
 def Crowl_Louvar_LFL(atoms):
-    r'''Calculates lower flammability limit, using the Crowl-Louvar [1]_
+    r"""Calculates lower flammability limit, using the Crowl-Louvar [1]_
     correlation. Uses molecular formula only.
     The lower flammability limit of a gas is air is:
 
@@ -1581,7 +1581,7 @@ def Crowl_Louvar_LFL(atoms):
     .. [2] Jones, G. W. "Inflammation Limits and Their Practical Application
        in Hazardous Industrial Operations." Chemical Reviews 22, no. 1
        (February 1, 1938): 1-26. doi:10.1021/cr60071a001
-    '''
+    """
     nC, nH, nO = 0, 0, 0
     if atoms.get("C"):
         nC = atoms["C"]
@@ -1595,7 +1595,7 @@ def Crowl_Louvar_LFL(atoms):
 
 @mark_numba_incompatible
 def Crowl_Louvar_UFL(atoms):
-    r'''Calculates upper flammability limit, using the Crowl-Louvar [1]_
+    r"""Calculates upper flammability limit, using the Crowl-Louvar [1]_
     correlation. Uses molecular formula only.
     The upper flammability limit of a gas is air is:
 
@@ -1634,7 +1634,7 @@ def Crowl_Louvar_UFL(atoms):
     .. [2] Jones, G. W. "Inflammation Limits and Their Practical Application
        in Hazardous Industrial Operations." Chemical Reviews 22, no. 1
        (February 1, 1938): 1-26. doi:10.1021/cr60071a001
-    '''
+    """
     nC, nH, nO = 0, 0, 0
     if atoms.get("C"):
         nC = atoms["C"]

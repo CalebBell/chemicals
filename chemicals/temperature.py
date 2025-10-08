@@ -261,7 +261,7 @@ T90_to_T27 = lambda x : float(splev(x, T90_to_T27_tck))
 
 
 def ITS90_68_difference(T):
-    r'''Calculates the difference between ITS-90 and ITS-68 scales using a
+    r"""Calculates the difference between ITS-90 and ITS-68 scales using a
     series of models listed in [1]_, [2]_, and [3]_.
 
     The temperature difference is given by the following equations:
@@ -356,7 +356,7 @@ def ITS90_68_difference(T):
        Chemistry 64, no. 10 (1992): 1545-1562. doi:10.1351/pac199264101545.
     .. [4] Code10.info. "Conversions among International Temperature Scales."
        Accessed May 22, 2016. http://www.code10.info/index.php%3Foption%3Dcom_content%26view%3Darticle%26id%3D83:conversions-among-international-temperature-scales%26catid%3D60:temperature%26Itemid%3D83.
-    '''
+    """
     # Numba requires these coefficients to be in a list not a tuple
     ais = [-0.005903, 0.008174, -0.061924, -0.193388, 1.490793, 1.252347,
            -9.835868, 1.411912, 25.277595, -19.183815, -18.437089, 27.000895,
@@ -418,7 +418,7 @@ def polish_conversion(T_initial, forward_calculator, backward_calculator):
     return T_polished
 
 def T_converter(T, current, desired):
-    r'''Converts the a temperature reading made in any of the scales
+    r"""Converts the a temperature reading made in any of the scales
     'ITS-90', 'ITS-68','ITS-48', 'ITS-76', or 'ITS-27' to any of the other
     scales. Not all temperature ranges can be converted to other ranges; for
     instance, 'ITS-76' is purely for low temperatures, and 5 K on it has no
@@ -466,7 +466,7 @@ def T_converter(T, current, desired):
        and Thermodynamic Properties to the Basis of the International
        Temperature Scale of 1990 (Technical Report)." Pure and Applied
        Chemistry 64, no. 10 (1992): 1545-1562. doi:10.1351/pac199264101545.
-    '''
+    """
     if current == "ITS-90":
         pass
     elif current == "ITS-68":

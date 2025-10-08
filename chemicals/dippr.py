@@ -1029,7 +1029,7 @@ def EQ106_ABC(T, Tc, val, der, der2):
 
 
 def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
-    r'''DIPPR Equation #107. Often used in calculating ideal-gas heat capacity.
+    r"""DIPPR Equation #107. Often used in calculating ideal-gas heat capacity.
     All 5 parameters are required.
     Also called the Aly-Lee equation.
 
@@ -1105,7 +1105,7 @@ def EQ107(T, A=0, B=0, C=0, D=0, E=0, order=0):
        Calculating the Ideal Gas Heat Capacity, Enthalpy, and Entropy." Fluid
        Phase Equilibria 6, no. 3 (January 1, 1981): 169-79.
        doi:10.1016/0378-3812(81)85002-9.
-    '''
+    """
     if order == 0:
         C_T = C/T
         t0 = 2.0*C_T/(trunc_exp(C_T) - trunc_exp(-C_T))

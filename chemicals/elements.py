@@ -1112,7 +1112,7 @@ def atom_matrix(atomss, atom_IDs=None):
 
 @mark_numba_incompatible
 def similarity_variable(atoms, MW=None):
-    r'''Calculates the similarity variable of an compound, as defined in [1]_.
+    r"""Calculates the similarity variable of an compound, as defined in [1]_.
     Currently only applied for certain heat capacity estimation routines.
 
     .. math::
@@ -1147,14 +1147,14 @@ def similarity_variable(atoms, MW=None):
        Variable for Estimating the Heat Capacity of Solid Organic Compounds:
        Part I. Fundamentals." Fluid Phase Equilibria 268, no. 1-2
        (June 25, 2008): 51-60. doi:10.1016/j.fluid.2008.03.019.
-    '''
+    """
     if not MW:
         MW = molecular_weight(atoms)
     return sum(atoms.values())/MW
 
 @mark_numba_incompatible
 def atoms_to_Hill(atoms):
-    r'''Determine the Hill formula of a compound, given a dictionary of its
+    r"""Determine the Hill formula of a compound, given a dictionary of its
     atoms and their counts, in the format {symbol: count}.
 
     Parameters
@@ -1188,7 +1188,7 @@ def atoms_to_Hill(atoms):
        ADOPTED BY THE CLASSIFICATION DIVISION OF THE U. S. PATENT OFFICE.1."
        Journal of the American Chemical Society 22, no. 8 (August 1, 1900):
        478-94. doi:10.1021/ja02046a005.
-    '''
+    """
     def str_ele_count(ele):
         if atoms[ele] == 1:
             count = ""

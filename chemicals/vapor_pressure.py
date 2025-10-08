@@ -366,7 +366,7 @@ def __getattr__(name):
 
 
 def TDE_PVExpansion(T, a1, a2, a3, a4=0.0, a5=0.0, a6=0.0, a7=0.0, a8=0.0):
-    r'''Calculates vapor pressure or sublimation pressure of a chemical using
+    r"""Calculates vapor pressure or sublimation pressure of a chemical using
     the PVExpansion equation for vapor pressure or sublimation pressure.
     Parameters `a1`, `a2`, `a3`, `a4`, `a5`, `a6`, `a7`, and `a8`
     are chemical-dependent. Parameters
@@ -419,12 +419,12 @@ def TDE_PVExpansion(T, a1, a2, a3, a4=0.0, a5=0.0, a6=0.0, a7=0.0, a8=0.0):
     ----------
     .. [1] "ThermoData Engine (TDE103a V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-PhaseBoundaryLG/PVExpansion.htm
-    '''
+    """
     T2 = T*T
     return trunc_exp(a1 + a2/T + a3*log(T) + a4*T + a5*T2 + a6/T2 + a7*T2*T2*T2 + a8/(T2*T2))
 
 def Yaws_Psat(T, A, B, C, D, E):
-    r'''Calculates vapor pressure of a chemical using the Yaws equation for
+    r"""Calculates vapor pressure of a chemical using the Yaws equation for
     vapor pressure.
     Parameters `A`, `B`, `C`, `D`, and `E` are chemical-dependent. Parameters
     can be found in numerous sources; however units of the coefficients used
@@ -486,7 +486,7 @@ def Yaws_Psat(T, A, B, C, D, E):
        Publishing, 2014.
     .. [2] "ThermoData Engine (TDE103a V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103a/Eqns-Pure-PhaseBoundaryLG/Yaws-VaporPressure.htm.
-    '''
+    """
     exponent = (A + B/T + C*log10(T) + T*(D + E*T))
     if exponent > 308.0:
         return 1e308
@@ -1252,7 +1252,7 @@ def d2TRC_Antoine_extended_dT2(T, Tc, to, A, B, C, n, E, F):
 
 
 def Wagner_original(T, Tc, Pc, a, b, c, d):
-    r'''Calculates vapor pressure using the Wagner equation (3, 6 form).
+    r"""Calculates vapor pressure using the Wagner equation (3, 6 form).
 
     Requires critical temperature and pressure as well as four coefficients
     specific to each chemical.
@@ -1310,7 +1310,7 @@ def Wagner_original(T, Tc, Pc, a, b, c, d):
     .. [3] PPDS2 Temperature-Dependent Equation Forms. National Engineering
        Laboratory, 2004
        https://web.archive.org/web/20050510061545/http://www.ppds.co.uk/library/pdf/PPDS_EquationForms.pdf
-    '''
+    """
     Tr = T/Tc
     if Tr > 1.0:
         Tr = 1.0
@@ -1703,7 +1703,7 @@ def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
     return out
 
 def Wagner(T, Tc, Pc, a, b, c, d):
-    r'''Calculates vapor pressure using the Wagner equation (2.5, 5 form).
+    r"""Calculates vapor pressure using the Wagner equation (2.5, 5 form).
 
     Requires critical temperature and pressure as well as four coefficients
     specific to each chemical.
@@ -1759,7 +1759,7 @@ def Wagner(T, Tc, Pc, a, b, c, d):
     .. [3] PPDS2 Temperature-Dependent Equation Forms. National Engineering
        Laboratory, 2004
        https://web.archive.org/web/20050510061545/http://www.ppds.co.uk/library/pdf/PPDS_EquationForms.pdf
-    '''
+    """
     Tr = T/Tc
     if Tr > 1.0:
         Tr = 1.0
@@ -2148,7 +2148,7 @@ def boiling_critical_relation(T, Tb, Tc, Pc):
 
 
 def Lee_Kesler(T, Tc, Pc, omega):
-    r'''Calculates vapor pressure of a fluid at arbitrary temperatures using a
+    r"""Calculates vapor pressure of a fluid at arbitrary temperatures using a
     CSP relationship by [1]_; requires a chemical's critical temperature and
     acentric factor.
 
@@ -2199,7 +2199,7 @@ def Lee_Kesler(T, Tc, Pc, omega):
        21, no. 3 (1975): 510-527. doi:10.1002/aic.690210313.
     .. [2] Reid, Robert C..; Prausnitz, John M.;; Poling, Bruce E.
        The Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     Tr = T/Tc
     logTr = log(Tr)
     Tr6 = Tr*Tr
@@ -2210,7 +2210,7 @@ def Lee_Kesler(T, Tc, Pc, omega):
 
 
 def Ambrose_Walton(T, Tc, Pc, omega):
-    r'''Calculates vapor pressure of a fluid at arbitrary temperatures using a
+    r"""Calculates vapor pressure of a fluid at arbitrary temperatures using a
     CSP relationship by [1]_; requires a chemical's critical temperature and
     acentric factor.
 
@@ -2268,7 +2268,7 @@ def Ambrose_Walton(T, Tc, Pc, omega):
        Chemistry 61, no. 8 (1989): 1395-1403. doi:10.1351/pac198961081395.
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     if T > Tc:
         T = Tc
     Tr = T/Tc
@@ -2287,7 +2287,7 @@ def Ambrose_Walton(T, Tc, Pc, omega):
 
 
 def Sanjari(T, Tc, Pc, omega):
-    r'''Calculates vapor pressure of a fluid at arbitrary temperatures using a
+    r"""Calculates vapor pressure of a fluid at arbitrary temperatures using a
     CSP relationship by [1]_. Requires a chemical's critical temperature,
     pressure, and acentric factor. Although developed for refrigerants,
     this model should have some general predictive ability.
@@ -2350,7 +2350,7 @@ def Sanjari(T, Tc, Pc, omega):
        Ghaheri. "An Accurate Generalized Model for Predict Vapor Pressure of
        Refrigerants." International Journal of Refrigeration 36, no. 4
        (June 2013): 1327-32. doi:10.1016/j.ijrefrig.2013.01.007.
-    '''
+    """
     Tr = T/Tc
     Tr_inv = 1.0/Tr
     log_Tr = log(Tr)
@@ -2362,7 +2362,7 @@ def Sanjari(T, Tc, Pc, omega):
 
 
 def Edalat(T, Tc, Pc, omega):
-    r'''Calculates vapor pressure of a fluid at arbitrary temperatures using a
+    r"""Calculates vapor pressure of a fluid at arbitrary temperatures using a
     CSP relationship by [1]_. Requires a chemical's critical temperature,
     pressure, and acentric factor. Claimed to have a higher accuracy than the
     Lee-Kesler CSP relationship.
@@ -2418,7 +2418,7 @@ def Edalat(T, Tc, Pc, omega):
     .. [1] Edalat, M., R. B. Bozar-Jomehri, and G. A. Mansoori. "Generalized
        Equation Predicts Vapor Pressure of Hydrocarbons." Oil and Gas Journal;
        91:5 (February 1, 1993).
-    '''
+    """
     tau = 1. - T/Tc
     a = -6.1559 - 4.0855*omega
     c = -0.8747 - 7.8874*omega
@@ -2433,7 +2433,7 @@ def Edalat(T, Tc, Pc, omega):
 ### Sublimation Pressure
 
 def Psub_Clapeyron(T, Tt, Pt, Hsub_t):
-    r'''Calculates sublimation pressure of a solid at arbitrary temperatures
+    r"""Calculates sublimation pressure of a solid at arbitrary temperatures
     using an approximate themodynamic identity - the Clapeyron equation as
     described in [1]_ and [2]_.
     Requires a chemical's triple temperature, triple pressure, and triple
@@ -2484,7 +2484,7 @@ def Psub_Clapeyron(T, Tt, Pt, Hsub_t):
        Sublimation Enthalpy of H2O Ice Ih between 0 and 273.16K." Geochimica et
        Cosmochimica Acta 71, no. 1 (January 1, 2007): 36-45.
        https://doi.org/10.1016/j.gca.2006.08.034.
-    '''
+    """
     ans = Pt*exp(Hsub_t*(T - Tt)/(R*T*Tt))
     # Truncation to avoid issues in later calculations
     return max(ans, 1e-200)

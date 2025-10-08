@@ -205,7 +205,7 @@ def __getattr__(name):
 pi_inv = 1.0/pi # TODO move to fluids.constants
 
 def PPDS8(T, Tc, a0, a1, a2, a3):
-    r'''Calculate the thermal conductivity of a liquid using the 4-term
+    r"""Calculate the thermal conductivity of a liquid using the 4-term
     `tau` polynomial developed by the PPDS and named PPDS equation 8.
 
     .. math::
@@ -245,13 +245,13 @@ def PPDS8(T, Tc, a0, a1, a2, a3):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondSatL/PPDS8.htm
-    '''
+    """
     tau = 1.0 - T/Tc
     tau_cbrt = tau**(1.0/3.0)
     return a0*(1.0 + a1*tau_cbrt + a2*tau_cbrt*tau_cbrt + a3*tau)
 
 def PPDS3(T, Tc, a1, a2, a3):
-    r'''Calculate the thermal conductivity of a low-pressure gas using the 3-term
+    r"""Calculate the thermal conductivity of a low-pressure gas using the 3-term
     `Tr` polynomial developed by the PPDS and named PPDS equation 3.
 
     .. math::
@@ -289,7 +289,7 @@ def PPDS3(T, Tc, a1, a2, a3):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ThermalCondG/PPDS3-ThermCondGas.htm
-    '''
+    """
     Tr = T/Tc
     Tr_inv = 1.0/Tr
     tot = Tr_inv*(a1 + Tr_inv*(a2 + a3*Tr_inv))
@@ -347,7 +347,7 @@ def Chemsep_16(T, A, B, C, D, E):
 
 
 def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
-    r'''Calculate the thermal conductivity of water or steam according to the
+    r"""Calculate the thermal conductivity of water or steam according to the
     2011 IAPWS [1]_ formulation. Critical enhancement is ignored unless
     parameters for it are provided.
 
@@ -462,7 +462,7 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
        International Formulation for the Thermal Conductivity of H2O."
        Journal of Physical and Chemical Reference Data 41, no. 3 (September 1,
        2012): 033102. doi:10.1063/1.4738955.
-    '''
+    """
     rhor = rho*0.003105590062111801#1/322.0
     Tr = T*0.0015453657571674064 # 1/647.096
     Tr_inv = 1.0/Tr
@@ -572,7 +572,7 @@ def k_IAPWS(T, rho, Cp=None, Cv=None, mu=None, drho_dP=None, drho_dP_Tr=None):
     return k
 
 def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=None):
-    r'''Calculate the thermal conductivity of air using the Lemmon and Jacobsen
+    r"""Calculate the thermal conductivity of air using the Lemmon and Jacobsen
     (2004) [1]_ formulation. The critical enhancement term is ignored unless
     all the rquired parameters for it are provided.
 
@@ -672,7 +672,7 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
        Conductivity Equations for Nitrogen, Oxygen, Argon, and Air."
        International Journal of Thermophysics 25, no. 1 (January 1, 2004):
        21-69. https://doi.org/10.1023/B:IJOT.0000022327.04529.f3.
-    '''
+    """
     R0 = 1.01
     Pc = 3.78502E6
     xi0 = 0.11E-9
@@ -745,7 +745,7 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
 ### Purely CSP Methods - Liquids
 
 def Sheffy_Johnson(T, MW, Tm):
-    r'''Calculate the thermal conductivity of a liquid as a function of
+    r"""Calculate the thermal conductivity of a liquid as a function of
     temperature using the Sheffy-Johnson (1961) method. Requires
     Temperature, molecular weight, and melting point.
 
@@ -781,12 +781,12 @@ def Sheffy_Johnson(T, MW, Tm):
     .. [1] Scheffy, W. J., and E. F. Johnson. "Thermal Conductivities of
        Liquids at High Temperatures." Journal of Chemical & Engineering Data
        6, no. 2 (April 1, 1961): 245-49. doi:10.1021/je60010a019
-    '''
+    """
     return 1.951*(1.0 - 0.00126*(T - Tm))*Tm**-0.216*MW**-0.3
 
 
 def Sato_Riedel(T, MW, Tb, Tc):
-    r'''Calculate the thermal conductivity of a liquid as a function of
+    r"""Calculate the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Sato-Riedel [1]_, [2]_, published in
     Reid [3]_. Requires temperature, molecular weight, and boiling and critical
     temperatures.
@@ -826,7 +826,7 @@ def Sato_Riedel(T, MW, Tb, Tc):
     .. [1] Riedel, L.: Chem. Ing. Tech., 21, 349 (1949); 23: 59, 321, 465 (1951)
     .. [2] Maejima, T., private communication, 1973
     .. [3] Properties of Gases and Liquids", 3rd Ed., McGraw-Hill, 1977
-    '''
+    """
     Tr = T/Tc
     Tbr = Tb/Tc
     Tr_term = 1.0 - Tr
@@ -836,7 +836,7 @@ def Sato_Riedel(T, MW, Tb, Tc):
 
 
 def Lakshmi_Prasad(T, MW):
-    r'''Estimates thermal conductivity of pure liquids as a function of
+    r"""Estimates thermal conductivity of pure liquids as a function of
     temperature using a reference fluid approach. Low accuracy but quick.
     Developed using several organic fluids.
 
@@ -871,12 +871,12 @@ def Lakshmi_Prasad(T, MW):
     .. [1] Lakshmi, D. S., and D. H. L. Prasad. "A Rapid Estimation Method for
        Thermal Conductivity of Pure Liquids." The Chemical Engineering Journal
        48, no. 3 (April 1992): 211-14. doi:10.1016/0300-9467(92)80037-B
-    '''
+    """
     return 0.0655 - 0.0005*T + (1.3855 - 0.00197*T)/sqrt(MW)
 
 
 def Gharagheizi_liquid(T, MW, Tb, Pc, omega):
-    r'''Estimates the thermal conductivity of a liquid as a function of
+    r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Gharagheizi [1]_. A  convoluted
     method claiming high-accuracy and using only statistically significant
     variable following analalysis.
@@ -930,7 +930,7 @@ def Gharagheizi_liquid(T, MW, Tb, Pc, omega):
         "Development of a General Model for Determination of Thermal
         Conductivity of Liquid Chemical Compounds at Atmospheric Pressure."
         AIChE Journal 59, no. 5 (May 1, 2013): 1702-8. doi:10.1002/aic.13938
-    '''
+    """
     M2 = MW*MW
     M4 = M2*M2
     Pc = Pc*1E-5
@@ -943,7 +943,7 @@ def Gharagheizi_liquid(T, MW, Tb, Pc, omega):
 
 
 def Nicola_original(T, MW, Tc, omega, Hfus):
-    r'''Estimates the thermal conductivity of a liquid as a function of
+    r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Nicola [1]_. A  simpler but long
     method claiming high-accuracy and using only statistically significant
     variable following analalysis.
@@ -991,14 +991,14 @@ def Nicola_original(T, MW, Tc, omega, Hfus):
         Roman Stryjek. "A New Equation for the Thermal Conductivity of Organic
         Compounds." Journal of Thermal Analysis and Calorimetry 116, no. 1
         (April 1, 2014): 135-40. doi:10.1007/s10973-013-3422-7
-    '''
+    """
     Tr = T/Tc
     Hfus = Hfus*1000.0
     return -0.5694 - 0.1436*Tr + 5.4893E-10*Hfus + 0.0508*omega + MW**-0.0622
 
 
 def Nicola(T, MW, Tc, Pc, omega):
-    r'''Estimates the thermal conductivity of a liquid as a function of
+    r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of [1]_. A statistically derived
     equation using any correlated terms.
 
@@ -1043,12 +1043,12 @@ def Nicola(T, MW, Tc, Pc, omega):
        Liquid Refrigerants at Atmospheric Pressure or near Saturation."
        International Journal of Refrigeration. 2014.
        doi:10.1016/j.ijrefrig.2014.06.003
-    '''
+    """
     return 0.5147*(-0.2537*T/Tc + 0.0017E-5*Pc + 0.1501*omega + MW**-0.2999)
 
 
 def Bahadori_liquid(T, MW):
-    r'''Estimates the thermal conductivity of parafin liquid hydrocarbons.
+    r"""Estimates the thermal conductivity of parafin liquid hydrocarbons.
     Fits their data well, and is useful as only MW is required.
     X is the Molecular weight, and Y the temperature.
 
@@ -1095,7 +1095,7 @@ def Bahadori_liquid(T, MW):
     .. [1] Bahadori, Alireza, and Saeid Mokhatab. "Estimating Thermal
        Conductivity of Hydrocarbons." Chemical Engineering 115, no. 13
        (December 2008): 52-54
-    '''
+    """
     A = (-6.48326E-2, 2.715015E-3, -1.08580E-5, 9.853917E-9)
     B = (1.565612E-2, -1.55833E-4, 5.051114E-7, -4.68030E-10)
     C = (-1.80304E-4, 1.758693E-6, -5.55224E-9, 5.201365E-12)
@@ -1110,7 +1110,7 @@ def Bahadori_liquid(T, MW):
 
 
 def kl_Mersmann_Kind(T, MW, Tc, Vc, na):
-    r'''Estimates the thermal conductivity of organic liquid substances
+    r"""Estimates the thermal conductivity of organic liquid substances
     according to the method of [1]_.
 
     .. math::
@@ -1157,7 +1157,7 @@ def kl_Mersmann_Kind(T, MW, Tc, Vc, na):
        Thermal Properties of Pure Liquids, of Critical Data, and of Vapor
        Pressure." Industrial & Engineering Chemistry Research, January 31,
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
-    '''
+    """
     lambda_star = (2/3.)*(na + 40.*sqrt(1. - T/Tc))
     Vc = Vc*1000.0 # m^3/mol to m^3/kmol
     N_A2 = N_A*1000.0 # Their avogadro's constant is per kmol
@@ -1295,7 +1295,7 @@ def Missenard(T, P, Tc, Pc, kl):
 
 
 def DIPPR9H(ws, ks):
-    r'''Calculates thermal conductivity of a liquid mixture according to
+    r"""Calculates thermal conductivity of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_.
 
     .. math::
@@ -1351,14 +1351,14 @@ def DIPPR9H(ws, ks):
     .. [3] Focke, Walter W. "Correlating Thermal-Conductivity Data for Ternary
        Liquid Mixtures." International Journal of Thermophysics 29, no. 4
        (August 1, 2008): 1342-60. https://doi.org/10.1007/s10765-008-0465-2.
-    '''
+    """
     kl = 0.0
     for i in range(len(ws)):
         kl += ws[i]/(ks[i]*ks[i])
     return 1.0/sqrt(kl)
 
 def DIPPR9I(zs, Vms, ks):
-    r'''Calculates thermal conductivity of a liquid mixture according to
+    r"""Calculates thermal conductivity of a liquid mixture according to
     mixing rules in [1]_. This is recommended in [2]_ for aqueous and
     nonaqueous systems.
 
@@ -1408,7 +1408,7 @@ def DIPPR9I(zs, Vms, ks):
        22, no. 5 (1976): 927-30. https://doi.org/10.1002/aic.690220520.
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
-    '''
+    """
     N = len(zs)
     k = 0.0
     # Precomputation
@@ -1577,7 +1577,7 @@ def Eucken_modified(MW, Cvm, mu):
 
 
 def DIPPR9B(T, MW, Cvm, mu, Tc=None, chemtype=None):
-    r'''Calculates the thermal conductivity of a gas using one of several
+    r"""Calculates the thermal conductivity of a gas using one of several
     emperical equations developed in [1]_, [2]_, and presented in [3]_.
 
     For monoatomic gases:
@@ -1638,7 +1638,7 @@ def DIPPR9B(T, MW, Cvm, mu, Tc=None, chemtype=None):
        Journal 10, no. 1 (January 1, 1964): 26-30. doi:10.1002/aic.690100114
     .. [3] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
-    '''
+    """
     Cvm = Cvm*1000.  # J/g/K to J/kmol/K
     if chemtype == "monoatomic":
         return 2.5*mu*Cvm/MW
@@ -1650,7 +1650,7 @@ def DIPPR9B(T, MW, Cvm, mu, Tc=None, chemtype=None):
 
 
 def Chung(T, MW, Tc, omega, Cvm, mu):
-    r'''Estimates the thermal conductivity of a gas as a function of
+    r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the CSP method of Chung [1]_.
 
     .. math::
@@ -1709,7 +1709,7 @@ def Chung(T, MW, Tc, omega, Cvm, mu):
        (February 1, 1984): 8-13. doi:10.1021/i100013a002
     .. [2] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     MW = MW*1e-3
     alpha = Cvm*R_inv - 1.5
     beta = 0.7862 - 0.7109*omega + 1.3168*omega*omega
@@ -1720,7 +1720,7 @@ def Chung(T, MW, Tc, omega, Cvm, mu):
 
 
 def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
-    r'''Estimates the thermal conductivity of a gas as a function of
+    r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the reference fluid method of Eli and Hanley [1]_ as
     shown in [2]_.
 
@@ -1803,7 +1803,7 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
        1983): 90-97. doi:10.1021/i100009a016.
     .. [2] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     Tr = T/Tc
     if Tr > 2.0:
         Tr = 2.0
@@ -1838,7 +1838,7 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
 
 
 def Gharagheizi_gas(T, MW, Tb, Pc, omega):
-    r'''Estimates the thermal conductivity of a gas as a function of
+    r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the CSP method of Gharagheizi [1]_. A  convoluted
     method claiming high-accuracy and using only statistically significant
     variable following analalysis.
@@ -1893,7 +1893,7 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
        "Development of a General Model for Determination of Thermal
        Conductivity of Liquid Chemical Compounds at Atmospheric Pressure."
        AIChE Journal 59, no. 5 (May 1, 2013): 1702-8. doi:10.1002/aic.13938
-    '''
+    """
     Pc = Pc*1e-4
     Tb_inv = 1.0/Tb
     B = (T + (2.*omega + 2.*T - 2.*T*(2.*omega + 3.2825)*Tb_inv + 3.2825)
@@ -1906,7 +1906,7 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
 
 
 def Bahadori_gas(T, MW):
-    r'''Estimates the thermal conductivity of hydrocarbons gases at low P.
+    r"""Estimates the thermal conductivity of hydrocarbons gases at low P.
     Fits their data well, and is useful as only MW is required.
     Y is the Molecular weight, and X the temperature.
 
@@ -1951,7 +1951,7 @@ def Bahadori_gas(T, MW):
     .. [1] Bahadori, Alireza, and Saeid Mokhatab. "Estimating Thermal
        Conductivity of Hydrocarbons." Chemical Engineering 115, no. 13
        (December 2008): 52-54
-    '''
+    """
     A = (4.3931323468E-1, -3.88001122207E-2, 9.28616040136E-4, -6.57828995724E-6)
     B = (-2.9624238519E-3, 2.67956145820E-4, -6.40171884139E-6, 4.48579040207E-8)
     C = (7.54249790107E-6, -6.46636219509E-7, 1.5124510261E-8, -1.0376480449E-10)
@@ -1968,7 +1968,7 @@ def Bahadori_gas(T, MW):
 ### Thermal Conductivity of dense gases
 
 def Stiel_Thodos_dense(T, MW, Tc, Pc, Vc, Zc, Vm, kg):
-    r'''Estimates the thermal conductivity of a gas at high pressure as a
+    r"""Estimates the thermal conductivity of a gas at high pressure as a
     function of temperature using difference method of Stiel and Thodos [1]_
     as shown in [2]_.
 
@@ -2031,7 +2031,7 @@ def Stiel_Thodos_dense(T, MW, Tc, Pc, Vc, Zc, Vm, kg):
        Journal 10, no. 1 (January 1, 1964): 26-30. doi:10.1002/aic.690100114.
     .. [2] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     gamma = 210.0*(Tc*MW*MW*MW*(Pc*1e-5)**-4.0)**(1.0/6.0)
     rhor = Vc/Vm
     if rhor < 0.5:
@@ -2047,7 +2047,7 @@ def Stiel_Thodos_dense(T, MW, Tc, Pc, Vc, Zc, Vm, kg):
 
 
 def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
-    r'''Estimates the thermal conductivity of a gas at high pressure as a
+    r"""Estimates the thermal conductivity of a gas at high pressure as a
     function of temperature using the reference fluid method of Eli and
     Hanley [1]_ as shown in [2]_.
 
@@ -2150,7 +2150,7 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
        1983): 90-97. doi:10.1021/i100009a016.
     .. [2] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     Cs = [2.907741307E6, -3.312874033E6, 1.608101838E6, -4.331904871E5,
           7.062481330E4, -7.116620750E3, 4.325174400E2, -1.445911210E1,
           2.037119479E-1]
@@ -2227,7 +2227,7 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
 
 
 def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
-    r'''Estimates the thermal conductivity of a gas at high pressure as a
+    r"""Estimates the thermal conductivity of a gas at high pressure as a
     function of temperature using the reference fluid method of
     Chung [1]_ as shown in [2]_.
 
@@ -2324,7 +2324,7 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
        27, no. 4 (April 1, 1988): 671-79. doi:10.1021/ie00076a024.
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     Tr = T/Tc
     mur = 131.3*dipole*(Vc*1E6*Tc)**-0.5
     mur4 = mur*mur
@@ -2357,7 +2357,7 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
 
 
 def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
-    r'''Calculates thermal conductivity of a gas mixture according to
+    r"""Calculates thermal conductivity of a gas mixture according to
     mixing rules in [1]_ and also in [2]_. It is significantly more complicated
     than other kinetic theory models.
 
@@ -2421,7 +2421,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     .. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     N = len(ys)
     S_roots = [0.0]*N
     bigis = [0.0]*N

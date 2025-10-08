@@ -318,7 +318,7 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     return rho if MW is None else 0.001 * MW / rho
 
 def TDE_VDNS_rho(T, Tc, rhoc, a1, a2, a3, a4, MW=None):
-    r'''Calculates saturation liquid volume, using the critical properties
+    r"""Calculates saturation liquid volume, using the critical properties
     and fitted coefficients in the TDE VDNW form from [1]_.
 
     .. math::
@@ -358,13 +358,13 @@ def TDE_VDNS_rho(T, Tc, rhoc, a1, a2, a3, a4, MW=None):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-DensityLG/VDNSExpansion.htm.
-    '''
+    """
     tau = 1.0 - T/Tc
     rho = rhoc + a1*tau**0.35 + tau*(a2 + tau*(a3 + a4*tau))
     return rho if MW is None else 0.001 * MW / rho
 
 def PPDS17(T, Tc, a0, a1, a2, MW=None):
-    r'''Calculates saturation liquid volume, using the critical temperature
+    r"""Calculates saturation liquid volume, using the critical temperature
     and fitted coefficients in the PPDS17 form in [1]_.
 
     .. math::
@@ -402,7 +402,7 @@ def PPDS17(T, Tc, a0, a1, a2, MW=None):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-DensityLG/PPDS17.htm.
-    '''
+    """
     tau = 1.0 - T/Tc
     rho = 1.0/(a0*(a1 + a2*tau)**(1.0 + tau**(2.0/7.)))
     return rho if MW is None else 0.001 * MW / rho
@@ -411,7 +411,7 @@ def PPDS17(T, Tc, a0, a1, a2, MW=None):
 ### Critical-properties based
 
 def Yen_Woods_saturation(T, Tc, Vc, Zc):
-    r'''Calculates saturation liquid volume, using the Yen and Woods [1]_ CSP
+    r"""Calculates saturation liquid volume, using the Yen and Woods [1]_ CSP
     method and a chemical's critical properties.
 
     The molar volume of a liquid is given by:
@@ -468,7 +468,7 @@ def Yen_Woods_saturation(T, Tc, Vc, Zc):
     .. [1] Yen, Lewis C., and S. S. Woods. "A Generalized Equation for Computer
        Calculation of Liquid Densities." AIChE Journal 12, no. 1 (1966):
        95-99. doi:10.1002/aic.690120119
-    '''
+    """
     Tr = T/Tc
     A = Zc*(Zc*(989.625 - 1522.06*Zc) - 214.578) + 17.4425
     if Zc <= 0.26:
@@ -482,7 +482,7 @@ def Yen_Woods_saturation(T, Tc, Vc, Zc):
 
 
 def Rackett(T, Tc, Pc, Zc):
-    r'''Calculates saturation liquid volume, using Rackett CSP method and
+    r"""Calculates saturation liquid volume, using Rackett CSP method and
     critical properties.
 
     The molar volume of a liquid is given by:
@@ -525,11 +525,11 @@ def Rackett(T, Tc, Pc, Zc):
     .. [1] Rackett, Harold G. "Equation of State for Saturated Liquids."
        Journal of Chemical & Engineering Data 15, no. 4 (1970): 514-517.
        doi:10.1021/je60047a012
-    '''
+    """
     return R*Tc/Pc*Zc**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
 def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
-    r'''Calculates saturation liquid volume, using the Rackett equation form
+    r"""Calculates saturation liquid volume, using the Rackett equation form
     and a known or estimated critical temperature and density as well
     as fit parameters `b` and `n`.
 
@@ -597,14 +597,14 @@ def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
     .. [2] Yaws, Carl L. "Liquid Density of the Elements: A Comprehensive
        Tabulation for All the Important Elements from Ag to Zr." Chemical
        Engineering 114, no. 12 (2007): 44-47.
-    '''
+    """
     rho_calc = rhoc*b**(-(1.0 - T/Tc)**n)
     if MW is not None:
         return 1e-3*MW/rho_calc
     return 1.0/rho_calc
 
 def Yamada_Gunn(T, Tc, Pc, omega):
-    r'''Calculates saturation liquid volume, using Yamada and Gunn CSP method
+    r"""Calculates saturation liquid volume, using Yamada and Gunn CSP method
     and a chemical's critical properties and acentric factor.
 
     The molar volume of a liquid is given by:
@@ -650,12 +650,12 @@ def Yamada_Gunn(T, Tc, Pc, omega):
     .. [2] Yamada, Tomoyoshi, and Robert D. Gunn. "Saturated Liquid Molar
         Volumes. Rackett Equation." Journal of Chemical & Engineering Data 18,
         no. 2 (1973): 234-36. doi:10.1021/je60057a006
-    '''
+    """
     return R*Tc/Pc*(0.29056 - 0.08775*omega)**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
 
 def Townsend_Hales(T, Tc, Vc, omega):
-    r'''Calculates saturation liquid density, using the Townsend and Hales
+    r"""Calculates saturation liquid density, using the Townsend and Hales
     CSP method as modified from the original Riedel equation. Uses
     chemical critical volume and temperature, as well as acentric factor
 
@@ -694,7 +694,7 @@ def Townsend_Hales(T, Tc, Vc, omega):
     .. [1] Hales, J. L, and R Townsend. "Liquid Densities from 293 to 490 K of
        Nine Aromatic Hydrocarbons." The Journal of Chemical Thermodynamics
        4, no. 5 (1972): 763-72. doi:10.1016/0021-9614(72)90050-X
-    '''
+    """
     Tr = T/Tc
     return Vc/(1.0 + 0.85*(1.0-Tr) + (1.692 + 0.986*omega)*(1.0-Tr)**(1.0/3.))
 
@@ -714,7 +714,7 @@ Bhirud_normal_lnU1_tck = implementation_optimize_tck([[0.98, 0.98, 0.98, 0.98, 0
 
 
 def Bhirud_normal(T, Tc, Pc, omega):
-    r'''Calculates saturation liquid density using the Bhirud [1]_ CSP method.
+    r"""Calculates saturation liquid density using the Bhirud [1]_ CSP method.
     Uses Critical temperature and pressure and acentric factor.
 
     The density of a liquid is given by:
@@ -765,7 +765,7 @@ def Bhirud_normal(T, Tc, Pc, omega):
     .. [1] Bhirud, Vasant L. "Saturated Liquid Densities of Normal Fluids."
        AIChE Journal 24, no. 6 (November 1, 1978): 1127-31.
        doi:10.1002/aic.690240630
-    '''
+    """
     Tr = T/Tc
     if Tr > 1.0:
         Tr = 1.0
@@ -785,7 +785,7 @@ def Bhirud_normal(T, Tc, Pc, omega):
 
 
 def COSTALD(T, Tc, Vc, omega):
-    r'''Calculate saturation liquid density using the COSTALD CSP method.
+    r"""Calculate saturation liquid density using the COSTALD CSP method.
 
     A popular and accurate estimation method. If possible, fit parameters are
     used; alternatively critical properties work well.
@@ -843,7 +843,7 @@ def COSTALD(T, Tc, Vc, omega):
     .. [1] Hankinson, Risdon W., and George H. Thomson. "A New Correlation for
        Saturated Densities of Liquids and Their Mixtures." AIChE Journal
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
-    '''
+    """
     if T > Tc:
         T = Tc
     Tr = T/Tc
@@ -855,7 +855,7 @@ def COSTALD(T, Tc, Vc, omega):
 
 
 def Campbell_Thodos(T, Tb, Tc, Pc, MW, dipole=0.0, has_hydroxyl=False):
-    r'''Calculate saturation liquid density using the Campbell-Thodos [1]_
+    r"""Calculate saturation liquid density using the Campbell-Thodos [1]_
     CSP method.
 
     An old and uncommon estimation method.
@@ -940,7 +940,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, MW, dipole=0.0, has_hydroxyl=False):
        Liquid Densities and Critical Volumes for Polar and Nonpolar
        Substances." Journal of Chemical & Engineering Data 30, no. 1
        (January 1, 1985): 102-11. doi:10.1021/je00039a032.
-    '''
+    """
     Tc_inv = 1.0/Tc
     Tr = T * Tc_inv
     Tbr = Tb * Tc_inv
@@ -965,7 +965,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, MW, dipole=0.0, has_hydroxyl=False):
 
 
 def SNM0(T, Tc, Vc, omega, delta_SRK=None):
-    r'''Calculates saturated liquid density using the Mchaweh, Moshfeghian
+    r"""Calculates saturated liquid density using the Mchaweh, Moshfeghian
     model [1]_. Designed for simple calculations.
 
     .. math::
@@ -1024,7 +1024,7 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
        "A Simplified Method for Calculating Saturated Liquid Densities."
        Fluid Phase Equilibria 224, no. 2 (October 1, 2004): 157-67.
        doi:10.1016/j.fluid.2004.06.054
-    '''
+    """
     Tr = T/Tc
     m = 0.480 + 1.574*omega - 0.176*omega*omega
     x0 = (1.0 + m*(1.0 - sqrt(Tr)))
@@ -1095,7 +1095,7 @@ def CRC_inorganic(T, rho0, k, Tm, MW=None):
 
 
 def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
-    r'''Calculates compressed-liquid volume, using the COSTALD [1]_ CSP
+    r"""Calculates compressed-liquid volume, using the COSTALD [1]_ CSP
     method and a chemical's critical properties.
 
     The molar volume of a liquid is given by:
@@ -1153,7 +1153,7 @@ def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
     .. [1]  Thomson, G. H., K. R. Brobst, and R. W. Hankinson. "An Improved
        Correlation for Densities of Compressed Liquids and Liquid Mixtures."
        AIChE Journal 28, no. 4 (July 1, 1982): 671-76. doi:10.1002/aic.690280420
-    '''
+    """
     a = -9.070217
     b = 62.45326
     d = -135.1102
@@ -1333,7 +1333,7 @@ def Amgat(xs, Vms):
 
 
 def Rackett_mixture(T, xs, MWs, Tcs, Pcs, Zrs):
-    r'''Calculate mixture liquid density using the Rackett-derived mixing rule
+    r"""Calculate mixture liquid density using the Rackett-derived mixing rule
     as shown in [2]_.
 
     .. math::
@@ -1386,7 +1386,7 @@ def Rackett_mixture(T, xs, MWs, Tcs, Pcs, Zrs):
        doi:10.1021/je60047a012
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
-    '''
+    """
     bigsum, Tc, Zr, MW = 0.0, 0.0, 0.0, 0.0
 
     # Fastest for numba and PyPy and CPython
@@ -1401,7 +1401,7 @@ def Rackett_mixture(T, xs, MWs, Tcs, Pcs, Zrs):
 
 
 def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
-    r'''Calculate mixture liquid density using the COSTALD CSP method.
+    r"""Calculate mixture liquid density using the COSTALD CSP method.
 
     A popular and accurate estimation method. If possible, fit parameters are
     used; alternatively critical properties work well.
@@ -1457,7 +1457,7 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
     .. [1] Hankinson, Risdon W., and George H. Thomson. "A New Correlation for
        Saturated Densities of Liquids and Their Mixtures." AIChE Journal
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
-    '''
+    """
     N = len(xs)
     sum1, sum2, sum3, omega = 0.0, 0.0, 0.0, 0.0
     for i in range(N):
@@ -1515,7 +1515,7 @@ def ideal_gas(T, P):
 ### Solids
 
 def Goodman(T, Tt, Vml):
-    r'''Calculates solid density at T using the simple relationship
+    r"""Calculates solid density at T using the simple relationship
     by a member of the DIPPR.
 
     The molar volume of a solid is given by:
@@ -1556,7 +1556,7 @@ def Goodman(T, Tt, Vml):
        Richard L. Rowley. "A Note on the Relationship between Organic Solid
        Density and Liquid Density at the Triple Point." Journal of Chemical &
        Engineering Data 49, no. 6 (2004): 1512-14. doi:10.1021/je034220e.
-    '''
+    """
     return Vml/(1.28 - 0.16*(T/Tt))
 
 

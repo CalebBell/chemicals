@@ -272,7 +272,7 @@ def sigma_IAPWS(T):
 ### Regressed coefficient-based functions
 
 def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
-    r'''Calculates air-liquid surface tension  using the REFPROP_sigma [1]_
+    r"""Calculates air-liquid surface tension  using the REFPROP_sigma [1]_
     regression-based method. Relatively recent, and most accurate.
 
     .. math::
@@ -331,7 +331,7 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
        Michael Frenkel. "ThermoData Engine (TDE): Software Implementation of
        the Dynamic Data Evaluation Concept." Journal of Chemical Information
        and Modeling 53, no. 12 (2013): 3418-30. doi:10.1021/ci4005699.
-    '''
+    """
     Tr = T/Tc
     tau = 1.0 - Tr
     if tau <= 0.0:
@@ -345,7 +345,7 @@ def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
 
 
 def PPDS14(T, Tc, a0, a1, a2):
-    r'''Calculates air-liquid surface tension  using the [1]_
+    r"""Calculates air-liquid surface tension  using the [1]_
     emperical (parameter-regressed) method, called the PPDS 14 equation for
     surface tension.
 
@@ -395,14 +395,14 @@ def PPDS14(T, Tc, a0, a1, a2):
        Implementation of the Dynamic Data Evaluation Concept." Journal of
        Chemical Information and Modeling 45, no. 4 (July 1, 2005): 816-38.
        https://doi.org/10.1021/ci050067b.
-    '''
+    """
     tau = 1.0 - T/Tc
     if tau <= 0.0:
         return 0.0
     return a0*tau**a1*(1.0 + a2*tau)
 
 def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
-    r'''Calculates air-liquid surface tension using the Watson [1]_
+    r"""Calculates air-liquid surface tension using the Watson [1]_
     emperical (parameter-regressed) method developed by NIST.
 
     .. math::
@@ -455,7 +455,7 @@ def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/HVPExpansion-SurfaceTension.htm
-    '''
+    """
     Tr = T/Tc
     if Tr >= 1.0:
         return 0.0
@@ -463,7 +463,7 @@ def Watson_sigma(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     return exp(a1 + l*(a2 + Tr*(a3 + Tr*(a4 + a5*Tr))))
 
 def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
-    r'''Calculates air-liquid surface tension using the IST expansion [1]_
+    r"""Calculates air-liquid surface tension using the IST expansion [1]_
     emperical (parameter-regressed) method developed by NIST.
 
     .. math::
@@ -508,14 +508,14 @@ def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-SurfaceTension/ISTExpansion-SurfaceTension.htm
-    '''
+    """
     tau = 1.0 - T/Tc
     if tau <= 0.0:
         return 0.0
     return tau*(a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau))))
 
 def Somayajulu(T, Tc, A, B, C):
-    r'''Calculates air-liquid surface tension  using the [1]_
+    r"""Calculates air-liquid surface tension  using the [1]_
     emperical (parameter-regressed) method. Well regressed, no recent data.
 
     .. math::
@@ -564,7 +564,7 @@ def Somayajulu(T, Tc, A, B, C):
     .. [1] Somayajulu, G. R. "A Generalized Equation for Surface Tension from
        the Triple Point to the Critical Point." International Journal of
        Thermophysics 9, no. 4 (July 1988): 559-66. doi:10.1007/BF00503154.
-    '''
+    """
     if T >= Tc:
         return 0.0
     X = (Tc-T)/Tc
@@ -572,7 +572,7 @@ def Somayajulu(T, Tc, A, B, C):
 
 
 def Jasper(T, a, b):
-    r'''Calculates surface tension of a fluid given two parameters, a linear
+    r"""Calculates surface tension of a fluid given two parameters, a linear
     fit in Celcius from [1]_ with data reprinted in [2]_.
 
     .. math::
@@ -612,7 +612,7 @@ def Jasper(T, a, b):
        (October 1, 1972): 841-1010. doi:10.1063/1.3253106.
     .. [2] Speight, James. Lange's Handbook of Chemistry. 16 edition.
        McGraw-Hill Professional, 2005.
-    '''
+    """
     sigma = (a - b*(T-273.15))*1e-3
     if sigma < 0.0:
         return 0.0
@@ -623,7 +623,7 @@ def Jasper(T, a, b):
 
 
 def Brock_Bird(T, Tb, Tc, Pc):
-    r'''Calculates air-liquid surface tension using the [1]_
+    r"""Calculates air-liquid surface tension using the [1]_
     emperical method. Old and tested.
 
     .. math::
@@ -675,7 +675,7 @@ def Brock_Bird(T, Tb, Tc, Pc):
     .. [1] Brock, James R., and R. Byron Bird. "Surface Tension and the
        Principle of Corresponding States." AIChE Journal 1, no. 2
        (June 1, 1955): 174-77. doi:10.1002/aic.690010208
-    '''
+    """
     if T >= Tc:
         return 0.0
     Tc_inv = 1.0/Tc
@@ -689,7 +689,7 @@ def Brock_Bird(T, Tb, Tc, Pc):
 
 
 def Pitzer_sigma(T, Tc, Pc, omega):
-    r'''Calculates air-liquid surface tension using the correlation derived
+    r"""Calculates air-liquid surface tension using the correlation derived
     by [1]_ from the works of [2]_ and [3]_. Based on critical property CSP
     methods.
 
@@ -737,7 +737,7 @@ def Pitzer_sigma(T, Tc, Pc, omega):
        doi:10.1021/ie50578a047
     .. [3] Pitzer, K. S.: Thermodynamics, 3d ed., New York, McGraw-Hill,
        1995, p. 521.
-    '''
+    """
     if T >= Tc:
         return 0.0
     Tr = T/Tc
@@ -748,7 +748,7 @@ def Pitzer_sigma(T, Tc, Pc, omega):
 
 
 def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
-    r'''Calculates air-liquid surface tension using the correlation derived by
+    r"""Calculates air-liquid surface tension using the correlation derived by
     [1]_ based on critical property CSP methods and chemical classes.
 
     .. math::
@@ -792,7 +792,7 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
        Surface Tension of Organic Liquids." The Chemical Engineering Journal
        and the Biochemical Engineering Journal 59, no. 2 (October 1995): 181-86.
        doi:10.1016/0923-0467(94)02946-6.
-    '''
+    """
     if T >= Tc:
         return 0.0
     if chemicaltype == "alcohol":
@@ -810,7 +810,7 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
 
 
 def Zuo_Stenby(T, Tc, Pc, omega):
-    r'''Calculates air-liquid surface tension using the reference fluids
+    r"""Calculates air-liquid surface tension using the reference fluids
     methods of [1]_.
 
     .. math::
@@ -862,7 +862,7 @@ def Zuo_Stenby(T, Tc, Pc, omega):
        Parachor Models for the Calculation of Interfacial Tensions." The
        Canadian Journal of Chemical Engineering 75, no. 6 (December 1, 1997):
        1130-37. doi:10.1002/cjce.5450750617
-    '''
+    """
     if T >= Tc:
         return 0.0
     Tc_1, Pc_1, omega_1 = 190.56, 4599000.0*1e-5, 0.012
@@ -884,7 +884,7 @@ def Zuo_Stenby(T, Tc, Pc, omega):
 
 
 def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
-    r'''Calculates air-liquid surface tension using the reference fluids methods
+    r"""Calculates air-liquid surface tension using the reference fluids methods
     of [1]_.
 
     .. math::
@@ -933,7 +933,7 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
        Relationship for the Surface Tension of Polar Fluids." Industrial &
        Engineering Chemistry Fundamentals 10, no. 1 (February 1, 1971): 174-75.
        doi:10.1021/i160037a032.
-    '''
+    """
     if T >= Tc:
         return 0.0
     omega2 = omega*omega
@@ -950,7 +950,7 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
 
 
 def Miqueu(T, Tc, Vc, omega):
-    r'''Calculates air-liquid surface tension using the methods of [1]_.
+    r"""Calculates air-liquid surface tension using the methods of [1]_.
 
     .. math::
         \sigma = k T_c \left( \frac{N_a}{V_c}\right)^{2/3}
@@ -997,7 +997,7 @@ def Miqueu(T, Tc, Vc, omega):
        of the Surface Tension of Pure Compounds Inferred from an Analysis of
        Experimental Data." Fluid Phase Equilibria 172, no. 2 (July 5, 2000):
        169-82. doi:10.1016/S0378-3812(00)00384-8.
-    '''
+    """
     if T >= Tc:
         return 0.0
     Vc = Vc*1E6
@@ -1007,7 +1007,7 @@ def Miqueu(T, Tc, Vc, omega):
 
 
 def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
-    r'''Calculates vapor-liquid surface tension using the correlation derived by
+    r"""Calculates vapor-liquid surface tension using the correlation derived by
     [1]_ based on critical property CSP methods.
 
     .. math::
@@ -1073,7 +1073,7 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
        "A Model for the Estimation of Surface Tension of Pure Hydrocarbon
        Liquids." Petroleum Science and Technology 33, no. 23-24 (December 17,
        2015): 1908-15. doi:10.1080/10916466.2015.1110593.
-    '''
+    """
     MW = MW*1e-3 # Use kg/mol for consistency with the other units
     sphericity = 1. - MW*(0.0047 - 6.8E-6*MW)
     res = sphericity*MW**(1.0/3.0)/(6.*N_A**(1.0/3.0))*rhol**(2.0/3.)*(Hvap_Tb + Cpl*(Tb-T))
@@ -1083,7 +1083,7 @@ def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
 
 
 def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
-    r'''Estimates the surface tension of organic liquid substances
+    r"""Estimates the surface tension of organic liquid substances
     according to the method of [1]_.
 
     .. math::
@@ -1134,7 +1134,7 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
        Thermal Properties of Pure Liquids, of Critical Data, and of Vapor
        Pressure." Industrial & Engineering Chemistry Research, January 31,
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
-    '''
+    """
     if T >= Tc:
         return 0.0
     Tr = T/Tc
@@ -1144,7 +1144,7 @@ def Mersmann_Kind_sigma(T, Tm, Tb, Tc, Pc, n_associated=1):
 
 
 def sigma_Gharagheizi_1(T, Tc, MW, omega):
-    r'''Calculates air-liquid surface tension using the
+    r"""Calculates air-liquid surface tension using the
     equation 4 derived in [1]_ by gene expression programming.
 
     .. math::
@@ -1189,7 +1189,7 @@ def sigma_Gharagheizi_1(T, Tc, MW, omega):
        and Dominique Richon. "Development of Corresponding States Model for
        Estimation of the Surface Tension of Chemical Compounds." AIChE Journal 59,
        no. 2 (2013): 613-21. https://doi.org/10.1002/aic.13824.
-    '''
+    """
     # Equation 4
     A = (Tc - T - omega)
     if A < 0.0:
@@ -1198,7 +1198,7 @@ def sigma_Gharagheizi_1(T, Tc, MW, omega):
     return sigma
 
 def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
-    r'''Calculates air-liquid surface tension using the
+    r"""Calculates air-liquid surface tension using the
     equation 6 derived in [1]_ by gene expression programming.
 
     .. math::
@@ -1245,7 +1245,7 @@ def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
        and Dominique Richon. "Development of Corresponding States Model for
        Estimation of the Surface Tension of Chemical Compounds." AIChE Journal 59,
        no. 2 (2013): 613-21. https://doi.org/10.1002/aic.13824.
-    '''
+    """
     # Equation 6
     if T >= Tc:
         return 0.0
@@ -1311,7 +1311,7 @@ def API10A32(T, Tc, K_W):
 ### Surface Tension Mixtures
 
 def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
-    r'''Calculates surface tension of a liquid mixture according to
+    r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_.
 
     .. math::
@@ -1359,7 +1359,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
        (November 1, 1978): 1010-14. doi:10.1002/aic.690240610.
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
-    '''
+    """
     N = len(xs)
     Vms = [0.0]*N
     rho = 0.0
@@ -1387,7 +1387,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
 
 
 def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
-    r'''Calculates surface tension of a liquid mixture according to
+    r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_.
 
     .. math::
@@ -1447,7 +1447,7 @@ def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
     .. [1] Diguilio, Ralph, and Amyn S. Teja. "Correlation and Prediction of
        the Surface Tensions of Mixtures." The Chemical Engineering Journal 38,
        no. 3 (July 1988): 205-8. doi:10.1016/0300-9467(88)80079-0.
-    '''
+    """
     Tc, Tb, sigmar = 0.0, 0.0, 0.0
     for i in range(len(xs)):
         Tc += Tcs[i]*xs[i]
@@ -1460,7 +1460,7 @@ def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
 
 
 def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
-    r'''Calculates surface tension of a liquid mixture according to
+    r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_. This is based on the
     Parachor concept. This is called the Macleod-Sugden model in some places.
 
@@ -1509,7 +1509,7 @@ def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
        no. 2 (February 1, 1943): 239-246. https://doi.org/10.1021/ie50398a028.
     .. [2] Pedersen, Karen Schou, Aage Fredenslund, and Per Thomassen.
        Properties of Oils and Natural Gases. Vol. 5. Gulf Pub Co, 1989.
-    '''
+    """
     tot = 0.0
     rhoml = 1.0/Vml
     rhomg = 1.0/Vmg
@@ -1523,7 +1523,7 @@ def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
 
 
 def Meybodi_Daryasafar_Karimi(rho_water, rho_oil, T, Tc):
-    r'''Calculates the interfacial tension between water and a hydrocabon
+    r"""Calculates the interfacial tension between water and a hydrocabon
     liquid according to the correlation of [1]_.
 
     .. math::
@@ -1562,7 +1562,7 @@ def Meybodi_Daryasafar_Karimi(rho_water, rho_oil, T, Tc):
        "Determination of Hydrocarbon-Water Interfacial Tension Using a New
        Empirical Correlation."  Fluid Phase Equilibria 415 (May 15, 2016):
        42-50. doi:10.1016/j.fluid.2016.01.037.
-    '''
+    """
     A1 = -1.3687340042E-1
     A2 = -3.0391828884E-1
     A3 = 5.6225871072E-1

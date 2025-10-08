@@ -117,7 +117,7 @@ def dipole_moment_methods(CASRN):
 
 @mark_numba_incompatible
 def dipole_moment(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's dipole moment.
+    r"""This function handles the retrieval of a chemical's dipole moment.
     Lookup is based on CASRNs. Will automatically select a data source to use
     if no method is provided; returns None if the data is not available.
 
@@ -185,7 +185,7 @@ def dipole_moment(CASRN, method=None):
        Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure
        Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65.
        https://doi.org/10.1002/wcms.93.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "dipole_moment")
         if found: return val

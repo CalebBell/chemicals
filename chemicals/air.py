@@ -1798,7 +1798,7 @@ def lemmon2000_air_P_bubble(T):
 
 
 def lemmon2000_P(T, rho):
-    r'''Calculate the pressure of air according to the (2000)
+    r"""Calculate the pressure of air according to the (2000)
     given a temperature `T` and molar density `rho`.
 
     Parameters
@@ -1832,7 +1832,7 @@ def lemmon2000_P(T, rho):
        Nitrogen, Argon, and Oxygen From 60 to 2000 K at Pressures to 2000 MPa."
        Journal of Physical and Chemical Reference Data 29, no. 3 (May 1, 2000):
        331-85. https://doi.org/10.1063/1.1285884.
-    '''
+    """
     tau = lemmon2000_air_T_reducing/T
     delta = rho*lemmon2000_air_rho_reducing_inv
     dAddelta_res_val = lemmon2000_air_dAr_ddelta(tau, delta)
@@ -1855,7 +1855,7 @@ def lemmon2000_rho_err(rho, T, P_spec):
 
 
 def lemmon2000_rho(T, P):
-    r'''Calculate the density of air according to the Lemmon (2000) [1]_
+    r"""Calculate the density of air according to the Lemmon (2000) [1]_
     given a temperature `T` and pressure `P`.
 
     Parameters
@@ -1893,7 +1893,7 @@ def lemmon2000_rho(T, P):
        Nitrogen, Argon, and Oxygen From 60 to 2000 K at Pressures to 2000 MPa."
        Journal of Physical and Chemical Reference Data 29, no. 3 (May 1, 2000):
        331-85. https://doi.org/10.1063/1.1285884.
-    '''
+    """
     a = 1e-20 # Value where error is always negative
     b = 500000.0 # value where error is always positive
 
@@ -1930,7 +1930,7 @@ def lemmon2000_T_err(T, rho, P_spec):
     return err, dP_dT
 
 def lemmon2000_T(P, rho):
-    r'''Calculate the temperature of air according to the Lemmon (2000) [1]_
+    r"""Calculate the temperature of air according to the Lemmon (2000) [1]_
     given a pressure `P` and molar density `rho` .
 
     Parameters
@@ -1962,7 +1962,7 @@ def lemmon2000_T(P, rho):
        Nitrogen, Argon, and Oxygen From 60 to 2000 K at Pressures to 2000 MPa."
        Journal of Physical and Chemical Reference Data 29, no. 3 (May 1, 2000):
        331-85. https://doi.org/10.1063/1.1285884.
-    '''
+    """
     # Estimate the initial temperature by fitting a second virial coefficient
     # to a quadratic. Choose 1 atm as the pressure instead of using the theoretical
     # virial coefficient as that pressure range is more common
@@ -2006,7 +2006,7 @@ def lemmon2000_T(P, rho):
 TEOS10_CAAW_coeffs = [0.482737E-9, 1.05678E-7, -6.56394E-5,  0.294442E-1, -3.19317][::-1]
 
 def TEOS10_CAAW_derivatives(T):
-    r'''Calculates the third molar virial cross coefficient between
+    r"""Calculates the third molar virial cross coefficient between
     air and air-water according to [1]_.
 
     .. math::
@@ -2051,7 +2051,7 @@ def TEOS10_CAAW_derivatives(T):
        "Thermodynamic Properties of Real Moist Air, Dry Air, Steam, Water, and
        Ice (RP-1485)." HVAC&R Research 15, no. 5 (September 1, 2009): 961-986.
        https://doi.org/10.1080/10789669.2009.10390874.
-    '''
+    """
     T_inv = 1.0/T
     d0, d1, d2, d3 = horner_and_der3(TEOS10_CAAW_coeffs, T_inv)
     T_inv2 = T_inv*T_inv
@@ -2061,7 +2061,7 @@ def TEOS10_CAAW_derivatives(T):
             -(6.0*(d1 + d2*T_inv) + d3*T_inv2)*T_inv2*T_inv2)
 
 def TEOS10_CAWW_derivatives(T):
-    r'''Calculates the third molar virial cross coefficient between
+    r"""Calculates the third molar virial cross coefficient between
     air and water-water according to [1]_.
 
     .. math::
@@ -2107,7 +2107,7 @@ def TEOS10_CAWW_derivatives(T):
        "Thermodynamic Properties of Real Moist Air, Dry Air, Steam, Water, and
        Ice (RP-1485)." HVAC&R Research 15, no. 5 (September 1, 2009): 961-986.
        https://doi.org/10.1080/10789669.2009.10390874.
-    '''
+    """
     T_inv = 1.0/T
     expt = exp(T_inv*(T_inv*(33406000.0*T_inv - 383383.0) + 3478.02))
     d0 = -2.190323971261093e-11*expt
@@ -2128,7 +2128,7 @@ def TEOS10_CAWW_derivatives(T):
     return (d0, d1, d2, d3)
 
 def TEOS10_BAW_derivatives(T):
-    r'''Calculates the second molar virial cross coefficient between
+    r"""Calculates the second molar virial cross coefficient between
     air and water according to [1]_.
 
     .. math::
@@ -2176,7 +2176,7 @@ def TEOS10_BAW_derivatives(T):
        "Thermodynamic Properties of Real Moist Air, Dry Air, Steam, Water, and
        Ice (RP-1485)." HVAC&R Research 15, no. 5 (September 1, 2009): 961-986.
        https://doi.org/10.1080/10789669.2009.10390874.
-    '''
+    """
     T_inv = 1.0/T
     T_inv3_1000 = T_inv**0.003
     T_inv12_1000 = T_inv3_1000*T_inv3_1000
@@ -2200,7 +2200,7 @@ def TEOS10_BAW_derivatives(T):
 
 ### Henry
 def iapws04_Henry_air(T):
-    r'''Calculate the Henry's law constant of air in water according to the
+    r"""Calculate the Henry's law constant of air in water according to the
     IAPWS-04 standard.
 
     Parameters
@@ -2230,7 +2230,7 @@ def iapws04_Henry_air(T):
        Solutes in H2O and D2O at High Temperatures." Journal of Physical and
        Chemical Reference Data 32, no. 2 (June 2003): 903-16.
        https://doi.org/10.1063/1.1564818.
-    '''
+    """
     # result has units of 1/Pa
     Tr = T*iapws95_Tc_inv
     Tr_inv = 1.0/Tr
@@ -2245,7 +2245,7 @@ def iapws04_Henry_air(T):
     return (0.7812*kH_N2 + 0.2095*kH_O2 + 0.0093*kH_Ar)/(1.01325*Psat)
 
 def iapws04_dHenry_air_dT(T):
-    r'''Calculate the temperature derivative of Henry's law constant of air in
+    r"""Calculate the temperature derivative of Henry's law constant of air in
     water according to the IAPWS-04 standard. As the actual Henry's law
     constant must be calculated as well, it is also returned.
 
@@ -2278,7 +2278,7 @@ def iapws04_dHenry_air_dT(T):
        Solutes in H2O and D2O at High Temperatures." Journal of Physical and
        Chemical Reference Data 32, no. 2 (June 2003): 903-16.
        https://doi.org/10.1063/1.1564818.
-    '''
+    """
     dPsat_dT, Psat = iapws92_dPsat_dT(T)
     x1 = 1.0/Psat
     Tr = T*iapws95_Tc_inv

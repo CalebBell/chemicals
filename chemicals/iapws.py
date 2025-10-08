@@ -2994,7 +2994,7 @@ def iapws97_region5_rho(T, P):
 
 
 def iapws97_rho(T, P, use_95_boundary=False):
-    r'''Calculate the density of water in kg/m^3 according to the IAPWS-97
+    r"""Calculate the density of water in kg/m^3 according to the IAPWS-97
     standard.
 
     Parameters
@@ -3056,7 +3056,7 @@ def iapws97_rho(T, P, use_95_boundary=False):
        Formulation 1997 for the Thermodynamic Properties of Water and Steam."
        The International Association for the Properties of Water and Steam 1
        (2007): 48.
-    '''
+    """
     region = iapws97_identify_region_TP(T, P, use_95_boundary)
     if region == 1:
         return iapws97_region1_rho(T, P)
@@ -3169,7 +3169,7 @@ def iapws_97_Trho_err_region5(P, T, rho):
     return err, derr
 
 def iapws97_P(T, rho):
-    r'''Calculate the pressure of water according to the IAPWS-97
+    r"""Calculate the pressure of water according to the IAPWS-97
     standard given a temperature `T` and mass density `rho`.
 
     Parameters
@@ -3241,7 +3241,7 @@ def iapws97_P(T, rho):
        Formulation 1997 for the Thermodynamic Properties of Water and Steam."
        The International Association for the Properties of Water and Steam 1
        (2007): 48.
-    '''
+    """
     if T < 273.15:
         raise ValueError("T is under minimum value of 273.15 K")
     elif T <= 1073.15:
@@ -3339,7 +3339,7 @@ def iapws_97_Prho_err_region3(T, P, rho):
 
 @mark_numba_uncacheable
 def iapws97_T(P, rho):
-    r'''Calculate the temperature of water according to the IAPWS-97
+    r"""Calculate the temperature of water according to the IAPWS-97
     standard given a pressure `P` and mass density `rho`.
 
     Parameters
@@ -3393,7 +3393,7 @@ def iapws97_T(P, rho):
        Formulation 1997 for the Thermodynamic Properties of Water and Steam."
        The International Association for the Properties of Water and Steam 1
        (2007): 48.
-    '''
+    """
     solve_region = 0
     if P > 100e6:
         raise ValueError("P is above maximum value of 100 MPa")
@@ -3494,7 +3494,7 @@ def iapws97_T(P, rho):
 ### IAPWS 95 Initial Guesses
 
 def iapws92_rhol_sat(T):
-    r'''Calculates saturation liquid mass density of water using the IAPWS
+    r"""Calculates saturation liquid mass density of water using the IAPWS
     SR1-86(1992) [1]_ [2]_ explicit equation.
 
     .. math::
@@ -3547,7 +3547,7 @@ def iapws92_rhol_sat(T):
        the International Temperature Scale of 1990. Addendum to J. Phys. Chem.
        Ref. Data 16, 893 (1987)." Journal of Physical and Chemical Reference
        Data 22, no. 3 (May 1, 1993): 783-87. https://doi.org/10.1063/1.555926.
-    '''
+    """
     tau = 1.0 - T * iapws95_Tc_inv
 
     tau_cbrt = tau**(1.0/3.0)
@@ -3575,7 +3575,7 @@ def iapws92_rhol_sat(T):
     return ratio * iapws95_rhoc
 
 def iapws92_rhog_sat(T):
-    r'''Calculates saturation vapor mass density of water using the IAPWS
+    r"""Calculates saturation vapor mass density of water using the IAPWS
     SR1-86(1992) [1]_ [2]_ explicit equation.
 
     .. math::
@@ -3628,7 +3628,7 @@ def iapws92_rhog_sat(T):
        the International Temperature Scale of 1990. Addendum to J. Phys. Chem.
        Ref. Data 16, 893 (1987)." Journal of Physical and Chemical Reference
        Data 22, no. 3 (May 1, 1993): 783-87. https://doi.org/10.1063/1.555926.
-    '''
+    """
     tau = 1.0 - T * iapws95_Tc_inv
 
     tau_6rt = tau**(1.0/6.0)
@@ -6621,7 +6621,7 @@ def iapws95_T_err(T, rho, P_spec):
     return err, dP_dT
 
 def iapws95_P(T, rho):
-    r'''Calculate the pressure of water according to the IAPWS-95
+    r"""Calculate the pressure of water according to the IAPWS-95
     standard given a temperature `T` and mass density `rho`.
 
     Parameters
@@ -6661,7 +6661,7 @@ def iapws95_P(T, rho):
        the Thermodynamic Properties of Ordinary Water Substance for General and
        Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
        2 (2002): 387-535.
-    '''
+    """
     tau = iapws95_Tc/T
     delta = rho*iapws95_rhoc_inv
     dAddelta_res_val = iapws95_dAr_ddelta(tau, delta)
@@ -6670,7 +6670,7 @@ def iapws95_P(T, rho):
 
 @mark_numba_uncacheable
 def iapws95_T(P, rho):
-    r'''Calculate the temperature of water according to the IAPWS-95
+    r"""Calculate the temperature of water according to the IAPWS-95
     standard given a density `rho` and pressure `P`.
 
     Parameters
@@ -6707,7 +6707,7 @@ def iapws95_T(P, rho):
        the Thermodynamic Properties of Ordinary Water Substance for General and
        Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
        2 (2002): 387-535.
-    '''
+    """
     try:
         T = iapws97_T(P, rho)
         MAX_T_STEP = 100.0
@@ -6743,7 +6743,7 @@ def iapws95_T(P, rho):
 
 
 def iapws95_rho(T, P):
-    r'''Calculate the density of water according to the IAPWS-95
+    r"""Calculate the density of water according to the IAPWS-95
     standard given a temperature `T` and pressure `P`. The phase is determined
     in this calculation.
 
@@ -6796,7 +6796,7 @@ def iapws95_rho(T, P):
        the Thermodynamic Properties of Ordinary Water Substance for General and
        Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
        2 (2002): 387-535.
-    '''
+    """
     a = 1e-20 # Value where error is always negative
     b = 5000.0 # value where error is always positive
 
@@ -6862,7 +6862,7 @@ def iapws95_rho(T, P):
 
 
 def iapws95_properties(T, P):
-    r'''Calculate some basic properties of water according to the IAPWS-95
+    r"""Calculate some basic properties of water according to the IAPWS-95
     standard given a temperature `T` and pressure `P`.
 
     The properties are density `rho`, internal energy `U`, entropy `S`,
@@ -6994,7 +6994,7 @@ def iapws95_properties(T, P):
        the Thermodynamic Properties of Ordinary Water Substance for General and
        Scientific Use." Journal of Physical and Chemical Reference Data 31, no.
        2 (2002): 387-535.
-    '''
+    """
     rho = iapws95_rho(T, P)
     tau = iapws95_Tc/T
     delta = rho*iapws95_rhoc_inv

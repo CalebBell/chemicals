@@ -312,7 +312,7 @@ def Hfl_methods(CASRN):
 
 @mark_numba_incompatible
 def Hfl(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's liquid standard
+    r"""This function handles the retrieval of a chemical's liquid standard
     phase heat of formation. The lookup is based on CASRNs. Will automatically
     select a data source to use if no method is provided; returns None if
     the data is not available.
@@ -361,7 +361,7 @@ def Hfl(CASRN, method=None):
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     .. [3] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Hfl")
         if found: return val
@@ -399,7 +399,7 @@ def Hfg_methods(CASRN):
 
 @mark_numba_incompatible
 def Hfg(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's gas heat of
+    r"""This function handles the retrieval of a chemical's gas heat of
     formation. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
@@ -473,7 +473,7 @@ def Hfg(CASRN, method=None):
        doi:10.1080/00986448708960487.
     .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Hfg")
         if found: return val
@@ -788,7 +788,7 @@ def Hf_basis_converter(Hvapm, Hf_liq=None, Hf_gas=None):
 
 def Gibbs_formation(dHf, S0_abs, dHfs_std, S0_abs_elements, coeffs_elements,
                     T_ref=298.15):
-    r'''This function calculates the Gibbs free energy of formation of a
+    r"""This function calculates the Gibbs free energy of formation of a
     compound, from its constituent elements.
 
     The calculated value will be for a "standard-state" value if `dHf` and
@@ -858,7 +858,7 @@ def Gibbs_formation(dHf, S0_abs, dHfs_std, S0_abs_elements, coeffs_elements,
     ----------
     .. [1] "Standard Gibbs Free Energy of Formation Calculations Chemistry
        Tutorial." Accessed March, 2019. https://www.ausetute.com.au/gibbsform.html.
-    '''
+    """
     N = len(coeffs_elements)
     dH = dHf
     dS = S0_abs
@@ -868,7 +868,7 @@ def Gibbs_formation(dHf, S0_abs, dHfs_std, S0_abs_elements, coeffs_elements,
     return dH - T_ref*dS
 
 def entropy_formation(Hf, Gf, T_ref=298.15):
-    r'''This function calculates the entropy of formation of a
+    r"""This function calculates the entropy of formation of a
     compound, from its constituent elements.
 
     The calculated value will be for a "standard-state" value if `Hf` and
@@ -905,7 +905,7 @@ def entropy_formation(Hf, Gf, T_ref=298.15):
 
     >>> entropy_formation(Hf=-241818, Gf=-228572)
     -44.427301693778304
-    '''
+    """
     return (Hf - Gf)/T_ref
 
 
@@ -913,7 +913,7 @@ def entropy_formation(Hf, Gf, T_ref=298.15):
 
 @mark_numba_incompatible
 def stoichiometric_matrix(atomss, reactants):
-    r'''This function calculates a stoichiometric matrix of reactants and
+    r"""This function calculates a stoichiometric matrix of reactants and
     stoichiometric matrix, as required by a solver to compute the reation
     coefficients.
 
@@ -987,7 +987,7 @@ def stoichiometric_matrix(atomss, reactants):
     .. [2] URAVNOTE, NOVOODKRITI PARADOKSI V. TEORIJI, and ENJA KEMIJSKIH
        REAKCIJ. "New Discovered Paradoxes in Theory of Balancing Chemical
        Reactions." Materiali in Tehnologije 45, no. 6 (2011): 503-22.
-    '''
+    """
     n_compounds = len(atomss)
     elements = set()
     for atoms in atomss:
@@ -1050,7 +1050,7 @@ def floats_to_ints(float_list, matrix, max_denominator=1000):
 
 
 def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
-    r'''This function balances a chemical reaction.
+    r"""This function balances a chemical reaction.
 
     Parameters
     ----------
@@ -1106,7 +1106,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     .. [4] Smith, William R., and Ronald W. Missen. "Using Mathematica and
        Maple To Obtain Chemical Equations." Journal of Chemical Education
        74, no. 11 (November 1, 1997): 1369. https://doi.org/10.1021/ed074p1369.
-    '''
+    """
     from fluids.numerics import null_space
     null_vectors = null_space(matrix, rcond=None)
 

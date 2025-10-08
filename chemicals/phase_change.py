@@ -290,7 +290,7 @@ def Tb_methods(CASRN):
 
 @mark_numba_incompatible
 def Tb(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's normal boiling
+    r"""This function handles the retrieval of a chemical's normal boiling
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available. Function has data for approximately 34000 chemicals.
@@ -359,7 +359,7 @@ def Tb(CASRN, method=None):
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
        Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Tb")
         if found: return val
@@ -399,7 +399,7 @@ def Tm_methods(CASRN):
 
 @mark_numba_incompatible
 def Tm(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's melting
+    r"""This function handles the retrieval of a chemical's melting
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available. Function has data for approximately 83000 chemicals.
@@ -464,7 +464,7 @@ def Tm(CASRN, method=None):
        doi:10.1080/00986448708960487.
     .. [6] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Tm")
         if found: return val
@@ -531,7 +531,7 @@ def Clapeyron(T, Tc, Pc, dZ=1, Psat=101325):
     return R*T*dZ*log(Pc/Psat)/(1. - Tr)
 
 def Pitzer(T, Tc, omega):
-    r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
+    r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     fit by [2]_ to the work of Pitzer [1]_; requires a chemical's critical
     temperature and acentric factor.
 
@@ -584,14 +584,14 @@ def Pitzer(T, Tc, omega):
        New York: McGraw-Hill Professional, 2000.
     .. [3] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        Eighth Edition. McGraw-Hill Professional, 2007.
-    '''
+    """
     if T >= Tc:
         return 0.0
     Tr = T/Tc
     return R*Tc * (7.08*(1. - Tr)**0.354 + 10.95*omega*(1. - Tr)**0.456)
 
 def SMK(T, Tc, omega):
-    r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
+    r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     the work of [1]_; requires a chemical's critical temperature and
     acentric factor.
 
@@ -663,7 +663,7 @@ def SMK(T, Tc, omega):
        between Their Freezing Points and Critical Points." Industrial &
        Engineering Chemistry Fundamentals 23, no. 1 (February 1, 1984): 97-100.
        doi:10.1021/i100013a017.
-    '''
+    """
     if T >= Tc:
         return 0.0
     omegaR1, omegaR2 = 0.212, 0.461
@@ -697,7 +697,7 @@ def SMK(T, Tc, omega):
     return R*Tc*(L0 + domega*L1)
 
 def MK(T, Tc, omega):
-    r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
+    r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     the work of [1]_; requires a chemical's critical temperature and
     acentric factor.
 
@@ -752,7 +752,7 @@ def MK(T, Tc, omega):
        Models for Vapor Pressures and Heats of Vaporization to Long-Chain
        Hydrocarbons." Fluid Phase Equilibria 94 (March 15, 1994): 51-87.
        doi:10.1016/0378-3812(94)87051-9.
-    '''
+    """
     if T >= Tc:
         return 0.0
     bs0 = [5.2804, 0.080022, 7.2543]
@@ -781,7 +781,7 @@ def MK(T, Tc, omega):
     return (H0 + omega*(H1 + omega*H2))*R*Tc
 
 def Velasco(T, Tc, omega):
-    r'''Calculates enthalpy of vaporization at arbitrary temperatures using a
+    r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     the work of [1]_; requires a chemical's critical temperature and
     acentric factor.
 
@@ -827,7 +827,7 @@ def Velasco(T, Tc, omega):
        and Constant-Volume Heat Capacity at Vaporization." The Journal of
        Chemical Thermodynamics 85 (June 2015): 68-76.
        doi:10.1016/j.jct.2015.01.011.
-    '''
+    """
     if T >= Tc:
         return 0.0
     return (7.2729 + 10.4962*omega + 0.6061*omega**2)*(1-T/Tc)**0.38*R*Tc
@@ -835,7 +835,7 @@ def Velasco(T, Tc, omega):
 ### Enthalpy of Vaporization at Normal Boiling Point.
 
 def Riedel(Tb, Tc, Pc):
-    r'''Calculates enthalpy of vaporization at the boiling point, using the
+    r"""Calculates enthalpy of vaporization at the boiling point, using the
     Ridel [1]_ CSP method. Required information are critical temperature
     and pressure, and boiling point. Equation taken from [2]_ and [3]_.
 
@@ -886,13 +886,13 @@ def Riedel(Tb, Tc, Pc):
        New York: McGraw-Hill Professional, 2000.
     .. [3] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        Eighth Edition. McGraw-Hill Professional, 2007.
-    '''
+    """
     Pc = Pc/1E5  # Pa to bar
     Tbr = Tb/Tc
     return 1.093*Tb*R*(log(Pc) - 1.013)/(0.93 - Tbr)
 
 def Chen(Tb, Tc, Pc):
-    r'''Calculates enthalpy of vaporization using the Chen [1]_ correlation
+    r"""Calculates enthalpy of vaporization using the Chen [1]_ correlation
     and a chemical's critical temperature, pressure and boiling point.
 
     The enthalpy of vaporization is given by:
@@ -938,13 +938,13 @@ def Chen(Tb, Tc, Pc):
        doi:10.1021/je60025a047
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     Tbr = Tb/Tc
     Pc = Pc/1E5  # Pa to bar
     return R*Tb*(3.978*Tbr - 3.958 + 1.555*log(Pc))/(1.07 - Tbr)
 
 def Liu(Tb, Tc, Pc):
-    r'''Calculates enthalpy of vaporization at the normal boiling point using
+    r"""Calculates enthalpy of vaporization at the normal boiling point using
     the Liu [1]_ correlation, and a chemical's critical temperature, pressure
     and boiling point.
 
@@ -993,13 +993,13 @@ def Liu(Tb, Tc, Pc):
     .. [1] LIU, ZHI-YONG. "Estimation of Heat of Vaporization of Pure Liquid at
        Its Normal Boiling Temperature." Chemical Engineering Communications
        184, no. 1 (February 1, 2001): 221-28. doi:10.1080/00986440108912849.
-    '''
+    """
     Tbr = Tb/Tc
     return R*Tb*(Tb/220.)**0.0627*(1. - Tbr)**0.38*log(Pc/101325.) \
         / (1 - Tbr + 0.38*Tbr*log(Tbr))
 
 def Vetere(Tb, Tc, Pc, F=1.0):
-    r'''Calculates enthalpy of vaporization at the boiling point, using the
+    r"""Calculates enthalpy of vaporization at the boiling point, using the
     Vetere [1]_ CSP method. Required information are critical temperature
     and pressure, and boiling point. Equation taken from [2]_.
 
@@ -1048,7 +1048,7 @@ def Vetere(Tb, Tc, Pc, F=1.0):
        doi:10.1016/0378-3812(94)02627-D.
     .. [2] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        Eighth Edition. McGraw-Hill Professional, 2007.
-    '''
+    """
     Tbr = Tb/Tc
     taub = 1-Tb/Tc
     Pc = Pc/1E5
@@ -1058,7 +1058,7 @@ def Vetere(Tb, Tc, Pc, F=1.0):
 ### Enthalpy of Vaporization adjusted for T
 
 def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
-    r'''Calculates enthalpy of vaporization of a chemical at a temperature
+    r"""Calculates enthalpy of vaporization of a chemical at a temperature
     using the known heat of vaporization at another temperature according to
     the Watson [1]_ [2]_ correlation. This is an application of the
     corresponding-states principle, with an emperical temperature dependence.
@@ -1108,7 +1108,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     .. [2] Martin, Joseph J., and John B. Edwards. "Correlation of Latent Heats
        of Vaporization.” AIChE Journal 11, no. 2 (1965): 331-33.
        https://doi.org/10.1002/aic.690110226.
-    '''
+    """
     Tr = T/Tc
     if Tr >= 1.0:
         return 0.0
@@ -1158,7 +1158,7 @@ def Watson_n(T1, T2, Hvap1, Hvap2, Tc):
 ### Enthalpy of Vaporization model equations
 
 def Alibakhshi(T, Tc, C):
-    r'''Calculates enthalpy of vaporization of a chemical at a temperature
+    r"""Calculates enthalpy of vaporization of a chemical at a temperature
     using a theoretically-derived single-coefficient fit equation developed in
     [1]_. This model falls apart at ~0.8 Tc.
 
@@ -1201,11 +1201,11 @@ def Alibakhshi(T, Tc, C):
        Dependence and Correlation with Surface Tension: A Theoretical Approach."
        Fluid Phase Equilibria 432 (January 25, 2017): 62-69.
        https://doi.org/10.1016/j.fluid.2016.10.013.
-    '''
+    """
     return (4.5*pi*N_A)**(1/3.)*4.2E-7*(Tc-6.) - R/2.*T*log(T) + C*T
 
 def PPDS12(T, Tc, A, B, C, D, E):
-    r'''Calculate the enthalpy of vaporization of a fluid using the 5-term
+    r"""Calculate the enthalpy of vaporization of a fluid using the 5-term
     power fit developed by the PPDS and named PPDS equation 12.
 
     .. math::
@@ -1262,7 +1262,7 @@ def PPDS12(T, Tc, A, B, C, D, E):
        Berlin; New York:: Springer, 2010.
     .. [2] "Enthalpy of Vaporization: PPDS12."
        https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-Hvap/PPDS12.htm.
-    '''
+    """
     if T >= Tc:
         return 0.0
     tau = 1. - T/Tc
@@ -1301,7 +1301,7 @@ def Hfus_methods(CASRN):
 
 @mark_numba_incompatible
 def Hfus(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's heat of fusion.
+    r"""This function handles the retrieval of a chemical's heat of fusion.
     Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
@@ -1355,7 +1355,7 @@ def Hfus(CASRN, method=None):
        doi:10.1080/00986448708960487.
     .. [4] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Hfus")
         if found: return val

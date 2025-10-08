@@ -161,7 +161,7 @@ def hansen_delta_d_methods(CASRN):
 
 @mark_numba_incompatible
 def hansen_delta_d(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's Hansen dispersive
+    r"""This function handles the retrieval of a chemical's Hansen dispersive
     parameter (δD). Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
@@ -214,7 +214,7 @@ def hansen_delta_d(CASRN, method=None):
        Repository (2020).
     .. [4] Alejandro Gutierrez, "HSPiPy".
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "HANSEN_DELTA_D")
         if found:
@@ -251,7 +251,7 @@ def hansen_delta_p_methods(CASRN):
 
 @mark_numba_incompatible
 def hansen_delta_p(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's Hansen polar
+    r"""This function handles the retrieval of a chemical's Hansen polar
     parameter (δP). Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
@@ -304,7 +304,7 @@ def hansen_delta_p(CASRN, method=None):
        Repository (2020).
     .. [4] Alejandro Gutierrez, "HSPiPy".
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "HANSEN_DELTA_P")
         if found:
@@ -341,7 +341,7 @@ def hansen_delta_h_methods(CASRN):
 
 @mark_numba_incompatible
 def hansen_delta_h(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's Hansen hydrogen bonding
+    r"""This function handles the retrieval of a chemical's Hansen hydrogen bonding
     parameter (δH). Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
     available.
@@ -394,7 +394,7 @@ def hansen_delta_h(CASRN, method=None):
        Repository (2020).
     .. [4] Alejandro Gutierrez, "HSPiPy".
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "HANSEN_DELTA_H")
         if found:

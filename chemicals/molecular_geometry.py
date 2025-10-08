@@ -124,7 +124,7 @@ def RG_methods(CASRN):
 
 @mark_numba_incompatible
 def RG(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's radius of gyration.
+    r"""This function handles the retrieval of a chemical's radius of gyration.
     Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
@@ -172,7 +172,7 @@ def RG(CASRN, method=None):
        https://doi.org/10.1002/wcms.93.
     .. [2] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on
        Demand Norderstedt, Germany, 2000.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "RG")
         if found: return val
@@ -213,7 +213,7 @@ def linear_methods(CASRN):
 
 @mark_numba_incompatible
 def linear(CASRN, method=None):
-    r'''This function handles the retrieval whether or not a chemical is linear.
+    r"""This function handles the retrieval whether or not a chemical is linear.
     Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
@@ -258,7 +258,7 @@ def linear(CASRN, method=None):
        Mintz, et al. "Psi4: An Open-Source Ab Initio Electronic Structure
        Program." WIREs Computational Molecular Science 2, no. 4 (2012): 556-65.
        https://doi.org/10.1002/wcms.93.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "linear")
         if found: return bool(val)

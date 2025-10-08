@@ -533,7 +533,7 @@ root_1000 = 1000**0.5
 root_1000_inv = 1.0/root_1000
 
 def v_to_v_molar(v, MW):
-    r'''Convert a velocity from units of m/s to a "molar" form of velocity,
+    r"""Convert a velocity from units of m/s to a "molar" form of velocity,
     compatible with thermodynamic calculations on a molar basis.
 
     .. math::
@@ -558,7 +558,7 @@ def v_to_v_molar(v, MW):
     --------
     >>> v_to_v_molar(500, 18.015)
     67.10998435404377
-    '''
+    """
     return v*MW**0.5*root_1000_inv
 
 def v_molar_to_v(v_molar, MW):
@@ -1237,7 +1237,7 @@ def isothermal_compressibility(V, dV_dP):
 
 
 def phase_identification_parameter(V, dP_dT, dP_dV, d2P_dV2, d2P_dVdT):
-    r'''Calculate the Phase Identification Parameter developed in [1]_ for
+    r"""Calculate the Phase Identification Parameter developed in [1]_ for
     the accurate and efficient determination of whether a fluid is a liquid or
     a gas based on the results of an equation of state. For supercritical
     conditions, this provides a good method for choosing which property
@@ -1297,12 +1297,12 @@ def phase_identification_parameter(V, dP_dT, dP_dV, d2P_dV2, d2P_dVdT):
        Temperature, without Prior Knowledge of Saturation Properties: Extension
        to Solid Phase." Fluid Phase Equilibria 425 (October 15, 2016): 269-277.
        doi:10.1016/j.fluid.2016.06.001.
-    '''
+    """
     return V*(d2P_dVdT/dP_dT - d2P_dV2/dP_dV)
 
 
 def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=None, d2P_dV2=None):
-    r'''Uses the Phase Identification Parameter concept developed in [1]_ and
+    r"""Uses the Phase Identification Parameter concept developed in [1]_ and
     [2]_ to determine if a chemical is a solid, liquid, or vapor given the
     appropriate thermodynamic conditions.
 
@@ -1356,7 +1356,7 @@ def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=Non
        Temperature, without Prior Knowledge of Saturation Properties: Extension
        to Solid Phase." Fluid Phase Equilibria 425 (October 15, 2016): 269-277.
        doi:10.1016/j.fluid.2016.06.001.
-    '''
+    """
     if d2P_dVdT > 0:
         return "s"
     else:
@@ -1425,7 +1425,7 @@ def Cp_minus_Cv(T, dP_dT, dP_dV):
 
 
 def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
-    r'''Calculate a real fluid's speed of sound. The required derivatives should
+    r"""Calculate a real fluid's speed of sound. The required derivatives should
     be calculated with an equation of state, and `Cp` and `Cv` are both the
     real fluid versions. Expression is given in [1]_ and [2]_; a unit conversion
     is further performed to obtain a result in m/s. If MW is not provided the
@@ -1482,7 +1482,7 @@ def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
     .. [2] Pratt, R. M. "Thermodynamic Properties Involving Derivatives: Using
        the Peng-Robinson Equation of State." Chemical Engineering Education 35,
        no. 2 (March 1, 2001): 112-115.
-    '''
+    """
     if MW is None:
         return (-V*V*dP_dV*Cp/Cv)**0.5
     else:
@@ -1542,7 +1542,7 @@ def velocity_to_molar_velocity(v, MW):
     return v*sqrt(MW)/sqrt(1000)
 
 def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
-    r'''Calculate a real fluid's Joule Thomson coefficient. The required
+    r"""Calculate a real fluid's Joule Thomson coefficient. The required
     derivative should be calculated with an equation of state, and `Cp` is the
     real fluid versions. This can either be calculated with `dV_dT` directly,
     or with `beta` if it is already known.
@@ -1584,7 +1584,7 @@ def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
     .. [2] Pratt, R. M. "Thermodynamic Properties Involving Derivatives: Using
        the Peng-Robinson Equation of State." Chemical Engineering Education 35,
        no. 2 (March 1, 2001): 112-115.
-    '''
+    """
     if dV_dT is not None:
         return (T*dV_dT - V)/Cp
     elif beta is not None:
@@ -1636,7 +1636,7 @@ def isentropic_exponent(Cp, Cv):
     return Cp/Cv
 
 def isentropic_exponent_PV(Cp, Cv, Vm, P, dP_dV_T):
-    r'''Calculate the isentropic coefficient of real fluid using the definition
+    r"""Calculate the isentropic coefficient of real fluid using the definition
     of :math:`PV^k = \text{const}`.
 
     .. math::
@@ -1683,11 +1683,11 @@ def isentropic_exponent_PV(Cp, Cv, Vm, P, dP_dV_T):
        Real Gases and Application for the Air at Temperatures from 150 K to 450
        K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99.
        https://doi.org/10.1007/BF01176874.
-    '''
+    """
     return -Vm*Cp*dP_dV_T/(P*Cv)
 
 def isentropic_exponent_PT(Cp, P, dV_dT_P):
-    r'''Calculate the isentropic coefficient of real fluid using the definition
+    r"""Calculate the isentropic coefficient of real fluid using the definition
     of :math:`P^{(1-k)}T^k = \text{const}`.
 
     .. math::
@@ -1730,13 +1730,13 @@ def isentropic_exponent_PT(Cp, P, dV_dT_P):
        Real Gases and Application for the Air at Temperatures from 150 K to 450
        K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99.
        https://doi.org/10.1007/BF01176874.
-    '''
+    """
     return -Cp/(P*dV_dT_P - Cp) # Avoids a division
     # return 1.0/(1.0 - P*dV_dT_P/Cp)
 
 
 def isentropic_exponent_TV(Cv, Vm, dP_dT_V):
-    r'''Calculate the isentropic coefficient of real fluid using the definition
+    r"""Calculate the isentropic coefficient of real fluid using the definition
     of :math:`TV^{k-1} = \text{const}`.
 
     .. math::
@@ -1779,7 +1779,7 @@ def isentropic_exponent_TV(Cv, Vm, dP_dT_V):
        Real Gases and Application for the Air at Temperatures from 150 K to 450
        K." Acta Mechanica 65, no. 1 (January 1, 1987): 81-99.
        https://doi.org/10.1007/BF01176874.
-    '''
+    """
     return 1.0 + Vm*dP_dT_V/Cv
 
 def Vm_to_rho(Vm, MW):
@@ -3349,7 +3349,7 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
 
 
 def radius_of_gyration(MW, A, B, C, planar=False):
-    r'''Calculates the radius of gyration of a molecule using the DIPPR
+    r"""Calculates the radius of gyration of a molecule using the DIPPR
     definition. The parameters `A`, `B`, and `C` must be obtained from
     either vibrational scpectra and analysis or quantum chemistry calculations
     of programs such as `psi <https://psicode.org/>`.
@@ -3434,7 +3434,7 @@ def radius_of_gyration(MW, A, B, C, planar=False):
        8E. McGraw-Hill Professional, 2007.
     .. [2] Johnson III, Russell D. "NIST 101. Computational Chemistry
        Comparison and Benchmark Database," 1999. https://cccbdb.nist.gov
-    '''
+    """
     if planar:
         return sqrt(sqrt(A*B)*N_A*1e3/MW)
     else:

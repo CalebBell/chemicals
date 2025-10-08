@@ -285,7 +285,7 @@ def __getattr__(name):
 
 
 def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
-    r'''Calculates and returns the viscosity of water according to the IAPWS
+    r"""Calculates and returns the viscosity of water according to the IAPWS
     (2008) release.
 
     Viscosity is calculated as a function of three terms;
@@ -426,7 +426,7 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
        K. Miyagawa. "New International Formulation for the Viscosity of H2O."
        Journal of Physical and Chemical Reference Data 38, no. 2
        (June 1, 2009): 101-25. doi:10.1063/1.3088050.
-    '''
+    """
     Tr = T*0.0015453657571674064 #/647.096
     Tr_inv = 1.0/Tr
     rhor = rho*0.003105590062111801 #1/322.
@@ -528,7 +528,7 @@ def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
 
 
 def mu_air_lemmon(T, rho):
-    r'''Calculates and returns the viscosity of air according to Lemmon
+    r"""Calculates and returns the viscosity of air according to Lemmon
     and Jacobsen (2003) [1]_.
 
     Viscosity is calculated as a function of two terms;
@@ -601,7 +601,7 @@ def mu_air_lemmon(T, rho):
        Conductivity Equations for Nitrogen, Oxygen, Argon, and Air."
        International Journal of Thermophysics 25, no. 1 (January 1, 2004):
        21-69. https://doi.org/10.1023/B:IJOT.0000022327.04529.f3.
-    '''
+    """
     # Cost: 1 log; 2 exp; 1 power; 2 divisions
 #     sigma = 0.360 # nm
 #     M = 28.9586 # g/mol
@@ -1048,7 +1048,7 @@ def dPPDS9_dT(T, A, B, C, D, E):
     return (dmu_dT, mu)
 
 def mu_TDE(T, A, B, C, D):
-    r'''Calculate the viscosity of a liquid using the 4-term exponential
+    r"""Calculate the viscosity of a liquid using the 4-term exponential
     inverse-temperature fit equation used in NIST's TDE.
 
     .. math::
@@ -1086,13 +1086,13 @@ def mu_TDE(T, A, B, C, D):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscositySatL/ViscosityL.htm.
-    '''
+    """
     T_inv = 1.0/T
     expr = A + T_inv*(B + T_inv*(C + D*T_inv))
     return trunc_exp(expr)
 
 def PPDS5(T, Tc, a0, a1, a2):
-    r'''Calculate the viscosity of a low-pressure gas using the 3-term
+    r"""Calculate the viscosity of a low-pressure gas using the 3-term
     exponential power fit developed by the PPDS and named PPDS equation 5.
 
     .. math::
@@ -1130,12 +1130,12 @@ def PPDS5(T, Tc, a0, a1, a2):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-ViscosityG/PPDS5-ViscosityGas.htm.
-    '''
+    """
     Tr = T/Tc
     return a0*Tr/(1.0 + a1*(Tr - 1.0)*Tr**a2)**(1.0/6.0)
 
 def Letsou_Stiel(T, MW, Tc, Pc, omega):
-    r'''Calculates the viscosity of a liquid using an emperical model
+    r"""Calculates the viscosity of a liquid using an emperical model
     developed in [1]_. However. the fitting parameters for tabulated values
     in the original article are found in ChemSep.
 
@@ -1189,7 +1189,7 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     .. [1] Letsou, Athena, and Leonard I. Stiel. "Viscosity of Saturated
        Nonpolar Liquids at Elevated Pressures." AIChE Journal 19, no. 2 (1973):
        409-11. doi:10.1002/aic.690190241.
-    '''
+    """
     Tr = T/Tc
     xi0 = (1.5174 - Tr*(2.135 - 0.75*Tr))*1E-5
     xi1 = (4.2552 - Tr*(7.674 - 3.4*Tr))*1E-5
@@ -1198,7 +1198,7 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
 
 
 def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
-    r'''Calculates the viscosity of a liquid using an emperical formula
+    r"""Calculates the viscosity of a liquid using an emperical formula
     developed in [1]_.
 
     .. math::
@@ -1250,7 +1250,7 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
     .. [1] Przedziecki, J. W., and T. Sridhar. "Prediction of Liquid
        Viscosities." AIChE Journal 31, no. 2 (February 1, 1985): 333-35.
        doi:10.1002/aic.690310225.
-    '''
+    """
     Pc = Pc*1e-5  # Pa to atm
     Vm, Vc = Vm*1E6, Vc*1E6  # m^3/mol to mL/mol
     Tc_inv = 1.0/Tc
@@ -1269,7 +1269,7 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
 
 
 def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
-    r'''Adjustes for pressure the viscosity of a liquid using an emperical
+    r"""Adjustes for pressure the viscosity of a liquid using an emperical
     formula developed in [1]_, but as discussed in [2]_ as the original source
     is in German.
 
@@ -1330,7 +1330,7 @@ def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
        (February 1, 1974): 157-157. doi:10.1002/cite.330460413.
     .. [2] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     Tr = min(T/Tc, 1.0)
     C = Tr*(Tr*(Tr*(Tr*(Tr*(Tr*(15.6719*Tr - 59.8127) + 96.1209) - 84.8291) + 44.1706) - 13.404) + 2.1616) - 0.07921
     D = 0.3257*(1.0039-Tr**2.573)**-0.2906 - 0.2086
@@ -1344,7 +1344,7 @@ def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
 ### Viscosity of Gases - low pressure
 
 def Yoon_Thodos(T, Tc, Pc, MW):
-    r'''Calculates the viscosity of a gas using an emperical formula
+    r"""Calculates the viscosity of a gas using an emperical formula
     developed in [1]_.
 
     .. math::
@@ -1390,7 +1390,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
     .. [1] Yoon, Poong, and George Thodos. "Viscosity of Nonpolar Gaseous
        Mixtures at Normal Pressures." AIChE Journal 16, no. 2 (1970): 300-304.
        doi:10.1002/aic.690160225.
-    '''
+    """
     Tr = T/Tc
     xi = 2173.4241*Tc**(1/6.)/sqrt(MW)*Pc**(-2.0/3.)
     a = 46.1
@@ -1403,7 +1403,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
 
 
 def Stiel_Thodos(T, Tc, Pc, MW):
-    r'''Calculates the viscosity of a gas using an emperical formula
+    r"""Calculates the viscosity of a gas using an emperical formula
     developed in [1]_.
 
     if :math:`T_r > 1.5`:
@@ -1452,7 +1452,7 @@ def Stiel_Thodos(T, Tc, Pc, MW):
     .. [1] Stiel, Leonard I., and George Thodos. "The Viscosity of Nonpolar
        Gases at Normal Pressures." AIChE Journal 7, no. 4 (1961): 611-15.
        doi:10.1002/aic.690070416.
-    '''
+    """
     Pc = Pc*(1.0/101325.)
     Tr = T/Tc
     xi = Tc**(1/6.)/(sqrt(MW)*Pc**(2/3.))
@@ -1565,7 +1565,7 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
 
 
 def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
-    r'''Calculates the viscosity of a gas using an emperical formula
+    r"""Calculates the viscosity of a gas using an emperical formula
     developed in [1]_.
 
     .. math::
@@ -1612,7 +1612,7 @@ def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
        Determination of the Viscosity of Gases at Atmospheric Pressure."
        Industrial & Engineering Chemistry Research 51, no. 7
        (February 22, 2012): 3179-85. doi:10.1021/ie202591f.
-    '''
+    """
     Tr = T/Tc
     if Tr < 0.2:
         Tr = 0.2
@@ -1626,7 +1626,7 @@ def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
 
 
 def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
-    r'''Calculates viscosity of a gas mixture according to
+    r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
     .. math::
@@ -1666,7 +1666,7 @@ def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
     .. [1] Herning, F. and Zipperer, L,: "Calculation of the Viscosity of
        Technical Gas Mixtures from the Viscosity of Individual Gases, german",
        Gas u. Wasserfach (1936) 79, No. 49, 69.
-    '''
+    """
     N = len(zs)
     if MW_roots is None:
         MW_roots = [0.0]*N
@@ -1680,7 +1680,7 @@ def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
     return k/denominator
 
 def Wilke(ys, mus, MWs):
-    r'''Calculates viscosity of a gas mixture according to
+    r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
     .. math::
@@ -1725,7 +1725,7 @@ def Wilke(ys, mus, MWs):
     .. [1] Wilke, C. R. "A Viscosity Equation for Gas Mixtures." The Journal of
        Chemical Physics 18, no. 4 (April 1, 1950): 517-19.
        https://doi.org/10.1063/1.1747673.
-    '''
+    """
     cmps = range(len(ys))
     phis = [[(1.0 + (mus[i]/mus[j])**0.5*(MWs[j]/MWs[i])**0.25)**2.0/(8.0*(1.0 + MWs[i]/MWs[j]))**0.5
                     for j in cmps] for i in cmps]
@@ -1803,7 +1803,7 @@ def Wilke_prefactors(MWs):
     return t0s, t1s, phi_fact_invs
 
 def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
-    r'''Calculates viscosity of a gas mixture according to
+    r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_, using precomputed parameters.
 
     .. math::
@@ -1851,7 +1851,7 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
     .. [1] Wilke, C. R. "A Viscosity Equation for Gas Mixtures." The Journal of
        Chemical Physics 18, no. 4 (April 1, 1950): 517-19.
        https://doi.org/10.1063/1.1747673.
-    '''
+    """
     N = len(ys)
     mu_root_invs = [0.0]*N
     mu_roots = [0.0]*N
@@ -1910,7 +1910,7 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
     """
 
 def Wilke_large(ys, mus, MWs):
-    r'''Calculates viscosity of a gas mixture according to
+    r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
     This function is a slightly faster version of :obj:`Wilke`. It achieves its
@@ -1948,7 +1948,7 @@ def Wilke_large(ys, mus, MWs):
     .. [1] Wilke, C. R. "A Viscosity Equation for Gas Mixtures." The Journal of
        Chemical Physics 18, no. 4 (April 1, 1950): 517-19.
        https://doi.org/10.1063/1.1747673.
-    '''
+    """
     # For the cases where memory is sparse or not desired to be consumed
     N = len(MWs)
 
@@ -1992,7 +1992,7 @@ def Wilke_large(ys, mus, MWs):
 
 
 def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
-    r'''Calculates viscosity of a gas mixture according to
+    r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
     .. math::
@@ -2060,7 +2060,7 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
     .. [2] Brokaw, R. S. Viscosity of Gas Mixtures, NASA-TN-D-4496, 1968.
     .. [3] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
-    '''
+    """
     N = len(ys)
     cmps = range(len(ys))
     MDs = molecular_diameters
@@ -2153,7 +2153,7 @@ def Twu_1985_internal(T, Tb, SG):
     return nu
 
 def Twu_1985(T, Tb, rho):
-    r'''Calculate the viscosity of a petroleum liquid using the
+    r"""Calculate the viscosity of a petroleum liquid using the
     Twu (1985) correlation
     developed in [1]_. Based on a fit to n-alkanes that used as a
     reference. Requires the boiling point and density of
@@ -2242,7 +2242,7 @@ def Twu_1985(T, Tb, rho):
        Liquid Viscosities of Petroleum Fractions." Industrial & Engineering
        Chemistry Process Design and Development 24, no. 4 (October 1, 1985):
        1287-93. https://doi.org/10.1021/i200031a064.
-    '''
+    """
     SG = rho*0.00100098388466972 #1/999.0170824078306
     nu = Twu_1985_internal(T*1.8, Tb*1.8, SG)
     nu = nu*1e-6 # to m^2/s
@@ -2255,7 +2255,7 @@ def Twu_1985(T, Tb, rho):
 ### Viscosity for Liquids or Gases
 
 def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
-    r'''Calculates the viscosity of a gas or a liquid using the method of
+    r"""Calculates the viscosity of a gas or a liquid using the method of
     Lorentz, Bray, and Clarke [1]_. This method is not quite the same as the
     original, but rather the form commonly presented and used today. The
     original had a different formula for pressure correction for gases which
@@ -2326,7 +2326,7 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
        https://doi.org/10.2118/915-PA.
     .. [2] Whitson, Curtis H., and Michael R. Brulé. Phase Behavior. Henry L.
        Doherty Memorial Fund of AIME, Society of Petroleum Engineers, 2000.
-    '''
+    """
     Tc, Pc, Vc, MW = 0.0, 0.0, 0.0, 0.0
     N = len(zs)
     for i in range(N):

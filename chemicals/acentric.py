@@ -91,7 +91,7 @@ def omega_methods(CASRN):
 
 @mark_numba_incompatible
 def omega(CASRN, method=None):
-    r'''Retrieve a chemical's acentric factor, `omega`.
+    r"""Retrieve a chemical's acentric factor, `omega`.
 
     Automatically select a method to use if no method is provided;
     returns None if the data is not available.
@@ -163,7 +163,7 @@ def omega(CASRN, method=None):
        "The NIST REFPROP Database for Highly Accurate Properties of Industrially
        Important Fluids." Industrial & Engineering Chemistry Research 61, no. 42
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "omega")
         if found: return val
@@ -209,7 +209,7 @@ def omega_definition(Psat, Pc):
     return -log10(Psat/Pc) - 1.0
 
 def LK_omega(Tb, Tc, Pc):
-    r'''Estimates the acentric factor of a fluid using a correlation in [1]_.
+    r"""Estimates the acentric factor of a fluid using a correlation in [1]_.
 
     .. math::
         \omega = \frac{\ln P_{br}^{sat} - 5.92714 + 6.09648/T_{br} + 1.28862
@@ -247,7 +247,7 @@ def LK_omega(Tb, Tc, Pc):
     .. [1] Lee, Byung Ik, and Michael G. Kesler. "A Generalized Thermodynamic
        Correlation Based on Three-Parameter Corresponding States." AIChE Journal
        21, no. 3 (1975): 510-527. doi:10.1002/aic.690210313.
-    '''
+    """
     T_br = Tb/Tc
     log_T_br = log(T_br)
     T_br_6 = T_br*T_br
@@ -258,7 +258,7 @@ def LK_omega(Tb, Tc, Pc):
     return omega
 
 def Stiel_polar_factor(Psat, Pc, omega):
-    r'''This function handles the calculation of a chemical's Stiel Polar
+    r"""This function handles the calculation of a chemical's Stiel Polar
     factor, directly through the definition of Stiel-polar factor.
     Requires the vapor pressure `Psat` at a reduced temperature of 0.6,
     the critical pressure `Pc`, and the acentric factor `omega`.
@@ -300,7 +300,7 @@ def Stiel_polar_factor(Psat, Pc, omega):
     .. [2] D, Kukoljac Miloš, and Grozdanić Dušan K. "New Values of the
        Polarity Factor." Journal of the Serbian Chemical Society 65, no. 12
        (January 1, 2000). http://www.shd.org.rs/JSCS/Vol65/No12-Pdf/JSCS12-07.pdf
-    '''
+    """
     Pr = Psat/Pc
     factor = log10(Pr) + 1.70*omega + 1.552
     return factor

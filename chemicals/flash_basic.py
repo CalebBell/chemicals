@@ -196,7 +196,7 @@ def K_value(P=None, Psat=None, phi_l=None, phi_g=None, gamma=None, Poynting=1.0)
 
 
 def Wilson_K_value(T, P, Tc, Pc, omega):
-    r'''Calculates the equilibrium K-value for a component using Wilson's
+    r"""Calculates the equilibrium K-value for a component using Wilson's
     heuristic mode. This is very useful for initialization of stability tests
     and flashes.
 
@@ -256,12 +256,12 @@ def Wilson_K_value(T, P, Tc, Pc, omega):
        Equilibrium Calculations for Systems Containing Water." The Canadian
        Journal of Chemical Engineering, December 1, 1976.
        https://doi.org/10.1002/cjce.5450540620.
-    '''
+    """
     return Pc/P*exp(5.37*(1.0 + omega)*(1.0 - Tc/T))
 
 
 def PR_water_K_value(T, P, Tc, Pc):
-    r'''Calculates the equilibrium K-value for a component against water
+    r"""Calculates the equilibrium K-value for a component against water
     according to the Peng and Robinson (1976) heuristic.
 
     .. math::
@@ -301,7 +301,7 @@ def PR_water_K_value(T, P, Tc, Pc):
        Equilibrium Calculations for Systems Containing Water." The Canadian
        Journal of Chemical Engineering, December 1, 1976.
        https://doi.org/10.1002/cjce.5450540620.
-    '''
+    """
     Tr = T/Tc
     Pr = P/Pc
     return 1e6*Pr/Tr
@@ -520,7 +520,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
 
 
 def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
-    r'''PVT flash model using a model published in [1]_, which provides a PT
+    r"""PVT flash model using a model published in [1]_, which provides a PT
     surface using only each compound's boiling temperature and critical
     temperature and pressure. This is useful for obtaining initial
     guesses for more rigorous models, or it can be used as its own model.
@@ -600,7 +600,7 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
        Convergence Issues for Dew Point, Bubble Point and Flash Calculations."
        International Journal of Mechanical Engineering Education 41, no. 3
        (July 1, 2013): 188-202. https://doi.org/10.7227/IJMEE.41.3.2.
-    '''
+    """
     T_MAX = 50000
     N = len(zs)
     cmps = range(N)

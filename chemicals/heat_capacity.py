@@ -1090,7 +1090,7 @@ def Poling_integral_over_T(T, a, b, c, d, e):
     return R*(((((0.25*e)*T + d*(1.0/3.))*T + 0.5*c)*T + b)*T + a*log(T))
 
 def PPDS2(T, Ts, C_low, C_inf, a1, a2, a3, a4, a5):
-    r'''Calculates the ideal-gas heat capacity using the [1]_
+    r"""Calculates the ideal-gas heat capacity using the [1]_
     emperical (parameter-regressed) method, called the PPDS 2 equation for
     heat capacity.
 
@@ -1141,14 +1141,14 @@ def PPDS2(T, Ts, C_low, C_inf, a1, a2, a3, a4, a5):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/TDE_Help/Eqns-Pure-Cp0/PPDS2Cp0.htm.
-    '''
+    """
     y = T/(T + Ts)
     tot = a1 + y*(a2 + y*(a3 + y*(a4 + a5*y)))
     main = C_low + (C_inf - C_low)*y*y*(1.0 + (y - 1.0)*tot)
     return R*main
 
 def PPDS15(T, Tc, a0, a1, a2, a3, a4, a5):
-    r'''Calculates the saturation liquid heat capacity using the [1]_
+    r"""Calculates the saturation liquid heat capacity using the [1]_
     emperical (parameter-regressed) method, called the PPDS 15 equation for
     heat capacity.
 
@@ -1195,13 +1195,13 @@ def PPDS15(T, Tc, a0, a1, a2, a3, a4, a5):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/PPDS15-Csat.htm.
-    '''
+    """
     tau = 1.0 - T/Tc
     poly_term = a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau)))
     return R*(a0/tau + poly_term)
 
 def TDE_CSExpansion(T, Tc, b, a1, a2=0.0, a3=0.0, a4=0.0):
-    r'''Calculates the saturation liquid heat capacity using the [1]_
+    r"""Calculates the saturation liquid heat capacity using the [1]_
     CSExpansion method from NIST's TDE:
 
     .. math::
@@ -1243,7 +1243,7 @@ def TDE_CSExpansion(T, Tc, b, a1, a2=0.0, a3=0.0, a4=0.0):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-CsatL/CSExpansion.htm
-    '''
+    """
     tau = 1.0 - T/Tc
     return b/tau + a1 + T*(a2 + T*(a3 + a4*T))
 
@@ -1294,7 +1294,7 @@ def Lastovka_Shaw_term_A(similarity_variable, cyclic_aliphatic):
     return term_A
 
 def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_A=None):
-    r'''Calculate ideal-gas constant-pressure heat capacity with the similarity
+    r"""Calculate ideal-gas constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
 
     .. math::
@@ -1380,7 +1380,7 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
 
-    '''
+    """
     a = similarity_variable
     if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
 
@@ -1407,7 +1407,7 @@ def Lastovka_Shaw(T, similarity_variable, cyclic_aliphatic=False, MW=None, term_
 
 def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
                            MW=None, term_A=None):
-    r'''Calculate the integral of ideal-gas constant-pressure heat capacity
+    r"""Calculate the integral of ideal-gas constant-pressure heat capacity
     with the similarity variable concept and method as shown in [1]_.
 
     Parameters
@@ -1450,7 +1450,7 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
 
-    '''
+    """
     a = similarity_variable
     if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
 
@@ -1472,7 +1472,7 @@ def Lastovka_Shaw_integral(T, similarity_variable, cyclic_aliphatic=False,
 
 def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False,
                                   MW=None, term_A=None):
-    r'''Calculate the integral over temperature of ideal-gas constant-pressure
+    r"""Calculate the integral over temperature of ideal-gas constant-pressure
     heat capacity with the similarity variable concept and method as shown in
     [1]_.
 
@@ -1516,7 +1516,7 @@ def Lastovka_Shaw_integral_over_T(T, similarity_variable, cyclic_aliphatic=False
        Ideal Gas Heat Capacities of Pure Hydrocarbons and Petroleum Fractions."
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
-    '''
+    """
     a = similarity_variable
     if term_A is None: term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
 
@@ -1547,7 +1547,7 @@ def Lastovka_Shaw_T_for_Hm_err(T, MW, similarity_variable, H_ref, Hm, cyclic_ali
 @mark_numba_uncacheable
 def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
                            factor=1.0, cyclic_aliphatic=False):
-    r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
+    r"""Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
     the temperature which has a specified `Hm`, as is required in PH flashes,
     as shown in [1]_.
 
@@ -1592,7 +1592,7 @@ def Lastovka_Shaw_T_for_Hm(Hm, MW, similarity_variable, T_ref=298.15,
        Ideal Gas Heat Capacities of Pure Hydrocarbons and Petroleum Fractions."
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
-    '''
+    """
     Hm /= factor
     a = similarity_variable
     term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
@@ -1618,7 +1618,7 @@ def Lastovka_Shaw_T_for_Sm_err(T, MW, similarity_variable, S_ref, Sm, cyclic_ali
 @mark_numba_uncacheable
 def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
                            factor=1.0, cyclic_aliphatic=False):
-    r'''Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
+    r"""Uses the Lastovka-Shaw ideal-gas heat capacity correlation to solve for
     the temperature which has a specified `Sm`, as is required in PS flashes,
     as shown in [1]_.
 
@@ -1663,7 +1663,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
        Ideal Gas Heat Capacities of Pure Hydrocarbons and Petroleum Fractions."
        Fluid Phase Equilibria 356 (October 25, 2013): 338-370.
        doi:10.1016/j.fluid.2013.07.023.
-    '''
+    """
     Sm /= factor
     a = similarity_variable
     term_A = Lastovka_Shaw_term_A(a, cyclic_aliphatic)
@@ -2211,7 +2211,7 @@ def Dadgostar_Shaw_terms(similarity_variable):
             a31*a + a32*a2)
 
 def Dadgostar_Shaw(T, similarity_variable, MW=None):
-    r'''Calculate liquid constant-pressure heat capacity with the similarity
+    r"""Calculate liquid constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
 
     .. math::
@@ -2252,13 +2252,13 @@ def Dadgostar_Shaw(T, similarity_variable, MW=None):
        the Constant-Pressure Specific Heat Capacity of Pure and Ill-Defined
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
-    '''
+    """
     first, second, third = Dadgostar_Shaw_terms(similarity_variable)
     Cp = (first + second*T + third*T*T)
     return Cp*1000. if MW is None else Cp*MW
 
 def Dadgostar_Shaw_integral(T, similarity_variable, MW=None):
-    r'''Calculate the integral of liquid constant-pressure heat capacity
+    r"""Calculate the integral of liquid constant-pressure heat capacity
     with the similarity variable concept and method as shown in [1]_.
 
     Parameters
@@ -2298,14 +2298,14 @@ def Dadgostar_Shaw_integral(T, similarity_variable, MW=None):
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
 
-    '''
+    """
     T2 = T*T
     first, second, third = Dadgostar_Shaw_terms(similarity_variable)
     H = T2*T/3.*third + T2*0.5*second + T*first
     return H*1000. if MW is None else H*MW
 
 def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
-    r'''Calculate the integral of liquid constant-pressure heat capacity
+    r"""Calculate the integral of liquid constant-pressure heat capacity
     with the similarity variable concept and method as shown in [1]_.
 
     Parameters
@@ -2345,7 +2345,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
        Liquid Hydrocarbons." Fluid Phase Equilibria 313 (January 15, 2012):
        211-226. doi:10.1016/j.fluid.2011.09.015.
 
-    '''
+    """
     first, second, third = Dadgostar_Shaw_terms(similarity_variable)
     S = T*T*0.5*third + T*second + first*log(T)
     return S*1000. if MW is None else S*MW
@@ -2686,7 +2686,7 @@ def Perry_151(T, a, b, c, d):
     return (a + b*T + c/T2 + d*T2) * 4.184
 
 def Lastovka_solid(T, similarity_variable, MW=None):
-    r'''Calculate solid constant-pressure heat capacity with the similarity
+    r"""Calculate solid constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
 
     .. math::
@@ -2748,7 +2748,7 @@ def Lastovka_solid(T, similarity_variable, MW=None):
        Compounds: Part II. Application: Heat Capacity Calculation for
        Ill-Defined Organic Solids." Fluid Phase Equilibria 268, no. 1-2
        (June 25, 2008): 134-41. doi:10.1016/j.fluid.2008.03.018.
-    '''
+    """
     A1 = 0.013183
     A2 = 0.249381
     theta = 151.8675
@@ -2765,7 +2765,7 @@ def Lastovka_solid(T, similarity_variable, MW=None):
     return Cp*1000. if MW is None else Cp*MW
 
 def Lastovka_solid_integral(T, similarity_variable, MW=None):
-    r'''Integrates solid constant-pressure heat capacity with the similarity
+    r"""Integrates solid constant-pressure heat capacity with the similarity
     variable concept and method as shown in [1]_.
 
     uses an explicit form as derived with Sympy.
@@ -2805,7 +2805,7 @@ def Lastovka_solid_integral(T, similarity_variable, MW=None):
        Compounds: Part II. Application: Heat Capacity Calculation for
        Ill-Defined Organic Solids." Fluid Phase Equilibria 268, no. 1-2
        (June 25, 2008): 134-41. doi:10.1016/j.fluid.2008.03.018.
-    '''
+    """
     A1 = 0.013183
     A2 = 0.249381
     theta = 151.8675
@@ -2821,7 +2821,7 @@ def Lastovka_solid_integral(T, similarity_variable, MW=None):
     return H*1000. if MW is None else H*MW
 
 def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
-    r'''Integrates over T solid constant-pressure heat capacity with the
+    r"""Integrates over T solid constant-pressure heat capacity with the
     similarity variable concept and method as shown in [1]_.
 
     uses an explicit form as derived with Sympy.
@@ -2861,7 +2861,7 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
        Compounds: Part II. Application: Heat Capacity Calculation for
        Ill-Defined Organic Solids." Fluid Phase Equilibria 268, no. 1-2
        (June 25, 2008): 134-41. doi:10.1016/j.fluid.2008.03.018.
-    '''
+    """
     A1 = 0.013183
     A2 = 0.249381
     theta = 151.8675

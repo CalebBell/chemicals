@@ -199,7 +199,7 @@ def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=Non
 @mark_numba_incompatible
 def Stockmayer(CASRN="", Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
                method=None):
-    r'''This function handles the retrieval or calculation a chemical's
+    r"""This function handles the retrieval or calculation a chemical's
     Stockmayer parameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 7 CSP methods.
     Will automatically select a data source to use if no method is provided;
@@ -260,7 +260,7 @@ def Stockmayer(CASRN="", Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
        Coefficients of Solutes in Liquids and Supercritical Fluids over Wide
        Ranges of Temperature and Density." The Journal of Supercritical Fluids
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
-    '''
+    """
     if CASRN and dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "Stockmayer")
         if found: return val
@@ -358,7 +358,7 @@ def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
 @mark_numba_incompatible
 def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
           Vm=None, Vb=None, method=None):
-    r'''This function handles the retrieval or calculation a chemical's
+    r"""This function handles the retrieval or calculation a chemical's
     L-J molecular diameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 9 CSP methods.
     Will automatically select a data source to use if no method is provided;
@@ -423,7 +423,7 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
        Coefficients of Solutes in Liquids and Supercritical Fluids over Wide
        Ranges of Temperature and Density." The Journal of Supercritical Fluids
        76 (April 2013): 94-114. doi:10.1016/j.supflu.2013.02.002.
-    '''
+    """
     if CASRN and dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "molecular_diameter")
         if found: return val
@@ -469,7 +469,7 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
 ### Sigma Lennard-Jones
 
 def sigma_Flynn(Vc):
-    r'''Calculates Lennard-Jones molecular diameter.
+    r"""Calculates Lennard-Jones molecular diameter.
     Uses critical volume. CSP method by [1]_ as reported in [2]_.
 
     .. math::
@@ -500,7 +500,7 @@ def sigma_Flynn(Vc):
     .. [2] Stiel, L. I., and George Thodos. "Lennard-Jones Force Constants
        Predicted from Critical Properties." Journal of Chemical & Engineering
        Data 7, no. 2 (April 1, 1962): 234-36. doi:10.1021/je60013a023
-    '''
+    """
     Vc = Vc*1E6  # m^3/mol to cm^3/mol
     sigma = 0.561*(Vc**(1/3.))**1.2
     return sigma
@@ -652,7 +652,7 @@ def sigma_Bird_Stewart_Lightfoot_melting(Vm):
     return sigma
 
 def sigma_Stiel_Thodos(Vc, Zc):
-    r'''Calculates Lennard-Jones molecular diameter.
+    r"""Calculates Lennard-Jones molecular diameter.
     Uses critical volume and compressibility. CSP method by [1]_.
 
     .. math::
@@ -686,14 +686,14 @@ def sigma_Stiel_Thodos(Vc, Zc):
     .. [1] Stiel, L. I., and George Thodos. "Lennard-Jones Force Constants
        Predicted from Critical Properties." Journal of Chemical & Engineering
        Data 7, no. 2 (April 1, 1962): 234-36. doi:10.1021/je60013a023
-    '''
+    """
     Vc = Vc*1E6
     sigma = 0.1866*Vc**(1/3.0)*Zc**(-1.2)
     return sigma
 
 
 def sigma_Tee_Gotoh_Steward_1(Tc, Pc):
-    r'''Calculates Lennard-Jones molecular diameter.
+    r"""Calculates Lennard-Jones molecular diameter.
     Uses critical temperature and pressure. CSP method by [1]_.
 
     .. math::
@@ -728,13 +728,13 @@ def sigma_Tee_Gotoh_Steward_1(Tc, Pc):
        Parameters for Normal Fluids. Lennard-Jones 12-6 Potential." Industrial
        & Engineering Chemistry Fundamentals 5, no. 3 (August 1, 1966): 356-63.
        doi:10.1021/i160019a011
-    '''
+    """
     Pc = Pc/101325.
     sigma = 2.3647*(Tc/Pc)**(1/3.)
     return sigma
 
 def sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega):
-    r'''Calculates Lennard-Jones molecular diameter.
+    r"""Calculates Lennard-Jones molecular diameter.
     Uses critical temperature, pressure, and acentric factor. CSP method by
     [1]_.
 
@@ -772,13 +772,13 @@ def sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega):
        for Normal Fluids. Lennard-Jones 12-6 Potential." Industrial
        & Engineering Chemistry Fundamentals 5, no. 3 (August 1, 1966): 356-63.
        doi:10.1021/i160019a011
-    '''
+    """
     Pc = Pc/101325.
     sigma = (2.3551-0.0874*omega)*(Tc/Pc)**(1/3.)
     return sigma
 
 def sigma_Silva_Liu_Macedo(Tc, Pc):
-    r'''Calculates Lennard-Jones molecular diameter.
+    r"""Calculates Lennard-Jones molecular diameter.
     Uses critical temperature and pressure. CSP method by [1]_.
 
     .. math::
@@ -814,7 +814,7 @@ def sigma_Silva_Liu_Macedo(Tc, Pc):
        Self-Diffusion Coefficients of Dense Fluids, Including Hydrogen-Bonding
        Substances." Chemical Engineering Science 53, no. 13 (July 1, 1998):
        2423-29. doi:10.1016/S0009-2509(98)00037-2
-    '''
+    """
     Pc = Pc/1E5  # Pa to bar
     term = 0.17791 + 11.779*(Tc/Pc) - 0.049029 * (Tc/Pc)**2
     if term < 0:
@@ -826,7 +826,7 @@ def sigma_Silva_Liu_Macedo(Tc, Pc):
 ### epsilon Lennard-Jones
 
 def epsilon_Flynn(Tc):
-    r'''Calculates Lennard-Jones depth of potential-energy minimum.
+    r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses critical temperature. CSP method by [1]_ as reported in [2]_.
 
     .. math::
@@ -856,7 +856,7 @@ def epsilon_Flynn(Tc):
     .. [2] Stiel, L. I., and George Thodos. "Lennard-Jones Force Constants
        Predicted from Critical Properties." Journal of Chemical & Engineering
        Data 7, no. 2 (April 1, 1962): 234-36. doi:10.1021/je60013a023
-    '''
+    """
     epsilon_k = 1.77*Tc**(5/6.)
     return epsilon_k
 
@@ -963,7 +963,7 @@ def epsilon_Bird_Stewart_Lightfoot_melting(Tm):
     return epsilon_k
 
 def epsilon_Stiel_Thodos(Tc, Zc):
-    r'''Calculates Lennard-Jones depth of potential-energy minimum.
+    r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses Critical temperature and critical compressibility. CSP method by [1]_.
 
     .. math::
@@ -996,12 +996,12 @@ def epsilon_Stiel_Thodos(Tc, Zc):
     .. [1] Stiel, L. I., and George Thodos. "Lennard-Jones Force Constants
        Predicted from Critical Properties." Journal of Chemical & Engineering
        Data 7, no. 2 (April 1, 1962): 234-36. doi:10.1021/je60013a023
-    '''
+    """
     epsilon_k = 65.3*Tc*Zc**3.6
     return epsilon_k
 
 def epsilon_Tee_Gotoh_Steward_1(Tc):
-    r'''Calculates Lennard-Jones depth of potential-energy minimum.
+    r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses Critical temperature. CSP method by [1]_.
 
     .. math::
@@ -1033,12 +1033,12 @@ def epsilon_Tee_Gotoh_Steward_1(Tc):
        for Normal Fluids. Lennard-Jones 12-6 Potential." Industrial &
        Engineering Chemistry Fundamentals 5, no. 3 (August 1, 1966): 356-63.
        doi:10.1021/i160019a011
-    '''
+    """
     epsilon_k = 0.7740*Tc
     return epsilon_k
 
 def epsilon_Tee_Gotoh_Steward_2(Tc, omega):
-    r'''Calculates Lennard-Jones depth of potential-energy minimum.
+    r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses critical temperature and acentric factor. CSP method by [1]_.
 
     .. math::
@@ -1072,14 +1072,14 @@ def epsilon_Tee_Gotoh_Steward_2(Tc, omega):
        for Normal Fluids. Lennard-Jones 12-6 Potential." Industrial &
        Engineering Chemistry Fundamentals 5, no. 3 (August 1, 1966): 356-63.
        doi:10.1021/i160019a011
-    '''
+    """
     epsilon_k = (0.7915 + 0.1693*omega)*Tc
     return epsilon_k
 
 ### Collision Integral
 
 def collision_integral_Neufeld_Janzen_Aziz(T_star, l=1, s=1):
-    r'''Calculates Lennard-Jones collision integral for any of 16 values of
+    r"""Calculates Lennard-Jones collision integral for any of 16 values of
     (l,j) for the wide range of 0.3 < T_star < 100. Values are accurate to
     0.1 % of actual values, but the calculation of actual values is
     computationally intensive and so these simplifications are used, developed
@@ -1130,7 +1130,7 @@ def collision_integral_Neufeld_Janzen_Aziz(T_star, l=1, s=1):
        Omega(l, S)* for the Lennard-Jones (12-6) Potential." The Journal of
        Chemical Physics 57, no. 3 (August 1, 1972): 1100-1102.
        doi:10.1063/1.1678363
-    '''
+    """
     if l == 1 and s == 1:
         A, B, C, D, E, F, G, H = 1.06036, 0.1561, 0.193, 0.47635, 1.03587, 1.52996, 1.76474, 3.89411
     elif l == 1 and s == 2:
@@ -1229,7 +1229,7 @@ Cs_collision = {
 }
 
 def collision_integral_Kim_Monroe(T_star, l=1, s=1):
-    r'''Calculates Lennard-Jones collision integral for any of 16 values of
+    r"""Calculates Lennard-Jones collision integral for any of 16 values of
     (l,j) for the wide range of 0.3 < T_star < 400. Values are accurate to
     0.007 % of actual values, but the calculation of actual values is
     computationally intensive and so these simplifications are used, developed
@@ -1274,7 +1274,7 @@ def collision_integral_Kim_Monroe(T_star, l=1, s=1):
        Interpolation to Parameterize Neon, Argon, and Krypton." Journal of
        Computational Physics 273 (September 15, 2014): 358-73.
        doi:10.1016/j.jcp.2014.05.018.
-    '''
+    """
     if (l, s) not in As_collision:
         raise ValueError("Input values of l and s are not supported")
     omega = As_collision[(l, s)]

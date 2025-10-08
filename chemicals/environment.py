@@ -249,7 +249,7 @@ def GTP_methods(CASRN):
 
 @mark_numba_incompatible
 def GWP(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's Global Warming
+    r"""This function handles the retrieval of a chemical's Global Warming
     Potential, relative to CO2. Lookup is based on CASRNs.
 
     There are four sources of data:
@@ -329,7 +329,7 @@ def GWP(CASRN, method=None):
        I. Gomis. "Climate Change 2021: The Physical Science Basis." Contribution of
        Working Group I to the Sixth Assessment Report of the Intergovernmental
        Panel on Climate Change 2 (2021): 24.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "GWP")
         if found: return val
@@ -356,7 +356,7 @@ def GWP(CASRN, method=None):
 
 @mark_numba_incompatible
 def GTP(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's Global Temperature
+    r"""This function handles the retrieval of a chemical's Global Temperature
     Potential, relative to CO2. Lookup is based on CASRNs.
 
     There are two sources of data:
@@ -409,7 +409,7 @@ def GTP(CASRN, method=None):
        I. Gomis. "Climate Change 2021: The Physical Science Basis." Contribution of
        Working Group I to the Sixth Assessment Report of the Intergovernmental
        Panel on Climate Change 2 (2021): 24.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "GTP")
         if found: return val
@@ -466,7 +466,7 @@ def ODP_methods(CASRN):
 
 @mark_numba_incompatible
 def ODP(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's Ozone Depletion
+    r"""This function handles the retrieval of a chemical's Ozone Depletion
     Potential, relative to CFC-11 (trichlorofluoromethane). Lookup is based on
     CASRNs. Will automatically select a data source to use if no method is
     provided; returns None if the data is not available.
@@ -526,7 +526,7 @@ def ODP(CASRN, method=None):
        of Ozone Depletion: 2010. Global Ozone Research and Monitoring
        Project-Report No. 52, Geneva, Switzerland, 516 p.
        https://www.wmo.int/pages/prog/arep/gaw/ozone_2010/documents/Ozone-Assessment-2010-complete.pdf
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, "ODP")
         if found: return val

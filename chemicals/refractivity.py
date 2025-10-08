@@ -137,7 +137,7 @@ def RI_methods(CASRN):
 
 @mark_numba_incompatible
 def RI(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's refractive
+    r"""This function handles the retrieval of a chemical's refractive
     index. Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
 
@@ -183,7 +183,7 @@ def RI(CASRN, method=None):
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
     .. [2] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
         RI, found = database_constant_lookup(CASRN, "RI")
         RIT, _ = database_constant_lookup(CASRN, "RIT")
@@ -207,7 +207,7 @@ def RI(CASRN, method=None):
 
 
 def polarizability_from_RI(RI, Vm):
-    r'''Returns the polarizability of a fluid given its molar volume and
+    r"""Returns the polarizability of a fluid given its molar volume and
     refractive index.
 
     .. math::
@@ -245,11 +245,11 @@ def polarizability_from_RI(RI, Vm):
        Polarizabilities of Nonpolar and Slightly Polar Hydrocarbons."
        International Journal of Thermophysics 37, no. 7 (June 6, 2016): 1-24.
        doi:10.1007/s10765-016-2075-8.
-    '''
+    """
     return 3/(4*pi*N_A)*(RI**2-1)/(RI**2+2)*Vm
 
 def molar_refractivity_from_RI(RI, Vm):
-    r'''Returns the molar refractivity of a fluid given its molar volume and
+    r"""Returns the molar refractivity of a fluid given its molar volume and
     refractive index.
 
     .. math::
@@ -282,11 +282,11 @@ def molar_refractivity_from_RI(RI, Vm):
        Polarizabilities of Nonpolar and Slightly Polar Hydrocarbons."
        International Journal of Thermophysics 37, no. 7 (June 6, 2016): 1-24.
        doi:10.1007/s10765-016-2075-8.
-    '''
+    """
     return (RI**2 - 1.)/(RI**2 + 2.)*Vm
 
 def RI_from_molar_refractivity(Rm, Vm):
-    r'''Returns the refractive index of a fluid given its molar volume and
+    r"""Returns the refractive index of a fluid given its molar volume and
     molar refractivity.
 
     .. math::
@@ -319,7 +319,7 @@ def RI_from_molar_refractivity(Rm, Vm):
        Polarizabilities of Nonpolar and Slightly Polar Hydrocarbons."
        International Journal of Thermophysics 37, no. 7 (June 6, 2016): 1-24.
        doi:10.1007/s10765-016-2075-8.
-    '''
+    """
     Rm = ((-2*Rm - Vm)/(Rm-Vm))**0.5
     return Rm
 
@@ -402,7 +402,7 @@ def RI_IAPWS(T, rho, wavelength=0.5893e-6):
     return n
 
 def TDE_RIXExpansion(T, Bs, Cs, wavelength=589.26e-9):
-    r'''Calculates the refractive index of a pure liquid at a given temperature,
+    r"""Calculates the refractive index of a pure liquid at a given temperature,
     and wavelength, using the NIST TDE RIXExpansion formula [1]_.
 
     .. math::
@@ -447,7 +447,7 @@ def TDE_RIXExpansion(T, Bs, Cs, wavelength=589.26e-9):
     ----------
     .. [1] "ThermoData Engine (TDE103b V10.1) User`s Guide."
        https://trc.nist.gov/TDE/Help/TDE103b/Eqns-Pure-RefractiveIndex/RIXExpansion.htm.
-    '''
+    """
     t = T - 298.15
     w = (wavelength - 589.26e-9)*1e9
     n_D = horner(Bs, t)
