@@ -184,7 +184,7 @@ def test_combustion():
     with pytest.raises(ValueError):
         combustion_data({'H': 5, 'C': 6, 'O': 2, 'N': 1}, Hf=-344900.0, method='BADMETHOD')
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         combustion_data(['H']) # Bad type
 
     with pytest.raises(ValueError):

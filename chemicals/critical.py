@@ -1128,7 +1128,7 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
     atom_count = 0
     for atom, count in atoms.items():
         if atom not in covalent_radii:
-            raise Exception(f"Atom {atom} is not supported by the supplied dictionary")
+            raise ValueError(f"Atom {atom} is not supported by the supplied dictionary")
         tot += count*covalent_radii[atom]
         atom_count += count
     da = 2.*tot/atom_count

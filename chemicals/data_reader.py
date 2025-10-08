@@ -114,7 +114,7 @@ def load_df(key):
     if sparsify:
         df = make_df_sparse(df)
     if low_mem:
-        for col_name in df.columns.values.tolist():
+        for col_name in df.columns.values.tolist():  # noqa: PD011
             if col_name in spurious_columns:
                 df[col_name] = pd.Series([], dtype=float).astype(pd.SparseDtype("float", nan))
 
@@ -215,7 +215,7 @@ def list_available_methods_from_df_dict(df_dict, index, key):
 def list_available_methods_from_df(df, index, keys_by_method):
     if index in df.index:
         return [method for method, key in keys_by_method.items()
-                if not pd.isnull(df.at[index, key])]
+                if not pd.isna(df.at[index, key])]
     else:
         return []
 

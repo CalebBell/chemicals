@@ -162,6 +162,7 @@ def _load_combustion_data():
     ignition_delay_sources = {
         DAHMEN_MARQUARDT: dahmen_marquardt_iqt,
     }
+    _combustion_data_loaded = True
 
 def __getattr__(name):
     if name in ("florian_liming_ron_experimental",
@@ -659,7 +660,7 @@ def as_atoms(formula):
     elif isinstance(formula, dict):
         atoms = formula
     else:
-        raise ValueError("atoms must be either a string or dictionary, "
+        raise TypeError("atoms must be either a string or dictionary, "
                         f"not a {type(formula).__name__} object")
     return atoms
 
