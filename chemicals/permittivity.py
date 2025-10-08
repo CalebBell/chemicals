@@ -67,10 +67,9 @@ from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 folder = os_path_join(source_path, "Electrolytes")
 register_df_source(folder, "Permittivity (Dielectric Constant) of Liquids.tsv")
 
-_permittivity_data_loaded = False
 @mark_numba_incompatible
 def _load_permittivity_data():
-    global _permittivity_data_loaded, permittivity_values_CRC, permittivity_data_CRC
+    global permittivity_values_CRC, permittivity_data_CRC
     permittivity_data_CRC = data_source("Permittivity (Dielectric Constant) of Liquids.tsv")
     permittivity_values_CRC = np.array(permittivity_data_CRC.values[:, 1:], dtype=float)
 

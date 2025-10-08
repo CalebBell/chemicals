@@ -3103,7 +3103,7 @@ def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
     if (set(IDs1) == set(IDs2)) and (len(IDs1) == len(IDs2)):
             cmps = IDs1
     else:
-        cmps = sorted(list(set(IDs1 + IDs2)))
+        cmps = sorted(set(IDs1 + IDs2))
     mole = flow1 + flow2
     moles = []
     for cmp in cmps:
@@ -3162,7 +3162,7 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
     if (set(IDs1) == set(IDs2)) and (len(IDs1) == len(IDs2)):
         cmps = IDs1
     else:
-        cmps = sorted(list(set(IDs1 + IDs2)))
+        cmps = sorted(set(IDs1 + IDs2))
 
     ns = []
     for ID in cmps:

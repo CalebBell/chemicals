@@ -175,10 +175,9 @@ register_df_source(folder, "Somayajulu.tsv")
 register_df_source(folder, "SomayajuluRevised.tsv")
 register_df_source(folder, "VDI PPDS surface tensions.tsv")
 
-_interface_dfs_loaded = False
 @mark_numba_incompatible
 def load_interface_dfs():
-    global _interface_dfs_loaded, sigma_data_Mulero_Cachadina, sigma_values_Mulero_Cachadina
+    global sigma_data_Mulero_Cachadina, sigma_values_Mulero_Cachadina
     global sigma_data_Jasper_Lange, sigma_values_Jasper_Lange
     global sigma_data_Somayajulu, sigma_values_Somayajulu, sigma_data_Somayajulu2
     global sigma_values_Somayajulu2, sigma_data_VDI_PPDS_11, sigma_values_VDI_PPDS_11

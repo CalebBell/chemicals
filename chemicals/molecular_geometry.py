@@ -83,6 +83,7 @@ def _load_RG_data():
     linear_sources = {
         PSI4_2022A: linear_data_psi4_2022a,
     }
+    _RG_data_loaded = True
 
 def __getattr__(name):
     if name in ("radius_of_gyration_data_psi4_2022a",

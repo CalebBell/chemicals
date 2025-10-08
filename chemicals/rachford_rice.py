@@ -121,16 +121,25 @@ significant error exists.
 """
 
 
-__all__ = ['Rachford_Rice_flash_error',
-           'Rachford_Rice_solution', 'Rachford_Rice_polynomial',
-           'Rachford_Rice_solution_polynomial', 'Rachford_Rice_solution_LN2',
-           'Rachford_Rice_solution2', 'Rachford_Rice_solutionN',
-           'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
-           'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
-           'flash_inner_loop_all_methods', 'flash_inner_loop_methods',
-           'Rachford_Rice_solution_mpmath', 'Rachford_Rice_solution_binary_dd',
-           'Rachford_Rice_solution_Leibovici_Neoschil',
-           'Rachford_Rice_solution_Leibovici_Neoschil_dd']
+__all__ = [
+    "Li_Johns_Ahmadi_solution",
+    "Rachford_Rice_flash2_f_jac",
+    "Rachford_Rice_flashN_f_jac",
+    "Rachford_Rice_flash_error",
+    "Rachford_Rice_polynomial",
+    "Rachford_Rice_solution",
+    "Rachford_Rice_solution2",
+    "Rachford_Rice_solutionN",
+    "Rachford_Rice_solution_LN2",
+    "Rachford_Rice_solution_Leibovici_Neoschil",
+    "Rachford_Rice_solution_Leibovici_Neoschil_dd",
+    "Rachford_Rice_solution_binary_dd",
+    "Rachford_Rice_solution_mpmath",
+    "Rachford_Rice_solution_polynomial",
+    "flash_inner_loop",
+    "flash_inner_loop_all_methods",
+    "flash_inner_loop_methods",
+]
 
 from fluids.numerics import (
     IS_PYPY,
@@ -2091,15 +2100,15 @@ def _Rachford_Rice_analytical_3(zs, Ks):
 
 
 
-FLASH_INNER_ANALYTICAL = 'Analytical'
-FLASH_INNER_SECANT = 'Rachford-Rice (Secant)'
-FLASH_INNER_NR = 'Rachford-Rice (Newton-Raphson)'
-FLASH_INNER_HALLEY = 'Rachford-Rice (Halley)'
-FLASH_INNER_NUMPY = 'Rachford-Rice (NumPy)'
-FLASH_INNER_LJA = 'Li-Johns-Ahmadi'
-FLASH_INNER_POLY = 'Rachford-Rice (polynomial)'
-FLASH_INNER_LN2 = 'Leibovici and Nichita 2'
-FLASH_INNER_LN = 'Leibovici and Neoschil'
+FLASH_INNER_ANALYTICAL = "Analytical"
+FLASH_INNER_SECANT = "Rachford-Rice (Secant)"
+FLASH_INNER_NR = "Rachford-Rice (Newton-Raphson)"
+FLASH_INNER_HALLEY = "Rachford-Rice (Halley)"
+FLASH_INNER_NUMPY = "Rachford-Rice (NumPy)"
+FLASH_INNER_LJA = "Li-Johns-Ahmadi"
+FLASH_INNER_POLY = "Rachford-Rice (polynomial)"
+FLASH_INNER_LN2 = "Leibovici and Nichita 2"
+FLASH_INNER_LN = "Leibovici and Neoschil"
 
 flash_inner_loop_all_methods = (FLASH_INNER_ANALYTICAL,
                                 FLASH_INNER_SECANT,
@@ -2306,7 +2315,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         elif l == 1:
             raise ValueError("Input dimensions are for one component! Rachford-Rice does not apply")
         else:
-            raise ValueError('Only solutions for components counts 2, 3, and 4 are available analytically')
+            raise ValueError("Only solutions for components counts 2, 3, and 4 are available analytically")
         # Need to avoid zero divisions here - specifically when the composition of one component in the feed is 0.0
         xs = [0.0]*l
         ys = [0.0]*l
@@ -2334,7 +2343,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
     elif method2 == FLASH_INNER_POLY:
         return Rachford_Rice_solution_polynomial(zs=zs, Ks=Ks)
     else:
-        raise ValueError('Incorrect method input')
+        raise ValueError("Incorrect method input")
 
 
 ### N phase RR
