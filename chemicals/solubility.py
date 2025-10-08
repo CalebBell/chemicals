@@ -203,16 +203,16 @@ def hansen_delta_d(CASRN, method=None):
     References
     ----------
     .. [1] Alshehri, Abdulelah S., Anjan K. Tula, Fengqi You, and Rafiqul Gani.
-       "Next Generation Pure Component Property Estimation Models: With and 
-       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022): 
+       "Next Generation Pure Component Property Estimation Models: With and
+       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022):
        e17469. https://doi.org/10.1002/aic.17469.
-    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte. 
-       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship 
-       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6 
+    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte.
+       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship
+       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6
        (May 24, 2022): 185. https://doi.org/10.1007/s42452-022-04959-4.
     .. [3] Joshua Schrier, "Hansen Solubility Parameters" from the Wolfram Data
        Repository (2020).
-    .. [4] Alejandro Gutierrez, "HSPiPy". 
+    .. [4] Alejandro Gutierrez, "HSPiPy".
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -293,16 +293,16 @@ def hansen_delta_p(CASRN, method=None):
     References
     ----------
     .. [1] Alshehri, Abdulelah S., Anjan K. Tula, Fengqi You, and Rafiqul Gani.
-       "Next Generation Pure Component Property Estimation Models: With and 
-       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022): 
+       "Next Generation Pure Component Property Estimation Models: With and
+       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022):
        e17469. https://doi.org/10.1002/aic.17469.
-    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte. 
-       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship 
-       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6 
+    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte.
+       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship
+       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6
        (May 24, 2022): 185. https://doi.org/10.1007/s42452-022-04959-4.
     .. [3] Joshua Schrier, "Hansen Solubility Parameters" from the Wolfram Data
        Repository (2020).
-    .. [4] Alejandro Gutierrez, "HSPiPy". 
+    .. [4] Alejandro Gutierrez, "HSPiPy".
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
@@ -383,16 +383,16 @@ def hansen_delta_h(CASRN, method=None):
     References
     ----------
     .. [1] Alshehri, Abdulelah S., Anjan K. Tula, Fengqi You, and Rafiqul Gani.
-       "Next Generation Pure Component Property Estimation Models: With and 
-       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022): 
+       "Next Generation Pure Component Property Estimation Models: With and
+       without Machine Learning Techniques." AIChE Journal 68, no. 6 (2022):
        e17469. https://doi.org/10.1002/aic.17469.
-    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte. 
-       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship 
-       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6 
+    .. [2] Ríos, Manuel Díaz de los, and Rubén Murcia Belmonte.
+       "Extending Microsoft Excel and Hansen Solubility Parameters Relationship
+       to Double Hansen's Sphere Calculation." SN Applied Sciences 4, no. 6
        (May 24, 2022): 185. https://doi.org/10.1007/s42452-022-04959-4.
     .. [3] Joshua Schrier, "Hansen Solubility Parameters" from the Wolfram Data
        Repository (2020).
-    .. [4] Alejandro Gutierrez, "HSPiPy". 
+    .. [4] Alejandro Gutierrez, "HSPiPy".
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:

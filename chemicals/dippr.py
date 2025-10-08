@@ -208,7 +208,7 @@ def EQ101(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
         Temperature, [K]
     A : float
         First coefficient [-]
-    B : float  
+    B : float
         Second coefficient [K]
     C : float, optional
         Third coefficient, default=0 [-]

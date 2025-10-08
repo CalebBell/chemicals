@@ -361,19 +361,19 @@ ORGANIC_PREFERENCES_FILE = 'organic_preferences.json'
 def load_chemical_preferences():
     """Loads preferred and unpreferred CAS numbers from preference files in the
     Identifiers folder.
-        
+
     Returns
     -------
     preferred_CAS : set
         Set of preferred CAS numbers from all loaded files
-    unpreferred_CAS : set 
+    unpreferred_CAS : set
         Set of unpreferred CAS numbers from all loaded files
-        
+
     Notes
     -----
     Each file should contain 'preferred_cas' and 'unpreferred_cas' lists.
     Missing files are skipped silently.
-    
+
     Examples
     --------
     >>> preferred, unpreferred = load_chemical_preferences()
@@ -590,7 +590,7 @@ class ChemicalMetadataDiskDB:
 
     def __init__(self, db_path=os_path_join(folder, 'metadata.db')):
         """Initialize connection to the SQLite database
-        
+
         Parameters
         ----------
         db_path : str or Path
@@ -720,7 +720,7 @@ class ChemicalMetadataDiskDB:
     @property
     def CAS_index(self):
         """Build and return a dictionary mapping CAS numbers to ChemicalMetadata objects.
-        
+
         Returns
         -------
         dict
@@ -739,7 +739,7 @@ class ChemicalMetadataDiskDB:
     @property
     def smiles_index(self):
         """Build and return a dictionary mapping SMILES strings to ChemicalMetadata objects.
-        
+
         Returns
         -------
         dict
@@ -757,7 +757,7 @@ class ChemicalMetadataDiskDB:
     @property
     def InChI_index(self):
         """Build and return a dictionary mapping InChI strings to ChemicalMetadata objects.
-        
+
         Returns
         -------
         dict
@@ -775,7 +775,7 @@ class ChemicalMetadataDiskDB:
     @property
     def InChI_key_index(self):
         """Build and return a dictionary mapping InChI keys to ChemicalMetadata objects.
-        
+
         Returns
         -------
         dict

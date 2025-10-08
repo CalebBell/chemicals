@@ -1027,13 +1027,13 @@ def floats_to_ints(float_list, matrix, max_denominator=1000):
     All floats are one or larger. The chemical equation is assumed to be reasonable.
     The SVD has already solved the problem, but there is a little numerical noise
     we need to clean up.
-    
+
     Parameters
     ----------
     - float_list: List of floats to convert
     - matrix: Stoichiometric matrix to verify balance
     - max_denominator: Maximum scaling factor to consider
-    
+
     Returns
     -------
     - A list of integers scaled from the original floats
@@ -1042,7 +1042,7 @@ def floats_to_ints(float_list, matrix, max_denominator=1000):
         # Calculate rounded integers
         # in practice this works extremely well and rarely goes above 10
         # it is extremely fast compared to a Fraction/Decimal approach
-        rounded = [int(round(D * x)) for x in float_list]
+        rounded = [round(D * x) for x in float_list]
         # Check if these coefficients actually balance the reaction
         if check_reaction_balance(matrix, rounded):
             return rounded
@@ -1103,7 +1103,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
        Reactions." Materiali in Tehnologije 45, no. 6 (2011): 503-22.
     .. [3] Risteski, Ice B. "A New Approach to Balancing Chemical Equations."
        SIAM Problems & Solutions, 2007, 1-10.
-    .. [4] Smith, William R., and Ronald W. Missen. "Using Mathematica and 
+    .. [4] Smith, William R., and Ronald W. Missen. "Using Mathematica and
        Maple To Obtain Chemical Equations." Journal of Chemical Education
        74, no. 11 (November 1, 1997): 1369. https://doi.org/10.1021/ed074p1369.
     '''

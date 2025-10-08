@@ -272,7 +272,7 @@ def Z_from_virial_density_form(T, P, coeffs=tuple()):
         - First coefficient (n=1): Second virial coefficient B [m³/mol]
         - Second coefficient (n=2): Third virial coefficient C [m³/mol²]
         - Third coefficient (n=3): Fourth virial coefficient D [m³/mol³]
-    
+
     Returns
     -------
     Z : float

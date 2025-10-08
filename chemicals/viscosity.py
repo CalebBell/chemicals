@@ -2687,13 +2687,13 @@ def generate_viscosity_dicts():
     for key, val in viscosity_scales.items():
         if key == 'barbey' or key == 'kinematic viscosity':
             continue
-            
+
         values, nus = val
         values_log, nus_log = np.log(values), np.log(nus)
-        
+
         to_nu_tck = splrep(values_log, nus_log, k=3, s=0)
         from_nu_tck = splrep(nus_log, values_log, k=3, s=0)
-        
+
         print(f"viscosity_converters_to_nu['{key}'] = implementation_optimize_tck([")
         print(f"    {to_nu_tck[0].tolist()!r},")
         print(f"    {to_nu_tck[1].tolist()!r},")
@@ -2705,14 +2705,14 @@ def generate_viscosity_dicts():
         print(f"    {from_nu_tck[2]}")
         print("])")
         print()
-    
+
     # Handle barbey scale separately
     barbey_values, barbey_nus = list(reversed(Barbey_degrees)), list(reversed(Barbey_nu))
     barbey_values_log, barbey_nus_log = np.log(barbey_values), np.log(barbey_nus)
-    
+
     to_nu_tck = splrep(barbey_values_log, barbey_nus_log, k=3, s=0)
     from_nu_tck = splrep(np.log(Barbey_nu), np.log(Barbey_degrees), k=3, s=0)
-    
+
     print("    viscosity_converters_to_nu['barbey'] = implementation_optimize_tck([")
     print(f"        {to_nu_tck[0].tolist()!r},")
     print(f"        {to_nu_tck[1].tolist()!r},")
