@@ -81,6 +81,7 @@ __all__ = [
 ]
 
 import os
+import sqlite3
 
 from chemicals.elements import charge_from_formula, homonuclear_elements_CASs_set, periodic_table, serialize_formula
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path, to_num
@@ -582,7 +583,6 @@ class ChemicalMetadataDB:
         '''Search for a chemical by its serialized formula.
         '''
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
-import sqlite3
 
 
 class ChemicalMetadataDiskDB:
@@ -621,15 +621,6 @@ class ChemicalMetadataDiskDB:
             common_name=row['common_name'],
             synonyms=synonyms
         )
-
-    def search_pubchem(self, pubchem, autoload=True):
-        """Search for a chemical by its pubchem number"""
-        cur = self._conn.cursor()
-        cur.execute(
-            "SELECT * FROM chemicals WHERE pubchemid = ? ORDER BY preferred DESC LIMIT 1",
-            (int(pubchem),)
-        )
-        return self._row_to_metadata(cur.fetchone())
 
     def search_CAS(self, CAS, autoload=True):
         """Search for a chemical by its CAS number"""
