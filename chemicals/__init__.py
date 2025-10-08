@@ -96,13 +96,40 @@ if not fluids.numerics.is_micropython:
     from .virial import *  # noqa: F403
     from .viscosity import *  # noqa: F403
     from .volume import *  # noqa: F403
-    __all__ = ['utils', 'critical', 'elements', 'reaction', 'dipole', 'dippr',
-               'temperature', 'miscdata', 'environment', 'refractivity', 'solubility',
-               'lennard_jones', 'heat_capacity', 'vapor_pressure', 'virial',
-               'phase_change', 'triple', 'exceptions', 'acentric', 'viscosity',
-               'interface', 'permittivity', 'thermal_conductivity', 'combustion',
-               'volume', 'rachford_rice', 'flash_basic', 'identifiers', 'safety',
-               'iapws', 'air', 'molecular_geometry']
+    __all__ = [
+        'acentric',
+        'air',
+        'combustion',
+        'critical',
+        'dipole',
+        'dippr',
+        'elements',
+        'environment',
+        'exceptions',
+        'flash_basic',
+        'heat_capacity',
+        'iapws',
+        'identifiers',
+        'interface',
+        'lennard_jones',
+        'miscdata',
+        'molecular_geometry',
+        'permittivity',
+        'phase_change',
+        'rachford_rice',
+        'reaction',
+        'refractivity',
+        'safety',
+        'solubility',
+        'temperature',
+        'thermal_conductivity',
+        'triple',
+        'utils',
+        'vapor_pressure',
+        'virial',
+        'viscosity',
+        'volume',
+    ]
 
     __all__.extend(exceptions.__all__)
     __all__.extend(critical.__all__)

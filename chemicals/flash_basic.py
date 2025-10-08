@@ -53,8 +53,14 @@ from fluids.numerics import brenth, exp, log, newton, secant
 from chemicals.rachford_rice import flash_inner_loop
 from chemicals.utils import mark_numba_uncacheable
 
-__all__ = ['K_value','Wilson_K_value', 'PR_water_K_value', 'flash_wilson',
-           'flash_Tb_Tc_Pc', 'flash_ideal']
+__all__ = [
+    'K_value',
+    'PR_water_K_value',
+    'Wilson_K_value',
+    'flash_Tb_Tc_Pc',
+    'flash_ideal',
+    'flash_wilson',
+]
 
 
 def K_value(P=None, Psat=None, phi_l=None, phi_g=None, gamma=None, Poynting=1.0):

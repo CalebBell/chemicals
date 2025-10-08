@@ -121,16 +121,25 @@ significant error exists.
 """
 
 
-__all__ = ['Rachford_Rice_flash_error',
-           'Rachford_Rice_solution', 'Rachford_Rice_polynomial',
-           'Rachford_Rice_solution_polynomial', 'Rachford_Rice_solution_LN2',
-           'Rachford_Rice_solution2', 'Rachford_Rice_solutionN',
-           'Rachford_Rice_flashN_f_jac', 'Rachford_Rice_flash2_f_jac',
-           'Li_Johns_Ahmadi_solution', 'flash_inner_loop',
-           'flash_inner_loop_all_methods', 'flash_inner_loop_methods',
-           'Rachford_Rice_solution_mpmath', 'Rachford_Rice_solution_binary_dd',
-           'Rachford_Rice_solution_Leibovici_Neoschil',
-           'Rachford_Rice_solution_Leibovici_Neoschil_dd']
+__all__ = [
+    'Li_Johns_Ahmadi_solution',
+    'Rachford_Rice_flash2_f_jac',
+    'Rachford_Rice_flashN_f_jac',
+    'Rachford_Rice_flash_error',
+    'Rachford_Rice_polynomial',
+    'Rachford_Rice_solution',
+    'Rachford_Rice_solution2',
+    'Rachford_Rice_solutionN',
+    'Rachford_Rice_solution_LN2',
+    'Rachford_Rice_solution_Leibovici_Neoschil',
+    'Rachford_Rice_solution_Leibovici_Neoschil_dd',
+    'Rachford_Rice_solution_binary_dd',
+    'Rachford_Rice_solution_mpmath',
+    'Rachford_Rice_solution_polynomial',
+    'flash_inner_loop',
+    'flash_inner_loop_all_methods',
+    'flash_inner_loop_methods',
+]
 
 from fluids.numerics import (
     IS_PYPY,

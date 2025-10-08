@@ -87,25 +87,30 @@ from chemicals.data_reader import (
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
 from chemicals.utils import mark_numba_incompatible, os_path_join, property_mass_to_molar, property_molar_to_mass, source_path
 
-__all__ = ('combustion_stoichiometry',
-           'CombustionData',
-           'combustion_data',
-           'HHV_modified_Dulong',
-           'HHV_stoichiometry',
-           'LHV_from_HHV',
-           'combustion_products_mixture',
-           'air_fuel_ratio_solver',
-           'fuel_air_spec_solver',
-           'combustion_spec_solver',
-           'RON', 'RON_methods',
-           'MON', 'MON_methods',
-           'Perez_Boehman_RON_from_ignition_delay',
-           'Perez_Boehman_MON_from_ignition_delay',
-           'octane_sensitivity',
-           'AKI',
-           'ignition_delay_all_methods', 'ignition_delay_methods',
-           'ignition_delay',
-           'IDT_to_DCN')
+__all__ = (
+    'AKI',
+    'MON',
+    'RON',
+    'CombustionData',
+    'HHV_modified_Dulong',
+    'HHV_stoichiometry',
+    'IDT_to_DCN',
+    'LHV_from_HHV',
+    'MON_methods',
+    'Perez_Boehman_MON_from_ignition_delay',
+    'Perez_Boehman_RON_from_ignition_delay',
+    'RON_methods',
+    'air_fuel_ratio_solver',
+    'combustion_data',
+    'combustion_products_mixture',
+    'combustion_spec_solver',
+    'combustion_stoichiometry',
+    'fuel_air_spec_solver',
+    'ignition_delay',
+    'ignition_delay_all_methods',
+    'ignition_delay_methods',
+    'octane_sensitivity',
+)
 
 
 # Register data sources and lazy load them

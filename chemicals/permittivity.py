@@ -56,7 +56,7 @@ attribute of this module.
 """
 
 
-__all__ = ['permittivity_IAPWS', 'permittivity_CRC']
+__all__ = ['permittivity_CRC', 'permittivity_IAPWS']
 
 from fluids.numerics import numpy as np
 from fluids.numerics import sqrt

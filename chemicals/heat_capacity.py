@@ -176,29 +176,52 @@ attribute of this module.
 
 """
 
-__all__ = ['heat_capacity_gas_methods',
-           'Poling', 'Poling_integral', 'Poling_integral_over_T',
-           'Lastovka_Shaw', 'Lastovka_Shaw_integral', 'Lastovka_Shaw_integral_over_T',
-           'Lastovka_Shaw_T_for_Hm', 'Lastovka_Shaw_T_for_Sm', 'Lastovka_Shaw_term_A',
-           'TRCCp', 'TRCCp_integral', 'TRCCp_integral_over_T',
-           'heat_capacity_liquid_methods', 'PPDS2', 'PPDS15',
-           'TDE_CSExpansion',
-           'Rowlinson_Poling', 'Rowlinson_Bondi', 'Dadgostar_Shaw',
-           'Zabransky_quasi_polynomial', 'Zabransky_quasi_polynomial_integral',
-           'Zabransky_quasi_polynomial_integral_over_T', 'Zabransky_cubic',
-           'Zabransky_cubic_integral', 'Zabransky_cubic_integral_over_T',
-           'Dadgostar_Shaw_integral', 'Dadgostar_Shaw_integral_over_T',
-           'Dadgostar_Shaw_terms',
-           'heat_capacity_solid_methods',
-           'Lastovka_solid', 'Lastovka_solid_integral',
-           'Lastovka_solid_integral_over_T', 'heat_capacity_solid_methods',
-           'ZabranskySpline', 'ZabranskyQuasipolynomial',
-           'PiecewiseHeatCapacity',
-           'Shomate_integral_over_T', 'Shomate_integral', 'Shomate',
-           'Cpg_statistical_mechanics', 'Cpg_statistical_mechanics_integral',
-           'Cpg_statistical_mechanics_integral_over_T',
-           'vibration_frequency_cm_to_characteristic_temperature',
-           ]
+__all__ = [
+    'PPDS2',
+    'PPDS15',
+    'Cpg_statistical_mechanics',
+    'Cpg_statistical_mechanics_integral',
+    'Cpg_statistical_mechanics_integral_over_T',
+    'Dadgostar_Shaw',
+    'Dadgostar_Shaw_integral',
+    'Dadgostar_Shaw_integral_over_T',
+    'Dadgostar_Shaw_terms',
+    'Lastovka_Shaw',
+    'Lastovka_Shaw_T_for_Hm',
+    'Lastovka_Shaw_T_for_Sm',
+    'Lastovka_Shaw_integral',
+    'Lastovka_Shaw_integral_over_T',
+    'Lastovka_Shaw_term_A',
+    'Lastovka_solid',
+    'Lastovka_solid_integral',
+    'Lastovka_solid_integral_over_T',
+    'PiecewiseHeatCapacity',
+    'Poling',
+    'Poling_integral',
+    'Poling_integral_over_T',
+    'Rowlinson_Bondi',
+    'Rowlinson_Poling',
+    'Shomate',
+    'Shomate_integral',
+    'Shomate_integral_over_T',
+    'TDE_CSExpansion',
+    'TRCCp',
+    'TRCCp_integral',
+    'TRCCp_integral_over_T',
+    'ZabranskyQuasipolynomial',
+    'ZabranskySpline',
+    'Zabransky_cubic',
+    'Zabransky_cubic_integral',
+    'Zabransky_cubic_integral_over_T',
+    'Zabransky_quasi_polynomial',
+    'Zabransky_quasi_polynomial_integral',
+    'Zabransky_quasi_polynomial_integral_over_T',
+    'heat_capacity_gas_methods',
+    'heat_capacity_liquid_methods',
+    'heat_capacity_solid_methods',
+    'heat_capacity_solid_methods',
+    'vibration_frequency_cm_to_characteristic_temperature',
+]
 import os
 from math import expm1
 
@@ -209,6 +232,7 @@ from fluids.numerics import numpy as np
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_uncacheable, os_path_join, source_path, to_num
 
+IS_NUMBA = "IS_NUMBA" in globals()
 ### Methods introduced in this module
 
 # Gases
@@ -268,10 +292,8 @@ class ZabranskySpline:
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
 
-    try:
-        IS_NUMBA  # type: ignore # noqa: F821
-    except:
-        __slots__ = ('coeffs', 'Tmin', 'Tmax')
+    if not IS_NUMBA:
+        __slots__ = ('Tmax', 'Tmin', 'coeffs')
 
     def __init__(self, coeffs, Tmin, Tmax):
         self.coeffs = coeffs
@@ -337,13 +359,10 @@ class ZabranskySpline:
     force_calculate_integral_over_T = calculate_integral_over_T
     force_calculate_integral = calculate_integral
     force_calculate = calculate
-try:
-    if IS_NUMBA:  # type: ignore # noqa: F821
-        ZabranskySpline = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 4)),  # type: ignore # noqa: F821
-                ('Tmin', numba.float64),  # type: ignore # noqa: F821
-                ('Tmax', numba.float64)])(ZabranskySpline)  # type: ignore # noqa: F821
-except:
-    pass
+if IS_NUMBA:  # type: ignore
+    ZabranskySpline = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 4)),  # type: ignore # noqa: F821
+            ('Tmin', numba.float64),  # type: ignore # noqa: F821
+            ('Tmax', numba.float64)])(ZabranskySpline)  # type: ignore # noqa: F821
 
 class ShomateRange:
     r'''
@@ -366,10 +385,8 @@ class ShomateRange:
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
 
-    try:
-        IS_NUMBA  # type: ignore # noqa: F821
-    except:
-        __slots__ = ('coeffs', 'Tmin', 'Tmax')
+    if not IS_NUMBA:
+        __slots__ = ('Tmax', 'Tmin', 'coeffs')
     def __init__(self, coeffs, Tmin, Tmax):
         self.coeffs = coeffs
         self.Tmin = Tmin
@@ -398,7 +415,7 @@ class ShomateRange:
     force_calculate_integral = calculate_integral
     force_calculate = calculate
 try:
-    if IS_NUMBA:  # type: ignore # noqa: F821
+    if IS_NUMBA:  # type: ignore
         ShomateRange = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 5)),  # type: ignore # noqa: F821
                 ('Tmin', numba.float64),  # type: ignore # noqa: F821
                 ('Tmax', numba.float64)])(ShomateRange)  # type: ignore # noqa: F821
@@ -433,10 +450,8 @@ class ZabranskyQuasipolynomial:
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
     '''
 
-    try:
-        IS_NUMBA  # type: ignore # noqa: F821
-    except:
-        __slots__ = ('coeffs', 'Tc', 'Tmin', 'Tmax')
+    if not IS_NUMBA:
+        __slots__ = ('Tc', 'Tmax', 'Tmin', 'coeffs')
 
     def __init__(self, coeffs, Tc, Tmin, Tmax):
         self.coeffs = coeffs
@@ -501,7 +516,7 @@ class ZabranskyQuasipolynomial:
         return (Zabransky_quasi_polynomial_integral_over_T(Tb, self.Tc, *self.coeffs)
                - Zabransky_quasi_polynomial_integral_over_T(Ta, self.Tc, *self.coeffs))
 try:
-    if IS_NUMBA:  # type: ignore # noqa: F821
+    if IS_NUMBA:  # type: ignore
         ZabranskyQuasipolynomial = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 6)),  # type: ignore # noqa: F821
             ('Tc', numba.float64),  # type: ignore # noqa: F821
             ('Tmin', numba.float64),  # type: ignore # noqa: F821
@@ -523,7 +538,7 @@ class PiecewiseHeatCapacity:
     """
 
     # Dev note - not possible to jitclass this as the model types are not explicit
-    __slots__ = ('models', 'Tmin', 'Tmax')
+    __slots__ = ('Tmax', 'Tmin', 'models')
 
     def __init__(self, models):
         self.models = tuple(sorted(models, key=lambda x: x.Tmin))

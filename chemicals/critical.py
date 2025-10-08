@@ -81,21 +81,36 @@ Critical Volume of Mixtures
 .. autofunction:: chemicals.critical.modified_Wilson_Vc
 """
 
-__all__ = ['Tc', 'Pc', 'Vc', 'Zc',
-           'Mersmann_Kind_predictor',
-           'third_property',
-           'critical_surface',
-           'Ihmels', 'Meissner', 'Grigoras', 'Hekayati_Raeissi', 'Li',
-           'Tb_Tc_relationship',
-           'Chueh_Prausnitz_Tc', 'Grieves_Thodos',
-           'modified_Wilson_Tc', 'Chueh_Prausnitz_Vc',
-           'modified_Wilson_Vc',
-           'Tc_methods', 'Pc_methods',
-           'Vc_methods', 'Zc_methods',
-           'critical_surface_methods',
-           'Tc_all_methods', 'Pc_all_methods',
-           'Vc_all_methods', 'Zc_all_methods',
-           'critical_surface_all_methods']
+__all__ = [
+    'Chueh_Prausnitz_Tc',
+    'Chueh_Prausnitz_Vc',
+    'Grieves_Thodos',
+    'Grigoras',
+    'Hekayati_Raeissi',
+    'Ihmels',
+    'Li',
+    'Meissner',
+    'Mersmann_Kind_predictor',
+    'Pc',
+    'Pc_all_methods',
+    'Pc_methods',
+    'Tb_Tc_relationship',
+    'Tc',
+    'Tc_all_methods',
+    'Tc_methods',
+    'Vc',
+    'Vc_all_methods',
+    'Vc_methods',
+    'Zc',
+    'Zc_all_methods',
+    'Zc_methods',
+    'critical_surface',
+    'critical_surface_all_methods',
+    'critical_surface_methods',
+    'modified_Wilson_Tc',
+    'modified_Wilson_Vc',
+    'third_property',
+]
 
 
 from fluids.constants import N_A, R, R_inv
@@ -1191,7 +1206,7 @@ def Tb_Tc_relationship(Tb=None, Tc=None, fit='Perry8E'):
     .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        Eighth Edition. McGraw-Hill Professional, 2007.
     '''
-    if Tb is None and Tc is None or (Tc is not None and Tb is not None):
+    if (Tb is None and Tc is None) or (Tc is not None and Tb is not None):
         raise ValueError("This function relates boiling and critical temperature; only one value must be provided")
     if fit == 'Perry8E':
         coeff = 1.64

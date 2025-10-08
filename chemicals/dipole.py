@@ -34,9 +34,11 @@ Lookup Functions
 .. autodata:: chemicals.dipole.dipole_moment_all_methods
 
 """
-__all__ = ['dipole_moment',
-           'dipole_moment_methods',
-           'dipole_moment_all_methods']
+__all__ = [
+    'dipole_moment',
+    'dipole_moment_all_methods',
+    'dipole_moment_methods',
+]
 
 from chemicals import data_reader as dr
 from chemicals.data_reader import (

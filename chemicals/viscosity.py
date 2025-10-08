@@ -172,17 +172,41 @@ The structure of each dataframe is shown below:
 """
 
 
-__all__ = ['Viswanath_Natarajan_3','Letsou_Stiel', 'Przedziecki_Sridhar', 'PPDS9', 'dPPDS9_dT',
-'Viswanath_Natarajan_2', 'Viswanath_Natarajan_2_exponential', 'Lucas', 'Brokaw',
-'mu_TDE',
-'Yoon_Thodos', 'Stiel_Thodos', 'Lucas_gas', 'viscosity_gas_Gharagheizi', 'Herning_Zipperer',
-'Wilke', 'Wilke_prefactors', 'Wilke_prefactored', 'Wilke_large', 'mu_Yaws', 'dmu_Yaws_dT', 'mu_Yaws_fitting_jacobian',
-'viscosity_index', 'viscosity_converter', 'Lorentz_Bray_Clarke', 'Twu_1985', 'mu_IAPWS', 'mu_air_lemmon',
-'PPDS5']
+__all__ = [
+    'PPDS5',
+    'PPDS9',
+    'Brokaw',
+    'Herning_Zipperer',
+    'Letsou_Stiel',
+    'Lorentz_Bray_Clarke',
+    'Lucas',
+    'Lucas_gas',
+    'Przedziecki_Sridhar',
+    'Stiel_Thodos',
+    'Twu_1985',
+    'Viswanath_Natarajan_2',
+    'Viswanath_Natarajan_2_exponential',
+    'Viswanath_Natarajan_3',
+    'Wilke',
+    'Wilke_large',
+    'Wilke_prefactored',
+    'Wilke_prefactors',
+    'Yoon_Thodos',
+    'dPPDS9_dT',
+    'dmu_Yaws_dT',
+    'mu_IAPWS',
+    'mu_TDE',
+    'mu_Yaws',
+    'mu_Yaws_fitting_jacobian',
+    'mu_air_lemmon',
+    'viscosity_converter',
+    'viscosity_gas_Gharagheizi',
+    'viscosity_index',
+]
 
 from math import acos, atan, tan
 
-from fluids.numerics import exp, interp, log, secant, sin, sqrt, trunc_exp, implementation_optimize_tck, splev
+from fluids.numerics import exp, implementation_optimize_tck, interp, log, secant, sin, splev, sqrt, trunc_exp
 from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source

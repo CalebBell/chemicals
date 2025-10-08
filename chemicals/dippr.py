@@ -59,19 +59,33 @@ Jacobians (for fitting)
 """
 
 
-__all__ = ['EQ100', 'EQ101', 'EQ102', 'EQ104', 'EQ105', 'EQ106', 'EQ107',
-           'EQ114', 'EQ115', 'EQ116', 'EQ127',
-           'EQ101_fitting_jacobian', 'EQ102_fitting_jacobian',
-           'EQ106_fitting_jacobian', 'EQ105_fitting_jacobian',
-           'EQ107_fitting_jacobian',
-           'EQ106_AB', 'EQ106_ABC',
-           'EQ100_reciprocal', 'EQ105_reciprocal', 'EQ106_reciprocal']
+__all__ = [
+    'EQ100',
+    'EQ101',
+    'EQ102',
+    'EQ104',
+    'EQ105',
+    'EQ106',
+    'EQ106_AB',
+    'EQ106_ABC',
+    'EQ107',
+    'EQ114',
+    'EQ115',
+    'EQ116',
+    'EQ127',
+    'EQ100_reciprocal',
+    'EQ101_fitting_jacobian',
+    'EQ102_fitting_jacobian',
+    'EQ105_fitting_jacobian',
+    'EQ105_reciprocal',
+    'EQ106_fitting_jacobian',
+    'EQ106_reciprocal',
+    'EQ107_fitting_jacobian',
+]
 
-from cmath import log as clog
-from cmath import sqrt as csqrt
 from math import atan, atanh, cosh, sinh, tanh
 
-from fluids.numerics import exp, hyp2f1, log, sqrt, trunc_exp, trunc_log, cbrt
+from fluids.numerics import cbrt, exp, log, sqrt, trunc_exp, trunc_log
 
 order_not_found_msg = ('Only the actual property calculation, first temperature '
                        'derivative, first temperature integral, and first '
@@ -1228,9 +1242,9 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         T3 = T2*T
         Tc2 = Tc*Tc
         Tc3 = Tc2*Tc
-        return (-A*A*Tc*log(abs(T - Tc)) - D*T2*T3*(C + x1)/(10.0*Tc2*Tc2) + T3*T3*x0/(30.0*Tc2*Tc3) 
-                + T2*T2*(x2 + 6.0*x3 + x4)/(12.0*Tc3) - T3*(2.0*x0 + x2 + 3.0*x3 + x5)/(3.0*Tc2) 
-                + T2*(C*x1 + x0 + x2 + 2.0*x5 + 2.0*x6)/(2.0*Tc) 
+        return (-A*A*Tc*log(abs(T - Tc)) - D*T2*T3*(C + x1)/(10.0*Tc2*Tc2) + T3*T3*x0/(30.0*Tc2*Tc3)
+                + T2*T2*(x2 + 6.0*x3 + x4)/(12.0*Tc3) - T3*(2.0*x0 + x2 + 3.0*x3 + x5)/(3.0*Tc2)
+                + T2*(C*x1 + x0 + x2 + 2.0*x5 + 2.0*x6)/(2.0*Tc)
                 - T*(-30.0*B + 10.0*x2 + 15.0*x3 + x4 + 30.0*x5 + 60.0*x6)*(1.0/30))
     elif order == INTEGRAL_OVER_T_CALCULATION:
         x0 = A*A
@@ -1246,10 +1260,10 @@ def EQ114(T, Tc, A, B, C, D, order=0):
         Tc2 = Tc*Tc
         Tc3 = Tc2*Tc
         return (-D*T2*T2*(C + x2)/(8.0*Tc2*Tc2)
-                 + T2*T3*x1/(25.0*Tc2*Tc3) + T3*(x3 + 6.0*x4 + x5)/(9.0*Tc3) 
-                 - T2*(2.0*x1 + x3 + 3.0*x4 + x6)/(2.0*Tc2) 
-                 + T*(C*x2 + x1 + x3 + 2.0*x6 + 2.0*x7)/Tc 
-                 - x0*log(abs(T - Tc)) 
+                 + T2*T3*x1/(25.0*Tc2*Tc3) + T3*(x3 + 6.0*x4 + x5)/(9.0*Tc3)
+                 - T2*(2.0*x1 + x3 + 3.0*x4 + x6)/(2.0*Tc2)
+                 + T*(C*x2 + x1 + x3 + 2.0*x6 + 2.0*x7)/Tc
+                 - x0*log(abs(T - Tc))
                  - (-30.0*B - 30.0*x0 + 10.0*x3 + 15.0*x4 + x5 + 30.0*x6 + 60.0*x7)*log(T)*(1.0/30.0))
     else:
         raise ValueError(order_not_found_msg)
@@ -1428,7 +1442,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
     elif order == 1:
         return (-0.35*B/((tau)**(0.65))
                 - (2.0/3.0)*C/(cbrt_tau)
-                - D - (4.0/3.0)*E*cbrt_tau)/Tc 
+                - D - (4.0/3.0)*E*cbrt_tau)/Tc
     elif order == -1:
         cbrt_tau2 = cbrt_tau*cbrt_tau
         cbrt_tau3 = cbrt_tau*cbrt_tau2
@@ -1470,7 +1484,7 @@ def EQ116(T, Tc, A, B, C, D, E, order=0):
         x29 = 2.0*x12
         x30 = sqrt(x29 + 10.0)
         x31 = 1.0/x30
-        x32 = 1.0 - x12 
+        x32 = 1.0 - x12
         x33 = 0.5*B*x22
         x34 = -x2*(T - Tc)
         x35 = 2.0*x34**0.1
@@ -1612,7 +1626,7 @@ def EQ127(T, A, B, C, D, E, F, G, order=0):
         x14 = E*E*E
         x15 = G*G*G
         return (-2.0*B*C*C*x4 - B*x0*x13*x4 + 2.0*B*x0*x13*exp(2.0*x1)*x3*x3*x3 - 2.0*D*E*E*x8
-                 - D*x0*x14*x8 + 2.0*D*x0*x14*exp(2.0*x5)*x7*x7*x7 - 2.0*F*G*G*x12 
+                 - D*x0*x14*x8 + 2.0*D*x0*x14*exp(2.0*x5)*x7*x7*x7 - 2.0*F*G*G*x12
                  - F*x0*x12*x15 + 2.0*F*x0*x15*exp(2.0*x9)*x11*x11*x11)*x0*x0*x0
     elif order == -1:
         T_inv = 1.0/T
@@ -1724,7 +1738,7 @@ def EQ105_reciprocal(T, A, B, C, D, order=0):
         problematic2 = problematic**D
         if abs(problematic2.imag) > 0.0: # This check should be removable - unless D is imaginary
             problematic2 = 0.0
-        ans = B**((1. + problematic2))/A
+        ans = B**(1. + problematic2)/A
         return ans
     elif order == 1:
         x0 = C - T
@@ -1734,12 +1748,12 @@ def EQ105_reciprocal(T, A, B, C, D, order=0):
         x0 = C - T
         x1 = (x0/C)**D
         x2 = D*x1*log(B)
-        return B**(x1 + 1)*x2*(D + x2 - 1)/(A*x0**2)    
+        return B**(x1 + 1)*x2*(D + x2 - 1)/(A*x0**2)
     else:
         raise ValueError("Only orders 0, 1, or 2 are supported for EQ105_reciprocal")
 
 def EQ106_reciprocal(T, Tc, A, B, C=0.0, D=0.0, E=0.0, order=0):
-    r'''DIPPR Equation #106 reciprocal variant. Often used in calculating liquid surface 
+    r'''DIPPR Equation #106 reciprocal variant. Often used in calculating liquid surface
     tension and heat of vaporization. Only parameters A and B are required.
 
     .. math::

@@ -58,13 +58,26 @@ Utility functions
 
 """
 
-__all__ = ['solubility_parameter',
-           'solubility_eutectic', 'Tm_depression_eutectic',
-           'Henry_converter', 'Henry_pressure', 'Henry_pressure_mixture',
-           'Henry_constants', 'dHenry_constants_dT', 'd2Henry_constants_dT2',
-           'hansen_delta_d', 'hansen_delta_d_methods', 'hansen_delta_d_all_methods',
-           'hansen_delta_p', 'hansen_delta_p_methods', 'hansen_delta_p_all_methods',
-           'hansen_delta_h', 'hansen_delta_h_methods', 'hansen_delta_h_all_methods']
+__all__ = [
+    'Henry_constants',
+    'Henry_converter',
+    'Henry_pressure',
+    'Henry_pressure_mixture',
+    'Tm_depression_eutectic',
+    'd2Henry_constants_dT2',
+    'dHenry_constants_dT',
+    'hansen_delta_d',
+    'hansen_delta_d_all_methods',
+    'hansen_delta_d_methods',
+    'hansen_delta_h',
+    'hansen_delta_h_all_methods',
+    'hansen_delta_h_methods',
+    'hansen_delta_p',
+    'hansen_delta_p_all_methods',
+    'hansen_delta_p_methods',
+    'solubility_eutectic',
+    'solubility_parameter',
+]
 
 
 from fluids.constants import R, R_inv, atm
@@ -142,7 +155,7 @@ def hansen_delta_d_methods(CASRN):
     --------
     hansen_delta_d
     """
-    if not _solubility_data_loaded: 
+    if not _solubility_data_loaded:
         _load_solubility_data()
     return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_D')
 
@@ -204,9 +217,9 @@ def hansen_delta_d(CASRN, method=None):
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_D')
-        if found: 
+        if found:
             return val
-    if not _solubility_data_loaded: 
+    if not _solubility_data_loaded:
         _load_solubility_data()
     if method:
         return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_D', method)
@@ -232,7 +245,7 @@ def hansen_delta_p_methods(CASRN):
     --------
     hansen_delta_p
     """
-    if not _solubility_data_loaded: 
+    if not _solubility_data_loaded:
         _load_solubility_data()
     return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_P')
 
@@ -294,9 +307,9 @@ def hansen_delta_p(CASRN, method=None):
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_P')
-        if found: 
+        if found:
             return val
-    if not _solubility_data_loaded: 
+    if not _solubility_data_loaded:
         _load_solubility_data()
     if method:
         return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_P', method)
@@ -322,7 +335,7 @@ def hansen_delta_h_methods(CASRN):
     --------
     hansen_delta_h
     """
-    if not _solubility_data_loaded: 
+    if not _solubility_data_loaded:
         _load_solubility_data()
     return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_H')
 
@@ -384,9 +397,9 @@ def hansen_delta_h(CASRN, method=None):
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
         val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_H')
-        if found: 
+        if found:
             return val
-    if not _solubility_data_loaded: 
+    if not _solubility_data_loaded:
         _load_solubility_data()
     if method:
         return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_H', method)

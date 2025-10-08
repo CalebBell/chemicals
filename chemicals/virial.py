@@ -111,47 +111,64 @@ Third Virial Correlations Dense Implementations
 """
 
 
-__all__ = ['BVirial_Pitzer_Curl', 'BVirial_Pitzer_Curl_fast',
-           'BVirial_Pitzer_Curl_vec', 'BVirial_Pitzer_Curl_mat',
-
-           'BVirial_Abbott', 'BVirial_Abbott_fast',
-           'BVirial_Abbott_vec', 'BVirial_Abbott_mat',
-
-           'BVirial_Tsonopoulos', 'BVirial_Tsonopoulos_fast',
-           'BVirial_Tsonopoulos_vec', 'BVirial_Tsonopoulos_mat',
-
-           'BVirial_Tsonopoulos_extended',
-           'BVirial_Tsonopoulos_extended_fast',
-           'BVirial_Tsonopoulos_extended_vec',
-           'BVirial_Tsonopoulos_extended_mat',
-
-           'Meng_virial_a', 'BVirial_Meng',
-           'BVirial_Meng_vec', 'BVirial_Meng_mat',
-
-           'BVirial_Oconnell_Prausnitz','BVirial_Oconnell_Prausnitz_vec',
-           'BVirial_Oconnell_Prausnitz_mat',
-
-           'BVirial_Xiang', 'BVirial_Xiang_vec', 'BVirial_Xiang_mat',
-
-           'BVirial_mixture', 'dBVirial_mixture_dzs',
-           'd2BVirial_mixture_dzizjs', 'd3BVirial_mixture_dzizjzks',
-
-           'dCVirial_mixture_Orentlicher_Prausnitz_dzs',
-           'd2CVirial_mixture_Orentlicher_Prausnitz_dzizjs',
-           'd3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks',
-
-           'B_to_Z', 'B_from_Z', 'Z_from_virial_density_form',
-           'Z_from_virial_pressure_form', 'CVirial_Orbey_Vera', 'CVirial_Liu_Xiang',
-           'CVirial_Liu_Xiang_mat', 'CVirial_Liu_Xiang_vec',
-           'CVirial_Orbey_Vera_vec', 'CVirial_Orbey_Vera_mat',
-           'CVirial_mixture_Orentlicher_Prausnitz', 'dCVirial_mixture_dT_Orentlicher_Prausnitz',
-           'd2CVirial_mixture_dT2_Orentlicher_Prausnitz',
-           'd3CVirial_mixture_dT3_Orentlicher_Prausnitz',
-           'd2CVirial_mixture_Orentlicher_Prausnitz_dTdzs',
-           'Tarakad_Danner_virial_CSP_kijs', 'Tarakad_Danner_virial_CSP_Tcijs',
-           'Tarakad_Danner_virial_CSP_Pcijs', 'Tarakad_Danner_virial_CSP_omegaijs',
-           'Meng_Duan_2005_virial_CSP_kijs', 'Lee_Kesler_virial_CSP_Vcijs',
-           'dV_dzs_virial', 'd2V_dzizjs_virial']
+__all__ = [
+    'BVirial_Abbott',
+    'BVirial_Abbott_fast',
+    'BVirial_Abbott_mat',
+    'BVirial_Abbott_vec',
+    'BVirial_Meng',
+    'BVirial_Meng_mat',
+    'BVirial_Meng_vec',
+    'BVirial_Oconnell_Prausnitz',
+    'BVirial_Oconnell_Prausnitz_mat',
+    'BVirial_Oconnell_Prausnitz_vec',
+    'BVirial_Pitzer_Curl',
+    'BVirial_Pitzer_Curl_fast',
+    'BVirial_Pitzer_Curl_mat',
+    'BVirial_Pitzer_Curl_vec',
+    'BVirial_Tsonopoulos',
+    'BVirial_Tsonopoulos_extended',
+    'BVirial_Tsonopoulos_extended_fast',
+    'BVirial_Tsonopoulos_extended_mat',
+    'BVirial_Tsonopoulos_extended_vec',
+    'BVirial_Tsonopoulos_fast',
+    'BVirial_Tsonopoulos_mat',
+    'BVirial_Tsonopoulos_vec',
+    'BVirial_Xiang',
+    'BVirial_Xiang_mat',
+    'BVirial_Xiang_vec',
+    'BVirial_mixture',
+    'B_from_Z',
+    'B_to_Z',
+    'CVirial_Liu_Xiang',
+    'CVirial_Liu_Xiang_mat',
+    'CVirial_Liu_Xiang_vec',
+    'CVirial_Orbey_Vera',
+    'CVirial_Orbey_Vera_mat',
+    'CVirial_Orbey_Vera_vec',
+    'CVirial_mixture_Orentlicher_Prausnitz',
+    'Lee_Kesler_virial_CSP_Vcijs',
+    'Meng_Duan_2005_virial_CSP_kijs',
+    'Meng_virial_a',
+    'Tarakad_Danner_virial_CSP_Pcijs',
+    'Tarakad_Danner_virial_CSP_Tcijs',
+    'Tarakad_Danner_virial_CSP_kijs',
+    'Tarakad_Danner_virial_CSP_omegaijs',
+    'Z_from_virial_density_form',
+    'Z_from_virial_pressure_form',
+    'd2BVirial_mixture_dzizjs',
+    'd2CVirial_mixture_Orentlicher_Prausnitz_dTdzs',
+    'd2CVirial_mixture_Orentlicher_Prausnitz_dzizjs',
+    'd2CVirial_mixture_dT2_Orentlicher_Prausnitz',
+    'd2V_dzizjs_virial',
+    'd3BVirial_mixture_dzizjzks',
+    'd3CVirial_mixture_Orentlicher_Prausnitz_dzizjzks',
+    'd3CVirial_mixture_dT3_Orentlicher_Prausnitz',
+    'dBVirial_mixture_dzs',
+    'dCVirial_mixture_Orentlicher_Prausnitz_dzs',
+    'dCVirial_mixture_dT_Orentlicher_Prausnitz',
+    'dV_dzs_virial',
+]
 
 
 from fluids.constants import R, R_inv
@@ -293,7 +310,7 @@ def Z_from_virial_density_form(T, P, coeffs=tuple()):
     if coeffs is None:
         return 1.0
     l = len(coeffs)
-    if l == 1 or l==2 and coeffs[1] == 0.0:
+    if l == 1 or (l==2 and coeffs[1] == 0.0):
         B = coeffs[0]
         determining_factor = 4.0*B*P + R*T
         if determining_factor < 0.0:

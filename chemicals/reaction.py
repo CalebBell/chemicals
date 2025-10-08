@@ -81,17 +81,37 @@ Chemical Reactions
 .. autofunction:: chemicals.reaction.standard_formation_reaction
 """
 
-__all__ = ['Hfg', 'Hfl', 'Hfs', 'S0g', 'S0l', 'S0s',
-           'Hfl_methods', 'Hfg_methods', 'Hfs_methods',
-           'S0l_methods', 'S0g_methods', 'S0s_methods',
-           'Hfl_all_methods', 'Hfg_all_methods', 'Hfs_all_methods',
-           'S0l_all_methods', 'S0g_all_methods', 'S0s_all_methods',
-           'Gibbs_formation', 'entropy_formation', 'Hf_basis_converter',
-           'balance_stoichiometry', 'stoichiometric_matrix',
-           'stoichiometry_molar_to_mass', 'stoichiometry_mass_to_molar',
-           'standard_formation_reaction', 'stoichiometry_MW_error']
+__all__ = [
+    'Gibbs_formation',
+    'Hf_basis_converter',
+    'Hfg',
+    'Hfg_all_methods',
+    'Hfg_methods',
+    'Hfl',
+    'Hfl_all_methods',
+    'Hfl_methods',
+    'Hfs',
+    'Hfs_all_methods',
+    'Hfs_methods',
+    'S0g',
+    'S0g_all_methods',
+    'S0g_methods',
+    'S0l',
+    'S0l_all_methods',
+    'S0l_methods',
+    'S0s',
+    'S0s_all_methods',
+    'S0s_methods',
+    'balance_stoichiometry',
+    'entropy_formation',
+    'standard_formation_reaction',
+    'stoichiometric_matrix',
+    'stoichiometry_MW_error',
+    'stoichiometry_mass_to_molar',
+    'stoichiometry_molar_to_mass',
+]
 
-from math import ceil, log10, floor
+from math import floor, log10
 
 from chemicals import data_reader as dr
 from chemicals import heat_capacity, miscdata
@@ -997,7 +1017,7 @@ def round_to_significant(x, significant_digits):
 
 def check_reaction_balance(matrix, coeffs, atol=1e-13):
     """Check that coefficients satisfy the stoichiometric matrix equation within tolerance."""
-    result = [sum(coeff * row[i] for i, coeff in enumerate(coeffs)) 
+    result = [sum(coeff * row[i] for i, coeff in enumerate(coeffs))
               for row in matrix]
     return all(abs(x) <= atol for x in result)
 
@@ -1008,12 +1028,14 @@ def floats_to_ints(float_list, matrix, max_denominator=1000):
     The SVD has already solved the problem, but there is a little numerical noise
     we need to clean up.
     
-    Parameters:
+    Parameters
+    ----------
     - float_list: List of floats to convert
     - matrix: Stoichiometric matrix to verify balance
     - max_denominator: Maximum scaling factor to consider
     
-    Returns:
+    Returns
+    -------
     - A list of integers scaled from the original floats
     """
     for D in range(1, max_denominator + 1):
@@ -1087,10 +1109,10 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     '''
     from fluids.numerics import null_space
     null_vectors = null_space(matrix, rcond=None)
-    
+
     if not null_vectors or len(null_vectors[0]) == 0:
         raise ValueError("No solution found")
-    
+
     # Take the first null vector (assuming unique solution)
     d = [row[0] for row in null_vectors]
     min_value_inv = 1.0/min(d, key=abs)

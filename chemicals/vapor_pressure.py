@@ -216,19 +216,43 @@ The structure of each dataframe is shown below:
 """
 
 
-__all__ = ['Antoine','dAntoine_dT', 'd2Antoine_dT2',
-           'Wagner_original',  'dWagner_original_dT', 'd2Wagner_original_dT2',
-           'Wagner', 'dWagner_dT', 'd2Wagner_dT2',
-           'TRC_Antoine_extended', 'dTRC_Antoine_extended_dT',
-           'd2TRC_Antoine_extended_dT2', 'dYaws_Psat_dT',
-           'boiling_critical_relation', 'Lee_Kesler', 'Ambrose_Walton',
-           'Edalat', 'Sanjari', 'Psat_IAPWS', 'dPsat_IAPWS_dT', 'Tsat_IAPWS',
-           'Psub_Clapeyron', 'Yaws_Psat', 'd2Yaws_Psat_dT2',
-           'Antoine_coeffs_from_point', 'Antoine_AB_coeffs_from_point',
-           'DIPPR101_ABC_coeffs_from_point', 'Wagner_original_fitting_jacobian',
-           'Wagner_fitting_jacobian', 'Yaws_Psat_fitting_jacobian',
-           'Antoine_fitting_jacobian', 'TRC_Antoine_extended_fitting_jacobian',
-           'TDE_PVExpansion', 'Arrhenius_extrapolation', 'Arrhenius_parameters']
+__all__ = [
+    'Ambrose_Walton',
+    'Antoine',
+    'Antoine_AB_coeffs_from_point',
+    'Antoine_coeffs_from_point',
+    'Antoine_fitting_jacobian',
+    'Arrhenius_extrapolation',
+    'Arrhenius_parameters',
+    'DIPPR101_ABC_coeffs_from_point',
+    'Edalat',
+    'Lee_Kesler',
+    'Psat_IAPWS',
+    'Psub_Clapeyron',
+    'Sanjari',
+    'TDE_PVExpansion',
+    'TRC_Antoine_extended',
+    'TRC_Antoine_extended_fitting_jacobian',
+    'Tsat_IAPWS',
+    'Wagner',
+    'Wagner_fitting_jacobian',
+    'Wagner_original',
+    'Wagner_original_fitting_jacobian',
+    'Yaws_Psat',
+    'Yaws_Psat_fitting_jacobian',
+    'boiling_critical_relation',
+    'd2Antoine_dT2',
+    'd2TRC_Antoine_extended_dT2',
+    'd2Wagner_dT2',
+    'd2Wagner_original_dT2',
+    'd2Yaws_Psat_dT2',
+    'dAntoine_dT',
+    'dPsat_IAPWS_dT',
+    'dTRC_Antoine_extended_dT',
+    'dWagner_dT',
+    'dWagner_original_dT',
+    'dYaws_Psat_dT',
+]
 
 from math import isinf, log10
 
@@ -2552,7 +2576,7 @@ def Arrhenius_extrapolation(T, T_ref, P_ref, slope):
 
 
 def dArrhenius_extrapolation_dT(T, T_ref, P_ref, slope):
-    r'''Calculates the first temperature derivative of vapor pressure using the 
+    r'''Calculates the first temperature derivative of vapor pressure using the
     Arrhenius-style vapor pressure extrapolation in ln(P) vs 1/T coordinates.
 
     .. math::
@@ -2584,7 +2608,7 @@ def dArrhenius_extrapolation_dT(T, T_ref, P_ref, slope):
     --------
     >>> dArrhenius_extrapolation_dT(300.0, 400.0, 1E5, -1600)
     468.617134427
-    '''    
+    '''
     return -P_ref*slope*exp(slope*(1.0/T - 1.0/T_ref))/(T*T)
 
 def d2Arrhenius_extrapolation_dT2(T, T_ref, P_ref, slope):

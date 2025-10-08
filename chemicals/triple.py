@@ -42,8 +42,14 @@ Triple Pressure
 
 """
 
-__all__ = ['Tt_all_methods', 'Tt_methods', 'Tt',
-           'Pt_all_methods', 'Pt_methods', 'Pt']
+__all__ = [
+    'Pt',
+    'Pt_all_methods',
+    'Pt_methods',
+    'Tt',
+    'Tt_all_methods',
+    'Tt_methods',
+]
 
 from chemicals import data_reader as dr
 from chemicals import miscdata

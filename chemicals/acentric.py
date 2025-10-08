@@ -47,8 +47,14 @@ Correlations
 .. autofunction:: chemicals.acentric.LK_omega
 """
 
-__all__ = ['omega', 'LK_omega', 'Stiel_polar_factor',
-           'omega_methods', 'omega_all_methods', 'omega_definition']
+__all__ = [
+    'LK_omega',
+    'Stiel_polar_factor',
+    'omega',
+    'omega_all_methods',
+    'omega_definition',
+    'omega_methods',
+]
 
 from math import log10
 

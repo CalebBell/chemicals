@@ -55,10 +55,18 @@ Pure Component Liquid Fit Correlations
 
 """
 
-__all__ = ['RI', 'RI_methods', 'RI_all_methods',
-           'polarizability_from_RI', 'molar_refractivity_from_RI',
-           'RI_from_molar_refractivity', 'RI_IAPWS', 'RI_to_brix',
-           'brix_to_RI', 'TDE_RIXExpansion']
+__all__ = [
+    'RI',
+    'RI_IAPWS',
+    'RI_all_methods',
+    'RI_from_molar_refractivity',
+    'RI_methods',
+    'RI_to_brix',
+    'TDE_RIXExpansion',
+    'brix_to_RI',
+    'molar_refractivity_from_RI',
+    'polarizability_from_RI',
+]
 
 from fluids.constants import N_A, pi
 from fluids.numerics import horner, interp, isnan, sqrt

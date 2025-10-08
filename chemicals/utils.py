@@ -30,43 +30,87 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 
 """
 
-__all__ = ['isobaric_expansion', 'isothermal_compressibility',
-'Cp_minus_Cv', 'speed_of_sound', 'Joule_Thomson',
-'phase_identification_parameter', 'phase_identification_parameter_phase',
-'isentropic_exponent', 'isentropic_exponent_TV', 'isentropic_exponent_PT', 'isentropic_exponent_PV',
-'Vm_to_rho', 'rho_to_Vm',
-'Z',  'zs_to_ws', 'ws_to_zs', 'zs_to_Vfs',
-'Vfs_to_zs',
-'ms_to_ns', 'ns_to_ms', 'ns_to_Qls', 'Qls_to_ns',
-'Qls_to_ms', 'ms_to_Qls',
- 'none_and_length_check', 'normalize', 'remove_zeros',
- 'mixing_simple',
-'mixing_logarithmic', 'mixing_power', 'to_num', 'Parachor', 'property_molar_to_mass', 'property_mass_to_molar',
-'SG_to_API', 'API_to_SG', 'API_to_rho', 'rho_to_API', 'SG',   'Watson_K',
-'dxs_to_dns', 'dns_to_dn_partials', 'dxs_to_dn_partials', 'd2ns_to_dn2_partials',
-'d2xs_to_dxdn_partials', 'dxs_to_dxsn1', 'd2xs_to_d2xsn1',
- 'vapor_mass_quality', 'mix_component_flows',
-'mix_multiple_component_flows', 'mix_component_partial_flows',
-'solve_flow_composition_mix', 'radius_of_gyration',
-'v_to_v_molar', 'v_molar_to_v', 'molar_velocity_to_velocity', 'velocity_to_molar_velocity',
-'Baume_heavy_to_SG', 'SG_to_Baume_heavy', 'Baume_light_to_SG', 'SG_to_Baume_light', 
-'Baume_heavy_to_rho', 'rho_to_Baume_heavy', 'Baume_light_to_rho', 'rho_to_Baume_light' 
+__all__ = [
+    'SG',
+    'API_to_SG',
+    'API_to_rho',
+    'Baume_heavy_to_SG',
+    'Baume_heavy_to_rho',
+    'Baume_light_to_SG',
+    'Baume_light_to_rho',
+    'Cp_minus_Cv',
+    'Joule_Thomson',
+    'Parachor',
+    'Qls_to_ms',
+    'Qls_to_ns',
+    'SG_to_API',
+    'SG_to_Baume_heavy',
+    'SG_to_Baume_light',
+    'Vfs_to_zs',
+    'Vm_to_rho',
+    'Watson_K',
+    'Z',
+    'd2ns_to_dn2_partials',
+    'd2xs_to_d2xsn1',
+    'd2xs_to_dxdn_partials',
+    'dns_to_dn_partials',
+    'dxs_to_dn_partials',
+    'dxs_to_dns',
+    'dxs_to_dxsn1',
+    'isentropic_exponent',
+    'isentropic_exponent_PT',
+    'isentropic_exponent_PV',
+    'isentropic_exponent_TV',
+    'isobaric_expansion',
+    'isothermal_compressibility',
+    'mix_component_flows',
+    'mix_component_partial_flows',
+    'mix_multiple_component_flows',
+    'mixing_logarithmic',
+    'mixing_power',
+    'mixing_simple',
+    'molar_velocity_to_velocity',
+    'ms_to_Qls',
+    'ms_to_ns',
+    'none_and_length_check',
+    'normalize',
+    'ns_to_Qls',
+    'ns_to_ms',
+    'phase_identification_parameter',
+    'phase_identification_parameter_phase',
+    'property_mass_to_molar',
+    'property_molar_to_mass',
+    'radius_of_gyration',
+    'remove_zeros',
+    'rho_to_API',
+    'rho_to_Baume_heavy',
+    'rho_to_Baume_light',
+    'rho_to_Vm',
+    'solve_flow_composition_mix',
+    'speed_of_sound',
+    'to_num',
+    'v_molar_to_v',
+    'v_to_v_molar',
+    'vapor_mass_quality',
+    'velocity_to_molar_velocity',
+    'ws_to_zs',
+    'zs_to_Vfs',
+    'zs_to_ws'
 ]
 
 import os
-import sys
+import types
 from math import (  # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
-    exp,
     pi,
     sqrt,
 )
-import types
+
 # __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma',
 # Obtained from SciPy 0.19 (2014 CODATA)
 # Included here so calculations are consistent across SciPy versions
 from fluids.constants import N_A, R
+from fluids.numerics import cbrt, trunc_exp, trunc_log
 from fluids.numerics import numpy as np
-from fluids.numerics import trunc_log, trunc_exp, cbrt
 
 try:
     source_path = os.path.dirname(__file__) # micropython
@@ -146,8 +190,8 @@ except:
     pass
 
 direct_mutable_types = frozenset([
-    list, dict, set, 
-    bytearray, 
+    list, dict, set,
+    bytearray,
     memoryview,
 ])
 
@@ -2889,11 +2933,11 @@ def mixing_power(fracs, props, r):
             prop += fracs[i]/(props[i] * cbrt(props[i]))
         rt_prop = sqrt(prop)
         return 1.0/(sqrt(rt_prop)*rt_prop)
-        
+
     elif r == 0.5:
         for i in range(N):
             prop += fracs[i] * sqrt(props[i])
-        return prop*prop   
+        return prop*prop
     elif r == -0.5:
         for i in range(N):
             prop += fracs[i] / sqrt(props[i])

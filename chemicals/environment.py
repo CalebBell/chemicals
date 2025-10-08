@@ -57,10 +57,20 @@ Octanol-Water Partition Coefficient
 
 """
 
-__all__ = ['GWP', 'ODP', 'logP',
-           'GWP_all_methods', 'ODP_all_methods', 'logP_all_methods',
-           'GWP_methods', 'ODP_methods', 'logP_methods',
-           'GTP', 'GTP_methods', 'GTP_all_methods']
+__all__ = [
+    'GTP',
+    'GWP',
+    'ODP',
+    'GTP_all_methods',
+    'GTP_methods',
+    'GWP_all_methods',
+    'GWP_methods',
+    'ODP_all_methods',
+    'ODP_methods',
+    'logP',
+    'logP_all_methods',
+    'logP_methods',
+]
 from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (

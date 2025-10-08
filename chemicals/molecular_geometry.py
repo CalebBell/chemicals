@@ -38,8 +38,14 @@ Lookup Functions
 
 """
 
-__all__ = ['RG', 'RG_methods', 'RG_all_methods',
-           'linear', 'linear_methods', 'linear_all_methods']
+__all__ = [
+    'RG',
+    'RG_all_methods',
+    'RG_methods',
+    'linear',
+    'linear_all_methods',
+    'linear_methods',
+]
 
 from chemicals import data_reader as dr
 from chemicals.data_reader import (

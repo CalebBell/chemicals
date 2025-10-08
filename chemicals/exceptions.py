@@ -33,11 +33,13 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 .. autoclass:: chemicals.exceptions.PhaseExistenceImpossible
 """
 
-__all__ = ['TrivialSolutionError',
-           'PhaseCountReducedError',
-           'PhaseExistenceImpossible',
-           'UnderspecifiedError',
-           'OverspeficiedError']
+__all__ = [
+    'OverspeficiedError',
+    'PhaseCountReducedError',
+    'PhaseExistenceImpossible',
+    'TrivialSolutionError',
+    'UnderspecifiedError',
+]
 
 class UnderspecifiedError(Exception):
     """Generic error to raise when not enough values are given."""

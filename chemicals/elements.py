@@ -59,14 +59,29 @@ Working with Parsed Formulas
 
 """
 
-__all__ = ['PeriodicTable', 'molecular_weight', 'mass_fractions',
-           'atom_fractions','mixture_atomic_composition', 'atom_matrix',
-           'similarity_variable', 'atoms_to_Hill', 'index_hydrogen_deficiency',
-           'simple_formula_parser', 'nested_formula_parser', 'CAS_by_number',
-           'periods', 'groups',  'homonuclear_elements',
-           'blocks', 'homonuclear_elemental_gases', 'charge_from_formula',
-           'serialize_formula', 'mixture_atomic_composition_ordered',
-           'periodic_table']
+__all__ = [
+    'CAS_by_number',
+    'PeriodicTable',
+    'atom_fractions',
+    'atom_matrix',
+    'atoms_to_Hill',
+    'blocks',
+    'charge_from_formula',
+    'groups',
+    'homonuclear_elemental_gases',
+    'homonuclear_elements',
+    'index_hydrogen_deficiency',
+    'mass_fractions',
+    'mixture_atomic_composition',
+    'mixture_atomic_composition_ordered',
+    'molecular_weight',
+    'nested_formula_parser',
+    'periodic_table',
+    'periods',
+    'serialize_formula',
+    'similarity_variable',
+    'simple_formula_parser',
+]
 import re
 
 from chemicals.utils import mark_numba_incompatible
@@ -421,8 +436,13 @@ class PeriodicTable:
        (2011), 3, 33. DOI:10.1186/1758-2946-3-33
     """
 
-    __slots__ = ('_number_to_elements', '_symbol_to_elements',
-                 '_name_to_elements', '_CAS_to_elements', '_indexes')
+    __slots__ = (
+        '_CAS_to_elements',
+        '_indexes',
+        '_name_to_elements',
+        '_number_to_elements',
+        '_symbol_to_elements',
+    )
     def __init__(self, elements):
         #: Dictionary lookup of number(int) -> Element;
         #: also has number(str) -> Element for convenience.
@@ -527,10 +547,27 @@ class Element:
         298.15 K), [J/mol/K]
     """
 
-    __slots__ = ['number', 'symbol', 'name', 'CAS', 'MW', 'AReneg', 'rcov',
-                 'rvdw', 'maxbonds', 'elneg', 'ionization', 'elaffinity',
-                 'period', 'group',
-                 'InChI_key', 'PubChem', 'phase', 'Hf', 'S0']
+    __slots__ = [
+        'AReneg',
+        'CAS',
+        'Hf',
+        'InChI_key',
+        'MW',
+        'PubChem',
+        'S0',
+        'elaffinity',
+        'elneg',
+        'group',
+        'ionization',
+        'maxbonds',
+        'name',
+        'number',
+        'period',
+        'phase',
+        'rcov',
+        'rvdw',
+        'symbol',
+    ]
 
     def __repr__(self):
         return "<Element %s (%s), number %d, MW=%g>" %(self.name, self.symbol, self.number, self.MW)

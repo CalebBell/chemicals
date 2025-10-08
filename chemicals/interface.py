@@ -133,14 +133,30 @@ The structure of each dataframe is shown below:
 
 
 
-__all__ = ['REFPROP_sigma', 'Somayajulu', 'Jasper',
-           'Brock_Bird', 'Pitzer_sigma', 'Sastri_Rao', 'Zuo_Stenby',
-           'sigma_IAPWS', 'PPDS14', 'Watson_sigma',
-           'Mersmann_Kind_sigma', 'API10A32',
-           'Hakim_Steinberg_Stiel', 'Miqueu', 'Aleem',
-           'Winterfeld_Scriven_Davis', 'Diguilio_Teja', 'Weinaug_Katz',
-           'Meybodi_Daryasafar_Karimi', 'ISTExpansion', 'sigma_Gharagheizi_1',
-           'sigma_Gharagheizi_2']
+__all__ = [
+    'API10A32',
+    'PPDS14',
+    'Aleem',
+    'Brock_Bird',
+    'Diguilio_Teja',
+    'Hakim_Steinberg_Stiel',
+    'ISTExpansion',
+    'Jasper',
+    'Mersmann_Kind_sigma',
+    'Meybodi_Daryasafar_Karimi',
+    'Miqueu',
+    'Pitzer_sigma',
+    'REFPROP_sigma',
+    'Sastri_Rao',
+    'Somayajulu',
+    'Watson_sigma',
+    'Weinaug_Katz',
+    'Winterfeld_Scriven_Davis',
+    'Zuo_Stenby',
+    'sigma_Gharagheizi_1',
+    'sigma_Gharagheizi_2',
+    'sigma_IAPWS',
+]
 
 
 from fluids.constants import N_A, k, root_two

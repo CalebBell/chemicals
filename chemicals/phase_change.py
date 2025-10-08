@@ -126,10 +126,27 @@ The structure of each dataframe is shown below:
 
 """
 
-__all__ = ['Tb_methods', 'Tb', 'Tm_methods', 'Tm',
-           'Clapeyron', 'Pitzer', 'SMK', 'MK', 'Velasco', 'Riedel', 'Chen',
-           'Liu', 'Vetere', 'Alibakhshi','PPDS12', 'Watson', 'Watson_n',
-           'Hfus', 'Hfus_methods']
+__all__ = [
+    'MK',
+    'PPDS12',
+    'SMK',
+    'Alibakhshi',
+    'Chen',
+    'Clapeyron',
+    'Hfus',
+    'Hfus_methods',
+    'Liu',
+    'Pitzer',
+    'Riedel',
+    'Tb',
+    'Tb_methods',
+    'Tm',
+    'Tm_methods',
+    'Velasco',
+    'Vetere',
+    'Watson',
+    'Watson_n',
+]
 
 
 from fluids.constants import N_A, R, pi

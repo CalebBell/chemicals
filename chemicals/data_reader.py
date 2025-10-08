@@ -19,16 +19,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-__all__ = ['df_sources',
-           'data_source',
-           'register_df_source',
-           'load_df',
-           'retrieve_any_from_df_dict',
-           'retrieve_from_df_dict',
-           'retrieve_any_from_df',
-           'retrieve_from_df',
-           'list_available_methods_from_df_dict',
-           'list_available_methods_from_df']
+__all__ = [
+    'data_source',
+    'df_sources',
+    'list_available_methods_from_df',
+    'list_available_methods_from_df_dict',
+    'load_df',
+    'register_df_source',
+    'retrieve_any_from_df',
+    'retrieve_any_from_df_dict',
+    'retrieve_from_df',
+    'retrieve_from_df_dict',
+]
 
 import os
 from math import isnan, nan
@@ -52,8 +54,8 @@ try:
 except:
     pass
 try:
-    import threading
     import sqlite3
+    import threading
 except:
     pass
 from chemicals.identifiers import CAS_to_int

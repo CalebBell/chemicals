@@ -72,24 +72,36 @@ Utility Functions
 
 
 
-__all__ = ['Stockmayer_all_methods', 'Stockmayer_methods', 'Stockmayer',
-           'molecular_diameter_all_methods', 'molecular_diameter', 'molecular_diameter_methods',
-
-           'sigma_Flynn',
-           'sigma_Bird_Stewart_Lightfoot_critical_2',
-           'sigma_Bird_Stewart_Lightfoot_critical_1',
-           'sigma_Bird_Stewart_Lightfoot_boiling',
-           'sigma_Bird_Stewart_Lightfoot_melting',
-           'sigma_Stiel_Thodos', 'sigma_Tee_Gotoh_Steward_1',
-           'sigma_Tee_Gotoh_Steward_2',
-           'sigma_Silva_Liu_Macedo', 'epsilon_Flynn',
-           'epsilon_Bird_Stewart_Lightfoot_critical',
-           'epsilon_Bird_Stewart_Lightfoot_boiling',
-           'epsilon_Bird_Stewart_Lightfoot_melting', 'epsilon_Stiel_Thodos',
-           'epsilon_Tee_Gotoh_Steward_1', 'epsilon_Tee_Gotoh_Steward_2',
-           'collision_integral_Neufeld_Janzen_Aziz',
-           'As_collision', 'Bs_collision', 'Cs_collision',
-           'collision_integral_Kim_Monroe', 'T_star']
+__all__ = [
+    'As_collision',
+    'Bs_collision',
+    'Cs_collision',
+    'Stockmayer',
+    'Stockmayer_all_methods',
+    'Stockmayer_methods',
+    'T_star',
+    'collision_integral_Kim_Monroe',
+    'collision_integral_Neufeld_Janzen_Aziz',
+    'epsilon_Bird_Stewart_Lightfoot_boiling',
+    'epsilon_Bird_Stewart_Lightfoot_critical',
+    'epsilon_Bird_Stewart_Lightfoot_melting',
+    'epsilon_Flynn',
+    'epsilon_Stiel_Thodos',
+    'epsilon_Tee_Gotoh_Steward_1',
+    'epsilon_Tee_Gotoh_Steward_2',
+    'molecular_diameter',
+    'molecular_diameter_all_methods',
+    'molecular_diameter_methods',
+    'sigma_Bird_Stewart_Lightfoot_boiling',
+    'sigma_Bird_Stewart_Lightfoot_critical_1',
+    'sigma_Bird_Stewart_Lightfoot_critical_2',
+    'sigma_Bird_Stewart_Lightfoot_melting',
+    'sigma_Flynn',
+    'sigma_Silva_Liu_Macedo',
+    'sigma_Stiel_Thodos',
+    'sigma_Tee_Gotoh_Steward_1',
+    'sigma_Tee_Gotoh_Steward_2',
+]
 
 
 from fluids.constants import k

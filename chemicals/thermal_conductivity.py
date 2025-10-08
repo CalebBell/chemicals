@@ -124,13 +124,38 @@ attribute of this module.
 """
 
 
-__all__ = ['Sheffy_Johnson', 'Sato_Riedel', 'Lakshmi_Prasad',
-'Gharagheizi_liquid', 'Nicola_original', 'Nicola', 'Bahadori_liquid',
-'kl_Mersmann_Kind', 'DIPPR9G', 'DIPPR9I','k_IAPWS',
-'Missenard', 'DIPPR9H', 'Filippov', 'Eucken', 'Eucken_modified', 'DIPPR9B',
-'Chung', 'Eli_Hanley', 'Gharagheizi_gas', 'Bahadori_gas', 'PPDS8', 'PPDS3',
-'Stiel_Thodos_dense', 'Eli_Hanley_dense', 'Chung_dense', 'Lindsay_Bromley',
-'Wassiljewa_Herning_Zipperer', 'k_air_lemmon', 'Chemsep_16']
+__all__ = [
+    'DIPPR9B',
+    'DIPPR9G',
+    'DIPPR9H',
+    'DIPPR9I',
+    'PPDS3',
+    'PPDS8',
+    'Bahadori_gas',
+    'Bahadori_liquid',
+    'Chemsep_16',
+    'Chung',
+    'Chung_dense',
+    'Eli_Hanley',
+    'Eli_Hanley_dense',
+    'Eucken',
+    'Eucken_modified',
+    'Filippov',
+    'Gharagheizi_gas',
+    'Gharagheizi_liquid',
+    'Lakshmi_Prasad',
+    'Lindsay_Bromley',
+    'Missenard',
+    'Nicola',
+    'Nicola_original',
+    'Sato_Riedel',
+    'Sheffy_Johnson',
+    'Stiel_Thodos_dense',
+    'Wassiljewa_Herning_Zipperer',
+    'k_IAPWS',
+    'k_air_lemmon',
+    'kl_Mersmann_Kind',
+]
 
 from math import atan
 

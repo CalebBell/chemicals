@@ -178,11 +178,28 @@ The structure of each dataframe is shown below:
 """
 
 
-__all__ = ['volume_VDI_PPDS', 'Yen_Woods_saturation', 'Rackett', 'Yamada_Gunn', 'Townsend_Hales',
-'Bhirud_normal', 'COSTALD', 'Campbell_Thodos', 'SNM0', 'CRC_inorganic',
-'COSTALD_compressed', 'Amgat', 'Rackett_mixture', 'COSTALD_mixture',
-'ideal_gas', 'Goodman', 'Rackett_fit', 'TDE_VDNS_rho', 'PPDS17',
-'Tait', 'Tait_molar',
+__all__ = [
+    'COSTALD',
+    'PPDS17',
+    'SNM0',
+    'Amgat',
+    'Bhirud_normal',
+    'COSTALD_compressed',
+    'COSTALD_mixture',
+    'CRC_inorganic',
+    'Campbell_Thodos',
+    'Goodman',
+    'Rackett',
+    'Rackett_fit',
+    'Rackett_mixture',
+    'TDE_VDNS_rho',
+    'Tait',
+    'Tait_molar',
+    'Townsend_Hales',
+    'Yamada_Gunn',
+    'Yen_Woods_saturation',
+    'ideal_gas',
+    'volume_VDI_PPDS',
 ]
 
 

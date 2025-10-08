@@ -64,13 +64,25 @@ a certain database or not. The following chemical groups are available.
 """
 
 
-__all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
-           'mixture_from_any', 'cryogenics', 'common_commercial_gases', 'dippr_compounds', 'IDs_to_CASs',
-           'get_pubchem_db', 'CAS_to_int', 'sorted_CAS_key', 'int_to_CAS']
+__all__ = [
+    'MW',
+    'CAS_from_any',
+    'CAS_to_int',
+    'IDs_to_CASs',
+    'check_CAS',
+    'common_commercial_gases',
+    'cryogenics',
+    'dippr_compounds',
+    'get_pubchem_db',
+    'int_to_CAS',
+    'mixture_from_any',
+    'search_chemical',
+    'sorted_CAS_key',
+]
 
 import os
 
-from chemicals.elements import charge_from_formula, homonuclear_elements_CASs_set, periodic_table, serialize_formula, nested_formula_parser
+from chemicals.elements import charge_from_formula, homonuclear_elements_CASs_set, periodic_table, serialize_formula
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path, to_num
 
 folder = os_path_join(source_path, 'Identifiers')
@@ -245,8 +257,19 @@ class ChemicalMetadata:
         CAS number of the compound; stored as an int for memory efficiency, [-]
     """
 
-    __slots__ = ('pubchemid', 'formula', 'MW', 'smiles', 'InChI', 'InChI_key',
-                 'iupac_name', 'common_name', 'synonyms', 'CAS', '_charge')
+    __slots__ = (
+        'CAS',
+        'InChI',
+        'InChI_key',
+        'MW',
+        '_charge',
+        'common_name',
+        'formula',
+        'iupac_name',
+        'pubchemid',
+        'smiles',
+        'synonyms',
+    )
 
     def __repr__(self):
         return (f"ChemicalMetadata(pubchemid={self.pubchemid!r}, "
@@ -279,7 +302,7 @@ class ChemicalMetadata:
                     self.CAS,
                     self.formula,
                     self.MW,
-                    self.smiles, 
+                    self.smiles,
                     self.InChI,
                     self.InChI_key,
                     self.iupac_name,
@@ -336,7 +359,7 @@ INORGANIC_PREFERENCES_FILE = 'inorganic_preferences.json'
 ORGANIC_PREFERENCES_FILE = 'organic_preferences.json'
 
 def load_chemical_preferences():
-    """Loads preferred and unpreferred CAS numbers from preference files in the 
+    """Loads preferred and unpreferred CAS numbers from preference files in the
     Identifiers folder.
         
     Returns
@@ -348,7 +371,6 @@ def load_chemical_preferences():
         
     Notes
     -----
-
     Each file should contain 'preferred_cas' and 'unpreferred_cas' lists.
     Missing files are skipped silently.
     
@@ -359,15 +381,15 @@ def load_chemical_preferences():
     import json
     preferred_CAS = set()
     unpreferred_CAS = set()
-    
+
     # Files to load
     files = [
         ANION_PREFERENCES_FILE,
-        CATION_PREFERENCES_FILE, 
+        CATION_PREFERENCES_FILE,
         INORGANIC_PREFERENCES_FILE,
         ORGANIC_PREFERENCES_FILE
     ]
-    
+
     # Load each file and update the sets
     for filename in files:
         pref_file = os.path.join(folder, filename)
@@ -376,7 +398,7 @@ def load_chemical_preferences():
                 preferences = json.load(f)
                 preferred_CAS.update(preferences.get('preferred_cas', []))
                 unpreferred_CAS.update(preferences.get('unpreferred_cas', []))
-    
+
     return preferred_CAS, unpreferred_CAS
 
 
@@ -397,7 +419,6 @@ class ChemicalMetadataDB:
                            os_path_join(folder, PUBCHEM_CATION_DB_NAME),
                            os_path_join(folder, PUBCHEM_ANION_DB_NAME),
                            os_path_join(folder, PUBCHEM_IONORGANIC_DB_NAME)]):
-                    
         '''Construct the database from its parameters, loading all of the files in
         `user_dbs`, the periodic table, and defering loading of `main_db`
         as it is very large until a search doesn't find a chemical in the smaller
@@ -562,9 +583,11 @@ class ChemicalMetadataDB:
         '''
         return self._search_autoload(formula, self.formula_index, autoload=autoload)
 import sqlite3
+
+
 class ChemicalMetadataDiskDB:
     """SQLite-backed version of ChemicalMetadataDB with preferred ordering support"""
-    
+
     def __init__(self, db_path=os_path_join(folder, 'metadata.db')):
         """Initialize connection to the SQLite database
         
@@ -576,16 +599,16 @@ class ChemicalMetadataDiskDB:
         self.db_path = db_path
         self._conn = sqlite3.connect(db_path)
         self._conn.row_factory = sqlite3.Row  # Allow column name access
-        
+
     def _row_to_metadata(self, row):
         """Convert a database row to a ChemicalMetadata object"""
         if row is None:
             return None
-        
+
         synonyms = [row['iupac_name'], row['common_name']]
         if row['raw_synonyms']:
             synonyms.extend(row['raw_synonyms'].split('\t'))
-        
+
         return ChemicalMetadata(
             pubchemid=row['pubchemid'],
             CAS=row['cas'],
@@ -598,7 +621,7 @@ class ChemicalMetadataDiskDB:
             common_name=row['common_name'],
             synonyms=synonyms
         )
-    
+
     def search_pubchem(self, pubchem, autoload=True):
         """Search for a chemical by its pubchem number"""
         cur = self._conn.cursor()
@@ -607,19 +630,19 @@ class ChemicalMetadataDiskDB:
             (int(pubchem),)
         )
         return self._row_to_metadata(cur.fetchone())
-    
+
     def search_CAS(self, CAS, autoload=True):
         """Search for a chemical by its CAS number"""
         if isinstance(CAS, str):
             CAS = int(CAS.replace('-', ''))
-        
+
         cur = self._conn.cursor()
         cur.execute(
             "SELECT * FROM chemicals WHERE cas = ? ORDER BY preferred DESC LIMIT 1",
             (CAS,)
         )
         return self._row_to_metadata(cur.fetchone())
-    
+
     def search_smiles(self, smiles, autoload=True):
         """Search for a chemical by its SMILES string"""
         cur = self._conn.cursor()
@@ -628,7 +651,7 @@ class ChemicalMetadataDiskDB:
             (smiles,)
         )
         return self._row_to_metadata(cur.fetchone())
-    
+
     def search_InChI(self, InChI, autoload=True):
         """Search for a chemical by its InChI string"""
         cur = self._conn.cursor()
@@ -637,7 +660,7 @@ class ChemicalMetadataDiskDB:
             (InChI,)
         )
         return self._row_to_metadata(cur.fetchone())
-    
+
     def search_InChI_key(self, InChI_key, autoload=True):
         """Search for a chemical by its InChI key"""
         cur = self._conn.cursor()
@@ -646,7 +669,7 @@ class ChemicalMetadataDiskDB:
             (InChI_key,)
         )
         return self._row_to_metadata(cur.fetchone())
-    
+
     def search_name(self, name, autoload=True):
         """Search for a chemical by its name"""
         cur = self._conn.cursor()
@@ -657,7 +680,7 @@ class ChemicalMetadataDiskDB:
             ORDER BY c.preferred DESC LIMIT 1
         """, (name,))
         return self._row_to_metadata(cur.fetchone())
-    
+
     def search_formula(self, formula, autoload=True):
         """Search for a chemical by its formula"""
         cur = self._conn.cursor()
@@ -666,7 +689,7 @@ class ChemicalMetadataDiskDB:
             (formula,)
         )
         return self._row_to_metadata(cur.fetchone())
-    
+
     def search_pubchem(self, pubchem, autoload=True):
         """Search for a chemical by its pubchem number"""
         cur = self._conn.cursor()
@@ -675,7 +698,7 @@ class ChemicalMetadataDiskDB:
             (int(pubchem),)
         )
         return self._row_to_metadata(cur.fetchone())
-            
+
 
     def __iter__(self):
         """Iterate over all chemicals in the database"""
@@ -687,7 +710,7 @@ class ChemicalMetadataDiskDB:
                 break
             for row in batch:
                 yield self._row_to_metadata(row)
-    
+
     def __len__(self):
         """Return the total number of chemicals in the database"""
         cur = self._conn.cursor()
@@ -1126,8 +1149,16 @@ class CommonMixtureMetadata:
         [-]
     """
 
-    __slots__ = ['name', 'CASs', 'N', 'source', 'names', 'ws', 'zs',
-                 'synonyms']
+    __slots__ = [
+        'CASs',
+        'N',
+        'name',
+        'names',
+        'source',
+        'synonyms',
+        'ws',
+        'zs',
+    ]
     def __repr__(self):
         return (f'<MixtureMetadata, name={self.name}, N={self.N}, CASs={self.CASs}, ws={self.ws}, zs={self.zs}>')
 
