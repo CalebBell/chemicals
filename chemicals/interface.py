@@ -134,28 +134,28 @@ The structure of each dataframe is shown below:
 
 
 __all__ = [
-    'API10A32',
-    'PPDS14',
-    'Aleem',
-    'Brock_Bird',
-    'Diguilio_Teja',
-    'Hakim_Steinberg_Stiel',
-    'ISTExpansion',
-    'Jasper',
-    'Mersmann_Kind_sigma',
-    'Meybodi_Daryasafar_Karimi',
-    'Miqueu',
-    'Pitzer_sigma',
-    'REFPROP_sigma',
-    'Sastri_Rao',
-    'Somayajulu',
-    'Watson_sigma',
-    'Weinaug_Katz',
-    'Winterfeld_Scriven_Davis',
-    'Zuo_Stenby',
-    'sigma_Gharagheizi_1',
-    'sigma_Gharagheizi_2',
-    'sigma_IAPWS',
+    "API10A32",
+    "PPDS14",
+    "Aleem",
+    "Brock_Bird",
+    "Diguilio_Teja",
+    "Hakim_Steinberg_Stiel",
+    "ISTExpansion",
+    "Jasper",
+    "Mersmann_Kind_sigma",
+    "Meybodi_Daryasafar_Karimi",
+    "Miqueu",
+    "Pitzer_sigma",
+    "REFPROP_sigma",
+    "Sastri_Rao",
+    "Somayajulu",
+    "Watson_sigma",
+    "Weinaug_Katz",
+    "Winterfeld_Scriven_Davis",
+    "Zuo_Stenby",
+    "sigma_Gharagheizi_1",
+    "sigma_Gharagheizi_2",
+    "sigma_IAPWS",
 ]
 
 
@@ -166,14 +166,14 @@ from fluids.numerics import numpy as np
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
-folder = os_path_join(source_path, 'Interface')
+folder = os_path_join(source_path, "Interface")
 
 
-register_df_source(folder, 'MuleroCachadinaParameters.tsv')
-register_df_source(folder, 'Jasper-Lange.tsv')
-register_df_source(folder, 'Somayajulu.tsv')
-register_df_source(folder, 'SomayajuluRevised.tsv')
-register_df_source(folder, 'VDI PPDS surface tensions.tsv')
+register_df_source(folder, "MuleroCachadinaParameters.tsv")
+register_df_source(folder, "Jasper-Lange.tsv")
+register_df_source(folder, "Somayajulu.tsv")
+register_df_source(folder, "SomayajuluRevised.tsv")
+register_df_source(folder, "VDI PPDS surface tensions.tsv")
 
 _interface_dfs_loaded = False
 @mark_numba_incompatible
@@ -183,26 +183,26 @@ def load_interface_dfs():
     global sigma_data_Somayajulu, sigma_values_Somayajulu, sigma_data_Somayajulu2
     global sigma_values_Somayajulu2, sigma_data_VDI_PPDS_11, sigma_values_VDI_PPDS_11
 
-    sigma_data_Mulero_Cachadina = data_source('MuleroCachadinaParameters.tsv')
+    sigma_data_Mulero_Cachadina = data_source("MuleroCachadinaParameters.tsv")
     sigma_values_Mulero_Cachadina = np.array(sigma_data_Mulero_Cachadina.values[:, 1:], dtype=float)
 
-    sigma_data_Jasper_Lange = data_source('Jasper-Lange.tsv')
+    sigma_data_Jasper_Lange = data_source("Jasper-Lange.tsv")
     sigma_values_Jasper_Lange = np.array(sigma_data_Jasper_Lange.values[:, 1:], dtype=float)
 
-    sigma_data_Somayajulu = data_source('Somayajulu.tsv')
+    sigma_data_Somayajulu = data_source("Somayajulu.tsv")
     sigma_values_Somayajulu = np.array(sigma_data_Somayajulu.values[:, 1:], dtype=float)
 
-    sigma_data_Somayajulu2 = data_source('SomayajuluRevised.tsv')
+    sigma_data_Somayajulu2 = data_source("SomayajuluRevised.tsv")
     sigma_values_Somayajulu2 = np.array(sigma_data_Somayajulu2.values[:, 1:], dtype=float)
 
-    sigma_data_VDI_PPDS_11 = data_source('VDI PPDS surface tensions.tsv')
+    sigma_data_VDI_PPDS_11 = data_source("VDI PPDS surface tensions.tsv")
     sigma_values_VDI_PPDS_11 = np.array(sigma_data_VDI_PPDS_11.values[:, 1:], dtype=float)
 
 def __getattr__(name):
-    if name in ('sigma_data_Mulero_Cachadina', 'sigma_values_Mulero_Cachadina',
-                'sigma_data_Jasper_Lange', 'sigma_values_Jasper_Lange',
-                'sigma_data_Somayajulu', 'sigma_values_Somayajulu', 'sigma_data_Somayajulu2',
-                'sigma_values_Somayajulu2', 'sigma_data_VDI_PPDS_11', 'sigma_values_VDI_PPDS_11'
+    if name in ("sigma_data_Mulero_Cachadina", "sigma_values_Mulero_Cachadina",
+                "sigma_data_Jasper_Lange", "sigma_values_Jasper_Lange",
+                "sigma_data_Somayajulu", "sigma_values_Somayajulu", "sigma_data_Somayajulu2",
+                "sigma_values_Somayajulu2", "sigma_data_VDI_PPDS_11", "sigma_values_VDI_PPDS_11"
                 ):
         load_interface_dfs()
         return globals()[name]
@@ -211,7 +211,7 @@ def __getattr__(name):
 
 
 def sigma_IAPWS(T):
-    r'''Calculate the surface tension of pure water as a function of .
+    r"""Calculate the surface tension of pure water as a function of .
     temperature. Assumes the 2011 IAPWS [1]_ formulation.
 
     .. math::
@@ -263,7 +263,7 @@ def sigma_IAPWS(T):
     ----------
     .. [1] IAPWS. 2014. Revised Release on Surface Tension of Ordinary Water
        Substance
-    '''
+    """
     tau = 1. - T*(1.0/647.096)
     if tau < 0.0:
         tau = 0.0
@@ -795,9 +795,9 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
     '''
     if T >= Tc:
         return 0.0
-    if chemicaltype == 'alcohol':
+    if chemicaltype == "alcohol":
         k, x, y, z, m = 2.28, 0.25, 0.175, 0, 0.8
-    elif chemicaltype == 'acid':
+    elif chemicaltype == "acid":
         k, x, y, z, m = 0.125, 0.50, -1.5, 1.85, 11.0/9.0
     else:
         k, x, y, z, m = 0.158, 0.50, -1.5, 1.85, 11.0/9.0
@@ -1259,7 +1259,7 @@ def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
     return sigma
 
 def API10A32(T, Tc, K_W):
-    r'''Calculates the interfacial tension between
+    r"""Calculates the interfacial tension between
     a liquid petroleum fraction and air, using the oil's pseudocritical
     temperature and Watson K Characterization factor.
 
@@ -1303,7 +1303,7 @@ def API10A32(T, Tc, K_W):
     ----------
     .. [1] API Technical Data Book: General Properties & Characterization.
        American Petroleum Institute, 7E, 2005.
-    '''
+    """
     if T >= Tc:
         return 0.0
     return 673.7*((Tc-T)/Tc)**1.232/K_W

@@ -60,33 +60,33 @@ Working with Parsed Formulas
 """
 
 __all__ = [
-    'CAS_by_number',
-    'PeriodicTable',
-    'atom_fractions',
-    'atom_matrix',
-    'atoms_to_Hill',
-    'blocks',
-    'charge_from_formula',
-    'groups',
-    'homonuclear_elemental_gases',
-    'homonuclear_elements',
-    'index_hydrogen_deficiency',
-    'mass_fractions',
-    'mixture_atomic_composition',
-    'mixture_atomic_composition_ordered',
-    'molecular_weight',
-    'nested_formula_parser',
-    'periodic_table',
-    'periods',
-    'serialize_formula',
-    'similarity_variable',
-    'simple_formula_parser',
+    "CAS_by_number",
+    "PeriodicTable",
+    "atom_fractions",
+    "atom_matrix",
+    "atoms_to_Hill",
+    "blocks",
+    "charge_from_formula",
+    "groups",
+    "homonuclear_elemental_gases",
+    "homonuclear_elements",
+    "index_hydrogen_deficiency",
+    "mass_fractions",
+    "mixture_atomic_composition",
+    "mixture_atomic_composition_ordered",
+    "molecular_weight",
+    "nested_formula_parser",
+    "periodic_table",
+    "periods",
+    "serialize_formula",
+    "similarity_variable",
+    "simple_formula_parser",
 ]
 import re
 
 from chemicals.utils import mark_numba_incompatible
 
-CAS_by_number_standard = ['1333-74-0', '7440-59-7', '7439-93-2', '7440-41-7', '7440-42-8', '7440-44-0', '7727-37-9', '7782-44-7', '7782-41-4', '7440-01-9', '7440-23-5', '7439-95-4', '7429-90-5', '7440-21-3', '7723-14-0', '7704-34-9', '7782-50-5', '7440-37-1', '7440-09-7', '7440-70-2', '7440-20-2', '7440-32-6', '7440-62-2', '7440-47-3', '7439-96-5', '7439-89-6', '7440-48-4', '7440-02-0', '7440-50-8', '7440-66-6', '7440-55-3', '7440-56-4', '7440-38-2', '7782-49-2', '7726-95-6', '7439-90-9', '7440-17-7', '7440-24-6', '7440-65-5', '7440-67-7', '7440-03-1', '7439-98-7', '7440-26-8', '7440-18-8', '7440-16-6', '7440-05-3', '7440-22-4', '7440-43-9', '7440-74-6', '7440-31-5', '7440-36-0', '13494-80-9', '7553-56-2', '7440-63-3', '7440-46-2', '7440-39-3', '7439-91-0', '7440-45-1', '7440-10-0', '7440-00-8', '7440-12-2', '7440-19-9', '7440-53-1', '7440-54-2', '7440-27-9', '7429-91-6', '7440-60-0', '7440-52-0', '7440-30-4', '7440-64-4', '7439-94-3', '7440-58-6', '7440-25-7', '7440-33-7', '7440-15-5', '7440-04-2', '7439-88-5', '7440-06-4', '7440-57-5', '7439-97-6', '7440-28-0', '7439-92-1', '7440-69-9', '7440-08-6', '7440-68-8', '10043-92-2', '7440-73-5', '7440-14-4', '7440-34-8', '7440-29-1', '7440-13-3', '7440-61-1', '7439-99-8', '7440-07-5', '7440-35-9', '7440-51-9', '7440-40-6', '7440-71-3', '7429-92-7', '7440-72-4', '7440-11-1', '10028-14-5', '22537-19-5', '53850-36-5', '53850-35-4', '54038-81-2', '54037-14-8', '54037-57-9', '54038-01-6', '54083-77-1', '54386-24-2', '54084-26-3', '54084-70-7', '54085-16-4', '54085-64-2', '54100-71-9', '54101-14-3', '54144-19-3']
+CAS_by_number_standard = ["1333-74-0", "7440-59-7", "7439-93-2", "7440-41-7", "7440-42-8", "7440-44-0", "7727-37-9", "7782-44-7", "7782-41-4", "7440-01-9", "7440-23-5", "7439-95-4", "7429-90-5", "7440-21-3", "7723-14-0", "7704-34-9", "7782-50-5", "7440-37-1", "7440-09-7", "7440-70-2", "7440-20-2", "7440-32-6", "7440-62-2", "7440-47-3", "7439-96-5", "7439-89-6", "7440-48-4", "7440-02-0", "7440-50-8", "7440-66-6", "7440-55-3", "7440-56-4", "7440-38-2", "7782-49-2", "7726-95-6", "7439-90-9", "7440-17-7", "7440-24-6", "7440-65-5", "7440-67-7", "7440-03-1", "7439-98-7", "7440-26-8", "7440-18-8", "7440-16-6", "7440-05-3", "7440-22-4", "7440-43-9", "7440-74-6", "7440-31-5", "7440-36-0", "13494-80-9", "7553-56-2", "7440-63-3", "7440-46-2", "7440-39-3", "7439-91-0", "7440-45-1", "7440-10-0", "7440-00-8", "7440-12-2", "7440-19-9", "7440-53-1", "7440-54-2", "7440-27-9", "7429-91-6", "7440-60-0", "7440-52-0", "7440-30-4", "7440-64-4", "7439-94-3", "7440-58-6", "7440-25-7", "7440-33-7", "7440-15-5", "7440-04-2", "7439-88-5", "7440-06-4", "7440-57-5", "7439-97-6", "7440-28-0", "7439-92-1", "7440-69-9", "7440-08-6", "7440-68-8", "10043-92-2", "7440-73-5", "7440-14-4", "7440-34-8", "7440-29-1", "7440-13-3", "7440-61-1", "7439-99-8", "7440-07-5", "7440-35-9", "7440-51-9", "7440-40-6", "7440-71-3", "7429-92-7", "7440-72-4", "7440-11-1", "10028-14-5", "22537-19-5", "53850-36-5", "53850-35-4", "54038-81-2", "54037-14-8", "54037-57-9", "54038-01-6", "54083-77-1", "54386-24-2", "54084-26-3", "54084-70-7", "54085-16-4", "54085-64-2", "54100-71-9", "54101-14-3", "54144-19-3"]
 """Standard CAS numbers of the elements, indexed by atomic numbers off-by-one up to 118."""
 
 CAS_by_number = list(CAS_by_number_standard)
@@ -103,11 +103,11 @@ s_block = [1, 2, 3, 4, 11, 12, 19, 20, 37, 38, 55, 56, 87, 88]
 d_block = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 72, 73, 74, 75, 76, 77, 78, 79, 80, 104, 105, 106, 107, 108, 109, 110, 111, 112]
 f_block = [57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103] # 57, 89 are sometimes placed in the d block
 p_block = [5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 31, 32, 33, 34, 35, 36, 49, 50, 51, 52, 53, 54, 81, 82, 83, 84, 85, 86, 113, 114, 115, 116, 117, 118]
-blocks = {'s': s_block, 'd': d_block, 'f': f_block, 'p': p_block}
+blocks = {"s": s_block, "d": d_block, "f": f_block, "p": p_block}
 """Blocks of the elements, stored in a dictionary with four keys and lists.
 Indexed by atomic numbers off-by-one up to 118."""
 
-InChI_keys = ['YZCKVEUIGOORGS-UHFFFAOYSA-N', 'SWQJXJOGLNCZEY-UHFFFAOYSA-N', 'WHXSMMKQMYFTQS-UHFFFAOYSA-N', 'ATBAMAFKBVZNFJ-UHFFFAOYSA-N', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', 'OKTJSMMVPCPJKN-UHFFFAOYSA-N', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', 'QVGXLLKOCUKJST-UHFFFAOYSA-N', 'YCKRFDGAMUMZLT-UHFFFAOYSA-N', 'GKAOGPIIYCISHV-UHFFFAOYSA-N', 'KEAYESYHFKHZAL-UHFFFAOYSA-N', 'FYYHWMGAXLPEAU-UHFFFAOYSA-N', 'XAGFODPZIPBFFR-UHFFFAOYSA-N', 'XUIMIQQOPSSXEZ-UHFFFAOYSA-N', 'OAICVXFJPJFONN-UHFFFAOYSA-N', 'NINIDFKCEFEMDL-UHFFFAOYSA-N', 'ZAMOUSCENKQFHK-UHFFFAOYSA-N', 'XKRFYHLGVUSROY-UHFFFAOYSA-N', 'ZLMJMSJWJFRBEC-UHFFFAOYSA-N', 'OYPRJOBELJOOCE-UHFFFAOYSA-N', 'SIXSYDAISGFNSX-UHFFFAOYSA-N', 'RTAQQCXQSZGOHL-UHFFFAOYSA-N', 'LEONUFNNVUYDNQ-UHFFFAOYSA-N', 'VYZAMTAEIAYCRO-UHFFFAOYSA-N', 'PWHULOQIROXLJO-UHFFFAOYSA-N', 'XEEYBQQBJWHFJM-UHFFFAOYSA-N', 'GUTLYIVDDKVIGB-UHFFFAOYSA-N', 'PXHVJJICTQNCMI-UHFFFAOYSA-N', 'RYGMFSIKBFXOCR-UHFFFAOYSA-N', 'HCHKCACWOHOZIP-UHFFFAOYSA-N', 'GYHNNYVSQQEPJS-UHFFFAOYSA-N', 'GNPVGFCGXDBREM-UHFFFAOYSA-N', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', 'WKBOTKDWSSQWDR-UHFFFAOYSA-N', 'DNNSSWSSYDEUBZ-UHFFFAOYSA-N', 'IGLNJRXAVVLDKE-UHFFFAOYSA-N', 'CIOAGBVUUVVLOB-UHFFFAOYSA-N', 'VWQVUPCCIRVNHF-UHFFFAOYSA-N', 'QCWXUUIWCKQGHC-UHFFFAOYSA-N', 'GUCVJGMIXFAOAE-UHFFFAOYSA-N', 'ZOKXTWBITQBERF-UHFFFAOYSA-N', 'GKLVYJBZJHMRIY-UHFFFAOYSA-N', 'KJTLSVCANCCWHF-UHFFFAOYSA-N', 'MHOVAHRLVXNVSD-UHFFFAOYSA-N', 'KDLHZDBZIXYQEI-UHFFFAOYSA-N', 'BQCADISMDOOEFD-UHFFFAOYSA-N', 'BDOSMKKIYDKNTQ-UHFFFAOYSA-N', 'APFVFJFRJDLVQX-UHFFFAOYSA-N', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', 'WATWJIUSRGPENY-UHFFFAOYSA-N', 'PORWMNRCUJJQNO-UHFFFAOYSA-N', 'ZCYVEMRRCGMTRW-UHFFFAOYSA-N', 'FHNFHKCVQCLJFQ-UHFFFAOYSA-N', 'TVFDJXOCXUVLDH-UHFFFAOYSA-N', 'DSAJWYNOEDNPEQ-UHFFFAOYSA-N', 'FZLIPJUXYLNCLC-UHFFFAOYSA-N', 'GWXLDORMOJMVQZ-UHFFFAOYSA-N', 'PUDIUYLPXJFUGB-UHFFFAOYSA-N', 'QEFYFXOXNSNQGX-UHFFFAOYSA-N', 'VQMWBBYLQSCNPO-UHFFFAOYSA-N', 'KZUNJOHGWZRPMI-UHFFFAOYSA-N', 'OGPBJKLSAFTDLK-UHFFFAOYSA-N', 'UIWYJDYFSGRHKR-UHFFFAOYSA-N', 'GZCRRIHWUXGPOV-UHFFFAOYSA-N', 'KBQHZAAAGSGFKK-UHFFFAOYSA-N', 'KJZYNXUDTRRSPN-UHFFFAOYSA-N', 'UYAHIZSMUZPPFV-UHFFFAOYSA-N', 'FRNOGLGSGLTDKL-UHFFFAOYSA-N', 'NAWDYIZEMPQZHO-UHFFFAOYSA-N', 'OHSVLFRHMCKCQY-UHFFFAOYSA-N', 'VBJZVLUMGGDVMO-UHFFFAOYSA-N', 'GUVRBAGPIYLISA-UHFFFAOYSA-N', 'WFKWXMTUELFFGS-UHFFFAOYSA-N', 'WUAPFZMCVAUBPE-UHFFFAOYSA-N', 'SYQBFIAQOQZEGI-UHFFFAOYSA-N', 'GKOZUEZYRPOHIO-UHFFFAOYSA-N', 'BASFCYQUMIYNBI-UHFFFAOYSA-N', 'PCHJSUWPFVWCPO-UHFFFAOYSA-N', 'QSHDDOUJBYECFT-UHFFFAOYSA-N', 'BKVIYDNLLOSFOA-UHFFFAOYSA-N', 'WABPQHHGFIMREM-UHFFFAOYSA-N', 'JCXGWMGPZLAOME-UHFFFAOYSA-N', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', 'RYXHOMYVWAEKHL-UHFFFAOYSA-N', 'SYUHGPGVQRZVTB-UHFFFAOYSA-N', 'KLMCZVJOEAUDNE-UHFFFAOYSA-N', 'HCWPIIXVSYCSAN-UHFFFAOYSA-N', 'QQINRWTZWGJFDB-UHFFFAOYSA-N', 'ZSLUVFAKFWKJRC-UHFFFAOYSA-N', 'XLROVYAPLOFLNU-UHFFFAOYSA-N', 'JFALSRSLKYAFGM-UHFFFAOYSA-N', 'LFNLGNPSGWYGGD-UHFFFAOYSA-N', 'OYEHPCDNVJXUIW-UHFFFAOYSA-N', 'LXQXZNRPTYVCNG-UHFFFAOYSA-N', 'NIWWFAAXEMMFMS-UHFFFAOYSA-N', 'PWVKJRSRVJTHTR-UHFFFAOYSA-N', 'HGLDOAKPQXAFKI-UHFFFAOYSA-N', 'CKBRQZNRCSJHFT-UHFFFAOYSA-N', 'MIORUQGGZCBUGO-UHFFFAOYSA-N', 'MQVSLOYRCXQRPM-UHFFFAOYSA-N', 'ORQBXQOJMQIAOY-UHFFFAOYSA-N', 'CNQCVBJFEGMYDW-UHFFFAOYSA-N', 'YGPLJIIQQIDVFJ-UHFFFAOYSA-N', 'PUKKTGLVJQVIOF-UHFFFAOYSA-N', 'VAOUCABZIBBBJH-UHFFFAOYSA-N', 'INOXRQQPOOCQPH-UHFFFAOYSA-N', 'OBDWMWVOVYJOMI-UHFFFAOYSA-N', 'VAJSJTKWMRUWBF-UHFFFAOYSA-N', 'NCBMSFCPDGXTHD-UHFFFAOYSA-N', 'LJROPTGWFUZRDB-UHFFFAOYSA-N', 'NOTIIDSZELDPOP-UHFFFAOYSA-N', 'KUGNSLWRKGRKGS-UHFFFAOYSA-N', 'WIHJCBVMYKIGOT-UHFFFAOYSA-N', 'QDXZEHQJHSHEQF-UHFFFAOYSA-N', 'ONFASNXETZOODS-UHFFFAOYSA-N', 'INMSAURDCVBGHH-UHFFFAOYSA-N', 'GOANEQIZDYDFCO-UHFFFAOYSA-N']
+InChI_keys = ["YZCKVEUIGOORGS-UHFFFAOYSA-N", "SWQJXJOGLNCZEY-UHFFFAOYSA-N", "WHXSMMKQMYFTQS-UHFFFAOYSA-N", "ATBAMAFKBVZNFJ-UHFFFAOYSA-N", "ZOXJGFHDIHLPTG-UHFFFAOYSA-N", "OKTJSMMVPCPJKN-UHFFFAOYSA-N", "QJGQUHMNIGDVPM-UHFFFAOYSA-N", "QVGXLLKOCUKJST-UHFFFAOYSA-N", "YCKRFDGAMUMZLT-UHFFFAOYSA-N", "GKAOGPIIYCISHV-UHFFFAOYSA-N", "KEAYESYHFKHZAL-UHFFFAOYSA-N", "FYYHWMGAXLPEAU-UHFFFAOYSA-N", "XAGFODPZIPBFFR-UHFFFAOYSA-N", "XUIMIQQOPSSXEZ-UHFFFAOYSA-N", "OAICVXFJPJFONN-UHFFFAOYSA-N", "NINIDFKCEFEMDL-UHFFFAOYSA-N", "ZAMOUSCENKQFHK-UHFFFAOYSA-N", "XKRFYHLGVUSROY-UHFFFAOYSA-N", "ZLMJMSJWJFRBEC-UHFFFAOYSA-N", "OYPRJOBELJOOCE-UHFFFAOYSA-N", "SIXSYDAISGFNSX-UHFFFAOYSA-N", "RTAQQCXQSZGOHL-UHFFFAOYSA-N", "LEONUFNNVUYDNQ-UHFFFAOYSA-N", "VYZAMTAEIAYCRO-UHFFFAOYSA-N", "PWHULOQIROXLJO-UHFFFAOYSA-N", "XEEYBQQBJWHFJM-UHFFFAOYSA-N", "GUTLYIVDDKVIGB-UHFFFAOYSA-N", "PXHVJJICTQNCMI-UHFFFAOYSA-N", "RYGMFSIKBFXOCR-UHFFFAOYSA-N", "HCHKCACWOHOZIP-UHFFFAOYSA-N", "GYHNNYVSQQEPJS-UHFFFAOYSA-N", "GNPVGFCGXDBREM-UHFFFAOYSA-N", "RQNWIZPPADIBDY-UHFFFAOYSA-N", "BUGBHKTXTAQXES-UHFFFAOYSA-N", "WKBOTKDWSSQWDR-UHFFFAOYSA-N", "DNNSSWSSYDEUBZ-UHFFFAOYSA-N", "IGLNJRXAVVLDKE-UHFFFAOYSA-N", "CIOAGBVUUVVLOB-UHFFFAOYSA-N", "VWQVUPCCIRVNHF-UHFFFAOYSA-N", "QCWXUUIWCKQGHC-UHFFFAOYSA-N", "GUCVJGMIXFAOAE-UHFFFAOYSA-N", "ZOKXTWBITQBERF-UHFFFAOYSA-N", "GKLVYJBZJHMRIY-UHFFFAOYSA-N", "KJTLSVCANCCWHF-UHFFFAOYSA-N", "MHOVAHRLVXNVSD-UHFFFAOYSA-N", "KDLHZDBZIXYQEI-UHFFFAOYSA-N", "BQCADISMDOOEFD-UHFFFAOYSA-N", "BDOSMKKIYDKNTQ-UHFFFAOYSA-N", "APFVFJFRJDLVQX-UHFFFAOYSA-N", "ATJFFYVFTNAWJD-UHFFFAOYSA-N", "WATWJIUSRGPENY-UHFFFAOYSA-N", "PORWMNRCUJJQNO-UHFFFAOYSA-N", "ZCYVEMRRCGMTRW-UHFFFAOYSA-N", "FHNFHKCVQCLJFQ-UHFFFAOYSA-N", "TVFDJXOCXUVLDH-UHFFFAOYSA-N", "DSAJWYNOEDNPEQ-UHFFFAOYSA-N", "FZLIPJUXYLNCLC-UHFFFAOYSA-N", "GWXLDORMOJMVQZ-UHFFFAOYSA-N", "PUDIUYLPXJFUGB-UHFFFAOYSA-N", "QEFYFXOXNSNQGX-UHFFFAOYSA-N", "VQMWBBYLQSCNPO-UHFFFAOYSA-N", "KZUNJOHGWZRPMI-UHFFFAOYSA-N", "OGPBJKLSAFTDLK-UHFFFAOYSA-N", "UIWYJDYFSGRHKR-UHFFFAOYSA-N", "GZCRRIHWUXGPOV-UHFFFAOYSA-N", "KBQHZAAAGSGFKK-UHFFFAOYSA-N", "KJZYNXUDTRRSPN-UHFFFAOYSA-N", "UYAHIZSMUZPPFV-UHFFFAOYSA-N", "FRNOGLGSGLTDKL-UHFFFAOYSA-N", "NAWDYIZEMPQZHO-UHFFFAOYSA-N", "OHSVLFRHMCKCQY-UHFFFAOYSA-N", "VBJZVLUMGGDVMO-UHFFFAOYSA-N", "GUVRBAGPIYLISA-UHFFFAOYSA-N", "WFKWXMTUELFFGS-UHFFFAOYSA-N", "WUAPFZMCVAUBPE-UHFFFAOYSA-N", "SYQBFIAQOQZEGI-UHFFFAOYSA-N", "GKOZUEZYRPOHIO-UHFFFAOYSA-N", "BASFCYQUMIYNBI-UHFFFAOYSA-N", "PCHJSUWPFVWCPO-UHFFFAOYSA-N", "QSHDDOUJBYECFT-UHFFFAOYSA-N", "BKVIYDNLLOSFOA-UHFFFAOYSA-N", "WABPQHHGFIMREM-UHFFFAOYSA-N", "JCXGWMGPZLAOME-UHFFFAOYSA-N", "HZEBHPIOVYHPMT-UHFFFAOYSA-N", "RYXHOMYVWAEKHL-UHFFFAOYSA-N", "SYUHGPGVQRZVTB-UHFFFAOYSA-N", "KLMCZVJOEAUDNE-UHFFFAOYSA-N", "HCWPIIXVSYCSAN-UHFFFAOYSA-N", "QQINRWTZWGJFDB-UHFFFAOYSA-N", "ZSLUVFAKFWKJRC-UHFFFAOYSA-N", "XLROVYAPLOFLNU-UHFFFAOYSA-N", "JFALSRSLKYAFGM-UHFFFAOYSA-N", "LFNLGNPSGWYGGD-UHFFFAOYSA-N", "OYEHPCDNVJXUIW-UHFFFAOYSA-N", "LXQXZNRPTYVCNG-UHFFFAOYSA-N", "NIWWFAAXEMMFMS-UHFFFAOYSA-N", "PWVKJRSRVJTHTR-UHFFFAOYSA-N", "HGLDOAKPQXAFKI-UHFFFAOYSA-N", "CKBRQZNRCSJHFT-UHFFFAOYSA-N", "MIORUQGGZCBUGO-UHFFFAOYSA-N", "MQVSLOYRCXQRPM-UHFFFAOYSA-N", "ORQBXQOJMQIAOY-UHFFFAOYSA-N", "CNQCVBJFEGMYDW-UHFFFAOYSA-N", "YGPLJIIQQIDVFJ-UHFFFAOYSA-N", "PUKKTGLVJQVIOF-UHFFFAOYSA-N", "VAOUCABZIBBBJH-UHFFFAOYSA-N", "INOXRQQPOOCQPH-UHFFFAOYSA-N", "OBDWMWVOVYJOMI-UHFFFAOYSA-N", "VAJSJTKWMRUWBF-UHFFFAOYSA-N", "NCBMSFCPDGXTHD-UHFFFAOYSA-N", "LJROPTGWFUZRDB-UHFFFAOYSA-N", "NOTIIDSZELDPOP-UHFFFAOYSA-N", "KUGNSLWRKGRKGS-UHFFFAOYSA-N", "WIHJCBVMYKIGOT-UHFFFAOYSA-N", "QDXZEHQJHSHEQF-UHFFFAOYSA-N", "ONFASNXETZOODS-UHFFFAOYSA-N", "INMSAURDCVBGHH-UHFFFAOYSA-N", "GOANEQIZDYDFCO-UHFFFAOYSA-N"]
 # Big problem: Atoms like N2, O2 point to only the singlet
 
 homonuclear_elements = [1, 7, 8, 9, 17, 35, 53] # includes Br2, I2
@@ -117,7 +117,7 @@ homonuclear_elements_set = frozenset(homonuclear_elements)
 homonuclear_elemental_gases = [1, 7, 8, 9, 17] # 35, 53
 homonuclear_elemental_singlets_CASs = ["12385-13-6", "17778-88-0", "17778-80-2", "14762-94-8", "22537-15-1"]
 
-homonuclear_elements_CASs = homonuclear_elemental_singlets_CASs + ['10097-32-2', '14362-44-8']
+homonuclear_elements_CASs = homonuclear_elemental_singlets_CASs + ["10097-32-2", "14362-44-8"]
 homonuclear_elements_CASs_set = frozenset(homonuclear_elements_CASs)
 
 for i, CAS in zip(homonuclear_elements, homonuclear_elements_CASs):
@@ -133,147 +133,147 @@ cids = [5362549, 23987, 3028194, 5460467, 5462311, 5462310, 57370662, 159832, 53
 # format: (name, count, phase, stp_ref, smiles, inchi, inchi_key, closest_CAS, unique_CAS_maybe_fake,)
 
 allotropes = {}
-allotropes['N'] = [
-    ('dinitrogen', 2, 'g', True, 'N#N', 'N2/c1-2', 'IJGRMHOSHXDMSA-UHFFFAOYSA-N', '7727-37-9', '7727-37-9'),
-    ('atomic nitrogen', 1, 'g', False, '[N]', 'N', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', '17778-88-0', '17778-88-0'),
-    ('linear trinitrogen', 3, 'g', False, '[N-]=[N+]=[N]', '1S/N3/c1-3-2', 'QJGQUHMNIGDVPM-UHFFFAOYSA-N', '12596-60-0', '12596-60-0'),
-    ('cyclic trinitrogen', 3, 'g', False, 'N1=N[N]1', '1S/N3/c1-2-3-1', 'RLXSTAGCZQYHDL-UHFFFAOYSA-N', '12596-60-0', '2099958000-00-0'),
+allotropes["N"] = [
+    ("dinitrogen", 2, "g", True, "N#N", "N2/c1-2", "IJGRMHOSHXDMSA-UHFFFAOYSA-N", "7727-37-9", "7727-37-9"),
+    ("atomic nitrogen", 1, "g", False, "[N]", "N", "QJGQUHMNIGDVPM-UHFFFAOYSA-N", "17778-88-0", "17778-88-0"),
+    ("linear trinitrogen", 3, "g", False, "[N-]=[N+]=[N]", "1S/N3/c1-3-2", "QJGQUHMNIGDVPM-UHFFFAOYSA-N", "12596-60-0", "12596-60-0"),
+    ("cyclic trinitrogen", 3, "g", False, "N1=N[N]1", "1S/N3/c1-2-3-1", "RLXSTAGCZQYHDL-UHFFFAOYSA-N", "12596-60-0", "2099958000-00-0"),
 ]
-allotropes['H'] = [
-    ('dihydrogen', 2, 'g', True, '[HH]', 'H2/h1H', 'UFHFLCQGNIYNRP-UHFFFAOYSA-N', '1333-74-0', '1333-74-0'),
-    ('atomic hydrogen', 1, 'g', False, '[H]', 'H', 'YZCKVEUIGOORGS-UHFFFAOYSA-N', '12385-13-6', '12385-13-6')
+allotropes["H"] = [
+    ("dihydrogen", 2, "g", True, "[HH]", "H2/h1H", "UFHFLCQGNIYNRP-UHFFFAOYSA-N", "1333-74-0", "1333-74-0"),
+    ("atomic hydrogen", 1, "g", False, "[H]", "H", "YZCKVEUIGOORGS-UHFFFAOYSA-N", "12385-13-6", "12385-13-6")
 ]
-allotropes['F'] = [
-    ('difluorine', 2, 'g', True, 'FF', 'F2/c1-2', 'PXGOKWXKJXAPGV-UHFFFAOYSA-N', '7782-41-4', '7782-41-4'),
-    ('atomic fluorine', 1, 'g', False, '[F]', 'F', 'YCKRFDGAMUMZLT-UHFFFAOYSA-N', '14762-94-8', '14762-94-8')
-]
-
-allotropes['I'] = [
-    ('diiodine', 2, 's', True, 'II', 'I2/c1-2', 'PNDPGZBMCMUPRI-UHFFFAOYSA-N', '7553-56-2', '7553-56-2'),
-    ('atomic iodine', 1, 'g', False, '[I]', 'I', 'ZCYVEMRRCGMTRW-UHFFFAOYSA-N', '14362-44-8', '14362-44-8'),
+allotropes["F"] = [
+    ("difluorine", 2, "g", True, "FF", "F2/c1-2", "PXGOKWXKJXAPGV-UHFFFAOYSA-N", "7782-41-4", "7782-41-4"),
+    ("atomic fluorine", 1, "g", False, "[F]", "F", "YCKRFDGAMUMZLT-UHFFFAOYSA-N", "14762-94-8", "14762-94-8")
 ]
 
-allotropes['Br'] = [
-    ('dibromine', 2, 'l', True, 'BrBr', '1S/Br2/c1-2', 'GDTBXPJZTBHREO-UHFFFAOYSA-N', '7726-95-6', '7726-95-6'),
-    ('atomic bromine', 1, 'g', False, '[Br]', 'Br', 'WKBOTKDWSSQWDR-UHFFFAOYSA-N', '10097-32-2', '10097-32-2')
+allotropes["I"] = [
+    ("diiodine", 2, "s", True, "II", "I2/c1-2", "PNDPGZBMCMUPRI-UHFFFAOYSA-N", "7553-56-2", "7553-56-2"),
+    ("atomic iodine", 1, "g", False, "[I]", "I", "ZCYVEMRRCGMTRW-UHFFFAOYSA-N", "14362-44-8", "14362-44-8"),
 ]
 
-allotropes['Cl'] = [
-    ('dichlorine', 2, 'g', True, 'ClCl', 'Cl2/c1-2', 'KZBUYRJDOAKODT-UHFFFAOYSA-N', '7782-50-5', '7782-50-5'),
-    ('atomic chlorine', 1, 'g', False, '[Cl]', 'Cl', 'ZAMOUSCENKQFHK-UHFFFAOYSA-N', '22537-15-1', '22537-15-1')
+allotropes["Br"] = [
+    ("dibromine", 2, "l", True, "BrBr", "1S/Br2/c1-2", "GDTBXPJZTBHREO-UHFFFAOYSA-N", "7726-95-6", "7726-95-6"),
+    ("atomic bromine", 1, "g", False, "[Br]", "Br", "WKBOTKDWSSQWDR-UHFFFAOYSA-N", "10097-32-2", "10097-32-2")
 ]
 
-allotropes['C'] = [
-    ('diamond', 1, 's', False, 'C', 'CH4/h1H4', 'VNWKTOKETHGBQD-UHFFFAOYSA-N', '7782-40-3', '7782-40-3'),
-    ('graphite', 1, 's', True, 'C', 'CH4/h1H4', 'VNWKTOKETHGBQD-UHFFFAOYSA-N', '7782-42-5', '7782-42-5'),
-    ('atomic carbon', 1, 's', False, 'C', 'CH4/h1H4', 'VNWKTOKETHGBQD-UHFFFAOYSA-N', '7440-44-0', '7440-44-0'),# also carbon black
+allotropes["Cl"] = [
+    ("dichlorine", 2, "g", True, "ClCl", "Cl2/c1-2", "KZBUYRJDOAKODT-UHFFFAOYSA-N", "7782-50-5", "7782-50-5"),
+    ("atomic chlorine", 1, "g", False, "[Cl]", "Cl", "ZAMOUSCENKQFHK-UHFFFAOYSA-N", "22537-15-1", "22537-15-1")
+]
+
+allotropes["C"] = [
+    ("diamond", 1, "s", False, "C", "CH4/h1H4", "VNWKTOKETHGBQD-UHFFFAOYSA-N", "7782-40-3", "7782-40-3"),
+    ("graphite", 1, "s", True, "C", "CH4/h1H4", "VNWKTOKETHGBQD-UHFFFAOYSA-N", "7782-42-5", "7782-42-5"),
+    ("atomic carbon", 1, "s", False, "C", "CH4/h1H4", "VNWKTOKETHGBQD-UHFFFAOYSA-N", "7440-44-0", "7440-44-0"),# also carbon black
 ]
 
 
-allotropes['Po'] = [
+allotropes["Po"] = [
     # assuming alpha is more stable
-    ('alpha polonium', 1, 's', True, '[Po]', 'Po', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', '7440-08-6', '2099953000-00-0'),
-    ('beta polonium', 1, 's', False, '[Po]', 'Po', 'HZEBHPIOVYHPMT-UHFFFAOYSA-N', '7440-08-6', '2099937000-00-0'),
+    ("alpha polonium", 1, "s", True, "[Po]", "Po", "HZEBHPIOVYHPMT-UHFFFAOYSA-N", "7440-08-6", "2099953000-00-0"),
+    ("beta polonium", 1, "s", False, "[Po]", "Po", "HZEBHPIOVYHPMT-UHFFFAOYSA-N", "7440-08-6", "2099937000-00-0"),
 ]
 
-allotropes['Sn'] = [
+allotropes["Sn"] = [
     # unfortunately sources report the same CAS
-    ('white tin', 1, 's', True, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099932000-00-0'),
-    ('gray tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099916000-00-0'),
-    ('gamma tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099911000-00-0'), # not common
-    ('sigma tin', 1, 's', False, '[Sn]', 'Sn', 'ATJFFYVFTNAWJD-UHFFFAOYSA-N', '7440-31-5', '2099898000-00-0'), # not common
+    ("white tin", 1, "s", True, "[Sn]", "Sn", "ATJFFYVFTNAWJD-UHFFFAOYSA-N", "7440-31-5", "2099932000-00-0"),
+    ("gray tin", 1, "s", False, "[Sn]", "Sn", "ATJFFYVFTNAWJD-UHFFFAOYSA-N", "7440-31-5", "2099916000-00-0"),
+    ("gamma tin", 1, "s", False, "[Sn]", "Sn", "ATJFFYVFTNAWJD-UHFFFAOYSA-N", "7440-31-5", "2099911000-00-0"), # not common
+    ("sigma tin", 1, "s", False, "[Sn]", "Sn", "ATJFFYVFTNAWJD-UHFFFAOYSA-N", "7440-31-5", "2099898000-00-0"), # not common
 ]
 
-allotropes['Se'] = [
+allotropes["Se"] = [
     # most stable at STP, chiral hexagonal crystal lattice
-    ('gray selenium', 1, 's', True, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2', '7782-49-2'),
+    ("gray selenium", 1, "s", True, "[Se]", "Se", "BUGBHKTXTAQXES-UHFFFAOYSA-N", "7782-49-2", "7782-49-2"),
 
     # monocrystaline puckered cyclooctaselenium (Se8) rings
-    ('red gamma selenium', 8, 's', False, '[Se]1[Se][Se][Se][Se][Se][Se][Se]1', 'Se8/c1-2-4-6-8-7-5-3-1',
-                    'JWMKWLJGSKAGLH-UHFFFAOYSA-N', '12597-33-0', '2099893000-00-0'),
+    ("red gamma selenium", 8, "s", False, "[Se]1[Se][Se][Se][Se][Se][Se][Se]1", "Se8/c1-2-4-6-8-7-5-3-1",
+                    "JWMKWLJGSKAGLH-UHFFFAOYSA-N", "12597-33-0", "2099893000-00-0"),
 
     # monocrystaline puckered cyclooctaselenium (Se8) rings
-    ('red beta selenium', 8, 's', False, '[Se]1[Se][Se][Se][Se][Se][Se][Se]1', 'Se8/c1-2-4-6-8-7-5-3-1',
-                    'JWMKWLJGSKAGLH-UHFFFAOYSA-N', '12597-33-0', '2099877000-00-0'),
+    ("red beta selenium", 8, "s", False, "[Se]1[Se][Se][Se][Se][Se][Se][Se]1", "Se8/c1-2-4-6-8-7-5-3-1",
+                    "JWMKWLJGSKAGLH-UHFFFAOYSA-N", "12597-33-0", "2099877000-00-0"),
 
-    ('amorphous black selenium', 1, 's', False, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2',
-                '2099872000-00-0'),  # amorphous, up to 1000 atoms per ring
-    ('amorphous red selenium', 1, 's', False, '[Se]', 'Se', 'BUGBHKTXTAQXES-UHFFFAOYSA-N', '7782-49-2',
-                '2099856000-00-0'),  # amorphous
+    ("amorphous black selenium", 1, "s", False, "[Se]", "Se", "BUGBHKTXTAQXES-UHFFFAOYSA-N", "7782-49-2",
+                "2099872000-00-0"),  # amorphous, up to 1000 atoms per ring
+    ("amorphous red selenium", 1, "s", False, "[Se]", "Se", "BUGBHKTXTAQXES-UHFFFAOYSA-N", "7782-49-2",
+                "2099856000-00-0"),  # amorphous
 ]
 
-allotropes['As'] = [
-    ('gray arsenic', 1, 's', True, '[As]', 'As', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', '7440-38-2', '2099851000-00-0'), # most stable form
-    ('yellow arsenic', 1, 's', False, '[As]', 'As', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', '7440-38-2', '2099835000-00-0'),
-    ('black arsenic', 1, 's', False, '[As]', 'As', 'RQNWIZPPADIBDY-UHFFFAOYSA-N', '7440-38-2', '2099830000-00-0'),
+allotropes["As"] = [
+    ("gray arsenic", 1, "s", True, "[As]", "As", "RQNWIZPPADIBDY-UHFFFAOYSA-N", "7440-38-2", "2099851000-00-0"), # most stable form
+    ("yellow arsenic", 1, "s", False, "[As]", "As", "RQNWIZPPADIBDY-UHFFFAOYSA-N", "7440-38-2", "2099835000-00-0"),
+    ("black arsenic", 1, "s", False, "[As]", "As", "RQNWIZPPADIBDY-UHFFFAOYSA-N", "7440-38-2", "2099830000-00-0"),
 ]
 
 
 
-allotropes['P'] = [
+allotropes["P"] = [
     # most stable form at room Body-centred cubic or Triclinic also heard yellow phosphorus; CAS is tetraphosphorus
-    ('alpha white phosphorus', 4, 's', True, 'P12P3P1P23', 'P4/c1-2-3(1)4(1)2', 'OBSZRRSYVTXPNB-UHFFFAOYSA-N', '12185-10-3', '2099819000-00-0'),
+    ("alpha white phosphorus", 4, "s", True, "P12P3P1P23", "P4/c1-2-3(1)4(1)2", "OBSZRRSYVTXPNB-UHFFFAOYSA-N", "12185-10-3", "2099819000-00-0"),
     #  Triclinic also heard yellow phosphorus
-    ('beta white phosphorus', 4, 's', False, 'P12P3P1P23', 'P4/c1-2-3(1)4(1)2', 'OBSZRRSYVTXPNB-UHFFFAOYSA-N', '12185-10-3', '2099814000-00-0'),
+    ("beta white phosphorus", 4, "s", False, "P12P3P1P23", "P4/c1-2-3(1)4(1)2", "OBSZRRSYVTXPNB-UHFFFAOYSA-N", "12185-10-3", "2099814000-00-0"),
 
     # CAS is phosphorus
-    ('red phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099796000-00-0'),
-    ('violet phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099791000-00-0'), # Monoclinic
-    ('black phosphorus', 1, 's', False, '[P]', 'P', 'OAICVXFJPJFONN-UHFFFAOYSA-N', '7723-14-0', '2099775000-00-0'), # Orthorhombic
+    ("red phosphorus", 1, "s", False, "[P]", "P", "OAICVXFJPJFONN-UHFFFAOYSA-N", "7723-14-0", "2099796000-00-0"),
+    ("violet phosphorus", 1, "s", False, "[P]", "P", "OAICVXFJPJFONN-UHFFFAOYSA-N", "7723-14-0", "2099791000-00-0"), # Monoclinic
+    ("black phosphorus", 1, "s", False, "[P]", "P", "OAICVXFJPJFONN-UHFFFAOYSA-N", "7723-14-0", "2099775000-00-0"), # Orthorhombic
 
-    ('diphosphorus', 2, 'g', False, 'P#P', '1S/P2/c1-2', 'FOBPTJZYDGNHLR-UHFFFAOYSA-N', '12185-09-0', '12185-09-0'), # gas
+    ("diphosphorus", 2, "g", False, "P#P", "1S/P2/c1-2", "FOBPTJZYDGNHLR-UHFFFAOYSA-N", "12185-09-0", "12185-09-0"), # gas
 ]
 
-allotropes['Sb'] = [
-    ('white antimony', 1, 's', True, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099770000-00-0'),# most stable form
-    ('yellow antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099759000-00-0'),# metastable
-    ('black antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099754000-00-0'),# metastable
-    ('explosive antimony', 1, 's', False, '[Sb]', 'Sb', 'WATWJIUSRGPENY-UHFFFAOYSA-N', '7440-36-0', '2099738000-00-0'),# eep
+allotropes["Sb"] = [
+    ("white antimony", 1, "s", True, "[Sb]", "Sb", "WATWJIUSRGPENY-UHFFFAOYSA-N", "7440-36-0", "2099770000-00-0"),# most stable form
+    ("yellow antimony", 1, "s", False, "[Sb]", "Sb", "WATWJIUSRGPENY-UHFFFAOYSA-N", "7440-36-0", "2099759000-00-0"),# metastable
+    ("black antimony", 1, "s", False, "[Sb]", "Sb", "WATWJIUSRGPENY-UHFFFAOYSA-N", "7440-36-0", "2099754000-00-0"),# metastable
+    ("explosive antimony", 1, "s", False, "[Sb]", "Sb", "WATWJIUSRGPENY-UHFFFAOYSA-N", "7440-36-0", "2099738000-00-0"),# eep
 ]
 
-allotropes['S'] = [
-    ('atomic sulfur', 1, 's', False, '[S]', 'S', 'NINIDFKCEFEMDL-UHFFFAOYSA-N', '7704-34-9', '7704-34-9'),
+allotropes["S"] = [
+    ("atomic sulfur", 1, "s", False, "[S]", "S", "NINIDFKCEFEMDL-UHFFFAOYSA-N", "7704-34-9", "7704-34-9"),
 
     # orthorhombic  most common
-    ('alpha S8 sulfur', 8, 's', True, 'S1SSSSSSS1', 'S8/c1-2-4-6-8-7-5-3-1', 'JLQNHALFVCURHW-UHFFFAOYSA-N', '10544-50-0', '2099733000-00-0'),
+    ("alpha S8 sulfur", 8, "s", True, "S1SSSSSSS1", "S8/c1-2-4-6-8-7-5-3-1", "JLQNHALFVCURHW-UHFFFAOYSA-N", "10544-50-0", "2099733000-00-0"),
     # orthorhombicform from alpha when raised to 95.3 °C
-    ('beta S8 sulfur', 8, 's', False, 'S1SSSSSSS1', 'S8/c1-2-4-6-8-7-5-3-1', 'JLQNHALFVCURHW-UHFFFAOYSA-N', '10544-50-0', '2099717000-00-0'),
+    ("beta S8 sulfur", 8, "s", False, "S1SSSSSSS1", "S8/c1-2-4-6-8-7-5-3-1", "JLQNHALFVCURHW-UHFFFAOYSA-N", "10544-50-0", "2099717000-00-0"),
     # orthorhombic  nacreous sulfur or mother of pearl sulfur
-    ('gamma S8 sulfur', 8, 's', False, 'S1SSSSSSS1', 'S8/c1-2-4-6-8-7-5-3-1', 'JLQNHALFVCURHW-UHFFFAOYSA-N', '10544-50-0', '2099712000-00-0'),
+    ("gamma S8 sulfur", 8, "s", False, "S1SSSSSSS1", "S8/c1-2-4-6-8-7-5-3-1", "JLQNHALFVCURHW-UHFFFAOYSA-N", "10544-50-0", "2099712000-00-0"),
 
     # most common component of sulfur vapour above 720 °C
-    ('disulfur', 2, 'g', False, 'S=S', 'S2/c1-2', 'MAHNFPMIPQKPPI-UHFFFAOYSA-N', '23550-45-0', '23550-45-0'),
+    ("disulfur", 2, "g", False, "S=S", "S2/c1-2", "MAHNFPMIPQKPPI-UHFFFAOYSA-N", "23550-45-0", "23550-45-0"),
     # vapor species 10% at 440 °C
-    ('trisulfur', 3, 'g', False, 'S=S=S', 'S3/c1-3-2', 'NVSDADJBGGUCLP-UHFFFAOYSA-N', '12597-03-4', '12597-03-4'),
+    ("trisulfur", 3, "g", False, "S=S=S", "S3/c1-3-2", "NVSDADJBGGUCLP-UHFFFAOYSA-N", "12597-03-4", "12597-03-4"),
      # gas only not characterized
-    ('tetrasulfur', 4, 'g', False, 'S1SSS1', 'S4/c1-2-4-3-1', 'NWWQJUISNMIVLJ-UHFFFAOYSA-N', '19269-85-3', '19269-85-3'),
+    ("tetrasulfur", 4, "g", False, "S1SSS1", "S4/c1-2-4-3-1", "NWWQJUISNMIVLJ-UHFFFAOYSA-N", "19269-85-3", "19269-85-3"),
      # gas only not characterized
-    ('pentasulfur', 5, 'g', False, 'S1SSSS1', 'S5/c1-2-4-5-3-1', 'DEVHCWHUQVZNMT-UHFFFAOYSA-N', '12597-10-3', '12597-10-3'),
+    ("pentasulfur", 5, "g", False, "S1SSSS1", "S5/c1-2-4-5-3-1", "DEVHCWHUQVZNMT-UHFFFAOYSA-N", "12597-10-3", "12597-10-3"),
 
     # solid ring form
-    ('cyclo-S6', 6, 's', False, 'S1SSSSS1', 'S6/c1-2-4-6-5-3-1', 'FEXCMMPRRBSCRG-UHFFFAOYSA-N', '13798-23-7', '13798-23-7'),
+    ("cyclo-S6", 6, "s", False, "S1SSSSS1", "S6/c1-2-4-6-5-3-1", "FEXCMMPRRBSCRG-UHFFFAOYSA-N", "13798-23-7", "13798-23-7"),
 
     # solid ring S7 forms
-    ('alpha S7 sulfur', 7, 's', False, 'S1SSSSSS1', 'S7/c1-2-4-6-7-5-3-1', 'VVNDVBPCYWJYSK-UHFFFAOYSA-N', '21459-04-1', '2099699000-00-0'),
-    ('beta S7 sulfur', 7, 's', False, 'S1SSSSSS1', 'S7/c1-2-4-6-7-5-3-1', 'VVNDVBPCYWJYSK-UHFFFAOYSA-N', '21459-04-1', '2099694000-00-0'),
-    ('gamma S7 sulfur', 7, 's', False, 'S1SSSSSS1', 'S7/c1-2-4-6-7-5-3-1', 'VVNDVBPCYWJYSK-UHFFFAOYSA-N', '21459-04-1', '2099678000-00-0'),
-    ('delta S7 sulfur', 7, 's', False, 'S1SSSSSS1', 'S7/c1-2-4-6-7-5-3-1', 'VVNDVBPCYWJYSK-UHFFFAOYSA-N', '21459-04-1', '2099673000-00-0'),
+    ("alpha S7 sulfur", 7, "s", False, "S1SSSSSS1", "S7/c1-2-4-6-7-5-3-1", "VVNDVBPCYWJYSK-UHFFFAOYSA-N", "21459-04-1", "2099699000-00-0"),
+    ("beta S7 sulfur", 7, "s", False, "S1SSSSSS1", "S7/c1-2-4-6-7-5-3-1", "VVNDVBPCYWJYSK-UHFFFAOYSA-N", "21459-04-1", "2099694000-00-0"),
+    ("gamma S7 sulfur", 7, "s", False, "S1SSSSSS1", "S7/c1-2-4-6-7-5-3-1", "VVNDVBPCYWJYSK-UHFFFAOYSA-N", "21459-04-1", "2099678000-00-0"),
+    ("delta S7 sulfur", 7, "s", False, "S1SSSSSS1", "S7/c1-2-4-6-7-5-3-1", "VVNDVBPCYWJYSK-UHFFFAOYSA-N", "21459-04-1", "2099673000-00-0"),
 ]
 
-allotropes['O'] = [
-    ('dioxygen', 2, 'g', True, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '7782-44-7'),
-    ('atomic oxygen', 1, 'g', False, '[O]', 'O', 'QVGXLLKOCUKJST-UHFFFAOYSA-N', '17778-80-2', '17778-80-2'),
-    ('ozone', 3, 'g', False, '[O-][O+]=O', 'O3/c1-3-2', 'CBENFWSGALASAD-UHFFFAOYSA-N', '10028-15-6', '10028-15-6'),
+allotropes["O"] = [
+    ("dioxygen", 2, "g", True, "O=O", "O2/c1-2", "MYMOFIZGZYHOMD-UHFFFAOYSA-N", "7782-44-7", "7782-44-7"),
+    ("atomic oxygen", 1, "g", False, "[O]", "O", "QVGXLLKOCUKJST-UHFFFAOYSA-N", "17778-80-2", "17778-80-2"),
+    ("ozone", 3, "g", False, "[O-][O+]=O", "O3/c1-3-2", "CBENFWSGALASAD-UHFFFAOYSA-N", "10028-15-6", "10028-15-6"),
 
     # theorized wikipedia only and chemspider
-    ('cyclic ozone', 3, 'g', False, 'o1oo1', '1S/O3/c1-2-3-1', 'XQOAKYYZMDCSIA-UHFFFAOYSA-N', '153851-84-4', '153851-84-4'),
+    ("cyclic ozone", 3, "g", False, "o1oo1", "1S/O3/c1-2-3-1", "XQOAKYYZMDCSIA-UHFFFAOYSA-N", "153851-84-4", "153851-84-4"),
 
-    ('alpha oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099550000-00-0'),
-    ('beta oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099539000-00-0'),
-    ('gamma oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099534000-00-0'),
-    ('delta oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099518000-00-0'), # orange high pressure
-    ('epsilon oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099513000-00-0'), # red high pressure
-    ('zeta oxygen', 2, 's', False, 'O=O', 'O2/c1-2', 'MYMOFIZGZYHOMD-UHFFFAOYSA-N', '7782-44-7', '2099495000-00-0'), # metallic high pressure
+    ("alpha oxygen", 2, "s", False, "O=O", "O2/c1-2", "MYMOFIZGZYHOMD-UHFFFAOYSA-N", "7782-44-7", "2099550000-00-0"),
+    ("beta oxygen", 2, "s", False, "O=O", "O2/c1-2", "MYMOFIZGZYHOMD-UHFFFAOYSA-N", "7782-44-7", "2099539000-00-0"),
+    ("gamma oxygen", 2, "s", False, "O=O", "O2/c1-2", "MYMOFIZGZYHOMD-UHFFFAOYSA-N", "7782-44-7", "2099534000-00-0"),
+    ("delta oxygen", 2, "s", False, "O=O", "O2/c1-2", "MYMOFIZGZYHOMD-UHFFFAOYSA-N", "7782-44-7", "2099518000-00-0"), # orange high pressure
+    ("epsilon oxygen", 2, "s", False, "O=O", "O2/c1-2", "MYMOFIZGZYHOMD-UHFFFAOYSA-N", "7782-44-7", "2099513000-00-0"), # red high pressure
+    ("zeta oxygen", 2, "s", False, "O=O", "O2/c1-2", "MYMOFIZGZYHOMD-UHFFFAOYSA-N", "7782-44-7", "2099495000-00-0"), # metallic high pressure
 
     # Don't have structures for these
 #     'tetraoxygen': '852461-27-9', # cyclotetraoxygen D2d structure form
@@ -282,63 +282,63 @@ allotropes['O'] = [
 
 
 # https://janaf.nist.gov/tables/B-001.html
-allotropes['B'] = [
-    ('alpha rhombohedral boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099657000-00-0'),
-    ('beta rhombohedral boron', 1, 's', True, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099652000-00-0'),# most stable
-    ('beta tetragonal boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099636000-00-0'),
+allotropes["B"] = [
+    ("alpha rhombohedral boron", 1, "s", False, "[B]", "B", "ZOXJGFHDIHLPTG-UHFFFAOYSA-N", "7440-42-8", "2099657000-00-0"),
+    ("beta rhombohedral boron", 1, "s", True, "[B]", "B", "ZOXJGFHDIHLPTG-UHFFFAOYSA-N", "7440-42-8", "2099652000-00-0"),# most stable
+    ("beta tetragonal boron", 1, "s", False, "[B]", "B", "ZOXJGFHDIHLPTG-UHFFFAOYSA-N", "7440-42-8", "2099636000-00-0"),
 
-    ('alpha tetragonal boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099631000-00-0'),
-    ('gamma orthorhombic boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099615000-00-0'),
+    ("alpha tetragonal boron", 1, "s", False, "[B]", "B", "ZOXJGFHDIHLPTG-UHFFFAOYSA-N", "7440-42-8", "2099631000-00-0"),
+    ("gamma orthorhombic boron", 1, "s", False, "[B]", "B", "ZOXJGFHDIHLPTG-UHFFFAOYSA-N", "7440-42-8", "2099615000-00-0"),
 
-    ('powder boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099610000-00-0'),
-    ('glassy boron', 1, 's', False, '[B]', 'B', 'ZOXJGFHDIHLPTG-UHFFFAOYSA-N', '7440-42-8', '2099597000-00-0'),
+    ("powder boron", 1, "s", False, "[B]", "B", "ZOXJGFHDIHLPTG-UHFFFAOYSA-N", "7440-42-8", "2099610000-00-0"),
+    ("glassy boron", 1, "s", False, "[B]", "B", "ZOXJGFHDIHLPTG-UHFFFAOYSA-N", "7440-42-8", "2099597000-00-0"),
 
     # not sure actually exists but is in common chemistry
-    ('diboron', 2, 's', False, 'B#B', 'B2/c1-2', 'ZOCHARZZJNPSEU-UHFFFAOYSA-N', '14452-61-0', '14452-61-0'),
+    ("diboron", 2, "s", False, "B#B", "B2/c1-2", "ZOCHARZZJNPSEU-UHFFFAOYSA-N", "14452-61-0", "14452-61-0"),
 ]
 
 
-allotropes['Zr'] = [
-    ('alpha zirconium', 1, 's', False, '[Zr]', 'Zr', 'QCWXUUIWCKQGHC-UHFFFAOYSA-N', '7440-67-7', '2099592000-00-0'),
-    ('beta zirconium', 1, 's', True, '[Zr]', 'Zr', 'QCWXUUIWCKQGHC-UHFFFAOYSA-N', '7440-67-7', '2099576000-00-0'),
+allotropes["Zr"] = [
+    ("alpha zirconium", 1, "s", False, "[Zr]", "Zr", "QCWXUUIWCKQGHC-UHFFFAOYSA-N", "7440-67-7", "2099592000-00-0"),
+    ("beta zirconium", 1, "s", True, "[Zr]", "Zr", "QCWXUUIWCKQGHC-UHFFFAOYSA-N", "7440-67-7", "2099576000-00-0"),
 ]
 
-allotropes['Ti'] = [
+allotropes["Ti"] = [
     # format: (name, count, phase, stp_ref, smiles, inchi, inchi_key, closest_CAS, unique_CAS_maybe_fake,)
-    ('alpha titanium', 1, 's', True, '[Ti]', 'Ti', 'RTAQQCXQSZGOHL-UHFFFAOYSA-N', '7440-67-7', '2099571000-00-0'),
-    ('beta titanium', 1, 's', False, '[Ti]', 'Ti', 'RTAQQCXQSZGOHL-UHFFFAOYSA-N', '7440-67-7', '2099555000-00-0'),
+    ("alpha titanium", 1, "s", True, "[Ti]", "Ti", "RTAQQCXQSZGOHL-UHFFFAOYSA-N", "7440-67-7", "2099571000-00-0"),
+    ("beta titanium", 1, "s", False, "[Ti]", "Ti", "RTAQQCXQSZGOHL-UHFFFAOYSA-N", "7440-67-7", "2099555000-00-0"),
 ]
 
 solid_allotrope_map = {
-    '7440-32-6': {'T_transitions': [1166], 'CASs_transitions': ['2099571000-00-0', '2099555000-00-0'], 'all_CASs': ['2099555000-00-0', '2099571000-00-0']},
-    '7782-44-7': {'T_transitions': [23.876, 43.7964], 'H_transitions': [0.0, 742], #Freiman, Yu. A., and H. J. Jodl. “Solid Oxygen.” Physics Reports 401, no. 1 (November 1, 2004): 1–228. https://doi.org/10.1016/j.physrep.2004.06.002.
-                 'CASs_transitions': ['2099550000-00-0', '2099539000-00-0', '2099534000-00-0'],
-                         'all_CASs': ['2099550000-00-0', '2099539000-00-0', '2099534000-00-0']},
+    "7440-32-6": {"T_transitions": [1166], "CASs_transitions": ["2099571000-00-0", "2099555000-00-0"], "all_CASs": ["2099555000-00-0", "2099571000-00-0"]},
+    "7782-44-7": {"T_transitions": [23.876, 43.7964], "H_transitions": [0.0, 742], #Freiman, Yu. A., and H. J. Jodl. “Solid Oxygen.” Physics Reports 401, no. 1 (November 1, 2004): 1–228. https://doi.org/10.1016/j.physrep.2004.06.002.
+                 "CASs_transitions": ["2099550000-00-0", "2099539000-00-0", "2099534000-00-0"],
+                         "all_CASs": ["2099550000-00-0", "2099539000-00-0", "2099534000-00-0"]},
 }
 
 allotrope_CAS_to_name = {v[8]: v[0] for t in allotropes.values() for v in t}
 
 # For each element that has allotropes, the allotrope which is used as a reference state at STP
-allotropic_standard_states = {'H': 'dihydrogen',
-                              'N': 'dinitrogen',
-                              'O': 'dioxygen',
-                              'F': 'difluorine',
-                              'I': 'diiodine',
-                              'Br': 'dibromine',
-                              'Cl': 'dichlorine',
+allotropic_standard_states = {"H": "dihydrogen",
+                              "N": "dinitrogen",
+                              "O": "dioxygen",
+                              "F": "difluorine",
+                              "I": "diiodine",
+                              "Br": "dibromine",
+                              "Cl": "dichlorine",
 
-                              'C': 'graphite',  # consistent with NBS/JANAF
-                              'Po': 'alpha polonium',
-                              'Sb': 'white antimony',
-                              'Sn': 'white tin', # consistent with NBS/JANAF
-                              'P': 'alpha white phosphorus', # consistent with NBS/JANAF
-                              'S': 'alpha S8 sulfur', # JANAF consistent 298.15 K then switches to beta then gas
-                              'Se': 'gray selenium',
-                              'As': 'gray arsenic',
-                              'B': 'beta rhombohedral boron',
+                              "C": "graphite",  # consistent with NBS/JANAF
+                              "Po": "alpha polonium",
+                              "Sb": "white antimony",
+                              "Sn": "white tin", # consistent with NBS/JANAF
+                              "P": "alpha white phosphorus", # consistent with NBS/JANAF
+                              "S": "alpha S8 sulfur", # JANAF consistent 298.15 K then switches to beta then gas
+                              "Se": "gray selenium",
+                              "As": "gray arsenic",
+                              "B": "beta rhombohedral boron",
 
-                              'Ti': 'alpha titanium',
-                              'Zr': 'beta zirconium',
+                              "Ti": "alpha titanium",
+                              "Zr": "beta zirconium",
 }
 
 
@@ -352,7 +352,7 @@ for i, ele in enumerate(periodic_table):
     elif ele.symbol in gases:
         phases[i] = 'g'
 """
-phases = ['g', 'g', 's', 's', 's', 's', 'g', 'g', 'g', 'g', 's', 's', 's', 's', 's', 's', 'g', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 'l', 's', 's', 's', 's', 's', 'g', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's', 's']
+phases = ["g", "g", "s", "s", "s", "s", "g", "g", "g", "g", "s", "s", "s", "s", "s", "s", "g", "g", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "l", "g", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "g", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "l", "s", "s", "s", "s", "s", "g", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s", "s"]
 
 
 """# From CRC Table:
@@ -437,11 +437,11 @@ class PeriodicTable:
     """
 
     __slots__ = (
-        '_CAS_to_elements',
-        '_indexes',
-        '_name_to_elements',
-        '_number_to_elements',
-        '_symbol_to_elements',
+        "_CAS_to_elements",
+        "_indexes",
+        "_name_to_elements",
+        "_number_to_elements",
+        "_symbol_to_elements",
     )
     def __init__(self, elements):
         #: Dictionary lookup of number(int) -> Element;
@@ -548,25 +548,25 @@ class Element:
     """
 
     __slots__ = [
-        'AReneg',
-        'CAS',
-        'Hf',
-        'InChI_key',
-        'MW',
-        'PubChem',
-        'S0',
-        'elaffinity',
-        'elneg',
-        'group',
-        'ionization',
-        'maxbonds',
-        'name',
-        'number',
-        'period',
-        'phase',
-        'rcov',
-        'rvdw',
-        'symbol',
+        "AReneg",
+        "CAS",
+        "Hf",
+        "InChI_key",
+        "MW",
+        "PubChem",
+        "S0",
+        "elaffinity",
+        "elneg",
+        "group",
+        "ionization",
+        "maxbonds",
+        "name",
+        "number",
+        "period",
+        "phase",
+        "rcov",
+        "rvdw",
+        "symbol",
     ]
 
     def __repr__(self):
@@ -601,56 +601,56 @@ class Element:
 
     @property
     def CAS_standard(self):
-        r'''CAS number of the compound of the element used as a standard state
+        r"""CAS number of the compound of the element used as a standard state
         ; i.e. the typically diatomic molecules hydrogen, nitrogen, oxygen,
         fluorine, and chlorine, have different CAS numbers for the monoatomic
         form and the diatomic form. This method returns the conventionally used
         CAS number.
-        '''
+        """
         return CAS_by_number_standard[self.number-1]
 
     @property
     def formula_standard(self):
-        r'''The formula of the element in its standard state. For homonuclear elements `2` is added to the formula.'''
+        r"""The formula of the element in its standard state. For homonuclear elements `2` is added to the formula."""
         if self.number in homonuclear_elements_set:
-            return self.symbol + '2'
+            return self.symbol + "2"
         return self.symbol
 
     @property
     def MW_standard(self):
-        r'''The molecular weight of the element in its standard state. For homonuclear elements the MW is doubled.'''
+        r"""The molecular weight of the element in its standard state. For homonuclear elements the MW is doubled."""
         if self.number in homonuclear_elements_set:
             return self.MW*2.0
         return self.MW
 
     @property
     def protons(self):
-        r'''The number of protons of the element.'''
+        r"""The number of protons of the element."""
         return self.number
 
     @property
     def electrons(self):
-        r'''The number of electrons of the element.'''
+        r"""The number of electrons of the element."""
         return self.number
 
     @property
     def neutrons(self):
-        r'''The number of neutrons of the element.'''
+        r"""The number of neutrons of the element."""
         return int(round(self.MW - self.number, 0))
 
     @property
     def smiles(self):
-        r'''The SMILES identification string of the element.'''
-        return f'[{self.symbol}]'
+        r"""The SMILES identification string of the element."""
+        return f"[{self.symbol}]"
 
     @property
     def InChI(self):
-        r'''The InChI identifier of the element. One of 's', 'd', 'f', or 'p'.'''
+        r"""The InChI identifier of the element. One of 's', 'd', 'f', or 'p'."""
         return self.symbol # 'InChI=1S/' +
 
     @property
     def block(self):
-        r'''Which block of the periodic table the element is in.'''
+        r"""Which block of the periodic table the element is in."""
         for k, v in blocks.items():
             if self.number in v:
                 return k
@@ -849,7 +849,7 @@ del openbabel_element_data
 
 @mark_numba_incompatible
 def molecular_weight(atoms):
-    r'''Calculates molecular weight of a molecule given a dictionary of its
+    r"""Calculates molecular weight of a molecule given a dictionary of its
     atoms and their counts, in the format {symbol: count}.
 
     .. math::
@@ -881,24 +881,24 @@ def molecular_weight(atoms):
     ----------
     .. [1] RDKit: Open-source cheminformatics; http://www.rdkit.org
 
-    '''
+    """
     MW = 0
     for i in atoms:
         if i in periodic_table:
             MW += periodic_table[i].MW*atoms[i]
-        elif i == 'D':
+        elif i == "D":
             # Hardcoded MW until an actual isotope db is created
             MW += 2.014102*atoms[i]
-        elif i == 'T':
+        elif i == "T":
             # Hardcoded MW until an actual isotope db is created
             MW += 3.0160492*atoms[i]
         else:
-            raise ValueError('Molecule includes unknown atoms')
+            raise ValueError("Molecule includes unknown atoms")
     return MW
 
 @mark_numba_incompatible
 def mass_fractions(atoms, MW=None):
-    r'''Calculates the mass fractions of each element in a compound,
+    r"""Calculates the mass fractions of each element in a compound,
     given a dictionary of its atoms and their counts, in the format
     {symbol: count}.
 
@@ -936,7 +936,7 @@ def mass_fractions(atoms, MW=None):
     References
     ----------
     .. [1] RDKit: Open-source cheminformatics; http://www.rdkit.org
-    '''
+    """
     if not MW:
         MW = molecular_weight(atoms)
     mfracs = {}
@@ -944,12 +944,12 @@ def mass_fractions(atoms, MW=None):
         if i in periodic_table:
             mfracs[i] = periodic_table[i].MW*atoms[i]/MW
         else:
-            raise ValueError('Molecule includes unknown atoms')
+            raise ValueError("Molecule includes unknown atoms")
     return mfracs
 
 @mark_numba_incompatible
 def atom_fractions(atoms):
-    r'''Calculates the atomic fractions of each element in a compound,
+    r"""Calculates the atomic fractions of each element in a compound,
     given a dictionary of its atoms and their counts, in the format
     {symbol: count}.
 
@@ -981,7 +981,7 @@ def atom_fractions(atoms):
     References
     ----------
     .. [1] RDKit: Open-source cheminformatics; http://www.rdkit.org
-    '''
+    """
     count = sum(atoms.values())
     afracs = {}
     for i in atoms:
@@ -990,7 +990,7 @@ def atom_fractions(atoms):
 
 @mark_numba_incompatible
 def mixture_atomic_composition(atomss, zs):
-    r'''Simple function to calculate the atomic average composition of a
+    r"""Simple function to calculate the atomic average composition of a
     mixture, using the mole fractions of each species and their own atomic
     compositions.
 
@@ -1013,7 +1013,7 @@ def mixture_atomic_composition(atomss, zs):
     --------
     >>> mixture_atomic_composition([{'O': 2}, {'N': 1, 'O': 2}, {'C': 1, 'H': 4}], [0.95, 0.025, .025])
     {'O': 1.95, 'N': 0.025, 'C': 0.025, 'H': 0.1}
-    '''
+    """
     ans = {}
     for atoms, zs_i in zip(atomss, zs):
         for key, val in atoms.items():
@@ -1025,7 +1025,7 @@ def mixture_atomic_composition(atomss, zs):
 
 @mark_numba_incompatible
 def mixture_atomic_composition_ordered(atomss, zs):
-    r'''Simple function to calculate the atomic average composition of a
+    r"""Simple function to calculate the atomic average composition of a
     mixture, using the mole fractions of each species and their own atomic
     compositions. Returns the result as a sorted list with atomic numbers from
     low to high.
@@ -1053,7 +1053,7 @@ def mixture_atomic_composition_ordered(atomss, zs):
     --------
     >>> mixture_atomic_composition_ordered([{'O': 2}, {'N': 1, 'O': 2}, {'C': 1, 'H': 4}], [0.95, 0.025, .025])
     ([0.1, 0.025, 0.025, 1.95], ['H', 'C', 'N', 'O'])
-    '''
+    """
     ans = mixture_atomic_composition(atomss, zs)
     nums = []
     eles = []
@@ -1064,7 +1064,7 @@ def mixture_atomic_composition_ordered(atomss, zs):
 
 @mark_numba_incompatible
 def atom_matrix(atomss, atom_IDs=None):
-    r'''Simple function to create a matrix of elements in each compound, where
+    r"""Simple function to create a matrix of elements in each compound, where
     each row has the same elements.
 
     Parameters
@@ -1088,7 +1088,7 @@ def atom_matrix(atomss, atom_IDs=None):
     --------
     >>> atom_matrix([{'C': 1, 'H': 4}, {'C': 2, 'H': 6}, {'N': 2}, {'O': 2}, {'H': 2, 'O': 1}, {'C': 1, 'O': 2}])
     [[4, 1, 0.0, 0.0], [6, 2, 0.0, 0.0], [0.0, 0.0, 2, 0.0], [0.0, 0.0, 0.0, 2], [2, 0.0, 0.0, 1], [0.0, 1, 0.0, 2]]
-    '''
+    """
     if atom_IDs is None:
         ans = set()
         for atoms in atomss:
@@ -1191,18 +1191,18 @@ def atoms_to_Hill(atoms):
     '''
     def str_ele_count(ele):
         if atoms[ele] == 1:
-            count = ''
+            count = ""
         else:
             count = str(atoms[ele])
         return count
     atoms = atoms.copy()
-    s = ''
-    if 'C' in atoms.keys():
-        s += 'C' + str_ele_count('C')
-        del atoms['C']
-        if 'H' in atoms.keys():
-            s += 'H' + str_ele_count('H')
-            del atoms['H']
+    s = ""
+    if "C" in atoms.keys():
+        s += "C" + str_ele_count("C")
+        del atoms["C"]
+        if "H" in atoms.keys():
+            s += "H" + str_ele_count("H")
+            del atoms["H"]
         for ele in sorted(atoms.keys()):
             s += ele + str_ele_count(ele)
     else:
@@ -1210,12 +1210,12 @@ def atoms_to_Hill(atoms):
             s += ele + str_ele_count(ele)
     return s
 
-_simple_formula_parser_re_str = r'([A-Z][a-z]{0,2})([\d\.\d]+)?'
+_simple_formula_parser_re_str = r"([A-Z][a-z]{0,2})([\d\.\d]+)?"
 _simple_formula_parser_re = None # Delay creation to simple_formula_parser to speedup start
 
 @mark_numba_incompatible
 def simple_formula_parser(formula):
-    r'''Basic formula parser, primarily for obtaining element counts from
+    r"""Basic formula parser, primarily for obtaining element counts from
     formulas as formated in PubChem. Handles formulas with integer or decimal
     counts (with period separator), but no brackets, no hydrates, no charges,
     no isotopes, and no group multipliers.
@@ -1244,11 +1244,11 @@ def simple_formula_parser(formula):
     --------
     >>> simple_formula_parser('CO2')
     {'C': 1, 'O': 2}
-    '''
+    """
     global _simple_formula_parser_re
     if not _simple_formula_parser_re:
         _simple_formula_parser_re = re.compile(_simple_formula_parser_re_str)
-    formula = formula.split('+')[0].split('-')[0]
+    formula = formula.split("+")[0].split("-")[0]
     counts = {}
     for element, count in _simple_formula_parser_re.findall(formula):
         if count.isdigit():
@@ -1264,18 +1264,18 @@ def simple_formula_parser(formula):
     return counts
 
 #  Delay creation to simple_formula_parser to speedup start
-formula_token_matcher_rational_re_str = r'[A-Z][a-z]?|(?:\d*[.])?\d+|\d+|[()]'
-bracketed_charge_re_str = r'\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$'
+formula_token_matcher_rational_re_str = r"[A-Z][a-z]?|(?:\d*[.])?\d+|\d+|[()]"
+bracketed_charge_re_str = r"\([+-]?\d+\)$|\(\d+[+-]?\)$|\([+-]+\)$"
 formula_token_matcher_rational = bracketed_charge_re = None
-letter_set = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-subscripts = '₀₁₂₃₄₅₆₇₈₉'
-numbers = '0123456789'
+letter_set = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+subscripts = "₀₁₂₃₄₅₆₇₈₉"
+numbers = "0123456789"
 # translate_subscripts = str.maketrans(subscripts, numbers)# missing in micropython
 translate_subscripts = {8320: 48, 8321: 49, 8322: 50, 8323: 51, 8324: 52, 8325: 53, 8326: 54, 8327: 55, 8328: 56, 8329: 57}
 
 @mark_numba_incompatible
 def nested_formula_parser(formula, check=True):
-    r'''Improved formula parser which handles braces and their multipliers,
+    r"""Improved formula parser which handles braces and their multipliers,
     as well as rational element counts.
 
     Strips charges from the end of a formula first. Accepts repeated chemical
@@ -1306,7 +1306,7 @@ def nested_formula_parser(formula, check=True):
     --------
     >>> nested_formula_parser('Pd(NH3)4.0001+2')
     {'Pd': 1, 'N': 4.0001, 'H': 12.0003}
-    '''
+    """
     global formula_token_matcher_rational, bracketed_charge_re
     if formula_token_matcher_rational is None:
         formula_token_matcher_rational = re.compile(formula_token_matcher_rational_re_str)
@@ -1316,12 +1316,12 @@ def nested_formula_parser(formula, check=True):
     # Benchmarking shows a call to translate is faster than checking if it is needed.
     formula = formula.translate(translate_subscripts)
 
-    formula = formula.replace('[', '').replace(']', '')
+    formula = formula.replace("[", "").replace("]", "")
     charge_splits = bracketed_charge_re.split(formula)
     if len(charge_splits) > 1:
         formula = charge_splits[0]
     else:
-        formula = formula.split('+')[0].split('-')[0]
+        formula = formula.split("+")[0].split("-")[0]
 
     stack = [[]]
     last = stack[0]
@@ -1331,7 +1331,7 @@ def nested_formula_parser(formula, check=True):
         token_letters = {j for i in tokens for j in i if j in letter_set}
         formula_letters = {i for i in formula if i in letter_set}
         if formula_letters != token_letters:
-            raise ValueError('Input may not be a formula; extra letters were detected')
+            raise ValueError("Input may not be a formula; extra letters were detected")
 
     for token in tokens:
         if token == "(":
@@ -1367,7 +1367,7 @@ def nested_formula_parser(formula, check=True):
 
 @mark_numba_incompatible
 def charge_from_formula(formula):
-    r'''Basic formula parser to determine the charge from a formula - given
+    r"""Basic formula parser to determine the charge from a formula - given
     that the charge is already specified as one element of the formula.
 
     Performs no sanity checking that elements are actually elements.
@@ -1393,28 +1393,28 @@ def charge_from_formula(formula):
     -1
     >>> charge_from_formula('Br3(-)')
     -1
-    '''
+    """
     global bracketed_charge_re
-    negative = '-' in formula
-    positive = '+' in formula
+    negative = "-" in formula
+    positive = "+" in formula
     if positive and negative:
-        raise ValueError('Both negative and positive signs were found in the formula; only one sign is allowed')
+        raise ValueError("Both negative and positive signs were found in the formula; only one sign is allowed")
     if not (positive or negative):
         return 0
-    multiplier, sign = (-1, '-') if negative else (1, '+')
+    multiplier, sign = (-1, "-") if negative else (1, "+")
 
     hit = False
-    if '(' in formula:
+    if "(" in formula:
         if bracketed_charge_re is None: # pragma: no cover
             bracketed_charge_re = re.compile(bracketed_charge_re_str)
         hit = bracketed_charge_re.findall(formula)
         if hit:
-            formula = hit[-1].replace('(', '').replace(')', '')
+            formula = hit[-1].replace("(", "").replace(")", "")
 
     count = formula.count(sign)
     if count == 1:
         splits = formula.split(sign)
-        if splits[1] == '' or splits[1] == ')':
+        if splits[1] == "" or splits[1] == ")":
             return multiplier
         return multiplier*int(splits[1])
     else:
@@ -1422,7 +1422,7 @@ def charge_from_formula(formula):
 
 @mark_numba_incompatible
 def serialize_formula(formula):
-    r'''Basic formula serializer to construct a consistently-formatted formula.
+    r"""Basic formula serializer to construct a consistently-formatted formula.
     This is necessary for handling user-supplied formulas, which are not always
     well formatted.
 
@@ -1445,7 +1445,7 @@ def serialize_formula(formula):
     --------
     >>> serialize_formula('Pd(NH3)4+3')
     'H12N4Pd+3'
-    '''
+    """
     charge = charge_from_formula(formula)
     element_dict = nested_formula_parser(formula)
     base = atoms_to_Hill(element_dict)
@@ -1453,22 +1453,22 @@ def serialize_formula(formula):
         pass
     elif charge > 0:
         if charge == 1:
-            base += '+'
+            base += "+"
         else:
-            base += '+' + str(charge)
+            base += "+" + str(charge)
     elif charge < 0:
         if charge == -1:
-            base += '-'
+            base += "-"
         else:
             base +=  str(charge)
     return base
 
 
-allowable_atoms_index_hydrogen_deficiency = frozenset(['C', 'O', 'H', 'N', 'F', 'Cl', 'Br', 'I', 'At'])
+allowable_atoms_index_hydrogen_deficiency = frozenset(["C", "O", "H", "N", "F", "Cl", "Br", "I", "At"])
 
 @mark_numba_incompatible
 def index_hydrogen_deficiency(atoms):
-    r'''Calculate the index of hydrogen deficiency of a compound, given a
+    r"""Calculate the index of hydrogen deficiency of a compound, given a
     dictionary of its atoms and their counts, in the format {symbol: count}.
 
     Parameters
@@ -1503,16 +1503,16 @@ def index_hydrogen_deficiency(atoms):
     ----------
     .. [1] Brown, William H., and Thomas Poon. Introduction to Organic
        Chemistry. 4th edition. Hoboken, NJ: Wiley, 2010.
-    '''
+    """
     if not set(atoms.keys()).issubset(allowable_atoms_index_hydrogen_deficiency):
         raise ValueError("Atoms contain unsupported element; supported elements are 'C', 'O', 'H', 'N', 'F', 'Cl', 'Br', 'I', 'At'.")
     # https://www.chem.ucalgary.ca/courses/350/Carey5th/Ch13/ch13-ihd.html
-    halogens = ('F', 'Cl', 'Br', 'I', 'At')
+    halogens = ("F", "Cl", "Br", "I", "At")
     halogen_count = 0
     for atom in halogens:
         halogen_count += atoms.get(atom, 0)
 
     # Oxygen is OK also, does not alter the calculation
-    IDH = 0.5*(2*atoms.get('C', 0) + 2 - atoms.get('H', 0) - halogen_count + atoms.get('N', 0))
+    IDH = 0.5*(2*atoms.get("C", 0) + 2 - atoms.get("H", 0) - halogen_count + atoms.get("N", 0))
     return IDH
 

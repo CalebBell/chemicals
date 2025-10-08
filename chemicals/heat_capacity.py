@@ -177,50 +177,50 @@ attribute of this module.
 """
 
 __all__ = [
-    'PPDS2',
-    'PPDS15',
-    'Cpg_statistical_mechanics',
-    'Cpg_statistical_mechanics_integral',
-    'Cpg_statistical_mechanics_integral_over_T',
-    'Dadgostar_Shaw',
-    'Dadgostar_Shaw_integral',
-    'Dadgostar_Shaw_integral_over_T',
-    'Dadgostar_Shaw_terms',
-    'Lastovka_Shaw',
-    'Lastovka_Shaw_T_for_Hm',
-    'Lastovka_Shaw_T_for_Sm',
-    'Lastovka_Shaw_integral',
-    'Lastovka_Shaw_integral_over_T',
-    'Lastovka_Shaw_term_A',
-    'Lastovka_solid',
-    'Lastovka_solid_integral',
-    'Lastovka_solid_integral_over_T',
-    'PiecewiseHeatCapacity',
-    'Poling',
-    'Poling_integral',
-    'Poling_integral_over_T',
-    'Rowlinson_Bondi',
-    'Rowlinson_Poling',
-    'Shomate',
-    'Shomate_integral',
-    'Shomate_integral_over_T',
-    'TDE_CSExpansion',
-    'TRCCp',
-    'TRCCp_integral',
-    'TRCCp_integral_over_T',
-    'ZabranskyQuasipolynomial',
-    'ZabranskySpline',
-    'Zabransky_cubic',
-    'Zabransky_cubic_integral',
-    'Zabransky_cubic_integral_over_T',
-    'Zabransky_quasi_polynomial',
-    'Zabransky_quasi_polynomial_integral',
-    'Zabransky_quasi_polynomial_integral_over_T',
-    'heat_capacity_gas_methods',
-    'heat_capacity_liquid_methods',
-    'heat_capacity_solid_methods',
-    'heat_capacity_solid_methods',
-    'vibration_frequency_cm_to_characteristic_temperature',
+    "PPDS2",
+    "PPDS15",
+    "Cpg_statistical_mechanics",
+    "Cpg_statistical_mechanics_integral",
+    "Cpg_statistical_mechanics_integral_over_T",
+    "Dadgostar_Shaw",
+    "Dadgostar_Shaw_integral",
+    "Dadgostar_Shaw_integral_over_T",
+    "Dadgostar_Shaw_terms",
+    "Lastovka_Shaw",
+    "Lastovka_Shaw_T_for_Hm",
+    "Lastovka_Shaw_T_for_Sm",
+    "Lastovka_Shaw_integral",
+    "Lastovka_Shaw_integral_over_T",
+    "Lastovka_Shaw_term_A",
+    "Lastovka_solid",
+    "Lastovka_solid_integral",
+    "Lastovka_solid_integral_over_T",
+    "PiecewiseHeatCapacity",
+    "Poling",
+    "Poling_integral",
+    "Poling_integral_over_T",
+    "Rowlinson_Bondi",
+    "Rowlinson_Poling",
+    "Shomate",
+    "Shomate_integral",
+    "Shomate_integral_over_T",
+    "TDE_CSExpansion",
+    "TRCCp",
+    "TRCCp_integral",
+    "TRCCp_integral_over_T",
+    "ZabranskyQuasipolynomial",
+    "ZabranskySpline",
+    "Zabransky_cubic",
+    "Zabransky_cubic_integral",
+    "Zabransky_cubic_integral_over_T",
+    "Zabransky_quasi_polynomial",
+    "Zabransky_quasi_polynomial_integral",
+    "Zabransky_quasi_polynomial_integral_over_T",
+    "heat_capacity_gas_methods",
+    "heat_capacity_liquid_methods",
+    "heat_capacity_solid_methods",
+    "heat_capacity_solid_methods",
+    "vibration_frequency_cm_to_characteristic_temperature",
 ]
 import os
 from math import expm1
@@ -236,25 +236,25 @@ IS_NUMBA = "IS_NUMBA" in globals()
 ### Methods introduced in this module
 
 # Gases
-TRCIG = 'TRC Thermodynamics of Organic Compounds in the Gas State (1994)'
-POLING = 'Poling et al. (2001)'
-POLING_CONST = 'Poling et al. (2001) constant'
-CRCSTD = 'CRC Standard Thermodynamic Properties of Chemical Substances'
-VDI_TABULAR = 'VDI Heat Atlas'
-LASTOVKA_SHAW = 'Lastovka and Shaw (2013)'
+TRCIG = "TRC Thermodynamics of Organic Compounds in the Gas State (1994)"
+POLING = "Poling et al. (2001)"
+POLING_CONST = "Poling et al. (2001) constant"
+CRCSTD = "CRC Standard Thermodynamic Properties of Chemical Substances"
+VDI_TABULAR = "VDI Heat Atlas"
+LASTOVKA_SHAW = "Lastovka and Shaw (2013)"
 heat_capacity_gas_methods = (
     TRCIG, POLING, LASTOVKA_SHAW, CRCSTD, POLING_CONST, VDI_TABULAR
 )
 # Liquids
-ZABRANSKY_SPLINE = 'Zabransky spline, averaged heat capacity'
-ZABRANSKY_QUASIPOLYNOMIAL = 'Zabransky quasipolynomial, averaged heat capacity'
-ZABRANSKY_SPLINE_C = 'Zabransky spline, constant-pressure'
-ZABRANSKY_QUASIPOLYNOMIAL_C = 'Zabransky quasipolynomial, constant-pressure'
-ZABRANSKY_SPLINE_SAT = 'Zabransky spline, saturation'
-ZABRANSKY_QUASIPOLYNOMIAL_SAT = 'Zabransky quasipolynomial, saturation'
-ROWLINSON_POLING = 'Rowlinson and Poling (2001)'
-ROWLINSON_BONDI = 'Rowlinson and Bondi (1969)'
-DADGOSTAR_SHAW = 'Dadgostar and Shaw (2011)'
+ZABRANSKY_SPLINE = "Zabransky spline, averaged heat capacity"
+ZABRANSKY_QUASIPOLYNOMIAL = "Zabransky quasipolynomial, averaged heat capacity"
+ZABRANSKY_SPLINE_C = "Zabransky spline, constant-pressure"
+ZABRANSKY_QUASIPOLYNOMIAL_C = "Zabransky quasipolynomial, constant-pressure"
+ZABRANSKY_SPLINE_SAT = "Zabransky spline, saturation"
+ZABRANSKY_QUASIPOLYNOMIAL_SAT = "Zabransky quasipolynomial, saturation"
+ROWLINSON_POLING = "Rowlinson and Poling (2001)"
+ROWLINSON_BONDI = "Rowlinson and Bondi (1969)"
+DADGOSTAR_SHAW = "Dadgostar and Shaw (2011)"
 heat_capacity_liquid_methods = (
     ZABRANSKY_SPLINE, ZABRANSKY_QUASIPOLYNOMIAL, ZABRANSKY_SPLINE_C,
     ZABRANSKY_QUASIPOLYNOMIAL_C, ZABRANSKY_SPLINE_SAT, ZABRANSKY_QUASIPOLYNOMIAL_SAT,
@@ -262,13 +262,13 @@ heat_capacity_liquid_methods = (
     CRCSTD
 )
 # Solids
-LASTOVKA_S = 'Lastovka, Fulem, Becerra and Shaw (2008)'
+LASTOVKA_S = "Lastovka, Fulem, Becerra and Shaw (2008)"
 PERRY151 = "Perry's Table 2-151"
 heat_capacity_solid_methods = (PERRY151, CRCSTD, LASTOVKA_S)
 
 ### Heat capacity classes
 class ZabranskySpline:
-    r'''
+    r"""
     Implementation of the cubic spline method presented in [1]_ for
     calculating the heat capacity of a chemical.
     Implements the enthalpy and entropy integrals as well.
@@ -290,10 +290,10 @@ class ZabranskySpline:
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-    '''
+    """
 
     if not IS_NUMBA:
-        __slots__ = ('Tmax', 'Tmin', 'coeffs')
+        __slots__ = ("Tmax", "Tmin", "coeffs")
 
     def __init__(self, coeffs, Tmin, Tmax):
         self.coeffs = coeffs
@@ -301,7 +301,7 @@ class ZabranskySpline:
         self.Tmax = Tmax
 
     def calculate(self, T):
-        r'''
+        r"""
         Return heat capacity as a function of temperature.
 
         Parameters
@@ -314,11 +314,11 @@ class ZabranskySpline:
         Cp : float
             Liquid heat capacity as T, [J/mol/K]
 
-        '''
+        """
         return Zabransky_cubic(T, *self.coeffs)
 
     def calculate_integral(self, Ta, Tb):
-        r'''
+        r"""
         Return the enthalpy integral of heat capacity from  `Ta` to `Tb`.
 
         Parameters
@@ -333,12 +333,12 @@ class ZabranskySpline:
         dH : float
             Enthalpy difference between `Ta` and `Tb`, [J/mol]
 
-        '''
+        """
         return (Zabransky_cubic_integral(Tb, *self.coeffs)
                 - Zabransky_cubic_integral(Ta, *self.coeffs))
 
     def calculate_integral_over_T(self, Ta, Tb):
-        r'''
+        r"""
         Return the entropy integral of heat capacity from `Ta` to `Tb`.
 
         Parameters
@@ -352,7 +352,7 @@ class ZabranskySpline:
         -------
         dS : float
             Entropy difference between `Ta` and `Tb`, [J/mol/K]
-        '''
+        """
         return (Zabransky_cubic_integral_over_T(Tb, *self.coeffs)
                 - Zabransky_cubic_integral_over_T(Ta, *self.coeffs))
 
@@ -360,12 +360,12 @@ class ZabranskySpline:
     force_calculate_integral = calculate_integral
     force_calculate = calculate
 if IS_NUMBA:  # type: ignore
-    ZabranskySpline = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 4)),  # type: ignore # noqa: F821
-            ('Tmin', numba.float64),  # type: ignore # noqa: F821
-            ('Tmax', numba.float64)])(ZabranskySpline)  # type: ignore # noqa: F821
+    ZabranskySpline = jitclass([("coeffs", numba.types.UniTuple(numba.float64, 4)),  # type: ignore # noqa: F821
+            ("Tmin", numba.float64),  # type: ignore # noqa: F821
+            ("Tmax", numba.float64)])(ZabranskySpline)  # type: ignore # noqa: F821
 
 class ShomateRange:
-    r'''
+    r"""
     Implementation of a range of the Shomate equation presented in [1]_ for
     calculating the heat capacity of a chemical.
     Implements the enthalpy and entropy integrals as well.
@@ -383,10 +383,10 @@ class ShomateRange:
     ----------
     .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
 
     if not IS_NUMBA:
-        __slots__ = ('Tmax', 'Tmin', 'coeffs')
+        __slots__ = ("Tmax", "Tmin", "coeffs")
     def __init__(self, coeffs, Tmin, Tmax):
         self.coeffs = coeffs
         self.Tmin = Tmin
@@ -416,15 +416,15 @@ class ShomateRange:
     force_calculate = calculate
 try:
     if IS_NUMBA:  # type: ignore
-        ShomateRange = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 5)),  # type: ignore # noqa: F821
-                ('Tmin', numba.float64),  # type: ignore # noqa: F821
-                ('Tmax', numba.float64)])(ShomateRange)  # type: ignore # noqa: F821
+        ShomateRange = jitclass([("coeffs", numba.types.UniTuple(numba.float64, 5)),  # type: ignore # noqa: F821
+                ("Tmin", numba.float64),  # type: ignore # noqa: F821
+                ("Tmax", numba.float64)])(ShomateRange)  # type: ignore # noqa: F821
 except:
     pass
 
 
 class ZabranskyQuasipolynomial:
-    r'''
+    r"""
     Quasi-polynomial object for calculating the heat capacity of a chemical.
     Implements the enthalpy and entropy integrals as well.
 
@@ -448,10 +448,10 @@ class ZabranskyQuasipolynomial:
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-    '''
+    """
 
     if not IS_NUMBA:
-        __slots__ = ('Tc', 'Tmax', 'Tmin', 'coeffs')
+        __slots__ = ("Tc", "Tmax", "Tmin", "coeffs")
 
     def __init__(self, coeffs, Tc, Tmin, Tmax):
         self.coeffs = coeffs
@@ -460,7 +460,7 @@ class ZabranskyQuasipolynomial:
         self.Tmax = Tmax
 
     def calculate(self, T):
-        r'''
+        r"""
         Return the heat capacity as a function of temperature.
 
         Parameters
@@ -473,11 +473,11 @@ class ZabranskyQuasipolynomial:
         Cp : float
             Liquid heat capacity as T, [J/mol/K]
 
-        '''
+        """
         return Zabransky_quasi_polynomial(T, self.Tc, *self.coeffs)
 
     def calculate_integral(self, Ta, Tb):
-        r'''
+        r"""
         Return the enthalpy integral of heat capacity from `Ta` to `Tb`.
 
         Parameters
@@ -492,12 +492,12 @@ class ZabranskyQuasipolynomial:
         dH : float
             Enthalpy difference between `Ta` and `Tb`, [J/mol]
 
-        '''
+        """
         return (Zabransky_quasi_polynomial_integral(Tb, self.Tc, *self.coeffs)
                - Zabransky_quasi_polynomial_integral(Ta, self.Tc, *self.coeffs))
 
     def calculate_integral_over_T(self, Ta, Tb):
-        r'''
+        r"""
         Return the entropy integral of heat capacity from `Ta` to `Tb`.
 
         Parameters
@@ -512,15 +512,15 @@ class ZabranskyQuasipolynomial:
         dS : float
             Entropy difference between `Ta` and `Tb`, [J/mol/K]
 
-        '''
+        """
         return (Zabransky_quasi_polynomial_integral_over_T(Tb, self.Tc, *self.coeffs)
                - Zabransky_quasi_polynomial_integral_over_T(Ta, self.Tc, *self.coeffs))
 try:
     if IS_NUMBA:  # type: ignore
-        ZabranskyQuasipolynomial = jitclass([('coeffs', numba.types.UniTuple(numba.float64, 6)),  # type: ignore # noqa: F821
-            ('Tc', numba.float64),  # type: ignore # noqa: F821
-            ('Tmin', numba.float64),  # type: ignore # noqa: F821
-            ('Tmax', numba.float64)])(ZabranskyQuasipolynomial)  # type: ignore # noqa: F821
+        ZabranskyQuasipolynomial = jitclass([("coeffs", numba.types.UniTuple(numba.float64, 6)),  # type: ignore # noqa: F821
+            ("Tc", numba.float64),  # type: ignore # noqa: F821
+            ("Tmin", numba.float64),  # type: ignore # noqa: F821
+            ("Tmax", numba.float64)])(ZabranskyQuasipolynomial)  # type: ignore # noqa: F821
 except:
     pass
 
@@ -538,7 +538,7 @@ class PiecewiseHeatCapacity:
     """
 
     # Dev note - not possible to jitclass this as the model types are not explicit
-    __slots__ = ('Tmax', 'Tmin', 'models')
+    __slots__ = ("Tmax", "Tmin", "models")
 
     def __init__(self, models):
         self.models = tuple(sorted(models, key=lambda x: x.Tmin))
@@ -549,7 +549,7 @@ class PiecewiseHeatCapacity:
         return self.models.__iter__()
 
     def calculate(self, T):
-        r'''
+        r"""
         Return the heat capacity as a function of temperature.
 
         Parameters
@@ -572,14 +572,14 @@ class PiecewiseHeatCapacity:
         Cp : float
             Liquid heat capacity as T, [J/mol/K]
 
-        '''
+        """
         if T >= self.Tmin:
             for model in self.models:
                 if T <= model.Tmax: return model.calculate(T)
         raise ValueError(f"no valid model at T={T:g} K")
 
     def force_calculate(self, T):
-        r'''
+        r"""
         Return the heat capacity as a function of temperature.
 
         Parameters
@@ -602,13 +602,13 @@ class PiecewiseHeatCapacity:
         Cp : float
             Liquid heat capacity as T, [J/mol/K]
 
-        '''
+        """
         for model in self.models:
             if T <= model.Tmax: break
         return model.calculate(T)
 
     def calculate_integral(self, Ta, Tb):
-        r'''
+        r"""
         Return the enthalpy integral of heat capacity from `Ta` to `Tb`.
 
         Parameters
@@ -637,14 +637,14 @@ class PiecewiseHeatCapacity:
         dH : float
             Enthalpy difference between `Ta` and `Tb`, [J/mol]
 
-        '''
+        """
         if Tb < Ta: return -self.calculate_integral(Tb, Ta)
         if Ta < self.Tmin: raise ValueError(f"no valid model at T={Ta:g} K")
         elif Tb > self.Tmax: raise ValueError(f"no valid model at T={Tb:g} K")
         return self.force_calculate_integral(Ta, Tb)
 
     def force_calculate_integral(self, Ta, Tb):
-        r'''
+        r"""
         Return the enthalpy integral of heat capacity from `Ta` to `Tb`.
 
         Parameters
@@ -675,7 +675,7 @@ class PiecewiseHeatCapacity:
         dH : float
             Enthalpy difference between `Ta` and `Tb`, [J/mol]
 
-        '''
+        """
         if Tb < Ta: return -self.force_calculate_integral(Tb, Ta)
         integral = 0.
         for model in self.models:
@@ -688,7 +688,7 @@ class PiecewiseHeatCapacity:
         return integral + model.calculate_integral(Ta, Tb)
 
     def calculate_integral_over_T(self, Ta, Tb):
-        r'''
+        r"""
         Return the entropy integral of heat capacity from `Ta` to `Tb`.
 
         Parameters
@@ -717,14 +717,14 @@ class PiecewiseHeatCapacity:
         dS : float
             Entropy difference between `Ta` and `Tb`, [J/mol/K]
 
-        '''
+        """
         if Tb < Ta: return -self.calculate_integral_over_T(Tb, Ta)
         if Ta < self.Tmin: raise ValueError(f"no valid model at T={Ta} K")
         elif Tb > self.Tmax: raise ValueError(f"no valid model at T={Tb} K")
         return self.force_calculate_integral_over_T(Ta, Tb)
 
     def force_calculate_integral_over_T(self, Ta, Tb):
-        r'''
+        r"""
         Return the entropy integral of heat capacity from `Ta` to `Tb`.
 
         Parameters
@@ -749,7 +749,7 @@ class PiecewiseHeatCapacity:
         dS : float
             Entropy difference between `Ta` and `Tb`, [J/mol/K]
 
-        '''
+        """
         if Tb < Ta: return -self.force_calculate_integral_over_T(Tb, Ta)
         integral = 0.
         for model in self.models:
@@ -764,14 +764,14 @@ class PiecewiseHeatCapacity:
 
 ### Register data sources and lazy load them
 
-folder = os_path_join(source_path, 'Heat Capacity')
-register_df_source(folder, 'PolingDatabank.tsv')
-register_df_source(folder, 'TRC Thermodynamics of Organic Compounds in the Gas State.tsv', csv_kwargs={
-    'dtype':{'Tmin': float, 'Tmax': float, 'a0': float, 'a1': float, 'a2': float,
-             'a3': float, 'a4': float, 'a5': float, 'a6': float, 'a7': float,
-             'I': float, 'J': float, 'Hfg': float}})
+folder = os_path_join(source_path, "Heat Capacity")
+register_df_source(folder, "PolingDatabank.tsv")
+register_df_source(folder, "TRC Thermodynamics of Organic Compounds in the Gas State.tsv", csv_kwargs={
+    "dtype":{"Tmin": float, "Tmax": float, "a0": float, "a1": float, "a2": float,
+             "a3": float, "a4": float, "a5": float, "a6": float, "a7": float,
+             "I": float, "J": float, "Hfg": float}})
 
-register_df_source(folder, 'CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
+register_df_source(folder, "CRC Standard Thermodynamic Properties of Chemical Substances.tsv")
 
 _Cp_data_loaded = False
 def _load_Cp_data():
@@ -783,9 +783,9 @@ def _load_Cp_data():
     global type_to_zabransky_dict, zabransky_dicts, _Cp_data_loaded
     global Cp_dict_characteristic_temperatures_adjusted_psi4_2022a, Cp_dict_characteristic_temperatures_psi4_2022a
     global Cp_dict_JANAF_liquid, Cp_dict_JANAF_gas, Cp_dict_JANAF_solid
-    Cp_data_Poling = data_source('PolingDatabank.tsv')
-    TRC_gas_data = data_source('TRC Thermodynamics of Organic Compounds in the Gas State.tsv')
-    CRC_standard_data = data_source('CRC Standard Thermodynamic Properties of Chemical Substances.tsv')
+    Cp_data_Poling = data_source("PolingDatabank.tsv")
+    TRC_gas_data = data_source("TRC Thermodynamics of Organic Compounds in the Gas State.tsv")
+    CRC_standard_data = data_source("CRC Standard Thermodynamic Properties of Chemical Substances.tsv")
 
     TRC_gas_values = np.array(TRC_gas_data.values[:, 1:], dtype=float)
     Cp_values_Poling = np.array(Cp_data_Poling.values[:, 1:], dtype=float)
@@ -809,12 +809,12 @@ def _load_Cp_data():
     # p means constant-pressure values,
     # second argument is whether or not it has a spline
     type_to_zabransky_dict = {
-        ('C', True): zabransky_dict_const_s,
-        ('C', False):   zabransky_dict_const_p,
-        ('sat', True):  zabransky_dict_sat_s,
-        ('sat', False): zabransky_dict_sat_p,
-        ('p', True):    zabransky_dict_iso_s,
-        ('p', False):   zabransky_dict_iso_p
+        ("C", True): zabransky_dict_const_s,
+        ("C", False):   zabransky_dict_const_p,
+        ("sat", True):  zabransky_dict_sat_s,
+        ("sat", False): zabransky_dict_sat_p,
+        ("p", True):    zabransky_dict_iso_s,
+        ("p", False):   zabransky_dict_iso_p
     }
     zabransky_dicts = {
         ZABRANSKY_SPLINE: zabransky_dict_const_s,
@@ -824,10 +824,10 @@ def _load_Cp_data():
         ZABRANSKY_SPLINE_SAT: zabransky_dict_sat_s,
         ZABRANSKY_QUASIPOLYNOMIAL_SAT: zabransky_dict_sat_p
     }
-    with open(os.path.join(folder, 'Zabransky.tsv'), encoding='utf-8') as f:
+    with open(os.path.join(folder, "Zabransky.tsv"), encoding="utf-8") as f:
         next(f)
         for line in f:
-            values = to_num(line.strip('\n').split('\t'))
+            values = to_num(line.strip("\n").split("\t"))
             (CAS, name, Type, uncertainty, Tmin, Tmax,
              a1s, a2s, a3s, a4s, a1p, a2p, a3p, a4p, a5p, a6p, Tc) = values
             spline = bool(a1s) # False if Quasypolynomial, True if spline
@@ -886,25 +886,25 @@ def _load_Cp_data():
     Warning: 11 duplicated chemicals are present and currently clobbered.
     """
     import json
-    with open(os.path.join(folder, 'Perrys Table 2-151.json')) as f:
+    with open(os.path.join(folder, "Perrys Table 2-151.json")) as f:
         Cp_dict_PerryI = json.loads(f.read())
 
-    with open(os.path.join(folder, 'psi4_unadjusted_characteristic_temperatures.json')) as f:
+    with open(os.path.join(folder, "psi4_unadjusted_characteristic_temperatures.json")) as f:
         Cp_dict_characteristic_temperatures_psi4_2022a = json.loads(f.read())
 
-    with open(os.path.join(folder, 'psi4_adjusted_characteristic_temperatures.json')) as f:
+    with open(os.path.join(folder, "psi4_adjusted_characteristic_temperatures.json")) as f:
         Cp_dict_characteristic_temperatures_adjusted_psi4_2022a = json.loads(f.read())
 
-    with open(os.path.join(folder, 'JANAF_1998_liq_Cp.json')) as f:
+    with open(os.path.join(folder, "JANAF_1998_liq_Cp.json")) as f:
         Cp_dict_JANAF_liquid = json.loads(f.read())
 
-    with open(os.path.join(folder, 'JANAF_1998_gas_Cp.json')) as f:
+    with open(os.path.join(folder, "JANAF_1998_gas_Cp.json")) as f:
         Cp_dict_JANAF_gas = json.loads(f.read())
 
-    with open(os.path.join(folder, 'JANAF_1998_solid_Cp.json')) as f:
+    with open(os.path.join(folder, "JANAF_1998_solid_Cp.json")) as f:
         Cp_dict_JANAF_solid = json.loads(f.read())
 
-    with open(os.path.join(folder, 'webbook_shomate_coefficients.json')) as f:
+    with open(os.path.join(folder, "webbook_shomate_coefficients.json")) as f:
         WebBook_Shomate_coefficients = json.loads(f.read())
         WebBook_Shomate_solids, WebBook_Shomate_liquids, WebBook_Shomate_gases = {}, {}, {}
         for i, d in zip(range(3), [WebBook_Shomate_solids, WebBook_Shomate_liquids, WebBook_Shomate_gases]):
@@ -921,13 +921,13 @@ def _load_Cp_data():
     _Cp_data_loaded = True
 
 def __getattr__(name):
-    if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
-                'Cp_dict_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
-                'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
-                'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
-                'WebBook_Shomate_liquids', 'WebBook_Shomate_gases', 'WebBook_Shomate_solids',
-                'WebBook_Shomate_coefficients',
-                'Cp_dict_JANAF_liquid', 'Cp_dict_JANAF_gas', 'Cp_dict_JANAF_solid'):
+    if name in ("Cp_data_Poling", "Cp_values_Poling", "TRC_gas_data", "TRC_gas_values", "CRC_standard_data",
+                "Cp_dict_PerryI", "zabransky_dict_sat_s", "zabransky_dict_sat_p",
+                "zabransky_dict_const_s", "zabransky_dict_const_p", "zabransky_dict_iso_s",
+                "zabransky_dict_iso_p", "type_to_zabransky_dict", "zabransky_dicts",
+                "WebBook_Shomate_liquids", "WebBook_Shomate_gases", "WebBook_Shomate_solids",
+                "WebBook_Shomate_coefficients",
+                "Cp_dict_JANAF_liquid", "Cp_dict_JANAF_gas", "Cp_dict_JANAF_solid"):
         _load_Cp_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -1683,7 +1683,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
             raise ValueError("Could not converge")
 
 def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
-    r'''Calculates ideal gas heat capacity using the model developed in [1]_.
+    r"""Calculates ideal gas heat capacity using the model developed in [1]_.
     The ideal gas heat capacity is given by:
 
     .. math::
@@ -1732,7 +1732,7 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     ----------
     .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
        in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
-    '''
+    """
     if T <= a7:
         y = 0.
     else:
@@ -1748,7 +1748,7 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
     return Cp
 
 def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
-    r'''Integrates ideal gas heat capacity using the model developed in [1]_.
+    r"""Integrates ideal gas heat capacity using the model developed in [1]_.
     Best used as a delta only.
     The difference in enthalpy with respect to 0 K is given by:
 
@@ -1808,7 +1808,7 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
     ----------
     .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
        in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
-    '''
+    """
     if T <= a7:
         y = 0.
     else:
@@ -1828,7 +1828,7 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
     return (a0 + a1*exp(-a2/T)/(a2*T) + I/T + h/T)*R*T
 
 def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
-    r'''Integrates ideal gas heat capacity over T using the model developed in
+    r"""Integrates ideal gas heat capacity over T using the model developed in
     [1]_. Best used as a delta only.
     The difference in ideal-gas entropy with respect to 0 K is given by:
 
@@ -1895,7 +1895,7 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
     ----------
     .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
        in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
-    '''
+    """
     # Possible optimizations: pre-cache as much as possible.
     # If this were replaced by a cache, much of this would not need to be computed.
     if T <= a7:
@@ -1931,7 +1931,7 @@ def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
     return R*(J + a0*log(T) + a1/(a2*a2)*(1. + x2)*exp(-x2) + s)
 
 def Shomate(T, A, B, C, D, E):
-    r'''Calculates heat capacity using the Shomate polynomial model [1]_.
+    r"""Calculates heat capacity using the Shomate polynomial model [1]_.
     The heat capacity is given by:
 
     .. math::
@@ -1976,11 +1976,11 @@ def Shomate(T, A, B, C, D, E):
     ----------
     .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     return A + T*(B + T*(C + D*T)) + E/(T*T)
 
 def Shomate_integral(T, A, B, C, D, E):
-    r'''Calculates the enthalpy integral using the Shomate polynomial model [1]_.
+    r"""Calculates the enthalpy integral using the Shomate polynomial model [1]_.
     The difference in enthalpy with respect to 0 K is given by:
 
     .. math::
@@ -2022,11 +2022,11 @@ def Shomate_integral(T, A, B, C, D, E):
     ----------
     .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     return T*(A + T*(B*0.5 + T*(C*(1.0/3.0) + D*T*0.25))) - E/T
 
 def Shomate_integral_over_T(T, A, B, C, D, E):
-    r'''Integrates the heat capacity over T using the model developed in
+    r"""Integrates the heat capacity over T using the model developed in
     [1]_.
     The difference in entropy with respect to 0 K is given by:
 
@@ -2069,14 +2069,14 @@ def Shomate_integral_over_T(T, A, B, C, D, E):
     ----------
     .. [1] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     T2 = T*T
     return A*log(T) + B*T + 0.5*C*T2 + D*T*T2*(1.0/3.0) - E/T2*0.5
 
 ### Heat capacities of liquids
 
 def Rowlinson_Poling(T, Tc, omega, Cpgm):
-    r'''Calculate liquid constant-pressure heat capacity with the [1]_ CSP method.
+    r"""Calculate liquid constant-pressure heat capacity with the [1]_ CSP method.
     This equation is not terrible accurate.
 
     The heat capacity of a liquid is given by:
@@ -2115,14 +2115,14 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     Tr = T/Tc
     one_minus_Tr = 1. - Tr
     Cplm = Cpgm+ R*(1.586 + 0.49/one_minus_Tr + omega*(4.2775 + 6.3*one_minus_Tr**(1/3.)/Tr + 0.4355/one_minus_Tr))
     return Cplm
 
 def Rowlinson_Bondi(T, Tc, omega, Cpgm):
-    r'''Calculate liquid constant-pressure heat capacity with the CSP method
+    r"""Calculate liquid constant-pressure heat capacity with the CSP method
     shown in [1]_.
 
     The heat capacity of a liquid is given by:
@@ -2164,7 +2164,7 @@ def Rowlinson_Bondi(T, Tc, omega, Cpgm):
        Berlin; New York:: Springer, 2010.
     .. [3] J.S. Rowlinson, Liquids and Liquid Mixtures, 2nd Ed.,
        Butterworth, London (1969).
-    '''
+    """
     Tr = T/Tc
     one_minus_Tr = 1. - Tr
     Cplm = Cpgm + R*(1.45 + 0.45/(one_minus_Tr) + 0.25*omega*(17.11 + 25.2*(one_minus_Tr)**(1/3.)/Tr + 1.742/one_minus_Tr))
@@ -2351,7 +2351,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
     return S*1000. if MW is None else S*MW
 
 def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
-    r'''Calculates liquid heat capacity using the model developed in [1]_.
+    r"""Calculates liquid heat capacity using the model developed in [1]_.
 
     .. math::
         \frac{C}{R}=A_1\ln(1-T_r) + \frac{A_2}{1-T_r}
@@ -2399,7 +2399,7 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-    '''
+    """
     Tr = T/Tc
     if Tr >= 1.0:
         Tr = (1-1e-15) # TODO limitd
@@ -2407,7 +2407,7 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
 
 
 def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
-    r'''Calculates the integral of liquid heat capacity using the
+    r"""Calculates the integral of liquid heat capacity using the
     quasi-polynomial model developed in [1]_.
 
     Parameters
@@ -2453,7 +2453,7 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-    '''
+    """
     Tc2 = Tc*Tc
     Tc3 = Tc2*Tc
     term = T - Tc
@@ -2461,7 +2461,7 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
               + T*a1*log(1. - T/Tc) - 0.5*Tc*(a1 + a2)*log(term*term))
 
 def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
-    r'''Calculates the integral of liquid heat capacity over T using the
+    r"""Calculates the integral of liquid heat capacity over T using the
     quasi-polynomial model  developed in [1]_.
 
     Parameters
@@ -2509,7 +2509,7 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-    '''
+    """
     term = T - Tc
     logT = log(T)
     Tc2 = Tc*Tc
@@ -2518,7 +2518,7 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
               + T*(T*(T*a6/(3.*Tc3) + a5/(2.*Tc2)) + a4/Tc))
 
 def Zabransky_cubic(T, a1, a2, a3, a4):
-    r'''Calculates liquid heat capacity using the model developed in [1]_.
+    r"""Calculates liquid heat capacity using the model developed in [1]_.
 
     .. math::
         \frac{C}{R}=\sum_{j=0}^3 A_{j+1} \left(\frac{T}{100 \text{K}}\right)^j
@@ -2556,12 +2556,12 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-    '''
+    """
     T = T*1e-2
     return R*(((a4*T + a3)*T + a2)*T + a1)
 
 def Zabransky_cubic_integral(T, a1, a2, a3, a4):
-    r'''Calculates the integral of liquid heat capacity using the model
+    r"""Calculates the integral of liquid heat capacity using the model
     developed in [1]_.
 
     Parameters
@@ -2596,12 +2596,12 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-    '''
+    """
     T = T*1e-2
     return 100.0*R*T*(T*(T*(T*a4*0.25 + a3*(1.0/3.)) + a2*0.5) + a1)
 
 def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
-    r'''Calculates the integral of liquid heat capacity over T using the model
+    r"""Calculates the integral of liquid heat capacity over T using the model
     developed in [1]_.
 
     Parameters
@@ -2638,7 +2638,7 @@ def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
     .. [1] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
        Heat Capacity of Liquids: Critical Review and Recommended Values.
        2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
-    '''
+    """
     T = T*1e-2
     return R*(T*(T*(T*a4/3.0 + 0.5*a3) + a2) + a1*log(T))
 
@@ -2880,7 +2880,7 @@ def Lastovka_solid_integral_over_T(T, similarity_variable, MW=None):
     return S*1000. if MW is None else S*MW
 
 def Cpg_statistical_mechanics(T, thetas, linear=False):
-    r'''Calculates the ideal-gas heat capacity using of a molecule using
+    r"""Calculates the ideal-gas heat capacity using of a molecule using
     its characteristic temperatures, themselves calculated from each of the
     frequencies of vibration of the molecule. These can be obtained from
     spectra or quantum mechanical calculations.
@@ -2943,7 +2943,7 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
     ----------
     .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        Eighth Edition. McGraw-Hill Professional, 2007.
-    '''
+    """
     # delta == 1 for linear molecules, 0 for nonlinear
     # linear molecules have 1 R
     # nonlinear have 1.5 R
@@ -2976,7 +2976,7 @@ def Cpg_statistical_mechanics(T, thetas, linear=False):
     return Cp_R*R
 
 def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
-    r'''Calculates the integral of ideal-gas heat capacity using of a molecule
+    r"""Calculates the integral of ideal-gas heat capacity using of a molecule
     using its characteristic temperatures.
 
     .. math::
@@ -3010,7 +3010,7 @@ def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
     >>> thetas = [1360, 2330, 2330, 4800, 4880, 4880]
     >>> Cpg_statistical_mechanics_integral(300.0, thetas)
     10116.6053294
-    '''
+    """
     H_R = (2.5 + (1.0 if linear else 1.5))*T
     if T > 0.0:
         for j in range(len(thetas)):
@@ -3024,7 +3024,7 @@ def Cpg_statistical_mechanics_integral(T, thetas, linear=False):
     return H_R*R
 
 def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
-    r'''Calculates the integral over T of ideal-gas heat capacity using of a
+    r"""Calculates the integral over T of ideal-gas heat capacity using of a
      molecule  using its characteristic temperatures.
 
     .. math::
@@ -3061,7 +3061,7 @@ def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
     >>> thetas = [1360, 2330, 2330, 4800, 4880, 4880]
     >>> Cpg_statistical_mechanics_integral_over_T(300.0, thetas)
     190.25658088
-    '''
+    """
     S_R = (2.5 + (1.0 if linear else 1.5))*log(T)
     for j in range(len(thetas)):
         t = thetas[j]
@@ -3075,7 +3075,7 @@ def Cpg_statistical_mechanics_integral_over_T(T, thetas, linear=False):
 
 
 def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1.0):
-    r'''Convert a vibrational frequency in units of 1/cm to a characteristic
+    r"""Convert a vibrational frequency in units of 1/cm to a characteristic
     temperature for use in calculating heat capacity.
 
     .. math::
@@ -3106,7 +3106,7 @@ def vibration_frequency_cm_to_characteristic_temperature(frequency, scale=1.0):
     --------
     >>> vibration_frequency_cm_to_characteristic_temperature(667)
     959.6641613636505
-    '''
+    """
     frequency *= 100.0*scale # convert to 1/m
     hz = frequency*c
     return h*hz/k

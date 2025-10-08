@@ -34,7 +34,7 @@ Temperature Dependent data
 
 """
 
-__all__ = ['lookup_VDI_tabular_data']
+__all__ = ["lookup_VDI_tabular_data"]
 
 import os
 
@@ -43,53 +43,53 @@ from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 ### Register data sources and lazy load them
 
-folder = os_path_join(source_path, 'Misc')
+folder = os_path_join(source_path, "Misc")
 
 ### CRC Handbook general tables
-register_df_source(folder, 'heos_constants.tsv')
-register_df_source(folder, 'Physical Constants of Inorganic Compounds.csv')
-register_df_source(folder, 'Physical Constants of Organic Compounds.csv')
-register_df_source(folder, 'joback_predictions.tsv', int_CAS=True)
-register_df_source(folder, 'wikidata_properties.tsv', sparsify=True, int_CAS=True)
-register_df_source(folder, 'webbook_constants.tsv', sparsify=True, int_CAS=True)
-register_df_source(folder, 'common_chemistry_data.tsv', sparsify=True, int_CAS=True)
+register_df_source(folder, "heos_constants.tsv")
+register_df_source(folder, "Physical Constants of Inorganic Compounds.csv")
+register_df_source(folder, "Physical Constants of Organic Compounds.csv")
+register_df_source(folder, "joback_predictions.tsv", int_CAS=True)
+register_df_source(folder, "wikidata_properties.tsv", sparsify=True, int_CAS=True)
+register_df_source(folder, "webbook_constants.tsv", sparsify=True, int_CAS=True)
+register_df_source(folder, "common_chemistry_data.tsv", sparsify=True, int_CAS=True)
 
 # Common database IDs
-JOBACK = 'JOBACK'
-WIKIDATA = 'WIKIDATA'
-WEBBOOK = 'WEBBOOK'
-COMMON_CHEMISTRY = 'COMMON_CHEMISTRY'
-PSI4_2022A = 'PSI4_2022A'
-CHEMSEP = 'CHEMSEP'
-JANAF = 'JANAF'
-HEOS = 'HEOS'
+JOBACK = "JOBACK"
+WIKIDATA = "WIKIDATA"
+WEBBOOK = "WEBBOOK"
+COMMON_CHEMISTRY = "COMMON_CHEMISTRY"
+PSI4_2022A = "PSI4_2022A"
+CHEMSEP = "CHEMSEP"
+JANAF = "JANAF"
+HEOS = "HEOS"
 
 # metadata about othe type of data being read in
 
-EXPERIMENTAL = 'EXPERIMENTAL' # The quantity was measured directly or the standard means of measuring the quantity was performed
-PREDICTED = 'PREDICTED' # A published or unpublished estimation method to guess the value
-DEFINED = 'DEFINED' # e.g. enthalpy of formation of oxygen is 0
-PROCESSED = 'PROCESSED' # Values that came from something that took in other values
+EXPERIMENTAL = "EXPERIMENTAL" # The quantity was measured directly or the standard means of measuring the quantity was performed
+PREDICTED = "PREDICTED" # A published or unpublished estimation method to guess the value
+DEFINED = "DEFINED" # e.g. enthalpy of formation of oxygen is 0
+PROCESSED = "PROCESSED" # Values that came from something that took in other values
 
-EXPERIMENTAL_PRIMARY = 'EXPERIMENTAL_PRIMARY' # published the experimental data for the first time
-EXPERIMENTAL_COMPILATION = 'EXPERIMENTAL_COMPILATION' # a paper that isn't publishing experimental data for the first time but putting multiple chemical values together
-EXPERIMENTAL_REVIEW = 'EXPERIMENTAL_REVIEW' # A paper that looks at multiple single property values published in the literature for the same chemical and recommends one (potentially averaing them to get a new value)
-EXPERIMENTAL_COMPILATION_SECONDARY = 'EXPERIMENTAL_COMPILATION_SECONDARY'# A paper that reproduces compilled data from another source
+EXPERIMENTAL_PRIMARY = "EXPERIMENTAL_PRIMARY" # published the experimental data for the first time
+EXPERIMENTAL_COMPILATION = "EXPERIMENTAL_COMPILATION" # a paper that isn't publishing experimental data for the first time but putting multiple chemical values together
+EXPERIMENTAL_REVIEW = "EXPERIMENTAL_REVIEW" # A paper that looks at multiple single property values published in the literature for the same chemical and recommends one (potentially averaing them to get a new value)
+EXPERIMENTAL_COMPILATION_SECONDARY = "EXPERIMENTAL_COMPILATION_SECONDARY"# A paper that reproduces compilled data from another source
 
-PREDICTED_GC = 'PREDICTED_GC'
-PREDICTED_CSP = 'PREDICTED_CSP'
-PREDICTED_MM = 'PREDICTED_MM' # molecular modeling
-PREDICTED_QM = 'PREDICTED_QM' # quantum mechanics calc
+PREDICTED_GC = "PREDICTED_GC"
+PREDICTED_CSP = "PREDICTED_CSP"
+PREDICTED_MM = "PREDICTED_MM" # molecular modeling
+PREDICTED_QM = "PREDICTED_QM" # quantum mechanics calc
 
 # The definition of PROCESSED is that software was used, or a complex database (wikidata, common chemistry) involved
 
-PROCESSED_EXPERIMENTAL = 'PROCESSED_EXPERIMENTAL' # Processed values that are all derived from experiments
-PROCESSED_PREDICTED = 'PROCESSED_PREDICTED' # Processed values that are all derived from predictions
-PROCESSED_EXPERIMENTAL_PREDICTED = 'PROCESSED_EXPERIMENTAL_PREDICTED' # Processed values that are derived experiments and or predictions may have no real data for a chemical
+PROCESSED_EXPERIMENTAL = "PROCESSED_EXPERIMENTAL" # Processed values that are all derived from experiments
+PROCESSED_PREDICTED = "PROCESSED_PREDICTED" # Processed values that are all derived from predictions
+PROCESSED_EXPERIMENTAL_PREDICTED = "PROCESSED_EXPERIMENTAL_PREDICTED" # Processed values that are derived experiments and or predictions may have no real data for a chemical
 
-PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY = 'PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY' # same, but haven't seen original output only someone's republication
-PROCESSED_EXPERIMENTAL_SECONDARY = 'PROCESSED_EXPERIMENTAL_SECONDARY' # same, but haven't seen original output only someone's republication
-PROCESSED_PREDICTED_SECONDARY = 'PROCESSED_PREDICTED_SECONDARY' # same, but haven't seen original output only someone's republication
+PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY = "PROCESSED_EXPERIMENTAL_PREDICTED_SECONDARY" # same, but haven't seen original output only someone's republication
+PROCESSED_EXPERIMENTAL_SECONDARY = "PROCESSED_EXPERIMENTAL_SECONDARY" # same, but haven't seen original output only someone's republication
+PROCESSED_PREDICTED_SECONDARY = "PROCESSED_PREDICTED_SECONDARY" # same, but haven't seen original output only someone's republication
 
 
 data_source_categories = [EXPERIMENTAL, PREDICTED, DEFINED, PROCESSED]
@@ -113,29 +113,29 @@ def _load_VDI_saturation_dict():
     import json
     global VDI_saturation_dict, _VDI_dict_loaded
 
-    with open(os.path.join(folder, 'VDI Saturation Compounds Data.json')) as f:
+    with open(os.path.join(folder, "VDI Saturation Compounds Data.json")) as f:
         VDI_saturation_dict = json.loads(f.read())
     _VDI_dict_loaded = True
 
 _miscdata_loaded = False
 def _load_miscdata():
     global CRC_inorganic_data, CRC_organic_data, joback_predictions, wikidata_data, webbook_data, common_chemistry_data, heos_data, _miscdata_loaded
-    heos_data = data_source('heos_constants.tsv')
-    CRC_inorganic_data = data_source('Physical Constants of Inorganic Compounds.csv')
-    CRC_organic_data = data_source('Physical Constants of Organic Compounds.csv')
-    joback_predictions = data_source('joback_predictions.tsv')
-    wikidata_data = data_source('wikidata_properties.tsv')
-    webbook_data = data_source('webbook_constants.tsv')
-    common_chemistry_data = data_source('common_chemistry_data.tsv')
+    heos_data = data_source("heos_constants.tsv")
+    CRC_inorganic_data = data_source("Physical Constants of Inorganic Compounds.csv")
+    CRC_organic_data = data_source("Physical Constants of Organic Compounds.csv")
+    joback_predictions = data_source("joback_predictions.tsv")
+    wikidata_data = data_source("wikidata_properties.tsv")
+    webbook_data = data_source("webbook_constants.tsv")
+    common_chemistry_data = data_source("common_chemistry_data.tsv")
     _miscdata_loaded = True
 
 def __getattr__(name):
-    if name in ('CRC_inorganic_data', 'CRC_organic_data', 'heos_data',
-                'joback_predictions', 'wikidata_data', 'webbook_data',
-                'common_chemistry_data'):
+    if name in ("CRC_inorganic_data", "CRC_organic_data", "heos_data",
+                "joback_predictions", "wikidata_data", "webbook_data",
+                "common_chemistry_data"):
         _load_miscdata()
         return globals()[name]
-    elif name == 'VDI_saturation_dict':
+    elif name == "VDI_saturation_dict":
         _load_VDI_saturation_dict()
         return VDI_saturation_dict
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -143,7 +143,7 @@ def __getattr__(name):
 
 @mark_numba_incompatible
 def lookup_VDI_tabular_data(CASRN, prop):
-    r'''This function retrieves the tabular data available for a given chemical
+    r"""This function retrieves the tabular data available for a given chemical
     and a given property. Lookup is based on CASRNs. Length of data returned
     varies between chemicals. All data is at saturation condition from [1]_.
 
@@ -183,23 +183,23 @@ def lookup_VDI_tabular_data(CASRN, prop):
     References
     ----------
     .. [1] Gesellschaft, VDI, ed. VDI Heat Atlas. 2E. Berlin : Springer, 2010.
-    '''
+    """
     if not _VDI_dict_loaded: _load_VDI_saturation_dict()
     try:
         d = VDI_saturation_dict[CASRN]
     except KeyError:
-        raise LookupError('CASRN not in VDI tabulation')
+        raise LookupError("CASRN not in VDI tabulation")
     try:
-        props, Ts = d[prop], d['T']
+        props, Ts = d[prop], d["T"]
     except:
-        raise ValueError('property not specified correctly')
+        raise ValueError("property not specified correctly")
     Ts = [T for p, T in zip(props, Ts) if p]
     props = [p for p in props if p]
     # Not all data series converege to correct values
-    if prop == 'sigma' and props:
-        if Ts[-1] < d['Tc']:
-            Ts.append(d['Tc'])
+    if prop == "sigma" and props:
+        if Ts[-1] < d["Tc"]:
+            Ts.append(d["Tc"])
             props.append(0.0)
-        elif Ts[-1] == d['Tc']:
+        elif Ts[-1] == d["Tc"]:
             props[-1] = 0.0
     return Ts, props

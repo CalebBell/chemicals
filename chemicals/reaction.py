@@ -82,33 +82,33 @@ Chemical Reactions
 """
 
 __all__ = [
-    'Gibbs_formation',
-    'Hf_basis_converter',
-    'Hfg',
-    'Hfg_all_methods',
-    'Hfg_methods',
-    'Hfl',
-    'Hfl_all_methods',
-    'Hfl_methods',
-    'Hfs',
-    'Hfs_all_methods',
-    'Hfs_methods',
-    'S0g',
-    'S0g_all_methods',
-    'S0g_methods',
-    'S0l',
-    'S0l_all_methods',
-    'S0l_methods',
-    'S0s',
-    'S0s_all_methods',
-    'S0s_methods',
-    'balance_stoichiometry',
-    'entropy_formation',
-    'standard_formation_reaction',
-    'stoichiometric_matrix',
-    'stoichiometry_MW_error',
-    'stoichiometry_mass_to_molar',
-    'stoichiometry_molar_to_mass',
+    "Gibbs_formation",
+    "Hf_basis_converter",
+    "Hfg",
+    "Hfg_all_methods",
+    "Hfg_methods",
+    "Hfl",
+    "Hfl_all_methods",
+    "Hfl_methods",
+    "Hfs",
+    "Hfs_all_methods",
+    "Hfs_methods",
+    "S0g",
+    "S0g_all_methods",
+    "S0g_methods",
+    "S0l",
+    "S0l_all_methods",
+    "S0l_methods",
+    "S0s",
+    "S0s_all_methods",
+    "S0s_methods",
+    "balance_stoichiometry",
+    "entropy_formation",
+    "standard_formation_reaction",
+    "stoichiometric_matrix",
+    "stoichiometry_MW_error",
+    "stoichiometry_mass_to_molar",
+    "stoichiometry_molar_to_mass",
 ]
 
 from math import floor, log10
@@ -127,30 +127,30 @@ from chemicals.elements import periodic_table, simple_formula_parser
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 # %% Register data sources and lazy load them
-CRC = 'CRC'
-YAWS = 'YAWS'
-API_TDB_G = 'API_TDB_G'
-ATCT_L = 'ATCT_L'
-ATCT_G = 'ATCT_G'
-TRC = 'TRC'
+CRC = "CRC"
+YAWS = "YAWS"
+API_TDB_G = "API_TDB_G"
+ATCT_L = "ATCT_L"
+ATCT_G = "ATCT_G"
+TRC = "TRC"
 
-folder = os_path_join(source_path, 'Reactions')
-register_df_source(folder, 'API TDB Albahri Hf (g).tsv')
-register_df_source(folder, 'ATcT 1.112 (g).tsv')
-register_df_source(folder, 'ATcT 1.112 (l).tsv')
-register_df_source(folder, 'Yaws Hf S0 (g).tsv')
-register_df_source(folder, 'JANAF_1998.tsv')
+folder = os_path_join(source_path, "Reactions")
+register_df_source(folder, "API TDB Albahri Hf (g).tsv")
+register_df_source(folder, "ATcT 1.112 (g).tsv")
+register_df_source(folder, "ATcT 1.112 (l).tsv")
+register_df_source(folder, "Yaws Hf S0 (g).tsv")
+register_df_source(folder, "JANAF_1998.tsv")
 _reaction_data_loaded = False
 def _load_reaction_data():
     global Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, Hfg_S0g_YAWS_data
     global Hfg_sources, Hfl_sources, Hfs_sources
     global S0g_sources, S0l_sources, S0s_sources
     global _reaction_data_loaded
-    Hfg_API_TDB_data = data_source('API TDB Albahri Hf (g).tsv')
-    Hfg_ATcT_data = data_source('ATcT 1.112 (g).tsv')
-    Hfl_ATcT_data = data_source('ATcT 1.112 (l).tsv')
-    Hfg_S0g_YAWS_data = data_source('Yaws Hf S0 (g).tsv')
-    JANAF_1998_data = data_source('JANAF_1998.tsv')
+    Hfg_API_TDB_data = data_source("API TDB Albahri Hf (g).tsv")
+    Hfg_ATcT_data = data_source("ATcT 1.112 (g).tsv")
+    Hfl_ATcT_data = data_source("ATcT 1.112 (l).tsv")
+    Hfg_S0g_YAWS_data = data_source("Yaws Hf S0 (g).tsv")
+    JANAF_1998_data = data_source("JANAF_1998.tsv")
     _reaction_data_loaded = True
     S0g_sources = {
         CRC: heat_capacity.CRC_standard_data,
@@ -189,10 +189,10 @@ def _load_reaction_data():
     }
 
 def __getattr__(name):
-    if name in ('Hfg_API_TDB_data', 'Hfg_ATcT_data',
-                'Hfl_ATcT_data', 'Hfg_S0g_YAWS_data', 'JANAF_1998_data',
-                'Hfg_sources', 'Hfl_sources', 'Hfs_sources',
-                'S0g_sources', 'S0l_sources', 'S0s_sources'):
+    if name in ("Hfg_API_TDB_data", "Hfg_ATcT_data",
+                "Hfl_ATcT_data", "Hfg_S0g_YAWS_data", "JANAF_1998_data",
+                "Hfg_sources", "Hfl_sources", "Hfs_sources",
+                "S0g_sources", "S0l_sources", "S0s_sources"):
         _load_reaction_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -227,11 +227,11 @@ def Hfs_methods(CASRN):
     Hfs
     """
     if not _reaction_data_loaded: _load_reaction_data()
-    return list_available_methods_from_df_dict(Hfs_sources, CASRN, 'Hfs')
+    return list_available_methods_from_df_dict(Hfs_sources, CASRN, "Hfs")
 
 @mark_numba_incompatible
 def Hfs(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's solid/crystaline
+    r"""This function handles the retrieval of a chemical's solid/crystaline
     standard phase heat of formation. The lookup is based on CASRNs. Will
     automatically select a data source to use if no method is provided; returns
     None if the data is not available.
@@ -274,15 +274,15 @@ def Hfs(CASRN, method=None):
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Hfs')
+        val, found = database_constant_lookup(CASRN, "Hfs")
         if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
-        return retrieve_from_df_dict(Hfs_sources, CASRN, 'Hfs', method)
+        return retrieve_from_df_dict(Hfs_sources, CASRN, "Hfs", method)
     else:
-        return retrieve_any_from_df_dict(Hfs_sources, CASRN, 'Hfs')
+        return retrieve_any_from_df_dict(Hfs_sources, CASRN, "Hfs")
 
 Hfl_all_methods = (ATCT_L, CRC, miscdata.WEBBOOK, miscdata.JANAF)
 """Tuple of method name keys. See the `Hfl` for the actual references"""
@@ -308,7 +308,7 @@ def Hfl_methods(CASRN):
     Hfl
     """
     if not _reaction_data_loaded: _load_reaction_data()
-    return list_available_methods_from_df_dict(Hfl_sources, CASRN, 'Hfl')
+    return list_available_methods_from_df_dict(Hfl_sources, CASRN, "Hfl")
 
 @mark_numba_incompatible
 def Hfl(CASRN, method=None):
@@ -363,13 +363,13 @@ def Hfl(CASRN, method=None):
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Hfl')
+        val, found = database_constant_lookup(CASRN, "Hfl")
         if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
-        return retrieve_from_df_dict(Hfl_sources, CASRN, 'Hfl', method)
+        return retrieve_from_df_dict(Hfl_sources, CASRN, "Hfl", method)
     else:
-        return retrieve_any_from_df_dict(Hfl_sources, CASRN, 'Hfl')
+        return retrieve_any_from_df_dict(Hfl_sources, CASRN, "Hfl")
 
 Hfg_all_methods = (ATCT_G, TRC, CRC, miscdata.WEBBOOK, miscdata.JANAF, YAWS, miscdata.JOBACK)
 """Tuple of method name keys. See the `Hfg` for the actual references"""
@@ -395,7 +395,7 @@ def Hfg_methods(CASRN):
     Hfg
     """
     if not _reaction_data_loaded: _load_reaction_data()
-    return list_available_methods_from_df_dict(Hfg_sources, CASRN, 'Hfg')
+    return list_available_methods_from_df_dict(Hfg_sources, CASRN, "Hfg")
 
 @mark_numba_incompatible
 def Hfg(CASRN, method=None):
@@ -475,13 +475,13 @@ def Hfg(CASRN, method=None):
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Hfg')
+        val, found = database_constant_lookup(CASRN, "Hfg")
         if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
-        return retrieve_from_df_dict(Hfg_sources, CASRN, 'Hfg', method)
+        return retrieve_from_df_dict(Hfg_sources, CASRN, "Hfg", method)
     else:
-        return retrieve_any_from_df_dict(Hfg_sources, CASRN, 'Hfg')
+        return retrieve_any_from_df_dict(Hfg_sources, CASRN, "Hfg")
 
 S0s_all_methods = (CRC, miscdata.WEBBOOK)
 """Tuple of method name keys. See the `S0s` for the actual references"""
@@ -507,11 +507,11 @@ def S0s_methods(CASRN):
     S0s
     """
     if not _reaction_data_loaded: _load_reaction_data()
-    return list_available_methods_from_df_dict(S0s_sources, CASRN, 'S0s')
+    return list_available_methods_from_df_dict(S0s_sources, CASRN, "S0s")
 
 @mark_numba_incompatible
 def S0s(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's absolute
+    r"""This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the solid state. Lookup is based on CASRNs. Will automatically select a
     data source to use if no method is provided; returns None if the data is not
@@ -556,15 +556,15 @@ def S0s(CASRN, method=None):
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
     .. [2] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'S0s')
+        val, found = database_constant_lookup(CASRN, "S0s")
         if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
-        return retrieve_from_df_dict(S0s_sources, CASRN, 'S0s', method)
+        return retrieve_from_df_dict(S0s_sources, CASRN, "S0s", method)
     else:
-        return retrieve_any_from_df_dict(S0s_sources, CASRN, 'S0s')
+        return retrieve_any_from_df_dict(S0s_sources, CASRN, "S0s")
 
 S0l_all_methods = (CRC, miscdata.WEBBOOK, miscdata.JANAF)
 """Tuple of method name keys. See the `S0l` for the actual references"""
@@ -589,11 +589,11 @@ def S0l_methods(CASRN):
     S0l
     """
     if not _reaction_data_loaded: _load_reaction_data()
-    return list_available_methods_from_df_dict(S0l_sources, CASRN, 'S0l')
+    return list_available_methods_from_df_dict(S0l_sources, CASRN, "S0l")
 
 @mark_numba_incompatible
 def S0l(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's absolute
+    r"""This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the liquid state.
 
@@ -636,15 +636,15 @@ def S0l(CASRN, method=None):
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'S0l')
+        val, found = database_constant_lookup(CASRN, "S0l")
         if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
-        return retrieve_from_df_dict(S0l_sources, CASRN, 'S0l', method)
+        return retrieve_from_df_dict(S0l_sources, CASRN, "S0l", method)
     else:
-        return retrieve_any_from_df_dict(S0l_sources, CASRN, 'S0l')
+        return retrieve_any_from_df_dict(S0l_sources, CASRN, "S0l")
 
 S0g_all_methods = (CRC, miscdata.WEBBOOK, miscdata.JANAF, YAWS)
 """Tuple of method name keys. See the `S0g` for the actual references"""
@@ -669,11 +669,11 @@ def S0g_methods(CASRN):
     S0g
     """
     if not _reaction_data_loaded: _load_reaction_data()
-    return list_available_methods_from_df_dict(S0g_sources, CASRN, 'S0g')
+    return list_available_methods_from_df_dict(S0g_sources, CASRN, "S0g")
 
 @mark_numba_incompatible
 def S0g(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's absolute
+    r"""This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the ideal gas state.
 
@@ -726,21 +726,21 @@ def S0g(CASRN, method=None):
        Publishing, 2014.
     .. [3] Shen, V.K., Siderius, D.W., Krekelberg, W.P., and Hatch, H.W., Eds.,
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'S0g')
+        val, found = database_constant_lookup(CASRN, "S0g")
         if found: return val
     if not _reaction_data_loaded: _load_reaction_data()
     if method:
-        return retrieve_from_df_dict(S0g_sources, CASRN, 'S0g', method)
+        return retrieve_from_df_dict(S0g_sources, CASRN, "S0g", method)
     else:
-        return retrieve_any_from_df_dict(S0g_sources, CASRN, 'S0g')
+        return retrieve_any_from_df_dict(S0g_sources, CASRN, "S0g")
 
 
 # %% Converter functions
 
 def Hf_basis_converter(Hvapm, Hf_liq=None, Hf_gas=None):
-    r'''This function converts a liquid or gas enthalpy of formation to the
+    r"""This function converts a liquid or gas enthalpy of formation to the
     other. This is useful, as thermodynamic packages often work with ideal-
     gas as the reference state and require ideal-gas enthalpies of formation.
 
@@ -776,7 +776,7 @@ def Hf_basis_converter(Hvapm, Hf_liq=None, Hf_gas=None):
 
     >>> Hf_basis_converter(44018, Hf_gas=-241812)
     -285830
-    '''
+    """
     if Hf_liq is None and Hf_gas is None:
         raise ValueError("Provide either a liquid or a gas enthalpy of formation")
     if Hvapm is None or Hvapm < 0.0:
@@ -1124,7 +1124,7 @@ def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
     return d
 
 def stoichiometry_molar_to_mass(coefficients, MWs):
-    r'''This function translates molar stoichiometric
+    r"""This function translates molar stoichiometric
     coefficients (most commonly used) into less commonly
     used mass-based stoichiometric coefficients.
 
@@ -1152,11 +1152,11 @@ def stoichiometry_molar_to_mass(coefficients, MWs):
     >>> coeffs = balance_stoichiometry(matrix)
     >>> stoichiometry_molar_to_mass(coeffs, [17.03052, 31.9988, 30.0061, 18.01528])
     [68.12208, 159.994, 120.0244, 108.09168]
-    '''
+    """
     return [c*MW for c, MW in zip(coefficients, MWs)]
 
 def stoichiometry_mass_to_molar(mass_coefficients, MWs):
-    r'''This function translates mass stoichiometric coefficients into the
+    r"""This function translates mass stoichiometric coefficients into the
     more commonly used mole-based stoichiometric coefficients.
 
     Parameters
@@ -1176,11 +1176,11 @@ def stoichiometry_mass_to_molar(mass_coefficients, MWs):
     -----
     >>> stoichiometry_mass_to_molar([68.12208, 159.994, 120.0244, 108.09168], [17.03052, 31.9988, 30.0061, 18.01528])
     [4.0, 5.0, 4.0, 6.0]
-    '''
+    """
     return [c/MW for c, MW in zip(mass_coefficients, MWs)]
 
 def stoichiometry_MW_error(coefficients, MWs, reactants):
-    r'''This function calculates the molecular weight imbalance
+    r"""This function calculates the molecular weight imbalance
     of a reaction given the coefficients and molecular weights of
     the involved components, and their statuses as reactants or product.
 
@@ -1207,7 +1207,7 @@ def stoichiometry_MW_error(coefficients, MWs, reactants):
 
     >>> stoichiometry_MW_error([4.0, 5.0, 4.0, 6.0], [17.03052, 31.9988, 30.0061, 18.01528], [True, True, False, False])
     0.0
-    '''
+    """
     reactant_MW = 0.0
     product_MW = 0.0
     for coeff, MW, stat in zip(coefficients, MWs, reactants):
@@ -1218,7 +1218,7 @@ def stoichiometry_MW_error(coefficients, MWs, reactants):
     return reactant_MW - product_MW
 
 def standard_formation_reaction(atoms):
-    r'''This function calculates the standard reaction to reduce a chemical
+    r"""This function calculates the standard reaction to reduce a chemical
     compound to its standard state elements. Any hydrogen in the compound
     is transformed to H2; oxygen to O2; carbon to graphite (single C), calcium
     to Ca, etc.
@@ -1260,7 +1260,7 @@ def standard_formation_reaction(atoms):
     >>> standard_formation_reaction({'C': 1, 'H': 5, 'N': 1})
     (2.0, [2.0, 5.0, 1.0], [{'C': 1}, {'H': 2}, {'N': 2}])
 
-    '''
+    """
     product_atomss = []
     reactants = []
     for atom in atoms:

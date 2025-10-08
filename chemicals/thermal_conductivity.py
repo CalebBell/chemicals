@@ -125,36 +125,36 @@ attribute of this module.
 
 
 __all__ = [
-    'DIPPR9B',
-    'DIPPR9G',
-    'DIPPR9H',
-    'DIPPR9I',
-    'PPDS3',
-    'PPDS8',
-    'Bahadori_gas',
-    'Bahadori_liquid',
-    'Chemsep_16',
-    'Chung',
-    'Chung_dense',
-    'Eli_Hanley',
-    'Eli_Hanley_dense',
-    'Eucken',
-    'Eucken_modified',
-    'Filippov',
-    'Gharagheizi_gas',
-    'Gharagheizi_liquid',
-    'Lakshmi_Prasad',
-    'Lindsay_Bromley',
-    'Missenard',
-    'Nicola',
-    'Nicola_original',
-    'Sato_Riedel',
-    'Sheffy_Johnson',
-    'Stiel_Thodos_dense',
-    'Wassiljewa_Herning_Zipperer',
-    'k_IAPWS',
-    'k_air_lemmon',
-    'kl_Mersmann_Kind',
+    "DIPPR9B",
+    "DIPPR9G",
+    "DIPPR9H",
+    "DIPPR9I",
+    "PPDS3",
+    "PPDS8",
+    "Bahadori_gas",
+    "Bahadori_liquid",
+    "Chemsep_16",
+    "Chung",
+    "Chung_dense",
+    "Eli_Hanley",
+    "Eli_Hanley_dense",
+    "Eucken",
+    "Eucken_modified",
+    "Filippov",
+    "Gharagheizi_gas",
+    "Gharagheizi_liquid",
+    "Lakshmi_Prasad",
+    "Lindsay_Bromley",
+    "Missenard",
+    "Nicola",
+    "Nicola_original",
+    "Sato_Riedel",
+    "Sheffy_Johnson",
+    "Stiel_Thodos_dense",
+    "Wassiljewa_Herning_Zipperer",
+    "k_IAPWS",
+    "k_air_lemmon",
+    "kl_Mersmann_Kind",
 ]
 
 from math import atan
@@ -167,13 +167,13 @@ from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 from chemicals.viscosity import Herning_Zipperer
 
-folder = os_path_join(source_path, 'Thermal Conductivity')
+folder = os_path_join(source_path, "Thermal Conductivity")
 
 
-register_df_source(folder, 'Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv')
-register_df_source(folder, 'Table 2-315 Thermal Conductivity of Inorganic and Organic Liquids.tsv')
-register_df_source(folder, 'VDI PPDS Thermal conductivity of saturated liquids.tsv', csv_kwargs={'float_precision': 'legacy'})
-register_df_source(folder, 'VDI PPDS Thermal conductivity of gases.tsv', csv_kwargs={'float_precision': 'legacy'})
+register_df_source(folder, "Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv")
+register_df_source(folder, "Table 2-315 Thermal Conductivity of Inorganic and Organic Liquids.tsv")
+register_df_source(folder, "VDI PPDS Thermal conductivity of saturated liquids.tsv", csv_kwargs={"float_precision": "legacy"})
+register_df_source(folder, "VDI PPDS Thermal conductivity of gases.tsv", csv_kwargs={"float_precision": "legacy"})
 
 _k_data_loaded = False
 @mark_numba_incompatible
@@ -182,22 +182,22 @@ def _load_k_data():
     global k_data_Perrys_8E_2_315, k_values_Perrys_8E_2_315, k_data_VDI_PPDS_9
     global k_values_VDI_PPDS_9, k_data_VDI_PPDS_10, k_values_VDI_PPDS_10
 
-    k_data_Perrys_8E_2_314 = data_source('Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv')
+    k_data_Perrys_8E_2_314 = data_source("Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv")
     k_values_Perrys_8E_2_314 = np.array(k_data_Perrys_8E_2_314.values[:, 1:], dtype=float)
 
-    k_data_Perrys_8E_2_315 = data_source('Table 2-315 Thermal Conductivity of Inorganic and Organic Liquids.tsv')
+    k_data_Perrys_8E_2_315 = data_source("Table 2-315 Thermal Conductivity of Inorganic and Organic Liquids.tsv")
     k_values_Perrys_8E_2_315 = np.array(k_data_Perrys_8E_2_315.values[:, 1:], dtype=float)
 
-    k_data_VDI_PPDS_9 = data_source('VDI PPDS Thermal conductivity of saturated liquids.tsv')
+    k_data_VDI_PPDS_9 = data_source("VDI PPDS Thermal conductivity of saturated liquids.tsv")
     k_values_VDI_PPDS_9 = np.array(k_data_VDI_PPDS_9.values[:, 1:], dtype=float)
 
-    k_data_VDI_PPDS_10 = data_source('VDI PPDS Thermal conductivity of gases.tsv')
+    k_data_VDI_PPDS_10 = data_source("VDI PPDS Thermal conductivity of gases.tsv")
     k_values_VDI_PPDS_10 = np.array(k_data_VDI_PPDS_10.values[:, 1:], dtype=float)
 
 def __getattr__(name):
-    if name in ('k_data_Perrys_8E_2_314', 'k_values_Perrys_8E_2_314', 'k_data_Perrys_8E_2_315',
-                'k_values_Perrys_8E_2_315', 'k_data_VDI_PPDS_9', 'k_values_VDI_PPDS_9', 'k_data_VDI_PPDS_10',
-                'k_values_VDI_PPDS_10'):
+    if name in ("k_data_Perrys_8E_2_314", "k_values_Perrys_8E_2_314", "k_data_Perrys_8E_2_315",
+                "k_values_Perrys_8E_2_315", "k_data_VDI_PPDS_9", "k_values_VDI_PPDS_9", "k_data_VDI_PPDS_10",
+                "k_values_VDI_PPDS_10"):
         _load_k_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -296,7 +296,7 @@ def PPDS3(T, Tc, a1, a2, a3):
     return sqrt(Tr)/tot
 
 def Chemsep_16(T, A, B, C, D, E):
-    r'''Calculate the thermal conductivity of a low-pressure liquid using the
+    r"""Calculate the thermal conductivity of a low-pressure liquid using the
     5-term `T` exponential polynomial found in ChemSep.
 
     .. math::
@@ -339,7 +339,7 @@ def Chemsep_16(T, A, B, C, D, E):
     ----------
     .. [1] Kooijman, Harry A., and Ross Taylor. The ChemSep Book. Books on
        Demand Norderstedt, Germany, 2000.
-    '''
+    """
     prop = A + trunc_exp(B/T + C + D*T + E*T*T)
     if prop < 0.0:
         prop = 0.0
@@ -1171,7 +1171,7 @@ def kl_Mersmann_Kind(T, MW, Tc, Vc, na):
 ### Thermal Conductivity of Dense Liquids
 
 def DIPPR9G(T, P, Tc, Pc, kl):
-    r'''Adjustes for pressure the thermal conductivity of a liquid using an
+    r"""Adjustes for pressure the thermal conductivity of a liquid using an
     emperical formula based on [1]_, but as given in [2]_.
 
     .. math::
@@ -1217,7 +1217,7 @@ def DIPPR9G(T, P, Tc, Pc, kl):
        Series or a Group of Liquids , Rev. Gen.Thermodyn., 101 649 (1970).
     .. [2] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
-    '''
+    """
     Tr = T/Tc
     Pr = P/Pc
     Tr_2_10 = Tr**(0.2)
@@ -1242,7 +1242,7 @@ Missenard_tck = implementation_optimize_tck([[1.0, 1.0, 5.0, 10.0, 50.0, 100.0, 
                                               1,1])
 
 def Missenard(T, P, Tc, Pc, kl):
-    r'''Adjustes for pressure the thermal conductivity of a liquid using an
+    r"""Adjustes for pressure the thermal conductivity of a liquid using an
     emperical formula based on [1]_, but as given in [2]_.
 
     .. math::
@@ -1285,7 +1285,7 @@ def Missenard(T, P, Tc, Pc, kl):
        Series or a Group of Liquids , Rev. Gen.Thermodyn., 101 649 (1970).
     .. [2] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     Tr = T/Tc
     Pr = P/Pc
     Q = float(bisplev(Pr, Tr, Missenard_tck))
@@ -1442,7 +1442,7 @@ def DIPPR9I(zs, Vms, ks):
     return k
 
 def Filippov(ws, ks):
-    r'''Calculates thermal conductivity of a binary liquid mixture according to
+    r"""Calculates thermal conductivity of a binary liquid mixture according to
     mixing rules in [2]_ as found in [1]_.
 
     .. math::
@@ -1480,7 +1480,7 @@ def Filippov(ws, ks):
        (8I0E): 67-69A955); Chem. Abstr., 50: 8276 A956).
        Filippov, L. P., and N. S. Novoselova: Vestn. Mosk. Univ., Ser. F
        iz. Mat. Estestv.Nauk, CI0B): 37-40A955); Chem. Abstr., 49: 11366 A955).
-    '''
+    """
     len_ks = len(ks)
     if len_ks != len(ws) or len_ks != 2:
         raise ValueError("Filippov method is only defined for mixtures of two components")
@@ -1491,7 +1491,7 @@ def Filippov(ws, ks):
 ### Thermal Conductivity of Gases
 
 def Eucken(MW, Cvm, mu):
-    r'''Estimates the thermal conductivity of a gas as a function of
+    r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the CSP method of Eucken [1]_.
 
     .. math::
@@ -1528,13 +1528,13 @@ def Eucken(MW, Cvm, mu):
     ----------
     .. [1] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     MW = MW*1e-3
     return (1. + 9.0/4.0*R/Cvm)*mu*Cvm/MW
 
 
 def Eucken_modified(MW, Cvm, mu):
-    r'''Estimates the thermal conductivity of a gas as a function of
+    r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the Modified CSP method of Eucken [1]_.
 
     .. math::
@@ -1571,7 +1571,7 @@ def Eucken_modified(MW, Cvm, mu):
     ----------
     .. [1] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     MW = MW*1e-3
     return (1.32 + 1.77*R/Cvm)*mu*Cvm/MW
 
@@ -1640,9 +1640,9 @@ def DIPPR9B(T, MW, Cvm, mu, Tc=None, chemtype=None):
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     '''
     Cvm = Cvm*1000.  # J/g/K to J/kmol/K
-    if chemtype == 'monoatomic':
+    if chemtype == "monoatomic":
         return 2.5*mu*Cvm/MW
-    elif chemtype == 'nonlinear':
+    elif chemtype == "nonlinear":
         return mu/MW*(1.15*Cvm + 16903.36)
     # elif chemtype == 'linear' or chemtype is None:
     Tr = T/Tc
@@ -2469,7 +2469,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
 
 
 def Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots=None):
-    r'''Calculates thermal conductivity of a gas mixture according to
+    r"""Calculates thermal conductivity of a gas mixture according to
     the kinetic theory expression of Wassiljewa with the interaction
     term from the Herning-Zipperer expression. This is also used for
     the prediction of gas mixture viscosity.
@@ -2510,5 +2510,5 @@ def Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots=None):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     return Herning_Zipperer(zs, ks, MWs, MW_roots)

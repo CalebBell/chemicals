@@ -118,46 +118,46 @@ Utility Methods
 """
 
 __all__ = (
-    'LFL',
-    'LFL_ISO_10156_2017',
-    'STEL',
-    'TWA',
-    'UFL',
-    'Carcinogen',
-    'Carcinogen_all_methods',
-    'Carcinogen_methods',
-    'Ceiling',
-    'Ceiling_all_methods',
-    'Ceiling_methods',
-    'Crowl_Louvar_LFL',
-    'Crowl_Louvar_UFL',
-    'IARC_codes',
-    'LFL_all_methods',
-    'LFL_estimate',
-    'LFL_methods',
-    'NFPA_30_classification',
-    'NTP_codes',
-    'STEL_all_methods',
-    'STEL_methods',
-    'Skin',
-    'Skin_all_methods',
-    'Skin_methods',
-    'Suzuki_LFL',
-    'Suzuki_UFL',
-    'TWA_all_methods',
-    'TWA_methods',
-    'T_autoignition',
-    'T_autoignition_all_methods',
-    'T_autoignition_methods',
-    'T_flash',
-    'T_flash_all_methods',
-    'T_flash_methods',
-    'UFL_all_methods',
-    'UFL_estimate',
-    'UFL_methods',
-    'fire_mixing',
-    'mgm3_to_ppmv',
-    'ppmv_to_mgm3',
+    "LFL",
+    "LFL_ISO_10156_2017",
+    "STEL",
+    "TWA",
+    "UFL",
+    "Carcinogen",
+    "Carcinogen_all_methods",
+    "Carcinogen_methods",
+    "Ceiling",
+    "Ceiling_all_methods",
+    "Ceiling_methods",
+    "Crowl_Louvar_LFL",
+    "Crowl_Louvar_UFL",
+    "IARC_codes",
+    "LFL_all_methods",
+    "LFL_estimate",
+    "LFL_methods",
+    "NFPA_30_classification",
+    "NTP_codes",
+    "STEL_all_methods",
+    "STEL_methods",
+    "Skin",
+    "Skin_all_methods",
+    "Skin_methods",
+    "Suzuki_LFL",
+    "Suzuki_UFL",
+    "TWA_all_methods",
+    "TWA_methods",
+    "T_autoignition",
+    "T_autoignition_all_methods",
+    "T_autoignition_methods",
+    "T_flash",
+    "T_flash_all_methods",
+    "T_flash_methods",
+    "UFL_all_methods",
+    "UFL_estimate",
+    "UFL_methods",
+    "fire_mixing",
+    "mgm3_to_ppmv",
+    "ppmv_to_mgm3",
 )
 
 
@@ -176,7 +176,7 @@ from chemicals.utils import R, mark_numba_incompatible, normalize, os_path_join,
 ### Utilities
 
 def ppmv_to_mgm3(ppmv, MW, T=298.15, P=101325.0):
-    r'''
+    r"""
     Converts a concentration in ppmv to units of mg/m^3. Used in
     industrial toxicology.
 
@@ -215,14 +215,14 @@ def ppmv_to_mgm3(ppmv, MW, T=298.15, P=101325.0):
     .. [1] ACGIH. Industrial Ventilation: A Manual of Recommended Practice,
        23rd Edition. American Conference of Governmental and Industrial
        Hygenists, 2004.
-    '''
+    """
     parts = ppmv*1E-6
     n = parts*P/(R*T)
     mgm3 = MW*n*1000  # mol toxin /m^3 * g/mol toxis * 1000 mg/g
     return mgm3
 
 def mgm3_to_ppmv(mgm3, MW, T=298.15, P=101325.):
-    r'''
+    r"""
     Converts a concentration in  mg/m^3 to units of ppmv. Used in
     industrial toxicology.
 
@@ -261,7 +261,7 @@ def mgm3_to_ppmv(mgm3, MW, T=298.15, P=101325.):
     .. [1] ACGIH. Industrial Ventilation: A Manual of Recommended Practice,
        23rd Edition. American Conference of Governmental and Industrial
        Hygenists, 2004.
-    '''
+    """
     n = mgm3/MW/1000.
     parts = n*R*T/P
     ppm = parts/1E-6
@@ -270,42 +270,42 @@ def mgm3_to_ppmv(mgm3, MW, T=298.15, P=101325.):
 ### Data
 
 
-NTP_codes = {1: 'Known', 2: 'Reasonably Anticipated'}
-IARC_codes = {1: 'Carcinogenic to humans (1)',
-              11: 'Probably carcinogenic to humans (2A)',  # 2A
-              12: 'Possibly carcinogenic to humans (2B)',  # 2B
-              3: 'Not classifiable as to its carcinogenicity to humans (3)',
-              4: 'Probably not carcinogenic to humans (4)'}
+NTP_codes = {1: "Known", 2: "Reasonably Anticipated"}
+IARC_codes = {1: "Carcinogenic to humans (1)",
+              11: "Probably carcinogenic to humans (2A)",  # 2A
+              12: "Possibly carcinogenic to humans (2B)",  # 2B
+              3: "Not classifiable as to its carcinogenicity to humans (3)",
+              4: "Probably not carcinogenic to humans (4)"}
 
-folder = os_path_join(source_path, 'Safety')
-register_df_source(folder, 'NFPA 497 2008.tsv')
-register_df_source(folder, 'IS IEC 60079-20-1 2010.tsv')
-register_df_source(folder, 'DIPPR T_flash Serat.csv')
-register_df_source(folder, 'National Toxicology Program Carcinogens.tsv')
-register_df_source(folder, 'IARC Carcinogen Database.tsv')
+folder = os_path_join(source_path, "Safety")
+register_df_source(folder, "NFPA 497 2008.tsv")
+register_df_source(folder, "IS IEC 60079-20-1 2010.tsv")
+register_df_source(folder, "DIPPR T_flash Serat.csv")
+register_df_source(folder, "National Toxicology Program Carcinogens.tsv")
+register_df_source(folder, "IARC Carcinogen Database.tsv")
 _safety_data_loaded = False
 
 
-IEC = 'IEC 60079-20-1 (2010)'
-NFPA = 'NFPA 497 (2008)'
-SERAT = 'Serat DIPPR (2017)'
+IEC = "IEC 60079-20-1 (2010)"
+NFPA = "NFPA 497 (2008)"
+SERAT = "Serat DIPPR (2017)"
 
-SUZUKI = 'Suzuki (1994)'
-CROWLLOUVAR = 'Crowl and Louvar (2001)'
+SUZUKI = "Suzuki (1994)"
+CROWLLOUVAR = "Crowl and Louvar (2001)"
 
 def _load_safety_data():
     global Ontario_exposure_limits_dict, NFPA_2008_data, IEC_2010_data
     global DIPPR_SERAT_data, NTP_data, IARC_data, Tflash_sources
     global Tautoignition_sources, LFL_sources, UFL_sources, _safety_data_loaded
     import json
-    file = os_path_join(folder, 'Ontario Exposure Limits.json')
+    file = os_path_join(folder, "Ontario Exposure Limits.json")
     with open(file) as stream:
         Ontario_exposure_limits_dict = json.load(stream)
-    NFPA_2008_data = data_source('NFPA 497 2008.tsv')
-    IEC_2010_data = data_source('IS IEC 60079-20-1 2010.tsv')
-    DIPPR_SERAT_data = data_source('DIPPR T_flash Serat.csv')
-    NTP_data = data_source('National Toxicology Program Carcinogens.tsv')
-    IARC_data = data_source('IARC Carcinogen Database.tsv')
+    NFPA_2008_data = data_source("NFPA 497 2008.tsv")
+    IEC_2010_data = data_source("IS IEC 60079-20-1 2010.tsv")
+    DIPPR_SERAT_data = data_source("DIPPR T_flash Serat.csv")
+    NTP_data = data_source("National Toxicology Program Carcinogens.tsv")
+    IARC_data = data_source("IARC Carcinogen Database.tsv")
     Tflash_sources = {IEC: IEC_2010_data,
                       NFPA: NFPA_2008_data,
                       SERAT: DIPPR_SERAT_data,
@@ -319,8 +319,8 @@ def _load_safety_data():
     _safety_data_loaded = True
 
 def __getattr__(name):
-    if name in ('Ontario_exposure_limits_dict', 'NFPA_2008_data', 'IEC_2010_data',
-                'DIPPR_SERAT_data'):
+    if name in ("Ontario_exposure_limits_dict", "NFPA_2008_data", "IEC_2010_data",
+                "DIPPR_SERAT_data"):
         _load_safety_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -417,7 +417,7 @@ def __getattr__(name):
 # TODO: Add https://www.worksafebc.com/en/law-policy/occupational-health-safety/searchable-ohs-regulation/ohs-guidelines/guidelines-part-05#ExposureLimits
 ### OSHA exposure limit functions
 
-ONTARIO = 'Ontario Limits'
+ONTARIO = "Ontario Limits"
 TWA_all_methods = (ONTARIO,)
 """Tuple of method name keys. See the :obj:`TWA` for the actual references"""
 
@@ -497,11 +497,11 @@ def TWA(CASRN, method=None):
         if CASRN in Ontario_exposure_limits_dict:
             data = Ontario_exposure_limits_dict[CASRN]
             value = data["TWA (ppm)"]
-            if value: return value, 'ppm'
+            if value: return value, "ppm"
             value = data["TWA (mg/m^3)"]
-            if value: return value, 'mg/m^3'
+            if value: return value, "mg/m^3"
     else:
-        raise ValueError(f'Invalid method: {method}, allowed methods are {TWA_all_methods}')
+        raise ValueError(f"Invalid method: {method}, allowed methods are {TWA_all_methods}")
 
 @mark_numba_incompatible
 def STEL_methods(CASRN):
@@ -566,11 +566,11 @@ def STEL(CASRN, method=None):
         if CASRN in Ontario_exposure_limits_dict:
             data = Ontario_exposure_limits_dict[CASRN]
             value = data["STEL (ppm)"]
-            if value: return value, 'ppm'
+            if value: return value, "ppm"
             value = data["STEL (mg/m^3)"]
-            if value: return value, 'mg/m^3'
+            if value: return value, "mg/m^3"
     else:
-        raise ValueError(f'Invalid method: {method}, allowed methods are {TWA_all_methods}')
+        raise ValueError(f"Invalid method: {method}, allowed methods are {TWA_all_methods}")
 
 @mark_numba_incompatible
 def Ceiling_methods(CASRN):
@@ -628,11 +628,11 @@ def Ceiling(CASRN, method=None):
         if CASRN in Ontario_exposure_limits_dict:
             data = Ontario_exposure_limits_dict[CASRN]
             value = data["Ceiling (ppm)"]
-            if value: return value, 'ppm'
+            if value: return value, "ppm"
             value = data["Ceiling (mg/m^3)"]
-            if value: return value, 'mg/m^3'
+            if value: return value, "mg/m^3"
     else:
-        raise ValueError(f'Invalid method: {method}, allowed methods are {list(Ontario_exposure_limits_dict)}')
+        raise ValueError(f"Invalid method: {method}, allowed methods are {list(Ontario_exposure_limits_dict)}")
 
 @mark_numba_incompatible
 def Skin_methods(CASRN):
@@ -685,14 +685,14 @@ def Skin(CASRN, method=None):
         if CASRN in Ontario_exposure_limits_dict:
             return Ontario_exposure_limits_dict[CASRN]["Skin"]
     else:
-        raise ValueError(f'Invalid method: {method}, allowed methods are {TWA_all_methods}')
+        raise ValueError(f"Invalid method: {method}, allowed methods are {TWA_all_methods}")
 
 ### Carcinogen functions
 
-IARC = 'International Agency for Research on Cancer'
-NTP = 'National Toxicology Program 13th Report on Carcinogens'
-UNLISTED = 'Unlisted'
-COMBINED = 'Combined'
+IARC = "International Agency for Research on Cancer"
+NTP = "National Toxicology Program 13th Report on Carcinogens"
+UNLISTED = "Unlisted"
+COMBINED = "Combined"
 
 Carcinogen_all_methods = (IARC, NTP)
 """Tuple of method name keys. See the :obj:`Carcinogen` for the actual references"""
@@ -720,7 +720,7 @@ def Carcinogen_methods(CASRN):
 
 @mark_numba_incompatible
 def Carcinogen(CASRN, method=None):
-    r'''Looks up if a chemical is listed as a carcinogen or not according to
+    r"""Looks up if a chemical is listed as a carcinogen or not according to
     either a specifc method or with all methods.
     Returns either the status as a string for a specified method, or the
     status of the chemical in all available data sources, in the format
@@ -769,21 +769,21 @@ def Carcinogen(CASRN, method=None):
        Fifteenth Edition.; Research Triangle Park, NC: U.S. Department of
        Health and Human Services, Public Health Service.
        https://doi.org/10.22427/NTP-OTHER-1003
-    '''
+    """
     if not _safety_data_loaded: _load_safety_data()
     if not method:
         return {
-            IARC: IARC_codes[IARC_data.at[CASRN, 'group']] if CASRN in IARC_data.index else UNLISTED,
-            NTP: NTP_codes[NTP_data.at[CASRN, 'Listing']] if CASRN in NTP_data.index else UNLISTED
+            IARC: IARC_codes[IARC_data.at[CASRN, "group"]] if CASRN in IARC_data.index else UNLISTED,
+            NTP: NTP_codes[NTP_data.at[CASRN, "Listing"]] if CASRN in NTP_data.index else UNLISTED
         }
     if method == IARC:
         if CASRN in IARC_data.index:
-            return IARC_codes[IARC_data.at[CASRN, 'group']]
+            return IARC_codes[IARC_data.at[CASRN, "group"]]
     elif method == NTP:
         if CASRN in NTP_data.index:
-            return NTP_codes[NTP_data.at[CASRN, 'Listing']]
+            return NTP_codes[NTP_data.at[CASRN, "Listing"]]
     else:
-        raise ValueError(f'Invalid method: {method}, allowed methods are {Carcinogen_all_methods}')
+        raise ValueError(f"Invalid method: {method}, allowed methods are {Carcinogen_all_methods}")
     return UNLISTED
 
 
@@ -812,7 +812,7 @@ def T_flash_methods(CASRN):
     T_flash
     """
     if not _safety_data_loaded: _load_safety_data()
-    return list_available_methods_from_df_dict(Tflash_sources, CASRN, 'T_flash')
+    return list_available_methods_from_df_dict(Tflash_sources, CASRN, "T_flash")
 
 @mark_numba_incompatible
 def T_flash(CASRN, method=None):
@@ -875,13 +875,13 @@ def T_flash(CASRN, method=None):
     .. [4] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'T_flash')
+        val, found = database_constant_lookup(CASRN, "T_flash")
         if found: return val
     if not _safety_data_loaded: _load_safety_data()
     if method:
-        return retrieve_from_df_dict(Tflash_sources, CASRN, 'T_flash', method)
+        return retrieve_from_df_dict(Tflash_sources, CASRN, "T_flash", method)
     else:
-        return retrieve_any_from_df_dict(Tflash_sources, CASRN, 'T_flash')
+        return retrieve_any_from_df_dict(Tflash_sources, CASRN, "T_flash")
 
 
 T_autoignition_all_methods = (IEC, NFPA, miscdata.WIKIDATA)
@@ -907,11 +907,11 @@ def T_autoignition_methods(CASRN):
     T_autoignition
     """
     if not _safety_data_loaded: _load_safety_data()
-    return list_available_methods_from_df_dict(Tautoignition_sources, CASRN, 'T_autoignition')
+    return list_available_methods_from_df_dict(Tautoignition_sources, CASRN, "T_autoignition")
 
 @mark_numba_incompatible
 def T_autoignition(CASRN, method=None):
-    r'''
+    r"""
     This function handles the retrieval or calculation of a chemical's
     autoifnition temperature. Lookup is based on CASRNs. No predictive methods
     are currently implemented. Will automatically select a data source to use
@@ -959,15 +959,15 @@ def T_autoignition(CASRN, method=None):
        Practice for the Classification of Flammable Liquids, Gases, or Vapors
        and of Hazardous. NFPA, 2008.
     .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'T_autoignition')
+        val, found = database_constant_lookup(CASRN, "T_autoignition")
         if found: return val
     if not _safety_data_loaded: _load_safety_data()
     if method:
-        return retrieve_from_df_dict(Tautoignition_sources, CASRN, 'T_autoignition', method)
+        return retrieve_from_df_dict(Tautoignition_sources, CASRN, "T_autoignition", method)
     else:
-        return retrieve_any_from_df_dict(Tautoignition_sources, CASRN, 'T_autoignition')
+        return retrieve_any_from_df_dict(Tautoignition_sources, CASRN, "T_autoignition")
 
 
 
@@ -975,7 +975,7 @@ LFL_all_methods = (IEC, NFPA, miscdata.WIKIDATA, SUZUKI, CROWLLOUVAR)
 """Tuple of method name keys. See the :obj:`LFL` for the actual references"""
 
 @mark_numba_incompatible
-def LFL_methods(Hc=None, atoms=None, CASRN=''):
+def LFL_methods(Hc=None, atoms=None, CASRN=""):
     """Return all methods available to obtain LFL for the desired chemical.
 
     Parameters
@@ -1004,7 +1004,7 @@ def LFL_methods(Hc=None, atoms=None, CASRN=''):
     ['IEC 60079-20-1 (2010)', 'NFPA 497 (2008)', 'Suzuki (1994)', 'Crowl and Louvar (2001)']
     """
     if not _safety_data_loaded: _load_safety_data()
-    methods = list_available_methods_from_df_dict(LFL_sources, CASRN, 'LFL')
+    methods = list_available_methods_from_df_dict(LFL_sources, CASRN, "LFL")
     if Hc is not None:
         methods.append(SUZUKI)
     if atoms is not None:
@@ -1013,7 +1013,7 @@ def LFL_methods(Hc=None, atoms=None, CASRN=''):
 
 @mark_numba_incompatible
 def LFL_estimate(Hc=None, atoms=None, method=None):
-    r'''This function handles the estimation of a chemical's Lower Flammability Limit
+    r"""This function handles the estimation of a chemical's Lower Flammability Limit
     based on heat of combustion or atomic composition. Will automatically
     select an estimation method if no Method is provided; returns None if the
     estimation cannot be performed.
@@ -1040,7 +1040,7 @@ def LFL_estimate(Hc=None, atoms=None, method=None):
     -----
     If the heat of combustion is provided, the estimation method :obj:`Suzuki_LFL` can be used.
     If the atoms of the molecule are available, the method :obj:`Crowl_Louvar_LFL` can be used.
-    '''
+    """
     if not method:
         if Hc == 0.0:
             return None
@@ -1056,7 +1056,7 @@ def LFL_estimate(Hc=None, atoms=None, method=None):
     return None
 
 @mark_numba_incompatible
-def LFL(Hc=None, atoms=None, CASRN='', method=None):
+def LFL(Hc=None, atoms=None, CASRN="", method=None):
     r'''This function handles the retrieval or calculation of a chemical's
     Lower Flammability Limit. Lookup is based on CASRNs. Will automatically
     select a data source to use if no Method is provided; returns None if the
@@ -1110,24 +1110,24 @@ def LFL(Hc=None, atoms=None, CASRN='', method=None):
     .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'LFL')
+        val, found = database_constant_lookup(CASRN, "LFL")
         if found: return val
     if not _safety_data_loaded: _load_safety_data()
     if not method:
-        LFL = retrieve_any_from_df_dict(LFL_sources, CASRN, 'LFL')
+        LFL = retrieve_any_from_df_dict(LFL_sources, CASRN, "LFL")
         if not LFL:
             LFL = LFL_estimate(Hc, atoms)
         return LFL
     elif method in [SUZUKI, CROWLLOUVAR]:
         return LFL_estimate(Hc, atoms, method)
     else:
-        return retrieve_from_df_dict(LFL_sources, CASRN, 'LFL', method)
+        return retrieve_from_df_dict(LFL_sources, CASRN, "LFL", method)
 
 UFL_all_methods = (IEC, NFPA, miscdata.WIKIDATA, SUZUKI, CROWLLOUVAR)
 """Tuple of method name keys. See the :obj:`UFL` for the actual references"""
 
 @mark_numba_incompatible
-def UFL_methods(Hc=None, atoms=None, CASRN=''):
+def UFL_methods(Hc=None, atoms=None, CASRN=""):
     """Return all methods available to obtain UFL for the desired chemical.
 
     Parameters
@@ -1156,7 +1156,7 @@ def UFL_methods(Hc=None, atoms=None, CASRN=''):
     ['IEC 60079-20-1 (2010)', 'NFPA 497 (2008)', 'Suzuki (1994)', 'Crowl and Louvar (2001)']
     """
     if not _safety_data_loaded: _load_safety_data()
-    methods = list_available_methods_from_df_dict(UFL_sources, CASRN, 'UFL')
+    methods = list_available_methods_from_df_dict(UFL_sources, CASRN, "UFL")
     if Hc is not None:
         methods.append(SUZUKI)
     if atoms is not None:
@@ -1166,7 +1166,7 @@ def UFL_methods(Hc=None, atoms=None, CASRN=''):
 
 @mark_numba_incompatible
 def UFL_estimate(Hc=None, atoms=None, method=None):
-    r'''This function handles the estimation of a chemical's Upper Flammability Limit
+    r"""This function handles the estimation of a chemical's Upper Flammability Limit
     based on heat of combustion or atomic composition. Will automatically
     select an estimation method if no Method is provided; returns None if the
     estimation cannot be performed.
@@ -1193,7 +1193,7 @@ def UFL_estimate(Hc=None, atoms=None, method=None):
     -----
     If the heat of combustion is provided, the estimation method :obj:`Suzuki_UFL` can be used.
     If the atoms of the molecule are available, the method :obj:`Crowl_Louvar_UFL` can be used.
-    '''
+    """
     if not method:
         if Hc is not None:
             return Suzuki_UFL(Hc)
@@ -1207,7 +1207,7 @@ def UFL_estimate(Hc=None, atoms=None, method=None):
     return None
 
 @mark_numba_incompatible
-def UFL(Hc=None, atoms=None, CASRN='', method=None):
+def UFL(Hc=None, atoms=None, CASRN="", method=None):
     r'''This function handles the retrieval or calculation of a chemical's
     Upper Flammability Limit. Lookup is based on CASRNs. Two predictive methods
     are currently implemented. Will automatically select a data source to use
@@ -1264,38 +1264,38 @@ def UFL(Hc=None, atoms=None, CASRN='', method=None):
     .. [3] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'UFL')
+        val, found = database_constant_lookup(CASRN, "UFL")
         if found: return val
     if not _safety_data_loaded: _load_safety_data()
     if not method:
-        UFL = retrieve_any_from_df_dict(UFL_sources, CASRN, 'UFL')
+        UFL = retrieve_any_from_df_dict(UFL_sources, CASRN, "UFL")
         if not UFL:
             UFL = UFL_estimate(Hc, atoms)
         return UFL
     elif method in [SUZUKI, CROWLLOUVAR]:
         return UFL_estimate(Hc, atoms, method)
     else:
-        return retrieve_from_df_dict(UFL_sources, CASRN, 'UFL', method)
+        return retrieve_from_df_dict(UFL_sources, CASRN, "UFL", method)
 
 ISO_10156_2017_Kks = {
-    '7782-44-7': 1.0, # O2,
-    '7727-37-9': 1.0, # N2
-    '124-38-9': 1.5, # CO2
-    '7440-59-7': 0.9, # He
-    '7440-37-1': 0.55, # Ar
-    '7440-01-9': 0.7, # Ne
-    '7439-90-9': 0.5, # Kr
-    '7440-63-3': 0.5, # Xe
-    '7446-09-5': 1.5, # SO2
-    '2551-62-4': 4.0, # SF6
-    '75-73-0': 2.0, # CF4
-    '76-19-7': 1.5, # C3F8
-    '354-33-6': 3.5, # C2HF5
+    "7782-44-7": 1.0, # O2,
+    "7727-37-9": 1.0, # N2
+    "124-38-9": 1.5, # CO2
+    "7440-59-7": 0.9, # He
+    "7440-37-1": 0.55, # Ar
+    "7440-01-9": 0.7, # Ne
+    "7439-90-9": 0.5, # Kr
+    "7440-63-3": 0.5, # Xe
+    "7446-09-5": 1.5, # SO2
+    "2551-62-4": 4.0, # SF6
+    "75-73-0": 2.0, # CF4
+    "76-19-7": 1.5, # C3F8
+    "354-33-6": 3.5, # C2HF5
 }
 
 @mark_numba_incompatible
 def LFL_ISO_10156_2017(zs, LFLs, CASs):
-    r'''Calculate the lower flammability limit of a mixture of combustible gases
+    r"""Calculate the lower flammability limit of a mixture of combustible gases
     and inert gases according to ISO 10156 (2017) [1]_.
 
     .. math::
@@ -1351,7 +1351,7 @@ def LFL_ISO_10156_2017(zs, LFLs, CASs):
     .. [1] Standardization, International Organization for. ISO 10156: 2017 :
        Gas Cylinders - Gases and Gas Mixtures - Determination of Fire Potential
        and Oxidizing Ability for the Selection of Cylinder Valve Outlets, 2017.
-    '''
+    """
     has_inerts = False
     for CAS in CASs:
         if CAS in ISO_10156_2017_Kks:
@@ -1395,7 +1395,7 @@ def LFL_ISO_10156_2017(zs, LFLs, CASs):
     return 1.0/tot
 
 def fire_mixing(ys, FLs):
-    '''Le Chatelier's mixing rule for lower and upper flammability limits of
+    """Le Chatelier's mixing rule for lower and upper flammability limits of
     mixtures of gases.
 
     Parameters
@@ -1432,7 +1432,7 @@ def fire_mixing(ys, FLs):
     .. [1] Crowl, Daniel A., and Joseph F. Louvar. Chemical Process Safety:
        Fundamentals with Applications. 2E. Upper Saddle River, N.J: Prentice
        Hall, 2001.
-    '''
+    """
     tot = 0.0
     for i in range(len(ys)):
         tot += ys[i]/FLs[i]
@@ -1583,14 +1583,14 @@ def Crowl_Louvar_LFL(atoms):
        (February 1, 1938): 1-26. doi:10.1021/cr60071a001
     '''
     nC, nH, nO = 0, 0, 0
-    if atoms.get('C'):
-        nC = atoms['C']
+    if atoms.get("C"):
+        nC = atoms["C"]
     else:
         return None
-    if 'H' in atoms:
-        nH = atoms['H']
-    if 'O' in atoms:
-        nO = atoms['O']
+    if "H" in atoms:
+        nH = atoms["H"]
+    if "O" in atoms:
+        nO = atoms["O"]
     return 0.55/(4.76*nC + 1.19*nH - 2.38*nO + 1.)
 
 @mark_numba_incompatible
@@ -1636,18 +1636,18 @@ def Crowl_Louvar_UFL(atoms):
        (February 1, 1938): 1-26. doi:10.1021/cr60071a001
     '''
     nC, nH, nO = 0, 0, 0
-    if atoms.get('C'):
-        nC = atoms['C']
+    if atoms.get("C"):
+        nC = atoms["C"]
     else:
         return None
-    if 'H' in atoms:
-        nH = atoms['H']
-    if 'O' in atoms:
-        nO = atoms['O']
+    if "H" in atoms:
+        nH = atoms["H"]
+    if "O" in atoms:
+        nO = atoms["O"]
     return 3.5/(4.76*nC + 1.19*nH - 2.38*nO + 1.)
 
 def NFPA_30_classification(T_flash, Tb=None, Psat_100F=None):
-    r'''Classify a chemical's flammability/combustibility according
+    r"""Classify a chemical's flammability/combustibility according
     to the NFPA 30 standard Flammable and Combustible Liquids Code.
 
     * Class IA: Flash Point < 73°F; Boiling Point < 100°F
@@ -1697,7 +1697,7 @@ def NFPA_30_classification(T_flash, Tb=None, Psat_100F=None):
     .. [1] NFPA (National Fire Prevention Association). NFPA 30: Flammable and
        Combustible Liquids Code, 2008. National Fire Protection Association
        (NFPA), 2007.
-    '''
+    """
     F_100 = 310.92777777777777
     F_73 = 295.92777777777775
     F_140 = 333.15
@@ -1714,16 +1714,16 @@ def NFPA_30_classification(T_flash, Tb=None, Psat_100F=None):
         if T_flash < F_73 and not Tb_above_100F:
             # Also unstable flammable liquids
             # ethylene oxide, methyl chloride, pentane should go here
-            return 'IA'
+            return "IA"
         elif T_flash < F_73 and Tb_above_100F:
             # acetone, benzene, ethyl alcohol, and isopropyl alcohol.
-            return 'IB'
+            return "IB"
         elif F_73 <= T_flash < F_100:
             # butyl alcohol, diethyl glycol, styrene, and turpentine.
-            return 'IC'
+            return "IC"
     if F_100 <= T_flash < F_140:
-        return 'II'
+        return "II"
     if F_140 <= T_flash < F_200:
-        return 'IIIA'
+        return "IIIA"
     if F_200 <= T_flash:
-        return 'IIIB'
+        return "IIIB"

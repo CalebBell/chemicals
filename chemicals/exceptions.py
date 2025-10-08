@@ -34,11 +34,11 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 """
 
 __all__ = [
-    'OverspeficiedError',
-    'PhaseCountReducedError',
-    'PhaseExistenceImpossible',
-    'TrivialSolutionError',
-    'UnderspecifiedError',
+    "OverspeficiedError",
+    "PhaseCountReducedError",
+    "PhaseExistenceImpossible",
+    "TrivialSolutionError",
+    "UnderspecifiedError",
 ]
 
 class UnderspecifiedError(Exception):

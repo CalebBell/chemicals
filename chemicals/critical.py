@@ -82,34 +82,34 @@ Critical Volume of Mixtures
 """
 
 __all__ = [
-    'Chueh_Prausnitz_Tc',
-    'Chueh_Prausnitz_Vc',
-    'Grieves_Thodos',
-    'Grigoras',
-    'Hekayati_Raeissi',
-    'Ihmels',
-    'Li',
-    'Meissner',
-    'Mersmann_Kind_predictor',
-    'Pc',
-    'Pc_all_methods',
-    'Pc_methods',
-    'Tb_Tc_relationship',
-    'Tc',
-    'Tc_all_methods',
-    'Tc_methods',
-    'Vc',
-    'Vc_all_methods',
-    'Vc_methods',
-    'Zc',
-    'Zc_all_methods',
-    'Zc_methods',
-    'critical_surface',
-    'critical_surface_all_methods',
-    'critical_surface_methods',
-    'modified_Wilson_Tc',
-    'modified_Wilson_Vc',
-    'third_property',
+    "Chueh_Prausnitz_Tc",
+    "Chueh_Prausnitz_Vc",
+    "Grieves_Thodos",
+    "Grigoras",
+    "Hekayati_Raeissi",
+    "Ihmels",
+    "Li",
+    "Meissner",
+    "Mersmann_Kind_predictor",
+    "Pc",
+    "Pc_all_methods",
+    "Pc_methods",
+    "Tb_Tc_relationship",
+    "Tc",
+    "Tc_all_methods",
+    "Tc_methods",
+    "Vc",
+    "Vc_all_methods",
+    "Vc_methods",
+    "Zc",
+    "Zc_all_methods",
+    "Zc_methods",
+    "critical_surface",
+    "critical_surface_all_methods",
+    "critical_surface_methods",
+    "modified_Wilson_Tc",
+    "modified_Wilson_Vc",
+    "third_property",
 ]
 
 
@@ -128,17 +128,17 @@ from chemicals.data_reader import (
 )
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
-folder = os_path_join(source_path, 'Critical Properties')
-IUPAC = 'IUPAC'
-MATTHEWS = 'MATTHEWS'
-CRC = 'CRC'
-PSRK = 'PSRK'
-PD = 'PD'
-YAWS = 'YAWS'
-PINAMARTINES = 'PINAMARTINES'
-FEDORS = 'FEDORS'
-WILSON_JASPERSON = 'WILSON_JASPERSON'
-ACENTRIC_DEFINITION = 'ACENTRIC_DEFINITION'
+folder = os_path_join(source_path, "Critical Properties")
+IUPAC = "IUPAC"
+MATTHEWS = "MATTHEWS"
+CRC = "CRC"
+PSRK = "PSRK"
+PD = "PD"
+YAWS = "YAWS"
+PINAMARTINES = "PINAMARTINES"
+FEDORS = "FEDORS"
+WILSON_JASPERSON = "WILSON_JASPERSON"
+ACENTRIC_DEFINITION = "ACENTRIC_DEFINITION"
 
 ### Register data sources and lazy load them
 
@@ -147,25 +147,25 @@ def _add_Zc_to_df(df):
     # Some files don't have the `Zc` column; this adds it
     # TODO: Think about adding these to the files
     import pandas as pd
-    if 'Zc' in df: return
-    df['Zc'] = pd.Series(df['Pc']*df['Vc']*R_inv/df['Tc'], index=df.index)
+    if "Zc" in df: return
+    df["Zc"] = pd.Series(df["Pc"]*df["Vc"]*R_inv/df["Tc"], index=df.index)
 
 # IUPAC Organic data series
 # TODO: 12E of this data http://pubsdc3.acs.org/doi/10.1021/acs.jced.5b00571
-register_df_source(folder, 'IUPACOrganicCriticalProps.tsv')
+register_df_source(folder, "IUPACOrganicCriticalProps.tsv")
 
 # CRC Handbook from TRC Organic data section (only in 2015)
 # No Inorganic table was taken, although it is already present;
 # data almost all from IUPAC
-register_df_source(folder, 'CRCCriticalOrganics.tsv', postload=_add_Zc_to_df)
-register_df_source(folder, 'Mathews1972InorganicCriticalProps.tsv')
-register_df_source(folder, 'Appendix to PSRK Revision 4.tsv', postload=_add_Zc_to_df)
-register_df_source(folder, 'PassutDanner1973.tsv')
-register_df_source(folder, 'Yaws Collection.tsv', postload=_add_Zc_to_df)
-register_df_source(folder, 'DIPPRPinaMartines.tsv', postload=_add_Zc_to_df)
-register_df_source(folder, 'wilson_jasperson_Tc_Pc_predictions.tsv', int_CAS=True)
-register_df_source(folder, 'fedors_Vc_predictions.tsv', int_CAS=True)
-register_df_source(folder, 'omega_Psat_Tc_predictions.tsv', int_CAS=True)
+register_df_source(folder, "CRCCriticalOrganics.tsv", postload=_add_Zc_to_df)
+register_df_source(folder, "Mathews1972InorganicCriticalProps.tsv")
+register_df_source(folder, "Appendix to PSRK Revision 4.tsv", postload=_add_Zc_to_df)
+register_df_source(folder, "PassutDanner1973.tsv")
+register_df_source(folder, "Yaws Collection.tsv", postload=_add_Zc_to_df)
+register_df_source(folder, "DIPPRPinaMartines.tsv", postload=_add_Zc_to_df)
+register_df_source(folder, "wilson_jasperson_Tc_Pc_predictions.tsv", int_CAS=True)
+register_df_source(folder, "fedors_Vc_predictions.tsv", int_CAS=True)
+register_df_source(folder, "omega_Psat_Tc_predictions.tsv", int_CAS=True)
 
 _critical_data_loaded = False
 @mark_numba_incompatible
@@ -175,16 +175,16 @@ def _load_critical_data():
     global critical_data_WilsonJasperson, critical_data_Fedors, critical_data_omega_Psat_Tc
     global Tc_sources, Pc_sources, Vc_sources, Zc_sources, omega_sources
     global _critical_data_loaded
-    critical_data_IUPAC = data_source('IUPACOrganicCriticalProps.tsv')
-    critical_data_Matthews = data_source('Mathews1972InorganicCriticalProps.tsv')
-    critical_data_CRC = data_source('CRCCriticalOrganics.tsv')
-    critical_data_PSRKR4 = data_source('Appendix to PSRK Revision 4.tsv')
-    critical_data_Yaws = data_source('Yaws Collection.tsv')
-    critical_data_PassutDanner = data_source('PassutDanner1973.tsv')
-    critical_data_PinaMartines = data_source('DIPPRPinaMartines.tsv')
-    critical_data_WilsonJasperson = data_source('wilson_jasperson_Tc_Pc_predictions.tsv')
-    critical_data_Fedors = data_source('fedors_Vc_predictions.tsv')
-    critical_data_omega_Psat_Tc = data_source('omega_Psat_Tc_predictions.tsv')
+    critical_data_IUPAC = data_source("IUPACOrganicCriticalProps.tsv")
+    critical_data_Matthews = data_source("Mathews1972InorganicCriticalProps.tsv")
+    critical_data_CRC = data_source("CRCCriticalOrganics.tsv")
+    critical_data_PSRKR4 = data_source("Appendix to PSRK Revision 4.tsv")
+    critical_data_Yaws = data_source("Yaws Collection.tsv")
+    critical_data_PassutDanner = data_source("PassutDanner1973.tsv")
+    critical_data_PinaMartines = data_source("DIPPRPinaMartines.tsv")
+    critical_data_WilsonJasperson = data_source("wilson_jasperson_Tc_Pc_predictions.tsv")
+    critical_data_Fedors = data_source("fedors_Vc_predictions.tsv")
+    critical_data_omega_Psat_Tc = data_source("omega_Psat_Tc_predictions.tsv")
     _critical_data_loaded = True
     Tc_sources = {
         miscdata.HEOS: miscdata.heos_data,
@@ -239,14 +239,14 @@ def _load_critical_data():
     }
 
 def __getattr__(name):
-    if name in ('critical_data_IUPAC', 'critical_data_Matthews',
-                'critical_data_CRC', 'critical_data_PSRKR4',
-                'critical_data_Yaws', 'critical_data_PassutDanner',
-                'critical_data_PinaMartines',
-                'critical_data_WilsonJasperson', 'critical_data_Fedors',
-                'critical_data_omega_Psat_Tc',
-                'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
-                'omega_sources'):
+    if name in ("critical_data_IUPAC", "critical_data_Matthews",
+                "critical_data_CRC", "critical_data_PSRKR4",
+                "critical_data_Yaws", "critical_data_PassutDanner",
+                "critical_data_PinaMartines",
+                "critical_data_WilsonJasperson", "critical_data_Fedors",
+                "critical_data_omega_Psat_Tc",
+                "Tc_sources", "Pc_sources", "Vc_sources", "Zc_sources",
+                "omega_sources"):
         _load_critical_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -293,7 +293,7 @@ def Tc_methods(CASRN):
     Tc
     """
     if not _critical_data_loaded: _load_critical_data()
-    return list_available_methods_from_df_dict(Tc_sources, CASRN, 'Tc')
+    return list_available_methods_from_df_dict(Tc_sources, CASRN, "Tc")
 
 @mark_numba_incompatible
 def Tc(CASRN, method=None):
@@ -449,13 +449,13 @@ def Tc(CASRN, method=None):
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Tc')
+        val, found = database_constant_lookup(CASRN, "Tc")
         if found: return val
     if not _critical_data_loaded: _load_critical_data()
     if method:
-        return retrieve_from_df_dict(Tc_sources, CASRN, 'Tc', method)
+        return retrieve_from_df_dict(Tc_sources, CASRN, "Tc", method)
     else:
-        return retrieve_any_from_df_dict(Tc_sources, CASRN, 'Tc')
+        return retrieve_any_from_df_dict(Tc_sources, CASRN, "Tc")
 
 Pc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, WILSON_JASPERSON, miscdata.JOBACK)
 """Tuple of method name keys. See the `Pc` for the actual references"""
@@ -480,7 +480,7 @@ def Pc_methods(CASRN):
     Pc
     """
     if not _critical_data_loaded: _load_critical_data()
-    return list_available_methods_from_df_dict(Pc_sources, CASRN, 'Pc')
+    return list_available_methods_from_df_dict(Pc_sources, CASRN, "Pc")
 
 @mark_numba_incompatible
 def Pc(CASRN, method=None):
@@ -636,13 +636,13 @@ def Pc(CASRN, method=None):
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Pc')
+        val, found = database_constant_lookup(CASRN, "Pc")
         if found: return val
     if not _critical_data_loaded: _load_critical_data()
     if method:
-        return retrieve_from_df_dict(Pc_sources, CASRN, 'Pc', method)
+        return retrieve_from_df_dict(Pc_sources, CASRN, "Pc", method)
     else:
-        return retrieve_any_from_df_dict(Pc_sources, CASRN, 'Pc')
+        return retrieve_any_from_df_dict(Pc_sources, CASRN, "Pc")
 
 Vc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, FEDORS, miscdata.JOBACK)
 """Tuple of method name keys. See the `Vc` for the actual references"""
@@ -667,7 +667,7 @@ def Vc_methods(CASRN):
     Vc
     """
     if not _critical_data_loaded: _load_critical_data()
-    return list_available_methods_from_df_dict(Vc_sources, CASRN, 'Vc')
+    return list_available_methods_from_df_dict(Vc_sources, CASRN, "Vc")
 
 @mark_numba_incompatible
 def Vc(CASRN, method=None):
@@ -816,13 +816,13 @@ def Vc(CASRN, method=None):
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Vc')
+        val, found = database_constant_lookup(CASRN, "Vc")
         if found: return val
     if not _critical_data_loaded: _load_critical_data()
     if method:
-        return retrieve_from_df_dict(Vc_sources, CASRN, 'Vc', method)
+        return retrieve_from_df_dict(Vc_sources, CASRN, "Vc", method)
     else:
-        return retrieve_any_from_df_dict(Vc_sources, CASRN, 'Vc')
+        return retrieve_any_from_df_dict(Vc_sources, CASRN, "Vc")
 
 Zc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, PINAMARTINES, YAWS, miscdata.JOBACK)
 """Tuple of method name keys. See the `Zc` for the actual references"""
@@ -847,7 +847,7 @@ def Zc_methods(CASRN):
     Zc
     """
     if not _critical_data_loaded: _load_critical_data()
-    return list_available_methods_from_df_dict(Zc_sources, CASRN, 'Zc')
+    return list_available_methods_from_df_dict(Zc_sources, CASRN, "Zc")
 
 @mark_numba_incompatible
 def Zc(CASRN, method=None):
@@ -993,56 +993,56 @@ def Zc(CASRN, method=None):
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Zc')
+        val, found = database_constant_lookup(CASRN, "Zc")
         if found: return val
     if not _critical_data_loaded: _load_critical_data()
     if method:
-        return retrieve_from_df_dict(Zc_sources, CASRN, 'Zc', method)
+        return retrieve_from_df_dict(Zc_sources, CASRN, "Zc", method)
     else:
-        return retrieve_any_from_df_dict(Zc_sources, CASRN, 'Zc')
+        return retrieve_any_from_df_dict(Zc_sources, CASRN, "Zc")
 
-rcovs_Mersmann_Kind = {'C': 0.77, 'Cl': 0.99, 'I': 1.33, 'H': 0.37, 'F': 0.71,
-                       'S': 1.04, 'O': 0.6, 'N': 0.71, 'Si': 1.17, 'Br': 1.14}
+rcovs_Mersmann_Kind = {"C": 0.77, "Cl": 0.99, "I": 1.33, "H": 0.37, "F": 0.71,
+                       "S": 1.04, "O": 0.6, "N": 0.71, "Si": 1.17, "Br": 1.14}
 
 rcovs_regressed =  {
-    'Nb': 0.5139380605234125,
-    'Ne': 0.7708216694154189,
-    'Al': 1.004994775098707,
-    'Re': 1.1164444694484814,
-    'Rb': 2.9910506044828837,
-    'Rn': 1.9283158156480653,
-    'Xe': 1.694221043013319,
-    'Ta': 1.1185133195453156,
-    'Bi': 1.8436438207262267,
-    'Br': 1.3081458724155532,
-    'Hf': 0.8829545460486594,
-    'Mo': 0.740396259301556,
-    'He': 0.9808144122544257,
-    'C': 0.6068586007600608,
-    'B': 0.7039677272439753,
-    'F': 0.5409105884533288,
-    'I': 1.7262432419406561,
-    'H': 0.33296601702348533,
-    'K': 0.7384112258842432,
-    'O': 0.5883254088243008,
-    'N': 0.5467979701131293,
-    'P': 1.0444655158949694,
-    'Si': 1.4181434041348049,
-    'U': 1.5530287578073485,
-    'Sn': 1.3339487990207999,
-    'W': 0.8355335838735266,
-    'V': 0.6714619384794069,
-    'Sb': 0.8840680681215854,
-    'Se': 1.5747549515496795,
-    'Ge': 1.0730584829731715,
-    'Kr': 1.393999829252709,
-    'Cl': 1.0957835025011224,
-    'S': 1.0364452121761167,
-    'Hg': 0.6750818243474633,
-    'As': 0.6750687692915264,
-    'Ar': 1.2008872952022298,
-    'Cs': 3.433699060142929,
-    'Zr': 0.9346554283483623}
+    "Nb": 0.5139380605234125,
+    "Ne": 0.7708216694154189,
+    "Al": 1.004994775098707,
+    "Re": 1.1164444694484814,
+    "Rb": 2.9910506044828837,
+    "Rn": 1.9283158156480653,
+    "Xe": 1.694221043013319,
+    "Ta": 1.1185133195453156,
+    "Bi": 1.8436438207262267,
+    "Br": 1.3081458724155532,
+    "Hf": 0.8829545460486594,
+    "Mo": 0.740396259301556,
+    "He": 0.9808144122544257,
+    "C": 0.6068586007600608,
+    "B": 0.7039677272439753,
+    "F": 0.5409105884533288,
+    "I": 1.7262432419406561,
+    "H": 0.33296601702348533,
+    "K": 0.7384112258842432,
+    "O": 0.5883254088243008,
+    "N": 0.5467979701131293,
+    "P": 1.0444655158949694,
+    "Si": 1.4181434041348049,
+    "U": 1.5530287578073485,
+    "Sn": 1.3339487990207999,
+    "W": 0.8355335838735266,
+    "V": 0.6714619384794069,
+    "Sb": 0.8840680681215854,
+    "Se": 1.5747549515496795,
+    "Ge": 1.0730584829731715,
+    "Kr": 1.393999829252709,
+    "Cl": 1.0957835025011224,
+    "S": 1.0364452121761167,
+    "Hg": 0.6750818243474633,
+    "As": 0.6750687692915264,
+    "Ar": 1.2008872952022298,
+    "Cs": 3.433699060142929,
+    "Zr": 0.9346554283483623}
 
 @mark_numba_incompatible
 def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
@@ -1123,12 +1123,12 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
        Pressure." Industrial & Engineering Chemistry Research, January 31,
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     '''
-    H_RADIUS_COV = covalent_radii['H']
+    H_RADIUS_COV = covalent_radii["H"]
     tot = 0
     atom_count = 0
     for atom, count in atoms.items():
         if atom not in covalent_radii:
-            raise Exception(f'Atom {atom} is not supported by the supplied dictionary')
+            raise Exception(f"Atom {atom} is not supported by the supplied dictionary")
         tot += count*covalent_radii[atom]
         atom_count += count
     da = 2.*tot/atom_count
@@ -1138,8 +1138,8 @@ def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
 
 ### Property Relationships
 
-def Tb_Tc_relationship(Tb=None, Tc=None, fit='Perry8E'):
-    r'''This function relates the normal boiling point and the critical point
+def Tb_Tc_relationship(Tb=None, Tc=None, fit="Perry8E"):
+    r"""This function relates the normal boiling point and the critical point
     of a compound. It is inspired by the relationship shown in [1]_ on page
     2-468 for inorganic compounds.
 
@@ -1205,36 +1205,36 @@ def Tb_Tc_relationship(Tb=None, Tc=None, fit='Perry8E'):
     ----------
     .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        Eighth Edition. McGraw-Hill Professional, 2007.
-    '''
+    """
     if (Tb is None and Tc is None) or (Tc is not None and Tb is not None):
         raise ValueError("This function relates boiling and critical temperature; only one value must be provided")
-    if fit == 'Perry8E':
+    if fit == "Perry8E":
         coeff = 1.64
-    elif fit == 'Chemicals2021FitInorganic':
+    elif fit == "Chemicals2021FitInorganic":
         coeff = 1.606
-    elif fit == 'Chemicals2021FitOrganic':
+    elif fit == "Chemicals2021FitOrganic":
         coeff = 1.453
-    elif fit == 'Chemicals2021FitElements':
+    elif fit == "Chemicals2021FitElements":
         coeff = 1.748
-    elif fit == 'Chemicals2021FitBinary':
+    elif fit == "Chemicals2021FitBinary":
         coeff = 1.568
-    elif fit == 'Chemicals2021FitTernary':
+    elif fit == "Chemicals2021FitTernary":
         coeff = 1.601
-    elif fit == 'Chemicals2021FitCl':
+    elif fit == "Chemicals2021FitCl":
         coeff = 1.558
-    elif fit == 'Chemicals2021FitN':
+    elif fit == "Chemicals2021FitN":
         coeff = 1.616
-    elif fit == 'Chemicals2021FitC':
+    elif fit == "Chemicals2021FitC":
         coeff = 1.611
-    elif fit == 'Chemicals2021FitF':
+    elif fit == "Chemicals2021FitF":
         coeff = 1.573
-    elif fit == 'Chemicals2021FitO':
+    elif fit == "Chemicals2021FitO":
         coeff = 1.613
-    elif fit == 'Chemicals2021FitI':
+    elif fit == "Chemicals2021FitI":
         coeff = 1.452
-    elif fit == 'Chemicals2021FitBr':
+    elif fit == "Chemicals2021FitBr":
         coeff = 1.564
-    elif fit == 'Chemicals2021FitSi':
+    elif fit == "Chemicals2021FitSi":
         coeff = 1.526
     else:
         raise ValueError("Unrecognized method")
@@ -1252,7 +1252,7 @@ def _assert_two_critical_properties_provided(Tc, Pc, Vc):
     if Vc is not None:
         specs += 1
     if specs != 2:
-        raise ValueError('Two and only two of Tc, Pc, and Vc must be provided')
+        raise ValueError("Two and only two of Tc, Pc, and Vc must be provided")
 
 def Ihmels(Tc=None, Pc=None, Vc=None):
     r'''Most recent, and most recommended method of estimating critical
@@ -1560,9 +1560,9 @@ def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
     Vc *= 1e-3
     return (Tc_ans, Pc_ans, Vc)
 
-IHMELS = 'IHMELS'
-MEISSNER = 'MEISSNER'
-GRIGORAS = 'GRIGORAS'
+IHMELS = "IHMELS"
+MEISSNER = "MEISSNER"
+GRIGORAS = "GRIGORAS"
 critical_surface_all_methods = (IHMELS, MEISSNER, GRIGORAS)
 
 @mark_numba_incompatible
@@ -1599,7 +1599,7 @@ def critical_surface_methods(Tc=None, Pc=None, Vc=None):
 @mark_numba_incompatible
 def critical_surface(Tc=None, Pc=None, Vc=None,
                      method=None):
-    r'''Function for calculating a critical property of a substance from its
+    r"""Function for calculating a critical property of a substance from its
     other two critical properties. Calls functions Ihmels, Meissner, and
     Grigoras, each of which use a general 'Critical surface' type of equation.
     Limited accuracy is expected due to very limited theoretical backing.
@@ -1631,7 +1631,7 @@ def critical_surface(Tc=None, Pc=None, Vc=None,
     --------
     critical_surface_methods_methods
 
-    '''
+    """
     # Numba compatibility should come eventually with no work done here
     if not method or method == IHMELS:
         return Ihmels(Tc=Tc, Pc=Pc, Vc=Vc)
@@ -1644,7 +1644,7 @@ def critical_surface(Tc=None, Pc=None, Vc=None,
 
 @mark_numba_incompatible
 def third_property(CASRN=None, T=False, P=False, V=False):
-    r'''Function for calculating a critical property of a substance from its
+    r"""Function for calculating a critical property of a substance from its
     other two critical properties, but retrieving the actual other critical
     values for convenient calculation.
     Calls functions Ihmels, Meissner, and
@@ -1678,7 +1678,7 @@ def third_property(CASRN=None, T=False, P=False, V=False):
 
     >>> third_property('110-15-6', P=True)
     6095016.233766234
-    '''
+    """
     specs = 0
     if T:
         specs += 1

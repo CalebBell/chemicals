@@ -56,16 +56,16 @@ Pure Component Liquid Fit Correlations
 """
 
 __all__ = [
-    'RI',
-    'RI_IAPWS',
-    'RI_all_methods',
-    'RI_from_molar_refractivity',
-    'RI_methods',
-    'RI_to_brix',
-    'TDE_RIXExpansion',
-    'brix_to_RI',
-    'molar_refractivity_from_RI',
-    'polarizability_from_RI',
+    "RI",
+    "RI_IAPWS",
+    "RI_all_methods",
+    "RI_from_molar_refractivity",
+    "RI_methods",
+    "RI_to_brix",
+    "TDE_RIXExpansion",
+    "brix_to_RI",
+    "molar_refractivity_from_RI",
+    "polarizability_from_RI",
 ]
 
 from fluids.constants import N_A, pi
@@ -85,24 +85,24 @@ from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 # Register data sources and lazy load them
 
-folder = os_path_join(source_path, 'Misc')
-register_df_source(folder, 'CRC Handbook Organic RI.csv',
-                   csv_kwargs={'dtype': {'RI': float, 'RIT': float}})
+folder = os_path_join(source_path, "Misc")
+register_df_source(folder, "CRC Handbook Organic RI.csv",
+                   csv_kwargs={"dtype": {"RI": float, "RIT": float}})
 
-CRC = 'CRC'
+CRC = "CRC"
 
 _RI_data_loaded = False
 @mark_numba_incompatible
 def _load_RI_data():
     global _RI_data_loaded, RI_data_CRC_organic, RI_sources
-    RI_data_CRC_organic = data_source('CRC Handbook Organic RI.csv')
+    RI_data_CRC_organic = data_source("CRC Handbook Organic RI.csv")
     RI_sources = {
         CRC: RI_data_CRC_organic,
         miscdata.WIKIDATA: miscdata.wikidata_data
     }
 
 def __getattr__(name):
-    if name in ('RI_data_CRC_organic', 'RI_sources'):
+    if name in ("RI_data_CRC_organic", "RI_sources"):
         _load_RI_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -133,7 +133,7 @@ def RI_methods(CASRN):
     RI
     """
     if not _RI_data_loaded: _load_RI_data()
-    return list_available_methods_from_df_dict(RI_sources, CASRN, 'RI')
+    return list_available_methods_from_df_dict(RI_sources, CASRN, "RI")
 
 @mark_numba_incompatible
 def RI(CASRN, method=None):
@@ -185,11 +185,11 @@ def RI(CASRN, method=None):
     .. [2] Wikidata. Wikidata. Accessed via API. https://www.wikidata.org/
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        RI, found = database_constant_lookup(CASRN, 'RI')
-        RIT, _ = database_constant_lookup(CASRN, 'RIT')
+        RI, found = database_constant_lookup(CASRN, "RI")
+        RIT, _ = database_constant_lookup(CASRN, "RIT")
         if found: return (RI, RIT)
     if not _RI_data_loaded: _load_RI_data()
-    key = ('RI', 'RIT')
+    key = ("RI", "RIT")
     if method:
         value = retrieve_from_df_dict(RI_sources, CASRN, key, method)
     else:
@@ -325,7 +325,7 @@ def RI_from_molar_refractivity(Rm, Vm):
 
 
 def RI_IAPWS(T, rho, wavelength=0.5893e-6):
-    r'''Calculates the refractive index of water at a given temperature,
+    r"""Calculates the refractive index of water at a given temperature,
     density, and wavelength.
 
     .. math::
@@ -384,7 +384,7 @@ def RI_IAPWS(T, rho, wavelength=0.5893e-6):
     ----------
     .. [1] IAPWS, 1997. Release on the Refractive Index of Ordinary Water
        Substance as a Function of Wavelength, Temperature and Pressure.
-    '''
+    """
     wavelength *= 1e6
     delta = rho*1e-3
     theta = T*(1.0/273.15)

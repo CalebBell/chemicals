@@ -58,18 +58,18 @@ Octanol-Water Partition Coefficient
 """
 
 __all__ = [
-    'GTP',
-    'GWP',
-    'ODP',
-    'GTP_all_methods',
-    'GTP_methods',
-    'GWP_all_methods',
-    'GWP_methods',
-    'ODP_all_methods',
-    'ODP_methods',
-    'logP',
-    'logP_all_methods',
-    'logP_methods',
+    "GTP",
+    "GWP",
+    "ODP",
+    "GTP_all_methods",
+    "GTP_methods",
+    "GWP_all_methods",
+    "GWP_methods",
+    "ODP_all_methods",
+    "ODP_methods",
+    "logP",
+    "logP_all_methods",
+    "logP_methods",
 ]
 from chemicals import data_reader as dr
 from chemicals import miscdata
@@ -87,33 +87,33 @@ from chemicals.data_reader import (
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 ### Register data sources and lazy load them
-folder = os_path_join(source_path, 'Environment')
-register_df_source(folder, 'Official Global Warming Potentials 2007.tsv')
-register_df_source(folder, 'Official Global Warming Potentials 2014.tsv')
-register_df_source(folder, 'Official Global Warming Potentials 2021.tsv', index_col=1)
-register_df_source(folder, 'Ozone Depletion Potentials.tsv')
-register_df_source(folder, 'CRC logP table.tsv')
-register_df_source(folder, 'Syrres logP data.csv.gz',
-                   csv_kwargs={'compression': 'gzip'})
+folder = os_path_join(source_path, "Environment")
+register_df_source(folder, "Official Global Warming Potentials 2007.tsv")
+register_df_source(folder, "Official Global Warming Potentials 2014.tsv")
+register_df_source(folder, "Official Global Warming Potentials 2021.tsv", index_col=1)
+register_df_source(folder, "Ozone Depletion Potentials.tsv")
+register_df_source(folder, "CRC logP table.tsv")
+register_df_source(folder, "Syrres logP data.csv.gz",
+                   csv_kwargs={"compression": "gzip"})
 
-IPCC_2007_100YR_GWP = 'IPCC (2007) 100yr'
-IPCC_1995_100YR_GWP = 'IPCC (1995) 100yr'
-IPCC_2007_20YR_GWP = 'IPCC (2007) 20yr'
-IPCC_2007_500YR_GWP = 'IPCC (2007) 500yr'
+IPCC_2007_100YR_GWP = "IPCC (2007) 100yr"
+IPCC_1995_100YR_GWP = "IPCC (1995) 100yr"
+IPCC_2007_20YR_GWP = "IPCC (2007) 20yr"
+IPCC_2007_500YR_GWP = "IPCC (2007) 500yr"
 
-IPCC_2014_20YR_GWP = 'IPCC (2014) 20yr'
-IPCC_2014_100YR_GWP = 'IPCC (2014) 100yr'
+IPCC_2014_20YR_GWP = "IPCC (2014) 20yr"
+IPCC_2014_100YR_GWP = "IPCC (2014) 100yr"
 
-IPCC_2021_20YR_GWP = 'IPCC (2021) 20yr'
-IPCC_2021_100YR_GWP = 'IPCC (2021) 100yr'
-IPCC_2021_500YR_GWP = 'IPCC (2021) 500yr'
+IPCC_2021_20YR_GWP = "IPCC (2021) 20yr"
+IPCC_2021_100YR_GWP = "IPCC (2021) 100yr"
+IPCC_2021_500YR_GWP = "IPCC (2021) 500yr"
 
-IPCC_2014_20YR_GTP = 'IPCC (2014) 20yr'
-IPCC_2014_50YR_GTP = 'IPCC (2014) 50yr'
-IPCC_2014_100YR_GTP = 'IPCC (2014) 100yr'
+IPCC_2014_20YR_GTP = "IPCC (2014) 20yr"
+IPCC_2014_50YR_GTP = "IPCC (2014) 50yr"
+IPCC_2014_100YR_GTP = "IPCC (2014) 100yr"
 
-IPCC_2021_50YR_GTP = 'IPCC (2021) 50yr'
-IPCC_2021_100YR_GTP = 'IPCC (2021) 100yr'
+IPCC_2021_50YR_GTP = "IPCC (2021) 50yr"
+IPCC_2021_100YR_GTP = "IPCC (2021) 100yr"
 
 GWP_all_methods = (IPCC_2014_100YR_GWP, IPCC_2014_20YR_GWP,
                    IPCC_2007_100YR_GWP, IPCC_2007_20YR_GWP, IPCC_2007_500YR_GWP,
@@ -131,68 +131,68 @@ def _load_GWP_ODP_data():
     global _IPCC_2007_GWP_keys_by_method, _IPCC_2014_GWP_keys_by_method, _IPCC_2021_GWP_keys_by_method
     global _IPCC_2014_GTP_keys_by_method, _IPCC_2021_GTP_keys_by_method
     global _ODP_keys_by_method
-    IPCC_2007_GWPs = data_source('Official Global Warming Potentials 2007.tsv')
-    IPCC_2014_GWPs = data_source('Official Global Warming Potentials 2014.tsv')
-    IPCC_2021_GWPs = data_source('Official Global Warming Potentials 2021.tsv')
+    IPCC_2007_GWPs = data_source("Official Global Warming Potentials 2007.tsv")
+    IPCC_2014_GWPs = data_source("Official Global Warming Potentials 2014.tsv")
+    IPCC_2021_GWPs = data_source("Official Global Warming Potentials 2021.tsv")
 
-    ODP_data = data_source('Ozone Depletion Potentials.tsv')
+    ODP_data = data_source("Ozone Depletion Potentials.tsv")
     _GWP_ODP_data_loaded = True
     _IPCC_2007_GWP_keys_by_method = {
-        IPCC_2007_20YR_GWP: '20yr GWP',
-        IPCC_2007_100YR_GWP : '100yr GWP',
-        IPCC_1995_100YR_GWP: 'SAR 100yr',
-        IPCC_2007_500YR_GWP: '500yr GWP',
+        IPCC_2007_20YR_GWP: "20yr GWP",
+        IPCC_2007_100YR_GWP : "100yr GWP",
+        IPCC_1995_100YR_GWP: "SAR 100yr",
+        IPCC_2007_500YR_GWP: "500yr GWP",
     }
     _IPCC_2014_GWP_keys_by_method = {
-        IPCC_2014_20YR_GWP : '20yr GWP',
-        IPCC_2014_100YR_GWP: '100yr GWP',
+        IPCC_2014_20YR_GWP : "20yr GWP",
+        IPCC_2014_100YR_GWP: "100yr GWP",
     }
     _IPCC_2021_GWP_keys_by_method = {
-        IPCC_2021_20YR_GWP: '20yr GWP',
-        IPCC_2021_100YR_GWP: '100yr GWP',
-        IPCC_2021_500YR_GWP: '500yr GWP',
+        IPCC_2021_20YR_GWP: "20yr GWP",
+        IPCC_2021_100YR_GWP: "100yr GWP",
+        IPCC_2021_500YR_GWP: "500yr GWP",
     }
 
     _IPCC_2014_GTP_keys_by_method = {
-        IPCC_2014_20YR_GTP : '20yr GTP',
-        IPCC_2014_50YR_GTP : '50yr GTP',
-        IPCC_2014_100YR_GTP: '100yr GTP',
+        IPCC_2014_20YR_GTP : "20yr GTP",
+        IPCC_2014_50YR_GTP : "50yr GTP",
+        IPCC_2014_100YR_GTP: "100yr GTP",
     }
 
     _IPCC_2021_GTP_keys_by_method = {
-        IPCC_2021_50YR_GTP: '50yr GTP',
-        IPCC_2021_100YR_GTP: '100yr GTP',
+        IPCC_2021_50YR_GTP: "50yr GTP",
+        IPCC_2021_100YR_GTP: "100yr GTP",
     }
 
     _ODP_keys_by_method = {
-        'ODP2 Max': 'ODP2 Max',
-        'ODP1 Max': 'ODP1 Max',
-        'ODP2 logarithmic average': 'ODP2 Design',
-        'ODP1 logarithmic average': 'ODP1 Design',
-        'ODP2 Min': 'ODP2 Min',
-        'ODP1 Min': 'ODP1 Min',
-        'ODP2 string': 'ODP2',
-        'ODP1 string': 'ODP1',
+        "ODP2 Max": "ODP2 Max",
+        "ODP1 Max": "ODP1 Max",
+        "ODP2 logarithmic average": "ODP2 Design",
+        "ODP1 logarithmic average": "ODP1 Design",
+        "ODP2 Min": "ODP2 Min",
+        "ODP1 Min": "ODP1 Min",
+        "ODP2 string": "ODP2",
+        "ODP1 string": "ODP1",
     }
 
 _logP_data_loaded = False
 @mark_numba_incompatible
 def _load_logP_data():
     global _logP_data_loaded, logP_data_CRC, logP_data_Syrres, logP_sources
-    logP_data_CRC = data_source('CRC logP table.tsv')
-    logP_data_Syrres = data_source('Syrres logP data.csv.gz')
+    logP_data_CRC = data_source("CRC logP table.tsv")
+    logP_data_Syrres = data_source("Syrres logP data.csv.gz")
     _logP_data_loaded = True
     logP_sources = {
-        'CRC': logP_data_CRC,
-        'SYRRES': logP_data_Syrres,
+        "CRC": logP_data_CRC,
+        "SYRRES": logP_data_Syrres,
         miscdata.WIKIDATA: miscdata.wikidata_data
     }
 
 def __getattr__(name):
-    if name in ('IPCC_2007_GWPs', 'IPCC_2014_GWPs', 'IPCC_2021_GWPs', 'ODP_data'):
+    if name in ("IPCC_2007_GWPs", "IPCC_2014_GWPs", "IPCC_2021_GWPs", "ODP_data"):
         _load_GWP_ODP_data()
         return globals()[name]
-    elif name in ('logP_data_CRC', 'logP_data_Syrres'):
+    elif name in ("logP_data_CRC", "logP_data_Syrres"):
         _load_logP_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -331,7 +331,7 @@ def GWP(CASRN, method=None):
        Panel on Climate Change 2 (2021): 24.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'GWP')
+        val, found = database_constant_lookup(CASRN, "GWP")
         if found: return val
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
@@ -411,7 +411,7 @@ def GTP(CASRN, method=None):
        Panel on Climate Change 2 (2021): 24.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'GTP')
+        val, found = database_constant_lookup(CASRN, "GTP")
         if found: return val
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
@@ -431,14 +431,14 @@ def GTP(CASRN, method=None):
 
 ### Ozone Depletion Potentials
 
-ODP2MAX = 'ODP2 Max'
-ODP2MIN = 'ODP2 Min'
-ODP2STR = 'ODP2 string'
-ODP2LOG = 'ODP2 logarithmic average'
-ODP1MAX = 'ODP1 Max'
-ODP1MIN = 'ODP1 Min'
-ODP1STR = 'ODP1 string'
-ODP1LOG = 'ODP1 logarithmic average'
+ODP2MAX = "ODP2 Max"
+ODP2MIN = "ODP2 Min"
+ODP2STR = "ODP2 string"
+ODP2LOG = "ODP2 logarithmic average"
+ODP1MAX = "ODP1 Max"
+ODP1MIN = "ODP1 Min"
+ODP1STR = "ODP1 string"
+ODP1LOG = "ODP1 logarithmic average"
 ODP_all_methods = (ODP2MAX, ODP1MAX, ODP2LOG, ODP1LOG,
                    ODP2MIN, ODP1MIN, ODP2STR, ODP1STR)
 """Tuple of method name keys. See the `ODP` for the actual references"""
@@ -528,7 +528,7 @@ def ODP(CASRN, method=None):
        https://www.wmo.int/pages/prog/arep/gaw/ozone_2010/documents/Ozone-Assessment-2010-complete.pdf
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'ODP')
+        val, found = database_constant_lookup(CASRN, "ODP")
         if found: return val
     if not _GWP_ODP_data_loaded: _load_GWP_ODP_data()
     if method:
@@ -539,8 +539,8 @@ def ODP(CASRN, method=None):
 
 ### log P
 
-SYRRES = 'SYRRES'
-CRC = 'CRC'
+SYRRES = "SYRRES"
+CRC = "CRC"
 logP_all_methods = (SYRRES, CRC, miscdata.WIKIDATA)
 """Tuple of method name keys. See the `logP` for the actual references"""
 
@@ -563,11 +563,11 @@ def logP_methods(CASRN):
     logP
     """
     if not _logP_data_loaded: _load_logP_data()
-    return list_available_methods_from_df_dict(logP_sources, CASRN, 'logP')
+    return list_available_methods_from_df_dict(logP_sources, CASRN, "logP")
 
 @mark_numba_incompatible
 def logP(CASRN, method=None):
-    r'''This function handles the retrieval of a chemical's octanol-water
+    r"""This function handles the retrieval of a chemical's octanol-water
     partition coefficient. Lookup is based on CASRNs. Will automatically
     select a data source to use if no method is provided; returns None if the
     data is not available.
@@ -611,12 +611,12 @@ def logP(CASRN, method=None):
        http://esc.syrres.com/interkow/Download/SrcKowData2.zip
     .. [2] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics, 95E. Boca Raton, FL: CRC press, 2014.
-    '''
+    """
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'logP')
+        val, found = database_constant_lookup(CASRN, "logP")
         if found: return val
     if not _logP_data_loaded: _load_logP_data()
     if method:
-        return retrieve_from_df_dict(logP_sources, CASRN, 'logP', method)
+        return retrieve_from_df_dict(logP_sources, CASRN, "logP", method)
     else:
-        return retrieve_any_from_df_dict(logP_sources, CASRN, 'logP')
+        return retrieve_any_from_df_dict(logP_sources, CASRN, "logP")

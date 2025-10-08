@@ -31,71 +31,71 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 """
 
 __all__ = [
-    'SG',
-    'API_to_SG',
-    'API_to_rho',
-    'Baume_heavy_to_SG',
-    'Baume_heavy_to_rho',
-    'Baume_light_to_SG',
-    'Baume_light_to_rho',
-    'Cp_minus_Cv',
-    'Joule_Thomson',
-    'Parachor',
-    'Qls_to_ms',
-    'Qls_to_ns',
-    'SG_to_API',
-    'SG_to_Baume_heavy',
-    'SG_to_Baume_light',
-    'Vfs_to_zs',
-    'Vm_to_rho',
-    'Watson_K',
-    'Z',
-    'd2ns_to_dn2_partials',
-    'd2xs_to_d2xsn1',
-    'd2xs_to_dxdn_partials',
-    'dns_to_dn_partials',
-    'dxs_to_dn_partials',
-    'dxs_to_dns',
-    'dxs_to_dxsn1',
-    'isentropic_exponent',
-    'isentropic_exponent_PT',
-    'isentropic_exponent_PV',
-    'isentropic_exponent_TV',
-    'isobaric_expansion',
-    'isothermal_compressibility',
-    'mix_component_flows',
-    'mix_component_partial_flows',
-    'mix_multiple_component_flows',
-    'mixing_logarithmic',
-    'mixing_power',
-    'mixing_simple',
-    'molar_velocity_to_velocity',
-    'ms_to_Qls',
-    'ms_to_ns',
-    'none_and_length_check',
-    'normalize',
-    'ns_to_Qls',
-    'ns_to_ms',
-    'phase_identification_parameter',
-    'phase_identification_parameter_phase',
-    'property_mass_to_molar',
-    'property_molar_to_mass',
-    'radius_of_gyration',
-    'remove_zeros',
-    'rho_to_API',
-    'rho_to_Baume_heavy',
-    'rho_to_Baume_light',
-    'rho_to_Vm',
-    'solve_flow_composition_mix',
-    'speed_of_sound',
-    'to_num',
-    'v_molar_to_v',
-    'v_to_v_molar',
-    'vapor_mass_quality',
-    'velocity_to_molar_velocity',
-    'ws_to_zs',
-    'zs_to_Vfs',
-    'zs_to_ws'
+    "SG",
+    "API_to_SG",
+    "API_to_rho",
+    "Baume_heavy_to_SG",
+    "Baume_heavy_to_rho",
+    "Baume_light_to_SG",
+    "Baume_light_to_rho",
+    "Cp_minus_Cv",
+    "Joule_Thomson",
+    "Parachor",
+    "Qls_to_ms",
+    "Qls_to_ns",
+    "SG_to_API",
+    "SG_to_Baume_heavy",
+    "SG_to_Baume_light",
+    "Vfs_to_zs",
+    "Vm_to_rho",
+    "Watson_K",
+    "Z",
+    "d2ns_to_dn2_partials",
+    "d2xs_to_d2xsn1",
+    "d2xs_to_dxdn_partials",
+    "dns_to_dn_partials",
+    "dxs_to_dn_partials",
+    "dxs_to_dns",
+    "dxs_to_dxsn1",
+    "isentropic_exponent",
+    "isentropic_exponent_PT",
+    "isentropic_exponent_PV",
+    "isentropic_exponent_TV",
+    "isobaric_expansion",
+    "isothermal_compressibility",
+    "mix_component_flows",
+    "mix_component_partial_flows",
+    "mix_multiple_component_flows",
+    "mixing_logarithmic",
+    "mixing_power",
+    "mixing_simple",
+    "molar_velocity_to_velocity",
+    "ms_to_Qls",
+    "ms_to_ns",
+    "none_and_length_check",
+    "normalize",
+    "ns_to_Qls",
+    "ns_to_ms",
+    "phase_identification_parameter",
+    "phase_identification_parameter_phase",
+    "property_mass_to_molar",
+    "property_molar_to_mass",
+    "radius_of_gyration",
+    "remove_zeros",
+    "rho_to_API",
+    "rho_to_Baume_heavy",
+    "rho_to_Baume_light",
+    "rho_to_Vm",
+    "solve_flow_composition_mix",
+    "speed_of_sound",
+    "to_num",
+    "v_molar_to_v",
+    "v_to_v_molar",
+    "vapor_mass_quality",
+    "velocity_to_molar_velocity",
+    "ws_to_zs",
+    "zs_to_Vfs",
+    "zs_to_ws"
 ]
 
 import os
@@ -115,16 +115,16 @@ from fluids.numerics import numpy as np
 try:
     source_path = os.path.dirname(__file__) # micropython
 except:
-    source_path = ''
+    source_path = ""
 
-if os.name == 'nt':
+if os.name == "nt":
     def os_path_join(*args):
-        return '\\'.join(args)
+        return "\\".join(args)
 else:
     def os_path_join(*args):
-        return '/'.join(args)
+        return "/".join(args)
 
-numba_blacklisted = ['mark_numba_incompatible', 'mark_numba_uncacheable']
+numba_blacklisted = ["mark_numba_incompatible", "mark_numba_uncacheable"]
 numba_cache_blacklisted = []
 
 def mark_numba_incompatible(f):
@@ -137,7 +137,7 @@ def mark_numba_uncacheable(f):
 
 @mark_numba_incompatible
 def to_num(values):
-    r'''Legacy function to turn a list of strings into either floats
+    r"""Legacy function to turn a list of strings into either floats
     (if numeric), stripped strings (if not) or None if the string is empty.
     Accepts any numeric formatting the float function does.
 
@@ -155,13 +155,13 @@ def to_num(values):
     --------
     >>> to_num(['1', '1.1', '1E5', '0xB4', ''])
     [1.0, 1.1, 100000.0, '0xB4', None]
-    '''
+    """
     float_ = float
     for i in range(len(values)):
         try:
             values[i] = float_(values[i])
         except:
-            if values[i] == '':
+            if values[i] == "":
                 values[i] = None
             else:
                 values[i] = values[i].strip()
@@ -198,16 +198,16 @@ direct_mutable_types = frozenset([
 # ones we don't want to import and put in `immutable_types` for performance reasons
 immutable_class_types = {
     # Basic standard library immutable classes
-    'Fraction', 'Decimal',
+    "Fraction", "Decimal",
     # Date and time related
-    'datetime', 'date', 'time', 'timedelta', 'timezone',
+    "datetime", "date", "time", "timedelta", "timezone",
     # Other standard library immutables
-    'Pattern',  # Regular expression pattern
-    'UUID',
+    "Pattern",  # Regular expression pattern
+    "UUID",
     # Range is a special type
-    'range',
+    "range",
     # Enum types
-    'Enum', 'IntEnum', 'Flag', 'IntFlag',
+    "Enum", "IntEnum", "Flag", "IntFlag",
 }
 
 object_data_type_cache = {}
@@ -217,7 +217,7 @@ def create_object_data_function(instance):
         return object_data_type_cache[t]
     except:
         pass
-    has_d = hasattr(instance, '__dict__')
+    has_d = hasattr(instance, "__dict__")
     slots = []
     for base in instance.__class__.__mro__[:-1]:
         try:
@@ -227,7 +227,7 @@ def create_object_data_function(instance):
     # remove duplicates
     slots_set = set(slots)
     try:
-        slots_set.remove('__dict__')
+        slots_set.remove("__dict__")
     except:
         pass
     slots = tuple(slots_set)
@@ -320,24 +320,24 @@ def recursive_copy(obj):
 
     obj_class_name = obj_type.__name__
 
-    if obj_class_name == 'array':
+    if obj_class_name == "array":
         return obj.__copy__() # mutable
     elif obj_class_name in immutable_class_types:
         return obj
 
-    if hasattr(obj, '__copy__'):
+    if hasattr(obj, "__copy__"):
         # Allow objects to provide their own hooks and wash our hands of them
         return obj.__copy__()
 
     # Is it a named tuple
-    if hasattr(obj, '_fields') and hasattr(obj, '_asdict') and obj_type.__mro__[1] is tuple:
+    if hasattr(obj, "_fields") and hasattr(obj, "_asdict") and obj_type.__mro__[1] is tuple:
         return obj_type(*(recursive_copy(v) for v in obj))
     raise ValueError(f"No copy function implemented for type {obj_type}")
 
 
 @mark_numba_incompatible
 def hash_any_primitive(v):
-    '''Method to hash a primitive - with basic support for lists and
+    """Method to hash a primitive - with basic support for lists and
     dictionaries.
 
     Parameters
@@ -367,7 +367,7 @@ def hash_any_primitive(v):
     hash_any_primitive([1,2,3,4,5])
 
     hash_any_primitive({'a': [1,2,3], 'b': []})
-    '''
+    """
     # original_v = v
     t = type(v)
     if t is list:
@@ -402,7 +402,7 @@ def hash_any_primitive(v):
     return hash_value
 
 def Parachor(MW, rhol, rhog, sigma):
-    r'''Calculate Parachor for a pure species, using its density in the
+    r"""Calculate Parachor for a pure species, using its density in the
     liquid and gas phases, surface tension, and molecular weight.
 
     .. math::
@@ -457,13 +457,13 @@ def Parachor(MW, rhol, rhog, sigma):
        8E. McGraw-Hill Professional, 2007.
     .. [3] Danner, Ronald P, and Design Institute for Physical Property Data.
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
-    '''
+    """
     rhol, rhog = rhol*1000., rhog*1000. # Convert kg/m^3 to g/m^3
     return sigma**0.25*MW/(rhol-rhog) # (N/m)**0.25*g/mol/(g/m^3)
 
 
 def property_molar_to_mass(A_molar, MW):
-    r'''Convert a quantity in molar units [thing/mol] to mass units [thing/kg].
+    r"""Convert a quantity in molar units [thing/mol] to mass units [thing/kg].
     The standard gram-mole is used here, as it is everwhere in this library.
 
     .. math::
@@ -490,14 +490,14 @@ def property_molar_to_mass(A_molar, MW):
     --------
     >>> property_molar_to_mass(500, 18.015)
     27754.648903691366
-    '''
+    """
     if A_molar is None:
         return None
     return A_molar*1000.0/MW
 
 
 def property_mass_to_molar(A_mass, MW):
-    r'''Convert a quantity in mass units [thing/kg] to molar units [thing/mol].
+    r"""Convert a quantity in mass units [thing/kg] to molar units [thing/mol].
     The standard gram-mole is used here, as it is everwhere in this library.
 
     .. math::
@@ -524,7 +524,7 @@ def property_mass_to_molar(A_mass, MW):
     --------
     >>> property_mass_to_molar(20.0, 18.015)
     0.3603
-    '''
+    """
     if A_mass is None:
         return None
     return 1e-3*A_mass*MW
@@ -562,7 +562,7 @@ def v_to_v_molar(v, MW):
     return v*MW**0.5*root_1000_inv
 
 def v_molar_to_v(v_molar, MW):
-    r'''Convert a velocity from units of the molar velocity form to standard
+    r"""Convert a velocity from units of the molar velocity form to standard
     m/s units.
 
     .. math::
@@ -587,11 +587,11 @@ def v_molar_to_v(v_molar, MW):
     --------
     >>> v_molar_to_v(67.10998435404377, 18.015)
     499.99999999999994
-    '''
+    """
     return v_molar*root_1000*MW**-0.5
 
 def vapor_mass_quality(VF, MWl, MWg):
-    r'''Calculates the vapor quality on a mass basis of a two-phase mixture;
+    r"""Calculates the vapor quality on a mass basis of a two-phase mixture;
     this is the most common definition, where 1 means a pure vapor and 0 means
     a pure liquid. The vapor quality on a mass basis is related to the mole
     basis vapor fraction according to the following relationship:
@@ -629,13 +629,13 @@ def vapor_mass_quality(VF, MWl, MWg):
     ----------
     .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        8E. McGraw-Hill Professional, 2007.
-    '''
+    """
     ng = VF
     nl = (1. - VF)
     return ng*MWg/(nl*MWl + ng*MWg)
 
 def rho_to_API(rho, rho_ref=999.0170824078306):
-    r'''Calculates API of a liquid given its mass density, as shown in
+    r"""Calculates API of a liquid given its mass density, as shown in
     [1]_.
 
     .. math::
@@ -668,11 +668,11 @@ def rho_to_API(rho, rho_ref=999.0170824078306):
     ----------
     .. [1] API Technical Data Book: General Properties & Characterization.
        American Petroleum Institute, 7E, 2005.
-    '''
+    """
     return 141.5*rho_ref/rho - 131.5
 
 def API_to_rho(API, rho_ref=999.0170824078306):
-    r'''Calculates mass density of a liquid given its API, as shown in
+    r"""Calculates mass density of a liquid given its API, as shown in
     [1]_.
 
     .. math::
@@ -703,13 +703,13 @@ def API_to_rho(API, rho_ref=999.0170824078306):
     ----------
     .. [1] API Technical Data Book: General Properties & Characterization.
        American Petroleum Institute, 7E, 2005.
-    '''
+    """
     return (141.5*rho_ref)/(API + 131.5)
 
 
 
 def SG_to_API(SG):
-    r'''Calculates API of a liquid given its specific gravity, as shown in
+    r"""Calculates API of a liquid given its specific gravity, as shown in
     [1]_.
 
     .. math::
@@ -738,12 +738,12 @@ def SG_to_API(SG):
     ----------
     .. [1] API Technical Data Book: General Properties & Characterization.
        American Petroleum Institute, 7E, 2005.
-    '''
+    """
     return 141.5/SG - 131.5
 
 
 def API_to_SG(API):
-    r'''Calculates specific gravity of a liquid given its API, as shown in
+    r"""Calculates specific gravity of a liquid given its API, as shown in
     [1]_.
 
     .. math::
@@ -772,11 +772,11 @@ def API_to_SG(API):
     ----------
     .. [1] API Technical Data Book: General Properties & Characterization.
        American Petroleum Institute, 7E, 2005.
-    '''
+    """
     return 141.5/(API + 131.5)
 
 def rho_to_Baume_light(rho, rho_ref=999.0170824078306):
-    r'''Calculates degrees Baumé of a liquid lighter than water given its mass density,
+    r"""Calculates degrees Baumé of a liquid lighter than water given its mass density,
     as shown in [1]_.
 
     .. math::
@@ -808,11 +808,11 @@ def rho_to_Baume_light(rho, rho_ref=999.0170824078306):
     ----------
     .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
        Tulsa, OK, 2004.
-    '''
+    """
     return 140*rho_ref/rho - 130
 
 def Baume_light_to_rho(Baume, rho_ref=999.0170824078306):
-    r'''Calculates mass density of a liquid lighter than water given its degrees Baumé,
+    r"""Calculates mass density of a liquid lighter than water given its degrees Baumé,
     as shown in [1]_.
 
     .. math::
@@ -844,11 +844,11 @@ def Baume_light_to_rho(Baume, rho_ref=999.0170824078306):
     ----------
     .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
        Tulsa, OK, 2004.
-    '''
+    """
     return (140*rho_ref)/(130 + Baume)
 
 def rho_to_Baume_heavy(rho, rho_ref=999.0170824078306):
-    r'''Calculates degrees Baumé of a liquid heavier than water given its mass density,
+    r"""Calculates degrees Baumé of a liquid heavier than water given its mass density,
     as shown in [1]_.
 
     .. math::
@@ -880,11 +880,11 @@ def rho_to_Baume_heavy(rho, rho_ref=999.0170824078306):
     ----------
     .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
        Tulsa, OK, 2004.
-    '''
+    """
     return 145 - 145*rho_ref/rho
 
 def Baume_heavy_to_rho(Baume, rho_ref=999.0170824078306):
-    r'''Calculates mass density of a liquid heavier than water given its degrees Baumé,
+    r"""Calculates mass density of a liquid heavier than water given its degrees Baumé,
     as shown in [1]_.
 
     .. math::
@@ -916,11 +916,11 @@ def Baume_heavy_to_rho(Baume, rho_ref=999.0170824078306):
     ----------
     .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
        Tulsa, OK, 2004.
-    '''
+    """
     return (145*rho_ref)/(145 - Baume)
 
 def SG_to_Baume_light(SG):
-    r'''Calculates degrees Baumé of a liquid lighter than water given its specific gravity,
+    r"""Calculates degrees Baumé of a liquid lighter than water given its specific gravity,
     as shown in [1]_.
 
     .. math::
@@ -950,11 +950,11 @@ def SG_to_Baume_light(SG):
     ----------
     .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
        Tulsa, OK, 2004.
-    '''
+    """
     return 140/SG - 130
 
 def Baume_light_to_SG(Baume):
-    r'''Calculates specific gravity of a liquid lighter than water given its degrees Baumé,
+    r"""Calculates specific gravity of a liquid lighter than water given its degrees Baumé,
     as shown in [1]_.
 
     .. math::
@@ -984,11 +984,11 @@ def Baume_light_to_SG(Baume):
     ----------
     .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
        Tulsa, OK, 2004.
-    '''
+    """
     return 140/(130 + Baume)
 
 def SG_to_Baume_heavy(SG):
-    r'''Calculates degrees Baumé of a liquid heavier than water given its specific gravity,
+    r"""Calculates degrees Baumé of a liquid heavier than water given its specific gravity,
     as shown in [1]_.
 
     .. math::
@@ -1018,11 +1018,11 @@ def SG_to_Baume_heavy(SG):
     ----------
     .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
        Tulsa, OK, 2004.
-    '''
+    """
     return 145 - 145/SG
 
 def Baume_heavy_to_SG(Baume):
-    r'''Calculates specific gravity of a liquid heavier than water given its degrees Baumé,
+    r"""Calculates specific gravity of a liquid heavier than water given its degrees Baumé,
     as shown in [1]_.
 
     .. math::
@@ -1052,11 +1052,11 @@ def Baume_heavy_to_SG(Baume):
     ----------
     .. [1] GPSA Engineering Data Book, Gas Processors Suppliers Association,
        Tulsa, OK, 2004.
-    '''
+    """
     return 145/(145 - Baume)
 
 def SG(rho, rho_ref=999.0170824078306):
-    r'''Calculates the specific gravity of a substance with respect to another
+    r"""Calculates the specific gravity of a substance with respect to another
     substance; by default, this is water at 15.555 °C (60 °F). For gases,
     normally the reference density is 1.2 kg/m^3, that of dry air. However, in
     general specific gravity should always be specified with respect to the
@@ -1088,12 +1088,12 @@ def SG(rho, rho_ref=999.0170824078306):
     --------
     >>> SG(860)
     0.8608461408159591
-    '''
+    """
     return rho/rho_ref
 
 
 def Watson_K(Tb, SG):
-    r'''Calculates the Watson or UOP K Characterization factor
+    r"""Calculates the Watson or UOP K Characterization factor
     of a liquid of a liquid given its specific gravity, and its
     average boiling point as shown in [1]_.
 
@@ -1135,12 +1135,12 @@ def Watson_K(Tb, SG):
     ----------
     .. [1] API Technical Data Book: General Properties & Characterization.
        American Petroleum Institute, 7E, 2005.
-    '''
+    """
     return (Tb*1.8)**(1.0/3.0)/SG
 
 
 def isobaric_expansion(V, dV_dT):
-    r'''Calculate the isobaric coefficient of a thermal expansion, given its
+    r"""Calculate the isobaric coefficient of a thermal expansion, given its
     molar volume at a certain `T` and `P`, and its derivative of molar volume
     with respect to `T`.
 
@@ -1177,12 +1177,12 @@ def isobaric_expansion(V, dV_dT):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     return dV_dT/V
 
 
 def isothermal_compressibility(V, dV_dP):
-    r'''Calculate the isothermal coefficient of compressibility, given its
+    r"""Calculate the isothermal coefficient of compressibility, given its
     molar volume at a certain `T` and `P`, and its derivative of molar volume
     with respect to `P`.
 
@@ -1232,7 +1232,7 @@ def isothermal_compressibility(V, dV_dP):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     return -dV_dP/V
 
 
@@ -1358,15 +1358,15 @@ def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=Non
        doi:10.1016/j.fluid.2016.06.001.
     '''
     if d2P_dVdT > 0:
-        return 's'
+        return "s"
     else:
         PIP = phase_identification_parameter(V=V, dP_dT=dP_dT, dP_dV=dP_dV,
                                              d2P_dV2=d2P_dV2, d2P_dVdT=d2P_dVdT)
-        return 'l' if PIP > 1 else 'g'
+        return "l" if PIP > 1 else "g"
 
 
 def Cp_minus_Cv(T, dP_dT, dP_dV):
-    r'''Calculate the difference between a real gas's constant-pressure heat
+    r"""Calculate the difference between a real gas's constant-pressure heat
     capacity and constant-volume heat capacity, as given in [1]_, [2]_, and
     [3]_. The required derivatives should be calculated with an equation of
     state.
@@ -1420,7 +1420,7 @@ def Cp_minus_Cv(T, dP_dT, dP_dV):
     .. [3] Gmehling, Jurgen, Barbel Kolbe, Michael Kleiber, and Jurgen Rarey.
        Chemical Thermodynamics for Process Simulation. 1st edition. Weinheim:
        Wiley-VCH, 2012.
-    '''
+    """
     return -T*dP_dT*dP_dT/dP_dV
 
 
@@ -1489,7 +1489,7 @@ def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
         return (-V*V*1000.0*dP_dV*Cp/(Cv*MW))**0.5
 
 def molar_velocity_to_velocity(v_molar, MW):
-    r'''Calculate the mass-based velocity (m/s) from the molar velocity of
+    r"""Calculate the mass-based velocity (m/s) from the molar velocity of
     the fluid.
 
     .. math::
@@ -1512,11 +1512,11 @@ def molar_velocity_to_velocity(v_molar, MW):
     >>> molar_velocity_to_velocity(46., 40.445)
     228.73
 
-    '''
+    """
     return sqrt(1000)*v_molar/sqrt(MW)
 
 def velocity_to_molar_velocity(v, MW):
-    r'''Calculate the molar velocity from the mass-based (m/s) velocity of
+    r"""Calculate the molar velocity from the mass-based (m/s) velocity of
     the fluid.
 
     .. math::
@@ -1538,7 +1538,7 @@ def velocity_to_molar_velocity(v, MW):
     --------
     >>> velocity_to_molar_velocity(228.73, 40.445)
     46.
-    '''
+    """
     return v*sqrt(MW)/sqrt(1000)
 
 def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
@@ -1590,11 +1590,11 @@ def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
     elif beta is not None:
         return V/Cp*(beta*T - 1.)
     else:
-        raise ValueError('Either dV_dT or beta is needed')
+        raise ValueError("Either dV_dT or beta is needed")
 
 
 def isentropic_exponent(Cp, Cv):
-    r'''Calculate the isentropic coefficient of an ideal gas, given its constant-
+    r"""Calculate the isentropic coefficient of an ideal gas, given its constant-
     pressure and constant-volume heat capacity.
 
     .. math::
@@ -1632,7 +1632,7 @@ def isentropic_exponent(Cp, Cv):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     return Cp/Cv
 
 def isentropic_exponent_PV(Cp, Cv, Vm, P, dP_dV_T):
@@ -1783,7 +1783,7 @@ def isentropic_exponent_TV(Cv, Vm, dP_dT_V):
     return 1.0 + Vm*dP_dT_V/Cv
 
 def Vm_to_rho(Vm, MW):
-    r'''Calculate the density of a chemical, given its molar volume and
+    r"""Calculate the density of a chemical, given its molar volume and
     molecular weight.
 
     .. math::
@@ -1810,12 +1810,12 @@ def Vm_to_rho(Vm, MW):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     return 1e-3*MW/Vm
 
 
 def rho_to_Vm(rho, MW):
-    r'''Calculate the molar volume of a chemical, given its density and
+    r"""Calculate the molar volume of a chemical, given its density and
     molecular weight.
 
     .. math::
@@ -1842,12 +1842,12 @@ def rho_to_Vm(rho, MW):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     return 1e-3*MW/rho
 
 
 def Z(T, P, V):
-    r'''Calculates the compressibility factor of a gas, given its
+    r"""Calculates the compressibility factor of a gas, given its
     temperature, pressure, and molar volume.
 
     .. math::
@@ -1876,11 +1876,11 @@ def Z(T, P, V):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     return V*P/(R*T)
 
 def zs_to_ws(zs, MWs):
-    r'''Converts a list of mole fractions to mass fractions. Requires molecular
+    r"""Converts a list of mole fractions to mass fractions. Requires molecular
     weights for all species.
 
     .. math::
@@ -1910,7 +1910,7 @@ def zs_to_ws(zs, MWs):
     --------
     >>> zs_to_ws([0.5, 0.5], [10, 20])
     [0.3333333333333333, 0.6666666666666666]
-    '''
+    """
     # Cannot use sum and list comprehension with numba; otherwise Mavg = 1.0/sum(ws)
     # use [0.0]*N initialization for easy transformation into a numpy array in numba
     N = len(zs)
@@ -1926,7 +1926,7 @@ def zs_to_ws(zs, MWs):
     return ws
 
 def ws_to_zs(ws, MWs):
-    r'''Converts a list of mass fractions to mole fractions. Requires molecular
+    r"""Converts a list of mass fractions to mole fractions. Requires molecular
     weights for all species.
 
     .. math::
@@ -1953,7 +1953,7 @@ def ws_to_zs(ws, MWs):
     --------
     >>> ws_to_zs([0.3333333333333333, 0.6666666666666666], [10, 20])
     [0.5, 0.5]
-    '''
+    """
     N = len(ws)
     zs = [0.0]*N
     tot = 0.0
@@ -1968,7 +1968,7 @@ def ws_to_zs(ws, MWs):
 
 
 def zs_to_Vfs(zs, Vms):
-    r'''Converts a list of mole fractions to volume fractions. Requires molar
+    r"""Converts a list of mole fractions to volume fractions. Requires molar
     volumes for all species.
 
     .. math::
@@ -2000,7 +2000,7 @@ def zs_to_Vfs(zs, Vms):
 
     >>> zs_to_Vfs([0.637, 0.363], [8.0234e-05, 9.543e-05])
     [0.5960229712956298, 0.4039770287043703]
-    '''
+    """
     N = len(zs)
     Vfs = [0.0]*N
     tot = 0.0
@@ -2015,7 +2015,7 @@ def zs_to_Vfs(zs, Vms):
 
 
 def Vfs_to_zs(Vfs, Vms):
-    r'''Converts a list of mass fractions to mole fractions. Requires molecular
+    r"""Converts a list of mass fractions to mole fractions. Requires molecular
     weights for all species.
 
     .. math::
@@ -2048,7 +2048,7 @@ def Vfs_to_zs(Vfs, Vms):
 
     >>> Vfs_to_zs([0.596, 0.404], [8.0234e-05, 9.543e-05])
     [0.6369779395901142, 0.3630220604098858]
-    '''
+    """
     N = len(Vfs)
     zs = [0.0]*N
     tot = 0.0
@@ -2062,7 +2062,7 @@ def Vfs_to_zs(Vfs, Vms):
     return zs
 
 def ms_to_ns(ms, MWs):
-    r'''Converts a list of mass flow rates to mole flow rates. Requires molecular
+    r"""Converts a list of mass flow rates to mole flow rates. Requires molecular
     weights for all species.
 
     .. math::
@@ -2088,7 +2088,7 @@ def ms_to_ns(ms, MWs):
     --------
     >>> ms_to_ns([4, 5], [24, 45])
     [166.666, 111.111]
-    '''
+    """
     N = len(ms)
     ns = [0.0]*N
     for i in range(N):
@@ -2096,7 +2096,7 @@ def ms_to_ns(ms, MWs):
     return ns
 
 def ns_to_ms(ns, MWs):
-    r'''Converts a list of mole flow rates to mass flow rates. Requires molecular
+    r"""Converts a list of mole flow rates to mass flow rates. Requires molecular
     weights for all species.
 
     .. math::
@@ -2122,7 +2122,7 @@ def ns_to_ms(ns, MWs):
     --------
     >>> ns_to_ms([166.6666666666, 111.1111111111], [24, 45])
     [4.0, 5.0]
-    '''
+    """
     N = len(ns)
     ms = [0.0]*N
     for i in range(N):
@@ -2130,7 +2130,7 @@ def ns_to_ms(ns, MWs):
     return ms
 
 def ns_to_Qls(ns, Vmls):
-    r'''Converts a list of mole flow rates to standard liquid volume
+    r"""Converts a list of mole flow rates to standard liquid volume
     flow rates. Requires standard liquid molar volumes for all species.
 
     .. math::
@@ -2156,7 +2156,7 @@ def ns_to_Qls(ns, Vmls):
     --------
     >>> ns_to_Qls([2.0, 3.0], [1e-4, 2e-4])
     [2e-4, 6e-4]
-    '''
+    """
     N = len(ns)
     Qls = [0.0]*N
     for i in range(N):
@@ -2164,7 +2164,7 @@ def ns_to_Qls(ns, Vmls):
     return Qls
 
 def Qls_to_ns(Qls, Vmls):
-    r'''Converts a list of standard liquid volume flow rates
+    r"""Converts a list of standard liquid volume flow rates
     to mole flow rates. Requires standard liquid molar volumes for all species.
 
     .. math::
@@ -2190,7 +2190,7 @@ def Qls_to_ns(Qls, Vmls):
     --------
     >>> Qls_to_ns([2e-4, 6e-4], [1e-4, 2e-4])
     [2.0, 3.0]
-    '''
+    """
     N = len(Qls)
     ns = [0.0]*N
     for i in range(N):
@@ -2198,7 +2198,7 @@ def Qls_to_ns(Qls, Vmls):
     return ns
 
 def ms_to_Qls(ms, MWs, Vmls):
-    r'''Converts a list of mass flow rates to standard liquid volume
+    r"""Converts a list of mass flow rates to standard liquid volume
     flow rates. Requires molecular weights and standard molar liquid
     volumes for all species.
 
@@ -2227,7 +2227,7 @@ def ms_to_Qls(ms, MWs, Vmls):
     --------
     >>> ms_to_Qls([4.0, 5.0], [24, 45], [1e-4, 2e-4])
     [0.0166666666, 0.0222222222]
-    '''
+    """
     N = len(ms)
     Qls = [0.0]*N
     for i in range(N):
@@ -2235,7 +2235,7 @@ def ms_to_Qls(ms, MWs, Vmls):
     return Qls
 
 def Qls_to_ms(Qls, MWs, Vmls):
-    r'''Converts a list of standard liquid volume flow rates to mass
+    r"""Converts a list of standard liquid volume flow rates to mass
     flow rates. Requires molecular weights and standard liquid molar
     volumes for all species.
 
@@ -2264,7 +2264,7 @@ def Qls_to_ms(Qls, MWs, Vmls):
     --------
     >>> Qls_to_ms([1.666666666e-02, 1.11111111e-01], [24, 45], [1e-4, 2e-4])
     [4.0, 25.0]
-    '''
+    """
     N = len(Qls)
     ms = [0.0]*N
     for i in range(N):
@@ -2272,7 +2272,7 @@ def Qls_to_ms(Qls, MWs, Vmls):
     return ms
 
 def dxs_to_dns(dxs, xs, dns=None):
-    r'''Convert the mole fraction derivatives of a quantity (calculated so
+    r"""Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to mole number derivatives (where the mole fractions
     do sum to one). Requires the derivatives and the mole fractions of the
     mixture.
@@ -2310,7 +2310,7 @@ def dxs_to_dns(dxs, xs, dns=None):
     --------
     >>> dxs_to_dns([-0.0028, -0.00719, -0.00859], [0.7, 0.2, 0.1])
     [0.0014570000000000004, -0.002933, -0.004333]
-    '''
+    """
     xdx_tot = 0.0
     N = len(xs)
     for j in range(N):
@@ -2323,7 +2323,7 @@ def dxs_to_dns(dxs, xs, dns=None):
 
 
 def dns_to_dn_partials(dns, F, partial_properties=None):
-    r'''Convert the mole number derivatives of a quantity (calculated so
+    r"""Convert the mole number derivatives of a quantity (calculated so
     they do sum to 1) to partial molar quantites.
 
     .. math::
@@ -2363,7 +2363,7 @@ def dns_to_dn_partials(dns, F, partial_properties=None):
     --------
     >>> dns_to_dn_partials([0.001459, -0.002939, -0.004334], -0.0016567)
     [-0.0001977000000000001, -0.0045957, -0.0059907]
-    '''
+    """
     N = len(dns)
     if partial_properties is None:
         partial_properties = [0.0]*N
@@ -2373,7 +2373,7 @@ def dns_to_dn_partials(dns, F, partial_properties=None):
 
 
 def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
-    r'''Convert the mole fraction derivatives of a quantity (calculated so
+    r"""Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to partial molar quantites. Requires the derivatives
     and the mole fractions of the mixture.
 
@@ -2420,7 +2420,7 @@ def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
     >>> dxs_to_dn_partials([-0.0026404, -0.00719, -0.00859], [0.7, 0.2, 0.1],
     ... -0.0016567)
     [-0.00015182, -0.0047014199999999996, -0.00610142]
-    '''
+    """
     xdx_totF = F
     N = len(xs)
     if partial_properties is None:
@@ -2433,7 +2433,7 @@ def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
 
 
 def d2ns_to_dn2_partials(d2ns, dns):
-    r'''Convert second-order mole number derivatives of a quantity
+    r"""Convert second-order mole number derivatives of a quantity
      to the following second-order partial derivative:
 
     .. math::
@@ -2491,7 +2491,7 @@ def d2ns_to_dn2_partials(d2ns, dns):
     >>> d2ns = [[0.152, 0.08, 0.547], [0.08, 0.674, 0.729], [0.547, 0.729, 0.131]]
     >>> d2ns_to_dn2_partials(d2ns, [20.0, .124, 900.52])
     [[40.152, 20.203999999999997, 921.067], [20.204, 0.922, 901.3729999999999], [921.067, 901.373, 1801.1709999999998]]
-    '''
+    """
     cmps = range(len(dns))
     hess = []
     for i in cmps:
@@ -2505,7 +2505,7 @@ def d2ns_to_dn2_partials(d2ns, dns):
 
 
 def d2xs_to_dxdn_partials(d2xs, xs):
-    r'''Convert second-order mole fraction derivatives of a quantity
+    r"""Convert second-order mole fraction derivatives of a quantity
     (calculated so they do not sum to 1) to the following second-order
     partial derivative:
 
@@ -2546,7 +2546,7 @@ def d2xs_to_dxdn_partials(d2xs, xs):
     >>> d2xs = [[0.152, 0.08, 0.547], [0.08, 0.674, 0.729], [0.547, 0.729, 0.131]]
     >>> d2xs_to_dxdn_partials(d2xs, [0.7, 0.2, 0.1])
     [[-0.02510000000000001, -0.18369999999999997, 0.005199999999999982], [-0.0971, 0.41030000000000005, 0.18719999999999992], [0.3699, 0.4653, -0.41080000000000005]]
-    '''
+    """
     N = len(xs)
 
     double_sums = [0.0]*N
@@ -2570,7 +2570,7 @@ def d2xs_to_dxdn_partials(d2xs, xs):
 
 
 def dxs_to_dxsn1(dxs):
-    r'''Convert the mole fraction derivatives of a quantity (calculated so
+    r"""Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to derivatives such that they do sum to 1 by changing
     the composition of the last component in the negative of the component
     which is changed. Requires the derivatives of the mixture only. The size of
@@ -2600,13 +2600,13 @@ def dxs_to_dxsn1(dxs):
     --------
     >>> dxs_to_dxsn1([-2651.3181821109024, -2085.574403592012, -2295.0860830203587])
     [-356.23209909054367, 209.51167942834672]
-    '''
+    """
     last = dxs[-1]
     return [dx - last for dx in dxs[:-1]]
 
 
 def d2xs_to_d2xsn1(d2xs):
-    r'''Convert the second mole fraction derivatives of a quantity (calculated
+    r"""Convert the second mole fraction derivatives of a quantity (calculated
     so they do not sum to 1) to derivatives such that they do sum to 1
     Requires the second derivatives of the mixture only. The size of
     the returned array is one less than the input in both dimensions
@@ -2638,7 +2638,7 @@ def d2xs_to_d2xsn1(d2xs):
     --------
     >>> d2xs_to_d2xsn1([[-2890.4327598108, -6687.0990540960065, -1549.375443699441], [-6687.099054095983, -2811.2832904869883, -1228.6223853777503], [-1549.3754436994498, -1228.6223853777562, -3667.388098758508]])
     [[-3459.069971170426, -7576.489323777324], [-7576.489323777299, -4021.4266184899957]]
-    '''
+    """
     N = len(d2xs)-1
     out = [[0.0]*N for _ in range(N)]
     last = d2xs[-1][-1]
@@ -2650,7 +2650,7 @@ def d2xs_to_d2xsn1(d2xs):
 
 
 def none_and_length_check(all_inputs, length=None):
-    r'''Checks inputs for suitability of use by a mixing rule which requires
+    r"""Checks inputs for suitability of use by a mixing rule which requires
     all inputs to be of the same length and non-None. A number of variations
     were attempted for this function; this was found to be the quickest.
 
@@ -2675,7 +2675,7 @@ def none_and_length_check(all_inputs, length=None):
     --------
     >>> none_and_length_check(([1, 1], [1, 1], [1, 30], [10,0]), length=2)
     True
-    '''
+    """
     if not length:
         length = len(all_inputs[0])
     return all(not (None in things or len(things) != length) for things in all_inputs)
@@ -2684,7 +2684,7 @@ def none_and_length_check(all_inputs, length=None):
 
 
 def normalize(values):
-    r'''Simple function which normalizes a series of values to be from 0 to 1,
+    r"""Simple function which normalizes a series of values to be from 0 to 1,
     and for their sum to add to 1.
 
     .. math::
@@ -2708,7 +2708,7 @@ def normalize(values):
     --------
     >>> normalize([3, 2, 1])
     [0.5, 0.3333333333333333, 0.16666666666666666]
-    '''
+    """
     try:
         tot_inv = 1.0/sum(values)
         return [i*tot_inv for i in values]
@@ -2722,7 +2722,7 @@ def normalize(values):
             return []
 
 def remove_zeros(values, tol=1e-6):
-    r'''Simple function which removes zero values from an array, and replaces
+    r"""Simple function which removes zero values from an array, and replaces
     them with a user-specified value, normally a very small number. Helpful
     for the case where a function can work with values very close to zero but
     not quite zero. The resulting array is normalized so the sum is still one.
@@ -2747,7 +2747,7 @@ def remove_zeros(values, tol=1e-6):
     --------
     >>> remove_zeros([0, 1e-9, 1], 1e-12)
     [9.99999998999e-13, 9.99999998999e-10, 0.999999998999]
-    '''
+    """
     if any(i == 0 for i in values):
         ans = normalize([i if i != 0 else tol for i in values])
         if type(values) != list:
@@ -2758,7 +2758,7 @@ def remove_zeros(values, tol=1e-6):
 
 
 def mixing_simple(fracs, props):
-    r'''Simple function calculates a property based on weighted averages of
+    r"""Simple function calculates a property based on weighted averages of
     properties. Weights could be mole fractions, volume fractions, mass
     fractions, or anything else.
 
@@ -2784,7 +2784,7 @@ def mixing_simple(fracs, props):
     --------
     >>> mixing_simple([0.1, 0.9], [0.01, 0.02])
     0.019000000000000003
-    '''
+    """
     tot = 0.0
     for i in range(len(fracs)):
         tot += fracs[i]*props[i]
@@ -2792,7 +2792,7 @@ def mixing_simple(fracs, props):
 
 
 def mixing_logarithmic(fracs, props):
-    r'''Simple function calculates a property based on weighted averages of
+    r"""Simple function calculates a property based on weighted averages of
     logarithmic properties.
 
     .. math::
@@ -2820,14 +2820,14 @@ def mixing_logarithmic(fracs, props):
     --------
     >>> mixing_logarithmic([0.1, 0.9], [0.01, 0.02])
     0.01866065983073615
-    '''
+    """
     tot = 0.0
     for i in range(len(fracs)):
         tot += fracs[i]*trunc_log(props[i])
     return trunc_exp(tot)
 
 def mixing_power(fracs, props, r):
-    r'''Power law mixing rule for any property, with a variable exponent
+    r"""Power law mixing rule for any property, with a variable exponent
     `r` as input. Optimiezd routines are available for common powers.
 
     .. math::
@@ -2870,7 +2870,7 @@ def mixing_power(fracs, props, r):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     N = len(fracs)
     prop = 0.0
     if r == -4.0:
@@ -3062,7 +3062,7 @@ def mixing_power(fracs, props, r):
 
 
 def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
-    r'''Mix two flows of potentially different chemicals of given overall flow
+    r"""Mix two flows of potentially different chemicals of given overall flow
     rates and flow fractions to determine the outlet components, flow rates,
     and compositions. The flows do not need to be of the same length.
 
@@ -3099,7 +3099,7 @@ def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
     --------
     >>> mix_component_flows(['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1'], 1, 1, [0.5, 0.5], [0.5, 0.5])
     (['64-17-5', '67-56-1', '7732-18-5'], [0.5, 0.5, 1.0])
-    '''
+    """
     if (set(IDs1) == set(IDs2)) and (len(IDs1) == len(IDs2)):
             cmps = IDs1
     else:
@@ -3118,7 +3118,7 @@ def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
 
 
 def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
-    r'''Mix two flows of potentially different chemicals; with the feature that
+    r"""Mix two flows of potentially different chemicals; with the feature that
     the mole flows of either or both streams may be unknown.
 
     The flows do not need to be of the same length.
@@ -3158,7 +3158,7 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
     (['64-17-5', '67-56-1', '7732-18-5'], [0.5, 0.0, 0.5])
     >>> mix_component_partial_flows(['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1'], None, None)
     (['64-17-5', '67-56-1', '7732-18-5'], [0.0, 0.0, 0.0])
-    '''
+    """
     if (set(IDs1) == set(IDs2)) and (len(IDs1) == len(IDs2)):
         cmps = IDs1
     else:
@@ -3178,7 +3178,7 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
 
 
 def mix_multiple_component_flows(IDs, flows, fractions):
-    r'''Mix multiple flows of potentially different chemicals of given overall
+    r"""Mix multiple flows of potentially different chemicals of given overall
     flow rates and flow fractions to determine the outlet components, flow
     rates,  and compositions. The flows do not need to be of the same length.
 
@@ -3210,7 +3210,7 @@ def mix_multiple_component_flows(IDs, flows, fractions):
     >>> mix_multiple_component_flows([['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1']],
     ... [1, 1], [[0.5, 0.5], [0.5, 0.5]])
     (['64-17-5', '67-56-1', '7732-18-5'], [0.5, 0.5, 1.0])
-    '''
+    """
     n_inputs = len(IDs)
     assert n_inputs == len(flows) == len(fractions)
     if n_inputs == 1:
@@ -3235,7 +3235,7 @@ def mix_multiple_component_flows(IDs, flows, fractions):
 
 
 def solve_flow_composition_mix(Fs, zs, ws, MWs):
-    r'''Solve a stream composition problem where some specs are mole flow rates;
+    r"""Solve a stream composition problem where some specs are mole flow rates;
     some are mass fractions; and some are mole fractions. This algorithm
     requires at least one mole flow rate; and for every other component, a
     single spec in mole or mass or a flow rate. It is permissible for no
@@ -3285,7 +3285,7 @@ def solve_flow_composition_mix(Fs, zs, ws, MWs):
     [0.6932356751002141, 0.1, 0.2, 0.0033583706669188186, 0.003405954232867038]
     >>> ws
     [0.5154077420893426, 0.19012206531421305, 0.26447019259644433, 0.01, 0.02]
-    '''
+    """
     # Fs needs to have at least one flow in it
     # Either F, z, or w needs to be specified for every flow.
     # MW needs to be specified for every component.

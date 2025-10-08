@@ -24,7 +24,7 @@ SOFTWARE.
 
 import fluids
 
-__version__ = '1.3.3'
+__version__ = "1.3.3"
 from math import isnan
 
 if not fluids.numerics.is_micropython:
@@ -97,38 +97,38 @@ if not fluids.numerics.is_micropython:
     from .viscosity import *  # noqa: F403
     from .volume import *  # noqa: F403
     __all__ = [
-        'acentric',
-        'air',
-        'combustion',
-        'critical',
-        'dipole',
-        'dippr',
-        'elements',
-        'environment',
-        'exceptions',
-        'flash_basic',
-        'heat_capacity',
-        'iapws',
-        'identifiers',
-        'interface',
-        'lennard_jones',
-        'miscdata',
-        'molecular_geometry',
-        'permittivity',
-        'phase_change',
-        'rachford_rice',
-        'reaction',
-        'refractivity',
-        'safety',
-        'solubility',
-        'temperature',
-        'thermal_conductivity',
-        'triple',
-        'utils',
-        'vapor_pressure',
-        'virial',
-        'viscosity',
-        'volume',
+        "acentric",
+        "air",
+        "combustion",
+        "critical",
+        "dipole",
+        "dippr",
+        "elements",
+        "environment",
+        "exceptions",
+        "flash_basic",
+        "heat_capacity",
+        "iapws",
+        "identifiers",
+        "interface",
+        "lennard_jones",
+        "miscdata",
+        "molecular_geometry",
+        "permittivity",
+        "phase_change",
+        "rachford_rice",
+        "reaction",
+        "refractivity",
+        "safety",
+        "solubility",
+        "temperature",
+        "thermal_conductivity",
+        "triple",
+        "utils",
+        "vapor_pressure",
+        "virial",
+        "viscosity",
+        "volume",
     ]
 
     __all__.extend(exceptions.__all__)
@@ -200,7 +200,7 @@ if not fluids.numerics.is_micropython:
         combustion._load_combustion_data()
         solubility._load_solubility_data()
         try:
-            identifiers.search_chemical('asdfasddsaf', autoload=True, cache=False)
+            identifiers.search_chemical("asdfasddsaf", autoload=True, cache=False)
         except:
             pass
 
@@ -212,7 +212,7 @@ if not fluids.numerics.is_micropython:
                 CASs_found.append(CASs[i])
         return values_found, CASs_found
     def constant_statistics():
-        '''
+        """
 
         Returns
         -------
@@ -220,15 +220,15 @@ if not fluids.numerics.is_micropython:
             Counts of each constant property and the number of chemicals that
             values are available for, [-]
 
-        '''
+        """
         complete_lazy_loading()
         counts = {}
-        properties = ['Tt', 'Pt', 'Tm', 'Tb', 'Tc', 'Pc', 'Vc', 'Zc',
-                      'omega', 'T_flash', 'T_autoignition', 'LFL', 'UFL',
-                     'Hfs', 'Hfl', 'Hfg', 'S0s', 'S0l', 'S0g',
-                     'RI', 'Hfus', 'Stockmayer', 'molecular_diameter'
-                     'Dipole', 'logP', 'RG', 'RON', 'MON', 'IGNITION_DELAY',
-                     'linear', 'HANSEN_DELTA_D', 'HANSEN_DELTA_P', 'HANSEN_DELTA_H']
+        properties = ["Tt", "Pt", "Tm", "Tb", "Tc", "Pc", "Vc", "Zc",
+                      "omega", "T_flash", "T_autoignition", "LFL", "UFL",
+                     "Hfs", "Hfl", "Hfg", "S0s", "S0l", "S0g",
+                     "RI", "Hfus", "Stockmayer", "molecular_diameter"
+                     "Dipole", "logP", "RG", "RON", "MON", "IGNITION_DELAY",
+                     "linear", "HANSEN_DELTA_D", "HANSEN_DELTA_P", "HANSEN_DELTA_H"]
         for df in data_reader.df_sources.values():
             for p in properties:
                 if p in df.columns:
@@ -252,23 +252,23 @@ if not fluids.numerics.is_micropython:
         names = [x for _, x in sorted(zip(usages, names))]
         usages.sort()
         for name, use in zip(names, usages):
-            print(f'{name} : {use/1024**2:3f} MB')
-        print(f'Total usage: {sum(usages)/1024**2:3f} MB')
+            print(f"{name} : {use/1024**2:3f} MB")
+        print(f"Total usage: {sum(usages)/1024**2:3f} MB")
 
     def __getattr__(name):
-        if name == 'vectorized':
+        if name == "vectorized":
             import chemicals.vectorized
             globals()[name] = chemicals.vectorized
             return chemicals.vectorized
-        if name == 'numba':
+        if name == "numba":
             import chemicals.numba
             globals()[name] = chemicals.numba
             return chemicals.numba
-        if name == 'units':
+        if name == "units":
             import chemicals.units
             globals()[name] = chemicals.units
             return chemicals.units
-        if name == 'numba_vectorized':
+        if name == "numba_vectorized":
             import chemicals.numba_vectorized
             globals()[name] = chemicals.numba_vectorized
             return chemicals.numba_vectorized

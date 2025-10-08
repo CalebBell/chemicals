@@ -122,23 +122,23 @@ significant error exists.
 
 
 __all__ = [
-    'Li_Johns_Ahmadi_solution',
-    'Rachford_Rice_flash2_f_jac',
-    'Rachford_Rice_flashN_f_jac',
-    'Rachford_Rice_flash_error',
-    'Rachford_Rice_polynomial',
-    'Rachford_Rice_solution',
-    'Rachford_Rice_solution2',
-    'Rachford_Rice_solutionN',
-    'Rachford_Rice_solution_LN2',
-    'Rachford_Rice_solution_Leibovici_Neoschil',
-    'Rachford_Rice_solution_Leibovici_Neoschil_dd',
-    'Rachford_Rice_solution_binary_dd',
-    'Rachford_Rice_solution_mpmath',
-    'Rachford_Rice_solution_polynomial',
-    'flash_inner_loop',
-    'flash_inner_loop_all_methods',
-    'flash_inner_loop_methods',
+    "Li_Johns_Ahmadi_solution",
+    "Rachford_Rice_flash2_f_jac",
+    "Rachford_Rice_flashN_f_jac",
+    "Rachford_Rice_flash_error",
+    "Rachford_Rice_polynomial",
+    "Rachford_Rice_solution",
+    "Rachford_Rice_solution2",
+    "Rachford_Rice_solutionN",
+    "Rachford_Rice_solution_LN2",
+    "Rachford_Rice_solution_Leibovici_Neoschil",
+    "Rachford_Rice_solution_Leibovici_Neoschil_dd",
+    "Rachford_Rice_solution_binary_dd",
+    "Rachford_Rice_solution_mpmath",
+    "Rachford_Rice_solution_polynomial",
+    "flash_inner_loop",
+    "flash_inner_loop_all_methods",
+    "flash_inner_loop_methods",
 ]
 
 from fluids.numerics import (
@@ -1370,7 +1370,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     return LFr, VFr, xs, ys
 
 def Rachford_Rice_solution_binary_dd(zs, Ks):
-    r'''Solves the the Rachford-Rice flash equation for a binary system using
+    r"""Solves the the Rachford-Rice flash equation for a binary system using
     double-double math. This increases the range in which the
     calculation can be performed accurately but does not totally eliminate
     error.
@@ -1418,7 +1418,7 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
     :obj:`Rachford_Rice_solution_mpmath`. For example, with `z0` of 1e-28
     in the above example error creeps back in.
 
-    '''
+    """
     if len(zs) != 2:
         raise ValueError("This solution method works on two components only")
     z0, z1 = zs
@@ -1474,7 +1474,7 @@ def Rachford_Rice_solution_binary_dd(zs, Ks):
 
 @mark_numba_incompatible
 def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
-    r'''Solves the the Rachford-Rice flash equation using numerical
+    r"""Solves the the Rachford-Rice flash equation using numerical
     root-finding to a high precision using the `mpmath` library.
 
     .. math::
@@ -1517,7 +1517,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
     (0.3092697372261456, 0.6907302627738544, [0.33940869696634357, 0.3650560590371706, 0.29553524399648584], [0.5719036543882889, 0.27087159580558057, 0.15722474980613046])
     >>> Rachford_Rice_solution_mpmath(zs=[0.999999999999, 1e-12], Ks=[2.0, 1e-12])
     (1e-12, 0.999999999999, [0.49999999999975003, 0.50000000000025], [0.9999999999995001, 5.0000000000025e-13])
-    '''
+    """
     # extremely important to validate high decimal precision with mpmath
     # numerical issues make this an open research problem with respect to maintaining speed
     from mpmath import mp, mpf
@@ -2100,15 +2100,15 @@ def _Rachford_Rice_analytical_3(zs, Ks):
 
 
 
-FLASH_INNER_ANALYTICAL = 'Analytical'
-FLASH_INNER_SECANT = 'Rachford-Rice (Secant)'
-FLASH_INNER_NR = 'Rachford-Rice (Newton-Raphson)'
-FLASH_INNER_HALLEY = 'Rachford-Rice (Halley)'
-FLASH_INNER_NUMPY = 'Rachford-Rice (NumPy)'
-FLASH_INNER_LJA = 'Li-Johns-Ahmadi'
-FLASH_INNER_POLY = 'Rachford-Rice (polynomial)'
-FLASH_INNER_LN2 = 'Leibovici and Nichita 2'
-FLASH_INNER_LN = 'Leibovici and Neoschil'
+FLASH_INNER_ANALYTICAL = "Analytical"
+FLASH_INNER_SECANT = "Rachford-Rice (Secant)"
+FLASH_INNER_NR = "Rachford-Rice (Newton-Raphson)"
+FLASH_INNER_HALLEY = "Rachford-Rice (Halley)"
+FLASH_INNER_NUMPY = "Rachford-Rice (NumPy)"
+FLASH_INNER_LJA = "Li-Johns-Ahmadi"
+FLASH_INNER_POLY = "Rachford-Rice (polynomial)"
+FLASH_INNER_LN2 = "Leibovici and Nichita 2"
+FLASH_INNER_LN = "Leibovici and Neoschil"
 
 flash_inner_loop_all_methods = (FLASH_INNER_ANALYTICAL,
                                 FLASH_INNER_SECANT,
@@ -2154,7 +2154,7 @@ def flash_inner_loop_methods(N):
 
 @mark_numba_uncacheable
 def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
-    r'''This function handles the solution of the inner loop of a flash
+    r"""This function handles the solution of the inner loop of a flash
     calculation, solving for liquid and gas mole fractions and vapor fraction
     based on specified overall mole fractions and K values. As K values are
     weak functions of composition, this should be called repeatedly by an outer
@@ -2213,7 +2213,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
     --------
     >>> flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532])
     (0.6907302627738, [0.3394086969663, 0.3650560590371, 0.29553524399648], [0.571903654388, 0.27087159580558, 0.1572247498061])
-    '''
+    """
     l = len(zs)
     if method is None:
         method2 = FLASH_INNER_ANALYTICAL if l < 3 else (FLASH_INNER_NUMPY if (not IS_PYPY and l >= 10) else FLASH_INNER_LN2)
@@ -2315,7 +2315,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
         elif l == 1:
             raise ValueError("Input dimensions are for one component! Rachford-Rice does not apply")
         else:
-            raise ValueError('Only solutions for components counts 2, 3, and 4 are available analytically')
+            raise ValueError("Only solutions for components counts 2, 3, and 4 are available analytically")
         # Need to avoid zero divisions here - specifically when the composition of one component in the feed is 0.0
         xs = [0.0]*l
         ys = [0.0]*l
@@ -2343,7 +2343,7 @@ def flash_inner_loop(zs, Ks, method=None, guess=None, check=False):
     elif method2 == FLASH_INNER_POLY:
         return Rachford_Rice_solution_polynomial(zs=zs, Ks=Ks)
     else:
-        raise ValueError('Incorrect method input')
+        raise ValueError("Incorrect method input")
 
 
 ### N phase RR

@@ -54,17 +54,17 @@ from chemicals.rachford_rice import flash_inner_loop
 from chemicals.utils import mark_numba_uncacheable
 
 __all__ = [
-    'K_value',
-    'PR_water_K_value',
-    'Wilson_K_value',
-    'flash_Tb_Tc_Pc',
-    'flash_ideal',
-    'flash_wilson',
+    "K_value",
+    "PR_water_K_value",
+    "Wilson_K_value",
+    "flash_Tb_Tc_Pc",
+    "flash_ideal",
+    "flash_wilson",
 ]
 
 
 def K_value(P=None, Psat=None, phi_l=None, phi_g=None, gamma=None, Poynting=1.0):
-    r'''Calculates the equilibrium K-value assuming Raoult's law,
+    r"""Calculates the equilibrium K-value assuming Raoult's law,
     or an equation of state model, or an activity coefficient model,
     or a combined equation of state-activity model.
 
@@ -181,7 +181,7 @@ def K_value(P=None, Psat=None, phi_l=None, phi_g=None, gamma=None, Poynting=1.0)
        Wiley-VCH, 2012.
     .. [2] Skogestad, Sigurd. Chemical and Energy Process Engineering. 1st
        edition. Boca Raton, FL: CRC Press, 2008.
-    '''
+    """
     try:
         if gamma is not None:
             if phi_l is not None:
@@ -191,8 +191,8 @@ def K_value(P=None, Psat=None, phi_l=None, phi_g=None, gamma=None, Poynting=1.0)
             return phi_l/phi_g
         return Psat/P
     except:
-        raise TypeError('Input must consist of one set from (P, Psat, phi_l, '
-                        'phi_g, gamma), (P, Psat, gamma), (phi_l, phi_g), (P, Psat)')
+        raise TypeError("Input must consist of one set from (P, Psat, phi_l, "
+                        "phi_g, gamma), (P, Psat, gamma), (phi_l, phi_g), (P, Psat)")
 
 
 def Wilson_K_value(T, P, Tc, Pc, omega):
@@ -336,7 +336,7 @@ def err_Wilson_PVF(T_guess, N, P_inv, VF, Tcs, Pcs, Ks, zs, xs, x50s):
 
 @mark_numba_uncacheable
 def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
-    r'''PVT flash model using Wilson's equation - useful for obtaining initial
+    r"""PVT flash model using Wilson's equation - useful for obtaining initial
     guesses for more rigorous models, or it can be used as its own model.
     Capable of solving with two of `T`, `P`, and `VF` for the other one;
     that results in three solve modes, but for `VF=1` and `VF=0`, there are
@@ -398,7 +398,7 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
     >>> zs = [0.4, 0.6]
     >>> flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, T=300, P=1e5)
     (300, 100000.0, 0.422194532936, [0.02093881508003, 0.979061184919], [0.918774185622, 0.0812258143])
-    '''
+    """
     T_MAX = 50000.0
     N = len(zs)
     # Assume T and P to begin with
@@ -690,7 +690,7 @@ def flash_Tb_Tc_Pc(zs, Tbs, Tcs, Pcs, T=None, P=None, VF=None):
 
 
 def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
-    r'''PVT flash model using ideal, composition-independent equation.
+    r"""PVT flash model using ideal, composition-independent equation.
     Solves the various cases of composition-independent models.
 
     Capable of solving with two of `T`, `P`, and `VF` for the other one;
@@ -813,7 +813,7 @@ def flash_ideal(zs, funcs, Tcs=None, T=None, P=None, VF=None):
 
     Note that while this works for PT composition independent flashes - an
     outer iterating loop is needed for composition dependence!
-    '''
+    """
     T_MAX = 50000.0
     N = len(zs)
     cmps = range(N)

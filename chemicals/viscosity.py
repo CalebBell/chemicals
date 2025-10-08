@@ -173,35 +173,35 @@ The structure of each dataframe is shown below:
 
 
 __all__ = [
-    'PPDS5',
-    'PPDS9',
-    'Brokaw',
-    'Herning_Zipperer',
-    'Letsou_Stiel',
-    'Lorentz_Bray_Clarke',
-    'Lucas',
-    'Lucas_gas',
-    'Przedziecki_Sridhar',
-    'Stiel_Thodos',
-    'Twu_1985',
-    'Viswanath_Natarajan_2',
-    'Viswanath_Natarajan_2_exponential',
-    'Viswanath_Natarajan_3',
-    'Wilke',
-    'Wilke_large',
-    'Wilke_prefactored',
-    'Wilke_prefactors',
-    'Yoon_Thodos',
-    'dPPDS9_dT',
-    'dmu_Yaws_dT',
-    'mu_IAPWS',
-    'mu_TDE',
-    'mu_Yaws',
-    'mu_Yaws_fitting_jacobian',
-    'mu_air_lemmon',
-    'viscosity_converter',
-    'viscosity_gas_Gharagheizi',
-    'viscosity_index',
+    "PPDS5",
+    "PPDS9",
+    "Brokaw",
+    "Herning_Zipperer",
+    "Letsou_Stiel",
+    "Lorentz_Bray_Clarke",
+    "Lucas",
+    "Lucas_gas",
+    "Przedziecki_Sridhar",
+    "Stiel_Thodos",
+    "Twu_1985",
+    "Viswanath_Natarajan_2",
+    "Viswanath_Natarajan_2_exponential",
+    "Viswanath_Natarajan_3",
+    "Wilke",
+    "Wilke_large",
+    "Wilke_prefactored",
+    "Wilke_prefactors",
+    "Yoon_Thodos",
+    "dPPDS9_dT",
+    "dmu_Yaws_dT",
+    "mu_IAPWS",
+    "mu_TDE",
+    "mu_Yaws",
+    "mu_Yaws_fitting_jacobian",
+    "mu_air_lemmon",
+    "viscosity_converter",
+    "viscosity_gas_Gharagheizi",
+    "viscosity_index",
 ]
 
 from math import acos, atan, tan
@@ -212,28 +212,28 @@ from fluids.numerics import numpy as np
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
-folder = os_path_join(source_path, 'Viscosity')
+folder = os_path_join(source_path, "Viscosity")
 
-register_df_source(folder, 'Dutt Prasad 3 term.tsv', csv_kwargs={
-            'dtype':{'A': float, 'B': float, 'C': float, 'Tmin': float, 'Tmax': float}})
+register_df_source(folder, "Dutt Prasad 3 term.tsv", csv_kwargs={
+            "dtype":{"A": float, "B": float, "C": float, "Tmin": float, "Tmax": float}})
 
-register_df_source(folder, 'Viswanath Natarajan Dynamic 3 term.tsv', csv_kwargs={
-        'dtype':{'A': float, 'B': float, 'C': float, 'Tmin': float, 'Tmax': float}})
+register_df_source(folder, "Viswanath Natarajan Dynamic 3 term.tsv", csv_kwargs={
+        "dtype":{"A": float, "B": float, "C": float, "Tmin": float, "Tmax": float}})
 
-register_df_source(folder, 'Viswanath Natarajan Dynamic 2 term.tsv', csv_kwargs={
-    'dtype':{'A': float, 'B': float, 'Tmin': float, 'Tmax': float}})
+register_df_source(folder, "Viswanath Natarajan Dynamic 2 term.tsv", csv_kwargs={
+    "dtype":{"A": float, "B": float, "Tmin": float, "Tmax": float}})
 
-register_df_source(folder, 'Viswanath Natarajan Dynamic 2 term Exponential.tsv', csv_kwargs={
-    'dtype':{'C': float, 'D': float, 'Tmin': float, 'Tmax': float}})
+register_df_source(folder, "Viswanath Natarajan Dynamic 2 term Exponential.tsv", csv_kwargs={
+    "dtype":{"C": float, "D": float, "Tmin": float, "Tmax": float}})
 
-register_df_source(folder, 'Table 2-313 Viscosity of Inorganic and Organic Liquids.tsv')
+register_df_source(folder, "Table 2-313 Viscosity of Inorganic and Organic Liquids.tsv")
 
-register_df_source(folder, 'Table 2-312 Vapor Viscosity of Inorganic and Organic Substances.tsv', csv_kwargs={
-    'dtype':{'C1': float, 'C2': float, 'C3': float, 'C4': float, 'Tmin': float, 'Tmax': float}})
+register_df_source(folder, "Table 2-312 Vapor Viscosity of Inorganic and Organic Substances.tsv", csv_kwargs={
+    "dtype":{"C1": float, "C2": float, "C3": float, "C4": float, "Tmin": float, "Tmax": float}})
 
 
-register_df_source(folder, 'VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv', csv_kwargs={'float_precision': 'legacy'})
-register_df_source(folder, 'VDI PPDS Dynamic viscosity of gases polynomials.tsv', csv_kwargs={'float_precision': 'legacy'})
+register_df_source(folder, "VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv", csv_kwargs={"float_precision": "legacy"})
+register_df_source(folder, "VDI PPDS Dynamic viscosity of gases polynomials.tsv", csv_kwargs={"float_precision": "legacy"})
 
 
 
@@ -246,38 +246,38 @@ def _load_mu_data():
     global mu_data_Perrys_8E_2_312, mu_values_Perrys_8E_2_312
     global mu_data_VDI_PPDS_7, mu_values_PPDS_7, mu_data_VDI_PPDS_8, mu_values_PPDS_8
 
-    mu_data_Dutt_Prasad = data_source('Dutt Prasad 3 term.tsv')
+    mu_data_Dutt_Prasad = data_source("Dutt Prasad 3 term.tsv")
     mu_values_Dutt_Prasad = np.array(mu_data_Dutt_Prasad.values[:, 1:], dtype=float)
 
-    mu_data_VN3 = data_source('Viswanath Natarajan Dynamic 3 term.tsv')
+    mu_data_VN3 = data_source("Viswanath Natarajan Dynamic 3 term.tsv")
     mu_values_VN3 = np.array(mu_data_VN3.values[:, 2:], dtype=float)
 
-    mu_data_VN2 = data_source('Viswanath Natarajan Dynamic 2 term.tsv')
+    mu_data_VN2 = data_source("Viswanath Natarajan Dynamic 2 term.tsv")
     mu_values_VN2 = np.array(mu_data_VN2.values[:, 2:], dtype=float)
 
-    mu_data_VN2E = data_source('Viswanath Natarajan Dynamic 2 term Exponential.tsv')
+    mu_data_VN2E = data_source("Viswanath Natarajan Dynamic 2 term Exponential.tsv")
     mu_values_VN2E = np.array(mu_data_VN2E.values[:, 2:], dtype=float)
 
-    mu_data_Perrys_8E_2_313 = data_source('Table 2-313 Viscosity of Inorganic and Organic Liquids.tsv')
+    mu_data_Perrys_8E_2_313 = data_source("Table 2-313 Viscosity of Inorganic and Organic Liquids.tsv")
     mu_values_Perrys_8E_2_313 = np.array(mu_data_Perrys_8E_2_313.values[:, 1:], dtype=float)
 
-    mu_data_Perrys_8E_2_312 = data_source('Table 2-312 Vapor Viscosity of Inorganic and Organic Substances.tsv')
+    mu_data_Perrys_8E_2_312 = data_source("Table 2-312 Vapor Viscosity of Inorganic and Organic Substances.tsv")
     mu_values_Perrys_8E_2_312 = np.array(mu_data_Perrys_8E_2_312.values[:, 1:], dtype=float)
 
-    mu_data_VDI_PPDS_7 = data_source('VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv')
+    mu_data_VDI_PPDS_7 = data_source("VDI PPDS Dynamic viscosity of saturated liquids polynomials.tsv")
     mu_values_PPDS_7 = np.array(mu_data_VDI_PPDS_7.values[:, 2:], dtype=float)
 
-    mu_data_VDI_PPDS_8 = data_source('VDI PPDS Dynamic viscosity of gases polynomials.tsv')
+    mu_data_VDI_PPDS_8 = data_source("VDI PPDS Dynamic viscosity of gases polynomials.tsv")
     mu_values_PPDS_8 = np.array(mu_data_VDI_PPDS_8.values[:, 1:], dtype=float)
 
     _mu_data_loaded = True
 
 def __getattr__(name):
-    if name in ('mu_data_Dutt_Prasad', 'mu_values_Dutt_Prasad', 'mu_data_VN3',
-                'mu_values_VN3', 'mu_data_VN2', 'mu_values_VN2', 'mu_data_VN2E',
-                'mu_values_VN2E', 'mu_data_Perrys_8E_2_313', 'mu_values_Perrys_8E_2_313',
-                'mu_data_Perrys_8E_2_312', 'mu_values_Perrys_8E_2_312', 'mu_data_VDI_PPDS_7',
-                'mu_values_PPDS_7', 'mu_data_VDI_PPDS_8', 'mu_values_PPDS_8'):
+    if name in ("mu_data_Dutt_Prasad", "mu_values_Dutt_Prasad", "mu_data_VN3",
+                "mu_values_VN3", "mu_data_VN2", "mu_values_VN2", "mu_data_VN2E",
+                "mu_values_VN2E", "mu_data_Perrys_8E_2_313", "mu_values_Perrys_8E_2_313",
+                "mu_data_Perrys_8E_2_312", "mu_values_Perrys_8E_2_312", "mu_data_VDI_PPDS_7",
+                "mu_values_PPDS_7", "mu_data_VDI_PPDS_8", "mu_values_PPDS_8"):
         _load_mu_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -645,7 +645,7 @@ def mu_air_lemmon(T, rho):
 
 
 def Viswanath_Natarajan_2(T, A, B):
-    r'''Calculate the viscosity of a liquid using the 2-term form
+    r"""Calculate the viscosity of a liquid using the 2-term form
     representation developed in [1]_. Requires input coefficients. The `A`
     coefficient is assumed to yield coefficients in Pa*s; if it yields
     values in 1E-3 Pa*s, remove log(100) for A.
@@ -682,12 +682,12 @@ def Viswanath_Natarajan_2(T, A, B):
     ----------
     .. [1] Viswanath, Dabir S., and G. Natarajan. Databook On The Viscosity Of
        Liquids. New York: Taylor & Francis, 1989
-    '''
+    """
     return exp(A + B/T)
 
 
 def Viswanath_Natarajan_2_exponential(T, C, D):
-    r'''Calculate the viscosity of a liquid using the 2-term exponential form
+    r"""Calculate the viscosity of a liquid using the 2-term exponential form
     representation developed in [1]_. Requires input coefficients. The `A`
     coefficient is assumed to yield coefficients in Pa*s, as all
     coefficients found so far have been.
@@ -730,12 +730,12 @@ def Viswanath_Natarajan_2_exponential(T, C, D):
     ----------
     .. [1] Viswanath, Dabir S., and G. Natarajan. Databook On The Viscosity Of
        Liquids. New York: Taylor & Francis, 1989
-    '''
+    """
     return C*T**D
 
 
 def Viswanath_Natarajan_3(T, A, B, C):
-    r'''Calculate the viscosity of a liquid using the 3-term Antoine form
+    r"""Calculate the viscosity of a liquid using the 3-term Antoine form
     representation developed in [1]_. Requires input coefficients. If the
     coefficients do not yield viscosity in Pa*s, but rather cP, remove
     log10(1000) from `A`.
@@ -773,11 +773,11 @@ def Viswanath_Natarajan_3(T, A, B, C):
     ----------
     .. [1] Viswanath, Dabir S., and G. Natarajan. Databook On The Viscosity Of
        Liquids. New York: Taylor & Francis, 1989
-    '''
+    """
     return 10.0**(A + B/(C - T))
 
 def mu_Yaws(T, A, B, C=0.0, D=0.0):
-    r'''Calculate the viscosity of a liquid using the 4-term Yaws polynomial
+    r"""Calculate the viscosity of a liquid using the 4-term Yaws polynomial
     form. Requires input coefficients. If the
     coefficients do not yield viscosity in Pa*s, but rather cP, remove
     log10(1000) from `A`; this is required for the coefficients in [1]_.
@@ -817,14 +817,14 @@ def mu_Yaws(T, A, B, C=0.0, D=0.0):
     .. [1] Yaws, Carl L. Thermophysical Properties of Chemicals and
        Hydrocarbons, Second Edition. 2 edition. Amsterdam Boston: Gulf
        Professional Publishing, 2014.
-    '''
+    """
     exponent = (A + B/T + T*(C + D*T))
     if exponent > 308.0:
         return 1e308
     return 10.0**exponent
 
 def dmu_Yaws_dT(T, A, B, C=0.0, D=0.0):
-    r'''Calculate the temperature derivative of the viscosity of a liquid using
+    r"""Calculate the temperature derivative of the viscosity of a liquid using
     the 4-term Yaws polynomial form. Requires input coefficients.
 
     .. math::
@@ -857,13 +857,13 @@ def dmu_Yaws_dT(T, A, B, C=0.0, D=0.0):
     --------
     >>> dmu_Yaws_dT(300.0, -9.4406, 1117.6, 0.0137, -0.000015465)
     -1.853591586963e-05
-    '''
+    """
     x0 = D*T
     B_T = B/T
     return 10.0**(A + B_T + T*(C + x0))*(-B_T/T + C + 2.0*x0)*2.302585092994046
 
 def mu_Yaws_fitting_jacobian(Ts, A, B, C, D):
-    r'''Compute and return the Jacobian of the property predicted by
+    r"""Compute and return the Jacobian of the property predicted by
     the Yaws viscosity equation with respect to all the coefficients. This is
     used in fitting parameters for chemicals.
 
@@ -886,7 +886,7 @@ def mu_Yaws_fitting_jacobian(Ts, A, B, C, D):
         Matrix of derivatives of the equation with respect to the fitting
         parameters, [various]
 
-    '''
+    """
     N = len(Ts)
 #    out = np.zeros((N, 4)) # numba: uncomment
     out = [[0.0]*4 for _ in range(N)] # numba: delete
@@ -902,7 +902,7 @@ def mu_Yaws_fitting_jacobian(Ts, A, B, C, D):
     return out
 
 def PPDS9(T, A, B, C, D, E):
-    r'''Calculate the viscosity of a liquid using the 5-term exponential power
+    r"""Calculate the viscosity of a liquid using the 5-term exponential power
     fit developed by the PPDS and named PPDS equation 9.
 
     .. math::
@@ -945,7 +945,7 @@ def PPDS9(T, A, B, C, D, E):
     ----------
     .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
        Berlin; New York:: Springer, 2010.
-    '''
+    """
     term = (C - T)/(T-D)
     if term < 0.0:
         term1 = -((T - C)/(T-D))**(1/3.)
@@ -956,7 +956,7 @@ def PPDS9(T, A, B, C, D, E):
     return mu
 
 def dPPDS9_dT(T, A, B, C, D, E):
-    r'''Calculate the temperature derivative of  viscosity of a liquid using
+    r"""Calculate the temperature derivative of  viscosity of a liquid using
     the 5-term exponential power fit developed by the PPDS and named PPDS
     equation 9.
 
@@ -1021,7 +1021,7 @@ def dPPDS9_dT(T, A, B, C, D, E):
     ----------
     .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
        Berlin; New York:: Springer, 2010.
-    '''
+    """
     term = (C - T)/(T-D)
     if term < 0.0:
         x0 = 1.0/(-D + T)
@@ -1464,7 +1464,7 @@ def Stiel_Thodos(T, Tc, Pc, MW):
 
 
 def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
-    r'''Estimate the viscosity of a gas using an emperical
+    r"""Estimate the viscosity of a gas using an emperical
     formula developed in several sources, but as discussed in [1]_ as the
     original sources are in German or merely personal communications with the
     authors of [1]_.
@@ -1529,7 +1529,7 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
     ----------
     .. [1] Reid, Robert C.; Prausnitz, John M.; Poling, Bruce E.
        Properties of Gases and Liquids. McGraw-Hill Companies, 1987.
-    '''
+    """
     Tc_inv = 1.0/Tc
     Tr = T*Tc_inv
     MW_inv = 1.0/MW
@@ -1547,11 +1547,11 @@ def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
     FQ = 1.0
     if CASRN is not None:
         Q = 0.0
-        if CASRN == '7440-59-7':
+        if CASRN == "7440-59-7":
             Q = 1.38
-        elif CASRN == '1333-74-0':
+        elif CASRN == "1333-74-0":
             Q = 0.76
-        elif CASRN == '7782-39-0':
+        elif CASRN == "7782-39-0":
             Q = 0.52
         if Q != 0.0:
             if Tr - 12.0 > 0.0:
@@ -1735,7 +1735,7 @@ def Wilke(ys, mus, MWs):
 
 
 def Wilke_prefactors(MWs):
-    r'''The :obj:`Wilke` gas viscosity method can be sped up by precomputing several
+    r"""The :obj:`Wilke` gas viscosity method can be sped up by precomputing several
     matrices. The memory used is proportional to N^2, so it can be significant,
     but is still a substantial performance increase even when they are so large
     they cannot fit into cached memory. These matrices are functions of
@@ -1789,7 +1789,7 @@ def Wilke_prefactors(MWs):
     ([[0.25, 0.19392193320396522], [0.3179655106303118, 0.25]], [[0.5, 0.421161930934918], [0.5856226024677849, 0.5]], [[0.25, 0.22867110638055677], [0.2696470380083788, 0.25]])
     >>> Wilke_prefactored([0.05, 0.95], [1.34E-5, 9.5029E-6], *Wilke_prefactors([64.06, 46.07]))
     9.701614885866193e-06
-    '''
+    """
     cmps = range(len(MWs))
     MWs_inv = [1.0/MWi for MWi in MWs]
     phi_fact_invs = [[1.0/(8.0*(1.0 + MWs[i]*MWs_inv[j]))**0.5
@@ -2362,7 +2362,7 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
 
 
 def _round_whole_even(i):
-    r'''Round a number to the nearest whole number. If the number is exactly
+    r"""Round a number to the nearest whole number. If the number is exactly
     between two numbers, round to the even whole number. Used by
     `viscosity_index`.
 
@@ -2385,7 +2385,7 @@ def _round_whole_even(i):
     --------
     _round_whole_even(116.5)
     116
-    '''
+    """
     if i % .5 == 0.0:
         if (i + 0.5) % 2 == 0.0:
             i = i + 0.5
@@ -2491,7 +2491,7 @@ VI_Hs = [6.394, 6.894, 7.41, 7.944, 8.496, 9.063, 9.647, 10.25, 10.87, 11.5,
 ]
 
 def viscosity_index(nu_40, nu_100, rounding=False):
-    r'''Calculates the viscosity index of a liquid. Requires dynamic viscosity
+    r"""Calculates the viscosity index of a liquid. Requires dynamic viscosity
     of a liquid at 40°C and 100°C. Value may either be returned with or
     without rounding. Rounding is performed per the standard.
 
@@ -2555,7 +2555,7 @@ def viscosity_index(nu_40, nu_100, rounding=False):
     .. [1] ASTM D2270-10(2016) Standard Practice for Calculating Viscosity
        Index from Kinematic Viscosity at 40 °C and 100 °C, ASTM International,
        West Conshohocken, PA, 2016, http://dx.doi.org/10.1520/D2270-10R16
-    '''
+    """
     nu_40, nu_100 = nu_40*1E6, nu_100*1E6  # m^2/s to mm^2/s
     if nu_100 < 2.0:
         return None  # Not defined for under this
@@ -2585,100 +2585,100 @@ viscosity_scales = {}
 
 SSU_SSU = [31.0, 35.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 150.0, 200.0, 250.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0, 1500.0, 2000.0, 2500.0, 3000.0, 4000.0, 5000.0, 6000.0, 7000.0, 8000.0, 9000.0, 10000.0, 15000.0, 20000.0]
 SSU_nu = [1.0, 2.56, 4.3, 7.4, 10.3, 13.1, 15.7, 18.2, 20.6, 32.1, 43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0, 3300.0, 4400.0]
-viscosity_scales['saybolt universal'] = (SSU_SSU, SSU_nu)
+viscosity_scales["saybolt universal"] = (SSU_SSU, SSU_nu)
 
 SSF_SSF = [12.95, 13.7, 14.44, 15.24, 19.3, 23.5, 28.0, 32.5, 41.9, 51.6, 61.4, 71.1, 81.0, 91.0, 100.7, 150.0, 200.0, 250.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0, 1500.0, 2000.0]
 SSF_nu = [13.1, 15.7, 18.2, 20.6, 32.1, 43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0, 3300.0, 4400.0]
-viscosity_scales['saybolt furol'] = (SSF_SSF, SSF_nu)
+viscosity_scales["saybolt furol"] = (SSF_SSF, SSF_nu)
 
 SRS_SRS = [29.0, 32.1, 36.2, 44.3, 52.3, 60.9, 69.2, 77.6, 85.6, 128.0, 170.0, 212.0, 254.0, 338.0, 423.0, 508.0, 592.0, 677.0, 762.0, 896.0, 1270.0, 1690.0, 2120.0, 2540.0, 3380.0, 4230.0, 5080.0, 5920.0, 6770.0, 7620.0, 8460.0, 13700.0, 18400.0]
 SRS_nu = SSU_nu
-viscosity_scales['redwood standard'] = (SRS_SRS, SRS_nu)
+viscosity_scales["redwood standard"] = (SRS_SRS, SRS_nu)
 
 SRA_SRA = [5.1, 5.83, 6.77, 7.6, 8.44, 9.3, 10.12, 14.48, 18.9, 23.45, 28.0, 37.1, 46.2, 55.4, 64.6, 73.8, 83.0, 92.1, 138.2, 184.2, 230.0, 276.0, 368.0, 461.0, 553.0, 645.0, 737.0, 829.0, 921.0]
 SRA_nu = [4.3, 7.4, 10.3, 13.1, 15.7, 18.2, 20.6, 32.1, 43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0]
-viscosity_scales['redwood admiralty'] = (SRA_SRA, SRA_nu)
+viscosity_scales["redwood admiralty"] = (SRA_SRA, SRA_nu)
 
 Engler_degrees = [1.0, 1.16, 1.31, 1.58, 1.88, 2.17, 2.45, 2.73, 3.02, 4.48, 5.92, 7.35, 8.79, 11.7, 14.6, 17.5, 20.45, 23.35, 26.3, 29.2, 43.8, 58.4, 73.0, 87.6, 117.0, 146.0, 175.0, 204.5, 233.5, 263.0, 292.0, 438.0, 584.0]
 Engler_nu = SSU_nu
-viscosity_scales['engler'] = (Engler_degrees, Engler_nu)
+viscosity_scales["engler"] = (Engler_degrees, Engler_nu)
 
 # Note: Barbey is decreasing not increasing
 Barbey_degrees = [6200.0, 2420.0, 1440.0, 838.0, 618.0, 483.0, 404.0, 348.0, 307.0, 195.0, 144.0, 114.0, 95.0, 70.8, 56.4, 47.0, 40.3, 35.2, 31.3, 28.2, 18.7, 14.1, 11.3, 9.4, 7.05, 5.64, 4.7, 4.03, 3.52, 3.13, 2.82, 2.5, 1.4]
 Barbey_nu = SSU_nu
-viscosity_scales['barbey'] = (Barbey_degrees, Barbey_nu)
+viscosity_scales["barbey"] = (Barbey_degrees, Barbey_nu)
 PC7_PC7 = [40.0, 46.0, 52.5, 66.0, 79.0, 92.0, 106.0, 120.0, 135.0, 149.0]
 PC7_nu = [43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0]
-viscosity_scales['parlin cup #7'] = (PC7_PC7, PC7_nu)
+viscosity_scales["parlin cup #7"] = (PC7_PC7, PC7_nu)
 
 PC10_PC10 = [15.0, 21.0, 25.0, 30.0, 35.0, 39.0, 41.0, 43.0, 65.0, 86.0, 108.0, 129.0, 172.0, 215.0, 258.0, 300.0, 344.0, 387.0, 430.0, 650.0, 860.0]
 PC10_nu = [65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0, 3300.0, 4400.0]
-viscosity_scales['parlin cup #10'] = (PC10_PC10, PC10_nu)
+viscosity_scales["parlin cup #10"] = (PC10_PC10, PC10_nu)
 
 PC15_PC15 = [6.0, 7.2, 7.8, 8.5, 9.0, 9.8, 10.7, 11.5, 15.2, 19.5, 24.0, 28.5, 37.0, 47.0, 57.0, 67.0, 76.0, 86.0, 96.0, 147.0, 203.0]
 PC15_nu = PC10_nu
-viscosity_scales['parlin cup #15'] = (PC15_PC15, PC15_nu)
+viscosity_scales["parlin cup #15"] = (PC15_PC15, PC15_nu)
 
 PC20_PC20 = [3.0, 3.2, 3.4, 3.6, 3.9, 4.1, 4.3, 4.5, 6.3, 7.5, 9.0, 11.0, 14.0, 18.0, 22.0, 25.0, 29.0, 32.0, 35.0, 53.0, 70.0]
 PC20_nu = PC10_nu
-viscosity_scales['parlin cup #20'] = (PC20_PC20, PC20_nu)
+viscosity_scales["parlin cup #20"] = (PC20_PC20, PC20_nu)
 
 FC3_FC3 = [30.0, 42.0, 50.0, 58.0, 67.0, 74.0, 82.0, 90.0, 132.0, 172.0, 218.0, 258.0, 337.0, 425.0, 520.0, 600.0, 680.0, 780.0, 850.0, 1280.0, 1715.0]
 FC3_nu = PC10_nu
-viscosity_scales['ford cup #3'] = (FC3_FC3, FC3_nu)
+viscosity_scales["ford cup #3"] = (FC3_FC3, FC3_nu)
 
 FC4_FC4 = [20.0, 28.0, 34.0, 40.0, 45.0, 50.0, 57.0, 62.0, 90.0, 118.0, 147.0, 172.0, 230.0, 290.0, 350.0, 410.0, 465.0, 520.0, 575.0, 860.0, 1150.0]
 FC4_nu = PC10_nu
-viscosity_scales['ford cup #4'] = (FC4_FC4, FC4_nu)
+viscosity_scales["ford cup #4"] = (FC4_FC4, FC4_nu)
 
 MM_MM = [125.0, 145.0, 165.0, 198.0, 225.0, 270.0, 320.0, 370.0, 420.0, 470.0, 515.0, 570.0, 805.0, 1070.0, 1325.0, 1690.0, 2110.0, 2635.0, 3145.0, 3670.0, 4170.0, 4700.0, 5220.0, 7720.0, 10500.0]
 MM_nu = [20.6, 32.1, 43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0, 3300.0, 4400.0]
-viscosity_scales['mac michael'] = (MM_MM, MM_nu)
+viscosity_scales["mac michael"] = (MM_MM, MM_nu)
 
 ZC1_ZC1 = [38.0, 47.0, 54.0, 62.0, 73.0, 90.0]
 ZC1_nu = [20.6, 32.1, 43.2, 54.0, 65.0, 87.6]
-viscosity_scales['zahn cup #1'] = (ZC1_ZC1, ZC1_nu)
+viscosity_scales["zahn cup #1"] = (ZC1_ZC1, ZC1_nu)
 
 ZC2_ZC2 = [18.0, 20.0, 23.0, 26.0, 29.0, 37.0, 46.0, 55.0, 63.0, 72.0, 80.0, 88.0]
 ZC2_nu = [20.6, 32.1, 43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0]
-viscosity_scales['zahn cup #2'] = (ZC2_ZC2, ZC2_nu)
+viscosity_scales["zahn cup #2"] = (ZC2_ZC2, ZC2_nu)
 
 ZC3_ZC3 = [22.5, 24.5, 27.0, 29.0, 40.0, 51.0, 63.0, 75.0]
 ZC3_nu = [154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0]
-viscosity_scales['zahn cup #3'] = (ZC3_ZC3, ZC3_nu)
+viscosity_scales["zahn cup #3"] = (ZC3_ZC3, ZC3_nu)
 
 ZC4_ZC4 = [18.0, 20.0, 28.0, 34.0, 41.0, 48.0, 63.0, 77.0]
 ZC4_nu = [198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0]
-viscosity_scales['zahn cup #4'] = (ZC4_ZC4, ZC4_nu)
+viscosity_scales["zahn cup #4"] = (ZC4_ZC4, ZC4_nu)
 
 ZC5_ZC5 = [13.0, 18.0, 24.0, 29.0, 33.0, 43.0, 50.0, 65.0, 75.0, 86.0, 96.0]
 ZC5_nu = [220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0]
-viscosity_scales['zahn cup #5'] = (ZC5_ZC5, ZC5_nu)
+viscosity_scales["zahn cup #5"] = (ZC5_ZC5, ZC5_nu)
 
 D1_D1 = [1.3, 2.3, 3.2, 4.1, 4.9, 5.7, 6.5, 10.0, 13.5, 16.9, 20.4, 27.4, 34.5, 41.0, 48.0, 55.0, 62.0, 69.0, 103.0, 137.0, 172.0, 206.0, 275.0, 344.0, 413.0, 481.0, 550.0, 620.0, 690.0, 1030.0, 1370.0]
 D1_nu = [4.3, 7.4, 10.3, 13.1, 15.7, 18.2, 20.6, 32.1, 43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0, 3300.0, 4400.0]
-viscosity_scales['demmier #1'] = (D1_D1, D1_nu)
+viscosity_scales["demmier #1"] = (D1_D1, D1_nu)
 
 D10_D10 = [1.0, 1.4, 1.7, 2.0, 2.7, 3.5, 4.1, 4.8, 5.5, 6.2, 6.9, 10.3, 13.7, 17.2, 20.6, 27.5, 34.4, 41.3, 48.0, 55.0, 62.0, 69.0, 103.0, 137.0]
 D10_nu = [32.1, 43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0, 3300.0, 4400.0]
-viscosity_scales['demmier #10'] = (D10_D10, D10_nu)
+viscosity_scales["demmier #10"] = (D10_D10, D10_nu)
 
 S100_S100 = [2.6, 3.6, 4.6, 5.5, 6.4, 7.3, 11.3, 15.2, 19.0, 23.0, 31.0, 39.0, 46.0, 54.0, 62.0, 70.0, 77.0, 116.0, 154.0, 193.0, 232.0, 308.0, 385.0, 462.0, 540.0, 618.0, 695.0, 770.0, 1160.0, 1540.0]
 S100_nu = [7.4, 10.3, 13.1, 15.7, 18.2, 20.6, 32.1, 43.2, 54.0, 65.0, 87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0, 3300.0, 4400.0]
-viscosity_scales['stormer 100g load'] = (S100_S100, S100_nu)
+viscosity_scales["stormer 100g load"] = (S100_S100, S100_nu)
 
 PLF_PLF = [7.0, 8.0, 9.0, 9.5, 10.8, 11.9, 12.4, 16.8, 22.0, 27.6, 33.7, 45.0, 55.8, 65.5, 77.0, 89.0, 102.0, 113.0, 172.0, 234.0]
 PLF_nu = [87.6, 110.0, 132.0, 154.0, 176.0, 198.0, 220.0, 330.0, 440.0, 550.0, 660.0, 880.0, 1100.0, 1320.0, 1540.0, 1760.0, 1980.0, 2200.0, 3300.0, 4400.0]
-viscosity_scales['pratt lambert f'] = (PLF_PLF, PLF_nu)
+viscosity_scales["pratt lambert f"] = (PLF_PLF, PLF_nu)
 
-viscosity_scales['kinematic viscosity'] = (SSU_nu, SSU_nu)
+viscosity_scales["kinematic viscosity"] = (SSU_nu, SSU_nu)
 
 viscosity_converter_limits = {
     scale: (values[0], values[-1], nus[0], nus[-1])
     for scale, (values, nus) in viscosity_scales.items()
 }
 # special handling
-viscosity_converter_limits['barbey'] = (Barbey_degrees[-1], Barbey_degrees[0], Barbey_nu[0], Barbey_nu[-1])
+viscosity_converter_limits["barbey"] = (Barbey_degrees[-1], Barbey_degrees[0], Barbey_nu[0], Barbey_nu[-1])
 
 """
 def generate_viscosity_dicts():
@@ -2729,243 +2729,243 @@ def generate_viscosity_dicts():
 viscosity_converters_to_nu = {}
 viscosity_converters_from_nu = {}
 
-viscosity_converters_to_nu['saybolt universal'] = implementation_optimize_tck([
+viscosity_converters_to_nu["saybolt universal"] = implementation_optimize_tck([
     [3.4339872044851463, 3.4339872044851463, 3.4339872044851463, 3.4339872044851463, 3.6888794541139363, 3.912023005428146, 4.0943445622221, 4.248495242049359, 4.382026634673881, 4.499809670330265, 4.605170185988092, 5.0106352940962555, 5.298317366548036, 5.521460917862246, 5.703782474656201, 5.991464547107982, 6.214608098422191, 6.396929655216146, 6.551080335043404, 6.684611727667927, 6.802394763324311, 6.907755278982137, 7.313220387090301, 7.600902459542082, 7.824046010856292, 8.006367567650246, 8.294049640102028, 8.517193191416238, 8.699514748210191, 8.85366542803745, 8.987196820661973, 9.104979856318357, 9.210340371976184, 9.903487552536127, 9.903487552536127, 9.903487552536127, 9.903487552536127],
     [-2.575601309673699e-18, 0.8982062175689627, 1.4796172487516794, 1.9931137257692506, 2.3217449048160703, 2.5685211362061713, 2.7483500452967573, 2.8981247808410164, 3.142680014381249, 3.4299774843937145, 3.746135121917541, 3.9743336288866606, 4.209367192735221, 4.451711048011456, 4.687660784671951, 4.873250999168711, 5.030113681170718, 5.1652270656408446, 5.284127795272641, 5.4936605984622675, 5.759832137976685, 6.065261800997406, 6.2963109627307094, 6.527360000337889, 6.758409068683301, 6.9894581269751255, 7.175996723320295, 7.332664599660219, 7.467819635712368, 7.586711283688449, 7.892141527648389, 8.158310759718983, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['saybolt universal'] = implementation_optimize_tck([
+viscosity_converters_from_nu["saybolt universal"] = implementation_optimize_tck([
     [0.0, 0.0, 0.0, 0.0, 1.4586150226995167, 2.0014800002101243, 2.33214389523559, 2.5726122302071057, 2.7536607123542622, 2.9014215940827497, 3.0252910757955354, 3.4688560301359703, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [3.4339872044851454, 3.4770122406396635, 3.5499978345728866, 3.866476068856097, 4.072959316830347, 4.230716131588708, 4.372175807676851, 4.491832893375579, 4.695665316073382, 4.961810515135175, 5.271921068674815, 5.509918917935071, 5.7414955220589965, 5.967553884029658, 6.1987002440732715, 6.387697257042421, 6.544173647107132, 6.679369625020088, 6.798252346087102, 7.007791924297624, 7.273958888244225, 7.579389703241187, 7.810438663611398, 8.041487745992798, 8.272536798159697, 8.503585860208874, 8.690124455826915, 8.846792332316191, 8.98194736833642, 9.100839016319444, 9.406269260275643, 9.672438492350183, 9.903487552536127, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['saybolt furol'] = implementation_optimize_tck([
+viscosity_converters_to_nu["saybolt furol"] = implementation_optimize_tck([
     [2.5610957881455465, 2.5610957881455465, 2.5610957881455465, 2.5610957881455465, 2.67000213346468, 2.7239235502585, 2.9601050959108397, 3.1570004211501135, 3.332204510175204, 3.481240089335692, 3.735285826928092, 3.9435216724875173, 4.117409835153096, 4.264087336809195, 4.394449154672439, 4.51085950651685, 4.612145799724517, 5.0106352940962555, 5.298317366548036, 5.521460917862246, 5.703782474656201, 5.991464547107982, 6.214608098422191, 6.396929655216146, 6.551080335043404, 6.684611727667927, 6.802394763324311, 6.907755278982137, 7.600902459542082, 7.600902459542082, 7.600902459542082, 7.600902459542082],
     [2.5726122302071066, 2.693958194199299, 2.8665941879570487, 3.161076872192932, 3.4587143215270197, 3.7649798217372896, 3.977044772380672, 4.220248931358957, 4.458502089358454, 4.69015119303059, 4.872555263761827, 5.032212011814911, 5.166268190856598, 5.282140863641715, 5.498077785250693, 5.762602127463929, 6.065184312201249, 6.296325467420656, 6.527354049755852, 6.758410509314402, 6.989457851050498, 7.17599677958435, 7.332664587690123, 7.467819638330826, 7.586711283128077, 7.892141528812376, 8.15831075906347, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['saybolt furol'] = implementation_optimize_tck([
+viscosity_converters_from_nu["saybolt furol"] = implementation_optimize_tck([
     [2.5726122302071057, 2.5726122302071057, 2.5726122302071057, 2.5726122302071057, 2.9014215940827497, 3.0252910757955354, 3.4688560301359703, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [2.5610957881455465, 2.5955176376740865, 2.637849385380515, 2.7703990007554493, 2.9240008937754385, 3.1317252362242067, 3.3227410264313173, 3.509762868371335, 3.7116986808655983, 3.9275052472031002, 4.109154250219636, 4.256607525913555, 4.388775885164053, 4.507754014184948, 4.706943671155109, 4.970898952984426, 5.2768865961958396, 5.507838224130827, 5.738908948929746, 5.969950180925843, 6.201001059153068, 6.387539303303461, 6.544207251986937, 6.679362272571954, 6.798253923918287, 7.10368416605005, 7.369853400049709, 7.600902459542082, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['redwood standard'] = implementation_optimize_tck([
+viscosity_converters_to_nu["redwood standard"] = implementation_optimize_tck([
     [3.367295829986474, 3.367295829986474, 3.367295829986474, 3.367295829986474, 3.5890591188317256, 3.7909846770510898, 3.9569963710708773, 4.109233174715851, 4.237000862623624, 4.351567427189173, 4.449685283147696, 4.852030263919617, 5.135798437050262, 5.356586274672012, 5.537334267018537, 5.823045895483019, 6.0473721790462776, 6.230481447578482, 6.3835066348840055, 6.517671272912275, 6.635946555686647, 6.79794041297493, 7.146772179452637, 7.432483807917119, 7.659171367666058, 7.8399193600125825, 8.125630988477065, 8.349957272040324, 8.533066540572527, 8.68609172787805, 8.820256365906321, 8.938531648680692, 9.04310445260027, 9.820105943597078, 9.820105943597078, 9.820105943597078, 9.820105943597078],
     [4.282841451291465e-18, 0.947037676439903, 1.477251010205093, 1.9944132211219097, 2.3359307229445525, 2.5626774509345287, 2.751329437909557, 2.8939892962699667, 3.1570848844933703, 3.425197413541664, 3.7472394803637106, 3.9744318887640464, 4.209503949548924, 4.453538574390683, 4.687826096235816, 4.871468740026616, 5.032526465958892, 5.16127260644653, 5.317080486672467, 5.397590053158708, 5.808831075970844, 6.063381839195508, 6.294129060227128, 6.527602371787728, 6.760205843032018, 6.989473697437789, 7.174666175341072, 7.333745087287264, 7.467974952604229, 7.585333136497559, 7.9301678574581995, 8.088976161950345, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['redwood standard'] = implementation_optimize_tck([
+viscosity_converters_from_nu["redwood standard"] = implementation_optimize_tck([
     [0.0, 0.0, 0.0, 0.0, 1.4586150226995167, 2.0014800002101243, 2.33214389523559, 2.5726122302071057, 2.7536607123542622, 2.9014215940827497, 3.0252910757955354, 3.4688560301359703, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [3.3672958299864737, 3.400434306614668, 3.460603811995803, 3.752138785880567, 3.932074643902959, 4.094246535336774, 4.226012267827194, 4.345701404190787, 4.530788286407653, 4.806653210921934, 5.109115574154829, 5.3451446199103785, 5.574777317040083, 5.798471702527616, 6.03102484318245, 6.222700954612007, 6.373865463382127, 6.519045916863379, 6.611498649709145, 6.989076379744764, 7.069058817296409, 7.415486958966173, 7.6458745591303465, 7.874729352199147, 8.103355246560241, 8.336210343280028, 8.524358493490668, 8.678746964907798, 8.814741785965277, 8.935541033869432, 9.227940102424007, 9.639786192479114, 9.820105943597078, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['redwood admiralty'] = implementation_optimize_tck([
+viscosity_converters_to_nu["redwood admiralty"] = implementation_optimize_tck([
     [1.62924053973028, 1.62924053973028, 1.62924053973028, 1.62924053973028, 1.9125010869241836, 2.028148247292285, 2.1329823086078656, 2.2300144001592104, 2.3145136638593193, 2.6727683869575705, 2.9391619220655967, 3.1548704948922883, 3.332204510175204, 3.6136169696133895, 3.832979798087693, 4.014579593753238, 4.168214410788556, 4.301358731606427, 4.418840607796598, 4.522874943261261, 4.92870191133357, 5.216022123821206, 5.438079308923196, 5.62040086571715, 5.908082938168931, 6.133398042996649, 6.315358001522335, 6.4692503167957724, 6.602587892189336, 6.825460036255307, 6.825460036255307, 6.825460036255307, 6.825460036255307],
     [1.4586150226995171, 1.99245547818402, 2.198645351736692, 2.5763836703653205, 2.752292613488804, 2.8954053090461627, 3.1625950736882227, 3.434585678625406, 3.7529639955991314, 3.9744587249425765, 4.210317953537125, 4.452063844926447, 4.689274258752756, 4.873187490282762, 5.030131949628652, 5.1653692478957085, 5.283387927421693, 5.496215927041389, 5.758987858475604, 6.0646762410300905, 6.296991371437176, 6.527051338901946, 6.760290518752237, 6.987855244018296, 7.176173074639375, 7.332648915198676, 7.502977730497019, 7.621834230268609, 7.696212639346407, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['redwood admiralty'] = implementation_optimize_tck([
+viscosity_converters_from_nu["redwood admiralty"] = implementation_optimize_tck([
     [1.4586150226995167, 1.4586150226995167, 1.4586150226995167, 1.4586150226995167, 2.33214389523559, 2.5726122302071057, 2.7536607123542622, 2.9014215940827497, 3.0252910757955354, 3.4688560301359703, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.696212639346407, 7.696212639346407, 7.696212639346407, 7.696212639346407],
     [1.6292405397302805, 1.6319773022180983, 1.817654349717493, 2.0133354226652287, 2.1235649294247927, 2.224712463645648, 2.3841932793299736, 2.6283858383869063, 2.911412080325757, 3.1438472334063343, 3.3685671133919604, 3.5902734096354734, 3.816522814754836, 4.005469480368168, 4.161334122990485, 4.296004503218459, 4.41509117349568, 4.62094487520665, 4.890037248239102, 5.194852236817404, 5.424154014131652, 5.65583129326589, 5.88540376188756, 6.120554382333644, 6.305823619357463, 6.462414898741196, 6.632394626184034, 6.751166651395489, 6.825460036255307, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['engler'] = implementation_optimize_tck([
+viscosity_converters_to_nu["engler"] = implementation_optimize_tck([
     [0.0, 0.0, 0.0, 0.0, 0.2700271372130602, 0.4574248470388755, 0.6312717768418578, 0.7747271675523681, 0.8960880245566357, 1.0043016091968684, 1.1052568313867783, 1.4996230464268938, 1.7783364488959144, 1.9947003132247452, 2.1736147116970854, 2.4595888418037104, 2.681021528714291, 2.8622008809294686, 3.017982882488811, 3.150596984114906, 3.269568939183719, 3.374168709274236, 3.7796338173824005, 4.067315889834181, 4.290459441148391, 4.472780997942346, 4.762173934797756, 4.983606621708336, 5.1647859739235145, 5.320567975482857, 5.453182077108952, 5.572154032177765, 5.676753802268282, 6.369900982828227, 6.369900982828227, 6.369900982828227, 6.369900982828227],
     [2.1594153113692496e-17, 0.7037275545363345, 1.4308578642142395, 2.0240892855650605, 2.3148847620025803, 2.566472239097515, 2.749062627900356, 2.9013846175406637, 3.1438575205043926, 3.428976409714024, 3.7461303364216247, 3.9756254444891543, 4.211084523228673, 4.451340173494784, 4.687463832818195, 4.875335812879517, 5.028124457195314, 5.166916625693337, 5.28276475320344, 5.495581312016972, 5.759354077441313, 6.065390229772868, 6.296165964372802, 6.528422737952099, 6.7562300018197465, 6.98938683539475, 7.178058496345786, 7.330681085096422, 7.469506660198741, 7.585353117283889, 7.895447960631904, 8.156588918877056, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['engler'] = implementation_optimize_tck([
+viscosity_converters_from_nu["engler"] = implementation_optimize_tck([
     [0.0, 0.0, 0.0, 0.0, 1.4586150226995167, 2.0014800002101243, 2.33214389523559, 2.5726122302071057, 2.7536607123542622, 2.9014215940827497, 3.0252910757955354, 3.4688560301359703, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [0.0, 0.059332625496393246, 0.16886365696695008, 0.4084889360836577, 0.6125425274276474, 0.7589962438515636, 0.887107192852041, 0.9957434380856023, 1.192512459576446, 1.4527460137348578, 1.7528371474791022, 1.982961773267287, 2.2102322897395914, 2.436034716546568, 2.6655403224011383, 2.851796029543637, 3.012217775025054, 3.1443639230386924, 3.2661410158203377, 3.4725380675102833, 3.7408499307017538, 4.04567463885504, 4.276997482383534, 4.507408788850714, 4.74169563074714, 4.970266628489593, 5.1542513521928495, 5.3148300272908555, 5.446944441665345, 5.568722811658543, 5.8696284711234075, 6.140571969833711, 6.369900982828227, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['parlin cup #7'] = implementation_optimize_tck([
+viscosity_converters_to_nu["parlin cup #7"] = implementation_optimize_tck([
     [3.6888794541139363, 3.6888794541139363, 3.6888794541139363, 3.6888794541139363, 3.960813169597578, 4.189654742026425, 4.3694478524670215, 4.5217885770490405, 4.663439094112067, 4.787491742782046, 5.003946305945459, 5.003946305945459, 5.003946305945459, 5.003946305945459],
     [3.7658404952500653, 3.9233280575512803, 4.160734697228943, 4.45214587299842, 4.69074301735995, 4.882817316303614, 5.029261804025008, 5.207909888410892, 5.310044699429509, 5.393627546352362, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['parlin cup #7'] = implementation_optimize_tck([
+viscosity_converters_from_nu["parlin cup #7"] = implementation_optimize_tck([
     [3.765840495250065, 3.765840495250065, 3.765840495250065, 3.765840495250065, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.393627546352362, 5.393627546352362, 5.393627546352362, 5.393627546352362],
     [3.688879454113936, 3.765900816511903, 3.92856617129852, 4.1709431993242765, 4.35623876083105, 4.509783729225598, 4.658337101103849, 4.811041442198458, 4.940771350207313, 5.003946305945459, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['parlin cup #10'] = implementation_optimize_tck([
+viscosity_converters_to_nu["parlin cup #10"] = implementation_optimize_tck([
     [2.70805020110221, 2.70805020110221, 2.70805020110221, 2.70805020110221, 3.2188758248682006, 3.4011973816621555, 3.5553480614894135, 3.6635616461296463, 3.713572066704308, 3.7612001156935624, 4.174387269895637, 4.454347296253507, 4.68213122712422, 4.859812404361672, 5.147494476813453, 5.3706380281276624, 5.552959584921617, 5.703782474656201, 5.840641657373398, 5.958424693029782, 6.063785208687608, 6.756932389247553, 6.756932389247553, 6.756932389247553, 6.756932389247553],
     [4.174387269895635, 4.177868605279104, 4.622888024731438, 4.866822485352646, 5.0302665415023196, 5.109906760441441, 5.289605560506511, 5.667364571070318, 5.7029903115726714, 6.082652956001828, 6.288016568001154, 6.533015667965044, 6.757142200848558, 6.990355208478638, 7.172880278163543, 7.3373236076608706, 7.465487531312411, 7.586875920994592, 7.892705481130982, 8.141543260362633, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['parlin cup #10'] = implementation_optimize_tck([
+viscosity_converters_from_nu["parlin cup #10"] = implementation_optimize_tck([
     [4.174387269895637, 4.174387269895637, 4.174387269895637, 4.174387269895637, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [2.7080502011022096, 3.0050746948658005, 3.084113298472601, 3.3931966213361364, 3.5516524090096575, 3.672367384479932, 3.710718293097653, 3.793657747253398, 4.161319062622642, 4.424188181146925, 4.672857873926469, 4.891207941699611, 5.127143618258207, 5.356161383763761, 5.545566574329714, 5.6944535245951435, 5.836627005131794, 5.954114617700045, 6.259152912628183, 6.542772412646688, 6.756932389247553, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['parlin cup #15'] = implementation_optimize_tck([
+viscosity_converters_to_nu["parlin cup #15"] = implementation_optimize_tck([
     [1.791759469228055, 1.791759469228055, 1.791759469228055, 1.791759469228055, 2.0541237336955462, 2.1400661634962708, 2.1972245773362196, 2.2823823856765264, 2.3702437414678603, 2.4423470353692043, 2.7212954278522306, 2.970414465569701, 3.1780538303479458, 3.349904087274605, 3.6109179126442243, 3.8501476017100584, 4.04305126783455, 4.204692619390966, 4.330733340286331, 4.454347296253507, 4.564348191467836, 5.313205979041787, 5.313205979041787, 5.313205979041787, 5.313205979041787],
     [4.174387269895636, 4.069411219997944, 4.635941726808014, 4.839118622854668, 5.082895259664981, 5.167895904788395, 5.279390094845426, 5.49457694855415, 5.807506325678317, 6.07144265735525, 6.299044565451546, 6.519201243080843, 6.786529971237586, 6.984500950950229, 7.178001184972424, 7.321785222638846, 7.476997641984404, 7.585341856635592, 7.902476308077364, 8.17692436468151, 8.389359819906355, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['parlin cup #15'] = implementation_optimize_tck([
+viscosity_converters_from_nu["parlin cup #15"] = implementation_optimize_tck([
     [4.174387269895637, 4.174387269895637, 4.174387269895637, 4.174387269895637, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [1.7917594692280552, 1.970830229617362, 1.9791186272895795, 2.1459249074862647, 2.1830257440343495, 2.2767416042446986, 2.3692390446678893, 2.5098427507224996, 2.6748536525858753, 2.9495897244648175, 3.1637250489772666, 3.387554813535431, 3.5758290532766868, 3.839225148663546, 4.030963246826631, 4.203587113976053, 4.32075904756381, 4.4510953972340355, 4.766950417856681, 5.043008453764842, 5.313205979041787, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['parlin cup #20'] = implementation_optimize_tck([
+viscosity_converters_to_nu["parlin cup #20"] = implementation_optimize_tck([
     [1.0986122886681098, 1.0986122886681098, 1.0986122886681098, 1.0986122886681098, 1.2237754316221157, 1.2809338454620642, 1.3609765531356006, 1.410986973710262, 1.4586150226995167, 1.5040773967762742, 1.840549633397487, 2.0149030205422647, 2.1972245773362196, 2.3978952727983707, 2.6390573296152584, 2.8903717578961645, 3.091042453358316, 3.2188758248682006, 3.367295829986474, 3.4657359027997265, 3.5553480614894135, 4.248495242049359, 4.248495242049359, 4.248495242049359, 4.248495242049359],
     [4.174387269895636, 4.39660473046765, 4.621951004757847, 4.929363588260073, 4.993461117294169, 5.174073014206359, 5.285955320978621, 5.632708492823754, 5.652999406401367, 6.1166972563540964, 6.328730773353977, 6.481094525964685, 6.810237508549038, 6.989742039396471, 7.140761691334212, 7.36479254067722, 7.442085614485727, 7.5894464026039214, 7.933298535525166, 8.118111141334893, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['parlin cup #20'] = implementation_optimize_tck([
+viscosity_converters_from_nu["parlin cup #20"] = implementation_optimize_tck([
     [4.174387269895637, 4.174387269895637, 4.174387269895637, 4.174387269895637, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [1.0986122886681102, 1.123675515426659, 1.19860175331427, 1.2651364479210463, 1.3662080607592082, 1.4059546827393599, 1.4584559265920132, 1.5341047757161053, 1.8539096701151676, 1.9870353450750486, 2.1668514375991434, 2.458329365130117, 2.5917386078007136, 2.874448418835185, 3.0993850182758695, 3.194743066616606, 3.374934434419905, 3.4598590976024552, 3.721050274617513, 4.054812225158822, 4.248495242049359, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['ford cup #3'] = implementation_optimize_tck([
+viscosity_converters_to_nu["ford cup #3"] = implementation_optimize_tck([
     [3.4011973816621555, 3.4011973816621555, 3.4011973816621555, 3.4011973816621555, 3.912023005428146, 4.060443010546419, 4.204692619390966, 4.30406509320417, 4.406719247264253, 4.499809670330265, 4.882801922586371, 5.147494476813453, 5.384495062789089, 5.552959584921617, 5.820082930352362, 6.052089168924417, 6.253828811575473, 6.396929655216146, 6.522092798170152, 6.659293919683638, 6.745236349484363, 7.44716835960004, 7.44716835960004, 7.44716835960004, 7.44716835960004],
     [4.174387269895635, 4.235010951495693, 4.546306401368109, 4.891301119016985, 5.006035087987643, 5.179475622998687, 5.282927421563667, 5.5071623985516815, 5.744909093520779, 6.092188693108466, 6.27711122625197, 6.530168441864454, 6.773058874431685, 6.999063720043492, 7.158310121353729, 7.331424013637432, 7.488770336766041, 7.559595844806968, 7.976158876764658, 8.115360502604224, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['ford cup #3'] = implementation_optimize_tck([
+viscosity_converters_from_nu["ford cup #3"] = implementation_optimize_tck([
     [4.174387269895637, 4.174387269895637, 4.174387269895637, 4.174387269895637, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [3.4011973816621555, 3.6658150644295513, 3.8217904719932014, 4.0438126549887965, 4.209411716855145, 4.293444443486365, 4.404349254525439, 4.584716740249135, 4.858012747496513, 5.1116516587850995, 5.380437068564622, 5.58277904895064, 5.794305549281043, 6.031853923159892, 6.25209862156876, 6.3925603941058675, 6.504933849634002, 6.668104522488961, 6.873672983280552, 7.249970267314259, 7.44716835960004, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['ford cup #4'] = implementation_optimize_tck([
+viscosity_converters_to_nu["ford cup #4"] = implementation_optimize_tck([
     [2.995732273553991, 2.995732273553991, 2.995732273553991, 2.995732273553991, 3.5263605246161616, 3.6888794541139363, 3.8066624897703196, 3.912023005428146, 4.04305126783455, 4.127134385045092, 4.499809670330265, 4.770684624465665, 4.990432586778736, 5.147494476813453, 5.438079308923196, 5.66988092298052, 5.857933154483459, 6.016157159698354, 6.142037405587356, 6.253828811575473, 6.354370040797351, 7.047517221357296, 7.047517221357296, 7.047517221357296, 7.047517221357296],
     [4.174387269895637, 4.251488580015067, 4.578802297622766, 4.857630648725153, 5.03030241586516, 5.195074682944892, 5.257846026150228, 5.529297583846938, 5.752866695891904, 6.077911699309654, 6.2767900479705325, 6.554004012227638, 6.758509674974357, 6.988689456935371, 7.176894254362655, 7.324981145497996, 7.46897293490252, 7.586769337379531, 7.904669560066052, 8.158272029516167, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['ford cup #4'] = implementation_optimize_tck([
+viscosity_converters_from_nu["ford cup #4"] = implementation_optimize_tck([
     [4.174387269895637, 4.174387269895637, 4.174387269895637, 4.174387269895637, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [2.9957322735539913, 3.2543421273633903, 3.4129326031173814, 3.6865473452369435, 3.80421925615069, 3.8923855836695638, 4.051448296413546, 4.190864134323703, 4.4719077976775665, 4.7420473255424485, 4.987515192397558, 5.16785281223535, 5.417319039066321, 5.656229034075097, 5.847207555041156, 6.012893732297337, 6.136167475065811, 6.250046666279471, 6.539886402559759, 6.816102294644018, 7.047517221357296, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['mac michael'] = implementation_optimize_tck([
+viscosity_converters_to_nu["mac michael"] = implementation_optimize_tck([
     [4.8283137373023015, 4.8283137373023015, 4.8283137373023015, 4.8283137373023015, 5.10594547390058, 5.288267030694535, 5.41610040220442, 5.598421958998375, 5.768320995793772, 5.91350300563827, 6.040254711277414, 6.152732694704104, 6.244166900663736, 6.345636360828596, 6.690842277418564, 6.975413927455952, 7.1891677384203225, 7.432483807917119, 7.6544432264701125, 7.876638460975463, 8.05356916913454, 8.207946941048617, 8.335671314792847, 8.45531778769815, 8.560252680876685, 9.259130536145614, 9.259130536145614, 9.259130536145614, 9.259130536145614],
     [3.0252910757955362, 3.309048660225974, 3.8015578068795866, 3.9477102091193084, 4.197562932422006, 4.4818256053756516, 4.6899230339151625, 4.875816005626788, 5.033739813098702, 5.156529510812838, 5.300152694461719, 5.4642538160845735, 5.8047350194763325, 6.046487048467108, 6.350275147569952, 6.4365377098076495, 6.810164293656892, 6.97909139000128, 7.18182393923967, 7.327133812599172, 7.473172812291389, 7.584998019355741, 7.895273291164656, 8.194667189042956, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['mac michael'] = implementation_optimize_tck([
+viscosity_converters_from_nu["mac michael"] = implementation_optimize_tck([
     [3.0252910757955354, 3.0252910757955354, 3.0252910757955354, 3.0252910757955354, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [4.8283137373023015, 4.977572196004898, 4.920899182300126, 5.288415669109919, 5.443641391461551, 5.572517443890477, 5.755665691788839, 5.905643458046299, 6.032351381772725, 6.153169546264002, 6.2336628658740185, 6.453386619988654, 6.627709633315948, 6.9723057914990045, 7.142439342344769, 7.5197673498103255, 7.603779301481185, 7.87108111536658, 8.04047575929093, 8.20446815597734, 8.32770260556312, 8.452105814008403, 8.755175884170438, 8.990090610140427, 9.259130536145614, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['zahn cup #1'] = implementation_optimize_tck([
+viscosity_converters_to_nu["zahn cup #1"] = implementation_optimize_tck([
     [3.6375861597263857, 3.6375861597263857, 3.6375861597263857, 3.6375861597263857, 3.9889840465642745, 4.127134385045092, 4.499809670330265, 4.499809670330265, 4.499809670330265, 4.499809670330265],
     [3.025291075795535, 3.222644075465119, 3.666419096064154, 4.127083853487198, 4.2250148808030294, 4.472780997942346, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['zahn cup #1'] = implementation_optimize_tck([
+viscosity_converters_from_nu["zahn cup #1"] = implementation_optimize_tck([
     [3.0252910757955354, 3.0252910757955354, 3.0252910757955354, 3.0252910757955354, 3.765840495250065, 3.9889840465642745, 4.472780997942346, 4.472780997942346, 4.472780997942346, 4.472780997942346],
     [3.6375861597263857, 3.7769696282041414, 3.8873423262901667, 4.1609287874314695, 4.449826287955393, 4.499809670330265, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['zahn cup #2'] = implementation_optimize_tck([
+viscosity_converters_to_nu["zahn cup #2"] = implementation_optimize_tck([
     [2.8903717578961645, 2.8903717578961645, 2.8903717578961645, 2.8903717578961645, 3.1354942159291497, 3.258096538021482, 3.367295829986474, 3.6109179126442243, 3.828641396489095, 4.007333185232471, 4.143134726391533, 4.276666119016055, 4.477336814478207, 4.477336814478207, 4.477336814478207, 4.477336814478207],
     [3.0252910757955345, 3.4939623726886793, 3.6846822351087916, 3.983448284883306, 4.2603024753818, 4.463633546652626, 4.691320918802126, 4.859619373592127, 5.04374341823447, 5.183883618647157, 5.324994691713382, 5.393627546352363, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['zahn cup #2'] = implementation_optimize_tck([
+viscosity_converters_from_nu["zahn cup #2"] = implementation_optimize_tck([
     [3.0252910757955354, 3.0252910757955354, 3.0252910757955354, 3.0252910757955354, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.393627546352362, 5.393627546352362, 5.393627546352362, 5.393627546352362],
     [2.890371757896164, 2.9019929388211776, 3.0355921974217805, 3.251781703198547, 3.3802279222783604, 3.58558219226917, 3.810689745569852, 4.0057220423981725, 4.129534879273454, 4.3146159960105335, 4.404734261587551, 4.477336814478207, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['zahn cup #3'] = implementation_optimize_tck([
+viscosity_converters_to_nu["zahn cup #3"] = implementation_optimize_tck([
     [3.1135153092103742, 3.1135153092103742, 3.1135153092103742, 3.1135153092103742, 3.295836866004329, 3.367295829986474, 3.6888794541139363, 3.9318256327243257, 4.31748811353631, 4.31748811353631, 4.31748811353631, 4.31748811353631],
     [5.0369526024136295, 5.159791792082915, 5.224416524098557, 5.527395600207853, 5.761664633167972, 6.1555615441667895, 6.351712744533946, 6.492239835020471, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['zahn cup #3'] = implementation_optimize_tck([
+viscosity_converters_from_nu["zahn cup #3"] = implementation_optimize_tck([
     [5.0369526024136295, 5.0369526024136295, 5.0369526024136295, 5.0369526024136295, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.492239835020471, 6.492239835020471, 6.492239835020471, 6.492239835020471],
     [3.1135153092103742, 3.143178103410941, 3.2706425864829805, 3.4269498134078895, 3.6603264183165023, 3.954219559147537, 4.192558405324681, 4.31748811353631, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['zahn cup #4'] = implementation_optimize_tck([
+viscosity_converters_to_nu["zahn cup #4"] = implementation_optimize_tck([
     [2.8903717578961645, 2.8903717578961645, 2.8903717578961645, 2.8903717578961645, 3.332204510175204, 3.5263605246161616, 3.713572066704308, 3.871201010907891, 4.343805421853684, 4.343805421853684, 4.343805421853684, 4.343805421853684],
     [5.288267030694534, 5.432615247755282, 5.651928263819595, 6.101421209819679, 6.295187294274101, 6.621999291047122, 6.8126881329071205, 7.003065458786462, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['zahn cup #4'] = implementation_optimize_tck([
+viscosity_converters_from_nu["zahn cup #4"] = implementation_optimize_tck([
     [5.288267030694535, 5.288267030694535, 5.288267030694535, 5.288267030694535, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 7.003065458786462, 7.003065458786462, 7.003065458786462, 7.003065458786462],
     [2.8903717578961654, 3.066256960033695, 3.2992505316778855, 3.4968229248625007, 3.703841744777038, 3.9591375071077697, 4.204162454398758, 4.343805421853684, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['zahn cup #5'] = implementation_optimize_tck([
+viscosity_converters_to_nu["zahn cup #5"] = implementation_optimize_tck([
     [2.5649493574615367, 2.5649493574615367, 2.5649493574615367, 2.5649493574615367, 3.1780538303479458, 3.367295829986474, 3.4965075614664802, 3.7612001156935624, 3.912023005428146, 4.174387269895637, 4.31748811353631, 4.564348191467836, 4.564348191467836, 4.564348191467836, 4.564348191467836],
     [5.393627546352365, 5.710312512118053, 5.925474983703362, 6.27000301923224, 6.577527820379961, 6.686902295630258, 7.105058919635149, 7.112863665222863, 7.394253732954623, 7.488520782028579, 7.590852123688581, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['zahn cup #5'] = implementation_optimize_tck([
+viscosity_converters_from_nu["zahn cup #5"] = implementation_optimize_tck([
     [5.393627546352362, 5.393627546352362, 5.393627546352362, 5.393627546352362, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.590852123688581, 7.590852123688581, 7.590852123688581, 7.590852123688581],
     [2.564949357461537, 2.6822088440741987, 3.046146719461773, 3.3677420173958623, 3.5006795420821426, 3.7907683089722517, 3.838797898224285, 4.198368376327341, 4.32566686002696, 4.502481713423904, 4.564348191467836, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['demmier #1'] = implementation_optimize_tck([
+viscosity_converters_to_nu["demmier #1"] = implementation_optimize_tck([
     [0.26236426446749106, 0.26236426446749106, 0.26236426446749106, 0.26236426446749106, 1.1631508098056809, 1.410986973710262, 1.589235205116581, 1.7404661748405046, 1.8718021769015913, 2.302585092994046, 2.6026896854443837, 2.8273136219290276, 3.0155349008501706, 3.3105430133940246, 3.5409593240373143, 3.713572066704308, 3.871201010907891, 4.007333185232471, 4.127134385045092, 4.23410650459726, 4.634728988229636, 4.919980925828125, 5.147494476813453, 5.327876168789581, 5.616771097666572, 5.840641657373398, 6.023447592961033, 6.175867270105761, 6.309918278226516, 6.429719478039138, 6.536691597591305, 7.222566018822171, 7.222566018822171, 7.222566018822171, 7.222566018822171],
     [1.4586150226995171, 1.71073020413693, 2.130557177301486, 2.5459071200692494, 2.746335602097296, 2.8965003266930434, 3.115192670969138, 3.4329157094051497, 3.7390508458630056, 3.9782988851980874, 4.20697132189436, 4.456141285762206, 4.674944448477957, 4.882253102916237, 5.028896980521317, 5.16527336142792, 5.2840697109140615, 5.489424075705094, 5.76014617385828, 6.0702812571485065, 6.292044976707557, 6.530315846838931, 6.757650191781952, 6.989819784532628, 7.174344986163944, 7.3339959706348585, 7.468668358430634, 7.586630009023315, 7.885398972076964, 8.16285981672486, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['demmier #1'] = implementation_optimize_tck([
+viscosity_converters_from_nu["demmier #1"] = implementation_optimize_tck([
     [1.4586150226995167, 1.4586150226995167, 1.4586150226995167, 1.4586150226995167, 2.33214389523559, 2.5726122302071057, 2.7536607123542622, 2.9014215940827497, 3.0252910757955354, 3.4688560301359703, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [0.26236426446749106, 0.6010699462118122, 0.9363299696306459, 1.3947077517127915, 1.5764812081499955, 1.7306738789371188, 1.9890056748728902, 2.2459961971737625, 2.579693991216237, 2.813292095638698, 3.0562074724399007, 3.282189336952426, 3.5318885806104703, 3.6998539305408715, 3.865145982650516, 4.001868007130916, 4.122916610774629, 4.336272582432516, 4.5959904225597015, 4.89567561549399, 5.136056991938173, 5.361088907432062, 5.595850897703561, 5.8265983368689955, 6.0149611478018645, 6.168424236702356, 6.304302416540273, 6.425530993946575, 6.736467367503558, 6.989354337693505, 7.222566018822171, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['demmier #10'] = implementation_optimize_tck([
+viscosity_converters_to_nu["demmier #10"] = implementation_optimize_tck([
     [0.0, 0.0, 0.0, 0.0, 0.5306282510621704, 0.6931471805599453, 0.9932517730102834, 1.252762968495368, 1.410986973710262, 1.5686159179138452, 1.7047480922384253, 1.824549292051046, 1.9315214116032138, 2.33214389523559, 2.617395832834079, 2.8449093838194073, 3.0252910757955354, 3.3141860046725258, 3.5380565643793527, 3.720862499966987, 3.871201010907891, 4.007333185232471, 4.127134385045092, 4.23410650459726, 4.919980925828125, 4.919980925828125, 4.919980925828125, 4.919980925828125],
     [3.4688560301359708, 3.569770497469311, 3.8483584159193303, 4.229655585481154, 4.475874515937343, 4.64509586335484, 4.893176395602696, 5.027436022534686, 5.1655917774463616, 5.284001533060033, 5.4894988836778875, 5.7601244001096354, 6.070288063445428, 6.292035849980337, 6.5303467651576215, 6.757474200127011, 6.990271203658143, 7.172404210492034, 7.336919929874899, 7.467181958740508, 7.586802071296843, 7.885050970603688, 8.163055382426146, 8.389359819906355, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['demmier #10'] = implementation_optimize_tck([
+viscosity_converters_from_nu["demmier #10"] = implementation_optimize_tck([
     [3.4688560301359703, 3.4688560301359703, 3.4688560301359703, 3.4688560301359703, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [-2.5940108011161694e-18, 0.24439543096273444, 0.43218802462619954, 0.7238737291530682, 0.9516479228540552, 1.2578479050323754, 1.391504805145228, 1.5637871969499424, 1.6990146050637553, 1.8203891091709945, 2.033622370617629, 2.2934244853383956, 2.5930843570290696, 2.8334805868344586, 3.0584733811479787, 3.293436233953942, 3.523575372206134, 3.713605683315231, 3.862220007233949, 4.002509008119753, 4.1227764758193075, 4.434234201765468, 4.686571049547071, 4.919980925828125, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['stormer 100g load'] = implementation_optimize_tck([
+viscosity_converters_to_nu["stormer 100g load"] = implementation_optimize_tck([
     [0.9555114450274363, 0.9555114450274363, 0.9555114450274363, 0.9555114450274363, 1.5260563034950492, 1.7047480922384253, 1.8562979903656263, 1.9878743481543455, 2.424802725718295, 2.7212954278522306, 2.9444389791664403, 3.1354942159291497, 3.4339872044851463, 3.6635616461296463, 3.828641396489095, 3.9889840465642745, 4.127134385045092, 4.248495242049359, 4.343805421853684, 4.7535901911063645, 5.0369526024136295, 5.262690188904886, 5.44673737166631, 5.730099782973574, 5.953243334287785, 6.135564891081739, 6.29156913955832, 6.42648845745769, 6.543911845564792, 6.646390514847729, 7.3395376954076745, 7.3395376954076745, 7.3395376954076745, 7.3395376954076745],
     [2.0014800002101247, 2.2081982869987318, 2.4359447967016497, 2.7461554921163596, 2.896398061351864, 3.117564806356968, 3.426312248721431, 3.739877931108494, 3.9809047078493927, 4.205991082632947, 4.455558910023335, 4.6686049571745585, 4.8892765924161745, 5.027328255028008, 5.167059609893703, 5.274710399165016, 5.516870605111536, 5.747956242836144, 6.070687236497746, 6.2958893029864935, 6.523788392473561, 6.7613656433125335, 6.98895758543227, 7.177304852304456, 7.332463277016886, 7.467132482765323, 7.584968899386042, 7.901591060586778, 8.144361746774743, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['stormer 100g load'] = implementation_optimize_tck([
+viscosity_converters_from_nu["stormer 100g load"] = implementation_optimize_tck([
     [2.0014800002101243, 2.0014800002101243, 2.0014800002101243, 2.0014800002101243, 2.5726122302071057, 2.7536607123542622, 2.9014215940827497, 3.0252910757955354, 3.4688560301359703, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [0.955511445027437, 1.129055253782241, 1.4021249764841106, 1.692140023209894, 1.8465608724801996, 2.1046550526727743, 2.371478655042039, 2.6982483378714024, 2.9291968044688286, 3.177359581499901, 3.4050767523313756, 3.6581125927944678, 3.8116229477343673, 3.9840076714494184, 4.120026127241616, 4.248853234980905, 4.426912765186266, 4.722920627303147, 5.012396641859333, 5.249203877271702, 5.48341394310556, 5.707079426964617, 5.940135790488285, 6.125478770623342, 6.28473919227368, 6.421360662788953, 6.540644363371554, 6.834008583321535, 7.122439894929551, 7.3395376954076745, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['pratt lambert f'] = implementation_optimize_tck([
+viscosity_converters_to_nu["pratt lambert f"] = implementation_optimize_tck([
     [1.9459101490553132, 1.9459101490553132, 1.9459101490553132, 1.9459101490553132, 2.1972245773362196, 2.2512917986064953, 2.379546134130174, 2.4765384001174837, 2.517696472610991, 2.8213788864092133, 3.091042453358316, 3.3178157727231046, 3.517497837358316, 3.8066624897703196, 4.021773869387265, 4.182050142641207, 4.343805421853684, 4.48863636973214, 4.624972813284271, 4.727387818712341, 5.455321115357702, 5.455321115357702, 5.455321115357702, 5.455321115357702],
     [4.472780997942348, 4.735723623279403, 4.643157968700142, 5.139532436075622, 5.151621937826048, 5.227025496128334, 5.646901991476376, 5.756030986163222, 6.082273367390175, 6.304393363254469, 6.514223938630912, 6.75734568699049, 6.974838232501322, 7.195432554445979, 7.331926380253746, 7.475243201027783, 7.574048611098696, 7.923204111231037, 8.153345682904884, 8.389359819906353, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['pratt lambert f'] = implementation_optimize_tck([
+viscosity_converters_from_nu["pratt lambert f"] = implementation_optimize_tck([
     [4.472780997942346, 4.472780997942346, 4.472780997942346, 4.472780997942346, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [1.945910149055314, 1.970233575484605, 2.212617992316628, 2.218944817704878, 2.380488654268661, 2.4863130470989145, 2.5367199460437266, 2.785993314533494, 3.0666917243801786, 3.2986259656253227, 3.5617751404077778, 3.782999363183989, 4.017336918420929, 4.163858930396986, 4.338371609655286, 4.478013030014296, 4.626990641459872, 4.903498060635997, 5.2171271309421146, 5.455321115357702, 0.0, 0.0, 0.0, 0.0],
     3
 ])
 
-viscosity_converters_to_nu['barbey'] = implementation_optimize_tck([
+viscosity_converters_to_nu["barbey"] = implementation_optimize_tck([
     [0.3364722366212129, 0.3364722366212129, 0.3364722366212129, 0.3364722366212129, 1.0367368849500223, 1.1410330045520618, 1.2584609896100056, 1.3937663759585917, 1.547562508716013, 1.7298840655099674, 1.9530276168241774, 2.2407096892759584, 2.424802725718295, 2.6461747973841225, 2.928523523860541, 3.339321977944068, 3.4436180975461075, 3.5610460826040513, 3.696351468952637, 3.8501476017100584, 4.032469158504013, 4.259859000699674, 4.553876891600541, 4.736198448394496, 4.969813299576001, 5.272999558563747, 5.726847747587197, 5.8522024797744745, 6.0014148779611505, 6.180016653652572, 6.42648845745769, 6.731018100482083, 7.272398392570047, 8.732304571033183, 8.732304571033183, 8.732304571033183, 8.732304571033183],
     [8.389359819906355, 11.016039308886484, 7.714822572010306, 7.602753323347697, 7.461128819509047, 7.335996764118376, 7.174879950521344, 6.989767099286427, 6.758533281838772, 6.525700312748302, 6.298388483905108, 6.067101933617808, 5.7517671769019465, 5.497843241516832, 5.283655849227734, 5.163953580434897, 5.031653546990693, 4.872885650123412, 4.6855823490804, 4.450958400202121, 4.213557960341426, 3.9682272779345245, 3.747010272216809, 3.417210801373589, 3.1342657975409898, 2.8932365145450674, 2.7455867304919956, 2.545778447103095, 2.3232392010369707, 1.9028183731782218, 1.1732532186088065, 0.46813938214393835, 0.0, 0.0, 0.0, 0.0, 0.0],
     3
 ])
-viscosity_converters_from_nu['barbey'] = implementation_optimize_tck([
+viscosity_converters_from_nu["barbey"] = implementation_optimize_tck([
     [0.0, 0.0, 0.0, 0.0, 1.4586150226995167, 2.0014800002101243, 2.33214389523559, 2.5726122302071057, 2.7536607123542622, 2.9014215940827497, 3.0252910757955354, 3.4688560301359703, 3.765840495250065, 3.9889840465642745, 4.174387269895637, 4.472780997942346, 4.700480365792417, 4.882801922586371, 5.0369526024136295, 5.170483995038151, 5.288267030694535, 5.393627546352362, 5.799092654460526, 6.0867747269123065, 6.309918278226516, 6.492239835020471, 6.779921907472252, 7.003065458786462, 7.1853870155804165, 7.3395376954076745, 7.473069088032197, 7.590852123688581, 7.696212639346407, 8.389359819906353, 8.389359819906353, 8.389359819906353, 8.389359819906353],
     [8.73230457103318, 8.22931707401472, 7.596562094846855, 6.783238261660232, 6.466667813349762, 6.195757103615377, 6.014212277460382, 5.8599436146689365, 5.6197783228924045, 5.32037565213582, 4.998898870253533, 4.745014146796411, 4.518261786803321, 4.283771553970103, 4.047728697974775, 3.8591241028036105, 3.70409882799983, 3.565715518826268, 3.447530238307399, 3.241302582823786, 2.9633181827865713, 2.668317377842094, 2.439320840853108, 2.204501278713815, 1.9747300870228615, 1.7436385592434631, 1.556406462440578, 1.4019214017072539, 1.2618866366700296, 1.1488238145304066, 0.8015807047280459, 1.2114951712296043, 0.3364722366212129, 0.0, 0.0, 0.0, 0.0],
     3
@@ -2981,46 +2981,46 @@ viscosity_converters_from_nu['barbey'] = implementation_optimize_tck([
 # Note: Engler can also be reported in units of time? Would be good to have a reference.
 
 viscosity_scales_linear = {
-    'american can': (3.5, 35),
-    'astm 0.07': (1.4, 60),
-    'astm 0.10': (4.8, 25),
-    'astm 0.15': (21, 9),
-    'astm 0.20': (61, 5),
-    'astm 0.25': (140, 4),
-    'a&w b': (18.5, 10),
-    'a&w crucible': (11.7, 12),
-    'caspers tin plate': (3.6, 39),
-    'continental can': (3.3, 12),
-    'crown cork and seal': (3.3, 12),
-    'engler': (7.3, 18),
-    'ford cup #3': (2.4, 34),
-    'ford cup #4': (3.7, 23),
-    'murphy varnish': (3.1, 24),
-    'parlin cup #7': (1.3, 60),
-    'parlin cup #10': (4.8, 21),
-    'parlin cup #15': (21.5, 10),
-    'parlin cup #20': (60, 5),
-    'parlin cup #25': (140, 15),
-    'parlin cup #30': (260, 10),
-    'pratt lambert a': (0.61, 70),
-    'pratt lambert b': (1.22, 60),
-    'pratt lambert c': (2.43, 40),
-    'pratt lambert d': (4.87, 25),
-    'pratt lambert e': (9.75, 15),
-    'pratt lambert f': (19.5, 9),
-    'pratt lambert g': (38, 7),
-    'pratt lambert h': (76, 5),
-    'pratt lambert i': (152, 4),
-    'redwood standard': (0.23, 320),
-    'saybolt furol': (2.1, 17),
-    'saybolt universal': (0.21, 70),
-    'scott': (1.6, 20),
-    'westinghouse': (3.4, 30),
-    'zahn cup #1': (0.75, 50),
-    'zahn cup #2': (3.1, 30),
-    'zahn cup #3': (9.8, 25),
-    'zahn cup #4': (12.5, 14),
-    'zahn cup #5': (23.6, 12)
+    "american can": (3.5, 35),
+    "astm 0.07": (1.4, 60),
+    "astm 0.10": (4.8, 25),
+    "astm 0.15": (21, 9),
+    "astm 0.20": (61, 5),
+    "astm 0.25": (140, 4),
+    "a&w b": (18.5, 10),
+    "a&w crucible": (11.7, 12),
+    "caspers tin plate": (3.6, 39),
+    "continental can": (3.3, 12),
+    "crown cork and seal": (3.3, 12),
+    "engler": (7.3, 18),
+    "ford cup #3": (2.4, 34),
+    "ford cup #4": (3.7, 23),
+    "murphy varnish": (3.1, 24),
+    "parlin cup #7": (1.3, 60),
+    "parlin cup #10": (4.8, 21),
+    "parlin cup #15": (21.5, 10),
+    "parlin cup #20": (60, 5),
+    "parlin cup #25": (140, 15),
+    "parlin cup #30": (260, 10),
+    "pratt lambert a": (0.61, 70),
+    "pratt lambert b": (1.22, 60),
+    "pratt lambert c": (2.43, 40),
+    "pratt lambert d": (4.87, 25),
+    "pratt lambert e": (9.75, 15),
+    "pratt lambert f": (19.5, 9),
+    "pratt lambert g": (38, 7),
+    "pratt lambert h": (76, 5),
+    "pratt lambert i": (152, 4),
+    "redwood standard": (0.23, 320),
+    "saybolt furol": (2.1, 17),
+    "saybolt universal": (0.21, 70),
+    "scott": (1.6, 20),
+    "westinghouse": (3.4, 30),
+    "zahn cup #1": (0.75, 50),
+    "zahn cup #2": (3.1, 30),
+    "zahn cup #3": (9.8, 25),
+    "zahn cup #4": (12.5, 14),
+    "zahn cup #5": (23.6, 12)
 }
 
 def errf(T_other, initial_T, backward_calculator):
@@ -3048,7 +3048,7 @@ def Saybolt_universal_eq(nu):
 
 
 def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
-    r'''Converts kinematic viscosity values from different scales which have
+    r"""Converts kinematic viscosity values from different scales which have
     historically been used. Though they may not be in use much, some standards
     still specify values in these scales.
 
@@ -3126,30 +3126,30 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
        American Petroleum Institute, 7E, 2005.
     .. [5] ASTM. Standard Practice for Conversion of Kinematic Viscosity to
        Saybolt Universal Viscosity or to Saybolt Furol Viscosity. D 2161 - 93.
-    '''
+    """
     def range_check(visc, scale):
         scale_min, scale_max, kinematic_viscosity_min, kinematic_viscosity_max = viscosity_converter_limits[scale]
 
         if visc < scale_min*(1.-1E-7) or visc > scale_max*(1.+1E-7):
-            raise ValueError('Viscosity conversion is outside the limits of the '
-                            f'{scale} scale; given value is {visc}, but the range of the '
-                            f'scale is from {scale_min} to {scale_max}. Set `extrapolate` to True '
-                            'to perform the conversion anyway.')
+            raise ValueError("Viscosity conversion is outside the limits of the "
+                            f"{scale} scale; given value is {visc}, but the range of the "
+                            f"scale is from {scale_min} to {scale_max}. Set `extrapolate` to True "
+                            "to perform the conversion anyway.")
 
     def range_check_linear(val, c, tmin, scale):
         if val < tmin:
-            raise ValueError('Viscosity conversion is outside the limits of the '
-                            f'{scale} scale; given value is {val}, but the minimum time '
-                            f'for this scale is {tmin} s. Set `extrapolate` to True '
-                            'to perform the conversion anyway.')
+            raise ValueError("Viscosity conversion is outside the limits of the "
+                            f"{scale} scale; given value is {val}, but the minimum time "
+                            f"for this scale is {tmin} s. Set `extrapolate` to True "
+                            "to perform the conversion anyway.")
 
-    old_scale = old_scale.lower().replace('degrees', '').replace('seconds', '').strip()
-    new_scale = new_scale.lower().replace('degrees', '').replace('seconds', '').strip()
+    old_scale = old_scale.lower().replace("degrees", "").replace("seconds", "").strip()
+    new_scale = new_scale.lower().replace("degrees", "").replace("seconds", "").strip()
 
     # Convert to kinematic viscosity
-    if old_scale == 'kinematic viscosity':
+    if old_scale == "kinematic viscosity":
         kinematic_viscosity = 1E6*val # convert to centistokes, the basis of the functions
-    elif old_scale == 'saybolt universal':
+    elif old_scale == "saybolt universal":
         if not extrapolate:
             range_check(val, old_scale)
         to_solve = lambda nu: Saybolt_universal_eq(nu) - val
@@ -3168,9 +3168,9 @@ def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
         raise ValueError(f'Scale "{old_scale}" not recognized - allowable values are any of {keys}.')
 
     # Convert to desired scale
-    if new_scale == 'kinematic viscosity':
+    if new_scale == "kinematic viscosity":
         val = 1E-6*kinematic_viscosity # convert to m^2/s
-    elif new_scale == 'saybolt universal':
+    elif new_scale == "saybolt universal":
         val = Saybolt_universal_eq(kinematic_viscosity)
     elif new_scale in viscosity_converters_from_nu:
         forward = lambda x: exp(splev(log(x), viscosity_converters_from_nu[new_scale]))

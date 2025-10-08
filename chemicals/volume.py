@@ -179,27 +179,27 @@ The structure of each dataframe is shown below:
 
 
 __all__ = [
-    'COSTALD',
-    'PPDS17',
-    'SNM0',
-    'Amgat',
-    'Bhirud_normal',
-    'COSTALD_compressed',
-    'COSTALD_mixture',
-    'CRC_inorganic',
-    'Campbell_Thodos',
-    'Goodman',
-    'Rackett',
-    'Rackett_fit',
-    'Rackett_mixture',
-    'TDE_VDNS_rho',
-    'Tait',
-    'Tait_molar',
-    'Townsend_Hales',
-    'Yamada_Gunn',
-    'Yen_Woods_saturation',
-    'ideal_gas',
-    'volume_VDI_PPDS',
+    "COSTALD",
+    "PPDS17",
+    "SNM0",
+    "Amgat",
+    "Bhirud_normal",
+    "COSTALD_compressed",
+    "COSTALD_mixture",
+    "CRC_inorganic",
+    "Campbell_Thodos",
+    "Goodman",
+    "Rackett",
+    "Rackett_fit",
+    "Rackett_mixture",
+    "TDE_VDNS_rho",
+    "Tait",
+    "Tait_molar",
+    "Townsend_Hales",
+    "Yamada_Gunn",
+    "Yen_Woods_saturation",
+    "ideal_gas",
+    "volume_VDI_PPDS",
 ]
 
 
@@ -209,20 +209,20 @@ from fluids.numerics import exp, implementation_optimize_tck, log, np, splev, sq
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, mixing_simple, os_path_join, source_path
 
-folder = os_path_join(source_path, 'Density')
+folder = os_path_join(source_path, "Density")
 
-register_df_source(folder, 'COSTALD Parameters.tsv')
-register_df_source(folder, 'Mchaweh SN0 deltas.tsv')
-register_df_source(folder, 'Perry Parameters 105.tsv')
-register_df_source(folder, 'CRC Liquid Inorganic Constant Densities.tsv')
-register_df_source(folder, 'CRC Solid Inorganic Constant Densities.tsv')
+register_df_source(folder, "COSTALD Parameters.tsv")
+register_df_source(folder, "Mchaweh SN0 deltas.tsv")
+register_df_source(folder, "Perry Parameters 105.tsv")
+register_df_source(folder, "CRC Liquid Inorganic Constant Densities.tsv")
+register_df_source(folder, "CRC Solid Inorganic Constant Densities.tsv")
 
-register_df_source(folder, 'VDI PPDS Density of Saturated Liquids.tsv', csv_kwargs={
-        'dtype':{'rhoc': float}})
-register_df_source(folder, 'CRC Inorganics densties of molten compounds and salts.tsv', csv_kwargs={
-        'dtype':{'rho': float}})
-register_df_source(folder, 'CRC Virial polynomials.tsv', csv_kwargs={
-        'dtype':{'a1': float, 'a2': float, 'a3': float, 'a4': float, 'a5': float}})
+register_df_source(folder, "VDI PPDS Density of Saturated Liquids.tsv", csv_kwargs={
+        "dtype":{"rhoc": float}})
+register_df_source(folder, "CRC Inorganics densties of molten compounds and salts.tsv", csv_kwargs={
+        "dtype":{"rho": float}})
+register_df_source(folder, "CRC Virial polynomials.tsv", csv_kwargs={
+        "dtype":{"a1": float, "a2": float, "a3": float, "a4": float, "a5": float}})
 
 
 _rho_data_loaded = False
@@ -235,36 +235,36 @@ def _load_rho_data():
     global rho_data_CRC_inorg_l_const, rho_data_CRC_inorg_s_const
     global rho_data_CRC_virial, rho_values_CRC_virial
 
-    rho_data_COSTALD = data_source('COSTALD Parameters.tsv')
-    rho_data_SNM0 = data_source('Mchaweh SN0 deltas.tsv')
-    rho_data_Perry_8E_105_l = data_source('Perry Parameters 105.tsv')
+    rho_data_COSTALD = data_source("COSTALD Parameters.tsv")
+    rho_data_SNM0 = data_source("Mchaweh SN0 deltas.tsv")
+    rho_data_Perry_8E_105_l = data_source("Perry Parameters 105.tsv")
     rho_values_Perry_8E_105_l = np.array(rho_data_Perry_8E_105_l.values[:, 1:], dtype=float)
 
-    rho_data_VDI_PPDS_2 = data_source('VDI PPDS Density of Saturated Liquids.tsv')
+    rho_data_VDI_PPDS_2 = data_source("VDI PPDS Density of Saturated Liquids.tsv")
     rho_values_VDI_PPDS_2 = np.array(rho_data_VDI_PPDS_2.values[:, 1:], dtype=float)
 
-    rho_data_CRC_inorg_l = data_source('CRC Inorganics densties of molten compounds and salts.tsv')
+    rho_data_CRC_inorg_l = data_source("CRC Inorganics densties of molten compounds and salts.tsv")
     rho_values_CRC_inorg_l = np.array(rho_data_CRC_inorg_l.values[:, 1:], dtype=float)
 
-    rho_data_CRC_inorg_l_const = data_source('CRC Liquid Inorganic Constant Densities.tsv')
-    rho_data_CRC_inorg_s_const = data_source('CRC Solid Inorganic Constant Densities.tsv')
+    rho_data_CRC_inorg_l_const = data_source("CRC Liquid Inorganic Constant Densities.tsv")
+    rho_data_CRC_inorg_s_const = data_source("CRC Solid Inorganic Constant Densities.tsv")
 
-    rho_data_CRC_virial = data_source('CRC Virial polynomials.tsv')
+    rho_data_CRC_virial = data_source("CRC Virial polynomials.tsv")
     rho_values_CRC_virial = np.array(rho_data_CRC_virial.values[:, 1:], dtype=float)
 
 def __getattr__(name):
-    if name in ('rho_data_COSTALD', 'rho_data_SNM0', 'rho_data_Perry_8E_105_l',
-                'rho_values_Perry_8E_105_l', 'rho_data_VDI_PPDS_2',
-                'rho_values_VDI_PPDS_2', 'rho_data_CRC_inorg_l',
-                'rho_values_CRC_inorg_l', 'rho_data_CRC_inorg_l_const',
-                'rho_data_CRC_inorg_s_const', 'rho_data_CRC_virial',
-                'rho_values_CRC_virial'):
+    if name in ("rho_data_COSTALD", "rho_data_SNM0", "rho_data_Perry_8E_105_l",
+                "rho_values_Perry_8E_105_l", "rho_data_VDI_PPDS_2",
+                "rho_values_VDI_PPDS_2", "rho_data_CRC_inorg_l",
+                "rho_values_CRC_inorg_l", "rho_data_CRC_inorg_l_const",
+                "rho_data_CRC_inorg_s_const", "rho_data_CRC_virial",
+                "rho_values_CRC_virial"):
         _load_rho_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
 
 def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
-    r'''Calculates saturation liquid volume, using the critical properties
+    r"""Calculates saturation liquid volume, using the critical properties
     and fitted coefficients from [1]_. This is also known as the PPDS equation
     10 or PPDS10.
 
@@ -311,7 +311,7 @@ def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     ----------
     .. [1] Gesellschaft, V. D. I., ed. VDI Heat Atlas. 2nd edition.
        Berlin; New York:: Springer, 2010.
-    '''
+    """
     tau = 1. - T/Tc if T < Tc else 0.
     tau_cbrt = tau**(1.0/3.)
     rho = rhoc + a*tau**0.35 + b*tau_cbrt*tau_cbrt + tau*(c + d*tau_cbrt)
@@ -1042,7 +1042,7 @@ def SNM0(T, Tc, Vc, omega, delta_SRK=None):
 
 
 def CRC_inorganic(T, rho0, k, Tm, MW=None):
-    r'''Calculates liquid density of a molten element or salt at temperature
+    r"""Calculates liquid density of a molten element or salt at temperature
     above the melting point. Some coefficients are given nearly up to the
     boiling point.
 
@@ -1089,7 +1089,7 @@ def CRC_inorganic(T, rho0, k, Tm, MW=None):
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
         Chemistry and Physics, 95E. [Boca Raton, FL]: CRC press, 2014.
-    '''
+    """
     rho = rho0 - k*(T-Tm)
     return rho if MW is None else 0.001 * MW / rho
 
@@ -1170,7 +1170,7 @@ def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
     return Vs*(1.0 - C*log((B + P)/(B + Psat)))
 
 def Tait(P, P_ref, rho_ref, B, C):
-    r'''Calculates compressed-liquid mass density using the Tait
+    r"""Calculates compressed-liquid mass density using the Tait
     model [1]_ and fit coefficients
     `B` and `C` and the reference (usually saturation) liquid
     density. `B` and `C` are normally temperature dependent but it
@@ -1226,14 +1226,14 @@ def Tait(P, P_ref, rho_ref, B, C):
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
-    '''
+    """
     if P < P_ref:
         # The model is not fit on pressures below saturation and cannot extrapolate there
         return rho_ref
     return rho_ref/(1.0 - C*log((B+P)/(B+P_ref) ))
 
 def Tait_molar(P, P_ref, V_ref, B, C):
-    r'''Calculates compressed-liquid volume using the Tait
+    r"""Calculates compressed-liquid volume using the Tait
     model [1]_ and fit coefficients
     `B` and `C` and the reference (usually saturation) liquid
     density. `B` and `C` are normally temperature dependent but it
@@ -1283,7 +1283,7 @@ def Tait_molar(P, P_ref, V_ref, B, C):
     ----------
     .. [1] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
        Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
-    '''
+    """
     if P < P_ref:
         P = P_ref
     return V_ref*(1.0  - C*log((B + P)/(B + P_ref) ))
@@ -1292,7 +1292,7 @@ def Tait_molar(P, P_ref, V_ref, B, C):
 ### Liquid Mixtures
 
 def Amgat(xs, Vms):
-    r'''Calculate mixture liquid density using the Amgat mixing rule.
+    r"""Calculate mixture liquid density using the Amgat mixing rule.
     Highly inacurate, but easy to use. Assumes idea liquids with
     no excess volume. Average molecular weight should be used with it to obtain
     density.
@@ -1328,7 +1328,7 @@ def Amgat(xs, Vms):
     --------
     >>> Amgat([0.5, 0.5], [4.057e-05, 5.861e-05])
     4.9590000000000005e-05
-    '''
+    """
     return mixing_simple(xs, Vms)
 
 
@@ -1486,7 +1486,7 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
 
 
 def ideal_gas(T, P):
-    r'''Calculates ideal gas molar volume.
+    r"""Calculates ideal gas molar volume.
     The molar volume of an ideal gas is given by:
 
     .. math::
@@ -1508,7 +1508,7 @@ def ideal_gas(T, P):
     --------
     >>> ideal_gas(298.15, 101325.)
     0.024465403697038125
-    '''
+    """
     return R*T/P
 
 

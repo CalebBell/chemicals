@@ -191,122 +191,122 @@ from chemicals.utils import mark_numba_uncacheable
 from chemicals.vapor_pressure import Psat_IAPWS, Tsat_IAPWS
 
 __all__ = [
-    'iapws11_Psub',
-    'iapws92_Psat',
-    'iapws92_dPsat_dT',
-    'iapws92_rhog_sat',
-    'iapws92_rhol_sat',
-    'iapws95_A0',
-    'iapws95_A0_tau_derivatives',
-    'iapws95_Ar',
-    'iapws95_MW',
-    'iapws95_P',
-    'iapws95_Pc',
-    'iapws95_Psat',
-    'iapws95_R',
-    'iapws95_T',
-    'iapws95_Tc',
-    'iapws95_Tsat',
-    'iapws95_d2A0_dtau2',
-    'iapws95_d2Ar_ddelta2',
-    'iapws95_d2Ar_ddeltadtau',
-    'iapws95_d2Ar_dtau2',
-    'iapws95_d3A0_dtau3',
-    'iapws95_d3Ar_ddelta2dtau',
-    'iapws95_d3Ar_ddelta3',
-    'iapws95_d3Ar_ddeltadtau2',
-    'iapws95_d4Ar_ddelta2dtau2',
-    'iapws95_dA0_dtau',
-    'iapws95_dAr_ddelta',
-    'iapws95_dAr_dtau',
-    'iapws95_dPsat_dT',
-    'iapws95_drhol_sat_dT',
-    'iapws95_properties',
-    'iapws95_rho',
-    'iapws95_rhoc',
-    'iapws95_rhog_sat',
-    'iapws95_rhol_sat',
-    'iapws95_saturation',
-    'iapws97_A_region3',
-    'iapws97_G0_region2',
-    'iapws97_G0_region5',
-    'iapws97_G_region1',
-    'iapws97_Gr_region2',
-    'iapws97_Gr_region5',
-    'iapws97_P',
-    'iapws97_R',
-    'iapws97_T',
-    'iapws97_boundary_3ab',
-    'iapws97_boundary_3cd',
-    'iapws97_boundary_3ef',
-    'iapws97_boundary_3ef',
-    'iapws97_boundary_3gh',
-    'iapws97_boundary_3ij',
-    'iapws97_boundary_3jk',
-    'iapws97_boundary_3mn',
-    'iapws97_boundary_3op',
-    'iapws97_boundary_3qu',
-    'iapws97_boundary_3rx',
-    'iapws97_boundary_3uv',
-    'iapws97_boundary_3wx',
-    'iapws97_d2A_ddelta2_region3',
-    'iapws97_d2A_ddeltadtau_region3',
-    'iapws97_d2A_dtau2_region3',
-    'iapws97_d2G0_dtau2_region2',
-    'iapws97_d2G0_dtau2_region5',
-    'iapws97_d2G_dpi2_region1',
-    'iapws97_d2G_dpidtau_region1',
-    'iapws97_d2G_dtau2_region1',
-    'iapws97_d2Gr_dpi2_region2',
-    'iapws97_d2Gr_dpi2_region5',
-    'iapws97_d2Gr_dpidtau_region2',
-    'iapws97_d2Gr_dpidtau_region5',
-    'iapws97_d2Gr_dtau2_region2',
-    'iapws97_d2Gr_dtau2_region5',
-    'iapws97_dA_ddelta_region3',
-    'iapws97_dA_dtau_region3',
-    'iapws97_dG0_dtau_region2',
-    'iapws97_dG0_dtau_region5',
-    'iapws97_dG_dpi_region1',
-    'iapws97_dG_dtau_region1',
-    'iapws97_dGr_dpi_region2',
-    'iapws97_dGr_dpi_region5',
-    'iapws97_dGr_dtau_region2',
-    'iapws97_dGr_dtau_region5',
-    'iapws97_identify_region_TP',
-    'iapws97_region1_rho',
-    'iapws97_region2_rho',
-    'iapws97_region3_a',
-    'iapws97_region3_b',
-    'iapws97_region3_c',
-    'iapws97_region3_d',
-    'iapws97_region3_e',
-    'iapws97_region3_f',
-    'iapws97_region3_g',
-    'iapws97_region3_h',
-    'iapws97_region3_i',
-    'iapws97_region3_j',
-    'iapws97_region3_k',
-    'iapws97_region3_l',
-    'iapws97_region3_m',
-    'iapws97_region3_n',
-    'iapws97_region3_o',
-    'iapws97_region3_p',
-    'iapws97_region3_q',
-    'iapws97_region3_r',
-    'iapws97_region3_rho',
-    'iapws97_region3_s',
-    'iapws97_region3_t',
-    'iapws97_region3_u',
-    'iapws97_region3_v',
-    'iapws97_region3_w',
-    'iapws97_region3_x',
-    'iapws97_region3_y',
-    'iapws97_region3_z',
-    'iapws97_region5_rho',
-    'iapws97_region_3',
-    'iapws97_rho',
-    'iapws97_rho_extrapolated',
+    "iapws11_Psub",
+    "iapws92_Psat",
+    "iapws92_dPsat_dT",
+    "iapws92_rhog_sat",
+    "iapws92_rhol_sat",
+    "iapws95_A0",
+    "iapws95_A0_tau_derivatives",
+    "iapws95_Ar",
+    "iapws95_MW",
+    "iapws95_P",
+    "iapws95_Pc",
+    "iapws95_Psat",
+    "iapws95_R",
+    "iapws95_T",
+    "iapws95_Tc",
+    "iapws95_Tsat",
+    "iapws95_d2A0_dtau2",
+    "iapws95_d2Ar_ddelta2",
+    "iapws95_d2Ar_ddeltadtau",
+    "iapws95_d2Ar_dtau2",
+    "iapws95_d3A0_dtau3",
+    "iapws95_d3Ar_ddelta2dtau",
+    "iapws95_d3Ar_ddelta3",
+    "iapws95_d3Ar_ddeltadtau2",
+    "iapws95_d4Ar_ddelta2dtau2",
+    "iapws95_dA0_dtau",
+    "iapws95_dAr_ddelta",
+    "iapws95_dAr_dtau",
+    "iapws95_dPsat_dT",
+    "iapws95_drhol_sat_dT",
+    "iapws95_properties",
+    "iapws95_rho",
+    "iapws95_rhoc",
+    "iapws95_rhog_sat",
+    "iapws95_rhol_sat",
+    "iapws95_saturation",
+    "iapws97_A_region3",
+    "iapws97_G0_region2",
+    "iapws97_G0_region5",
+    "iapws97_G_region1",
+    "iapws97_Gr_region2",
+    "iapws97_Gr_region5",
+    "iapws97_P",
+    "iapws97_R",
+    "iapws97_T",
+    "iapws97_boundary_3ab",
+    "iapws97_boundary_3cd",
+    "iapws97_boundary_3ef",
+    "iapws97_boundary_3ef",
+    "iapws97_boundary_3gh",
+    "iapws97_boundary_3ij",
+    "iapws97_boundary_3jk",
+    "iapws97_boundary_3mn",
+    "iapws97_boundary_3op",
+    "iapws97_boundary_3qu",
+    "iapws97_boundary_3rx",
+    "iapws97_boundary_3uv",
+    "iapws97_boundary_3wx",
+    "iapws97_d2A_ddelta2_region3",
+    "iapws97_d2A_ddeltadtau_region3",
+    "iapws97_d2A_dtau2_region3",
+    "iapws97_d2G0_dtau2_region2",
+    "iapws97_d2G0_dtau2_region5",
+    "iapws97_d2G_dpi2_region1",
+    "iapws97_d2G_dpidtau_region1",
+    "iapws97_d2G_dtau2_region1",
+    "iapws97_d2Gr_dpi2_region2",
+    "iapws97_d2Gr_dpi2_region5",
+    "iapws97_d2Gr_dpidtau_region2",
+    "iapws97_d2Gr_dpidtau_region5",
+    "iapws97_d2Gr_dtau2_region2",
+    "iapws97_d2Gr_dtau2_region5",
+    "iapws97_dA_ddelta_region3",
+    "iapws97_dA_dtau_region3",
+    "iapws97_dG0_dtau_region2",
+    "iapws97_dG0_dtau_region5",
+    "iapws97_dG_dpi_region1",
+    "iapws97_dG_dtau_region1",
+    "iapws97_dGr_dpi_region2",
+    "iapws97_dGr_dpi_region5",
+    "iapws97_dGr_dtau_region2",
+    "iapws97_dGr_dtau_region5",
+    "iapws97_identify_region_TP",
+    "iapws97_region1_rho",
+    "iapws97_region2_rho",
+    "iapws97_region3_a",
+    "iapws97_region3_b",
+    "iapws97_region3_c",
+    "iapws97_region3_d",
+    "iapws97_region3_e",
+    "iapws97_region3_f",
+    "iapws97_region3_g",
+    "iapws97_region3_h",
+    "iapws97_region3_i",
+    "iapws97_region3_j",
+    "iapws97_region3_k",
+    "iapws97_region3_l",
+    "iapws97_region3_m",
+    "iapws97_region3_n",
+    "iapws97_region3_o",
+    "iapws97_region3_p",
+    "iapws97_region3_q",
+    "iapws97_region3_r",
+    "iapws97_region3_rho",
+    "iapws97_region3_s",
+    "iapws97_region3_t",
+    "iapws97_region3_u",
+    "iapws97_region3_v",
+    "iapws97_region3_w",
+    "iapws97_region3_x",
+    "iapws97_region3_y",
+    "iapws97_region3_z",
+    "iapws97_region5_rho",
+    "iapws97_region_3",
+    "iapws97_rho",
+    "iapws97_rho_extrapolated",
 ]
 
 iapws95_R = 461.51805
@@ -340,16 +340,16 @@ iapws95_Tt = 273.16
 
 def use_mpmath_backend():
     import mpmath as mp
-    globals()['exp'] = mp.exp
-    globals()['log'] = mp.log
-    globals()['sqrt'] = mp.sqrt
-    globals()['iapws95_R'] = mp.mpf("461.51805")
-    globals()['iapws97_R'] = mp.mpf("461.526")
-    globals()['iapws95_MW'] = mp.mpf("18.015268")
-    globals()['iapws95_Tc'] = mp.mpf("647.096")
-    globals()['Tc_inv'] = 1/mp.mpf("647.096")
-    globals()['rhoc'] = mp.mpf("322")
-    globals()['iapws95_rhoc_inv'] = 1/mp.mpf("322")
+    globals()["exp"] = mp.exp
+    globals()["log"] = mp.log
+    globals()["sqrt"] = mp.sqrt
+    globals()["iapws95_R"] = mp.mpf("461.51805")
+    globals()["iapws97_R"] = mp.mpf("461.526")
+    globals()["iapws95_MW"] = mp.mpf("18.015268")
+    globals()["iapws95_Tc"] = mp.mpf("647.096")
+    globals()["Tc_inv"] = 1/mp.mpf("647.096")
+    globals()["rhoc"] = mp.mpf("322")
+    globals()["iapws95_rhoc_inv"] = 1/mp.mpf("322")
     import fluids.numerics
     fluids.numerics.exp = mp.exp
     fluids.numerics.log = mp.log
@@ -360,16 +360,16 @@ def use_mpmath_backend():
 
 def reset_backend():
     import math
-    globals()['exp'] = math.exp
-    globals()['log'] = math.log
-    globals()['sqrt'] = math.sqrt
-    globals()['iapws95_R'] = 461.51805
-    globals()['iapws97_R'] = 461.526
-    globals()['iapws95_MW'] = 18.015268
-    globals()['iapws95_Tc'] = 647.096
-    globals()['Tc_inv'] = 1/647.096
-    globals()['rhoc'] = 322.0
-    globals()['iapws95_rhoc_inv'] = 1/322.0
+    globals()["exp"] = math.exp
+    globals()["log"] = math.log
+    globals()["sqrt"] = math.sqrt
+    globals()["iapws95_R"] = 461.51805
+    globals()["iapws97_R"] = 461.526
+    globals()["iapws95_MW"] = 18.015268
+    globals()["iapws95_Tc"] = 647.096
+    globals()["Tc_inv"] = 1/647.096
+    globals()["rhoc"] = 322.0
+    globals()["iapws95_rhoc_inv"] = 1/322.0
     import fluids.numerics
     import fluids.numerics.special
     fluids.numerics.exp = math.exp
@@ -380,28 +380,28 @@ def reset_backend():
 
 
 def iapws97_boundary_2_3(T):
-    '''Above this pressure we are in region 3.
+    """Above this pressure we are in region 3.
 
     >>> iapws97_boundary_2_3(0.623150000E3)
     16529164.2526216
-    '''
+    """
     return (0.34805185628969E9 - T*(0.11671859879975E7 - 0.10192970039326E4*T))
 
 ### IAPWS 07 Region 3 P boundaries
 
 def iapws97_boundary_2_3_reverse(P):
-    '''
+    """
     >>> iapws97_boundary_2_3_reverse(16529164.2526216)
     623.15000000000
-    '''
+    """
     return (116.85603437027114637*sqrt(7.1845068690062562659e-8*P - 1.0)
             + 572.54459862744727161)
 
 def iapws97_boundary_3uv(P):
-    '''
+    """
     >>> iapws97_boundary_3uv(22.3E6)
     647.7996121480069
-    '''
+    """
     return (P*(P*(2.867916822636969863e-21*P - 2.228141349037550121e-13)
                + 8.905796021353068107e-6) + 528.1996462630620499)
 #    P = P/1E6
@@ -409,20 +409,20 @@ def iapws97_boundary_3uv(P):
 #    return T
 
 def iapws97_boundary_3ef(P):
-    '''
+    """
     >>> iapws97_boundary_3ef(40E6)
     713.959399239744
-    '''
+    """
     return 3.7278880039999996e-6*P + 564.843879079744056
 #    P = P/1E6
 #    T = 3.727888004*(P-22.064)+Tc
 #    return T
 
 def iapws97_boundary_3cd(P):
-    '''
+    """
     >>> iapws97_boundary_3cd(25E6)
     649.3659208321279
-    '''
+    """
     return (P*(P*(1.59090746562728991e-22*P - 1.2728354929587799e-14)
                + 2.78233532206914969e-6) + 585.27696669634895)
 #    P = P/1E6
@@ -430,10 +430,10 @@ def iapws97_boundary_3cd(P):
 #    return T
 
 def iapws97_boundary_3gh(P):
-    '''
+    """
     >>> iapws97_boundary_3gh(25E6)
     656.69805722612
-    '''
+    """
     return (P*(P*(P*(7.51608051114156857e-18 - 7.87105249910382769e-26*P)
                   - 2.69029173140129987e-10) + 0.0042814358479154593) - 24928.4240900418008)
 #    P = P/1E6
@@ -441,10 +441,10 @@ def iapws97_boundary_3gh(P):
 #    return T
 
 def iapws97_boundary_3ij(P):
-    '''
+    """
     >>> iapws97_boundary_3ij(25E6)
     660.7865756716819
-    '''
+    """
     return (P*(P*(P*(5.15308185433081825e-29*P - 5.87071076864458977e-21)
                   + 2.60763050899561981e-13) - 6.16179320924617007e-7) + 584.814781649163024)
 #    P = P/1E6
@@ -452,10 +452,10 @@ def iapws97_boundary_3ij(P):
 #    return T
 
 def iapws97_boundary_3jk(P):
-    '''
+    """
     >>> iapws97_boundary_3jk(25E6)
     668.1915358826951
-    '''
+    """
     return (P*(P*(P*(1.37897492684193974e-28*P - 1.57391839848015003e-20)
                   + 6.97072596851896056e-13) - 7.70600270141674947e-6) + 617.229772068439047)
 #    P = P/1E6
@@ -463,10 +463,10 @@ def iapws97_boundary_3jk(P):
 #    return T
 
 def iapws97_boundary_3mn(P):
-    '''
+    """
     >>> iapws97_boundary_3mn(22.8E6)
     649.6054132953997
-    '''
+    """
     return (P*(P*(1.92871054508107992e-21*P - 1.58365725441647998e-13)
                + 7.61978122720127966e-6) + 535.339483742384004)
 #    P = P/1E6
@@ -474,10 +474,10 @@ def iapws97_boundary_3mn(P):
 #    return T
 
 def iapws97_boundary_3qu(P):
-    '''
+    """
     >>> iapws97_boundary_3qu(22E6)
     645.6355027340121
-    '''
+    """
     return (P*(P*(1.22240301070144985e-21*P - 1.02020639611015996e-13)
                + 5.29062258221221963e-6) + 565.60364823912596)
 #    P = P/1E6
@@ -485,10 +485,10 @@ def iapws97_boundary_3qu(P):
 #    return T
 
 def iapws97_boundary_3rx(P):
-    '''
+    """
     >>> iapws97_boundary_3rx(22E6)
     648.26227536701
-    '''
+    """
     return (P*(P*(2.43293362700451993e-13 - 2.94905044740798962e-21*P)
                - 1.02961025163668997e-6) + 584.561202520005963)
 #    P = P/1E6
@@ -497,10 +497,10 @@ def iapws97_boundary_3rx(P):
 
 ### IAPWS 07 Region 3 log P boundaries
 def iapws97_boundary_3wx(logP_MPa, logP_MPa_inv):
-    '''
+    """
     >>> iapws97_boundary_3wx(log(22.3), 1/log(22.3))
     648.204947950734
-    '''
+    """
     return (logP_MPa*(14.7370491183190993*logP_MPa + 97.3505869861951965)
             + 7.28052609145380014 + logP_MPa_inv*(329.196213998375015 + 873.371668682416953*logP_MPa_inv))
 #    P = P/1E6
@@ -508,20 +508,20 @@ def iapws97_boundary_3wx(logP_MPa, logP_MPa_inv):
 #    return T
 
 def iapws97_boundary_3ab(logP_MPa, logP_MPa_inv):
-    '''
+    """
     >>> iapws97_boundary_3ab(log(40), 1/log(40))
     693.0341408296053
-    '''
+    """
     return (logP_MPa*(21.3144632222113017*logP_MPa - 187.661219490113012)
             + 1547.93642129415002 - logP_MPa_inv*(1918.87498864292002 - 918.419702359447001*logP_MPa_inv))
 #    T = sum([nis3ab[i]*logP_MPa**Iis3ab[i] for i in range(5)])
 #    return T
 
 def iapws97_boundary_3op(logP_MPa, logP_MPa_inv):
-    '''
+    """
     >>> iapws97_boundary_3op(log(22.8), 1/log(22.8))
     650.010694314133
-    '''
+    """
     return (logP_MPa*(64.2859598466067013*logP_MPa - 332.500170441277987)
             + 969.461372400213008 + logP_MPa_inv*(773.845935768222034 - 1523.13732937084001*logP_MPa_inv))
 #    T = sum([nis3op[i]*logP_MPa**Iis3op[i] for i in range(5)])
@@ -581,7 +581,7 @@ except: # except is needed for running Python under -OO flag
 ### Region 1
 
 def iapws97_G_region1(tau, pi):
-    r'''Calculates the dimensionless Gibbs free energy for water according to
+    r"""Calculates the dimensionless Gibbs free energy for water according to
     the IAPWS-97 standard (for region 1).
 
     .. math::
@@ -606,7 +606,7 @@ def iapws97_G_region1(tau, pi):
     --------
     >>> iapws97_G_region1(1386/277.15, 101325/16.53E6)
     -0.00016341033954414
-    '''
+    """
     pit = 7.1 - pi
     taut = tau - 1.222
     taut_inv = 1.0/taut
@@ -660,7 +660,7 @@ def iapws97_G_region1(tau, pi):
             - 9.353708729245799802e-26*pit2*pit*taut_inv3)))
 
 def iapws97_dG_dpi_region1(tau, pi):
-    r'''Calculates the derivative of dimensionless Gibbs free energy
+    r"""Calculates the derivative of dimensionless Gibbs free energy
     with respect to `pi` for water according to the IAPWS-97 standard
     (for region 1).
 
@@ -692,7 +692,7 @@ def iapws97_dG_dpi_region1(tau, pi):
     --------
     >>> iapws97_dG_dpi_region1(1386/277.15, 101325/16.53E6)
     0.1292327182544
-    '''
+    """
     pit = 7.1 - pi
     taut = tau - 1.222
     pit2 = pit*pit
@@ -729,7 +729,7 @@ def iapws97_dG_dpi_region1(tau, pi):
             + 2.99318679335865594e-24*(pit3)*(taut_inv7))))
 
 def iapws97_d2G_dpi2_region1(tau, pi):
-    r'''Calculates the second derivative of dimensionless Gibbs free energy
+    r"""Calculates the second derivative of dimensionless Gibbs free energy
     with respect to `pi` for water according to the IAPWS-97 standard
     (for region 1).
 
@@ -757,7 +757,7 @@ def iapws97_d2G_dpi2_region1(tau, pi):
     --------
     >>> iapws97_d2G_dpi2_region1(1386/277.15, 101325/16.53E6)
      -0.0010570100274769
-    '''
+    """
     pit = 7.1 - pi
     taut = tau - 1.222
     taut_inv = 1.0/taut
@@ -794,7 +794,7 @@ def iapws97_d2G_dpi2_region1(tau, pi):
 
 
 def iapws97_dG_dtau_region1(tau, pi):
-    r'''Calculates the derivative of dimensionless Gibbs free energy
+    r"""Calculates the derivative of dimensionless Gibbs free energy
     with respect to `tau` for water according to the IAPWS-97 standard
     (for region 1).
 
@@ -822,7 +822,7 @@ def iapws97_dG_dtau_region1(tau, pi):
     --------
     >>> iapws97_dG_dtau_region1(1386/277.15, 101325/16.53E6)
     0.026440334282967
-    '''
+    """
     pit = 7.1 - pi
     taut = tau - 1.222
     taut_inv = 1.0/taut
@@ -862,7 +862,7 @@ def iapws97_dG_dtau_region1(tau, pi):
             + 3.835020578990777884e-24*pit29*pit2*pit*taut_inv30*taut_inv9*taut_inv3)
 
 def iapws97_d2G_dtau2_region1(tau, pi):
-    r'''Calculates the second derivative of dimensionless Gibbs free energy
+    r"""Calculates the second derivative of dimensionless Gibbs free energy
     with respect to `tau` for water according to the IAPWS-97 standard
     (for region 1).
 
@@ -890,7 +890,7 @@ def iapws97_d2G_dtau2_region1(tau, pi):
     --------
     >>> iapws97_d2G_dtau2_region1(1386/277.15, 101325/16.53E6)
     -0.3645169808573
-    '''
+    """
     pit = 7.1 - pi
     taut = tau - 1.222
     taut_inv = 1.0/taut
@@ -925,7 +925,7 @@ def iapws97_d2G_dtau2_region1(tau, pi):
             - 1.610708643176126667e-22*pit29*pit2*pit*taut_inv31*taut_inv9*taut_inv2*taut_inv)
 
 def iapws97_d2G_dpidtau_region1(tau, pi):
-    r'''Calculates the second derivative of dimensionless Gibbs free energy
+    r"""Calculates the second derivative of dimensionless Gibbs free energy
     with respect to `tau` and `pi` for water according to the IAPWS-97 standard
     (for region 1).
 
@@ -953,7 +953,7 @@ def iapws97_d2G_dpidtau_region1(tau, pi):
     --------
     >>> iapws97_d2G_dpidtau_region1(1386/277.15, 101325/16.53E6)
     0.025837659858819
-    '''
+    """
     pit = 7.1 - pi
     taut = tau - 1.222
     taut_inv = 1.0/taut
@@ -992,7 +992,7 @@ def iapws97_d2G_dpidtau_region1(tau, pi):
 ### Region 2
 
 def iapws97_G0_region2(tau, pi):
-    r'''Calculates the dimensionless ideal gas Gibbs free energy for water
+    r"""Calculates the dimensionless ideal gas Gibbs free energy for water
     according to the IAPWS-97 standard (for region 2).
 
     .. math::
@@ -1017,7 +1017,7 @@ def iapws97_G0_region2(tau, pi):
     --------
     >>> iapws97_G0_region2(540/300.0, 101325/1e6)
     3.3180953922351
-    '''
+    """
     tau_inv = 1.0/tau
     return (tau*(tau*(0.0212684637533070015*tau - 0.284086324607719987)
             + 10.0866559680180004) + tau_inv*(tau_inv*(tau_inv*(tau_inv*(0.0714527380814549973
@@ -1025,7 +1025,7 @@ def iapws97_G0_region2(tau, pi):
             - 4.38395113194500041) + log(pi) - 9.69276865002169963)
 
 def iapws97_dG0_dtau_region2(tau, pi):
-    r'''Calculates the first derivative of dimensionless ideal gas Gibbs free
+    r"""Calculates the first derivative of dimensionless ideal gas Gibbs free
     energy with respect to `tau` for water
     according to the IAPWS-97 standard (for region 2).
 
@@ -1054,7 +1054,7 @@ def iapws97_dG0_dtau_region2(tau, pi):
     --------
     >>> iapws97_dG0_dtau_region2(540/300.0, 101325/1e6)
     10.2374188173906
-    '''
+    """
     tau_inv = 1.0/tau
     return (tau*(0.0638053912599210044*tau - 0.568172649215439973)
             + tau_inv*tau_inv*(tau_inv*(tau_inv*(tau_inv*(0.0280439556415100003*tau_inv
@@ -1062,7 +1062,7 @@ def iapws97_dG0_dtau_region2(tau, pi):
             + 4.38395113194500041) + 10.0866559680180004)
 
 def iapws97_d2G0_dtau2_region2(tau, pi):
-    r'''Calculates the second derivative of dimensionless ideal gas Gibbs free
+    r"""Calculates the second derivative of dimensionless ideal gas Gibbs free
     energy with respect to `tau` for water
     according to the IAPWS-97 standard (for region 2).
 
@@ -1091,7 +1091,7 @@ def iapws97_d2G0_dtau2_region2(tau, pi):
     --------
     >>> iapws97_d2G0_dtau2_region2(540/300.0, 101325/1e6)
     -1.2472096479372
-    '''
+    """
     tau_inv = 1.0/tau
     return (0.127610782519842009*tau + tau_inv*tau_inv*tau_inv*(tau_inv*(tau_inv*(
             tau_inv*(1.42905476162910006 - 0.168263733849060015*tau_inv)
@@ -1099,7 +1099,7 @@ def iapws97_d2G0_dtau2_region2(tau, pi):
             - 8.76790226389000082) - 0.568172649215439973)
 
 def iapws97_Gr_region2(tau, pi):
-    r'''Calculates the dimensionless residual Gibbs free energy for water
+    r"""Calculates the dimensionless residual Gibbs free energy for water
     according to the IAPWS-97 standard (for region 2).
 
     .. math::
@@ -1124,7 +1124,7 @@ def iapws97_Gr_region2(tau, pi):
     --------
     >>> iapws97_Gr_region2(540/300.0, 101325/1e6)
     -0.71851548053980
-    '''
+    """
     taut = tau - 0.5
     pi2 = pi*pi
     pi3 = pi2*pi
@@ -1163,7 +1163,7 @@ def iapws97_Gr_region2(tau, pi):
             - 9.436970724120999844e-7*pi20*pi4*taut25*taut25*taut4*taut4)
 
 def iapws97_dGr_dpi_region2(tau, pi):
-    r'''Calculates the first derivative of dimensionless residual Gibbs free
+    r"""Calculates the first derivative of dimensionless residual Gibbs free
     energy with respect to `pi` for water
     according to the IAPWS-97 standard (for region 2).
 
@@ -1192,7 +1192,7 @@ def iapws97_dGr_dpi_region2(tau, pi):
     --------
     >>> iapws97_dGr_dpi_region2(540/300.0, 101325/1e6)
     -27.7714056629532
-    '''
+    """
     taut = tau - 0.5
     pi2 = pi*pi
     pi3 = pi*pi2
@@ -1242,7 +1242,7 @@ def iapws97_dGr_dpi_region2(tau, pi):
             - 0.0575812590834320001*taut3 - 0.0503252787279300021*taut6 - 0.00177317424732129992)
 
 def iapws97_d2Gr_dpi2_region2(tau, pi):
-    r'''Calculates the second derivative of dimensionless residual Gibbs free
+    r"""Calculates the second derivative of dimensionless residual Gibbs free
     energy with respect to `pi` for water
     according to the IAPWS-97 standard (for region 2).
 
@@ -1270,7 +1270,7 @@ def iapws97_d2Gr_dpi2_region2(tau, pi):
     --------
     >>> iapws97_d2Gr_dpi2_region2(540/300.0, 101325/1e6)
     -983.15187604898
-    '''
+    """
     taut = tau - 0.5
     pi2 = pi*pi
     pi4 = pi2*pi2
@@ -1303,7 +1303,7 @@ def iapws97_d2Gr_dpi2_region2(tau, pi):
             - 0.0005209207839714791177*pi18*pi4*taut25*taut25*taut4*taut4 - 0.00005334909582817400282*taut25*taut10*taut)
 
 def iapws97_dGr_dtau_region2(tau, pi):
-    r'''Calculates the first derivative of dimensionless residual Gibbs free
+    r"""Calculates the first derivative of dimensionless residual Gibbs free
     energy with respect to `tau` for water
     according to the IAPWS-97 standard (for region 2).
 
@@ -1331,7 +1331,7 @@ def iapws97_dGr_dtau_region2(tau, pi):
     --------
     >>> iapws97_dGr_dtau_region2(540/300.0, 101325/1e6)
     -18.1535856049444
-    '''
+    """
     taut = tau - 0.5
     pi2 = pi*pi
     pi3 = pi2*pi
@@ -1348,7 +1348,7 @@ def iapws97_dGr_dtau_region2(tau, pi):
     return (-0.09199202739273000529*pi*taut - 0.01783486229235799886*pi - 0.1727437772502959934*pi*taut2 - 0.3019516723675800263*pi*taut5 - 0.0003789797503262999981*taut*pi2 + 2.558143570457000165e-8*taut*pi4 - 0.00003303264167020299999*pi2 - 0.01575711089734200057*pi2*taut2*taut - 0.3065810695540109876*pi2*taut5*taut - 0.0009602837249071320778*pi2*taut34*taut + 4.387066728443500103e-7*pi3 - 0.00009683303171571000013*pi3*taut2 - 0.00902035472528879903*pi3*taut5 - 1.423388874692715023*pi3*taut34 - 7.884730955936700091e-10*pi4 + 1.446761181555210154e-6*pi4*taut2 + 0.00001604545343636269952*pi4*pi*taut5*taut - 5.014429935318300022e-11*pi4*pi2*taut2 - 0.0338743557141679974*pi4*pi2*taut13*taut2 - 836.3509676936399728*pi4*pi2*taut34 - 0.00001388398978901110004*pi4*pi3*taut5*taut5 - 0.9736710608934751043*pi4*pi3*taut13*taut5*taut5*taut + 9.004969088367199864e-11*pi8*taut5*taut2 - 296.3208272327927943*pi8*taut34*taut + 2.575262664271440094e-7*pi8*pi*taut5*taut5*taut2 + 4.162786084069599818e-19*pi8*pi2*taut2*taut - 1.023474709592899964e-12*pi8*pi2*taut5*taut2*taut2 - 1.402545113131540004e-8*pi8*pi2*taut13 - 2.345604350762564972e-9*pi8*pi8*taut13*taut13*taut2 + 5.34651593970450012*pi8*pi8*taut34*taut13*taut2 - 19.18748282727747068*pi8*pi8*pi2*taut34*taut13*taut5*taut2*taut2 + 1.783716907108420048e-23*pi20*taut13*taut5*taut + 1.072026090668119912e-11*pi20*taut34 - 0.0002016118449513984044*pi20*taut34*taut13 - 1.240176623398419126e-24*pi20*pi*taut13*taut5*taut2 + 0.0002004828223513221118*pi20*pi2*taut34*taut13*taut5 - 4.979757484525589725e-14*pi20*pi3*taut34*taut2*taut2 + 1.90027787547158596e-27*pi20*pi4*taut13*taut5*taut5*taut2 + 2.216588614031120095e-15*pi20*pi4*taut34*taut5 - 0.00005473443019990179931*pi20*pi4*taut34*taut13*taut5*taut5)
 
 def iapws97_d2Gr_dtau2_region2(tau, pi):
-    r'''Calculates the second derivative of dimensionless residual Gibbs free
+    r"""Calculates the second derivative of dimensionless residual Gibbs free
     energy with respect to `tau` for water
     according to the IAPWS-97 standard (for region 2).
 
@@ -1376,7 +1376,7 @@ def iapws97_d2Gr_dtau2_region2(tau, pi):
     --------
     >>> iapws97_d2Gr_dtau2_region2(540/300.0, 101325/1e6)
     -470.9302933324787
-    '''
+    """
     taut = tau - 0.5
     pi2 = pi*pi
     pi3 = pi2*pi
@@ -1394,7 +1394,7 @@ def iapws97_d2Gr_dtau2_region2(tau, pi):
     return (-0.3454875545005919868*pi*taut - 0.09199202739273000529*pi - 1.509758361837900242*pi*taut4 - 0.0001936660634314200003*taut*pi3 + 2.893522363110420308e-6*taut*pi4 - 1.002885987063660004e-10*taut*pi4*pi2 - 0.0003789797503262999981*pi2 - 0.04727133269202600518*pi2*taut2 - 1.839486417324065926*pi2*taut5 - 0.03360993037174962034*pi2*taut33*taut - 0.04510177362644399168*pi3*taut4 - 48.3952217395523121*pi3*taut33 + 2.558143570457000165e-8*pi4 + 0.00009627272061817619036*pi4*pi*taut5 - 0.5081153357125199888*pi4*pi2*taut5*taut5*taut4 - 28435.93290158375748*pi4*pi2*taut33 - 0.0001388398978901110071*pi4*pi3*taut5*taut4 - 23.3681054614434025*pi4*pi3*taut18*taut5 + 6.303478361857040293e-10*pi8*taut5*taut - 10371.22895314774723*pi8*taut33*taut + 3.090315197125728325e-6*pi8*pi*taut5*taut5*taut + 1.248835825220879946e-18*pi8*pi2*taut2 - 9.211272386336099881e-12*pi8*pi2*taut5*taut2*taut - 1.823308647071001956e-7*pi8*pi2*taut5*taut5*taut2 - 6.567692182135182584e-8*pi8*pi8*taut18*taut5*taut4 + 261.9792810455205085*pi8*pi8*taut33*taut5*taut5*taut5 - 1074.499038327538301*pi8*pi8*pi2*taut33*taut18*taut4 + 3.389062123505998002e-22*pi20*taut18 + 3.644888708271607926e-10*pi20*taut33 - 0.009475756712715725089*pi20*taut33*taut5*taut5*taut2*taut - 2.4803532467968384e-23*pi20*pi*taut18*taut + 0.01042510676226874981*pi20*pi2*taut33*taut18 - 1.892307844119724095e-12*pi20*pi3*taut33*taut4 + 4.750694688678964685e-26*pi20*pi4*taut18*taut5*taut + 8.644695594721368726e-14*pi20*pi4*taut33*taut5 - 0.003119862521394402635*pi20*pi4*taut33*taut18*taut5)
 
 def iapws97_d2Gr_dpidtau_region2(tau, pi):
-    r'''Calculates the second derivative of dimensionless residual Gibbs free
+    r"""Calculates the second derivative of dimensionless residual Gibbs free
     energy with respect to `tau` and `pi` for water
     according to the IAPWS-97 standard (for region 2).
 
@@ -1422,7 +1422,7 @@ def iapws97_d2Gr_dpidtau_region2(tau, pi):
     --------
     >>> iapws97_d2Gr_dpidtau_region2(540/300.0, 101325/1e6)
     -735.391845360247
-    '''
+    """
     taut = tau - 0.5
     pi2 = pi*pi
     pi3 = pi2*pi
@@ -1440,7 +1440,7 @@ def iapws97_d2Gr_dpidtau_region2(tau, pi):
 
 ### Region 3 A formulations
 def iapws97_A_region3(tau, delta):
-    r'''Calculates the dimensionless Helmholtz free energy for water
+    r"""Calculates the dimensionless Helmholtz free energy for water
     according to the IAPWS-97 standard (for region 3).
 
     .. math::
@@ -1466,7 +1466,7 @@ def iapws97_A_region3(tau, delta):
     --------
     >>> iapws97_A_region3(647.096/500.0, 400.0/322.0)
     -3.0336402168865
-    '''
+    """
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -1497,7 +1497,7 @@ def iapws97_A_region3(tau, delta):
             + 1.205336969651700008*tau6*tau6 - 0.008456681281250200827*tau13*tau6*tau4)
 
 def iapws97_dA_ddelta_region3(tau, delta):
-    r'''Calculates the derivative of dimensionless Helmholtz free energy
+    r"""Calculates the derivative of dimensionless Helmholtz free energy
     with respect to `delta` for water
     according to the IAPWS-97 standard (for region 3).
 
@@ -1525,7 +1525,7 @@ def iapws97_dA_ddelta_region3(tau, delta):
     --------
     >>> iapws97_dA_ddelta_region3(647.096/500.0, 400.0/322.0)
     7.35562435092
-    '''
+    """
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -1554,7 +1554,7 @@ def iapws97_dA_ddelta_region3(tau, delta):
             + 0.8852104398431800414*tau13*tau2 - 0.6420776518160700164*tau13*tau3*tau)
 
 def iapws97_d2A_ddelta2_region3(tau, delta):
-    r'''Calculates the second derivative of dimensionless Helmholtz free energy
+    r"""Calculates the second derivative of dimensionless Helmholtz free energy
     with respect to `delta` for water
     according to the IAPWS-97 standard (for region 3).
 
@@ -1582,7 +1582,7 @@ def iapws97_d2A_ddelta2_region3(tau, delta):
     --------
     >>> iapws97_d2A_ddelta2_region3(647.096/500.0, 400.0/322.0)
     -2.2858869882497
-    '''
+    """
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -1606,7 +1606,7 @@ def iapws97_d2A_ddelta2_region3(tau, delta):
             + 0.07884107375830799735*tau20*tau2 + 0.2511681684861600261*tau20*tau6)
 
 def iapws97_dA_dtau_region3(tau, delta):
-    r'''Calculates the derivative of dimensionless Helmholtz free energy
+    r"""Calculates the derivative of dimensionless Helmholtz free energy
     with respect to `tau` for water
     according to the IAPWS-97 standard (for region 3).
 
@@ -1634,7 +1634,7 @@ def iapws97_dA_dtau_region3(tau, delta):
     --------
     >>> iapws97_dA_dtau_region3(647.096/500.0, 400.0/322.0)
     -24.9687028688
-    '''
+    """
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -1665,7 +1665,7 @@ def iapws97_dA_dtau_region3(tau, delta):
             - 0.1945036694687546086*tau11*tau11)
 
 def iapws97_d2A_dtau2_region3(tau, delta):
-    r'''Calculates the second derivative of dimensionless Helmholtz free energy
+    r"""Calculates the second derivative of dimensionless Helmholtz free energy
     with respect to `tau` for water
     according to the IAPWS-97 standard (for region 3).
 
@@ -1693,7 +1693,7 @@ def iapws97_d2A_dtau2_region3(tau, delta):
     --------
     >>> iapws97_d2A_dtau2_region3(647.096/500.0, 400.0/322.0)
     -373.6565823701
-    '''
+    """
     delta2 = delta*delta
     delta3 = delta2*delta
     delta6 = delta3*delta3
@@ -1720,7 +1720,7 @@ def iapws97_d2A_dtau2_region3(tau, delta):
 
 
 def iapws97_d2A_ddeltadtau_region3(tau, delta):
-    r'''Calculates the second derivative of dimensionless Helmholtz free energy
+    r"""Calculates the second derivative of dimensionless Helmholtz free energy
     with respect to `tau` and `delta` for water
     according to the IAPWS-97 standard (for region 3).
 
@@ -1748,7 +1748,7 @@ def iapws97_d2A_ddeltadtau_region3(tau, delta):
     --------
     >>> iapws97_d2A_ddeltadtau_region3(647.096/500.0, 400.0/322.0)
     145.85190014717
-    '''
+    """
     tau2 = tau*tau
     delta2 = tau2*tau2 # abuse - tau4
     tau5 = delta2*tau
@@ -1779,7 +1779,7 @@ def iapws97_d2A_ddeltadtau_region3(tau, delta):
 ### Region 5
 
 def iapws97_G0_region5(tau, pi):
-    r'''Calculates the dimensionless ideal gas Gibbs free energy for water
+    r"""Calculates the dimensionless ideal gas Gibbs free energy for water
     according to the IAPWS-97 standard (for region 5).
 
     .. math::
@@ -1804,14 +1804,14 @@ def iapws97_G0_region5(tau, pi):
     --------
     >>> iapws97_G0_region5(1000.0/1500, 101325/1e6)
     -14.9741430290056
-    '''
+    """
     tau_inv = 1.0/tau
     return (tau*(6.85408416344340043 - 0.329616265389169993*tau)
             + tau_inv*(tau_inv*(0.369015349803330006 - 0.0248051489334660015*tau_inv)
             - 3.1161318213925) + log(pi) - 13.1799836742010008)
 
 def iapws97_dG0_dtau_region5(tau, pi):
-    r'''Calculates the first derivative of dimensionless ideal gas Gibbs free
+    r"""Calculates the first derivative of dimensionless ideal gas Gibbs free
     energy with respect to `tau` for water
     according to the IAPWS-97 standard (for region 5).
 
@@ -1840,13 +1840,13 @@ def iapws97_dG0_dtau_region5(tau, pi):
     --------
     >>> iapws97_dG0_dtau_region5(1000.0/1500, 101325/1e6)
     11.311766995978
-    '''
+    """
     tau_inv = 1.0/tau
     return (-0.659232530778339987*tau + tau_inv*tau_inv*(tau_inv*(0.074415446800398008*tau_inv
             - 0.738030699606660012) + 3.1161318213925) + 6.85408416344340043)
 
 def iapws97_d2G0_dtau2_region5(tau, pi):
-    r'''Calculates the second derivative of dimensionless ideal gas Gibbs free
+    r"""Calculates the second derivative of dimensionless ideal gas Gibbs free
     energy with respect to `tau` for water
     according to the IAPWS-97 standard (for region 5).
 
@@ -1875,14 +1875,14 @@ def iapws97_d2G0_dtau2_region5(tau, pi):
     --------
     >>> iapws97_d2G0_dtau2_region5(1000.0/1500, 101325/1e6)
     -12.744650271463655
-    '''
+    """
     tau_inv = 1.0/tau
     return (tau_inv*tau_inv*tau_inv*(tau_inv*(2.21409209881998015
                                               - 0.297661787201592032*tau_inv)
             - 6.232263642785) - 0.659232530778339987)
 
 def iapws97_Gr_region5(tau, pi):
-    r'''Calculates the dimensionless residual Gibbs free energy for water
+    r"""Calculates the dimensionless residual Gibbs free energy for water
     according to the IAPWS-97 standard (for region 5).
 
     .. math::
@@ -1907,7 +1907,7 @@ def iapws97_Gr_region5(tau, pi):
     --------
     >>> iapws97_Gr_region5(1000/300.0, 101325/1e6)
     -0.0194648291645718
-    '''
+    """
     tau3 = tau*tau*tau
     return (pi*(pi*tau3*(3.79194548229549995e-8*pi*tau*tau3 + (2.24400374094849992e-6
             - 4.11632754534709986e-6*tau3*tau3)) + tau*(tau*(0.000901537616739440007
@@ -1915,7 +1915,7 @@ def iapws97_Gr_region5(tau, pi):
 
 
 def iapws97_dGr_dpi_region5(tau, pi):
-    r'''Calculates the first derivative of dimensionless residual Gibbs free
+    r"""Calculates the first derivative of dimensionless residual Gibbs free
     energy with respect to `pi` for water
     according to the IAPWS-97 standard (for region 5).
 
@@ -1944,14 +1944,14 @@ def iapws97_dGr_dpi_region5(tau, pi):
     --------
     >>> iapws97_dGr_dpi_region5(1000/300.0, 101325/1e6)
     -0.213281155629998
-    '''
+    """
     tau3 = tau*tau
     tau3 *= tau
     return (pi*tau3*(4.48800748189699983e-6 + tau3*(1.13758364468865005e-7*pi*tau - 8.23265509069419973e-6*tau3))
             + tau*(tau*(0.000901537616739440007 - 0.00502700776776479966*tau) + 0.00157364048552589993))
 
 def iapws97_d2Gr_dpi2_region5(tau, pi):
-    r'''Calculates the second derivative of dimensionless residual Gibbs free
+    r"""Calculates the second derivative of dimensionless residual Gibbs free
     energy with respect to `pi` for water
     according to the IAPWS-97 standard (for region 5).
 
@@ -1979,13 +1979,13 @@ def iapws97_d2Gr_dpi2_region5(tau, pi):
     --------
     >>> iapws97_d2Gr_dpi2_region5(1000/300.0, 101325/1e6)
     -0.4179905782304291
-    '''
+    """
     tau2 = tau*tau
     return (tau2*tau*(tau2*tau2*(2.2751672893773001e-7*pi - 8.23265509069419973e-6*tau2)
                   + 4.48800748189699983e-6))
 
 def iapws97_dGr_dtau_region5(tau, pi):
-    r'''Calculates the first derivative of dimensionless residual Gibbs free
+    r"""Calculates the first derivative of dimensionless residual Gibbs free
     energy with respect to `tau` for water
     according to the IAPWS-97 standard (for region 5).
 
@@ -2013,7 +2013,7 @@ def iapws97_dGr_dtau_region5(tau, pi):
     --------
     >>> iapws97_dGr_dtau_region5(1000/300.0, 101325/1e6)
     -0.02200629869194
-    '''
+    """
     tau2 = tau*tau
     return pi*(0.001803075233478880013*tau + 0.001573640485525899932
             + tau2*(-0.01508102330329439897 + pi*(6.732011222845499322e-6
@@ -2021,7 +2021,7 @@ def iapws97_dGr_dtau_region5(tau, pi):
             + 2.654361837606849767e-7*pi))))
 
 def iapws97_d2Gr_dtau2_region5(tau, pi):
-    r'''Calculates the second derivative of dimensionless residual Gibbs free
+    r"""Calculates the second derivative of dimensionless residual Gibbs free
     energy with respect to `tau` for water
     according to the IAPWS-97 standard (for region 5).
 
@@ -2049,7 +2049,7 @@ def iapws97_d2Gr_dtau2_region5(tau, pi):
     --------
     >>> iapws97_d2Gr_dtau2_region5(1000/300.0, 101325/1e6)
     -0.0239165867999155
-    '''
+    """
     tau2 = tau*tau
 # # 10 before
 #    return (0.00180307523347888001*pi + tau*(0.0000134640224456909986*pi2
@@ -2060,7 +2060,7 @@ def iapws97_d2Gr_dtau2_region5(tau, pi):
             + 1.592617102564109754e-6*pi))))
 
 def iapws97_d2Gr_dpidtau_region5(tau, pi):
-    r'''Calculates the second derivative of dimensionless residual Gibbs free
+    r"""Calculates the second derivative of dimensionless residual Gibbs free
     energy with respect to `tau` and `pi` for water
     according to the IAPWS-97 standard (for region 5).
 
@@ -2088,7 +2088,7 @@ def iapws97_d2Gr_dpidtau_region5(tau, pi):
     --------
     >>> iapws97_d2Gr_dpidtau_region5(1000/300.0, 101325/1e6)
     -0.27438379131103097
-    '''
+    """
     tau2 = tau*tau
     return (0.001573640485525899932 + tau*(0.001803075233478880013
             + tau*(-0.01508102330329439897 + pi*(0.00001346402244569099864
@@ -2126,13 +2126,13 @@ REGION_3X = 24
 REGION_3Y = 25
 REGION_3Z = 26
 
-REGION_3_AS_LETTERS = {1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'E', 6: 'F', 7: 'G',
-                       8: 'H', 9: 'I', 10: 'J', 11: 'K', 12: 'L', 13: 'M',
-                       14: 'N', 15: 'O', 16: 'P', 17: 'Q', 18: 'R', 19: 'S',
-                       20: 'T', 21: 'U', 22: 'V', 23: 'W', 24: 'X', 25: 'Y', 26: 'Z'}
+REGION_3_AS_LETTERS = {1: "A", 2: "B", 3: "C", 4: "D", 5: "E", 6: "F", 7: "G",
+                       8: "H", 9: "I", 10: "J", 11: "K", 12: "L", 13: "M",
+                       14: "N", 15: "O", 16: "P", 17: "Q", 18: "R", 19: "S",
+                       20: "T", 21: "U", 22: "V", 23: "W", 24: "X", 25: "Y", 26: "Z"}
 
 def iapws97_region_3(T, P):
-    r'''Identify the subregion in the IAPWS-97 region 3 given a temperature and
+    r"""Identify the subregion in the IAPWS-97 region 3 given a temperature and
     pressure point. No cheking that the original point is in region 3 is
     performed.
 
@@ -2152,7 +2152,7 @@ def iapws97_region_3(T, P):
     --------
     >>> iapws97_identify_region_TP(648.6, 22.5e6)
     3
-    '''
+    """
     logP_MPa = log(P*1e-6)
     logP_MPa_inv = 1.0/logP_MPa
     region = 0
@@ -2843,7 +2843,7 @@ try:
 except: # except is needed for running Python under -OO flag
     pass
 def iapws97_region3_rho(T, P):
-    r'''Calculate the mass density of water in region 3 of the IAPWS-97 standard.
+    r"""Calculate the mass density of water in region 3 of the IAPWS-97 standard.
     No cheking that the original point is in region 3 is performed.
 
     Parameters
@@ -2866,7 +2866,7 @@ def iapws97_region3_rho(T, P):
     --------
     >>> iapws97_region3_rho(648.6, 22.5e6)
     353.06081088726
-    '''
+    """
     region = iapws97_region_3(T, P)
     if region == REGION_3A:
         rho = iapws97_region3_a(T, P)
@@ -2926,7 +2926,7 @@ def iapws97_region3_rho(T, P):
 
 
 def iapws97_identify_region_TP(T, P, use_95_boundary=False):
-    r'''Identify the main region given a temperature and pressure point
+    r"""Identify the main region given a temperature and pressure point
     according to the IAPWS-97 standard.
 
     Raises a ValueError if the input point is out of bounds.
@@ -2951,7 +2951,7 @@ def iapws97_identify_region_TP(T, P, use_95_boundary=False):
     --------
     >>> iapws97_identify_region_TP(400, 1e6)
     1
-    '''
+    """
     under_623 = T <= 623.15
     if under_623:
         if use_95_boundary:
@@ -3655,7 +3655,7 @@ def iapws92_rhog_sat(T):
 ### IAPWS 95 fundamental derivatives
 
 def iapws95_A0(tau, delta):
-    r'''Calculates the ideal gas Helmholtz energy of water according to the
+    r"""Calculates the ideal gas Helmholtz energy of water according to the
     IAPWS-95 standard.
 
     .. math::
@@ -3682,7 +3682,7 @@ def iapws95_A0(tau, delta):
     --------
     >>> iapws95_A0(647.096/300.0, 999.0/322)
     9.537075529761053
-    '''
+    """
     # only way to optimize is likely to save transcendentals between calls
     # It should also be possible to replace the tau bit with polynomial fits
     # which are nearly bit for bit identical, including the derivatives.
@@ -3695,7 +3695,7 @@ def iapws95_A0(tau, delta):
             - 8.32044648374970031)
 
 def iapws95_dA0_dtau(tau, delta):
-    r'''Calculates the first derivative of ideal gas Helmholtz energy of water
+    r"""Calculates the first derivative of ideal gas Helmholtz energy of water
     with respect to `tau` according to the IAPWS-95 standard.
 
     .. math::
@@ -3724,7 +3724,7 @@ def iapws95_dA0_dtau(tau, delta):
     --------
     >>> iapws95_dA0_dtau(647.096/300.0, 999.0/322)
     8.079705548882
-    '''
+    """
     return (-22.4843580635585205
             + 0.01600873433612/(1.0 - exp(-1.28728967*tau))
             + 3.44236458139299994/(1.0 - exp(-3.53734222*tau))
@@ -3734,7 +3734,7 @@ def iapws95_dA0_dtau(tau, delta):
             + 3.00632/tau)
 
 def iapws95_d2A0_dtau2(tau, delta):
-    r'''Calculates the second derivative of ideal gas Helmholtz energy of water
+    r"""Calculates the second derivative of ideal gas Helmholtz energy of water
     with respect to `tau` according to the IAPWS-95 standard.
 
     .. math::
@@ -3764,7 +3764,7 @@ def iapws95_d2A0_dtau2(tau, delta):
     --------
     >>> iapws95_d2A0_dtau2(647.096/300.0, 999.0/322)
     -0.653543047751809
-    '''
+    """
     x0 = exp(-27.5075105*tau)
     x1 = exp(-9.24437796*tau)
     x2 = exp(-7.74073708*tau)
@@ -3778,7 +3778,7 @@ def iapws95_d2A0_dtau2(tau, delta):
             - 3.00632/(tau*tau))
 
 def iapws95_d3A0_dtau3(tau, delta):
-    r'''Calculates the third derivative of ideal gas Helmholtz energy of water
+    r"""Calculates the third derivative of ideal gas Helmholtz energy of water
     with respect to `tau` according to the IAPWS-95 standard.
 
     Parameters
@@ -3804,7 +3804,7 @@ def iapws95_d3A0_dtau3(tau, delta):
     --------
     >>> iapws95_d3A0_dtau3(647.096/300.0, 999.0/322)
     0.6222542507278
-    '''
+    """
     tot = 0.0
     x0 = exp(-27.5075105*tau)
     x1 = 1.0/(1.0 - x0)
@@ -3830,7 +3830,7 @@ def iapws95_d3A0_dtau3(tau, delta):
 
 
 def iapws95_A0_tau_derivatives(tau, delta):
-    r'''Calculates the ideal gas Helmholtz energy of water
+    r"""Calculates the ideal gas Helmholtz energy of water
     and its first three derivatives with respect to `tau` according to the
     IAPWS-95 standard. As each of those calls spends most of their time
     computing exponentials which are the same for each function, function
@@ -3866,7 +3866,7 @@ def iapws95_A0_tau_derivatives(tau, delta):
     --------
     >>> iapws95_A0_tau_derivatives(647.096/300.0, 999.0/322)
     (9.53707552976, 8.0797055488, -0.65354304775, 0.62225425072)
-    '''
+    """
     _exp, _log = exp, log
     # 6 divisions, 5 exp, 7 log
     x0 = _exp(-27.5075105*tau)
@@ -3925,7 +3925,7 @@ def iapws95_A0_tau_derivatives(tau, delta):
 
 
 def iapws95_Ar(tau, delta):
-    r'''Calculates the residual Helmholtz energy of water according to the
+    r"""Calculates the residual Helmholtz energy of water according to the
     IAPWS-95 standard.
 
     .. math::
@@ -3986,7 +3986,7 @@ def iapws95_Ar(tau, delta):
     --------
     >>> iapws95_Ar(647.096/300.0, 999.0/322)
     -9.57577716026768
-    '''
+    """
     _sqrt, _exp = sqrt, exp
     taurt = _sqrt(tau)
     tau_quarter = _sqrt(taurt)
@@ -4099,7 +4099,7 @@ def iapws95_Ar(tau, delta):
 
 
 def iapws95_dAr_ddelta(tau, delta):
-    r'''Calculates the first derivative of residual Helmholtz energy of water
+    r"""Calculates the first derivative of residual Helmholtz energy of water
     with respect to `delta` according to the IAPWS-95 standard.
 
     .. math::
@@ -4155,7 +4155,7 @@ def iapws95_dAr_ddelta(tau, delta):
     --------
     >>> iapws95_dAr_ddelta(647.096/300.0, 999.0/322)
     -0.3093321202374
-    '''
+    """
     if tau == 1.0 and delta == 1.0:
         # Evaluated with sympy's limit command, otherwise divide by zero
         return -0.7705590295466400609
@@ -4296,7 +4296,7 @@ def iapws95_d2Ar_ddelta2_delta_1(tau):
 
 
 def iapws95_d2Ar_ddelta2(tau, delta):
-    r'''Calculates the second derivative of residual Helmholtz energy of water
+    r"""Calculates the second derivative of residual Helmholtz energy of water
     with respect to `delta` according to the IAPWS-95 standard.
 
     .. math::
@@ -4355,7 +4355,7 @@ def iapws95_d2Ar_ddelta2(tau, delta):
     --------
     >>> iapws95_d2Ar_ddelta2(647.096/300.0, 999.0/322)
     1.7862535141735987
-    '''
+    """
     if delta == 1.0:
         return iapws95_d2Ar_ddelta2_delta_1(tau)
     # 4 sqrt; 4 exp; 2 power; 3 div; loads of multiplies and adds.
@@ -4495,7 +4495,7 @@ def iapws95_d2Ar_ddelta2(tau, delta):
             - 0.604316106690436006*exp800*y19*pow005*(64.0*y2 - 1.0) + 63.0922804755619993*y6*y7)
 
 def iapws95_d3Ar_ddelta3(tau, delta):
-    r'''Calculates the third derivative of residual Helmholtz energy of water
+    r"""Calculates the third derivative of residual Helmholtz energy of water
     with respect to `delta` according to the IAPWS-95 standard.
 
     Parameters
@@ -4537,7 +4537,7 @@ def iapws95_d3Ar_ddelta3(tau, delta):
     --------
     >>> iapws95_d3Ar_ddelta3(647.096/300.0, 999.0/322)
     0.33621190578
-    '''
+    """
     # Gonna have to reduce the number of constants quite a bit for pypy
     delta2 = delta*delta
     delta3 = delta*delta2
@@ -4733,7 +4733,7 @@ def iapws95_d3Ar_ddelta3(tau, delta):
 
 
 def iapws95_d3Ar_ddelta2dtau(tau, delta):
-    r'''Calculates the third derivative of residual Helmholtz energy of water
+    r"""Calculates the third derivative of residual Helmholtz energy of water
     with respect to `delta` twice and `tau` one according to the IAPWS-95
     standard.
 
@@ -4776,7 +4776,7 @@ def iapws95_d3Ar_ddelta2dtau(tau, delta):
     --------
     >>> iapws95_d3Ar_ddelta2dtau(647.096/300.0, 999.0/322)
     0.015646982949077
-    '''
+    """
     # simplest when derivaed from  diff((calcA_res(tau, delta)), delta, delta, tau)
     tau2 = tau*tau
     tau3 = tau*tau2
@@ -4983,7 +4983,7 @@ def iapws95_d3Ar_ddelta2dtau(tau, delta):
 
 
 def iapws95_d3Ar_ddeltadtau2(tau, delta):
-    r'''Calculates the third derivative of residual Helmholtz energy of water
+    r"""Calculates the third derivative of residual Helmholtz energy of water
     with respect to `delta` once and `tau` twice according to the IAPWS-95
     standard.
 
@@ -5026,7 +5026,7 @@ def iapws95_d3Ar_ddeltadtau2(tau, delta):
     --------
     >>> iapws95_d3Ar_ddeltadtau2(647.096/300.0, 999.0/322)
     1.081479970332
-    '''
+    """
     tau_inv = 1.0/tau
     taurtinv = sqrt(tau_inv)
     tau4rtinv = sqrt(taurtinv)
@@ -5179,7 +5179,7 @@ def iapws95_d3Ar_ddeltadtau2(tau, delta):
 
 
 def iapws95_dAr_dtau(tau, delta):
-    r'''Calculates the first derivative of residual Helmholtz energy of water
+    r"""Calculates the first derivative of residual Helmholtz energy of water
     with respect to `tau` according to the IAPWS-95 standard.
 
     .. math::
@@ -5234,7 +5234,7 @@ def iapws95_dAr_dtau(tau, delta):
     --------
     >>> iapws95_dAr_dtau(647.096/300.0, 999.0/322)
     -7.7043336309570
-    '''
+    """
     delta2 = delta*delta
     delta3 = delta*delta2
     delta4 = delta2*delta2
@@ -5299,7 +5299,7 @@ def iapws95_dAr_dtau(tau, delta):
             *exp(-800.0*x16 - 32.0*x9) - 8.78032033035609949))
 
 def iapws95_d2Ar_dtau2(tau, delta):
-    r'''Calculates the second derivative of residual Helmholtz energy of water
+    r"""Calculates the second derivative of residual Helmholtz energy of water
     with respect to `tau` according to the IAPWS-95 standard.
 
     .. math::
@@ -5358,7 +5358,7 @@ def iapws95_d2Ar_dtau2(tau, delta):
     --------
     >>> iapws95_d2Ar_dtau2(647.096/300.0, 999.0/322)
     -1.2616419775539
-    '''
+    """
     delta2 = delta*delta
     delta3 = delta*delta2
     delta4 = delta*delta3
@@ -5452,7 +5452,7 @@ def iapws95_d2Ar_dtau2(tau, delta):
 
 
 def iapws95_d2Ar_ddeltadtau(tau, delta):
-    r'''Calculates the second derivative of residual Helmholtz energy of water
+    r"""Calculates the second derivative of residual Helmholtz energy of water
     with respect to `tau` and also `delta` according to the IAPWS-95 standard.
 
     .. math::
@@ -5510,7 +5510,7 @@ def iapws95_d2Ar_ddeltadtau(tau, delta):
     --------
     >>> iapws95_d2Ar_ddeltadtau(647.096/300.0, 999.0/322)
     -0.198403562385
-    '''
+    """
     delta2 = delta*delta
     delta3 = delta2*delta
     delta4 = delta3*delta
@@ -5825,7 +5825,7 @@ def iapws95_d4Ar_ddelta2dtau2_full(tau, delta):
     return (-0.0902731829971464006*delta**20*x55 - 0.00367103930872672004*delta**14*x52 + 0.0109968400811223284*delta*tau**(-1.625) + 20.5672344027503975*delta*x10 + 6.13014328528949992*delta*x12 - 0.00874006386523868382*delta*x13 - 0.148746408567240002*delta*x152*x176 - 40.7118219244083193*delta*x177 + 313.650359923098563*delta*x27 + 27.1998742905086388*delta*x29 + 62.8036066422878321*delta*x31 - 8.1895344291498151e-6*delta*x34 + 3.55111663314491999*delta*x8 - 0.159012546727090004*tau**(-1.5) + 0.0980457519725924931*tau**(-1.25) + 16.6817169680569926*tau*x19 - 8.80423951091896839*tau*x21 + 0.926762053780944006*tau*x23 - 56783.0524280057944*tau*x62 + 2271322.09712023195*tau*x70 + 24940820.1179529876*tau*x74 - 166272134.119686574*tau*x79 - 997632804.718119502*tau*x82 + 6650885364.78746319*tau*x84 - 0.000546777915034636847*x0*x14*x24 - 5.14180860068759937*x1*x10 - 159.352525206331222*x1*x25 - 440.383012999930713*x1*x27 - 15.8047851591246946*x1*x29 + 0.359777858333803158*x1*x35 + 194.006766291113166*x1*x43 - 466.257937312538729*x1*x44 - 11.5739053101007201*x1*x8 - 10.2836172013751987*x10 - 2084445.2825297059*x100*x58 + 32569.4575395266547*x100 + 46646.8737266864628*x101*x126 + 28.3213161912024951*x101 - 130277.830158106619*x102*x128 - 77.3524616563758087*x102 + x103*x109 - 23323.4368633432314*x103 - x104*x110 + 65138.9150790533095*x104 - 1306112.46434722096*x105*x126 - 792.996853353669849*x105 + 4168890.56505941181*x106*x128 + 2475.27877300402588*x106 - 914278725.0430547*x107*x90 + 653056.232173610479*x107 + 3335112452.0475297*x108*x58 - 52111132.0632426515*x108 + x109*x141*x93 + 18.4751468063532016*x11*x45 + 0.239466863754491999*x11*x54 - x110*x146 + 755.235098432066707*x111*x115*x159 + 4125.46462167337631*x111*x123 - 1762.21522967482247*x112*x117 + 84586.3310243914602*x112 + 4813.04205861894025*x113*x117 - 264029.735787096084*x113 + 0.172625165355901*x115*x118 + 1.2587251640534447*x117*x131 - 3.00815128663683762*x117*x135 - 0.137515487389112678*x118*x120 - 2062.73231083668816*x119*x158*x89 - 12.2602865705789998*x12 - 0.0318061108784440244*x120*x154 + 0.636122217568879988*x121*x177 - 2.57841538854586005*x122*x133 + 1.07890728347438092*x122*x136 - 1510.47019686413341*x122*x89*x92 + 1628472.87697633286*x123*x143*x90 - x123*x151 + x124*x126 - x124*x141 - 16.6595977595308788*x125*x136*x57 - 65138.9150790533095*x128*x96 + 0.0174801277304773676*x13 - 60.4188078745653385*x131 + 0.318061108784439994*x132*x168*x178 - 1017.79554811020796*x133*x178*x89 - 0.539453641737190459*x134*x159*x171 + 165.018584866935043*x135 + 466.46873726686465*x137*x58 - 8.32979887976543942*x137 + 40.7118219244083193*x138*x57 - 1302.77830158106622*x139*x58 + 20.3559109622041596*x139 + 0.141752467966757778*x14*x15 - 683.882094343439235*x14*x27 - 485.01691572778293*x14*x43 + 1165.64484328134677*x14*x44 - 0.0951977014830336227*x141*x171*x172 + 133.276782076247088*x142*x160 - 46646.8737266864628*x142*x161 - 4.99787932785926525*x142 - 0.318061108784439994*x143*x167*x179*x88**(-3.04999999999999982)*(-4.09999999999999964*tau + 1.31199999999999983*x86 + 4.09999999999999964) - 108.56485846508896*x145*x160 + 130277.830158106619*x145*x162 + 4.07118219244083512*x145 + 65138.9150790533095*x146 - 0.297492817134480003*x147*x176 + 832.979887976543978*x148*x161 + 0.0892478451403440204*x148 - 583085.921583580784*x149*x90 + 416.489943988271989*x149 - 0.0472508226555859237*x15*x16 + 0.00337505876111328026*x15*x17 - 2035.59109622041592*x150*x162 - 0.0636122217568880488*x150 + x151*x168*x179*x89 + 416.489943988271989*x153*x161 + 0.0446239225701720102*x153 - x155*x163 + 208.244971994135994*x155 + x156*x164 - 508.89777405510398*x156 + 1.28920769427293003*x158*x168 + 51.555234624798608*x16*x27 - 5.26826171970823243*x16*x29 + 0.119925952777934386*x16*x35 - 408.881387879821318*x16*x44 - 16.0117938988394393*x16*x50 + x163*x183 - x164*x180 - 0.342116739704651951*x169*x182 + 133.818674814062092*x17*x27 + 94.2054099634317623*x17*x31 + 0.0000900848787206479763*x17*x34 - 0.0134858755501646374*x17*x8 + 0.148746408567240002*x170*x182*x88**(-3.14999999999999991)*(-4.29999999999999982*tau + 1.37599999999999989*x86 + 4.29999999999999982) - 416.489943988271989*x171*x181*x89 + 0.067853036540680603*x172*x174 + 0.667928328447323971*x173*x179 + 16.6595977595308788*x175*x176 + 508.89777405510398*x180 - 208.244971994135994*x183 - 6.674592985697549*x19*x51 - 17.6199723478402532*x19*x7 - 4.18353638538023986*x19 + 0.000736508871132914803*x2*x36 - 0.962227894219367941*x2 - 2.53835921304921969e-6*x20*x38 + 102.22034696995533*x20*x44 + 0.00029558075281787275*x20*x8 + 5.10502838422212069*x21*x26 + 3.52270185356259535*x21*x51 + 9.29942985024902313*x21*x7 + 2.20797753672845998*x21 - 3.22480718297120481e-8*x22*x40 + 4.38985981730447989e-6*x22*x8 - 0.370810721427641599*x23*x51 - 0.97888735265779192*x23*x7 - 0.232418688076680008*x23 - 0.0109355583006927361*x24*x4 + 0.00546777915034636804*x24*x6 + 1.02839597940537364*x25*x37 - 0.479918123722507695*x25*x39 + 0.0457064879735721574*x25*x41 + 63.7410100825324832*x25*x5 + 31.8705050412662416*x25 + 128.681098658076564*x27*x3 - 49.091166397234808*x27*x37 + 690.842702179562366*x27*x5 - 72.4458055743504019*x27 + 23.7071777386870473*x28*x45 - 18.1332495270057592*x29*x3 + 227.156326599900694*x3*x44 - 251.214426569151328*x31*x5 + 29591.1148825265227*x33*x53 - 0.0000491372065748988906*x34*x42 - 8703.26908309603641*x34*x5 - 10443.9228997152422*x34*x56 - 0.539666787500704737*x35*x5 - 0.000491005914088610013*x36*x4 + 0.0000613757392610762517*x36*x6 + 0.0000114226164587214907*x37*x38 + 145.505074718334896*x37*x43 - 349.693452984404075*x37*x44 + 7.85135734198982949*x37*x50 + 0.00337146888754115935*x37*x8 + 1.26917960652460995e-7*x38*x39 - 2.51440206942216582*x39*x50 - 0.121144297187981767*x39*x52 - 0.0000965769159806985627*x39*x8 + 1.92898421835012002*x4*x7 + 0.64148526281291196*x4 + 5.37467863828534189e-9*x40*x41 - 2.0671840916482082e-10*x40*x42 - 1.02685745659254035*x41*x55 + 38414.8515090707369*x46*x53 - 11298.4857379619825*x47*x5 - 13558.1828855543772*x47*x56 - 67095.0078641202126*x48*x53 + 19733.8258423883017*x49*x5 + 23680.5910108659555*x49*x56 + 0.0458879913590840016*x51*x54 + 0.699617168227884667*x55*x56 - 15142147.3141348809*x58*x67 - 48409256.3360543996*x58*x72 + 2017052347.33560038*x58*x73 + 32272837.5573695973*x58*x81 - 1575822146355.9375*x58*x83 - 0.0801856578516139951*x6 - 378.553682853371981*x62*x68 + 56351.2685821830019*x62 + 2523.6912190224798*x63*x68 - 375675.123881220061*x63 - 181534.711260204*x65*x7 + 121023.140840135995*x65*x76 - 5909333048.83476543*x66*x80 + 7563946.30250850134*x66 + 378553.682853371953*x67 + 15142.1473141348797*x68*x70 - 100947.648760899203*x68*x75 + 7261388.45040815976*x7*x77 - 2254050.74328732025*x70 + 1210231.40840136004*x72 - 50426308.6833900139*x73 - 24751167.6993522421*x74 + 15027004.9552487992*x75 - 4840925.63360544015*x76*x77 + 236373321953.390625*x78*x80 - 302557852.100340068*x78 + 165007784.66234827*x79 + 16.0455773539116002*x8 - 806820.938934240025*x81 + 990046707.974089622*x82 + 39395553658.8984375*x83 - 6600311386.49393082*x84 + 16326405.804340262*x90*x98 + 14.1606580956012458*x93 - 38.6762308281879044*x96 - 11661.7184316716157*x98)
 
 def iapws95_d4Ar_ddelta2dtau2(tau, delta):
-    r'''Calculates the fourth derivative of residual Helmholtz energy of water
+    r"""Calculates the fourth derivative of residual Helmholtz energy of water
     with respect to `tau` twice and `delta` twice according to the IAPWS-95
     standard.
 
@@ -5849,7 +5849,7 @@ def iapws95_d4Ar_ddelta2dtau2(tau, delta):
     --------
     >>> iapws95_d4Ar_ddelta2dtau2(647.096/300.0, 999.0/322)
     -2.656422915480
-    '''
+    """
     if 0.6 < tau < 1.6 and delta < 7.0:
         return iapws95_d4Ar_ddelta2dtau2_full(tau, delta)
     # Otherwise drop terms 51-54 and the last two
@@ -5925,7 +5925,7 @@ def iapws95_d4Ar_ddelta2dtau2(tau, delta):
 
 ### Vapor pressure solution
 def _P_G_dG_dV_T_dG_dV_T(T, V):
-    '''For calculating vapor pressure'''
+    """For calculating vapor pressure"""
     _MW_kg = iapws95_MW / 1000
     R_MW_0_001 = _MW_kg*iapws95_R
     rho = rho_mass = iapws95_MW / V / 1000
@@ -5983,7 +5983,7 @@ def iapws95_sat_err_and_jac(Vs, T):
 
 
 def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
-    r'''Solve the vapor-liquid saturation equations of IAPWS-95 given a
+    r"""Solve the vapor-liquid saturation equations of IAPWS-95 given a
     specified temperature. With floating point numbers, the achievable
     tolerance is somewhat low so `xtol` is exposed as a setting - it can be
     adjusted somewhat. Density guesses may be provided, otherwise they will
@@ -6032,7 +6032,7 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
     (245769.345, 937.4860, 1.3694075)
     >>> iapws95_saturation(647.0955, xtol=1e-7)
     (22063866.35, 325.70, 318.277)
-    '''
+    """
     if rhog_guess is None:
         rhog = iapws92_rhog_sat(T)
     else:
@@ -6079,7 +6079,7 @@ def iapws95_saturation(T, xtol=1e-5, rhol_guess=None, rhog_guess=None):
 
 
 def iapws92_Psat(T):
-    r'''Compute the saturation pressure of the IAPWS-92 equation.
+    r"""Compute the saturation pressure of the IAPWS-92 equation.
 
     .. math::
         P_{sat} = P_c \exp\left(\frac{T_c}{T}[a_1\tau + a_2\tau^{1.5} + a_3\tau^3 + a_4\tau^{3.5}
@@ -6105,7 +6105,7 @@ def iapws92_Psat(T):
     --------
     >>> iapws92_Psat(400.0)
     245765.2635418
-    '''
+    """
     Tr = T*iapws95_Tc_inv
     tau = 1.0 - Tr
     taurt2 = sqrt(tau)
@@ -6116,7 +6116,7 @@ def iapws92_Psat(T):
                       + 1.80122502*tau3*taurt2*tau4 - 11.7866497*tau3 - 15.9618719*tau4)/Tr)
 
 def iapws92_dPsat_dT(T):
-    r'''Compute the temperature derivative of saturation pressure of the
+    r"""Compute the temperature derivative of saturation pressure of the
     IAPWS-92 equation.
 
     .. math::
@@ -6145,7 +6145,7 @@ def iapws92_dPsat_dT(T):
     --------
     >>> iapws92_dPsat_dT(400.0)
     (7483.47094105, 245765.263541)
-    '''
+    """
     Tr = T*iapws95_Tc_inv
     T_inv = 1.0/T
     Tr_inv = iapws95_Tc*T_inv
@@ -6183,7 +6183,7 @@ Psat_iapws95_coeff_bs = [254.074999999999989, 366.636250000000018, 534.911500000
 
 
 def iapws95_dPsat_dT(T):
-    r'''Compute the temperature derivative of saturation pressure of the
+    r"""Compute the temperature derivative of saturation pressure of the
     IAPWS-95 equation using high-
     fidelity polynomial fits. The range of the fit is 235 K to
     647.096 K, the critical point.
@@ -6217,7 +6217,7 @@ def iapws95_dPsat_dT(T):
     --------
     >>> iapws95_dPsat_dT(400.0)
     (7483.62075827, 245769.3455657)
-    '''
+    """
     # May need to optimize this in the future without the loop
     for i in range(Psat_iapws95_coeff_set_count):
         if Psat_iapws95_coeff_boundaries[i] <= T <= Psat_iapws95_coeff_boundaries[i+1]:
@@ -6232,7 +6232,7 @@ def iapws95_dPsat_dT(T):
 
 
 def iapws95_Psat(T):
-    r'''Compute the saturation pressure of the IAPWS-95 equation using high-
+    r"""Compute the saturation pressure of the IAPWS-95 equation using high-
     fidelity polynomial fits. These have a relative accuracy of under 1e-12,
     and are generated by solving the saturation equations under the
     high-precision environment of mpmath. The range of the fit is 235 K to
@@ -6272,7 +6272,7 @@ def iapws95_Psat(T):
     --------
     >>> iapws95_Psat(400.0)
     245769.3455
-    '''
+    """
     # Using a loop involves a 10% decrease in PyPy speed but a 50% hit to numba
     # Maybe in the future we can use this :)
 #    for i in range(Psat_iapws95_coeff_set_count):
@@ -6314,7 +6314,7 @@ def iapws95_Psat(T):
 Psat_235 = 22.849568234070716 # iapws95_Psat(235)
 
 def iapws95_Tsat(Psat):
-    r'''Compute the saturation temperature of the IAPWS-95 equation.
+    r"""Compute the saturation temperature of the IAPWS-95 equation.
     The range of the fit is 235 K to 647.096 K, the critical point.
 
 
@@ -6343,7 +6343,7 @@ def iapws95_Tsat(Psat):
     --------
     >>> iapws95_Tsat(iapws95_Psat(400.0))
     400.0
-    '''
+    """
     if Psat > iapws95_Pc:
         raise ValueError("Pressure higher than critical pressure")
     elif Psat < 22.849568234070716: # iapws95_Psat(235)
@@ -6390,7 +6390,7 @@ rhol_iapws95_coeff_as = [0.052424639580602915, 0.0106967602187487444, 0.01337095
 rhol_iapws95_coeff_bs = [254.074999999999989, 366.636250000000018, 534.911500000000046, 626.528025000000071, 645.038302499999986, 646.895527500000071, 647.080000000000041, 647.092499999999973, 647.095450000000028, 647.095945000000029, 647.095994499999961, 647.095999495000001]
 
 def iapws95_rhol_sat(T):
-    r'''Compute the saturation liquid density of the IAPWS-95 equation using high-
+    r"""Compute the saturation liquid density of the IAPWS-95 equation using high-
     fidelity polynomial fits. These have a relative accuracy of under 1e-13,
     except near the critical point where it rises to 1e-10,
     and are generated by solving the saturation equations under the
@@ -6420,7 +6420,7 @@ def iapws95_rhol_sat(T):
     --------
     >>> iapws95_rhol_sat(400.0)
     937.48603939
-    '''
+    """
     if 235.0 <= T < 273.15:
         val = horner(rhol_coeffs_iapws95_235_273, 0.052424639580602915*(T - 254.074999999999989))
     elif 273.15 <= T <= 460.1225: # half the points
@@ -6460,7 +6460,7 @@ def iapws95_rhol_sat(T):
 
 
 def iapws95_drhol_sat_dT(T):
-    r'''Compute the first temperature derivative of saturation liquid density
+    r"""Compute the first temperature derivative of saturation liquid density
     of the IAPWS-95 equation using high-fidelity polynomial fits. The actual
     saturated liquid density is returned as well.
 
@@ -6483,7 +6483,7 @@ def iapws95_drhol_sat_dT(T):
     --------
     >>> iapws95_drhol_sat_dT(400.0)
     (-0.835194603380, 937.486039392)
-    '''
+    """
     if rhol_iapws95_coeff_boundaries[-1] < T <= iapws95_Tc:
         return (-5464.1616377970422036*iapws95_rhoc,
                 (1.0000546416597242 - 5.464165972424162e-05*(T-647.09599999)/(647.096-647.09599999))*iapws95_rhoc)
@@ -6523,7 +6523,7 @@ rhog_all_coeffs_iapws95 = [rhog_coeffs_iapws95_235_273, rhog_coeffs_iapws95_273_
 rhog_iapws95_coeff_boundaries = [235.0, 273.15, 460.1225, 609.7005, 643.35555, 646.721055, 647.07, 647.09, 647.095, 647.0959, 647.09599, 647.095999, 647.0959999, 647.09599999, iapws95_Tc]
 
 def iapws95_rhog_sat(T):
-    r'''Compute the saturation vapor density of the IAPWS-95 equation using high-
+    r"""Compute the saturation vapor density of the IAPWS-95 equation using high-
     fidelity polynomial fits. These have a relative accuracy of under 1e-13,
     except near the critical point where it rises to 1e-10,
     and are generated by solving the saturation equations under the
@@ -6552,7 +6552,7 @@ def iapws95_rhog_sat(T):
     --------
     >>> iapws95_rhog_sat(400.0)
     1.3694075410
-    '''
+    """
     if 235.0 <= T < 273.15:
         # (2.0607069702164786e-14, 1.3923330571480516e-14, 6.141003425167497e-14)
         val = horner(rhog_coeffs_iapws95_235_273, 0.052424639580602915*(T - 254.074999999999989))
@@ -7037,7 +7037,7 @@ def iapws95_properties(T, P):
 
 
 def iapws11_Psub(T):
-    r'''Compute the sublimation pressure of the frozen water using the IAPWS-11
+    r"""Compute the sublimation pressure of the frozen water using the IAPWS-11
     equation from the Revised Release on the Pressure along the Melting and
     Sublimation Curves of Ordinary Water Substance.
 
@@ -7076,7 +7076,7 @@ def iapws11_Psub(T):
     --------
     >>> iapws11_Psub(230.0)
     8.947352740189151
-    '''
+    """
     return 611.657*exp(-5687.566391521397*T**-0.99666666667
                        + 8.569600103586199*T**0.20666666999999994
                        - 0.11807069369846021*T**0.70333333)

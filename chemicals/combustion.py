@@ -88,48 +88,48 @@ from chemicals.elements import mass_fractions, molecular_weight, simple_formula_
 from chemicals.utils import mark_numba_incompatible, os_path_join, property_mass_to_molar, property_molar_to_mass, source_path
 
 __all__ = (
-    'AKI',
-    'MON',
-    'RON',
-    'CombustionData',
-    'HHV_modified_Dulong',
-    'HHV_stoichiometry',
-    'IDT_to_DCN',
-    'LHV_from_HHV',
-    'MON_methods',
-    'Perez_Boehman_MON_from_ignition_delay',
-    'Perez_Boehman_RON_from_ignition_delay',
-    'RON_methods',
-    'air_fuel_ratio_solver',
-    'combustion_data',
-    'combustion_products_mixture',
-    'combustion_spec_solver',
-    'combustion_stoichiometry',
-    'fuel_air_spec_solver',
-    'ignition_delay',
-    'ignition_delay_all_methods',
-    'ignition_delay_methods',
-    'octane_sensitivity',
+    "AKI",
+    "MON",
+    "RON",
+    "CombustionData",
+    "HHV_modified_Dulong",
+    "HHV_stoichiometry",
+    "IDT_to_DCN",
+    "LHV_from_HHV",
+    "MON_methods",
+    "Perez_Boehman_MON_from_ignition_delay",
+    "Perez_Boehman_RON_from_ignition_delay",
+    "RON_methods",
+    "air_fuel_ratio_solver",
+    "combustion_data",
+    "combustion_products_mixture",
+    "combustion_spec_solver",
+    "combustion_stoichiometry",
+    "fuel_air_spec_solver",
+    "ignition_delay",
+    "ignition_delay_all_methods",
+    "ignition_delay_methods",
+    "octane_sensitivity",
 )
 
 
 # Register data sources and lazy load them
 
-folder = os_path_join(source_path, 'Misc')
-register_df_source(folder, 'Florian_Liming_RON_experimental.tsv')
-register_df_source(folder, 'Florian_Liming_MON_experimental.tsv')
-register_df_source(folder, 'Florian_Liming_RON_MON_ANN.tsv')
-register_df_source(folder, 'Travis_Kessler_Combustdb_RON.tsv')
-register_df_source(folder, 'Travis_Kessler_Combustdb_MON.tsv')
-register_df_source(folder, 'Travis_Kessler_Combustdb_predictions.tsv')
-register_df_source(folder, 'Dahmen_Marquardt_ignition_delay_IQT.tsv')
+folder = os_path_join(source_path, "Misc")
+register_df_source(folder, "Florian_Liming_RON_experimental.tsv")
+register_df_source(folder, "Florian_Liming_MON_experimental.tsv")
+register_df_source(folder, "Florian_Liming_RON_MON_ANN.tsv")
+register_df_source(folder, "Travis_Kessler_Combustdb_RON.tsv")
+register_df_source(folder, "Travis_Kessler_Combustdb_MON.tsv")
+register_df_source(folder, "Travis_Kessler_Combustdb_predictions.tsv")
+register_df_source(folder, "Dahmen_Marquardt_ignition_delay_IQT.tsv")
 
 
-FLORIAN_LIMING = 'FLORIAN_LIMING'
-FLORIAN_LIMING_ANN = 'FLORIAN_LIMING_ANN'
-COMBUSTDB = 'COMBUSTDB'
-COMBUSTDB_PREDICTIONS = 'COMBUSTDB_PREDICTIONS'
-DAHMEN_MARQUARDT = 'DAHMEN_MARQUARDT'
+FLORIAN_LIMING = "FLORIAN_LIMING"
+FLORIAN_LIMING_ANN = "FLORIAN_LIMING_ANN"
+COMBUSTDB = "COMBUSTDB"
+COMBUSTDB_PREDICTIONS = "COMBUSTDB_PREDICTIONS"
+DAHMEN_MARQUARDT = "DAHMEN_MARQUARDT"
 
 
 _combustion_data_loaded = False
@@ -138,13 +138,13 @@ def _load_combustion_data():
     global _combustion_data_loaded, florian_liming_ron_experimental, RON_sources, combustdb_ron, combustdb_predictions
     global florian_liming_ron_mon_ann, florian_liming_mon_experimental, MON_sources, dahmen_marquardt_iqt
     global ignition_delay_sources
-    florian_liming_ron_experimental = data_source('Florian_Liming_RON_experimental.tsv')
-    florian_liming_mon_experimental = data_source('Florian_Liming_MON_experimental.tsv')
-    florian_liming_ron_mon_ann = data_source('Florian_Liming_RON_MON_ANN.tsv')
-    combustdb_ron = data_source('Travis_Kessler_Combustdb_RON.tsv')
-    combustdb_mon = data_source('Travis_Kessler_Combustdb_MON.tsv')
-    combustdb_predictions = data_source('Travis_Kessler_Combustdb_predictions.tsv')
-    dahmen_marquardt_iqt = data_source('Dahmen_Marquardt_ignition_delay_IQT.tsv')
+    florian_liming_ron_experimental = data_source("Florian_Liming_RON_experimental.tsv")
+    florian_liming_mon_experimental = data_source("Florian_Liming_MON_experimental.tsv")
+    florian_liming_ron_mon_ann = data_source("Florian_Liming_RON_MON_ANN.tsv")
+    combustdb_ron = data_source("Travis_Kessler_Combustdb_RON.tsv")
+    combustdb_mon = data_source("Travis_Kessler_Combustdb_MON.tsv")
+    combustdb_predictions = data_source("Travis_Kessler_Combustdb_predictions.tsv")
+    dahmen_marquardt_iqt = data_source("Dahmen_Marquardt_ignition_delay_IQT.tsv")
 
     RON_sources = {
         FLORIAN_LIMING: florian_liming_ron_experimental,
@@ -164,14 +164,14 @@ def _load_combustion_data():
     }
 
 def __getattr__(name):
-    if name in ('florian_liming_ron_experimental',
-                'florian_liming_ron_mon_ann',
-                'combustdb_ron',
-                'combustdb_predictions',
-                'dahmen_marquardt_iqt'
-                'RON_sources',
-                'MON_sources',
-                'ignition_delay_sources'):
+    if name in ("florian_liming_ron_experimental",
+                "florian_liming_ron_mon_ann",
+                "combustdb_ron",
+                "combustdb_predictions",
+                "dahmen_marquardt_iqt"
+                "RON_sources",
+                "MON_sources",
+                "ignition_delay_sources"):
         _load_combustion_data()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -201,7 +201,7 @@ def RON_methods(CASRN):
     RON
     """
     if not _combustion_data_loaded: _load_combustion_data()
-    return list_available_methods_from_df_dict(RON_sources, CASRN, 'RON')
+    return list_available_methods_from_df_dict(RON_sources, CASRN, "RON")
 
 @mark_numba_incompatible
 def RON(CASRN, method=None):
@@ -262,13 +262,13 @@ def RON(CASRN, method=None):
        Software 2, no. 17 (2017): 401.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'RON')
+        val, found = database_constant_lookup(CASRN, "RON")
         if found: return val
     if not _combustion_data_loaded: _load_combustion_data()
     if method:
-        value = retrieve_from_df_dict(RON_sources, CASRN, 'RON', method)
+        value = retrieve_from_df_dict(RON_sources, CASRN, "RON", method)
     else:
-        value = retrieve_any_from_df_dict(RON_sources, CASRN, 'RON')
+        value = retrieve_any_from_df_dict(RON_sources, CASRN, "RON")
     return value
 
 
@@ -296,7 +296,7 @@ def MON_methods(CASRN):
     MON
     """
     if not _combustion_data_loaded: _load_combustion_data()
-    return list_available_methods_from_df_dict(MON_sources, CASRN, 'MON')
+    return list_available_methods_from_df_dict(MON_sources, CASRN, "MON")
 
 @mark_numba_incompatible
 def MON(CASRN, method=None):
@@ -357,13 +357,13 @@ def MON(CASRN, method=None):
        Software 2, no. 17 (2017): 401.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'MON')
+        val, found = database_constant_lookup(CASRN, "MON")
         if found: return val
     if not _combustion_data_loaded: _load_combustion_data()
     if method:
-        value = retrieve_from_df_dict(MON_sources, CASRN, 'MON', method)
+        value = retrieve_from_df_dict(MON_sources, CASRN, "MON", method)
     else:
-        value = retrieve_any_from_df_dict(MON_sources, CASRN, 'MON')
+        value = retrieve_any_from_df_dict(MON_sources, CASRN, "MON")
     return value
 
 
@@ -391,10 +391,10 @@ def ignition_delay_methods(CASRN):
     ignition_delay
     """
     if dr.USE_CONSTANTS_DATABASE:
-        val, found = database_constant_lookup(CASRN, 'IGNITION_DELAY')
+        val, found = database_constant_lookup(CASRN, "IGNITION_DELAY")
         if found: return val
     if not _combustion_data_loaded: _load_combustion_data()
-    return list_available_methods_from_df_dict(ignition_delay_sources, CASRN, 'IGNITION_DELAY')
+    return list_available_methods_from_df_dict(ignition_delay_sources, CASRN, "IGNITION_DELAY")
 
 @mark_numba_incompatible
 def ignition_delay(CASRN, method=None):
@@ -445,9 +445,9 @@ def ignition_delay(CASRN, method=None):
     '''
     if not _combustion_data_loaded: _load_combustion_data()
     if method:
-        value = retrieve_from_df_dict(ignition_delay_sources, CASRN, 'IGNITION_DELAY', method)
+        value = retrieve_from_df_dict(ignition_delay_sources, CASRN, "IGNITION_DELAY", method)
     else:
-        value = retrieve_any_from_df_dict(ignition_delay_sources, CASRN, 'IGNITION_DELAY')
+        value = retrieve_any_from_df_dict(ignition_delay_sources, CASRN, "IGNITION_DELAY")
     return value
 
 def AKI(RON, MON):
@@ -663,83 +663,83 @@ def as_atoms(formula):
                         f"not a {type(formula).__name__} object")
     return atoms
 
-DULONG = 'Dulong'
-STOICHIOMETRY = 'Stoichiometry'
+DULONG = "Dulong"
+STOICHIOMETRY = "Stoichiometry"
 HHV_methods = (DULONG, STOICHIOMETRY)
 
-combustible_elements = ('C', 'H', 'N', 'O', 'S', 'Br', 'I', 'Cl', 'F', 'P')
+combustible_elements = ("C", "H", "N", "O", "S", "Br", "I", "Cl", "F", "P")
 combustible_elements_set = frozenset(combustible_elements)
 
 Hf_combustion_chemicals = {
-    'H2O': -285825.0,
-    'CO2': -393474.0,
-    'SO2': -296800.0,
-    'Br2': 30880.0,
-    'I2': 62417.0,
-    'HCl': -92173.0,
-    'HF': -272711.0,
-    'P4O10': -3009940.0,
-    'O2': 0.0,
-    'N2': 0.0,
-    'Ar': 0.0,
-    'Ne': 0.0,
-    'Kr': 0.0,
-    'Xe': 0.0,
-    'He': 0.0,
+    "H2O": -285825.0,
+    "CO2": -393474.0,
+    "SO2": -296800.0,
+    "Br2": 30880.0,
+    "I2": 62417.0,
+    "HCl": -92173.0,
+    "HF": -272711.0,
+    "P4O10": -3009940.0,
+    "O2": 0.0,
+    "N2": 0.0,
+    "Ar": 0.0,
+    "Ne": 0.0,
+    "Kr": 0.0,
+    "Xe": 0.0,
+    "He": 0.0,
     "Ash": 0.0,
 }
 
 
 incombustible_materials = {
-'7440-37-1': 'Ar',
-'7440-59-7': 'He',
-'7782-44-7': 'O2',
-'7440-01-9': 'Ne',
-'7439-90-9': 'Kr',
-'7440-63-3': 'Xe',
-'7727-37-9': 'N2',
-'124-38-9': 'CO2',
-'1314-13-2': 'ZnO2',
-'7732-18-5': 'water',
-'7789-20-0': 'water(D2)',
-'13463-67-7': 'TiO2',
-'14762-55-1': 'He3',
-'7782-50-5': 'Cl',
-'7446-09-5': 'SO2',
-'7726-95-6': 'Br'}
+"7440-37-1": "Ar",
+"7440-59-7": "He",
+"7782-44-7": "O2",
+"7440-01-9": "Ne",
+"7439-90-9": "Kr",
+"7440-63-3": "Xe",
+"7727-37-9": "N2",
+"124-38-9": "CO2",
+"1314-13-2": "ZnO2",
+"7732-18-5": "water",
+"7789-20-0": "water(D2)",
+"13463-67-7": "TiO2",
+"14762-55-1": "He3",
+"7782-50-5": "Cl",
+"7446-09-5": "SO2",
+"7726-95-6": "Br"}
 
 combustion_products_to_CASs = {
-'Br2': '7726-95-6',
-'CO2': '124-38-9',
-'H2O': '7732-18-5',
-'HCl': '7647-01-0',
-'HF': '7664-39-3',
-'I2': '7553-56-2',
-'N2': '7727-37-9',
-'O2': '7782-44-7',
-'Ar': '7440-37-1',
-'He': '7440-59-7',
-'P4O10': '16752-60-6',
-'SO2': '7446-09-5'}
+"Br2": "7726-95-6",
+"CO2": "124-38-9",
+"H2O": "7732-18-5",
+"HCl": "7647-01-0",
+"HF": "7664-39-3",
+"I2": "7553-56-2",
+"N2": "7727-37-9",
+"O2": "7782-44-7",
+"Ar": "7440-37-1",
+"He": "7440-59-7",
+"P4O10": "16752-60-6",
+"SO2": "7446-09-5"}
 
 unreactive_CASs = {
-    '124-38-9': 'CO2',
-    '16752-60-6': 'P4O10',
-    '7446-09-5': 'SO2',
-    '7553-56-2': 'I2',
-    '7647-01-0': 'HCl',
-    '7664-39-3': 'HF',
-    '7726-95-6': 'Br2',
-    '7727-37-9': 'N2',
-    '7732-18-5': 'H2O',
-    '7440-37-1': 'Ar',
-    '7440-59-7': 'He'}
+    "124-38-9": "CO2",
+    "16752-60-6": "P4O10",
+    "7446-09-5": "SO2",
+    "7553-56-2": "I2",
+    "7647-01-0": "HCl",
+    "7664-39-3": "HF",
+    "7726-95-6": "Br2",
+    "7727-37-9": "N2",
+    "7732-18-5": "H2O",
+    "7440-37-1": "Ar",
+    "7440-59-7": "He"}
 
-O2_CAS = '7782-44-7'
-H2O_CAS = '7732-18-5'
+O2_CAS = "7782-44-7"
+H2O_CAS = "7732-18-5"
 
 @mark_numba_incompatible
-def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
+def combustion_stoichiometry(atoms, MW=None, missing_handling="elemental"):
     r"""Return a dictionary of stoichiometric coefficients of chemical
     combustion, given a dictionary of a molecule's constituent atoms and their
     counts.
@@ -806,26 +806,26 @@ def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
     products = {}
     nC, nH, nN, nO, nS, nBr, nI, nCl, nF, nP = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 
-    if 'C' in atoms:
-        products['CO2'] = nC = atoms['C']
-    if 'H' in atoms:
-        nH = atoms['H']
-    if 'N' in atoms:
-        nN = atoms['N']
-    if 'O' in atoms:
-        nO = atoms['O']
-    if 'S' in atoms:
-        nS = atoms['S']
-    if 'Br' in atoms:
-        nBr = atoms['Br']
-    if 'I' in atoms:
-        nI = atoms['I']
-    if 'Cl' in atoms:
-        nCl = atoms['Cl']
-    if 'F' in atoms:
-        nF = atoms['F']
-    if 'P' in atoms:
-        nP = atoms['P']
+    if "C" in atoms:
+        products["CO2"] = nC = atoms["C"]
+    if "H" in atoms:
+        nH = atoms["H"]
+    if "N" in atoms:
+        nN = atoms["N"]
+    if "O" in atoms:
+        nO = atoms["O"]
+    if "S" in atoms:
+        nS = atoms["S"]
+    if "Br" in atoms:
+        nBr = atoms["Br"]
+    if "I" in atoms:
+        nI = atoms["I"]
+    if "Cl" in atoms:
+        nCl = atoms["Cl"]
+    if "F" in atoms:
+        nF = atoms["F"]
+    if "P" in atoms:
+        nP = atoms["P"]
 
     nO2 = -(nC + nS + .25*nH + 1.25*nP - .25*(nCl + nF) - .5*nO)
     nCO2 = nC
@@ -839,44 +839,44 @@ def combustion_stoichiometry(atoms, MW=None, missing_handling='elemental'):
     nH2O = 0.5*(nH - nCl - nF)
 
     if nO2 != 0.0:
-        products['O2'] = nO2
+        products["O2"] = nO2
     if nCO2 !=  0.0:
-        products['CO2'] = nCO2
+        products["CO2"] = nCO2
     if nBr2 != 0.0:
-        products['Br2'] = nBr2
+        products["Br2"] = nBr2
     if nI2 != 0.0:
-        products['I2'] = nI2
+        products["I2"] = nI2
     if nCl != 0.0:
-        products['HCl'] = nHCl
+        products["HCl"] = nHCl
     if nHF != 0.0:
-        products['HF'] = nHF
+        products["HF"] = nHF
     if nSO2 != 0.0:
-        products['SO2'] = nSO2
+        products["SO2"] = nSO2
     if nN2 != 0.0:
-        products['N2'] = nN2
+        products["N2"] = nN2
     if nP4O10 != 0.0:
-        products['P4O10'] = nP4O10
+        products["P4O10"] = nP4O10
     if nH2O != 0.0:
-        products['H2O'] = nH2O
+        products["H2O"] = nH2O
 
     missing_handling = missing_handling.lower()
-    if missing_handling == 'elemental':
+    if missing_handling == "elemental":
         for atom, value in atoms.items():
             if atom not in combustible_elements_set:
                 products[atom] = value
-    elif missing_handling == 'ash':
+    elif missing_handling == "ash":
         combustion_atoms = {i: atoms.get(i, 0) for i in combustible_elements}
         MW = MW or molecular_weight(atoms)
         Ash = MW - molecular_weight(combustion_atoms)
         if Ash/MW > 0.0001:
-            products['Ash'] = Ash
+            products["Ash"] = Ash
     else:
         raise ValueError("Allowed values for `missing_handling` are 'elemental' and 'ash'.")
     return products
 
 @mark_numba_incompatible
 def combustion_products_mixture(atoms_list, zs, reactivities=None, CASs=None,
-                                missing_handling='elemental',
+                                missing_handling="elemental",
                                 combustion_stoichiometries=None):
     """Calculates the combustion products of a mixture of molecules and their,
     mole fractions; requires a list of dictionaries of each molecule's
@@ -957,8 +957,8 @@ def combustion_products_mixture(atoms_list, zs, reactivities=None, CASs=None,
 def combustion_products_to_list(products, CASs):
     zs = [0.0 for i in CASs]
     for product, zi in products.items():
-        if product == 'O2_required':
-            product = 'O2'
+        if product == "O2_required":
+            product = "O2"
             zi = -zi
 
         if product in CASs:
@@ -978,9 +978,9 @@ def is_combustible(CAS, atoms, reactive=True):
         return False
     if CAS in unreactive_CASs:
         return False
-    elif 'C' in atoms and atoms['C'] > 0.0:
+    elif "C" in atoms and atoms["C"] > 0.0:
         return True
-    return bool('H' in atoms and atoms['H'] > 0.0)
+    return bool("H" in atoms and atoms["H"] > 0.0)
 
 @mark_numba_incompatible
 def HHV_stoichiometry(stoichiometry, Hf, Hf_chemicals=None):
@@ -1066,10 +1066,10 @@ def HHV_modified_Dulong(mass_fractions):
        9 ed.; McGraw-Hill Education, 2018
 
     """
-    C = mass_fractions.get('C', 0.)
-    H = mass_fractions.get('H', 0.)
-    O = mass_fractions.get('O', 0.)
-    S = mass_fractions.get('S', 0.)
+    C = mass_fractions.get("C", 0.)
+    H = mass_fractions.get("H", 0.)
+    O = mass_fractions.get("O", 0.)
+    S = mass_fractions.get("S", 0.)
     if O > 0.105:
         raise ValueError("Dulong's formula is only valid at 10 wt. % Oxygen "
                          f"or less ({O} given)")
@@ -1118,7 +1118,7 @@ def LHV_from_HHV(HHV, N_H2O):
 
 @mark_numba_incompatible
 def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
-                    method=None, missing_handling='ash'):
+                    method=None, missing_handling="ash"):
     r"""
     Return a CombustionData object (a named tuple) that contains the stoichiometry
     coefficients of the reactants and products, the lower and higher
@@ -1206,7 +1206,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     if method:
         method = method.capitalize()
     else:
-        method = 'Dulong' if Hf is None else 'Stoichiometry'
+        method = "Dulong" if Hf is None else "Stoichiometry"
     if method == DULONG:
         HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
         if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
@@ -1248,15 +1248,15 @@ class CombustionData:
     @property
     def LHV(self):
         """Lower heating value [LHV; in J/mol]"""
-        return LHV_from_HHV(self.HHV, self.stoichiometry.get('H2O', 0.))
+        return LHV_from_HHV(self.HHV, self.stoichiometry.get("H2O", 0.))
 
     def __repr__(self):
-        return f'CombustionData(stoichiometry={self.stoichiometry}, HHV={self.HHV}, Hf={self.Hf}, MW={self.MW})'
+        return f"CombustionData(stoichiometry={self.stoichiometry}, HHV={self.HHV}, Hf={self.Hf}, MW={self.MW})"
 
 
 def air_fuel_ratio_solver(ratio, Vm_air, Vm_fuel, MW_air, MW_fuel,
                           n_air=None, n_fuel=None,
-                          basis='mass'):
+                          basis="mass"):
     """Calculates molar flow rate of air or fuel from the other, using a
     specified air-fuel ratio. Supports 'mole', 'mass', and 'volume'.
 
@@ -1325,12 +1325,12 @@ def air_fuel_ratio_solver(ratio, Vm_air, Vm_fuel, MW_air, MW_fuel,
     ... n_fuel=n_fuel, basis='mole')
     (25.0, 5.0, 5.0, 8.073858296891782, 5.011182039683378)
     """
-    if basis == 'mole':
+    if basis == "mole":
         if n_air is not None and n_fuel is None:
             n_fuel = n_air/ratio
         elif n_fuel is not None and n_air is None:
             n_air = n_fuel*ratio
-    elif basis == 'mass':
+    elif basis == "mass":
         if n_air is not None and n_fuel is None:
             m_air = property_mass_to_molar(n_air, MW_air)
             m_fuel = m_air/ratio
@@ -1339,7 +1339,7 @@ def air_fuel_ratio_solver(ratio, Vm_air, Vm_fuel, MW_air, MW_fuel,
             m_fuel = property_mass_to_molar(n_fuel, MW_fuel)
             m_air = m_fuel*ratio
             n_air = property_molar_to_mass(m_air, MW_air)
-    elif basis == 'volume':
+    elif basis == "volume":
         if n_air is not None and n_fuel is None:
             V_air = n_air*Vm_air
             V_fuel = V_air/ratio
@@ -1360,7 +1360,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
                          O2_excess=None, frac_out_O2=None,
                          frac_out_O2_dry=None, ratio=None,
                          Vm_air=None, Vm_fuel=None, MW_air=None, MW_fuel=None,
-                         ratio_basis='mass', reactivities=None,
+                         ratio_basis="mass", reactivities=None,
                          combustion_stoichiometries=None):
     """Solves the system of equations describing a flow of air mixing with a
     flow of combustibles and burning completely. All calculated variables are
@@ -1507,7 +1507,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
         if n_fuel is not None:
             comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
-            n_O2_required = -comb_ans['O2']*n_fuel + z_fuel_O2*n_fuel
+            n_O2_required = -comb_ans["O2"]*n_fuel + z_fuel_O2*n_fuel
             N_O2_required_air = n_O2_required*(1.0 + O2_excess)- z_fuel_O2*n_fuel
             n_air = N_O2_required_air/zs_air[O2_index]
         elif n_air is not None:
@@ -1518,7 +1518,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
             solve([Eq1, Eq2], [n_fuel, O2])"""
             comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
-            O2_per_mole_fuel = (-comb_ans['O2'] + zs_fuel[O2_index])*(1.0 + O2_excess)
+            O2_per_mole_fuel = (-comb_ans["O2"] + zs_fuel[O2_index])*(1.0 + O2_excess)
             n_O2_air = zs_air[O2_index]*n_air
             n_fuel = n_O2_air/(O2_per_mole_fuel - z_fuel_O2)
         elif n_out is not None:
@@ -1531,12 +1531,12 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
             comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
             stoic_comb_products = combustion_products_to_list(comb_ans, CASs)
-            O2_coeff = O2_burnt_n_fuel = -comb_ans['O2'] + z_fuel_O2
+            O2_coeff = O2_burnt_n_fuel = -comb_ans["O2"] + z_fuel_O2
             n_delta = 1
             for z_new, z_old, CAS in zip(stoic_comb_products, zs_fuel, CASs):
                 if CAS != O2_CAS:
                     n_delta += z_new - z_old
-            n_delta -= -comb_ans['O2'] + z_fuel_O2
+            n_delta -= -comb_ans["O2"] + z_fuel_O2
 
             n_fuel = n_out*z_air_O2/(O2_coeff*O2_excess + O2_coeff + n_delta*z_air_O2 - z_fuel_O2)
             n_air = n_out*(O2_coeff*O2_excess + O2_coeff - z_fuel_O2)/(O2_coeff*O2_excess + O2_coeff + n_delta*z_air_O2 - z_fuel_O2)
@@ -1552,7 +1552,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
             ns_fuel = [zi*n_fuel for zi in zs_fuel]
             comb_ans = combustion_products_mixture(atomss, ns_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
-            n_O2_stoic = -comb_ans['O2']
+            n_O2_stoic = -comb_ans["O2"]
             if n_O2_stoic < 0.0:
                 raise ValueError("Cannot meet air spec - insufficient air for full combustion")
             # when burning stoichiometrically, how many moles out?
@@ -1580,8 +1580,8 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
         elif n_air is not None or n_out is not None:
             comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
-            O2_burnt_n_fuel = -comb_ans['O2']
-            H2O_from_fuel_n = comb_ans['H2O']
+            O2_burnt_n_fuel = -comb_ans["O2"]
+            H2O_from_fuel_n = comb_ans["H2O"]
             n_delta = 0.0
             for v in comb_ans.values():
                 n_delta += v
@@ -1646,7 +1646,7 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
 
 
     # Compute all other properties from the air and fuel flow rate
-    results = {'n_fuel': n_fuel, 'n_air': n_air}
+    results = {"n_fuel": n_fuel, "n_air": n_air}
     if n_fuel is not None and n_air is not None:
         ns_to_combust = [zi_air*n_air + zi_fuel*n_fuel for zi_air, zi_fuel in zip(zs_air, zs_fuel)]
 
@@ -1662,23 +1662,23 @@ def fuel_air_spec_solver(zs_air, zs_fuel, CASs, atomss, n_fuel=None,
         frac_out_O2 = zs_out[O2_index]
         frac_out_O2_dry = frac_out_O2/(1.0 - zs_out[H2O_index])
 
-        results['ns_out'] = ns_out
-        results['zs_out'] = zs_out
-        results['n_out'] = n_out
-        results['frac_out_O2'] = frac_out_O2
-        results['frac_out_O2_dry'] = frac_out_O2_dry
+        results["ns_out"] = ns_out
+        results["zs_out"] = zs_out
+        results["n_out"] = n_out
+        results["frac_out_O2"] = frac_out_O2
+        results["frac_out_O2_dry"] = frac_out_O2_dry
 
 
         O2_in = n_air*zs_air[O2_index] + n_fuel*zs_fuel[O2_index]
-        O2_demand = O2_in - results['ns_out'][O2_index]
-        results['O2_excess'] = O2_in/O2_demand - 1.0
+        O2_demand = O2_in - results["ns_out"][O2_index]
+        results["O2_excess"] = O2_in/O2_demand - 1.0
 #        results['O2_excess'] = n_air*z_air_O2/(comb_fuel_only['O2_required']) - 1
 
         ratios = (None, None, None)
         if Vm_air is not None and Vm_fuel is not None and MW_air is not None and MW_fuel is not None:
             ratios = air_fuel_ratio_solver(None, Vm_air, Vm_fuel, MW_air, MW_fuel,
                                            n_air=n_air, n_fuel=n_fuel)[2:]
-        results['mole_ratio'], results['mass_ratio'], results['volume_ratio'] = ratios
+        results["mole_ratio"], results["mass_ratio"], results["volume_ratio"] = ratios
 
     return results
 
@@ -1689,16 +1689,16 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                            frac_out_O2_dry=None, ratio=None,
                            Vm_air=None, Vm_fuel=None, Vm_third=None,
                            MW_air=None, MW_fuel=None, MW_third=None,
-                           ratio_basis='mass', reactivities=None,
+                           ratio_basis="mass", reactivities=None,
                            combustion_stoichiometries=None):
     # I believe will always require 1 intensive spec (or flow of )
     # To begin - exclude n_out spec? Should be possible to solve for it/with it though.
 
-    common_specs = {'zs_air': zs_air, 'CASs': CASs, 'atomss': atomss,
-                    'n_air': n_air, 'O2_excess': O2_excess, 'frac_out_O2': frac_out_O2,
-                    'frac_out_O2_dry': frac_out_O2_dry, 'Vm_air': Vm_air, 'MW_air': MW_air,
-                    'ratio': ratio, 'ratio_basis': ratio_basis,
-                    'reactivities': reactivities}
+    common_specs = {"zs_air": zs_air, "CASs": CASs, "atomss": atomss,
+                    "n_air": n_air, "O2_excess": O2_excess, "frac_out_O2": frac_out_O2,
+                    "frac_out_O2_dry": frac_out_O2_dry, "Vm_air": Vm_air, "MW_air": MW_air,
+                    "ratio": ratio, "ratio_basis": ratio_basis,
+                    "reactivities": reactivities}
 
     O2_index = CASs.index(O2_CAS)
     H2O_index = CASs.index(H2O_CAS)
@@ -1718,7 +1718,7 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
         if Vm_air is not None and Vm_mix is not None and MW_air is not None and MW_mix is not None:
             ratios = air_fuel_ratio_solver(None, Vm_air, Vm_mix, MW_air, MW_mix,
                                            n_air=n_air, n_fuel=n_fuel+n_third)[2:]
-        results['mole_ratio'], results['mass_ratio'], results['volume_ratio'] = ratios
+        results["mole_ratio"], results["mass_ratio"], results["volume_ratio"] = ratios
 
     if n_fuel is not None :
         if Vm_fuel is not None and Vm_third is not None:
@@ -1735,7 +1735,7 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                                         Vm_fuel=Vm_mix, MW_fuel=MW_mix,
                                         n_out=n_out, combustion_stoichiometries=combustion_stoichiometries,
                                        **common_specs)
-        mix_burn['n_fuel'] -= n_third
+        mix_burn["n_fuel"] -= n_third
         return mix_burn
     if n_air is not None and n_fuel is None:
         O2_in_third = n_third*zs_third[O2_index]
@@ -1745,14 +1745,14 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                                           Vm_fuel=Vm_third, MW_fuel=MW_third,
                                           combustion_stoichiometries=combustion_stoichiometries,
                                           **common_specs)
-        n_air2 = third_burn['n_out']
-        zs_air2 = third_burn['zs_out']
+        n_air2 = third_burn["n_out"]
+        zs_air2 = third_burn["zs_out"]
 
-        O2_demand_third = O2_in_orig - third_burn['ns_out'][O2_index]
+        O2_demand_third = O2_in_orig - third_burn["ns_out"][O2_index]
 
         extra_specs = common_specs.copy()
-        extra_specs['n_air'] = n_air2
-        extra_specs['zs_air'] = zs_air2
+        extra_specs["n_air"] = n_air2
+        extra_specs["zs_air"] = zs_air2
         if O2_excess is not None:
             """from sympy import *
             O2_excess, excess_sub, O2_air, O2_in_third, O2_fixed, z_fuel_O2, n_fuel, O2_coeff, O2_demand_third = symbols('O2_excess, excess_sub, O2_air, O2_in_third, O2_fixed, z_fuel_O2, n_fuel, O2_coeff, O2_demand_third')
@@ -1761,19 +1761,19 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
             solve([Eq1, Eq2], [excess_sub, n_fuel])"""
             comb_ans = combustion_products_mixture(atomss, zs_fuel, reactivities=reactivities, CASs=CASs,
                                                    combustion_stoichiometries=combustion_stoichiometries)
-            O2_burnt_n_fuel = O2_coeff = -comb_ans['O2'] + z_fuel_O2
+            O2_burnt_n_fuel = O2_coeff = -comb_ans["O2"] + z_fuel_O2
             O2_air = z_air_O2*n_air
             # Simpler expression for n_fuel than fake O2 excess
             n_fuel = (O2_air - O2_demand_third*O2_excess - O2_demand_third + O2_in_third)/(O2_coeff*O2_excess + O2_coeff - z_fuel_O2)
 
         elif ratio is not None:
-            if ratio_basis == 'mole':
+            if ratio_basis == "mole":
                 n_fuel = n_air/ratio - n_third
-            elif ratio_basis == 'mass':
+            elif ratio_basis == "mass":
                 m_air, m_third = n_air*MW_air*1e-3, n_third*MW_third*1e-3
                 m_fuel = m_air/ratio - m_third
                 n_fuel = m_fuel/(MW_fuel*1e-3)
-            elif ratio_basis == 'volume':
+            elif ratio_basis == "volume":
                 Q_air, Q_third = n_air*Vm_air, n_third*Vm_third
                 Q_fuel = Q_air/ratio - Q_third
                 n_fuel = Q_fuel/Vm_fuel
@@ -1784,16 +1784,16 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                                          n_out=n_out, combustion_stoichiometries=combustion_stoichiometries,
                                          **extra_specs)
 
-        O2_in_fuel = fuel_burn['n_fuel']*zs_fuel[O2_index]
-        O2_demand_fuel = (n_air2*zs_air2[O2_index] + O2_in_fuel)/(fuel_burn['O2_excess'] + 1)
+        O2_in_fuel = fuel_burn["n_fuel"]*zs_fuel[O2_index]
+        O2_demand_fuel = (n_air2*zs_air2[O2_index] + O2_in_fuel)/(fuel_burn["O2_excess"] + 1)
 
 
 
         # denominator and numerator are correct now, do not change vars used..
-        fuel_burn['O2_excess'] = (O2_in_orig + O2_in_fuel)/(O2_demand_fuel + O2_demand_third) - 1
+        fuel_burn["O2_excess"] = (O2_in_orig + O2_in_fuel)/(O2_demand_fuel + O2_demand_third) - 1
 
-        fuel_burn['n_air'] = n_air
-        n_fuel = fuel_burn['n_fuel']
+        fuel_burn["n_air"] = n_air
+        n_fuel = fuel_burn["n_fuel"]
         fix_ratios(fuel_burn)
 
         # O2 excess should be wrong, same for ratios
@@ -1808,26 +1808,26 @@ def fuel_air_third_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                                           Vm_fuel=Vm_third, MW_fuel=MW_third,
                                           combustion_stoichiometries=combustion_stoichiometries,
                                           **common_specs)
-        n_out_remaining = n_out - third_burn['n_out']
+        n_out_remaining = n_out - third_burn["n_out"]
 
         fuel_burn = fuel_air_spec_solver(zs_fuel=zs_fuel, n_out=n_out_remaining,
                                              Vm_fuel=Vm_fuel, MW_fuel=MW_fuel,
                                              combustion_stoichiometries=combustion_stoichiometries,
                                              **common_specs)
 
-        ans = {'n_out': n_out}
-        ans['n_air'] = n_air = third_burn['n_air'] + fuel_burn['n_air']
-        ans['n_fuel'] = n_fuel = fuel_burn['n_fuel']
-        ans['ns_out'] = [ni+nj for ni, nj in zip(third_burn['ns_out'], fuel_burn['ns_out'])]
-        ans['zs_out'] = normalize(ans['ns_out'])
-        ans['frac_out_O2'] = ans['ns_out'][O2_index]/n_out
-        ans['frac_out_O2_dry'] = ans['ns_out'][O2_index]/(n_out - ans['ns_out'][H2O_index])
+        ans = {"n_out": n_out}
+        ans["n_air"] = n_air = third_burn["n_air"] + fuel_burn["n_air"]
+        ans["n_fuel"] = n_fuel = fuel_burn["n_fuel"]
+        ans["ns_out"] = [ni+nj for ni, nj in zip(third_burn["ns_out"], fuel_burn["ns_out"])]
+        ans["zs_out"] = normalize(ans["ns_out"])
+        ans["frac_out_O2"] = ans["ns_out"][O2_index]/n_out
+        ans["frac_out_O2_dry"] = ans["ns_out"][O2_index]/(n_out - ans["ns_out"][H2O_index])
 
 
         # O2 excess definition needs to include O2 from elsewhere!
         O2_in = n_air*zs_air[O2_index] + n_fuel*zs_fuel[O2_index] + n_third*zs_third[O2_index]
-        O2_demand = O2_in - ans['ns_out'][O2_index]
-        ans['O2_excess'] = O2_in/O2_demand - 1
+        O2_demand = O2_in - ans["ns_out"][O2_index]
+        ans["O2_excess"] = O2_in/O2_demand - 1
         fix_ratios(ans)
 
         return ans
@@ -1839,7 +1839,7 @@ def combustion_spec_solver(zs_air, zs_fuel, zs_third, CASs, atomss, n_third,
                            frac_out_O2_dry=None, ratio=None,
                            Vm_air=None, Vm_fuel=None, Vm_third=None,
                            MW_air=None, MW_fuel=None, MW_third=None,
-                           ratio_basis='mass', reactivities=None,
+                           ratio_basis="mass", reactivities=None,
                            combustion_stoichiometries=None):
     """Solves the system of equations describing a flow of air mixing with two
     flow of combustibles, one fixed and one potentially variable, and burning

@@ -48,12 +48,12 @@ Correlations
 """
 
 __all__ = [
-    'LK_omega',
-    'Stiel_polar_factor',
-    'omega',
-    'omega_all_methods',
-    'omega_definition',
-    'omega_methods',
+    "LK_omega",
+    "Stiel_polar_factor",
+    "omega",
+    "omega_all_methods",
+    "omega_definition",
+    "omega_methods",
 ]
 
 from math import log10
@@ -65,7 +65,7 @@ from chemicals import data_reader as dr
 from chemicals.data_reader import database_constant_lookup, list_available_methods_from_df_dict, retrieve_any_from_df_dict, retrieve_from_df_dict
 from chemicals.utils import mark_numba_incompatible
 
-omega_all_methods = (miscdata.HEOS, 'PSRK', 'PD', 'YAWS', critical.ACENTRIC_DEFINITION)
+omega_all_methods = (miscdata.HEOS, "PSRK", "PD", "YAWS", critical.ACENTRIC_DEFINITION)
 """Tuple of method name keys. See the `omega` for the actual references"""
 
 @mark_numba_incompatible
@@ -87,7 +87,7 @@ def omega_methods(CASRN):
     --------
     omega
     """
-    return list_available_methods_from_df_dict(critical.omega_sources, CASRN, 'omega')
+    return list_available_methods_from_df_dict(critical.omega_sources, CASRN, "omega")
 
 @mark_numba_incompatible
 def omega(CASRN, method=None):
@@ -165,15 +165,15 @@ def omega(CASRN, method=None):
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'omega')
+        val, found = database_constant_lookup(CASRN, "omega")
         if found: return val
     if method:
-        return retrieve_from_df_dict(critical.omega_sources, CASRN, 'omega', method)
+        return retrieve_from_df_dict(critical.omega_sources, CASRN, "omega", method)
     else:
-        return retrieve_any_from_df_dict(critical.omega_sources, CASRN, 'omega')
+        return retrieve_any_from_df_dict(critical.omega_sources, CASRN, "omega")
 
 def omega_definition(Psat, Pc):
-    r'''Returns the acentric factor of a fluid according to its fundamental
+    r"""Returns the acentric factor of a fluid according to its fundamental
     definition using the vapor pressure at a reduced temperature of 0.7Tc.
 
     .. math::
@@ -205,7 +205,7 @@ def omega_definition(Psat, Pc):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     return -log10(Psat/Pc) - 1.0
 
 def LK_omega(Tb, Tc, Pc):

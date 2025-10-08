@@ -59,24 +59,24 @@ Utility functions
 """
 
 __all__ = [
-    'Henry_constants',
-    'Henry_converter',
-    'Henry_pressure',
-    'Henry_pressure_mixture',
-    'Tm_depression_eutectic',
-    'd2Henry_constants_dT2',
-    'dHenry_constants_dT',
-    'hansen_delta_d',
-    'hansen_delta_d_all_methods',
-    'hansen_delta_d_methods',
-    'hansen_delta_h',
-    'hansen_delta_h_all_methods',
-    'hansen_delta_h_methods',
-    'hansen_delta_p',
-    'hansen_delta_p_all_methods',
-    'hansen_delta_p_methods',
-    'solubility_eutectic',
-    'solubility_parameter',
+    "Henry_constants",
+    "Henry_converter",
+    "Henry_pressure",
+    "Henry_pressure_mixture",
+    "Tm_depression_eutectic",
+    "d2Henry_constants_dT2",
+    "dHenry_constants_dT",
+    "hansen_delta_d",
+    "hansen_delta_d_all_methods",
+    "hansen_delta_d_methods",
+    "hansen_delta_h",
+    "hansen_delta_h_all_methods",
+    "hansen_delta_h_methods",
+    "hansen_delta_p",
+    "hansen_delta_p_all_methods",
+    "hansen_delta_p_methods",
+    "solubility_eutectic",
+    "solubility_parameter",
 ]
 
 
@@ -94,16 +94,16 @@ from chemicals.data_reader import (
 )
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
-folder = os_path_join(source_path, 'Misc')
-register_df_source(folder, 'alshehri_hansen_solubility_parameters.tsv')
-register_df_source(folder, 'hspipy_hansen_solubility_parameters.tsv')
-register_df_source(folder, 'schrier_hansen_solubility_parameters.tsv')
-register_df_source(folder, 'ruben_manuel_hansen_solubility_parameters.tsv')
+folder = os_path_join(source_path, "Misc")
+register_df_source(folder, "alshehri_hansen_solubility_parameters.tsv")
+register_df_source(folder, "hspipy_hansen_solubility_parameters.tsv")
+register_df_source(folder, "schrier_hansen_solubility_parameters.tsv")
+register_df_source(folder, "ruben_manuel_hansen_solubility_parameters.tsv")
 
-ALSHERI_HANSEN = 'ALSHERI_HANSEN'
-HSPIPY = 'HSPIPY'
-WDR_SCHRIER = 'WDR_SCHRIER'
-MANUEL_RUBEN_2022 = 'MANUEL_RUBEN_2022'
+ALSHERI_HANSEN = "ALSHERI_HANSEN"
+HSPIPY = "HSPIPY"
+WDR_SCHRIER = "WDR_SCHRIER"
+MANUEL_RUBEN_2022 = "MANUEL_RUBEN_2022"
 
 hansen_delta_h_all_methods = hansen_delta_p_all_methods = hansen_delta_d_all_methods = (MANUEL_RUBEN_2022, ALSHERI_HANSEN, HSPIPY, WDR_SCHRIER)
 """Tuple of method name keys. See the `hansen_delta_d` for the actual references"""
@@ -115,10 +115,10 @@ def _load_solubility_data():
     global alsheri_hansen_data, hspipy_data, wdr_schrier_data, manuel_ruben_2022_data
     global solubility_sources, _solubility_data_loaded
 
-    alsheri_hansen_data = data_source('alshehri_hansen_solubility_parameters.tsv')
-    hspipy_data = data_source('hspipy_hansen_solubility_parameters.tsv')
-    wdr_schrier_data = data_source('schrier_hansen_solubility_parameters.tsv')
-    manuel_ruben_2022_data = data_source('ruben_manuel_hansen_solubility_parameters.tsv')
+    alsheri_hansen_data = data_source("alshehri_hansen_solubility_parameters.tsv")
+    hspipy_data = data_source("hspipy_hansen_solubility_parameters.tsv")
+    wdr_schrier_data = data_source("schrier_hansen_solubility_parameters.tsv")
+    manuel_ruben_2022_data = data_source("ruben_manuel_hansen_solubility_parameters.tsv")
     # Set up sources for lookup
     solubility_sources = {
         MANUEL_RUBEN_2022: manuel_ruben_2022_data,
@@ -129,7 +129,7 @@ def _load_solubility_data():
     _solubility_data_loaded = True
 
 def __getattr__(name):
-    if name in ('alsheri_hansen_data', 'hspipy_data', 'wdr_schrier_data', 'manuel_ruben_2022_data', 'solubility_sources'):
+    if name in ("alsheri_hansen_data", "hspipy_data", "wdr_schrier_data", "manuel_ruben_2022_data", "solubility_sources"):
         if not _solubility_data_loaded:
             _load_solubility_data()
         return globals()[name]
@@ -157,7 +157,7 @@ def hansen_delta_d_methods(CASRN):
     """
     if not _solubility_data_loaded:
         _load_solubility_data()
-    return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_D')
+    return list_available_methods_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_D")
 
 @mark_numba_incompatible
 def hansen_delta_d(CASRN, method=None):
@@ -216,15 +216,15 @@ def hansen_delta_d(CASRN, method=None):
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_D')
+        val, found = database_constant_lookup(CASRN, "HANSEN_DELTA_D")
         if found:
             return val
     if not _solubility_data_loaded:
         _load_solubility_data()
     if method:
-        return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_D', method)
+        return retrieve_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_D", method)
     else:
-        return retrieve_any_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_D')
+        return retrieve_any_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_D")
 
 @mark_numba_incompatible
 def hansen_delta_p_methods(CASRN):
@@ -247,7 +247,7 @@ def hansen_delta_p_methods(CASRN):
     """
     if not _solubility_data_loaded:
         _load_solubility_data()
-    return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_P')
+    return list_available_methods_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_P")
 
 @mark_numba_incompatible
 def hansen_delta_p(CASRN, method=None):
@@ -306,15 +306,15 @@ def hansen_delta_p(CASRN, method=None):
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_P')
+        val, found = database_constant_lookup(CASRN, "HANSEN_DELTA_P")
         if found:
             return val
     if not _solubility_data_loaded:
         _load_solubility_data()
     if method:
-        return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_P', method)
+        return retrieve_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_P", method)
     else:
-        return retrieve_any_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_P')
+        return retrieve_any_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_P")
 
 @mark_numba_incompatible
 def hansen_delta_h_methods(CASRN):
@@ -337,7 +337,7 @@ def hansen_delta_h_methods(CASRN):
     """
     if not _solubility_data_loaded:
         _load_solubility_data()
-    return list_available_methods_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_H')
+    return list_available_methods_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_H")
 
 @mark_numba_incompatible
 def hansen_delta_h(CASRN, method=None):
@@ -396,18 +396,18 @@ def hansen_delta_h(CASRN, method=None):
        GitHub Repository, https://github.com/Gnpd/HSPiPy.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'HANSEN_DELTA_H')
+        val, found = database_constant_lookup(CASRN, "HANSEN_DELTA_H")
         if found:
             return val
     if not _solubility_data_loaded:
         _load_solubility_data()
     if method:
-        return retrieve_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_H', method)
+        return retrieve_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_H", method)
     else:
-        return retrieve_any_from_df_dict(solubility_sources, CASRN, 'HANSEN_DELTA_H')
+        return retrieve_any_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_H")
 
 def solubility_parameter(T, Hvapm, Vml):
-    r'''This function handles the calculation of a chemical's solubility
+    r"""This function handles the calculation of a chemical's solubility
     parameter. Calculation is a function of temperature, but is not always
     presented as such. `Hvapm`, `Vml`, `T` are required.
 
@@ -449,12 +449,12 @@ def solubility_parameter(T, Hvapm, Vml):
     ----------
     .. [1] Barton, Allan F. M. CRC Handbook of Solubility Parameters and Other
        Cohesion Parameters, Second Edition. CRC Press, 1991.
-    '''
+    """
     # Prevent taking the root of a negative number
     return None if (Hvapm < R*T or Vml < 0.0) else sqrt((Hvapm - R*T)/Vml)
 
 def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
-    r'''Returns the maximum solubility of a solute in a solvent.
+    r"""Returns the maximum solubility of a solute in a solvent.
 
     .. math::
         \ln x_i^L \gamma_i^L = \frac{\Delta H_{m,i}}{RT}\left(
@@ -499,14 +499,14 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     ----------
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
-    '''
+    """
     dCp = Cpl-Cps
     x = exp(- R_inv*((Hm*(1.0 - T/Tm) - dCp*(Tm-T))/T + dCp*log(Tm/T)))/gamma
     return x
 
 
 def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
-    r'''Returns the freezing point depression caused by a solute in a solvent.
+    r"""Returns the freezing point depression caused by a solute in a solvent.
     Can use either the mole fraction of the solute or its molality and the
     molecular weight of the solvent. Assumes ideal system behavior.
 
@@ -549,30 +549,30 @@ def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
     ----------
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
-    '''
+    """
     if x is not None:
         dTm = R*Tm*Tm*x/Hm
     elif M is not None and MW is not None:
         MW = MW/1000. #g/mol to kg/mol
         dTm = R*Tm*Tm*MW*M/Hm
     else:
-        raise ValueError('Either molality or mole fraction of the solute must be specified; MW of the solvent is required also if molality is provided')
+        raise ValueError("Either molality or mole fraction of the solute must be specified; MW of the solvent is required also if molality is provided")
     return dTm
 
 
-HENRY_SCALES_HCP = ('Hcp', 'mol/(m^3*Pa)')
-HENRY_SCALES_HCP_MOLALITY = ('M/atm',)
-HENRY_SCALES_HCC = ('Hcc',)
-HENRY_SCALES_HBP_SI = ('mol/(kg*Pa)',)
-HENRY_SCALES_HBP = ('Hbp', 'mol/(kg*atm)')
-HENRY_SCALES_HXP = ('Hxp', '1/atm')
-HENRY_SCALES_BUNSEN = ('alpha', 'bunsen coefficient')
+HENRY_SCALES_HCP = ("Hcp", "mol/(m^3*Pa)")
+HENRY_SCALES_HCP_MOLALITY = ("M/atm",)
+HENRY_SCALES_HCC = ("Hcc",)
+HENRY_SCALES_HBP_SI = ("mol/(kg*Pa)",)
+HENRY_SCALES_HBP = ("Hbp", "mol/(kg*atm)")
+HENRY_SCALES_HXP = ("Hxp", "1/atm")
+HENRY_SCALES_BUNSEN = ("alpha", "bunsen coefficient")
 
-HENRY_SCALES_KHPX = ('KHpx', 'atm')
-HENRY_SCALES_KHPC_SI =  ('m^3*Pa/mol',)
-HENRY_SCALES_KHPC = ('KHpc', 'm^3*atm/mol')
-HENRY_SCALES_KHCC = ('KHcc',)
-HENRY_SCALES_SI = ('SI',)
+HENRY_SCALES_KHPX = ("KHpx", "atm")
+HENRY_SCALES_KHPC_SI =  ("m^3*Pa/mol",)
+HENRY_SCALES_KHPC = ("KHpc", "m^3*atm/mol")
+HENRY_SCALES_KHCC = ("KHcc",)
+HENRY_SCALES_SI = ("SI",)
 
 HENRY_SCALES_LIST = (HENRY_SCALES_HCP + HENRY_SCALES_HCP_MOLALITY
                      + HENRY_SCALES_HCC + HENRY_SCALES_HBP_SI + HENRY_SCALES_HBP
@@ -582,7 +582,7 @@ HENRY_SCALES_LIST = (HENRY_SCALES_HCP + HENRY_SCALES_HCP_MOLALITY
 
 
 def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
-    r'''Converts Henry's law constant for a gas with respect to a solvent from
+    r"""Converts Henry's law constant for a gas with respect to a solvent from
     one scale to another.
 
     There are many scales, but it is recommemed to operate in the scale of
@@ -635,7 +635,7 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
     ----------
     .. [1] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
        8E. McGraw-Hill Professional, 2007.
-    '''
+    """
     # Convert val to units of 1/atm
     if old_scale in HENRY_SCALES_HCP:
         factor = atm/rhom
@@ -722,7 +722,7 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
 
 
 def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
-    r'''Calculates Henry's law constant as a function of temperature according
+    r"""Calculates Henry's law constant as a function of temperature according
     to the SI units of `Pa` and using a common temperature dependence as used
     in many process simulation applications.
 
@@ -778,13 +778,13 @@ def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
     ----------
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
-    '''
+    """
     T_inv = 1.0/T
     return exp(A + T_inv*(B + E*T_inv)  + C*log(T) + T*(D + F*T))
 
 
 def Henry_pressure_mixture(Hs, weights=None, zs=None):
-    r'''Mixing rule for Henry's law components. Applies a logarithmic average
+    r"""Mixing rule for Henry's law components. Applies a logarithmic average
     to all solvent components and mole fractions. Optionally, weight factors
     can be provided instead of using mole fractions - only specify one of them.
 
@@ -819,7 +819,7 @@ def Henry_pressure_mixture(Hs, weights=None, zs=None):
     ----------
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
-    '''
+    """
     N = len(Hs)
     if weights is None and zs is None:
         raise ValueError("Weights or mole fractions are required")
@@ -841,7 +841,7 @@ def Henry_pressure_mixture(Hs, weights=None, zs=None):
     return H
 
 def Henry_constants(lnHenry_matrix, zs, henry_components, skip_zero=True, Hs=None):
-    r'''Calculate the Henry's law constants for a list of components, only some of
+    r"""Calculate the Henry's law constants for a list of components, only some of
     which are henry's law following components (solutes) and the rest that are
     solvents. The empirical mixing rule from [1]_ is used as follows:
 
@@ -889,7 +889,7 @@ def Henry_constants(lnHenry_matrix, zs, henry_components, skip_zero=True, Hs=Non
     ----------
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
-    '''
+    """
     N = len(zs)
     if Hs is None:
         Hs = [0.0]*N
@@ -915,7 +915,7 @@ def Henry_constants(lnHenry_matrix, zs, henry_components, skip_zero=True, Hs=Non
 
 def dHenry_constants_dT(lnHenry_matrix, dlnHenry_matrix_dT, zs,
                         henry_components, skip_zero=True, dH_dTs=None):
-    r'''Calculate the first temperature derivative of
+    r"""Calculate the first temperature derivative of
     Henry's law constants for a list of components, only some of
     which are henry's law following components (solutes) and the rest that are
     solvents. The empirical mixing rule from [1]_ is used as follows:
@@ -965,7 +965,7 @@ def dHenry_constants_dT(lnHenry_matrix, dlnHenry_matrix_dT, zs,
     ----------
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
-    '''
+    """
     N = len(zs)
     if dH_dTs is None:
         dH_dTs = [0.0]*N
@@ -1000,7 +1000,7 @@ def dHenry_constants_dT(lnHenry_matrix, dlnHenry_matrix_dT, zs,
 
 def d2Henry_constants_dT2(lnHenry_matrix, dlnHenry_matrix_dT, d2lnHenry_matrix_dT2,
                           zs, henry_components, skip_zero=True, d2H_dT2s=None):
-    r'''Calculate the second temperature derivative of
+    r"""Calculate the second temperature derivative of
     Henry's law constants for a list of components, only some of
     which are henry's law following components (solutes) and the rest that are
     solvents. The empirical mixing rule from [1]_ is used as follows:
@@ -1054,7 +1054,7 @@ def d2Henry_constants_dT2(lnHenry_matrix, dlnHenry_matrix_dT, d2lnHenry_matrix_d
     ----------
     .. [1] Gmehling, Jurgen. Chemical Thermodynamics: For Process Simulation.
        Weinheim, Germany: Wiley-VCH, 2012.
-    '''
+    """
     N = len(zs)
     if d2H_dT2s is None:
         d2H_dT2s = [0.0]*N

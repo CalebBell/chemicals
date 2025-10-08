@@ -127,25 +127,25 @@ The structure of each dataframe is shown below:
 """
 
 __all__ = [
-    'MK',
-    'PPDS12',
-    'SMK',
-    'Alibakhshi',
-    'Chen',
-    'Clapeyron',
-    'Hfus',
-    'Hfus_methods',
-    'Liu',
-    'Pitzer',
-    'Riedel',
-    'Tb',
-    'Tb_methods',
-    'Tm',
-    'Tm_methods',
-    'Velasco',
-    'Vetere',
-    'Watson',
-    'Watson_n',
+    "MK",
+    "PPDS12",
+    "SMK",
+    "Alibakhshi",
+    "Chen",
+    "Clapeyron",
+    "Hfus",
+    "Hfus_methods",
+    "Liu",
+    "Pitzer",
+    "Riedel",
+    "Tb",
+    "Tb_methods",
+    "Tm",
+    "Tm_methods",
+    "Velasco",
+    "Vetere",
+    "Watson",
+    "Watson_n",
 ]
 
 
@@ -167,23 +167,23 @@ from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 ###  Register data sources and lazy load them
 
-folder = os_path_join(source_path, 'Phase Change')
-register_df_source(folder, 'Yaws Boiling Points.tsv')
-register_df_source(folder, 'OpenNotebook Melting Points.tsv')
-register_df_source(folder, 'Ghazerati Appendix Vaporization Enthalpy.tsv',
-                   csv_kwargs={'dtype': {'Hvap298': float}})
-register_df_source(folder, 'CRC Handbook Heat of Vaporization.tsv')
-register_df_source(folder, 'CRC Handbook Heat of Fusion.tsv')
-register_df_source(folder, 'Ghazerati Appendix Sublimation Enthalpy.tsv')
-register_df_source(folder, 'Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
-register_df_source(folder, 'VDI PPDS Enthalpies of vaporization.tsv')
-register_df_source(folder, 'Alibakhshi one-coefficient enthalpy of vaporization.tsv')
+folder = os_path_join(source_path, "Phase Change")
+register_df_source(folder, "Yaws Boiling Points.tsv")
+register_df_source(folder, "OpenNotebook Melting Points.tsv")
+register_df_source(folder, "Ghazerati Appendix Vaporization Enthalpy.tsv",
+                   csv_kwargs={"dtype": {"Hvap298": float}})
+register_df_source(folder, "CRC Handbook Heat of Vaporization.tsv")
+register_df_source(folder, "CRC Handbook Heat of Fusion.tsv")
+register_df_source(folder, "Ghazerati Appendix Sublimation Enthalpy.tsv")
+register_df_source(folder, "Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv")
+register_df_source(folder, "VDI PPDS Enthalpies of vaporization.tsv")
+register_df_source(folder, "Alibakhshi one-coefficient enthalpy of vaporization.tsv")
 
-CRC_ORG = 'CRC_ORG'
-CRC_INORG = 'CRC_INORG'
-YAWS = 'YAWS'
-OPEN_NTBKM = 'OPEN_NTBKM'
-CRC = 'CRC'
+CRC_ORG = "CRC_ORG"
+CRC_INORG = "CRC_INORG"
+YAWS = "YAWS"
+OPEN_NTBKM = "OPEN_NTBKM"
+CRC = "CRC"
 
 _phase_change_const_loaded = False
 @mark_numba_incompatible
@@ -191,12 +191,12 @@ def _load_phase_change_constants():
     global Tb_data_Yaws, Tm_ON_data, Hvap_data_Gharagheizi, Hvap_data_CRC
     global Hfus_data_CRC, Hsub_data_Gharagheizi, _phase_change_const_loaded
     global Tb_sources, Tm_sources, Hfus_sources
-    Tb_data_Yaws = data_source('Yaws Boiling Points.tsv')
-    Tm_ON_data = data_source('OpenNotebook Melting Points.tsv')
-    Hvap_data_Gharagheizi = data_source('Ghazerati Appendix Vaporization Enthalpy.tsv')
-    Hvap_data_CRC = data_source('CRC Handbook Heat of Vaporization.tsv')
-    Hfus_data_CRC = data_source('CRC Handbook Heat of Fusion.tsv')
-    Hsub_data_Gharagheizi = data_source('Ghazerati Appendix Sublimation Enthalpy.tsv')
+    Tb_data_Yaws = data_source("Yaws Boiling Points.tsv")
+    Tm_ON_data = data_source("OpenNotebook Melting Points.tsv")
+    Hvap_data_Gharagheizi = data_source("Ghazerati Appendix Vaporization Enthalpy.tsv")
+    Hvap_data_CRC = data_source("CRC Handbook Heat of Vaporization.tsv")
+    Hfus_data_CRC = data_source("CRC Handbook Heat of Fusion.tsv")
+    Hsub_data_Gharagheizi = data_source("Ghazerati Appendix Sublimation Enthalpy.tsv")
     _phase_change_const_loaded = True
     Tb_sources = {
         miscdata.HEOS: miscdata.heos_data,
@@ -233,27 +233,27 @@ def _load_phase_change_correlations():
     global phase_change_data_Alibakhshi_Cs, _phase_change_corrs_loaded
 
     # 66554 for pandas; 19264 bytes for numpy
-    phase_change_data_Perrys2_150 = data_source('Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv')
+    phase_change_data_Perrys2_150 = data_source("Table 2-150 Heats of Vaporization of Inorganic and Organic Liquids.tsv")
     phase_change_values_Perrys2_150 = np.array(phase_change_data_Perrys2_150.values[:, 1:], dtype=float)
 
     # 52187 bytes for pandas, 13056 bytes for numpy
-    phase_change_data_VDI_PPDS_4 = data_source('VDI PPDS Enthalpies of vaporization.tsv')
+    phase_change_data_VDI_PPDS_4 = data_source("VDI PPDS Enthalpies of vaporization.tsv")
     phase_change_values_VDI_PPDS_4 = np.array(phase_change_data_VDI_PPDS_4.values[:, 2:], dtype=float)
 
-    phase_change_data_Alibakhshi_Cs = data_source('Alibakhshi one-coefficient enthalpy of vaporization.tsv')
+    phase_change_data_Alibakhshi_Cs = data_source("Alibakhshi one-coefficient enthalpy of vaporization.tsv")
     _phase_change_corrs_loaded = True
 
 def __getattr__(name):
-    if name in ('Tb_data_Yaws', 'Tm_ON_data', 'Hvap_data_Gharagheizi',
-                'Hvap_data_CRC', 'Hfus_data_CRC', 'Hsub_data_Gharagheizi',
-                'Tb_sources', 'Tm_sources', 'Hfus_sources'):
+    if name in ("Tb_data_Yaws", "Tm_ON_data", "Hvap_data_Gharagheizi",
+                "Hvap_data_CRC", "Hfus_data_CRC", "Hsub_data_Gharagheizi",
+                "Tb_sources", "Tm_sources", "Hfus_sources"):
         _load_phase_change_constants()
         return globals()[name]
-    elif name in ('phase_change_data_Perrys2_150',
-                  'phase_change_values_Perrys2_150',
-                  'phase_change_data_VDI_PPDS_4',
-                  'phase_change_values_VDI_PPDS_4',
-                  'phase_change_data_Alibakhshi_Cs'):
+    elif name in ("phase_change_data_Perrys2_150",
+                  "phase_change_values_Perrys2_150",
+                  "phase_change_data_VDI_PPDS_4",
+                  "phase_change_values_VDI_PPDS_4",
+                  "phase_change_data_Alibakhshi_Cs"):
         _load_phase_change_correlations()
         return globals()[name]
     raise AttributeError(f"module {__name__} has no attribute {name}")
@@ -286,7 +286,7 @@ def Tb_methods(CASRN):
     Tb
     """
     if not _phase_change_const_loaded: _load_phase_change_constants()
-    return list_available_methods_from_df_dict(Tb_sources, CASRN, 'Tb')
+    return list_available_methods_from_df_dict(Tb_sources, CASRN, "Tb")
 
 @mark_numba_incompatible
 def Tb(CASRN, method=None):
@@ -361,13 +361,13 @@ def Tb(CASRN, method=None):
        (October 26, 2022): 15449-72. https://doi.org/10.1021/acs.iecr.2c01427.
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Tb')
+        val, found = database_constant_lookup(CASRN, "Tb")
         if found: return val
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
-        return retrieve_from_df_dict(Tb_sources, CASRN, 'Tb', method)
+        return retrieve_from_df_dict(Tb_sources, CASRN, "Tb", method)
     else:
-        return retrieve_any_from_df_dict(Tb_sources, CASRN, 'Tb')
+        return retrieve_any_from_df_dict(Tb_sources, CASRN, "Tb")
 
 ### Melting Point
 
@@ -395,7 +395,7 @@ def Tm_methods(CASRN):
     Tm
     """
     if not _phase_change_const_loaded: _load_phase_change_constants()
-    return list_available_methods_from_df_dict(Tm_sources, CASRN, 'Tm')
+    return list_available_methods_from_df_dict(Tm_sources, CASRN, "Tm")
 
 @mark_numba_incompatible
 def Tm(CASRN, method=None):
@@ -466,19 +466,19 @@ def Tm(CASRN, method=None):
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Tm')
+        val, found = database_constant_lookup(CASRN, "Tm")
         if found: return val
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
-        return retrieve_from_df_dict(Tm_sources, CASRN, 'Tm', method)
+        return retrieve_from_df_dict(Tm_sources, CASRN, "Tm", method)
     else:
-        return retrieve_any_from_df_dict(Tm_sources, CASRN, 'Tm')
+        return retrieve_any_from_df_dict(Tm_sources, CASRN, "Tm")
 
 
 ### Enthalpy of Vaporization at T
 
 def Clapeyron(T, Tc, Pc, dZ=1, Psat=101325):
-    r'''Calculates enthalpy of vaporization at arbitrary temperatures using the
+    r"""Calculates enthalpy of vaporization at arbitrary temperatures using the
     Clapeyron equation.
 
     The enthalpy of vaporization is given by:
@@ -526,7 +526,7 @@ def Clapeyron(T, Tc, Pc, dZ=1, Psat=101325):
     ----------
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
-    '''
+    """
     Tr = T/Tc
     return R*T*dZ*log(Pc/Psat)/(1. - Tr)
 
@@ -1117,7 +1117,7 @@ def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
     return H2
 
 def Watson_n(T1, T2, Hvap1, Hvap2, Tc):
-    r'''Calculates the Watson heat of vaporizaton extrapolation exponent
+    r"""Calculates the Watson heat of vaporizaton extrapolation exponent
     given two known heats of vaporization.
 
     .. math::
@@ -1152,7 +1152,7 @@ def Watson_n(T1, T2, Hvap1, Hvap2, Tc):
     --------
     >>> Watson_n(T1=320, T2=300, Hvap1=42928.990094915454, Hvap2=43908, Tc=647.14)
     0.380000000000
-    '''
+    """
     return log(Hvap1/Hvap2)/log((T1 - Tc)/(T2 - Tc))
 
 ### Enthalpy of Vaporization model equations
@@ -1297,7 +1297,7 @@ def Hfus_methods(CASRN):
     Hfus
     """
     if not _phase_change_const_loaded: _load_phase_change_constants()
-    return list_available_methods_from_df_dict(Hfus_sources, CASRN, 'Hfus')
+    return list_available_methods_from_df_dict(Hfus_sources, CASRN, "Hfus")
 
 @mark_numba_incompatible
 def Hfus(CASRN, method=None):
@@ -1357,12 +1357,12 @@ def Hfus(CASRN, method=None):
        NIST WebBook, NIST, http://doi.org/10.18434/T4M88Q
     '''
     if dr.USE_CONSTANTS_DATABASE and method is None:
-        val, found = database_constant_lookup(CASRN, 'Hfus')
+        val, found = database_constant_lookup(CASRN, "Hfus")
         if found: return val
     if not _phase_change_const_loaded: _load_phase_change_constants()
     if method:
-        return retrieve_from_df_dict(Hfus_sources, CASRN, 'Hfus', method)
+        return retrieve_from_df_dict(Hfus_sources, CASRN, "Hfus", method)
     else:
-        return retrieve_any_from_df_dict(Hfus_sources, CASRN, 'Hfus')
+        return retrieve_any_from_df_dict(Hfus_sources, CASRN, "Hfus")
 
 

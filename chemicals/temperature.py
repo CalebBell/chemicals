@@ -39,17 +39,17 @@ Conversion functions
 from fluids.numerics import implementation_optimize_tck, secant, splev
 
 __all__ = [
-    'ITS90_68_difference',
-    'T_converter',
-    'T_scales',
-    'Ts_27',
-    'Ts_48',
-    'Ts_68',
-    'Ts_76',
-    'diffs_27',
-    'diffs_48',
-    'diffs_68',
-    'diffs_76',
+    "ITS90_68_difference",
+    "T_converter",
+    "T_scales",
+    "Ts_27",
+    "Ts_48",
+    "Ts_68",
+    "Ts_76",
+    "diffs_27",
+    "diffs_48",
+    "diffs_68",
+    "diffs_76",
 ]
 
 """Tabulated values of T68 vs. difference as in [2]_"""
@@ -390,7 +390,7 @@ def ITS90_68_difference(T):
     return dT
 
 
-T_scales = ['ITS-90', 'ITS-68', 'ITS-27', 'ITS-48', 'ITS-76']
+T_scales = ["ITS-90", "ITS-68", "ITS-27", "ITS-48", "ITS-76"]
 
 def range_check(T, Tmin, Tmax, scale):
     if T < Tmin:
@@ -467,35 +467,35 @@ def T_converter(T, current, desired):
        Temperature Scale of 1990 (Technical Report)." Pure and Applied
        Chemistry 64, no. 10 (1992): 1545-1562. doi:10.1351/pac199264101545.
     '''
-    if current == 'ITS-90':
+    if current == "ITS-90":
         pass
-    elif current == 'ITS-68':
-        range_check(T, 13.999, 4300.0001, 'ITS-68')
+    elif current == "ITS-68":
+        range_check(T, 13.999, 4300.0001, "ITS-68")
         T = T68_to_T90(T)
-    elif current == 'ITS-76':
-        range_check(T, 4.9999, 27.0001, 'ITS-76')
+    elif current == "ITS-76":
+        range_check(T, 4.9999, 27.0001, "ITS-76")
         T = T76_to_T90(T)
-    elif current == 'ITS-48':
-        range_check(T, 93.149999, 4273.15001, 'ITS-48')
+    elif current == "ITS-48":
+        range_check(T, 93.149999, 4273.15001, "ITS-48")
         T = T48_to_T90(T)
-    elif current == 'ITS-27':
-        range_check(T, 903.15, 4273.15, 'ITS-27')
+    elif current == "ITS-27":
+        range_check(T, 903.15, 4273.15, "ITS-27")
         T = T27_to_T90(T)
     else:
         raise ValueError(f"Unknown temperature scale: {current}")
-    if desired == 'ITS-90':
+    if desired == "ITS-90":
         pass
-    elif desired == 'ITS-68':
-        range_check(T, 13.999, 4300.0001, 'ITS-68')
+    elif desired == "ITS-68":
+        range_check(T, 13.999, 4300.0001, "ITS-68")
         T = polish_conversion(T, T90_to_T68, T68_to_T90)
-    elif desired == 'ITS-76':
-        range_check(T, 4.9999, 27.0001, 'ITS-76')
+    elif desired == "ITS-76":
+        range_check(T, 4.9999, 27.0001, "ITS-76")
         T = polish_conversion(T, T90_to_T76, T76_to_T90)
-    elif desired == 'ITS-48':
-        range_check(T, 93.149999, 4273.15001, 'ITS-48')
+    elif desired == "ITS-48":
+        range_check(T, 93.149999, 4273.15001, "ITS-48")
         T = polish_conversion(T, T90_to_T48, T48_to_T90)
-    elif desired == 'ITS-27':
-        range_check(T, 903.15, 4273.15, 'ITS-27')
+    elif desired == "ITS-27":
+        range_check(T, 903.15, 4273.15, "ITS-27")
         T = polish_conversion(T, T90_to_T27, T27_to_T90)
     else:
         raise ValueError(f"Unknown temperature scale: {desired}")
