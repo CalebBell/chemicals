@@ -719,8 +719,8 @@ class PiecewiseHeatCapacity:
 
         '''
         if Tb < Ta: return -self.calculate_integral_over_T(Tb, Ta)
-        if Ta < self.Tmin: raise ValueError("no valid model at T=%d K" % Ta)
-        elif Tb > self.Tmax: raise ValueError("no valid model at T=%d K" % Tb)
+        if Ta < self.Tmin: raise ValueError(f"no valid model at T={Ta} K")
+        elif Tb > self.Tmax: raise ValueError(f"no valid model at T={Tb} K")
         return self.force_calculate_integral_over_T(Ta, Tb)
 
     def force_calculate_integral_over_T(self, Ta, Tb):

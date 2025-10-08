@@ -570,7 +570,7 @@ class Element:
     ]
 
     def __repr__(self):
-        return "<Element %s (%s), number %d, MW=%g>" %(self.name, self.symbol, self.number, self.MW)
+        return f"<Element {self.name} ({self.symbol}), number {self.number}, MW={self.MW}>"
 
     def __init__(self, number, symbol, name, MW, CAS, AReneg, rcov, rvdw,
                  maxbonds, elneg, ionization, elaffinity, period, group,
