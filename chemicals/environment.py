@@ -178,19 +178,14 @@ def _load_logP_data():
         miscdata.WIKIDATA: miscdata.wikidata_data
     }
 
-if PY37:
-    def __getattr__(name):
-        if name in ('IPCC_2007_GWPs', 'IPCC_2014_GWPs', 'IPCC_2021_GWPs', 'ODP_data'):
-            _load_GWP_ODP_data()
-            return globals()[name]
-        elif name in ('logP_data_CRC', 'logP_data_Syrres'):
-            _load_logP_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:  # pragma: no cover
-    if can_load_data:
+def __getattr__(name):
+    if name in ('IPCC_2007_GWPs', 'IPCC_2014_GWPs', 'IPCC_2021_GWPs', 'ODP_data'):
         _load_GWP_ODP_data()
+        return globals()[name]
+    elif name in ('logP_data_CRC', 'logP_data_Syrres'):
         _load_logP_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 ### Environmental data functions

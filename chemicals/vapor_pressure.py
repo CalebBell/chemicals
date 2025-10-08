@@ -327,22 +327,18 @@ def load_vapor_pressure_dfs():
 
     _vapor_pressure_dfs_loaded = True
 
-if PY37:
-    def __getattr__(name):
-        if name in ('Psat_data_WagnerMcGarry', 'Psat_values_WagnerMcGarry', 'Psat_data_AntoinePoling',
-                    'Psat_values_AntoinePoling', 'Psat_data_WagnerPoling', 'Psat_values_WagnerPoling',
-                    'Psat_data_AntoineExtended', 'Psat_values_AntoineExtended', 'Psat_data_Perrys2_8',
-                    'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3',
-                    'Psat_data_Alcock_elements', 'Psat_values_Alcock_elements',
-                    'Psub_data_Alcock_elements', 'Psub_values_Alcock_elements',
-                    'Landolt_data_sublimation_Antoine', 'Psub_values_Landolt_Antoine',
-                    'Psat_data_Landolt_Antoine', 'Psat_values_Landolt_Antoine'):
-            load_vapor_pressure_dfs()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('Psat_data_WagnerMcGarry', 'Psat_values_WagnerMcGarry', 'Psat_data_AntoinePoling',
+                'Psat_values_AntoinePoling', 'Psat_data_WagnerPoling', 'Psat_values_WagnerPoling',
+                'Psat_data_AntoineExtended', 'Psat_values_AntoineExtended', 'Psat_data_Perrys2_8',
+                'Psat_values_Perrys2_8', 'Psat_data_VDI_PPDS_3', 'Psat_values_VDI_PPDS_3',
+                'Psat_data_Alcock_elements', 'Psat_values_Alcock_elements',
+                'Psub_data_Alcock_elements', 'Psub_values_Alcock_elements',
+                'Landolt_data_sublimation_Antoine', 'Psub_values_Landolt_Antoine',
+                'Psat_data_Landolt_Antoine', 'Psat_values_Landolt_Antoine'):
         load_vapor_pressure_dfs()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 def TDE_PVExpansion(T, a1, a2, a3, a4=0.0, a5=0.0, a6=0.0, a7=0.0, a8=0.0):

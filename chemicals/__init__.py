@@ -229,21 +229,21 @@ if not fluids.numerics.is_micropython:
             print(f'{name} : {use/1024**2:3f} MB')
         print(f'Total usage: {sum(usages)/1024**2:3f} MB')
 
-    if PY37:
-        def __getattr__(name):
-            global vectorized, numba, units, numba_vectorized
-            if name == 'vectorized':
-                import chemicals.vectorized
-                return chemicals.vectorized
-            if name == 'numba':
-                import chemicals.numba
-                return chemicals.numba
-            if name == 'units':
-                import chemicals.units
-                return chemicals.units
-            if name == 'numba_vectorized':
-                import chemicals.numba_vectorized
-                return chemicals.numba_vectorized
-            raise AttributeError(f"module {__name__} has no attribute {name}")
-    else:
-        pass
+    def __getattr__(name):
+        if name == 'vectorized':
+            import chemicals.vectorized
+            globals()[name] = chemicals.vectorized
+            return chemicals.vectorized
+        if name == 'numba':
+            import chemicals.numba
+            globals()[name] = chemicals.numba
+            return chemicals.numba
+        if name == 'units':
+            import chemicals.units
+            globals()[name] = chemicals.units
+            return chemicals.units
+        if name == 'numba_vectorized':
+            import chemicals.numba_vectorized
+            globals()[name] = chemicals.numba_vectorized
+            return chemicals.numba_vectorized
+        raise AttributeError(f"module {__name__} has no attribute {name}")

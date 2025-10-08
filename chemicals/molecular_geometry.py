@@ -78,19 +78,15 @@ def _load_RG_data():
         PSI4_2022A: linear_data_psi4_2022a,
     }
 
-if PY37:
-    def __getattr__(name):
-        if name in ('radius_of_gyration_data_psi4_2022a',
-                    'radius_of_gyration_data_chemsep',
-                    'linear_data_psi4_2022a',
-                    'RG_sources',
-                    'linear_sources'):
-            _load_RG_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('radius_of_gyration_data_psi4_2022a',
+                'radius_of_gyration_data_chemsep',
+                'linear_data_psi4_2022a',
+                'RG_sources',
+                'linear_sources'):
         _load_RG_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 #  Refractive index functions
 

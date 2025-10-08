@@ -168,18 +168,14 @@ def _load_reaction_data():
         miscdata.WEBBOOK: miscdata.webbook_data,
     }
 
-if PY37:
-    def __getattr__(name):
-        if name in ('Hfg_API_TDB_data', 'Hfg_ATcT_data',
-                    'Hfl_ATcT_data', 'Hfg_S0g_YAWS_data', 'JANAF_1998_data',
-                    'Hfg_sources', 'Hfl_sources', 'Hfs_sources',
-                    'S0g_sources', 'S0l_sources', 'S0s_sources'):
-            _load_reaction_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('Hfg_API_TDB_data', 'Hfg_ATcT_data',
+                'Hfl_ATcT_data', 'Hfg_S0g_YAWS_data', 'JANAF_1998_data',
+                'Hfg_sources', 'Hfl_sources', 'Hfs_sources',
+                'S0g_sources', 'S0l_sources', 'S0s_sources'):
         _load_reaction_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 # %% Lookup functions

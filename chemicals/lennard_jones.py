@@ -133,15 +133,11 @@ def _load_LJ_data():
         POLING: LJ_data_Poling,
     }
 
-if PY37:
-    def __getattr__(name):
-        if name in ('LJ_data_Magalhaes', 'LJ_data_Poling', 'LJ_sources'):
-            _load_LJ_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('LJ_data_Magalhaes', 'LJ_data_Poling', 'LJ_sources'):
         _load_LJ_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 Stockmayer_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN, BSLC,
                           TEEGOTOSTEWARD1, BSLB, BSLM)

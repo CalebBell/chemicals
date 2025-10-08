@@ -905,21 +905,17 @@ def _load_Cp_data():
 
     _Cp_data_loaded = True
 
-if PY37:
-    def __getattr__(name):
-        if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
-                    'Cp_dict_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
-                    'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
-                    'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
-                    'WebBook_Shomate_liquids', 'WebBook_Shomate_gases', 'WebBook_Shomate_solids',
-                    'WebBook_Shomate_coefficients',
-                    'Cp_dict_JANAF_liquid', 'Cp_dict_JANAF_gas', 'Cp_dict_JANAF_solid'):
-            _load_Cp_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('Cp_data_Poling', 'Cp_values_Poling', 'TRC_gas_data', 'TRC_gas_values', 'CRC_standard_data',
+                'Cp_dict_PerryI', 'zabransky_dict_sat_s', 'zabransky_dict_sat_p',
+                'zabransky_dict_const_s', 'zabransky_dict_const_p', 'zabransky_dict_iso_s',
+                'zabransky_dict_iso_p', 'type_to_zabransky_dict', 'zabransky_dicts',
+                'WebBook_Shomate_liquids', 'WebBook_Shomate_gases', 'WebBook_Shomate_solids',
+                'WebBook_Shomate_coefficients',
+                'Cp_dict_JANAF_liquid', 'Cp_dict_JANAF_gas', 'Cp_dict_JANAF_solid'):
         _load_Cp_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 

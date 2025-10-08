@@ -182,19 +182,15 @@ def load_interface_dfs():
     sigma_data_VDI_PPDS_11 = data_source('VDI PPDS surface tensions.tsv')
     sigma_values_VDI_PPDS_11 = np.array(sigma_data_VDI_PPDS_11.values[:, 1:], dtype=float)
 
-if PY37:
-    def __getattr__(name):
-        if name in ('sigma_data_Mulero_Cachadina', 'sigma_values_Mulero_Cachadina',
-                    'sigma_data_Jasper_Lange', 'sigma_values_Jasper_Lange',
-                    'sigma_data_Somayajulu', 'sigma_values_Somayajulu', 'sigma_data_Somayajulu2',
-                    'sigma_values_Somayajulu2', 'sigma_data_VDI_PPDS_11', 'sigma_values_VDI_PPDS_11'
-                    ):
-            load_interface_dfs()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('sigma_data_Mulero_Cachadina', 'sigma_values_Mulero_Cachadina',
+                'sigma_data_Jasper_Lange', 'sigma_values_Jasper_Lange',
+                'sigma_data_Somayajulu', 'sigma_values_Somayajulu', 'sigma_data_Somayajulu2',
+                'sigma_values_Somayajulu2', 'sigma_data_VDI_PPDS_11', 'sigma_values_VDI_PPDS_11'
+                ):
         load_interface_dfs()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 

@@ -1299,15 +1299,10 @@ def load_mixture_composition():
     mixture_composition_loaded = True
 
 
-if PY37:
-    def __getattr__(name):
-        if name == 'pubchem_db':
-            return get_pubchem_db()
-        elif name in ('common_mixtures', 'common_mixtures_by_synonym'):
-            load_mixture_composition()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")  # pragma: no cover
-else:  # pragma: no cover
-    if can_load_data:
-        get_pubchem_db()
+def __getattr__(name):
+    if name == 'pubchem_db':
+        return get_pubchem_db()
+    elif name in ('common_mixtures', 'common_mixtures_by_synonym'):
         load_mixture_composition()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")  # pragma: no cover

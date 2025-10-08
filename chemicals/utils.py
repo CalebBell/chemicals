@@ -88,7 +88,7 @@ else:
 can_load_data = True
 try:
     implementation = sys.implementation.name
-    if implementation  in ('micropython', 'ironpython'):
+    if implementation  in ('micropython', ):
         can_load_data = False
 except:
     pass

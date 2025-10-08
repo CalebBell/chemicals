@@ -223,22 +223,18 @@ def _load_critical_data():
         ACENTRIC_DEFINITION: critical_data_omega_Psat_Tc
     }
 
-if PY37:
-    def __getattr__(name):
-        if name in ('critical_data_IUPAC', 'critical_data_Matthews',
-                    'critical_data_CRC', 'critical_data_PSRKR4',
-                    'critical_data_Yaws', 'critical_data_PassutDanner',
-                    'critical_data_PinaMartines',
-                    'critical_data_WilsonJasperson', 'critical_data_Fedors',
-                    'critical_data_omega_Psat_Tc',
-                    'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
-                    'omega_sources'):
-            _load_critical_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else: # pragma: no cover
-    if can_load_data:
+def __getattr__(name):
+    if name in ('critical_data_IUPAC', 'critical_data_Matthews',
+                'critical_data_CRC', 'critical_data_PSRKR4',
+                'critical_data_Yaws', 'critical_data_PassutDanner',
+                'critical_data_PinaMartines',
+                'critical_data_WilsonJasperson', 'critical_data_Fedors',
+                'critical_data_omega_Psat_Tc',
+                'Tc_sources', 'Pc_sources', 'Vc_sources', 'Zc_sources',
+                'omega_sources'):
         _load_critical_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 ### Critical point functions
 

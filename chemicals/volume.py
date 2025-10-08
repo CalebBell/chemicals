@@ -235,20 +235,16 @@ def _load_rho_data():
     rho_data_CRC_virial = data_source('CRC Virial polynomials.tsv')
     rho_values_CRC_virial = np.array(rho_data_CRC_virial.values[:, 1:], dtype=float)
 
-if PY37:
-    def __getattr__(name):
-        if name in ('rho_data_COSTALD', 'rho_data_SNM0', 'rho_data_Perry_8E_105_l',
-                    'rho_values_Perry_8E_105_l', 'rho_data_VDI_PPDS_2',
-                    'rho_values_VDI_PPDS_2', 'rho_data_CRC_inorg_l',
-                    'rho_values_CRC_inorg_l', 'rho_data_CRC_inorg_l_const',
-                    'rho_data_CRC_inorg_s_const', 'rho_data_CRC_virial',
-                    'rho_values_CRC_virial'):
-            _load_rho_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('rho_data_COSTALD', 'rho_data_SNM0', 'rho_data_Perry_8E_105_l',
+                'rho_values_Perry_8E_105_l', 'rho_data_VDI_PPDS_2',
+                'rho_values_VDI_PPDS_2', 'rho_data_CRC_inorg_l',
+                'rho_values_CRC_inorg_l', 'rho_data_CRC_inorg_l_const',
+                'rho_data_CRC_inorg_s_const', 'rho_data_CRC_virial',
+                'rho_values_CRC_virial'):
         _load_rho_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 def volume_VDI_PPDS(T, Tc, rhoc, a, b, c, d, MW=None):
     r'''Calculates saturation liquid volume, using the critical properties

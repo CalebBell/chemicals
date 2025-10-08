@@ -93,15 +93,11 @@ def _load_RI_data():
         miscdata.WIKIDATA: miscdata.wikidata_data
     }
 
-if PY37:
-    def __getattr__(name):
-        if name in ('RI_data_CRC_organic', 'RI_sources'):
-            _load_RI_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('RI_data_CRC_organic', 'RI_sources'):
         _load_RI_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 #  Refractive index functions
 

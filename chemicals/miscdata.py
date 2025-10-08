@@ -129,21 +129,16 @@ def _load_miscdata():
     common_chemistry_data = data_source('common_chemistry_data.tsv')
     _miscdata_loaded = True
 
-if PY37:
-    def __getattr__(name):
-        if name in ('CRC_inorganic_data', 'CRC_organic_data', 'heos_data',
-                    'joback_predictions', 'wikidata_data', 'webbook_data',
-                    'common_chemistry_data'):
-            _load_miscdata()
-            return globals()[name]
-        elif name == 'VDI_saturation_dict':
-            _load_VDI_saturation_dict()
-            return VDI_saturation_dict
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('CRC_inorganic_data', 'CRC_organic_data', 'heos_data',
+                'joback_predictions', 'wikidata_data', 'webbook_data',
+                'common_chemistry_data'):
         _load_miscdata()
+        return globals()[name]
+    elif name == 'VDI_saturation_dict':
         _load_VDI_saturation_dict()
+        return VDI_saturation_dict
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 @mark_numba_incompatible

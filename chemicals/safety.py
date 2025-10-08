@@ -290,16 +290,12 @@ def _load_safety_data():
     UFL_sources = Tautoignition_sources.copy()
     _safety_data_loaded = True
 
-if PY37:
-    def __getattr__(name):
-        if name in ('Ontario_exposure_limits_dict', 'NFPA_2008_data', 'IEC_2010_data',
-                    'DIPPR_SERAT_data'):
-            _load_safety_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else: # pragma: no cover
-    if can_load_data:
+def __getattr__(name):
+    if name in ('Ontario_exposure_limits_dict', 'NFPA_2008_data', 'IEC_2010_data',
+                'DIPPR_SERAT_data'):
         _load_safety_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 # # Used to read Ontario Expore Limits data from original file (DO NOT DELETE!)
 # Ontario_exposure_limits_dict = {}

@@ -169,17 +169,13 @@ def _load_k_data():
     k_data_VDI_PPDS_10 = data_source('VDI PPDS Thermal conductivity of gases.tsv')
     k_values_VDI_PPDS_10 = np.array(k_data_VDI_PPDS_10.values[:, 1:], dtype=float)
 
-if PY37:
-    def __getattr__(name):
-        if name in ('k_data_Perrys_8E_2_314', 'k_values_Perrys_8E_2_314', 'k_data_Perrys_8E_2_315',
-                    'k_values_Perrys_8E_2_315', 'k_data_VDI_PPDS_9', 'k_values_VDI_PPDS_9', 'k_data_VDI_PPDS_10',
-                    'k_values_VDI_PPDS_10'):
-            _load_k_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('k_data_Perrys_8E_2_314', 'k_values_Perrys_8E_2_314', 'k_data_Perrys_8E_2_315',
+                'k_values_Perrys_8E_2_315', 'k_data_VDI_PPDS_9', 'k_values_VDI_PPDS_9', 'k_data_VDI_PPDS_10',
+                'k_values_VDI_PPDS_10'):
         _load_k_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 pi_inv = 1.0/pi # TODO move to fluids.constants
 

@@ -115,16 +115,12 @@ def _load_solubility_data():
     }
     _solubility_data_loaded = True
 
-if PY37:
-    def __getattr__(name):
-        if name in ('alsheri_hansen_data', 'hspipy_data', 'wdr_schrier_data', 'manuel_ruben_2022_data', 'solubility_sources'):
-            if not _solubility_data_loaded:
-                _load_solubility_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
-        _load_solubility_data()
+def __getattr__(name):
+    if name in ('alsheri_hansen_data', 'hspipy_data', 'wdr_schrier_data', 'manuel_ruben_2022_data', 'solubility_sources'):
+        if not _solubility_data_loaded:
+            _load_solubility_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 @mark_numba_incompatible

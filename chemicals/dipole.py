@@ -79,15 +79,11 @@ def _load_dipole_data():
         PSI4_2022A: dipole_data_psi4_2022a,
     }
 
-if PY37:
-    def __getattr__(name):
-        if name in ('dipole_data_Poling', 'dipole_data_CCDB', 'dipole_data_Muller', 'dipole_data_psi4_2022a'):
-            _load_dipole_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else: # pragma: no cover
-    if can_load_data:
+def __getattr__(name):
+    if name in ('dipole_data_Poling', 'dipole_data_CCDB', 'dipole_data_Muller', 'dipole_data_psi4_2022a'):
         _load_dipole_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 # %% Dipole moment functions
 

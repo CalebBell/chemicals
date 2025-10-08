@@ -248,19 +248,15 @@ def _load_mu_data():
 
     _mu_data_loaded = True
 
-if PY37:
-    def __getattr__(name):
-        if name in ('mu_data_Dutt_Prasad', 'mu_values_Dutt_Prasad', 'mu_data_VN3',
-                    'mu_values_VN3', 'mu_data_VN2', 'mu_values_VN2', 'mu_data_VN2E',
-                    'mu_values_VN2E', 'mu_data_Perrys_8E_2_313', 'mu_values_Perrys_8E_2_313',
-                    'mu_data_Perrys_8E_2_312', 'mu_values_Perrys_8E_2_312', 'mu_data_VDI_PPDS_7',
-                    'mu_values_PPDS_7', 'mu_data_VDI_PPDS_8', 'mu_values_PPDS_8'):
-            _load_mu_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('mu_data_Dutt_Prasad', 'mu_values_Dutt_Prasad', 'mu_data_VN3',
+                'mu_values_VN3', 'mu_data_VN2', 'mu_values_VN2', 'mu_data_VN2E',
+                'mu_values_VN2E', 'mu_data_Perrys_8E_2_313', 'mu_values_Perrys_8E_2_313',
+                'mu_data_Perrys_8E_2_312', 'mu_values_Perrys_8E_2_312', 'mu_data_VDI_PPDS_7',
+                'mu_values_PPDS_7', 'mu_data_VDI_PPDS_8', 'mu_values_PPDS_8'):
         _load_mu_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 

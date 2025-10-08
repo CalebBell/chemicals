@@ -226,25 +226,20 @@ def _load_phase_change_correlations():
     phase_change_data_Alibakhshi_Cs = data_source('Alibakhshi one-coefficient enthalpy of vaporization.tsv')
     _phase_change_corrs_loaded = True
 
-if PY37:
-    def __getattr__(name):
-        if name in ('Tb_data_Yaws', 'Tm_ON_data', 'Hvap_data_Gharagheizi',
-                    'Hvap_data_CRC', 'Hfus_data_CRC', 'Hsub_data_Gharagheizi',
-                    'Tb_sources', 'Tm_sources', 'Hfus_sources'):
-            _load_phase_change_constants()
-            return globals()[name]
-        elif name in ('phase_change_data_Perrys2_150',
-                      'phase_change_values_Perrys2_150',
-                      'phase_change_data_VDI_PPDS_4',
-                      'phase_change_values_VDI_PPDS_4',
-                      'phase_change_data_Alibakhshi_Cs'):
-            _load_phase_change_correlations()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('Tb_data_Yaws', 'Tm_ON_data', 'Hvap_data_Gharagheizi',
+                'Hvap_data_CRC', 'Hfus_data_CRC', 'Hsub_data_Gharagheizi',
+                'Tb_sources', 'Tm_sources', 'Hfus_sources'):
         _load_phase_change_constants()
+        return globals()[name]
+    elif name in ('phase_change_data_Perrys2_150',
+                  'phase_change_values_Perrys2_150',
+                  'phase_change_data_VDI_PPDS_4',
+                  'phase_change_values_VDI_PPDS_4',
+                  'phase_change_data_Alibakhshi_Cs'):
         _load_phase_change_correlations()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 ### Phase change functions
 

@@ -158,22 +158,18 @@ def _load_combustion_data():
         DAHMEN_MARQUARDT: dahmen_marquardt_iqt,
     }
 
-if PY37:
-    def __getattr__(name):
-        if name in ('florian_liming_ron_experimental',
-                    'florian_liming_ron_mon_ann',
-                    'combustdb_ron',
-                    'combustdb_predictions',
-                    'dahmen_marquardt_iqt'
-                    'RON_sources',
-                    'MON_sources',
-                    'ignition_delay_sources'):
-            _load_combustion_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('florian_liming_ron_experimental',
+                'florian_liming_ron_mon_ann',
+                'combustdb_ron',
+                'combustdb_predictions',
+                'dahmen_marquardt_iqt'
+                'RON_sources',
+                'MON_sources',
+                'ignition_delay_sources'):
         _load_combustion_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 
 RON_all_methods = (FLORIAN_LIMING, COMBUSTDB, FLORIAN_LIMING_ANN, COMBUSTDB_PREDICTIONS)

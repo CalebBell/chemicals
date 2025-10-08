@@ -77,15 +77,11 @@ def _load_triple_data():
     }
     Pt_sources = Tt_sources.copy()
 
-if PY37:
-    def __getattr__(name):
-        if name in ('triple_data_Staveley', 'Tt_sources', 'Pt_sources'):
-            _load_triple_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('triple_data_Staveley', 'Tt_sources', 'Pt_sources'):
         _load_triple_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 Tt_all_methods = (miscdata.HEOS, STAVELEY, miscdata.WEBBOOK, MELTING)
 """Tuple of method name keys. See the `Tt` for the actual references"""

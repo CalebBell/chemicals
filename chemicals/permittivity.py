@@ -74,15 +74,11 @@ def _load_permittivity_data():
     permittivity_data_CRC = data_source('Permittivity (Dielectric Constant) of Liquids.tsv')
     permittivity_values_CRC = np.array(permittivity_data_CRC.values[:, 1:], dtype=float)
 
-if PY37:
-    def __getattr__(name):
-        if name in ('permittivity_values_CRC', 'permittivity_data_CRC'):
-            _load_permittivity_data()
-            return globals()[name]
-        raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
-    if can_load_data:
+def __getattr__(name):
+    if name in ('permittivity_values_CRC', 'permittivity_data_CRC'):
         _load_permittivity_data()
+        return globals()[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
 
 def permittivity_CRC(T, a, b, c, d):
     r"""
