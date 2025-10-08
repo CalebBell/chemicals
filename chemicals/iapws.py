@@ -390,7 +390,8 @@ def iapws97_boundary_2_3(T):
 ### IAPWS 07 Region 3 P boundaries
 
 def iapws97_boundary_2_3_reverse(P):
-    """
+    """Calculate boundary temperature between regions 2 and 3.
+
     >>> iapws97_boundary_2_3_reverse(16529164.2526216)
     623.15000000000
     """
@@ -398,7 +399,8 @@ def iapws97_boundary_2_3_reverse(P):
             + 572.54459862744727161)
 
 def iapws97_boundary_3uv(P):
-    """
+    """Calculate boundary temperature between regions 3u and 3v.
+
     >>> iapws97_boundary_3uv(22.3E6)
     647.7996121480069
     """
@@ -409,7 +411,8 @@ def iapws97_boundary_3uv(P):
 #    return T
 
 def iapws97_boundary_3ef(P):
-    """
+    """Calculate boundary temperature between regions 3e and 3f.
+
     >>> iapws97_boundary_3ef(40E6)
     713.959399239744
     """
@@ -419,7 +422,8 @@ def iapws97_boundary_3ef(P):
 #    return T
 
 def iapws97_boundary_3cd(P):
-    """
+    """Calculate boundary temperature between regions 3c and 3d.
+
     >>> iapws97_boundary_3cd(25E6)
     649.3659208321279
     """
@@ -430,7 +434,8 @@ def iapws97_boundary_3cd(P):
 #    return T
 
 def iapws97_boundary_3gh(P):
-    """
+    """Calculate boundary temperature between regions 3g and 3h.
+
     >>> iapws97_boundary_3gh(25E6)
     656.69805722612
     """
@@ -441,7 +446,8 @@ def iapws97_boundary_3gh(P):
 #    return T
 
 def iapws97_boundary_3ij(P):
-    """
+    """Calculate boundary temperature between regions 3i and 3j.
+
     >>> iapws97_boundary_3ij(25E6)
     660.7865756716819
     """
@@ -452,7 +458,8 @@ def iapws97_boundary_3ij(P):
 #    return T
 
 def iapws97_boundary_3jk(P):
-    """
+    """Calculate boundary temperature between regions 3j and 3k.
+
     >>> iapws97_boundary_3jk(25E6)
     668.1915358826951
     """
@@ -463,7 +470,8 @@ def iapws97_boundary_3jk(P):
 #    return T
 
 def iapws97_boundary_3mn(P):
-    """
+    """Calculate boundary temperature between regions 3m and 3n.
+
     >>> iapws97_boundary_3mn(22.8E6)
     649.6054132953997
     """
@@ -474,7 +482,8 @@ def iapws97_boundary_3mn(P):
 #    return T
 
 def iapws97_boundary_3qu(P):
-    """
+    """Calculate boundary temperature between regions 3q and 3u.
+
     >>> iapws97_boundary_3qu(22E6)
     645.6355027340121
     """
@@ -485,7 +494,8 @@ def iapws97_boundary_3qu(P):
 #    return T
 
 def iapws97_boundary_3rx(P):
-    """
+    """Calculate boundary temperature between regions 3r and 3x.
+
     >>> iapws97_boundary_3rx(22E6)
     648.26227536701
     """
@@ -497,7 +507,8 @@ def iapws97_boundary_3rx(P):
 
 ### IAPWS 07 Region 3 log P boundaries
 def iapws97_boundary_3wx(logP_MPa, logP_MPa_inv):
-    """
+    """Calculate boundary temperature between regions 3w and 3x.
+
     >>> iapws97_boundary_3wx(log(22.3), 1/log(22.3))
     648.204947950734
     """
@@ -508,7 +519,8 @@ def iapws97_boundary_3wx(logP_MPa, logP_MPa_inv):
 #    return T
 
 def iapws97_boundary_3ab(logP_MPa, logP_MPa_inv):
-    """
+    """Calculate boundary temperature between regions 3a and 3b.
+
     >>> iapws97_boundary_3ab(log(40), 1/log(40))
     693.0341408296053
     """
@@ -518,7 +530,8 @@ def iapws97_boundary_3ab(logP_MPa, logP_MPa_inv):
 #    return T
 
 def iapws97_boundary_3op(logP_MPa, logP_MPa_inv):
-    """
+    """Calculate boundary temperature between regions 3o and 3p.
+
     >>> iapws97_boundary_3op(log(22.8), 1/log(22.8))
     650.010694314133
     """
