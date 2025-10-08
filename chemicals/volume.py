@@ -190,7 +190,7 @@ from fluids.constants import R, root_two
 from fluids.numerics import exp, implementation_optimize_tck, log, np, splev, sqrt
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, mixing_simple, os_path_join, source_path
+from chemicals.utils import mark_numba_incompatible, mixing_simple, os_path_join, source_path
 
 folder = os_path_join(source_path, 'Density')
 

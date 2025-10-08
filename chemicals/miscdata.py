@@ -39,7 +39,7 @@ __all__ = ['lookup_VDI_tabular_data']
 import os
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 ### Register data sources and lazy load them
 

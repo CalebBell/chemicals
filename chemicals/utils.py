@@ -68,11 +68,6 @@ from fluids.constants import N_A, R
 from fluids.numerics import numpy as np
 from fluids.numerics import trunc_log, trunc_exp, cbrt
 
-__all__.extend(['PY37'])
-version_components = sys.version.split('.')
-PY_MAJOR, PY_MINOR = int(version_components[0]), int(version_components[1])
-PY37 = (PY_MAJOR, PY_MINOR) >= (3, 7)
-
 try:
     source_path = os.path.dirname(__file__) # micropython
 except:
@@ -84,14 +79,6 @@ if os.name == 'nt':
 else:
     def os_path_join(*args):
         return '/'.join(args)
-
-can_load_data = True
-try:
-    implementation = sys.implementation.name
-    if implementation  in ('micropython', ):
-        can_load_data = False
-except:
-    pass
 
 numba_blacklisted = ['mark_numba_incompatible', 'mark_numba_uncacheable']
 numba_cache_blacklisted = []

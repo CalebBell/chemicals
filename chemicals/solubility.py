@@ -79,7 +79,7 @@ from chemicals.data_reader import (
     retrieve_any_from_df_dict,
     retrieve_from_df_dict,
 )
-from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 folder = os_path_join(source_path, 'Misc')
 register_df_source(folder, 'alshehri_hansen_solubility_parameters.tsv')

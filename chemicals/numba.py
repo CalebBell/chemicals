@@ -18,7 +18,7 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import fluids as normal_fluids
 
-from chemicals.utils import PY37, numba_blacklisted, numba_cache_blacklisted
+from chemicals.utils import numba_blacklisted, numba_cache_blacklisted
 
 busy = False
 __all__ = []
@@ -153,16 +153,13 @@ def transform():
     gdct['__file__'] = orig_file
     del gdct['transform']
 
-if PY37:
-    def __getattr__(name):
-        if name == '__path__' or busy:
-            raise AttributeError(f"module {__name__} has no attribute {name}")
-        gdct = globals()
-        gdct['busy'] = True
-        transform()
-        del gdct['__getattr__'], gdct['busy']
-        try: return gdct[name]
-        except KeyError:
-            raise AttributeError(f"module {__name__} has no attribute {name}")
-else:
+def __getattr__(name):
+    if name == '__path__' or busy:
+        raise AttributeError(f"module {__name__} has no attribute {name}")
+    gdct = globals()
+    gdct['busy'] = True
     transform()
+    del gdct['__getattr__'], gdct['busy']
+    try: return gdct[name]
+    except KeyError:
+        raise AttributeError(f"module {__name__} has no attribute {name}")

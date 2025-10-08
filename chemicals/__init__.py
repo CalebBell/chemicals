@@ -92,7 +92,6 @@ if not fluids.numerics.is_micropython:
     from .thermal_conductivity import *  # noqa: F403
     from .triple import *  # noqa: F403
     from .utils import *  # noqa: F403
-    from .utils import PY37
     from .vapor_pressure import *  # noqa: F403
     from .virial import *  # noqa: F403
     from .viscosity import *  # noqa: F403

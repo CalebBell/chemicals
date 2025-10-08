@@ -207,7 +207,7 @@ from fluids.numerics import brenth, exp, log, polylog2, secant
 from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
-from chemicals.utils import PY37, can_load_data, mark_numba_uncacheable, os_path_join, source_path, to_num
+from chemicals.utils import mark_numba_uncacheable, os_path_join, source_path, to_num
 
 ### Methods introduced in this module
 

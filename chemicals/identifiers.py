@@ -71,7 +71,7 @@ __all__ = ['check_CAS', 'CAS_from_any', 'MW', 'search_chemical',
 import os
 
 from chemicals.elements import charge_from_formula, homonuclear_elements_CASs_set, periodic_table, serialize_formula, nested_formula_parser
-from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path, to_num
+from chemicals.utils import mark_numba_incompatible, os_path_join, source_path, to_num
 
 folder = os_path_join(source_path, 'Identifiers')
 

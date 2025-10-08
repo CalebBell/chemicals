@@ -85,7 +85,7 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
-from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, property_mass_to_molar, property_molar_to_mass, source_path
+from chemicals.utils import mark_numba_incompatible, os_path_join, property_mass_to_molar, property_molar_to_mass, source_path
 
 __all__ = ('combustion_stoichiometry',
            'CombustionData',

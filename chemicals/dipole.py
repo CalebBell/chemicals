@@ -48,7 +48,7 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.miscdata import PSI4_2022A
-from chemicals.utils import PY37, can_load_data, mark_numba_incompatible, os_path_join, source_path
+from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 # %% Register data sources and lazy load them
 
