@@ -225,10 +225,9 @@ register_df_source(folder, "CRC Virial polynomials.tsv", csv_kwargs={
         "dtype":{"a1": float, "a2": float, "a3": float, "a4": float, "a5": float}})
 
 
-_rho_data_loaded = False
 @mark_numba_incompatible
 def _load_rho_data():
-    global _rho_data_loaded, rho_data_COSTALD, rho_data_SNM0
+    global rho_data_COSTALD, rho_data_SNM0
     global rho_data_Perry_8E_105_l, rho_values_Perry_8E_105_l
     global rho_data_VDI_PPDS_2, rho_values_VDI_PPDS_2
     global rho_data_CRC_inorg_l, rho_values_CRC_inorg_l

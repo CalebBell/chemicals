@@ -175,10 +175,9 @@ register_df_source(folder, "Table 2-315 Thermal Conductivity of Inorganic and Or
 register_df_source(folder, "VDI PPDS Thermal conductivity of saturated liquids.tsv", csv_kwargs={"float_precision": "legacy"})
 register_df_source(folder, "VDI PPDS Thermal conductivity of gases.tsv", csv_kwargs={"float_precision": "legacy"})
 
-_k_data_loaded = False
 @mark_numba_incompatible
 def _load_k_data():
-    global _k_data_loaded, k_data_Perrys_8E_2_314, k_values_Perrys_8E_2_314
+    global k_data_Perrys_8E_2_314, k_values_Perrys_8E_2_314
     global k_data_Perrys_8E_2_315, k_values_Perrys_8E_2_315, k_data_VDI_PPDS_9
     global k_values_VDI_PPDS_9, k_data_VDI_PPDS_10, k_values_VDI_PPDS_10
 

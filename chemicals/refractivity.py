@@ -100,6 +100,7 @@ def _load_RI_data():
         CRC: RI_data_CRC_organic,
         miscdata.WIKIDATA: miscdata.wikidata_data
     }
+    _RI_data_loaded = True
 
 def __getattr__(name):
     if name in ("RI_data_CRC_organic", "RI_sources"):

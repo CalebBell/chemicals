@@ -348,7 +348,7 @@ def _Rachford_Rice_polynomial_coeff(value, zs, Cs, N):
 
 
 def Rachford_Rice_polynomial(zs, Ks):
-    r'''Transforms the Rachford-Rice equation into a polynomial and returns
+    r"""Transforms the Rachford-Rice equation into a polynomial and returns
     its coefficients.
     A spelled-out solution is used for N from 2 to 5, derived with SymPy and
     optimized with the common sub expression approach.
@@ -431,7 +431,7 @@ def Rachford_Rice_polynomial(zs, Ks):
        Multicomponent Mixtures." Chemical Engineering Science 56, no. 20
        (October 1, 2001): 5865-68.
        https://doi.org/10.1016/S0009-2509(01)00267-6.
-    '''
+    """
     N = len(zs)
     Cs = [0.0]*N
     for i in range(N):
@@ -486,7 +486,7 @@ def err_and_der_RR_poly(VF, poly):
 
 @mark_numba_uncacheable
 def Rachford_Rice_solution_polynomial(zs, Ks):
-    r'''Solves the Rachford-Rice equation by transforming it into a polynomial,
+    r"""Solves the Rachford-Rice equation by transforming it into a polynomial,
     and then either analytically calculating the roots, or, using the known
     range the correct root is in, numerically solving for the correct
     polynomial root. The analytical solutions are used for N from 2 to 4.
@@ -556,7 +556,7 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
        doi:10.1016/j.fluid.2011.12.005.
     .. [3] Warren, John H. "Explicit Determination of the Vapor Fraction in
        Flash Calculations." Pennsylvania State University, 1991.
-    '''
+    """
     N = len(zs)
     if N > 30: # numba: delete
         raise ValueError("Unlikely to solve") # numba: delete
@@ -642,7 +642,7 @@ def Rachford_Rice_solution_polynomial(zs, Ks):
 
 
 def Rachford_Rice_flash_error(V_over_F, zs, Ks):
-    r'''Calculates the objective function of the Rachford-Rice flash equation.
+    r"""Calculates the objective function of the Rachford-Rice flash equation.
     This function should be called by a solver seeking a solution to a flash
     calculation. The unknown variable is `V_over_F`, for which a solution
     must be between 0 and 1.
@@ -698,7 +698,7 @@ def Rachford_Rice_flash_error(V_over_F, zs, Ks):
        Digital Computers in Calculating Flash Vaporization Hydrocarbon
        Equilibrium." Journal of Petroleum Technology 4, no. 10 (October 1,
        1952): 19-3. doi:10.2118/952327-G.
-    '''
+    """
     err = 0.0
     for i in range(len(zs)):
         err += zs[i]*(Ks[i] - 1.0)/(1.0 + V_over_F*(Ks[i] - 1.0))
@@ -735,7 +735,7 @@ def Rachford_Rice_err(V_over_F, zs_k_minus_1, K_minus_1):
 
 @mark_numba_uncacheable
 def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
-    r'''Solves the objective function of the Rachford-Rice flash equation [1]_.
+    r"""Solves the objective function of the Rachford-Rice flash equation [1]_.
     Uses the method proposed in [2]_ to obtain an initial guess.
 
     .. math::
@@ -825,7 +825,7 @@ def Rachford_Rice_solution(zs, Ks, fprime=False, fprime2=False, guess=None):
        Fluid Phase Equilibria, Proceedings of the Fifth International
        Conference, 53 (December 1, 1989): 51-71.
        doi:10.1016/0378-3812(89)80072-X.
-    '''
+    """
     N = len(Ks)
 
     Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
@@ -1037,7 +1037,7 @@ def Rachford_Rice_err_fprime_Leibovici_Neoschil(V_over_F, zs_k_minus_1, zs_k_min
 
 @mark_numba_uncacheable
 def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
-    r'''Solves the objective function of the Rachford-Rice flash equation as
+    r"""Solves the objective function of the Rachford-Rice flash equation as
     modified by Leibovici and Neoschil. This modification helps
     convergence near the vapor fraction boundaries only; it slows
     convergence in other regions.
@@ -1093,7 +1093,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
     .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the
        Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992):
        303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
-    '''
+    """
     N = len(Ks)
     Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
     for i in range(N):
@@ -1189,7 +1189,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil(zs, Ks, guess=None):
 
 @mark_numba_uncacheable
 def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
-    r'''Solves the objective function of the Rachford-Rice flash equation as
+    r"""Solves the objective function of the Rachford-Rice flash equation as
     modified by Leibovici and Neoschil, using double-double precision math
     for maximum accuracy. For most cases, this function will return
     bit-for-bit accurate results; but there are pathological inputs where
@@ -1246,7 +1246,7 @@ def Rachford_Rice_solution_Leibovici_Neoschil_dd(zs, Ks, guess=None):
     .. [1] Leibovici, ClaudeF., and Jean Neoschil. "A New Look at the
        Rachford-Rice Equation." Fluid Phase Equilibria 74 (July 15, 1992):
        303-8. https://doi.org/10.1016/0378-3812(92)85069-K.
-    '''
+    """
     N = len(Ks)
     if N == 2:
         return Rachford_Rice_solution_binary_dd(zs, Ks)
@@ -1671,7 +1671,7 @@ def Rachford_Rice_err_LN2(y, zs, cis_ys, x0, V_over_F_min, N):
 
 @mark_numba_uncacheable
 def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
-    r'''Solves the a objective function for the Rachford-Rice flash equation
+    r"""Solves the a objective function for the Rachford-Rice flash equation
     according to the Leibovici and Nichita (2010) transformation (method 2).
     This transformation makes the only zero of the function be the desired one.
     Consequently, higher-order methods may be used to solve this equation.
@@ -1758,7 +1758,7 @@ def Rachford_Rice_solution_LN2(zs, Ks, guess=None):
     .. [3] Billingsley, D. S. "Iterative Solution for ∑iaiλ-ci Equations."
        Computers & Chemical Engineering 26, no. 3 (March 15, 2002): 457-60.
        https://doi.org/10.1016/S0098-1354(01)00767-0.
-    '''
+    """
     N = len(Ks)
     Kmin, Kmax, z_of_Kmax = 1e300, -1e300, 1e300
     for i in range(N):
@@ -1866,7 +1866,7 @@ def LJA_fprime2(v, t1, terms_2, terms_3, N2):
 
 @mark_numba_uncacheable
 def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
-    r'''Solves the objective function of the Li-Johns-Ahmadi flash equation.
+    r"""Solves the objective function of the Li-Johns-Ahmadi flash equation.
     Uses the method proposed in [1]_ to obtain an initial guess.
 
     .. math::
@@ -1922,7 +1922,7 @@ def Li_Johns_Ahmadi_solution(zs, Ks, guess=None):
        Alternative to Rachford-Rice in Flash Calculations." Fluid Phase
        Equilibria 316 (February 25, 2012): 85-97.
        doi:10.1016/j.fluid.2011.12.005.
-    '''
+    """
     # Re-order both Ks and Zs by K value, higher coming first
     p = sorted(zip(Ks,zs), reverse=True) # numba: delete
     Ks_sorted, zs_sorted = [K for (K,z) in p], [z for (K,z) in p] # numba: delete
@@ -2438,7 +2438,7 @@ def Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=False):
 
 @mark_numba_uncacheable
 def Rachford_Rice_solutionN(ns, Ks, betas):
-    r'''Solves the (phases -1) objectives functions of the Rachford-Rice flash
+    r"""Solves the (phases -1) objectives functions of the Rachford-Rice flash
     equation for an N-phase system. Initial guesses are required for all phase
     fractions except the last. The Newton method is used, with an
     analytical Jacobian.
@@ -2486,7 +2486,7 @@ def Rachford_Rice_solutionN(ns, Ks, betas):
     .. [1] Gao, Ran, Xiaolong Yin, and Zhiping Li. "Hybrid Newton-Successive
        Substitution Method for Multiphase Rachford-Rice Equations." Entropy 20,
        no. 6 (June 2018): 452. https://doi.org/10.3390/e20060452.
-    '''
+    """
     limit_betas = False
     if not Rachford_Rice_valid_solution_naive(ns, betas, Ks, limit_betas=limit_betas):
         raise ValueError("Initial guesses will not lead to convergence")
@@ -2615,7 +2615,7 @@ def RRN_new_betas(betas, d_betas, damping, ns, Ks, *args):
 
 @mark_numba_uncacheable
 def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
-    r'''Solves the two objective functions of the Rachford-Rice flash equation
+    r"""Solves the two objective functions of the Rachford-Rice flash equation
     for a three-phase system. Initial guesses are required for both phase
     fractions, `beta_y` and `beta_z`. The Newton method is used, with an
     analytical Jacobian.
@@ -2717,7 +2717,7 @@ def Rachford_Rice_solution2(ns, Ks_y, Ks_z, beta_y=0.5, beta_z=1e-6):
        Rachford-Rice Equations for Multiphase Systems." Fluid Phase Equilibria
        112, no. 2 (December 1, 1995): 217-21.
        https://doi.org/10.1016/0378-3812(95)02797-I.
-    '''
+    """
     limit_betas = False
 
     Ks = [Ks_y, Ks_z] # numba: delete
