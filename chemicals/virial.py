@@ -109,10 +109,9 @@ Third Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.CVirial_Liu_Xiang_mat
 .. autofunction:: chemicals.virial.CVirial_Orbey_Vera_mat
 """
-from typing import List
+from __future__ import annotations
 
-
-__all__: List[str] = [
+__all__: list[str] = [
     "BVirial_Abbott",
     "BVirial_Abbott_fast",
     "BVirial_Abbott_mat",

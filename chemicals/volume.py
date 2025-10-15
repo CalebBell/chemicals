@@ -176,11 +176,11 @@ The structure of each dataframe is shown below:
     In [9]: chemicals.volume.rho_data_CRC_virial
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-__all__: List[str] = [
+__all__: list[str] = [
     "COSTALD",
     "PPDS17",
     "SNM0",
@@ -210,6 +210,9 @@ from fluids.numerics import exp, implementation_optimize_tck, log, np, splev, sq
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, mixing_simple, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 folder = os_path_join(source_path, "Density")
 
@@ -965,7 +968,7 @@ def Campbell_Thodos(T: float, Tb: float, Tc: float, Pc: float, MW: float, dipole
     return Vs
 
 
-def SNM0(T: int, Tc: float, Vc: float, omega: float, delta_SRK: Optional[float]=None) -> float:
+def SNM0(T: int, Tc: float, Vc: float, omega: float, delta_SRK: float | None=None) -> float:
     r"""Calculates saturated liquid density using the Mchaweh, Moshfeghian
     model [1]_. Designed for simple calculations.
 
@@ -1292,7 +1295,7 @@ def Tait_molar(P, P_ref, V_ref, B, C):
 
 ### Liquid Mixtures
 
-def Amgat(xs: List[float], Vms: List[float]) -> float:
+def Amgat(xs: list[float], Vms: list[float]) -> float:
     r"""Calculate mixture liquid density using the Amgat mixing rule.
     Highly inacurate, but easy to use. Assumes idea liquids with
     no excess volume. Average molecular weight should be used with it to obtain
@@ -1333,7 +1336,7 @@ def Amgat(xs: List[float], Vms: List[float]) -> float:
     return mixing_simple(xs, Vms)
 
 
-def Rackett_mixture(T: float, xs: List[float], MWs: List[float], Tcs: List[float], Pcs: List[float], Zrs: List[float]) -> float:
+def Rackett_mixture(T: float, xs: list[float], MWs: list[float], Tcs: list[float], Pcs: list[float], Zrs: list[float]) -> float:
     r"""Calculate mixture liquid density using the Rackett-derived mixing rule
     as shown in [2]_.
 
@@ -1401,7 +1404,7 @@ def Rackett_mixture(T: float, xs: List[float], MWs: List[float], Tcs: List[float
     return (R*bigsum*Zr**(1.0 + (1.0 - Tr)**(2.0/7.0)))*MW
 
 
-def COSTALD_mixture(xs: List[float], T: float, Tcs: List[float], Vcs: List[float], omegas: List[float]) -> float:
+def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float], omegas: list[float]) -> float:
     r"""Calculate mixture liquid density using the COSTALD CSP method.
 
     A popular and accurate estimation method. If possible, fit parameters are

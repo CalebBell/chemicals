@@ -170,11 +170,11 @@ The structure of each dataframe is shown below:
     In [9]: chemicals.viscosity.mu_data_VDI_PPDS_8
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional, Tuple, Union
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-__all__: List[str] = [
+__all__: list[str] = [
     "PPDS5",
     "PPDS9",
     "Brokaw",
@@ -213,6 +213,9 @@ from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 folder = os_path_join(source_path, "Viscosity")
 
@@ -286,7 +289,7 @@ def __getattr__(name: str) -> DataFrame:
 
 
 
-def mu_IAPWS(T: float, rho: float, drho_dP: Optional[float]=None, drho_dP_Tr: Optional[float]=None) -> float:
+def mu_IAPWS(T: float, rho: float, drho_dP: float | None=None, drho_dP_Tr: float | None=None) -> float:
     r"""Calculates and returns the viscosity of water according to the IAPWS
     (2008) release.
 
@@ -1465,7 +1468,7 @@ def Stiel_Thodos(T: float, Tc: float, Pc: float, MW: float) -> float:
     return mu_g*1e-3
 
 
-def Lucas_gas(T: float, Tc: float, Pc: float, Zc: float, MW: float, dipole: Optional[float]=0.0, CASRN: Optional[str]=None) -> float:
+def Lucas_gas(T: float, Tc: float, Pc: float, Zc: float, MW: float, dipole: float | None=0.0, CASRN: str | None=None) -> float:
     r"""Estimate the viscosity of a gas using an emperical
     formula developed in several sources, but as discussed in [1]_ as the
     original sources are in German or merely personal communications with the
@@ -1627,7 +1630,7 @@ def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
 ### Viscosity of gas mixtures
 
 
-def Herning_Zipperer(zs: List[float], mus: List[float], MWs: Optional[Union[List[int], List[float]]], MW_roots: Optional[List[float]]=None) -> float:
+def Herning_Zipperer(zs: list[float], mus: list[float], MWs: list[int] | list[float] | None, MW_roots: list[float] | None=None) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
@@ -1681,7 +1684,7 @@ def Herning_Zipperer(zs: List[float], mus: List[float], MWs: Optional[Union[List
         denominator += v
     return k/denominator
 
-def Wilke(ys: List[float], mus: List[float], MWs: List[float]) -> float:
+def Wilke(ys: list[float], mus: list[float], MWs: list[float]) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
@@ -1736,7 +1739,7 @@ def Wilke(ys: List[float], mus: List[float], MWs: List[float]) -> float:
     return sum([ys[i]*mus[i]/sum([ys[j]*phis[i][j] for j in cmps]) for i in cmps])
 
 
-def Wilke_prefactors(MWs: List[float]) -> Tuple[List[List[float]], List[List[float]], List[List[float]]]:
+def Wilke_prefactors(MWs: list[float]) -> tuple[list[list[float]], list[list[float]], list[list[float]]]:
     r"""The :obj:`Wilke` gas viscosity method can be sped up by precomputing several
     matrices. The memory used is proportional to N^2, so it can be significant,
     but is still a substantial performance increase even when they are so large
@@ -1804,7 +1807,7 @@ def Wilke_prefactors(MWs: List[float]) -> Tuple[List[List[float]], List[List[flo
                     for j in cmps] for i in cmps]
     return t0s, t1s, phi_fact_invs
 
-def Wilke_prefactored(ys: List[float], mus: List[float], t0s: List[List[float]], t1s: List[List[float]], t2s: List[List[float]]) -> float:
+def Wilke_prefactored(ys: list[float], mus: list[float], t0s: list[list[float]], t1s: list[list[float]], t2s: list[list[float]]) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_, using precomputed parameters.
 
@@ -1911,7 +1914,7 @@ def Wilke_prefactored(ys: List[float], mus: List[float], t0s: List[List[float]],
     return mu
     """
 
-def Wilke_large(ys: List[float], mus: List[float], MWs: List[float]) -> float:
+def Wilke_large(ys: list[float], mus: list[float], MWs: list[float]) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
@@ -1993,7 +1996,7 @@ def Wilke_large(ys: List[float], mus: List[float], MWs: List[float]) -> float:
 
 
 
-def Brokaw(T: float, ys: List[float], mus: List[float], MWs: List[float], molecular_diameters: List[float], Stockmayers: List[int]) -> float:
+def Brokaw(T: float, ys: list[float], mus: list[float], MWs: list[float], molecular_diameters: list[float], Stockmayers: list[int]) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
@@ -2256,7 +2259,7 @@ def Twu_1985(T: float, Tb: float, rho: float) -> float:
 
 ### Viscosity for Liquids or Gases
 
-def Lorentz_Bray_Clarke(T: float, P: float, Vm: float, zs: List[float], MWs: List[float], Tcs: List[float], Pcs: List[float], Vcs: List[float]) -> float:
+def Lorentz_Bray_Clarke(T: float, P: float, Vm: float, zs: list[float], MWs: list[float], Tcs: list[float], Pcs: list[float], Vcs: list[float]) -> float:
     r"""Calculates the viscosity of a gas or a liquid using the method of
     Lorentz, Bray, and Clarke [1]_. This method is not quite the same as the
     original, but rather the form commonly presented and used today. The
@@ -2492,7 +2495,7 @@ VI_Hs = [6.394, 6.894, 7.41, 7.944, 8.496, 9.063, 9.647, 10.25, 10.87, 11.5,
     1488.0, 1506.0, 1523.0, 1541.0, 1558.0
 ]
 
-def viscosity_index(nu_40: float, nu_100: float, rounding: bool=False) -> Optional[float]:
+def viscosity_index(nu_40: float, nu_100: float, rounding: bool=False) -> float | None:
     r"""Calculates the viscosity index of a liquid. Requires dynamic viscosity
     of a liquid at 40°C and 100°C. Value may either be returned with or
     without rounding. Rounding is performed per the standard.

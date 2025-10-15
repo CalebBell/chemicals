@@ -122,11 +122,11 @@ attribute of this module.
     In [5]: chemicals.thermal_conductivity.k_data_VDI_PPDS_10
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional, Union
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-__all__: List[str] = [
+__all__: list[str] = [
     "DIPPR9B",
     "DIPPR9G",
     "DIPPR9H",
@@ -168,6 +168,9 @@ from fluids.numerics import numpy as np
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 from chemicals.viscosity import Herning_Zipperer
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 folder = os_path_join(source_path, "Thermal Conductivity")
 
@@ -1295,7 +1298,7 @@ def Missenard(T: float, P: float, Tc: float, Pc: float, kl: float) -> float:
 ### Thermal conductivity of liquid mixtures
 
 
-def DIPPR9H(ws: List[float], ks: List[float]) -> float:
+def DIPPR9H(ws: list[float], ks: list[float]) -> float:
     r"""Calculates thermal conductivity of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_.
 
@@ -1358,7 +1361,7 @@ def DIPPR9H(ws: List[float], ks: List[float]) -> float:
         kl += ws[i]/(ks[i]*ks[i])
     return 1.0/sqrt(kl)
 
-def DIPPR9I(zs: List[float], Vms: List[float], ks: List[float]) -> float:
+def DIPPR9I(zs: list[float], Vms: list[float], ks: list[float]) -> float:
     r"""Calculates thermal conductivity of a liquid mixture according to
     mixing rules in [1]_. This is recommended in [2]_ for aqueous and
     nonaqueous systems.
@@ -1442,7 +1445,7 @@ def DIPPR9I(zs: List[float], Vms: List[float], ks: List[float]) -> float:
     k += 4.0*main_k_sum
     return k
 
-def Filippov(ws: List[float], ks: List[float]) -> float:
+def Filippov(ws: list[float], ks: list[float]) -> float:
     r"""Calculates thermal conductivity of a binary liquid mixture according to
     mixing rules in [2]_ as found in [1]_.
 
@@ -1577,7 +1580,7 @@ def Eucken_modified(MW: float, Cvm: float, mu: float) -> float:
     return (1.32 + 1.77*R/Cvm)*mu*Cvm/MW
 
 
-def DIPPR9B(T: float, MW: float, Cvm: float, mu: float, Tc: Optional[float]=None, chemtype: Optional[str]=None) -> float:
+def DIPPR9B(T: float, MW: float, Cvm: float, mu: float, Tc: float | None=None, chemtype: str | None=None) -> float:
     r"""Calculates the thermal conductivity of a gas using one of several
     emperical equations developed in [1]_, [2]_, and presented in [3]_.
 
@@ -2357,7 +2360,7 @@ def Chung_dense(T: float, MW: float, Tc: float, Vc: float, omega: float, Cvm: fl
 ### Thermal conductivity of gas mixtures
 
 
-def Lindsay_Bromley(T: float, ys: List[float], ks: List[float], mus: List[float], Tbs: List[float], MWs: List[float]) -> float:
+def Lindsay_Bromley(T: float, ys: list[float], ks: list[float], mus: list[float], Tbs: list[float], MWs: list[float]) -> float:
     r"""Calculates thermal conductivity of a gas mixture according to
     mixing rules in [1]_ and also in [2]_. It is significantly more complicated
     than other kinetic theory models.
@@ -2469,7 +2472,7 @@ def Lindsay_Bromley(T: float, ys: List[float], ks: List[float], mus: List[float]
 #    return sum([ys[i]*ks[i]/sum(ys[j]*Aij[i][j] for j in cmps) for i in cmps])
 
 
-def Wassiljewa_Herning_Zipperer(zs: List[float], ks: List[float], MWs: Union[List[int], List[float]], MW_roots: Optional[List[float]]=None) -> float:
+def Wassiljewa_Herning_Zipperer(zs: list[float], ks: list[float], MWs: list[int] | list[float], MW_roots: list[float] | None=None) -> float:
     r"""Calculates thermal conductivity of a gas mixture according to
     the kinetic theory expression of Wassiljewa with the interaction
     term from the Herning-Zipperer expression. This is also used for

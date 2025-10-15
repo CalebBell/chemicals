@@ -54,15 +54,14 @@ array([591.75 , 647.096])
    directly.
 
 """
-
+from __future__ import annotations
 
 from fluids.numerics import FakePackage
 from fluids.numerics import numpy as np
 
 import chemicals
-from typing import List
 
-__all__: List[str] = []
+__all__: list[str] = []
 
 
 __funcs = {}

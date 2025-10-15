@@ -41,10 +41,11 @@ Triple Pressure
 .. autodata:: chemicals.triple.Pt_all_methods
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional
+from __future__ import annotations
 
-__all__: List[str] = [
+from typing import TYPE_CHECKING
+
+__all__: list[str] = [
     "Pt",
     "Pt_all_methods",
     "Pt_methods",
@@ -65,6 +66,9 @@ from chemicals.data_reader import (
 )
 from chemicals.phase_change import Tm
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 # Register data sources and lazy load them
 folder = os_path_join(source_path, "Triple Properties")
@@ -95,7 +99,7 @@ Tt_all_methods = (miscdata.HEOS, STAVELEY, miscdata.WEBBOOK, MELTING)
 """Tuple of method name keys. See the `Tt` for the actual references"""
 
 @mark_numba_incompatible
-def Tt_methods(CASRN: str) -> List[str]:
+def Tt_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain the triple temperature for the
     desired chemical.
 
@@ -196,7 +200,7 @@ Pt_all_methods = (miscdata.HEOS, STAVELEY, miscdata.WEBBOOK)
 """Tuple of method name keys. See the `Pt` for the actual references"""
 
 @mark_numba_incompatible
-def Pt_methods(CASRN: str) -> List[str]:
+def Pt_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain the Pt for the desired chemical.
 
     Parameters

@@ -29,10 +29,11 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 .. contents:: :local:
 
 """
-import numpy
-from typing import Any, List, Optional, Tuple, Union
+from __future__ import annotations
 
-__all__: List[str] = [
+from typing import TYPE_CHECKING, Any
+
+__all__: list[str] = [
     "SG",
     "API_to_SG",
     "API_to_rho",
@@ -114,6 +115,9 @@ from fluids.constants import N_A, R
 from fluids.numerics import cbrt, trunc_exp, trunc_log
 from fluids.numerics import numpy as np
 
+if TYPE_CHECKING:
+    import numpy
+
 source_path = os.path.dirname(__file__)
 
 if os.name == "nt":
@@ -135,7 +139,7 @@ def mark_numba_uncacheable(f):
     return f
 
 @mark_numba_incompatible
-def to_num(values: List[str]) -> Union[List[Optional[Union[str, float]]], List[Union[str, float]]]:
+def to_num(values: list[str]) -> list[str | float | None] | list[str | float]:
     r"""Legacy function to turn a list of strings into either floats
     (if numeric), stripped strings (if not) or None if the string is empty.
     Accepts any numeric formatting the float function does.
@@ -1300,7 +1304,7 @@ def phase_identification_parameter(V: float, dP_dT: float, dP_dV: float, d2P_dV2
     return V*(d2P_dVdT/dP_dT - d2P_dV2/dP_dV)
 
 
-def phase_identification_parameter_phase(d2P_dVdT: float, V: Optional[float]=None, dP_dT: Optional[float]=None, dP_dV: Optional[float]=None, d2P_dV2: Optional[float]=None) -> str:
+def phase_identification_parameter_phase(d2P_dVdT: float, V: float | None=None, dP_dT: float | None=None, dP_dV: float | None=None, d2P_dV2: float | None=None) -> str:
     r"""Uses the Phase Identification Parameter concept developed in [1]_ and
     [2]_ to determine if a chemical is a solid, liquid, or vapor given the
     appropriate thermodynamic conditions.
@@ -1423,7 +1427,7 @@ def Cp_minus_Cv(T: int, dP_dT: float, dP_dV: float) -> float:
     return -T*dP_dT*dP_dT/dP_dV
 
 
-def speed_of_sound(V: float, dP_dV: float, Cp: float, Cv: float, MW: Optional[float]=None) -> float:
+def speed_of_sound(V: float, dP_dV: float, Cp: float, Cv: float, MW: float | None=None) -> float:
     r"""Calculate a real fluid's speed of sound. The required derivatives should
     be calculated with an equation of state, and `Cp` and `Cv` are both the
     real fluid versions. Expression is given in [1]_ and [2]_; a unit conversion
@@ -1540,7 +1544,7 @@ def velocity_to_molar_velocity(v, MW):
     """
     return v*sqrt(MW)/sqrt(1000)
 
-def Joule_Thomson(T: int, V: float, Cp: float, dV_dT: Optional[float]=None, beta: Optional[float]=None) -> float:
+def Joule_Thomson(T: int, V: float, Cp: float, dV_dT: float | None=None, beta: float | None=None) -> float:
     r"""Calculate a real fluid's Joule Thomson coefficient. The required
     derivative should be calculated with an equation of state, and `Cp` is the
     real fluid versions. This can either be calculated with `dV_dT` directly,
@@ -1878,7 +1882,7 @@ def Z(T: int, P: float, V: float) -> float:
     """
     return V*P/(R*T)
 
-def zs_to_ws(zs: List[float], MWs: Union[List[int], List[float]]) -> List[float]:
+def zs_to_ws(zs: list[float], MWs: list[int] | list[float]) -> list[float]:
     r"""Converts a list of mole fractions to mass fractions. Requires molecular
     weights for all species.
 
@@ -1924,7 +1928,7 @@ def zs_to_ws(zs: List[float], MWs: Union[List[int], List[float]]) -> List[float]
         ws[i] *= Mavg
     return ws
 
-def ws_to_zs(ws: List[float], MWs: List[int]) -> List[float]:
+def ws_to_zs(ws: list[float], MWs: list[int]) -> list[float]:
     r"""Converts a list of mass fractions to mole fractions. Requires molecular
     weights for all species.
 
@@ -1966,7 +1970,7 @@ def ws_to_zs(ws: List[float], MWs: List[int]) -> List[float]:
     return zs
 
 
-def zs_to_Vfs(zs: List[float], Vms: List[float]) -> List[float]:
+def zs_to_Vfs(zs: list[float], Vms: list[float]) -> list[float]:
     r"""Converts a list of mole fractions to volume fractions. Requires molar
     volumes for all species.
 
@@ -2013,7 +2017,7 @@ def zs_to_Vfs(zs: List[float], Vms: List[float]) -> List[float]:
     return Vfs
 
 
-def Vfs_to_zs(Vfs: List[float], Vms: List[float]) -> List[float]:
+def Vfs_to_zs(Vfs: list[float], Vms: list[float]) -> list[float]:
     r"""Converts a list of mass fractions to mole fractions. Requires molecular
     weights for all species.
 
@@ -2431,7 +2435,7 @@ def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
     return partial_properties
 
 
-def d2ns_to_dn2_partials(d2ns: List[List[float]], dns: List[float]) -> List[List[float]]:
+def d2ns_to_dn2_partials(d2ns: list[list[float]], dns: list[float]) -> list[list[float]]:
     r"""Convert second-order mole number derivatives of a quantity
      to the following second-order partial derivative:
 
@@ -2568,7 +2572,7 @@ def d2xs_to_dxdn_partials(d2xs, xs):
 
 
 
-def dxs_to_dxsn1(dxs: List[float]) -> List[float]:
+def dxs_to_dxsn1(dxs: list[float]) -> list[float]:
     r"""Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to derivatives such that they do sum to 1 by changing
     the composition of the last component in the negative of the component
@@ -2604,7 +2608,7 @@ def dxs_to_dxsn1(dxs: List[float]) -> List[float]:
     return [dx - last for dx in dxs[:-1]]
 
 
-def d2xs_to_d2xsn1(d2xs: List[List[float]]) -> List[List[float]]:
+def d2xs_to_d2xsn1(d2xs: list[list[float]]) -> list[list[float]]:
     r"""Convert the second mole fraction derivatives of a quantity (calculated
     so they do not sum to 1) to derivatives such that they do sum to 1
     Requires the second derivatives of the mixture only. The size of
@@ -2648,7 +2652,7 @@ def d2xs_to_d2xsn1(d2xs: List[List[float]]) -> List[List[float]]:
     return out
 
 
-def none_and_length_check(all_inputs: Any, length: Optional[int]=None) -> bool:
+def none_and_length_check(all_inputs: Any, length: int | None=None) -> bool:
     r"""Checks inputs for suitability of use by a mixing rule which requires
     all inputs to be of the same length and non-None. A number of variations
     were attempted for this function; this was found to be the quickest.
@@ -2682,7 +2686,7 @@ def none_and_length_check(all_inputs: Any, length: Optional[int]=None) -> bool:
 
 
 
-def normalize(values: Union[List[float], List[Union[float, numpy.float64]], List[int], List[float]]) -> Union[List[numpy.float64], List[float]]:
+def normalize(values: list[float] | list[float | numpy.float64] | list[int]) -> list[numpy.float64] | list[float]:
     r"""Simple function which normalizes a series of values to be from 0 to 1,
     and for their sum to add to 1.
 
@@ -2720,7 +2724,7 @@ def normalize(values: Union[List[float], List[Union[float, numpy.float64]], List
             # case of 0 values
             return []
 
-def remove_zeros(values: Union[List[float], numpy.ndarray, List[float]], tol: float=1e-6) -> Union[numpy.ndarray, List[float]]:
+def remove_zeros(values: list[float] | numpy.ndarray, tol: float=1e-6) -> numpy.ndarray | list[float]:
     r"""Simple function which removes zero values from an array, and replaces
     them with a user-specified value, normally a very small number. Helpful
     for the case where a function can work with values very close to zero but
@@ -2756,7 +2760,7 @@ def remove_zeros(values: Union[List[float], numpy.ndarray, List[float]], tol: fl
     return values
 
 
-def mixing_simple(fracs: List[float], props: List[float]) -> Optional[float]:
+def mixing_simple(fracs: list[float], props: list[float]) -> float | None:
     r"""Simple function calculates a property based on weighted averages of
     properties. Weights could be mole fractions, volume fractions, mass
     fractions, or anything else.
@@ -2790,7 +2794,7 @@ def mixing_simple(fracs: List[float], props: List[float]) -> Optional[float]:
     return tot
 
 
-def mixing_logarithmic(fracs: List[float], props: List[float]) -> Optional[float]:
+def mixing_logarithmic(fracs: list[float], props: list[float]) -> float | None:
     r"""Simple function calculates a property based on weighted averages of
     logarithmic properties.
 
@@ -2825,7 +2829,7 @@ def mixing_logarithmic(fracs: List[float], props: List[float]) -> Optional[float
         tot += fracs[i]*trunc_log(props[i])
     return trunc_exp(tot)
 
-def mixing_power(fracs: List[float], props: List[float], r: int) -> float:
+def mixing_power(fracs: list[float], props: list[float], r: int) -> float:
     r"""Power law mixing rule for any property, with a variable exponent
     `r` as input. Optimiezd routines are available for common powers.
 
@@ -3060,7 +3064,7 @@ def mixing_power(fracs: List[float], props: List[float], r: int) -> float:
     return prop**(1.0/r)
 
 
-def mix_component_flows(IDs1: List[str], IDs2: List[str], flow1: float, flow2: int, fractions1: List[float], fractions2: List[float]) -> Tuple[List[str], List[float]]:
+def mix_component_flows(IDs1: list[str], IDs2: list[str], flow1: float, flow2: int, fractions1: list[float], fractions2: list[float]) -> tuple[list[str], list[float]]:
     r"""Mix two flows of potentially different chemicals of given overall flow
     rates and flow fractions to determine the outlet components, flow rates,
     and compositions. The flows do not need to be of the same length.
@@ -3176,7 +3180,7 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
     return cmps, ns
 
 
-def mix_multiple_component_flows(IDs: List[List[str]], flows: List[int], fractions: List[List[float]]) -> Tuple[List[str], List[float]]:
+def mix_multiple_component_flows(IDs: list[list[str]], flows: list[int], fractions: list[list[float]]) -> tuple[list[str], list[float]]:
     r"""Mix multiple flows of potentially different chemicals of given overall
     flow rates and flow fractions to determine the outlet components, flow
     rates,  and compositions. The flows do not need to be of the same length.
@@ -3233,7 +3237,7 @@ def mix_multiple_component_flows(IDs: List[List[str]], flows: List[int], fractio
 
 
 
-def solve_flow_composition_mix(Fs: Union[List[Optional[float]], List[Optional[int]], List[float], List[Optional[float]]], zs: Union[List[None], List[Optional[float]]], ws: Union[List[Optional[float]], List[None]], MWs: List[float]) -> Union[Tuple[List[float], List[float], List[float]], Tuple[List[float], List[float], List[float]]]:
+def solve_flow_composition_mix(Fs: list[float | None] | list[int | None] | list[float], zs: list[None] | list[float | None], ws: list[float | None] | list[None], MWs: list[float]) -> tuple[list[float], list[float], list[float]]:
     r"""Solve a stream composition problem where some specs are mole flow rates;
     some are mass fractions; and some are mole fractions. This algorithm
     requires at least one mole flow rate; and for every other component, a

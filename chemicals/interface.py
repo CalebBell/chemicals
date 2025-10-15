@@ -130,12 +130,11 @@ The structure of each dataframe is shown below:
 
     In [6]: chemicals.interface.sigma_data_VDI_PPDS_11
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-
-__all__: List[str] = [
+__all__: list[str] = [
     "API10A32",
     "PPDS14",
     "Aleem",
@@ -167,6 +166,9 @@ from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 folder = os_path_join(source_path, "Interface")
 
@@ -748,7 +750,7 @@ def Pitzer_sigma(T, Tc, Pc, omega):
     return sigma*1e-3  # N/m, please
 
 
-def Sastri_Rao(T: float, Tb: float, Tc: float, Pc: float, chemicaltype: Optional[str]=None) -> float:
+def Sastri_Rao(T: float, Tb: float, Tc: float, Pc: float, chemicaltype: str | None=None) -> float:
     r"""Calculates air-liquid surface tension using the correlation derived by
     [1]_ based on critical property CSP methods and chemical classes.
 
@@ -1311,7 +1313,7 @@ def API10A32(T: float, Tc: float, K_W: float) -> float:
 
 ### Surface Tension Mixtures
 
-def Winterfeld_Scriven_Davis(xs: List[float], sigmas: List[float], rhoms: List[float]) -> float:
+def Winterfeld_Scriven_Davis(xs: list[float], sigmas: list[float], rhoms: list[float]) -> float:
     r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_.
 
@@ -1387,7 +1389,7 @@ def Winterfeld_Scriven_Davis(xs: List[float], sigmas: List[float], rhoms: List[f
     return tot
 
 
-def Diguilio_Teja(T: float, xs: List[float], sigmas_Tb: List[float], Tbs: List[float], Tcs: List[float]) -> float:
+def Diguilio_Teja(T: float, xs: list[float], sigmas_Tb: list[float], Tbs: list[float], Tcs: list[float]) -> float:
     r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_.
 
@@ -1460,7 +1462,7 @@ def Diguilio_Teja(T: float, xs: List[float], sigmas_Tb: List[float], Tbs: List[f
     return 1.002855*Tst**1.118091*(T/Tb)*sigmar
 
 
-def Weinaug_Katz(parachors: List[float], Vml: float, Vmg: float, xs: List[float], ys: List[float]) -> float:
+def Weinaug_Katz(parachors: list[float], Vml: float, Vmg: float, xs: list[float], ys: list[float]) -> float:
     r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_. This is based on the
     Parachor concept. This is called the Macleod-Sugden model in some places.

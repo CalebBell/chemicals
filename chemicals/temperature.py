@@ -35,11 +35,11 @@ Conversion functions
 .. autofunction:: chemicals.temperature.ITS90_68_difference
 
 """
+from __future__ import annotations
 
 from fluids.numerics import implementation_optimize_tck, secant, splev
-from typing import List
 
-__all__: List[str] = [
+__all__: list[str] = [
     "ITS90_68_difference",
     "T_converter",
     "T_scales",

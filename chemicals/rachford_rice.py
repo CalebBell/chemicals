@@ -119,11 +119,11 @@ significant error exists.
 1.0000000000028162
 
 """
-from numpy import float64, ndarray
-from typing import List, Optional, Tuple, Union
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-__all__: List[str] = [
+__all__: list[str] = [
     "Li_Johns_Ahmadi_solution",
     "Rachford_Rice_flash2_f_jac",
     "Rachford_Rice_flashN_f_jac",
@@ -178,13 +178,16 @@ from fluids.numerics import numpy as np
 from chemicals.exceptions import PhaseCountReducedError
 from chemicals.utils import mark_numba_incompatible, mark_numba_uncacheable
 
+if TYPE_CHECKING:
+    from numpy import float64, ndarray
+
 try:
     from itertools import combinations
 except:
     pass
 
 
-def Rachford_Rice_polynomial_3(zs: List[float], Cs: List[float]) -> List[float]:
+def Rachford_Rice_polynomial_3(zs: list[float], Cs: list[float]) -> list[float]:
     z0, z1, z2 = zs
     C0, C1, C2 = Cs
     x0 = C0*z0
@@ -195,7 +198,7 @@ def Rachford_Rice_polynomial_3(zs: List[float], Cs: List[float]) -> List[float]:
             (C0*(x1+x2) + C1*(x0 + x2) + C2*(x0 + x1))*a_inv,
             (x0 + x1 + x2)*a_inv]
 
-def Rachford_Rice_polynomial_4(zs: List[float], Cs: List[float]) -> List[float]:
+def Rachford_Rice_polynomial_4(zs: list[float], Cs: list[float]) -> list[float]:
     z0, z1, z2, z3 = zs
     C0, C1, C2, C3 = Cs
     x0 = C0*z0
@@ -219,7 +222,7 @@ def Rachford_Rice_polynomial_4(zs: List[float], Cs: List[float]) -> List[float]:
             (x0_x2_x4 + x6)*a_inv]
 
 
-def Rachford_Rice_polynomial_5(zs: List[float], Cs: List[float]) -> List[float]:
+def Rachford_Rice_polynomial_5(zs: list[float], Cs: list[float]) -> list[float]:
     z0, z1, z2, z3, z4 = zs
     C0, C1, C2, C3, C4 = Cs
     x0 = C0*z0
@@ -272,7 +275,7 @@ def Rachford_Rice_polynomial_5(zs: List[float], Cs: List[float]) -> List[float]:
 
 
 # _RR_poly_idx_cache = {}
-def _Rachford_Rice_polynomial_coeff(value: int, zs: List[float], Cs: List[float], N: int) -> float:
+def _Rachford_Rice_polynomial_coeff(value: int, zs: list[float], Cs: list[float], N: int) -> float:
 #     global_list = []
 #     # This part can be cached, so its performance implication is small
 #     # I believe for high-N, this is causing out of memory errors
@@ -349,7 +352,7 @@ def _Rachford_Rice_polynomial_coeff(value: int, zs: List[float], Cs: List[float]
     return c
 
 
-def Rachford_Rice_polynomial(zs: List[float], Ks: Union[List[float], List[float]]) -> List[float]:
+def Rachford_Rice_polynomial(zs: list[float], Ks: list[float]) -> list[float]:
     r"""Transforms the Rachford-Rice equation into a polynomial and returns
     its coefficients.
     A spelled-out solution is used for N from 2 to 5, derived with SymPy and
@@ -481,13 +484,13 @@ def Rachford_Rice_polynomial(zs: List[float], Ks: Union[List[float], List[float]
     coeffs[-1] = c
     return coeffs
 
-def err_RR_poly(VF: float, poly: List[float]) -> float:
+def err_RR_poly(VF: float, poly: list[float]) -> float:
     return horner(poly, VF)
 def err_and_der_RR_poly(VF, poly):
     return horner_and_der(poly, VF)
 
 @mark_numba_uncacheable
-def Rachford_Rice_solution_polynomial(zs: List[float], Ks: Union[List[float], List[float]]) -> Tuple[float, List[float], List[float]]:
+def Rachford_Rice_solution_polynomial(zs: list[float], Ks: list[float]) -> tuple[float, list[float], list[float]]:
     r"""Solves the Rachford-Rice equation by transforming it into a polynomial,
     and then either analytically calculating the roots, or, using the known
     range the correct root is in, numerically solving for the correct
@@ -643,7 +646,7 @@ def Rachford_Rice_solution_polynomial(zs: List[float], Ks: Union[List[float], Li
     return V_over_F, xs, ys
 
 
-def Rachford_Rice_flash_error(V_over_F: float, zs: List[float], Ks: List[float]) -> float:
+def Rachford_Rice_flash_error(V_over_F: float, zs: list[float], Ks: list[float]) -> float:
     r"""Calculates the objective function of the Rachford-Rice flash equation.
     This function should be called by a solver seeking a solution to a flash
     calculation. The unknown variable is `V_over_F`, for which a solution
@@ -706,7 +709,7 @@ def Rachford_Rice_flash_error(V_over_F: float, zs: List[float], Ks: List[float])
         err += zs[i]*(Ks[i] - 1.0)/(1.0 + V_over_F*(Ks[i] - 1.0))
     return err
 
-def Rachford_Rice_err_fprime(V_over_F: float, zs_k_minus_1: List[float], zs_k_minus_1_2: List[float], K_minus_1: List[float]) -> Tuple[float, float]:
+def Rachford_Rice_err_fprime(V_over_F: float, zs_k_minus_1: list[float], zs_k_minus_1_2: list[float], K_minus_1: list[float]) -> tuple[float, float]:
     err0, err1 = 0.0, 0.0
     for num0, num1, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, K_minus_1):
         VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
@@ -715,7 +718,7 @@ def Rachford_Rice_err_fprime(V_over_F: float, zs_k_minus_1: List[float], zs_k_mi
 #            print(err0, V_over_F)
     return err0, err1
 
-def Rachford_Rice_err_fprime2(V_over_F: float, zs_k_minus_1: List[float], zs_k_minus_1_2: List[float], zs_k_minus_1_3: List[float], K_minus_1: List[float]) -> Tuple[float, float, float]:
+def Rachford_Rice_err_fprime2(V_over_F: float, zs_k_minus_1: list[float], zs_k_minus_1_2: list[float], zs_k_minus_1_3: list[float], K_minus_1: list[float]) -> tuple[float, float, float]:
     err0, err1, err2 = 0.0, 0.0, 0.0
     for num0, num1, num2, Kim1 in zip(zs_k_minus_1, zs_k_minus_1_2, zs_k_minus_1_3, K_minus_1):
         VF_kim1_1_inv = 1.0/(1. + V_over_F*Kim1)
@@ -727,7 +730,7 @@ def Rachford_Rice_err_fprime2(V_over_F: float, zs_k_minus_1: List[float], zs_k_m
     # print(err0, V_over_F)
     return err0, err1, err2
 
-def Rachford_Rice_err(V_over_F: float, zs_k_minus_1: List[float], K_minus_1: List[float]) -> float:
+def Rachford_Rice_err(V_over_F: float, zs_k_minus_1: list[float], K_minus_1: list[float]) -> float:
     err = 0.0
     for i in range(len(zs_k_minus_1)):
         err += zs_k_minus_1[i]/(1. + V_over_F*K_minus_1[i])
@@ -736,7 +739,7 @@ def Rachford_Rice_err(V_over_F: float, zs_k_minus_1: List[float], K_minus_1: Lis
 
 
 @mark_numba_uncacheable
-def Rachford_Rice_solution(zs: List[float], Ks: Union[List[float], List[float]], fprime: Optional[Union[bool, float]]=False, fprime2: bool=False, guess: None=None) -> Tuple[float, List[float], List[float]]:
+def Rachford_Rice_solution(zs: list[float], Ks: list[float], fprime: bool | float | None=False, fprime2: bool=False, guess: None=None) -> tuple[float, list[float], list[float]]:
     r"""Solves the objective function of the Rachford-Rice flash equation [1]_.
     Uses the method proposed in [2]_ to obtain an initial guess.
 
@@ -900,7 +903,7 @@ def Rachford_Rice_numpy_err(V_over_F, zs_k_minus_1, K_minus_1):
 #    return err # numba: uncomment
     return float(err) # numba: delete
 
-def Rachford_Rice_numpy_err_fprime2(V_over_F: float64, zs_k_minus_1: ndarray, K_minus_1: ndarray) -> Tuple[float, float, float]:
+def Rachford_Rice_numpy_err_fprime2(V_over_F: float64, zs_k_minus_1: ndarray, K_minus_1: ndarray) -> tuple[float, float, float]:
     x0 = 1.0/(K_minus_1*V_over_F + 1.0)
 
     err = zs_k_minus_1*x0
@@ -914,7 +917,7 @@ def Rachford_Rice_numpy_err_fprime2(V_over_F: float64, zs_k_minus_1: ndarray, K_
 
 
 @mark_numba_uncacheable
-def Rachford_Rice_solution_numpy(zs: List[float], Ks: Union[List[float], List[float]], guess: None=None) -> Tuple[float, List[float], List[float]]:
+def Rachford_Rice_solution_numpy(zs: list[float], Ks: list[float], guess: None=None) -> tuple[float, list[float], list[float]]:
     """Undocumented version of Rachford_Rice_solution which works with numpy
     instead.
 
@@ -1645,7 +1648,7 @@ def Rachford_Rice_solution_mpmath(zs, Ks, dps=200, tol=1e-100):
 
 
 
-def Rachford_Rice_err_LN2(y: float, zs: List[float], cis_ys: List[float], x0: float, V_over_F_min: float, N: int) -> Tuple[float, float, float]:
+def Rachford_Rice_err_LN2(y: float, zs: list[float], cis_ys: list[float], x0: float, V_over_F_min: float, N: int) -> tuple[float, float, float]:
     # print(y)
     x1 = exp(-y)
     x3 = 1.0/(x1 + 1.0)
@@ -1672,7 +1675,7 @@ def Rachford_Rice_err_LN2(y: float, zs: List[float], cis_ys: List[float], x0: fl
     return F0, -dF0, ddF0
 
 @mark_numba_uncacheable
-def Rachford_Rice_solution_LN2(zs: List[float], Ks: Union[List[float], List[float]], guess: Optional[float]=None) -> Tuple[float, List[float], List[float]]:
+def Rachford_Rice_solution_LN2(zs: list[float], Ks: list[float], guess: float | None=None) -> tuple[float, list[float], list[float]]:
     r"""Solves the a objective function for the Rachford-Rice flash equation
     according to the Leibovici and Nichita (2010) transformation (method 2).
     This transformation makes the only zero of the function be the desired one.
@@ -1852,7 +1855,7 @@ def LJA_err(x1, t1, terms_2, terms_3, N2):
         err += x1/(terms_2[i] + terms_3[i]*x1)
     return err
 
-def LJA_fprime2(v: float, t1: float, terms_2: List[float], terms_3: List[float], N2: int) -> Tuple[float, float, float]:
+def LJA_fprime2(v: float, t1: float, terms_2: list[float], terms_3: list[float], N2: int) -> tuple[float, float, float]:
     err = 1. + t1*v
     fprime = t1
     fprime2 = 0.0
@@ -1867,7 +1870,7 @@ def LJA_fprime2(v: float, t1: float, terms_2: List[float], terms_3: List[float],
     return err, fprime, fprime2
 
 @mark_numba_uncacheable
-def Li_Johns_Ahmadi_solution(zs: List[float], Ks: Union[List[float], List[float]], guess: None=None) -> Tuple[float, List[float], List[float]]:
+def Li_Johns_Ahmadi_solution(zs: list[float], Ks: list[float], guess: None=None) -> tuple[float, list[float], list[float]]:
     r"""Solves the objective function of the Li-Johns-Ahmadi flash equation.
     Uses the method proposed in [1]_ to obtain an initial guess.
 
@@ -2001,7 +2004,7 @@ def Li_Johns_Ahmadi_solution(zs: List[float], Ks: Union[List[float], List[float]
     return V_over_F, Ks_sorted, zs_sorted
 
 
-def _Rachford_Rice_analytical_3(zs: List[float], Ks: List[float]) -> Union[Tuple[complex, List[complex], List[complex]], Tuple[float, List[float], List[float]]]:
+def _Rachford_Rice_analytical_3(zs: list[float], Ks: list[float]) -> tuple[complex, list[complex], list[complex]] | tuple[float, list[float], list[float]]:
     z1, z2, z3 = zs
     K1, K2, K3 = Ks
     x0 = K1*z1
@@ -2120,7 +2123,7 @@ flash_inner_loop_all_methods = (FLASH_INNER_ANALYTICAL,
                                 FLASH_INNER_LN)
 """Tuple of method name keys. See the `flash_inner_loop` for the actual references"""
 
-def flash_inner_loop_methods(N: int) -> List[str]:
+def flash_inner_loop_methods(N: int) -> list[str]:
     """Return all methods able to solve the Rachford-Rice equation
     for the specified number of components.
 
@@ -2155,7 +2158,7 @@ def flash_inner_loop_methods(N: int) -> List[str]:
 
 
 @mark_numba_uncacheable
-def flash_inner_loop(zs: List[float], Ks: Union[List[float], List[float]], method: Optional[str]=None, guess: Optional[float]=None, check: bool=False) -> Tuple[float, List[float], List[float]]:
+def flash_inner_loop(zs: list[float], Ks: list[float], method: str | None=None, guess: float | None=None, check: bool=False) -> tuple[float, list[float], list[float]]:
     r"""This function handles the solution of the inner loop of a flash
     calculation, solving for liquid and gas mole fractions and vapor fraction
     based on specified overall mole fractions and K values. As K values are
@@ -2350,7 +2353,7 @@ def flash_inner_loop(zs: List[float], Ks: Union[List[float], List[float]], metho
 
 ### N phase RR
 
-def Rachford_Rice_flashN_f_jac(betas: List[float], ns: List[float], Ks: List[List[float]], Ksm1: Optional[List[List[float]]]=None, zsKsm1: Optional[List[List[float]]]=None) -> Tuple[List[float], List[List[float]]]:
+def Rachford_Rice_flashN_f_jac(betas: list[float], ns: list[float], Ks: list[list[float]], Ksm1: list[list[float]] | None=None, zsKsm1: list[list[float]] | None=None) -> tuple[list[float], list[list[float]]]:
     N = len(betas)
     Fs = [0.0]*N
     dFs_dBetas = [[0.0]*N for i in range(N)] # numba: delete
@@ -2383,7 +2386,7 @@ def Rachford_Rice_flashN_f_jac(betas: List[float], ns: List[float], Ks: List[Lis
     return Fs, dFs_dBetas
 
 
-def Rachford_Rice_flash2_f_jac(betas: Union[List[float], List[float]], zs: List[float], Ks: List[List[float]]) -> Tuple[List[float], List[List[float]]]:
+def Rachford_Rice_flash2_f_jac(betas: list[float], zs: list[float], Ks: list[list[float]]) -> tuple[list[float], list[list[float]]]:
     # In a more clever system like RR 2, can compute entire numerators before hand.
     beta_y = betas[0]
     beta_z = betas[1]
@@ -2421,7 +2424,7 @@ def Rachford_Rice_flash2_f_jac(betas: Union[List[float], List[float]], zs: List[
 #    return Fs, dFs # numba: uncomment
     return [F0, F1], [[dF0_dy, dF0_dz], [dF0_dz, dF1_dz]] # numba: delete
 
-def Rachford_Rice_valid_solution_naive(ns: List[float], betas: Union[List[float], List[float]], Ks: List[List[float]], limit_betas: bool=False) -> bool:
+def Rachford_Rice_valid_solution_naive(ns: list[float], betas: list[float], Ks: list[list[float]], limit_betas: bool=False) -> bool:
     # print([ns, betas, Ks, limit_betas])
     if limit_betas:
         for beta in betas:
@@ -2439,7 +2442,7 @@ def Rachford_Rice_valid_solution_naive(ns: List[float], betas: Union[List[float]
 
 
 @mark_numba_uncacheable
-def Rachford_Rice_solutionN(ns: List[float], Ks: List[List[float]], betas: List[float]) -> Tuple[List[float], List[List[float]]]:
+def Rachford_Rice_solutionN(ns: list[float], Ks: list[list[float]], betas: list[float]) -> tuple[list[float], list[list[float]]]:
     r"""Solves the (phases -1) objectives functions of the Rachford-Rice flash
     equation for an N-phase system. Initial guesses are required for all phase
     fractions except the last. The Newton method is used, with an
@@ -2589,7 +2592,7 @@ def Rachford_Rice_solutionN(ns: List[float], Ks: List[List[float]], betas: List[
     return all_betas, comps
 
 
-def RRN_new_betas(betas: Union[List[float], List[float]], d_betas: List[float], damping: float, ns: List[float], Ks: List[List[float]], *args) -> List[float]:
+def RRN_new_betas(betas: list[float], d_betas: list[float], damping: float, ns: list[float], Ks: list[list[float]], *args) -> list[float]:
     N = len(betas)
     limit_betas = False
     max_beta_step = 1e100
@@ -2616,7 +2619,7 @@ def RRN_new_betas(betas: Union[List[float], List[float]], d_betas: List[float], 
 
 
 @mark_numba_uncacheable
-def Rachford_Rice_solution2(ns: List[float], Ks_y: List[float], Ks_z: List[float], beta_y: float=0.5, beta_z: float=1e-6) -> Tuple[float, float, List[float], List[float], List[float]]:
+def Rachford_Rice_solution2(ns: list[float], Ks_y: list[float], Ks_z: list[float], beta_y: float=0.5, beta_z: float=1e-6) -> tuple[float, float, list[float], list[float], list[float]]:
     r"""Solves the two objective functions of the Rachford-Rice flash equation
     for a three-phase system. Initial guesses are required for both phase
     fractions, `beta_y` and `beta_z`. The Newton method is used, with an

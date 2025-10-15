@@ -34,9 +34,9 @@ Lookup Functions
 .. autodata:: chemicals.dipole.dipole_moment_all_methods
 
 """
-from typing import List, Optional
+from __future__ import annotations
 
-__all__: List[str] = [
+__all__: list[str] = [
     "dipole_moment",
     "dipole_moment_all_methods",
     "dipole_moment_methods",
@@ -95,7 +95,7 @@ dipole_moment_all_methods = (CCCBDB, MULLER, POLING, PSI4_2022A)
 """Tuple of method name keys. See the `dipole` for the actual references"""
 
 @mark_numba_incompatible
-def dipole_moment_methods(CASRN: str) -> List[str]:
+def dipole_moment_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain the dipole moment for the desired
     chemical.
 

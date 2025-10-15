@@ -175,10 +175,9 @@ attribute of this module.
     In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Tuple
+from __future__ import annotations
 
-__all__: List[str] = [
+__all__: list[str] = [
     "PPDS2",
     "PPDS15",
     "Cpg_statistical_mechanics",
@@ -226,6 +225,7 @@ __all__: List[str] = [
 ]
 import os
 from math import expm1
+from typing import TYPE_CHECKING
 
 from fluids.constants import R, c, h, k
 from fluids.numerics import brenth, exp, log, polylog2, secant
@@ -233,6 +233,9 @@ from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_uncacheable, os_path_join, source_path, to_num
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 IS_NUMBA = "IS_NUMBA" in globals()
 ### Methods introduced in this module
@@ -297,7 +300,7 @@ class ZabranskySpline:
     if not IS_NUMBA:
         __slots__ = ("Tmax", "Tmin", "coeffs")
 
-    def __init__(self, coeffs: Tuple[float, float, float, float], Tmin: float, Tmax: float) -> None:
+    def __init__(self, coeffs: tuple[float, float, float, float], Tmin: float, Tmax: float) -> None:
         self.coeffs = coeffs
         self.Tmin = Tmin
         self.Tmax = Tmax
@@ -455,7 +458,7 @@ class ZabranskyQuasipolynomial:
     if not IS_NUMBA:
         __slots__ = ("Tc", "Tmax", "Tmin", "coeffs")
 
-    def __init__(self, coeffs: Tuple[float, float, float, float, float, float], Tc: float, Tmin: float, Tmax: float) -> None:
+    def __init__(self, coeffs: tuple[float, float, float, float, float, float], Tc: float, Tmin: float, Tmax: float) -> None:
         self.coeffs = coeffs
         self.Tc = Tc
         self.Tmin = Tmin
@@ -542,7 +545,7 @@ class PiecewiseHeatCapacity:
     # Dev note - not possible to jitclass this as the model types are not explicit
     __slots__ = ("Tmax", "Tmin", "models")
 
-    def __init__(self, models: List[ZabranskySpline]) -> None:
+    def __init__(self, models: list[ZabranskySpline]) -> None:
         self.models = tuple(sorted(models, key=lambda x: x.Tmin))
         self.Tmin = self.models[0].Tmin
         self.Tmax = self.models[-1].Tmax

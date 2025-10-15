@@ -54,10 +54,11 @@ Pure Component Liquid Fit Correlations
 .. autofunction:: chemicals.refractivity.TDE_RIXExpansion
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional, Tuple
+from __future__ import annotations
 
-__all__: List[str] = [
+from typing import TYPE_CHECKING
+
+__all__: list[str] = [
     "RI",
     "RI_IAPWS",
     "RI_all_methods",
@@ -84,6 +85,9 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 # Register data sources and lazy load them
 
@@ -116,7 +120,7 @@ RI_all_methods = (CRC, miscdata.WIKIDATA)
 """Tuple of method name keys. See the `RI` for the actual references"""
 
 @mark_numba_incompatible
-def RI_methods(CASRN: str) -> List[str]:
+def RI_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain the refractive index for the
     desired chemical.
 
@@ -139,7 +143,7 @@ def RI_methods(CASRN: str) -> List[str]:
     return list_available_methods_from_df_dict(RI_sources, CASRN, "RI")
 
 @mark_numba_incompatible
-def RI(CASRN: str, method: Optional[str]=None) -> Tuple[float, float]:
+def RI(CASRN: str, method: str | None=None) -> tuple[float, float]:
     r"""This function handles the retrieval of a chemical's refractive
     index. Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.

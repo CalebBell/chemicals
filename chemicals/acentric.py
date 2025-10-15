@@ -46,9 +46,9 @@ Correlations
 ------------
 .. autofunction:: chemicals.acentric.LK_omega
 """
-from typing import List, Optional
+from __future__ import annotations
 
-__all__: List[str] = [
+__all__: list[str] = [
     "LK_omega",
     "Stiel_polar_factor",
     "omega",
@@ -70,7 +70,7 @@ omega_all_methods = (miscdata.HEOS, "PSRK", "PD", "YAWS", critical.ACENTRIC_DEFI
 """Tuple of method name keys. See the `omega` for the actual references"""
 
 @mark_numba_incompatible
-def omega_methods(CASRN: str) -> List[str]:
+def omega_methods(CASRN: str) -> list[str]:
     """Return all methods available for obtaining omega for the desired
     chemical.
 
@@ -91,7 +91,7 @@ def omega_methods(CASRN: str) -> List[str]:
     return list_available_methods_from_df_dict(critical.omega_sources, CASRN, "omega")
 
 @mark_numba_incompatible
-def omega(CASRN: str, method: Optional[str]=None) -> Optional[float]:
+def omega(CASRN: str, method: str | None=None) -> float | None:
     r"""Retrieve a chemical's acentric factor, `omega`.
 
     Automatically select a method to use if no method is provided;

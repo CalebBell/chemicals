@@ -214,11 +214,11 @@ The structure of each dataframe is shown below:
 
     In [11]: chemicals.vapor_pressure.Psat_data_Landolt_Antoine
 """
-from pandas.core.frame import DataFrame
-from typing import List, Tuple
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-__all__: List[str] = [
+__all__: list[str] = [
     "Ambrose_Walton",
     "Antoine",
     "Antoine_AB_coeffs_from_point",
@@ -264,6 +264,9 @@ from fluids.numerics import numpy as np
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 folder = os_path_join(source_path, "Vapor Pressure")
 
@@ -823,7 +826,7 @@ def d2Antoine_dT2(T, A, B, C, base=10.0):
     x0 = B*den*log_base
     return x0*base**(A - B*den)*(x0 - 2.0)*den*den
 
-def Antoine_coeffs_from_point(T: float, Psat: float, dPsat_dT: float, d2Psat_dT2: float, base: float=10.0) -> Tuple[float, float, float]:
+def Antoine_coeffs_from_point(T: float, Psat: float, dPsat_dT: float, d2Psat_dT2: float, base: float=10.0) -> tuple[float, float, float]:
     r"""Calculates the antoine coefficients `A`, `B`, and `C` from a known
     vapor pressure and its first and second temperature derivative.
 
@@ -891,7 +894,7 @@ def Antoine_coeffs_from_point(T: float, Psat: float, dPsat_dT: float, d2Psat_dT2
     C = -x3*(2.0*Psat*dPsat_dT + T*x1 - T*dPsat_dT_2)
     return (A, B, C)
 
-def Antoine_AB_coeffs_from_point(T: float, Psat: float, dPsat_dT: float, base: float=10.0) -> Tuple[float, float]:
+def Antoine_AB_coeffs_from_point(T: float, Psat: float, dPsat_dT: float, base: float=10.0) -> tuple[float, float]:
     r"""Calculates the antoine coefficients `A`, `B`, with `C` set to zero to
     improve low-temperature or high-temperature extrapolation, from a known
     vapor pressure and its first temperature derivative.
@@ -956,7 +959,7 @@ def Antoine_AB_coeffs_from_point(T: float, Psat: float, dPsat_dT: float, base: f
     B = T*T*dPsat_dT*log_base_inv*Psat_inv
     return (A, B)
 
-def DIPPR101_ABC_coeffs_from_point(T: float, Psat: float, dPsat_dT: float, d2Psat_dT2: float) -> Tuple[float, float, float]:
+def DIPPR101_ABC_coeffs_from_point(T: float, Psat: float, dPsat_dT: float, d2Psat_dT2: float) -> tuple[float, float, float]:
     r"""Calculates the first three DIPPR101 coefficients `A`, `B`, and `C`
     from a known vapor pressure and its first and second temperature derivative.
 

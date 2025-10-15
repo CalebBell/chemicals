@@ -69,12 +69,11 @@ Utility Functions
 .. autofunction:: chemicals.lennard_jones.T_star
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-
-__all__: List[str] = [
+__all__: list[str] = [
     "As_collision",
     "Bs_collision",
     "Cs_collision",
@@ -120,6 +119,9 @@ from chemicals.data_reader import (
 )
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
+
 #  Register data sources and lazy load them
 
 folder = os_path_join(source_path, "Viscosity")
@@ -158,7 +160,7 @@ Stockmayer_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN
 """Tuple of method name keys. See the `Stockmayer` for the actual references"""
 
 @mark_numba_incompatible
-def Stockmayer_methods(CASRN: Optional[str]=None, Tm: Optional[float]=None, Tb: Optional[float]=None, Tc: Optional[float]=None, Zc: Optional[float]=None, omega: Optional[float]=None) -> List[str]:
+def Stockmayer_methods(CASRN: str | None=None, Tm: float | None=None, Tb: float | None=None, Tc: float | None=None, Zc: float | None=None, omega: float | None=None) -> list[str]:
     """Return all methods available to obtain the Stockmayer parameter for the
     desired chemical.
 
@@ -199,8 +201,8 @@ def Stockmayer_methods(CASRN: Optional[str]=None, Tm: Optional[float]=None, Tb: 
     return methods
 
 @mark_numba_incompatible
-def Stockmayer(CASRN: str="", Tm: Optional[float]=None, Tb: Optional[float]=None, Tc: Optional[float]=None, Zc: Optional[float]=None, omega: Optional[float]=None,
-               method: Optional[str]=None) -> Optional[float]:
+def Stockmayer(CASRN: str="", Tm: float | None=None, Tb: float | None=None, Tc: float | None=None, Zc: float | None=None, omega: float | None=None,
+               method: str | None=None) -> float | None:
     r"""This function handles the retrieval or calculation a chemical's
     Stockmayer parameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 7 CSP methods.
@@ -309,8 +311,8 @@ molecular_diameter_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD4, SILVALIUMA
 """Tuple of method name keys. See the `molecular_diameter` for the actual references"""
 
 @mark_numba_incompatible
-def molecular_diameter_methods(CASRN: Optional[str]=None, Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: Optional[float]=None, Zc: Optional[float]=None,
-                               omega: Optional[float]=None, Vm: Optional[float]=None, Vb: Optional[float]=None) -> List[str]:
+def molecular_diameter_methods(CASRN: str | None=None, Tc: float | None=None, Pc: float | None=None, Vc: float | None=None, Zc: float | None=None,
+                               omega: float | None=None, Vm: float | None=None, Vb: float | None=None) -> list[str]:
     """Return all methods available to obtain the molecular diameter for the
     desired chemical.
 
@@ -358,8 +360,8 @@ def molecular_diameter_methods(CASRN: Optional[str]=None, Tc: Optional[float]=No
     return methods
 
 @mark_numba_incompatible
-def molecular_diameter(CASRN: Optional[str]=None, Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: Optional[float]=None, Zc: Optional[float]=None, omega: Optional[float]=None,
-          Vm: Optional[float]=None, Vb: Optional[float]=None, method: Optional[str]=None) -> Optional[float]:
+def molecular_diameter(CASRN: str | None=None, Tc: float | None=None, Pc: float | None=None, Vc: float | None=None, Zc: float | None=None, omega: float | None=None,
+          Vm: float | None=None, Vb: float | None=None, method: str | None=None) -> float | None:
     r"""This function handles the retrieval or calculation a chemical's
     L-J molecular diameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 9 CSP methods.
@@ -779,7 +781,7 @@ def sigma_Tee_Gotoh_Steward_2(Tc: float, Pc: float, omega: float) -> float:
     sigma = (2.3551-0.0874*omega)*(Tc/Pc)**(1/3.)
     return sigma
 
-def sigma_Silva_Liu_Macedo(Tc: float, Pc: float) -> Optional[float]:
+def sigma_Silva_Liu_Macedo(Tc: float, Pc: float) -> float | None:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses critical temperature and pressure. CSP method by [1]_.
 

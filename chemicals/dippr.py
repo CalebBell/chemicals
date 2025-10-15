@@ -57,10 +57,9 @@ Jacobians (for fitting)
 .. autofunction:: chemicals.dippr.EQ107_fitting_jacobian
 
 """
-from typing import List, Union
+from __future__ import annotations
 
-
-__all__: List[str] = [
+__all__: list[str] = [
     "EQ100",
     "EQ101",
     "EQ102",
@@ -106,7 +105,7 @@ INTEGRAL_CALCULATION = -1
 INTEGRAL_OVER_T_CALCULATION = -10
 
 
-def EQ100(T: float, A: float=0, B: float=0, C: float=0, D: float=0, E: float=0, F: int=0, G: int=0, order: Union[complex, float, int]=0) -> float:
+def EQ100(T: float, A: float=0, B: float=0, C: float=0, D: float=0, E: float=0, F: int=0, G: int=0, order: complex=0) -> float:
     r"""DIPPR Equation # 100. Used in calculating the molar heat capacities
     of liquids and solids, liquid thermal conductivity, and solid density.
     All parameters default to zero. As this is a straightforward polynomial,
@@ -284,7 +283,7 @@ def EQ101(T, A, B, C=0.0, D=0.0, E=0.0, order=0):
     else:
         raise ValueError(order_not_found_pos_only_msg)
 
-def EQ102(T: float, A: float, B: float, C: float=0.0, D: float=0.0, order: Union[complex, float, int]=0) -> float:
+def EQ102(T: float, A: float, B: float, C: float=0.0, D: float=0.0, order: complex=0) -> float:
     r"""DIPPR Equation # 102. Used in calculating vapor viscosity, vapor
     thermal conductivity, and sometimes solid heat capacity. High values of B
     raise an OverflowError.
@@ -546,7 +545,7 @@ def EQ107_fitting_jacobian(Ts, A, B, C, D, E):
         r[4] = 2.0*D*E*x7*(-x5*sinh(x5)*x6_inv + 1.0)
     return out
 
-def EQ104(T: float, A: float, B: float, C: int=0.0, D: float=0.0, E: float=0.0, order: Union[complex, float, int]=0) -> float:
+def EQ104(T: float, A: float, B: float, C: int=0.0, D: float=0.0, E: float=0.0, order: complex=0) -> float:
     r"""DIPPR Equation #104. Often used in calculating second virial
     coefficients of gases. All 5 parameters are required.
     C, D, and E are normally large values.
@@ -1029,7 +1028,7 @@ def EQ106_ABC(T, Tc, val, der, der2):
     return (A, B, C)
 
 
-def EQ107(T: float, A: float=0, B: float=0, C: float=0, D: float=0, E: float=0, order: Union[complex, float, int]=0) -> float:
+def EQ107(T: float, A: float=0, B: float=0, C: float=0, D: float=0, E: float=0, order: complex=0) -> float:
     r"""DIPPR Equation #107. Often used in calculating ideal-gas heat capacity.
     All 5 parameters are required.
     Also called the Aly-Lee equation.
@@ -1127,7 +1126,7 @@ def EQ107(T: float, A: float=0, B: float=0, C: float=0, D: float=0, E: float=0, 
         raise ValueError(order_not_found_msg)
 
 
-def EQ114(T: float, Tc: float, A: float, B: float, C: float, D: float, order: Union[complex, float, int]=0) -> float:
+def EQ114(T: float, Tc: float, A: float, B: float, C: float, D: float, order: complex=0) -> float:
     r"""DIPPR Equation #114. Rarely used, normally as an alternate liquid
     heat capacity expression. All 4 parameters are required, as well as
     critical temperature.
@@ -1361,7 +1360,7 @@ def EQ115(T, A, B, C=0, D=0, E=0, order=0):
         raise ValueError(order_not_found_msg)
 
 
-def EQ116(T: float, Tc: float, A: float, B: float, C: float, D: float, E: float, order: Union[complex, float, int]=0) -> float:
+def EQ116(T: float, Tc: float, A: float, B: float, C: float, D: float, E: float, order: complex=0) -> float:
     r"""DIPPR Equation #116. Used to describe the molar density of water fairly
     precisely; no other uses listed. All 5 parameters are needed, as well as
     the critical temperature.
@@ -1506,7 +1505,7 @@ def EQ116(T: float, Tc: float, A: float, B: float, C: float, D: float, E: float,
         raise ValueError(order_not_found_msg)
 
 
-def EQ127(T: float, A: float, B: float, C: float, D: float, E: float, F: float, G: float, order: Union[complex, float, int]=0) -> float:
+def EQ127(T: float, A: float, B: float, C: float, D: float, E: float, F: float, G: float, order: complex=0) -> float:
     r"""DIPPR Equation #127. Rarely used, and then only in calculating
     ideal-gas heat capacity. All 7 parameters are required.
 

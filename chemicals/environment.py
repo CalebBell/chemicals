@@ -56,10 +56,11 @@ Octanol-Water Partition Coefficient
 .. autodata:: chemicals.environment.logP_all_methods
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional, Union
+from __future__ import annotations
 
-__all__: List[str] = [
+from typing import TYPE_CHECKING
+
+__all__: list[str] = [
     "GTP",
     "GWP",
     "ODP",
@@ -87,6 +88,9 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 ### Register data sources and lazy load them
 folder = os_path_join(source_path, "Environment")
@@ -203,7 +207,7 @@ def __getattr__(name: str) -> DataFrame:
 ### Environmental data functions
 
 @mark_numba_incompatible
-def GWP_methods(CASRN: str) -> List[str]:
+def GWP_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain GWP for the desired chemical.
 
     Parameters
@@ -250,7 +254,7 @@ def GTP_methods(CASRN):
     return methods_5e + methods_6e
 
 @mark_numba_incompatible
-def GWP(CASRN: str, method: Optional[str]=None) -> Optional[float]:
+def GWP(CASRN: str, method: str | None=None) -> float | None:
     r"""This function handles the retrieval of a chemical's Global Warming
     Potential, relative to CO2. Lookup is based on CASRNs.
 
@@ -446,7 +450,7 @@ ODP_all_methods = (ODP2MAX, ODP1MAX, ODP2LOG, ODP1LOG,
 """Tuple of method name keys. See the `ODP` for the actual references"""
 
 @mark_numba_incompatible
-def ODP_methods(CASRN: str) -> List[str]:
+def ODP_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain ODP for the desired chemical.
 
     Parameters
@@ -467,7 +471,7 @@ def ODP_methods(CASRN: str) -> List[str]:
     return list_available_methods_from_df(ODP_data, CASRN, _ODP_keys_by_method)
 
 @mark_numba_incompatible
-def ODP(CASRN: str, method: Optional[str]=None) -> Optional[Union[str, float]]:
+def ODP(CASRN: str, method: str | None=None) -> str | float | None:
     r"""This function handles the retrieval of a chemical's Ozone Depletion
     Potential, relative to CFC-11 (trichlorofluoromethane). Lookup is based on
     CASRNs. Will automatically select a data source to use if no method is
@@ -547,7 +551,7 @@ logP_all_methods = (SYRRES, CRC, miscdata.WIKIDATA)
 """Tuple of method name keys. See the `logP` for the actual references"""
 
 @mark_numba_incompatible
-def logP_methods(CASRN: str) -> List[str]:
+def logP_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain logP for the desired chemical.
 
     Parameters
@@ -568,7 +572,7 @@ def logP_methods(CASRN: str) -> List[str]:
     return list_available_methods_from_df_dict(logP_sources, CASRN, "logP")
 
 @mark_numba_incompatible
-def logP(CASRN: str, method: Optional[str]=None) -> Optional[float]:
+def logP(CASRN: str, method: str | None=None) -> float | None:
     r"""This function handles the retrieval of a chemical's octanol-water
     partition coefficient. Lookup is based on CASRNs. Will automatically
     select a data source to use if no method is provided; returns None if the

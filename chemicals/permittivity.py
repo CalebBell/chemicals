@@ -54,17 +54,20 @@ attribute of this module.
     In [2]: chemicals.permittivity.permittivity_data_CRC
 
 """
-from pandas.core.frame import DataFrame
-from typing import List
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
-__all__: List[str] = ["permittivity_CRC", "permittivity_IAPWS"]
+__all__: list[str] = ["permittivity_CRC", "permittivity_IAPWS"]
 
 from fluids.numerics import numpy as np
 from fluids.numerics import sqrt
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 folder = os_path_join(source_path, "Electrolytes")
 register_df_source(folder, "Permittivity (Dielectric Constant) of Liquids.tsv")

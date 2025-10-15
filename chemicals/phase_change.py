@@ -125,10 +125,11 @@ The structure of each dataframe is shown below:
     In [4]: chemicals.phase_change.phase_change_data_Alibakhshi_Cs
 
 """
-from pandas.core.frame import DataFrame
-from typing import List, Optional
+from __future__ import annotations
 
-__all__: List[str] = [
+from typing import TYPE_CHECKING
+
+__all__: list[str] = [
     "MK",
     "PPDS12",
     "SMK",
@@ -166,6 +167,9 @@ from chemicals.data_reader import (
     retrieve_from_df_dict,
 )
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
+
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
 
 ###  Register data sources and lazy load them
 
@@ -269,7 +273,7 @@ Tb_all_methods = (miscdata.HEOS, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
 """Tuple of method name keys. See the `Tbg` for the actual references"""
 
 @mark_numba_incompatible
-def Tb_methods(CASRN: str) -> List[str]:
+def Tb_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain the normal boiling point
     for the desired chemical.
 
@@ -291,7 +295,7 @@ def Tb_methods(CASRN: str) -> List[str]:
     return list_available_methods_from_df_dict(Tb_sources, CASRN, "Tb")
 
 @mark_numba_incompatible
-def Tb(CASRN: str, method: Optional[str]=None) -> Optional[float]:
+def Tb(CASRN: str, method: str | None=None) -> float | None:
     r"""This function handles the retrieval of a chemical's normal boiling
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -378,7 +382,7 @@ Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
 """Tuple of method name keys. See the `Tm` for the actual references"""
 
 @mark_numba_incompatible
-def Tm_methods(CASRN: str) -> List[str]:
+def Tm_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain the melting point for the desired
     chemical.
 
@@ -400,7 +404,7 @@ def Tm_methods(CASRN: str) -> List[str]:
     return list_available_methods_from_df_dict(Tm_sources, CASRN, "Tm")
 
 @mark_numba_incompatible
-def Tm(CASRN: str, method: Optional[str]=None) -> Optional[float]:
+def Tm(CASRN: str, method: str | None=None) -> float | None:
     r"""This function handles the retrieval of a chemical's melting
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -1280,7 +1284,7 @@ Hfus_all_methods = (CRC, miscdata.WEBBOOK, miscdata.WIKIDATA, miscdata.JOBACK)
 """Tuple of method name keys. See the `Hfus` for the actual references"""
 
 @mark_numba_incompatible
-def Hfus_methods(CASRN: str) -> List[str]:
+def Hfus_methods(CASRN: str) -> list[str]:
     """Return all methods available to obtain the heat of fusion for the
     desired chemical.
 
@@ -1302,7 +1306,7 @@ def Hfus_methods(CASRN: str) -> List[str]:
     return list_available_methods_from_df_dict(Hfus_sources, CASRN, "Hfus")
 
 @mark_numba_incompatible
-def Hfus(CASRN: str, method: None=None) -> Optional[float]:
+def Hfus(CASRN: str, method: None=None) -> float | None:
     r"""This function handles the retrieval of a chemical's heat of fusion.
     Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not

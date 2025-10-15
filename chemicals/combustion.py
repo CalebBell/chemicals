@@ -72,6 +72,7 @@ Lookup Functions
 .. autodata:: chemicals.combustion.ignition_delay_all_methods
 
 """
+from __future__ import annotations
 
 from fluids.numerics import normalize
 
@@ -86,9 +87,8 @@ from chemicals.data_reader import (
 )
 from chemicals.elements import mass_fractions, molecular_weight, simple_formula_parser
 from chemicals.utils import mark_numba_incompatible, os_path_join, property_mass_to_molar, property_molar_to_mass, source_path
-from typing import Dict, List, Optional, Tuple, Union
 
-__all__: List[str] = (
+__all__: list[str] = (
     "AKI",
     "MON",
     "RON",
@@ -655,7 +655,7 @@ def IDT_to_DCN(IDT):
         return (83.99*(IDT-1.512)**-0.658) + 3.547
 
 @mark_numba_incompatible
-def as_atoms(formula: Union[str, Dict[str, int], Dict[str, float], Dict[str, float]]) -> Dict[str, float]:
+def as_atoms(formula: str | dict[str, int] | dict[str, float]) -> dict[str, float]:
     if isinstance(formula, str):
         atoms = simple_formula_parser(formula)
     elif isinstance(formula, dict):
@@ -741,7 +741,7 @@ O2_CAS = "7782-44-7"
 H2O_CAS = "7732-18-5"
 
 @mark_numba_incompatible
-def combustion_stoichiometry(atoms: Dict[str, float], MW: Optional[float]=None, missing_handling: str="elemental") -> Dict[str, float]:
+def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, missing_handling: str="elemental") -> dict[str, float]:
     r"""Return a dictionary of stoichiometric coefficients of chemical
     combustion, given a dictionary of a molecule's constituent atoms and their
     counts.
@@ -877,9 +877,9 @@ def combustion_stoichiometry(atoms: Dict[str, float], MW: Optional[float]=None, 
     return products
 
 @mark_numba_incompatible
-def combustion_products_mixture(atoms_list: List[Dict[str, int]], zs: List[float], reactivities: Optional[List[bool]]=None, CASs: Optional[List[str]]=None,
+def combustion_products_mixture(atoms_list: list[dict[str, int]], zs: list[float], reactivities: list[bool] | None=None, CASs: list[str] | None=None,
                                 missing_handling: str="elemental",
-                                combustion_stoichiometries: None=None) -> Dict[str, float]:
+                                combustion_stoichiometries: None=None) -> dict[str, float]:
     """Calculates the combustion products of a mixture of molecules and their,
     mole fractions; requires a list of dictionaries of each molecule's
     constituent atoms and their counts. Products for non-hydrocarbons may not be
@@ -956,7 +956,7 @@ def combustion_products_mixture(atoms_list: List[Dict[str, int]], zs: List[float
     return products
 
 
-def combustion_products_to_list(products: Dict[str, float], CASs: List[str]) -> List[float]:
+def combustion_products_to_list(products: dict[str, float], CASs: list[str]) -> list[float]:
     zs = [0.0 for i in CASs]
     for product, zi in products.items():
         if product == "O2_required":
@@ -975,7 +975,7 @@ def combustion_products_to_list(products: Dict[str, float], CASs: List[str]) -> 
 
 
 @mark_numba_incompatible
-def is_combustible(CAS: str, atoms: Dict[str, int], reactive: bool=True) -> bool:
+def is_combustible(CAS: str, atoms: dict[str, int], reactive: bool=True) -> bool:
     if not reactive:
         return False
     if CAS in unreactive_CASs:
@@ -985,7 +985,7 @@ def is_combustible(CAS: str, atoms: Dict[str, int], reactive: bool=True) -> bool
     return bool("H" in atoms and atoms["H"] > 0.0)
 
 @mark_numba_incompatible
-def HHV_stoichiometry(stoichiometry: Dict[str, float], Hf: float, Hf_chemicals: Optional[Dict[str, float]]=None) -> float:
+def HHV_stoichiometry(stoichiometry: dict[str, float], Hf: float, Hf_chemicals: dict[str, float] | None=None) -> float:
     r"""
     Return the higher heating value [HHV; in J/mol] based on the
     theoretical combustion stoichiometry and the heat of formation of
@@ -1030,7 +1030,7 @@ def HHV_stoichiometry(stoichiometry: Dict[str, float], Hf: float, Hf_chemicals: 
     return sum([Hfs[i] * j for i, j in stoichiometry.items()]) - Hf
 
 @mark_numba_incompatible
-def HHV_modified_Dulong(mass_fractions: Dict[str, float]) -> float:
+def HHV_modified_Dulong(mass_fractions: dict[str, float]) -> float:
     r"""
     Return higher heating value [HHV; in J/g] based on the modified
     Dulong's equation [1]_.
@@ -1241,7 +1241,7 @@ class CombustionData:
 
     """
 
-    def __init__(self, stoichiometry: Dict[str, float], HHV: float, Hf: float, MW: float) -> None:
+    def __init__(self, stoichiometry: dict[str, float], HHV: float, Hf: float, MW: float) -> None:
         self.stoichiometry = stoichiometry
         self.HHV = HHV
         self.Hf = Hf
@@ -1256,9 +1256,9 @@ class CombustionData:
         return f"CombustionData(stoichiometry={self.stoichiometry}, HHV={self.HHV}, Hf={self.Hf}, MW={self.MW})"
 
 
-def air_fuel_ratio_solver(ratio: Optional[float], Vm_air: float, Vm_fuel: float, MW_air: float, MW_fuel: float,
-                          n_air: Optional[float]=None, n_fuel: Optional[float]=None,
-                          basis: str="mass") -> Tuple[float, float, float, float, float]:
+def air_fuel_ratio_solver(ratio: float | None, Vm_air: float, Vm_fuel: float, MW_air: float, MW_fuel: float,
+                          n_air: float | None=None, n_fuel: float | None=None,
+                          basis: str="mass") -> tuple[float, float, float, float, float]:
     """Calculates molar flow rate of air or fuel from the other, using a
     specified air-fuel ratio. Supports 'mole', 'mass', and 'volume'.
 
@@ -1357,13 +1357,13 @@ def air_fuel_ratio_solver(ratio: Optional[float], Vm_air: float, Vm_fuel: float,
     return n_air, n_fuel, mole_ratio, mass_ratio, volume_ratio
 
 @mark_numba_incompatible
-def fuel_air_spec_solver(zs_air: List[float], zs_fuel: List[float], CASs: List[str], atomss: List[Dict[str, int]], n_fuel: Optional[float]=None,
-                         n_air: Optional[float]=None, n_out: Optional[float]=None,
-                         O2_excess: Optional[float]=None, frac_out_O2: Optional[float]=None,
-                         frac_out_O2_dry: Optional[float]=None, ratio: Optional[float]=None,
-                         Vm_air: Optional[float]=None, Vm_fuel: Optional[float]=None, MW_air: Optional[float]=None, MW_fuel: Optional[float]=None,
-                         ratio_basis: str="mass", reactivities: Optional[List[bool]]=None,
-                         combustion_stoichiometries: None=None) -> Dict[str, Union[float, List[float]]]:
+def fuel_air_spec_solver(zs_air: list[float], zs_fuel: list[float], CASs: list[str], atomss: list[dict[str, int]], n_fuel: float | None=None,
+                         n_air: float | None=None, n_out: float | None=None,
+                         O2_excess: float | None=None, frac_out_O2: float | None=None,
+                         frac_out_O2_dry: float | None=None, ratio: float | None=None,
+                         Vm_air: float | None=None, Vm_fuel: float | None=None, MW_air: float | None=None, MW_fuel: float | None=None,
+                         ratio_basis: str="mass", reactivities: list[bool] | None=None,
+                         combustion_stoichiometries: None=None) -> dict[str, float | list[float]]:
     """Solves the system of equations describing a flow of air mixing with a
     flow of combustibles and burning completely. All calculated variables are
     returned as a dictionary.
@@ -1685,14 +1685,14 @@ def fuel_air_spec_solver(zs_air: List[float], zs_fuel: List[float], CASs: List[s
     return results
 
 @mark_numba_incompatible
-def fuel_air_third_spec_solver(zs_air: List[float], zs_fuel: List[float], zs_third: List[float], CASs: List[str], atomss: List[Dict[str, int]], n_third: float,
-                           n_fuel: Optional[float]=None, n_air: Optional[float]=None, n_out: Optional[float]=None,
-                           O2_excess: Optional[float]=None, frac_out_O2: Optional[float]=None,
-                           frac_out_O2_dry: Optional[float]=None, ratio: Optional[float]=None,
-                           Vm_air: Optional[float]=None, Vm_fuel: Optional[float]=None, Vm_third: Optional[float]=None,
-                           MW_air: Optional[float]=None, MW_fuel: Optional[float]=None, MW_third: Optional[float]=None,
-                           ratio_basis: str="mass", reactivities: Optional[List[bool]]=None,
-                           combustion_stoichiometries: None=None) -> Dict[str, Union[float, List[float]]]:
+def fuel_air_third_spec_solver(zs_air: list[float], zs_fuel: list[float], zs_third: list[float], CASs: list[str], atomss: list[dict[str, int]], n_third: float,
+                           n_fuel: float | None=None, n_air: float | None=None, n_out: float | None=None,
+                           O2_excess: float | None=None, frac_out_O2: float | None=None,
+                           frac_out_O2_dry: float | None=None, ratio: float | None=None,
+                           Vm_air: float | None=None, Vm_fuel: float | None=None, Vm_third: float | None=None,
+                           MW_air: float | None=None, MW_fuel: float | None=None, MW_third: float | None=None,
+                           ratio_basis: str="mass", reactivities: list[bool] | None=None,
+                           combustion_stoichiometries: None=None) -> dict[str, float | list[float]]:
     # I believe will always require 1 intensive spec (or flow of )
     # To begin - exclude n_out spec? Should be possible to solve for it/with it though.
 
@@ -1835,14 +1835,14 @@ def fuel_air_third_spec_solver(zs_air: List[float], zs_fuel: List[float], zs_thi
         return ans
 
 @mark_numba_incompatible
-def combustion_spec_solver(zs_air: List[float], zs_fuel: List[float], zs_third: List[float], CASs: List[str], atomss: List[Dict[str, int]], n_third: float,
-                           n_fuel: Optional[float]=None, n_air: Optional[float]=None, n_out: Optional[float]=None,
-                           O2_excess: Optional[float]=None, frac_out_O2: Optional[float]=None,
-                           frac_out_O2_dry: Optional[float]=None, ratio: Optional[float]=None,
-                           Vm_air: Optional[float]=None, Vm_fuel: Optional[float]=None, Vm_third: Optional[float]=None,
-                           MW_air: Optional[float]=None, MW_fuel: Optional[float]=None, MW_third: Optional[float]=None,
-                           ratio_basis: str="mass", reactivities: Optional[List[bool]]=None,
-                           combustion_stoichiometries: None=None) -> Dict[str, Union[float, List[float]]]:
+def combustion_spec_solver(zs_air: list[float], zs_fuel: list[float], zs_third: list[float], CASs: list[str], atomss: list[dict[str, int]], n_third: float,
+                           n_fuel: float | None=None, n_air: float | None=None, n_out: float | None=None,
+                           O2_excess: float | None=None, frac_out_O2: float | None=None,
+                           frac_out_O2_dry: float | None=None, ratio: float | None=None,
+                           Vm_air: float | None=None, Vm_fuel: float | None=None, Vm_third: float | None=None,
+                           MW_air: float | None=None, MW_fuel: float | None=None, MW_third: float | None=None,
+                           ratio_basis: str="mass", reactivities: list[bool] | None=None,
+                           combustion_stoichiometries: None=None) -> dict[str, float | list[float]]:
     """Solves the system of equations describing a flow of air mixing with two
     flow of combustibles, one fixed and one potentially variable, and burning
     completely. All calculated variables are returned as a dictionary.
