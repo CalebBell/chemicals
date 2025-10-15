@@ -157,7 +157,7 @@ Citation
 
 To cite chemicals in publications use::
 
-    Caleb Bell, Yoel Rene Cortes-Pena, and Contributors (2016-2024). Chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
+    Caleb Bell, Yoel Rene Cortes-Pena, and Contributors (2016-2025). Chemicals: Chemical properties component of Chemical Engineering Design Library (ChEDL)
     https://github.com/CalebBell/chemicals.
     
 Indices and tables
