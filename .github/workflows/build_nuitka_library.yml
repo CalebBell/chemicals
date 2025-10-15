@@ -1,8 +1,8 @@
-name: Build
+name: Check Nuitka Compatibility
 
 on:
   push:
-    branches: [master, release]
+    branches: [release]
   pull_request:
     branches: [master, release]
 
@@ -17,17 +17,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.13t', 'pypy3.9']
+        python-version: ['3.13']
         os: [windows-latest, ubuntu-latest, macos-15-intel, macos-latest]
         architecture: ['x86', 'x64']
         exclude:
-          # Only test pypy on Linux
-          - os: windows-latest
-            python-version: pypy3.9
-          - os: macos-latest
-            python-version: pypy3.9
-          - os: macos-15-intel
-            python-version: pypy3.9
           # no python builds available on macos 32 bit, arm or x64
           - os: macos-latest
             architecture: x86
@@ -55,16 +48,6 @@ jobs:
           - os: windows-latest
             architecture: x86
             python-version: 3.13
-          - os: windows-latest
-            architecture: x86
-            python-version: 3.13t
-          - os: windows-latest
-            architecture: x86
-            python-version: 3.14
-          # pandas doesn't have wheels for 3.13t on Windows x64
-          - os: windows-latest
-            architecture: x64
-            python-version: 3.13t
 
           # These are arm - old versions of Python are not supported
           - os: macos-latest
@@ -73,11 +56,10 @@ jobs:
             python-version: 3.9
           - os: macos-latest
             python-version: 3.10
-    
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }} ${{ matrix.architecture }}
-      uses: actions/setup-python@v5 
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         architecture: ${{ matrix.architecture }}
@@ -112,43 +94,26 @@ jobs:
       run: |
         # Taken from scipy
         sudo apt-get update
-        sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev libjpeg-dev zlib1g-dev libtiff-dev libfreetype6-dev liblcms2-dev libwebp-dev
+        sudo apt-get install -y libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev ccache libmpc-dev
+
     - name: Install dependencies
       run: |
         python -c "import platform; print(platform.platform()); print(platform.architecture())"
         python -m pip install --upgrade pip
         python -m pip install wheel
         pip install -r requirements_test.txt
+        pip install nuitka
     - name: Add numba
-      if: ${{ !contains(fromJSON('["pypy3.9", "3.13t"]'), matrix.python-version) }}
+      if: ${{ !contains(fromJSON('["pypy3.9"]'), matrix.python-version) }}
       run: |
         pip install numba
-    #- name: Test with low memory
-    #  run: |
-    #    pytest . -v --enable-low-memory=1 -m "not online and not sympy and not CoolProp and not fuzz"
-    - name: Test
+    - name: Build nuitka library
       run: |
-        pytest . -v --enable-low-memory=0 --cov-report html --cov=chemicals --cov-report term-missing -m "not online and not sympy and not CoolProp and not fuzz"
-        coveralls || true
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
-        COVERALLS_PARALLEL: true
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PYTHON_GIL: ${{ matrix.python-version == '3.13t' && '0' || '' }}
-
-    - name: Upload coverage HTML report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-html-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.architecture }}
-        path: htmlcov/
-  finish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls Finished
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        python -m nuitka --module chemicals --include-package=chemicals
+    - name: Delete chemicals folder
+      shell: bash
       run: |
-        curl https://coveralls.io/webhook?repo_token=${{ secrets.coveralls }} -d "payload[build_num]=${{ github.sha }}&payload[status]=done"
+          rm -rf chemicals/chemicals
+    - name: Test build library can be imported
+      run: |
+        python -c "import chemicals; print(chemicals.__version__)"
