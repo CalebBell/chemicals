@@ -2686,7 +2686,7 @@ def none_and_length_check(all_inputs: Any, length: int | None=None) -> bool:
 
 
 
-def normalize(values: list[float] | list[float | numpy.float64] | list[int]) -> list[numpy.float64] | list[float]:
+def normalize(values: list[float]) -> list[float]:
     r"""Simple function which normalizes a series of values to be from 0 to 1,
     and for their sum to add to 1.
 

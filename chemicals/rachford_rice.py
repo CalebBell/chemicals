@@ -178,9 +178,6 @@ from fluids.numerics import numpy as np
 from chemicals.exceptions import PhaseCountReducedError
 from chemicals.utils import mark_numba_incompatible, mark_numba_uncacheable
 
-if TYPE_CHECKING:
-    from numpy import float64, ndarray
-
 try:
     from itertools import combinations
 except:
@@ -903,7 +900,7 @@ def Rachford_Rice_numpy_err(V_over_F, zs_k_minus_1, K_minus_1):
 #    return err # numba: uncomment
     return float(err) # numba: delete
 
-def Rachford_Rice_numpy_err_fprime2(V_over_F: float64, zs_k_minus_1: ndarray, K_minus_1: ndarray) -> tuple[float, float, float]:
+def Rachford_Rice_numpy_err_fprime2(V_over_F: float, zs_k_minus_1: np.ndarray, K_minus_1: np.ndarray) -> tuple[float, float, float]:
     x0 = 1.0/(K_minus_1*V_over_F + 1.0)
 
     err = zs_k_minus_1*x0
