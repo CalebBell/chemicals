@@ -22,8 +22,6 @@ SOFTWARE.
 """
 
 
-import fluids
-
 __version__ = "1.3.3"
 from math import isnan
 
@@ -94,6 +92,7 @@ from .vapor_pressure import *  # noqa: F403
 from .virial import *  # noqa: F403
 from .viscosity import *  # noqa: F403
 from .volume import *  # noqa: F403
+
 __all__ = [
     "acentric",
     "air",
