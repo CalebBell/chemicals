@@ -89,7 +89,7 @@ def test_k_IAPWS():
 
     # Feed P: 8600000.0
     # Case where zero division was occuring
-    kwargs ={'T': 400, 'rho': 941.720097520186, 'Cp': 4233.740244740559, 'Cv': 3622.5838143014544, 'mu': 0.00022080449914642125, 'drho_dP': 4.996396679875349e-07, 'drho_dP_Tr': 2.3158445867118744e-07}
+    kwargs ={"T": 400, "rho": 941.720097520186, "Cp": 4233.740244740559, "Cv": 3622.5838143014544, "mu": 0.00022080449914642125, "drho_dP": 4.996396679875349e-07, "drho_dP_Tr": 2.3158445867118744e-07}
     assert_close(k_IAPWS(**kwargs), .688018419964361, rtol=1e-11)
 
 
@@ -109,9 +109,9 @@ def test_k_air_lemmon():
     assert_close(k_near_crit, 0.07562307234760142, rtol=1e-13)
 
     # Random point found that was causing issues
-    kwargs_problematic = {'T': 300, 'rho': 5000.0, 'Cp': 34.650910964354516,
-                      'Cv': 21.576284320940534, 'drho_dP': 0.00038766674876690075,
-                      'drho_dP_Tr': 0.0004713577861638539, 'mu': 2.1324097850144885e-05}
+    kwargs_problematic = {"T": 300, "rho": 5000.0, "Cp": 34.650910964354516,
+                      "Cv": 21.576284320940534, "drho_dP": 0.00038766674876690075,
+                      "drho_dP_Tr": 0.0004713577861638539, "mu": 2.1324097850144885e-05}
     assert_close(k_air_lemmon(**kwargs_problematic), 0.0326062305718951, rtol=1e-13)
 
 
@@ -119,7 +119,7 @@ def test_k_air_lemmon():
 def test_Perrys2_314_data():
     # In perry's, only 102 is used. No chemicals are missing.
     # Tmaxs all match to 5E-4. Tmins match to 1E-3.
-    tots_calc = [k_data_Perrys_8E_2_314[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'Tmin', 'Tmax']]
+    tots_calc = [k_data_Perrys_8E_2_314[i].abs().sum() for i in ["C1", "C2", "C3", "C4", "Tmin", "Tmax"]]
     tots = [48935634.823768869, 297.41545078799999, 421906466448.71423, 232863514627157.62, 125020.26000000001, 347743.42000000004]
     assert_close(tots_calc, tots)
 
@@ -131,7 +131,7 @@ def test_Perrys2_315_data():
     # All perry's use #100.
     # Tmins all match at 5E-4.
     # Tmaxs all match at 2E-3.
-    tots_calc = [k_data_Perrys_8E_2_315[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'C5', 'Tmin', 'Tmax']]
+    tots_calc = [k_data_Perrys_8E_2_315[i].abs().sum() for i in ["C1", "C2", "C3", "C4", "C5", "Tmin", "Tmax"]]
     tots = [82.001667499999996, 0.19894598900000002, 0.0065330144999999999, 0.00046928630199999995, 1.0268010799999999e-07, 70996.369999999995, 138833.41]
     assert_close1d(tots_calc, tots)
 
@@ -149,7 +149,7 @@ def test_VDI_PPDS_10_data():
 
     These have been checked - it appears the tabulated data is just incorrect.
     """
-    tots_calc = [k_data_VDI_PPDS_10[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E']]
+    tots_calc = [k_data_VDI_PPDS_10[i].abs().sum() for i in ["A", "B", "C", "D", "E"]]
     tots = [2.2974640014599998, 0.015556001460000001, 1.9897655000000001e-05, 6.7747269999999993e-09, 2.3260109999999999e-12]
     assert_close1d(tots_calc, tots)
 
@@ -164,7 +164,7 @@ def test_VDI_PPDS_9_data():
 
     These have been checked - it appears the tabulated data is just incorrect.
     """
-    tots_calc = [k_data_VDI_PPDS_9[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E']]
+    tots_calc = [k_data_VDI_PPDS_9[i].abs().sum() for i in ["A", "B", "C", "D", "E"]]
     tots = [63.458699999999993, 0.14461469999999998, 0.00042270770000000005, 1.7062660000000002e-06, 3.2715370000000003e-09]
     assert_close1d(tots_calc, tots)
 
@@ -227,13 +227,13 @@ def test_CSP_gas():
     assert_close(kg, 0.023593536999201956)
 
     # CO, brute force tests on three  options for chemtype
-    kg1 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='linear')
+    kg1 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype="linear")
     assert kg1 == DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92) # No argument
-    kg2 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='monoatomic')
-    kg3 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='nonlinear')
+    kg2 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype="monoatomic")
+    kg3 = DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype="nonlinear")
     assert_close1d([kg1, kg2, kg3], [0.01813208676438415, 0.023736881470903245, 0.018625352738307743])
 
-    assert_close(DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='FAIL'), DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92))
+    assert_close(DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype="FAIL"), DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92))
 
 
     kg = Chung(T=373.15, MW=72.151, Tc=460.4, omega=0.227, Cvm=135.9, mu=8.77E-6)

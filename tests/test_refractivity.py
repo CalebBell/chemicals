@@ -38,8 +38,8 @@ from chemicals.refractivity import (
 
 
 def test_refractivity_CRC():
-    assert_close(RI_data_CRC_organic['RI'].sum(), 6602.78821)
-    assert_close(RI_data_CRC_organic['RIT'].sum(), 1304152.35)
+    assert_close(RI_data_CRC_organic["RI"].sum(), 6602.78821)
+    assert_close(RI_data_CRC_organic["RIT"].sum(), 1304152.35)
 
 @pytest.mark.slow
 @pytest.mark.fuzz
@@ -56,22 +56,22 @@ def test_refractivity_all_answers():
 
 
 def test_refractivity_general():
-    vals = RI(CASRN='64-17-5')
+    vals = RI(CASRN="64-17-5")
     assert type(vals) is tuple
     assert_close1d(vals, (1.3611, 293.15))
 
-    vals = RI_methods(CASRN='64-17-5')
-    assert vals == ['CRC', 'WIKIDATA']
+    vals = RI_methods(CASRN="64-17-5")
+    assert vals == ["CRC", "WIKIDATA"]
     assert RI_data_CRC_organic.shape == (4490, 2)
-    assert RI_methods(CASRN='6400000-17-5') == []
+    assert RI_methods(CASRN="6400000-17-5") == []
 
     with pytest.raises(Exception):
-        RI(CASRN='64-17-5', method='FAIL')
+        RI(CASRN="64-17-5", method="FAIL")
 
 
     assert RI("60-35-5") == (1.4278, None)
 
-    assert RI(CASRN='74-82-8', method='CRC') == (None, None)
+    assert RI(CASRN="74-82-8", method="CRC") == (None, None)
 
 
 

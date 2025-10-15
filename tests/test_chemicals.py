@@ -24,5 +24,5 @@ import chemicals
 
 
 def test_all_methods_accessible():
-    all_methods = [i for i in dir(chemicals) if 'all_methods' in i]
+    all_methods = [i for i in dir(chemicals) if "all_methods" in i]
     len(all_methods) >= 31

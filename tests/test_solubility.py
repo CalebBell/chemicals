@@ -24,91 +24,91 @@ import pytest
 from fluids.numerics import assert_close, assert_close1d
 
 from chemicals.solubility import (
+    ALSHERI_HANSEN,
+    HSPIPY,
+    MANUEL_RUBEN_2022,
+    WDR_SCHRIER,
     Henry_constants,
     Henry_converter,
     Henry_pressure,
     Henry_pressure_mixture,
     Tm_depression_eutectic,
+    alsheri_hansen_data,
     d2Henry_constants_dT2,
     dHenry_constants_dT,
-    solubility_eutectic,
-    solubility_parameter,
     hansen_delta_d,
     hansen_delta_d_methods,
-    hansen_delta_p,
-    hansen_delta_p_methods,
     hansen_delta_h,
     hansen_delta_h_methods,
-    ALSHERI_HANSEN,
-    HSPIPY,
-    WDR_SCHRIER,
-    MANUEL_RUBEN_2022,
-    alsheri_hansen_data, 
-    hspipy_data, 
-    wdr_schrier_data,
+    hansen_delta_p,
+    hansen_delta_p_methods,
+    hspipy_data,
     manuel_ruben_2022_data,
+    solubility_eutectic,
+    solubility_parameter,
+    wdr_schrier_data,
 )
 
 
 def test_hansen_delta():
     # Test values for ethanol (64-17-5)
-    d_calc = hansen_delta_d('64-17-5')
-    p_calc = hansen_delta_p('64-17-5')
-    h_calc = hansen_delta_h('64-17-5')
-    
+    d_calc = hansen_delta_d("64-17-5")
+    p_calc = hansen_delta_p("64-17-5")
+    h_calc = hansen_delta_h("64-17-5")
+
     assert_close1d([d_calc, p_calc, h_calc], [15800.0, 8800.0, 19400.0])
-    
-    hits_d = hansen_delta_d_methods('64-17-5')
-    hits_p = hansen_delta_p_methods('64-17-5')
-    hits_h = hansen_delta_h_methods('64-17-5')
-    
+
+    hits_d = hansen_delta_d_methods("64-17-5")
+    hits_p = hansen_delta_p_methods("64-17-5")
+    hits_h = hansen_delta_h_methods("64-17-5")
+
     assert hits_d == hits_p
     assert hits_p == hits_h
-    
-    with pytest.raises(Exception):
-        hansen_delta_d('64-17-5', method='BADMETHOD')
-    with pytest.raises(Exception):
-        hansen_delta_p('64-17-5', method='BADMETHOD')
-    with pytest.raises(Exception):
-        hansen_delta_h('64-17-5', method='BADMETHOD')
 
-    assert None is hansen_delta_d('99234-43-50-0')
-    assert [] == hansen_delta_d_methods('99234-43-50-0')
-    assert None is hansen_delta_p('99234-43-50-0')
-    assert [] == hansen_delta_p_methods('99234-43-50-0')
-    assert None is hansen_delta_h('99234-43-50-0')
-    assert [] == hansen_delta_h_methods('99234-43-50-0')
+    with pytest.raises(Exception):
+        hansen_delta_d("64-17-5", method="BADMETHOD")
+    with pytest.raises(Exception):
+        hansen_delta_p("64-17-5", method="BADMETHOD")
+    with pytest.raises(Exception):
+        hansen_delta_h("64-17-5", method="BADMETHOD")
 
-    w_methods = hansen_delta_d_methods('7732-18-5')
-    assert w_methods == ['MANUEL_RUBEN_2022', 'HSPIPY']
-    w_methods = hansen_delta_p_methods('7732-18-5')
-    assert w_methods == ['MANUEL_RUBEN_2022', 'HSPIPY']
-    w_methods = hansen_delta_h_methods('7732-18-5')
-    assert w_methods == ['MANUEL_RUBEN_2022', 'HSPIPY']
+    assert None is hansen_delta_d("99234-43-50-0")
+    assert [] == hansen_delta_d_methods("99234-43-50-0")
+    assert None is hansen_delta_p("99234-43-50-0")
+    assert [] == hansen_delta_p_methods("99234-43-50-0")
+    assert None is hansen_delta_h("99234-43-50-0")
+    assert [] == hansen_delta_h_methods("99234-43-50-0")
 
-    w_values = [hansen_delta_d('7732-18-5', method=method) for method in w_methods]
+    w_methods = hansen_delta_d_methods("7732-18-5")
+    assert w_methods == ["MANUEL_RUBEN_2022", "HSPIPY"]
+    w_methods = hansen_delta_p_methods("7732-18-5")
+    assert w_methods == ["MANUEL_RUBEN_2022", "HSPIPY"]
+    w_methods = hansen_delta_h_methods("7732-18-5")
+    assert w_methods == ["MANUEL_RUBEN_2022", "HSPIPY"]
+
+    w_values = [hansen_delta_d("7732-18-5", method=method) for method in w_methods]
     assert_close1d(w_values, [15500.0, 15500.0])
-    w_values = [hansen_delta_p('7732-18-5', method=method) for method in w_methods]
+    w_values = [hansen_delta_p("7732-18-5", method=method) for method in w_methods]
     assert_close1d(w_values, [16000.0, 16000.0])
-    w_values = [hansen_delta_h('7732-18-5', method=method) for method in w_methods]
+    w_values = [hansen_delta_h("7732-18-5", method=method) for method in w_methods]
     assert_close1d(w_values, [42300.0, 42300.0])
 
 
-    test_cases = ['64-17-5', '7732-18-5', '71-43-2', '67-56-1']
+    test_cases = ["64-17-5", "7732-18-5", "71-43-2", "67-56-1"]
     for cas in test_cases:
         d_methods = set(hansen_delta_d_methods(cas))
         p_methods = set(hansen_delta_p_methods(cas))
         h_methods = set(hansen_delta_h_methods(cas))
         assert d_methods == p_methods == h_methods, f"Inconsistent methods for {cas}"
 
-    assert isinstance(hansen_delta_d('64-17-5'), float)
-    assert isinstance(hansen_delta_p('64-17-5'), float)
-    assert isinstance(hansen_delta_h('64-17-5'), float)
+    assert isinstance(hansen_delta_d("64-17-5"), float)
+    assert isinstance(hansen_delta_p("64-17-5"), float)
+    assert isinstance(hansen_delta_h("64-17-5"), float)
 
-    assert_close(hansen_delta_d('138495-42-8'), 11600.0)  # Non-zero δD
-    assert_close(hansen_delta_p('138495-42-8'), 0.0)      # Zero δP
-    assert_close(hansen_delta_h('138495-42-8'), 0.0)      # Zero δH
-    
+    assert_close(hansen_delta_d("138495-42-8"), 11600.0)  # Non-zero δD
+    assert_close(hansen_delta_p("138495-42-8"), 0.0)      # Zero δP
+    assert_close(hansen_delta_h("138495-42-8"), 0.0)      # Zero δH
+
 def test_hansen_solubility_all_data():
     s1 = alsheri_hansen_data.index
     s2 = hspipy_data.index
@@ -116,21 +116,21 @@ def test_hansen_solubility_all_data():
     s4 = manuel_ruben_2022_data.index
     tots = {}
     tots_exp = {
-        ALSHERI_HANSEN: {'delta_d': 15302100.0, 'delta_p': 6738300.0, 'delta_h': 6748800.0},
-        HSPIPY: {'delta_d': 4126200.0, 'delta_p': 1692500.0, 'delta_h': 1982300.0},
-        WDR_SCHRIER: {'delta_d': 1884800.0, 'delta_p': 841900.0, 'delta_h': 982400.0},
-        MANUEL_RUBEN_2022: {'delta_d': 20575260.0, 'delta_p': 8828240.0, 'delta_h': 8904890.0}
+        ALSHERI_HANSEN: {"delta_d": 15302100.0, "delta_p": 6738300.0, "delta_h": 6748800.0},
+        HSPIPY: {"delta_d": 4126200.0, "delta_p": 1692500.0, "delta_h": 1982300.0},
+        WDR_SCHRIER: {"delta_d": 1884800.0, "delta_p": 841900.0, "delta_h": 982400.0},
+        MANUEL_RUBEN_2022: {"delta_d": 20575260.0, "delta_p": 8828240.0, "delta_h": 8904890.0}
     }
     # These should match the sums of the respective series
     for s, method in zip([s1, s2, s3, s4], [ALSHERI_HANSEN, HSPIPY, WDR_SCHRIER, MANUEL_RUBEN_2022]):
         tots[method] = {
-            'delta_d': sum([hansen_delta_d(i, method=method) for i in s]),
-            'delta_p': sum([hansen_delta_p(i, method=method) for i in s]),
-            'delta_h': sum([hansen_delta_h(i, method=method) for i in s])
+            "delta_d": sum([hansen_delta_d(i, method=method) for i in s]),
+            "delta_p": sum([hansen_delta_p(i, method=method) for i in s]),
+            "delta_h": sum([hansen_delta_h(i, method=method) for i in s])
         }
 
     for method in [ALSHERI_HANSEN, HSPIPY, WDR_SCHRIER, MANUEL_RUBEN_2022]:
-        for param in ['delta_d', 'delta_p', 'delta_h']:
+        for param in ["delta_d", "delta_p", "delta_h"]:
             assert_close(tots[method][param], tots_exp[method][param], rtol=1e-11)
 
     s = set()
@@ -187,7 +187,7 @@ def test_Henry_converter():
                    HENRY_SCALES_KHPC, HENRY_SCALES_KHCC, HENRY_SCALES_SI]
     for v, scales in zip(test_values, test_scales):
         for scale in scales:
-            calc = Henry_converter(v, old_scale=scale, new_scale='Hxp', rhom=55341.9, MW=18.01528)
+            calc = Henry_converter(v, old_scale=scale, new_scale="Hxp", rhom=55341.9, MW=18.01528)
             # Best we can match given the digits provided
             assert_close(calc, 2.19707E-05, rtol=2e-6)
             recalc = Henry_converter(v, old_scale=scale, new_scale=scale, rhom=55341.9, MW=18.01528)
@@ -208,7 +208,7 @@ def test_Henry_constants():
     assert_close1d([0.0, 4106424071.093, 4552937470.331], Hs)
 
     # Test no error, henry goes too high
-    kwargs = {'lnHenry_matrix': [[0.0, 0.0, 0.0, 10.219309168602226], [25.321910952013628, 0.0, 20.22048862340195, 18.156499431206274], [24.269833800974848, 15.365770016174015, 0.0, 18.57423773432834], [15.37228504674701, 0.0, 0.0, 0.0]], 'zs': [0.000242872042323124, 0.5796842606361365, 0.41952722776289886, 0.000545639558641481], 'henry_components': [False, True, True, False], 'skip_zero': True, 'Hs': [0.0, 0.0, 0.0, 0.0]}
+    kwargs = {"lnHenry_matrix": [[0.0, 0.0, 0.0, 10.219309168602226], [25.321910952013628, 0.0, 20.22048862340195, 18.156499431206274], [24.269833800974848, 15.365770016174015, 0.0, 18.57423773432834], [15.37228504674701, 0.0, 0.0, 0.0]], "zs": [0.000242872042323124, 0.5796842606361365, 0.41952722776289886, 0.000545639558641481], "henry_components": [False, True, True, False], "skip_zero": True, "Hs": [0.0, 0.0, 0.0, 0.0]}
     Henry_constants(**kwargs)
 
 

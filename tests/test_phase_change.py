@@ -60,7 +60,7 @@ def test_Watson():
     assert_close(Hvap, 42928.990094915454, rtol=1e-12)
 
     # Supercritical
-    Hvap = Watson(T=480, **{'Hvap_ref': 862.4034055086013, 'T_ref': 469.6530300000001, 'Tc': 469.7, 'exponent': 0.48746055545202976})
+    Hvap = Watson(T=480, Hvap_ref=862.4034055086013, T_ref=469.6530300000001, Tc=469.7, exponent=0.48746055545202976)
     assert Hvap == 0.0
 
 
@@ -139,40 +139,40 @@ def test_Vetere():
 
 def test_Hvap_CRC_data():
 
-    HvapTb_tot = Hvap_data_CRC['HvapTb'].sum()
+    HvapTb_tot = Hvap_data_CRC["HvapTb"].sum()
     assert_close(HvapTb_tot, 30251890.0)
 
-    Hvap298_tot = Hvap_data_CRC['Hvap298'].sum()
+    Hvap298_tot = Hvap_data_CRC["Hvap298"].sum()
     assert_close(Hvap298_tot, 29343710.0)
 
-    Tb_tot = Hvap_data_CRC['Tb'].sum()
+    Tb_tot = Hvap_data_CRC["Tb"].sum()
     assert_close(Tb_tot, 407502.95600000001)
 
     assert Hvap_data_CRC.shape == (926, 5)
 
 
 def test_Hfus_CRC_data():
-    Hfus_total = Hfus_data_CRC['Hfus'].sum()
+    Hfus_total = Hfus_data_CRC["Hfus"].sum()
     assert_close(Hfus_total, 29131241)
     assert Hfus_data_CRC.shape == (1112, 3)
 
 
 def test_Hfus():
-    assert_close(Hfus('462-06-6', method='CRC'), 11310.0, rtol=1e-12)
-    assert_close(Hfus('462-06-6'), 11310.0, rtol=1e-12)
-    assert_close(Hfus(CASRN='75-07-0'), 2310.0)
-    assert Hfus(CASRN='75000-07-0') is None
+    assert_close(Hfus("462-06-6", method="CRC"), 11310.0, rtol=1e-12)
+    assert_close(Hfus("462-06-6"), 11310.0, rtol=1e-12)
+    assert_close(Hfus(CASRN="75-07-0"), 2310.0)
+    assert Hfus(CASRN="75000-07-0") is None
 
-    assert Hfus_methods('7732-18-5') == ['CRC']
+    assert Hfus_methods("7732-18-5") == ["CRC"]
 
 def test_Gharagheizi_Hvap_data():
-    Hvap298_tot = Hvap_data_Gharagheizi['Hvap298'].sum()
+    Hvap298_tot = Hvap_data_Gharagheizi["Hvap298"].sum()
     assert_close(Hvap298_tot, 173139200)
     assert Hvap_data_Gharagheizi.shape == (2723, 2)
 
 
 def test_Gharagheizi_Hsub_data():
-    tots = [Hsub_data_Gharagheizi[i].sum() for i in ['Hsub', 'error']]
+    tots = [Hsub_data_Gharagheizi[i].sum() for i in ["Hsub", "error"]]
     assert_close(tots[0], 130537650)
     assert_close(tots[1], 1522960.0)
 
@@ -180,12 +180,12 @@ def test_Gharagheizi_Hsub_data():
 
 
 def test_Yaws_Tb_data():
-    tot = Tb_data_Yaws.sum()['Tb']
+    tot = Tb_data_Yaws.sum()["Tb"]
     assert_close(tot, 6631287.51)
     assert Tb_data_Yaws.shape == (13461, 1)
 
 def test_Tm_ON_data():
-    tot = Tm_ON_data.sum()['Tm']
+    tot = Tm_ON_data.sum()["Tm"]
     assert_close(tot, 4059989.425)
 
     assert Tm_ON_data.shape == (11549, 1)
@@ -197,7 +197,7 @@ def test_Perrys2_150_data():
     # C1 is divided by 1000, to give units of J/mol instead of J/kmol
     # Terephthalic acid removed, was a constant value only.
 
-    tots_calc = [phase_change_data_Perrys2_150[i].abs().sum() for i in ['Tc', 'C1', 'C2', 'C3', 'C4', 'Tmin', 'Tmax']]
+    tots_calc = [phase_change_data_Perrys2_150[i].abs().sum() for i in ["Tc", "C1", "C2", "C3", "C4", "Tmin", "Tmax"]]
     tots = [189407.42499999999, 18617223.739999998, 174.34494000000001, 112.51209900000001, 63.894040000000004, 70810.849999999991, 189407.005]
     assert_close1d(tots_calc, tots)
 
@@ -205,7 +205,7 @@ def test_Perrys2_150_data():
 
 
 def test_Alibakhshi_Cs_data():
-    tots_calc = [phase_change_data_Alibakhshi_Cs[i].abs().sum() for i in ['C']]
+    tots_calc = [phase_change_data_Alibakhshi_Cs[i].abs().sum() for i in ["C"]]
     tots = [28154.361500000003]
     assert_close1d(tots_calc, tots)
 
@@ -214,7 +214,7 @@ def test_Alibakhshi_Cs_data():
 
 def test_VDI_PPDS_4_data():
     """I believe there are no errors here."""
-    tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tc']]
+    tots_calc = [phase_change_data_VDI_PPDS_4[i].abs().sum() for i in ["A", "B", "C", "D", "E", "Tc"]]
     tots = [1974.2929800000002, 2653.9399000000003, 2022.530649, 943.25633100000005, 3124.9258610000002, 150142.28]
     assert_close1d(tots_calc, tots)
 
@@ -223,14 +223,14 @@ def test_VDI_PPDS_4_data():
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_Tb_all_values():
-    s1 = CRC_inorganic_data.index[CRC_inorganic_data['Tb'].notnull()]
-    s2 = CRC_organic_data.index[CRC_organic_data['Tb'].notnull()]
+    s1 = CRC_inorganic_data.index[CRC_inorganic_data["Tb"].notnull()]
+    s2 = CRC_organic_data.index[CRC_organic_data["Tb"].notnull()]
     s3 = Tb_data_Yaws.index
 
     tots = []
     tots_exp = [639213.2310000042, 2280667.079999829, 6631287.510000873]
     # These should match the sums of the respective series
-    for s, method in zip([s1, s2, s3], ['CRC_INORG', 'CRC_ORG', 'YAWS']):
+    for s, method in zip([s1, s2, s3], ["CRC_INORG", "CRC_ORG", "YAWS"]):
         tots.append(sum([Tb(i, method=method) for i in s]))
     assert_close1d(tots, tots_exp, rtol=1e-11)
 
@@ -239,38 +239,38 @@ def test_Tb_all_values():
 
 def test_Tb():
     # CRC_inorg, CRC org, Yaws
-    Tbs_calc = Tb('993-50-0'), Tb('626-94-8'), Tb('7631-99-4')
+    Tbs_calc = Tb("993-50-0"), Tb("626-94-8"), Tb("7631-99-4")
     Tbs = [399.15, 412.15, 653.15]
     assert_close1d(Tbs, Tbs_calc)
 
-    hits = [Tb_methods(i) for i in ['993-50-0', '626-94-8', '7631-99-4']]
-    assert hits == [['CRC_INORG', 'COMMON_CHEMISTRY'], ['CRC_ORG', 'JOBACK'], ['YAWS']]
+    hits = [Tb_methods(i) for i in ["993-50-0", "626-94-8", "7631-99-4"]]
+    assert hits == [["CRC_INORG", "COMMON_CHEMISTRY"], ["CRC_ORG", "JOBACK"], ["YAWS"]]
 
 
     with pytest.raises(Exception):
-        Tb('993-50-0', method='BADMETHOD')
+        Tb("993-50-0", method="BADMETHOD")
 
-    assert None is Tb('9923443-50-0')
-    assert [] == Tb_methods('9923443-50-0')
+    assert None is Tb("9923443-50-0")
+    assert [] == Tb_methods("9923443-50-0")
 
 
-    w_methods = Tb_methods('7732-18-5')
-    assert w_methods == ['HEOS', 'CRC_INORG', 'COMMON_CHEMISTRY', 'WEBBOOK', 'YAWS', 'WIKIDATA']
+    w_methods = Tb_methods("7732-18-5")
+    assert w_methods == ["HEOS", "CRC_INORG", "COMMON_CHEMISTRY", "WEBBOOK", "YAWS", "WIKIDATA"]
 
-    Tbs = [Tb('7732-18-5', method=i) for i in w_methods]
+    Tbs = [Tb("7732-18-5", method=i) for i in w_methods]
     assert_close1d(Tbs, [373.124295848, 373.124, 373.15, 373.17, 373.15, 373.1339])
 
 
 @pytest.mark.slow
 @pytest.mark.fuzz
 def test_Tm_all_values():
-    s1 = CRC_inorganic_data.index[CRC_inorganic_data['Tm'].notnull()]
-    s2 = CRC_organic_data.index[CRC_organic_data['Tm'].notnull()]
+    s1 = CRC_inorganic_data.index[CRC_inorganic_data["Tm"].notnull()]
+    s2 = CRC_organic_data.index[CRC_organic_data["Tm"].notnull()]
     s3 = Tm_ON_data.index
     tots = []
     tots_exp = [1543322.6125999668, 2571284.480399755, 4059989.4249993376]
     # These should match the sums of the respective series
-    for s, method in zip([s1, s2, s3], ['CRC_INORG', 'CRC_ORG', 'OPEN_NTBKM']):
+    for s, method in zip([s1, s2, s3], ["CRC_INORG", "CRC_ORG", "OPEN_NTBKM"]):
         tots.append(sum([Tm(i, method=method) for i in s]))
     assert_close1d(tots, tots_exp, rtol=1e-11)
 
@@ -279,24 +279,24 @@ def test_Tm_all_values():
 
 def test_Tm():
     # Open notebook, CRC organic, CRC inorg
-    Tms_calc = Tm('996-50-9'), Tm('999-78-0'), Tm('993-50-0')
+    Tms_calc = Tm("996-50-9"), Tm("999-78-0"), Tm("993-50-0")
     Tms = [263.15, 191.15, 274.15]
     assert_close1d(Tms, Tms_calc)
 
-    hits = [Tm_methods(i) for i in ['996-50-9', '999-78-0', '993-50-0']]
-    assert hits == [['OPEN_NTBKM', 'WIKIDATA'], ['CRC_ORG', 'WEBBOOK', 'JOBACK'], ['CRC_INORG']]
+    hits = [Tm_methods(i) for i in ["996-50-9", "999-78-0", "993-50-0"]]
+    assert hits == [["OPEN_NTBKM", "WIKIDATA"], ["CRC_ORG", "WEBBOOK", "JOBACK"], ["CRC_INORG"]]
 
     with pytest.raises(Exception):
-        Tm('993-50-0', method='BADMETHOD')
+        Tm("993-50-0", method="BADMETHOD")
 
-    assert  Tm('9923443-50-0') is None
-    assert [] == Tm_methods('9923443-50-0')
+    assert  Tm("9923443-50-0") is None
+    assert [] == Tm_methods("9923443-50-0")
 
 
-    w_methods = Tm_methods('7732-18-5')
-    assert w_methods == ['OPEN_NTBKM', 'CRC_INORG', 'COMMON_CHEMISTRY', 'WIKIDATA']
+    w_methods = Tm_methods("7732-18-5")
+    assert w_methods == ["OPEN_NTBKM", "CRC_INORG", "COMMON_CHEMISTRY", "WIKIDATA"]
 
-    Tms = [Tm('7732-18-5', method=i) for i in w_methods]
+    Tms = [Tm("7732-18-5", method=i) for i in w_methods]
     assert_close1d(Tms, [273.15, 273.15, 273.15, 273.15252])
 
 

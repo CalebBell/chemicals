@@ -209,7 +209,7 @@ def test_Lastovka_Shaw_T_for_Hm_fuzz():
                 try:
                     Lastovka_Shaw_T_for_Hm(Hm=Hm, MW=MW, similarity_variable=sv, T_ref=T_ref)
                 except Exception as e:
-                    if 'negative temperature' in str(e):
+                    if "negative temperature" in str(e):
                         continue
     #                 print(sv, MW, Hm, e)
 
@@ -240,7 +240,7 @@ def test_Lastovka_Shaw_T_for_Hm_fuzz():
 #                        raise ValueError("Could not converge with unexpected error")
 
 def test_CRC_standard_data():
-    tots_calc = [CRC_standard_data[i].abs().sum() for i in ['Hfs', 'Gfs', 'S0s', 'Cps', 'Hfl', 'Gfl', 'S0l', 'Cpl', 'Hfg', 'Gfg', 'S0g', 'Cpg']]
+    tots_calc = [CRC_standard_data[i].abs().sum() for i in ["Hfs", "Gfs", "S0s", "Cps", "Hfl", "Gfl", "S0l", "Cpl", "Hfg", "Gfg", "S0g", "Cpg"]]
     tots = [628580900.0, 306298700.0, 68541.800000000003, 56554.400000000001, 265782700.0, 23685900.0, 61274.0, 88464.399999999994, 392946600.0, 121270700.0, 141558.29999999999, 33903.300000000003]
     assert_close1d(tots_calc, tots)
 
@@ -248,7 +248,7 @@ def test_CRC_standard_data():
 
 
 def test_Cp_data_Poling():
-    tots_calc = [Cp_data_Poling[i].abs().sum() for i in ['Tmin', 'Tmax', 'a0', 'a1', 'a2', 'a3', 'a4', 'Cpg', 'Cpl']]
+    tots_calc = [Cp_data_Poling[i].abs().sum() for i in ["Tmin", "Tmax", "a0", "a1", "a2", "a3", "a4", "Cpg", "Cpl"]]
     tots = [40966.0, 301000.0, 1394.792, 10.3125808, 0.024578948000000003, 3.1149673000000004e-05, 1.25391256e-08, 43400.95, 49813.16]
     assert_close1d(tots_calc, tots)
 
@@ -256,7 +256,7 @@ def test_Cp_data_Poling():
 
 
 def test_TRC_gas_data():
-    tots_calc = [TRC_gas_data[i].abs().sum() for i in ['Tmin', 'Tmax', 'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'I', 'J', 'Hfg']]
+    tots_calc = [TRC_gas_data[i].abs().sum() for i in ["Tmin", "Tmax", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "I", "J", "Hfg"]]
     tots = [365114, 3142000, 7794.1999999999998, 24465781000, 1056180, 133537.068, 67639.309000000008, 156121050000, 387884, 212320, 967467.89999999991, 30371.91, 495689880.0]
     assert_close1d(tots_calc, tots)
 
@@ -302,14 +302,14 @@ def test_Zabransky_dicts():
     coeff_sums = [[1509.3503910000002, 170.63668272100003, 553.71843, 3602.9634764, 2731.1423000000004, 2505.7230399999994],
                   [394736.92543421406, 52342.25656440046, 54451.52735, 366067.89141800004, 61161.632348850006, 207335.59372000452],
                   [85568.9366422, 9692.534972905993, 13110.905983999992, 97564.75442449997, 30855.65738500001, 73289.607074896]]
-    attrs = ['Tmin', 'Tmax', 'Tc']
+    attrs = ["Tmin", "Tmax", "Tc"]
     getattr_ = getattr
     sum_ = sum
     abs_ = abs
     for i in range(len(quasi_dicts)):
         tot_calc = [sum_([abs_(getattr_(k, j)) for k in quasi_dicts[i].values()]) for j in attrs]
         assert_close1d(tot_calc, sums[i])
-        coeff_calc = sum_(np.abs([getattr_(k, 'coeffs') for k in quasi_dicts[i].values()]))
+        coeff_calc = sum_(np.abs([getattr_(k, "coeffs") for k in quasi_dicts[i].values()]))
         assert_close1d(coeff_calc, coeff_sums[i])
 
     sums = [[108141.20000000004, 153049.59999999992, 16980025.79560638],
@@ -328,13 +328,13 @@ def test_Zabransky_dicts():
 def test_HeatCapacityClass_methods():
     classes = [ZabranskySpline, ZabranskyQuasipolynomial]
     for c in classes:
-        assert hasattr(c, 'calculate')
-        assert hasattr(c, 'calculate_integral')
-        assert hasattr(c, 'calculate_integral_over_T')
+        assert hasattr(c, "calculate")
+        assert hasattr(c, "calculate_integral")
+        assert hasattr(c, "calculate_integral_over_T")
 
 def test_ZABRANSKY_SPLINE():
     from chemicals.heat_capacity import zabransky_dict_iso_s
-    d = zabransky_dict_iso_s['7732-18-5']
+    d = zabransky_dict_iso_s["7732-18-5"]
     assert_close(d.force_calculate(645), 4521.767801978968)
     assert_close(d.calculate(400), 76.53795418514787)
     assert_close(d.force_calculate(250), 77.1082743553618)
@@ -391,7 +391,7 @@ def test_ZABRANSKY_SPLINE():
 
 
     # Test a chemical with only one set of coefficients
-    d = zabransky_dict_iso_s['2016-57-1']
+    d = zabransky_dict_iso_s["2016-57-1"]
     assert_close(d.calculate(310), 375.543177681642)
     assert_close(d.force_calculate_integral(290, 340), 18857.29436766774)
     assert_close(d.force_calculate_integral_over_T(290, 340), 59.96511735461314)
@@ -417,7 +417,7 @@ def test_TDE_CSExpansion():
 
 def test_piece_wise_heat_capacity():
     class HeatCapacity:
-        __slots__ = ('value', 'Tmin', 'Tmax')
+        __slots__ = ("Tmax", "Tmin", "value")
         def __init__(self, value, Tmin, Tmax):
             self.value = value
             self.Tmin = Tmin

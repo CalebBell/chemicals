@@ -161,7 +161,7 @@ def test_BVirial_Pitzer_Curl_calculus():
 
     # Derivatives check
     # Uses SymPy
-    T, Tc, Pc, omega, R = symbols('T, Tc, Pc, omega, R')
+    T, Tc, Pc, omega, R = symbols("T, Tc, Pc, omega, R")
     Tr = T/Tc
     B0 = Rational(1445,10000) - Rational(33,100)/Tr - Rational(1385,10000)/Tr**2 - Rational(121,10000)/Tr**3
     B1 = Rational(73,1000) + Rational(46,100)/Tr - Rational(1,2)/Tr**2 - Rational(97,1000)/Tr**3 - Rational(73,10000)/Tr**8
@@ -231,7 +231,7 @@ def test_BVirial_Abbott_calculus_sympy():
     with pytest.raises(Exception):
         BVirial_Abbott(510., 425.2, 38E5, 0.193, order=-3)
 
-    T, Tc, Pc, omega, R = symbols('T, Tc, Pc, omega, R')
+    T, Tc, Pc, omega, R = symbols("T, Tc, Pc, omega, R")
     Tr = T/Tc
     B0 = 0.083 - 0.422/Tr**1.6
     B1 = 0.139 - 0.172/Tr**4.2
@@ -292,7 +292,7 @@ def test_BVirial_Tsonopoulos():
 def test_BVirial_Tsonopoulos_calculus():
     from sympy import Rational, diff, integrate, lambdify, symbols
 
-    T, Tc, Pc, omega, R = symbols('T, Tc, Pc, omega, R')
+    T, Tc, Pc, omega, R = symbols("T, Tc, Pc, omega, R")
     Tr = T/Tc
     B0 = Rational(1445, 10000) - Rational(33,100)/Tr - Rational(1385,10000)/Tr**2 - Rational(121,10000)/Tr**3 - Rational(607,1000000)/Tr**8
     B1 = Rational(637,10000) + Rational(331,1000)/Tr**2 - Rational(423,1000)/Tr**3 - Rational(8,1000)/Tr**8
@@ -336,7 +336,7 @@ def test_BVirial_Tsonopoulos_calculus():
         assert_close1d(Bcalcs, Bcalc2)
 
 def test_BVirial_Tsonopoulos_extended():
-    B = BVirial_Tsonopoulos_extended(510., 425.2, 38E5, 0.193, species_type='normal', dipole=0)
+    B = BVirial_Tsonopoulos_extended(510., 425.2, 38E5, 0.193, species_type="normal", dipole=0)
     assert_close(B, -0.00020935295404416802)
 
     B = BVirial_Tsonopoulos_extended_fast(510., 425.2, 38E5, 0.193, a=0, b=0)[0]
@@ -346,16 +346,16 @@ def test_BVirial_Tsonopoulos_extended():
                      BVirial_Tsonopoulos_extended_fast(510., 425.2, 38E5, 0.193, a=0, b=0)[i], rtol=1e-13)
 
 
-    B = BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type='ketone', dipole=1.469)
+    B = BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608, a=0, b=0, species_type="ketone", dipole=1.469)
     assert_close(B, -9.679718337596426e-05)
 
     with pytest.raises(Exception):
         BVirial_Tsonopoulos_extended(510., 425.2, 38E5, 0.193, order=-3)
 
     # Test all of the different types
-    types = ['simple', 'normal', 'methyl alcohol', 'water', 'ketone',
-    'aldehyde', 'alkyl nitrile', 'ether', 'carboxylic acid', 'ester', 'carboxylic acid',
-    'ester', 'alkyl halide', 'mercaptan', 'sulfide', 'disulfide', 'alkanol']
+    types = ["simple", "normal", "methyl alcohol", "water", "ketone",
+    "aldehyde", "alkyl nitrile", "ether", "carboxylic acid", "ester", "carboxylic acid",
+    "ester", "alkyl halide", "mercaptan", "sulfide", "disulfide", "alkanol"]
 
     Bs_calc = [BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608,
                                             a=0, b=0, species_type=i, dipole=0.1) for i in types]
@@ -364,7 +364,7 @@ def test_BVirial_Tsonopoulos_extended():
 
     # Test the fast call - with a group specified
     calc0 = BVirial_Tsonopoulos_extended(430., 405.65, 11.28E6, 0.252608,
-                                            a=0, b=0, species_type='ketone', dipole=0.1)
+                                            a=0, b=0, species_type="ketone", dipole=0.1)
 
     calc1 = BVirial_Tsonopoulos_extended_fast(430., 405.65, 11.28E6, 0.252608,
                                             a=-0.00014477824238067583, b=0)[0]
@@ -395,7 +395,7 @@ def test_BVirial_Tsonopoulos_extended_calculus():
     _Ts, _Tcs, _Pcs, _omegas = np.meshgrid(_Ts, _Tcs, _Pcs, _omegas)
     _Ts, _Tcs, _Pcs, _omegas = _Ts.ravel(), _Tcs.ravel(), _Pcs.ravel(), _omegas.ravel()
 
-    T, Tc, Pc, omega, R = symbols('T, Tc, Pc, omega, R')
+    T, Tc, Pc, omega, R = symbols("T, Tc, Pc, omega, R")
     Tr = T/Tc
     # Attempted to optimize things - the integrate expressions for B)c and B1c are the slowest.
     B0 = Rational(1445, 10000) - Rational(33,100)/Tr - Rational(1385,10000)/Tr**2 - Rational(121,10000)/Tr**3 - Rational(607,1000000)/Tr**8
@@ -743,8 +743,8 @@ def test_Tarakad_Danner_virial_CSP_omegaijs():
 
 
 def test_Meng_Duan_2005_virial_CSP_kijs():
-    CASs = ['74-82-8', '74-84-0', '124-38-9', '7727-37-9', '7439-89-6']
-    atomss = [{'C': 1, 'H': 4}, {'C': 2, 'H': 6}, {'C': 1, 'O': 2}, {'N': 2}, {'Fe': 1}]
+    CASs = ["74-82-8", "74-84-0", "124-38-9", "7727-37-9", "7439-89-6"]
+    atomss = [{"C": 1, "H": 4}, {"C": 2, "H": 6}, {"C": 1, "O": 2}, {"N": 2}, {"Fe": 1}]
     kijs = Meng_Duan_2005_virial_CSP_kijs(CASs=CASs, atomss=atomss)
     kijs_expect = [[0.0, 0.0014070591327669385, 0.04313694538361394, 0.024878043016556484, 0.0],
                    [0.0014070591327669385, 0.0, 0.08607516737052616, 0.0496414777972359, 0.0],

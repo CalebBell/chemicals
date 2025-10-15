@@ -43,50 +43,50 @@ import time
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.coverage',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.coverage",
     #'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.autosummary',
-    'numpydoc',
-    'IPython.sphinxext.ipython_console_highlighting',
-    'IPython.sphinxext.ipython_directive',
-    'sphinx.ext.intersphinx',
-    'nbsphinx',
-    'matplotlib.sphinxext.plot_directive',
-    'sphinxcontrib.katex',
-    'sphinx_sitemap',
-    'sphinxcontrib.googleanalytics'
+    "sphinx.ext.viewcode",
+    "sphinx.ext.autosummary",
+    "numpydoc",
+    "IPython.sphinxext.ipython_console_highlighting",
+    "IPython.sphinxext.ipython_directive",
+    "sphinx.ext.intersphinx",
+    "nbsphinx",
+    "matplotlib.sphinxext.plot_directive",
+    "sphinxcontrib.katex",
+    "sphinx_sitemap",
+    "sphinxcontrib.googleanalytics"
 ]
-googleanalytics_id = 'G-JLXVLC6XDM'
+googleanalytics_id = "G-JLXVLC6XDM"
 
 #     'sphinx.ext.napoleon'
 
-html_baseurl = 'https://chemicals.readthedocs.io/'
+html_baseurl = "https://chemicals.readthedocs.io/"
 sitemap_url_scheme = "{link}"
-sitemap_filename = 'sitemap2.xml' # readthedocs generates its own
+sitemap_filename = "sitemap2.xml" # readthedocs generates its own
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = 'Chemicals'
+project = "Chemicals"
 import datetime
 
 build_date = datetime.datetime.utcfromtimestamp(
-    int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))
+    int(os.environ.get("SOURCE_DATE_EPOCH", time.time()))
 )
-copyright = '2016 - %s, Caleb Bell, Yoel Rene Cortes-Pena, and contributors' %build_date.year
+copyright = f"2016 - {build_date.year}, Caleb Bell, Yoel Rene Cortes-Pena, and contributors"
 
 
 # The version info for the project you're documenting, acts as replacement for
@@ -94,7 +94,6 @@ copyright = '2016 - %s, Caleb Bell, Yoel Rene Cortes-Pena, and contributors' %bu
 # built documents.
 import chemicals
 
-#
 version = chemicals.__version__
 # The full version, including alpha/beta/rc tags.
 release = chemicals.__version__
@@ -111,7 +110,7 @@ release = chemicals.__version__
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', '**.ipynb_checkpoints']
+exclude_patterns = ["_build", "**.ipynb_checkpoints"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -129,7 +128,7 @@ exclude_patterns = ['_build', '**.ipynb_checkpoints']
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
@@ -142,7 +141,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'nature'
+html_theme = "nature"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -171,12 +170,12 @@ html_theme = 'nature'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
-html_extra_path = ['robots.txt']
+html_extra_path = ["robots.txt"]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -220,7 +219,7 @@ html_extra_path = ['robots.txt']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'chemicals doc'
+htmlhelp_basename = "chemicals doc"
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -240,8 +239,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'chemicals.tex', 'chemicals Documentation',
-   'Caleb Bell and contributors', 'manual'),
+  ("index", "chemicals.tex", "chemicals Documentation",
+   "Caleb Bell and contributors", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -270,8 +269,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'chemicals', 'chemicals Documentation',
-     ['Caleb Bell and contributors'], 1)
+    ("index", "chemicals", "chemicals Documentation",
+     ["Caleb Bell and contributors"], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -284,9 +283,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'chemicals', 'chemicals Documentation',
-   'Caleb Bell and contributors', 'chemicals', 'One line description of project.',
-   'Miscellaneous'),
+  ("index", "chemicals", "chemicals Documentation",
+   "Caleb Bell and contributors", "chemicals", "One line description of project.",
+   "Miscellaneous"),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -310,16 +309,16 @@ numpydoc_class_members_toctree = False
 autosummary_generate = True
 
 katex_css_path = \
-    'https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css'
-katex_js_path = 'katex.min.js'
-katex_autorender_path = 'auto-render.min.js'
+    "https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css"
+katex_js_path = "katex.min.js"
+katex_autorender_path = "auto-render.min.js"
 katex_prerender = True
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy', None),
-                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplotlib': ('http://matplotlib.org/stable/', None),
-                       'fluids': ('https://fluids.readthedocs.io/', None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None),
+                       "numpy": ("http://docs.scipy.org/doc/numpy", None),
+                       "scipy": ("http://docs.scipy.org/doc/scipy/reference", None),
+                       "matplotlib": ("http://matplotlib.org/stable/", None),
+                       "fluids": ("https://fluids.readthedocs.io/", None)}
 
 from sphinx.ext.autodoc import between
 
@@ -333,6 +332,6 @@ except:
 def setup(app):
     # Register a sphinx.ext.autodoc.between listener to ignore everything
     # between lines that contain the word IGNORE
-    app.connect('autodoc-process-docstring', between('(^Chemical Engineering Design Library).*|(^SOFTWARE.$).*', exclude=True))
+    app.connect("autodoc-process-docstring", between("(^Chemical Engineering Design Library).*|(^SOFTWARE.$).*", exclude=True))
     #app.connect('autodoc-skip-member', maybe_skip_member)
     return app

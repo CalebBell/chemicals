@@ -21,7 +21,6 @@ SOFTWARE.
 """
 
 import numpy as np
-import pytest
 from fluids.numerics import assert_close, assert_close1d
 
 from chemicals.interface import (
@@ -88,8 +87,8 @@ def test_CSP():
     assert 0.0 == Pitzer_sigma(700., 633.0, 4530000.0, 0.249)
 
     sigma1 = Sastri_Rao(293.15, 404.75, 633.0, 4530000.0)
-    sigma2 = Sastri_Rao(293.15, 404.75, 633.0, 4530000.0, chemicaltype='alcohol')
-    sigma3 = Sastri_Rao(293.15, 404.75, 633.0, 4530000.0, chemicaltype='acid')
+    sigma2 = Sastri_Rao(293.15, 404.75, 633.0, 4530000.0, chemicaltype="alcohol")
+    sigma3 = Sastri_Rao(293.15, 404.75, 633.0, 4530000.0, chemicaltype="acid")
     sigmas = [0.03234567739694441, 0.023255104102733407, 0.02558993464948134]
     assert_close1d([sigma1, sigma2, sigma3], sigmas)
 
@@ -141,9 +140,9 @@ def test_REFPROP():
     assert_close(REFPROP_sigma(700.0, 647.096, -0.1306, 2.471, 0.2151, 1.233), 0, atol=1e-12)
 
     # check the correlation can be used with a sigma but not a `n`
-    kwargs = {'sigma0': 0.3990499999999977, 'n0': 1.0000000000000073,
-            'sigma1': 0.14400000000000238, 'n1': 0.0,
-            'sigma2': 0.0, 'n2': 0.0, 'Tc': 1735.0}
+    kwargs = {"sigma0": 0.3990499999999977, "n0": 1.0000000000000073,
+            "sigma1": 0.14400000000000238, "n1": 0.0,
+            "sigma2": 0.0, "n2": 0.0, "Tc": 1735.0}
 
     # We can force both sigma and n parameters to go together by ignoring
     # the contribution of one or the other if both are not 0
@@ -168,26 +167,26 @@ def test_data():
     tot = sum([sigma_data_Mulero_Cachadina[i].sum() for i in sigma_data_Mulero_Cachadina.columns[1:]])
     assert_close(tot, 114350.07371931802)
 
-    for col in ('sigma0', 'n0', 'sigma1', 'n1', 'sigma2','n2',
-                'Tc', 'Tmin','Tmax'):
+    for col in ("sigma0", "n0", "sigma1", "n1", "sigma2","n2",
+                "Tc", "Tmin","Tmax"):
             assert col in sigma_data_Mulero_Cachadina.columns
     assert len(sigma_data_Mulero_Cachadina) == 115
 
     tot = sum([sigma_data_Jasper_Lange[i].sum() for i in sigma_data_Jasper_Lange.columns[1:]])
     assert_close(tot, 343153.38953333395)
 
-    assert np.all(sigma_data_Jasper_Lange.columns == ['Name', 'a', 'b', 'Tmin', 'Tmax'])
+    assert np.all(sigma_data_Jasper_Lange.columns == ["Name", "a", "b", "Tmin", "Tmax"])
     assert len(sigma_data_Jasper_Lange) == 522
 
     tot = sum([sigma_data_Somayajulu[i].sum() for i in sigma_data_Somayajulu.columns[1:]])
     assert_close(tot, 38941.199955999997)
 
-    assert np.all(sigma_data_Somayajulu.columns == ['Chemical', 'Tt', 'Tc', 'A', 'B', 'C'])
+    assert np.all(sigma_data_Somayajulu.columns == ["Chemical", "Tt", "Tc", "A", "B", "C"])
     assert len(sigma_data_Somayajulu) == 64
 
     tot = sum([sigma_data_Somayajulu2[i].sum() for i in sigma_data_Somayajulu2.columns[1:]])
     assert_close(tot, 39471.356771000006)
-    assert np.all(sigma_data_Somayajulu2.columns == ['Chemical', 'Tt', 'Tc', 'A', 'B', 'C'])
+    assert np.all(sigma_data_Somayajulu2.columns == ["Chemical", "Tt", "Tc", "A", "B", "C"])
     assert len(sigma_data_Somayajulu) == 64
 
 def test_VDI_PPDS_11_data():
@@ -195,7 +194,7 @@ def test_VDI_PPDS_11_data():
     assert len(sigma_data_VDI_PPDS_11) == 272
 
     # Doing the sums on the arrays is faster but much uglier. Worth it?
-    tots_calc = [sigma_data_VDI_PPDS_11[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E', 'Tc', 'Tm']]
+    tots_calc = [sigma_data_VDI_PPDS_11[i].abs().sum() for i in ["A", "B", "C", "D", "E", "Tc", "Tm"]]
     tots = [18.495069999999998, 336.69950000000006, 6.5941200000000002, 7.7347200000000003, 6.4262199999999998, 150142.28, 56917.699999999997]
     for calc, fixed in zip(tots_calc, tots):
         assert_close(calc, fixed)

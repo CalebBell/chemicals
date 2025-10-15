@@ -27,8 +27,8 @@ import chemicals.vectorized
 
 
 def test_Tc_multi():
-    Tcs_simple = [chemicals.critical.Tc(i) for i in ['108-88-3', '7732-18-5']]
-    Tcs_vec = chemicals.vectorized.Tc(['108-88-3', '7732-18-5'])
+    Tcs_simple = [chemicals.critical.Tc(i) for i in ["108-88-3", "7732-18-5"]]
+    Tcs_vec = chemicals.vectorized.Tc(["108-88-3", "7732-18-5"])
     assert_close1d(Tcs_simple, Tcs_vec)
 
 

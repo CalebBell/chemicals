@@ -51,7 +51,7 @@ from chemicals.rachford_rice import (
     flash_inner_loop_methods,
 )
 
-is_pypy = 'PyPy' in sys.version
+is_pypy = "PyPy" in sys.version
 
 def RR_solution_mpmath(zs, Ks, guess=None, dps=200):
     LV, VF, xs, ys = Rachford_Rice_solution_mpmath(zs, Ks, dps=dps)
@@ -230,7 +230,7 @@ def test_Rachford_Rice_solution_Leibovici_Neoschil(func):
     assert_close1d(ys, ys_expect, rtol=1e-14)
 
     # Call it once with the outer method
-    flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], method='Leibovici and Neoschil')
+    flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], method="Leibovici and Neoschil")
 
 
 
@@ -427,7 +427,7 @@ def test_Rachford_Rice_err_fprime2():
 
 
 def test_flash_inner_loop():
-    V_over_F, xs, ys = flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], method='Analytical')
+    V_over_F, xs, ys = flash_inner_loop(zs=[0.5, 0.3, 0.2], Ks=[1.685, 0.742, 0.532], method="Analytical")
     xs_expect = [0.33940869696634357, 0.3650560590371706, 0.2955352439964858]
     ys_expect = [0.5719036543882889, 0.27087159580558057, 0.15722474980613044]
     assert_close(V_over_F, 0.6907302627738544)
@@ -438,13 +438,13 @@ def test_flash_inner_loop():
     Ks = [4.2, 1.75, 0.74, 0.34]
     xs_expect = [0.07194096138571988, 0.18324869220986345, 0.3098180825880347, 0.4349922638163819]
     ys_expect = [0.30215203782002353, 0.320685211367261, 0.2292653811151457, 0.14789736969756986]
-    V_over_F, xs, ys = flash_inner_loop(zs=zs, Ks=Ks, method='Analytical')
+    V_over_F, xs, ys = flash_inner_loop(zs=zs, Ks=Ks, method="Analytical")
     assert_close(V_over_F, 0.12188396426827647)
     assert_close1d(xs, xs_expect)
     assert_close1d(ys, ys_expect)
 
 #     Self created random case, twice, to force the recognition
-    V_over_F, xs, ys = flash_inner_loop(zs=[0.6, 0.4], Ks=[1.685, 0.4], method='Analytical')
+    V_over_F, xs, ys = flash_inner_loop(zs=[0.6, 0.4], Ks=[1.685, 0.4], method="Analytical")
     assert_close(V_over_F, 0.416058394160584)
     V_over_F, xs, ys = flash_inner_loop(zs=[0.6, 0.4], Ks=[1.685, 0.4])
     assert_close(V_over_F, 0.416058394160584)
@@ -452,7 +452,7 @@ def test_flash_inner_loop():
     # with pytest.raises(Exception):
     #     flash_inner_loop(zs=[0.6, 0.4], Ks=[1.685, 0.4], method='FAIL')
 
-    V_over_F_5a, xs_5a, ys_5a = flash_inner_loop(zs=[0.1, 0.2, 0.3, 0.3, .01], Ks=[4.2, 1.75, 0.74, 0.34, .01], method='Analytical')
+    V_over_F_5a, xs_5a, ys_5a = flash_inner_loop(zs=[0.1, 0.2, 0.3, 0.3, .01], Ks=[4.2, 1.75, 0.74, 0.34, .01], method="Analytical")
     V_over_F_5b, xs_5b, ys_5b = flash_inner_loop(zs=[0.1, 0.2, 0.3, 0.3, .01], Ks=[4.2, 1.75, 0.74, 0.34, .01])
     assert_close1d(xs_5a, xs_5b)
     assert_close1d(ys_5a, ys_5b)
@@ -474,20 +474,20 @@ def test_flash_inner_loop():
 @pytest.mark.skipif(is_pypy, reason="PyPy is slowed down by numpy")
 def test_flash_inner_loop_methods():
     methods = flash_inner_loop_methods(4)
-    assert methods == ['Analytical', 'Leibovici and Nichita 2', 'Rachford-Rice (Secant)',
-                       'Rachford-Rice (Newton-Raphson)', 'Rachford-Rice (Halley)', 'Leibovici and Neoschil',
-                       'Rachford-Rice (NumPy)', 'Li-Johns-Ahmadi',
-                       'Rachford-Rice (polynomial)']
+    assert methods == ["Analytical", "Leibovici and Nichita 2", "Rachford-Rice (Secant)",
+                       "Rachford-Rice (Newton-Raphson)", "Rachford-Rice (Halley)", "Leibovici and Neoschil",
+                       "Rachford-Rice (NumPy)", "Li-Johns-Ahmadi",
+                       "Rachford-Rice (polynomial)"]
 
 
-flash_inner_loop_secant = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Secant)')
-flash_inner_loop_NR = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Newton-Raphson)')
-flash_inner_loop_halley = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (Halley)')
-flash_inner_loop_numpy = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (NumPy)')
-flash_inner_loop_LJA = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Li-Johns-Ahmadi')
-flash_inner_loop_poly = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Rachford-Rice (polynomial)')
-flash_inner_loop_LN2 = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Nichita 2')
-flash_inner_loop_LN = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method='Leibovici and Neoschil')
+flash_inner_loop_secant = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method="Rachford-Rice (Secant)")
+flash_inner_loop_NR = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method="Rachford-Rice (Newton-Raphson)")
+flash_inner_loop_halley = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method="Rachford-Rice (Halley)")
+flash_inner_loop_numpy = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method="Rachford-Rice (NumPy)")
+flash_inner_loop_LJA = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method="Li-Johns-Ahmadi")
+flash_inner_loop_poly = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method="Rachford-Rice (polynomial)")
+flash_inner_loop_LN2 = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method="Leibovici and Nichita 2")
+flash_inner_loop_LN = lambda zs, Ks, guess=None: flash_inner_loop(zs=zs, Ks=Ks, guess=guess, method="Leibovici and Neoschil")
 flash_LNdd = lambda zs, Ks, guess=None: Rachford_Rice_solution_Leibovici_Neoschil_dd(zs=zs, Ks=Ks, guess=guess)[1:]
 
 
@@ -704,7 +704,7 @@ def test_RR3_analytical_handle_imag_result():
     Ks = [0.9999533721721108, 1.0002950232772678, 0.9998314089519726]
     zs = [0.8486684394734213, 0.14038238201968353, 0.010949178506895217]
     # Need to fallback to another solver
-    sln = flash_inner_loop(zs, Ks, method='Analytical')
+    sln = flash_inner_loop(zs, Ks, method="Analytical")
     assert_close(sln[0], -0.09940571001259549)
 
 
@@ -712,7 +712,7 @@ def test_RR4_analytical_correct_root_selection():
     zs = [.25]*4
     Ks = [272.3389789221219, 0.03332258671372583, 5.5312234259718825e-06, 0.7150198654249253]
     # Cannot naively take a root
-    V_over_F, xs, ys = flash_inner_loop(zs, Ks, method='Analytical')
+    V_over_F, xs, ys = flash_inner_loop(zs, Ks, method="Analytical")
     xs_expect = [0.002907312276718056, 0.35857061296097453, 0.3640191709591237, 0.2745029038031836]
     ys_expect = [0.7917744568491449, 0.011948500343385897, 2.0134713659119683e-06, 0.19627502933610355]
     assert_close1d(xs, xs_expect)
@@ -761,7 +761,7 @@ def test_RR_3_component_analytical_killers():
 
     zs = [.8, 0.19, .01]
     Ks = [1.0003745026538315, 0.9983665794975959, 1.0010499948551157]
-    V_over_F, xs, ys = flash_inner_loop(zs, Ks, method='Analytical')
+    V_over_F, xs, ys = flash_inner_loop(zs, Ks, method="Analytical")
     V_over_F_good, xs_good, ys_good = Rachford_Rice_solution(zs, Ks)
     assert not isclose(V_over_F, V_over_F_good)
 
@@ -784,7 +784,7 @@ def test_RR_9_guess_outside_bounds():
     for method in methods:
         # 9 coeff root finding is numerically terrible - has a false root, and doesn't quite bracket
         # Cannot make work
-        if 'polynomial' not in method:
+        if "polynomial" not in method:
             V_over_F, xs, ys = flash_inner_loop(zs, Ks, method=method)
             assert_close(V_over_F, V_over_F_expect, rtol=1e-6)
             assert_close1d(xs, xs_expect, rtol=1e-5)

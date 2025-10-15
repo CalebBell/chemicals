@@ -38,12 +38,12 @@ from chemicals.dippr import (
     EQ115,
     EQ116,
     EQ127,
+    INTEGRAL_OVER_T_CALCULATION,
     EQ101_fitting_jacobian,
     EQ102_fitting_jacobian,
     EQ105_fitting_jacobian,
     EQ106_fitting_jacobian,
     EQ107_fitting_jacobian,
-    INTEGRAL_OVER_T_CALCULATION,
 )
 
 
@@ -97,7 +97,7 @@ def test_EQ105_more():
 
 
     # avoid complex numbers
-    kwargs = {'T': 195.0, 'A': 7247.0, 'B': 0.418, 'C': 5.2, 'D': 0.24, 'order': 0}
+    kwargs = {"T": 195.0, "A": 7247.0, "B": 0.418, "C": 5.2, "D": 0.24, "order": 0}
     assert_close(EQ105(**kwargs), 17337.32057416268)
 
     # Another complex case
@@ -123,12 +123,12 @@ def test_EQ106_more():
     assert_close(d3_analytical, d3_numerical, rtol=1e-8)
 
     # check that this regression set of points does not produce an error
-    overflow_kwargs = {'T': 304.747, 'Tc': 405.4, 'A': 56.743647419038744, 'B': -75.36242555958763,
-                   'C': -141.1028969227863, 'D': -254.76349199392695, 'E': -442.5916844036474, 'order': 0}
+    overflow_kwargs = {"T": 304.747, "Tc": 405.4, "A": 56.743647419038744, "B": -75.36242555958763,
+                   "C": -141.1028969227863, "D": -254.76349199392695, "E": -442.5916844036474, "order": 0}
     EQ106(**overflow_kwargs)
 
     # Point exactly on the critical point that was an error, needed an if statement.
-    assert 0.0 == EQ106(T=473.2, Tc=473.2, **{'A': 4761730.0, 'B': -11.5565, 'C': 30.6629, 'D': -31.89366, 'E': 12.67797})
+    assert 0.0 == EQ106(T=473.2, Tc=473.2, A=4761730.0, B=-11.5565, C=30.6629, D=-31.89366, E=12.67797)
 
     # Point above critical point, just set it to zero as the two properties used work
     assert 0.0 == EQ106(647.097, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
@@ -139,12 +139,12 @@ def test_EQ106_AB_and_ABC():
     C = -0.01
     Tmax = 590.0
 
-    kwargs = {'T': 590.0, 'Tc': 592.5, 'val': 4.106957515154657e-05, 'der': -2.1684735680016856e-05}
+    kwargs = {"T": 590.0, "Tc": 592.5, "val": 4.106957515154657e-05, "der": -2.1684735680016856e-05}
 
     res = EQ106_AB(**kwargs)
     assert_close1d(res, (0.056, 1.32), rtol=1e-13)
 
-    kwargs = {'T': 590.0, 'Tc': 592.5, 'val': 4.33678101801987e-05, 'der': -2.2721462154946353e-05, 'der2': 2.814732501661309e-06}
+    kwargs = {"T": 590.0, "Tc": 592.5, "val": 4.33678101801987e-05, "der": -2.2721462154946353e-05, "der2": 2.814732501661309e-06}
     res = EQ106_ABC(**kwargs)
     assert_close1d(res, (0.056, 1.32, -0.01), rtol=1e-9)
 
@@ -211,7 +211,7 @@ def test_EQ115_more():
     assert_close(d3_analytical, d3_numerical)
 
     # Check case avoid overflow
-    kwargs = {'T': 400.05, 'A': 1.0, 'B': 1.0, 'C': 1.0, 'D': 1.0, 'E': 1.0, 'order': 0}
+    kwargs = {"T": 400.05, "A": 1.0, "B": 1.0, "C": 1.0, "D": 1.0, "E": 1.0, "order": 0}
     EQ115(**kwargs)
 
 
@@ -277,7 +277,7 @@ def test_EQ107_more():
         EQ107(20., *coeffs, order=1E100)
 
     # Case that requires overflow handling
-    EQ107(**{'T': 377.77777777777777, 'A': 1539249.2020718465, 'B': -46807441.804555826, 'C': -409401.9169728528, 'D': -2164118.45731599, 'E': 339.5030595758336, 'order': 0})
+    EQ107(T=377.77777777777777, A=1539249.2020718465, B=-46807441.804555826, C=-409401.9169728528, D=-2164118.45731599, E=339.5030595758336, order=0)
 
 
 def test_EQ114_more():
@@ -491,14 +491,13 @@ def test_EQ107_fitting():
 
 
 
-import pytest
-from fluids.numerics import assert_close, derivative
 
 from chemicals.dippr import (
     EQ100_reciprocal,
     EQ105_reciprocal,
     EQ106_reciprocal,
 )
+
 
 def test_EQ100_reciprocal():
     # Base value test
@@ -507,13 +506,13 @@ def test_EQ100_reciprocal():
 
     # First derivative test
     d1_analytical = EQ100_reciprocal(250., 276370., -2090.1, 8.125, -0.014116, 0.0000093701, order=1)
-    d1_numerical = derivative(lambda T: EQ100_reciprocal(T, 276370., -2090.1, 8.125, -0.014116, 0.0000093701), 
+    d1_numerical = derivative(lambda T: EQ100_reciprocal(T, 276370., -2090.1, 8.125, -0.014116, 0.0000093701),
                             250., dx=1e-3)
     assert_close(d1_analytical, d1_numerical, rtol=1e-6)
 
     # Second derivative test
     d2_analytical = EQ100_reciprocal(250., 276370., -2090.1, 8.125, -0.014116, 0.0000093701, order=2)
-    d2_numerical = derivative(lambda T: EQ100_reciprocal(T, 276370., -2090.1, 8.125, -0.014116, 0.0000093701, order=1), 
+    d2_numerical = derivative(lambda T: EQ100_reciprocal(T, 276370., -2090.1, 8.125, -0.014116, 0.0000093701, order=1),
                             250., dx=1e-3)
     assert_close(d2_analytical, d2_numerical, rtol=1e-6)
 
@@ -528,18 +527,18 @@ def test_EQ105_reciprocal():
 
     # First derivative test
     d1_analytical = EQ105_reciprocal(300., 0.70824, 0.26411, 507.6, 0.27537, order=1)
-    d1_numerical = derivative(lambda T: EQ105_reciprocal(T, 0.70824, 0.26411, 507.6, 0.27537), 
+    d1_numerical = derivative(lambda T: EQ105_reciprocal(T, 0.70824, 0.26411, 507.6, 0.27537),
                             300., dx=1e-3)
     assert_close(d1_analytical, d1_numerical, rtol=1e-6)
 
     # Second derivative test
     d2_analytical = EQ105_reciprocal(300., 0.70824, 0.26411, 507.6, 0.27537, order=2)
-    d2_numerical = derivative(lambda T: EQ105_reciprocal(T, 0.70824, 0.26411, 507.6, 0.27537, order=1), 
+    d2_numerical = derivative(lambda T: EQ105_reciprocal(T, 0.70824, 0.26411, 507.6, 0.27537, order=1),
                             300., dx=1e-3)
     assert_close(d2_analytical, d2_numerical, rtol=1e-6)
 
     # Complex number avoidance test
-    kwargs = {'T': 195.0, 'A': 7247.0, 'B': 0.418, 'C': 5.2, 'D': 0.24, 'order': 0}
+    kwargs = {"T": 195.0, "A": 7247.0, "B": 0.418, "C": 5.2, "D": 0.24, "order": 0}
     result = EQ105_reciprocal(**kwargs)
     assert_close(result, 1.0/17337.32057416268, rtol=1e-13)
 
@@ -554,23 +553,23 @@ def test_EQ106_reciprocal():
 
     # First derivative test
     d1_analytical = EQ106_reciprocal(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1)
-    d1_numerical = derivative(lambda T: EQ106_reciprocal(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699), 
+    d1_numerical = derivative(lambda T: EQ106_reciprocal(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699),
                             300., dx=1e-3)
     assert_close(d1_analytical, d1_numerical, rtol=1e-6)
 
     # Second derivative test
     d2_analytical = EQ106_reciprocal(300, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=2)
-    d2_numerical = derivative(lambda T: EQ106_reciprocal(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1), 
+    d2_numerical = derivative(lambda T: EQ106_reciprocal(T, 647.096, 0.17766, 2.567, -3.3377, 1.9699, order=1),
                             300., dx=1e-3)
     assert_close(d2_analytical, d2_numerical, rtol=1e-6)
 
     # Test at critical point
     result = EQ106_reciprocal(647.096, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
-    assert result == float('inf')
+    assert result == float("inf")
 
     # Test above critical point
     result = EQ106_reciprocal(648.0, 647.096, 0.17766, 2.567, -3.3377, 1.9699)
-    assert result == float('inf')
+    assert result == float("inf")
 
     # Invalid order test
     with pytest.raises(ValueError):

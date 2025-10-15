@@ -61,108 +61,108 @@ from chemicals.miscdata import heos_data, webbook_data
 
 
 def test_data_IUPAC():
-    Tc_sum = critical_data_IUPAC['Tc'].sum()
+    Tc_sum = critical_data_IUPAC["Tc"].sum()
     assert_close(Tc_sum, 462157.51300000004)
 
-    Pc_sum = critical_data_IUPAC['Pc'].sum()
+    Pc_sum = critical_data_IUPAC["Pc"].sum()
     assert_close(Pc_sum, 2063753000.0)
 
-    Vc_sum = critical_data_IUPAC['Vc'].sum()
+    Vc_sum = critical_data_IUPAC["Vc"].sum()
     assert_close(Vc_sum, 0.19953190000000001)
 
-    Zc_sum = critical_data_IUPAC['Zc'].sum()
+    Zc_sum = critical_data_IUPAC["Zc"].sum()
     assert_close(Zc_sum, 109.892)
 
     assert critical_data_IUPAC.shape == (810, 7)
 
 
 def test_data_Matthews():
-    Tc_sum = critical_data_Matthews['Tc'].sum()
+    Tc_sum = critical_data_Matthews["Tc"].sum()
     assert_close(Tc_sum, 65343.210900000005)
 
-    Pc_sum = critical_data_Matthews['Pc'].sum()
+    Pc_sum = critical_data_Matthews["Pc"].sum()
     assert_close(Pc_sum, 579365204.25)
 
-    Vc_sum = critical_data_Matthews['Vc'].sum()
+    Vc_sum = critical_data_Matthews["Vc"].sum()
     assert_close(Vc_sum, 0.014921000000000002)
 
-    Zc_sum = critical_data_Matthews['Zc'].sum()
+    Zc_sum = critical_data_Matthews["Zc"].sum()
     assert_close(Zc_sum, 12.141000000000002)
 
     assert critical_data_Matthews.shape == (120, 6)
 
 
 def test_data_CRC():
-    Tc_sum = critical_data_CRC['Tc'].sum()
+    Tc_sum = critical_data_CRC["Tc"].sum()
     assert_close(Tc_sum, 514092.75)
 
-    Pc_sum = critical_data_CRC['Pc'].sum()
+    Pc_sum = critical_data_CRC["Pc"].sum()
     assert_close(Pc_sum, 2700259000.0)
 
-    Vc_sum = critical_data_CRC['Vc'].sum()
+    Vc_sum = critical_data_CRC["Vc"].sum()
     assert_close(Vc_sum, 0.38876929999999998)
 
-    Zc_sum = critical_data_CRC['Zc'].sum()
+    Zc_sum = critical_data_CRC["Zc"].sum()
     assert_close(Zc_sum, 207.98663028416496, 1e-6)
 
     assert critical_data_CRC.shape == (861, 8)
 
-    Tc_error_sum = critical_data_CRC['Tc_error'].sum()
+    Tc_error_sum = critical_data_CRC["Tc_error"].sum()
     assert_close(Tc_error_sum, 2444.24)
 
-    Pc_error_sum = critical_data_CRC['Pc_error'].sum()
+    Pc_error_sum = critical_data_CRC["Pc_error"].sum()
     assert_close(Pc_error_sum, 1.2587e+08)
 
-    Vc_error_sum = critical_data_CRC['Vc_error'].sum()
+    Vc_error_sum = critical_data_CRC["Vc_error"].sum()
     assert_close(Vc_error_sum, 0.014151)
 
 
 def test_data_PSRKR4():
-    Tc_sum = critical_data_PSRKR4['Tc'].sum()
+    Tc_sum = critical_data_PSRKR4["Tc"].sum()
     assert_close(Tc_sum, 597984.0)
 
-    Pc_sum = critical_data_PSRKR4['Pc'].sum()
+    Pc_sum = critical_data_PSRKR4["Pc"].sum()
     assert_close(Pc_sum, 3708990509)
 
-    Vc_sum = critical_data_PSRKR4['Vc'].sum()
+    Vc_sum = critical_data_PSRKR4["Vc"].sum()
     assert_close(Vc_sum, 0.40726849999999998)
 
-    Zc_sum = critical_data_PSRKR4['Zc'].sum()
+    Zc_sum = critical_data_PSRKR4["Zc"].sum()
     assert_close(Zc_sum, 251.29839643655527, 1e-6)
 
-    omega_sum = critical_data_PSRKR4['omega'].sum()
+    omega_sum = critical_data_PSRKR4["omega"].sum()
     assert_close(omega_sum, 410.50560000000002)
 
     assert critical_data_PSRKR4.shape == (995, 6)
 
 
 def test_data_PassutDanner():
-    Tc_sum = critical_data_PassutDanner['Tc'].sum()
+    Tc_sum = critical_data_PassutDanner["Tc"].sum()
     assert_close(Tc_sum, 111665.28333333334)
 
-    Pc_sum = critical_data_PassutDanner['Pc'].sum()
+    Pc_sum = critical_data_PassutDanner["Pc"].sum()
     assert_close(Pc_sum, 579756767.55527318)
 
-    omega_sum = critical_data_PassutDanner['omega'].sum()
+    omega_sum = critical_data_PassutDanner["omega"].sum()
     assert_close(omega_sum, 65.567000000000007)
 
     assert critical_data_PassutDanner.shape == (192, 4)
 
 
 def test_data_Yaws():
-    Tc_sum = critical_data_Yaws['Tc'].sum()
+    Tc_sum = critical_data_Yaws["Tc"].sum()
     assert_close(Tc_sum, 5862006.9500000002)
 
-    Pc_sum = critical_data_Yaws['Pc'].sum()
+    Pc_sum = critical_data_Yaws["Pc"].sum()
     assert_close(Pc_sum, 62251189000.0)
 
-    Vc_sum = critical_data_Yaws['Vc'].sum()
+    Vc_sum = critical_data_Yaws["Vc"].sum()
     assert_close(Vc_sum, 4.65511199)
 
-    Zc_sum = critical_data_Yaws['Zc'].sum()
+    Zc_sum = critical_data_Yaws["Zc"].sum()
     assert_close(Zc_sum, 1859.6389176846883, 1e-6)
 
-    omega_sum = critical_data_Yaws['omega'].sum()
+    omega_sum = critical_data_Yaws["omega"].sum()
     assert_close(omega_sum, 3170.3041999999996)
 
     assert critical_data_Yaws.shape == (7549, 6)
@@ -190,26 +190,25 @@ def test_relationships():
     with pytest.raises(Exception):
         Grigoras(Tc=559.4)
 
-    Vc1 = critical_surface(Tc=599.4, Pc=1.19E6, method='IHMELS')
-    Vc2 = critical_surface(Tc=599.4, Pc=1.19E6, method='MEISSNER')
-    Vc3 = critical_surface(Tc=599.4, Pc=1.19E6, method='GRIGORAS')
+    Vc1 = critical_surface(Tc=599.4, Pc=1.19E6, method="IHMELS")
+    Vc2 = critical_surface(Tc=599.4, Pc=1.19E6, method="MEISSNER")
+    Vc3 = critical_surface(Tc=599.4, Pc=1.19E6, method="GRIGORAS")
     assert_close1d([Vc1, Vc2, Vc3],
                     [0.0010927333333333334, 0.0010695726588235296, 0.00134532])
 
     methods = critical_surface_methods(Tc=599.4, Pc=1.19E6)
     methods.sort()
-    methods_listed = ['IHMELS', 'MEISSNER', 'GRIGORAS']
+    methods_listed = ["IHMELS", "MEISSNER", "GRIGORAS"]
     methods_listed.sort()
     assert methods == methods_listed
     with pytest.raises(ValueError):
         critical_surface()
     with pytest.raises(Exception):
-        critical_surface(Tc=599.4, Pc=1.19E6, method='FAIL')
+        critical_surface(Tc=599.4, Pc=1.19E6, method="FAIL")
 
     assert [] == critical_surface_methods(Tc=100)
 
 
-#
 
 @pytest.mark.slow
 @pytest.mark.parametrize("with_database", [True, False])
@@ -221,7 +220,7 @@ def test_Tc_all_values(with_database):
     CASs = set()
     for k in sources:
         for i in k.index:
-            if pd.notnull(k.at[i, 'Tc']):
+            if pd.notnull(k.at[i, "Tc"]):
                 CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
@@ -232,46 +231,46 @@ def test_Tc_all_values(with_database):
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Tc(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
-    Tc_val = Tc(CASRN='64-17-5')
+    Tc_val = Tc(CASRN="64-17-5")
     assert_close(514.71, Tc_val)
     assert type(Tc_val) is float
 
-    assert_close(516.2, Tc(CASRN='64-17-5', method='PSRK'))
-    assert Tc(CASRN='64-17-5', method='MATTHEWS') is None
+    assert_close(516.2, Tc(CASRN="64-17-5", method="PSRK"))
+    assert Tc(CASRN="64-17-5", method="MATTHEWS") is None
 
-    assert_close(647.3, Tc(CASRN='7732-18-5', method='PSRK'))
+    assert_close(647.3, Tc(CASRN="7732-18-5", method="PSRK"))
 
-    assert_close(126.2, Tc(CASRN='7727-37-9', method='MATTHEWS'))
+    assert_close(126.2, Tc(CASRN="7727-37-9", method="MATTHEWS"))
 
-    methods = Tc_methods(CASRN='98-01-1')
-    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON']
+    methods = Tc_methods(CASRN="98-01-1")
+    assert methods == ["IUPAC", "PSRK", "WEBBOOK", "PINAMARTINES", "YAWS", "WILSON_JASPERSON"]
 
     # Error handling
-    assert Tc(CASRN='BADCAS') is None
+    assert Tc(CASRN="BADCAS") is None
 
     with pytest.raises(Exception):
-        Tc(CASRN='98-01-1', method='BADMETHOD')
+        Tc(CASRN="98-01-1", method="BADMETHOD")
 
     # https://github.com/CalebBell/thermo/issues/65
-    assert Tc(CASRN='7784-42-1', method='MATTHEWS') == 373
+    assert Tc(CASRN="7784-42-1", method="MATTHEWS") == 373
 
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Pc(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
 
-    assert_close(6268000.0, Pc(CASRN='64-17-5'))
+    assert_close(6268000.0, Pc(CASRN="64-17-5"))
 
-    assert_close(22048321.0, Pc(CASRN='7732-18-5', method='PSRK'))
+    assert_close(22048321.0, Pc(CASRN="7732-18-5", method="PSRK"))
 
-    assert_close(3394387.5, Pc(CASRN='7727-37-9', method='MATTHEWS'))
+    assert_close(3394387.5, Pc(CASRN="7727-37-9", method="MATTHEWS"))
 
-    methods = Pc_methods(CASRN='98-01-1')
-    assert methods == ['IUPAC', 'PSRK', 'WEBBOOK', 'PINAMARTINES', 'YAWS', 'WILSON_JASPERSON']
+    methods = Pc_methods(CASRN="98-01-1")
+    assert methods == ["IUPAC", "PSRK", "WEBBOOK", "PINAMARTINES", "YAWS", "WILSON_JASPERSON"]
 
     # Error handling
-    assert None is Pc(CASRN='BADCAS')
+    assert None is Pc(CASRN="BADCAS")
     with pytest.raises(Exception):
-        Pc(CASRN='98-01-1', method='BADMETHOD')
+        Pc(CASRN="98-01-1", method="BADMETHOD")
 
 
 @pytest.mark.slow
@@ -284,7 +283,7 @@ def test_Pc_all_values(with_database):
     CASs = set()
     for k in sources:
         for i in k.index:
-            if pd.notnull(k.at[i, 'Pc']):
+            if pd.notnull(k.at[i, "Pc"]):
                 CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
@@ -295,19 +294,19 @@ def test_Pc_all_values(with_database):
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Vc(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
-    assert_close(0.000168634064081, Vc(CASRN='64-17-5'))
+    assert_close(0.000168634064081, Vc(CASRN="64-17-5"))
 
-    assert_close(5.600e-05, Vc(CASRN='7732-18-5', method='PSRK'))
+    assert_close(5.600e-05, Vc(CASRN="7732-18-5", method="PSRK"))
 
-    assert_close(8.950e-05, Vc(CASRN='7727-37-9', method='MATTHEWS'))
+    assert_close(8.950e-05, Vc(CASRN="7727-37-9", method="MATTHEWS"))
 
-    methods = Vc_methods(CASRN='98-01-1')
-    assert methods == ['PSRK', 'PINAMARTINES', 'YAWS', 'FEDORS']
+    methods = Vc_methods(CASRN="98-01-1")
+    assert methods == ["PSRK", "PINAMARTINES", "YAWS", "FEDORS"]
 
     # Error handling
-    assert None is Vc(CASRN='BADCAS')
+    assert None is Vc(CASRN="BADCAS")
     with pytest.raises(Exception):
-        Vc(CASRN='98-01-1', method='BADMETHOD')
+        Vc(CASRN="98-01-1", method="BADMETHOD")
 
 @pytest.mark.slow
 @pytest.mark.parametrize("with_database", [True, False])
@@ -319,7 +318,7 @@ def test_Vc_all_values(with_database):
     CASs = set()
     for k in sources:
         for i in k.index:
-            if pd.notnull(k.at[i, 'Vc']):
+            if pd.notnull(k.at[i, "Vc"]):
                 CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
@@ -330,19 +329,19 @@ def test_Vc_all_values(with_database):
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Zc(with_database):
     data_reader.USE_CONSTANTS_DATABASE = with_database
-    assert_close(0.24698893835371977, Zc(CASRN='64-17-5'))
+    assert_close(0.24698893835371977, Zc(CASRN="64-17-5"))
 
-    assert_close(0.22941602891834947, Zc(CASRN='7732-18-5', method='PSRK'))
+    assert_close(0.22941602891834947, Zc(CASRN="7732-18-5", method="PSRK"))
 
-    assert_close(0.29, Zc(CASRN='7727-37-9', method='MATTHEWS'))
+    assert_close(0.29, Zc(CASRN="7727-37-9", method="MATTHEWS"))
 
-    methods = Zc_methods(CASRN='98-01-1')
-    assert methods == ['PSRK', 'PINAMARTINES', 'YAWS']
+    methods = Zc_methods(CASRN="98-01-1")
+    assert methods == ["PSRK", "PINAMARTINES", "YAWS"]
 
     # Error handling
-    assert None is Zc(CASRN='BADCAS')
+    assert None is Zc(CASRN="BADCAS")
     with pytest.raises(Exception):
-        Zc(CASRN='98-01-1', method='BADMETHOD')
+        Zc(CASRN="98-01-1", method="BADMETHOD")
 
 @pytest.mark.parametrize("with_database", [True, False])
 @pytest.mark.slow
@@ -354,7 +353,7 @@ def test_Zc_all_values(with_database):
     CASs = set()
     for k in sources:
         for i in k.index:
-            if pd.notnull(k.at[i, 'Zc']):
+            if pd.notnull(k.at[i, "Zc"]):
                 CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
@@ -365,13 +364,13 @@ def test_Zc_all_values(with_database):
 
 
 def test_Mersmann_Kind_predictor():
-    test_atoms = {'C': 10, 'H': 22}
+    test_atoms = {"C": 10, "H": 22}
 
     Vc_pred = Mersmann_Kind_predictor(test_atoms)
     assert_close(Vc_pred, 0.0005851859052024729)
 
     with pytest.raises(Exception):
-        Mersmann_Kind_predictor( {'C': 10, 'H': 22, 'NOTANATOM': 100})
+        Mersmann_Kind_predictor( {"C": 10, "H": 22, "NOTANATOM": 100})
 
 
 def test_mixing_Tc():
@@ -462,13 +461,13 @@ def test_mixing_modified_Wilson_Vc():
 
 def test_third_property():
     with pytest.raises(Exception):
-        third_property('141-62-8')
+        third_property("141-62-8")
     with pytest.raises(Exception):
-        third_property('1410-62-8', V=True)
+        third_property("1410-62-8", V=True)
 
-    assert_close(third_property('110-15-6', V=True), 0.00039809186906019007)
-    assert_close(third_property('110-15-6', P=True), 6095016.233766234)
-    assert_close(third_property('110-15-6', T=True), 658.410835214447)
+    assert_close(third_property("110-15-6", V=True), 0.00039809186906019007)
+    assert_close(third_property("110-15-6", P=True), 6095016.233766234)
+    assert_close(third_property("110-15-6", T=True), 658.410835214447)
 
 
 def test_Hekayati_Raeissi():
@@ -500,27 +499,27 @@ def test_Hekayati_Raeissi():
 
 
 def test_Tb_Tc_relationship():
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Perry8E'), 700.526)
-    assert_close(Tb_Tc_relationship(Tc=700.526, fit='Perry8E'), 427.15)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitInorganic'), 686.0029)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitOrganic'), 620.64895)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Perry8E"), 700.526)
+    assert_close(Tb_Tc_relationship(Tc=700.526, fit="Perry8E"), 427.15)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitInorganic"), 686.0029)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitOrganic"), 620.64895)
 
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitBinary'), 669.7712)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitTernary'), 683.8671499999999)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitElements'), 746.6582)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitBinary"), 669.7712)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitTernary"), 683.8671499999999)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitElements"), 746.6582)
 
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitBr'), 668.0626)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitSi'), 651.8309)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitC'), 688.13865)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitI'), 620.2218)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitN'), 690.2744)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitCl'), 665.4997)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitF'), 671.9069499999999)
-    assert_close(Tb_Tc_relationship(Tb=427.15, fit='Chemicals2021FitO'),688.99295)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitBr"), 668.0626)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitSi"), 651.8309)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitC"), 688.13865)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitI"), 620.2218)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitN"), 690.2744)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitCl"), 665.4997)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitF"), 671.9069499999999)
+    assert_close(Tb_Tc_relationship(Tb=427.15, fit="Chemicals2021FitO"),688.99295)
 
     with pytest.raises(ValueError):
-        Tb_Tc_relationship(Tb=427.15, fit='BAD')
+        Tb_Tc_relationship(Tb=427.15, fit="BAD")
     with pytest.raises(ValueError):
-        Tb_Tc_relationship(fit='Perry8E')
+        Tb_Tc_relationship(fit="Perry8E")
     with pytest.raises(ValueError):
-        Tb_Tc_relationship(Tb=1, Tc=2, fit='Perry8E')
+        Tb_Tc_relationship(Tb=1, Tc=2, fit="Perry8E")

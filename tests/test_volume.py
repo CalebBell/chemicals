@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import pytest
 from fluids.numerics import assert_close, assert_close1d
 
 from chemicals.utils import Vm_to_rho
@@ -38,6 +37,8 @@ from chemicals.volume import (
     Goodman,
     Rackett,
     Rackett_mixture,
+    Tait,
+    Tait_molar,
     TDE_VDNS_rho,
     Townsend_Hales,
     Yamada_Gunn,
@@ -50,8 +51,6 @@ from chemicals.volume import (
     rho_data_Perry_8E_105_l,
     rho_data_SNM0,
     rho_data_VDI_PPDS_2,
-    Tait,
-    Tait_molar,
 )
 
 
@@ -148,17 +147,17 @@ def test_CRC_inorganic():
     assert_close(rho, 2206.30796)
 
 def test_COSTALD_parameters():
-    tots_calc = [rho_data_COSTALD[i].sum() for i in ['omega_SRK', 'Vchar', 'Z_RA']]
+    tots_calc = [rho_data_COSTALD[i].sum() for i in ["omega_SRK", "Vchar", "Z_RA"]]
     tots = [72.483900000000006, 0.086051663333333334, 49.013500000000001]
     assert_close1d(tots_calc, tots)
 
 def test_SN0_data():
-    tot = rho_data_SNM0['delta_SRK'].abs().sum()
+    tot = rho_data_SNM0["delta_SRK"].abs().sum()
     assert_close(tot, 2.0715134)
 
 
 def test_Perry_l_data():
-    tots_calc = [rho_data_Perry_8E_105_l[i].sum() for i in ['C1', 'C2', 'C3', 'C4', 'Tmin', 'Tmax']]
+    tots_calc = [rho_data_Perry_8E_105_l[i].sum() for i in ["C1", "C2", "C3", "C4", "Tmin", "Tmax"]]
     tots = [376364.41000000003, 89.676429999999996, 189873.32999999999, 96.68741, 71151.899999999994, 189873.32999999999]
     assert_close1d(tots_calc, tots)
 
@@ -172,29 +171,29 @@ def test_VDI_PPDS_2_data():
     Note this table needed to have Tc and MW added to it as well, from the same
     source.
     """
-    tots_calc = [rho_data_VDI_PPDS_2[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'Tc', 'rhoc']]
+    tots_calc = [rho_data_VDI_PPDS_2[i].abs().sum() for i in ["A", "B", "C", "D", "Tc", "rhoc"]]
     tots = [208878.27130000002, 117504.59450000001, 202008.99950000001, 85280.333600000013, 150142.28, 97269]
     assert_close1d(tots_calc, tots)
 
     assert rho_data_VDI_PPDS_2.shape == (272, 8)
 
 def test_CRC_inorg_l_data2():
-    tots_calc = [rho_data_CRC_inorg_l[i].abs().sum() for i in ['rho', 'k', 'Tm', 'Tmax']]
+    tots_calc = [rho_data_CRC_inorg_l[i].abs().sum() for i in ["rho", "k", "Tm", "Tmax"]]
     tots = [882131, 181.916, 193785.09499999997, 233338.04999999996]
     assert_close1d(tots_calc, tots)
 
 
 def test_CRC_const_inorg_l():
-    tot_calc = rho_data_CRC_inorg_l_const['Vm'].sum()
+    tot_calc = rho_data_CRC_inorg_l_const["Vm"].sum()
     tot = 0.01106122489849834
     assert_close(tot_calc, tot)
 
 def test_CRC_const_inorg_s():
-    tot = rho_data_CRC_inorg_s_const['Vm'].sum()
+    tot = rho_data_CRC_inorg_s_const["Vm"].sum()
     assert_close(tot, 0.13528770767318143)
 
 def test_CRC_virial_poly():
-    tots_calc = [rho_data_CRC_virial[i].abs().sum() for i in ['a1', 'a2', 'a3', 'a4', 'a5']]
+    tots_calc = [rho_data_CRC_virial[i].abs().sum() for i in ["a1", "a2", "a3", "a4", "a5"]]
     tots = [146559.69999999998, 506997.70000000001, 619708.59999999998, 120772.89999999999, 4483]
     assert_close1d(tots_calc, tots)
 

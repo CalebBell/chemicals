@@ -29,34 +29,34 @@ from chemicals.dipole import dipole_moment, dipole_moment_methods
 
 def test_dipole_moment_methods():
 
-    tot = dipole.dipole_data_Poling['dipole_moment'].sum()
+    tot = dipole.dipole_data_Poling["dipole_moment"].sum()
     assert_close(tot, 248.59999999999999)
 
-    tot = dipole.dipole_data_CCDB['dipole_moment'].sum()
+    tot = dipole.dipole_data_CCDB["dipole_moment"].sum()
     assert_close(tot, 629.69)
 
-    tot = dipole.dipole_data_Muller['dipole_moment'].sum()
+    tot = dipole.dipole_data_Muller["dipole_moment"].sum()
     assert_close(tot, 420.05190108045235)
 
 def test_dipole():
-    d = dipole_moment(CASRN='64-17-5')
+    d = dipole_moment(CASRN="64-17-5")
     assert_close(d, 1.44)
 
-    d = dipole_moment(CASRN='75-52-5', method='POLING')
+    d = dipole_moment(CASRN="75-52-5", method="POLING")
     assert_close(d, 3.1)
 
-    d = dipole_moment(CASRN='56-81-5', method='MULLER')
+    d = dipole_moment(CASRN="56-81-5", method="MULLER")
     assert_close(d, 4.21)
 
-    methods = dipole_moment_methods(CASRN='78-78-4')
-    methods_fixed = ['CCCBDB', 'MULLER', 'POLING']
+    methods = dipole_moment_methods(CASRN="78-78-4")
+    methods_fixed = ["CCCBDB", "MULLER", "POLING"]
     assert methods == methods_fixed
 
     with pytest.raises(Exception):
-        dipole_moment(CASRN='78-78-4', method='FAIL')
+        dipole_moment(CASRN="78-78-4", method="FAIL")
 
 
     # Just test one thing with psi4
     # git can track everything
-    val = dipole_moment(CASRN='64-17-5', method='PSI4_2022A')
+    val = dipole_moment(CASRN="64-17-5", method="PSI4_2022A")
     assert val > 1

@@ -21,9 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from math import log, log10, exp
-from random import uniform
-from random import Random
+from math import exp, log, log10
+from random import Random, uniform
 
 import pytest
 from fluids.constants import atm, foot, lb, psi
@@ -67,17 +66,17 @@ from chemicals.viscosity import (
     mu_Yaws,
     mu_Yaws_fitting_jacobian,
     viscosity_converter,
+    viscosity_converter_limits,
     viscosity_gas_Gharagheizi,
     viscosity_index,
-    viscosity_scales, 
-    viscosity_scales_linear, 
-    viscosity_converter_limits,
+    viscosity_scales,
+    viscosity_scales_linear,
 )
 
 ### Check data integrity
 
 def test_Dutt_Prasad_data():
-    tots_calc = [mu_data_Dutt_Prasad[i].abs().sum() for i in ['A', 'B', 'C', 'Tmin', 'Tmax']]
+    tots_calc = [mu_data_Dutt_Prasad[i].abs().sum() for i in ["A", "B", "C", "Tmin", "Tmax"]]
     tots = [195.89260000000002, 65395.299999999996, 9849.1899999999987, 25952, 35016]
     assert_close1d(tots_calc, tots)
 
@@ -85,7 +84,7 @@ def test_Dutt_Prasad_data():
 
 
 def test_VN2E_data():
-    tots_calc = [mu_data_VN2E[i].abs().sum() for i in ['C', 'D', 'Tmin', 'Tmax']]
+    tots_calc = [mu_data_VN2E[i].abs().sum() for i in ["C", "D", "Tmin", "Tmax"]]
     tots = [567743298666.74878, 48.8643, 3690, 4860]
     assert_close1d(tots_calc, tots)
 
@@ -93,14 +92,14 @@ def test_VN2E_data():
 
 
 def test_VN3_data():
-    tots_calc = [mu_data_VN3[i].abs().sum() for i in ['A', 'B', 'C', 'Tmin', 'Tmax']]
+    tots_calc = [mu_data_VN3[i].abs().sum() for i in ["A", "B", "C", "Tmin", "Tmax"]]
     tots = [645.18849999999998, 169572.65159999998, 50050.151870000002, 126495, 175660]
     assert_close1d(tots_calc, tots)
 
     assert mu_data_VN3.shape == (432, 7)
 
 def test_VN2_data():
-    tots_calc = [mu_data_VN2[i].abs().sum() for i in ['A', 'B', 'Tmin', 'Tmax']]
+    tots_calc = [mu_data_VN2[i].abs().sum() for i in ["A", "B", "Tmin", "Tmax"]]
     tots = [674.10069999999996, 83331.98599999999, 39580, 47897]
     assert_close1d(tots_calc, tots)
 
@@ -110,7 +109,7 @@ def test_VN2_data():
 def test_Perrys2_313_data():
     # All values calculated at Tmin and Tmax check out to at least 5E-3 precision
     # The rounding has some effect, but it is not worrying.
-    tots_calc = [mu_data_Perrys_8E_2_313[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'C5', 'Tmin', 'Tmax']]
+    tots_calc = [mu_data_Perrys_8E_2_313[i].abs().sum() for i in ["C1", "C2", "C3", "C4", "C5", "Tmin", "Tmax"]]
     tots = [9166.6971369999992, 615425.94497999991, 1125.5317557875198, 9.054869390623603e+34, 402.21244000000002, 72467.140000000014, 136954.85999999999]
     assert_close1d(tots_calc, tots)
 
@@ -123,7 +122,7 @@ def test_Perrys2_312_data():
     # ~1E-5 Pa*S, but listed values are ~1E-10 to 1E-12. Unsure of the cause.
     # All coumpounds match at 1E-3 for Tmin.
 
-    tots_calc = [mu_data_Perrys_8E_2_312[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'Tmin', 'Tmax']]
+    tots_calc = [mu_data_Perrys_8E_2_312[i].abs().sum() for i in ["C1", "C2", "C3", "C4", "Tmin", "Tmax"]]
     tots = [0.00019683902626010103, 250.10520100000002, 65862.829200000007, 191286, 74802.639999999999, 355064.37]
     assert_close1d(tots_calc, tots)
 
@@ -131,7 +130,7 @@ def test_Perrys2_312_data():
 
 
 def test_VDI_PPDS_7_data():
-    tots_calc = [mu_data_VDI_PPDS_7[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E']]
+    tots_calc = [mu_data_VDI_PPDS_7[i].abs().sum() for i in ["A", "B", "C", "D", "E"]]
     tots = [507.14607000000001, 1680.7624099999998, 165461.14259999999, 46770.887000000002, 0.057384780000000003]
     assert_close1d(tots_calc, tots)
 
@@ -141,7 +140,7 @@ def test_VDI_PPDS_8_data():
     # Coefficients for water are incorrect - obtained an average deviation of 150%!
     assert mu_data_VDI_PPDS_8.shape == (274, 6)
 
-    tots_calc = [mu_data_VDI_PPDS_8[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'E']]
+    tots_calc = [mu_data_VDI_PPDS_8[i].abs().sum() for i in ["A", "B", "C", "D", "E"]]
     tots = [0.00032879559999999999, 9.5561339999999995e-06, 2.8377710000000001e-09, 2.8713399999999998e-12, 2.8409200000000004e-15]
     assert_close1d(tots_calc, tots)
 
@@ -242,10 +241,10 @@ def test_Lucas_gas():
     assert_close(mu, 1.7811559961984407e-05)
 
     # Helium, testing Q
-    mu = Lucas_gas(T=6, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
+    mu = Lucas_gas(T=6, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN="7440-59-7")
     assert_close(mu, 1.3042945737346396e-06)
 
-    mu = Lucas_gas(T=150, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
+    mu = Lucas_gas(T=150, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN="7440-59-7")
     assert_close(mu, 1.2558477184738118e-05)
 
 
@@ -376,88 +375,88 @@ def test_Lorentz_Bray_Clarke():
 def test_viscosity_converter():
     # Barbey - todo viscosity_converter(95, 'barbey', 'parlin cup #7')
 
-    visc = viscosity_converter(8.79, 'engler', 'parlin cup #7')
+    visc = viscosity_converter(8.79, "engler", "parlin cup #7")
     assert type(visc) is float
     assert_close(visc, 52.5)
 
     # seconds/degrees string inputs and capitals
-    visc = viscosity_converter(8.79, 'degrees engler', 'seconds parlin cup #7')
+    visc = viscosity_converter(8.79, "degrees engler", "seconds parlin cup #7")
     assert type(visc) is float
     assert_close(visc, 52.5)
 
-    visc = viscosity_converter(8.79, '    degrees engler', 'seconds parlin cup #7    ')
+    visc = viscosity_converter(8.79, "    degrees engler", "seconds parlin cup #7    ")
     assert type(visc) is float
     assert_close(visc, 52.5)
 
-    visc = viscosity_converter(8.79, 'Engler', 'PARLIN cup #7')
+    visc = viscosity_converter(8.79, "Engler", "PARLIN cup #7")
     assert type(visc) is float
     assert_close(visc, 52.5)
 
 
-    visc = viscosity_converter(8.78, 'engler', 'parlin cup #7')
+    visc = viscosity_converter(8.78, "engler", "parlin cup #7")
     assert type(visc) is float
     assert_close(visc, 52.45389001785669, rtol=2e-5)
 
-    visc = viscosity_converter(5.91, 'engler', 'parlin cup #7', True)
+    visc = viscosity_converter(5.91, "engler", "parlin cup #7", True)
     assert type(visc) is float
     assert_close(visc, 39.96017612902695, rtol=2e-5)
 
     with pytest.raises(Exception):
         # limit is 5.92, but even that fails due to float conversion
-        viscosity_converter(5.91, 'engler', 'parlin cup #7', extrapolate=False)
+        viscosity_converter(5.91, "engler", "parlin cup #7", extrapolate=False)
 
-    viscosity_converter(5.919999999, 'engler', 'parlin cup #7')
+    viscosity_converter(5.919999999, "engler", "parlin cup #7")
     with pytest.raises(Exception):
         # too little
-        viscosity_converter(5.91999, 'engler', 'parlin cup #7')
+        viscosity_converter(5.91999, "engler", "parlin cup #7")
 
     with pytest.raises(Exception):
-        viscosity_converter(8.79, 'NOTAREALSCALE', 'kinematic viscosity')
+        viscosity_converter(8.79, "NOTAREALSCALE", "kinematic viscosity")
     with pytest.raises(Exception):
-        viscosity_converter(8.79, 'kinematic viscosity', 'NOTAREALSCALE')
+        viscosity_converter(8.79, "kinematic viscosity", "NOTAREALSCALE")
 
-    nu = viscosity_converter(8.79, 'engler', 'kinematic viscosity')
+    nu = viscosity_converter(8.79, "engler", "kinematic viscosity")
     assert type(nu) is float
     assert_close(nu, 6.5E-5)
 
     with pytest.raises(Exception):
-        viscosity_converter(8.79, 'pratt lambert e', 'kinematic viscosity')
+        viscosity_converter(8.79, "pratt lambert e", "kinematic viscosity")
 
-    t = viscosity_converter(0.0002925, 'kinematic viscosity', 'pratt lambert g')
+    t = viscosity_converter(0.0002925, "kinematic viscosity", "pratt lambert g")
     assert type(nu) is float
     assert_close(t, 7.697368421052632)
-    nu = viscosity_converter(7.697368421052632, 'pratt lambert g', 'kinematic viscosity', )
+    nu = viscosity_converter(7.697368421052632, "pratt lambert g", "kinematic viscosity", )
     assert type(nu) is float
     assert_close(nu, .0002925)
 
     with pytest.raises(Exception):
-        viscosity_converter(0.00002925, 'kinematic viscosity', 'pratt lambert g')
-    viscosity_converter(0.00002925, 'kinematic viscosity', 'pratt lambert g', True)
+        viscosity_converter(0.00002925, "kinematic viscosity", "pratt lambert g")
+    viscosity_converter(0.00002925, "kinematic viscosity", "pratt lambert g", True)
 
     # Too low on the input side
     with pytest.raises(Exception):
-        viscosity_converter(6, 'pratt lambert g', 'kinematic viscosity')
-    viscosity_converter(6, 'pratt lambert g', 'kinematic viscosity', True)
+        viscosity_converter(6, "pratt lambert g", "kinematic viscosity")
+    viscosity_converter(6, "pratt lambert g", "kinematic viscosity", True)
 
-    nu = viscosity_converter(700, 'Saybolt Universal Seconds', 'kinematic viscosity')
+    nu = viscosity_converter(700, "Saybolt Universal Seconds", "kinematic viscosity")
     assert type(nu) is float
     assert_close(nu, 0.00015108914751515542)
 
-    t = viscosity_converter(0.00015108914751515542, 'kinematic viscosity', 'Saybolt Universal Seconds')
+    t = viscosity_converter(0.00015108914751515542, "kinematic viscosity", "Saybolt Universal Seconds")
     assert type(t) is float
     assert_close(t, 700)
 
     # Barbey custom tests
-    nu = viscosity_converter(483, 'barbey', 'kinematic viscosity')*1E6
+    nu = viscosity_converter(483, "barbey", "kinematic viscosity")*1E6
     assert type(nu) is float
     assert_close(nu, 13.1)
-    nu = viscosity_converter(1.4, 'barbey', 'kinematic viscosity')*1E6
+    nu = viscosity_converter(1.4, "barbey", "kinematic viscosity")*1E6
     assert type(nu) is float
     assert_close(nu, 4400)
-    nu = viscosity_converter(6200, 'barbey', 'kinematic viscosity')*1E6
+    nu = viscosity_converter(6200, "barbey", "kinematic viscosity")*1E6
     assert type(nu) is float
     assert_close(nu, 1)
-    nu = viscosity_converter(6300, 'barbey', 'kinematic viscosity', extrapolate=True)*1E6
+    nu = viscosity_converter(6300, "barbey", "kinematic viscosity", extrapolate=True)*1E6
     assert type(nu) is float
     assert_close(nu, 0.984, rtol=1E-3)
     # The extrapolation when barbey is known and under 1.4 is not working and goes the wrong direction
@@ -465,207 +464,208 @@ def test_viscosity_converter():
 
 def test_viscosity_converter_spline_fits():
     # Saybolt Furol conversions
-    assert_close(viscosity_converter(12.95, 'saybolt furol', 'kinematic viscosity'), 1.3099999999999998e-05)
-    assert_close(viscosity_converter(100.7, 'saybolt furol', 'kinematic viscosity'), 0.00021999999999999998)
-    assert_close(viscosity_converter(2000.0, 'saybolt furol', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(12.95, "saybolt furol", "kinematic viscosity"), 1.3099999999999998e-05)
+    assert_close(viscosity_converter(100.7, "saybolt furol", "kinematic viscosity"), 0.00021999999999999998)
+    assert_close(viscosity_converter(2000.0, "saybolt furol", "kinematic viscosity"), 0.004399999999999999)
 
     # Redwood Standard conversions
-    assert_close(viscosity_converter(29.0, 'redwood standard', 'kinematic viscosity'), 1e-06)
-    assert_close(viscosity_converter(592.0, 'redwood standard', 'kinematic viscosity'), 0.000154)
-    assert_close(viscosity_converter(18400.0, 'redwood standard', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(29.0, "redwood standard", "kinematic viscosity"), 1e-06)
+    assert_close(viscosity_converter(592.0, "redwood standard", "kinematic viscosity"), 0.000154)
+    assert_close(viscosity_converter(18400.0, "redwood standard", "kinematic viscosity"), 0.004399999999999999)
 
     # Redwood Admiralty conversions
-    assert_close(viscosity_converter(5.1, 'redwood admiralty', 'kinematic viscosity'), 4.2999999999999995e-06)
-    assert_close(viscosity_converter(64.6, 'redwood admiralty', 'kinematic viscosity'), 0.000154)
-    assert_close(viscosity_converter(921.0, 'redwood admiralty', 'kinematic viscosity'), 0.0021999999999999997)
+    assert_close(viscosity_converter(5.1, "redwood admiralty", "kinematic viscosity"), 4.2999999999999995e-06)
+    assert_close(viscosity_converter(64.6, "redwood admiralty", "kinematic viscosity"), 0.000154)
+    assert_close(viscosity_converter(921.0, "redwood admiralty", "kinematic viscosity"), 0.0021999999999999997)
 
     # Engler conversions
-    assert_close(viscosity_converter(1.0, 'engler', 'kinematic viscosity'), 1e-06)
-    assert_close(viscosity_converter(20.45, 'engler', 'kinematic viscosity'), 0.000154)
-    assert_close(viscosity_converter(584.0, 'engler', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(1.0, "engler", "kinematic viscosity"), 1e-06)
+    assert_close(viscosity_converter(20.45, "engler", "kinematic viscosity"), 0.000154)
+    assert_close(viscosity_converter(584.0, "engler", "kinematic viscosity"), 0.004399999999999999)
 
     # Barbey conversions
-    assert_close(viscosity_converter(6200.0, 'barbey', 'kinematic viscosity'), 1e-06)
-    assert_close(viscosity_converter(40.3, 'barbey', 'kinematic viscosity'), 0.000154)
-    assert_close(viscosity_converter(1.4, 'barbey', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(6200.0, "barbey", "kinematic viscosity"), 1e-06)
+    assert_close(viscosity_converter(40.3, "barbey", "kinematic viscosity"), 0.000154)
+    assert_close(viscosity_converter(1.4, "barbey", "kinematic viscosity"), 0.004399999999999999)
 
     # Parlin Cup #7 conversions
-    assert_close(viscosity_converter(40.0, 'parlin cup #7', 'kinematic viscosity'), 4.32e-05)
-    assert_close(viscosity_converter(92.0, 'parlin cup #7', 'kinematic viscosity'), 0.00013199999999999998)
-    assert_close(viscosity_converter(149.0, 'parlin cup #7', 'kinematic viscosity'), 0.00021999999999999998)
+    assert_close(viscosity_converter(40.0, "parlin cup #7", "kinematic viscosity"), 4.32e-05)
+    assert_close(viscosity_converter(92.0, "parlin cup #7", "kinematic viscosity"), 0.00013199999999999998)
+    assert_close(viscosity_converter(149.0, "parlin cup #7", "kinematic viscosity"), 0.00021999999999999998)
 
     # Parlin Cup #10 conversions
-    assert_close(viscosity_converter(15.0, 'parlin cup #10', 'kinematic viscosity'), 6.5e-05)
-    assert_close(viscosity_converter(108.0, 'parlin cup #10', 'kinematic viscosity'), 0.0005499999999999999)
-    assert_close(viscosity_converter(860.0, 'parlin cup #10', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(15.0, "parlin cup #10", "kinematic viscosity"), 6.5e-05)
+    assert_close(viscosity_converter(108.0, "parlin cup #10", "kinematic viscosity"), 0.0005499999999999999)
+    assert_close(viscosity_converter(860.0, "parlin cup #10", "kinematic viscosity"), 0.004399999999999999)
 
     # Parlin Cup #15 conversions
-    assert_close(viscosity_converter(6.0, 'parlin cup #15', 'kinematic viscosity'), 6.5e-05)
-    assert_close(viscosity_converter(24.0, 'parlin cup #15', 'kinematic viscosity'), 0.0005499999999999999)
-    assert_close(viscosity_converter(203.0, 'parlin cup #15', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(6.0, "parlin cup #15", "kinematic viscosity"), 6.5e-05)
+    assert_close(viscosity_converter(24.0, "parlin cup #15", "kinematic viscosity"), 0.0005499999999999999)
+    assert_close(viscosity_converter(203.0, "parlin cup #15", "kinematic viscosity"), 0.004399999999999999)
 
     # Parlin Cup #20 conversions
-    assert_close(viscosity_converter(3.0, 'parlin cup #20', 'kinematic viscosity'), 6.5e-05)
-    assert_close(viscosity_converter(9.0, 'parlin cup #20', 'kinematic viscosity'), 0.0005499999999999999)
-    assert_close(viscosity_converter(70.0, 'parlin cup #20', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(3.0, "parlin cup #20", "kinematic viscosity"), 6.5e-05)
+    assert_close(viscosity_converter(9.0, "parlin cup #20", "kinematic viscosity"), 0.0005499999999999999)
+    assert_close(viscosity_converter(70.0, "parlin cup #20", "kinematic viscosity"), 0.004399999999999999)
 
     # Ford Cup #3 conversions
-    assert_close(viscosity_converter(30.0, 'ford cup #3', 'kinematic viscosity'), 6.5e-05)
-    assert_close(viscosity_converter(218.0, 'ford cup #3', 'kinematic viscosity'), 0.0005499999999999999)
-    assert_close(viscosity_converter(1715.0, 'ford cup #3', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(30.0, "ford cup #3", "kinematic viscosity"), 6.5e-05)
+    assert_close(viscosity_converter(218.0, "ford cup #3", "kinematic viscosity"), 0.0005499999999999999)
+    assert_close(viscosity_converter(1715.0, "ford cup #3", "kinematic viscosity"), 0.004399999999999999)
 
     # Ford Cup #4 conversions
-    assert_close(viscosity_converter(20.0, 'ford cup #4', 'kinematic viscosity'), 6.5e-05)
-    assert_close(viscosity_converter(147.0, 'ford cup #4', 'kinematic viscosity'), 0.0005499999999999999)
-    assert_close(viscosity_converter(1150.0, 'ford cup #4', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(20.0, "ford cup #4", "kinematic viscosity"), 6.5e-05)
+    assert_close(viscosity_converter(147.0, "ford cup #4", "kinematic viscosity"), 0.0005499999999999999)
+    assert_close(viscosity_converter(1150.0, "ford cup #4", "kinematic viscosity"), 0.004399999999999999)
 
     # Mac Michael conversions
-    assert_close(viscosity_converter(125.0, 'mac michael', 'kinematic viscosity'), 2.06e-05)
-    assert_close(viscosity_converter(805.0, 'mac michael', 'kinematic viscosity'), 0.00033)
-    assert_close(viscosity_converter(10500.0, 'mac michael', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(125.0, "mac michael", "kinematic viscosity"), 2.06e-05)
+    assert_close(viscosity_converter(805.0, "mac michael", "kinematic viscosity"), 0.00033)
+    assert_close(viscosity_converter(10500.0, "mac michael", "kinematic viscosity"), 0.004399999999999999)
 
     # Zahn Cup #1 conversions
-    assert_close(viscosity_converter(38.0, 'zahn cup #1', 'kinematic viscosity'), 2.06e-05)
-    assert_close(viscosity_converter(62.0, 'zahn cup #1', 'kinematic viscosity'), 5.4e-05)
-    assert_close(viscosity_converter(90.0, 'zahn cup #1', 'kinematic viscosity'), 8.759999999999999e-05)
+    assert_close(viscosity_converter(38.0, "zahn cup #1", "kinematic viscosity"), 2.06e-05)
+    assert_close(viscosity_converter(62.0, "zahn cup #1", "kinematic viscosity"), 5.4e-05)
+    assert_close(viscosity_converter(90.0, "zahn cup #1", "kinematic viscosity"), 8.759999999999999e-05)
 
     # Zahn Cup #2 conversions
-    assert_close(viscosity_converter(18.0, 'zahn cup #2', 'kinematic viscosity'), 2.06e-05)
-    assert_close(viscosity_converter(46.0, 'zahn cup #2', 'kinematic viscosity'), 0.00010999999999999999)
-    assert_close(viscosity_converter(88.0, 'zahn cup #2', 'kinematic viscosity'), 0.00021999999999999998)
+    assert_close(viscosity_converter(18.0, "zahn cup #2", "kinematic viscosity"), 2.06e-05)
+    assert_close(viscosity_converter(46.0, "zahn cup #2", "kinematic viscosity"), 0.00010999999999999999)
+    assert_close(viscosity_converter(88.0, "zahn cup #2", "kinematic viscosity"), 0.00021999999999999998)
 
     # Zahn Cup #3 conversions
-    assert_close(viscosity_converter(22.5, 'zahn cup #3', 'kinematic viscosity'), 0.000154)
-    assert_close(viscosity_converter(40.0, 'zahn cup #3', 'kinematic viscosity'), 0.00033)
-    assert_close(viscosity_converter(75.0, 'zahn cup #3', 'kinematic viscosity'), 0.00066)
+    assert_close(viscosity_converter(22.5, "zahn cup #3", "kinematic viscosity"), 0.000154)
+    assert_close(viscosity_converter(40.0, "zahn cup #3", "kinematic viscosity"), 0.00033)
+    assert_close(viscosity_converter(75.0, "zahn cup #3", "kinematic viscosity"), 0.00066)
 
     # Zahn Cup #4 conversions
-    assert_close(viscosity_converter(18.0, 'zahn cup #4', 'kinematic viscosity'), 0.000198)
-    assert_close(viscosity_converter(41.0, 'zahn cup #4', 'kinematic viscosity'), 0.0005499999999999999)
-    assert_close(viscosity_converter(77.0, 'zahn cup #4', 'kinematic viscosity'), 0.0010999999999999998)
+    assert_close(viscosity_converter(18.0, "zahn cup #4", "kinematic viscosity"), 0.000198)
+    assert_close(viscosity_converter(41.0, "zahn cup #4", "kinematic viscosity"), 0.0005499999999999999)
+    assert_close(viscosity_converter(77.0, "zahn cup #4", "kinematic viscosity"), 0.0010999999999999998)
 
     # Zahn Cup #5 conversions
-    assert_close(viscosity_converter(13.0, 'zahn cup #5', 'kinematic viscosity'), 0.00021999999999999998)
-    assert_close(viscosity_converter(43.0, 'zahn cup #5', 'kinematic viscosity'), 0.0008799999999999999)
-    assert_close(viscosity_converter(96.0, 'zahn cup #5', 'kinematic viscosity'), 0.00198)
+    assert_close(viscosity_converter(13.0, "zahn cup #5", "kinematic viscosity"), 0.00021999999999999998)
+    assert_close(viscosity_converter(43.0, "zahn cup #5", "kinematic viscosity"), 0.0008799999999999999)
+    assert_close(viscosity_converter(96.0, "zahn cup #5", "kinematic viscosity"), 0.00198)
 
     # Demmier #1 conversions
-    assert_close(viscosity_converter(1.3, 'demmier #1', 'kinematic viscosity'), 4.2999999999999995e-06)
-    assert_close(viscosity_converter(55.0, 'demmier #1', 'kinematic viscosity'), 0.000176)
-    assert_close(viscosity_converter(1370.0, 'demmier #1', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(1.3, "demmier #1", "kinematic viscosity"), 4.2999999999999995e-06)
+    assert_close(viscosity_converter(55.0, "demmier #1", "kinematic viscosity"), 0.000176)
+    assert_close(viscosity_converter(1370.0, "demmier #1", "kinematic viscosity"), 0.004399999999999999)
 
     # Demmier #10 conversions
-    assert_close(viscosity_converter(1.0, 'demmier #10', 'kinematic viscosity'), 3.21e-05)
-    assert_close(viscosity_converter(13.7, 'demmier #10', 'kinematic viscosity'), 0.00043999999999999996)
-    assert_close(viscosity_converter(137.0, 'demmier #10', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(1.0, "demmier #10", "kinematic viscosity"), 3.21e-05)
+    assert_close(viscosity_converter(13.7, "demmier #10", "kinematic viscosity"), 0.00043999999999999996)
+    assert_close(viscosity_converter(137.0, "demmier #10", "kinematic viscosity"), 0.004399999999999999)
 
     # Stormer 100G Load conversions
-    assert_close(viscosity_converter(2.6, 'stormer 100g load', 'kinematic viscosity'), 7.4e-06)
-    assert_close(viscosity_converter(70.0, 'stormer 100g load', 'kinematic viscosity'), 0.000198)
-    assert_close(viscosity_converter(1540.0, 'stormer 100g load', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(2.6, "stormer 100g load", "kinematic viscosity"), 7.4e-06)
+    assert_close(viscosity_converter(70.0, "stormer 100g load", "kinematic viscosity"), 0.000198)
+    assert_close(viscosity_converter(1540.0, "stormer 100g load", "kinematic viscosity"), 0.004399999999999999)
 
     # Pratt Lambert F conversions
-    assert_close(viscosity_converter(7.0, 'pratt lambert f', 'kinematic viscosity'), 8.759999999999999e-05)
-    assert_close(viscosity_converter(33.7, 'pratt lambert f', 'kinematic viscosity'), 0.00066)
-    assert_close(viscosity_converter(234.0, 'pratt lambert f', 'kinematic viscosity'), 0.004399999999999999)
+    assert_close(viscosity_converter(7.0, "pratt lambert f", "kinematic viscosity"), 8.759999999999999e-05)
+    assert_close(viscosity_converter(33.7, "pratt lambert f", "kinematic viscosity"), 0.00066)
+    assert_close(viscosity_converter(234.0, "pratt lambert f", "kinematic viscosity"), 0.004399999999999999)
 
 def test_viscosity_converter_linear_ones():
-    assert_close(viscosity_converter(35, 'american can', 'kinematic viscosity'), 0.0001225)
-    assert_close(viscosity_converter(70, 'american can', 'kinematic viscosity'), 0.000245)
-    assert_close(viscosity_converter(60, 'astm 0.07', 'kinematic viscosity'), 8.4e-05)
-    assert_close(viscosity_converter(120, 'astm 0.07', 'kinematic viscosity'), 0.000168)
-    assert_close(viscosity_converter(25, 'astm 0.10', 'kinematic viscosity'), 0.00011999999999999999)
-    assert_close(viscosity_converter(50, 'astm 0.10', 'kinematic viscosity'), 0.00023999999999999998)
-    assert_close(viscosity_converter(9, 'astm 0.15', 'kinematic viscosity'), 0.00018899999999999999)
-    assert_close(viscosity_converter(18, 'astm 0.15', 'kinematic viscosity'), 0.00037799999999999997)
-    assert_close(viscosity_converter(5, 'astm 0.20', 'kinematic viscosity'), 0.000305)
-    assert_close(viscosity_converter(10, 'astm 0.20', 'kinematic viscosity'), 0.00061)
-    assert_close(viscosity_converter(4, 'astm 0.25', 'kinematic viscosity'), 0.00056)
-    assert_close(viscosity_converter(8, 'astm 0.25', 'kinematic viscosity'), 0.00112)
-    assert_close(viscosity_converter(10, 'a&w b', 'kinematic viscosity'), 0.000185)
-    assert_close(viscosity_converter(20, 'a&w b', 'kinematic viscosity'), 0.00037)
-    assert_close(viscosity_converter(12, 'a&w crucible', 'kinematic viscosity'), 0.00014039999999999997)
-    assert_close(viscosity_converter(24, 'a&w crucible', 'kinematic viscosity'), 0.00028079999999999994)
-    assert_close(viscosity_converter(39, 'caspers tin plate', 'kinematic viscosity'), 0.0001404)
-    assert_close(viscosity_converter(78, 'caspers tin plate', 'kinematic viscosity'), 0.0002808)
-    assert_close(viscosity_converter(12, 'continental can', 'kinematic viscosity'), 3.9599999999999994e-05)
-    assert_close(viscosity_converter(24, 'continental can', 'kinematic viscosity'), 7.919999999999999e-05)
-    assert_close(viscosity_converter(12, 'crown cork and seal', 'kinematic viscosity'), 3.9599999999999994e-05)
-    assert_close(viscosity_converter(24, 'crown cork and seal', 'kinematic viscosity'), 7.919999999999999e-05)
-    assert_close(viscosity_converter(24, 'murphy varnish', 'kinematic viscosity'), 7.44e-05)
-    assert_close(viscosity_converter(48, 'murphy varnish', 'kinematic viscosity'), 0.0001488)
-    assert_close(viscosity_converter(15, 'parlin cup #25', 'kinematic viscosity'), 0.0021)
-    assert_close(viscosity_converter(30, 'parlin cup #25', 'kinematic viscosity'), 0.0042)
-    assert_close(viscosity_converter(10, 'parlin cup #30', 'kinematic viscosity'), 0.0026)
-    assert_close(viscosity_converter(20, 'parlin cup #30', 'kinematic viscosity'), 0.0052)
-    assert_close(viscosity_converter(70, 'pratt lambert a', 'kinematic viscosity'), 4.2699999999999994e-05)
-    assert_close(viscosity_converter(140, 'pratt lambert a', 'kinematic viscosity'), 8.539999999999999e-05)
-    assert_close(viscosity_converter(60, 'pratt lambert b', 'kinematic viscosity'), 7.32e-05)
-    assert_close(viscosity_converter(120, 'pratt lambert b', 'kinematic viscosity'), 0.0001464)
-    assert_close(viscosity_converter(40, 'pratt lambert c', 'kinematic viscosity'), 9.72e-05)
-    assert_close(viscosity_converter(80, 'pratt lambert c', 'kinematic viscosity'), 0.0001944)
-    assert_close(viscosity_converter(25, 'pratt lambert d', 'kinematic viscosity'), 0.00012174999999999999)
-    assert_close(viscosity_converter(50, 'pratt lambert d', 'kinematic viscosity'), 0.00024349999999999998)
-    assert_close(viscosity_converter(15, 'pratt lambert e', 'kinematic viscosity'), 0.00014625)
-    assert_close(viscosity_converter(30, 'pratt lambert e', 'kinematic viscosity'), 0.0002925)
-    assert_close(viscosity_converter(7, 'pratt lambert g', 'kinematic viscosity'), 0.000266)
-    assert_close(viscosity_converter(14, 'pratt lambert g', 'kinematic viscosity'), 0.000532)
-    assert_close(viscosity_converter(5, 'pratt lambert h', 'kinematic viscosity'), 0.00037999999999999997)
-    assert_close(viscosity_converter(10, 'pratt lambert h', 'kinematic viscosity'), 0.0007599999999999999)
-    assert_close(viscosity_converter(4, 'pratt lambert i', 'kinematic viscosity'), 0.0006079999999999999)
-    assert_close(viscosity_converter(8, 'pratt lambert i', 'kinematic viscosity'), 0.0012159999999999999)
-    assert_close(viscosity_converter(20, 'scott', 'kinematic viscosity'), 3.2e-05)
-    assert_close(viscosity_converter(40, 'scott', 'kinematic viscosity'), 6.4e-05)
-    assert_close(viscosity_converter(30, 'westinghouse', 'kinematic viscosity'), 0.000102)
-    assert_close(viscosity_converter(60, 'westinghouse', 'kinematic viscosity'), 0.000204)
+    assert_close(viscosity_converter(35, "american can", "kinematic viscosity"), 0.0001225)
+    assert_close(viscosity_converter(70, "american can", "kinematic viscosity"), 0.000245)
+    assert_close(viscosity_converter(60, "astm 0.07", "kinematic viscosity"), 8.4e-05)
+    assert_close(viscosity_converter(120, "astm 0.07", "kinematic viscosity"), 0.000168)
+    assert_close(viscosity_converter(25, "astm 0.10", "kinematic viscosity"), 0.00011999999999999999)
+    assert_close(viscosity_converter(50, "astm 0.10", "kinematic viscosity"), 0.00023999999999999998)
+    assert_close(viscosity_converter(9, "astm 0.15", "kinematic viscosity"), 0.00018899999999999999)
+    assert_close(viscosity_converter(18, "astm 0.15", "kinematic viscosity"), 0.00037799999999999997)
+    assert_close(viscosity_converter(5, "astm 0.20", "kinematic viscosity"), 0.000305)
+    assert_close(viscosity_converter(10, "astm 0.20", "kinematic viscosity"), 0.00061)
+    assert_close(viscosity_converter(4, "astm 0.25", "kinematic viscosity"), 0.00056)
+    assert_close(viscosity_converter(8, "astm 0.25", "kinematic viscosity"), 0.00112)
+    assert_close(viscosity_converter(10, "a&w b", "kinematic viscosity"), 0.000185)
+    assert_close(viscosity_converter(20, "a&w b", "kinematic viscosity"), 0.00037)
+    assert_close(viscosity_converter(12, "a&w crucible", "kinematic viscosity"), 0.00014039999999999997)
+    assert_close(viscosity_converter(24, "a&w crucible", "kinematic viscosity"), 0.00028079999999999994)
+    assert_close(viscosity_converter(39, "caspers tin plate", "kinematic viscosity"), 0.0001404)
+    assert_close(viscosity_converter(78, "caspers tin plate", "kinematic viscosity"), 0.0002808)
+    assert_close(viscosity_converter(12, "continental can", "kinematic viscosity"), 3.9599999999999994e-05)
+    assert_close(viscosity_converter(24, "continental can", "kinematic viscosity"), 7.919999999999999e-05)
+    assert_close(viscosity_converter(12, "crown cork and seal", "kinematic viscosity"), 3.9599999999999994e-05)
+    assert_close(viscosity_converter(24, "crown cork and seal", "kinematic viscosity"), 7.919999999999999e-05)
+    assert_close(viscosity_converter(24, "murphy varnish", "kinematic viscosity"), 7.44e-05)
+    assert_close(viscosity_converter(48, "murphy varnish", "kinematic viscosity"), 0.0001488)
+    assert_close(viscosity_converter(15, "parlin cup #25", "kinematic viscosity"), 0.0021)
+    assert_close(viscosity_converter(30, "parlin cup #25", "kinematic viscosity"), 0.0042)
+    assert_close(viscosity_converter(10, "parlin cup #30", "kinematic viscosity"), 0.0026)
+    assert_close(viscosity_converter(20, "parlin cup #30", "kinematic viscosity"), 0.0052)
+    assert_close(viscosity_converter(70, "pratt lambert a", "kinematic viscosity"), 4.2699999999999994e-05)
+    assert_close(viscosity_converter(140, "pratt lambert a", "kinematic viscosity"), 8.539999999999999e-05)
+    assert_close(viscosity_converter(60, "pratt lambert b", "kinematic viscosity"), 7.32e-05)
+    assert_close(viscosity_converter(120, "pratt lambert b", "kinematic viscosity"), 0.0001464)
+    assert_close(viscosity_converter(40, "pratt lambert c", "kinematic viscosity"), 9.72e-05)
+    assert_close(viscosity_converter(80, "pratt lambert c", "kinematic viscosity"), 0.0001944)
+    assert_close(viscosity_converter(25, "pratt lambert d", "kinematic viscosity"), 0.00012174999999999999)
+    assert_close(viscosity_converter(50, "pratt lambert d", "kinematic viscosity"), 0.00024349999999999998)
+    assert_close(viscosity_converter(15, "pratt lambert e", "kinematic viscosity"), 0.00014625)
+    assert_close(viscosity_converter(30, "pratt lambert e", "kinematic viscosity"), 0.0002925)
+    assert_close(viscosity_converter(7, "pratt lambert g", "kinematic viscosity"), 0.000266)
+    assert_close(viscosity_converter(14, "pratt lambert g", "kinematic viscosity"), 0.000532)
+    assert_close(viscosity_converter(5, "pratt lambert h", "kinematic viscosity"), 0.00037999999999999997)
+    assert_close(viscosity_converter(10, "pratt lambert h", "kinematic viscosity"), 0.0007599999999999999)
+    assert_close(viscosity_converter(4, "pratt lambert i", "kinematic viscosity"), 0.0006079999999999999)
+    assert_close(viscosity_converter(8, "pratt lambert i", "kinematic viscosity"), 0.0012159999999999999)
+    assert_close(viscosity_converter(20, "scott", "kinematic viscosity"), 3.2e-05)
+    assert_close(viscosity_converter(40, "scott", "kinematic viscosity"), 6.4e-05)
+    assert_close(viscosity_converter(30, "westinghouse", "kinematic viscosity"), 0.000102)
+    assert_close(viscosity_converter(60, "westinghouse", "kinematic viscosity"), 0.000204)
 
 def test_roundtrip_viscosity_conversions():
-    '''Test roundtrip conversions between viscosity scales using random points
-    in valid overlapping ranges, accounting for scale differences.'''
-    viscosity_converter(35, 'american can', 'kinematic viscosity')
+    """Test roundtrip conversions between viscosity scales using random points
+    in valid overlapping ranges, accounting for scale differences.
+    """
+    viscosity_converter(35, "american can", "kinematic viscosity")
     # Get all scales that can be tested
-    tabulated_scales = set(viscosity_scales.keys()) - {'kinematic viscosity'}
+    tabulated_scales = set(viscosity_scales.keys()) - {"kinematic viscosity"}
     linear_scales = set(viscosity_scales_linear.keys())
     all_scales = tabulated_scales | linear_scales
-    
+
     ranges = {}
     # For linear scales, use the minimum time and a reasonable maximum; test only a few scales as they're all the same
-    linear_subset = {'caspers tin plate', 'american can', 'parlin cup #30', 'a&w crucible', 'astm 0.20'}
+    linear_subset = {"caspers tin plate", "american can", "parlin cup #30", "a&w crucible", "astm 0.20"}
     for scale, (coef, min_time) in ((s, viscosity_scales_linear[s]) for s in linear_subset):
         # Use 10x minimum time as a reasonable maximum
         ranges[scale] = (min_time, min_time * 10)
-    
+
     # For tabulated scales, use the limits from viscosity_converter_limits instead of the linear scales
     for scale in tabulated_scales:
         scale_min, scale_max, nu_min, nu_max = viscosity_converter_limits[scale]
         ranges[scale] = (scale_min, scale_max)
-    
+
     rng = Random(0)
     pts = 3
     scales = sorted(ranges.keys())
     for i, scale1 in enumerate(scales):
         for scale2 in scales[i+1:]:
             # Convert range limits to kinematic viscosity for comparison
-            scale1_nu_min = viscosity_converter(ranges[scale1][0], scale1, 'kinematic viscosity', extrapolate=True)
-            scale1_nu_max = viscosity_converter(ranges[scale1][1], scale1, 'kinematic viscosity', extrapolate=True)
-            scale2_nu_min = viscosity_converter(ranges[scale2][0], scale2, 'kinematic viscosity', extrapolate=True)
-            scale2_nu_max = viscosity_converter(ranges[scale2][1], scale2, 'kinematic viscosity', extrapolate=True)
-            
+            scale1_nu_min = viscosity_converter(ranges[scale1][0], scale1, "kinematic viscosity", extrapolate=True)
+            scale1_nu_max = viscosity_converter(ranges[scale1][1], scale1, "kinematic viscosity", extrapolate=True)
+            scale2_nu_min = viscosity_converter(ranges[scale2][0], scale2, "kinematic viscosity", extrapolate=True)
+            scale2_nu_max = viscosity_converter(ranges[scale2][1], scale2, "kinematic viscosity", extrapolate=True)
+
             # Find overlapping range in kinematic viscosity, leaving room for the polishing
             min_nu = max(scale1_nu_min, scale2_nu_min)*1.1
             max_nu = min(scale1_nu_max, scale2_nu_max)*0.9
-            
+
             if min_nu >= max_nu:
                 continue
-            
+
             # Generate test points in kinematic viscosity space
             # Use log-uniform distribution since viscosity ranges are often logarithmic
             log_min = log(min_nu)
             log_max = log(max_nu)
             test_nus = [exp(rng.uniform(log_min, log_max)) for _ in range(pts)]
-            
+
             for nu in test_nus:
-                in_scale_1 = viscosity_converter(nu,'kinematic viscosity', scale1)
+                in_scale_1 = viscosity_converter(nu,"kinematic viscosity", scale1)
                 in_scale_2 = viscosity_converter(in_scale_1, scale1, scale2)
                 roundtrip = viscosity_converter(in_scale_2, scale2, scale1)
                 assert_close(in_scale_1, roundtrip, rtol=1e-9)
@@ -679,8 +679,8 @@ def test_viscosity_converter_fuzz_SUS():
         # and stops working on the high side at 8000000000000. Plenty of room
         # for newton's method to converge!
         SUS = uniform(31.0, 20000.0)
-        nu = viscosity_converter(SUS, 'Saybolt Universal Seconds', 'kinematic viscosity')
-        SUS2 = viscosity_converter(nu, 'kinematic viscosity', 'Saybolt Universal Seconds')
+        nu = viscosity_converter(SUS, "Saybolt Universal Seconds", "kinematic viscosity")
+        SUS2 = viscosity_converter(nu, "kinematic viscosity", "Saybolt Universal Seconds")
         assert_close(SUS, SUS2)
 
 
@@ -780,7 +780,7 @@ def test_mu_Yaws():
     assert_close1d(der_analytical, [der_num], rtol=1e-7)
 
     # Point where overflow would occur
-    kwargs = {'T': 489.2, 'A': 1.0, 'B': 1.0, 'C': 1.0, 'D': 1.0}
+    kwargs = {"T": 489.2, "A": 1.0, "B": 1.0, "C": 1.0, "D": 1.0}
     mu_Yaws(**kwargs)
 
 

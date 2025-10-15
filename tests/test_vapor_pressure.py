@@ -31,6 +31,8 @@ from chemicals.vapor_pressure import (
     Antoine_AB_coeffs_from_point,
     Antoine_coeffs_from_point,
     Antoine_fitting_jacobian,
+    Arrhenius_extrapolation,
+    Arrhenius_parameters,
     DIPPR101_ABC_coeffs_from_point,
     Edalat,
     Lee_Kesler,
@@ -55,21 +57,19 @@ from chemicals.vapor_pressure import (
     Yaws_Psat_fitting_jacobian,
     boiling_critical_relation,
     d2Antoine_dT2,
+    d2Arrhenius_extrapolation_dT2,
     d2TRC_Antoine_extended_dT2,
     d2Wagner_dT2,
     d2Wagner_original_dT2,
     d2Yaws_Psat_dT2,
+    d3Arrhenius_extrapolation_dT3,
     dAntoine_dT,
+    dArrhenius_extrapolation_dT,
     dPsat_IAPWS_dT,
     dTRC_Antoine_extended_dT,
     dWagner_dT,
     dWagner_original_dT,
     dYaws_Psat_dT,
-    Arrhenius_parameters,
-    Arrhenius_extrapolation,
-    dArrhenius_extrapolation_dT, 
-    d2Arrhenius_extrapolation_dT2, 
-    d3Arrhenius_extrapolation_dT3,
 )
 
 ### Regression equations
@@ -103,8 +103,8 @@ def test_Wagner_original():
     for T in (0.0, 1e-150, 1e-200, 1e-250, 1e-300, 1e-100, 1e-400, 1e-308, 1e-307):
         assert d2Wagner_original_dT2(T, 190.53, 4596420., -6.00435, 1.1885, -0.834082, -1.22833) == 0.0
 
-    over_kwargs = {'T': 657.9000000000001, 'Tc': 657.9, 'Pc': 2806700.0, 'a': -8.11413, 'b': 1.77697, 'c': -4.4396, 'd': -1.47477}
-    assert_close(Wagner_original(**over_kwargs), over_kwargs['Pc'], rtol=1e-12)
+    over_kwargs = {"T": 657.9000000000001, "Tc": 657.9, "Pc": 2806700.0, "a": -8.11413, "b": 1.77697, "c": -4.4396, "d": -1.47477}
+    assert_close(Wagner_original(**over_kwargs), over_kwargs["Pc"], rtol=1e-12)
 
 
 def test_Wagner():
@@ -131,8 +131,8 @@ def test_Wagner():
         assert d2Wagner_dT2(T, 190.551, 4599200, -6.02242, 1.26652, -0.5707, -1.366) == 0.0
 
 
-    high_T_kwargs = {'T': 449.05000000000007, 'Tc': 449.05, 'Pc': 5990000.0, 'a': -7.49333, 'b': 1.78753, 'c': -4.04253, 'd': 8.50574}
-    assert_close(Wagner(**high_T_kwargs), high_T_kwargs['Pc'], rtol=1e-13)
+    high_T_kwargs = {"T": 449.05000000000007, "Tc": 449.05, "Pc": 5990000.0, "a": -7.49333, "b": 1.78753, "c": -4.04253, "d": 8.50574}
+    assert_close(Wagner(**high_T_kwargs), high_T_kwargs["Pc"], rtol=1e-13)
 
 def test_TRC_Antoine_extended():
     # Tetrafluoromethane, coefficients from [1]_, at 180 K:
@@ -242,7 +242,7 @@ def test_test_Antoine_AB():
     assert_close(B, AB[1])
 
     # Nasty overflow point
-    kwargs = {'T': 159.10000000000002, 'Psat': 0.0007352199499947608, 'dPsat_dT': 0.004770694513544764, 'base': 2.718281828459045}
+    kwargs = {"T": 159.10000000000002, "Psat": 0.0007352199499947608, "dPsat_dT": 0.004770694513544764, "base": 2.718281828459045}
     AB = Antoine_AB_coeffs_from_point(**kwargs)
     # Validated with mpmath
     assert_close1d(AB, (1025.1525881065513, 164249.7374972777), rtol=1e-13)
@@ -280,7 +280,7 @@ def test_DIPPR101_ABC_coeffs_from_point():
     dPsat_dT = dWagner_original_dT(T, Tc, Pc, a, b, c, d)
     Psat = Wagner_original(T, Tc, Pc, a, b, c, d)
 
-    A, B, C = DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, float('inf'))
+    A, B, C = DIPPR101_ABC_coeffs_from_point(T, Psat, dPsat_dT, float("inf"))
     assert EQ101(Tc*2, A, B, C) > EQ101(Tc, A, B, C)
     assert EQ101(Tc*20, A, B, C) > EQ101(Tc*10, A, B, C)
     assert EQ101(Tc*200, A, B, C) > EQ101(Tc*100, A, B, C)
@@ -290,7 +290,7 @@ def test_DIPPR101_ABC_coeffs_from_point():
 
 ### Data integrity
 def test_WagnerMcGarry_data():
-    sums_calc = [Psat_data_WagnerMcGarry[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'Pc', 'Tc', 'Tmin']]
+    sums_calc = [Psat_data_WagnerMcGarry[i].abs().sum() for i in ["A", "B", "C", "D", "Pc", "Tc", "Tmin"]]
     sums = [1889.3027499999998, 509.57053652899992, 1098.2766456999998, 1258.0866876, 1005210819, 129293.19100000001, 68482]
     assert_close1d(sums_calc, sums)
 
@@ -298,14 +298,14 @@ def test_WagnerMcGarry_data():
 
 
 def test_AntoinePoling_data():
-    sums_calc =  [Psat_data_AntoinePoling[i].abs().sum() for i in ['A', 'B', 'C', 'Tmin', 'Tmax']]
+    sums_calc =  [Psat_data_AntoinePoling[i].abs().sum() for i in ["A", "B", "C", "Tmin", "Tmax"]]
     sums = [2959.75131, 398207.29786, 18532.246009999995, 86349.09, 120340.66]
     assert_close1d(sums_calc, sums)
 
     assert Psat_data_AntoinePoling.shape == (325, 6)
 
 def test_WagnerPoling_data():
-    sums_calc =  [Psat_data_WagnerPoling[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'Tmin', 'Tmax', 'Tc', 'Pc']]
+    sums_calc =  [Psat_data_WagnerPoling[i].abs().sum() for i in ["A", "B", "C", "D", "Tmin", "Tmax", "Tc", "Pc"]]
     sums = [894.39071999999999, 271.76480999999995, 525.8134399999999, 538.25393000000008, 24348.006000000001, 59970.149999999994, 63016.021000000001, 357635500]
     assert_close1d(sums_calc, sums)
 
@@ -313,7 +313,7 @@ def test_WagnerPoling_data():
 
 
 def test_AntoineExtended_data():
-    sums_calc = [Psat_data_AntoineExtended[i].abs().sum() for i in ['A', 'B', 'C', 'Tc', 'to', 'n', 'E', 'F', 'Tmin', 'Tmax']]
+    sums_calc = [Psat_data_AntoineExtended[i].abs().sum() for i in ["A", "B", "C", "Tc", "to", "n", "E", "F", "Tmin", "Tmax"]]
     sums = [873.55827000000011, 107160.285, 4699.9650000000001, 47592.470000000001, 7647, 241.56537999999998, 22816.815000000002, 1646509.79, 33570.550000000003, 46510.849999999999]
     assert_close1d(sums_calc, sums)
 
@@ -325,14 +325,14 @@ def test_VDI_PPDS_3_data():
     Average temperature deviation
     0.144% vs tabulated values.
     """
-    tots_calc = [Psat_data_VDI_PPDS_3[i].abs().sum() for i in ['A', 'B', 'C', 'D', 'Tc', 'Pc', 'Tm']]
+    tots_calc = [Psat_data_VDI_PPDS_3[i].abs().sum() for i in ["A", "B", "C", "D", "Tc", "Pc", "Tm"]]
     tots = [2171.4607300000002, 694.38631999999996, 931.3604499999999, 919.88944000000004, 150225.16000000003, 1265565000, 56957.849999999991]
     assert_close1d(tots_calc, tots)
 
     assert Psat_data_VDI_PPDS_3.shape == (275, 8)
 
 def test_Perrys2_8_data():
-    tots_calc = [Psat_data_Perrys2_8[i].abs().sum() for i in ['C1', 'C2', 'C3', 'C4', 'C5', 'Tmin', 'Tmax']]
+    tots_calc = [Psat_data_Perrys2_8[i].abs().sum() for i in ["C1", "C2", "C3", "C4", "C5", "Tmin", "Tmax"]]
     tots = [30288.457300000002, 2574584.506, 3394.9677, 1.1357374248600194, 1223.7, 70399.92, 187558.921]
     assert_close1d(tots_calc, tots)
 
@@ -359,7 +359,7 @@ def test_Ambrose_Walton():
 
 
     # Add limit on omega with this test
-    low_T_kwargs = {'T': 0.010000000000218279, 'Tc': 4287.0, 'Pc': 19252000.0, 'omega': -0.7998}
+    low_T_kwargs = {"T": 0.010000000000218279, "Tc": 4287.0, "Pc": 19252000.0, "omega": -0.7998}
     Psat = Ambrose_Walton(**low_T_kwargs)
     assert_close(Psat, 0, atol=1e-30)
 
@@ -507,7 +507,7 @@ def test_TDE_PVExpansion():
     assert_close(TDE_PVExpansion(T=273.16, a1=23.7969+log(1000), a2=-11422, a3=0.177978), 4.062206573980815e-05, rtol=1e-14)
 
     # overflow
-    TDE_PVExpansion(**{'T': 203.65, 'a1': 1.0, 'a2': 1.0, 'a3': 1.0, 'a4': 0.0, 'a5': 1.0, 'a6': 0, 'a7': 0, 'a8': 0})
+    TDE_PVExpansion(T=203.65, a1=1.0, a2=1.0, a3=1.0, a4=0.0, a5=1.0, a6=0, a7=0, a8=0)
 
 
 def test_TRC_Antoine_extended_fitting_jacobian():
@@ -579,7 +579,7 @@ def test_Arrhenius_extrapolation():
 def test_Arrhenius_extrapolation_derivatives():
     # Test conditions
     T, T_ref, P_ref, slope = 300.0, 400.0, 1E5, -1600
-    
+
     # First derivative test
     dP_dT_analytical = dArrhenius_extrapolation_dT(T, T_ref, P_ref, slope)
     assert_close(dP_dT_analytical, 468.61713442795866, rtol=1e-13)
@@ -591,7 +591,7 @@ def test_Arrhenius_extrapolation_derivatives():
     assert_close(d2P_dT2_analytical, 5.206857049199541, rtol=1e-13)
     d2P_dT2_numerical = derivative(lambda T: dArrhenius_extrapolation_dT(T, T_ref, P_ref, slope), T, dx=T*1e-6)
     assert_close(d2P_dT2_analytical, d2P_dT2_numerical, rtol=1e-8)
-    
+
     # Third derivative test
     d3P_dT3_analytical = d3Arrhenius_extrapolation_dT3(T, T_ref, P_ref, slope)
     assert_close(d3P_dT3_analytical, 0.012727872786932212, rtol=1e-13)

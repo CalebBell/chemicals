@@ -68,20 +68,21 @@ try:
     import chemicals.numba_vectorized
 except:
     numba = None
-import numpy as np
 import os
 
-jit_disabled = os.environ.get('NUMBA_DISABLE_JIT') == '1'
+import numpy as np
+
+jit_disabled = os.environ.get("NUMBA_DISABLE_JIT") == "1"
 
 def swap_funcs_and_test(names, substitutions, test):
-    '''
+    """
     names : list[str]
         object names to switch out
     substitutions : list[obj]
         Objects to put in
     test : function
         Unit test to run in the file
-    '''
+    """
     originals = {}
     glob = test.__globals__
     for name, sub in zip(names, substitutions):
@@ -241,8 +242,8 @@ def test_thermal_conductivity_misc():
     assert_close(chemicals.numba.Filippov(np.array([0.258, 0.742]), np.array([0.1692, 0.1528])),
                  Filippov([0.258, 0.742], [0.1692, 0.1528]))
 
-    assert_close(chemicals.numba.DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='linear'),
-                 chemicals.DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype='linear'))
+    assert_close(chemicals.numba.DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype="linear"),
+                 chemicals.DIPPR9B(200., 28.01, 20.826, 1.277E-5, 132.92, chemtype="linear"))
 
     assert_close(chemicals.numba.Eli_Hanley(T=373.15, MW=72.151, Tc=460.4, Vc=3.06E-4, Zc=0.267, omega=0.227, Cvm=135.9),
                  chemicals.Eli_Hanley(T=373.15, MW=72.151, Tc=460.4, Vc=3.06E-4, Zc=0.267, omega=0.227, Cvm=135.9))
@@ -279,7 +280,7 @@ def test_viscosity_misc():
 
     # Test the dict lookup has been turned into a couple if statements - not suitable for large
     # tables but for three elements it is just as fast as a dict lookup
-    kwargs = dict(T=6, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN='7440-59-7')
+    kwargs = dict(T=6, Tc=5.1889, Pc=226968.0, Zc=0.3014, MW=4.002602, CASRN="7440-59-7")
     assert_close(chemicals.numba.Lucas_gas(**kwargs), Lucas_gas(**kwargs), rtol=1e-14)
 
     # A couple of points with Herning-Sipperer; works fine
@@ -477,8 +478,8 @@ def test_volume():
 
 @mark_as_numba
 def test_solbility():
-    assert_close(Henry_converter(1.2e-5, old_scale='Hcp', new_scale='SI', rhom=55344.59,  MW=18.01528),
-                 chemicals.numba.Henry_converter(1.2e-5, old_scale='Hcp', new_scale='SI', rhom=55344.59,  MW=18.01528))
+    assert_close(Henry_converter(1.2e-5, old_scale="Hcp", new_scale="SI", rhom=55344.59,  MW=18.01528),
+                 chemicals.numba.Henry_converter(1.2e-5, old_scale="Hcp", new_scale="SI", rhom=55344.59,  MW=18.01528))
 
 @mark_as_numba
 def test_refractivity():
@@ -628,7 +629,7 @@ def test_fitting_jacobians():
     assert_close1d(der_analytical, der_expect, rtol=1e-13)
 
 
-@pytest.mark.skipif(jit_disabled, reason='NUMBA JIT is disabled')
+@pytest.mark.skipif(jit_disabled, reason="NUMBA JIT is disabled")
 @mark_as_numba
 def test_lazy_loading():
     # Numba interfers with to_num
@@ -636,16 +637,16 @@ def test_lazy_loading():
     chemicals.numba.heat_capacity.zabransky_dicts
     chemicals.numba.heat_capacity.CRC_standard_data
 
-    assert hasattr(chemicals.numba.heat_capacity.ZabranskySpline, 'class_type')
-    assert hasattr(chemicals.numba.heat_capacity.ZabranskyQuasipolynomial, 'class_type')
+    assert hasattr(chemicals.numba.heat_capacity.ZabranskySpline, "class_type")
+    assert hasattr(chemicals.numba.heat_capacity.ZabranskyQuasipolynomial, "class_type")
 
-    assert 'jitclass' in str(chemicals.numba.heat_capacity.zabransky_dict_iso_s['2016-57-1'].models[0])
+    assert "jitclass" in str(chemicals.numba.heat_capacity.zabransky_dict_iso_s["2016-57-1"].models[0])
 
 
 @mark_as_numba
 def test_safety_functions():
     from . import test_safety
-    swap_funcs_and_test(['NFPA_30_classification'],
+    swap_funcs_and_test(["NFPA_30_classification"],
                         [chemicals.numba.NFPA_30_classification],
                         test_safety.test_NFPA_30_classification)
 

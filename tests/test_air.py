@@ -426,7 +426,7 @@ def test_lemmon2000_P():
     assert_close(lemmon2000_P(300.0, 40.10292351061862), 1e5, rtol=1e-14)
 
 def test_lemmon2000_T():
-    '''B coefficients can be derived as follows:
+    """B coefficients can be derived as follows:
     # Equation form
     from sympy import *
     P, V, R, T, B0, B1, B2, B3 = symbols('P, V, R, T, B0, B1, B2, B3')
@@ -461,7 +461,7 @@ def test_lemmon2000_T():
     print(coeffs)
 
 
-    '''
+    """
     # Catch a case the B estimator goes into the liquid region
     T = 143.93790965391196
     rho = lemmon2000_rho(T, 9011018.251664797)

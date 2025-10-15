@@ -37,7 +37,7 @@ def test_acentric_fuzz():
     CASs = set()
     for k in sources:
         for i in k.index:
-            if pd.notnull(k.at[i, 'omega']):
+            if pd.notnull(k.at[i, "omega"]):
                 CASs.add(i if type(i) is str else int_to_CAS(i))
 
     # Use the default method for each chemical in this file
@@ -48,30 +48,30 @@ def test_acentric_fuzz():
     assert_close(omegas_default_sum, 3251.3456239999887)
 
 def test_acentric_main():
-    omega_calc = omega('629-92-5', method='PSRK')
+    omega_calc = omega("629-92-5", method="PSRK")
     assert_close(omega_calc, 0.8486, rtol=1e-13)
-    assert_close(omega('629-92-5'), 0.8486, rtol=1e-13)
+    assert_close(omega("629-92-5"), 0.8486, rtol=1e-13)
 
-    omega_calc = omega('629-92-5', method='PD')
+    omega_calc = omega("629-92-5", method="PD")
     assert_close(omega_calc, 0.8271, rtol=1e-13)
 
-    omega_calc = omega('629-92-5', method='YAWS')
+    omega_calc = omega("629-92-5", method="YAWS")
     assert_close(omega_calc, 0.852, rtol=1e-13)
 
-    methods = omega_methods('74-98-6')
-    assert methods == ['HEOS', 'PSRK', 'PD', 'YAWS', ACENTRIC_DEFINITION]
+    methods = omega_methods("74-98-6")
+    assert methods == ["HEOS", "PSRK", "PD", "YAWS", ACENTRIC_DEFINITION]
 
     # Error handling
-    assert None is omega(CASRN='BADCAS')
+    assert None is omega(CASRN="BADCAS")
 
 @pytest.mark.skip_types
 def test_acentric_main_bad_methods():
     with pytest.raises(ValueError):
-        omega(CASRN='98-01-1', method='BADMETHOD')
+        omega(CASRN="98-01-1", method="BADMETHOD")
     with pytest.raises(ValueError):
-        omega(CASRN='98-01-1', method=1)
+        omega(CASRN="98-01-1", method=1)
     with pytest.raises(ValueError):
-        omega(CASRN='98-01-1', method=omega)
+        omega(CASRN="98-01-1", method=omega)
 
 
 

@@ -31,7 +31,7 @@ from chemicals.identifiers import CAS_to_int, check_CAS, int_to_CAS
 def test_CAS_numbers_valid_and_unique():
     int64_dtype = np.dtype(np.int64)
     chemicals.complete_lazy_loading()
-    for k, df in chemicals.data_reader.df_sources.items():
+    for df in chemicals.data_reader.df_sources.values():
         if df.index.dtype is int64_dtype:
             already_int = True
         else:
@@ -51,5 +51,5 @@ def test_CAS_numbers_valid_and_unique():
                 assert CAS_int < 9223372036854775807
 
     # Check that the name is CAS
-    for k, df in chemicals.data_reader.df_sources.items():
-        assert df.index.name == 'CAS'
+    for df in chemicals.data_reader.df_sources.values():
+        assert df.index.name == "CAS"

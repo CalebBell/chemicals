@@ -21,21 +21,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+
 import numpy as np
 import pytest
 from fluids.numerics import assert_close, assert_close1d, assert_close2d
-import pytest
-import types
-import decimal
-import fractions
-import collections
+
 from chemicals.utils import (
     SG,
     API_to_SG,
+    Baume_heavy_to_rho,
+    Baume_heavy_to_SG,
+    Baume_light_to_rho,
+    Baume_light_to_SG,
     Cp_minus_Cv,
     Joule_Thomson,
     Parachor,
+    Qls_to_ms,
+    Qls_to_ns,
     SG_to_API,
+    SG_to_Baume_heavy,
+    SG_to_Baume_light,
     Vfs_to_zs,
     Vm_to_rho,
     Watson_K,
@@ -59,8 +64,12 @@ from chemicals.utils import (
     mixing_power,
     mixing_simple,
     molar_velocity_to_velocity,
+    ms_to_ns,
+    ms_to_Qls,
     none_and_length_check,
     normalize,
+    ns_to_ms,
+    ns_to_Qls,
     phase_identification_parameter,
     phase_identification_parameter_phase,
     property_mass_to_molar,
@@ -68,6 +77,8 @@ from chemicals.utils import (
     radius_of_gyration,
     recursive_copy,
     remove_zeros,
+    rho_to_Baume_heavy,
+    rho_to_Baume_light,
     rho_to_Vm,
     solve_flow_composition_mix,
     speed_of_sound,
@@ -79,22 +90,15 @@ from chemicals.utils import (
     ws_to_zs,
     zs_to_Vfs,
     zs_to_ws,
-    ms_to_ns,
-    ns_to_ms,
-    ns_to_Qls,
-    Qls_to_ns,
-    Qls_to_ms,
-    ms_to_Qls,
-    rho_to_Baume_light, Baume_light_to_rho, SG_to_Baume_light, Baume_light_to_SG, rho_to_Baume_heavy, Baume_heavy_to_rho, SG_to_Baume_heavy, Baume_heavy_to_SG
 )
 
 
 def test_recursive_copy():
     import array
+    from collections import namedtuple
     from copy import deepcopy
     from decimal import Decimal
     from fractions import Fraction
-    from collections import namedtuple
 
     test_cases = [None,
                   True, False,
@@ -104,7 +108,7 @@ def test_recursive_copy():
                  -1, 0, 1, 2, 2000, 2**65,
                   -1.1234, 0, 2e200, float("nan"),
                   1j, 1.1234j, 1234132+123.234j, -12341-1234j,
-                  'a', 'b', 'asdfsdfasdf', 'asdf asdfadf',
+                  "a", "b", "asdfsdfasdf", "asdf asdfadf",
                   Decimal(2),Fraction(2.34),
                  ]
 
@@ -124,13 +128,13 @@ def test_recursive_copy():
         pass
 
 
-    InnerTuple = namedtuple('InnerTuple', ['a', 'b'])
-    OuterTuple = namedtuple('OuterTuple', ['x', 'y'])
+    InnerTuple = namedtuple("InnerTuple", ["a", "b"])
+    OuterTuple = namedtuple("OuterTuple", ["x", "y"])
     named_tuple_1 = InnerTuple(1, (2, 3, 4))
-    named_tuple_2 = OuterTuple(InnerTuple(1, (2, 3, 4)), 'abc')
-    named_tuple_3 = OuterTuple(InnerTuple('asdfas', (2, '125dsaf', 4)), frozenset([0]))
+    named_tuple_2 = OuterTuple(InnerTuple(1, (2, 3, 4)), "abc")
+    named_tuple_3 = OuterTuple(InnerTuple("asdfas", (2, "125dsaf", 4)), frozenset([0]))
 
-    tuple_cases = [(12,21,34,3, None, -1, 'asd', 1j),
+    tuple_cases = [(12,21,34,3, None, -1, "asd", 1j),
                    (12., (123.352, None, 4, (123.352, None, 4), [123]), ),
                    tuple(),
                    tuple(range(129)),
@@ -139,17 +143,17 @@ def test_recursive_copy():
                    named_tuple_3
                   ]
 
-    list_cases = [[2,21,34,3, None, -1, 'asd', 1j],
+    list_cases = [[2,21,34,3, None, -1, "asd", 1j],
                    [12., (123.352, None, 4, (123.352, None, 4), [123]), ],
                    list(),
                    list(range(129)),
 
     ]
 
-    set_cases = [{1,2,'a', 1j, np.float32(1)},
+    set_cases = [{1,2,"a", 1j, np.float32(1)},
     ]
 
-    frozenset_cases = [frozenset([1,2,'a', 1j, np.float32(1)]),
+    frozenset_cases = [frozenset([1,2,"a", 1j, np.float32(1)]),
     ]
 
     numpy_cases = [np.arange(13),
@@ -163,8 +167,8 @@ def test_recursive_copy():
     ]
 
 
-    byte_cases = [b'asdfasd', b'1232',
-                  bytes.fromhex('2Ef0 F1f2  '),
+    byte_cases = [b"asdfasd", b"1232",
+                  bytes.fromhex("2Ef0 F1f2  "),
                  ]
 
     test_cases += numpy_test_cases
@@ -190,7 +194,7 @@ def test_recursive_copy():
                         range(1,2,10),
                         range(1,29,10),
                         bytearray([0,1,3,2]),
-                        array.array('l', [-11111111, 22222222, -33333333, 44444444]),
+                        array.array("l", [-11111111, 22222222, -33333333, 44444444]),
                        ]
 
 
@@ -201,7 +205,7 @@ def test_recursive_copy():
         assert id(implemented_copy) != case
 
 
-    read_only_cases = [{'a': 3, 'b': 5}.items(),]
+    read_only_cases = [{"a": 3, "b": 5}.items(),]
 
     for case in read_only_cases:
         implemented_copy = recursive_copy(case)
@@ -218,7 +222,7 @@ def test_recursive_copy():
 
 
 def test_to_num():
-    assert to_num(['1', '1.1', '1E5', '0xB4', '']) == [1.0, 1.1, 100000.0, '0xB4', None]
+    assert to_num(["1", "1.1", "1E5", "0xB4", ""]) == [1.0, 1.1, 100000.0, "0xB4", None]
 
 
 def test_remove_zeros():
@@ -382,9 +386,9 @@ def test_phase_identification_parameter():
     PIP = phase_identification_parameter(0.000130229900874, 582169.397484, -3.66431747236e+12, 4.48067893805e+17, -20518995218.2)
     assert_close(PIP, 11.33428990564796)
 
-    assert 'l' == phase_identification_parameter_phase(-20518995218.2, 0.000130229900874, 582169.397484, -3.66431747236e+12, 4.48067893805e+17)
+    assert "l" == phase_identification_parameter_phase(-20518995218.2, 0.000130229900874, 582169.397484, -3.66431747236e+12, 4.48067893805e+17)
     # Artificially give a value to make it be solid
-    assert 's' == phase_identification_parameter_phase(+20518995218.2)
+    assert "s" == phase_identification_parameter_phase(+20518995218.2)
 
 def test_Cp_minus_Cv():
     d = Cp_minus_Cv(299, 582232.475794113, -3665180614672.253)
@@ -428,26 +432,26 @@ def test_Watson_K():
 
 
 def test_mix_component_flows():
-    names, flows = mix_component_flows(['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1'], 1, 1, [0.5, 0.5], [0.5, 0.5])
-    assert names == ['64-17-5', '67-56-1', '7732-18-5']
+    names, flows = mix_component_flows(["7732-18-5", "64-17-5"], ["7732-18-5", "67-56-1"], 1, 1, [0.5, 0.5], [0.5, 0.5])
+    assert names == ["64-17-5", "67-56-1", "7732-18-5"]
     assert_close1d(flows, [ 0.5,  0.5,  1.])
 
-    names, flows = mix_component_flows(['7732-18-5', '67-56-1'], ['7732-18-5', '67-56-1'], 1, 1, [0.2, 0.8], [0.3, 0.7])
-    assert names == ['7732-18-5', '67-56-1']
+    names, flows = mix_component_flows(["7732-18-5", "67-56-1"], ["7732-18-5", "67-56-1"], 1, 1, [0.2, 0.8], [0.3, 0.7])
+    assert names == ["7732-18-5", "67-56-1"]
     assert_close1d(flows,  [0.5, 1.5])
 
 def test_mix_multiple_component_flows():
-    names, flows = mix_multiple_component_flows([['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1']], [1, 1], [[0.5, 0.5], [0.5, 0.5]])
-    assert names == ['64-17-5', '67-56-1', '7732-18-5']
+    names, flows = mix_multiple_component_flows([["7732-18-5", "64-17-5"], ["7732-18-5", "67-56-1"]], [1, 1], [[0.5, 0.5], [0.5, 0.5]])
+    assert names == ["64-17-5", "67-56-1", "7732-18-5"]
     assert_close1d(flows, [ 0.5,  0.5,  1.])
 
-    args = ([['7732-18-5', '64-17-5'], ['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1'], ['7732-18-5', '67-56-1']], [1, 1, 1, 1], [[0.5, 0.5], [0.5, 0.5], [0.5, 0.5], [0.5, 0.5]])
+    args = ([["7732-18-5", "64-17-5"], ["7732-18-5", "64-17-5"], ["7732-18-5", "67-56-1"], ["7732-18-5", "67-56-1"]], [1, 1, 1, 1], [[0.5, 0.5], [0.5, 0.5], [0.5, 0.5], [0.5, 0.5]])
     names, flows = mix_multiple_component_flows(*args)
-    assert names == ['64-17-5', '67-56-1', '7732-18-5']
+    assert names == ["64-17-5", "67-56-1", "7732-18-5"]
     assert_close1d(flows, [1.0, 1.0, 2.0])
 
-    names, flows = mix_multiple_component_flows([['7732-18-5', '64-17-5']], [1], [[0.5 , 0.5]])
-    assert names == ['7732-18-5', '64-17-5']
+    names, flows = mix_multiple_component_flows([["7732-18-5", "64-17-5"]], [1], [[0.5 , 0.5]])
+    assert names == ["7732-18-5", "64-17-5"]
     assert_close1d(flows, [ 0.5, 0.5,])
 
 
@@ -666,7 +670,7 @@ def test_mixing_power():
     assert_close(mixing_power(zs, props, r=0.5), 0.019056901419612297, rtol=1e-13)
     assert_close(mixing_power(zs, props, r=0.75), 0.01928114152959784, rtol=1e-13)
     assert_close(mixing_power(zs, props, r=1.5), 0.005541354936265382, rtol=1e-13)
-    
+
     assert_close(mixing_power(zs, props, r=-4/3.0), 0.017332239251910703, rtol=1e-13)
     assert_close(mixing_power(zs, props, r=-2/3), 0.017964155302880425, rtol=1e-13)
     assert_close(mixing_power(zs, props, r=-1/3), 0.01828110264599271, rtol=1e-13)
@@ -686,7 +690,7 @@ def test_mixing_power():
     # generic case
     assert_close(mixing_power(zs, props, r=3.3423), 0.02120966068692269, rtol=1e-13)
 
-    
+
 
 
 def test_radius_of_gyration():
@@ -737,10 +741,10 @@ def test_Baume_light_roundtrip():
     Be = rho_to_Baume_light(rho)
     rho2 = Baume_light_to_rho(Be)
     assert_close(rho, rho2)
-    
+
     # Test SG conversion round trip
     SG = 0.8209
-    Be = SG_to_Baume_light(SG) 
+    Be = SG_to_Baume_light(SG)
     SG2 = Baume_light_to_SG(Be)
     assert_close(SG, SG2)
 
@@ -750,18 +754,18 @@ def test_Baume_heavy_roundtrip():
     Be = rho_to_Baume_heavy(rho)
     rho2 = Baume_heavy_to_rho(Be)
     assert_close(rho, rho2)
-    
+
     # Test SG conversion round trip
     SG = 1.2012
     Be = SG_to_Baume_heavy(SG)
     SG2 = Baume_heavy_to_SG(Be)
     assert_close(SG, SG2)
 
-    
+
 def test_hash_any_primitive():
     from chemicals.utils import hash_any_primitive
-    a = {'a': 1, 'b': 2}
-    b = {'b': 2, 'a': 1}
+    a = {"a": 1, "b": 2}
+    b = {"b": 2, "a": 1}
     assert hash_any_primitive(a) == hash_any_primitive(b)
 
 
@@ -769,6 +773,6 @@ def test_hash_any_primitive():
 
     assert hash_any_primitive([1,2]) == hash_any_primitive([1,2])
 
-    assert not hash_any_primitive([1,2]) == hash_any_primitive([1,2,3])
+    assert hash_any_primitive([1, 2]) != hash_any_primitive([1, 2, 3])
 
-    assert not hash_any_primitive([1,2,4]) == hash_any_primitive([1,2,3])
+    assert hash_any_primitive([1, 2, 4]) != hash_any_primitive([1, 2, 3])

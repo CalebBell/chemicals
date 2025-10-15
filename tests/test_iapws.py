@@ -23,7 +23,6 @@ SOFTWARE.
 
 from math import exp, log, log10
 
-import numpy as np
 import pytest
 from fluids.numerics import assert_close, assert_close1d, assert_close2d, derivative, linspace, logspace
 
@@ -150,9 +149,9 @@ except:  # pragma: no cover
 N_FACT = 1
 def make_me_precise():
     import mpmath as mp
-    globals()['exp'] = mp.exp
-    globals()['log'] = mp.log
-    globals()['sqrt'] = mp.sqrt
+    globals()["exp"] = mp.exp
+    globals()["log"] = mp.log
+    globals()["sqrt"] = mp.sqrt
     mp.mp.dps = 50
 
     import fluids.numerics
@@ -162,9 +161,9 @@ def make_me_precise():
 
 def make_me_float():
     import math
-    globals()['exp'] = math.exp
-    globals()['log'] = math.log
-    globals()['sqrt'] = math.sqrt
+    globals()["exp"] = math.exp
+    globals()["log"] = math.log
+    globals()["sqrt"] = math.sqrt
     import fluids.numerics
     fluids.numerics.exp = math.exp
     fluids.numerics.log = math.log
@@ -812,7 +811,7 @@ def test_iapws97_rho():
 @pytest.mark.slow
 @pytest.mark.iapws
 @pytest.mark.fuzz
-@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
+@pytest.mark.skipif(not has_CoolProp, reason="CoolProp is missing")
 def test_iapws97_region_3_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     Ts = linspace(623.15+1e-10, 1073.15, 100)
@@ -833,7 +832,7 @@ def test_iapws97_region_3_rho_coolprop():
             for P in test_Ps(T, 100):
                 assert iapws97_identify_region_TP(T, P) == 3
                 rho_implemented = iapws97_rho(T=T, P=P)
-                rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
+                rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
     #            try:
                 assert_close(rho_CoolProp, rho_implemented, rtol=1e-10)
     #            except:
@@ -845,7 +844,7 @@ def test_iapws97_region_3_rho_coolprop():
 @pytest.mark.slow
 @pytest.mark.iapws
 @pytest.mark.fuzz
-@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
+@pytest.mark.skipif(not has_CoolProp, reason="CoolProp is missing")
 def test_iapws97_region_5_rho_coolprop():
     # Working great!
     from CoolProp.CoolProp import PropsSI
@@ -857,14 +856,14 @@ def test_iapws97_region_5_rho_coolprop():
         for P in test_Ps(T, 100):
             assert iapws97_identify_region_TP(T, P) == 5
             rho_implemented = iapws97_rho(T=T, P=P)
-            rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
+            rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
             assert_close(rho_CoolProp, rho_implemented, rtol=1e-10)
 
 
 def iapws97_dGr_dpi_region2_fastest(tau, pi):
-    '''Fastest implementation, maybe near possible. Horner's method in places
+    """Fastest implementation, maybe near possible. Horner's method in places
     has caused issues however and this has some error in some regions.
-    '''
+    """
     taut = tau - 0.5
     pi2 = pi*pi
     taut2 = taut*taut
@@ -900,7 +899,7 @@ def iapws97_dGr_dpi_region2_fastest(tau, pi):
 @pytest.mark.slow
 @pytest.mark.iapws
 @pytest.mark.fuzz
-@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
+@pytest.mark.skipif(not has_CoolProp, reason="CoolProp is missing")
 def test_iapws97_region_2_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     tol = 1e-4
@@ -922,7 +921,7 @@ def test_iapws97_region_2_rho_coolprop():
         for P in test_Ps(T, 100):
             assert iapws97_identify_region_TP(T, P) == 2
             rho_implemented = iapws97_rho(T=T, P=P)
-            rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
+            rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
 #            try:
             assert_close(rho_CoolProp, rho_implemented, rtol=2e-15)
 #            except:
@@ -933,7 +932,7 @@ def test_iapws97_region_2_rho_coolprop():
 @pytest.mark.slow
 @pytest.mark.iapws
 @pytest.mark.fuzz
-@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
+@pytest.mark.skipif(not has_CoolProp, reason="CoolProp is missing")
 def test_iapws97_region_1_rho_coolprop():
     from CoolProp.CoolProp import PropsSI
     tol = 1e-4
@@ -946,7 +945,7 @@ def test_iapws97_region_1_rho_coolprop():
         for P in test_Ps(T, 20*N_FACT):
             assert iapws97_identify_region_TP(T, P) == 1
             rho_implemented = iapws97_rho(T=T, P=P)
-            rho_CoolProp = PropsSI('DMASS','T',T,'P',P,'IF97::Water')
+            rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
             # try:
             assert_close(rho_CoolProp, rho_implemented, rtol=2e-13)
             # except:
@@ -1118,7 +1117,7 @@ def test_iapws97_T():
     rho = iapws97_rho(273.9508008008008, 17030650.2925232)
     assert_close(iapws97_T(17030650.2925232, rho), 273.9508008008008)
 
-    # region 5 border requiring calc    
+    # region 5 border requiring calc
     rho = iapws97_rho(1073.150000000001, 34705199.859195136)
     assert_close(iapws97_T(34705199.859195136, rho), 1073.150000000001)
 
@@ -1178,28 +1177,28 @@ gammais = [None, None, None, 1.28728967, 3.53734222, 7.74073708,
 
 
 def dAddelta_idg(tau, delta):
-    '''
+    """
     >>> dAddelta_idg(1.000148377125193, 1.1118012422360248)
     0.8994413407821229
-    '''
+    """
     tot = 1./delta
     return tot
 
 
 def ddAdddelta_idg(tau, delta):
-    '''
+    """
     >>> ddAdddelta_idg(1.000148377125193, 1.1118012422360248)
     -0.8089947255079429
-    '''
+    """
     tot = -1./(delta*delta)
     return tot
 
 
 def dAdtau_idg(tau, delta):
-    '''
+    """
     >>> dAdtau_idg(1.000148377125193, 1.1118012422360248)
     9.803439179390017
-    '''
+    """
     tot =ni0s[1] + ni0s[2]/tau
     for i in range(3, 8):
         tot += ni0s[i]*gammais[i]*(1.0/(1 - exp(-gammais[i]*tau)) - 1.0)
@@ -1207,10 +1206,10 @@ def dAdtau_idg(tau, delta):
 
 
 def ddAddtau_idg(tau, delta):
-    '''
+    """
     >>> ddAddtau_idg(1.000148377125193, 1.1118012422360248)
     -3.433163341430695
-    '''
+    """
     tot = -ni0s[2]/tau**2
     for i in range(3,8):
         tot -= ni0s[i]*gammais[i]**2*exp(-gammais[i]*tau)*(1-exp(-gammais[i]*tau))**-2
@@ -1218,10 +1217,10 @@ def ddAddtau_idg(tau, delta):
 
 
 def A_idg(tau, delta):
-    '''
+    """
     >>> A_idg(1.000148377125193, 1.1118012422360248)
     -1.5631960505251727
-    '''
+    """
     tot = log(delta) + ni0s[0] + ni0s[1]*tau + ni0s[2]*log(tau)
     for i in range(3,8):
         tot += ni0s[i]*log(1 - exp(-gammais[i]*tau))
@@ -1278,10 +1277,10 @@ for arr in (cis, dis, tis, nis):
 
 
 def calcA_res(tau, delta):
-    '''
+    """
     >>> calcA_res(647.096/647., 358./322.)
     -1.212026565041463
-    '''
+    """
     phir = 0
     for i in range(7):
         phir += nis[i]*delta**dis[i]*tau**tis[i]
@@ -1301,10 +1300,10 @@ def calcA_res(tau, delta):
 
 
 def dAddelta_res(tau, delta):
-    '''
+    """
     >>> dAddelta_res(647.096/647., 358./322.)
     -0.714012024371285
-    '''
+    """
     phir = 0.0
     for i in range(7):
         phir += nis[i]*dis[i]*delta**(dis[i]-1.0)*tau**tis[i]
@@ -1327,10 +1326,10 @@ def dAddelta_res(tau, delta):
 
 
 def ddAdddelta_res(tau, delta):
-    '''Works. Don't touch it.
+    """Works. Don't touch it.
     >>> ddAdddelta_res(647.096/647., 358./322.)
     0.47573069564568893
-    '''
+    """
     # need this for rho solver newton
     phir = 0
     for i in range(7):
@@ -1378,10 +1377,10 @@ def dddA_ddddelta_res(tau, delta):
 
 
 def dAdtau_res(tau, delta):
-    '''
+    """
     >>> dAdtau_res(647.096/647., 358./322.)
     -3.2172250077516558
-    '''
+    """
     phir = 0
     for i in range(7):
         phir += nis[i]*tis[i]*delta**dis[i]*tau**(tis[i]-1)
@@ -1401,10 +1400,10 @@ def dAdtau_res(tau, delta):
         phir += nis[i+54]*delta*(_d_Delta_bd_tau*psi + Delta**bis[i]*_d_psi_d_tau)
     return phir
 def ddAddtau_res(tau, delta):
-    '''
+    """
     >>> ddAddtau_res(647.096/647., 358./322.)
     -9.960295065592888
-    '''
+    """
     phir = 0
     for i in range(7):
         phir += nis[i]*tis[i]*(tis[i]-1)*delta**dis[i]*tau**(tis[i]-2)
@@ -1430,10 +1429,10 @@ def ddAddtau_res(tau, delta):
 
 
 def dAddeltatau_res(tau, delta):
-    '''
+    """
     >>> dAddeltatau_res(647.096/647., 358./322.)
     -1.332147204361434
-    '''
+    """
     phir = 0
     for i in range(7):
         phir += nis[i]*dis[i]*tis[i]*delta**(dis[i]-1)*tau**(tis[i]-1)
@@ -1491,19 +1490,19 @@ def iapws95_d3Ar_ddelta2dtau_naive(tau, delta):
 ### Derivatives of Distance Function
 
 def d_psi_d_delta(i, tau, delta):
-    '''i is either 0 or 1 for 55 or 56.
+    """i is either 0 or 1 for 55 or 56.
     >>> d_psi_d_delta(0, 647.096/647., 358./322.)
     -4.411951793785948
-    '''
+    """
     psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
     ans = -2*Cis[i]*(delta-1)*psi
     return ans
 
 def d_Delta_d_delta(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d_Delta_d_delta(1, 647.096/647., 358./322.)
     3.595414062719538e-06
-    '''
+    """
     theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
     ans = (delta - 1)*(
     Ais[i]*theta*2/betas[i+3]*((delta-1.)**2 )**(1./(2*betas[i+3])-1.)
@@ -1512,10 +1511,10 @@ def d_Delta_d_delta(i, tau, delta):
 
 
 def d_Delta_bd_delta(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d_Delta_bd_delta(1, 647.096/647., 358./322.)
     7.931159558108671e-06
-    '''
+    """
     theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
     Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
 
@@ -1528,20 +1527,20 @@ def d_Delta_bd_delta(i, tau, delta):
 
 
 def d2_psi_d2_delta(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d2_psi_d2_delta(1, 647.096/647., 358./322.)
     -8.581401910121393
-    '''
+    """
     psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
     ans = (2*Cis[i]*(delta-1)**2 - 1)*2*Cis[i]*psi
     return ans
 
 
 def d2_Delta_d2_delta(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d2_Delta_d2_delta(1, 647.096/647., 358./322.)
     0.0002472143243416378
-    '''
+    """
     theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
 
     _d_Delta_d_delta = (delta - 1)*(
@@ -1557,10 +1556,10 @@ def d2_Delta_d2_delta(i, tau, delta):
 
 
 def d2_Delta_bd2_delta(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d2_Delta_bd2_delta(1, 647.096/647., 358./322.)
     0.0005157293089972383
-    '''
+    """
     theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
     Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
 
@@ -1580,10 +1579,10 @@ def d2_Delta_bd2_delta(i, tau, delta):
 
 
 def d_Delta_bd_tau(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d_Delta_bd_tau(1, 647.096/647., 358./322.)
     -0.0002958235123606516
-    '''
+    """
     theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
     Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
     ans = -2*theta*bis[i]*Delta**(bis[i]-1)
@@ -1591,30 +1590,30 @@ def d_Delta_bd_tau(i, tau, delta):
 
 
 def d_psi_d_tau(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d_psi_d_tau(1, 647.096/647., 358./322.)
     -0.159135911130251
-    '''
+    """
     psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
     ans = -2*Dis[i]*(tau-1)*psi
     return ans
 
 
 def d2_psi_d2_tau(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d2_psi_d2_tau(1, 647.096/647., 358./322.)
     -1072.4719549824797
-    '''
+    """
     psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
     ans = (2*Dis[i]*(tau-1)**2 -1)*2*Dis[i]*psi
     return ans
 
 
 def d2_Delta_bd2_tau(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d2_Delta_bd2_tau(1, 647.096/647., 358./322.)
     4.370635612303636
-    '''
+    """
     theta = (1-tau) + Ais[i]*((delta-1)**2)**(1/(2*betas[i+3]))
     psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
     Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
@@ -1624,20 +1623,20 @@ def d2_Delta_bd2_tau(i, tau, delta):
 
 
 def d2_psi_d_delta_d_tau(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d2_psi_d_delta_d_tau(1, 647.096/647., 358./322.)
     1.1386619231183175
-    '''
+    """
     psi = exp(-Cis[i]*(delta-1)**2 - Dis[i]*(tau-1)**2)
     ans = 4*Cis[i]*Dis[i]*(delta-1)*(tau-1)*psi
     return ans
 
 
 def d2_Delta_bd_delta_d_tau(i, tau, delta):
-    ''''i is either 0 or 1 for 55 or 56.
+    """'i is either 0 or 1 for 55 or 56.
     >>> d2_Delta_bd_delta_d_tau(1, 647.096/647., 358./322.)
     -0.027232925382835605
-    '''
+    """
     theta = (1-tau) + Ais[i]*((delta-1)**2)**(1./(2*betas[i+3]))
     Delta = theta**2 + Bis[i]*((delta-1)**2)**ais[i]
 
@@ -1664,10 +1663,10 @@ def test_iapws95_d2A_d2deltar():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d2A_d2deltar_vs_naive(precise=False, allow_fail=True):
-    '''Overall performs very well. 2e-10 was needed in 2000^2 points for like 1 point.
+    """Overall performs very well. 2e-10 was needed in 2000^2 points for like 1 point.
     Smaller number of points work to 1e-12. Having an absolute tolerance of 1e-15
     would also work find.
-    '''
+    """
     if precise:
         mp = make_me_precise()
         mpf = mp.mpf
@@ -1805,8 +1804,8 @@ def test_iapws95_d3Ar_ddelta3_mpmath():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
-    '''
-    '''
+    """
+    """
     if precise:
         mp = make_me_precise()
         mpf = mp.mpf
@@ -1841,8 +1840,8 @@ def test_iapws95_d3Ar_ddeltadtau2_vs_naive(precise=False, allow_fail=True):
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d3Ar_ddelta2dtau_vs_naive(precise=False, allow_fail=True):
-    '''
-    '''
+    """
+    """
     if precise:
         mp = make_me_precise()
         mpf = mp.mpf
@@ -1889,8 +1888,8 @@ def test_iapws95_dA_ddeltar():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_dA_ddeltar_vs_naive(precise=False, allow_fail=True):
-    '''
-    '''
+    """
+    """
     if precise:
         mp = make_me_precise()
         mpf = mp.mpf
@@ -1969,8 +1968,8 @@ def test_iapws95_dAr_dtau():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_dAr_dtau_vs_naive(precise=False, allow_fail=True):
-    '''
-    '''
+    """
+    """
     if precise:
         mp = make_me_precise()
         mpf = mp.mpf
@@ -2004,8 +2003,8 @@ def test_iapws95_dAr_dtau_vs_naive(precise=False, allow_fail=True):
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d2Ar_dtau2_vs_naive(precise=False, allow_fail=True):
-    '''
-    '''
+    """
+    """
     if precise:
         mp = make_me_precise()
         mpf = mp.mpf
@@ -2043,8 +2042,8 @@ def test_iapws95_d2Ar_dtau2():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_d2Ar_ddeltadtau_vs_naive(precise=False, allow_fail=True):
-    '''
-    '''
+    """
+    """
     if precise:
         mp = make_me_precise()
         mpf = mp.mpf
@@ -2081,8 +2080,8 @@ def test_iapws95_d2Ar_ddeltadtau():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_A0_vs_naive():
-    '''Can't think of a way to optimize this.
-    '''
+    """Can't think of a way to optimize this.
+    """
     errs = []
     rerr = 0
     N = 400*N_FACT
@@ -2106,8 +2105,8 @@ def test_iapws95_A0_vs_naive():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_iapws95_iapws95_dA0_dtau_vs_naive():
-    '''Can't think of a way to optimize this.
-    '''
+    """Can't think of a way to optimize this.
+    """
     errs = []
     rerr = 0
     N = 300*N_FACT
@@ -2130,8 +2129,8 @@ def test_iapws95_iapws95_dA0_dtau_vs_naive():
 @pytest.mark.iapws
 @pytest.mark.fuzz
 def test_ddAddtau_idg_vs_naive():
-    '''Can't think of a way to optimize this.
-    '''
+    """Can't think of a way to optimize this.
+    """
     errs = []
     rerr = 0
     N = 100*N_FACT
@@ -2174,7 +2173,7 @@ def test_iapws95_d3A0_dtau3():
 @pytest.mark.iapws
 @pytest.mark.CoolProp
 @pytest.mark.fuzz
-@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
+@pytest.mark.skipif(not has_CoolProp, reason="CoolProp is missing")
 def test_rho_iapws95_CoolProp():
     from CoolProp.CoolProp import PropsSI
     N = 40*N_FACT
@@ -2184,7 +2183,7 @@ def test_rho_iapws95_CoolProp():
     for T in Ts:
         for P in Ps:
             rho_implemented = iapws95_rho(T, P)
-            rho_CoolProp = PropsSI('DMASS', 'T', T, 'P', P, 'water')
+            rho_CoolProp = PropsSI("DMASS", "T", T, "P", P, "water")
             assert_close(rho_implemented, rho_CoolProp, rtol=1e-10)
             # some points found to fail near Psat curve as expected.
 
@@ -2222,10 +2221,10 @@ def test_iapws95_T_err():
                  iapws95_T_err(300, 1000, 1e5)[1])
 
 def test_iapws95_rho():
-    '''TODO points:
+    """TODO points:
 
     iapws95_rho(200.0, 1e9) - not solving
-    '''
+    """
     with pytest.raises(ValueError):
         iapws95_rho(0.000999999999999999, 900000.0)
 
@@ -2261,11 +2260,11 @@ def test_iapws95_rho():
 @pytest.mark.slow
 @pytest.mark.iapws
 @pytest.mark.CoolProp
-@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
+@pytest.mark.skipif(not has_CoolProp, reason="CoolProp is missing")
 def test_iapws95_rho_vs_Coolprop():
     from CoolProp.CoolProp import PropsSI
     assert_close(iapws95_rho(2357., 97719212),
-                 PropsSI('DMASS', 'T', 2357, 'P', 97719212.0, 'water'),
+                 PropsSI("DMASS", "T", 2357, "P", 97719212.0, "water"),
                  rtol=1e-9)
 
 def test_iapws95_T():
@@ -2471,18 +2470,18 @@ def test_rhog_sat_IAPWS95_vs_saturation2():
 @pytest.mark.slow
 @pytest.mark.iapws
 @pytest.mark.CoolProp
-@pytest.mark.skipif(not has_CoolProp, reason='CoolProp is missing')
+@pytest.mark.skipif(not has_CoolProp, reason="CoolProp is missing")
 def test_rhog_sat_IAPWS95_CoolProp():
     from CoolProp.CoolProp import PropsSI
     Ts = [400.0, 600.0]
     for T in Ts:
         assert_close(iapws95_rhog_sat(T),
-                     PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-13)
+                     PropsSI("DMASS", "T", T, "Q", 1, "water"), rtol=1e-13)
 
     Ts = [630.0, 645, 647]
     for T in Ts:
         assert_close(iapws95_rhog_sat(T),
-                     PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-9)
+                     PropsSI("DMASS", "T", T, "Q", 1, "water"), rtol=1e-9)
 
     Ts = [647.08, 647.094,
 #          647.0958
@@ -2490,7 +2489,7 @@ def test_rhog_sat_IAPWS95_CoolProp():
           ]
     for T in Ts:
         assert_close(iapws95_rhog_sat(T),
-                     PropsSI('DMASS', 'T', T, 'Q', 1, 'water'), rtol=1e-4)
+                     PropsSI("DMASS", "T", T, "Q", 1, "water"), rtol=1e-4)
 
 #
 #test_rhog_sat_IAPWS95()

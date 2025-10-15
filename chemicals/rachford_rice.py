@@ -121,8 +121,6 @@ significant error exists.
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 __all__: list[str] = [
     "Li_Johns_Ahmadi_solution",
     "Rachford_Rice_flash2_f_jac",
