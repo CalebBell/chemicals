@@ -112,10 +112,7 @@ from fluids.constants import N_A, R
 from fluids.numerics import cbrt, trunc_exp, trunc_log
 from fluids.numerics import numpy as np
 
-try:
-    source_path = os.path.dirname(__file__) # micropython
-except:
-    source_path = ""
+source_path = os.path.dirname(__file__)
 
 if os.name == "nt":
     def os_path_join(*args):
