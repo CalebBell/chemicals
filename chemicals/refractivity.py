@@ -54,8 +54,10 @@ Pure Component Liquid Fit Correlations
 .. autofunction:: chemicals.refractivity.TDE_RIXExpansion
 
 """
+from pandas.core.frame import DataFrame
+from typing import List, Optional, Tuple
 
-__all__ = [
+__all__: List[str] = [
     "RI",
     "RI_IAPWS",
     "RI_all_methods",
@@ -93,7 +95,7 @@ CRC = "CRC"
 
 _RI_data_loaded = False
 @mark_numba_incompatible
-def _load_RI_data():
+def _load_RI_data() -> None:
     global _RI_data_loaded, RI_data_CRC_organic, RI_sources
     RI_data_CRC_organic = data_source("CRC Handbook Organic RI.csv")
     RI_sources = {
@@ -102,7 +104,7 @@ def _load_RI_data():
     }
     _RI_data_loaded = True
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("RI_data_CRC_organic", "RI_sources"):
         _load_RI_data()
         return globals()[name]
@@ -114,7 +116,7 @@ RI_all_methods = (CRC, miscdata.WIKIDATA)
 """Tuple of method name keys. See the `RI` for the actual references"""
 
 @mark_numba_incompatible
-def RI_methods(CASRN):
+def RI_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the refractive index for the
     desired chemical.
 
@@ -137,7 +139,7 @@ def RI_methods(CASRN):
     return list_available_methods_from_df_dict(RI_sources, CASRN, "RI")
 
 @mark_numba_incompatible
-def RI(CASRN, method=None):
+def RI(CASRN: str, method: Optional[str]=None) -> Tuple[float, float]:
     r"""This function handles the retrieval of a chemical's refractive
     index. Lookup is based on CASRNs. Will automatically select a data source
     to use if no method is provided; returns None if the data is not available.
@@ -207,7 +209,7 @@ def RI(CASRN, method=None):
     return value
 
 
-def polarizability_from_RI(RI, Vm):
+def polarizability_from_RI(RI: float, Vm: float) -> float:
     r"""Returns the polarizability of a fluid given its molar volume and
     refractive index.
 
@@ -249,7 +251,7 @@ def polarizability_from_RI(RI, Vm):
     """
     return 3/(4*pi*N_A)*(RI**2-1)/(RI**2+2)*Vm
 
-def molar_refractivity_from_RI(RI, Vm):
+def molar_refractivity_from_RI(RI: float, Vm: float) -> float:
     r"""Returns the molar refractivity of a fluid given its molar volume and
     refractive index.
 
@@ -286,7 +288,7 @@ def molar_refractivity_from_RI(RI, Vm):
     """
     return (RI**2 - 1.)/(RI**2 + 2.)*Vm
 
-def RI_from_molar_refractivity(Rm, Vm):
+def RI_from_molar_refractivity(Rm: float, Vm: float) -> float:
     r"""Returns the refractive index of a fluid given its molar volume and
     molar refractivity.
 
@@ -325,7 +327,7 @@ def RI_from_molar_refractivity(Rm, Vm):
     return Rm
 
 
-def RI_IAPWS(T, rho, wavelength=0.5893e-6):
+def RI_IAPWS(T: float, rho: float, wavelength: float=0.5893e-6) -> float:
     r"""Calculates the refractive index of water at a given temperature,
     density, and wavelength.
 
@@ -472,7 +474,7 @@ ICUMSA_1974_RIs = [1.33299, 1.33442, 1.33586, 1.33732, 1.33879, 1.34026, 1.34175
                    1.50129, 1.50398, 1.5067, 1.5094, 1.5122, 1.5149, 1.5177,
                    1.5205, 1.5234, 1.5262, 1.5291, 1.5320]
 
-def brix_to_RI(brix):
+def brix_to_RI(brix: float) -> float:
     """Convert a refractive index measurement on the `brix` scale to a standard
     refractive index.
 
@@ -513,7 +515,7 @@ def brix_to_RI(brix):
     """
     return interp(brix, ICUMSA_1974_brix, ICUMSA_1974_RIs, extrapolate=True)
 
-def RI_to_brix(RI):
+def RI_to_brix(RI: float) -> float:
     """Convert a standard refractive index measurement to the `brix` scale.
 
     Parameters

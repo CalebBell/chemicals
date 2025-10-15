@@ -176,9 +176,11 @@ The structure of each dataframe is shown below:
     In [9]: chemicals.volume.rho_data_CRC_virial
 
 """
+from pandas.core.frame import DataFrame
+from typing import List, Optional
 
 
-__all__ = [
+__all__: List[str] = [
     "COSTALD",
     "PPDS17",
     "SNM0",
@@ -226,7 +228,7 @@ register_df_source(folder, "CRC Virial polynomials.tsv", csv_kwargs={
 
 
 @mark_numba_incompatible
-def _load_rho_data():
+def _load_rho_data() -> None:
     global rho_data_COSTALD, rho_data_SNM0
     global rho_data_Perry_8E_105_l, rho_values_Perry_8E_105_l
     global rho_data_VDI_PPDS_2, rho_values_VDI_PPDS_2
@@ -251,7 +253,7 @@ def _load_rho_data():
     rho_data_CRC_virial = data_source("CRC Virial polynomials.tsv")
     rho_values_CRC_virial = np.array(rho_data_CRC_virial.values[:, 1:], dtype=float)
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("rho_data_COSTALD", "rho_data_SNM0", "rho_data_Perry_8E_105_l",
                 "rho_values_Perry_8E_105_l", "rho_data_VDI_PPDS_2",
                 "rho_values_VDI_PPDS_2", "rho_data_CRC_inorg_l",
@@ -480,7 +482,7 @@ def Yen_Woods_saturation(T, Tc, Vc, Zc):
     return Vm
 
 
-def Rackett(T, Tc, Pc, Zc):
+def Rackett(T: float, Tc: float, Pc: float, Zc: float) -> float:
     r"""Calculates saturation liquid volume, using Rackett CSP method and
     critical properties.
 
@@ -602,7 +604,7 @@ def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
         return 1e-3*MW/rho_calc
     return 1.0/rho_calc
 
-def Yamada_Gunn(T, Tc, Pc, omega):
+def Yamada_Gunn(T: int, Tc: float, Pc: float, omega: float) -> float:
     r"""Calculates saturation liquid volume, using Yamada and Gunn CSP method
     and a chemical's critical properties and acentric factor.
 
@@ -653,7 +655,7 @@ def Yamada_Gunn(T, Tc, Pc, omega):
     return R*Tc/Pc*(0.29056 - 0.08775*omega)**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
 
-def Townsend_Hales(T, Tc, Vc, omega):
+def Townsend_Hales(T: int, Tc: float, Vc: float, omega: float) -> float:
     r"""Calculates saturation liquid density, using the Townsend and Hales
     CSP method as modified from the original Riedel equation. Uses
     chemical critical volume and temperature, as well as acentric factor
@@ -712,7 +714,7 @@ Bhirud_normal_lnU1_tck = implementation_optimize_tck([[0.98, 0.98, 0.98, 0.98, 0
                                                      3])
 
 
-def Bhirud_normal(T, Tc, Pc, omega):
+def Bhirud_normal(T: float, Tc: float, Pc: float, omega: float) -> float:
     r"""Calculates saturation liquid density using the Bhirud [1]_ CSP method.
     Uses Critical temperature and pressure and acentric factor.
 
@@ -783,7 +785,7 @@ def Bhirud_normal(T, Tc, Pc, omega):
     return Vm
 
 
-def COSTALD(T, Tc, Vc, omega):
+def COSTALD(T: float, Tc: float, Vc: float, omega: float) -> float:
     r"""Calculate saturation liquid density using the COSTALD CSP method.
 
     A popular and accurate estimation method. If possible, fit parameters are
@@ -853,7 +855,7 @@ def COSTALD(T, Tc, Vc, omega):
     return Vc*V_0*(1.0 - omega*V_delta)
 
 
-def Campbell_Thodos(T, Tb, Tc, Pc, MW, dipole=0.0, has_hydroxyl=False):
+def Campbell_Thodos(T: float, Tb: float, Tc: float, Pc: float, MW: float, dipole: float=0.0, has_hydroxyl: bool=False) -> float:
     r"""Calculate saturation liquid density using the Campbell-Thodos [1]_
     CSP method.
 
@@ -963,7 +965,7 @@ def Campbell_Thodos(T, Tb, Tc, Pc, MW, dipole=0.0, has_hydroxyl=False):
     return Vs
 
 
-def SNM0(T, Tc, Vc, omega, delta_SRK=None):
+def SNM0(T: int, Tc: float, Vc: float, omega: float, delta_SRK: Optional[float]=None) -> float:
     r"""Calculates saturated liquid density using the Mchaweh, Moshfeghian
     model [1]_. Designed for simple calculations.
 
@@ -1093,7 +1095,7 @@ def CRC_inorganic(T, rho0, k, Tm, MW=None):
     return rho if MW is None else 0.001 * MW / rho
 
 
-def COSTALD_compressed(T, P, Psat, Tc, Pc, omega, Vs):
+def COSTALD_compressed(T: float, P: float, Psat: float, Tc: float, Pc: float, omega: float, Vs: float) -> float:
     r"""Calculates compressed-liquid volume, using the COSTALD [1]_ CSP
     method and a chemical's critical properties.
 
@@ -1290,7 +1292,7 @@ def Tait_molar(P, P_ref, V_ref, B, C):
 
 ### Liquid Mixtures
 
-def Amgat(xs, Vms):
+def Amgat(xs: List[float], Vms: List[float]) -> float:
     r"""Calculate mixture liquid density using the Amgat mixing rule.
     Highly inacurate, but easy to use. Assumes idea liquids with
     no excess volume. Average molecular weight should be used with it to obtain
@@ -1331,7 +1333,7 @@ def Amgat(xs, Vms):
     return mixing_simple(xs, Vms)
 
 
-def Rackett_mixture(T, xs, MWs, Tcs, Pcs, Zrs):
+def Rackett_mixture(T: float, xs: List[float], MWs: List[float], Tcs: List[float], Pcs: List[float], Zrs: List[float]) -> float:
     r"""Calculate mixture liquid density using the Rackett-derived mixing rule
     as shown in [2]_.
 
@@ -1399,7 +1401,7 @@ def Rackett_mixture(T, xs, MWs, Tcs, Pcs, Zrs):
     return (R*bigsum*Zr**(1.0 + (1.0 - Tr)**(2.0/7.0)))*MW
 
 
-def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
+def COSTALD_mixture(xs: List[float], T: float, Tcs: List[float], Vcs: List[float], omegas: List[float]) -> float:
     r"""Calculate mixture liquid density using the COSTALD CSP method.
 
     A popular and accurate estimation method. If possible, fit parameters are
@@ -1484,7 +1486,7 @@ def COSTALD_mixture(xs, T, Tcs, Vcs, omegas):
 ### Gases
 
 
-def ideal_gas(T, P):
+def ideal_gas(T: float, P: float) -> float:
     r"""Calculates ideal gas molar volume.
     The molar volume of an ideal gas is given by:
 
@@ -1513,7 +1515,7 @@ def ideal_gas(T, P):
 
 ### Solids
 
-def Goodman(T, Tt, Vml):
+def Goodman(T: int, Tt: float, Vml: float) -> float:
     r"""Calculates solid density at T using the simple relationship
     by a member of the DIPPR.
 

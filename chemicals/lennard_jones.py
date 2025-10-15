@@ -69,10 +69,12 @@ Utility Functions
 .. autofunction:: chemicals.lennard_jones.T_star
 
 """
+from pandas.core.frame import DataFrame
+from typing import List, Optional
 
 
 
-__all__ = [
+__all__: List[str] = [
     "As_collision",
     "Bs_collision",
     "Cs_collision",
@@ -135,7 +137,7 @@ BSLB = "Bird, Stewart, and Light (2002) boiling relation"
 BSLM = "Bird, Stewart, and Light (2002) melting relation"
 
 _LJ_data_loaded = False
-def _load_LJ_data():
+def _load_LJ_data() -> None:
     global _LJ_data_loaded, LJ_data_Magalhaes, LJ_data_Poling, LJ_sources
     LJ_data_Magalhaes = data_source("MagalhaesLJ.tsv")
     LJ_data_Poling = data_source("PolingLJ.tsv")
@@ -145,7 +147,7 @@ def _load_LJ_data():
         POLING: LJ_data_Poling,
     }
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("LJ_data_Magalhaes", "LJ_data_Poling", "LJ_sources"):
         _load_LJ_data()
         return globals()[name]
@@ -156,7 +158,7 @@ Stockmayer_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD2, STIELTHODOS, FLYNN
 """Tuple of method name keys. See the `Stockmayer` for the actual references"""
 
 @mark_numba_incompatible
-def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=None):
+def Stockmayer_methods(CASRN: Optional[str]=None, Tm: Optional[float]=None, Tb: Optional[float]=None, Tc: Optional[float]=None, Zc: Optional[float]=None, omega: Optional[float]=None) -> List[str]:
     """Return all methods available to obtain the Stockmayer parameter for the
     desired chemical.
 
@@ -197,8 +199,8 @@ def Stockmayer_methods(CASRN=None, Tm=None, Tb=None, Tc=None, Zc=None, omega=Non
     return methods
 
 @mark_numba_incompatible
-def Stockmayer(CASRN="", Tm=None, Tb=None, Tc=None, Zc=None, omega=None,
-               method=None):
+def Stockmayer(CASRN: str="", Tm: Optional[float]=None, Tb: Optional[float]=None, Tc: Optional[float]=None, Zc: Optional[float]=None, omega: Optional[float]=None,
+               method: Optional[str]=None) -> Optional[float]:
     r"""This function handles the retrieval or calculation a chemical's
     Stockmayer parameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 7 CSP methods.
@@ -307,8 +309,8 @@ molecular_diameter_all_methods = (MAGALHAES, POLING, TEEGOTOSTEWARD4, SILVALIUMA
 """Tuple of method name keys. See the `molecular_diameter` for the actual references"""
 
 @mark_numba_incompatible
-def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
-                               omega=None, Vm=None, Vb=None):
+def molecular_diameter_methods(CASRN: Optional[str]=None, Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: Optional[float]=None, Zc: Optional[float]=None,
+                               omega: Optional[float]=None, Vm: Optional[float]=None, Vb: Optional[float]=None) -> List[str]:
     """Return all methods available to obtain the molecular diameter for the
     desired chemical.
 
@@ -356,8 +358,8 @@ def molecular_diameter_methods(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None,
     return methods
 
 @mark_numba_incompatible
-def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=None,
-          Vm=None, Vb=None, method=None):
+def molecular_diameter(CASRN: Optional[str]=None, Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: Optional[float]=None, Zc: Optional[float]=None, omega: Optional[float]=None,
+          Vm: Optional[float]=None, Vb: Optional[float]=None, method: Optional[str]=None) -> Optional[float]:
     r"""This function handles the retrieval or calculation a chemical's
     L-J molecular diameter. Values are available from one source with lookup
     based on CASRNs, or can be estimated from 9 CSP methods.
@@ -468,7 +470,7 @@ def molecular_diameter(CASRN=None, Tc=None, Pc=None, Vc=None, Zc=None, omega=Non
 
 ### Sigma Lennard-Jones
 
-def sigma_Flynn(Vc):
+def sigma_Flynn(Vc: float) -> float:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses critical volume. CSP method by [1]_ as reported in [2]_.
 
@@ -505,7 +507,7 @@ def sigma_Flynn(Vc):
     sigma = 0.561*(Vc**(1/3.))**1.2
     return sigma
 
-def sigma_Bird_Stewart_Lightfoot_critical_2(Tc, Pc):
+def sigma_Bird_Stewart_Lightfoot_critical_2(Tc: float, Pc: float) -> float:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses critical temperature and pressure. CSP method by [1]_.
 
@@ -543,7 +545,7 @@ def sigma_Bird_Stewart_Lightfoot_critical_2(Tc, Pc):
     sigma = 2.44*(Tc/Pc)**(1/3.0)
     return sigma
 
-def sigma_Bird_Stewart_Lightfoot_critical_1(Vc):
+def sigma_Bird_Stewart_Lightfoot_critical_1(Vc: float) -> float:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses critical volume. CSP method by [1]_.
 
@@ -579,7 +581,7 @@ def sigma_Bird_Stewart_Lightfoot_critical_1(Vc):
     sigma = 0.841*Vc**(1/3.0)
     return sigma
 
-def sigma_Bird_Stewart_Lightfoot_boiling(Vb):
+def sigma_Bird_Stewart_Lightfoot_boiling(Vb: float) -> float:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses molar volume of liquid at boiling. CSP method by [1]_.
 
@@ -615,7 +617,7 @@ def sigma_Bird_Stewart_Lightfoot_boiling(Vb):
     sigma = 1.166*Vb**(1/3.0)
     return sigma
 
-def sigma_Bird_Stewart_Lightfoot_melting(Vm):
+def sigma_Bird_Stewart_Lightfoot_melting(Vm: float) -> float:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses molar volume of a liquid at its melting point. CSP method by [1]_.
 
@@ -651,7 +653,7 @@ def sigma_Bird_Stewart_Lightfoot_melting(Vm):
     sigma = 1.222*Vm**(1/3.)
     return sigma
 
-def sigma_Stiel_Thodos(Vc, Zc):
+def sigma_Stiel_Thodos(Vc: float, Zc: float) -> float:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses critical volume and compressibility. CSP method by [1]_.
 
@@ -692,7 +694,7 @@ def sigma_Stiel_Thodos(Vc, Zc):
     return sigma
 
 
-def sigma_Tee_Gotoh_Steward_1(Tc, Pc):
+def sigma_Tee_Gotoh_Steward_1(Tc: float, Pc: float) -> float:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses critical temperature and pressure. CSP method by [1]_.
 
@@ -733,7 +735,7 @@ def sigma_Tee_Gotoh_Steward_1(Tc, Pc):
     sigma = 2.3647*(Tc/Pc)**(1/3.)
     return sigma
 
-def sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega):
+def sigma_Tee_Gotoh_Steward_2(Tc: float, Pc: float, omega: float) -> float:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses critical temperature, pressure, and acentric factor. CSP method by
     [1]_.
@@ -777,7 +779,7 @@ def sigma_Tee_Gotoh_Steward_2(Tc, Pc, omega):
     sigma = (2.3551-0.0874*omega)*(Tc/Pc)**(1/3.)
     return sigma
 
-def sigma_Silva_Liu_Macedo(Tc, Pc):
+def sigma_Silva_Liu_Macedo(Tc: float, Pc: float) -> Optional[float]:
     r"""Calculates Lennard-Jones molecular diameter.
     Uses critical temperature and pressure. CSP method by [1]_.
 
@@ -825,7 +827,7 @@ def sigma_Silva_Liu_Macedo(Tc, Pc):
 
 ### epsilon Lennard-Jones
 
-def epsilon_Flynn(Tc):
+def epsilon_Flynn(Tc: float) -> float:
     r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses critical temperature. CSP method by [1]_ as reported in [2]_.
 
@@ -860,7 +862,7 @@ def epsilon_Flynn(Tc):
     epsilon_k = 1.77*Tc**(5/6.)
     return epsilon_k
 
-def epsilon_Bird_Stewart_Lightfoot_critical(Tc):
+def epsilon_Bird_Stewart_Lightfoot_critical(Tc: float) -> float:
     r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses critical temperature. CSP method by [1]_.
 
@@ -894,7 +896,7 @@ def epsilon_Bird_Stewart_Lightfoot_critical(Tc):
     epsilon_k = 0.77*Tc
     return epsilon_k
 
-def epsilon_Bird_Stewart_Lightfoot_boiling(Tb):
+def epsilon_Bird_Stewart_Lightfoot_boiling(Tb: float) -> float:
     r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses boiling temperature. CSP method by [1]_.
 
@@ -928,7 +930,7 @@ def epsilon_Bird_Stewart_Lightfoot_boiling(Tb):
     epsilon_k = 1.15*Tb
     return epsilon_k
 
-def epsilon_Bird_Stewart_Lightfoot_melting(Tm):
+def epsilon_Bird_Stewart_Lightfoot_melting(Tm: float) -> float:
     r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses melting temperature. CSP method by [1]_.
 
@@ -962,7 +964,7 @@ def epsilon_Bird_Stewart_Lightfoot_melting(Tm):
     epsilon_k = 1.92*Tm
     return epsilon_k
 
-def epsilon_Stiel_Thodos(Tc, Zc):
+def epsilon_Stiel_Thodos(Tc: float, Zc: float) -> float:
     r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses Critical temperature and critical compressibility. CSP method by [1]_.
 
@@ -1000,7 +1002,7 @@ def epsilon_Stiel_Thodos(Tc, Zc):
     epsilon_k = 65.3*Tc*Zc**3.6
     return epsilon_k
 
-def epsilon_Tee_Gotoh_Steward_1(Tc):
+def epsilon_Tee_Gotoh_Steward_1(Tc: float) -> float:
     r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses Critical temperature. CSP method by [1]_.
 
@@ -1037,7 +1039,7 @@ def epsilon_Tee_Gotoh_Steward_1(Tc):
     epsilon_k = 0.7740*Tc
     return epsilon_k
 
-def epsilon_Tee_Gotoh_Steward_2(Tc, omega):
+def epsilon_Tee_Gotoh_Steward_2(Tc: float, omega: float) -> float:
     r"""Calculates Lennard-Jones depth of potential-energy minimum.
     Uses critical temperature and acentric factor. CSP method by [1]_.
 
@@ -1078,7 +1080,7 @@ def epsilon_Tee_Gotoh_Steward_2(Tc, omega):
 
 ### Collision Integral
 
-def collision_integral_Neufeld_Janzen_Aziz(T_star, l=1, s=1):
+def collision_integral_Neufeld_Janzen_Aziz(T_star: float, l: int=1, s: int=1) -> float:
     r"""Calculates Lennard-Jones collision integral for any of 16 values of
     (l,j) for the wide range of 0.3 < T_star < 100. Values are accurate to
     0.1 % of actual values, but the calculation of actual values is
@@ -1228,7 +1230,7 @@ Cs_collision = {
     (4, 4): [-1.4676253, 0.53048161, -0.11909781, 0.016123847, -0.0012174905, 0.0000395451]
 }
 
-def collision_integral_Kim_Monroe(T_star, l=1, s=1):
+def collision_integral_Kim_Monroe(T_star: float, l: int=1, s: int=1) -> float:
     r"""Calculates Lennard-Jones collision integral for any of 16 values of
     (l,j) for the wide range of 0.3 < T_star < 400. Values are accurate to
     0.007 % of actual values, but the calculation of actual values is

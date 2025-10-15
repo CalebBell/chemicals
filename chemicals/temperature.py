@@ -37,8 +37,9 @@ Conversion functions
 """
 
 from fluids.numerics import implementation_optimize_tck, secant, splev
+from typing import List
 
-__all__ = [
+__all__: List[str] = [
     "ITS90_68_difference",
     "T_converter",
     "T_scales",
@@ -260,7 +261,7 @@ T90_to_T27 = lambda x : float(splev(x, T90_to_T27_tck))
 
 
 
-def ITS90_68_difference(T):
+def ITS90_68_difference(T: float) -> float:
     r"""Calculates the difference between ITS-90 and ITS-68 scales using a
     series of models listed in [1]_, [2]_, and [3]_.
 
@@ -417,7 +418,7 @@ def polish_conversion(T_initial, forward_calculator, backward_calculator):
     )
     return T_polished
 
-def T_converter(T, current, desired):
+def T_converter(T: float, current: str, desired: str) -> float:
     r"""Converts the a temperature reading made in any of the scales
     'ITS-90', 'ITS-68','ITS-48', 'ITS-76', or 'ITS-27' to any of the other
     scales. Not all temperature ranges can be converted to other ranges; for

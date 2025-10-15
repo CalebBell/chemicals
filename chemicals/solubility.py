@@ -57,8 +57,9 @@ Utility functions
 .. autofunction:: chemicals.solubility.Tm_depression_eutectic
 
 """
+from typing import List, Optional
 
-__all__ = [
+__all__: List[str] = [
     "Henry_constants",
     "Henry_converter",
     "Henry_pressure",
@@ -406,7 +407,7 @@ def hansen_delta_h(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(solubility_sources, CASRN, "HANSEN_DELTA_H")
 
-def solubility_parameter(T, Hvapm, Vml):
+def solubility_parameter(T: float, Hvapm: float, Vml: float) -> Optional[float]:
     r"""This function handles the calculation of a chemical's solubility
     parameter. Calculation is a function of temperature, but is not always
     presented as such. `Hvapm`, `Vml`, `T` are required.
@@ -453,7 +454,7 @@ def solubility_parameter(T, Hvapm, Vml):
     # Prevent taking the root of a negative number
     return None if (Hvapm < R*T or Vml < 0.0) else sqrt((Hvapm - R*T)/Vml)
 
-def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
+def solubility_eutectic(T: float, Tm: float, Hm: float, Cpl: int=0, Cps: int=0, gamma: float=1) -> float:
     r"""Returns the maximum solubility of a solute in a solvent.
 
     .. math::
@@ -505,7 +506,7 @@ def solubility_eutectic(T, Tm, Hm, Cpl=0, Cps=0, gamma=1):
     return x
 
 
-def Tm_depression_eutectic(Tm, Hm, x=None, M=None, MW=None):
+def Tm_depression_eutectic(Tm: float, Hm: int, x: Optional[float]=None, M: Optional[float]=None, MW: Optional[float]=None) -> float:
     r"""Returns the freezing point depression caused by a solute in a solvent.
     Can use either the mole fraction of the solute or its molality and the
     molecular weight of the solvent. Assumes ideal system behavior.
@@ -581,7 +582,7 @@ HENRY_SCALES_LIST = (HENRY_SCALES_HCP + HENRY_SCALES_HCP_MOLALITY
                      + HENRY_SCALES_SI)
 
 
-def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
+def Henry_converter(val: float, old_scale: str, new_scale: str, rhom: Optional[float]=None, MW: Optional[float]=None) -> float:
     r"""Converts Henry's law constant for a gas with respect to a solvent from
     one scale to another.
 
@@ -721,7 +722,7 @@ def Henry_converter(val, old_scale, new_scale, rhom=None, MW=None):
     return conv_val
 
 
-def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
+def Henry_pressure(T: float, A: float, B: float=0.0, C: float=0.0, D: float=0.0, E: float=0.0, F: float=0.0) -> float:
     r"""Calculates Henry's law constant as a function of temperature according
     to the SI units of `Pa` and using a common temperature dependence as used
     in many process simulation applications.
@@ -783,7 +784,7 @@ def Henry_pressure(T, A, B=0.0, C=0.0, D=0.0, E=0.0, F=0.0):
     return exp(A + T_inv*(B + E*T_inv)  + C*log(T) + T*(D + F*T))
 
 
-def Henry_pressure_mixture(Hs, weights=None, zs=None):
+def Henry_pressure_mixture(Hs: List[Optional[float]], weights: None=None, zs: Optional[List[float]]=None) -> float:
     r"""Mixing rule for Henry's law components. Applies a logarithmic average
     to all solvent components and mole fractions. Optionally, weight factors
     can be provided instead of using mole fractions - only specify one of them.

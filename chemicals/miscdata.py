@@ -33,8 +33,10 @@ Temperature Dependent data
 .. autofunction:: chemicals.miscdata.lookup_VDI_tabular_data
 
 """
+from pandas.core.frame import DataFrame
+from typing import Dict, List, Optional, Tuple, Union
 
-__all__ = ["lookup_VDI_tabular_data"]
+__all__: List[str] = ["lookup_VDI_tabular_data"]
 
 import os
 
@@ -101,7 +103,7 @@ processed_data_source_categories = [PROCESSED_EXPERIMENTAL, PROCESSED_PREDICTED,
 
 
 _VDI_dict_loaded = False
-def _load_VDI_saturation_dict():
+def _load_VDI_saturation_dict() -> None:
     """Read in a dict of assorted chemical properties at saturation for 58
     industrially important chemicals, from:
 
@@ -129,7 +131,7 @@ def _load_miscdata():
     common_chemistry_data = data_source("common_chemistry_data.tsv")
     _miscdata_loaded = True
 
-def __getattr__(name):
+def __getattr__(name: str) -> Union[Dict[str, Union[Dict[str, Union[str, float, List[float], List[Optional[float]]]], Dict[str, Union[str, float, List[float]]]]], DataFrame]:
     if name in ("CRC_inorganic_data", "CRC_organic_data", "heos_data",
                 "joback_predictions", "wikidata_data", "webbook_data",
                 "common_chemistry_data"):
@@ -142,7 +144,7 @@ def __getattr__(name):
 
 
 @mark_numba_incompatible
-def lookup_VDI_tabular_data(CASRN, prop):
+def lookup_VDI_tabular_data(CASRN: str, prop: str) -> Union[Tuple[List[float], List[float]], Tuple[List[float], List[float]]]:
     r"""This function retrieves the tabular data available for a given chemical
     and a given property. Lookup is based on CASRNs. Length of data returned
     varies between chemicals. All data is at saturation condition from [1]_.

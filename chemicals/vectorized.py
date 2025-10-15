@@ -60,8 +60,9 @@ from fluids.numerics import FakePackage
 from fluids.numerics import numpy as np
 
 import chemicals
+from typing import List
 
-__all__ = []
+__all__: List[str] = []
 
 
 __funcs = {}

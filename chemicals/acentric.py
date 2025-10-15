@@ -46,8 +46,9 @@ Correlations
 ------------
 .. autofunction:: chemicals.acentric.LK_omega
 """
+from typing import List, Optional
 
-__all__ = [
+__all__: List[str] = [
     "LK_omega",
     "Stiel_polar_factor",
     "omega",
@@ -69,7 +70,7 @@ omega_all_methods = (miscdata.HEOS, "PSRK", "PD", "YAWS", critical.ACENTRIC_DEFI
 """Tuple of method name keys. See the `omega` for the actual references"""
 
 @mark_numba_incompatible
-def omega_methods(CASRN):
+def omega_methods(CASRN: str) -> List[str]:
     """Return all methods available for obtaining omega for the desired
     chemical.
 
@@ -90,7 +91,7 @@ def omega_methods(CASRN):
     return list_available_methods_from_df_dict(critical.omega_sources, CASRN, "omega")
 
 @mark_numba_incompatible
-def omega(CASRN, method=None):
+def omega(CASRN: str, method: Optional[str]=None) -> Optional[float]:
     r"""Retrieve a chemical's acentric factor, `omega`.
 
     Automatically select a method to use if no method is provided;
@@ -172,7 +173,7 @@ def omega(CASRN, method=None):
     else:
         return retrieve_any_from_df_dict(critical.omega_sources, CASRN, "omega")
 
-def omega_definition(Psat, Pc):
+def omega_definition(Psat: float, Pc: float) -> float:
     r"""Returns the acentric factor of a fluid according to its fundamental
     definition using the vapor pressure at a reduced temperature of 0.7Tc.
 
@@ -208,7 +209,7 @@ def omega_definition(Psat, Pc):
     """
     return -log10(Psat/Pc) - 1.0
 
-def LK_omega(Tb, Tc, Pc):
+def LK_omega(Tb: float, Tc: float, Pc: float) -> float:
     r"""Estimates the acentric factor of a fluid using a correlation in [1]_.
 
     .. math::
@@ -257,7 +258,7 @@ def LK_omega(Tb, Tc, Pc):
              0.43577*T_br_6)
     return omega
 
-def Stiel_polar_factor(Psat, Pc, omega):
+def Stiel_polar_factor(Psat: float, Pc: float, omega: float) -> float:
     r"""This function handles the calculation of a chemical's Stiel Polar
     factor, directly through the definition of Stiel-polar factor.
     Requires the vapor pressure `Psat` at a reduced temperature of 0.6,

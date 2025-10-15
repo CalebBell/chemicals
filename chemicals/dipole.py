@@ -34,7 +34,9 @@ Lookup Functions
 .. autodata:: chemicals.dipole.dipole_moment_all_methods
 
 """
-__all__ = [
+from typing import List, Optional
+
+__all__: List[str] = [
     "dipole_moment",
     "dipole_moment_all_methods",
     "dipole_moment_methods",
@@ -68,7 +70,7 @@ register_df_source(folder, "psi4_dipoles.tsv")
 
 _dipole_data_loaded = False
 @mark_numba_incompatible
-def _load_dipole_data():
+def _load_dipole_data() -> None:
     global dipole_data_CCDB, dipole_data_Muller, dipole_data_Poling, dipole_sources
     dipole_data_CCDB = data_source("cccbdb.nist.gov Dipoles.csv")
     dipole_data_Muller = data_source("Muller Supporting Info Dipoles.csv")
@@ -81,7 +83,7 @@ def _load_dipole_data():
         PSI4_2022A: dipole_data_psi4_2022a,
     }
 
-def __getattr__(name):
+def __getattr__(name: str):
     if name in ("dipole_data_Poling", "dipole_data_CCDB", "dipole_data_Muller", "dipole_data_psi4_2022a"):
         _load_dipole_data()
         return globals()[name]
@@ -93,7 +95,7 @@ dipole_moment_all_methods = (CCCBDB, MULLER, POLING, PSI4_2022A)
 """Tuple of method name keys. See the `dipole` for the actual references"""
 
 @mark_numba_incompatible
-def dipole_moment_methods(CASRN):
+def dipole_moment_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the dipole moment for the desired
     chemical.
 

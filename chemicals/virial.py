@@ -109,9 +109,10 @@ Third Virial Correlations Dense Implementations
 .. autofunction:: chemicals.virial.CVirial_Liu_Xiang_mat
 .. autofunction:: chemicals.virial.CVirial_Orbey_Vera_mat
 """
+from typing import List
 
 
-__all__ = [
+__all__: List[str] = [
     "BVirial_Abbott",
     "BVirial_Abbott_fast",
     "BVirial_Abbott_mat",
@@ -176,7 +177,7 @@ from fluids.numerics import cbrt, exp, log, roots_cubic, sqrt
 from fluids.numerics import numpy as np
 
 
-def B_to_Z(B, T, P):
+def B_to_Z(B: float, T: float, P: float) -> float:
     r"""Calculates the compressibility factor of a gas, given its
     second virial coefficient.
 
@@ -214,7 +215,7 @@ def B_to_Z(B, T, P):
     return 1. + B*P/(R*T)
 
 
-def B_from_Z(Z, T, P):
+def B_from_Z(Z: float, T: float, P: float) -> float:
     r"""Calculates the second virial coefficient of a pure species, given the
     compressibility factor of the gas.
 
@@ -829,7 +830,7 @@ def BVirial_Oconnell_Prausnitz_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None,
             d3B_row[j] = d3B
     return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
-def BVirial_Pitzer_Curl(T, Tc, Pc, omega, order=0):
+def BVirial_Pitzer_Curl(T: float, Tc: float, Pc: float, omega: float, order: int=0) -> float:
     r"""Calculates the second virial coefficient using the model in [1]_.
     Designed for simple calculations.
 
@@ -1468,7 +1469,7 @@ def BVirial_Abbott_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None,
             d3B_row[j] = d3B
     return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
-def BVirial_Tsonopoulos(T, Tc, Pc, omega, order=0):
+def BVirial_Tsonopoulos(T: float, Tc: float, Pc: float, omega: float, order: int=0) -> float:
     r"""Calculates the second virial coefficient using the model in [1]_.
 
     .. math::
@@ -1801,8 +1802,8 @@ def BVirial_Tsonopoulos_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None,
             d3B_row[j] = d3B
     return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
-def BVirial_Tsonopoulos_extended(T, Tc, Pc, omega, a=0, b=0, species_type="",
-                                 dipole=0, order=0):
+def BVirial_Tsonopoulos_extended(T: float, Tc: float, Pc: float, omega: float, a: int=0, b: int=0, species_type: str="",
+                                 dipole: float=0, order: int=0) -> float:
     r"""Calculates the second virial coefficient using the
     comprehensive model in [1]_. See the notes for the calculation of `a` and
     `b`.

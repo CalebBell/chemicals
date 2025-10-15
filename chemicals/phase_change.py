@@ -125,8 +125,10 @@ The structure of each dataframe is shown below:
     In [4]: chemicals.phase_change.phase_change_data_Alibakhshi_Cs
 
 """
+from pandas.core.frame import DataFrame
+from typing import List, Optional
 
-__all__ = [
+__all__: List[str] = [
     "MK",
     "PPDS12",
     "SMK",
@@ -187,7 +189,7 @@ CRC = "CRC"
 
 _phase_change_const_loaded = False
 @mark_numba_incompatible
-def _load_phase_change_constants():
+def _load_phase_change_constants() -> None:
     global Tb_data_Yaws, Tm_ON_data, Hvap_data_Gharagheizi, Hvap_data_CRC
     global Hfus_data_CRC, Hsub_data_Gharagheizi, _phase_change_const_loaded
     global Tb_sources, Tm_sources, Hfus_sources
@@ -227,7 +229,7 @@ def _load_phase_change_constants():
 
 _phase_change_corrs_loaded = False
 @mark_numba_incompatible
-def _load_phase_change_correlations():
+def _load_phase_change_correlations() -> None:
     global phase_change_data_Perrys2_150, phase_change_values_Perrys2_150
     global phase_change_data_VDI_PPDS_4, phase_change_values_VDI_PPDS_4
     global phase_change_data_Alibakhshi_Cs, _phase_change_corrs_loaded
@@ -243,7 +245,7 @@ def _load_phase_change_correlations():
     phase_change_data_Alibakhshi_Cs = data_source("Alibakhshi one-coefficient enthalpy of vaporization.tsv")
     _phase_change_corrs_loaded = True
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("Tb_data_Yaws", "Tm_ON_data", "Hvap_data_Gharagheizi",
                 "Hvap_data_CRC", "Hfus_data_CRC", "Hsub_data_Gharagheizi",
                 "Tb_sources", "Tm_sources", "Hfus_sources"):
@@ -267,7 +269,7 @@ Tb_all_methods = (miscdata.HEOS, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
 """Tuple of method name keys. See the `Tbg` for the actual references"""
 
 @mark_numba_incompatible
-def Tb_methods(CASRN):
+def Tb_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the normal boiling point
     for the desired chemical.
 
@@ -289,7 +291,7 @@ def Tb_methods(CASRN):
     return list_available_methods_from_df_dict(Tb_sources, CASRN, "Tb")
 
 @mark_numba_incompatible
-def Tb(CASRN, method=None):
+def Tb(CASRN: str, method: Optional[str]=None) -> Optional[float]:
     r"""This function handles the retrieval of a chemical's normal boiling
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -376,7 +378,7 @@ Tm_all_methods = (OPEN_NTBKM, CRC_INORG, CRC_ORG, miscdata.COMMON_CHEMISTRY,
 """Tuple of method name keys. See the `Tm` for the actual references"""
 
 @mark_numba_incompatible
-def Tm_methods(CASRN):
+def Tm_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the melting point for the desired
     chemical.
 
@@ -398,7 +400,7 @@ def Tm_methods(CASRN):
     return list_available_methods_from_df_dict(Tm_sources, CASRN, "Tm")
 
 @mark_numba_incompatible
-def Tm(CASRN, method=None):
+def Tm(CASRN: str, method: Optional[str]=None) -> Optional[float]:
     r"""This function handles the retrieval of a chemical's melting
     point. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -477,7 +479,7 @@ def Tm(CASRN, method=None):
 
 ### Enthalpy of Vaporization at T
 
-def Clapeyron(T, Tc, Pc, dZ=1, Psat=101325):
+def Clapeyron(T: float, Tc: float, Pc: float, dZ: float=1, Psat: float=101325) -> float:
     r"""Calculates enthalpy of vaporization at arbitrary temperatures using the
     Clapeyron equation.
 
@@ -530,7 +532,7 @@ def Clapeyron(T, Tc, Pc, dZ=1, Psat=101325):
     Tr = T/Tc
     return R*T*dZ*log(Pc/Psat)/(1. - Tr)
 
-def Pitzer(T, Tc, omega):
+def Pitzer(T: int, Tc: float, omega: float) -> float:
     r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     fit by [2]_ to the work of Pitzer [1]_; requires a chemical's critical
     temperature and acentric factor.
@@ -590,7 +592,7 @@ def Pitzer(T, Tc, omega):
     Tr = T/Tc
     return R*Tc * (7.08*(1. - Tr)**0.354 + 10.95*omega*(1. - Tr)**0.456)
 
-def SMK(T, Tc, omega):
+def SMK(T: float, Tc: float, omega: float) -> float:
     r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     the work of [1]_; requires a chemical's critical temperature and
     acentric factor.
@@ -696,7 +698,7 @@ def SMK(T, Tc, omega):
 #    domega = (omega - omegaR1)/(omegaR2 - omegaR1)
     return R*Tc*(L0 + domega*L1)
 
-def MK(T, Tc, omega):
+def MK(T: float, Tc: float, omega: float) -> float:
     r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     the work of [1]_; requires a chemical's critical temperature and
     acentric factor.
@@ -780,7 +782,7 @@ def MK(T, Tc, omega):
 
     return (H0 + omega*(H1 + omega*H2))*R*Tc
 
-def Velasco(T, Tc, omega):
+def Velasco(T: float, Tc: float, omega: float) -> float:
     r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     the work of [1]_; requires a chemical's critical temperature and
     acentric factor.
@@ -834,7 +836,7 @@ def Velasco(T, Tc, omega):
 
 ### Enthalpy of Vaporization at Normal Boiling Point.
 
-def Riedel(Tb, Tc, Pc):
+def Riedel(Tb: float, Tc: float, Pc: float) -> float:
     r"""Calculates enthalpy of vaporization at the boiling point, using the
     Ridel [1]_ CSP method. Required information are critical temperature
     and pressure, and boiling point. Equation taken from [2]_ and [3]_.
@@ -891,7 +893,7 @@ def Riedel(Tb, Tc, Pc):
     Tbr = Tb/Tc
     return 1.093*Tb*R*(log(Pc) - 1.013)/(0.93 - Tbr)
 
-def Chen(Tb, Tc, Pc):
+def Chen(Tb: float, Tc: float, Pc: float) -> float:
     r"""Calculates enthalpy of vaporization using the Chen [1]_ correlation
     and a chemical's critical temperature, pressure and boiling point.
 
@@ -943,7 +945,7 @@ def Chen(Tb, Tc, Pc):
     Pc = Pc/1E5  # Pa to bar
     return R*Tb*(3.978*Tbr - 3.958 + 1.555*log(Pc))/(1.07 - Tbr)
 
-def Liu(Tb, Tc, Pc):
+def Liu(Tb: float, Tc: float, Pc: float) -> float:
     r"""Calculates enthalpy of vaporization at the normal boiling point using
     the Liu [1]_ correlation, and a chemical's critical temperature, pressure
     and boiling point.
@@ -998,7 +1000,7 @@ def Liu(Tb, Tc, Pc):
     return R*Tb*(Tb/220.)**0.0627*(1. - Tbr)**0.38*log(Pc/101325.) \
         / (1 - Tbr + 0.38*Tbr*log(Tbr))
 
-def Vetere(Tb, Tc, Pc, F=1.0):
+def Vetere(Tb: float, Tc: float, Pc: float, F: int=1.0) -> float:
     r"""Calculates enthalpy of vaporization at the boiling point, using the
     Vetere [1]_ CSP method. Required information are critical temperature
     and pressure, and boiling point. Equation taken from [2]_.
@@ -1057,7 +1059,7 @@ def Vetere(Tb, Tc, Pc, F=1.0):
 
 ### Enthalpy of Vaporization adjusted for T
 
-def Watson(T, Hvap_ref, T_ref, Tc, exponent=0.38):
+def Watson(T: int, Hvap_ref: int, T_ref: float, Tc: float, exponent: float=0.38) -> float:
     r"""Calculates enthalpy of vaporization of a chemical at a temperature
     using the known heat of vaporization at another temperature according to
     the Watson [1]_ [2]_ correlation. This is an application of the
@@ -1278,7 +1280,7 @@ Hfus_all_methods = (CRC, miscdata.WEBBOOK, miscdata.WIKIDATA, miscdata.JOBACK)
 """Tuple of method name keys. See the `Hfus` for the actual references"""
 
 @mark_numba_incompatible
-def Hfus_methods(CASRN):
+def Hfus_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the heat of fusion for the
     desired chemical.
 
@@ -1300,7 +1302,7 @@ def Hfus_methods(CASRN):
     return list_available_methods_from_df_dict(Hfus_sources, CASRN, "Hfus")
 
 @mark_numba_incompatible
-def Hfus(CASRN, method=None):
+def Hfus(CASRN: str, method: None=None) -> Optional[float]:
     r"""This function handles the retrieval of a chemical's heat of fusion.
     Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not

@@ -80,8 +80,10 @@ Chemical Reactions
 .. autofunction:: chemicals.reaction.stoichiometry_MW_error
 .. autofunction:: chemicals.reaction.standard_formation_reaction
 """
+from pandas.core.frame import DataFrame
+from typing import Dict, List, Optional, Union
 
-__all__ = [
+__all__: List[str] = [
     "Gibbs_formation",
     "Hf_basis_converter",
     "Hfg",
@@ -141,7 +143,7 @@ register_df_source(folder, "ATcT 1.112 (l).tsv")
 register_df_source(folder, "Yaws Hf S0 (g).tsv")
 register_df_source(folder, "JANAF_1998.tsv")
 _reaction_data_loaded = False
-def _load_reaction_data():
+def _load_reaction_data() -> None:
     global Hfg_API_TDB_data, Hfg_ATcT_data, Hfl_ATcT_data, Hfg_S0g_YAWS_data
     global Hfg_sources, Hfl_sources, Hfs_sources
     global S0g_sources, S0l_sources, S0s_sources
@@ -188,7 +190,7 @@ def _load_reaction_data():
         miscdata.WEBBOOK: miscdata.webbook_data,
     }
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("Hfg_API_TDB_data", "Hfg_ATcT_data",
                 "Hfl_ATcT_data", "Hfg_S0g_YAWS_data", "JANAF_1998_data",
                 "Hfg_sources", "Hfl_sources", "Hfs_sources",
@@ -207,7 +209,7 @@ Hfs_all_methods = (CRC, miscdata.WEBBOOK)
 """Tuple of method name keys. See the `Hfs` for the actual references"""
 
 @mark_numba_incompatible
-def Hfs_methods(CASRN):
+def Hfs_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the solid-phase heat of
     formation for the desired chemical.
 
@@ -230,7 +232,7 @@ def Hfs_methods(CASRN):
     return list_available_methods_from_df_dict(Hfs_sources, CASRN, "Hfs")
 
 @mark_numba_incompatible
-def Hfs(CASRN, method=None):
+def Hfs(CASRN: str, method: Optional[str]=None) -> float:
     r"""This function handles the retrieval of a chemical's solid/crystaline
     standard phase heat of formation. The lookup is based on CASRNs. Will
     automatically select a data source to use if no method is provided; returns
@@ -288,7 +290,7 @@ Hfl_all_methods = (ATCT_L, CRC, miscdata.WEBBOOK, miscdata.JANAF)
 """Tuple of method name keys. See the `Hfl` for the actual references"""
 
 @mark_numba_incompatible
-def Hfl_methods(CASRN):
+def Hfl_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the standard liquid-state heat
     of formation for the desired chemical.
 
@@ -311,7 +313,7 @@ def Hfl_methods(CASRN):
     return list_available_methods_from_df_dict(Hfl_sources, CASRN, "Hfl")
 
 @mark_numba_incompatible
-def Hfl(CASRN, method=None):
+def Hfl(CASRN: str, method: Optional[str]=None) -> Optional[float]:
     r"""This function handles the retrieval of a chemical's liquid standard
     phase heat of formation. The lookup is based on CASRNs. Will automatically
     select a data source to use if no method is provided; returns None if
@@ -375,7 +377,7 @@ Hfg_all_methods = (ATCT_G, TRC, CRC, miscdata.WEBBOOK, miscdata.JANAF, YAWS, mis
 """Tuple of method name keys. See the `Hfg` for the actual references"""
 
 @mark_numba_incompatible
-def Hfg_methods(CASRN):
+def Hfg_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the gas phase heat of formation
     for the desired chemical.
 
@@ -398,7 +400,7 @@ def Hfg_methods(CASRN):
     return list_available_methods_from_df_dict(Hfg_sources, CASRN, "Hfg")
 
 @mark_numba_incompatible
-def Hfg(CASRN, method=None):
+def Hfg(CASRN: str, method: Optional[str]=None) -> Optional[float]:
     r"""This function handles the retrieval of a chemical's gas heat of
     formation. Lookup is based on CASRNs. Will automatically select a data
     source to use if no method is provided; returns None if the data is not
@@ -487,7 +489,7 @@ S0s_all_methods = (CRC, miscdata.WEBBOOK)
 """Tuple of method name keys. See the `S0s` for the actual references"""
 
 @mark_numba_incompatible
-def S0s_methods(CASRN):
+def S0s_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the absolute entropy of the
     compound in the solid phase for the desired chemical.
 
@@ -510,7 +512,7 @@ def S0s_methods(CASRN):
     return list_available_methods_from_df_dict(S0s_sources, CASRN, "S0s")
 
 @mark_numba_incompatible
-def S0s(CASRN, method=None):
+def S0s(CASRN: str, method: Optional[str]=None) -> float:
     r"""This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the solid state. Lookup is based on CASRNs. Will automatically select a
@@ -570,7 +572,7 @@ S0l_all_methods = (CRC, miscdata.WEBBOOK, miscdata.JANAF)
 """Tuple of method name keys. See the `S0l` for the actual references"""
 
 @mark_numba_incompatible
-def S0l_methods(CASRN):
+def S0l_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the absolute entropy for the desired chemical.
 
     Parameters
@@ -592,7 +594,7 @@ def S0l_methods(CASRN):
     return list_available_methods_from_df_dict(S0l_sources, CASRN, "S0l")
 
 @mark_numba_incompatible
-def S0l(CASRN, method=None):
+def S0l(CASRN: str, method: Optional[str]=None) -> float:
     r"""This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the liquid state.
@@ -650,7 +652,7 @@ S0g_all_methods = (CRC, miscdata.WEBBOOK, miscdata.JANAF, YAWS)
 """Tuple of method name keys. See the `S0g` for the actual references"""
 
 @mark_numba_incompatible
-def S0g_methods(CASRN):
+def S0g_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the S0g for the desired chemical.
 
     Parameters
@@ -672,7 +674,7 @@ def S0g_methods(CASRN):
     return list_available_methods_from_df_dict(S0g_sources, CASRN, "S0g")
 
 @mark_numba_incompatible
-def S0g(CASRN, method=None):
+def S0g(CASRN: str, method: Optional[str]=None) -> float:
     r"""This function handles the retrieval of a chemical's absolute
     entropy at a reference temperature of 298.15 K and pressure of 1 bar,
     in the ideal gas state.
@@ -739,7 +741,7 @@ def S0g(CASRN, method=None):
 
 # %% Converter functions
 
-def Hf_basis_converter(Hvapm, Hf_liq=None, Hf_gas=None):
+def Hf_basis_converter(Hvapm: Optional[float], Hf_liq: Optional[float]=None, Hf_gas: Optional[float]=None) -> float:
     r"""This function converts a liquid or gas enthalpy of formation to the
     other. This is useful, as thermodynamic packages often work with ideal-
     gas as the reference state and require ideal-gas enthalpies of formation.
@@ -786,8 +788,8 @@ def Hf_basis_converter(Hvapm, Hf_liq=None, Hf_gas=None):
     else:
         return Hf_liq + Hvapm
 
-def Gibbs_formation(dHf, S0_abs, dHfs_std, S0_abs_elements, coeffs_elements,
-                    T_ref=298.15):
+def Gibbs_formation(dHf: float, S0_abs: float, dHfs_std: Union[List[float], List[float]], S0_abs_elements: List[float], coeffs_elements: Union[List[float], List[float]],
+                    T_ref: float=298.15) -> float:
     r"""This function calculates the Gibbs free energy of formation of a
     compound, from its constituent elements.
 
@@ -867,7 +869,7 @@ def Gibbs_formation(dHf, S0_abs, dHfs_std, S0_abs_elements, coeffs_elements,
         dS -= S0_abs_elements[i]*coeffs_elements[i]
     return dH - T_ref*dS
 
-def entropy_formation(Hf, Gf, T_ref=298.15):
+def entropy_formation(Hf: float, Gf: float, T_ref: float=298.15) -> float:
     r"""This function calculates the entropy of formation of a
     compound, from its constituent elements.
 
@@ -912,7 +914,7 @@ def entropy_formation(Hf, Gf, T_ref=298.15):
 # %% Stoichiometry functions
 
 @mark_numba_incompatible
-def stoichiometric_matrix(atomss, reactants):
+def stoichiometric_matrix(atomss: List[Dict[str, int]], reactants: List[bool]) -> List[List[int]]:
     r"""This function calculates a stoichiometric matrix of reactants and
     stoichiometric matrix, as required by a solver to compute the reation
     coefficients.
@@ -1049,7 +1051,7 @@ def floats_to_ints(float_list, matrix, max_denominator=1000):
     return float_list  # If we still can't find a solution, return original floats
 
 
-def balance_stoichiometry(matrix, rounding=9, allow_fractional=False):
+def balance_stoichiometry(matrix: List[List[int]], rounding: int=9, allow_fractional: bool=False) -> List[float]:
     r"""This function balances a chemical reaction.
 
     Parameters

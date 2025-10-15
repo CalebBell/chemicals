@@ -58,8 +58,9 @@ Working with Parsed Formulas
 
 
 """
+from typing import Dict, List, Optional, Tuple, Union
 
-__all__ = [
+__all__: List[str] = [
     "CAS_by_number",
     "PeriodicTable",
     "atom_fractions",
@@ -443,7 +444,7 @@ class PeriodicTable:
         "_number_to_elements",
         "_symbol_to_elements",
     )
-    def __init__(self, elements):
+    def __init__(self, elements: List[Element]) -> None:
         #: Dictionary lookup of number(int) -> Element;
         #: also has number(str) -> Element for convenience.
         self._number_to_elements = number_to_elements = {}
@@ -466,21 +467,21 @@ class PeriodicTable:
         self._indexes = (symbol_to_elements, number_to_elements,
                          name_to_elements, CAS_to_elements)
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return any(key in i for i in self._indexes)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return 118
 
     def __iter__(self):
         return iter([self._number_to_elements[i] for i in range(1,119)])
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union[str, int]) -> "Element":
         for i in self._indexes:
             if key in i: return i[key]
         raise KeyError(f"'{key}' is not in the periodic table")
 
-    def __getattr__(self, key):
+    def __getattr__(self, key: str) -> "Element":
         for i in self._indexes:
             if key in i: return i[key]
         raise AttributeError(f"'{key}' is not in the periodic table")
@@ -569,12 +570,12 @@ class Element:
         "symbol",
     ]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Element {self.name} ({self.symbol}), number {self.number}, MW={self.MW}>"
 
-    def __init__(self, number, symbol, name, MW, CAS, AReneg, rcov, rvdw,
-                 maxbonds, elneg, ionization, elaffinity, period, group,
-                 PubChem, phase, Hf, S0, InChI_key=None):
+    def __init__(self, number: int, symbol: str, name: str, MW: float, CAS: str, AReneg: Optional[float], rcov: Optional[float], rvdw: Optional[float],
+                 maxbonds: Optional[int], elneg: Optional[float], ionization: Optional[float], elaffinity: Optional[float], period: int, group: Optional[int],
+                 PubChem: Optional[int], phase: str, Hf: Optional[float], S0: Optional[float], InChI_key: Optional[str]=None) -> None:
         self.number = number
         self.symbol = symbol
         self.name = name
@@ -600,7 +601,7 @@ class Element:
         self.Hf = Hf
 
     @property
-    def CAS_standard(self):
+    def CAS_standard(self) -> str:
         r"""CAS number of the compound of the element used as a standard state
         ; i.e. the typically diatomic molecules hydrogen, nitrogen, oxygen,
         fluorine, and chlorine, have different CAS numbers for the monoatomic
@@ -624,12 +625,12 @@ class Element:
         return self.MW
 
     @property
-    def protons(self):
+    def protons(self) -> int:
         r"""The number of protons of the element."""
         return self.number
 
     @property
-    def electrons(self):
+    def electrons(self) -> int:
         r"""The number of electrons of the element."""
         return self.number
 
@@ -639,17 +640,17 @@ class Element:
         return int(round(self.MW - self.number, 0))
 
     @property
-    def smiles(self):
+    def smiles(self) -> str:
         r"""The SMILES identification string of the element."""
         return f"[{self.symbol}]"
 
     @property
-    def InChI(self):
+    def InChI(self) -> str:
         r"""The InChI identifier of the element. One of 's', 'd', 'f', or 'p'."""
         return self.symbol # 'InChI=1S/' +
 
     @property
-    def block(self):
+    def block(self) -> str:
         r"""Which block of the periodic table the element is in."""
         for k, v in blocks.items():
             if self.number in v:
@@ -848,7 +849,7 @@ True
 del openbabel_element_data
 
 @mark_numba_incompatible
-def molecular_weight(atoms):
+def molecular_weight(atoms: Dict[str, int]) -> float:
     r"""Calculates molecular weight of a molecule given a dictionary of its
     atoms and their counts, in the format {symbol: count}.
 
@@ -897,7 +898,7 @@ def molecular_weight(atoms):
     return MW
 
 @mark_numba_incompatible
-def mass_fractions(atoms, MW=None):
+def mass_fractions(atoms: Dict[str, int], MW: Optional[int]=None) -> Dict[str, float]:
     r"""Calculates the mass fractions of each element in a compound,
     given a dictionary of its atoms and their counts, in the format
     {symbol: count}.
@@ -948,7 +949,7 @@ def mass_fractions(atoms, MW=None):
     return mfracs
 
 @mark_numba_incompatible
-def atom_fractions(atoms):
+def atom_fractions(atoms: Dict[str, int]) -> Dict[str, float]:
     r"""Calculates the atomic fractions of each element in a compound,
     given a dictionary of its atoms and their counts, in the format
     {symbol: count}.
@@ -989,7 +990,7 @@ def atom_fractions(atoms):
     return afracs
 
 @mark_numba_incompatible
-def mixture_atomic_composition(atomss, zs):
+def mixture_atomic_composition(atomss: List[Dict[str, int]], zs: List[float]) -> Dict[str, float]:
     r"""Simple function to calculate the atomic average composition of a
     mixture, using the mole fractions of each species and their own atomic
     compositions.
@@ -1024,7 +1025,7 @@ def mixture_atomic_composition(atomss, zs):
     return ans
 
 @mark_numba_incompatible
-def mixture_atomic_composition_ordered(atomss, zs):
+def mixture_atomic_composition_ordered(atomss: List[Dict[str, int]], zs: List[float]) -> Tuple[List[float], List[str]]:
     r"""Simple function to calculate the atomic average composition of a
     mixture, using the mole fractions of each species and their own atomic
     compositions. Returns the result as a sorted list with atomic numbers from
@@ -1063,7 +1064,7 @@ def mixture_atomic_composition_ordered(atomss, zs):
     return nums, eles
 
 @mark_numba_incompatible
-def atom_matrix(atomss, atom_IDs=None):
+def atom_matrix(atomss: List[Dict[str, int]], atom_IDs: Optional[List[str]]=None) -> Union[List[Union[List[float], List[float]]], List[List[float]]]:
     r"""Simple function to create a matrix of elements in each compound, where
     each row has the same elements.
 
@@ -1111,7 +1112,7 @@ def atom_matrix(atomss, atom_IDs=None):
     return element_matrix
 
 @mark_numba_incompatible
-def similarity_variable(atoms, MW=None):
+def similarity_variable(atoms: Dict[str, int], MW: Optional[float]=None) -> float:
     r"""Calculates the similarity variable of an compound, as defined in [1]_.
     Currently only applied for certain heat capacity estimation routines.
 
@@ -1153,7 +1154,7 @@ def similarity_variable(atoms, MW=None):
     return sum(atoms.values())/MW
 
 @mark_numba_incompatible
-def atoms_to_Hill(atoms):
+def atoms_to_Hill(atoms: Dict[str, int]) -> str:
     r"""Determine the Hill formula of a compound, given a dictionary of its
     atoms and their counts, in the format {symbol: count}.
 
@@ -1214,7 +1215,7 @@ _simple_formula_parser_re_str = r"([A-Z][a-z]{0,2})([\d\.\d]+)?"
 _simple_formula_parser_re = None # Delay creation to simple_formula_parser to speedup start
 
 @mark_numba_incompatible
-def simple_formula_parser(formula):
+def simple_formula_parser(formula: str) -> Dict[str, float]:
     r"""Basic formula parser, primarily for obtaining element counts from
     formulas as formated in PubChem. Handles formulas with integer or decimal
     counts (with period separator), but no brackets, no hydrates, no charges,
@@ -1274,7 +1275,7 @@ numbers = "0123456789"
 translate_subscripts = {8320: 48, 8321: 49, 8322: 50, 8323: 51, 8324: 52, 8325: 53, 8326: 54, 8327: 55, 8328: 56, 8329: 57}
 
 @mark_numba_incompatible
-def nested_formula_parser(formula, check=True):
+def nested_formula_parser(formula: str, check: bool=True) -> Dict[str, float]:
     r"""Improved formula parser which handles braces and their multipliers,
     as well as rational element counts.
 
@@ -1366,7 +1367,7 @@ def nested_formula_parser(formula, check=True):
     return ans
 
 @mark_numba_incompatible
-def charge_from_formula(formula):
+def charge_from_formula(formula: str) -> int:
     r"""Basic formula parser to determine the charge from a formula - given
     that the charge is already specified as one element of the formula.
 
@@ -1421,7 +1422,7 @@ def charge_from_formula(formula):
         return multiplier*count
 
 @mark_numba_incompatible
-def serialize_formula(formula):
+def serialize_formula(formula: str) -> str:
     r"""Basic formula serializer to construct a consistently-formatted formula.
     This is necessary for handling user-supplied formulas, which are not always
     well formatted.

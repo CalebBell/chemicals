@@ -80,8 +80,10 @@ Critical Volume of Mixtures
 .. autofunction:: chemicals.critical.Chueh_Prausnitz_Vc
 .. autofunction:: chemicals.critical.modified_Wilson_Vc
 """
+from pandas.core.frame import DataFrame
+from typing import Dict, List, Optional, Union
 
-__all__ = [
+__all__: List[str] = [
     "Chueh_Prausnitz_Tc",
     "Chueh_Prausnitz_Vc",
     "Grieves_Thodos",
@@ -143,7 +145,7 @@ ACENTRIC_DEFINITION = "ACENTRIC_DEFINITION"
 ### Register data sources and lazy load them
 
 @mark_numba_incompatible
-def _add_Zc_to_df(df):
+def _add_Zc_to_df(df: DataFrame) -> None:
     # Some files don't have the `Zc` column; this adds it
     # TODO: Think about adding these to the files
     import pandas as pd
@@ -169,7 +171,7 @@ register_df_source(folder, "omega_Psat_Tc_predictions.tsv", int_CAS=True)
 
 _critical_data_loaded = False
 @mark_numba_incompatible
-def _load_critical_data():
+def _load_critical_data() -> None:
     global critical_data_IUPAC, critical_data_Matthews, critical_data_CRC
     global critical_data_PSRKR4, critical_data_Yaws, critical_data_PassutDanner, critical_data_PinaMartines
     global critical_data_WilsonJasperson, critical_data_Fedors, critical_data_omega_Psat_Tc
@@ -238,7 +240,7 @@ def _load_critical_data():
         ACENTRIC_DEFINITION: critical_data_omega_Psat_Tc
     }
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("critical_data_IUPAC", "critical_data_Matthews",
                 "critical_data_CRC", "critical_data_PSRKR4",
                 "critical_data_Yaws", "critical_data_PassutDanner",
@@ -274,7 +276,7 @@ Tc_all_method_types = {
 
 
 @mark_numba_incompatible
-def Tc_methods(CASRN):
+def Tc_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the critical temperature for the
     desired chemical.
 
@@ -461,7 +463,7 @@ Pc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, PD, miscdata.WEBBOOK, PSR
 """Tuple of method name keys. See the `Pc` for the actual references"""
 
 @mark_numba_incompatible
-def Pc_methods(CASRN):
+def Pc_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the critical pressure for the
     desired chemical.
 
@@ -648,7 +650,7 @@ Vc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, P
 """Tuple of method name keys. See the `Vc` for the actual references"""
 
 @mark_numba_incompatible
-def Vc_methods(CASRN):
+def Vc_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the critical volume for the
     desired chemical.
 
@@ -828,7 +830,7 @@ Zc_all_methods = (miscdata.HEOS, IUPAC, MATTHEWS, CRC, miscdata.WEBBOOK, PSRK, P
 """Tuple of method name keys. See the `Zc` for the actual references"""
 
 @mark_numba_incompatible
-def Zc_methods(CASRN):
+def Zc_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the critical compressibility for
     the desired chemical.
 
@@ -850,7 +852,7 @@ def Zc_methods(CASRN):
     return list_available_methods_from_df_dict(Zc_sources, CASRN, "Zc")
 
 @mark_numba_incompatible
-def Zc(CASRN, method=None):
+def Zc(CASRN: str, method: Optional[str]=None) -> Optional[float]:
     r"""This function handles the retrieval of a chemical's critical
     compressibility. Lookup is based on CASRNs. Will automatically select a
     data source to use if no method is provided; returns None if the data is
@@ -1045,8 +1047,8 @@ rcovs_regressed =  {
     "Zr": 0.9346554283483623}
 
 @mark_numba_incompatible
-def Mersmann_Kind_predictor(atoms, coeff=3.645, power=0.5,
-                            covalent_radii=rcovs_Mersmann_Kind):
+def Mersmann_Kind_predictor(atoms: Dict[str, int], coeff: float=3.645, power: float=0.5,
+                            covalent_radii: Dict[str, float]=rcovs_Mersmann_Kind) -> float:
     r"""Predicts the critical molar volume of a chemical based only on its
     atomic composition according to [1]_ and [2]_. This is a crude approach,
     but provides very reasonable
@@ -1243,7 +1245,7 @@ def Tb_Tc_relationship(Tb=None, Tc=None, fit="Perry8E"):
     elif Tc is None:
         return coeff*Tb
 
-def _assert_two_critical_properties_provided(Tc, Pc, Vc):
+def _assert_two_critical_properties_provided(Tc: Optional[float], Pc: Optional[float], Vc: Optional[float]) -> None:
     specs = 0 # numba compatibility
     if Tc is not None:
         specs += 1
@@ -1254,7 +1256,7 @@ def _assert_two_critical_properties_provided(Tc, Pc, Vc):
     if specs != 2:
         raise ValueError("Two and only two of Tc, Pc, and Vc must be provided")
 
-def Ihmels(Tc=None, Pc=None, Vc=None):
+def Ihmels(Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: Optional[float]=None) -> float:
     r"""Most recent, and most recommended method of estimating critical
     properties from each other. Two of the three properties are required.
     This model uses the "critical surface", a general plot of Tc vs Pc vs Vc.
@@ -1317,7 +1319,7 @@ def Ihmels(Tc=None, Pc=None, Vc=None):
         Tc_calc = 5.0/443.0*(40.0*Pc*Vc + Vc)
         return Tc_calc
 
-def Meissner(Tc=None, Pc=None, Vc=None):
+def Meissner(Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: Optional[float]=None) -> float:
     r"""Old (1942) relationship for estimating critical
     properties from each other. Two of the three properties are required.
     This model uses the "critical surface", a general plot of Tc vs Pc vs Vc.
@@ -1380,7 +1382,7 @@ def Meissner(Tc=None, Pc=None, Vc=None):
         Tc = 5./104.0*Pc*(Vc-8)
         return Tc
 
-def Grigoras(Tc=None, Pc=None, Vc=None):
+def Grigoras(Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: Optional[float]=None) -> float:
     r"""Relatively recent (1990) relationship for estimating critical
     properties from each other. Two of the three properties are required.
     This model uses the "critical surface", a general plot of Tc vs Pc vs Vc.
@@ -1566,7 +1568,7 @@ GRIGORAS = "GRIGORAS"
 critical_surface_all_methods = (IHMELS, MEISSNER, GRIGORAS)
 
 @mark_numba_incompatible
-def critical_surface_methods(Tc=None, Pc=None, Vc=None):
+def critical_surface_methods(Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: None=None) -> List[str]:
     """Return all methods available to obtain the third critial property for the
     desired chemical.
 
@@ -1597,8 +1599,8 @@ def critical_surface_methods(Tc=None, Pc=None, Vc=None):
         return []
 
 @mark_numba_incompatible
-def critical_surface(Tc=None, Pc=None, Vc=None,
-                     method=None):
+def critical_surface(Tc: Optional[float]=None, Pc: Optional[float]=None, Vc: Optional[float]=None,
+                     method: Optional[str]=None) -> float:
     r"""Function for calculating a critical property of a substance from its
     other two critical properties. Calls functions Ihmels, Meissner, and
     Grigoras, each of which use a general 'Critical surface' type of equation.
@@ -1643,7 +1645,7 @@ def critical_surface(Tc=None, Pc=None, Vc=None,
         raise ValueError('Method not recognized; available methods are "IHMELS", "MEISSNER", and "GRIGORAS"')
 
 @mark_numba_incompatible
-def third_property(CASRN=None, T=False, P=False, V=False):
+def third_property(CASRN: Optional[str]=None, T: bool=False, P: bool=False, V: bool=False) -> float:
     r"""Function for calculating a critical property of a substance from its
     other two critical properties, but retrieving the actual other critical
     values for convenient calculation.
@@ -1708,7 +1710,7 @@ def third_property(CASRN=None, T=False, P=False, V=False):
 
 ### Crtical Temperature of Mixtures - Estimation routines
 
-def Li(zs, Tcs, Vcs):
+def Li(zs: List[float], Tcs: List[float], Vcs: List[float]) -> float:
     r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_. Better than simple mixing rules.
 
@@ -1771,7 +1773,7 @@ def Li(zs, Tcs, Vcs):
         Tcm += zs[i]*Vcs[i]*Tcs[i]*denominator_inv
     return Tcm
 
-def Chueh_Prausnitz_Tc(zs, Tcs, Vcs, taus):
+def Chueh_Prausnitz_Tc(zs: List[float], Tcs: List[float], Vcs: List[float], taus: List[List[float]]) -> float:
     r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_.
 
@@ -1842,7 +1844,7 @@ def Chueh_Prausnitz_Tc(zs, Tcs, Vcs, taus):
     Tcm *= denominator_inv
     return Tcm
 
-def Grieves_Thodos(zs, Tcs, Aijs):
+def Grieves_Thodos(zs: List[float], Tcs: Union[List[Optional[float]], List[float]], Aijs: List[List[float]]) -> float:
     r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_.
 
@@ -1901,7 +1903,7 @@ def Grieves_Thodos(zs, Tcs, Aijs):
         Tcm += Tcs[i]/(1. + 1./zs[i]*tot)
     return Tcm
 
-def modified_Wilson_Tc(zs, Tcs, Aijs):
+def modified_Wilson_Tc(zs: List[float], Tcs: List[float], Aijs: List[List[float]]) -> float:
     r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_. Equation
 
@@ -1970,7 +1972,7 @@ def modified_Wilson_Tc(zs, Tcs, Aijs):
     return Tcm
 
 ### Crtical Volume of Mixtures
-def Chueh_Prausnitz_Vc(zs, Vcs, nus):
+def Chueh_Prausnitz_Vc(zs: List[float], Vcs: List[float], nus: List[List[float]]) -> float:
     r"""Calculates critical volume of a mixture according to
     mixing rules in [1]_ with an interaction parameter.
 
@@ -2036,7 +2038,7 @@ def Chueh_Prausnitz_Vc(zs, Vcs, nus):
     return Vcm
 
 
-def modified_Wilson_Vc(zs, Vcs, Aijs):
+def modified_Wilson_Vc(zs: List[float], Vcs: List[float], Aijs: List[List[float]]) -> float:
     r"""Calculates critical volume of a mixture according to
     mixing rules in [1]_ with parameters. Equation
 

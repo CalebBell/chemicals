@@ -175,8 +175,10 @@ attribute of this module.
     In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
 
 """
+from pandas.core.frame import DataFrame
+from typing import List, Tuple
 
-__all__ = [
+__all__: List[str] = [
     "PPDS2",
     "PPDS15",
     "Cpg_statistical_mechanics",
@@ -295,12 +297,12 @@ class ZabranskySpline:
     if not IS_NUMBA:
         __slots__ = ("Tmax", "Tmin", "coeffs")
 
-    def __init__(self, coeffs, Tmin, Tmax):
+    def __init__(self, coeffs: Tuple[float, float, float, float], Tmin: float, Tmax: float) -> None:
         self.coeffs = coeffs
         self.Tmin = Tmin
         self.Tmax = Tmax
 
-    def calculate(self, T):
+    def calculate(self, T: int) -> float:
         r"""
         Return heat capacity as a function of temperature.
 
@@ -317,7 +319,7 @@ class ZabranskySpline:
         """
         return Zabransky_cubic(T, *self.coeffs)
 
-    def calculate_integral(self, Ta, Tb):
+    def calculate_integral(self, Ta: float, Tb: float) -> float:
         r"""
         Return the enthalpy integral of heat capacity from  `Ta` to `Tb`.
 
@@ -337,7 +339,7 @@ class ZabranskySpline:
         return (Zabransky_cubic_integral(Tb, *self.coeffs)
                 - Zabransky_cubic_integral(Ta, *self.coeffs))
 
-    def calculate_integral_over_T(self, Ta, Tb):
+    def calculate_integral_over_T(self, Ta: float, Tb: float) -> float:
         r"""
         Return the entropy integral of heat capacity from `Ta` to `Tb`.
 
@@ -453,7 +455,7 @@ class ZabranskyQuasipolynomial:
     if not IS_NUMBA:
         __slots__ = ("Tc", "Tmax", "Tmin", "coeffs")
 
-    def __init__(self, coeffs, Tc, Tmin, Tmax):
+    def __init__(self, coeffs: Tuple[float, float, float, float, float, float], Tc: float, Tmin: float, Tmax: float) -> None:
         self.coeffs = coeffs
         self.Tc = Tc
         self.Tmin = Tmin
@@ -540,7 +542,7 @@ class PiecewiseHeatCapacity:
     # Dev note - not possible to jitclass this as the model types are not explicit
     __slots__ = ("Tmax", "Tmin", "models")
 
-    def __init__(self, models):
+    def __init__(self, models: List[ZabranskySpline]) -> None:
         self.models = tuple(sorted(models, key=lambda x: x.Tmin))
         self.Tmin = self.models[0].Tmin
         self.Tmax = self.models[-1].Tmax
@@ -548,7 +550,7 @@ class PiecewiseHeatCapacity:
     def __iter__(self):
         return self.models.__iter__()
 
-    def calculate(self, T):
+    def calculate(self, T: int) -> float:
         r"""
         Return the heat capacity as a function of temperature.
 
@@ -578,7 +580,7 @@ class PiecewiseHeatCapacity:
                 if T <= model.Tmax: return model.calculate(T)
         raise ValueError(f"no valid model at T={T:g} K")
 
-    def force_calculate(self, T):
+    def force_calculate(self, T: int) -> float:
         r"""
         Return the heat capacity as a function of temperature.
 
@@ -643,7 +645,7 @@ class PiecewiseHeatCapacity:
         elif Tb > self.Tmax: raise ValueError(f"no valid model at T={Tb:g} K")
         return self.force_calculate_integral(Ta, Tb)
 
-    def force_calculate_integral(self, Ta, Tb):
+    def force_calculate_integral(self, Ta: float, Tb: float) -> float:
         r"""
         Return the enthalpy integral of heat capacity from `Ta` to `Tb`.
 
@@ -723,7 +725,7 @@ class PiecewiseHeatCapacity:
         elif Tb > self.Tmax: raise ValueError(f"no valid model at T={Tb} K")
         return self.force_calculate_integral_over_T(Ta, Tb)
 
-    def force_calculate_integral_over_T(self, Ta, Tb):
+    def force_calculate_integral_over_T(self, Ta: float, Tb: float) -> float:
         r"""
         Return the entropy integral of heat capacity from `Ta` to `Tb`.
 
@@ -774,7 +776,7 @@ register_df_source(folder, "TRC Thermodynamics of Organic Compounds in the Gas S
 register_df_source(folder, "CRC Standard Thermodynamic Properties of Chemical Substances.tsv")
 
 _Cp_data_loaded = False
-def _load_Cp_data():
+def _load_Cp_data() -> None:
     global Cp_data_Poling, Cp_values_Poling, TRC_gas_data, TRC_gas_values
     global CRC_standard_data, Cp_dict_PerryI
     global WebBook_Shomate_liquids, WebBook_Shomate_gases, WebBook_Shomate_solids, WebBook_Shomate_coefficients
@@ -920,7 +922,7 @@ def _load_Cp_data():
 
     _Cp_data_loaded = True
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("Cp_data_Poling", "Cp_values_Poling", "TRC_gas_data", "TRC_gas_values", "CRC_standard_data",
                 "Cp_dict_PerryI", "zabransky_dict_sat_s", "zabransky_dict_sat_p",
                 "zabransky_dict_const_s", "zabransky_dict_const_p", "zabransky_dict_iso_s",
@@ -1682,7 +1684,7 @@ def Lastovka_Shaw_T_for_Sm(Sm, MW, similarity_variable, T_ref=298.15,
                                  "model requires negative temperature")
             raise ValueError("Could not converge")
 
-def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
+def TRCCp(T: float, a0: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float, a7: float) -> float:
     r"""Calculates ideal gas heat capacity using the model developed in [1]_.
     The ideal gas heat capacity is given by:
 
@@ -1747,7 +1749,7 @@ def TRCCp(T, a0, a1, a2, a3, a4, a5, a6, a7):
         Cp = R*(a0 + (a1*T_inv*T_inv)*exp(-a2*T_inv) + y2*(a3 + (a4 - a5/(T_m_a7*T_m_a7))*y2*y2*y2))
     return Cp
 
-def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
+def TRCCp_integral(T: float, a0: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float, a7: float, I: float=0) -> float:
     r"""Integrates ideal gas heat capacity using the model developed in [1]_.
     Best used as a delta only.
     The difference in enthalpy with respect to 0 K is given by:
@@ -1827,7 +1829,7 @@ def TRCCp_integral(T, a0, a1, a2, a3, a4, a5, a6, a7, I=0):
         h = first*(second + third + fourth + fifth)
     return (a0 + a1*exp(-a2/T)/(a2*T) + I/T + h/T)*R*T
 
-def TRCCp_integral_over_T(T, a0, a1, a2, a3, a4, a5, a6, a7, J=0):
+def TRCCp_integral_over_T(T: int, a0: float, a1: int, a2: int, a3: float, a4: float, a5: int, a6: int, a7: int, J: int=0) -> float:
     r"""Integrates ideal gas heat capacity over T using the model developed in
     [1]_. Best used as a delta only.
     The difference in ideal-gas entropy with respect to 0 K is given by:
@@ -2075,7 +2077,7 @@ def Shomate_integral_over_T(T, A, B, C, D, E):
 
 ### Heat capacities of liquids
 
-def Rowlinson_Poling(T, Tc, omega, Cpgm):
+def Rowlinson_Poling(T: float, Tc: float, omega: float, Cpgm: float) -> float:
     r"""Calculate liquid constant-pressure heat capacity with the [1]_ CSP method.
     This equation is not terrible accurate.
 
@@ -2121,7 +2123,7 @@ def Rowlinson_Poling(T, Tc, omega, Cpgm):
     Cplm = Cpgm+ R*(1.586 + 0.49/one_minus_Tr + omega*(4.2775 + 6.3*one_minus_Tr**(1/3.)/Tr + 0.4355/one_minus_Tr))
     return Cplm
 
-def Rowlinson_Bondi(T, Tc, omega, Cpgm):
+def Rowlinson_Bondi(T: float, Tc: float, omega: float, Cpgm: float) -> float:
     r"""Calculate liquid constant-pressure heat capacity with the CSP method
     shown in [1]_.
 
@@ -2350,7 +2352,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
     S = T*T*0.5*third + T*second + first*log(T)
     return S*1000. if MW is None else S*MW
 
-def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
+def Zabransky_quasi_polynomial(T: int, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
     r"""Calculates liquid heat capacity using the model developed in [1]_.
 
     .. math::
@@ -2406,7 +2408,7 @@ def Zabransky_quasi_polynomial(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(a1*log(1.0-Tr) + a2/(1.0-Tr) + a3 + Tr*(Tr*(Tr*a6 + a5) + a4))
 
 
-def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
+def Zabransky_quasi_polynomial_integral(T: int, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
     r"""Calculates the integral of liquid heat capacity using the
     quasi-polynomial model developed in [1]_.
 
@@ -2460,7 +2462,7 @@ def Zabransky_quasi_polynomial_integral(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(T*(T*(T*(T*a6/(4.*Tc3) + a5/(3.*Tc2)) + a4/(2.*Tc)) - a1 + a3)
               + T*a1*log(1. - T/Tc) - 0.5*Tc*(a1 + a2)*log(term*term))
 
-def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
+def Zabransky_quasi_polynomial_integral_over_T(T: int, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
     r"""Calculates the integral of liquid heat capacity over T using the
     quasi-polynomial model  developed in [1]_.
 
@@ -2517,7 +2519,7 @@ def Zabransky_quasi_polynomial_integral_over_T(T, Tc, a1, a2, a3, a4, a5, a6):
     return R*(a3*logT -a1*polylog2(T/Tc) - a2*(-logT + 0.5*log(term*term))
               + T*(T*(T*a6/(3.*Tc3) + a5/(2.*Tc2)) + a4/Tc))
 
-def Zabransky_cubic(T, a1, a2, a3, a4):
+def Zabransky_cubic(T: float, a1: float, a2: float, a3: float, a4: float) -> float:
     r"""Calculates liquid heat capacity using the model developed in [1]_.
 
     .. math::
@@ -2560,7 +2562,7 @@ def Zabransky_cubic(T, a1, a2, a3, a4):
     T = T*1e-2
     return R*(((a4*T + a3)*T + a2)*T + a1)
 
-def Zabransky_cubic_integral(T, a1, a2, a3, a4):
+def Zabransky_cubic_integral(T: float, a1: float, a2: float, a3: float, a4: float) -> float:
     r"""Calculates the integral of liquid heat capacity using the model
     developed in [1]_.
 
@@ -2600,7 +2602,7 @@ def Zabransky_cubic_integral(T, a1, a2, a3, a4):
     T = T*1e-2
     return 100.0*R*T*(T*(T*(T*a4*0.25 + a3*(1.0/3.)) + a2*0.5) + a1)
 
-def Zabransky_cubic_integral_over_T(T, a1, a2, a3, a4):
+def Zabransky_cubic_integral_over_T(T: float, a1: float, a2: float, a3: float, a4: float) -> float:
     r"""Calculates the integral of liquid heat capacity over T using the model
     developed in [1]_.
 

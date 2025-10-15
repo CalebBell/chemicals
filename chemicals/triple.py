@@ -41,8 +41,10 @@ Triple Pressure
 .. autodata:: chemicals.triple.Pt_all_methods
 
 """
+from pandas.core.frame import DataFrame
+from typing import List, Optional
 
-__all__ = [
+__all__: List[str] = [
     "Pt",
     "Pt_all_methods",
     "Pt_methods",
@@ -72,7 +74,7 @@ STAVELEY = "STAVELEY"
 MELTING = "MELTING"
 
 _triple_data_loaded = False
-def _load_triple_data():
+def _load_triple_data() -> None:
     global triple_data_Staveley, _triple_data_loaded, Tt_sources, Pt_sources
     triple_data_Staveley = data_source("Staveley 1981.tsv")
     _triple_data_loaded = True
@@ -83,7 +85,7 @@ def _load_triple_data():
     }
     Pt_sources = Tt_sources.copy()
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("triple_data_Staveley", "Tt_sources", "Pt_sources"):
         _load_triple_data()
         return globals()[name]
@@ -93,7 +95,7 @@ Tt_all_methods = (miscdata.HEOS, STAVELEY, miscdata.WEBBOOK, MELTING)
 """Tuple of method name keys. See the `Tt` for the actual references"""
 
 @mark_numba_incompatible
-def Tt_methods(CASRN):
+def Tt_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the triple temperature for the
     desired chemical.
 
@@ -194,7 +196,7 @@ Pt_all_methods = (miscdata.HEOS, STAVELEY, miscdata.WEBBOOK)
 """Tuple of method name keys. See the `Pt` for the actual references"""
 
 @mark_numba_incompatible
-def Pt_methods(CASRN):
+def Pt_methods(CASRN: str) -> List[str]:
     """Return all methods available to obtain the Pt for the desired chemical.
 
     Parameters

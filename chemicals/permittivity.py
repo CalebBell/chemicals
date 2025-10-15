@@ -54,9 +54,11 @@ attribute of this module.
     In [2]: chemicals.permittivity.permittivity_data_CRC
 
 """
+from pandas.core.frame import DataFrame
+from typing import List
 
 
-__all__ = ["permittivity_CRC", "permittivity_IAPWS"]
+__all__: List[str] = ["permittivity_CRC", "permittivity_IAPWS"]
 
 from fluids.numerics import numpy as np
 from fluids.numerics import sqrt
@@ -68,12 +70,12 @@ folder = os_path_join(source_path, "Electrolytes")
 register_df_source(folder, "Permittivity (Dielectric Constant) of Liquids.tsv")
 
 @mark_numba_incompatible
-def _load_permittivity_data():
+def _load_permittivity_data() -> None:
     global permittivity_values_CRC, permittivity_data_CRC
     permittivity_data_CRC = data_source("Permittivity (Dielectric Constant) of Liquids.tsv")
     permittivity_values_CRC = np.array(permittivity_data_CRC.values[:, 1:], dtype=float)
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("permittivity_values_CRC", "permittivity_data_CRC"):
         _load_permittivity_data()
         return globals()[name]
@@ -121,7 +123,7 @@ def permittivity_CRC(T, a, b, c, d):
     """
     return a + T*(b + T*(c + d*T))
 
-def permittivity_IAPWS(T, rho):
+def permittivity_IAPWS(T: float, rho: float) -> float:
     r"""Calculate the relative permittivity of pure water as a function of.
     temperature and density. Assumes the 1997 IAPWS [1]_ formulation.
 

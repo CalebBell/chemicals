@@ -122,9 +122,11 @@ attribute of this module.
     In [5]: chemicals.thermal_conductivity.k_data_VDI_PPDS_10
 
 """
+from pandas.core.frame import DataFrame
+from typing import List, Optional, Union
 
 
-__all__ = [
+__all__: List[str] = [
     "DIPPR9B",
     "DIPPR9G",
     "DIPPR9H",
@@ -176,7 +178,7 @@ register_df_source(folder, "VDI PPDS Thermal conductivity of saturated liquids.t
 register_df_source(folder, "VDI PPDS Thermal conductivity of gases.tsv", csv_kwargs={"float_precision": "legacy"})
 
 @mark_numba_incompatible
-def _load_k_data():
+def _load_k_data() -> None:
     global k_data_Perrys_8E_2_314, k_values_Perrys_8E_2_314
     global k_data_Perrys_8E_2_315, k_values_Perrys_8E_2_315, k_data_VDI_PPDS_9
     global k_values_VDI_PPDS_9, k_data_VDI_PPDS_10, k_values_VDI_PPDS_10
@@ -193,7 +195,7 @@ def _load_k_data():
     k_data_VDI_PPDS_10 = data_source("VDI PPDS Thermal conductivity of gases.tsv")
     k_values_VDI_PPDS_10 = np.array(k_data_VDI_PPDS_10.values[:, 1:], dtype=float)
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("k_data_Perrys_8E_2_314", "k_values_Perrys_8E_2_314", "k_data_Perrys_8E_2_315",
                 "k_values_Perrys_8E_2_315", "k_data_VDI_PPDS_9", "k_values_VDI_PPDS_9", "k_data_VDI_PPDS_10",
                 "k_values_VDI_PPDS_10"):
@@ -743,7 +745,7 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
 
 ### Purely CSP Methods - Liquids
 
-def Sheffy_Johnson(T, MW, Tm):
+def Sheffy_Johnson(T: int, MW: int, Tm: int) -> float:
     r"""Calculate the thermal conductivity of a liquid as a function of
     temperature using the Sheffy-Johnson (1961) method. Requires
     Temperature, molecular weight, and melting point.
@@ -784,7 +786,7 @@ def Sheffy_Johnson(T, MW, Tm):
     return 1.951*(1.0 - 0.00126*(T - Tm))*Tm**-0.216*MW**-0.3
 
 
-def Sato_Riedel(T, MW, Tb, Tc):
+def Sato_Riedel(T: int, MW: int, Tb: int, Tc: int) -> float:
     r"""Calculate the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Sato-Riedel [1]_, [2]_, published in
     Reid [3]_. Requires temperature, molecular weight, and boiling and critical
@@ -834,7 +836,7 @@ def Sato_Riedel(T, MW, Tb, Tc):
     return 1.1053*(3. + 20.*(Tr_term)**(2.0/3.0))*MW**-0.5/(3.0 + 20.0*(1.0 - Tbr)**(2.0/3.))
 
 
-def Lakshmi_Prasad(T, MW):
+def Lakshmi_Prasad(T: float, MW: int) -> float:
     r"""Estimates thermal conductivity of pure liquids as a function of
     temperature using a reference fluid approach. Low accuracy but quick.
     Developed using several organic fluids.
@@ -874,7 +876,7 @@ def Lakshmi_Prasad(T, MW):
     return 0.0655 - 0.0005*T + (1.3855 - 0.00197*T)/sqrt(MW)
 
 
-def Gharagheizi_liquid(T, MW, Tb, Pc, omega):
+def Gharagheizi_liquid(T: int, MW: int, Tb: int, Pc: float, omega: float) -> float:
     r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Gharagheizi [1]_. A  convoluted
     method claiming high-accuracy and using only statistically significant
@@ -941,7 +943,7 @@ def Gharagheizi_liquid(T, MW, Tb, Pc, omega):
     return kl
 
 
-def Nicola_original(T, MW, Tc, omega, Hfus):
+def Nicola_original(T: int, MW: float, Tc: float, omega: float, Hfus: int) -> float:
     r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Nicola [1]_. A  simpler but long
     method claiming high-accuracy and using only statistically significant
@@ -996,7 +998,7 @@ def Nicola_original(T, MW, Tc, omega, Hfus):
     return -0.5694 - 0.1436*Tr + 5.4893E-10*Hfus + 0.0508*omega + MW**-0.0622
 
 
-def Nicola(T, MW, Tc, Pc, omega):
+def Nicola(T: int, MW: float, Tc: float, Pc: float, omega: float) -> float:
     r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of [1]_. A statistically derived
     equation using any correlated terms.
@@ -1046,7 +1048,7 @@ def Nicola(T, MW, Tc, Pc, omega):
     return 0.5147*(-0.2537*T/Tc + 0.0017E-5*Pc + 0.1501*omega + MW**-0.2999)
 
 
-def Bahadori_liquid(T, MW):
+def Bahadori_liquid(T: float, MW: int) -> float:
     r"""Estimates the thermal conductivity of parafin liquid hydrocarbons.
     Fits their data well, and is useful as only MW is required.
     X is the Molecular weight, and Y the temperature.
@@ -1169,7 +1171,7 @@ def kl_Mersmann_Kind(T, MW, Tc, Vc, na):
 
 ### Thermal Conductivity of Dense Liquids
 
-def DIPPR9G(T, P, Tc, Pc, kl):
+def DIPPR9G(T: float, P: float, Tc: float, Pc: float, kl: float) -> float:
     r"""Adjustes for pressure the thermal conductivity of a liquid using an
     emperical formula based on [1]_, but as given in [2]_.
 
@@ -1240,7 +1242,7 @@ Missenard_tck = implementation_optimize_tck([[1.0, 1.0, 5.0, 10.0, 50.0, 100.0, 
                                               0.032, 0.038, 0.02, 0.025, 0.032, 0.038],
                                               1,1])
 
-def Missenard(T, P, Tc, Pc, kl):
+def Missenard(T: float, P: float, Tc: float, Pc: float, kl: float) -> float:
     r"""Adjustes for pressure the thermal conductivity of a liquid using an
     emperical formula based on [1]_, but as given in [2]_.
 
@@ -1293,7 +1295,7 @@ def Missenard(T, P, Tc, Pc, kl):
 ### Thermal conductivity of liquid mixtures
 
 
-def DIPPR9H(ws, ks):
+def DIPPR9H(ws: List[float], ks: List[float]) -> float:
     r"""Calculates thermal conductivity of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_.
 
@@ -1356,7 +1358,7 @@ def DIPPR9H(ws, ks):
         kl += ws[i]/(ks[i]*ks[i])
     return 1.0/sqrt(kl)
 
-def DIPPR9I(zs, Vms, ks):
+def DIPPR9I(zs: List[float], Vms: List[float], ks: List[float]) -> float:
     r"""Calculates thermal conductivity of a liquid mixture according to
     mixing rules in [1]_. This is recommended in [2]_ for aqueous and
     nonaqueous systems.
@@ -1440,7 +1442,7 @@ def DIPPR9I(zs, Vms, ks):
     k += 4.0*main_k_sum
     return k
 
-def Filippov(ws, ks):
+def Filippov(ws: List[float], ks: List[float]) -> float:
     r"""Calculates thermal conductivity of a binary liquid mixture according to
     mixing rules in [2]_ as found in [1]_.
 
@@ -1489,7 +1491,7 @@ def Filippov(ws, ks):
 
 ### Thermal Conductivity of Gases
 
-def Eucken(MW, Cvm, mu):
+def Eucken(MW: float, Cvm: float, mu: float) -> float:
     r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the CSP method of Eucken [1]_.
 
@@ -1532,7 +1534,7 @@ def Eucken(MW, Cvm, mu):
     return (1. + 9.0/4.0*R/Cvm)*mu*Cvm/MW
 
 
-def Eucken_modified(MW, Cvm, mu):
+def Eucken_modified(MW: float, Cvm: float, mu: float) -> float:
     r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the Modified CSP method of Eucken [1]_.
 
@@ -1575,7 +1577,7 @@ def Eucken_modified(MW, Cvm, mu):
     return (1.32 + 1.77*R/Cvm)*mu*Cvm/MW
 
 
-def DIPPR9B(T, MW, Cvm, mu, Tc=None, chemtype=None):
+def DIPPR9B(T: float, MW: float, Cvm: float, mu: float, Tc: Optional[float]=None, chemtype: Optional[str]=None) -> float:
     r"""Calculates the thermal conductivity of a gas using one of several
     emperical equations developed in [1]_, [2]_, and presented in [3]_.
 
@@ -1648,7 +1650,7 @@ def DIPPR9B(T, MW, Cvm, mu, Tc=None, chemtype=None):
     return mu/MW*(1.30*Cvm + 14644 - 2928.80/Tr)
 
 
-def Chung(T, MW, Tc, omega, Cvm, mu):
+def Chung(T: float, MW: float, Tc: float, omega: float, Cvm: float, mu: float) -> float:
     r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the CSP method of Chung [1]_.
 
@@ -1718,7 +1720,7 @@ def Chung(T, MW, Tc, omega, Cvm, mu):
     return 3.75*psi/(Cvm*MW)*R*mu*Cvm
 
 
-def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
+def Eli_Hanley(T: float, MW: float, Tc: float, Vc: float, Zc: float, omega: float, Cvm: float) -> float:
     r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the reference fluid method of Eli and Hanley [1]_ as
     shown in [2]_.
@@ -1836,7 +1838,7 @@ def Eli_Hanley(T, MW, Tc, Vc, Zc, omega, Cvm):
     return ks + 1320.0*etas/MW*(Cvm - 1.5*R)
 
 
-def Gharagheizi_gas(T, MW, Tb, Pc, omega):
+def Gharagheizi_gas(T: float, MW: float, Tb: float, Pc: float, omega: float) -> float:
     r"""Estimates the thermal conductivity of a gas as a function of
     temperature using the CSP method of Gharagheizi [1]_. A  convoluted
     method claiming high-accuracy and using only statistically significant
@@ -1904,7 +1906,7 @@ def Gharagheizi_gas(T, MW, Tb, Pc, omega):
     return 7.9505E-4 + 3.989E-5*T - 5.419E-5*MW + 3.989E-5*A
 
 
-def Bahadori_gas(T, MW):
+def Bahadori_gas(T: float, MW: int) -> float:
     r"""Estimates the thermal conductivity of hydrocarbons gases at low P.
     Fits their data well, and is useful as only MW is required.
     Y is the Molecular weight, and X the temperature.
@@ -1966,7 +1968,7 @@ def Bahadori_gas(T, MW):
 
 ### Thermal Conductivity of dense gases
 
-def Stiel_Thodos_dense(T, MW, Tc, Pc, Vc, Zc, Vm, kg):
+def Stiel_Thodos_dense(T: float, MW: float, Tc: float, Pc: float, Vc: float, Zc: float, Vm: float, kg: float) -> float:
     r"""Estimates the thermal conductivity of a gas at high pressure as a
     function of temperature using difference method of Stiel and Thodos [1]_
     as shown in [2]_.
@@ -2045,7 +2047,7 @@ def Stiel_Thodos_dense(T, MW, Tc, Pc, Vc, Zc, Vm, kg):
     return kg
 
 
-def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
+def Eli_Hanley_dense(T: float, MW: float, Tc: float, Vc: float, Zc: float, omega: float, Cvm: float, Vm: float) -> float:
     r"""Estimates the thermal conductivity of a gas at high pressure as a
     function of temperature using the reference fluid method of Eli and
     Hanley [1]_ as shown in [2]_.
@@ -2225,7 +2227,7 @@ def Eli_Hanley_dense(T, MW, Tc, Vc, Zc, omega, Cvm, Vm):
     return k
 
 
-def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
+def Chung_dense(T: float, MW: float, Tc: float, Vc: float, omega: float, Cvm: float, Vm: float, mu: float, dipole: float, association: float=0.0) -> float:
     r"""Estimates the thermal conductivity of a gas at high pressure as a
     function of temperature using the reference fluid method of
     Chung [1]_ as shown in [2]_.
@@ -2355,7 +2357,7 @@ def Chung_dense(T, MW, Tc, Vc, omega, Cvm, Vm, mu, dipole, association=0.0):
 ### Thermal conductivity of gas mixtures
 
 
-def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
+def Lindsay_Bromley(T: float, ys: List[float], ks: List[float], mus: List[float], Tbs: List[float], MWs: List[float]) -> float:
     r"""Calculates thermal conductivity of a gas mixture according to
     mixing rules in [1]_ and also in [2]_. It is significantly more complicated
     than other kinetic theory models.
@@ -2467,7 +2469,7 @@ def Lindsay_Bromley(T, ys, ks, mus, Tbs, MWs):
 #    return sum([ys[i]*ks[i]/sum(ys[j]*Aij[i][j] for j in cmps) for i in cmps])
 
 
-def Wassiljewa_Herning_Zipperer(zs, ks, MWs, MW_roots=None):
+def Wassiljewa_Herning_Zipperer(zs: List[float], ks: List[float], MWs: Union[List[int], List[float]], MW_roots: Optional[List[float]]=None) -> float:
     r"""Calculates thermal conductivity of a gas mixture according to
     the kinetic theory expression of Wassiljewa with the interaction
     term from the Herning-Zipperer expression. This is also used for

@@ -170,9 +170,11 @@ The structure of each dataframe is shown below:
     In [9]: chemicals.viscosity.mu_data_VDI_PPDS_8
 
 """
+from pandas.core.frame import DataFrame
+from typing import List, Optional, Tuple, Union
 
 
-__all__ = [
+__all__: List[str] = [
     "PPDS5",
     "PPDS9",
     "Brokaw",
@@ -239,7 +241,7 @@ register_df_source(folder, "VDI PPDS Dynamic viscosity of gases polynomials.tsv"
 
 _mu_data_loaded = False
 @mark_numba_incompatible
-def _load_mu_data():
+def _load_mu_data() -> None:
     global _mu_data_loaded, mu_data_Dutt_Prasad, mu_values_Dutt_Prasad
     global mu_data_VN3, mu_values_VN3, mu_data_VN2, mu_values_VN2
     global mu_data_VN2E, mu_values_VN2E, mu_data_Perrys_8E_2_313, mu_values_Perrys_8E_2_313
@@ -272,7 +274,7 @@ def _load_mu_data():
 
     _mu_data_loaded = True
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("mu_data_Dutt_Prasad", "mu_values_Dutt_Prasad", "mu_data_VN3",
                 "mu_values_VN3", "mu_data_VN2", "mu_values_VN2", "mu_data_VN2E",
                 "mu_values_VN2E", "mu_data_Perrys_8E_2_313", "mu_values_Perrys_8E_2_313",
@@ -284,7 +286,7 @@ def __getattr__(name):
 
 
 
-def mu_IAPWS(T, rho, drho_dP=None, drho_dP_Tr=None):
+def mu_IAPWS(T: float, rho: float, drho_dP: Optional[float]=None, drho_dP_Tr: Optional[float]=None) -> float:
     r"""Calculates and returns the viscosity of water according to the IAPWS
     (2008) release.
 
@@ -644,7 +646,7 @@ def mu_air_lemmon(T, rho):
     return (eta0 + etar)
 
 
-def Viswanath_Natarajan_2(T, A, B):
+def Viswanath_Natarajan_2(T: float, A: float, B: float) -> float:
     r"""Calculate the viscosity of a liquid using the 2-term form
     representation developed in [1]_. Requires input coefficients. The `A`
     coefficient is assumed to yield coefficients in Pa*s; if it yields
@@ -686,7 +688,7 @@ def Viswanath_Natarajan_2(T, A, B):
     return exp(A + B/T)
 
 
-def Viswanath_Natarajan_2_exponential(T, C, D):
+def Viswanath_Natarajan_2_exponential(T: float, C: int, D: float) -> float:
     r"""Calculate the viscosity of a liquid using the 2-term exponential form
     representation developed in [1]_. Requires input coefficients. The `A`
     coefficient is assumed to yield coefficients in Pa*s, as all
@@ -734,7 +736,7 @@ def Viswanath_Natarajan_2_exponential(T, C, D):
     return C*T**D
 
 
-def Viswanath_Natarajan_3(T, A, B, C):
+def Viswanath_Natarajan_3(T: float, A: float, B: float, C: float) -> float:
     r"""Calculate the viscosity of a liquid using the 3-term Antoine form
     representation developed in [1]_. Requires input coefficients. If the
     coefficients do not yield viscosity in Pa*s, but rather cP, remove
@@ -1134,7 +1136,7 @@ def PPDS5(T, Tc, a0, a1, a2):
     Tr = T/Tc
     return a0*Tr/(1.0 + a1*(Tr - 1.0)*Tr**a2)**(1.0/6.0)
 
-def Letsou_Stiel(T, MW, Tc, Pc, omega):
+def Letsou_Stiel(T: float, MW: float, Tc: float, Pc: float, omega: float) -> float:
     r"""Calculates the viscosity of a liquid using an emperical model
     developed in [1]_. However. the fitting parameters for tabulated values
     in the original article are found in ChemSep.
@@ -1197,7 +1199,7 @@ def Letsou_Stiel(T, MW, Tc, Pc, omega):
     return (xi0 + omega*xi1)/xi
 
 
-def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
+def Przedziecki_Sridhar(T: float, Tm: float, Tc: float, Pc: float, Vc: float, Vm: float, omega: float, MW: float) -> float:
     r"""Calculates the viscosity of a liquid using an emperical formula
     developed in [1]_.
 
@@ -1268,7 +1270,7 @@ def Przedziecki_Sridhar(T, Tm, Tc, Pc, Vc, Vm, omega, MW):
 ### Viscosity of Dense Liquids
 
 
-def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
+def Lucas(T: float, P: float, Tc: float, Pc: float, omega: float, Psat: float, mu_l: float) -> float:
     r"""Adjustes for pressure the viscosity of a liquid using an emperical
     formula developed in [1]_, but as discussed in [2]_ as the original source
     is in German.
@@ -1343,7 +1345,7 @@ def Lucas(T, P, Tc, Pc, omega, Psat, mu_l):
 ### Viscosity of liquid mixtures
 ### Viscosity of Gases - low pressure
 
-def Yoon_Thodos(T, Tc, Pc, MW):
+def Yoon_Thodos(T: float, Tc: float, Pc: float, MW: float) -> float:
     r"""Calculates the viscosity of a gas using an emperical formula
     developed in [1]_.
 
@@ -1402,7 +1404,7 @@ def Yoon_Thodos(T, Tc, Pc, MW):
     return (1. + a*Tr**b - c * exp(d*Tr) + e*exp(f*Tr))/(1E8*xi)
 
 
-def Stiel_Thodos(T, Tc, Pc, MW):
+def Stiel_Thodos(T: float, Tc: float, Pc: float, MW: float) -> float:
     r"""Calculates the viscosity of a gas using an emperical formula
     developed in [1]_.
 
@@ -1463,7 +1465,7 @@ def Stiel_Thodos(T, Tc, Pc, MW):
     return mu_g*1e-3
 
 
-def Lucas_gas(T, Tc, Pc, Zc, MW, dipole=0.0, CASRN=None):
+def Lucas_gas(T: float, Tc: float, Pc: float, Zc: float, MW: float, dipole: Optional[float]=0.0, CASRN: Optional[str]=None) -> float:
     r"""Estimate the viscosity of a gas using an emperical
     formula developed in several sources, but as discussed in [1]_ as the
     original sources are in German or merely personal communications with the
@@ -1625,7 +1627,7 @@ def viscosity_gas_Gharagheizi(T, Tc, Pc, MW):
 ### Viscosity of gas mixtures
 
 
-def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
+def Herning_Zipperer(zs: List[float], mus: List[float], MWs: Optional[Union[List[int], List[float]]], MW_roots: Optional[List[float]]=None) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
@@ -1679,7 +1681,7 @@ def Herning_Zipperer(zs, mus, MWs, MW_roots=None):
         denominator += v
     return k/denominator
 
-def Wilke(ys, mus, MWs):
+def Wilke(ys: List[float], mus: List[float], MWs: List[float]) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
@@ -1734,7 +1736,7 @@ def Wilke(ys, mus, MWs):
     return sum([ys[i]*mus[i]/sum([ys[j]*phis[i][j] for j in cmps]) for i in cmps])
 
 
-def Wilke_prefactors(MWs):
+def Wilke_prefactors(MWs: List[float]) -> Tuple[List[List[float]], List[List[float]], List[List[float]]]:
     r"""The :obj:`Wilke` gas viscosity method can be sped up by precomputing several
     matrices. The memory used is proportional to N^2, so it can be significant,
     but is still a substantial performance increase even when they are so large
@@ -1802,7 +1804,7 @@ def Wilke_prefactors(MWs):
                     for j in cmps] for i in cmps]
     return t0s, t1s, phi_fact_invs
 
-def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
+def Wilke_prefactored(ys: List[float], mus: List[float], t0s: List[List[float]], t1s: List[List[float]], t2s: List[List[float]]) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_, using precomputed parameters.
 
@@ -1909,7 +1911,7 @@ def Wilke_prefactored(ys, mus, t0s, t1s, t2s):
     return mu
     """
 
-def Wilke_large(ys, mus, MWs):
+def Wilke_large(ys: List[float], mus: List[float], MWs: List[float]) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
@@ -1991,7 +1993,7 @@ def Wilke_large(ys, mus, MWs):
 
 
 
-def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
+def Brokaw(T: float, ys: List[float], mus: List[float], MWs: List[float], molecular_diameters: List[float], Stockmayers: List[int]) -> float:
     r"""Calculates viscosity of a gas mixture according to
     mixing rules in [1]_.
 
@@ -2092,7 +2094,7 @@ def Brokaw(T, ys, mus, MWs, molecular_diameters, Stockmayers):
 
 ### Petroleum liquids
 
-def Twu_1985_internal(T, Tb, SG):
+def Twu_1985_internal(T: float, Tb: float, SG: float) -> float:
     Tb2 = Tb*Tb
     Tb10 = Tb2*Tb2
     Tb10 *= Tb10*Tb2 # compute Tb^-10
@@ -2152,7 +2154,7 @@ def Twu_1985_internal(T, Tb, SG):
     nu = x0 - exp(-0.7487 + x0*(x0*(0.6119 - 0.3193*x0) - 3.295))
     return nu
 
-def Twu_1985(T, Tb, rho):
+def Twu_1985(T: float, Tb: float, rho: float) -> float:
     r"""Calculate the viscosity of a petroleum liquid using the
     Twu (1985) correlation
     developed in [1]_. Based on a fit to n-alkanes that used as a
@@ -2254,7 +2256,7 @@ def Twu_1985(T, Tb, rho):
 
 ### Viscosity for Liquids or Gases
 
-def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
+def Lorentz_Bray_Clarke(T: float, P: float, Vm: float, zs: List[float], MWs: List[float], Tcs: List[float], Pcs: List[float], Vcs: List[float]) -> float:
     r"""Calculates the viscosity of a gas or a liquid using the method of
     Lorentz, Bray, and Clarke [1]_. This method is not quite the same as the
     original, but rather the form commonly presented and used today. The
@@ -2361,7 +2363,7 @@ def Lorentz_Bray_Clarke(T, P, Vm, zs, MWs, Tcs, Pcs, Vcs):
 ### Misc functions
 
 
-def _round_whole_even(i):
+def _round_whole_even(i: float) -> int:
     r"""Round a number to the nearest whole number. If the number is exactly
     between two numbers, round to the even whole number. Used by
     `viscosity_index`.
@@ -2490,7 +2492,7 @@ VI_Hs = [6.394, 6.894, 7.41, 7.944, 8.496, 9.063, 9.647, 10.25, 10.87, 11.5,
     1488.0, 1506.0, 1523.0, 1541.0, 1558.0
 ]
 
-def viscosity_index(nu_40, nu_100, rounding=False):
+def viscosity_index(nu_40: float, nu_100: float, rounding: bool=False) -> Optional[float]:
     r"""Calculates the viscosity index of a liquid. Requires dynamic viscosity
     of a liquid at 40°C and 100°C. Value may either be returned with or
     without rounding. Rounding is performed per the standard.
@@ -3042,12 +3044,12 @@ def polish_conversion(T_initial, forward_calculator, backward_calculator):
     return T_polished
 
 
-def Saybolt_universal_eq(nu):
+def Saybolt_universal_eq(nu: float) -> float:
     return (4.6324*nu + (1E5 + 3264.*nu)/(nu*(nu*(1.646*nu + 23.97)
                                           + 262.7) + 3930.2))
 
 
-def viscosity_converter(val, old_scale, new_scale, extrapolate=False):
+def viscosity_converter(val: float, old_scale: str, new_scale: str, extrapolate: bool=False) -> float:
     r"""Converts kinematic viscosity values from different scales which have
     historically been used. Though they may not be in use much, some standards
     still specify values in these scales.

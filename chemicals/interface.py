@@ -130,10 +130,12 @@ The structure of each dataframe is shown below:
 
     In [6]: chemicals.interface.sigma_data_VDI_PPDS_11
 """
+from pandas.core.frame import DataFrame
+from typing import List, Optional
 
 
 
-__all__ = [
+__all__: List[str] = [
     "API10A32",
     "PPDS14",
     "Aleem",
@@ -176,7 +178,7 @@ register_df_source(folder, "SomayajuluRevised.tsv")
 register_df_source(folder, "VDI PPDS surface tensions.tsv")
 
 @mark_numba_incompatible
-def load_interface_dfs():
+def load_interface_dfs() -> None:
     global sigma_data_Mulero_Cachadina, sigma_values_Mulero_Cachadina
     global sigma_data_Jasper_Lange, sigma_values_Jasper_Lange
     global sigma_data_Somayajulu, sigma_values_Somayajulu, sigma_data_Somayajulu2
@@ -197,7 +199,7 @@ def load_interface_dfs():
     sigma_data_VDI_PPDS_11 = data_source("VDI PPDS surface tensions.tsv")
     sigma_values_VDI_PPDS_11 = np.array(sigma_data_VDI_PPDS_11.values[:, 1:], dtype=float)
 
-def __getattr__(name):
+def __getattr__(name: str) -> DataFrame:
     if name in ("sigma_data_Mulero_Cachadina", "sigma_values_Mulero_Cachadina",
                 "sigma_data_Jasper_Lange", "sigma_values_Jasper_Lange",
                 "sigma_data_Somayajulu", "sigma_values_Somayajulu", "sigma_data_Somayajulu2",
@@ -209,7 +211,7 @@ def __getattr__(name):
 
 
 
-def sigma_IAPWS(T):
+def sigma_IAPWS(T: float) -> float:
     r"""Calculate the surface tension of pure water as a function of .
     temperature. Assumes the 2011 IAPWS [1]_ formulation.
 
@@ -270,7 +272,7 @@ def sigma_IAPWS(T):
 
 ### Regressed coefficient-based functions
 
-def REFPROP_sigma(T, Tc, sigma0, n0, sigma1=0.0, n1=0.0, sigma2=0.0, n2=0.0):
+def REFPROP_sigma(T: float, Tc: float, sigma0: float, n0: float, sigma1: float=0.0, n1: float=0.0, sigma2: float=0.0, n2: float=0.0) -> float:
     r"""Calculates air-liquid surface tension  using the REFPROP_sigma [1]_
     regression-based method. Relatively recent, and most accurate.
 
@@ -513,7 +515,7 @@ def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
         return 0.0
     return tau*(a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau))))
 
-def Somayajulu(T, Tc, A, B, C):
+def Somayajulu(T: int, Tc: float, A: float, B: float, C: float) -> float:
     r"""Calculates air-liquid surface tension  using the [1]_
     emperical (parameter-regressed) method. Well regressed, no recent data.
 
@@ -570,7 +572,7 @@ def Somayajulu(T, Tc, A, B, C):
     return X*sqrt(sqrt(X))*(A + X*(B + C*X))*1e-3
 
 
-def Jasper(T, a, b):
+def Jasper(T: float, a: int, b: float) -> float:
     r"""Calculates surface tension of a fluid given two parameters, a linear
     fit in Celcius from [1]_ with data reprinted in [2]_.
 
@@ -621,7 +623,7 @@ def Jasper(T, a, b):
 ### CSP methods
 
 
-def Brock_Bird(T, Tb, Tc, Pc):
+def Brock_Bird(T: float, Tb: float, Tc: float, Pc: float) -> float:
     r"""Calculates air-liquid surface tension using the [1]_
     emperical method. Old and tested.
 
@@ -746,7 +748,7 @@ def Pitzer_sigma(T, Tc, Pc, omega):
     return sigma*1e-3  # N/m, please
 
 
-def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
+def Sastri_Rao(T: float, Tb: float, Tc: float, Pc: float, chemicaltype: Optional[str]=None) -> float:
     r"""Calculates air-liquid surface tension using the correlation derived by
     [1]_ based on critical property CSP methods and chemical classes.
 
@@ -808,7 +810,7 @@ def Sastri_Rao(T, Tb, Tc, Pc, chemicaltype=None):
     return sigma
 
 
-def Zuo_Stenby(T, Tc, Pc, omega):
+def Zuo_Stenby(T: float, Tc: float, Pc: float, omega: float) -> float:
     r"""Calculates air-liquid surface tension using the reference fluids
     methods of [1]_.
 
@@ -882,7 +884,7 @@ def Zuo_Stenby(T, Tc, Pc, omega):
     return sigma
 
 
-def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
+def Hakim_Steinberg_Stiel(T: float, Tc: float, Pc: float, omega: float, StielPolar: float=0.0) -> float:
     r"""Calculates air-liquid surface tension using the reference fluids methods
     of [1]_.
 
@@ -948,7 +950,7 @@ def Hakim_Steinberg_Stiel(T, Tc, Pc, omega, StielPolar=0.0):
     return sigma
 
 
-def Miqueu(T, Tc, Vc, omega):
+def Miqueu(T: float, Tc: float, Vc: float, omega: float) -> float:
     r"""Calculates air-liquid surface tension using the methods of [1]_.
 
     .. math::
@@ -1005,7 +1007,7 @@ def Miqueu(T, Tc, Vc, omega):
     return sigma
 
 
-def Aleem(T, MW, Tb, rhol, Hvap_Tb, Cpl):
+def Aleem(T: float, MW: float, Tb: float, rhol: float, Hvap_Tb: float, Cpl: float) -> float:
     r"""Calculates vapor-liquid surface tension using the correlation derived by
     [1]_ based on critical property CSP methods.
 
@@ -1257,7 +1259,7 @@ def sigma_Gharagheizi_2(T, Tb, Tc, Pc, Vc):
     sigma *= (7.728729*Tbr + 2.476318*(Tbr*Tbr2 + Vc))
     return sigma
 
-def API10A32(T, Tc, K_W):
+def API10A32(T: float, Tc: float, K_W: float) -> float:
     r"""Calculates the interfacial tension between
     a liquid petroleum fraction and air, using the oil's pseudocritical
     temperature and Watson K Characterization factor.
@@ -1309,7 +1311,7 @@ def API10A32(T, Tc, K_W):
 
 ### Surface Tension Mixtures
 
-def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
+def Winterfeld_Scriven_Davis(xs: List[float], sigmas: List[float], rhoms: List[float]) -> float:
     r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_.
 
@@ -1385,7 +1387,7 @@ def Winterfeld_Scriven_Davis(xs, sigmas, rhoms):
     return tot
 
 
-def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
+def Diguilio_Teja(T: float, xs: List[float], sigmas_Tb: List[float], Tbs: List[float], Tcs: List[float]) -> float:
     r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_.
 
@@ -1458,7 +1460,7 @@ def Diguilio_Teja(T, xs, sigmas_Tb, Tbs, Tcs):
     return 1.002855*Tst**1.118091*(T/Tb)*sigmar
 
 
-def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
+def Weinaug_Katz(parachors: List[float], Vml: float, Vmg: float, xs: List[float], ys: List[float]) -> float:
     r"""Calculates surface tension of a liquid mixture according to
     mixing rules in [1]_ and also in [2]_. This is based on the
     Parachor concept. This is called the Macleod-Sugden model in some places.
@@ -1521,7 +1523,7 @@ def Weinaug_Katz(parachors, Vml, Vmg, xs, ys):
 ### Water-hydrocarbon interfacial tensions
 
 
-def Meybodi_Daryasafar_Karimi(rho_water, rho_oil, T, Tc):
+def Meybodi_Daryasafar_Karimi(rho_water: int, rho_oil: int, T: int, Tc: int) -> float:
     r"""Calculates the interfacial tension between water and a hydrocabon
     liquid according to the correlation of [1]_.
 

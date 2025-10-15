@@ -29,8 +29,10 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 .. contents:: :local:
 
 """
+import numpy
+from typing import Any, List, Optional, Tuple, Union
 
-__all__ = [
+__all__: List[str] = [
     "SG",
     "API_to_SG",
     "API_to_rho",
@@ -115,10 +117,10 @@ from fluids.numerics import numpy as np
 source_path = os.path.dirname(__file__)
 
 if os.name == "nt":
-    def os_path_join(*args):
+    def os_path_join(*args) -> str:
         return "\\".join(args)
 else:
-    def os_path_join(*args):
+    def os_path_join(*args) -> str:
         return "/".join(args)
 
 numba_blacklisted = ["mark_numba_incompatible", "mark_numba_uncacheable"]
@@ -133,7 +135,7 @@ def mark_numba_uncacheable(f):
     return f
 
 @mark_numba_incompatible
-def to_num(values):
+def to_num(values: List[str]) -> Union[List[Optional[Union[str, float]]], List[Union[str, float]]]:
     r"""Legacy function to turn a list of strings into either floats
     (if numeric), stripped strings (if not) or None if the string is empty.
     Accepts any numeric formatting the float function does.
@@ -398,7 +400,7 @@ def hash_any_primitive(v):
     # print(f"Hashing: type={t.__name__}, value={original_v}, hash_value={hash_value}")
     return hash_value
 
-def Parachor(MW, rhol, rhog, sigma):
+def Parachor(MW: float, rhol: float, rhog: float, sigma: float) -> float:
     r"""Calculate Parachor for a pure species, using its density in the
     liquid and gas phases, surface tension, and molecular weight.
 
@@ -459,7 +461,7 @@ def Parachor(MW, rhol, rhog, sigma):
     return sigma**0.25*MW/(rhol-rhog) # (N/m)**0.25*g/mol/(g/m^3)
 
 
-def property_molar_to_mass(A_molar, MW):
+def property_molar_to_mass(A_molar: int, MW: float) -> float:
     r"""Convert a quantity in molar units [thing/mol] to mass units [thing/kg].
     The standard gram-mole is used here, as it is everwhere in this library.
 
@@ -493,7 +495,7 @@ def property_molar_to_mass(A_molar, MW):
     return A_molar*1000.0/MW
 
 
-def property_mass_to_molar(A_mass, MW):
+def property_mass_to_molar(A_mass: float, MW: float) -> float:
     r"""Convert a quantity in mass units [thing/kg] to molar units [thing/mol].
     The standard gram-mole is used here, as it is everwhere in this library.
 
@@ -529,7 +531,7 @@ def property_mass_to_molar(A_mass, MW):
 root_1000 = 1000**0.5
 root_1000_inv = 1.0/root_1000
 
-def v_to_v_molar(v, MW):
+def v_to_v_molar(v: int, MW: float) -> float:
     r"""Convert a velocity from units of m/s to a "molar" form of velocity,
     compatible with thermodynamic calculations on a molar basis.
 
@@ -558,7 +560,7 @@ def v_to_v_molar(v, MW):
     """
     return v*MW**0.5*root_1000_inv
 
-def v_molar_to_v(v_molar, MW):
+def v_molar_to_v(v_molar: float, MW: float) -> float:
     r"""Convert a velocity from units of the molar velocity form to standard
     m/s units.
 
@@ -587,7 +589,7 @@ def v_molar_to_v(v_molar, MW):
     """
     return v_molar*root_1000*MW**-0.5
 
-def vapor_mass_quality(VF, MWl, MWg):
+def vapor_mass_quality(VF: float, MWl: int, MWg: int) -> float:
     r"""Calculates the vapor quality on a mass basis of a two-phase mixture;
     this is the most common definition, where 1 means a pure vapor and 0 means
     a pure liquid. The vapor quality on a mass basis is related to the mole
@@ -705,7 +707,7 @@ def API_to_rho(API, rho_ref=999.0170824078306):
 
 
 
-def SG_to_API(SG):
+def SG_to_API(SG: float) -> float:
     r"""Calculates API of a liquid given its specific gravity, as shown in
     [1]_.
 
@@ -739,7 +741,7 @@ def SG_to_API(SG):
     return 141.5/SG - 131.5
 
 
-def API_to_SG(API):
+def API_to_SG(API: float) -> float:
     r"""Calculates specific gravity of a liquid given its API, as shown in
     [1]_.
 
@@ -1052,7 +1054,7 @@ def Baume_heavy_to_SG(Baume):
     """
     return 145/(145 - Baume)
 
-def SG(rho, rho_ref=999.0170824078306):
+def SG(rho: int, rho_ref: float=999.0170824078306) -> float:
     r"""Calculates the specific gravity of a substance with respect to another
     substance; by default, this is water at 15.555 °C (60 °F). For gases,
     normally the reference density is 1.2 kg/m^3, that of dry air. However, in
@@ -1089,7 +1091,7 @@ def SG(rho, rho_ref=999.0170824078306):
     return rho/rho_ref
 
 
-def Watson_K(Tb, SG):
+def Watson_K(Tb: int, SG: float) -> float:
     r"""Calculates the Watson or UOP K Characterization factor
     of a liquid of a liquid given its specific gravity, and its
     average boiling point as shown in [1]_.
@@ -1136,7 +1138,7 @@ def Watson_K(Tb, SG):
     return (Tb*1.8)**(1.0/3.0)/SG
 
 
-def isobaric_expansion(V, dV_dT):
+def isobaric_expansion(V: float, dV_dT: float) -> float:
     r"""Calculate the isobaric coefficient of a thermal expansion, given its
     molar volume at a certain `T` and `P`, and its derivative of molar volume
     with respect to `T`.
@@ -1178,7 +1180,7 @@ def isobaric_expansion(V, dV_dT):
     return dV_dT/V
 
 
-def isothermal_compressibility(V, dV_dP):
+def isothermal_compressibility(V: float, dV_dP: float) -> float:
     r"""Calculate the isothermal coefficient of compressibility, given its
     molar volume at a certain `T` and `P`, and its derivative of molar volume
     with respect to `P`.
@@ -1233,7 +1235,7 @@ def isothermal_compressibility(V, dV_dP):
     return -dV_dP/V
 
 
-def phase_identification_parameter(V, dP_dT, dP_dV, d2P_dV2, d2P_dVdT):
+def phase_identification_parameter(V: float, dP_dT: float, dP_dV: float, d2P_dV2: float, d2P_dVdT: float) -> float:
     r"""Calculate the Phase Identification Parameter developed in [1]_ for
     the accurate and efficient determination of whether a fluid is a liquid or
     a gas based on the results of an equation of state. For supercritical
@@ -1298,7 +1300,7 @@ def phase_identification_parameter(V, dP_dT, dP_dV, d2P_dV2, d2P_dVdT):
     return V*(d2P_dVdT/dP_dT - d2P_dV2/dP_dV)
 
 
-def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=None, d2P_dV2=None):
+def phase_identification_parameter_phase(d2P_dVdT: float, V: Optional[float]=None, dP_dT: Optional[float]=None, dP_dV: Optional[float]=None, d2P_dV2: Optional[float]=None) -> str:
     r"""Uses the Phase Identification Parameter concept developed in [1]_ and
     [2]_ to determine if a chemical is a solid, liquid, or vapor given the
     appropriate thermodynamic conditions.
@@ -1362,7 +1364,7 @@ def phase_identification_parameter_phase(d2P_dVdT, V=None, dP_dT=None, dP_dV=Non
         return "l" if PIP > 1 else "g"
 
 
-def Cp_minus_Cv(T, dP_dT, dP_dV):
+def Cp_minus_Cv(T: int, dP_dT: float, dP_dV: float) -> float:
     r"""Calculate the difference between a real gas's constant-pressure heat
     capacity and constant-volume heat capacity, as given in [1]_, [2]_, and
     [3]_. The required derivatives should be calculated with an equation of
@@ -1421,7 +1423,7 @@ def Cp_minus_Cv(T, dP_dT, dP_dV):
     return -T*dP_dT*dP_dT/dP_dV
 
 
-def speed_of_sound(V, dP_dV, Cp, Cv, MW=None):
+def speed_of_sound(V: float, dP_dV: float, Cp: float, Cv: float, MW: Optional[float]=None) -> float:
     r"""Calculate a real fluid's speed of sound. The required derivatives should
     be calculated with an equation of state, and `Cp` and `Cv` are both the
     real fluid versions. Expression is given in [1]_ and [2]_; a unit conversion
@@ -1538,7 +1540,7 @@ def velocity_to_molar_velocity(v, MW):
     """
     return v*sqrt(MW)/sqrt(1000)
 
-def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
+def Joule_Thomson(T: int, V: float, Cp: float, dV_dT: Optional[float]=None, beta: Optional[float]=None) -> float:
     r"""Calculate a real fluid's Joule Thomson coefficient. The required
     derivative should be calculated with an equation of state, and `Cp` is the
     real fluid versions. This can either be calculated with `dV_dT` directly,
@@ -1590,7 +1592,7 @@ def Joule_Thomson(T, V, Cp, dV_dT=None, beta=None):
         raise ValueError("Either dV_dT or beta is needed")
 
 
-def isentropic_exponent(Cp, Cv):
+def isentropic_exponent(Cp: float, Cv: float) -> float:
     r"""Calculate the isentropic coefficient of an ideal gas, given its constant-
     pressure and constant-volume heat capacity.
 
@@ -1779,7 +1781,7 @@ def isentropic_exponent_TV(Cv, Vm, dP_dT_V):
     """
     return 1.0 + Vm*dP_dT_V/Cv
 
-def Vm_to_rho(Vm, MW):
+def Vm_to_rho(Vm: float, MW: float) -> float:
     r"""Calculate the density of a chemical, given its molar volume and
     molecular weight.
 
@@ -1811,7 +1813,7 @@ def Vm_to_rho(Vm, MW):
     return 1e-3*MW/Vm
 
 
-def rho_to_Vm(rho, MW):
+def rho_to_Vm(rho: float, MW: float) -> float:
     r"""Calculate the molar volume of a chemical, given its density and
     molecular weight.
 
@@ -1843,7 +1845,7 @@ def rho_to_Vm(rho, MW):
     return 1e-3*MW/rho
 
 
-def Z(T, P, V):
+def Z(T: int, P: float, V: float) -> float:
     r"""Calculates the compressibility factor of a gas, given its
     temperature, pressure, and molar volume.
 
@@ -1876,7 +1878,7 @@ def Z(T, P, V):
     """
     return V*P/(R*T)
 
-def zs_to_ws(zs, MWs):
+def zs_to_ws(zs: List[float], MWs: Union[List[int], List[float]]) -> List[float]:
     r"""Converts a list of mole fractions to mass fractions. Requires molecular
     weights for all species.
 
@@ -1922,7 +1924,7 @@ def zs_to_ws(zs, MWs):
         ws[i] *= Mavg
     return ws
 
-def ws_to_zs(ws, MWs):
+def ws_to_zs(ws: List[float], MWs: List[int]) -> List[float]:
     r"""Converts a list of mass fractions to mole fractions. Requires molecular
     weights for all species.
 
@@ -1964,7 +1966,7 @@ def ws_to_zs(ws, MWs):
     return zs
 
 
-def zs_to_Vfs(zs, Vms):
+def zs_to_Vfs(zs: List[float], Vms: List[float]) -> List[float]:
     r"""Converts a list of mole fractions to volume fractions. Requires molar
     volumes for all species.
 
@@ -2011,7 +2013,7 @@ def zs_to_Vfs(zs, Vms):
     return Vfs
 
 
-def Vfs_to_zs(Vfs, Vms):
+def Vfs_to_zs(Vfs: List[float], Vms: List[float]) -> List[float]:
     r"""Converts a list of mass fractions to mole fractions. Requires molecular
     weights for all species.
 
@@ -2429,7 +2431,7 @@ def dxs_to_dn_partials(dxs, xs, F, partial_properties=None):
     return partial_properties
 
 
-def d2ns_to_dn2_partials(d2ns, dns):
+def d2ns_to_dn2_partials(d2ns: List[List[float]], dns: List[float]) -> List[List[float]]:
     r"""Convert second-order mole number derivatives of a quantity
      to the following second-order partial derivative:
 
@@ -2566,7 +2568,7 @@ def d2xs_to_dxdn_partials(d2xs, xs):
 
 
 
-def dxs_to_dxsn1(dxs):
+def dxs_to_dxsn1(dxs: List[float]) -> List[float]:
     r"""Convert the mole fraction derivatives of a quantity (calculated so
     they do not sum to 1) to derivatives such that they do sum to 1 by changing
     the composition of the last component in the negative of the component
@@ -2602,7 +2604,7 @@ def dxs_to_dxsn1(dxs):
     return [dx - last for dx in dxs[:-1]]
 
 
-def d2xs_to_d2xsn1(d2xs):
+def d2xs_to_d2xsn1(d2xs: List[List[float]]) -> List[List[float]]:
     r"""Convert the second mole fraction derivatives of a quantity (calculated
     so they do not sum to 1) to derivatives such that they do sum to 1
     Requires the second derivatives of the mixture only. The size of
@@ -2646,7 +2648,7 @@ def d2xs_to_d2xsn1(d2xs):
     return out
 
 
-def none_and_length_check(all_inputs, length=None):
+def none_and_length_check(all_inputs: Any, length: Optional[int]=None) -> bool:
     r"""Checks inputs for suitability of use by a mixing rule which requires
     all inputs to be of the same length and non-None. A number of variations
     were attempted for this function; this was found to be the quickest.
@@ -2680,7 +2682,7 @@ def none_and_length_check(all_inputs, length=None):
 
 
 
-def normalize(values):
+def normalize(values: Union[List[float], List[Union[float, numpy.float64]], List[int], List[float]]) -> Union[List[numpy.float64], List[float]]:
     r"""Simple function which normalizes a series of values to be from 0 to 1,
     and for their sum to add to 1.
 
@@ -2718,7 +2720,7 @@ def normalize(values):
             # case of 0 values
             return []
 
-def remove_zeros(values, tol=1e-6):
+def remove_zeros(values: Union[List[float], numpy.ndarray, List[float]], tol: float=1e-6) -> Union[numpy.ndarray, List[float]]:
     r"""Simple function which removes zero values from an array, and replaces
     them with a user-specified value, normally a very small number. Helpful
     for the case where a function can work with values very close to zero but
@@ -2754,7 +2756,7 @@ def remove_zeros(values, tol=1e-6):
     return values
 
 
-def mixing_simple(fracs, props):
+def mixing_simple(fracs: List[float], props: List[float]) -> Optional[float]:
     r"""Simple function calculates a property based on weighted averages of
     properties. Weights could be mole fractions, volume fractions, mass
     fractions, or anything else.
@@ -2788,7 +2790,7 @@ def mixing_simple(fracs, props):
     return tot
 
 
-def mixing_logarithmic(fracs, props):
+def mixing_logarithmic(fracs: List[float], props: List[float]) -> Optional[float]:
     r"""Simple function calculates a property based on weighted averages of
     logarithmic properties.
 
@@ -2823,7 +2825,7 @@ def mixing_logarithmic(fracs, props):
         tot += fracs[i]*trunc_log(props[i])
     return trunc_exp(tot)
 
-def mixing_power(fracs, props, r):
+def mixing_power(fracs: List[float], props: List[float], r: int) -> float:
     r"""Power law mixing rule for any property, with a variable exponent
     `r` as input. Optimiezd routines are available for common powers.
 
@@ -3058,7 +3060,7 @@ def mixing_power(fracs, props, r):
     return prop**(1.0/r)
 
 
-def mix_component_flows(IDs1, IDs2, flow1, flow2, fractions1, fractions2):
+def mix_component_flows(IDs1: List[str], IDs2: List[str], flow1: float, flow2: int, fractions1: List[float], fractions2: List[float]) -> Tuple[List[str], List[float]]:
     r"""Mix two flows of potentially different chemicals of given overall flow
     rates and flow fractions to determine the outlet components, flow rates,
     and compositions. The flows do not need to be of the same length.
@@ -3174,7 +3176,7 @@ def mix_component_partial_flows(IDs1, IDs2, ns1=None, ns2=None):
     return cmps, ns
 
 
-def mix_multiple_component_flows(IDs, flows, fractions):
+def mix_multiple_component_flows(IDs: List[List[str]], flows: List[int], fractions: List[List[float]]) -> Tuple[List[str], List[float]]:
     r"""Mix multiple flows of potentially different chemicals of given overall
     flow rates and flow fractions to determine the outlet components, flow
     rates,  and compositions. The flows do not need to be of the same length.
@@ -3231,7 +3233,7 @@ def mix_multiple_component_flows(IDs, flows, fractions):
 
 
 
-def solve_flow_composition_mix(Fs, zs, ws, MWs):
+def solve_flow_composition_mix(Fs: Union[List[Optional[float]], List[Optional[int]], List[float], List[Optional[float]]], zs: Union[List[None], List[Optional[float]]], ws: Union[List[Optional[float]], List[None]], MWs: List[float]) -> Union[Tuple[List[float], List[float], List[float]], Tuple[List[float], List[float], List[float]]]:
     r"""Solve a stream composition problem where some specs are mole flow rates;
     some are mass fractions; and some are mole fractions. This algorithm
     requires at least one mole flow rate; and for every other component, a
