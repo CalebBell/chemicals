@@ -174,6 +174,23 @@ if TYPE_CHECKING:
 ###  Register data sources and lazy load them
 
 folder = os_path_join(source_path, "Phase Change")
+
+# Module-level variables for lazy-loaded data
+Tb_data_Yaws: DataFrame
+Tm_ON_data: DataFrame
+Hvap_data_Gharagheizi: DataFrame
+Hvap_data_CRC: DataFrame
+Hfus_data_CRC: DataFrame
+Hsub_data_Gharagheizi: DataFrame
+Tb_sources: dict[str, DataFrame]
+Tm_sources: dict[str, DataFrame]
+Hfus_sources: dict[str, DataFrame]
+phase_change_data_Perrys2_150: DataFrame
+phase_change_values_Perrys2_150: np.ndarray
+phase_change_data_VDI_PPDS_4: DataFrame
+phase_change_values_VDI_PPDS_4: np.ndarray
+phase_change_data_Alibakhshi_Cs: DataFrame
+
 register_df_source(folder, "Yaws Boiling Points.tsv")
 register_df_source(folder, "OpenNotebook Melting Points.tsv")
 register_df_source(folder, "Ghazerati Appendix Vaporization Enthalpy.tsv",
