@@ -70,6 +70,11 @@ if TYPE_CHECKING:
     from pandas.core.frame import DataFrame
 
 folder = os_path_join(source_path, "Electrolytes")
+
+# Module-level variables for lazy-loaded data
+permittivity_data_CRC: DataFrame
+permittivity_values_CRC: np.ndarray
+
 register_df_source(folder, "Permittivity (Dielectric Constant) of Liquids.tsv")
 
 @mark_numba_incompatible

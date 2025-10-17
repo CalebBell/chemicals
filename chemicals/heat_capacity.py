@@ -237,6 +237,31 @@ from chemicals.utils import mark_numba_uncacheable, os_path_join, source_path, t
 if TYPE_CHECKING:
     from pandas.core.frame import DataFrame
 
+# Module-level variables for lazy-loaded data
+Cp_data_Poling: DataFrame
+TRC_gas_data: DataFrame
+CRC_standard_data: DataFrame
+TRC_gas_values: np.ndarray
+Cp_values_Poling: np.ndarray
+zabransky_dict_sat_s: dict[str, list[ZabranskySpline]]
+zabransky_dict_sat_p: dict[str, ZabranskyQuasipolynomial]
+zabransky_dict_const_s: dict[str, list[ZabranskySpline]]
+zabransky_dict_const_p: dict[str, ZabranskyQuasipolynomial]
+zabransky_dict_iso_s: dict[str, list[ZabranskySpline]]
+zabransky_dict_iso_p: dict[str, ZabranskyQuasipolynomial]
+type_to_zabransky_dict: dict[tuple[str, bool], dict[str, list[ZabranskySpline]] | dict[str, ZabranskyQuasipolynomial]]
+zabransky_dicts: dict[str, dict[str, list[ZabranskySpline]] | dict[str, ZabranskyQuasipolynomial]]
+Cp_dict_PerryI: dict[str, dict[str, float]]
+Cp_dict_characteristic_temperatures_psi4_2022a: dict[str, list[float]]
+Cp_dict_characteristic_temperatures_adjusted_psi4_2022a: dict[str, list[float]]
+Cp_dict_JANAF_liquid: dict[str, list[float]]
+Cp_dict_JANAF_gas: dict[str, list[float]]
+Cp_dict_JANAF_solid: dict[str, list[float]]
+WebBook_Shomate_coefficients: dict[str, dict[str, list[float]]]
+WebBook_Shomate_solids: set[str]
+WebBook_Shomate_liquids: set[str]
+WebBook_Shomate_gases: set[str]
+
 IS_NUMBA = "IS_NUMBA" in globals()
 ### Methods introduced in this module
 
@@ -838,15 +863,15 @@ def _load_Cp_data() -> None:
             spline = bool(a1s) # False if Quasypolynomial, True if spline
             d = type_to_zabransky_dict[(Type, spline)]
             if spline:
-                coeffs = (a1s, a2s, a3s, a4s)
+                coeffs_spline = (a1s, a2s, a3s, a4s)
                 if CAS not in d:
-                    d[CAS] = [ZabranskySpline(coeffs, Tmin, Tmax)]
+                    d[CAS] = [ZabranskySpline(coeffs_spline, Tmin, Tmax)]
                 else:
-                    d[CAS].append(ZabranskySpline(coeffs, Tmin, Tmax))
+                    d[CAS].append(ZabranskySpline(coeffs_spline, Tmin, Tmax))
             else:
                 # No duplicates for quasipolynomials
-                coeffs = (a1p, a2p, a3p, a4p, a5p, a6p)
-                d[CAS] = ZabranskyQuasipolynomial(coeffs, Tc, Tmin, Tmax)
+                coeffs_quasi = (a1p, a2p, a3p, a4p, a5p, a6p)
+                d[CAS] = ZabranskyQuasipolynomial(coeffs_quasi, Tc, Tmin, Tmax)
     for dct in (zabransky_dict_const_s, zabransky_dict_iso_s, zabransky_dict_sat_s):
         for CAS in dct: dct[CAS] = PiecewiseHeatCapacity(dct[CAS])
     # Used to generate data. Do not delete!

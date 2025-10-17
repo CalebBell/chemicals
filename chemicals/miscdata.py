@@ -51,6 +51,16 @@ if TYPE_CHECKING:
 
 folder = os_path_join(source_path, "Misc")
 
+# Module-level variables for lazy-loaded data
+CRC_inorganic_data: DataFrame
+CRC_organic_data: DataFrame
+joback_predictions: DataFrame
+wikidata_data: DataFrame
+webbook_data: DataFrame
+common_chemistry_data: DataFrame
+heos_data: DataFrame
+VDI_saturation_dict: dict[str, dict[str, str | float | list[float] | list[float | None]] | dict[str, str | float | list[float]]]
+
 ### CRC Handbook general tables
 register_df_source(folder, "heos_constants.tsv")
 register_df_source(folder, "Physical Constants of Inorganic Compounds.csv")
