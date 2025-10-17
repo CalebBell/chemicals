@@ -92,6 +92,10 @@ if TYPE_CHECKING:
 # Register data sources and lazy load them
 
 folder = os_path_join(source_path, "Misc")
+
+# Module-level variables for lazy-loaded data
+RI_data_CRC_organic: DataFrame
+RI_sources: dict[str, DataFrame]
 register_df_source(folder, "CRC Handbook Organic RI.csv",
                    csv_kwargs={"dtype": {"RI": float, "RIT": float}})
 

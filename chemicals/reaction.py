@@ -141,6 +141,18 @@ ATCT_G = "ATCT_G"
 TRC = "TRC"
 
 folder = os_path_join(source_path, "Reactions")
+
+# Module-level variables for lazy-loaded data
+Hfg_API_TDB_data: DataFrame
+Hfg_ATcT_data: DataFrame
+Hfl_ATcT_data: DataFrame
+Hfg_S0g_YAWS_data: DataFrame
+Hfg_sources: dict[str, DataFrame]
+Hfl_sources: dict[str, DataFrame]
+Hfs_sources: dict[str, DataFrame]
+S0g_sources: dict[str, DataFrame]
+S0l_sources: dict[str, DataFrame]
+S0s_sources: dict[str, DataFrame]
 register_df_source(folder, "API TDB Albahri Hf (g).tsv")
 register_df_source(folder, "ATcT 1.112 (g).tsv")
 register_df_source(folder, "ATcT 1.112 (l).tsv")

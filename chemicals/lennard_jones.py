@@ -125,6 +125,11 @@ if TYPE_CHECKING:
 #  Register data sources and lazy load them
 
 folder = os_path_join(source_path, "Viscosity")
+
+# Module-level variables for lazy-loaded data
+LJ_data_Magalhaes: DataFrame
+LJ_data_Poling: DataFrame
+LJ_sources: dict[str, DataFrame]
 register_df_source(folder, "MagalhaesLJ.tsv")
 register_df_source(folder, "PolingLJ.tsv")
 

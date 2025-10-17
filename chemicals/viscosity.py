@@ -219,6 +219,24 @@ if TYPE_CHECKING:
 
 folder = os_path_join(source_path, "Viscosity")
 
+# Module-level variables for lazy-loaded data
+mu_data_Dutt_Prasad: DataFrame
+mu_values_Dutt_Prasad: np.ndarray
+mu_data_VN3: DataFrame
+mu_values_VN3: np.ndarray
+mu_data_VN2: DataFrame
+mu_values_VN2: np.ndarray
+mu_data_VN2E: DataFrame
+mu_values_VN2E: np.ndarray
+mu_data_Perrys_8E_2_313: DataFrame
+mu_values_Perrys_8E_2_313: np.ndarray
+mu_data_Perrys_8E_2_312: DataFrame
+mu_values_Perrys_8E_2_312: np.ndarray
+mu_data_VDI_PPDS_7: DataFrame
+mu_values_PPDS_7: np.ndarray
+mu_data_VDI_PPDS_8: DataFrame
+mu_values_PPDS_8: np.ndarray
+
 register_df_source(folder, "Dutt Prasad 3 term.tsv", csv_kwargs={
             "dtype":{"A": float, "B": float, "C": float, "Tmin": float, "Tmax": float}})
 

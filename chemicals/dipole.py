@@ -36,6 +36,8 @@ Lookup Functions
 """
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 __all__: list[str] = [
     "dipole_moment",
     "dipole_moment_all_methods",
@@ -54,9 +56,18 @@ from chemicals.data_reader import (
 from chemicals.miscdata import PSI4_2022A
 from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
+if TYPE_CHECKING:
+    from pandas.core.frame import DataFrame
+
 # %% Register data sources and lazy load them
 
 folder = os_path_join(source_path, "Misc")
+
+# Module-level variables for lazy-loaded data
+dipole_data_CCDB: DataFrame
+dipole_data_Muller: DataFrame
+dipole_data_Poling: DataFrame
+dipole_sources: dict[str, DataFrame]
 
 CCCBDB = "CCCBDB"
 MULLER = "MULLER"

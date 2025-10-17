@@ -216,6 +216,20 @@ if TYPE_CHECKING:
 
 folder = os_path_join(source_path, "Density")
 
+# Module-level variables for lazy-loaded data
+rho_data_COSTALD: DataFrame
+rho_data_SNM0: DataFrame
+rho_data_Perry_8E_105_l: DataFrame
+rho_values_Perry_8E_105_l: np.ndarray
+rho_data_VDI_PPDS_2: DataFrame
+rho_values_VDI_PPDS_2: np.ndarray
+rho_data_CRC_inorg_l: DataFrame
+rho_values_CRC_inorg_l: np.ndarray
+rho_data_CRC_inorg_l_const: DataFrame
+rho_data_CRC_inorg_s_const: DataFrame
+rho_data_CRC_virial: DataFrame
+rho_values_CRC_virial: np.ndarray
+
 register_df_source(folder, "COSTALD Parameters.tsv")
 register_df_source(folder, "Mchaweh SN0 deltas.tsv")
 register_df_source(folder, "Perry Parameters 105.tsv")

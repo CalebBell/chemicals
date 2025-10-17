@@ -267,8 +267,29 @@ from chemicals.utils import mark_numba_incompatible, os_path_join, source_path
 
 if TYPE_CHECKING:
     from pandas.core.frame import DataFrame
-
 folder = os_path_join(source_path, "Vapor Pressure")
+
+# Module-level variables for lazy-loaded data
+Psat_data_WagnerMcGarry: DataFrame
+Psat_values_WagnerMcGarry: np.ndarray
+Psat_data_AntoinePoling: DataFrame
+Psat_values_AntoinePoling: np.ndarray
+Psat_data_Alcock_elements: DataFrame
+Psat_values_Alcock_elements: np.ndarray
+Psub_data_Alcock_elements: DataFrame
+Psub_values_Alcock_elements: np.ndarray
+Psat_data_WagnerPoling: DataFrame
+Psat_values_WagnerPoling: np.ndarray
+Psat_data_AntoineExtended: DataFrame
+Psat_values_AntoineExtended: np.ndarray
+Psat_data_Perrys2_8: DataFrame
+Psat_values_Perrys2_8: np.ndarray
+Psat_data_VDI_PPDS_3: DataFrame
+Psat_values_VDI_PPDS_3: np.ndarray
+Psub_data_Landolt_Antoine: DataFrame
+Psub_values_Landolt_Antoine: np.ndarray
+Psat_data_Landolt_Antoine: DataFrame
+Psat_values_Landolt_Antoine: np.ndarray
 
 register_df_source(folder, "Antoine Collection Poling.tsv")
 register_df_source(folder, "Table 2-8 Vapor Pressure of Inorganic and Organic Liquids.tsv")

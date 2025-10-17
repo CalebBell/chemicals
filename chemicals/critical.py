@@ -135,6 +135,23 @@ if TYPE_CHECKING:
     from pandas.core.frame import DataFrame
 
 folder = os_path_join(source_path, "Critical Properties")
+
+# Module-level variables for lazy-loaded data
+critical_data_IUPAC: DataFrame
+critical_data_Matthews: DataFrame
+critical_data_CRC: DataFrame
+critical_data_PSRKR4: DataFrame
+critical_data_Yaws: DataFrame
+critical_data_PassutDanner: DataFrame
+critical_data_PinaMartines: DataFrame
+critical_data_WilsonJasperson: DataFrame
+critical_data_Fedors: DataFrame
+critical_data_omega_Psat_Tc: DataFrame
+Tc_sources: dict[str, DataFrame]
+Pc_sources: dict[str, DataFrame]
+Vc_sources: dict[str, DataFrame]
+Zc_sources: dict[str, DataFrame]
+omega_sources: dict[str, DataFrame]
 IUPAC = "IUPAC"
 MATTHEWS = "MATTHEWS"
 CRC = "CRC"

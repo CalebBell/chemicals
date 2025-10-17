@@ -172,6 +172,17 @@ if TYPE_CHECKING:
 
 folder = os_path_join(source_path, "Interface")
 
+# Module-level variables for lazy-loaded data
+sigma_data_Mulero_Cachadina: DataFrame
+sigma_values_Mulero_Cachadina: np.ndarray
+sigma_data_Jasper_Lange: DataFrame
+sigma_values_Jasper_Lange: np.ndarray
+sigma_data_Somayajulu: DataFrame
+sigma_values_Somayajulu: np.ndarray
+sigma_data_Somayajulu2: DataFrame
+sigma_values_Somayajulu2: np.ndarray
+sigma_data_VDI_PPDS_11: DataFrame
+sigma_values_VDI_PPDS_11: np.ndarray
 
 register_df_source(folder, "MuleroCachadinaParameters.tsv")
 register_df_source(folder, "Jasper-Lange.tsv")

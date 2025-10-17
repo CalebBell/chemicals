@@ -94,6 +94,21 @@ if TYPE_CHECKING:
 
 ### Register data sources and lazy load them
 folder = os_path_join(source_path, "Environment")
+
+# Module-level variables for lazy-loaded data
+IPCC_2007_GWPs: DataFrame
+IPCC_2014_GWPs: DataFrame
+IPCC_2021_GWPs: DataFrame
+ODP_data: DataFrame
+_IPCC_2007_GWP_keys_by_method: dict[str, str]
+_IPCC_2014_GWP_keys_by_method: dict[str, str]
+_IPCC_2021_GWP_keys_by_method: dict[str, str]
+_IPCC_2014_GTP_keys_by_method: dict[str, str]
+_IPCC_2021_GTP_keys_by_method: dict[str, str]
+_ODP_keys_by_method: dict[str, str]
+logP_data_CRC: DataFrame
+logP_data_Syrres: DataFrame
+logP_sources: dict[str, DataFrame]
 register_df_source(folder, "Official Global Warming Potentials 2007.tsv")
 register_df_source(folder, "Official Global Warming Potentials 2014.tsv")
 register_df_source(folder, "Official Global Warming Potentials 2021.tsv", index_col=1)

@@ -72,6 +72,11 @@ if TYPE_CHECKING:
 
 # Register data sources and lazy load them
 folder = os_path_join(source_path, "Triple Properties")
+
+# Module-level variables for lazy-loaded data
+triple_data_Staveley: DataFrame
+Tt_sources: dict[str, DataFrame]
+Pt_sources: dict[str, DataFrame]
 register_df_source(folder, "Staveley 1981.tsv")
 
 STAVELEY = "STAVELEY"

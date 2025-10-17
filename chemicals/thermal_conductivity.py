@@ -174,6 +174,15 @@ if TYPE_CHECKING:
 
 folder = os_path_join(source_path, "Thermal Conductivity")
 
+# Module-level variables for lazy-loaded data
+k_data_Perrys_8E_2_314: DataFrame
+k_values_Perrys_8E_2_314: np.ndarray
+k_data_Perrys_8E_2_315: DataFrame
+k_values_Perrys_8E_2_315: np.ndarray
+k_data_VDI_PPDS_9: DataFrame
+k_values_VDI_PPDS_9: np.ndarray
+k_data_VDI_PPDS_10: DataFrame
+k_values_VDI_PPDS_10: np.ndarray
 
 register_df_source(folder, "Table 2-314 Vapor Thermal Conductivity of Inorganic and Organic Substances.tsv")
 register_df_source(folder, "Table 2-315 Thermal Conductivity of Inorganic and Organic Liquids.tsv")
