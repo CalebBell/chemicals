@@ -1147,7 +1147,7 @@ def Mersmann_Kind_predictor(atoms: dict[str, int], coeff: float=3.645, power: fl
        2017. https://doi.org/10.1021/acs.iecr.6b04323.
     """
     H_RADIUS_COV = covalent_radii["H"]
-    tot = 0
+    tot = 0.0
     atom_count = 0
     for atom, count in atoms.items():
         if atom not in covalent_radii:
@@ -1266,17 +1266,6 @@ def Tb_Tc_relationship(Tb=None, Tc=None, fit="Perry8E"):
     elif Tc is None:
         return coeff*Tb
 
-def _assert_two_critical_properties_provided(Tc: float | None, Pc: float | None, Vc: float | None) -> None:
-    specs = 0 # numba compatibility
-    if Tc is not None:
-        specs += 1
-    if Pc is not None:
-        specs += 1
-    if Vc is not None:
-        specs += 1
-    if specs != 2:
-        raise ValueError("Two and only two of Tc, Pc, and Vc must be provided")
-
 def Ihmels(Tc: float | None=None, Pc: float | None=None, Vc: float | None=None) -> float:
     r"""Most recent, and most recommended method of estimating critical
     properties from each other. Two of the three properties are required.
@@ -1323,7 +1312,6 @@ def Ihmels(Tc: float | None=None, Pc: float | None=None, Vc: float | None=None) 
        & Engineering Data 55, no. 9 (September 9, 2010): 3474-80.
        doi:10.1021/je100167w.
     """
-    _assert_two_critical_properties_provided(Tc, Pc, Vc)
     if Tc is not None and Vc is not None:
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Pc_calc = -0.025+2.215*Tc/Vc
@@ -1334,11 +1322,14 @@ def Ihmels(Tc: float | None=None, Pc: float | None=None, Vc: float | None=None) 
         Vc_calc = 443.0*Tc/(200.0*Pc+5.0)
         Vc_calc = Vc_calc/1E6  # cm^3/mol to m^3/mol
         return Vc_calc
-    else: # Pc and Vc
+    elif Pc is not None and Vc is not None:
         Pc = Pc*1e-6  # Pa to MPa
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Tc_calc = 5.0/443.0*(40.0*Pc*Vc + Vc)
         return Tc_calc
+    else:
+        raise ValueError("Two and only two of Tc, Pc, and Vc must be provided")
+
 
 def Meissner(Tc: float | None=None, Pc: float | None=None, Vc: float | None=None) -> float:
     r"""Old (1942) relationship for estimating critical
@@ -1386,22 +1377,23 @@ def Meissner(Tc: float | None=None, Pc: float | None=None, Vc: float | None=None
            Constants." Industrial & Engineering Chemistry 34, no. 5
            (May 1, 1942): 521-26. doi:10.1021/ie50389a003.
     """
-    _assert_two_critical_properties_provided(Tc, Pc, Vc)
-    if Tc and Vc:
+    if Tc is not None and Vc is not None:
         Vc = Vc*1E6
         Pc = 20.8*Tc/(Vc-8)
         Pc = 101325*Pc  # atm to Pa
         return Pc
-    elif Tc and Pc:
+    elif Tc is not None and Pc is not None:
         Pc = Pc/101325.  # Pa to atm
         Vc = 104/5.0*Tc/Pc+8
         Vc = Vc/1E6  # cm^3/mol to m^3/mol
         return Vc
-    else: # Pc and Vc
+    elif Pc is not None and Vc is not None:
         Pc = Pc/101325.  # Pa to atm
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Tc = 5./104.0*Pc*(Vc-8)
         return Tc
+    else:
+        raise ValueError("Two and only two of Tc, Pc, and Vc must be provided")
 
 def Grigoras(Tc: float | None=None, Pc: float | None=None, Vc: float | None=None) -> float:
     r"""Relatively recent (1990) relationship for estimating critical
@@ -1451,22 +1443,23 @@ def Grigoras(Tc: float | None=None, Pc: float | None=None, Vc: float | None=None
            Chemistry 11, no. 4 (May 1, 1990): 493-510.
            doi:10.1002/jcc.540110408
     """
-    _assert_two_critical_properties_provided(Tc, Pc, Vc)
-    if Tc and Vc:
+    if Tc is not None and Vc is not None:
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Pc = 2.9 + 20.2*Tc/Vc
         Pc = Pc*1E5  # bar to Pa
         return Pc
-    elif Tc and Pc:
+    elif Tc is not None and Pc is not None:
         Pc = Pc/1E5  # Pa to bar
         Vc = 202.0*Tc/(10*Pc-29.0)
         Vc = Vc/1E6  # cm^3/mol to m^3/mol
         return Vc
-    else: # Pc and Vc
+    elif Pc is not None and Vc is not None:
         Pc = Pc/1E5  # Pa to bar
         Vc = Vc*1E6  # m^3/mol to cm^3/mol
         Tc = 1.0/202*(10*Pc-29.0)*Vc
         return Tc
+    else:
+        raise ValueError("Two and only two of Tc, Pc, and Vc must be provided")
 
 def Hekayati_Raeissi(MW, V_sat=None, Tc=None, Pc=None, Vc=None):
     r"""Estimation model for missing critical constants of a fluid
@@ -1865,7 +1858,7 @@ def Chueh_Prausnitz_Tc(zs: list[float], Tcs: list[float], Vcs: list[float], taus
     Tcm *= denominator_inv
     return Tcm
 
-def Grieves_Thodos(zs: list[float], Tcs: list[float | None] | list[float], Aijs: list[list[float]]) -> float:
+def Grieves_Thodos(zs: list[float], Tcs: list[float], Aijs: list[list[float]]) -> float:
     r"""Calculates critical temperature of a mixture according to
     mixing rules in [1]_.
 
