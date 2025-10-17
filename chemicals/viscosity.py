@@ -709,7 +709,7 @@ def Viswanath_Natarajan_2(T: float, A: float, B: float) -> float:
     return exp(A + B/T)
 
 
-def Viswanath_Natarajan_2_exponential(T: float, C: int, D: float) -> float:
+def Viswanath_Natarajan_2_exponential(T: float, C: float, D: float) -> float:
     r"""Calculate the viscosity of a liquid using the 2-term exponential form
     representation developed in [1]_. Requires input coefficients. The `A`
     coefficient is assumed to yield coefficients in Pa*s, as all

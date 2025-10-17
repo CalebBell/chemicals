@@ -536,7 +536,7 @@ def Clapeyron(T: float, Tc: float, Pc: float, dZ: float=1, Psat: float=101325) -
     Tr = T/Tc
     return R*T*dZ*log(Pc/Psat)/(1. - Tr)
 
-def Pitzer(T: int, Tc: float, omega: float) -> float:
+def Pitzer(T: float, Tc: float, omega: float) -> float:
     r"""Calculates enthalpy of vaporization at arbitrary temperatures using a
     fit by [2]_ to the work of Pitzer [1]_; requires a chemical's critical
     temperature and acentric factor.
@@ -1063,7 +1063,7 @@ def Vetere(Tb: float, Tc: float, Pc: float, F: float=1.0) -> float:
 
 ### Enthalpy of Vaporization adjusted for T
 
-def Watson(T: int, Hvap_ref: int, T_ref: float, Tc: float, exponent: float=0.38) -> float:
+def Watson(T: float, Hvap_ref: float, T_ref: float, Tc: float, exponent: float=0.38) -> float:
     r"""Calculates enthalpy of vaporization of a chemical at a temperature
     using the known heat of vaporization at another temperature according to
     the Watson [1]_ [2]_ correlation. This is an application of the

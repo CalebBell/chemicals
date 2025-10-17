@@ -621,7 +621,7 @@ def Rackett_fit(T, Tc, rhoc, b, n, MW=None):
         return 1e-3*MW/rho_calc
     return 1.0/rho_calc
 
-def Yamada_Gunn(T: int, Tc: float, Pc: float, omega: float) -> float:
+def Yamada_Gunn(T: float, Tc: float, Pc: float, omega: float) -> float:
     r"""Calculates saturation liquid volume, using Yamada and Gunn CSP method
     and a chemical's critical properties and acentric factor.
 
@@ -672,7 +672,7 @@ def Yamada_Gunn(T: int, Tc: float, Pc: float, omega: float) -> float:
     return R*Tc/Pc*(0.29056 - 0.08775*omega)**(1.0 + (1.0 - T/Tc)**(2.0/7.))
 
 
-def Townsend_Hales(T: int, Tc: float, Vc: float, omega: float) -> float:
+def Townsend_Hales(T: float, Tc: float, Vc: float, omega: float) -> float:
     r"""Calculates saturation liquid density, using the Townsend and Hales
     CSP method as modified from the original Riedel equation. Uses
     chemical critical volume and temperature, as well as acentric factor
@@ -982,7 +982,7 @@ def Campbell_Thodos(T: float, Tb: float, Tc: float, Pc: float, MW: float, dipole
     return Vs
 
 
-def SNM0(T: int, Tc: float, Vc: float, omega: float, delta_SRK: float | None=None) -> float:
+def SNM0(T: float, Tc: float, Vc: float, omega: float, delta_SRK: float | None=None) -> float:
     r"""Calculates saturated liquid density using the Mchaweh, Moshfeghian
     model [1]_. Designed for simple calculations.
 
@@ -1532,7 +1532,7 @@ def ideal_gas(T: float, P: float) -> float:
 
 ### Solids
 
-def Goodman(T: int, Tt: float, Vml: float) -> float:
+def Goodman(T: float, Tt: float, Vml: float) -> float:
     r"""Calculates solid density at T using the simple relationship
     by a member of the DIPPR.
 

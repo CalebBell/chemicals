@@ -1728,7 +1728,7 @@ def TRC_Antoine_extended_fitting_jacobian(Ts, Tc, to, A, B, C, n, E, F):
             row[6] = Tc_n12*x1_8*x1_4*x9
     return out
 
-def Wagner(T: float, Tc: float, Pc: int, a: float, b: float, c: float, d: float) -> float:
+def Wagner(T: float, Tc: float, Pc: float, a: float, b: float, c: float, d: float) -> float:
     r"""Calculates vapor pressure using the Wagner equation (2.5, 5 form).
 
     Requires critical temperature and pressure as well as four coefficients

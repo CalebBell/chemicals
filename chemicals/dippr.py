@@ -105,7 +105,7 @@ INTEGRAL_CALCULATION = -1
 INTEGRAL_OVER_T_CALCULATION = -10
 
 
-def EQ100(T: float, A: float=0, B: float=0, C: float=0, D: float=0, E: float=0, F: int=0, G: int=0, order: complex=0) -> float:
+def EQ100(T: float, A: float=0, B: float=0, C: float=0, D: float=0, E: float=0, F: float=0, G: float=0, order: complex=0) -> float:
     r"""DIPPR Equation # 100. Used in calculating the molar heat capacities
     of liquids and solids, liquid thermal conductivity, and solid density.
     All parameters default to zero. As this is a straightforward polynomial,
@@ -545,7 +545,7 @@ def EQ107_fitting_jacobian(Ts, A, B, C, D, E):
         r[4] = 2.0*D*E*x7*(-x5*sinh(x5)*x6_inv + 1.0)
     return out
 
-def EQ104(T: float, A: float, B: float, C: int=0.0, D: float=0.0, E: float=0.0, order: complex=0) -> float:
+def EQ104(T: float, A: float, B: float, C: float=0.0, D: float=0.0, E: float=0.0, order: complex=0) -> float:
     r"""DIPPR Equation #104. Often used in calculating second virial
     coefficients of gases. All 5 parameters are required.
     C, D, and E are normally large values.

@@ -1801,7 +1801,7 @@ def BVirial_Tsonopoulos_mat(T, Tcs, Pcs, omegas, Bs=None, dB_dTs=None,
             d3B_row[j] = d3B
     return Bs, dB_dTs, d2B_dT2s, d3B_dT3s
 
-def BVirial_Tsonopoulos_extended(T: float, Tc: float, Pc: float, omega: float, a: int=0, b: int=0, species_type: str="",
+def BVirial_Tsonopoulos_extended(T: float, Tc: float, Pc: float, omega: float, a: float=0, b: float=0, species_type: str="",
                                  dipole: float=0, order: int=0) -> float:
     r"""Calculates the second virial coefficient using the
     comprehensive model in [1]_. See the notes for the calculation of `a` and

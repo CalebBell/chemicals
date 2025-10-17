@@ -305,7 +305,7 @@ class ZabranskySpline:
         self.Tmin = Tmin
         self.Tmax = Tmax
 
-    def calculate(self, T: int) -> float:
+    def calculate(self, T: float) -> float:
         r"""
         Return heat capacity as a function of temperature.
 
@@ -553,7 +553,7 @@ class PiecewiseHeatCapacity:
     def __iter__(self):
         return self.models.__iter__()
 
-    def calculate(self, T: int) -> float:
+    def calculate(self, T: float) -> float:
         r"""
         Return the heat capacity as a function of temperature.
 
@@ -583,7 +583,7 @@ class PiecewiseHeatCapacity:
                 if T <= model.Tmax: return model.calculate(T)
         raise ValueError(f"no valid model at T={T:g} K")
 
-    def force_calculate(self, T: int) -> float:
+    def force_calculate(self, T: float) -> float:
         r"""
         Return the heat capacity as a function of temperature.
 
@@ -1832,7 +1832,7 @@ def TRCCp_integral(T: float, a0: float, a1: float, a2: float, a3: float, a4: flo
         h = first*(second + third + fourth + fifth)
     return (a0 + a1*exp(-a2/T)/(a2*T) + I/T + h/T)*R*T
 
-def TRCCp_integral_over_T(T: int, a0: float, a1: int, a2: int, a3: float, a4: float, a5: int, a6: int, a7: int, J: int=0) -> float:
+def TRCCp_integral_over_T(T: float, a0: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float, a7: float, J: float=0) -> float:
     r"""Integrates ideal gas heat capacity over T using the model developed in
     [1]_. Best used as a delta only.
     The difference in ideal-gas entropy with respect to 0 K is given by:
@@ -2355,7 +2355,7 @@ def Dadgostar_Shaw_integral_over_T(T, similarity_variable, MW=None):
     S = T*T*0.5*third + T*second + first*log(T)
     return S*1000. if MW is None else S*MW
 
-def Zabransky_quasi_polynomial(T: int, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
+def Zabransky_quasi_polynomial(T: float, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
     r"""Calculates liquid heat capacity using the model developed in [1]_.
 
     .. math::
@@ -2411,7 +2411,7 @@ def Zabransky_quasi_polynomial(T: int, Tc: float, a1: float, a2: float, a3: floa
     return R*(a1*log(1.0-Tr) + a2/(1.0-Tr) + a3 + Tr*(Tr*(Tr*a6 + a5) + a4))
 
 
-def Zabransky_quasi_polynomial_integral(T: int, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
+def Zabransky_quasi_polynomial_integral(T: float, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
     r"""Calculates the integral of liquid heat capacity using the
     quasi-polynomial model developed in [1]_.
 
@@ -2465,7 +2465,7 @@ def Zabransky_quasi_polynomial_integral(T: int, Tc: float, a1: float, a2: float,
     return R*(T*(T*(T*(T*a6/(4.*Tc3) + a5/(3.*Tc2)) + a4/(2.*Tc)) - a1 + a3)
               + T*a1*log(1. - T/Tc) - 0.5*Tc*(a1 + a2)*log(term*term))
 
-def Zabransky_quasi_polynomial_integral_over_T(T: int, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
+def Zabransky_quasi_polynomial_integral_over_T(T: float, Tc: float, a1: float, a2: float, a3: float, a4: float, a5: float, a6: float) -> float:
     r"""Calculates the integral of liquid heat capacity over T using the
     quasi-polynomial model  developed in [1]_.
 

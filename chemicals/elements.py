@@ -898,7 +898,7 @@ def molecular_weight(atoms: dict[str, int]) -> float:
     return MW
 
 @mark_numba_incompatible
-def mass_fractions(atoms: dict[str, int], MW: int | None=None) -> dict[str, float]:
+def mass_fractions(atoms: dict[str, int], MW: float | None=None) -> dict[str, float]:
     r"""Calculates the mass fractions of each element in a compound,
     given a dictionary of its atoms and their counts, in the format
     {symbol: count}.

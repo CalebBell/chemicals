@@ -757,7 +757,7 @@ def k_air_lemmon(T, rho, Cp=None, Cv=None, drho_dP=None, drho_dP_Tr=None, mu=Non
 
 ### Purely CSP Methods - Liquids
 
-def Sheffy_Johnson(T: int, MW: int, Tm: int) -> float:
+def Sheffy_Johnson(T: float, MW: float, Tm: float) -> float:
     r"""Calculate the thermal conductivity of a liquid as a function of
     temperature using the Sheffy-Johnson (1961) method. Requires
     Temperature, molecular weight, and melting point.
@@ -798,7 +798,7 @@ def Sheffy_Johnson(T: int, MW: int, Tm: int) -> float:
     return 1.951*(1.0 - 0.00126*(T - Tm))*Tm**-0.216*MW**-0.3
 
 
-def Sato_Riedel(T: int, MW: int, Tb: int, Tc: int) -> float:
+def Sato_Riedel(T: float, MW: float, Tb: float, Tc: float) -> float:
     r"""Calculate the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Sato-Riedel [1]_, [2]_, published in
     Reid [3]_. Requires temperature, molecular weight, and boiling and critical
@@ -848,7 +848,7 @@ def Sato_Riedel(T: int, MW: int, Tb: int, Tc: int) -> float:
     return 1.1053*(3. + 20.*(Tr_term)**(2.0/3.0))*MW**-0.5/(3.0 + 20.0*(1.0 - Tbr)**(2.0/3.))
 
 
-def Lakshmi_Prasad(T: float, MW: int) -> float:
+def Lakshmi_Prasad(T: float, MW: float) -> float:
     r"""Estimates thermal conductivity of pure liquids as a function of
     temperature using a reference fluid approach. Low accuracy but quick.
     Developed using several organic fluids.
@@ -888,7 +888,7 @@ def Lakshmi_Prasad(T: float, MW: int) -> float:
     return 0.0655 - 0.0005*T + (1.3855 - 0.00197*T)/sqrt(MW)
 
 
-def Gharagheizi_liquid(T: int, MW: int, Tb: int, Pc: float, omega: float) -> float:
+def Gharagheizi_liquid(T: float, MW: float, Tb: float, Pc: float, omega: float) -> float:
     r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Gharagheizi [1]_. A  convoluted
     method claiming high-accuracy and using only statistically significant
@@ -955,7 +955,7 @@ def Gharagheizi_liquid(T: int, MW: int, Tb: int, Pc: float, omega: float) -> flo
     return kl
 
 
-def Nicola_original(T: int, MW: float, Tc: float, omega: float, Hfus: int) -> float:
+def Nicola_original(T: float, MW: float, Tc: float, omega: float, Hfus: float) -> float:
     r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of Nicola [1]_. A  simpler but long
     method claiming high-accuracy and using only statistically significant
@@ -1010,7 +1010,7 @@ def Nicola_original(T: int, MW: float, Tc: float, omega: float, Hfus: int) -> fl
     return -0.5694 - 0.1436*Tr + 5.4893E-10*Hfus + 0.0508*omega + MW**-0.0622
 
 
-def Nicola(T: int, MW: float, Tc: float, Pc: float, omega: float) -> float:
+def Nicola(T: float, MW: float, Tc: float, Pc: float, omega: float) -> float:
     r"""Estimates the thermal conductivity of a liquid as a function of
     temperature using the CSP method of [1]_. A statistically derived
     equation using any correlated terms.
@@ -1060,7 +1060,7 @@ def Nicola(T: int, MW: float, Tc: float, Pc: float, omega: float) -> float:
     return 0.5147*(-0.2537*T/Tc + 0.0017E-5*Pc + 0.1501*omega + MW**-0.2999)
 
 
-def Bahadori_liquid(T: float, MW: int) -> float:
+def Bahadori_liquid(T: float, MW: float) -> float:
     r"""Estimates the thermal conductivity of parafin liquid hydrocarbons.
     Fits their data well, and is useful as only MW is required.
     X is the Molecular weight, and Y the temperature.
@@ -1918,7 +1918,7 @@ def Gharagheizi_gas(T: float, MW: float, Tb: float, Pc: float, omega: float) -> 
     return 7.9505E-4 + 3.989E-5*T - 5.419E-5*MW + 3.989E-5*A
 
 
-def Bahadori_gas(T: float, MW: int) -> float:
+def Bahadori_gas(T: float, MW: float) -> float:
     r"""Estimates the thermal conductivity of hydrocarbons gases at low P.
     Fits their data well, and is useful as only MW is required.
     Y is the Molecular weight, and X the temperature.

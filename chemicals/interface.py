@@ -528,7 +528,7 @@ def ISTExpansion(T, Tc, a1, a2, a3=0.0, a4=0.0, a5=0.0):
         return 0.0
     return tau*(a1 + tau*(a2 + tau*(a3 + tau*(a4 + a5*tau))))
 
-def Somayajulu(T: int, Tc: float, A: float, B: float, C: float) -> float:
+def Somayajulu(T: float, Tc: float, A: float, B: float, C: float) -> float:
     r"""Calculates air-liquid surface tension  using the [1]_
     emperical (parameter-regressed) method. Well regressed, no recent data.
 
@@ -585,7 +585,7 @@ def Somayajulu(T: int, Tc: float, A: float, B: float, C: float) -> float:
     return X*sqrt(sqrt(X))*(A + X*(B + C*X))*1e-3
 
 
-def Jasper(T: float, a: int, b: float) -> float:
+def Jasper(T: float, a: float, b: float) -> float:
     r"""Calculates surface tension of a fluid given two parameters, a linear
     fit in Celcius from [1]_ with data reprinted in [2]_.
 
@@ -1536,7 +1536,7 @@ def Weinaug_Katz(parachors: list[float], Vml: float, Vmg: float, xs: list[float]
 ### Water-hydrocarbon interfacial tensions
 
 
-def Meybodi_Daryasafar_Karimi(rho_water: int, rho_oil: int, T: int, Tc: int) -> float:
+def Meybodi_Daryasafar_Karimi(rho_water: float, rho_oil: float, T: float, Tc: float) -> float:
     r"""Calculates the interfacial tension between water and a hydrocabon
     liquid according to the correlation of [1]_.
 

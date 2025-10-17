@@ -454,7 +454,7 @@ def solubility_parameter(T: float, Hvapm: float, Vml: float) -> float | None:
     # Prevent taking the root of a negative number
     return None if (Hvapm < R*T or Vml < 0.0) else sqrt((Hvapm - R*T)/Vml)
 
-def solubility_eutectic(T: float, Tm: float, Hm: float, Cpl: int=0, Cps: int=0, gamma: float=1) -> float:
+def solubility_eutectic(T: float, Tm: float, Hm: float, Cpl: float=0, Cps: float=0, gamma: float=1) -> float:
     r"""Returns the maximum solubility of a solute in a solvent.
 
     .. math::
@@ -506,7 +506,7 @@ def solubility_eutectic(T: float, Tm: float, Hm: float, Cpl: int=0, Cps: int=0, 
     return x
 
 
-def Tm_depression_eutectic(Tm: float, Hm: int, x: float | None=None, M: float | None=None, MW: float | None=None) -> float:
+def Tm_depression_eutectic(Tm: float, Hm: float, x: float | None=None, M: float | None=None, MW: float | None=None) -> float:
     r"""Returns the freezing point depression caused by a solute in a solvent.
     Can use either the mole fraction of the solute or its molality and the
     molecular weight of the solvent. Assumes ideal system behavior.
