@@ -174,22 +174,6 @@ if TYPE_CHECKING:
 ###  Register data sources and lazy load them
 
 folder = os_path_join(source_path, "Phase Change")
-
-# Module-level variables for lazy-loaded data
-Tb_data_Yaws: DataFrame
-Tm_ON_data: DataFrame
-Hvap_data_Gharagheizi: DataFrame
-Hvap_data_CRC: DataFrame
-Hfus_data_CRC: DataFrame
-Hsub_data_Gharagheizi: DataFrame
-Tb_sources: dict[str, DataFrame]
-Tm_sources: dict[str, DataFrame]
-Hfus_sources: dict[str, DataFrame]
-phase_change_data_Perrys2_150: DataFrame
-phase_change_values_Perrys2_150: np.ndarray
-phase_change_data_VDI_PPDS_4: DataFrame
-phase_change_values_VDI_PPDS_4: np.ndarray
-phase_change_data_Alibakhshi_Cs: DataFrame
 register_df_source(folder, "Yaws Boiling Points.tsv")
 register_df_source(folder, "OpenNotebook Melting Points.tsv")
 register_df_source(folder, "Ghazerati Appendix Vaporization Enthalpy.tsv",
@@ -1020,7 +1004,7 @@ def Liu(Tb: float, Tc: float, Pc: float) -> float:
     return R*Tb*(Tb/220.)**0.0627*(1. - Tbr)**0.38*log(Pc/101325.) \
         / (1 - Tbr + 0.38*Tbr*log(Tbr))
 
-def Vetere(Tb: float, Tc: float, Pc: float, F: int=1.0) -> float:
+def Vetere(Tb: float, Tc: float, Pc: float, F: float=1.0) -> float:
     r"""Calculates enthalpy of vaporization at the boiling point, using the
     Vetere [1]_ CSP method. Required information are critical temperature
     and pressure, and boiling point. Equation taken from [2]_.
