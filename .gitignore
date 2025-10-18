@@ -1,28 +1,31 @@
 *.pyc
-*.pyo
 .gitignore
+.pytype
 .pypirc
 dist
 MANIFEST
 .coverage
 htmlcov
-_build
 .cache
 __pycache__
-prof
-*Pyreverse*
-monkeytype.sqlite3
-*.spyproject*
-chemicals.build
-.asv
-build
+*kate-swp
+.spyproject
 chemicals.egg-info
+prof
+.mypy_cache
+monkeytype.sqlite3
+.asv
+chemicals.build
+node_modules
+package-lock.json
+build
+_build
 
 # Docs #
 ########
-# No need to save these files
 docs/_build/*
 docs/make.bat
+
 # Compiled source #
 ###################
 *.com
@@ -31,9 +34,10 @@ docs/make.bat
 *.exe
 *.o
 *.so
+*.pyo
 *.idea
-.vscode
-chemicals/Identifiers/metadata.db
+*$py.class
+
 # Packages #
 ############
 # it's better to unpack these files and commit the raw source
@@ -46,35 +50,39 @@ chemicals/Identifiers/metadata.db
 *.rar
 #*.tar
 #*.zip
- 
+
 # Logs and databases #
 ######################
 *.log
 *.sql
 *.sqlite
- 
+.vscode
+
 # OS generated files #
 ######################
 .DS_Store
 .DS_Store?
+.ipynb_checkpoints
 ._*
+_*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
 Thumbs.db
-surfaces
 
+.pytest_cache/
+word_whitelist.txt
+simple_geolocator_cache.sqlite3
+.hypothesis
+.claude
+
+# Project specific
+chemicals/Identifiers/metadata.db
+*Pyreverse*
+surfaces
 constants dump.json
 binary dump.marshal
-
-thermo/Misc/constants dump 2018.json
-thermo/Misc/constants dump*
-
 dev/data/common_chemistry_complete.tsv
-
 dev/predictions/psi4
-.hypothesis
-
 dev/data/janaf/JANAF_Cache
 dev/data/janaf/janaf.nist.gov
-.claude
