@@ -884,15 +884,15 @@ def molecular_weight(atoms: dict[str, int]) -> float:
 
     """
     MW = 0
-    for i in atoms:
+    for i, count in atoms.items():
         if i in periodic_table:
-            MW += periodic_table[i].MW*atoms[i]
+            MW += periodic_table[i].MW*count
         elif i == "D":
             # Hardcoded MW until an actual isotope db is created
-            MW += 2.014102*atoms[i]
+            MW += 2.014102*count
         elif i == "T":
             # Hardcoded MW until an actual isotope db is created
-            MW += 3.0160492*atoms[i]
+            MW += 3.0160492*count
         else:
             raise ValueError("Molecule includes unknown atoms")
     return MW
@@ -941,9 +941,9 @@ def mass_fractions(atoms: dict[str, int], MW: float | None=None) -> dict[str, fl
     if not MW:
         MW = molecular_weight(atoms)
     mfracs = {}
-    for i in atoms:
+    for i, count in atoms.items():
         if i in periodic_table:
-            mfracs[i] = periodic_table[i].MW*atoms[i]/MW
+            mfracs[i] = periodic_table[i].MW*count/MW
         else:
             raise ValueError("Molecule includes unknown atoms")
     return mfracs
@@ -985,8 +985,8 @@ def atom_fractions(atoms: dict[str, int]) -> dict[str, float]:
     """
     count = sum(atoms.values())
     afracs = {}
-    for i in atoms:
-        afracs[i] = atoms[i]/count
+    for i, atom_count in atoms.items():
+        afracs[i] = atom_count/count
     return afracs
 
 @mark_numba_incompatible

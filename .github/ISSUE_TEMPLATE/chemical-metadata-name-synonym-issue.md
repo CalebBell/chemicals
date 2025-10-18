@@ -1,11 +1,12 @@
----
+______________________________________________________________________
+
 name: Chemical Metadata Name/Synonym Issue
 about: If you believe a synonym or name is looking up the wrong compound
 title: ''
 labels: name-issue-metadata
 assignees: ''
 
----
+______________________________________________________________________
 
 **What is the search string**
 

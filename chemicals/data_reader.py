@@ -114,7 +114,7 @@ def load_df(key):
     if sparsify:
         df = make_df_sparse(df)
     if low_mem:
-        for col_name in df.columns.values.tolist():  # noqa: PD011
+        for col_name in df.columns.values.tolist():
             if col_name in spurious_columns:
                 df[col_name] = pd.Series([], dtype=float).astype(pd.SparseDtype("float", nan))
 

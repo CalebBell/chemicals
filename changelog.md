@@ -20,24 +20,26 @@
 - Fix four duplicate/inconsistent entries in Zabransky which was previously being handled accidentally by overwritting data due to duplicates in the original source material - now the better data is intentionally loaded
 
 ### Changed
-- Chemical Metadata work
 
+- Chemical Metadata work
 
 ## [1.3.2] - 2024-12-08
 
 ### Changed
+
 - Chemical Metadata work
 - Improved performance of T_converter and viscosity_converter, which previously build splines on the fly; they now have already-built conversion routines
-
 
 ## [1.3.1] - 2024-11-10
 
 ### Changed
+
 - Added Dipalmitin back as synonym for 502-52-3
 
 ## [1.3.0] - 2024-11-10
 
 ### Changed
+
 - Code cleanup and minor optimizations
 - Re-import select chemical metadata from Common Chemistry and PubChem. This includes being more consistent about proper capitalization of chemical synonyms. No work was done on the main massive pubchem database (large/small files) at this time.
 - Move some vapor pressure extrapolation logic from thermo to proper functions in chemicals
@@ -50,11 +52,13 @@
 ## [1.2.0] - 2024-07-26
 
 ### Changed
+
 - Compatibility with NumPy 2.0 and SciPy 1.14
 - Fluids version dependency now >= 1.0.26
 
 ## [1.1.4] - 2023-06-04
 
 ### Changed
+
 - Code cleanup with ruff (experiment)
 - Add {critical, triple, boiling} data from REFPROP and other high-precision EOSs. This is the preferred method where available.

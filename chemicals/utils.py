@@ -31,7 +31,7 @@ please use the `GitHub issue tracker <https://github.com/CalebBell/chemicals/>`_
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 __all__: list[str] = [
     "SG",
@@ -103,20 +103,15 @@ __all__: list[str] = [
 
 import os
 import types
-from math import (  # Not supported in Python 2.6: expm1, erf, erfc,gamma lgamma
+from math import (
     pi,
     sqrt,
 )
 
-# __all__.extend(['R', 'k', 'N_A', 'calorie', 'epsilon_0']) # 'expm1', 'erf', 'erfc',  'lgamma', 'gamma',
-# Obtained from SciPy 0.19 (2014 CODATA)
 # Included here so calculations are consistent across SciPy versions
 from fluids.constants import N_A, R
 from fluids.numerics import cbrt, trunc_exp, trunc_log
 from fluids.numerics import numpy as np
-
-if TYPE_CHECKING:
-    import numpy
 
 source_path = os.path.dirname(__file__)
 
@@ -2724,7 +2719,7 @@ def normalize(values: list[float]) -> list[float]:
             # case of 0 values
             return []
 
-def remove_zeros(values: list[float] | numpy.ndarray, tol: float=1e-6) -> numpy.ndarray | list[float]:
+def remove_zeros(values: list[float] | np.ndarray, tol: float=1e-6) -> np.ndarray | list[float]:
     r"""Simple function which removes zero values from an array, and replaces
     them with a user-specified value, normally a very small number. Helpful
     for the case where a function can work with values very close to zero but

@@ -652,7 +652,7 @@ def Henry_converter(val: float, old_scale: str, new_scale: str, rhom: float | No
             raise ValueError("MW is required for the specified scale")
 
     # Type narrowing - create non-None versions, 0.0 variables will never be used
-    rhom2 = rhom if rhom is not None else 0.0 
+    rhom2 = rhom if rhom is not None else 0.0
     MW2 = MW if MW is not None else 0.0
 
     # Convert val to units of 1/atm

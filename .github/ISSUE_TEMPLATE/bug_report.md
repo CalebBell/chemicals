@@ -1,11 +1,12 @@
----
+______________________________________________________________________
+
 name: Bug report
 about: Create a bug report
 title: ''
 labels: ''
 assignees: ''
 
----
+______________________________________________________________________
 
 **Describe the bug**
 A clear and concise description of what the bug is. Please be sure you read the documentation.
