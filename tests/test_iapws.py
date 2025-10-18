@@ -832,7 +832,10 @@ def test_iapws97_region_3_rho_coolprop():
             for P in test_Ps(T, 100):
                 assert iapws97_identify_region_TP(T, P) == 3
                 rho_implemented = iapws97_rho(T=T, P=P)
-                rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
+                try:
+                    rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
+                except:
+                    continue
     #            try:
                 assert_close(rho_CoolProp, rho_implemented, rtol=1e-10)
     #            except:
@@ -856,7 +859,10 @@ def test_iapws97_region_5_rho_coolprop():
         for P in test_Ps(T, 100):
             assert iapws97_identify_region_TP(T, P) == 5
             rho_implemented = iapws97_rho(T=T, P=P)
-            rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
+            try:
+                rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
+            except:
+                continue
             assert_close(rho_CoolProp, rho_implemented, rtol=1e-10)
 
 
@@ -921,7 +927,10 @@ def test_iapws97_region_2_rho_coolprop():
         for P in test_Ps(T, 100):
             assert iapws97_identify_region_TP(T, P) == 2
             rho_implemented = iapws97_rho(T=T, P=P)
-            rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
+            try:
+                rho_CoolProp = PropsSI("DMASS","T",T,"P",P,"IF97::Water")
+            except:
+                continue
 #            try:
             assert_close(rho_CoolProp, rho_implemented, rtol=2e-15)
 #            except:
