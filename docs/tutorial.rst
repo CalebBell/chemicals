@@ -29,7 +29,7 @@ set of consistent units given to a function will return a consistent result.
 The user is directed to unit conversion libraries such as
 `pint <https://github.com/hgrecco/pint>`_ to perform unit conversions if they
 prefer not to work in SI units. The tutorial for using it with chemicals is
-at :doc:`chemicals.units <chemcials.units>`.
+at :doc:`chemicals.units <chemicals.units>`.
 
 There are two ways to use numpy arrays with chemicals. The easiest way to use numpy is a `vectorized` module,
 which wraps all of the chemicals functions with np.vectorize. Instead of importing

@@ -187,9 +187,9 @@ The structure of each dataframe is shown below:
 
     In [8]: chemicals.heat_capacity.zabransky_dicts.keys()
 
-    In [9]: chemicals.heat_capacity.Cp_data_Perry_Table_153_100['75-07-0']
+    In [9]: chemicals.heat_capacity.Cp_data_Perry_Table_153_100.loc['75-07-0']
 
-    In [10]: chemicals.heat_capacity.Cp_data_Perry_Table_153_114['7664-41-7']
+    In [10]: chemicals.heat_capacity.Cp_data_Perry_Table_153_114.loc['7664-41-7']
 """
 from __future__ import annotations
 
@@ -1748,10 +1748,13 @@ def TRCCp(T: float, a0: float, a1: float, a2: float, a3: float, a4: float, a5: f
 
     .. math::
         C_p = R\left(a_0 + (a_1/T^2) \exp(-a_2/T) + a_3 y^2
-        + (a_4 - a_5/(T-a_7)^2 )y^j \right)
+        + (a_4 - a_5/(T-a_7)^2 )y^8 \right)
 
     .. math::
-        y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
+        y = \begin{cases}
+        \frac{T-a_7}{T+a_6} & \text{for } T > a_7 \\
+        0 & \text{otherwise}
+        \end{cases}
 
     Parameters
     ----------
@@ -1910,7 +1913,10 @@ def TRCCp_integral_over_T(T: float, a0: float, a1: float, a2: float, a3: float, 
         z = \frac{T}{T+a_6} \cdot \frac{a_7 + a_6}{a_7}
 
     .. math::
-        y = \frac{T-a_7}{T+a_6} \text{ for } T > a_7 \text{ otherwise } 0
+        y = \begin{cases}
+        \frac{T-a_7}{T+a_6} & \text{for } T > a_7 \\
+        0 & \text{otherwise}
+        \end{cases}
 
     Parameters
     ----------
