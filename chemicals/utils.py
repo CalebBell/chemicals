@@ -113,7 +113,37 @@ from fluids.constants import N_A, R
 from fluids.numerics import cbrt, trunc_exp, trunc_log
 from fluids.numerics import numpy as np
 
-source_path = os.path.dirname(__file__)
+
+def _get_source_path():
+    """Get the base path for package resources.
+
+    Works with PyInstaller, py2exe, cx_Freeze, and normal Python.
+
+    Returns
+    -------
+    str
+        Absolute path to the chemicals package directory
+    """
+    import sys
+    if getattr(sys, "frozen", False):
+        # Running as compiled executable
+        if hasattr(sys, "_MEIPASS"):
+            # PyInstaller >= 2.0
+            return os.path.join(sys._MEIPASS, "chemicals")
+        else:
+            # py2exe, cx_Freeze - they copy package structure to executable directory
+            exe_dir = os.path.dirname(sys.executable)
+            # Look for chemicals package in lib directory (cx_Freeze pattern)
+            lib_path = os.path.join(exe_dir, "lib", "chemicals")
+            if os.path.exists(lib_path):
+                return lib_path
+            # Fallback to dist directory (py2exe pattern)
+            return os.path.join(exe_dir, "chemicals")
+    else:
+        # Running in normal Python environment
+        return os.path.dirname(__file__)
+
+source_path = _get_source_path()
 
 if os.name == "nt":
     def os_path_join(*args) -> str:
