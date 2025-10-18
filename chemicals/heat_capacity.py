@@ -156,16 +156,18 @@ attribute of this module.
     114 from [5]_. The coefficients are in units of J/kmol/K.
 
 .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
-    in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
+   in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
 .. [2] Zabransky, M., V. Ruzicka Jr, V. Majer, and Eugene S. Domalski.
-    Heat Capacity of Liquids: Critical Review and Recommended Values.
-    2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
+   Heat Capacity of Liquids: Critical Review and Recommended Values.
+   2 Volume Set. Washington, D.C.: Amer Inst of Physics, 1996.
 .. [3] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
-    New York: McGraw-Hill Professional, 2000.
+   New York: McGraw-Hill Professional, 2000.
 .. [4] Haynes, W.M., Thomas J. Bruno, and David R. Lide. CRC Handbook of
-    Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
+   Chemistry and Physics. [Boca Raton, FL]: CRC press, 2014.
 .. [5] Green, Don, and Robert Perry. Perry's Chemical Engineers' Handbook,
-    Eighth Edition. McGraw-Hill Professional, 2007.
+   Eighth Edition. McGraw-Hill Professional, 2007.
+
+The structure of each dataframe is shown below:
 
 .. ipython::
 
