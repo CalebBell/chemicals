@@ -10,6 +10,50 @@
 
 ### Fixed
 
+## [1.4.0] - 2025-10-19
+
+### Added
+
+- Python 3.13 and 3.13t (free-threaded) support with PYTHON_GIL=0 configuration
+- Pre-commit configuration with Ruff, mdformat, and file validators
+- New GitHub Actions workflows for pre-commit checks and security scanning
+- Packaging compatibility workflows for cx_Freeze, PyInstaller, and py2exe
+- Standalone test scripts and demo builders for verifying packaged distributions
+- Coverage HTML artifact uploads to all test workflows
+- Concurrency controls to workflows to cancel redundant builds
+- Justfile for streamlined development tasks (setup, docs, test, typecheck, lint)
+- Security scanning with pip-audit and bandit
+
+### Changed
+
+- Minimum Python version raised from 3.6 to 3.8
+- Updated actions to latest versions (setup-qemu v3, run-on-arch v3)
+- Updated macOS CI runners (macos-13 → macos-15-intel, added macos-latest for ARM)
+- Extensive code quality improvements with Ruff linting across entire codebase:
+  - String quote normalization to double quotes
+  - Removed unused imports and variables
+  - Improved code formatting and PEP 8 compliance
+  - Better type hints compatibility
+- Merged type hints across the codebase with improved accuracy
+- Fixed multi-architecture builds for RISC-V (libatlas-base-dev now optional)
+- Renamed workflow files to use .yml extension consistently
+- Updated copyright year to 2025
+- Fixed numerous typos across documentation files
+- Improved Sphinx configuration for Python 3.13 compatibility
+- Enhanced docstring and markdown formatting
+- Improved coveralls error handling (continue on failure)
+- Updated README to reflect Python 3.8+ requirement
+
+### Removed
+
+- Dropped Python 3.6 and 3.7 support
+- Removed obsolete platform-specific exclusions
+
+### Security
+
+- Added automated security scanning workflow documented in SECURITY.md
+- Added .claude to .gitignore
+
 ## [1.3.3] - 2025-03-16
 
 ### Added
