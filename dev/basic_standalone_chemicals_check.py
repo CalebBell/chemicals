@@ -1,3 +1,4 @@
+import sys
 import chemicals
 from chemicals import *
 import numpy as np
@@ -35,4 +36,4 @@ if run_checks():
     print("chemicals basic checks passed - NumPy and SciPy used successfully")
 else:
     print('Library not OK')
-    exit(1)
+    sys.exit(1)

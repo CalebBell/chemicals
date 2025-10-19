@@ -1,11 +1,29 @@
 from setuptools import setup
 import py2exe
 import sys
+import os
+import glob
+
+# Get all data files from chemicals package
+chemicals_data = []
+data_dirs = ["Critical Properties", "Density", "Electrolytes", "Environment",
+             "Heat Capacity", "Identifiers", "Law", "Misc", "Phase Change",
+             "Reactions", "Safety", "Solubility", "Interface", "Triple Properties",
+             "Thermal Conductivity", "Vapor Pressure", "Viscosity"]
+
+for data_dir in data_dirs:
+    dir_path = os.path.join('..', 'chemicals', data_dir)
+    if os.path.exists(dir_path):
+        files = glob.glob(os.path.join(dir_path, '*'))
+        files = [f for f in files if os.path.isfile(f)]
+        if files:
+            chemicals_data.append((f'chemicals/{data_dir}', files))
 
 setup(
     console=['basic_standalone_chemicals_check.py'],
     packages=[],
     py_modules=[],
+    data_files=chemicals_data,
     options={
         'py2exe': {
             'packages': ['chemicals', 'numpy', 'scipy', "fluids"],
