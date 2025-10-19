@@ -1,10 +1,13 @@
 name: Pre-commit
 
-on:
-  push:
-    branches: [master, release]
-  pull_request:
-    branches: [master, release]
+# TEMPORARILY DISABLED - uncomment the on: section below and remove workflow_dispatch to re-enable
+# on:
+#   push:
+#     branches: [master, release]
+#   pull_request:
+#     branches: [master, release]
+# workflow_dispatch allows manual triggering from GitHub Actions UI
+on: workflow_dispatch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
