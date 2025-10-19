@@ -6,7 +6,7 @@ pint
 IPython
 sphinx
 mpmath
-fuzzywuzzy
+thefuzz
 pytz
 wheel
 joblib
