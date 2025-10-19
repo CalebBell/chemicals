@@ -102,6 +102,7 @@ __all__: list[str] = [
 ]
 
 import os
+import sys
 import types
 from math import (
     pi,
@@ -124,38 +125,25 @@ def _get_source_path():
     str
         Absolute path to the chemicals package directory
     """
-    import sys
-    print(f"DEBUG: sys.frozen = {getattr(sys, 'frozen', False)}")
-    print(f"DEBUG: hasattr(sys, '_MEIPASS') = {hasattr(sys, '_MEIPASS')}")
-    print(f"DEBUG: sys.executable = {sys.executable}")
-    print(f"DEBUG: __file__ = {__file__}")
-
     if getattr(sys, "frozen", False):
         # Running as compiled executable
-        print("DEBUG: Running as frozen/compiled executable")
         if hasattr(sys, "_MEIPASS"):
             # PyInstaller >= 2.0
             path = os.path.join(sys._MEIPASS, "chemicals")
-            print(f"DEBUG: PyInstaller detected, path = {path}")
             return path
         else:
             # py2exe, cx_Freeze - they copy package structure to executable directory
             exe_dir = os.path.dirname(sys.executable)
-            print(f"DEBUG: py2exe/cx_Freeze detected, exe_dir = {exe_dir}")
             # Look for chemicals package in lib directory (cx_Freeze pattern)
             lib_path = os.path.join(exe_dir, "lib", "chemicals")
-            print(f"DEBUG: Checking lib_path = {lib_path}, exists = {os.path.exists(lib_path)}")
             if os.path.exists(lib_path):
-                print(f"DEBUG: Using lib_path = {lib_path}")
                 return lib_path
             # Fallback to dist directory (py2exe pattern)
             fallback_path = os.path.join(exe_dir, "chemicals")
-            print(f"DEBUG: Using fallback_path = {fallback_path}")
             return fallback_path
     else:
         # Running in normal Python environment
         path = os.path.dirname(__file__)
-        print(f"DEBUG: Running in normal Python, path = {path}")
         return path
 
 source_path = _get_source_path()
