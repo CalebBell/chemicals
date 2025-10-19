@@ -142,6 +142,7 @@ from chemicals.iapws import (
 from chemicals.vapor_pressure import Psat_IAPWS
 
 try:
+    import CoolProp # noqa: F401, I001
     has_CoolProp = True
 except:  # pragma: no cover
     has_CoolProp = False
