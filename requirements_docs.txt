@@ -26,6 +26,5 @@ numdifftools
 mpmath
 pandas
 fluids>=1.1.0
-CoolProp
 sympy
 openpyxl

@@ -1,13 +1,10 @@
 name: Build Multiarch
 
-# TEMPORARILY DISABLED - uncomment the on: section below and remove workflow_dispatch to re-enable
-# on:
-#   push:
-#     branches: [release]
-#   pull_request:
-#     branches: [master, release]
-# workflow_dispatch allows manual triggering from GitHub Actions UI
-on: workflow_dispatch
+on:
+  push:
+    branches: [release]
+  pull_request:
+    branches: [master, release]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

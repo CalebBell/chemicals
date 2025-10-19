@@ -1,13 +1,10 @@
 name: Build
 
-# TEMPORARILY DISABLED - uncomment the on: section below and remove workflow_dispatch to re-enable
-# on:
-#   push:
-#     branches: [master, release]
-#   pull_request:
-#     branches: [master, release]
-# workflow_dispatch allows manual triggering from GitHub Actions UI
-on: workflow_dispatch
+on:
+  push:
+    branches: [master, release]
+  pull_request:
+    branches: [master, release]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -126,6 +123,10 @@ jobs:
       if: ${{ !contains(fromJSON('["pypy3.9", "3.13t"]'), matrix.python-version) }}
       run: |
         pip install numba
+    - name: Add CoolProp
+      if: ${{ matrix.python-version == '3.13' }}
+      run: |
+        pip install CoolProp
     #- name: Test with low memory
     #  run: |
     #    pytest . -v --enable-low-memory=1 -m "not online and not sympy and not CoolProp and not fuzz"
