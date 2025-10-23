@@ -75,6 +75,7 @@ word_whitelist.txt
 simple_geolocator_cache.sqlite3
 .hypothesis
 .claude
+!_custom_build/
 
 # Project specific
 chemicals/Identifiers/metadata.db
