@@ -120,6 +120,36 @@ Packaging
 ---------
 The most up to date chemicals can be obtained on GitHub, and new releases are pushed to PyPi whenever a new release is made.
 
+Building distributions
+~~~~~~~~~~~~~~~~~~~~~~
+Chemicals uses a modern PEP 517 build backend with support for both standard and minified wheels
+
+Using uv:
+
+.. code-block:: bash
+
+   # Build source distribution
+   uv build --sdist
+
+   # Build normal wheel
+   uv build --wheel
+
+   # Build minified wheel
+   uv build --wheel -C light=true
+
+Using python -m build:
+
+.. code-block:: bash
+
+   # Build source distribution
+   python3 -m build --sdist
+
+   # Build normal wheel
+   python3 -m build --wheel
+
+   # Build minified wheel
+   python3 -m build --wheel -C light=true
+
 
 Code Formatting
 ---------------
