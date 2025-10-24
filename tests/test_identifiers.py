@@ -2135,7 +2135,8 @@ def test_db_vs_ChemSep():
     ElementTree.
     """
     import xml.etree.ElementTree as ET
-    folder = os.path.join(os.path.dirname(__file__), "..", "chemicals", "Misc")
+    from chemicals.utils import source_path
+    folder = os.path.join(source_path, "Misc")
 
     tree = ET.parse(os.path.join(folder, "ChemSep8.32.xml"))
     root = tree.getroot()
