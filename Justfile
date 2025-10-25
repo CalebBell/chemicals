@@ -36,7 +36,7 @@ install:
 ## 📚 docs: Build the Sphinx documentation.
 docs:
     @echo ">>> Building Sphinx docs..."
-    @{{VENV_PYTHON}} -m sphinx -b html -d _build/doctrees docs _build/html -j auto
+    @{{VENV_PYTHON}} -m sphinx -b html -d _build/doctrees docs _build/html
     @echo "✅ Docs built in _build/html"
 
 ## 🧪 test: Run the test suite with pytest.
