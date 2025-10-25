@@ -651,7 +651,7 @@ def test_safety_functions():
                         test_safety.test_NFPA_30_classification)
 
 
-
+@mark_as_numba
 def test_Tarakad_Danner_virial_CSP_Tcijs_numba():
 
     Vcs = np.array([0.000168, 0.000316, 5.6e-05, 0.002055])

@@ -35,13 +35,11 @@
   - Improved code formatting and PEP 8 compliance
   - Better type hints compatibility
 - Merged type hints across the codebase with improved accuracy
-- Fixed multi-architecture builds for RISC-V (libatlas-base-dev now optional)
 - Renamed workflow files to use .yml extension consistently
 - Updated copyright year to 2025
 - Fixed numerous typos across documentation files
 - Improved Sphinx configuration for Python 3.13 compatibility
 - Enhanced docstring and markdown formatting
-- Improved coveralls error handling (continue on failure)
 - Updated README to reflect Python 3.8+ requirement
 
 ### Removed

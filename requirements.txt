@@ -1,4 +1,0 @@
-numpy
-scipy>=1.6.0
-pandas
-fluids>=1.1.0
