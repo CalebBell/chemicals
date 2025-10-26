@@ -22,7 +22,7 @@ SOFTWARE.
 """
 
 
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 from math import isnan
 
 from . import (
