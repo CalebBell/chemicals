@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- Corrected spelling of "Demmler" viscosity cups (previously misspelled as "Demmier"). Added citation to Hydraulic Institute's Fluid Properties new website which shows the correct spelling.
+
 ## [1.5.0] - 2025-10-26
 
 ### Added
