@@ -1,4 +1,4 @@
-Chemicals tutorial
+Chemicals Tutorial
 ==================
 
 Importing
@@ -15,7 +15,7 @@ All functions are available from either the main chemicals module or the
 submodule; i.e. both chemicals.Antoine and 
 chemicals.vapor_pressure.Antoine are valid ways of accessing a function.
 
-Design philosophy
+Design Philosophy
 -----------------
 Like all libraries, this was developed to scratch my own itches.
 

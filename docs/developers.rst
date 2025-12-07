@@ -1,7 +1,7 @@
 Developer's Guide and Roadmap
 =============================
 
-The chemicals project has the following core ideas as its goals:
+The Chemicals project has the following core ideas as its goals:
 
 * Efficient
     * Functions do only the work required.
@@ -70,7 +70,7 @@ Docstrings
 The docstrings follow Pep8, most of the numpydoc standard,
 More information about numpydoc can be found `here <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 
-In addition to being documentation, the docstrings in chemicals serve the following purposes:
+In addition to being documentation, the docstrings in Chemicals serve the following purposes:
 
 * Contain LaTeX math formulas for implemented formulas. This makes it easy for the reader and authors to follow code. This is especially important when the code can be optimized by hand significantly, and end up not looking like the math formulas.
 * Contain doctests for every public method. These examples often make debugging really easy since they can just be copy-pasted into Jupyter or an IDE/debugger.
@@ -118,7 +118,7 @@ Chemicals may import in an earlier Python but that is not an indication you shou
 
 Packaging
 ---------
-The most up to date chemicals can be obtained on GitHub, and new releases are pushed to PyPi whenever a new release is made.
+The most up to date Chemicals can be obtained on GitHub, and new releases are pushed to PyPi whenever a new release is made.
 
 Building distributions
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -179,7 +179,7 @@ Github Actions is presently used. They test only code in the `release` branch. S
 
 Load Speed
 ----------
-On CPython, `chemicals` will load Numpy on load if it is available and `SciPy` and `Pandas` when they are needed. Numpy loads in ~150 ms. chemicals alone loads in ~15 ms. It is intended for this to increase only slowly.
+On CPython, `chemicals` will load Numpy on load if it is available and `SciPy` and `Pandas` when they are needed. Numpy loads in ~150 ms. Chemicals alone loads in ~15 ms. It is intended for this to increase only slowly.
 
 RAM Usage
 ---------
