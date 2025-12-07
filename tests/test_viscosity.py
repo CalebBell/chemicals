@@ -548,15 +548,15 @@ def test_viscosity_converter_spline_fits():
     assert_close(viscosity_converter(43.0, "zahn cup #5", "kinematic viscosity"), 0.0008799999999999999)
     assert_close(viscosity_converter(96.0, "zahn cup #5", "kinematic viscosity"), 0.00198)
 
-    # Demmier #1 conversions
-    assert_close(viscosity_converter(1.3, "demmier #1", "kinematic viscosity"), 4.2999999999999995e-06)
-    assert_close(viscosity_converter(55.0, "demmier #1", "kinematic viscosity"), 0.000176)
-    assert_close(viscosity_converter(1370.0, "demmier #1", "kinematic viscosity"), 0.004399999999999999)
+    # Demmler #1 conversions
+    assert_close(viscosity_converter(1.3, "demmler #1", "kinematic viscosity"), 4.2999999999999995e-06)
+    assert_close(viscosity_converter(55.0, "demmler #1", "kinematic viscosity"), 0.000176)
+    assert_close(viscosity_converter(1370.0, "demmler #1", "kinematic viscosity"), 0.004399999999999999)
 
-    # Demmier #10 conversions
-    assert_close(viscosity_converter(1.0, "demmier #10", "kinematic viscosity"), 3.21e-05)
-    assert_close(viscosity_converter(13.7, "demmier #10", "kinematic viscosity"), 0.00043999999999999996)
-    assert_close(viscosity_converter(137.0, "demmier #10", "kinematic viscosity"), 0.004399999999999999)
+    # Demmler #10 conversions
+    assert_close(viscosity_converter(1.0, "demmler #10", "kinematic viscosity"), 3.21e-05)
+    assert_close(viscosity_converter(13.7, "demmler #10", "kinematic viscosity"), 0.00043999999999999996)
+    assert_close(viscosity_converter(137.0, "demmler #10", "kinematic viscosity"), 0.004399999999999999)
 
     # Stormer 100G Load conversions
     assert_close(viscosity_converter(2.6, "stormer 100g load", "kinematic viscosity"), 7.4e-06)
