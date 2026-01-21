@@ -1418,7 +1418,7 @@ def Rackett_mixture(T: float, xs: list[float], MWs: list[float], Tcs: list[float
     return (R*bigsum*Zr**(1.0 + (1.0 - Tr)**(2.0/7.0)))*MW
 
 
-def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float], omegas: list[float]) -> float:
+def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float], omegas: list[float], P: float | None = None, Psat: float | None = None, Pcs: list[float] | None = None) -> float:
     r"""Calculate mixture liquid density using the COSTALD CSP method.
 
     A popular and accurate estimation method. If possible, fit parameters are
@@ -1453,11 +1453,17 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
     omegas : list
         (ideally SRK) Acentric factor of all fluids, [-]
         This parameter is alternatively a fit parameter.
+    P : float, optional
+        Pressure of fluid [Pa]
+        This parameter can be used for pressure-dependent mixtures.
+    Psat : float, optional
+        Saturation pressure of the mixture [Pa]
+        This parameter can be used for pressure-dependent mixtures.
 
     Returns
     -------
     Vs : float
-        Saturation liquid mixture volume
+        Saturation liquid mixture volume, or compressed liquid mixture volume if P is given
 
     Notes
     -----
@@ -1475,6 +1481,9 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
     .. [1] Hankinson, Risdon W., and George H. Thomson. "A New Correlation for
        Saturated Densities of Liquids and Their Mixtures." AIChE Journal
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
+    .. [2] Thomson, G. H., K. R. Brobst, and R. W. Hankinson. "An Improved
+       Correlation for Densities of Compressed Liquids and Liquid Mixtures."
+       AIChE Journal 28, no. 4 (July 1, 1982): 671-76. doi:10.1002/aic.690280420
     """
     N = len(xs)
     sum1, sum2, sum3, omega = 0.0, 0.0, 0.0, 0.0
@@ -1497,7 +1506,40 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
         for j in range(i):
             Tcm += vec[i]*vec[j]
         Tcm += 0.5*vec[i]*vec[i]
-    return COSTALD(T, Tcm, Vm, omega)
+
+    Vs = COSTALD(T, Tcm, Vm, omega)
+
+    # Extension of Mixing Rule to Compressed Liquids (COSTALD_compressed)
+    if P is not None:
+        # (Thomson 1982 Eq. 18 & 1)
+        Zcm = 0.291 - 0.080 * omega
+        Pcm = Zcm * R * Tcm / Vm
+
+        # 2. Calculation of Psat (Generalized Riedel), Thomson 1982 Eq. 19-23
+        if Psat is None:
+            # Thomson (1982) Eqs. 19-23
+            Trm = T / Tcm
+
+            # TODO: Handle T > Tcm case (supercritical) if necessary, though COSTALD
+            # is generally for liquid phase. For now, assume T < Tcm.
+
+            log_Trm = log(Trm, 10.0)
+            alpha = 35.0 - 36.0 / Trm - 96.736 * log_Trm + Trm**6
+            beta = log_Trm + 0.03721754 * alpha
+
+            Prm_0 = 5.8031817 * log_Trm + 0.07608141 * alpha
+            Prm_1 = 4.86601 * beta
+
+            log_Prm = Prm_0 + omega * Prm_1
+            # Convert log10 to value
+            Prm = 10.0**log_Prm
+
+            # Final Mixture Saturation Pressure
+            Psat = Prm * Pcm
+
+        return COSTALD_compressed(T, P, Psat, Tcm, Pcm, omega, Vs)
+
+    return Vs
 
 
 ### Gases

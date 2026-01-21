@@ -222,6 +222,11 @@ def test_COSTALD_mixture():
     Vl = COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29],[0.000117, 5.6e-05], [0.559,0.344] )
     assert_close(Vl, 2.706588773271354e-05)
 
+    # Add new compressed liquid test case
+    # TODO: No example found yet on literature, for improvement of exact experimental values
+    V_compressed = COSTALD_mixture(xs=[0.4576, 0.5424], T=298.0, Tcs=[512.58, 647.29], Vcs=[0.000117, 5.6e-05], omegas=[0.559, 0.344], P=1.0e7, Psat=None)
+    assert_close(V_compressed, 2.700019523935044e-05)
+
 def test_TDE_VDNS_rho():
     rho = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
     assert_close(947.4906064903166, rho, rtol=1e-13)
