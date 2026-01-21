@@ -1439,6 +1439,39 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
     .. math::
         \omega = \sum_i z_i \omega_i
 
+    If pressure `P` is provided, the method extends to compressed liquids using
+    the Tait equation. The mixture critical pressure :math:`P_{cm}` and saturation
+    pressure :math:`P_{sat}` (if not provided) are calculated as follows [2]_:
+
+    .. math::
+        P_{cm} = \frac{Z_{cm}RT_{cm}}{V_m}
+
+    .. math::
+        Z_{cm} = 0.291 - 0.080\omega
+
+    The saturation pressure :math:`P_{sat}` is estimated using a generalized
+    Riedel vapor pressure equation based on the mixture parameters:
+
+    .. math::
+        \log_{10} P_{Rm} = P_{Rm}^{(0)} + \omega P_{Rm}^{(1)}
+
+    .. math::
+        P_{Rm}^{(0)} = 5.8031817 \log_{10} T_{Rm} + 0.07608141 \alpha
+
+    .. math::
+        P_{Rm}^{(1)} = 4.86601 \beta
+
+    .. math::
+        \alpha = 35.0 - \frac{36.0}{T_{Rm}} - 96.736 \log_{10} T_{Rm} + T_{Rm}^6
+
+    .. math::
+        \beta = \log_{10} T_{Rm} + 0.03721754 \alpha
+
+    .. math::
+        P_{sat} = P_{cm} \times 10^{\log_{10} P_{Rm}}
+
+    where :math:`T_{Rm} = T/T_{cm}`.
+
     Parameters
     ----------
     xs : list
