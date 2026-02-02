@@ -862,13 +862,18 @@ def COSTALD(T: float, Tc: float, Vc: float, omega: float) -> float:
        Saturated Densities of Liquids and Their Mixtures." AIChE Journal
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
     """
-    if T > Tc:
-        T = Tc
     Tr = T/Tc
+    # Support arrays and clamp T to Tc
+    Tr = np.minimum(Tr, 1.0)
     tau = 1.0 - Tr
+
+    # 1.0/3.0 is 0.3333333333333333; but for negative numbers power might return complex
+    # Ensure tau is non-negative
+    tau = np.maximum(tau, 0.0)
+
     tau_cbrt = (tau)**(1.0/3.)
-    V_delta = (-0.296123 + Tr*(Tr*(-0.0480645*Tr - 0.0427258) + 0.386914))/(Tr - 1.00001)
-    V_0 = tau_cbrt*(tau_cbrt*(tau_cbrt*(0.190454*tau_cbrt - 0.81446) + 1.43907) - 1.52816) + 1.0
+    V_delta = (-0.296123 + Tr*(0.386914 + Tr*(-0.0427258 - 0.0480645*Tr)))/(Tr - 1.00001)
+    V_0 = 1.0 + tau_cbrt*(-1.52816 + tau_cbrt*(1.43907 + tau_cbrt*(-0.81446 + 0.190454*tau_cbrt)))
     return Vc*V_0*(1.0 - omega*V_delta)
 
 
@@ -1182,10 +1187,18 @@ def COSTALD_compressed(T: float, P: float, Psat: float, Tc: float, Pc: float, om
     k = 0.0344483
     e = exp(f + omega*(g + h*omega))
     C = j + k*omega
-    tau = 1.0 - T/Tc
+
+    Tr = T/Tc
+    tau = 1.0 - Tr
+    tau = np.maximum(tau, 0.0)
     tau13 = tau**(1.0/3.0)
-    B = Pc*(-1.0 + a*tau13 + b*tau13*tau13 + d*tau + e*tau*tau13)
-    return Vs*(1.0 - C*log((B + P)/(B + Psat)))
+
+    # Optimized calculation for B using Horner-like scheme where possible
+    # -1 + a*t + b*t^2 + d*t^3 + e*t^4  where t = tau^(1/3)
+    B = Pc*(-1.0 + tau13*(a + tau13*(b + tau13*(d + e*tau13))))
+
+    # Use log1p for better numerical stability when P is close to Psat
+    return Vs*(1.0 - C*np.log1p((P - Psat)/(B + Psat)))
 
 def Tait(P, P_ref, rho_ref, B, C):
     r"""Calculates compressed-liquid mass density using the Tait
@@ -1418,7 +1431,7 @@ def Rackett_mixture(T: float, xs: list[float], MWs: list[float], Tcs: list[float
     return (R*bigsum*Zr**(1.0 + (1.0 - Tr)**(2.0/7.0)))*MW
 
 
-def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float], omegas: list[float], P: float | None = None, Psat: float | None = None, Pcs: list[float] | None = None) -> float:
+def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float], omegas: list[float]) -> float:
     r"""Calculate mixture liquid density using the COSTALD CSP method.
 
     A popular and accurate estimation method. If possible, fit parameters are
@@ -1439,39 +1452,6 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
     .. math::
         \omega = \sum_i z_i \omega_i
 
-    If pressure `P` is provided, the method extends to compressed liquids using
-    the Tait equation. The mixture critical pressure :math:`P_{cm}` and saturation
-    pressure :math:`P_{sat}` (if not provided) are calculated as follows [2]_:
-
-    .. math::
-        P_{cm} = \frac{Z_{cm}RT_{cm}}{V_m}
-
-    .. math::
-        Z_{cm} = 0.291 - 0.080\omega
-
-    The saturation pressure :math:`P_{sat}` is estimated using a generalized
-    Riedel vapor pressure equation based on the mixture parameters:
-
-    .. math::
-        \log_{10} P_{Rm} = P_{Rm}^{(0)} + \omega P_{Rm}^{(1)}
-
-    .. math::
-        P_{Rm}^{(0)} = 5.8031817 \log_{10} T_{Rm} + 0.07608141 \alpha
-
-    .. math::
-        P_{Rm}^{(1)} = 4.86601 \beta
-
-    .. math::
-        \alpha = 35.0 - \frac{36.0}{T_{Rm}} - 96.736 \log_{10} T_{Rm} + T_{Rm}^6
-
-    .. math::
-        \beta = \log_{10} T_{Rm} + 0.03721754 \alpha
-
-    .. math::
-        P_{sat} = P_{cm} \times 10^{\log_{10} P_{Rm}}
-
-    where :math:`T_{Rm} = T/T_{cm}`.
-
     Parameters
     ----------
     xs : list
@@ -1486,17 +1466,11 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
     omegas : list
         (ideally SRK) Acentric factor of all fluids, [-]
         This parameter is alternatively a fit parameter.
-    P : float, optional
-        Pressure of fluid [Pa]
-        This parameter can be used for pressure-dependent mixtures.
-    Psat : float, optional
-        Saturation pressure of the mixture [Pa]
-        This parameter can be used for pressure-dependent mixtures.
 
     Returns
     -------
     Vs : float
-        Saturation liquid mixture volume, or compressed liquid mixture volume if P is given
+        Saturation liquid mixture volume
 
     Notes
     -----
@@ -1514,65 +1488,121 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
     .. [1] Hankinson, Risdon W., and George H. Thomson. "A New Correlation for
        Saturated Densities of Liquids and Their Mixtures." AIChE Journal
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
-    .. [2] Thomson, G. H., K. R. Brobst, and R. W. Hankinson. "An Improved
+    """
+    xs = np.asarray(xs, dtype=np.float64)
+    Tcs = np.asarray(Tcs, dtype=np.float64)
+    Vcs = np.asarray(Vcs, dtype=np.float64)
+    omegas = np.asarray(omegas, dtype=np.float64)
+
+    # Calculate mixture parameters
+    # Vm calculation
+    V_1_3 = Vcs**(1.0/3.0)
+    V_2_3 = Vcs**(2.0/3.0)
+
+    sum_xV = np.sum(xs * Vcs)
+    sum_xV_1_3 = np.sum(xs * V_1_3)
+    sum_xV_2_3 = np.sum(xs * V_2_3)
+
+    Vm = 0.25 * (sum_xV + 3.0 * sum_xV_2_3 * sum_xV_1_3)
+
+    # omega calculation
+    omega = np.sum(xs * omegas)
+
+    # Tcm calculation
+    # Using the optimized O(N) approach equivalent to the O(N^2) sum
+    # Tcm = (sum(x * sqrt(V*Tc)))^2 / Vm
+    VTc = Vcs * Tcs
+    VTc_sqrt = np.sqrt(VTc)
+
+    term = np.sum(xs * VTc_sqrt)
+    Tcm = (term * term) / Vm
+
+    return COSTALD(T, Tcm, Vm, omega)
+
+
+def COSTALD_mixture_compressed(xs: list[float], T: float, P: float, Tcs: list[float], Vcs: list[float], omegas: list[float], Psat: float | None = None) -> float:
+    r"""Calculate compressed mixture liquid density using the COSTALD-Tait CSP method.
+
+    Parameters
+    ----------
+    xs : list
+        Mole fractions of each component
+    T : float
+        Temperature of fluid [K]
+    P : float
+        Pressure of fluid [Pa]
+    Tcs : list
+        Critical temperature of fluids [K]
+    Vcs : list
+        Critical volumes of fluids [m^3/mol].
+        This parameter is alternatively a fit parameter
+    omegas : list
+        (ideally SRK) Acentric factor of all fluids, [-]
+        This parameter is alternatively a fit parameter.
+    Psat : float, optional
+        Saturation pressure of the mixture [Pa]. If not provided, it is estimated.
+
+    Returns
+    -------
+    V : float
+        Compressed liquid mixture volume [m^3/mol]
+
+    Notes
+    -----
+    The estimation of Psat uses a Generalized Riedel equation based on mixture parameters.
+
+    References
+    ----------
+    .. [1] Thomson, G. H., K. R. Brobst, and R. W. Hankinson. "An Improved
        Correlation for Densities of Compressed Liquids and Liquid Mixtures."
        AIChE Journal 28, no. 4 (July 1, 1982): 671-76. doi:10.1002/aic.690280420
     """
-    N = len(xs)
-    sum1, sum2, sum3, omega = 0.0, 0.0, 0.0, 0.0
-    for i in range(N):
-        sum1 += xs[i]*Vcs[i]
-        p = Vcs[i]**(1.0/3.)
-        v = xs[i]*p
-        sum2 += v
-        sum3 += v*p
-        omega += xs[i]*omegas[i]
+    xs = np.asarray(xs, dtype=np.float64)
+    Tcs = np.asarray(Tcs, dtype=np.float64)
+    Vcs = np.asarray(Vcs, dtype=np.float64)
+    omegas = np.asarray(omegas, dtype=np.float64)
 
-    Vm = 0.25*(sum1 + 3.0*sum2*sum3)
-    Vm_inv_root = root_two*(Vm)**-0.5
-    vec = [0.0]*N
-    for i in range(N):
-        vec[i] = (Tcs[i]*Vcs[i])**0.5*xs[i]*Vm_inv_root
+    # Re-calculate mixture parameters (duplication unavoidable to keep functions independent/self-contained)
+    # Vm calculation
+    V_1_3 = Vcs**(1.0/3.0)
+    V_2_3 = Vcs**(2.0/3.0)
+    sum_xV = np.sum(xs * Vcs)
+    sum_xV_1_3 = np.sum(xs * V_1_3)
+    sum_xV_2_3 = np.sum(xs * V_2_3)
+    Vm = 0.25 * (sum_xV + 3.0 * sum_xV_2_3 * sum_xV_1_3)
 
-    Tcm = 0.0
-    for i in range(N):
-        for j in range(i):
-            Tcm += vec[i]*vec[j]
-        Tcm += 0.5*vec[i]*vec[i]
+    # omega calculation
+    omega = np.sum(xs * omegas)
+
+    # Tcm calculation
+    VTc = Vcs * Tcs
+    VTc_sqrt = np.sqrt(VTc)
+    term = np.sum(xs * VTc_sqrt)
+    Tcm = (term * term) / Vm
 
     Vs = COSTALD(T, Tcm, Vm, omega)
 
-    # Extension of Mixing Rule to Compressed Liquids (COSTALD_compressed)
-    if P is not None:
-        # (Thomson 1982 Eq. 18 & 1)
-        Zcm = 0.291 - 0.080 * omega
-        Pcm = Zcm * R * Tcm / Vm
+    # Calculate Pcm and then Psat if needed
+    Zcm = 0.291 - 0.080 * omega
+    Pcm = Zcm * R * Tcm / Vm
 
-        # 2. Calculation of Psat (Generalized Riedel), Thomson 1982 Eq. 19-23
-        if Psat is None:
-            # Thomson (1982) Eqs. 19-23
-            Trm = T / Tcm
+    if Psat is None:
+        Trm = T / Tcm
 
-            # TODO: Handle T > Tcm case (supercritical) if necessary, though COSTALD
-            # is generally for liquid phase. For now, assume T < Tcm.
+        # Generalized Riedel Vapor Pressure Equation
+        log_Trm = np.log10(Trm)
+        alpha = 35.0 - 36.0 / Trm - 96.736 * log_Trm + Trm**6
+        beta = log_Trm + 0.03721754 * alpha
 
-            log_Trm = log(Trm, 10.0)
-            alpha = 35.0 - 36.0 / Trm - 96.736 * log_Trm + Trm**6
-            beta = log_Trm + 0.03721754 * alpha
+        Prm_0 = 5.8031817 * log_Trm + 0.07608141 * alpha
+        Prm_1 = 4.86601 * beta
 
-            Prm_0 = 5.8031817 * log_Trm + 0.07608141 * alpha
-            Prm_1 = 4.86601 * beta
+        log_Prm = Prm_0 + omega * Prm_1
+        Prm = 10.0**log_Prm
 
-            log_Prm = Prm_0 + omega * Prm_1
-            # Convert log10 to value
-            Prm = 10.0**log_Prm
+        Psat = Prm * Pcm
 
-            # Final Mixture Saturation Pressure
-            Psat = Prm * Pcm
-
-        return COSTALD_compressed(T, P, Psat, Tcm, Pcm, omega, Vs)
-
-    return Vs
+    return COSTALD_compressed(T, P, Psat, Tcm, Pcm, omega, Vs)
 
 
 ### Gases

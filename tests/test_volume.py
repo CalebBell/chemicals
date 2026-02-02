@@ -33,6 +33,7 @@ from chemicals.volume import (
     Campbell_Thodos,
     COSTALD_compressed,
     COSTALD_mixture,
+    COSTALD_mixture_compressed,
     CRC_inorganic,
     Goodman,
     Rackett,
@@ -222,10 +223,37 @@ def test_COSTALD_mixture():
     Vl = COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29],[0.000117, 5.6e-05], [0.559,0.344] )
     assert_close(Vl, 2.706588773271354e-05)
 
-    # Add new compressed liquid test case
-    # TODO: No example found yet on literature, for improvement of exact experimental values
-    V_compressed = COSTALD_mixture(xs=[0.4576, 0.5424], T=298.0, Tcs=[512.58, 647.29], Vcs=[0.000117, 5.6e-05], omegas=[0.559, 0.344], P=1.0e7, Psat=None)
-    assert_close(V_compressed, 2.700019523935044e-05)
+def test_COSTALD_mixture_compressed():
+    # Example from API Procedure 6A3.4
+    # 20 mole percent ethane and 80 mole percent n-decane at 160 F and 3000 psia
+    # Converted to SI
+    T = 344.2611111111111
+    P = 20684271.8795
+    Tcs = [305.3277777777778, 617.5944444444444]
+    Vcs = [0.00014576928794529767, 0.0006192229409547785]
+    omegas = [0.0983, 0.4916]
+    xs = [0.2, 0.8]
+
+    V_calc = COSTALD_mixture_compressed(xs=xs, T=T, P=P, Tcs=Tcs, Vcs=Vcs, omegas=omegas)
+    assert_close(V_calc, 0.00017161446362382157, rtol=1e-3) # API example value
+
+def test_COSTALD_arrays():
+    from fluids.numerics import np
+    # Array inputs for COSTALD
+    Ts = np.array([298., 272.03889])
+    Tcs = np.array([647.13, 369.83333])
+    Vcs = np.array([55.95E-6, 0.20008161E-3])
+    omegas = np.array([0.3449, 0.1532])
+    V1 = COSTALD(Ts, Tcs, Vcs, omegas)
+    assert_close1d(V1, [1.8133760480018036e-05, 8.315466172295678e-05])
+
+    # Array inputs for COSTALD_compressed
+    Ps = np.array([1e5, 9.8e7])
+    # T=303., Psat=85857.9, Tc=466.7, Pc=3640000.0, omega=0.281, Vs=0.000105047
+    V_comp = COSTALD_compressed(303., Ps, 85857.9, 466.7, 3640000.0, 0.281, 0.000105047)
+    assert V_comp.shape == (2,)
+    # The second value should match the scalar test case
+    assert_close(V_comp[1], 9.287482879788506e-05)
 
 def test_TDE_VDNS_rho():
     rho = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
