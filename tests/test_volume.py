@@ -228,7 +228,7 @@ def test_COSTALD_mixture_compressed():
     # 20 mole percent ethane and 80 mole percent n-decane at 160 F and 3000 psia
     # Converted to SI
     T = 344.2611111111111
-    P = 20684271.87
+    P = 20684271.8795
     Tcs = [305.3277777777778, 617.5944444444444]
     Vcs = [0.00014576928794529767, 0.0006192229409547785]
     omegas = [0.0983, 0.4916]
