@@ -853,7 +853,7 @@ def COSTALD(T: float, Tc: float, Vc: float, omega: float) -> float:
     Propane, from an example in the API Handbook:
 
     >>> from chemicals.utils import Vm_to_rho
-    >>> Vm_to_rho(COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532), 44.097)
+    >>> float(Vm_to_rho(COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532), 44.097))
     530.3009967969844
 
     References
@@ -1168,7 +1168,7 @@ def COSTALD_compressed(T: float, P: float, Psat: float, Tc: float, Pc: float, om
 
     Examples
     --------
-    >>> COSTALD_compressed(303., 9.8E7, 85857.9, 466.7, 3640000.0, 0.281, 0.000105047)
+    >>> float(COSTALD_compressed(303., 9.8E7, 85857.9, 466.7, 3640000.0, 0.281, 0.000105047))
     9.287482879788505e-05
 
     References
@@ -1480,7 +1480,7 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
 
     Examples
     --------
-    >>> COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29], [0.000117, 5.6e-05], [0.559,0.344])
+    >>> float(COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29], [0.000117, 5.6e-05], [0.559,0.344]))
     2.7065887732713534e-05
 
     References
@@ -1521,41 +1521,114 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
 
 
 def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs: list[float], omegas: list[float], P: float, Psat: float | None = None) -> float:
-    r"""Calculate compressed mixture liquid density using the COSTALD-Tait CSP method.
+    r"""Calculate compressed mixture liquid density using the COSTALD-Tait CSP method,
+    by Hankinson, Brobst, and Thomson [1]_, corresponding to API Technical Data Book Procedure 6A3.4 [2]_.
+
+    The molar volume of the compressed liquid mixture is calculated using the
+    Tait equation, where the saturation volume :math:`V_s` is obtained via the 
+    standard COSTALD mixture rules (API Procedure 6A3.2).
+
+    .. math::
+        V = V_s \left( 1 - C \ln \frac{B + P}{B + P_{sat}}\right)
+
+    The parameters :math:`B` and :math:`C` are generalized functions of the 
+    mixture acentric factor :math:`\omega_m` and reduced temperature :math:`T_r = T/T_{cm}`:
+
+    .. math::
+        \frac{B}{P_{cm}} = -1 + a(1-T_r)^{1/3} + b(1-T_r)^{2/3} + d(1-T_r) + e(1-T_r)^{4/3}
+
+    .. math::
+        e = \exp(f + g\omega_{m} + h \omega_{m}^2)
+
+    .. math::
+        C = j + k \omega_{m}
+
+    If the saturation pressure :math:`P_{sat}` is not provided, it is estimated 
+    using the Generalized Riedel vapor pressure equation using mixture critical properties:
+
+    .. math::
+        \log_{10} \frac{P_{sat}}{P_{cm}} = P_{rm}^{(0)} + \omega_m P_{rm}^{(1)}
+
+    .. math::
+        P_{rm}^{(0)} = 5.8031817 \log_{10} T_r + 0.07608141 \alpha
+
+    .. math::
+        P_{rm}^{(1)} = 4.86601 \beta
+
+    .. math::
+        \alpha = 35.0 - \frac{36.0}{T_r} - 96.736 \log_{10} T_r + T_r^6
+
+    .. math::
+        \beta = \log_{10} T_r + 0.03721754 \alpha
+
+    The mixture critical properties :math:`T_{cm}`, :math:`V_{m}`, and :math:`\omega_m` 
+    are calculated using the COSTALD mixing rules:
+
+    .. math::
+        V_m = 0.25\left[ \sum_i x_i V_i^* + 3\left(\sum_i x_i (V_i^*)^{2/3}\right)\left(\sum_i x_i (V_i^*)^{1/3}\right)\right]
+
+    .. math::
+        V_{ij}^* T_{cij} = \sqrt{V_i^* T_{ci} V_j^* T_{cj}}
+
+    .. math::
+        T_{cm} = \frac{\sum_i\sum_j x_i x_j (V_{ij}^* T_{cij})}{V_m}
+
+    .. math::
+        \omega_m = \sum_i x_i \omega_i
+
+    .. math::
+        P_{cm} = \frac{(0.291 - 0.080\omega_m)RT_{cm}}{V_m}
 
     Parameters
     ----------
     xs : list
-        Mole fractions of each component
+        Mole fractions of each component [-]
     T : float
         Temperature of fluid [K]
-    P : float
-        Pressure of fluid [Pa]
     Tcs : list
         Critical temperature of fluids [K]
     Vcs : list
-        Critical volumes of fluids [m^3/mol].
-        This parameter is alternatively a fit parameter
+        Critical volumes of fluids (characteristic COSTALD volume) [m^3/mol]
     omegas : list
-        (ideally SRK) Acentric factor of all fluids, [-]
-        This parameter is alternatively a fit parameter.
+        Acentric factor (ideally SRK) of all fluids [-]
+    P : float
+        Pressure of fluid [Pa]
     Psat : float, optional
-        Saturation pressure of the mixture [Pa]. If not provided, it is estimated.
+        Saturation pressure of the mixture [Pa]. If not provided, it is estimated
+        using the Generalized Riedel equation.
 
     Returns
     -------
-    V : float
+    Vs : float
         Compressed liquid mixture volume [m^3/mol]
 
     Notes
     -----
-    The estimation of Psat uses a Generalized Riedel equation based on mixture parameters.
+    The constants for the Tait parameter correlations are:
+    a = -9.070217, b = 62.45326, d = -135.1102, f = 4.79594,
+    g = 0.250047, h = 1.14188, j = 0.0861488, k = 0.0344483.
+
+    This method is generally accurate to within 1% for defined hydrocarbon mixtures
+    below Tr = 0.95.
+
+    Examples
+    --------
+    >>> Tcs = [305.3278, 617.594]
+    >>> Vcs = [0.00014576928794529767, 0.0006192229409547785]
+    >>> omegas = [0.0983, 0.4916]
+    >>> xs = [0.2, 0.8]
+    >>> T = 344.26111
+    >>> P = 20684271.8795
+    >>> float(COSTALD_mixture_compressed(xs, T, Tcs, Vcs, omegas, P)) #
+    0.00017167102195524188
 
     References
     ----------
     .. [1] Thomson, G. H., K. R. Brobst, and R. W. Hankinson. "An Improved
        Correlation for Densities of Compressed Liquids and Liquid Mixtures."
        AIChE Journal 28, no. 4 (July 1, 1982): 671-76. doi:10.1002/aic.690280420
+    .. [2] API Technical Data Book, Procedure 6A3.4 "Computer Method for the
+       Liquid Densities of Compressed Hydrocarbon Mixtures of Defined Composition."
     """
     xs = np.asarray(xs, dtype=np.float64)
     Tcs = np.asarray(Tcs, dtype=np.float64)
