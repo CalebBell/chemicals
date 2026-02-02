@@ -1520,7 +1520,7 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
     return COSTALD(T, Tcm, Vm, omega)
 
 
-def COSTALD_mixture_compressed(xs: list[float], T: float, P: float, Tcs: list[float], Vcs: list[float], omegas: list[float], Psat: float | None = None) -> float:
+def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs: list[float], omegas: list[float], P: float, Psat: float | None = None) -> float:
     r"""Calculate compressed mixture liquid density using the COSTALD-Tait CSP method.
 
     Parameters

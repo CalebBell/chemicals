@@ -235,7 +235,7 @@ def test_COSTALD_mixture_compressed():
     omegas1 = [0.0983, 0.4916]
     xs1 = [0.2, 0.8]            # mole %
 
-    V_calc1 = COSTALD_mixture_compressed(xs=xs1, T=T1, P=P1, Tcs=Tcs1, Vcs=Vcs1, omegas=omegas1)
+    V_calc1 = COSTALD_mixture_compressed(xs=xs1, T=T1, Tcs=Tcs1, Vcs=Vcs1, omegas=omegas1, P=P1)
     assert_close(V_calc1, 0.00017161446362382157, rtol=1e-3) # API example value
 
     # =========================================================================
@@ -251,7 +251,7 @@ def test_COSTALD_mixture_compressed():
     omegas2 = [0.1532, 0.2137]
     xs2 = [0.9, 0.1]
 
-    V_calc2 = COSTALD_mixture_compressed(xs=xs2, T=T2, P=P2, Tcs=Tcs2, Vcs=Vcs2, omegas=omegas2)
+    V_calc2 = COSTALD_mixture_compressed(xs=xs2, T=T2, Tcs=Tcs2, Vcs=Vcs2, omegas=omegas2, P=P2)
     # Thesis example experimental value
     assert_close(V_calc2, 0.00007747534, rtol=1e-2) # For > 20 MPa, error 1-2%
 
