@@ -245,11 +245,7 @@ def test_COSTALD_arrays():
     Vcs = np.array([55.95E-6, 0.20008161E-3])
     omegas = np.array([0.3449, 0.1532])
     V1 = COSTALD(Ts, Tcs, Vcs, omegas)
-    assert V1.shape == (2,)
-    # First value from test_COSTALD (Water)
-    assert_close(V1[0], 1.8133760480018036e-05)
-    # Second value from test_COSTALD (Propane)
-    assert_close(V1[1], 8.315466172295678e-05)
+    assert_close1d(V1, [1.8133760480018036e-05, 8.315466172295678e-05])
 
     # Array inputs for COSTALD_compressed
     Ps = np.array([1e5, 9.8e7])
