@@ -223,10 +223,19 @@ def test_COSTALD_mixture():
     Vl = COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29],[0.000117, 5.6e-05], [0.559,0.344] )
     assert_close(Vl, 2.706588773271354e-05)
 
-    # Add new compressed liquid test case
-    # TODO: No example found yet on literature, for improvement of exact experimental values
-    V_compressed = COSTALD_mixture_compressed(xs=[0.4576, 0.5424], T=298.0, P=1.0e7, Tcs=[512.58, 647.29], Vcs=[0.000117, 5.6e-05], omegas=[0.559, 0.344], Psat=None)
-    assert_close(V_compressed, 2.700019523935044e-05)
+def test_COSTALD_mixture_compressed():
+    # Example from API Procedure 6A3.4
+    # 20 mole percent ethane and 80 mole percent n-decane at 160 F and 3000 psia
+    # Converted to SI
+    T = 344.2611111111111
+    P = 20684271.87
+    Tcs = [305.3277777777778, 617.5944444444444]
+    Vcs = [0.00014576928794529767, 0.0006192229409547785]
+    omegas = [0.0983, 0.4916]
+    xs = [0.2, 0.8]
+
+    V_calc = COSTALD_mixture_compressed(xs=xs, T=T, P=P, Tcs=Tcs, Vcs=Vcs, omegas=omegas)
+    assert_close(V_calc, 0.00017161446362382157, rtol=1e-3) # API example value
 
 def test_COSTALD_arrays():
     from fluids.numerics import np
