@@ -240,10 +240,11 @@ def test_COSTALD_mixture_compressed():
 def test_COSTALD_arrays():
     from fluids.numerics import np
     # Array inputs for COSTALD
-    Ts = np.array([298., 300.])
-    V1 = COSTALD(Ts, 647.13, 55.95E-6, 0.3449)
+    Ts = np.array([298., 272.03889])
+    V1 = COSTALD(Ts, 369.83333, 0.20008161E-3, 0.1532)
     assert V1.shape == (2,)
-    assert_close(V1[0], 1.8133760480018036e-05)
+    # Propane at 272.03889 K, from API Handbook example (also in test_COSTALD)
+    assert_close(V1[1], 8.315466172295678e-05)
 
     # Array inputs for COSTALD_compressed
     Ps = np.array([1e5, 9.8e7])
