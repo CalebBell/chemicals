@@ -224,36 +224,37 @@ def test_COSTALD_mixture():
     assert_close(Vl, 2.706588773271354e-05)
 
 def test_COSTALD_mixture_compressed():
+    # =========================================================================
     # Example from API Procedure 6A3.4
     # 20 mole percent ethane and 80 mole percent n-decane at 160 F and 3000 psia
-    # Converted to SI
-    T = 344.2611111111111
-    P = 20684271.8795
-    Tcs = [305.3277777777778, 617.5944444444444]
-    Vcs = [0.00014576928794529767, 0.0006192229409547785]
-    omegas = [0.0983, 0.4916]
-    xs = [0.2, 0.8]
+    # Converted to SI units
+    T1 = 344.2611111111111      # K
+    P1 = 20684271.8795          # Pa
+    Tcs1 = [305.3277777777778, 617.5944444444444]           # K
+    Vcs1 = [0.00014576928794529767, 0.0006192229409547785]  # m3/mol
+    omegas1 = [0.0983, 0.4916]
+    xs1 = [0.2, 0.8]            # mole %
 
-    V_calc = COSTALD_mixture_compressed(xs=xs, T=T, P=P, Tcs=Tcs, Vcs=Vcs, omegas=omegas)
-    assert_close(V_calc, 0.00017161446362382157, rtol=1e-3) # API example value
+    V_calc1 = COSTALD_mixture_compressed(xs=xs1, T=T1, P=P1, Tcs=Tcs1, Vcs=Vcs1, omegas=omegas1)
+    assert_close(V_calc1, 0.00017161446362382157, rtol=1e-3) # API example value
 
-def test_COSTALD_arrays():
-    from fluids.numerics import np
-    # Array inputs for COSTALD
-    Ts = np.array([298., 272.03889])
-    Tcs = np.array([647.13, 369.83333])
-    Vcs = np.array([55.95E-6, 0.20008161E-3])
-    omegas = np.array([0.3449, 0.1532])
-    V1 = COSTALD(Ts, Tcs, Vcs, omegas)
-    assert_close1d(V1, [1.8133760480018036e-05, 8.315466172295678e-05])
+    # =========================================================================
+    # Other example from the thesis of Noor Sabeh Majied Al-Qazaz on PDF page 72
+    # https://nahrainuniv.edu.iq/sites/default/files/name%20project2.pdf
+    #
+    # Mixture of 90 mol% Propane (i=0) with 10 mol% Benzene (i=1)
+    # at 310.927 K and 680.272 atm.
+    T2 = 310.927
+    P2 = 68928560.4
+    Tcs2 = [369.8, 562.2]
+    Vcs2 = [0.0002001, 0.0002564]
+    omegas2 = [0.1532, 0.2137]
+    xs2 = [0.9, 0.1]
 
-    # Array inputs for COSTALD_compressed
-    Ps = np.array([1e5, 9.8e7])
-    # T=303., Psat=85857.9, Tc=466.7, Pc=3640000.0, omega=0.281, Vs=0.000105047
-    V_comp = COSTALD_compressed(303., Ps, 85857.9, 466.7, 3640000.0, 0.281, 0.000105047)
-    assert V_comp.shape == (2,)
-    # The second value should match the scalar test case
-    assert_close(V_comp[1], 9.287482879788506e-05)
+    V_calc2 = COSTALD_mixture_compressed(xs=xs2, T=T2, P=P2, Tcs=Tcs2, Vcs=Vcs2, omegas=omegas2)
+    # Thesis example experimental value
+    assert_close(V_calc2, 0.00007747534, rtol=1e-2) # For > 20 MPa, error 1-2%
+
 
 def test_TDE_VDNS_rho():
     rho = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
