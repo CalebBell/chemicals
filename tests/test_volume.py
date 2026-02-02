@@ -33,6 +33,7 @@ from chemicals.volume import (
     Campbell_Thodos,
     COSTALD_compressed,
     COSTALD_mixture,
+    COSTALD_mixture_compressed,
     CRC_inorganic,
     Goodman,
     Rackett,
@@ -224,8 +225,24 @@ def test_COSTALD_mixture():
 
     # Add new compressed liquid test case
     # TODO: No example found yet on literature, for improvement of exact experimental values
-    V_compressed = COSTALD_mixture(xs=[0.4576, 0.5424], T=298.0, Tcs=[512.58, 647.29], Vcs=[0.000117, 5.6e-05], omegas=[0.559, 0.344], P=1.0e7, Psat=None)
+    V_compressed = COSTALD_mixture_compressed(xs=[0.4576, 0.5424], T=298.0, P=1.0e7, Tcs=[512.58, 647.29], Vcs=[0.000117, 5.6e-05], omegas=[0.559, 0.344], Psat=None)
     assert_close(V_compressed, 2.700019523935044e-05)
+
+def test_COSTALD_arrays():
+    from fluids.numerics import np
+    # Array inputs for COSTALD
+    Ts = np.array([298., 300.])
+    V1 = COSTALD(Ts, 647.13, 55.95E-6, 0.3449)
+    assert V1.shape == (2,)
+    assert_close(V1[0], 1.8133760480018036e-05)
+
+    # Array inputs for COSTALD_compressed
+    Ps = np.array([1e5, 9.8e7])
+    # T=303., Psat=85857.9, Tc=466.7, Pc=3640000.0, omega=0.281, Vs=0.000105047
+    V_comp = COSTALD_compressed(303., Ps, 85857.9, 466.7, 3640000.0, 0.281, 0.000105047)
+    assert V_comp.shape == (2,)
+    # The second value should match the scalar test case
+    assert_close(V_comp[1], 9.287482879788506e-05)
 
 def test_TDE_VDNS_rho():
     rho = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
