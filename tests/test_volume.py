@@ -241,9 +241,14 @@ def test_COSTALD_arrays():
     from fluids.numerics import np
     # Array inputs for COSTALD
     Ts = np.array([298., 272.03889])
-    V1 = COSTALD(Ts, 369.83333, 0.20008161E-3, 0.1532)
+    Tcs = np.array([647.13, 369.83333])
+    Vcs = np.array([55.95E-6, 0.20008161E-3])
+    omegas = np.array([0.3449, 0.1532])
+    V1 = COSTALD(Ts, Tcs, Vcs, omegas)
     assert V1.shape == (2,)
-    # Propane at 272.03889 K, from API Handbook example (also in test_COSTALD)
+    # First value from test_COSTALD (Water)
+    assert_close(V1[0], 1.8133760480018036e-05)
+    # Second value from test_COSTALD (Propane)
     assert_close(V1[1], 8.315466172295678e-05)
 
     # Array inputs for COSTALD_compressed
