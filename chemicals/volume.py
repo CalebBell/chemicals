@@ -1623,7 +1623,7 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     >>> T = 344.26111
     >>> P = 20684271.8795
     >>> COSTALD_mixture_compressed(xs, T, Tcs, Vcs, omegas, P)
-    0.00017167102195524188
+    0.000171671021955242
 
     References
     ----------
