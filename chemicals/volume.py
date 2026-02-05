@@ -204,9 +204,9 @@ __all__: list[str] = [
     "volume_VDI_PPDS",
 ]
 
-
 from fluids.constants import R, root_two
 from fluids.numerics import exp, implementation_optimize_tck, log, np, splev, sqrt
+from math import log10, log1p
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, mixing_simple, os_path_join, source_path
@@ -853,7 +853,7 @@ def COSTALD(T: float, Tc: float, Vc: float, omega: float) -> float:
     Propane, from an example in the API Handbook:
 
     >>> from chemicals.utils import Vm_to_rho
-    >>> float(Vm_to_rho(COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532), 44.097))
+    >>> Vm_to_rho(COSTALD(272.03889, 369.83333, 0.20008161E-3, 0.1532), 44.097)
     530.3009967969844
 
     References
@@ -863,13 +863,12 @@ def COSTALD(T: float, Tc: float, Vc: float, omega: float) -> float:
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
     """
     Tr = T/Tc
-    # Support arrays and clamp T to Tc
-    Tr = np.minimum(Tr, 1.0)
-    tau = 1.0 - Tr
+    if Tr > 1.0:
+        Tr = 1.0
 
-    # 1.0/3.0 is 0.3333333333333333; but for negative numbers power might return complex
-    # Ensure tau is non-negative
-    tau = np.maximum(tau, 0.0)
+    tau = 1.0 - Tr
+    if tau < 0.0:
+        tau = 0.0
 
     tau_cbrt = (tau)**(1.0/3.)
     V_delta = (-0.296123 + Tr*(0.386914 + Tr*(-0.0427258 - 0.0480645*Tr)))/(Tr - 1.00001)
@@ -1168,7 +1167,7 @@ def COSTALD_compressed(T: float, P: float, Psat: float, Tc: float, Pc: float, om
 
     Examples
     --------
-    >>> float(COSTALD_compressed(303., 9.8E7, 85857.9, 466.7, 3640000.0, 0.281, 0.000105047))
+    >>> COSTALD_compressed(303., 9.8E7, 85857.9, 466.7, 3640000.0, 0.281, 0.000105047)
     9.287482879788505e-05
 
     References
@@ -1190,7 +1189,9 @@ def COSTALD_compressed(T: float, P: float, Psat: float, Tc: float, Pc: float, om
 
     Tr = T/Tc
     tau = 1.0 - Tr
-    tau = np.maximum(tau, 0.0)
+    if tau < 0.0:
+        tau = 0.0
+
     tau13 = tau**(1.0/3.0)
 
     # Optimized calculation for B using Horner-like scheme where possible
@@ -1198,7 +1199,8 @@ def COSTALD_compressed(T: float, P: float, Psat: float, Tc: float, Pc: float, om
     B = Pc*(-1.0 + tau13*(a + tau13*(b + tau13*(d + e*tau13))))
 
     # Use log1p for better numerical stability when P is close to Psat
-    return Vs*(1.0 - C*np.log1p((P - Psat)/(B + Psat)))
+    # log((B+P)/(B+Psat)) == log(1 + (P-Psat)/(B+Psat))
+    return Vs*(1.0 - C*log1p((P - Psat)/(B + Psat)))
 
 def Tait(P, P_ref, rho_ref, B, C):
     r"""Calculates compressed-liquid mass density using the Tait
@@ -1480,7 +1482,7 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
 
     Examples
     --------
-    >>> float(COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29], [0.000117, 5.6e-05], [0.559,0.344]))
+    >>> COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29], [0.000117, 5.6e-05], [0.559,0.344])
     2.7065887732713534e-05
 
     References
@@ -1489,33 +1491,34 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
        Saturated Densities of Liquids and Their Mixtures." AIChE Journal
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
     """
-    xs = np.asarray(xs, dtype=np.float64)
-    Tcs = np.asarray(Tcs, dtype=np.float64)
-    Vcs = np.asarray(Vcs, dtype=np.float64)
-    omegas = np.asarray(omegas, dtype=np.float64)
+    sum_xV = 0.0
+    sum_xV_1_3 = 0.0
+    sum_xV_2_3 = 0.0
+    omega = 0.0
 
-    # Calculate mixture parameters
-    # Vm calculation
-    V_1_3 = Vcs**(1.0/3.0)
-    V_2_3 = Vcs**(2.0/3.0)
+    # Pre-calculate term for Tcm
+    # Tcm = (sum(x * sqrt(V*Tc)))^2 / Vm
+    # To avoid N^2 loop, we use the property that sum(xi*xj*sqrt(Vi*Tci)*sqrt(Vj*Tcj)) 
+    # is equal to (sum(xi*sqrt(Vi*Tci)))^2
+    term_Tcm = 0.0
 
-    sum_xV = np.sum(xs * Vcs)
-    sum_xV_1_3 = np.sum(xs * V_1_3)
-    sum_xV_2_3 = np.sum(xs * V_2_3)
+    for i in range(len(xs)):
+        xi = xs[i]
+        Vci = Vcs[i]
+
+        V_1_3 = Vci**(1.0/3.0)
+        V_2_3 = V_1_3*V_1_3
+
+        sum_xV += xi * Vci
+        sum_xV_1_3 += xi * V_1_3
+        sum_xV_2_3 += xi * V_2_3
+
+        omega += xi * omegas[i]
+
+        term_Tcm += xi * sqrt(Vci * Tcs[i])
 
     Vm = 0.25 * (sum_xV + 3.0 * sum_xV_2_3 * sum_xV_1_3)
-
-    # omega calculation
-    omega = np.sum(xs * omegas)
-
-    # Tcm calculation
-    # Using the optimized O(N) approach equivalent to the O(N^2) sum
-    # Tcm = (sum(x * sqrt(V*Tc)))^2 / Vm
-    VTc = Vcs * Tcs
-    VTc_sqrt = np.sqrt(VTc)
-
-    term = np.sum(xs * VTc_sqrt)
-    Tcm = (term * term) / Vm
+    Tcm = (term_Tcm * term_Tcm) / Vm
 
     return COSTALD(T, Tcm, Vm, omega)
 
@@ -1599,8 +1602,8 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
 
     Returns
     -------
-    Vs : float
-        Compressed liquid mixture volume [m^3/mol]
+    V_dense : float
+        Compressed liquid mixture molar volume [m^3/mol]
 
     Notes
     -----
@@ -1619,7 +1622,7 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     >>> xs = [0.2, 0.8]
     >>> T = 344.26111
     >>> P = 20684271.8795
-    >>> float(COSTALD_mixture_compressed(xs, T, Tcs, Vcs, omegas, P)) #
+    >>> COSTALD_mixture_compressed(xs, T, Tcs, Vcs, omegas, P)
     0.00017167102195524188
 
     References
@@ -1630,28 +1633,30 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     .. [2] API Technical Data Book, Procedure 6A3.4 "Computer Method for the
        Liquid Densities of Compressed Hydrocarbon Mixtures of Defined Composition."
     """
-    xs = np.asarray(xs, dtype=np.float64)
-    Tcs = np.asarray(Tcs, dtype=np.float64)
-    Vcs = np.asarray(Vcs, dtype=np.float64)
-    omegas = np.asarray(omegas, dtype=np.float64)
+    # Recalculate mixture properties (duplication from COSTALD_mixture is intentional to keep functions independent)
+    sum_xV = 0.0
+    sum_xV_1_3 = 0.0
+    sum_xV_2_3 = 0.0
+    omega = 0.0
+    term_Tcm = 0.0
 
-    # Re-calculate mixture parameters (duplication unavoidable to keep functions independent/self-contained)
-    # Vm calculation
-    V_1_3 = Vcs**(1.0/3.0)
-    V_2_3 = Vcs**(2.0/3.0)
-    sum_xV = np.sum(xs * Vcs)
-    sum_xV_1_3 = np.sum(xs * V_1_3)
-    sum_xV_2_3 = np.sum(xs * V_2_3)
+    for i in range(len(xs)):
+        xi = xs[i]
+        Vci = Vcs[i]
+
+        V_1_3 = Vci**(1.0/3.0)
+        V_2_3 = V_1_3*V_1_3
+
+        sum_xV += xi * Vci
+        sum_xV_1_3 += xi * V_1_3
+        sum_xV_2_3 += xi * V_2_3
+
+        omega += xi * omegas[i]
+
+        term_Tcm += xi * sqrt(Vci * Tcs[i])
+
     Vm = 0.25 * (sum_xV + 3.0 * sum_xV_2_3 * sum_xV_1_3)
-
-    # omega calculation
-    omega = np.sum(xs * omegas)
-
-    # Tcm calculation
-    VTc = Vcs * Tcs
-    VTc_sqrt = np.sqrt(VTc)
-    term = np.sum(xs * VTc_sqrt)
-    Tcm = (term * term) / Vm
+    Tcm = (term_Tcm * term_Tcm) / Vm
 
     Vs = COSTALD(T, Tcm, Vm, omega)
 
@@ -1662,18 +1667,21 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     if Psat is None:
         Trm = T / Tcm
 
-        # Generalized Riedel Vapor Pressure Equation
-        log_Trm = np.log10(Trm)
-        alpha = 35.0 - 36.0 / Trm - 96.736 * log_Trm + Trm**6
-        beta = log_Trm + 0.03721754 * alpha
+        # Generalized Riedel Vapor Pressure Equation (API 6A3.4-12 to 16)
+        if Trm > 0:
+            log_Trm = log10(Trm)
+            alpha = 35.0 - 36.0 / Trm - 96.736 * log_Trm + Trm**6
+            beta = log_Trm + 0.03721754 * alpha
 
-        Prm_0 = 5.8031817 * log_Trm + 0.07608141 * alpha
-        Prm_1 = 4.86601 * beta
+            Prm_0 = 5.8031817 * log_Trm + 0.07608141 * alpha
+            Prm_1 = 4.86601 * beta
 
-        log_Prm = Prm_0 + omega * Prm_1
-        Prm = 10.0**log_Prm
+            log_Prm = Prm_0 + omega * Prm_1
+            Prm = 10.0**log_Prm
 
-        Psat = Prm * Pcm
+            Psat = Prm * Pcm
+        else:
+            Psat = 0.0
 
     return COSTALD_compressed(T, P, Psat, Tcm, Pcm, omega, Vs)
 
