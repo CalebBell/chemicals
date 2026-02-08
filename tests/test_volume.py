@@ -34,6 +34,7 @@ from chemicals.volume import (
     COSTALD_compressed,
     COSTALD_mixture,
     COSTALD_mixture_compressed,
+    COSTALD_mixture_parameters,
     CRC_inorganic,
     Goodman,
     Rackett,
@@ -218,6 +219,12 @@ def test_Amgat():
 def test_Rackett_mixture():
     Vl = Rackett_mixture(T=298., xs=[0.4576, 0.5424], MWs=[32.04, 18.01], Tcs=[512.58, 647.29], Pcs=[8.096E6, 2.209E7], Zrs=[0.2332, 0.2374])
     assert_close(Vl, 2.6252894930056885e-05)
+
+def test_COSTALD_mixture_parameters():
+    Tcm, Vm, omega = COSTALD_mixture_parameters([0.4576, 0.5424], [512.58, 647.29], [0.000117, 5.6e-05], [0.559, 0.344])
+    assert_close(Tcm, 564.9486520619129, rtol=1e-14)
+    assert_close(Vm, 8.207276247542878e-05, rtol=1e-14)
+    assert_close(omega, 0.442384, rtol=1e-14)
 
 def test_COSTALD_mixture():
     Vl = COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29],[0.000117, 5.6e-05], [0.559,0.344] )

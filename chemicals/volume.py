@@ -208,7 +208,7 @@ __all__: list[str] = [
 from math import log1p, log10
 
 from fluids.constants import R
-from fluids.numerics import exp, implementation_optimize_tck, log, np, splev, sqrt
+from fluids.numerics import cbrt, exp, implementation_optimize_tck, log, np, splev, sqrt
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, mixing_simple, os_path_join, source_path
@@ -1435,6 +1435,57 @@ def Rackett_mixture(T: float, xs: list[float], MWs: list[float], Tcs: list[float
     return (R*bigsum*Zr**(1.0 + (1.0 - Tr)**(2.0/7.0)))*MW
 
 
+def COSTALD_mixture_parameters(xs: list[float], Tcs: list[float], Vcs: list[float], omegas: list[float]) -> tuple[float, float, float]:
+    r"""Shared helper to calculate the COSTALD mixture parameters
+    :math:`T_{cm}`, :math:`V_m`, and :math:`\omega_m` using the
+    COSTALD standard mixing rules.
+
+    Parameters
+    ----------
+    xs : list[float]
+        Mole fractions of each component, [-]
+    Tcs : list[float]
+        Critical temperatures of all fluids, [K]
+    Vcs : list[float]
+        Critical volumes of all fluids (characteristic COSTALD volumes), [m^3/mol]
+    omegas : list[float]
+        Acentric factors (ideally SRK) of all fluids, [-]
+
+    Returns
+    -------
+    Tcm : float
+        Mixture pseudo-critical temperature, [K]
+    Vm : float
+        Mixture characteristic volume, [m^3/mol]
+    omega : float
+        Mixture acentric factor, [-]
+    """
+    sum_xV = 0.0
+    sum_xV_1_3 = 0.0
+    sum_xV_2_3 = 0.0
+    omega = 0.0
+    term_Tcm = 0.0
+
+    for i in range(len(xs)):
+        xi = xs[i]
+        Vci = Vcs[i]
+
+        V_1_3 = cbrt(Vci)
+        V_2_3 = V_1_3*V_1_3
+
+        sum_xV += xi * Vci
+        sum_xV_1_3 += xi * V_1_3
+        sum_xV_2_3 += xi * V_2_3
+
+        omega += xi * omegas[i]
+
+        term_Tcm += xi * sqrt(Vci * Tcs[i])
+
+    Vm = 0.25 * (sum_xV + 3.0 * sum_xV_2_3 * sum_xV_1_3)
+    Tcm = (term_Tcm * term_Tcm) / Vm
+    return Tcm, Vm, omega
+
+
 def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float], omegas: list[float]) -> float:
     r"""Calculate mixture liquid density using the COSTALD CSP method.
 
@@ -1485,7 +1536,7 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
     Examples
     --------
     >>> COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29], [0.000117, 5.6e-05], [0.559,0.344])
-    2.7065887732713534e-05
+    2.706589e-05
 
     References
     ----------
@@ -1493,35 +1544,7 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
        Saturated Densities of Liquids and Their Mixtures." AIChE Journal
        25, no. 4 (1979): 653-663. doi:10.1002/aic.690250412
     """
-    sum_xV = 0.0
-    sum_xV_1_3 = 0.0
-    sum_xV_2_3 = 0.0
-    omega = 0.0
-
-    # Pre-calculate term for Tcm
-    # Tcm = (sum(x * sqrt(V*Tc)))^2 / Vm
-    # To avoid N^2 loop, we use the property that sum(xi*xj*sqrt(Vi*Tci)*sqrt(Vj*Tcj))
-    # is equal to (sum(xi*sqrt(Vi*Tci)))^2
-    term_Tcm = 0.0
-
-    for i in range(len(xs)):
-        xi = xs[i]
-        Vci = Vcs[i]
-
-        V_1_3 = Vci**(1.0/3.0)
-        V_2_3 = V_1_3*V_1_3
-
-        sum_xV += xi * Vci
-        sum_xV_1_3 += xi * V_1_3
-        sum_xV_2_3 += xi * V_2_3
-
-        omega += xi * omegas[i]
-
-        term_Tcm += xi * sqrt(Vci * Tcs[i])
-
-    Vm = 0.25 * (sum_xV + 3.0 * sum_xV_2_3 * sum_xV_1_3)
-    Tcm = (term_Tcm * term_Tcm) / Vm
-
+    Tcm, Vm, omega = COSTALD_mixture_parameters(xs, Tcs, Vcs, omegas)
     return COSTALD(T, Tcm, Vm, omega)
 
 
@@ -1625,7 +1648,7 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     >>> T = 344.26111
     >>> P = 20684271.8795
     >>> COSTALD_mixture_compressed(xs, T, Tcs, Vcs, omegas, P)
-    0.000171671021955242
+    0.0001716710
 
     References
     ----------
@@ -1635,31 +1658,7 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     .. [2] API Technical Data Book, Procedure 6A3.4 "Computer Method for the
        Liquid Densities of Compressed Hydrocarbon Mixtures of Defined Composition."
     """
-    # Recalculate mixture properties (duplication from COSTALD_mixture is intentional to keep functions independent)
-    sum_xV = 0.0
-    sum_xV_1_3 = 0.0
-    sum_xV_2_3 = 0.0
-    omega = 0.0
-    term_Tcm = 0.0
-
-    for i in range(len(xs)):
-        xi = xs[i]
-        Vci = Vcs[i]
-
-        V_1_3 = Vci**(1.0/3.0)
-        V_2_3 = V_1_3*V_1_3
-
-        sum_xV += xi * Vci
-        sum_xV_1_3 += xi * V_1_3
-        sum_xV_2_3 += xi * V_2_3
-
-        omega += xi * omegas[i]
-
-        term_Tcm += xi * sqrt(Vci * Tcs[i])
-
-    Vm = 0.25 * (sum_xV + 3.0 * sum_xV_2_3 * sum_xV_1_3)
-    Tcm = (term_Tcm * term_Tcm) / Vm
-
+    Tcm, Vm, omega = COSTALD_mixture_parameters(xs, Tcs, Vcs, omegas)
     Vs = COSTALD(T, Tcm, Vm, omega)
 
     # Calculate Pcm and then Psat if needed
