@@ -48,6 +48,7 @@ Liquid Mixing Rules
 .. autofunction:: chemicals.volume.Amgat
 .. autofunction:: chemicals.volume.Rackett_mixture
 .. autofunction:: chemicals.volume.COSTALD_mixture
+.. autofunction:: chemicals.volume.COSTALD_mixture_compressed
 
 Gas Correlations
 ----------------
@@ -204,9 +205,10 @@ __all__: list[str] = [
     "volume_VDI_PPDS",
 ]
 
-from fluids.constants import R, root_two
+from math import log1p, log10
+
+from fluids.constants import R
 from fluids.numerics import exp, implementation_optimize_tck, log, np, splev, sqrt
-from math import log10, log1p
 
 from chemicals.data_reader import data_source, register_df_source
 from chemicals.utils import mark_numba_incompatible, mixing_simple, os_path_join, source_path
@@ -1498,7 +1500,7 @@ def COSTALD_mixture(xs: list[float], T: float, Tcs: list[float], Vcs: list[float
 
     # Pre-calculate term for Tcm
     # Tcm = (sum(x * sqrt(V*Tc)))^2 / Vm
-    # To avoid N^2 loop, we use the property that sum(xi*xj*sqrt(Vi*Tci)*sqrt(Vj*Tcj)) 
+    # To avoid N^2 loop, we use the property that sum(xi*xj*sqrt(Vi*Tci)*sqrt(Vj*Tcj))
     # is equal to (sum(xi*sqrt(Vi*Tci)))^2
     term_Tcm = 0.0
 
@@ -1528,13 +1530,13 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     by Hankinson, Brobst, and Thomson [1]_, corresponding to API Technical Data Book Procedure 6A3.4 [2]_.
 
     The molar volume of the compressed liquid mixture is calculated using the
-    Tait equation, where the saturation volume :math:`V_s` is obtained via the 
+    Tait equation, where the saturation volume :math:`V_s` is obtained via the
     standard COSTALD mixture rules (API Procedure 6A3.2).
 
     .. math::
         V = V_s \left( 1 - C \ln \frac{B + P}{B + P_{sat}}\right)
 
-    The parameters :math:`B` and :math:`C` are generalized functions of the 
+    The parameters :math:`B` and :math:`C` are generalized functions of the
     mixture acentric factor :math:`\omega_m` and reduced temperature :math:`T_r = T/T_{cm}`:
 
     .. math::
@@ -1546,7 +1548,7 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     .. math::
         C = j + k \omega_{m}
 
-    If the saturation pressure :math:`P_{sat}` is not provided, it is estimated 
+    If the saturation pressure :math:`P_{sat}` is not provided, it is estimated
     using the Generalized Riedel vapor pressure equation using mixture critical properties:
 
     .. math::
@@ -1564,7 +1566,7 @@ def COSTALD_mixture_compressed(xs: list[float], T: float, Tcs: list[float], Vcs:
     .. math::
         \beta = \log_{10} T_r + 0.03721754 \alpha
 
-    The mixture critical properties :math:`T_{cm}`, :math:`V_{m}`, and :math:`\omega_m` 
+    The mixture critical properties :math:`T_{cm}`, :math:`V_{m}`, and :math:`\omega_m`
     are calculated using the COSTALD mixing rules:
 
     .. math::
