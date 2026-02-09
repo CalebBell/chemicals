@@ -7,8 +7,8 @@ is_pypy = "PyPy" in sys.version
 is_graal = "Graal" in sys.version
 is_free_threaded = hasattr(sys, "_is_gil_enabled") and not sys._is_gil_enabled()
 ver_tup = tuple(int(x) for x in platform.python_version_tuple()[:2])
-_is_mac = sys.platform == "darwin"
-has_numba_platform = (platform.machine().lower() in ("i386", "i686", "x86", "x86_64", "amd64") and not _is_mac) or (_is_mac and platform.machine() == "arm64")
+is_mac = sys.platform == "darwin"
+has_numba_platform = (platform.machine().lower() in ("i386", "i686", "x86", "x86_64", "amd64") and not is_mac) or (is_mac and platform.machine() == "arm64")
 
 
 def pytest_ignore_collect( collection_path, config):
