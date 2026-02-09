@@ -1,15 +1,24 @@
 # Changelog
 
-## [Unreleased]
+## [1.5.1] - 2026-02-08
 
 ### Added
 
+- New `COSTALD_mixture_compressed` function for compressed liquid mixture density using the COSTALD-Tait CSP method (API Procedure 6A3.4)
+- New `COSTALD_compressed` function for compressed liquid density of pure components
+
 ### Changed
+
+- CI: Skip numba tests on macOS Intel (no llvmlite wheels available)
+- CI: Enable numba tests on macOS ARM
+- CI: Remove `zoneinfo` from cx_Freeze excludes (required by pandas)
+- CI: Remove unnecessary numba dependency from Nuitka test recipe
 
 ### Removed
 
 ### Fixed
 
+- Fixed E coefficient in heat capacity table from Perry 8E for 1-heptene
 - Corrected spelling of "Demmler" viscosity cups (previously misspelled as "Demmier"). Added citation to Hydraulic Institute's Fluid Properties new website which shows the correct spelling.
 
 ## [1.5.0] - 2025-10-26

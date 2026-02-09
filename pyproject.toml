@@ -5,7 +5,7 @@ backend-path = ["_custom_build"]
 
 [project]
 name = "chemicals"
-version = "1.5.0"
+version = "1.5.1"
 description = "Chemical properties component of Chemical Engineering Design Library (ChEDL)"
 readme = "README.rst"
 requires-python = ">=3.9"
@@ -144,7 +144,7 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/CalebBell/chemicals"
-Download = "https://github.com/CalebBell/chemicals/tarball/1.5.0"
+Download = "https://github.com/CalebBell/chemicals/tarball/1.5.1"
 
 [tool.setuptools]
 packages = ["chemicals"]
