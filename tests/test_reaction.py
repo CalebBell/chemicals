@@ -1810,6 +1810,29 @@ def test_balance_stoichiometry(test_case):
         check_reaction_balance(matrix, products_calc, atol=1e-11)
 
 
+def test_balance_stoichiometry_underdetermined():
+    """Test that underdetermined reactions (null space dim > 1) raise ValueError."""
+    # Hexane combustion with both CO and CO2 as products:
+    # O2 + C6H14 -> H2O + CO2 + CO
+    # 3 elements (C, H, O), 5 compounds => null space dim = 2
+    # O could go become CO2 or CO - realistically, both; but this comes from kinetics 
+    # and can't be determined in quantity from the formula alone
+    atomss = [{"O": 2}, {"C": 6, "H": 14}, {"H": 2, "O": 1}, {"C": 1, "O": 2}, {"C": 1, "O": 1}]
+    statuses = [True, True, False, False, False]
+    matrix = stoichiometric_matrix(atomss, statuses)
+    with pytest.raises(ValueError, match="underdetermined"):
+        balance_stoichiometry(matrix)
+
+def test_balance_stoichiometry_no_solution():
+    """Test that impossible reactions (null space dim = 0) raise ValueError."""
+    # Attempt to balance: H2 + O2 -> N2 with no matching atoms
+    atomss = [{"H": 2}, {"O": 2}, {"N": 2}]
+    statuses = [True, True, False]
+    matrix = stoichiometric_matrix(atomss, statuses)
+    with pytest.raises(ValueError):
+        balance_stoichiometry(matrix)
+
+
 def test_round_to_significant():
     """Test the round_to_significant function with various cases. TODO: Move to fluids.numerics."""
     # Test cases as (input, significant_digits, expected_output)
