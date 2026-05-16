@@ -125,12 +125,12 @@ def omega(CASRN: str, method: str | None=None) -> float | None:
     -----
     A total of four sources are available for this function. They are:
 
-        * 'PSRK', a compillation of experimental and estimated data published
-          in the Appendix of [2]_, the fourth revision of the PSRK model.
-        * 'PD', an older compillation of
-          data published in (Passut & Danner, 1973) [3]_.
-        * 'YAWS', a large compillation of data from a
-          variety of sources; no data points are sourced in the work of [4]_.
+        * 'PSRK', a compilation of experimental and estimated data published
+           in the Appendix of [2]_, the fourth revision of the PSRK model.
+        * 'PD', an older compilation of
+           data published in (Passut & Danner, 1973) [3]_.
+        * 'YAWS', a large compilation of data from a
+           variety of sources; no data points are sourced in the work of [4]_.
         * 'ACENTRIC_DEFINITION', the precalculated results using the
           `VaporPressure` object of Thermo and the critical properties of
           `chemicals`.
