@@ -39,7 +39,7 @@ Heat of Combustion
 .. autofunction:: chemicals.combustion.HHV_modified_Dulong
 .. autofunction:: chemicals.combustion.LHV_from_HHV
 
-Heat of Combustion and Stiochiometry
+Heat of Combustion and Stoichiometry
 ------------------------------------
 .. autofunction:: chemicals.combustion.combustion_data
 .. autoclass:: chemicals.combustion.CombustionData
@@ -235,7 +235,7 @@ def RON(CASRN, method=None):
 
         * 'FLORIAN_LIMING', the experimental values compiled in [1]_.
         * 'FLORIAN_LIMING_ANN', a set of predicted values using a QSPR-ANN model
-          developed in the author's earlier publication [3]_, from 260 comonents.
+          developed in the author's earlier publication [3]_, from 260 components.
         * 'COMBUSTDB', a compilation of values from various sources [2]_.
         * 'COMBUSTDB_PREDICTIONS', a set of predicted values developed by the
           author of CombustDB (Travis Kessler) using the tool [4]_.
@@ -330,7 +330,7 @@ def MON(CASRN, method=None):
 
         * 'FLORIAN_LIMING', the experimental values compiled in [1]_.
         * 'FLORIAN_LIMING_ANN', a set of predicted values using a QSPR-ANN model
-          developed in the author's earlier publication [3]_, from 260 comonents.
+          developed in the author's earlier publication [3]_, from 260 components.
         * 'COMBUSTDB', a compilation of values from various sources [2]_.
         * 'COMBUSTDB_PREDICTIONS', a set of predicted values developed by the
           author of CombustDB (Travis Kessler) using the tool [4]_.
@@ -525,7 +525,7 @@ def octane_sensitivity(RON, MON):
     return RON - MON
 
 def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
-    r"""Esimates the research octane number (RON) from a known
+    r"""Estimates the research octane number (RON) from a known
     ignition delay, as shown in [1]_.
 
     .. math::
@@ -565,7 +565,7 @@ def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
     return 120.77 - 425.48/ignition_delay
 
 def Perez_Boehman_MON_from_ignition_delay(ignition_delay):
-    r"""Esimates the motor octane number (MON) from a known
+    r"""Estimates the motor octane number (MON) from a known
     ignition delay, as shown in [1]_.
 
     .. math::
@@ -762,13 +762,13 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
     missing_handling : str, optional
         How to handle compounds which do not appear in the stoichiometric
         reaction below. If 'elemental', return those atoms in the monatomic
-        state; if 'ash', converts all missing attoms to 'Ash' in the output at
+        state; if 'ash', converts all missing atoms to 'Ash' in the output at
         a `MW` of 1 g/mol, [-]
 
     Returns
     -------
     stoichiometry : dict[str, float]
-        Stoichiometric coefficients of combustion. May inlcude the following
+        Stoichiometric coefficients of combustion. May include the following
         keys for complete combustion: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl',
         'HF' 'P4O10'; if `missing_handling` is 'elemental' can include the
         other elements; if `missing_handling` is 'ash', Ash will be present in
@@ -899,7 +899,7 @@ def combustion_products_mixture(atoms_list: list[dict[str, int]], zs: list[float
     missing_handling : str, optional
         How to handle compounds which do not appear in the stoichiometric
         reaction below. If 'elemental', return those atoms in the monatomic
-        state; if 'Ash', converts all missing attoms to 'Ash' in the output at
+        state; if 'Ash', converts all missing atoms to 'Ash' in the output at
         a `MW` of 1 g/mol, [-]
     combustion_stoichiometries : list[dict[str, float]]
         List of return values from `combustion_stoichiometry`, can be
@@ -907,7 +907,7 @@ def combustion_products_mixture(atoms_list: list[dict[str, int]], zs: list[float
 
     Returns
     -------
-    combustion_producucts : dict
+    combustion_products : dict
         Dictionary of combustion products and their counts, [-]
 
     Notes
@@ -994,7 +994,7 @@ def HHV_stoichiometry(stoichiometry: dict[str, float], Hf: float, Hf_chemicals: 
     Parameters
     ----------
     stoichiometry : dict[str, float]
-        Stoichiometric coefficients of combustion. May inlcude the following
+        Stoichiometric coefficients of combustion. May include the following
         keys: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 'HF' and 'P4O10'.
     Hf : float
         Heat of formation [J/mol].
@@ -1143,7 +1143,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     missing_handling : str, optional
         How to handle compounds which do not appear in the stoichiometric
         reaction below. If 'elemental', return those atoms in the monatomic
-        state; if 'Ash', converts all missing attoms to 'Ash' in the output at
+        state; if 'Ash', converts all missing atoms to 'Ash' in the output at
         a `MW` of 1 g/mol, [-]
 
     Returns
@@ -1151,7 +1151,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     combustion_data : :class:`~chemicals.combustion.CombustionData`
         A combustion data object with the stoichiometric coefficients of
         combustion, higher heating value, heat of formation, and molecular
-        weight as attributes named stoichiomery, HHV, Hf, and MW, respectively.
+        weight as attributes named stoichiometry, HHV, Hf, and MW, respectively.
 
     Notes
     -----
@@ -1385,13 +1385,13 @@ def fuel_air_spec_solver(zs_air: list[float], zs_fuel: list[float], CASs: list[s
     * `ratio`
 
     The variables `Vm_air`, `Vm_fuel`, `MW_air`, and `MW_fuel` are only
-    required when an air-fuel ratio is given. Howver, the ratios cannot be
+    required when an air-fuel ratio is given. However, the ratios cannot be
     calculated for the other solve options without them.
 
     Parameters
     ----------
     zs_air : list[float]
-        Mole fractions of the air; most not contain any combustibles, [-]
+        Mole fractions of the air; must not contain any combustibles, [-]
     zs_fuel : list[float]
         Mole fractions of the fuel; can contain inerts and/or oxygen as well,
         [-]
@@ -1849,13 +1849,13 @@ def combustion_spec_solver(zs_air: list[float], zs_fuel: list[float], zs_third: 
 
     The variables `Vm_air`, `Vm_fuel`, `Vm_third`, `MW_air`, `MW_fuel` and
     `MW_third` are only
-    required when an air-fuel ratio is given. Howver, the ratios cannot be
+    required when an air-fuel ratio is given. However, the ratios cannot be
     calculated for the other solve options without them.
 
     Parameters
     ----------
     zs_air : list[float]
-        Mole fractions of the air; most not contain any combustibles, [-]
+        Mole fractions of the air; must not contain any combustibles, [-]
     zs_fuel : list[float]
         Mole fractions of the fuel; can contain inerts and/or oxygen as well,
         [-]
