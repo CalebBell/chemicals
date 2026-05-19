@@ -1180,8 +1180,8 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         Required if method is "Stoichiometry".
     MW : float, optional
         Molecular weight of chemical [g/mol].
-    method : "Stoichiometry" or "Dulong", optional
-        Method to estimate LHV and HHV.
+    method : "Stoichiometry", "Dulong" or "Specification", optional
+        Method to estimate LHV and HHV. Use "Specification" if LHV or HHV are specified.
     missing_handling : str, optional
         How to handle compounds which do not appear in the stoichiometric
         reaction below. If 'elemental', return those atoms in the monatomic
