@@ -1333,7 +1333,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
     elif method == BOIE:
         HHV = MW * HHV_Boie(mass_fractions(atoms))
-        if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
+        if Hf: raise ValueError("cannot specify Hf if method is 'Boie'")
         Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
     elif method == STOICHIOMETRY:
         if Hf is None: raise ValueError("must specify Hf if method is 'Stoichiometry'")
