@@ -1187,6 +1187,10 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         reaction below. If 'elemental', return those atoms in the monatomic
         state; if 'Ash', converts all missing attoms to 'Ash' in the output at
         a `MW` of 1 g/mol, [-]
+    LHV : float, optional
+        Lower heating value of chemical [J/mol].
+    HHV : float, optional
+        Higher heating value of chemical [J/mol].
 
     Returns
     -------
