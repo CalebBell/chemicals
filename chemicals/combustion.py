@@ -37,6 +37,7 @@ Heat of Combustion
 ------------------
 .. autofunction:: chemicals.combustion.HHV_stoichiometry
 .. autofunction:: chemicals.combustion.HHV_modified_Dulong
+.. autofunction:: chemicals.combustion.HHV_Boie
 .. autofunction:: chemicals.combustion.LHV_from_HHV
 .. autofunction:: chemicals.combustion.HHV_from_LHV
 
@@ -95,6 +96,7 @@ __all__: list[str] = (
     "RON",
     "CombustionData",
     "HHV_modified_Dulong",
+    "HHV_Boie",
     "HHV_stoichiometry",
     "IDT_to_DCN",
     "LHV_from_HHV",
@@ -667,9 +669,10 @@ def as_atoms(formula: str | dict[str, int] | dict[str, float]) -> dict[str, floa
     return atoms
 
 DULONG = "Dulong"
+BOIE = "Boie"
 STOICHIOMETRY = "Stoichiometry"
 SPECIFICATION = "Specification"
-HHV_methods = (DULONG, STOICHIOMETRY, SPECIFICATION)
+HHV_methods = (DULONG, BOIE, STOICHIOMETRY, SPECIFICATION)
 
 combustible_elements = ("C", "H", "N", "O", "S", "Br", "I", "Cl", "F", "P")
 combustible_elements_set = frozenset(combustible_elements)
@@ -1044,14 +1047,14 @@ def HHV_modified_Dulong(mass_fractions: dict[str, float]) -> float:
     Returns
     -------
     HHV : float
-        Higher heating value [J/mol].
+        Higher heating value [J/g].
 
     Notes
     -----
-    The heat of combustion in J/mol is given by Dulong's equation [1]_:
+    The heat of combustion in J/g is given by Dulong's equation [1]_:
 
     .. math::
-        Hc (J/mol) = MW \cdot (338C + 1428(H - O/8)+ 95S)
+        Hc (J/mol) = -(338C + 1428(H - O/8)+ 95S)
 
     This equation is only good for <10 wt. % Oxygen content. Variables C, H, O,
     and S are atom weight fractions.
@@ -1061,7 +1064,7 @@ def HHV_modified_Dulong(mass_fractions: dict[str, float]) -> float:
     Dry bituminous coal:
 
     >>> HHV_modified_Dulong({'C': 0.716, 'H': 0.054, 'S': 0.016, 'N': 0.016, 'O': 0.093, 'Ash': 0.105})
-    -304.0395
+    -30403.9
 
     References
     ----------
@@ -1076,7 +1079,50 @@ def HHV_modified_Dulong(mass_fractions: dict[str, float]) -> float:
     if O > 0.105:
         raise ValueError("Dulong's formula is only valid at 10 wt. % Oxygen "
                          f"or less ({O} given)")
-    return - (338.*C  + 1428.*(H - O/8.)+ 95.*S)
+    return -(338.*C  + 1428.*(H - O/8.)+ 95.*S) * 100
+
+@mark_numba_incompatible
+def HHV_Boie(mass_fractions: dict[str, float]) -> float:
+    r"""
+    Return higher heating value [HHV; in J/g] based on the modified
+    Boie's equation [1]_.
+
+    Parameters
+    ----------
+    mass_fractions : dict[str, float]
+        Dictionary of atomic mass fractions [-].
+
+    Returns
+    -------
+    HHV : float
+        Higher heating value [J/g].
+
+    Notes
+    -----
+    The heat of combustion in J/g is given by Boie's equation [1]_:
+
+    .. math::
+        Hc (J/g) = -(347.3C + 1151H + 29N + 42S – 108O)
+
+    Examples
+    --------
+    Tire rubber:
+
+    >>> HHV_Boie({'C': 0.8033, 'H': 0.0766, 'S': 0.0087, 'N': 0.0035, 'O': 0.1079})
+    -35596.6
+
+    References
+    ----------
+    .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
+       9 ed.; McGraw-Hill Education, 2018
+
+    """
+    C = mass_fractions.get("C", 0.)
+    H = mass_fractions.get("H", 0.)
+    N = mass_fractions.get("N", 0.)
+    O = mass_fractions.get("O", 0.)
+    S = mass_fractions.get("S", 0.)
+    return -(347.3 * C + 1151 * H + 29 * N + 42 * S - 108 * O) * 100
 
 def LHV_from_HHV(HHV: float, N_H2O: float) -> float:
     r"""
@@ -1238,7 +1284,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
 
     >>> cd = combustion_data({'C': 0.05961, 'H': 0.053571, 'S': 0.000499, 'N': 0.001142, 'O': 0.005813, 'Ash': 0.105})
     >>> cd.HHV
-    -304.01927456402
+    -30401.9
     
     Find Hf from HHV for liquid methanol burning:
     
@@ -1283,6 +1329,10 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         method = "Stoichiometry"
     if method == DULONG:
         HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
+        if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
+        Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
+    elif method == BOIE:
+        HHV = MW * HHV_Boie(mass_fractions(atoms))
         if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
         Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
     elif method == STOICHIOMETRY:
