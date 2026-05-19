@@ -1244,7 +1244,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     
     Find Hf from LHV for liquid methanol burning:
     
-    >>> cd = combustion_data({'H': 4, 'C': 1, 'O': 1}, HHV=-638001.008)
+    >>> cd = combustion_data({'H': 4, 'C': 1, 'O': 1}, LHV=-638001.008)
     >>> cd.Hf
     -239100.0
     
