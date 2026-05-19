@@ -54,9 +54,9 @@ If you need to know something about a chemical, give chemicals a try.
    tutorial.rst
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: API
-   
+
    chemicals.acentric
    chemicals.air
    chemicals.combustion
@@ -129,7 +129,7 @@ To get the git version, run:
 Latest source code
 ------------------
 
-The latest development version of chemicals's sources can be obtained at
+The latest development version of Chemicals's sources can be obtained at
 
     https://github.com/CalebBell/chemicals
 
@@ -137,7 +137,7 @@ The latest development version of chemicals's sources can be obtained at
 Bug reports
 -----------
 
-To report bugs, please use the chemicals's Bug Tracker at:
+To report bugs, please use the Chemicals's Bug Tracker at:
 
     https://github.com/CalebBell/chemicals/issues
 
@@ -148,8 +148,8 @@ License information
 See ``LICENSE.txt`` for information on the terms & conditions for usage
 of this software, and a DISCLAIMER OF ALL WARRANTIES.
 
-Although not required by the chemicals license, if it is convenient for you,
-please cite chemicals if used in your work. Please also consider contributing
+Although not required by the Chemicals license, if it is convenient for you,
+please cite Chemicals if used in your work. Please also consider contributing
 any changes you make back, and benefit the community.
 
 Citation

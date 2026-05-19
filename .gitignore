@@ -65,6 +65,9 @@ docs/make.bat
 .ipynb_checkpoints
 ._*
 _*
+!_custom_build/
+!docs/_templates/
+!docs/_static/
 .Spotlight-V100
 .Trashes
 ehthumbs.db

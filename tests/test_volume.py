@@ -33,6 +33,8 @@ from chemicals.volume import (
     Campbell_Thodos,
     COSTALD_compressed,
     COSTALD_mixture,
+    COSTALD_mixture_compressed,
+    COSTALD_mixture_parameters,
     CRC_inorganic,
     Goodman,
     Rackett,
@@ -218,9 +220,48 @@ def test_Rackett_mixture():
     Vl = Rackett_mixture(T=298., xs=[0.4576, 0.5424], MWs=[32.04, 18.01], Tcs=[512.58, 647.29], Pcs=[8.096E6, 2.209E7], Zrs=[0.2332, 0.2374])
     assert_close(Vl, 2.6252894930056885e-05)
 
+def test_COSTALD_mixture_parameters():
+    Tcm, Vm, omega = COSTALD_mixture_parameters([0.4576, 0.5424], [512.58, 647.29], [0.000117, 5.6e-05], [0.559, 0.344])
+    assert_close(Tcm, 564.9486520619129, rtol=1e-14)
+    assert_close(Vm, 8.207276247542878e-05, rtol=1e-14)
+    assert_close(omega, 0.442384, rtol=1e-14)
+
 def test_COSTALD_mixture():
     Vl = COSTALD_mixture([0.4576, 0.5424], 298.,  [512.58, 647.29],[0.000117, 5.6e-05], [0.559,0.344] )
     assert_close(Vl, 2.706588773271354e-05)
+
+def test_COSTALD_mixture_compressed():
+    # =========================================================================
+    # Example from API Procedure 6A3.4
+    # 20 mole percent ethane and 80 mole percent n-decane at 160 F and 3000 psia
+    # Converted to SI units
+    T1 = 344.2611111111111      # K
+    P1 = 20684271.8795          # Pa
+    Tcs1 = [305.3277777777778, 617.5944444444444]           # K
+    Vcs1 = [0.00014576928794529767, 0.0006192229409547785]  # m3/mol
+    omegas1 = [0.0983, 0.4916]
+    xs1 = [0.2, 0.8]            # mole %
+
+    V_calc1 = COSTALD_mixture_compressed(xs=xs1, T=T1, Tcs=Tcs1, Vcs=Vcs1, omegas=omegas1, P=P1)
+    assert_close(V_calc1, 0.00017161446362382157, rtol=1e-3) # API example value
+
+    # =========================================================================
+    # Other example from the thesis of Noor Sabeh Majied Al-Qazaz on PDF page 72
+    # https://nahrainuniv.edu.iq/sites/default/files/name%20project2.pdf
+    #
+    # Mixture of 90 mol% Propane (i=0) with 10 mol% Benzene (i=1)
+    # at 310.927 K and 680.272 atm.
+    T2 = 310.927
+    P2 = 68928560.4
+    Tcs2 = [369.8, 562.2]
+    Vcs2 = [0.0002001, 0.0002564]
+    omegas2 = [0.1532, 0.2137]
+    xs2 = [0.9, 0.1]
+
+    V_calc2 = COSTALD_mixture_compressed(xs=xs2, T=T2, Tcs=Tcs2, Vcs=Vcs2, omegas=omegas2, P=P2)
+    # Thesis example experimental value
+    assert_close(V_calc2, 0.00007747534, rtol=1e-2) # For > 20 MPa, error 1-2%
+
 
 def test_TDE_VDNS_rho():
     rho = TDE_VDNS_rho(T=400.0, Tc=772.999, rhoc=320.037, a1=795.092, a2=-169.132, a3=448.929, a4=-102.931)
