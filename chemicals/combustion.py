@@ -38,6 +38,7 @@ Heat of Combustion
 .. autofunction:: chemicals.combustion.HHV_stoichiometry
 .. autofunction:: chemicals.combustion.HHV_modified_Dulong
 .. autofunction:: chemicals.combustion.LHV_from_HHV
+.. autofunction:: chemicals.combustion.HHV_from_LHV
 
 Heat of Combustion and Stiochiometry
 ------------------------------------
@@ -667,7 +668,8 @@ def as_atoms(formula: str | dict[str, int] | dict[str, float]) -> dict[str, floa
 
 DULONG = "Dulong"
 STOICHIOMETRY = "Stoichiometry"
-HHV_methods = (DULONG, STOICHIOMETRY)
+SPECIFICATION = "Specification"
+HHV_methods = (DULONG, STOICHIOMETRY, SPECIFICATION)
 
 combustible_elements = ("C", "H", "N", "O", "S", "Br", "I", "Cl", "F", "P")
 combustible_elements_set = frozenset(combustible_elements)
@@ -870,8 +872,7 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
         combustion_atoms = {i: atoms.get(i, 0) for i in combustible_elements}
         MW = MW or molecular_weight(atoms)
         Ash = MW - molecular_weight(combustion_atoms)
-        if Ash/MW > 0.0001:
-            products["Ash"] = Ash
+        if Ash/MW > 0.0001: products["Ash"] = Ash
     else:
         raise ValueError("Allowed values for `missing_handling` are 'elemental' and 'ash'.")
     return products
@@ -1118,11 +1119,52 @@ def LHV_from_HHV(HHV: float, N_H2O: float) -> float:
     """
     return HHV + 44011.496 * N_H2O
 
+def HHV_from_LHV(LHV: float, N_H2O: float) -> float:
+    r"""
+    Return the higher heating value [HHV; in J/mol] of a chemical given
+    the lower heating value [LHV; in J/mol] and the number of water
+    molecules formed per molecule burned.
+
+    Parameters
+    ----------
+    LHV : float
+        Lower heating value [J/mol].
+    N_H2O : int
+        Number of water molecules produced [-].
+
+    Returns
+    -------
+    HHV : float
+        Higher heating value [J/mol].
+
+    Notes
+    -----
+    The HHV is calculated as follows:
+
+    .. math::
+        HHV = LHV - H_{vap} \cdot H_2O
+
+    .. math::
+        H_{vap} = 44011.496 \frac{J}{mol H_2O}
+
+    .. math::
+        H_2O = \frac{mol H_2O}{mol}
+
+    Examples
+    --------
+    Methanol lower heat of combustion:
+
+    >>> HHV_from_LHV(-638001.008, 2)
+    -726024.0
+
+    """
+    return LHV - 44011.496 * N_H2O
+
 @mark_numba_incompatible
 def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
-                    method=None, missing_handling="ash"):
+                    method=None, missing_handling="ash", LHV=None, HHV=None):
     r"""
-    Return a CombustionData object (a named tuple) that contains the stoichiometry
+    Return a CombustionData object that contains the stoichiometry
     coefficients of the reactants and products, the lower and higher
     heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
     and the molecular weight [MW; in g/mol].
@@ -1188,6 +1230,24 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     >>> combustion_data({'H': 4, 'C': 1, 'O': 1}, Hf=-239100)
     CombustionData(stoichiometry={'CO2': 1, 'O2': -1.5, 'H2O': 2.0}, HHV=-726024.0, Hf=-239100, MW=32.04186)
 
+    Dry bituminous coal:
+
+    >>> cd = combustion_data({'C': 0.05961, 'H': 0.053571, 'S': 0.000499, 'N': 0.001142, 'O': 0.005813, 'Ash': 0.105})
+    >>> cd.HHV
+    -304.01927456402
+    
+    Find Hf from HHV for liquid methanol burning:
+    
+    >>> cd = combustion_data({'H': 4, 'C': 1, 'O': 1}, HHV=-726024.0)
+    >>> cd.Hf
+    -239100.0
+    
+    Find Hf from LHV for liquid methanol burning:
+    
+    >>> cd = combustion_data({'H': 4, 'C': 1, 'O': 1}, HHV=-638001.008)
+    >>> cd.Hf
+    -239100.0
+    
     References
     ----------
     .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
@@ -1207,8 +1267,16 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         MW = molecular_weight(atoms)
     if method:
         method = method.capitalize()
+    elif Hf is None:
+        if LHV is None:
+            if HHV is None:
+                method = "Dulong"
+            else:
+                method = "Specification"
+        else:
+            method = "Specification"
     else:
-        method = "Dulong" if Hf is None else "Stoichiometry"
+        method = "Stoichiometry"
     if method == DULONG:
         HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
         if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
@@ -1216,14 +1284,20 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     elif method == STOICHIOMETRY:
         if Hf is None: raise ValueError("must specify Hf if method is 'Stoichiometry'")
         HHV = HHV_stoichiometry(stoichiometry, Hf)
+    elif method == SPECIFICATION:
+        if HHV is None: 
+            if LHV is None:
+                raise ValueError("must specify either LHV or HHV if method is 'Specification'")
+            HHV = HHV_from_LHV(LHV, stoichiometry.get("H2O", 0.))
+        Hf = HHV_stoichiometry(stoichiometry, 0) - HHV
     else:
-        raise ValueError("method must be either 'Stoichiometric' or 'Dulong', "
-                         f"not {method}")
+        raise ValueError("method must be either 'Stoichiometric', 'Dulong', or 'Specification'; "
+                         f"not {method!r}")
     return CombustionData(stoichiometry, HHV, Hf, MW)
 
 class CombustionData:
     r"""
-    Return a CombustionData object (a named tuple) that contains the stoichiometry
+    Return a CombustionData object that contains the stoichiometry
     coefficients of the reactants and products, the lower and higher
     heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
     and the molecular weight [MW; in g/mol].
@@ -1849,7 +1923,7 @@ def combustion_spec_solver(zs_air: list[float], zs_fuel: list[float], zs_third: 
 
     The variables `Vm_air`, `Vm_fuel`, `Vm_third`, `MW_air`, `MW_fuel` and
     `MW_third` are only
-    required when an air-fuel ratio is given. Howver, the ratios cannot be
+    required when an air-fuel ratio is given. However, the ratios cannot be
     calculated for the other solve options without them.
 
     Parameters
