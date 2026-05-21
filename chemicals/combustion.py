@@ -1320,13 +1320,15 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     elif Hf is None:
         if LHV is None:
             if HHV is None:
-                method = "Dulong"
+                method = DULONG
+                z = mass_fractions(atoms)
+                if z.get('O', 0) > 0.105: method = BOIE
             else:
-                method = "Specification"
+                method = SPECIFICATION
         else:
-            method = "Specification"
+            method = SPECIFICATION
     else:
-        method = "Stoichiometry"
+        method = STOICHIOMETRY
     if method == DULONG:
         HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
         if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
