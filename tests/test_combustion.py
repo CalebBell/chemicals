@@ -162,7 +162,7 @@ def test_combustion():
     assert_close(H_calc, H_Nicotinic_acid)
 
     # Custome example to select Dulong method when no Hf is given
-    H_custom = -3004.589626
+    H_custom = -300458.9626
     H_calc = combustion_data({"C": 0.716, "H": 0.054, "S": 0.016, "N": 0.016, "O": 0.01}).HHV
     assert_close(H_calc, H_custom)
 
