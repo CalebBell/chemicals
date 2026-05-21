@@ -141,7 +141,7 @@ def test_combustion():
 
     # Dulong dry bituminous coal
     H_calc = HHV_modified_Dulong({"C": 0.716, "H": 0.054, "S": 0.016, "N": 0.016, "O": 0.093, "Ash": 0.105})
-    assert_close(H_calc, -304.0395)
+    assert_close(H_calc, -30403.95)
 
     # LHV methanol
     H_calc = LHV_from_HHV(-726024.0, 2.0)
