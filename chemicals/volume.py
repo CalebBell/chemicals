@@ -189,6 +189,7 @@ __all__: list[str] = [
     "Bhirud_normal",
     "COSTALD_compressed",
     "COSTALD_mixture",
+    "COSTALD_mixture_compressed",
     "CRC_inorganic",
     "Campbell_Thodos",
     "Goodman",

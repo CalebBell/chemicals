@@ -893,6 +893,8 @@ def molecular_weight(atoms: dict[str, int]) -> float:
         elif i == "T":
             # Hardcoded MW until an actual isotope db is created
             MW += 3.0160492*count
+        elif i == 'Ash':
+            MW += count # Not an element, but assume 1 kg/kmol for bulk Ash
         else:
             raise ValueError("Molecule includes unknown atoms")
     return MW
@@ -944,6 +946,12 @@ def mass_fractions(atoms: dict[str, int], MW: float | None=None) -> dict[str, fl
     for i, count in atoms.items():
         if i in periodic_table:
             mfracs[i] = periodic_table[i].MW*count/MW
+        elif i == "D":
+            mfracs[i] = 2.014102*count / MW
+        elif i == "T":
+            mfracs[i] = 3.0160492*count / MW
+        elif i == 'Ash':
+            mfracs[i] = count / MW
         else:
             raise ValueError("Molecule includes unknown atoms")
     return mfracs
