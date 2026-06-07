@@ -316,7 +316,7 @@ def MON(CASRN, method=None):
     Returns
     -------
     MON : float
-        Research octane number, [-]
+        Motor octane number, [-]
 
     Other Parameters
     ----------------
@@ -453,8 +453,8 @@ def ignition_delay(CASRN, method=None):
     return value
 
 def AKI(RON, MON):
-    r"""This function calculates the anti knock index (AKI) of a fuel, also
-    known as (R+M)/2 and by DON [1]_.
+    r"""This function calculates the anti-knock index (AKI) of a fuel, also
+    known as (R+M)/2 and as DON [1]_.
 
     .. math::
         \text{AKI} = 0.5\text{RON} + 0.5\text{MON}
@@ -770,9 +770,9 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
     stoichiometry : dict[str, float]
         Stoichiometric coefficients of combustion. May include the following
         keys for complete combustion: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl',
-        'HF' 'P4O10'; if `missing_handling` is 'elemental' can include the
+        'HF', 'P4O10'; if `missing_handling` is 'elemental' can include the
         other elements; if `missing_handling` is 'ash', Ash will be present in
-        the output if the compounds whose reactions are not included here.
+        the output for compounds whose reactions are not included here.
         'O2' is always present, with negative values indicating oxygen is
         required. [-]
 
@@ -787,7 +787,7 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
     Also included in the results is the moles of O2 required per mole of
-    the mixture of the molecule.
+    the molecule.
 
     HF and HCl are gaseous products in their standard state. P4O10 is a solid
     in its standard state. Bromine is a liquid as is iodine. Water depends on
@@ -880,7 +880,7 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
 def combustion_products_mixture(atoms_list: list[dict[str, int]], zs: list[float], reactivities: list[bool] | None=None, CASs: list[str] | None=None,
                                 missing_handling: str="elemental",
                                 combustion_stoichiometries: None=None) -> dict[str, float]:
-    """Calculates the combustion products of a mixture of molecules and their,
+    """Calculates the combustion products of a mixture of molecules and their
     mole fractions; requires a list of dictionaries of each molecule's
     constituent atoms and their counts. Products for non-hydrocarbons may not be
     correct, but are still calculated.
@@ -1053,7 +1053,7 @@ def HHV_modified_Dulong(mass_fractions: dict[str, float]) -> float:
         Hc (J/mol) = MW \cdot (338C + 1428(H - O/8)+ 95S)
 
     This equation is only good for <10 wt. % Oxygen content. Variables C, H, O,
-    and S are atom weight fractions.
+    and S are atomic weight fractions.
 
     Examples
     --------
@@ -1064,8 +1064,8 @@ def HHV_modified_Dulong(mass_fractions: dict[str, float]) -> float:
 
     References
     ----------
-    .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
-       9 ed.; McGraw-Hill Education, 2018
+    .. [1] Green, D. W. Waste management. In Perry's Chemical Engineers' Handbook,
+       9th ed.; McGraw-Hill Education, 2018
 
     """
     C = mass_fractions.get("C", 0.)
@@ -1163,8 +1163,8 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     .. math::
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
-    If the method is "Stoichiometry", the HHV is found using
-    through an energy balance on the reaction (i.e. heat of reaction).
+    If the method is "Stoichiometry", the HHV is found through an energy
+    balance on the reaction (i.e. heat of reaction).
     If the method is "Dulong", Dulong's equation is used [1]_:
 
     .. math::
@@ -1190,8 +1190,8 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
 
     References
     ----------
-    .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
-       9 ed.; McGraw-Hill Education, 2018
+    .. [1] Green, D. W. Waste management. In Perry's Chemical Engineers' Handbook,
+       9th ed.; McGraw-Hill Education, 2018
 
     """
     if formula:
@@ -1217,7 +1217,7 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         if Hf is None: raise ValueError("must specify Hf if method is 'Stoichiometry'")
         HHV = HHV_stoichiometry(stoichiometry, Hf)
     else:
-        raise ValueError("method must be either 'Stoichiometric' or 'Dulong', "
+        raise ValueError("method must be either 'Stoichiometry' or 'Dulong', "
                          f"not {method}")
     return CombustionData(stoichiometry, HHV, Hf, MW)
 
@@ -1260,9 +1260,8 @@ def air_fuel_ratio_solver(ratio: float | None, Vm_air: float, Vm_fuel: float, MW
                           n_air: float | None=None, n_fuel: float | None=None,
                           basis: str="mass") -> tuple[float, float, float, float, float]:
     """Calculates molar flow rate of air or fuel from the other, using a
-    specified air-fuel ratio. Supports 'mole', 'mass', and 'volume'.
-
-    bases for the ratio variable. The ratio must be of the same units -
+    specified air-fuel ratio. Supports 'mole', 'mass', and 'volume' bases
+    for the ratio variable. The ratio must be of the same units -
     i.e. kg/kg instead of lb/kg.
 
     The mole, mass, and volume air-fuel ratios are calculated in the process
@@ -1844,7 +1843,7 @@ def combustion_spec_solver(zs_air: list[float], zs_fuel: list[float], zs_third: 
                            ratio_basis: str="mass", reactivities: list[bool] | None=None,
                            combustion_stoichiometries: None=None) -> dict[str, float | list[float]]:
     """Solves the system of equations describing a flow of air mixing with two
-    flow of combustibles, one fixed and one potentially variable, and burning
+    flows of combustibles, one fixed and one potentially variable, and burning
     completely. All calculated variables are returned as a dictionary.
 
     The variables `Vm_air`, `Vm_fuel`, `Vm_third`, `MW_air`, `MW_fuel` and
