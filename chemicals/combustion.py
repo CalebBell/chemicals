@@ -37,9 +37,11 @@ Heat of Combustion
 ------------------
 .. autofunction:: chemicals.combustion.HHV_stoichiometry
 .. autofunction:: chemicals.combustion.HHV_modified_Dulong
+.. autofunction:: chemicals.combustion.HHV_Boie
 .. autofunction:: chemicals.combustion.LHV_from_HHV
+.. autofunction:: chemicals.combustion.HHV_from_LHV
 
-Heat of Combustion and Stiochiometry
+Heat of Combustion and Stoichiometry
 ------------------------------------
 .. autofunction:: chemicals.combustion.combustion_data
 .. autoclass:: chemicals.combustion.CombustionData
@@ -93,6 +95,8 @@ __all__: list[str] = (
     "MON",
     "RON",
     "CombustionData",
+    "HHV_Boie",
+    "HHV_from_LHV",
     "HHV_modified_Dulong",
     "HHV_stoichiometry",
     "IDT_to_DCN",
@@ -235,7 +239,7 @@ def RON(CASRN, method=None):
 
         * 'FLORIAN_LIMING', the experimental values compiled in [1]_.
         * 'FLORIAN_LIMING_ANN', a set of predicted values using a QSPR-ANN model
-          developed in the author's earlier publication [3]_, from 260 comonents.
+          developed in the author's earlier publication [3]_, from 260 components.
         * 'COMBUSTDB', a compilation of values from various sources [2]_.
         * 'COMBUSTDB_PREDICTIONS', a set of predicted values developed by the
           author of CombustDB (Travis Kessler) using the tool [4]_.
@@ -316,7 +320,7 @@ def MON(CASRN, method=None):
     Returns
     -------
     MON : float
-        Research octane number, [-]
+        Motor octane number, [-]
 
     Other Parameters
     ----------------
@@ -330,7 +334,7 @@ def MON(CASRN, method=None):
 
         * 'FLORIAN_LIMING', the experimental values compiled in [1]_.
         * 'FLORIAN_LIMING_ANN', a set of predicted values using a QSPR-ANN model
-          developed in the author's earlier publication [3]_, from 260 comonents.
+          developed in the author's earlier publication [3]_, from 260 components.
         * 'COMBUSTDB', a compilation of values from various sources [2]_.
         * 'COMBUSTDB_PREDICTIONS', a set of predicted values developed by the
           author of CombustDB (Travis Kessler) using the tool [4]_.
@@ -453,8 +457,8 @@ def ignition_delay(CASRN, method=None):
     return value
 
 def AKI(RON, MON):
-    r"""This function calculates the anti knock index (AKI) of a fuel, also
-    known as (R+M)/2 and by DON [1]_.
+    r"""This function calculates the anti-knock index (AKI) of a fuel, also
+    known as (R+M)/2 and as DON [1]_.
 
     .. math::
         \text{AKI} = 0.5\text{RON} + 0.5\text{MON}
@@ -525,7 +529,7 @@ def octane_sensitivity(RON, MON):
     return RON - MON
 
 def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
-    r"""Esimates the research octane number (RON) from a known
+    r"""Estimates the research octane number (RON) from a known
     ignition delay, as shown in [1]_.
 
     .. math::
@@ -565,7 +569,7 @@ def Perez_Boehman_RON_from_ignition_delay(ignition_delay):
     return 120.77 - 425.48/ignition_delay
 
 def Perez_Boehman_MON_from_ignition_delay(ignition_delay):
-    r"""Esimates the motor octane number (MON) from a known
+    r"""Estimates the motor octane number (MON) from a known
     ignition delay, as shown in [1]_.
 
     .. math::
@@ -666,8 +670,10 @@ def as_atoms(formula: str | dict[str, int] | dict[str, float]) -> dict[str, floa
     return atoms
 
 DULONG = "Dulong"
+BOIE = "Boie"
 STOICHIOMETRY = "Stoichiometry"
-HHV_methods = (DULONG, STOICHIOMETRY)
+SPECIFICATION = "Specification"
+HHV_methods = (DULONG, BOIE, STOICHIOMETRY, SPECIFICATION)
 
 combustible_elements = ("C", "H", "N", "O", "S", "Br", "I", "Cl", "F", "P")
 combustible_elements_set = frozenset(combustible_elements)
@@ -762,17 +768,17 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
     missing_handling : str, optional
         How to handle compounds which do not appear in the stoichiometric
         reaction below. If 'elemental', return those atoms in the monatomic
-        state; if 'ash', converts all missing attoms to 'Ash' in the output at
+        state; if 'ash', converts all missing atoms to 'Ash' in the output at
         a `MW` of 1 g/mol, [-]
 
     Returns
     -------
     stoichiometry : dict[str, float]
-        Stoichiometric coefficients of combustion. May inlcude the following
+        Stoichiometric coefficients of combustion. May include the following
         keys for complete combustion: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl',
-        'HF' 'P4O10'; if `missing_handling` is 'elemental' can include the
+        'HF', 'P4O10'; if `missing_handling` is 'elemental' can include the
         other elements; if `missing_handling` is 'ash', Ash will be present in
-        the output if the compounds whose reactions are not included here.
+        the output for compounds whose reactions are not included here.
         'O2' is always present, with negative values indicating oxygen is
         required. [-]
 
@@ -787,7 +793,7 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
     Also included in the results is the moles of O2 required per mole of
-    the mixture of the molecule.
+    the molecule.
 
     HF and HCl are gaseous products in their standard state. P4O10 is a solid
     in its standard state. Bromine is a liquid as is iodine. Water depends on
@@ -870,8 +876,7 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
         combustion_atoms = {i: atoms.get(i, 0) for i in combustible_elements}
         MW = MW or molecular_weight(atoms)
         Ash = MW - molecular_weight(combustion_atoms)
-        if Ash/MW > 0.0001:
-            products["Ash"] = Ash
+        if Ash/MW > 0.0001: products["Ash"] = Ash
     else:
         raise ValueError("Allowed values for `missing_handling` are 'elemental' and 'ash'.")
     return products
@@ -880,7 +885,7 @@ def combustion_stoichiometry(atoms: dict[str, float], MW: float | None=None, mis
 def combustion_products_mixture(atoms_list: list[dict[str, int]], zs: list[float], reactivities: list[bool] | None=None, CASs: list[str] | None=None,
                                 missing_handling: str="elemental",
                                 combustion_stoichiometries: None=None) -> dict[str, float]:
-    """Calculates the combustion products of a mixture of molecules and their,
+    """Calculates the combustion products of a mixture of molecules and their
     mole fractions; requires a list of dictionaries of each molecule's
     constituent atoms and their counts. Products for non-hydrocarbons may not be
     correct, but are still calculated.
@@ -899,7 +904,7 @@ def combustion_products_mixture(atoms_list: list[dict[str, int]], zs: list[float
     missing_handling : str, optional
         How to handle compounds which do not appear in the stoichiometric
         reaction below. If 'elemental', return those atoms in the monatomic
-        state; if 'Ash', converts all missing attoms to 'Ash' in the output at
+        state; if 'Ash', converts all missing atoms to 'Ash' in the output at
         a `MW` of 1 g/mol, [-]
     combustion_stoichiometries : list[dict[str, float]]
         List of return values from `combustion_stoichiometry`, can be
@@ -907,7 +912,7 @@ def combustion_products_mixture(atoms_list: list[dict[str, int]], zs: list[float
 
     Returns
     -------
-    combustion_producucts : dict
+    combustion_products : dict
         Dictionary of combustion products and their counts, [-]
 
     Notes
@@ -994,7 +999,7 @@ def HHV_stoichiometry(stoichiometry: dict[str, float], Hf: float, Hf_chemicals: 
     Parameters
     ----------
     stoichiometry : dict[str, float]
-        Stoichiometric coefficients of combustion. May inlcude the following
+        Stoichiometric coefficients of combustion. May include the following
         keys: 'H2O', 'CO2', 'SO2', 'Br2', 'I2', 'HCl', 'HF' and 'P4O10'.
     Hf : float
         Heat of formation [J/mol].
@@ -1043,29 +1048,29 @@ def HHV_modified_Dulong(mass_fractions: dict[str, float]) -> float:
     Returns
     -------
     HHV : float
-        Higher heating value [J/mol].
+        Higher heating value [J/g].
 
     Notes
     -----
-    The heat of combustion in J/mol is given by Dulong's equation [1]_:
+    The heat of combustion in J/g is given by Dulong's equation [1]_:
 
     .. math::
-        Hc (J/mol) = MW \cdot (338C + 1428(H - O/8)+ 95S)
+        Hc (J/mol) = -(338C + 1428(H - O/8)+ 95S)
 
     This equation is only good for <10 wt. % Oxygen content. Variables C, H, O,
-    and S are atom weight fractions.
+    and S are atomic weight fractions.
 
     Examples
     --------
     Dry bituminous coal:
 
     >>> HHV_modified_Dulong({'C': 0.716, 'H': 0.054, 'S': 0.016, 'N': 0.016, 'O': 0.093, 'Ash': 0.105})
-    -304.0395
+    -30403.9
 
     References
     ----------
-    .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
-       9 ed.; McGraw-Hill Education, 2018
+    .. [1] Green, D. W. Waste management. In Perry's Chemical Engineers' Handbook,
+       9th ed.; McGraw-Hill Education, 2018
 
     """
     C = mass_fractions.get("C", 0.)
@@ -1075,7 +1080,50 @@ def HHV_modified_Dulong(mass_fractions: dict[str, float]) -> float:
     if O > 0.105:
         raise ValueError("Dulong's formula is only valid at 10 wt. % Oxygen "
                          f"or less ({O} given)")
-    return - (338.*C  + 1428.*(H - O/8.)+ 95.*S)
+    return -(338.*C  + 1428.*(H - O/8.)+ 95.*S) * 100
+
+@mark_numba_incompatible
+def HHV_Boie(mass_fractions: dict[str, float]) -> float:
+    r"""
+    Return higher heating value [HHV; in J/g] based on the modified
+    Boie's equation [1]_.
+
+    Parameters
+    ----------
+    mass_fractions : dict[str, float]
+        Dictionary of atomic mass fractions [-].
+
+    Returns
+    -------
+    HHV : float
+        Higher heating value [J/g].
+
+    Notes
+    -----
+    The heat of combustion in J/g is given by Boie's equation [1]_:
+
+    .. math::
+        Hc (J/g) = -(347.3C + 1151H + 29N + 42S - 108O)
+
+    Examples
+    --------
+    Tire rubber:
+
+    >>> HHV_Boie({'C': 0.8033, 'H': 0.0766, 'S': 0.0087, 'N': 0.0035, 'O': 0.1079})
+    -35596.6
+
+    References
+    ----------
+    .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
+       9 ed.; McGraw-Hill Education, 2018
+
+    """
+    C = mass_fractions.get("C", 0.)
+    H = mass_fractions.get("H", 0.)
+    N = mass_fractions.get("N", 0.)
+    O = mass_fractions.get("O", 0.)
+    S = mass_fractions.get("S", 0.)
+    return -(347.3 * C + 1151 * H + 29 * N + 42 * S - 108 * O) * 100
 
 def LHV_from_HHV(HHV: float, N_H2O: float) -> float:
     r"""
@@ -1118,11 +1166,52 @@ def LHV_from_HHV(HHV: float, N_H2O: float) -> float:
     """
     return HHV + 44011.496 * N_H2O
 
+def HHV_from_LHV(LHV: float, N_H2O: float) -> float:
+    r"""
+    Return the higher heating value [HHV; in J/mol] of a chemical given
+    the lower heating value [LHV; in J/mol] and the number of water
+    molecules formed per molecule burned.
+
+    Parameters
+    ----------
+    LHV : float
+        Lower heating value [J/mol].
+    N_H2O : int
+        Number of water molecules produced [-].
+
+    Returns
+    -------
+    HHV : float
+        Higher heating value [J/mol].
+
+    Notes
+    -----
+    The HHV is calculated as follows:
+
+    .. math::
+        HHV = LHV - H_{vap} \cdot H_2O
+
+    .. math::
+        H_{vap} = 44011.496 \frac{J}{mol H_2O}
+
+    .. math::
+        H_2O = \frac{mol H_2O}{mol}
+
+    Examples
+    --------
+    Methanol lower heat of combustion:
+
+    >>> HHV_from_LHV(-638001.008, 2)
+    -726024.0
+
+    """
+    return LHV - 44011.496 * N_H2O
+
 @mark_numba_incompatible
 def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
-                    method=None, missing_handling="ash"):
+                    method=None, missing_handling="ash", LHV=None, HHV=None):
     r"""
-    Return a CombustionData object (a named tuple) that contains the stoichiometry
+    Return a CombustionData object that contains the stoichiometry
     coefficients of the reactants and products, the lower and higher
     heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
     and the molecular weight [MW; in g/mol].
@@ -1138,20 +1227,24 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         Required if method is "Stoichiometry".
     MW : float, optional
         Molecular weight of chemical [g/mol].
-    method : "Stoichiometry" or "Dulong", optional
-        Method to estimate LHV and HHV.
+    method : "Stoichiometry", "Dulong" or "Specification", optional
+        Method to estimate LHV and HHV. Use "Specification" if LHV or HHV are specified.
     missing_handling : str, optional
         How to handle compounds which do not appear in the stoichiometric
         reaction below. If 'elemental', return those atoms in the monatomic
-        state; if 'Ash', converts all missing attoms to 'Ash' in the output at
+        state; if 'Ash', converts all missing atoms to 'Ash' in the output at
         a `MW` of 1 g/mol, [-]
+    LHV : float, optional
+        Lower heating value of chemical [J/mol].
+    HHV : float, optional
+        Higher heating value of chemical [J/mol].
 
     Returns
     -------
     combustion_data : :class:`~chemicals.combustion.CombustionData`
         A combustion data object with the stoichiometric coefficients of
         combustion, higher heating value, heat of formation, and molecular
-        weight as attributes named stoichiomery, HHV, Hf, and MW, respectively.
+        weight as attributes named stoichiometry, HHV, Hf, and MW, respectively.
 
     Notes
     -----
@@ -1163,8 +1256,8 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     .. math::
         k = c + s + \frac{h}{4} + \frac{5P}{4} - \frac{x + f}{4} - \frac{o}{2}
 
-    If the method is "Stoichiometry", the HHV is found using
-    through an energy balance on the reaction (i.e. heat of reaction).
+    If the method is "Stoichiometry", the HHV is found through an energy
+    balance on the reaction (i.e. heat of reaction).
     If the method is "Dulong", Dulong's equation is used [1]_:
 
     .. math::
@@ -1188,10 +1281,28 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
     >>> combustion_data({'H': 4, 'C': 1, 'O': 1}, Hf=-239100)
     CombustionData(stoichiometry={'CO2': 1, 'O2': -1.5, 'H2O': 2.0}, HHV=-726024.0, Hf=-239100, MW=32.04186)
 
+    Dry bituminous coal:
+
+    >>> cd = combustion_data({'C': 0.05961, 'H': 0.053571, 'S': 0.000499, 'N': 0.001142, 'O': 0.005813, 'Ash': 0.105})
+    >>> cd.HHV
+    -30401.9
+
+    Find Hf from HHV for liquid methanol burning:
+
+    >>> cd = combustion_data({'H': 4, 'C': 1, 'O': 1}, HHV=-726024.0)
+    >>> cd.Hf
+    -239100.0
+
+    Find Hf from LHV for liquid methanol burning:
+
+    >>> cd = combustion_data({'H': 4, 'C': 1, 'O': 1}, LHV=-638001.008)
+    >>> cd.Hf
+    -239100.0
+
     References
     ----------
-    .. [1] Green, D. W. Waste management. In Perry`s Chemical Engineers` Handbook,
-       9 ed.; McGraw-Hill Education, 2018
+    .. [1] Green, D. W. Waste management. In Perry's Chemical Engineers' Handbook,
+       9th ed.; McGraw-Hill Education, 2018
 
     """
     if formula:
@@ -1207,23 +1318,45 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         MW = molecular_weight(atoms)
     if method:
         method = method.capitalize()
+    elif Hf is not None and (HHV is not None or LHV is not None):
+        raise ValueError("cannot specify Hf with LHV or HHV")
+    elif Hf is None:
+        if LHV is None:
+            if HHV is None:
+                method = DULONG
+                z = mass_fractions(atoms)
+                if z.get("O", 0) > 0.105: method = BOIE
+            else:
+                method = SPECIFICATION
+        else:
+            method = SPECIFICATION
     else:
-        method = "Dulong" if Hf is None else "Stoichiometry"
+        method = STOICHIOMETRY
     if method == DULONG:
         HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
-        if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
+        if Hf is not None: raise ValueError("cannot specify Hf if method is 'Dulong'")
+        Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
+    elif method == BOIE:
+        HHV = MW * HHV_Boie(mass_fractions(atoms))
+        if Hf is not None: raise ValueError("cannot specify Hf if method is 'Boie'")
         Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
     elif method == STOICHIOMETRY:
         if Hf is None: raise ValueError("must specify Hf if method is 'Stoichiometry'")
         HHV = HHV_stoichiometry(stoichiometry, Hf)
+    elif method == SPECIFICATION:
+        if HHV is None:
+            if LHV is None:
+                raise ValueError("must specify either LHV or HHV if method is 'Specification'")
+            HHV = HHV_from_LHV(LHV, stoichiometry.get("H2O", 0.))
+        Hf = HHV_stoichiometry(stoichiometry, 0) - HHV
     else:
-        raise ValueError("method must be either 'Stoichiometric' or 'Dulong', "
-                         f"not {method}")
+        raise ValueError("method must be either 'Stoichiometry', 'Dulong', 'Boie', or 'Specification'; "
+                         f"not {method!r}")
     return CombustionData(stoichiometry, HHV, Hf, MW)
 
 class CombustionData:
     r"""
-    Return a CombustionData object (a named tuple) that contains the stoichiometry
+    Return a CombustionData object that contains the stoichiometry
     coefficients of the reactants and products, the lower and higher
     heating values [LHV, HHV; in J/mol], the heat of formation [Hf; in J/mol],
     and the molecular weight [MW; in g/mol].
@@ -1260,9 +1393,8 @@ def air_fuel_ratio_solver(ratio: float | None, Vm_air: float, Vm_fuel: float, MW
                           n_air: float | None=None, n_fuel: float | None=None,
                           basis: str="mass") -> tuple[float, float, float, float, float]:
     """Calculates molar flow rate of air or fuel from the other, using a
-    specified air-fuel ratio. Supports 'mole', 'mass', and 'volume'.
-
-    bases for the ratio variable. The ratio must be of the same units -
+    specified air-fuel ratio. Supports 'mole', 'mass', and 'volume' bases
+    for the ratio variable. The ratio must be of the same units -
     i.e. kg/kg instead of lb/kg.
 
     The mole, mass, and volume air-fuel ratios are calculated in the process
@@ -1385,13 +1517,13 @@ def fuel_air_spec_solver(zs_air: list[float], zs_fuel: list[float], CASs: list[s
     * `ratio`
 
     The variables `Vm_air`, `Vm_fuel`, `MW_air`, and `MW_fuel` are only
-    required when an air-fuel ratio is given. Howver, the ratios cannot be
+    required when an air-fuel ratio is given. However, the ratios cannot be
     calculated for the other solve options without them.
 
     Parameters
     ----------
     zs_air : list[float]
-        Mole fractions of the air; most not contain any combustibles, [-]
+        Mole fractions of the air; must not contain any combustibles, [-]
     zs_fuel : list[float]
         Mole fractions of the fuel; can contain inerts and/or oxygen as well,
         [-]
@@ -1844,18 +1976,18 @@ def combustion_spec_solver(zs_air: list[float], zs_fuel: list[float], zs_third: 
                            ratio_basis: str="mass", reactivities: list[bool] | None=None,
                            combustion_stoichiometries: None=None) -> dict[str, float | list[float]]:
     """Solves the system of equations describing a flow of air mixing with two
-    flow of combustibles, one fixed and one potentially variable, and burning
+    flows of combustibles, one fixed and one potentially variable, and burning
     completely. All calculated variables are returned as a dictionary.
 
     The variables `Vm_air`, `Vm_fuel`, `Vm_third`, `MW_air`, `MW_fuel` and
     `MW_third` are only
-    required when an air-fuel ratio is given. Howver, the ratios cannot be
+    required when an air-fuel ratio is given. However, the ratios cannot be
     calculated for the other solve options without them.
 
     Parameters
     ----------
     zs_air : list[float]
-        Mole fractions of the air; most not contain any combustibles, [-]
+        Mole fractions of the air; must not contain any combustibles, [-]
     zs_fuel : list[float]
         Mole fractions of the fuel; can contain inerts and/or oxygen as well,
         [-]

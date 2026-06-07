@@ -1997,7 +1997,7 @@ def lemmon2000_T(P, rho):
         T = T_old + dT
         iterations += 1
     if iterations == 100:
-        raise ValueError("Could not converge a temprature solution")
+        raise ValueError("Could not converge a temperature solution")
     return T
 
 

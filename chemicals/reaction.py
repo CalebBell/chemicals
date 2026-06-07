@@ -1131,7 +1131,10 @@ def balance_stoichiometry(matrix: list[list[int]], rounding: int=9, allow_fracti
     if not null_vectors or len(null_vectors[0]) == 0:
         raise ValueError("No solution found")
 
-    # Take the first null vector (assuming unique solution)
+    if len(null_vectors[0]) > 1:
+        raise ValueError("Reaction is underdetermined - multiple valid balancings exist")
+
+    # Take the first null vector (unique solution)
     d = [row[0] for row in null_vectors]
     min_value_inv = 1.0/min(d, key=abs)
     d = [i*min_value_inv for i in d]
