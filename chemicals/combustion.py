@@ -96,6 +96,7 @@ __all__: list[str] = (
     "RON",
     "CombustionData",
     "HHV_Boie",
+    "HHV_from_LHV",
     "HHV_modified_Dulong",
     "HHV_stoichiometry",
     "IDT_to_DCN",
@@ -1317,6 +1318,8 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         MW = molecular_weight(atoms)
     if method:
         method = method.capitalize()
+    elif Hf is not None and (HHV is not None or LHV is not None):
+        raise ValueError("cannot specify Hf with LHV or HHV")
     elif Hf is None:
         if LHV is None:
             if HHV is None:
@@ -1331,11 +1334,11 @@ def combustion_data(formula=None, stoichiometry=None, Hf=None, MW=None,
         method = STOICHIOMETRY
     if method == DULONG:
         HHV = MW * HHV_modified_Dulong(mass_fractions(atoms))
-        if Hf: raise ValueError("cannot specify Hf if method is 'Dulong'")
+        if Hf is not None: raise ValueError("cannot specify Hf if method is 'Dulong'")
         Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
     elif method == BOIE:
         HHV = MW * HHV_Boie(mass_fractions(atoms))
-        if Hf: raise ValueError("cannot specify Hf if method is 'Boie'")
+        if Hf is not None: raise ValueError("cannot specify Hf if method is 'Boie'")
         Hf = HHV - HHV_stoichiometry(stoichiometry, 0)
     elif method == STOICHIOMETRY:
         if Hf is None: raise ValueError("must specify Hf if method is 'Stoichiometry'")

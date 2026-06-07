@@ -24,6 +24,7 @@ from chemicals.combustion import (
     MON,
     RON,
     HHV_modified_Dulong,
+    HHV_from_LHV,
     HHV_stoichiometry,
     IDT_to_DCN,
     LHV_from_HHV,
@@ -146,6 +147,7 @@ def test_combustion():
     # LHV methanol
     H_calc = LHV_from_HHV(-726024.0, 2.0)
     assert_close(H_calc, -638001.008)
+    assert_close(HHV_from_LHV(H_calc, 2.0), -726024.0)
 
     # Methanol given formula
     cd = combustion_data("CH3OH", Hf=-239100)
@@ -189,6 +191,15 @@ def test_combustion():
 
     with pytest.raises(ValueError):
         combustion_data("C6H12O6", method="Dulong") # too much oxygen
+
+    with pytest.raises(ValueError):
+        combustion_data("CH4", Hf=-74520.0, HHV=-1.0)
+
+    with pytest.raises(ValueError):
+        combustion_data("CH4", Hf=0.0, method="Dulong")
+
+    with pytest.raises(ValueError):
+        combustion_data("CH2O", Hf=0.0, method="Boie")
 
     with pytest.raises(ValueError):
         combustion_data("CH3OH", {"H": 4, "C": 1, "O": 1})
