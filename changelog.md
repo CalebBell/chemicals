@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.5.2] - 2026-06-07
+
+### Added
+
+- Added `HHV_Boie` for estimating higher heating value with Boie's equation.
+- Added `HHV_from_LHV` for converting lower heating values to higher heating values.
+- Added support for specified `HHV` or `LHV` inputs in `combustion_data`.
+
+### Changed
+
+- CI: Added Python 3.14 and replaced Python 3.13t free-threaded testing with 3.14t.
+- CI: Moved quality validation to Python 3.14.
+- CI: Updated PyInstaller and cx_Freeze compatibility checks to Python 3.14 while keeping Nuitka on Python 3.13.
+- CI: Updated multiarch QEMU setup to `docker/setup-qemu-action@v4` and `tonistiigi/binfmt:qemu-v10.2.1-65`.
+- CI: Updated `actions/checkout` to v6, `actions/setup-python` to v6, `actions/upload-artifact` to v7, and `astral-sh/setup-uv` to v8.1.0 for Node 24 compatibility.
+- Improved combustion documentation and examples.
+
+### Fixed
+
+- Improved handling of underdetermined reaction balancing cases.
+
 ## [1.5.1] - 2026-02-08
 
 ### Added

@@ -112,7 +112,7 @@ ci: lint typecheck test
     @echo "✅ All CI checks passed!"
 
 ## 🧊 test-cxfreeze: Test cx_Freeze compatibility (build executable and run it).
-test-cxfreeze py="3.13":
+test-cxfreeze py="3.14":
     @echo ">>> Creating temporary virtual environment with Python {{py}}..."
     @uv venv .venv-cxfreeze-{{py}} --python {{py}}
     @echo "\n>>> Installing project and cx_Freeze in temporary environment..."
@@ -147,7 +147,7 @@ test-nuitka py="3.13":
     @echo "✅ Nuitka test complete and cleaned up!"
 
 ## 📦 test-pyinstaller: Test PyInstaller compatibility (build executable and run it).
-test-pyinstaller py="3.13":
+test-pyinstaller py="3.14":
     @echo ">>> Creating temporary virtual environment with Python {{py}}..."
     @uv venv .venv-pyinstaller-{{py}} --python {{py}}
     @echo "\n>>> Installing project and PyInstaller in temporary environment..."

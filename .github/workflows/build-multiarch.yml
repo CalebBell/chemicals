@@ -54,7 +54,7 @@ jobs:
             distro: alpine_latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Just
         uses: extractions/setup-just@v2
       - name: Set up QEMU
