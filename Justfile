@@ -214,7 +214,9 @@ prepare-multiarch-image arch distro="trixie":
 
     qemu_cpu_env=""
     if [[ "{{arch}}" == "s390x" ]]; then
+        export QEMU_CPU="{{S390X_QEMU_CPU}}"
         qemu_cpu_env="ENV QEMU_CPU={{S390X_QEMU_CPU}}"
+        echo "QEMU_CPU: $QEMU_CPU"
     fi
 
     # Determine package manager and install commands
@@ -318,7 +320,9 @@ test-arch arch distro="trixie":
 
     podman_env_args=()
     if [[ "{{arch}}" == "s390x" ]]; then
+        export QEMU_CPU="{{S390X_QEMU_CPU}}"
         podman_env_args=(-e "QEMU_CPU={{S390X_QEMU_CPU}}")
+        echo "QEMU_CPU: $QEMU_CPU"
     fi
 
     # Build image if it doesn't exist
