@@ -157,7 +157,6 @@ def _load_GWP_ODP_data() -> None:
     IPCC_2021_GWPs = data_source("Official Global Warming Potentials 2021.tsv")
 
     ODP_data = data_source("Ozone Depletion Potentials.tsv")
-    _GWP_ODP_data_loaded = True
     _IPCC_2007_GWP_keys_by_method = {
         IPCC_2007_20YR_GWP: "20yr GWP",
         IPCC_2007_100YR_GWP : "100yr GWP",
@@ -195,6 +194,7 @@ def _load_GWP_ODP_data() -> None:
         "ODP2 string": "ODP2",
         "ODP1 string": "ODP1",
     }
+    _GWP_ODP_data_loaded = True
 
 _logP_data_loaded = False
 @mark_numba_incompatible
@@ -202,12 +202,12 @@ def _load_logP_data() -> None:
     global _logP_data_loaded, logP_data_CRC, logP_data_Syrres, logP_sources
     logP_data_CRC = data_source("CRC logP table.tsv")
     logP_data_Syrres = data_source("Syrres logP data.csv.gz")
-    _logP_data_loaded = True
     logP_sources = {
         "CRC": logP_data_CRC,
         "SYRRES": logP_data_Syrres,
         miscdata.WIKIDATA: miscdata.wikidata_data
     }
+    _logP_data_loaded = True
 
 def __getattr__(name: str) -> DataFrame:
     if name in ("IPCC_2007_GWPs", "IPCC_2014_GWPs", "IPCC_2021_GWPs", "ODP_data"):

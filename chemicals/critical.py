@@ -208,7 +208,6 @@ def _load_critical_data() -> None:
     critical_data_WilsonJasperson = data_source("wilson_jasperson_Tc_Pc_predictions.tsv")
     critical_data_Fedors = data_source("fedors_Vc_predictions.tsv")
     critical_data_omega_Psat_Tc = data_source("omega_Psat_Tc_predictions.tsv")
-    _critical_data_loaded = True
     Tc_sources = {
         miscdata.HEOS: miscdata.heos_data,
         IUPAC: critical_data_IUPAC,
@@ -260,6 +259,7 @@ def _load_critical_data() -> None:
         YAWS: critical_data_Yaws,
         ACENTRIC_DEFINITION: critical_data_omega_Psat_Tc
     }
+    _critical_data_loaded = True
 
 def __getattr__(name: str) -> DataFrame:
     if name in ("critical_data_IUPAC", "critical_data_Matthews",
