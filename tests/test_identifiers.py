@@ -569,6 +569,13 @@ def test_search_chemical():
 
     assert search_chemical("water").charge == 0
 
+def test_search_chemical_rejects_petroleum_ether():
+    for name in ("Petroleum ether", "petroleum ether", "8030-30-6"):
+        with pytest.raises(ValueError):
+            search_chemical(name)
+
+    assert search_chemical("benzene").CASs == "71-43-2"
+
 def test_search_chemical_2024_update_metadata_organic_names():
     assert search_chemical("112-95-8").common_name == "eicosane"
     assert search_chemical("103554-13-8").common_name == "naphthalene, 2-hexyldecahydro-"
