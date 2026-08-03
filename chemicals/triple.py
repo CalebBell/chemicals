@@ -86,13 +86,13 @@ _triple_data_loaded = False
 def _load_triple_data() -> None:
     global triple_data_Staveley, _triple_data_loaded, Tt_sources, Pt_sources
     triple_data_Staveley = data_source("Staveley 1981.tsv")
-    _triple_data_loaded = True
     Tt_sources = {
         miscdata.HEOS: miscdata.heos_data,
         STAVELEY: triple_data_Staveley,
         miscdata.WEBBOOK: miscdata.webbook_data,
     }
     Pt_sources = Tt_sources.copy()
+    _triple_data_loaded = True
 
 def __getattr__(name: str) -> DataFrame:
     if name in ("triple_data_Staveley", "Tt_sources", "Pt_sources"):

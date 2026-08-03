@@ -148,11 +148,11 @@ def _load_LJ_data() -> None:
     global _LJ_data_loaded, LJ_data_Magalhaes, LJ_data_Poling, LJ_sources
     LJ_data_Magalhaes = data_source("MagalhaesLJ.tsv")
     LJ_data_Poling = data_source("PolingLJ.tsv")
-    _LJ_data_loaded = True
     LJ_sources = {
         MAGALHAES: LJ_data_Magalhaes,
         POLING: LJ_data_Poling,
     }
+    _LJ_data_loaded = True
 
 def __getattr__(name: str) -> DataFrame:
     if name in ("LJ_data_Magalhaes", "LJ_data_Poling", "LJ_sources"):

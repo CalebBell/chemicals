@@ -169,7 +169,6 @@ def _load_reaction_data() -> None:
     Hfl_ATcT_data = data_source("ATcT 1.112 (l).tsv")
     Hfg_S0g_YAWS_data = data_source("Yaws Hf S0 (g).tsv")
     JANAF_1998_data = data_source("JANAF_1998.tsv")
-    _reaction_data_loaded = True
     S0g_sources = {
         CRC: heat_capacity.CRC_standard_data,
         miscdata.WEBBOOK: miscdata.webbook_data,
@@ -205,6 +204,7 @@ def _load_reaction_data() -> None:
         CRC: heat_capacity.CRC_standard_data,
         miscdata.WEBBOOK: miscdata.webbook_data,
     }
+    _reaction_data_loaded = True
 
 def __getattr__(name: str) -> DataFrame:
     if name in ("Hfg_API_TDB_data", "Hfg_ATcT_data",
