@@ -669,7 +669,7 @@ def test_mixing_power():
     assert_close(mixing_power(zs, props, r=0.25), 0.01882804734220324, rtol=1e-13)
     assert_close(mixing_power(zs, props, r=0.5), 0.019056901419612297, rtol=1e-13)
     assert_close(mixing_power(zs, props, r=0.75), 0.01928114152959784, rtol=1e-13)
-    assert_close(mixing_power(zs, props, r=1.5), 0.005541354936265382, rtol=1e-13)
+    assert_close(mixing_power(zs, props, r=1.5), 0.01991904072342973, rtol=1e-13)
 
     assert_close(mixing_power(zs, props, r=-4/3.0), 0.017332239251910703, rtol=1e-13)
     assert_close(mixing_power(zs, props, r=-2/3), 0.017964155302880425, rtol=1e-13)
@@ -691,6 +691,21 @@ def test_mixing_power():
     assert_close(mixing_power(zs, props, r=3.3423), 0.02120966068692269, rtol=1e-13)
 
 
+
+
+@pytest.mark.parametrize("prop", [0.01, 4.0, 1000.0])
+def test_mixing_power_three_halves_pure_component(prop):
+    assert_close(mixing_power([1.0], [prop], 1.5), prop, rtol=1e-14)
+    assert_close(mixing_power([0.2, 0.8], [prop, prop], 1.5), prop, rtol=1e-14)
+
+
+def test_mixing_power_three_halves_units():
+    fractions = [0.4, 0.6]
+    props = [0.1, 0.2]
+    result = mixing_power(fractions, props, 1.5)
+    assert min(props) <= result <= max(props)
+    scaled = mixing_power(fractions, [1000.0*p for p in props], 1.5)
+    assert_close(scaled, 1000.0*result, rtol=1e-14)
 
 
 def test_radius_of_gyration():

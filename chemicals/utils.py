@@ -2975,7 +2975,7 @@ def mixing_power(fracs: list[float], props: list[float], r: int) -> float:
         return 1.0 / (prop*prop)
     elif r == 1.5:
         for i in range(N):
-            prop += fracs[i]*(props[i]*props[i])
+            prop += fracs[i]*(props[i]*sqrt(props[i]))
         return prop**(2.0/3.0)
     elif r == -1.5:
         for i in range(N):
