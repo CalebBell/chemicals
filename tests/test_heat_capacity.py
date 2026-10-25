@@ -599,3 +599,11 @@ def test_vibration_frequency_cm_to_characteristic_temperature():
     Cp = Cpg_statistical_mechanics(298.15, things)
     assert_close(Cp, 46.27123343052294, rtol=1e-12)
 
+
+@pytest.mark.parametrize("temperature", [50.0, 298.15, 1000.0, 5000.0])
+@pytest.mark.parametrize("offset", [0.0, 1.5, -2.0])
+def test_constant_trc_integrals(temperature, offset):
+    coefficients = [2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    assert_close(TRCCp(temperature, *coefficients), 2.5*R)
+    assert_close(TRCCp_integral(temperature, *coefficients, I=offset), R*(2.5*temperature + offset))
+    assert_close(TRCCp_integral_over_T(temperature, *coefficients, J=offset), R*(2.5*log(temperature) + offset))

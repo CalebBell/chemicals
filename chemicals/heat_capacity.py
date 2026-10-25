@@ -1872,6 +1872,9 @@ def TRCCp_integral(T: float, a0: float, a1: float, a2: float, a3: float, a4: flo
     .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
        in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
     """
+    # Constant correlations can have zero shape parameters.
+    if a1 == 0.0 and a3 == 0.0 and a4 == 0.0 and a5 == 0.0:
+        return R*(a0*T + I)
     if T <= a7:
         y = 0.
     else:
@@ -1962,6 +1965,9 @@ def TRCCp_integral_over_T(T: float, a0: float, a1: float, a2: float, a3: float, 
     .. [1] Kabo, G. J., and G. N. Roganov. Thermodynamics of Organic Compounds
        in the Gas State, Volume II: V. 2. College Station, Tex: CRC Press, 1994.
     """
+    # Constant correlations can have zero shape parameters.
+    if a1 == 0.0 and a3 == 0.0 and a4 == 0.0 and a5 == 0.0:
+        return R*(a0*log(T) + J)
     # Possible optimizations: pre-cache as much as possible.
     # If this were replaced by a cache, much of this would not need to be computed.
     if T <= a7:
