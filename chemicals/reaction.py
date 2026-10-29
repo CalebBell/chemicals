@@ -114,7 +114,7 @@ __all__: list[str] = [
     "stoichiometry_molar_to_mass",
 ]
 
-from math import floor, log10
+from math import floor, isfinite, log10
 
 from chemicals import data_reader as dr
 from chemicals import heat_capacity, miscdata
@@ -1007,6 +1007,14 @@ def stoichiometric_matrix(atomss: list[dict[str, int]], reactants: list[bool]) -
        Reactions." Materiali in Tehnologije 45, no. 6 (2011): 503-22.
     """
     n_compounds = len(atomss)
+    if n_compounds == 0 or len(reactants) != n_compounds:
+        raise ValueError("atomss and reactants must have the same non-zero length")
+    for atoms in atomss:
+        if not atoms:
+            raise ValueError("each compound must contain at least one element")
+        if any(not isfinite(v) or v <= 0.0 for v in atoms.values()):
+            raise ValueError("element counts must be finite and positive")
+
     elements = set()
     for atoms in atomss:
         elements.update(atoms.keys())
