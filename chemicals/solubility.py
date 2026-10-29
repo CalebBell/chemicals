@@ -83,6 +83,7 @@ __all__: list[str] = [
 
 from fluids.constants import R, R_inv, atm
 from fluids.numerics import exp, log, sqrt, trunc_exp
+from math import isfinite
 
 from chemicals import data_reader as dr
 from chemicals.data_reader import (
@@ -839,12 +840,19 @@ def Henry_pressure_mixture(Hs: list[float | None], weights: None=None, zs: list[
     N = len(Hs)
     if weights is None and zs is None:
         raise ValueError("Weights or mole fractions are required")
+    factors = zs if weights is None else weights
+    if len(factors) != N:
+        raise ValueError("The weighting vector must have the same length as Hs")
+    if any(not isfinite(x) or x < 0.0 for x in factors):
+        raise ValueError("Mole fractions and weights must be finite and non-negative")
     if weights is None:
         z_solvent = 0.0
         for i in range(N):
             if Hs[i] is not None:
                 z_solvent += zs[i]
         # Default parameters - when weight specified only weight by that
+        if z_solvent <= 0.0:
+            raise ValueError("At least one parameterized solvent must have positive mole fraction")
         z_solvent_inv = 1.0/z_solvent
         weights = [0.0]*N
         for i in range(N):

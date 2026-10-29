@@ -202,6 +202,14 @@ def test_Henry_pressure_mixture():
     H = Henry_pressure_mixture([1072330.36341, 744479.751106, None], zs=[.48, .48, .04])
     assert_close(H, 893492.1611602883)
 
+def test_Henry_pressure_mixture_rejects_invalid_weights():
+    for zs in ([-1.0, 2.0], [float("nan"), 1.0], [float("inf"), 1.0], [0.0, 0.0]):
+        with pytest.raises(ValueError):
+            Henry_pressure_mixture([1.0, 2.0], zs=zs)
+    with pytest.raises(ValueError):
+        Henry_pressure_mixture([1.0, 2.0], zs=[1.0])
+
+
 def test_Henry_constants():
     lnHenry_matrix = [[0.0, 0.0, 0.0], [22.13581843104147, 0.0, 0.0], [22.239038459475733, 0.0, 0.0]]
     Hs = Henry_constants(lnHenry_matrix, [0.8, 0.15, 0.05], [False, True, True], True)
