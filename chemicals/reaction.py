@@ -114,7 +114,7 @@ __all__: list[str] = [
     "stoichiometry_molar_to_mass",
 ]
 
-from math import floor, log10
+from math import floor, isfinite, log10
 
 from chemicals import data_reader as dr
 from chemicals import heat_capacity, miscdata
@@ -1174,6 +1174,13 @@ def stoichiometry_molar_to_mass(coefficients, MWs):
     >>> stoichiometry_molar_to_mass(coeffs, [17.03052, 31.9988, 30.0061, 18.01528])
     [68.12208, 159.994, 120.0244, 108.09168]
     """
+    N = len(coefficients)
+    if N == 0 or len(MWs) != N:
+        raise ValueError("coefficients and MWs must have the same non-zero length")
+    if any(not isfinite(c) or c <= 0.0 for c in coefficients):
+        raise ValueError("coefficients must be finite and positive")
+    if any(not isfinite(MW) or MW <= 0.0 for MW in MWs):
+        raise ValueError("MWs must be finite and positive")
     return [c*MW for c, MW in zip(coefficients, MWs)]
 
 def stoichiometry_mass_to_molar(mass_coefficients, MWs):
@@ -1198,6 +1205,13 @@ def stoichiometry_mass_to_molar(mass_coefficients, MWs):
     >>> stoichiometry_mass_to_molar([68.12208, 159.994, 120.0244, 108.09168], [17.03052, 31.9988, 30.0061, 18.01528])
     [4.0, 5.0, 4.0, 6.0]
     """
+    N = len(mass_coefficients)
+    if N == 0 or len(MWs) != N:
+        raise ValueError("mass_coefficients and MWs must have the same non-zero length")
+    if any(not isfinite(c) or c <= 0.0 for c in mass_coefficients):
+        raise ValueError("mass_coefficients must be finite and positive")
+    if any(not isfinite(MW) or MW <= 0.0 for MW in MWs):
+        raise ValueError("MWs must be finite and positive")
     return [c/MW for c, MW in zip(mass_coefficients, MWs)]
 
 def stoichiometry_MW_error(coefficients, MWs, reactants):

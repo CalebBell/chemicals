@@ -1810,6 +1810,18 @@ def test_balance_stoichiometry(test_case):
         check_reaction_balance(matrix, products_calc, atol=1e-11)
 
 
+def test_stoichiometry_conversion_input_validation():
+    with pytest.raises(ValueError):
+        stoichiometry_molar_to_mass([1.0, 2.0], [18.0])
+    with pytest.raises(ValueError):
+        stoichiometry_molar_to_mass([1.0, 0.0], [18.0, 32.0])
+    with pytest.raises(ValueError):
+        stoichiometry_molar_to_mass([1.0, 2.0], [18.0, float("nan")])
+    with pytest.raises(ValueError):
+        stoichiometry_mass_to_molar([1.0, 2.0], [18.0])
+    with pytest.raises(ValueError):
+        stoichiometry_mass_to_molar([1.0, 2.0], [18.0, -32.0])
+
 def test_balance_stoichiometry_underdetermined():
     """Test that underdetermined reactions (null space dim > 1) raise ValueError."""
     # Hexane combustion with both CO and CO2 as products:
