@@ -904,6 +904,14 @@ def test_BVirial_mixture():
     ans = BVirial_mixture(zs=zs, Bijs=Bijs)
     assert_close(ans, -3.19884e-05, rtol=1e-13)
 
+
+def test_BVirial_mixture_rejects_invalid_domains():
+    for zs, Bijs in (([-1.0, 2.0], [[1.0, 2.0], [2.0, 3.0]]),
+                     ([float("nan"), 1.0], [[1.0, 2.0], [2.0, 3.0]]),
+                     ([0.5, 0.5], [[1.0]])):
+        with pytest.raises(ValueError):
+            BVirial_mixture(zs, Bijs)
+
 def test_CVirial_mixture_Orentlicher_Prausnitz():
     Cijs = [[1.46e-09, 1.831e-09, 2.12e-09], [1.831e-09, 2.46e-09, 2.996e-09], [2.12e-09, 2.996e-09, 4.927e-09]]
 

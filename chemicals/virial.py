@@ -111,6 +111,8 @@ Third Virial Correlations Dense Implementations
 """
 from __future__ import annotations
 
+from math import isfinite
+
 __all__: list[str] = [
     "BVirial_Abbott",
     "BVirial_Abbott_fast",
@@ -439,8 +441,15 @@ def BVirial_mixture(zs, Bijs):
     .. [1] Poling, Bruce E. The Properties of Gases and Liquids. 5th edition.
        New York: McGraw-Hill Professional, 2000.
     """
+    N = len(zs)
+    if N == 0 or any(not isfinite(z) or z < 0.0 for z in zs) or sum(zs) <= 0.0:
+        raise ValueError("zs must contain finite non-negative mole fractions with positive total")
+    if len(Bijs) != N or any(len(row) != N for row in Bijs):
+        raise ValueError("Bijs must be a square matrix matching zs")
+    if any(not isfinite(value) for row in Bijs for value in row):
+        raise ValueError("Bijs must contain finite values")
+
     B = 0.0
-    N = len(Bijs)
     for i in range(N):
         B_tmp = 0.0
         row = Bijs[i]
