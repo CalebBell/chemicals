@@ -381,6 +381,15 @@ def test_fire_mixing():
     assert_close(UFL, 0.12927551844869378, rtol=1e-13)
 
 
+def test_fire_mixing_rejects_invalid_inputs():
+    for ys, FLs in (([-1.0, 2.0], [1.0, 2.0]),
+                    ([float("nan"), 1.0], [1.0, 2.0]),
+                    ([0.5], [1.0, 2.0]),
+                    ([0.5, 0.5], [0.0, 2.0])):
+        with pytest.raises(ValueError):
+            fire_mixing(ys, FLs)
+
+
 def test_NFPA_30_classification():
     assert NFPA_30_classification(253.15, 283.55) == "IA" # ethylene oxide
     assert NFPA_30_classification(253.15, Psat_100F=268062) == "IA" # ethylene oxide

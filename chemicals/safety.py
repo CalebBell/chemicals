@@ -161,6 +161,8 @@ __all__ = (
 )
 
 
+from math import isfinite
+
 from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (
@@ -1433,8 +1435,16 @@ def fire_mixing(ys, FLs):
        Fundamentals with Applications. 2E. Upper Saddle River, N.J: Prentice
        Hall, 2001.
     """
+    N = len(ys)
+    if N == 0 or len(FLs) != N:
+        raise ValueError("ys and FLs must have the same non-zero length")
+    if any(not isfinite(y) or y < 0.0 for y in ys) or sum(ys) <= 0.0:
+        raise ValueError("ys must contain finite non-negative fractions with positive total")
+    if any(not isfinite(FL) or FL <= 0.0 for FL in FLs):
+        raise ValueError("FLs must contain finite positive flammability limits")
+
     tot = 0.0
-    for i in range(len(ys)):
+    for i in range(N):
         tot += ys[i]/FLs[i]
     return 1.0/tot
 
