@@ -83,6 +83,7 @@ Critical Volume of Mixtures
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from math import isfinite
 
 __all__: list[str] = [
     "Chueh_Prausnitz_Tc",
@@ -1778,6 +1779,16 @@ def Li(zs: list[float], Tcs: list[float], Vcs: list[float]) -> float:
        (October 1, 1971): 709-10. doi:10.1002/cjce.5450490529.
     """
     N = len(zs)
+    if len(Tcs) != N or len(Vcs) != N:
+        raise ValueError("zs, Tcs, and Vcs must have the same length")
+    if any(not isfinite(z) or z < 0.0 for z in zs):
+        raise ValueError("Mole fractions must be finite and non-negative")
+    if any(not isfinite(T) or T <= 0.0 for T in Tcs):
+        raise ValueError("Critical temperatures must be finite and positive")
+    if any(not isfinite(V) or V <= 0.0 for V in Vcs):
+        raise ValueError("Critical volumes must be finite and positive")
+    if not any(z > 0.0 for z in zs):
+        raise ValueError("At least one mole fraction must be positive")
     denominator_inv = 0.0
     for i in range(N):
         denominator_inv += zs[i]*Vcs[i]

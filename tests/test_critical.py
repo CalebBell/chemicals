@@ -523,3 +523,15 @@ def test_Tb_Tc_relationship():
         Tb_Tc_relationship(fit="Perry8E")
     with pytest.raises(ValueError):
         Tb_Tc_relationship(Tb=1, Tc=2, fit="Perry8E")
+
+
+def test_Li_rejects_invalid_mixture_inputs():
+    for zs in ([-1.0, 2.0], [float("nan"), 1.0], [float("inf"), 1.0], [0.0, 0.0]):
+        with pytest.raises(ValueError):
+            Li(zs, [100.0, 200.0], [1e-4, 2e-4])
+    with pytest.raises(ValueError):
+        Li([1.0], [100.0, 200.0], [1e-4, 2e-4])
+
+
+def test_Li_valid_mixture():
+    assert Li([0.5, 0.5], [126.2, 150.8], [8.95e-05, 7.49e-05]) == pytest.approx(137.40766423357667)
