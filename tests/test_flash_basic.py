@@ -79,6 +79,14 @@ def test_flash_wilson_no_solution_high_P():
         flash_wilson(zs=zs, Tcs=Tcs, Pcs=Pcs, omegas=omegas, VF=1e-9, P=1e13)
 
 
+def test_flash_wilson_rejects_invalid_feed_fractions():
+    kwargs = dict(Tcs=[190.0, 300.0], Pcs=[4e6, 5e6], omegas=[0.01, 0.1],
+                  T=300.0, P=2e7)
+    for zs in ([-1.0, 2.0], [float("nan"), 1.0], [0.0, 0.0]):
+        with pytest.raises(ValueError):
+            flash_wilson(zs=zs, **kwargs)
+
+
 def test_flash_wilson_7_pts():
     # One point for each solver
     Tcs = [305.322, 540.13]

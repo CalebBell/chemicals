@@ -49,6 +49,7 @@ Equilibrium Constants
 
 
 from fluids.numerics import brenth, exp, log, newton, secant
+from math import isfinite
 
 from chemicals.rachford_rice import flash_inner_loop
 from chemicals.utils import mark_numba_uncacheable
@@ -401,6 +402,8 @@ def flash_wilson(zs, Tcs, Pcs, omegas, T=None, P=None, VF=None):
     """
     T_MAX = 50000.0
     N = len(zs)
+    if N == 0 or any(not isfinite(z) or z < 0.0 for z in zs) or sum(zs) <= 0.0:
+        raise ValueError("zs must contain finite non-negative mole fractions with positive total")
     # Assume T and P to begin with
     if T is not None and P is not None:
         # numba is failing its type inferences
