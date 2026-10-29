@@ -1347,6 +1347,10 @@ def nested_formula_parser(formula: str, check: bool=True) -> dict[str, float]:
             stack.append([])
             last = stack[-1]
         elif token == ")":  # noqa: S105
+            if len(stack) == 1:
+                if check:
+                    raise ValueError("Input may not be a formula; unbalanced parentheses were detected")
+                raise ValueError("Unbalanced closing parenthesis in formula")
             temp_dict = {}
             for d in last:
                 for ele, count in d.items():
@@ -1365,6 +1369,8 @@ def nested_formula_parser(formula: str, check: bool=True) -> dict[str, float]:
             if v_int == v:
                 v = v_int
             last[-1] = {ele: count*v for ele, count in last[-1].items()}
+    if check and len(stack) != 1:
+        raise ValueError("Input may not be a formula; unbalanced parentheses were detected")
     ans = {}
     for d in last:
         for ele, count in d.items():

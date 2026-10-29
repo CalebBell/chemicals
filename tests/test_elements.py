@@ -199,6 +199,12 @@ def test_nested_formula_parser():
     with pytest.raises(ValueError):
         nested_formula_parser("Adamantium(NH3)4.0001+2")
 
+    # Unbalanced groups must not silently discard part of the formula.
+    with pytest.raises(ValueError, match="unbalanced parentheses"):
+        nested_formula_parser("C(OH")
+    with pytest.raises(ValueError, match="unbalanced parentheses"):
+        nested_formula_parser("C)OH(")
+
     # repeat elements
     res = nested_formula_parser("Pd(NH3)4.0001Na(NH3)2+2")
     assert res == {"Pd": 1, "N": 6.0001, "H": 18.0003, "Na": 1}
