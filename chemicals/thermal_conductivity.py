@@ -159,7 +159,7 @@ __all__: list[str] = [
     "kl_Mersmann_Kind",
 ]
 
-from math import atan
+from math import atan, isfinite
 
 from fluids.constants import N_A, R, R_inv, k, pi
 from fluids.numerics import bisplev, exp, implementation_optimize_tck, log, sqrt, trunc_exp
@@ -1423,6 +1423,15 @@ def DIPPR9I(zs: list[float], Vms: list[float], ks: list[float]) -> float:
        Manual for Predicting Chemical Process Design Data. New York, N.Y, 1982.
     """
     N = len(zs)
+    if N == 0 or len(Vms) != N or len(ks) != N:
+        raise ValueError("zs, Vms, and ks must have the same non-zero length")
+    if any(not isfinite(z) or z < 0.0 for z in zs) or sum(zs) <= 0.0:
+        raise ValueError("zs must contain finite non-negative fractions with positive total")
+    if any(not isfinite(Vm) or Vm <= 0.0 for Vm in Vms):
+        raise ValueError("Vms must contain finite positive molar volumes")
+    if any(not isfinite(k) or k <= 0.0 for k in ks):
+        raise ValueError("ks must contain finite positive conductivities")
+
     k = 0.0
     # Precomputation
     ks_inv = [0.0]*N

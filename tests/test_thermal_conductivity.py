@@ -276,6 +276,16 @@ def test_DIPPR9H():
 #    with pytest.raises(Exception):
 #        DIPPR9H([0.258, 0.742], [0.1692])
 
+def test_DIPPR9I_rejects_invalid_inputs():
+    with pytest.raises(ValueError):
+        DIPPR9I([0.5], [1.0, 2.0], [0.1, 0.2])
+    with pytest.raises(ValueError):
+        DIPPR9I([-0.5, 1.5], [1.0, 2.0], [0.1, 0.2])
+    with pytest.raises(ValueError):
+        DIPPR9I([0.5, 0.5], [1.0, 2.0], [0.1, float("nan")])
+    with pytest.raises(ValueError):
+        DIPPR9I([0.5, 0.5], [1.0, 0.0], [0.1, 0.2])
+
 def test_Filippov():
     kl = Filippov([0.258, 0.742], [0.1692, 0.1528])
     assert_close(kl, 0.15929167628799998)
