@@ -105,6 +105,7 @@ import os
 import sys
 import types
 from math import (
+    isfinite,
     pi,
     sqrt,
 )
@@ -3131,6 +3132,9 @@ def mix_component_flows(IDs1: list[str], IDs2: list[str], flow1: float, flow2: i
     >>> mix_component_flows(['7732-18-5', '64-17-5'], ['7732-18-5', '67-56-1'], 1, 1, [0.5, 0.5], [0.5, 0.5])
     (['64-17-5', '67-56-1', '7732-18-5'], [0.5, 0.5, 1.0])
     """
+    for fractions in (fractions1, fractions2):
+        if any((not isfinite(fraction)) or fraction < 0.0 for fraction in fractions):
+            raise ValueError("component fractions must be finite and non-negative")
     if (set(IDs1) == set(IDs2)) and (len(IDs1) == len(IDs2)):
             cmps = IDs1
     else:

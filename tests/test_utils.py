@@ -440,6 +440,11 @@ def test_mix_component_flows():
     assert names == ["7732-18-5", "67-56-1"]
     assert_close1d(flows,  [0.5, 1.5])
 
+    with pytest.raises(ValueError, match="finite and non-negative"):
+        mix_component_flows(["A"], ["B"], 1, 1, [-1.0], [1.0])
+    with pytest.raises(ValueError, match="finite and non-negative"):
+        mix_component_flows(["A"], ["B"], 1, 1, [float("nan")], [1.0])
+
 def test_mix_multiple_component_flows():
     names, flows = mix_multiple_component_flows([["7732-18-5", "64-17-5"], ["7732-18-5", "67-56-1"]], [1, 1], [[0.5, 0.5], [0.5, 0.5]])
     assert names == ["64-17-5", "67-56-1", "7732-18-5"]
