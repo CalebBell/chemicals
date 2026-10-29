@@ -368,6 +368,13 @@ def test_mixing_logarithmic():
     prop = mixing_logarithmic([0.1, 0.9], [0.01, 0.02])
     assert_close(prop, 0.01866065983073615)
 
+    # Missing or mismatched mixture inputs are documented to return None.
+    assert mixing_logarithmic([], []) is None
+    assert mixing_logarithmic([0.5], [1.0, 2.0]) is None
+    assert mixing_logarithmic([0.5, 0.5], [1.0]) is None
+    assert mixing_logarithmic([None], [1.0]) is None
+    assert mixing_logarithmic([0.5], [None]) is None
+
 def test_normalize():
     fractions_calc = normalize([3, 2, 1])
     fractions = [0.5, 0.3333333333333333, 0.16666666666666666]

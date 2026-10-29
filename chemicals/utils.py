@@ -2852,6 +2852,14 @@ def mixing_logarithmic(fracs: list[float], props: list[float]) -> float | None:
     >>> mixing_logarithmic([0.1, 0.9], [0.01, 0.02])
     0.01866065983073615
     """
+    # Keep the documented missing-input behavior deterministic.  Without this
+    # guard, mismatched arrays silently ignore trailing values or raise an
+    # IndexError, and empty inputs return 1.0.
+    if len(fracs) != len(props) or len(fracs) == 0:
+        return None
+    if any(x is None for x in fracs) or any(x is None for x in props):
+        return None
+
     tot = 0.0
     for i in range(len(fracs)):
         tot += fracs[i]*trunc_log(props[i])
