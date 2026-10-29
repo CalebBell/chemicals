@@ -939,6 +939,8 @@ def combustion_products_mixture(atoms_list: list[dict[str, int]], zs: list[float
     ... CASs=['74-82-8', '74-84-0', '7440-37-1', '629-62-9'])
     {'CO2': 1.0, 'O2': -1.975, 'H2O': 1.9500000000000002, 'Ar': 0.04, '629-62-9': 0.01}
     """
+    if len(atoms_list) != len(zs):
+        raise ValueError("atoms_list and zs must have the same length")
     # Attempted to use a .copy() on a base dict but that was slower
     products = {}
     has_reactivities = reactivities is not None

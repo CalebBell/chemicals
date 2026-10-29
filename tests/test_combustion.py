@@ -410,3 +410,7 @@ def test_combustion_products_mixture():
     combustion_stoichiometries = [{"N2": 1.0}, {"O2": 1.0}, {"Ar": 1}, {"CO2": 1}, {"H2O": 1.0}, {"CO2": 1, "O2": -2.0, "H2O": 2.0}, {"CO2": 2, "O2": -3.5, "H2O": 3.0}]
     res = combustion_products_mixture(atomss, ns_to_combust, reactivities, CASs, combustion_stoichiometries=combustion_stoichiometries)
     assert res["O2"] == 0.0
+
+    # A mismatched component/fraction pair must not be silently truncated by zip().
+    with pytest.raises(ValueError, match="atoms_list and zs must have the same length"):
+        combustion_products_mixture([{"C": 1}, {"H": 4}], [1.0])
