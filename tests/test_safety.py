@@ -337,6 +337,15 @@ def test_LFL_ISO_10156_2017():
     res = LFL_ISO_10156_2017(zs, LFLs, CASs)
     assert_close(res, 0.14273722742907632, rtol=1e-13)
 
+    with pytest.raises(ValueError):
+        LFL_ISO_10156_2017([.5], [.01, .02], ["74-82-8"])
+    with pytest.raises(ValueError):
+        LFL_ISO_10156_2017([-.1, 1.1], [.01, .02], ["74-82-8", "74-84-0"])
+    with pytest.raises(ValueError):
+        LFL_ISO_10156_2017([float("nan"), 1.0], [.01, .02], ["74-82-8", "74-84-0"])
+    with pytest.raises(ValueError):
+        LFL_ISO_10156_2017([.5, .5], [None, .02], ["74-82-8", "74-84-0"])
+
 def test_UFL():
     UFL1 = UFL(CASRN="8006-61-9")
     UFL2 = UFL(CASRN="71-43-2", method=NFPA)

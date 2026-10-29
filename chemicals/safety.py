@@ -161,6 +161,8 @@ __all__ = (
 )
 
 
+from math import isfinite
+
 from chemicals import data_reader as dr
 from chemicals import miscdata
 from chemicals.data_reader import (
@@ -1352,6 +1354,18 @@ def LFL_ISO_10156_2017(zs, LFLs, CASs):
        Gas Cylinders - Gases and Gas Mixtures - Determination of Fire Potential
        and Oxidizing Ability for the Selection of Cylinder Valve Outlets, 2017.
     """
+    N = len(zs)
+    if N == 0 or len(LFLs) != N or len(CASs) != N:
+        raise ValueError("zs, LFLs, and CASs must have the same non-zero length")
+    if any(not isfinite(z) or z < 0.0 for z in zs) or sum(zs) <= 0.0:
+        raise ValueError("zs must contain finite non-negative fractions with positive total")
+    for LFL, CAS in zip(LFLs, CASs):
+        if CAS in ISO_10156_2017_Kks:
+            # Inert components do not need an LFL; their value is ignored.
+            continue
+        if LFL is None or not isfinite(LFL) or LFL <= 0.0:
+            raise ValueError("combustible components must have finite positive LFLs")
+
     has_inerts = False
     for CAS in CASs:
         if CAS in ISO_10156_2017_Kks:
