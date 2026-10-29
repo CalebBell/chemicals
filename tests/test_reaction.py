@@ -1810,6 +1810,12 @@ def test_balance_stoichiometry(test_case):
         check_reaction_balance(matrix, products_calc, atol=1e-11)
 
 
+def test_balance_stoichiometry_requires_positive_solution():
+    with pytest.raises(ValueError, match="all-positive"):
+        balance_stoichiometry([[1, 1]])
+    with pytest.raises(ValueError, match="all-positive"):
+        balance_stoichiometry([[1, 2], [2, 4]])
+
 def test_balance_stoichiometry_underdetermined():
     """Test that underdetermined reactions (null space dim > 1) raise ValueError."""
     # Hexane combustion with both CO and CO2 as products:

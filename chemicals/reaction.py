@@ -114,7 +114,7 @@ __all__: list[str] = [
     "stoichiometry_molar_to_mass",
 ]
 
-from math import floor, log10
+from math import floor, isfinite, log10
 
 from chemicals import data_reader as dr
 from chemicals import heat_capacity, miscdata
@@ -1142,6 +1142,8 @@ def balance_stoichiometry(matrix: list[list[int]], rounding: int=9, allow_fracti
     if not allow_fractional:
         d = floats_to_ints(d, matrix)
     d = [float(v) for v in d]
+    if any(not isfinite(v) or v <= 0.0 for v in d):
+        raise ValueError("Reaction has no all-positive stoichiometric solution")
     return d
 
 def stoichiometry_molar_to_mass(coefficients, MWs):
