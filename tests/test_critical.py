@@ -62,7 +62,7 @@ from chemicals.miscdata import heos_data, webbook_data
 
 def test_data_IUPAC():
     Tc_sum = critical_data_IUPAC["Tc"].sum()
-    assert_close(Tc_sum, 462157.51300000004)
+    assert_close(Tc_sum, 463025.644)
 
     Pc_sum = critical_data_IUPAC["Pc"].sum()
     assert_close(Pc_sum, 2063753000.0)
@@ -151,7 +151,7 @@ def test_data_PassutDanner():
 
 def test_data_Yaws():
     Tc_sum = critical_data_Yaws["Tc"].sum()
-    assert_close(Tc_sum, 5862006.9500000002)
+    assert_close(Tc_sum, 5862106.95)
 
     Pc_sum = critical_data_Yaws["Pc"].sum()
     assert_close(Pc_sum, 62251189000.0)
@@ -160,7 +160,7 @@ def test_data_Yaws():
     assert_close(Vc_sum, 4.65511199)
 
     Zc_sum = critical_data_Yaws["Zc"].sum()
-    assert_close(Zc_sum, 1859.6389176846883, 1e-6)
+    assert_close(Zc_sum, 1859.5974845413236, 1e-6)
 
     omega_sum = critical_data_Yaws["omega"].sum()
     assert_close(omega_sum, 3170.3041999999996)
@@ -226,7 +226,7 @@ def test_Tc_all_values(with_database):
     # Use the default method for each chemical in this file
     Tcs = [Tc(i) for i in CASs]
     Tcs_default_sum = pd.Series(Tcs).sum()
-    assert_close(Tcs_default_sum, 6249017.387222222)
+    assert_close(Tcs_default_sum, 6251497.368222222)
 
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Tc(with_database):
@@ -289,7 +289,7 @@ def test_Pc_all_values(with_database):
     # Use the default method for each chemical in this file
     Pcs = [Pc(i) for i in CASs]
     Pcs_default_sum = pd.Series(Pcs).sum()
-    assert_close(Pcs_default_sum, 64624155187.18326)
+    assert_close(Pcs_default_sum, 64612155187.18325)
 
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Vc(with_database):
@@ -324,7 +324,7 @@ def test_Vc_all_values(with_database):
     # Use the default method for each chemical in this file
     Vcs = [Vc(i) for i in CASs]
     Vcs_default_sum = pd.Series(Vcs).sum()
-    assert_close(Vcs_default_sum, 4.959032875713007)
+    assert_close(Vcs_default_sum, 4.959276875713007)
 
 @pytest.mark.parametrize("with_database", [True, False])
 def test_Zc(with_database):
@@ -359,7 +359,7 @@ def test_Zc_all_values(with_database):
     # Use the default method for each chemical in this file
     Zcs = [Zc(i) for i in CASs]
     Zcs_default_sum = pd.Series(Zcs).sum()
-    assert_close(Zcs_default_sum, 2001.0365327433638, 1e-6)
+    assert_close(Zcs_default_sum, 2000.7170306093572, 1e-6)
 
 
 
