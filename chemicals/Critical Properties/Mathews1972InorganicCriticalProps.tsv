@@ -30,7 +30,7 @@ CAS	Chemical	MW	Tc	Pc	Vc	Zc
 7647-01-0	Hydrogen chloride	36.46	324.6	8308650	0.000081	0.25
 7664-39-3	Hydrogen fluoride	20.01	461	6484800	0.000069	0.12
 7664-41-7	Ammonia	17.03	405.6	11277472.5	0.0000725	0.242
-7681-11-0	Iodine	253.809	819		0.000155	
+7553-56-2	Iodine	253.809	819		0.000155	
 7698-05-7	Deuterium chloride	37.47	323.4			
 7704-34-9	Sulfur	32.064	1314	11753700		
 7719-12-2	Phosphorus trichloride	137.33	563		0.00026	
@@ -89,7 +89,7 @@ CAS	Chemical	MW	Tc	Pc	Vc	Zc
 13283-01-7	Tungsten hexachloride	396.57	923		0.00042	
 13451-11-1	tantalum bromide (tabr5)	580.49	974		0.000461	
 13478-45-0	Niobium pentabromide	492.46	1010		0.000469	
-13494-88-7	Bismuth chloride	315.34	1179	11956350	0.000261	0.32
+7787-60-2	Bismuth chloride	315.34	1179	11956350	0.000261	0.32
 13499-05-3	Hafnium tetrachloride	320.3	723	5775525	0.000304	0.292
 13520-78-0	Tungsten oxide tetrachloride	341.66	782		0.000338	
 13536-59-9	Deuterium bromide	81.93	362			
