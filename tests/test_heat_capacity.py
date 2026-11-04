@@ -272,7 +272,7 @@ def test_Perry_2_153_114():
 
 def test_TRC_gas_data():
     tots_calc = [TRC_gas_data[i].abs().sum() for i in ["Tmin", "Tmax", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "I", "J", "Hfg"]]
-    tots = [365114, 3142000, 7794.1999999999998, 24465781000, 1056180, 133537.068, 67639.309000000008, 156121050000, 387884, 212320, 967467.89999999991, 30371.91, 495689880.0]
+    tots = [365114, 3142000, 7794.2, 24466595000, 1057049, 133538.677, 67628.109, 156082145000, 387877, 212304, 967473.5, 30371.879999999997, 495689880.0]
     assert_close1d(tots_calc, tots)
 
     assert TRC_gas_data.shape == (1961, 14)
@@ -285,6 +285,27 @@ def test_TRC_gas():
     Cp_zero = TRCCp(298, 4.0, 32753000, 892, 76.209, -0.254, -58870000, 98, 298)
     Cp_almost_zero = TRCCp(298*(1+1e-13), 4.0, 32753000, 892, 76.209, -0.254, -58870000, 98, 298)
     assert_close(Cp_zero, Cp_almost_zero)
+
+
+def test_TRC_NO2():
+    # Regression test for the nitrogen dioxide TRC coefficients, which
+    # gave heat capacities up to 17% above reference values; the
+    # coefficients were refit to the JANAF 1998 table (Chase, 1998),
+    # the source of the NIST WebBook values for NO2.
+    row = TRC_gas_data.loc["10102-44-0"]
+    coeffs = [row[i] for i in ["a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"]]
+    # JANAF 1998 tabulated Cp values for NO2
+    Ts = [298.15, 500.0, 1000.0, 2000.0]
+    Cps_JANAF = [36.974, 43.206, 52.166, 56.441]
+    Cps = [TRCCp(T, *coeffs) for T in Ts]
+    assert_close1d(Cps, Cps_JANAF, rtol=1e-3)
+    # The integration constants keep their anchoring: the entropy at
+    # 298.15 K is the JANAF value S = 240.04 J/mol/K, and the enthalpy
+    # rise from 298.15 K to 1000 K is the JANAF value of 32.34 kJ/mol
+    S = TRCCp_integral_over_T(298.15, *coeffs, row["J"])
+    assert_close(S, 240.04, atol=0.1)
+    dH = TRCCp_integral(1000.0, *coeffs, row["I"]) - TRCCp_integral(298.15, *coeffs, row["I"])
+    assert_close(dH, 32340.0, rtol=1e-3)
 
 
 def test_TRCCp_integral():
